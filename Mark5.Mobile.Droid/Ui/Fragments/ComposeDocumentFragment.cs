@@ -8,6 +8,7 @@ using Android.Content;
 using Android.OS;
 using Android.Provider;
 using Android.Support.Design.Widget;
+using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
@@ -62,7 +63,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         bool templateLoaded;
 
         ProgressBar progress;
-        ScrollView scrollView;
+        NestedScrollView scrollView;
         LinearLayoutCompat linearLayout;
 
         ToView toView;
@@ -164,7 +165,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             progress = rootView.FindViewById<ProgressBar>(Resource.Id.progress);
             progress.Visibility = ViewStates.Gone;
-            scrollView = rootView.FindViewById<ScrollView>(Resource.Id.scroll_view);
+            scrollView = rootView.FindViewById<NestedScrollView>(Resource.Id.scroll_view);
             scrollView.Visibility = ViewStates.Visible;
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
 
@@ -232,38 +233,34 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var rect = new Android.Graphics.Rect();
             View.GetWindowVisibleDisplayFrame(rect);
+
             keyboardHeight = View.RootView.Height - (rect.Bottom - rect.Top);
 
             CommonConfig.Logger.Debug($"KeyboardHeight {keyboardHeight}");
 
-            //var manager = Activity.Window.WindowManager;
-            //var metrics = new Android.Util.DisplayMetrics();
-            //manager.DefaultDisplay.GetMetrics(metrics);
-            //var metHeight = metrics.HeightPixels;
-            //manager.DefaultDisplay.GetRealMetrics(metrics);
-            //var realHeight = metrics.HeightPixels;
-
-            //CommonConfig.Logger.Debug($"HEIGHTSSSS - {metHeight} - {}")
+            var manager = Activity.Window.WindowManager;
+            var metrics = new Android.Util.DisplayMetrics();
+            manager.DefaultDisplay.GetMetrics(metrics);
+            var metHeight = metrics.HeightPixels;
         }
 
         void MoveViewToCaret(View webView, int caretYPosition)
         {
             int[] windowCoordinates = new int[2];
 
-            webView.GetLocationInWindow(windowCoordinates);
+            webView.GetLocationOnScreen(windowCoordinates);
 
-            CommonConfig.Logger.Debug($"WINDOW COORDINATES - {windowCoordinates[0]} {windowCoordinates[1]}");
-            CommonConfig.Logger.Debug($"CARET POSITION {caretYPosition}");
+            var absoluteCaretPosition = caretYPosition + windowCoordinates[1] + 20;
 
-            var absoluteCaretPosition = caretYPosition + windowCoordinates[1];
-
-            var delta = View.RootView.Height - absoluteCaretPosition - keyboardHeight - 144; //96 144
+            var delta = View.RootView.Height - absoluteCaretPosition - keyboardHeight - 300;
 
             if (delta < 0 || absoluteCaretPosition < 0)
-            {
-                var scrollY = scrollView.ScrollY - delta;
-                scrollView.SmoothScrollTo(scrollView.ScrollX, scrollY < 0 ? 0 : scrollY);
-            }
+                Activity.RunOnUiThread(() => scrollView.SmoothScrollTo(scrollView.ScrollX, scrollView.ScrollY - delta));
+
+            CommonConfig.Logger.Debug($"WEBVIEW Y - {windowCoordinates[1]}");
+            CommonConfig.Logger.Debug($"CARET Y - rel: {caretYPosition}, abs: {absoluteCaretPosition}");
+            //CommonConfig.Logger.Debug($"KEYBOARD - {keyboardHeight}");
+            CommonConfig.Logger.Debug($"DELTA - {delta}");
         }
 
 
