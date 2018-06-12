@@ -54,28 +54,23 @@ namespace Mark5.Mobile.Droid.Ui.Views.Common
             using (var sr = new System.IO.StreamReader(view.Context.Assets.Open("editorScript.js")))
                 editorScript = "javascript: " + sr.ReadToEnd();
 
-            view.AddJavascriptInterface(new WebAppInterface(view.Context, (CustomWebView)view), "Android");
+            view.AddJavascriptInterface(new WebAppInterface((CustomWebView)view), "Android");
             view.LoadUrl(editorScript);
         }
     }
 
     class WebAppInterface : Java.Lang.Object
     {
-        Context context;
-        CustomWebView webView;
+        readonly CustomWebView webView;
 
-        public WebAppInterface(Context context, CustomWebView webView)
+        public WebAppInterface(CustomWebView webView)
         {
-            this.context = context;
             this.webView = webView;
         }
 
         [Java.Interop.Export]
         [JavascriptInterface]
-        public void OnInput(int caretYcoord)
-        {
-            webView.OnInput(caretYcoord);
-        }
+        public void OnInput(int caretYcoord) => webView.OnInput(caretYcoord);
 
     }
 }
