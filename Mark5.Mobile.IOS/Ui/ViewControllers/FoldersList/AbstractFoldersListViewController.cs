@@ -576,6 +576,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             }
         }
 
+        async Task RefreshSearchFoldersInfo()
+        {
+            var sds = ((UITableViewController)searchController.SearchResultsController).TableView.Source as SearchDataSource;
+
+            var favoritesStatus = new SortedDictionary<int, bool>();
+
+            foreach (var folder in sds.Items)
+            {
+                favoritesStatus[folder.Id] = await Managers.FoldersManager.IsFolderFavouriteAsync(ParentFolder.Module, folder.Id);
+            }
+
+            if (!sds.FavoriteStatus.SequenceEqual(favoritesStatus))
+                sds.FavoriteStatus = favoritesStatus;
+        }
+
         #endregion
 
         #region List handlers
@@ -900,6 +915,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     return;
 
                 dataSource?.SetFolders(resultList);
+                await RefreshSearchFoldersInfo();
             }
             catch (Exception ex)
             {
@@ -1563,13 +1579,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         protected class SearchDataSource : UITableViewSource
         {
             public bool Empty => items.Count < 1;
+            public List<Folder> Items => items.ToList();
 
             readonly WeakReference<AbstractFoldersListViewController> viewControllerWeakReference;
             readonly WeakReference<UITableView> tableViewWeakReference;
             readonly ModuleType moduleType;
             readonly List<Folder> items = new List<Folder>();
 
-            SortedDictionary<int, bool> FavoriteStatus { get; set; } = new SortedDictionary<int, bool>();
+            public SortedDictionary<int, bool> FavoriteStatus { get; set; } = new SortedDictionary<int, bool>();
             bool loading = true;
 
             public SearchDataSource(AbstractFoldersListViewController viewController, UITableView tableView, ModuleType moduleType)
@@ -1636,22 +1653,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 viewControllerWeakReference.Unwrap()?.FolderDeselected(f);
             }
 
-            public async void SetFolders(List<Folder> folders)
+            public void SetFolders(List<Folder> folders)
             {
                 items.Clear();
                 items.AddRange(folders);
                 loading = false;
                 tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
-
-                var newFavoritesStatus = new SortedDictionary<int, bool>();
-
-                foreach (var folder in folders)
-                {
-                    newFavoritesStatus[folder.Id] = await Managers.FoldersManager.IsFolderFavouriteAsync(moduleType, folder.Id);
-                }
-
-                if (!FavoriteStatus.SequenceEqual(newFavoritesStatus))
-                    FavoriteStatus = newFavoritesStatus;
             }
 
             public void Reset()
@@ -1716,11 +1723,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                     await Managers.FoldersManager.AddFavoriteFolderAsync(folder.Module, folder);
 
-                        FavoriteStatus[folder.Id] = true;
+                    FavoriteStatus[folder.Id] = true;
 
-                        var indexPaths = GetIndexPaths(folder.Id);
-                        tableViewWeakReference.Unwrap()?.ReloadRows(indexPaths, UITableViewRowAnimation.Fade);
-                        viewControllerWeakReference.Unwrap()?.QuickRefreshData();
+                    var indexPaths = GetIndexPaths(folder.Id);
+                    tableViewWeakReference.Unwrap()?.ReloadRows(indexPaths, UITableViewRowAnimation.Fade);
+                    viewControllerWeakReference.Unwrap()?.QuickRefreshData();
                 }
                 catch (Exception ex)
                 {
