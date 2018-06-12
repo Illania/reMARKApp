@@ -271,7 +271,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             DefinesPresentationContext = true;
 
             var searchResultsController = new UITableViewController();
-            var searchResultsDataSource = new SearchDataSource(this, searchResultsController.TableView, ParentFolder.Module);
+            var searchResultsDataSource = new SearchDataSource(this, searchResultsController.TableView);
             searchResultsController.TableView.Source = searchResultsDataSource;
             searchResultsController.TableView.EstimatedRowHeight = 50f;
             searchResultsController.TableView.RowHeight = UITableView.AutomaticDimension;
@@ -578,7 +578,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         async Task RefreshSearchFoldersInfo()
         {
-            var sds = ((UITableViewController)searchController.SearchResultsController).TableView.Source as SearchDataSource;
+            var sds = ((UITableViewController)searchController?.SearchResultsController)?.TableView?.Source as SearchDataSource;
+
+            if (sds is null)
+                return;
 
             var favoritesStatus = new SortedDictionary<int, bool>();
 
@@ -1583,17 +1586,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             readonly WeakReference<AbstractFoldersListViewController> viewControllerWeakReference;
             readonly WeakReference<UITableView> tableViewWeakReference;
-            readonly ModuleType moduleType;
             readonly List<Folder> items = new List<Folder>();
 
             public SortedDictionary<int, bool> FavoriteStatus { get; set; } = new SortedDictionary<int, bool>();
             bool loading = true;
 
-            public SearchDataSource(AbstractFoldersListViewController viewController, UITableView tableView, ModuleType moduleType)
+            public SearchDataSource(AbstractFoldersListViewController viewController, UITableView tableView)
             {
                 viewControllerWeakReference = viewController.Wrap();
                 tableViewWeakReference = tableView.Wrap();
-                this.moduleType = moduleType;
             }
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
