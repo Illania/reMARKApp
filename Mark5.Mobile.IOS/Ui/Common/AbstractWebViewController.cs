@@ -158,13 +158,6 @@ namespace Mark5.Mobile.IOS.Ui.Common
             keyboardDisShowNotification = UIKeyboard.Notifications.ObserveDidShow(HandleKeyboardDidShow);
         }
 
-        void HandleKeyboardDidShow(object sender, UIKeyboardEventArgs e)
-        {
-            keyboardHeight = e.FrameEnd.Height;
-            if (Integration.IsRunningAtLeast(11))
-                keyboardHeight -= View.SafeAreaInsets.Bottom;
-        }
-
         public override void ViewWillLayoutSubviews()
         {
             base.ViewWillLayoutSubviews();
@@ -178,12 +171,6 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             SetHeaderPadding(desiredHeaderHeight);
         }
-
-        protected void HeaderView_BeginAnimating(object sender, EventArgs e) => headerAnimationRunning = true;
-
-        protected void HeaderView_EndAnimating(object sender, EventArgs e) => headerAnimationRunning = false;
-
-        protected void HeaderView_Animating(object sender, EventArgs e) => SetHeaderPadding(headerView.Layer.PresentationLayer.Frame.Height);
 
         protected override void Recycle()
         {
@@ -221,6 +208,19 @@ namespace Mark5.Mobile.IOS.Ui.Common
             headerView = null;
             webView = null;
         }
+
+        void HandleKeyboardDidShow(object sender, UIKeyboardEventArgs e)
+        {
+            keyboardHeight = e.FrameEnd.Height;
+            if (Integration.IsRunningAtLeast(11))
+                keyboardHeight -= View.SafeAreaInsets.Bottom;
+        }
+
+        protected void HeaderView_BeginAnimating(object sender, EventArgs e) => headerAnimationRunning = true;
+
+        protected void HeaderView_EndAnimating(object sender, EventArgs e) => headerAnimationRunning = false;
+
+        protected void HeaderView_Animating(object sender, EventArgs e) => SetHeaderPadding(headerView.Layer.PresentationLayer.Frame.Height);
 
         protected void SetHeaderView(UIView headerView)
         {
