@@ -15,7 +15,6 @@ using MailBee.Html;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.Droid.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
@@ -36,7 +35,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         bool oldContentShown;
 
-        public ContentView(Context context)
+        public ContentView(Context context, Action<View, int> moveViewToCaretAction)
             : base(context)
         {
             this.context = context;
@@ -50,6 +49,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             newContentWebView = new CustomWebView(context)
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
+                OnInputAction = moveViewToCaretAction,
             };
             newContentWebView.SetBackgroundColor(Color.Transparent);
             var customWebViewClient = new CustomWebViewClient();
@@ -79,6 +79,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             oldContentWebView = new CustomWebView(context)
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
+                OnInputAction = moveViewToCaretAction,
             };
             var oldContentWebViewClient = new CustomWebViewClient();
             oldContentWebViewClient.PageFinishedLoading += (sender, e) => { oldContentSemaphore.Release(); };

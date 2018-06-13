@@ -7,6 +7,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.Common
 {
     class CustomWebView : WebView
     {
+        public Action<View, int> OnInputAction { get; set; }
+
         public CustomWebView(Context context)
             : base(context)
         {
@@ -25,6 +27,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.Common
             base.OnOverScrolled(scrollX, scrollY, clampedX, clampedY);
             RequestDisallowInterceptTouchEvent(true);
         }
+
+        public void OnInput(int caretYcoord)
+        {
+            OnInputAction?.Invoke(this, caretYcoord);
+        }
     }
 
     class CustomWebViewClient : WebViewClient
@@ -42,6 +49,28 @@ namespace Mark5.Mobile.Droid.Ui.Views.Common
         {
             base.OnPageFinished(view, url);
             PageFinishedLoading(this, EventArgs.Empty);
+
+            string editorScript;
+            using (var sr = new System.IO.StreamReader(view.Context.Assets.Open("editorScript.js")))
+                editorScript = "javascript: " + sr.ReadToEnd();
+
+            view.AddJavascriptInterface(new WebAppInterface((CustomWebView)view), "Android");
+            view.LoadUrl(editorScript);
         }
+    }
+
+    class WebAppInterface : Java.Lang.Object
+    {
+        readonly CustomWebView webView;
+
+        public WebAppInterface(CustomWebView webView)
+        {
+            this.webView = webView;
+        }
+
+        [Java.Interop.Export]
+        [JavascriptInterface]
+        public void OnInput(int caretYcoord) => webView.OnInput(caretYcoord);
+
     }
 }
