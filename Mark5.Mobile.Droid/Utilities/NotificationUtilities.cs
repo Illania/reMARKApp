@@ -9,7 +9,7 @@ using Mark5.Mobile.Droid.Ui.Activities;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
-    public static class NotificationHandler
+    public static class NotificationUtilities
     {
         const string ReceivedEmailGroupKey = "b651c305-2250-4572-9528-d79275dfc86f";
         const string ReceivedEmailChannelId = "c1b5a3f4-9097-422d-bd23-8ee751ee47fd";

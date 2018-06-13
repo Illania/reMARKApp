@@ -38,7 +38,7 @@ namespace Mark5.Mobile.Droid.Utilities.Service
 
                 if (n.ObjectType == ObjectType.Document)
                 {
-                    NotificationBuilder.EmailReceived(this, n);
+                    NotificationUtilities.EmailReceived(this, n);
                     CommonConfig.MessengerHub.Publish(new NewNotificationsReceivedMessage(this));
                 }
 
