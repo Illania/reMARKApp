@@ -57,7 +57,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
 
-            fingerprintManager = FingerprintManagerCompat.From(Context);
             fingerprintUiHelper = new FingerprintUiHelper(fingerprintManager, iconImageView, statusTextView, this);
 
             return view;
