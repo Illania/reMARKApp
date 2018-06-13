@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -31,10 +30,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public Folder Folder { get; set; }
 
         UIBarButtonItem composeDocumentItem;
+        UIBarButtonItem selectAllItem;
         UIBarButtonItem exitEditItem;
         UIBarButtonItem editItem;
 
         bool refreshing;
+        bool selectAllEnabled;
 
         UISearchController searchController;
         CancellationTokenSource searchCancellationTokenSource;
@@ -191,6 +192,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.Recycle();
 
             composeDocumentItem = null;
+            selectAllItem = null;
             exitEditItem = null;
             editItem = null;
 
@@ -231,6 +233,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Image = UIImage.FromBundle("Create")
             };
             NavigationItem.SetRightBarButtonItem(composeDocumentItem, false);
+
+            selectAllItem = new UIBarButtonItem
+            {
+                Image = UIImage.FromBundle("SelectAll")
+            };
 
             exitEditItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
             editItem = new UIBarButtonItem(UIBarButtonSystemItem.Edit);
@@ -282,6 +289,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (exitEditItem != null)
                 exitEditItem.Clicked += ExitEditItem_Clicked;
 
+            if (selectAllItem != null)
+                selectAllItem.Clicked += SelectAllItem_Clicked;
+
             if (editItem != null)
                 editItem.Clicked += EditItem_Clicked;
 
@@ -295,6 +305,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (exitEditItem != null)
                 exitEditItem.Clicked -= ExitEditItem_Clicked;
+
+            if (selectAllItem != null)
+                selectAllItem.Clicked -= SelectAllItem_Clicked;
 
             if (editItem != null)
                 editItem.Clicked -= EditItem_Clicked;
@@ -397,11 +410,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"), UIAlertActionStyle.Default, a => ShowPriorityActionSheet(selectedDocuments, (UIBarButtonItem)sender)));
 
-            if (selectedDocuments.Count == ((DataSource)TableView.Source).Items.Count)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("unselect_all"), UIAlertActionStyle.Default, a => UnselectAll()));
-            else
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("select_all"), UIAlertActionStyle.Default, a => SelectAll()));
-
             if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, a => RemoveFromFolder(selectedDocuments, d)));
 
@@ -414,6 +422,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 eas.PopoverPresentationController.Delegate = d;
 
             PresentViewController(eas, true, null);
+        }
+
+        void SelectAllItem_Clicked(object sender, EventArgs e)
+        {
+            if (selectAllEnabled)
+            {
+                SelectAll();
+                selectAllItem.Image = UIImage.FromBundle("DeselectAll");
+            }
+            else
+            {
+                DeselectAll();
+                selectAllItem.Image = UIImage.FromBundle("SelectAll");
+            }
+
+            selectAllEnabled = !selectAllEnabled;
+
         }
 
         #endregion
@@ -673,7 +698,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        void SelectAll() 
+        void SelectAll()
         {
             var dataSource = (DataSource)TableView.Source;
             var currentSection = 0;
@@ -686,7 +711,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        void UnselectAll()
+        void DeselectAll()
         {
             var dataSource = (DataSource)TableView.Source;
             var currentSection = 0;
@@ -1043,14 +1068,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
             TableView.SetEditing(true, true);
-            NavigationItem.SetRightBarButtonItem(exitEditItem, true);
+            NavigationItem.SetRightBarButtonItems(new[] { exitEditItem, selectAllItem }, true);
             NavigationItem.SetLeftBarButtonItem(editItem, true);
+
+            selectAllEnabled = true;
+            selectAllItem.Image = UIImage.FromBundle("SelectAll");
         }
 
         void EndEditing()
         {
             TableView.SetEditing(false, true);
-            NavigationItem.SetRightBarButtonItem(composeDocumentItem, false);
+            NavigationItem.SetRightBarButtonItems(new[] { composeDocumentItem }, false);
             NavigationItem.SetLeftBarButtonItem(NavigationItem.BackBarButtonItem, true);
         }
 

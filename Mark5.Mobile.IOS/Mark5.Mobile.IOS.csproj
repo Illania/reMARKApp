@@ -551,6 +551,12 @@
 		<ImageAsset Include="Assets_icons.xcassets\Download.imageset\Contents.json" />
 		<ImageAsset Include="Assets_icons.xcassets\Download.imageset\download%402x.png" />
 		<ImageAsset Include="Assets_icons.xcassets\Download.imageset\download%403x.png" />
+		<ImageAsset Include="Assets_icons.xcassets\SelectAll.imageset\Contents.json" />
+		<ImageAsset Include="Assets_icons.xcassets\SelectAll.imageset\selectAll%402x.png" />
+		<ImageAsset Include="Assets_icons.xcassets\SelectAll.imageset\selectAll%403x.png" />
+		<ImageAsset Include="Assets_icons.xcassets\DeselectAll.imageset\Contents.json" />
+		<ImageAsset Include="Assets_icons.xcassets\DeselectAll.imageset\deselectAll%402x.png" />
+		<ImageAsset Include="Assets_icons.xcassets\DeselectAll.imageset\deselectAll%403x.png" />
 	</ItemGroup>
 	<ItemGroup>
 		<BundleResource Include="Resources\Base.lproj\Localizable.strings" />
@@ -640,6 +646,8 @@
 	  <Folder Include="Assets_icons.xcassets\Folderslist-Folder.imageset\" />
 	  <Folder Include="Assets_icons.xcassets\Folderslist-Worktray.imageset\" />
 	  <Folder Include="Assets_icons.xcassets\Download.imageset\" />
+	  <Folder Include="Assets_icons.xcassets\SelectAll.imageset\" />
+	  <Folder Include="Assets_icons.xcassets\DeselectAll.imageset\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 	<Import Project="..\packages\NETStandard.Library.2.0.1\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.1\build\netstandard2.0\NETStandard.Library.targets')" />
