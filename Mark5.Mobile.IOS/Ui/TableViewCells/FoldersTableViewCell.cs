@@ -23,7 +23,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         }
 
         readonly UIImageView folderIconImage;
-        readonly UIImageView favoriteIndicatorImage;
+        readonly UIImageView subscribedIndicatorImage;
         readonly UIImageView offlineIndicatorImage;
         readonly UILabel nameLabel;
         readonly UIButton expandButton;
@@ -43,12 +43,12 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             };
             ContentView.Add(folderIconImage);
 
-            favoriteIndicatorImage = new UIImageView
+            subscribedIndicatorImage = new UIImageView
             {
                 Image = UIImage.FromBundle("Checkmark").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
-            ContentView.Add(favoriteIndicatorImage);
+            ContentView.Add(subscribedIndicatorImage);
 
             offlineIndicatorImage = new UIImageView
             {
@@ -83,10 +83,10 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 folderIconImage.HeightAnchor.ConstraintEqualTo(20f),
                 folderIconImage.WidthAnchor.ConstraintEqualTo(20f),
 
-                favoriteIndicatorImage.CenterXAnchor.ConstraintEqualTo(folderIconImage.TrailingAnchor, -5f),
-                favoriteIndicatorImage.CenterYAnchor.ConstraintEqualTo(folderIconImage.BottomAnchor, -5f),
-                favoriteIndicatorImage.HeightAnchor.ConstraintEqualTo(15f),
-                favoriteIndicatorImage.WidthAnchor.ConstraintEqualTo(15f),
+                subscribedIndicatorImage.CenterXAnchor.ConstraintEqualTo(folderIconImage.TrailingAnchor, -5f),
+                subscribedIndicatorImage.CenterYAnchor.ConstraintEqualTo(folderIconImage.BottomAnchor, -5f),
+                subscribedIndicatorImage.HeightAnchor.ConstraintEqualTo(15f),
+                subscribedIndicatorImage.WidthAnchor.ConstraintEqualTo(15f),
 
                 offlineIndicatorLeadingConstraint = offlineIndicatorImage.LeadingAnchor.ConstraintEqualTo(folderIconImage.TrailingAnchor, 12f),
                 offlineIndicatorImage.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
@@ -113,10 +113,10 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
             nameLabel.TextColor = Theme.Black;
             folderIconImage.TintColor = Theme.TintColor;
-            favoriteIndicatorImage.TintColor = Theme.TintColor;
+            subscribedIndicatorImage.TintColor = Theme.TintColor;
 
             folderIconImage.Image = GetIcon(folder);
-            favoriteIndicatorImage.Hidden = !folder.Subscribed;
+            subscribedIndicatorImage.Hidden = !folder.Subscribed;
             offlineIndicatorLeadingConstraint.Constant = folderIsOffline ? 10f : 0f;
             offlineIndicatorWidthConstraint.Constant = folderIsOffline ? 15f : 0f;
             nameLabel.Text = folder.Name;
@@ -130,7 +130,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
             nameLabel.TextColor = Theme.DarkGray;
             folderIconImage.TintColor = Theme.DarkGray;
-            favoriteIndicatorImage.TintColor = Theme.DarkGray;
+            subscribedIndicatorImage.TintColor = Theme.DarkGray;
         }
 
         static UIImage GetIcon(Folder folder)
