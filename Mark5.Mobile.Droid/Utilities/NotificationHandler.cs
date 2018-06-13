@@ -9,7 +9,7 @@ using Mark5.Mobile.Droid.Ui.Activities;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
-    public static class NotificationBuilder
+    public static class NotificationHandler
     {
         const string ReceivedEmailGroupKey = "b651c305-2250-4572-9528-d79275dfc86f";
         const string ReceivedEmailChannelId = "c1b5a3f4-9097-422d-bd23-8ee751ee47fd";
@@ -89,7 +89,7 @@ namespace Mark5.Mobile.Droid.Utilities
             nm.Notify(channelName, StackNotification, n);
         }
 
-        public static void CreateChannelIfNotExists(Context context, string channelId, string channelName, NotificationImportance importance)
+        static void CreateChannelIfNotExists(Context context, string channelId, string channelName, NotificationImportance importance)
         {
             if (Build.VERSION.SdkInt < BuildVersionCodes.O)
                 return;
