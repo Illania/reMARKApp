@@ -4,7 +4,6 @@ using Android.Content;
 using Android.OS;
 using Android.Support.V4.App;
 using Android.Support.V4.Content;
-using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 
@@ -18,13 +17,14 @@ namespace Mark5.Mobile.Droid.Utilities
         const string EmailChannelId = "c1b5a3f4-9097-422d-bd23-8ee751ee47fd";
         const string CalendarChannelId = "bf1f3f92-2fa3-44d9-b095-2c1e1a9d6809";
 
+        const string ReceivedEmailCategory = "Received emails";
+
         const int StackNotification = -1000;
 
         public static void EmailReceived(Context context, Common.Model.Notification notification)
         {
-
             var nm = (NotificationManager)context.GetSystemService(Context.NotificationService);
-            CreateChannelIfNotExists(context,EmailChannelId,"ReceivedEmail");
+            CreateChannelIfNotExists(context,EmailChannelId,ReceivedEmailCategory, NotificationImportance.High);
 
             var i = DocumentActivity.CreateIntent(context, folderId: notification.FolderId, documentId: notification.ObjectId, notificationGuid: Serializer.Serialize(notification.Guid));
             var pi = PendingIntent.GetActivity(context, 0, i, PendingIntentFlags.OneShot);
@@ -53,7 +53,7 @@ namespace Mark5.Mobile.Droid.Utilities
             StackIfNeeded(context, EmailChannelId, ReceivedEmailGroupKey);
         }
 
-        static void StackIfNeeded(Context context, string channelId, string groupName)
+        static void StackIfNeeded(Context context, string channelId, string categoryName)
         {
             if (Build.VERSION.SdkInt < BuildVersionCodes.M)
                 return;
@@ -83,17 +83,17 @@ namespace Mark5.Mobile.Droid.Utilities
 
             builder.SetCategory(NotificationCompat.CategoryMessage);
             builder.SetAutoCancel(true);
-            builder.SetGroup(groupName);
+            builder.SetGroup(categoryName);
             builder.SetGroupSummary(true);
             builder.SetPriority((int)NotificationPriority.High);
 
             var n = builder.Build();
             n.Defaults = 0;
 
-            nm.Notify(groupName, StackNotification, n);
+            nm.Notify(categoryName, StackNotification, n);
         }
 
-        public static void CreateChannelIfNotExists(Context context, string channelId, string channelName)
+        public static void CreateChannelIfNotExists(Context context, string channelId, string categoryName, NotificationImportance importance)
         {
             if (Build.VERSION.SdkInt < BuildVersionCodes.O)
                 return;
@@ -104,7 +104,7 @@ namespace Mark5.Mobile.Droid.Utilities
             if (channel != null)
                 return;
 
-            channel = new NotificationChannel(channelId, channelName, NotificationImportance.High);
+            channel = new NotificationChannel(channelId, categoryName, importance);
             nm.CreateNotificationChannel(channel);
         }
     }
