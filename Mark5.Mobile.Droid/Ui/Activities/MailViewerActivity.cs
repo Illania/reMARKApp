@@ -288,7 +288,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 var attFile = await CreateTempFile(att.FilenameOriginal, att.GetData());
 
-                var uri = Android.Support.V4.Content.FileProvider.GetUriForFile(this, PackageName + ".fileprovider", attFile);
+                var uri = FileProvider.GetUriForFile(this, PackageName + ".fileprovider", attFile);
                 var mimeType = MimeTypeMap.GetMimeType(Path.GetExtension(att.FilenameOriginal));
 
                 var openFileIntent = new Intent(Intent.ActionView);
@@ -324,7 +324,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 var attFile = await CreateTempFile(att.FilenameOriginal, att.GetData());
 
-                var uri = Android.Support.V4.Content.FileProvider.GetUriForFile(this, PackageName + ".fileprovider", attFile);
+                var uri = FileProvider.GetUriForFile(this, PackageName + ".fileprovider", attFile);
                 var mimeType = MimeTypeMap.GetMimeType(Path.GetExtension(att.FilenameOriginal));
 
                 ShareCompat.IntentBuilder.From(this).SetType(mimeType).SetStream(uri).StartChooser();

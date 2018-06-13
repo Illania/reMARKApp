@@ -829,7 +829,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (string.IsNullOrWhiteSpace(path))
                     throw new Exception("Unable to open attachment");
 
-                var uri = Android.Support.V4.Content.FileProvider.GetUriForFile(Context, Context.PackageName + ".fileprovider", new Java.IO.File(path));
+                var uri = FileProvider.GetUriForFile(Context, Context.PackageName + ".fileprovider", new Java.IO.File(path));
                 var mimeType = MimeTypeMap.GetMimeType(Path.GetExtension(path));
 
                 var openFileIntent = new Intent(Intent.ActionView);
@@ -878,7 +878,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (string.IsNullOrWhiteSpace(path))
                     throw new Exception("Unable to get attachment path.");
 
-                var uri = Android.Support.V4.Content.FileProvider.GetUriForFile(Context, Context.PackageName + ".fileprovider", new Java.IO.File(path));
+                var uri = FileProvider.GetUriForFile(Context, Context.PackageName + ".fileprovider", new Java.IO.File(path));
                 var mimeType = MimeTypeMap.GetMimeType(Path.GetExtension(path));
 
                 ShareCompat.IntentBuilder.From(Activity).SetType(mimeType).SetStream(uri).StartChooser();
