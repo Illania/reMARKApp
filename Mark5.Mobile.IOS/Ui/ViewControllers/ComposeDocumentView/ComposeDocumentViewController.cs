@@ -172,7 +172,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             };
             insertButtonItem = new UIBarButtonItem
             {
-                Image = UIImage.FromBundle("Create").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
+                Image = UIImage.FromBundle("Attachment").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
                 Enabled = false
             };
 
