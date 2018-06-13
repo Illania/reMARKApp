@@ -48,18 +48,5 @@ namespace Mark5.Mobile.Droid.Utilities.Service
                 CommonConfig.Logger.Error($"Could not process notification. [message.from={message.From}, message.data.keys={string.Join(",", message.Data.Keys)}]", ex);
             }
         }
-
-        public void CreateChannelIfNotExists(NotificationManager nm)
-        {
-            if (Build.VERSION.SdkInt < BuildVersionCodes.O)
-                return;
-
-            var channel = nm.GetNotificationChannel("main");
-            if (channel != null)
-                return;
-
-            channel = new NotificationChannel("main", "General", NotificationImportance.High);
-            nm.CreateNotificationChannel(channel);
-        }
     }
 }
