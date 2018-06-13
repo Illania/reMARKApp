@@ -350,7 +350,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 autoSaveWorkingCopyWorker?.Stop();
                 autoSaveWorkingCopyWorker = new Worker(SaveWorkingCopy, AutoSaveWorkingCopyInterval);
-                //autoSaveWorkingCopyWorker.Start(); //TODO TESTING
+                autoSaveWorkingCopyWorker.Start();
             }
             catch (Exception ex)
             {
