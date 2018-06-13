@@ -103,6 +103,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 refreshDataOnAppear = false;
                 RefreshData();
             }
+            else
+                MarkAsReadIfNecessary();
         }
 
         public override void ViewWillDisappear(bool animated)
