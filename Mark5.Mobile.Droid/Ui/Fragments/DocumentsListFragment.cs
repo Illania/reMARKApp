@@ -475,6 +475,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             menu.Clear();
 
+            if (CurrentAdapter.SelectedItemCount == CurrentAdapter.ItemCount)
+                menu.Add(Menu.None, MenuItemActions.DeselectAll, MenuItemActions.DeselectAll, Resource.String.deselect_all);
+            else
+                menu.Add(Menu.None, MenuItemActions.SelectAll, MenuItemActions.SelectAll, Resource.String.select_all);
+
             if (CurrentAdapter.SelectedItems.Any(dp => !dp.IsReadByCurrent))
                 menu.Add(Menu.None, MenuItemActions.MarkAsRead, MenuItemActions.MarkAsRead, Resource.String.mark_as_read);
 
@@ -489,14 +494,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             menu.Add(Menu.None, MenuItemActions.SetPriority, MenuItemActions.SetPriority, Resource.String.set_priority);
 
-            if (CurrentAdapter.SelectedItemCount == CurrentAdapter.ItemCount)
-                menu.Add(Menu.None, MenuItemActions.UnselectAll, MenuItemActions.UnselectAll, Resource.String.unselect_all);
-            else
-                menu.Add(Menu.None, MenuItemActions.SelectAll, MenuItemActions.SelectAll, Resource.String.select_all);
-
             if (CurrentAdapter.SelectedItemCount == 1)
                 menu.Add(Menu.None, MenuItemActions.Categories, MenuItemActions.Categories, Resource.String.categories);
-            
+
             if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
                 menu.Add(Menu.None, MenuItemActions.DeleteFromFolder, MenuItemActions.DeleteFromFolder, Resource.String.delete_from_folder);
 
@@ -554,7 +554,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return true;
             }
 
-            if (item.ItemId == MenuItemActions.UnselectAll)
+            if (item.ItemId == MenuItemActions.DeselectAll)
             {
                 UnSelectAll();
                 return true;
@@ -801,6 +801,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         static class MenuItemActions
         {
+            public const int SelectAll = 05;
+            public const int DeselectAll = 06;
             public const int MarkAsRead = 10;
             public const int MarkAsUnread = 11;
             public const int CopyToWorktray = 20;
@@ -810,8 +812,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public const int Categories = 50;
             public const int DeleteFromFolder = 60;
             public const int Delete = 61;
-            public const int SelectAll = 70;
-            public const int UnselectAll = 71;
         }
 
         #endregion
