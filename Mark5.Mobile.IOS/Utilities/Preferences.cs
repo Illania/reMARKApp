@@ -1,6 +1,9 @@
 ﻿using Mark5.Mobile.Common.Model;
 using System.Collections.Generic;
 using Foundation;
+using System.Linq;
+using System;
+using Mark5.Mobile.IOS.Ui.Common;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
@@ -46,6 +49,10 @@ namespace Mark5.Mobile.IOS.Utilities
             public const string PushNotificationTokenKey = "PushNotificationToken";
 
             public const string ResetOnLaunchKey = "ResetOnLaunch";
+
+            public const string EmailTrailingSwipeActions = "EmailTrailingSwipeActions";
+            public const string EmailLeadingSwipeActions = "EmailLeadingSwipeActions";
+
         }
 
         readonly NSUserDefaults ud;
@@ -122,8 +129,15 @@ namespace Mark5.Mobile.IOS.Utilities
                 },
                 {
                     new NSString(Keys.AuthorizationInterval), NSNumber.FromInt16(-1)
+                },
+                {
+                    new NSString(Keys.EmailLeadingSwipeActions), NSArray.FromStrings(EmailSwipeAction.SwipeAction.Delete.ToString())
+                },
+                {
+                    new NSString(Keys.EmailTrailingSwipeActions), NSArray.FromStrings (EmailSwipeAction.SwipeAction.More.ToString(), EmailSwipeAction.SwipeAction.CopyToWorkTray.ToString(), EmailSwipeAction.SwipeAction.MarkAsRead.ToString())
                 }
             };
+
             ud.RegisterDefaults(defaultsDictionary);
         }
 
@@ -220,5 +234,71 @@ namespace Mark5.Mobile.IOS.Utilities
                 ud.Synchronize();
             }
         }
+
+        #region EmailSwipeActions
+
+        public void SetEmailLeadingSwipeAction(EmailSwipeAction.SwipeAction action)
+        {
+            EmailLeadingSwipeActions = new List<EmailSwipeAction> { new EmailSwipeAction(action) }; 
+        }
+
+        public void SetEmailTrailingLastAction(EmailSwipeAction.SwipeAction action)
+        {
+            List<EmailSwipeAction> newActions = new List<EmailSwipeAction>(EmailTrailingSwipeActions);
+            newActions.Last().Action = action;
+            EmailTrailingSwipeActions = newActions;
+        }
+
+        public void SetEmailTrailingMiddleAction(EmailSwipeAction.SwipeAction action)
+        {
+            List<EmailSwipeAction> newActions = new List<EmailSwipeAction>(EmailTrailingSwipeActions);
+            newActions[1].Action = action;
+            EmailTrailingSwipeActions = newActions;
+        }
+
+        public List<EmailSwipeAction> EmailLeadingSwipeActions
+        {
+            get {
+                var udActions = ud.ArrayForKey(Keys.EmailLeadingSwipeActions).ToList();
+                return udActions.Select(x => new EmailSwipeAction(x.ToString())).ToList();
+            }
+
+            set
+            {
+                var newVal = value.Select(item => item.Action.ToString()).ToArray();
+                ud.SetValueForKey(NSArray.FromStrings(newVal), new NSString(Keys.EmailLeadingSwipeActions));
+                ud.Synchronize();
+            }
+        }
+
+        public List<EmailSwipeAction> EmailTrailingSwipeActions
+        {
+            get
+            {
+                var udActions = ud.ArrayForKey(Keys.EmailTrailingSwipeActions).ToList();
+                var actions = udActions.Select(x => new EmailSwipeAction(x.ToString())).ToList();
+                return actions;
+            }
+
+            set
+            {
+                var newVal = value.Select(x => x.Action.ToString()).ToArray();
+                ud.SetValueForKey(NSArray.FromStrings(newVal), new NSString(Keys.EmailTrailingSwipeActions));
+                ud.Synchronize();
+            }
+        }
+
+        public List<EmailSwipeAction> GetAvailableSwipeActions()
+        {
+            return EmailSwipeAction.GetAllAvailableActions.Except(EmailLeadingSwipeActions).Except(EmailTrailingSwipeActions).ToList();                          
+        }
+
+        public void ResetSwipeActions() {
+            EmailLeadingSwipeActions = new List<EmailSwipeAction> { new EmailSwipeAction(EmailSwipeAction.SwipeAction.Delete) };
+            EmailTrailingSwipeActions = new List<EmailSwipeAction> { new EmailSwipeAction(EmailSwipeAction.SwipeAction.More), new EmailSwipeAction(EmailSwipeAction.SwipeAction.MarkAsRead), new EmailSwipeAction(EmailSwipeAction.SwipeAction.SetPriority) }; 
+        }
+
+        #endregion
+
     }
 }

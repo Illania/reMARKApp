@@ -33,6 +33,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         const string UsernameKey = "username";
         const string UseTemplateKey = "UseTemplate";
         const string VersionKey = "version";
+        const string EmailSwipeActions = "EmailSwipeActions";
 
         public SettingsViewController()
         {
@@ -102,6 +103,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public override async void RowSelected(UITableView tableView, NSIndexPath indexPath)
         {
             var specifier = SettingsReader.GetSpecifier(indexPath);
+
+            if (specifier.Key == "EmailSwipeActions")
+            {
+                var swipeActionVC = new SwipeActionViewController();
+                NavigationController.PushViewController(swipeActionVC, true);
+                return;
+            }
+
             if (specifier.Type == "PSMultiValueSpecifier")
             {
                 if (specifier.Key == AuthorizationIntervalKey)
@@ -123,6 +132,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 NavigationController.PushViewController(vc, true);
                 return;
             }
+
 
             base.RowSelected(tableView, indexPath);
         }
@@ -182,6 +192,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
                 cell.TextLabel.Text = specifier.Title;
                 cell.DetailTextLabel.Text = $"{NSBundle.MainBundle.InfoDictionary["CFBundleShortVersionString"]} ({NSBundle.MainBundle.InfoDictionary["CFBundleVersion"]})";
+                cell.DetailTextLabel.TextColor = Theme.DarkGray;
+                return cell;
+            }
+
+            if(specifier.Key == EmailSwipeActions) 
+            {
+                var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
+                cell.TextLabel.Text = specifier.Title;
+                cell.DetailTextLabel.Text = "";
                 cell.DetailTextLabel.TextColor = Theme.DarkGray;
                 return cell;
             }
