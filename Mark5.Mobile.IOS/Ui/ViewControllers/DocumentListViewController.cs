@@ -567,7 +567,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Actions
 
-        void ShowMoreActionSheet(NSIndexPath indexPath, DocumentPreview selectedDocument)
+        void ShowMoreActionSheet(NSIndexPath indexPath, DocumentPreview selectedDocument, Folder folder)
         {
             var alertController = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
             var d = new PopoverPresentationControllerDelegate(TableView, TableView.CellAt(indexPath));
@@ -605,7 +605,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         }));
                         break;
                     case EmailSwipeAction.SwipeAction.Delete:
-                        if (ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || selectedDocument.Direction == DocumentDirection.Draft)
+                        if (SwipeActionAllowed(item.Action, selectedDocument, folder))
                             alertController.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedDocument, d)));
 
                         break;
@@ -629,8 +629,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                         break;
                     case EmailSwipeAction.SwipeAction.MoveToFolder:
-                        //TODO: 
-                        if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
+                        if(SwipeActionAllowed(item.Action, selectedDocument, folder)) { 
                             alertController.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"),
                                 UIAlertActionStyle.Default,
                                 a =>
@@ -638,15 +637,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                                     MoveToFolder(selectedDocument);
                                     EndEditing();
                                 }));
+                        }
                         break;
                     case EmailSwipeAction.SwipeAction.SetPriority:
                         alertController.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"), UIAlertActionStyle.Default, a => ShowPriorityActionSheet(selectedDocument, TableView, TableView.CellAt(indexPath))));
 
                         break;
                     case EmailSwipeAction.SwipeAction.RemoveFromFolder:
-                        if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
+                        if (SwipeActionAllowed(item.Action, selectedDocument, folder))
+                        {
                             alertController.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, a => RemoveFromFolder(selectedDocument, d)));
-
+                        }
                         break;
 
                 }
@@ -1080,6 +1081,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         #endregion
 
         #region Utilities
+        static bool SwipeActionAllowed(EmailSwipeAction.SwipeAction action, DocumentPreview documentPreview, Folder folder)
+        {
+            switch (action)
+            {
+                case EmailSwipeAction.SwipeAction.MoveToFolder:
+                    return folder.InternalType == FolderInternalType.FilterView || folder.InternalType == FolderInternalType.Static || folder.InternalType == FolderInternalType.Worktray;
+                case EmailSwipeAction.SwipeAction.Delete:
+                    return ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || documentPreview.Direction == DocumentDirection.Draft;
+                case EmailSwipeAction.SwipeAction.RemoveFromFolder:
+                    return folder.InternalType == FolderInternalType.FilterView || folder.InternalType == FolderInternalType.Static || folder.InternalType == FolderInternalType.Worktray;
+                default:
+                    return true;
+            }
+        }
 
         void StartEditing()
         {
@@ -1209,6 +1224,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return null;
             }
         }
+
 
         #endregion
 
@@ -1536,7 +1552,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                                 SwipeActionTitle(swipeAction, documentPreview),
                                 (a, ip) => { OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView); });
                         
-                            actionWrapper.Disabled = !SwipeActionAllowed(swipeAction.Action, documentPreview, folder);;
+                            actionWrapper.Disabled = !SwipeActionAllowed(swipeAction.Action, documentPreview, folder);
                             break;
                         case EmailSwipeAction.SwipeAction.RemoveFromFolder:
                             actionWrapper.Action = UITableViewRowAction.Create(
@@ -1583,20 +1599,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return returnActions;
             }
 
-            bool SwipeActionAllowed(EmailSwipeAction.SwipeAction action, DocumentPreview documentPreview, Folder folder)
-            {
-                switch (action)
-                {
-                    case EmailSwipeAction.SwipeAction.MoveToFolder:
-                        return folder.InternalType == FolderInternalType.FilterView || folder.InternalType == FolderInternalType.Static || folder.InternalType == FolderInternalType.Worktray;
-                    case EmailSwipeAction.SwipeAction.Delete:
-                        return ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || documentPreview.Direction == DocumentDirection.Draft;
-                    case EmailSwipeAction.SwipeAction.RemoveFromFolder:
-                        return folder.InternalType == FolderInternalType.FilterView || folder.InternalType == FolderInternalType.Static || folder.InternalType == FolderInternalType.Worktray;
-                    default:
-                        return true;
-                }
-            }
 
             string SwipeActionTitle(EmailSwipeAction action, DocumentPreview documentPreview)
             {
@@ -1656,7 +1658,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         viewControllerWeakReference.Unwrap()?.EndEditing();
                         break;
                     case EmailSwipeAction.SwipeAction.More:
-                        viewControllerWeakReference.Unwrap()?.ShowMoreActionSheet(indexPath, documentPreview);
+                        viewControllerWeakReference.Unwrap()?.ShowMoreActionSheet(indexPath, documentPreview, folder);
                         break;
                     case EmailSwipeAction.SwipeAction.CopyToFolder:
                         viewControllerWeakReference.Unwrap()?.CopyToFolder(documentPreview);
@@ -1696,7 +1698,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         }
 
         #endregion
-
 
         #region Workers
 
