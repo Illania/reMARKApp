@@ -1,7 +1,5 @@
 ﻿using System;
-using CoreGraphics;
 using Foundation;
-using System.Collections.Generic;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
 using Mark5.Mobile.IOS.Utilities.Extensions;
@@ -12,13 +10,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
     public class SwipeActionViewController : AbstractViewController
     {
-
         NSObject observer;
 
-        protected UIScrollView scrollView;
-        protected UIStackView stackView;
-        protected float innerMargin = 5f;
-        protected float swipeContainerHeight = 160f;
+        const float swipeContainerHeight = 160f;
+        const float swipeActionBtnWidth = 80f;
 
         UIButton leadingSwipeButton;
         UIButton middleSwipeButton;
@@ -27,8 +22,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         static nint leadingBtnTag = 0;
         static nint trailingMiddleBtnTag = 1;
         static nint trailingLastBtnTag = 2;
-
-        private nfloat swipeActionBtnWidth = 80f;
 
         public override void ViewWillAppear(bool animated)
         {
@@ -74,7 +67,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             Title = Localization.GetString("email_swipe_actions");
 
-            scrollView = new UIScrollView
+            UIScrollView scrollView = new UIScrollView
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 BackgroundColor = UIColor.GroupTableViewBackgroundColor,
@@ -84,12 +77,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             View.AddSubview(scrollView);
 
-            scrollView.TopAnchor.ConstraintEqualTo(View.TopAnchor).Active = true;
-            scrollView.BottomAnchor.ConstraintEqualTo(View.BottomAnchor).Active = true;
-            scrollView.LeadingAnchor.ConstraintEqualTo(View.LeadingAnchor).Active = true;
-            scrollView.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor).Active = true;
-
-            scrollView.ContentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentBehavior.Always;
+            View.AddConstraints(new[]
+            {
+                scrollView.TopAnchor.ConstraintEqualTo(View.TopAnchor),
+                scrollView.BottomAnchor.ConstraintEqualTo(View.BottomAnchor),
+                scrollView.LeadingAnchor.ConstraintEqualTo(View.LeadingAnchor),
+                scrollView.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor)
+            });
 
             UILabel topLabel = new UILabel()
             {
@@ -114,120 +108,244 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 scrollView.AddConstraint(NSLayoutConstraint.Create(topLabel, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, scrollView.ReadableContentGuide, NSLayoutAttribute.Leading, 2f, 0f));
             }
 
-            scrollView.AddConstraints(new[] {
-                NSLayoutConstraint.Create(topLabel, NSLayoutAttribute.Trailing,  NSLayoutRelation.Equal, scrollView.ReadableContentGuide, NSLayoutAttribute.Trailing, 1f, 0f),
-                NSLayoutConstraint.Create(topLabel, NSLayoutAttribute.Top,  NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Top, 1f, 10f),
+            scrollView.AddConstraints(new[]
+            {
+                topLabel.TrailingAnchor.ConstraintEqualTo(scrollView.ReadableContentGuide.TrailingAnchor),
+                topLabel.TopAnchor.ConstraintEqualTo(scrollView.TopAnchor,10f)
             });
 
-            #region Leading Swipe
-            UIView leadingSwipeBg = new UIView()
+            var leadingSwipeElement = BuildSwipeContainer(scrollView, BuildLeadingSwipe(), topLabel, 10f);
+
+            var trailingSwipeMiddleElement = BuildSwipeContainer(scrollView, BuildTrailingSwipeMiddleAction(), leadingSwipeElement, 1f);
+
+            var trailingSwipeLastElement = BuildSwipeContainer(scrollView, BuildTrailingSwipeLastAction(), trailingSwipeMiddleElement, 1f);
+
+            BuildDefaultsButton(scrollView, trailingSwipeLastElement);
+        }
+
+        #region UI elements
+
+        UIView BuildSwipeContainer(UIScrollView scrollView, UIView content, UIView topView, float topMargin)
+        {
+            UIView background = new UIView()
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 BackgroundColor = Theme.White
             };
 
-            scrollView.AddSubview(leadingSwipeBg);
-            scrollView.AddConstraints(new[] {
-                NSLayoutConstraint.Create(leadingSwipeBg, NSLayoutAttribute.Width,  NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Width, 1f, 0f),
-                NSLayoutConstraint.Create(leadingSwipeBg, NSLayoutAttribute.CenterX,  NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.CenterX, 1f, 0f),
-                NSLayoutConstraint.Create(leadingSwipeBg, NSLayoutAttribute.Top,  NSLayoutRelation.Equal, topLabel, NSLayoutAttribute.Bottom, 1f, 10f),
-                NSLayoutConstraint.Create(leadingSwipeBg, NSLayoutAttribute.Height,  NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, swipeContainerHeight),
+            scrollView.AddSubview(background);
+
+            scrollView.AddConstraints(new[]
+            {
+                background.WidthAnchor.ConstraintEqualTo(scrollView.WidthAnchor),
+                background.CenterXAnchor.ConstraintEqualTo(scrollView.CenterXAnchor),
+                background.TopAnchor.ConstraintEqualTo(topView.BottomAnchor,topMargin),
+                background.HeightAnchor.ConstraintEqualTo(swipeContainerHeight)
             });
 
-            UIView leadingSwipe = BuildLeadingSwipe();
-            scrollView.AddSubview(leadingSwipe);
+            scrollView.AddSubview(content);
 
             if (Integration.IsIPad())
             {
-                scrollView.AddConstraint(NSLayoutConstraint.Create(leadingSwipe, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, scrollView.ReadableContentGuide, NSLayoutAttribute.Leading, 1f, 0f));
+                scrollView.AddConstraint(NSLayoutConstraint.Create(content, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, scrollView.ReadableContentGuide, NSLayoutAttribute.Leading, 1f, 0f));
             }
             else
             {
-                scrollView.AddConstraint(NSLayoutConstraint.Create(leadingSwipe, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, scrollView.ReadableContentGuide, NSLayoutAttribute.Leading, 2f, 0f));
+                scrollView.AddConstraint(NSLayoutConstraint.Create(content, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, scrollView.ReadableContentGuide, NSLayoutAttribute.Leading, 2f, 0f));
             }
 
-            scrollView.AddConstraints(new[] {
-                NSLayoutConstraint.Create(leadingSwipe, NSLayoutAttribute.Trailing,  NSLayoutRelation.Equal, scrollView.ReadableContentGuide, NSLayoutAttribute.Trailing, 1f, 0f),
-                NSLayoutConstraint.Create(leadingSwipe, NSLayoutAttribute.Top,  NSLayoutRelation.Equal, topLabel, NSLayoutAttribute.Bottom, 1f, 10f),
-                NSLayoutConstraint.Create(leadingSwipe, NSLayoutAttribute.Height,  NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, swipeContainerHeight),
+            scrollView.AddConstraints(new[]
+            {
+                content.TrailingAnchor.ConstraintEqualTo(scrollView.ReadableContentGuide.TrailingAnchor),
+                content.TopAnchor.ConstraintEqualTo(topView.BottomAnchor, topMargin),
+                content.HeightAnchor.ConstraintEqualTo(swipeContainerHeight)
             });
 
-            #endregion
+            return background;
+        }
 
-            #region Trailing Swipe Middle
-            UIView trailingSwipeMiddleBg = new UIView()
+        UIButton BuildActionSelectionButton()
+        {
+            var button = new UIButton()
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                BackgroundColor = Theme.White
+                ContentEdgeInsets = new UIEdgeInsets(5f, 5f, 5f, 5f),
+                HorizontalAlignment = UIControlContentHorizontalAlignment.Center,
             };
 
-            scrollView.AddSubview(trailingSwipeMiddleBg);
-            scrollView.AddConstraints(new[] {
-                NSLayoutConstraint.Create(trailingSwipeMiddleBg, NSLayoutAttribute.Width,  NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Width, 1f, 0f),
-                NSLayoutConstraint.Create(trailingSwipeMiddleBg, NSLayoutAttribute.CenterX,  NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.CenterX, 1f, 0f),
-                NSLayoutConstraint.Create(trailingSwipeMiddleBg, NSLayoutAttribute.Top,  NSLayoutRelation.Equal, leadingSwipeBg, NSLayoutAttribute.Bottom, 1f, 2f),
-                NSLayoutConstraint.Create(trailingSwipeMiddleBg, NSLayoutAttribute.Height,  NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, swipeContainerHeight),
+            button.SetTitleColor(Theme.White, UIControlState.Normal);
+            button.TitleLabel.Lines = 0;
+            button.TitleLabel.AdjustsFontSizeToFitWidth = false;
+            button.TitleLabel.Font = Theme.DefaultActionsFont;
+            button.TitleLabel.TextAlignment = UITextAlignment.Center;
+            button.TitleLabel.LineBreakMode = UILineBreakMode.WordWrap;
+
+            return button;
+        }
+
+        UIView BuildLeadingSwipeEmai()
+        {
+            UIView container = new UIView()
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+
+            var leadingMarginGuide = new UILayoutGuide();
+            container.AddLayoutGuide(leadingMarginGuide);
+
+            leadingMarginGuide.LeadingAnchor.ConstraintEqualTo(container.ReadableContentGuide.LeadingAnchor).Active = true;
+            var leadingMarginWidthAnchor = leadingMarginGuide.WidthAnchor.ConstraintEqualTo(0f);
+            leadingMarginWidthAnchor.SetIdentifier("leadingMarginWidth");
+            leadingMarginWidthAnchor.Active = true;
+
+            UILabel topLabel = new UILabel
+            {
+                Text = "Anne Mortensen",
+                Font = Theme.DefaultBoldFont,
+                TextColor = Theme.LightGray,
+                Lines = 1,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+
+            container.AddSubview(topLabel);
+            container.AddConstraints(new[]
+            {
+                topLabel.TopAnchor.ConstraintEqualTo(container.TopAnchor, 8f),
+                topLabel.LeadingAnchor.ConstraintEqualTo(leadingMarginGuide.TrailingAnchor, 15f + 8f),
+                topLabel.HeightAnchor.ConstraintGreaterThanOrEqualTo(Theme.MinimumLabelSize),
             });
 
-            UIView trailingSwipeMiddle = BuildTrailingSwipeMiddleAction();
-            scrollView.AddSubview(trailingSwipeMiddleBg);
-
-            scrollView.AddSubview(trailingSwipeMiddle);
-
-            if (Integration.IsIPad())
+            UILabel dateLabel = new UILabel
             {
-                scrollView.AddConstraint(NSLayoutConstraint.Create(trailingSwipeMiddle, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, scrollView.ReadableContentGuide, NSLayoutAttribute.Leading, 1f, 0f));
-            }
-            else
-            {
-                scrollView.AddConstraint(NSLayoutConstraint.Create(trailingSwipeMiddle, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, scrollView.ReadableContentGuide, NSLayoutAttribute.Leading, 2f, 0f));
-            }
+                Text = "9.35, today",
+                Font = Theme.DefaultLightFont.WithRelativeSize(-2f),
+                TextColor = Theme.LightGray,
+                Lines = 1,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            dateLabel.SetContentHuggingPriority(1000f, UILayoutConstraintAxis.Horizontal);
+            dateLabel.SetContentCompressionResistancePriority(1000f, UILayoutConstraintAxis.Horizontal);
 
-            scrollView.AddConstraints(new[] {
-                NSLayoutConstraint.Create(trailingSwipeMiddle, NSLayoutAttribute.Trailing,  NSLayoutRelation.Equal, scrollView.ReadableContentGuide, NSLayoutAttribute.Trailing, 1f, 0f),
-                NSLayoutConstraint.Create(trailingSwipeMiddle, NSLayoutAttribute.Top,  NSLayoutRelation.Equal, leadingSwipeBg, NSLayoutAttribute.Bottom, 1f, 2f),
-                NSLayoutConstraint.Create(trailingSwipeMiddle, NSLayoutAttribute.Height,  NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, swipeContainerHeight),
+            container.AddSubview(dateLabel);
+            container.AddConstraints(new[]
+            {
+                dateLabel.LeadingAnchor.ConstraintEqualTo(topLabel.TrailingAnchor, 8f),
+                dateLabel.TrailingAnchor.ConstraintEqualTo(container.ReadableContentGuide.TrailingAnchor),
+                dateLabel.CenterYAnchor.ConstraintEqualTo(topLabel.CenterYAnchor)
             });
 
-            #endregion
-            #region Trailing Swipe Middle
-            UIView trailingSwipeLastBg = new UIView()
+            UILabel middleLabel = new UILabel
+            {
+                Text = "Hvad skal du lave til nytår?",
+                Font = Theme.DefaultFont,
+                TextColor = Theme.LightGray,
+                Lines = 1,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+
+            container.AddSubview(middleLabel);
+            container.AddConstraints(new[]
+            {
+                middleLabel.LeadingAnchor.ConstraintEqualTo(topLabel.LeadingAnchor),
+                middleLabel.TopAnchor.ConstraintEqualTo(topLabel.BottomAnchor, 4f),
+                middleLabel.TrailingAnchor.ConstraintEqualTo(container.ReadableContentGuide.TrailingAnchor),
+            });
+
+            UITextView bottomLabel = new UITextView
+            {
+                Text = "Hej Anne nytår står for døren så jeg ville høre hvad dine planer er. Vi tænker at tage på musling og spise en masse...",
+                Font = Theme.DefaultFont.WithRelativeSize(-2f),
+                TextColor = Theme.LightGray,
+                Selectable = false,
+                Editable = false,
+                ScrollEnabled = false,
+                ClipsToBounds = false,
+                TextContainerInset = UIEdgeInsets.Zero,
+                UserInteractionEnabled = false,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            bottomLabel.TextContainer.MaximumNumberOfLines = 3;
+            bottomLabel.TextContainer.LineFragmentPadding = 0f;
+
+            container.AddSubview(bottomLabel);
+            container.AddConstraints(new[]
+            {
+                bottomLabel.LeadingAnchor.ConstraintEqualTo(topLabel.LeadingAnchor),
+                bottomLabel.TopAnchor.ConstraintEqualTo(middleLabel.BottomAnchor, 4f),
+                bottomLabel.TrailingAnchor.ConstraintEqualTo(container.ReadableContentGuide.TrailingAnchor),
+                bottomLabel.BottomAnchor.ConstraintEqualTo(container.BottomAnchor),
+            });
+
+            UIImageView directionIndicatorImageView = new UIImageView
+            {
+                ContentMode = UIViewContentMode.ScaleToFill,
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                Image = UIImage.FromBundle("Incoming").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
+                TintColor = Theme.LightGray
+            };
+
+            container.AddSubview(directionIndicatorImageView);
+            container.AddConstraints(new[]
+            {
+                directionIndicatorImageView.LeadingAnchor.ConstraintEqualTo(leadingMarginGuide.TrailingAnchor),
+                directionIndicatorImageView.CenterYAnchor.ConstraintEqualTo(topLabel.CenterYAnchor),
+                directionIndicatorImageView.WidthAnchor.ConstraintEqualTo(15f),
+                directionIndicatorImageView.HeightAnchor.ConstraintEqualTo(15f),
+            });
+
+            UIImageView unreadIndicatorImageView = new UIImageView
+            {
+                ContentMode = UIViewContentMode.ScaleToFill,
+                Image = UIImage.FromBundle("Full-Dot").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                TintColor = Theme.LightGray
+            };
+
+            container.AddSubview(unreadIndicatorImageView);
+            container.AddConstraints(new[]
+            {
+                unreadIndicatorImageView.LeadingAnchor.ConstraintEqualTo(leadingMarginGuide.TrailingAnchor),
+                unreadIndicatorImageView.TopAnchor.ConstraintEqualTo(directionIndicatorImageView.BottomAnchor, 4f),
+                unreadIndicatorImageView.WidthAnchor.ConstraintEqualTo(15f),
+                unreadIndicatorImageView.HeightAnchor.ConstraintEqualTo(15f),
+            });
+
+            container.Layer.BorderWidth = 1f;
+            container.Layer.BorderColor = Theme.Gray.CGColor;
+
+            return container;
+        }
+
+        void BuildMaskButton(UIView containerView, nint tag)
+        {
+
+            UIButton maskBtn = new UIButton()
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                BackgroundColor = Theme.White
+                UserInteractionEnabled = true,
+                Alpha = 1
             };
 
-            scrollView.AddSubview(trailingSwipeLastBg);
-            scrollView.AddConstraints(new[] {
-                NSLayoutConstraint.Create(trailingSwipeLastBg, NSLayoutAttribute.Width,  NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.Width, 1f, 0f),
-                NSLayoutConstraint.Create(trailingSwipeLastBg, NSLayoutAttribute.CenterX,  NSLayoutRelation.Equal, scrollView, NSLayoutAttribute.CenterX, 1f, 0f),
-                NSLayoutConstraint.Create(trailingSwipeLastBg, NSLayoutAttribute.Top,  NSLayoutRelation.Equal, trailingSwipeMiddleBg, NSLayoutAttribute.Bottom, 1f, 2f),
-                NSLayoutConstraint.Create(trailingSwipeLastBg, NSLayoutAttribute.Height,  NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, swipeContainerHeight),
-            });
+            maskBtn.Tag = Convert.ToInt16(tag);
 
-            UIView trailingSwipeLast = BuildTrailingSwipeLastAction();
-            scrollView.AddSubview(trailingSwipeLast);
+            maskBtn.SetTitleColor(Theme.Black, UIControlState.Normal);
 
-            scrollView.AddSubview(trailingSwipeLast);
+            maskBtn.TouchUpInside += SelectAction_Clicked;
 
-            if (Integration.IsIPad())
+            containerView.AddSubview(maskBtn);
+
+            containerView.AddConstraints(new[]
             {
-                scrollView.AddConstraint(NSLayoutConstraint.Create(trailingSwipeLast, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, scrollView.ReadableContentGuide, NSLayoutAttribute.Leading, 1f, 0f));
-            }
-            else
-            {
-                scrollView.AddConstraint(NSLayoutConstraint.Create(trailingSwipeLast, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, scrollView.ReadableContentGuide, NSLayoutAttribute.Leading, 2f, 0f));
-            }
-
-            scrollView.AddConstraints(new[] {
-                NSLayoutConstraint.Create(trailingSwipeLast, NSLayoutAttribute.Trailing,  NSLayoutRelation.Equal, scrollView.ReadableContentGuide, NSLayoutAttribute.Trailing, 1f, 0f),
-                NSLayoutConstraint.Create(trailingSwipeLast, NSLayoutAttribute.Top,  NSLayoutRelation.Equal, trailingSwipeMiddleBg, NSLayoutAttribute.Bottom, 1f, 2f),
-                NSLayoutConstraint.Create(trailingSwipeLast, NSLayoutAttribute.Height,  NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, swipeContainerHeight),
+                maskBtn.TopAnchor.ConstraintEqualTo(containerView.TopAnchor),
+                maskBtn.WidthAnchor.ConstraintEqualTo(containerView.WidthAnchor),
+                maskBtn.HeightAnchor.ConstraintEqualTo(containerView.HeightAnchor),
+                maskBtn.LeadingAnchor.ConstraintEqualTo(containerView.LeadingAnchor),
+                maskBtn.TrailingAnchor.ConstraintEqualTo(containerView.TrailingAnchor)
             });
+        }
 
-
-            #endregion
-
+        void BuildDefaultsButton(UIScrollView scrollView, UIView topView)
+        {
             UIButton defaultsBtn = new UIButton()
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
@@ -240,12 +358,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             defaultsBtn.SetTitle(Localization.GetString("swipe_reset_default"), UIControlState.Normal);
 
             scrollView.AddSubview(defaultsBtn);
-
-            defaultsBtn.TopAnchor.ConstraintEqualTo(trailingSwipeLast.BottomAnchor, 2f).Active = true;
-            defaultsBtn.WidthAnchor.ConstraintEqualTo(scrollView.WidthAnchor).Active = true;
-            defaultsBtn.CenterXAnchor.ConstraintEqualTo(scrollView.CenterXAnchor).Active = true;
-            defaultsBtn.HeightAnchor.ConstraintEqualTo(70f).Active = true;
-            defaultsBtn.BottomAnchor.ConstraintEqualTo(scrollView.BottomAnchor).Active = true;
+            scrollView.AddConstraints(new[]
+            {
+                defaultsBtn.TopAnchor.ConstraintEqualTo(topView.BottomAnchor, 1f),
+                defaultsBtn.WidthAnchor.ConstraintEqualTo(scrollView.WidthAnchor),
+                defaultsBtn.CenterXAnchor.ConstraintEqualTo(scrollView.CenterXAnchor),
+                defaultsBtn.HeightAnchor.ConstraintEqualTo(70f),
+                defaultsBtn.BottomAnchor.ConstraintEqualTo(scrollView.BottomAnchor)
+            });
 
             defaultsBtn.TouchUpInside += (object sender, EventArgs e) =>
             {
@@ -276,9 +396,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             containerView.AddSubview(titleLbl);
 
-            titleLbl.LeadingAnchor.ConstraintEqualTo(containerView.LeadingAnchor).Active = true;
-            titleLbl.TrailingAnchor.ConstraintEqualTo(containerView.TrailingAnchor).Active = true;
-            titleLbl.TopAnchor.ConstraintEqualTo(containerView.TopAnchor, 10f).Active = true;
+            containerView.AddConstraints(new[]
+            {
+                titleLbl.LeadingAnchor.ConstraintEqualTo(containerView.LeadingAnchor),
+                titleLbl.TrailingAnchor.ConstraintEqualTo(containerView.TrailingAnchor),
+                titleLbl.TopAnchor.ConstraintEqualTo(containerView.TopAnchor, 10f)
+            });
 
             UIView btnContainer = new UIView()
             {
@@ -286,42 +409,53 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 BackgroundColor = Theme.Gray
             };
 
-            middleSwipeButton = BuildActionSelectionButton(trailingMiddleBtnTag);
+            middleSwipeButton = BuildActionSelectionButton();
 
             var action = PlatformConfig.Preferences.EmailTrailingSwipeActions.ElementAt(1);
             if (action != null) middleSwipeButton.SetTitle(action.GetName(), UIControlState.Normal);
 
             containerView.AddSubview(btnContainer);
 
-            btnContainer.WidthAnchor.ConstraintEqualTo(3 * swipeActionBtnWidth).Active = true;
-            btnContainer.TopAnchor.ConstraintEqualTo(titleLbl.BottomAnchor, 10f).Active = true;
-            btnContainer.BottomAnchor.ConstraintEqualTo(containerView.BottomAnchor, -10f).Active = true;
-            btnContainer.TrailingAnchor.ConstraintEqualTo(containerView.TrailingAnchor).Active = true;
+            containerView.AddConstraints(new[]
+            {
+                btnContainer.WidthAnchor.ConstraintEqualTo(3 * swipeActionBtnWidth),
+                btnContainer.TopAnchor.ConstraintEqualTo(titleLbl.BottomAnchor, 10f),
+                btnContainer.BottomAnchor.ConstraintEqualTo(containerView.BottomAnchor, -10f),
+                btnContainer.TrailingAnchor.ConstraintEqualTo(containerView.TrailingAnchor)
+            });
 
             UIView emailContent = BuildLeadingSwipeEmai();
 
             containerView.AddSubview(emailContent);
 
-            emailContent.LeadingAnchor.ConstraintEqualTo(containerView.LeadingAnchor).Active = true;
-            emailContent.TrailingAnchor.ConstraintEqualTo(btnContainer.LeadingAnchor).Active = true;
-            emailContent.TopAnchor.ConstraintEqualTo(titleLbl.BottomAnchor, 10f).Active = true;
-            emailContent.BottomAnchor.ConstraintEqualTo(containerView.BottomAnchor, -10f).Active = true;
+            containerView.AddConstraints(new[]
+            {
+                emailContent.LeadingAnchor.ConstraintEqualTo(containerView.LeadingAnchor),
+                emailContent.TrailingAnchor.ConstraintEqualTo(btnContainer.LeadingAnchor),
+                emailContent.TopAnchor.ConstraintEqualTo(titleLbl.BottomAnchor, 10f),
+                emailContent.BottomAnchor.ConstraintEqualTo(containerView.BottomAnchor, -10f)
+            });
 
             containerView.AddSubview(middleSwipeButton);
 
-            middleSwipeButton.WidthAnchor.ConstraintEqualTo(swipeActionBtnWidth).Active = true;
-            middleSwipeButton.TopAnchor.ConstraintEqualTo(btnContainer.TopAnchor).Active = true;
-            middleSwipeButton.BottomAnchor.ConstraintEqualTo(containerView.BottomAnchor, -10f).Active = true;
-            middleSwipeButton.CenterXAnchor.ConstraintEqualTo(btnContainer.CenterXAnchor).Active = true;
+            containerView.AddConstraints(new[]
+            {
+                middleSwipeButton.WidthAnchor.ConstraintEqualTo(swipeActionBtnWidth),
+                middleSwipeButton.TopAnchor.ConstraintEqualTo(btnContainer.TopAnchor),
+                middleSwipeButton.BottomAnchor.ConstraintEqualTo(containerView.BottomAnchor, -10f),
+                middleSwipeButton.CenterXAnchor.ConstraintEqualTo(btnContainer.CenterXAnchor)
+            });
 
             middleSwipeButton.BackgroundColor = Theme.DarkBlue;
+
+            BuildMaskButton(containerView, trailingMiddleBtnTag);
 
             return containerView;
         }
 
         UIView BuildTrailingSwipeLastAction()
         {
-            UIView containerView = new UIView()
+            UIButton containerView = new UIButton()
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 BackgroundColor = Theme.White
@@ -342,9 +476,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             containerView.AddSubview(titleLbl);
 
-            titleLbl.LeadingAnchor.ConstraintEqualTo(containerView.LeadingAnchor).Active = true;
-            titleLbl.TrailingAnchor.ConstraintEqualTo(containerView.TrailingAnchor).Active = true;
-            titleLbl.TopAnchor.ConstraintEqualTo(containerView.TopAnchor, 10f).Active = true;
+            containerView.AddConstraints(new[]
+            {
+                titleLbl.LeadingAnchor.ConstraintEqualTo(containerView.LeadingAnchor),
+                titleLbl.TrailingAnchor.ConstraintEqualTo(containerView.TrailingAnchor),
+                titleLbl.TopAnchor.ConstraintEqualTo(containerView.TopAnchor, 10f)
+            });
 
             UIView btnContainer = new UIView()
             {
@@ -352,17 +489,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 BackgroundColor = Theme.Gray
             };
 
-            lastSwipeButton = BuildActionSelectionButton(trailingLastBtnTag);
+            lastSwipeButton = BuildActionSelectionButton();
 
             var action = PlatformConfig.Preferences.EmailTrailingSwipeActions.Last();
             if (action != null) lastSwipeButton.SetTitle(action.GetName(), UIControlState.Normal);
 
             containerView.AddSubview(btnContainer);
 
-            btnContainer.WidthAnchor.ConstraintEqualTo(3 * swipeActionBtnWidth).Active = true;
-            btnContainer.TopAnchor.ConstraintEqualTo(titleLbl.BottomAnchor, 10f).Active = true;
-            btnContainer.BottomAnchor.ConstraintEqualTo(containerView.BottomAnchor, -10f).Active = true;
-            btnContainer.TrailingAnchor.ConstraintEqualTo(containerView.TrailingAnchor).Active = true;
+            containerView.AddConstraints(new[]
+            {
+                btnContainer.WidthAnchor.ConstraintEqualTo(3 * swipeActionBtnWidth),
+                btnContainer.TopAnchor.ConstraintEqualTo(titleLbl.BottomAnchor, 10f),
+                btnContainer.BottomAnchor.ConstraintEqualTo(containerView.BottomAnchor, -10f),
+                btnContainer.TrailingAnchor.ConstraintEqualTo(containerView.TrailingAnchor)
+            });
 
             UIView seperator = new UIView()
             {
@@ -371,55 +511,41 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             };
 
             containerView.AddSubview(seperator);
-
-            seperator.WidthAnchor.ConstraintEqualTo(2f).Active = true;
-            seperator.TopAnchor.ConstraintEqualTo(btnContainer.TopAnchor).Active = true;
-            seperator.BottomAnchor.ConstraintEqualTo(btnContainer.BottomAnchor).Active = true;
-            seperator.LeadingAnchor.ConstraintEqualTo(btnContainer.LeadingAnchor, swipeActionBtnWidth).Active = true;
+            containerView.AddConstraints(new[]
+            {
+                seperator.WidthAnchor.ConstraintEqualTo(2f),
+                seperator.TopAnchor.ConstraintEqualTo(btnContainer.TopAnchor),
+                seperator.BottomAnchor.ConstraintEqualTo(btnContainer.BottomAnchor),
+                seperator.LeadingAnchor.ConstraintEqualTo(btnContainer.LeadingAnchor, swipeActionBtnWidth)
+            });
 
             UIView emailContent = BuildLeadingSwipeEmai();
 
             containerView.AddSubview(emailContent);
 
-            emailContent.LeadingAnchor.ConstraintEqualTo(containerView.LeadingAnchor).Active = true;
-            emailContent.TrailingAnchor.ConstraintEqualTo(btnContainer.LeadingAnchor).Active = true;
-            emailContent.TopAnchor.ConstraintEqualTo(titleLbl.BottomAnchor, 10f).Active = true;
-            emailContent.BottomAnchor.ConstraintEqualTo(containerView.BottomAnchor, -10f).Active = true;
+            containerView.AddConstraints(new[]
+            {
+                emailContent.LeadingAnchor.ConstraintEqualTo(containerView.LeadingAnchor),
+                emailContent.TrailingAnchor.ConstraintEqualTo(btnContainer.LeadingAnchor),
+                emailContent.TopAnchor.ConstraintEqualTo(titleLbl.BottomAnchor, 10f),
+                emailContent.BottomAnchor.ConstraintEqualTo(containerView.BottomAnchor, -10f)
+            });
 
             containerView.AddSubview(lastSwipeButton);
 
-            lastSwipeButton.WidthAnchor.ConstraintEqualTo(swipeActionBtnWidth).Active = true;
-            lastSwipeButton.TopAnchor.ConstraintEqualTo(btnContainer.TopAnchor).Active = true;
-            lastSwipeButton.BottomAnchor.ConstraintEqualTo(containerView.BottomAnchor, -10f).Active = true;
-            lastSwipeButton.TrailingAnchor.ConstraintEqualTo(btnContainer.TrailingAnchor).Active = true;
+            containerView.AddConstraints(new[]
+            {
+                lastSwipeButton.WidthAnchor.ConstraintEqualTo(swipeActionBtnWidth),
+                lastSwipeButton.TopAnchor.ConstraintEqualTo(btnContainer.TopAnchor),
+                lastSwipeButton.BottomAnchor.ConstraintEqualTo(containerView.BottomAnchor, -10f),
+                lastSwipeButton.TrailingAnchor.ConstraintEqualTo(btnContainer.TrailingAnchor)
+            });
 
             lastSwipeButton.BackgroundColor = Theme.Brown;
 
+            BuildMaskButton(containerView, trailingLastBtnTag);
+
             return containerView;
-        }
-
-        UIButton BuildActionSelectionButton(nint tag)
-        {
-            var button = new UIButton()
-            {
-                TranslatesAutoresizingMaskIntoConstraints = false,
-                LineBreakMode = UILineBreakMode.WordWrap,
-                HorizontalAlignment = UIControlContentHorizontalAlignment.Center,
-            };
-
-            button.SetTitleColor(Theme.White, UIControlState.Normal);
-            button.HorizontalAlignment = UIControlContentHorizontalAlignment.Center;
-            button.ContentEdgeInsets = new UIEdgeInsets(10f, 10f, 10f, 10f);
-            button.TitleLabel.Lines = 5;
-            button.TitleLabel.ContentScaleFactor = 0.7f;
-
-            button.TitleLabel.AdjustsFontSizeToFitWidth = true;
-            button.TitleLabel.Font = Theme.DefaultFont;
-            button.TitleLabel.TextAlignment = UITextAlignment.Center;
-            button.Tag = Convert.ToInt16(tag);
-            button.TouchUpInside += SelectAction_Clicked;
-
-            return button;
         }
 
         UIView BuildLeadingSwipe()
@@ -445,13 +571,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             containerView.AddSubview(titleLbl);
 
-            titleLbl.LeadingAnchor.ConstraintEqualTo(containerView.LeadingAnchor).Active = true;
-            titleLbl.TrailingAnchor.ConstraintEqualTo(containerView.TrailingAnchor).Active = true;
-            titleLbl.TopAnchor.ConstraintEqualTo(containerView.TopAnchor, 10f).Active = true;
+            containerView.AddConstraints(new[] {
+                titleLbl.LeadingAnchor.ConstraintEqualTo(containerView.LeadingAnchor),
+                titleLbl.TrailingAnchor.ConstraintEqualTo(containerView.TrailingAnchor),
+                titleLbl.TopAnchor.ConstraintEqualTo(containerView.TopAnchor, 10f)
+            });
 
             UIView emailContent = BuildLeadingSwipeEmai();
 
-            leadingSwipeButton = BuildActionSelectionButton(leadingBtnTag);
+            leadingSwipeButton = BuildActionSelectionButton();
 
             var leadingAction = PlatformConfig.Preferences.EmailLeadingSwipeActions.First();
 
@@ -460,181 +588,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             containerView.AddSubview(leadingSwipeButton);
 
-            leadingSwipeButton.WidthAnchor.ConstraintEqualTo(swipeActionBtnWidth).Active = true;
-            leadingSwipeButton.LeadingAnchor.ConstraintEqualTo(containerView.LeadingAnchor).Active = true;
-            leadingSwipeButton.TopAnchor.ConstraintEqualTo(titleLbl.BottomAnchor, 10f).Active = true;
-            leadingSwipeButton.BottomAnchor.ConstraintEqualTo(containerView.BottomAnchor, -10f).Active = true;
+            containerView.AddConstraints(new[] {
+                leadingSwipeButton.WidthAnchor.ConstraintEqualTo(swipeActionBtnWidth),
+                leadingSwipeButton.LeadingAnchor.ConstraintEqualTo(containerView.LeadingAnchor),
+                leadingSwipeButton.TopAnchor.ConstraintEqualTo(titleLbl.BottomAnchor, 10f),
+                leadingSwipeButton.BottomAnchor.ConstraintEqualTo(containerView.BottomAnchor, -10f)
+            });
 
             containerView.AddSubview(emailContent);
 
-            emailContent.TrailingAnchor.ConstraintEqualTo(containerView.TrailingAnchor).Active = true;
-            emailContent.LeadingAnchor.ConstraintEqualTo(leadingSwipeButton.TrailingAnchor).Active = true;
-            emailContent.TopAnchor.ConstraintEqualTo(titleLbl.BottomAnchor, 10f).Active = true;
-            emailContent.BottomAnchor.ConstraintEqualTo(containerView.BottomAnchor, -10f).Active = true;
-
-            /* commnet out if UI/UX wants color mask
-            UIView leftContainerColorMask = new UIView()
-            {
-                BackgroundColor = Theme.Gray,
-                Alpha = 0.7f,
-                TranslatesAutoresizingMaskIntoConstraints = false
-            };
-
-            containerView.AddSubview(leftContainerColorMask);
-
             containerView.AddConstraints(new[] {
-                NSLayoutConstraint.Create(leftContainerColorMask, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, leadingSwipeButton, NSLayoutAttribute.Trailing, 1f, 0f),
-                NSLayoutConstraint.Create(leftContainerColorMask, NSLayoutAttribute.Top, NSLayoutRelation.Equal, titleLbl, NSLayoutAttribute.Bottom, 1f, 10f),
-                NSLayoutConstraint.Create(leftContainerColorMask, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, containerView, NSLayoutAttribute.Bottom, 1f, -10f)
+                emailContent.TrailingAnchor.ConstraintEqualTo(containerView.TrailingAnchor),
+                emailContent.LeadingAnchor.ConstraintEqualTo(leadingSwipeButton.TrailingAnchor),
+                emailContent.TopAnchor.ConstraintEqualTo(titleLbl.BottomAnchor, 10f),
+                emailContent.BottomAnchor.ConstraintEqualTo(containerView.BottomAnchor, -10f)
             });
 
-            if (Integration.IsIPad())
-            {
-                containerView.AddConstraint(NSLayoutConstraint.Create(leftContainerColorMask, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, containerView.ReadableContentGuide, NSLayoutAttribute.Trailing, 1f, 0f));
-            }
-            else
-            {
-                containerView.AddConstraint(NSLayoutConstraint.Create(leftContainerColorMask, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, containerView.ReadableContentGuide, NSLayoutAttribute.Trailing, 1f, 40f));
+            BuildMaskButton(containerView, leadingBtnTag);
 
-            }
-            */
             return containerView;
         }
 
-        UIView BuildLeadingSwipeEmai()
-        {
+        #endregion
 
-            UIView container = new UIView()
-            {
-                TranslatesAutoresizingMaskIntoConstraints = false
-            };
-
-            var leadingMarginGuide = new UILayoutGuide();
-            container.AddLayoutGuide(leadingMarginGuide);
-
-            leadingMarginGuide.LeadingAnchor.ConstraintEqualTo(container.ReadableContentGuide.LeadingAnchor).Active = true;
-            var leadingMarginWidthAnchor = leadingMarginGuide.WidthAnchor.ConstraintEqualTo(0f);
-            leadingMarginWidthAnchor.SetIdentifier("leadingMarginWidth");
-            leadingMarginWidthAnchor.Active = true;
-
-            UILabel topLabel = new UILabel
-            {
-                Text = "Anne Mortensen",
-                Font = Theme.DefaultBoldFont,
-                TextColor = Theme.DarkGray,
-                Lines = 1,
-                TranslatesAutoresizingMaskIntoConstraints = false
-            };
-
-            container.AddSubview(topLabel);
-            container.AddConstraints(new[]
-            {
-                topLabel.TopAnchor.ConstraintEqualTo(container.TopAnchor, 8f),
-                topLabel.LeadingAnchor.ConstraintEqualTo(leadingMarginGuide.TrailingAnchor, 15f + 8f),
-                topLabel.HeightAnchor.ConstraintGreaterThanOrEqualTo(Theme.MinimumLabelSize),
-            });
-
-            UILabel dateLabel = new UILabel
-            {
-                Text = "9.35, today",
-                Font = Theme.DefaultLightFont.WithRelativeSize(-2f),
-                TextColor = Theme.DarkGray,
-                Lines = 1,
-                TranslatesAutoresizingMaskIntoConstraints = false
-            };
-            dateLabel.SetContentHuggingPriority(1000f, UILayoutConstraintAxis.Horizontal);
-            dateLabel.SetContentCompressionResistancePriority(1000f, UILayoutConstraintAxis.Horizontal);
-
-            container.AddSubview(dateLabel);
-            container.AddConstraints(new[]
-                {
-                    dateLabel.LeadingAnchor.ConstraintEqualTo(topLabel.TrailingAnchor, 8f),
-                    dateLabel.TrailingAnchor.ConstraintEqualTo(container.ReadableContentGuide.TrailingAnchor),
-                    dateLabel.CenterYAnchor.ConstraintEqualTo(topLabel.CenterYAnchor)
-                });
-
-            UILabel middleLabel = new UILabel
-            {
-                Text = "Hvad skal du lave til nytår?",
-                Font = Theme.DefaultFont,
-                TextColor = Theme.DarkGray,
-                Lines = 1,
-                TranslatesAutoresizingMaskIntoConstraints = false
-            };
-
-            container.AddSubview(middleLabel);
-            container.AddConstraints(new[]
-            {
-                middleLabel.LeadingAnchor.ConstraintEqualTo(topLabel.LeadingAnchor),
-                middleLabel.TopAnchor.ConstraintEqualTo(topLabel.BottomAnchor, 4f),
-                middleLabel.TrailingAnchor.ConstraintEqualTo(container.ReadableContentGuide.TrailingAnchor),
-            });
-
-            UITextView bottomLabel = new UITextView
-            {
-                Text = "Hej Anne nytår står for døren så jeg ville høre hvad dine planer er. Vi tænker at tage på musling og spise en masse...",
-                Font = Theme.DefaultFont.WithRelativeSize(-2f),
-                TextColor = Theme.DarkGray,
-                Selectable = false,
-                Editable = false,
-                ScrollEnabled = false,
-                ClipsToBounds = false,
-                TextContainerInset = UIEdgeInsets.Zero,
-                UserInteractionEnabled = false,
-                TranslatesAutoresizingMaskIntoConstraints = false
-            };
-            bottomLabel.TextContainer.MaximumNumberOfLines = 3;
-            bottomLabel.TextContainer.LineFragmentPadding = 0f;
-
-            container.AddSubview(bottomLabel);
-            container.AddConstraints(new[]
-            {
-                bottomLabel.LeadingAnchor.ConstraintEqualTo(topLabel.LeadingAnchor),
-                bottomLabel.TopAnchor.ConstraintEqualTo(middleLabel.BottomAnchor, 4f),
-                bottomLabel.TrailingAnchor.ConstraintEqualTo(container.ReadableContentGuide.TrailingAnchor),
-                bottomLabel.BottomAnchor.ConstraintEqualTo(container.BottomAnchor),
-            });
-
-            UIImageView directionIndicatorImageView = new UIImageView
-            {
-                ContentMode = UIViewContentMode.ScaleToFill,
-                TranslatesAutoresizingMaskIntoConstraints = false,
-                Image = UIImage.FromBundle("Incoming").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
-                TintColor = Theme.DarkGray
-            };
-
-            container.AddSubview(directionIndicatorImageView);
-            container.AddConstraints(new[]
-                {
-                    directionIndicatorImageView.LeadingAnchor.ConstraintEqualTo(leadingMarginGuide.TrailingAnchor),
-                    directionIndicatorImageView.CenterYAnchor.ConstraintEqualTo(topLabel.CenterYAnchor),
-                    directionIndicatorImageView.WidthAnchor.ConstraintEqualTo(15f),
-                    directionIndicatorImageView.HeightAnchor.ConstraintEqualTo(15f),
-                });
-
-            UIImageView unreadIndicatorImageView = new UIImageView
-            {
-                ContentMode = UIViewContentMode.ScaleToFill,
-                Image = UIImage.FromBundle("Full-Dot").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
-                TranslatesAutoresizingMaskIntoConstraints = false,
-                TintColor = Theme.DarkGray
-            };
-
-            container.AddSubview(unreadIndicatorImageView);
-            container.AddConstraints(new[]
-                {
-                    unreadIndicatorImageView.LeadingAnchor.ConstraintEqualTo(leadingMarginGuide.TrailingAnchor),
-                    unreadIndicatorImageView.TopAnchor.ConstraintEqualTo(directionIndicatorImageView.BottomAnchor, 4f),
-                    unreadIndicatorImageView.WidthAnchor.ConstraintEqualTo(15f),
-                    unreadIndicatorImageView.HeightAnchor.ConstraintEqualTo(15f),
-                });
-
-            container.Layer.BorderWidth = 1f;
-            container.Layer.BorderColor = Theme.Gray.CGColor;
-
-            return container;
-        }
-
+        #region Actions
         void SetAction(nint tag, EmailSwipeAction.SwipeAction action)
         {
             switch (tag)
@@ -698,7 +675,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }));
 
             eas.AddAction(UIAlertAction.Create(
-                Localization.GetString("delete_from_folder"), 
+                Localization.GetString("delete_from_folder"),
                 UIAlertActionStyle.Default,
                 a =>
                 {
@@ -707,7 +684,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
 
             eas.AddAction(UIAlertAction.Create(
-                Localization.GetString("delete"), 
+                Localization.GetString("delete"),
                 UIAlertActionStyle.Default,
                 a =>
                 {
@@ -731,5 +708,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
             PresentViewController(eas, true, null);
         }
+
+        #endregion
     }
 }

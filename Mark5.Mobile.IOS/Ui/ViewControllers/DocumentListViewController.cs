@@ -1439,7 +1439,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if(SwipeActionAllowed(leadingAction.Action, documentPreview, folder)) {
                     contextualAction.BackgroundColor = Theme.LightBrown;
                 } else {
-                    contextualAction.BackgroundColor = Theme.Gray;
+                    contextualAction.BackgroundColor = Theme.LightGray;
                 }
 
                 return contextualAction;
@@ -1578,7 +1578,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     if (actionWrappers[i].Disabled)
                     {
-                        actionWrappers[i].Action.BackgroundColor = Theme.Gray;
+                        actionWrappers[i].Action.BackgroundColor = Theme.LightGray;
                     }
                     else
                     {
