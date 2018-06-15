@@ -30,11 +30,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         private nfloat swipeActionBtnWidth = 80f;
 
-        public SwipeActionViewController()
-        {
-
-        }
-
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
@@ -100,7 +95,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 Font = Theme.DefaultFont,
                 TextColor = Theme.DarkGray,
-                Lines = 3,
+                LineBreakMode = UILineBreakMode.WordWrap,
+                Lines = 0,
                 BackgroundColor = Theme.Clear,
                 Text = Localization.GetString("swipe_settings_info"),
                 TextAlignment = UITextAlignment.Left,

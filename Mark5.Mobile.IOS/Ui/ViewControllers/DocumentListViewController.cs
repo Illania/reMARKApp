@@ -1417,17 +1417,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             class SwipeActionUIWrapper
             {
-
-                public SwipeActionUIWrapper()
-                {
-                    Disabled = false;
-                }
-
                 public UITableViewRowAction Action { get; set; }
-                public Boolean Disabled;
+                public bool Disabled;
             }
 
-            UIContextualAction BuildCentextualAction(UITableView tableView, NSIndexPath indexPath)
+            UIContextualAction BuildLeadingContextualAction(UITableView tableView, NSIndexPath indexPath)
             {
                 var documentPreview = Items[indexPath.Row];
 
@@ -1451,18 +1445,27 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return contextualAction;
             }
 
+            public override UISwipeActionsConfiguration GetLeadingSwipeActionsConfiguration(UITableView tableView, NSIndexPath indexPath)
+            {
+                var leadingSwipe = UISwipeActionsConfiguration.FromActions(new UIContextualAction[] { BuildLeadingContextualAction(tableView, indexPath) });
+
+                leadingSwipe.PerformsFirstActionWithFullSwipe = true;
+
+                return leadingSwipe;
+            }
+
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
             {
                 var actionWrappers = new List<SwipeActionUIWrapper>();
 
                 var documentPreview = Items[indexPath.Row];
 
-                List<EmailSwipeAction> trailingSwipeActios = PlatformConfig.Preferences.EmailTrailingSwipeActions;
+                List<EmailSwipeAction> trailingSwipeActions = PlatformConfig.Preferences.EmailTrailingSwipeActions;
 
-                trailingSwipeActios.Reverse();
+                trailingSwipeActions.Reverse();
                 var folder = viewControllerWeakReference.Unwrap()?.Folder;
 
-                foreach (EmailSwipeAction swipeAction in trailingSwipeActios)
+                foreach (EmailSwipeAction swipeAction in trailingSwipeActions)
                 {
                     SwipeActionUIWrapper actionWrapper = new SwipeActionUIWrapper();
 
@@ -1565,7 +1568,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                             actionWrapper.Disabled = !SwipeActionAllowed(swipeAction.Action, documentPreview, folder);
                             break;
                         default:
-                            throw new NotImplementedException("//TODO : Send report");
+                            break;
                     }
 
                     actionWrappers.Add(actionWrapper);
@@ -1600,9 +1603,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
 
-            string SwipeActionTitle(EmailSwipeAction action, DocumentPreview documentPreview)
+            string SwipeActionTitle(EmailSwipeAction swipeAction, DocumentPreview documentPreview)
             {
-                switch (action.Action)
+                switch (swipeAction.Action)
                 {
                     case EmailSwipeAction.SwipeAction.MarkAsRead:
                         if (documentPreview.IsReadByCurrent)
@@ -1631,15 +1634,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     case EmailSwipeAction.SwipeAction.RemoveFromFolder:
                         return Localization.GetString("delete_from_folder");
                     default:
-                        throw new NotImplementedException("//TODO : Send report");
+                        CommonConfig.Logger.Error("Missed case for EmailSwipeAction : " + swipeAction.Action.ToString());
+                        return "";
                 }
             }
 
-            void OnSwipeActionClick(EmailSwipeAction action, NSIndexPath indexPath, DocumentPreview documentPreview, Folder folder, UITableView tableView)
+            void OnSwipeActionClick(EmailSwipeAction swipeAction, NSIndexPath indexPath, DocumentPreview documentPreview, Folder folder, UITableView tableView)
             {
                 var popoverDelegate = new PopoverPresentationControllerDelegate(tableView, tableView.CellAt(indexPath));
 
-                switch (action.Action)
+                switch (swipeAction.Action)
                 {
                     case EmailSwipeAction.SwipeAction.MarkAsRead:
                         if (documentPreview.IsReadByCurrent)
@@ -1688,7 +1692,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         viewControllerWeakReference.Unwrap()?.RemoveFromFolder(documentPreview, popoverDelegate);
                         break;
                     default:
-                        CommonConfig.Logger.Error("Eer");
+                        CommonConfig.Logger.Error("Missed case for EmailSwipeAction : " + swipeAction.Action.ToString());
                         break;
                 }
             }

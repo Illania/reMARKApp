@@ -20,22 +20,7 @@ namespace Mark5.Mobile.IOS.Utilities
             Delete
         }
 
-        SwipeAction _action;
-        public SwipeAction Action
-        {
-            set {
-                this.SelectedAction = value.ToString();
-                _action = value;
-            }
-
-            get {
-                return _action;
-            }
-        }
-
-        string SelectedAction {
-            get; set;
-        }
+        public SwipeAction Action { get; set; }
 
         public EmailSwipeAction(SwipeAction action)
         {
