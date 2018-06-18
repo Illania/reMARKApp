@@ -393,7 +393,7 @@
 "youre_offline_title" = "You are offline";
 "youre_offline_message" = "This action cannot be performed offline";
 "email_swipe_actions" = "Swipe options";
-"swipe_settings_info" = "Select a swipe button bellow and choose which actions to quickly access when you swipe items in your inbox.";
+"swipe_settings_info" = "Select a swipe button bellow and choose which actions to quickly access when you swipe emails in your inbox.";
 "swipe_reset_default" = "Reset to Default";
 "swipe_settings_leading_title" = "SWIPE RIGHT";
 "swipe_settings_middle_title" = "SWIPE LEFT - MIDDLE BUTTON";
