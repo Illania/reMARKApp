@@ -582,7 +582,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                         if (selectedDocument.IsReadByCurrent)
                         {
-                            alertController.AddAction(UIAlertAction.Create(Localization.GetString("mark_as_unread_ml"), UIAlertActionStyle.Default, a =>
+                            alertController.AddAction(UIAlertAction.Create(Localization.GetString("mark_as_unread"), UIAlertActionStyle.Default, a =>
                             {
                                 MarkAsUnread(selectedDocument);
                                 EndEditing();
@@ -590,7 +590,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         }
                         else
                         {
-                            alertController.AddAction(UIAlertAction.Create(Localization.GetString("mark_as_read_ml"), UIAlertActionStyle.Default, a =>
+                            alertController.AddAction(UIAlertAction.Create(Localization.GetString("mark_as_read"), UIAlertActionStyle.Default, a =>
                             {
                                 MarkAsRead(selectedDocument);
                                 EndEditing();
@@ -598,7 +598,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         }
                         break;
                     case EmailSwipeAction.SwipeAction.CopyToWorkTray:
-                        alertController.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray_ml"), UIAlertActionStyle.Default, a =>
+                        alertController.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"), UIAlertActionStyle.Default, a =>
                         {
                             CopyToWorktray(selectedDocument);
                             EndEditing();

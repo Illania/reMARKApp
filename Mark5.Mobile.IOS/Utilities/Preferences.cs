@@ -290,7 +290,9 @@ namespace Mark5.Mobile.IOS.Utilities
 
         public List<EmailSwipeAction> GetAvailableSwipeActions()
         {
-            return EmailSwipeAction.GetAllAvailableActions.Except(EmailLeadingSwipeActions).Except(EmailTrailingSwipeActions).ToList();                          
+            var exceptLeading = EmailSwipeAction.GetAllAvailableActions.Where(all => !EmailLeadingSwipeActions.Any(leading => leading.Action == all.Action));
+            var exceptTrailing = exceptLeading.Where(leading => !EmailTrailingSwipeActions.Any(trailing => trailing.Action == leading.Action));
+            return exceptTrailing.ToList();                          
         }
 
         public void ResetSwipeActions() {
