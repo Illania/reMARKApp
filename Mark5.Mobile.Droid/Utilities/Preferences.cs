@@ -143,5 +143,45 @@ namespace Mark5.Mobile.Droid.Utilities
             Local = 2,
             AlwaysAsk = 3,
         }
+
+        #region EmailSwipeActions
+
+        public enum SwipeAction
+        {
+            Delete = 0,
+            More = 1,
+            MarkAsReadUnread = 2,
+            MoveToFolder = 3,
+            Categories = 4,
+            RemoveFromFolder = 5,
+            MoveToWorkTray = 6,
+            Priorities = 7
+        }
+
+        public SwipeAction LeadingSwipeAction
+        {
+            get => (SwipeAction)sp.GetInt(Application.Context.GetString(Resource.String.pref_key_email_leading_swipe_action), (int)SwipeAction.More);
+
+            set
+            {
+                var e = sp.Edit();
+                e.PutInt(Application.Context.GetString(Resource.String.pref_key_email_leading_swipe_action), (int)value);
+                e.Commit();
+            }
+        }
+
+        public SwipeAction TrailingSwipeAction
+        {
+            get => (SwipeAction)sp.GetInt(Application.Context.GetString(Resource.String.pref_key_email_trailing_swipe_action), (int)SwipeAction.MoveToFolder);
+
+            set
+            {
+                var e = sp.Edit();
+                e.PutInt(Application.Context.GetString(Resource.String.pref_key_email_trailing_swipe_action), (int)value);
+                e.Commit();
+            }
+        }
+
+        #endregion
     }
 }

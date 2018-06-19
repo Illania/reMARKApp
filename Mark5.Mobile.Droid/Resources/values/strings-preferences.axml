@@ -148,6 +148,8 @@
 	<string name="pref_key_search_contacts_to_get">pref_key_search_contacts_to_get</string>
 	<string name="pref_key_search_shortcodes_to_get">pref_key_search_shortcodes_to_get</string>
 	<string name="pref_key_search_partial_word">pref_key_search_partial_word</string>
+    <string name="pref_key_email_leading_swipe_action">pref_key_email_leading_swipe_action</string>
+    <string name="pref_key_email_trailing_swipe_action">pref_key_email_trailing_swipe_action</string>
     <string name="pref_notification_hide_read_summary_off">Do not hide read notifications in the list</string>
     <string name="pref_notification_hide_read_summary_on">Do not show read notifications in the list</string>
 	<string name="pref_notification_hide_read_title">Hide read notifications</string>
@@ -167,4 +169,7 @@
 	<string name="ssl_off">Disabled</string>
 	<string name="ssl_on">Enabled</string>
 	<string name="ssl_self_signed">Enabled (allow self-signed)</string>
+    <string name="pref_email_swipe_leading_key">pref_email_swipe_leading_key</string>
+    <string name="pref_email_swipe_leading_title">Left swipe action</string>
+    <string name="pref_email_swipe_leading_summary">Select action when swiping to right</string>
 </resources>

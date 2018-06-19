@@ -229,6 +229,7 @@
     <string name="mark_as_read">Mark as read</string>
     <string name="marking_as_read">Marking as read...</string>
     <string name="marking_as_unread">Marking as unread...</string>
+    <string name="marking_as_read_unread">Mark as read/unread</string>
     <string name="marks_as_unread">Mark as unread</string>
     <string name="move_to_folder">Move to folder</string>
     <string name="moving_to_folder">Moving to folder</string>
@@ -431,4 +432,6 @@
     <string name="yesterday">Yesterday</string>
     <string name="youre_offline_title">You are offline</string>
     <string name="youre_offline_message">This action cannot be performed offline</string>
+    <string name="more">More</string>
+    <string name="remove_from_folder">Remove from folder</string>
 </resources>

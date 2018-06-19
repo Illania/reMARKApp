@@ -147,7 +147,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }));
             recyclerView.SetAdapter(adapter);
 
-            swipeHelperCallback = new SwipeHelperCallback(Context, this, adapter, refreshLayout);
+
+            swipeHelperCallback = new SwipeHelperCallback(Context, this, adapter, refreshLayout, Folder);
             itemTouchHelper = new ItemTouchHelper(swipeHelperCallback);
             itemTouchHelper.AttachToRecyclerView(recyclerView);
 
@@ -1316,19 +1317,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             readonly DocumentsListAdapter adapter;
             readonly DocumentsListFragment fragment;
             readonly SwipeRefreshLayout refreshLayout;
+            readonly Folder folder;
 
-            readonly Drawable leftBackground;
-            readonly Drawable rightBackground;
+            Drawable leftBackground;
+            Drawable rightBackground;
 
-            public SwipeHelperCallback(Context context, DocumentsListFragment fragment, DocumentsListAdapter adapter, SwipeRefreshLayout refreshLayout)
+            public SwipeHelperCallback(Context context, DocumentsListFragment fragment, DocumentsListAdapter adapter, SwipeRefreshLayout refreshLayout, Folder folder)
             {
                 this.context = context;
                 this.fragment = fragment;
                 this.adapter = adapter;
                 this.refreshLayout = refreshLayout;
+                this.folder = folder;
 
-                leftBackground = new ColorDrawable(new Color(ContextCompat.GetColor(context, Resource.Color.brown)));
-                rightBackground = new ColorDrawable(new Color(ContextCompat.GetColor(context, Resource.Color.darkblue)));
+
             }
 
             public override int GetMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder)
@@ -1375,13 +1377,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 if (dX > 0) //Swiping to right
                 {
-                    var text = context.Resources.GetString(Resource.String.categories);
-
+                    Preferences.SwipeAction action = PlatformConfig.Preferences.LeadingSwipeAction;
+                    int bgColor = SwipeActionAllowed(action) ? Resource.Color.brown : Resource.Color.lightgray;
+                    leftBackground = new ColorDrawable(new Color(ContextCompat.GetColor(context, bgColor)));
+                    string text = GetSwipeActionTitle(action);
                     leftBackground.SetBounds(itemView.Left, itemView.Top, (int)dX, itemView.Bottom);
                     leftBackground.Draw(c);
-
                     var textLayout = new StaticLayout(text, paint, c.Width, Layout.Alignment.AlignNormal, 1, 0, false);
-
                     var textLeft = itemView.Left + iconMargin;
                     var textTop = itemView.Top + (itemViewHeight - textHeight) / 2;
 
@@ -1392,13 +1394,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
                 else if (dX < 0)
                 {
-                    var text = context.Resources.GetString(Resource.String.copy_to_worktray_multiline);
-
+                    Preferences.SwipeAction action = PlatformConfig.Preferences.TrailingSwipeAction;
+                    int bgColor = SwipeActionAllowed(action) ? Resource.Color.darkblue : Resource.Color.lightgray;
+                    rightBackground = new ColorDrawable(new Color(ContextCompat.GetColor(context, bgColor)));
+                    string text = GetSwipeActionTitle(action);
                     rightBackground.SetBounds(itemView.Right + (int)dX, itemView.Top, itemView.Right, itemView.Bottom);
                     rightBackground.Draw(c);
-
                     var textLayout = new StaticLayout(text, paint, c.Width, Layout.Alignment.AlignNormal, 1, 0, false);
-
                     var iconWidth = text.Split(new string[]
                             {
                                 "\n"
@@ -1422,12 +1424,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public override void OnSwiped(RecyclerView.ViewHolder viewHolder, int direction)
             {
-                if (direction == ItemTouchHelper.Left)
-                    fragment.CopyToOwnWorktray(adapter.Items[viewHolder.AdapterPosition]);
-                else if (direction == ItemTouchHelper.Right)
-                    fragment.ShowCategories(adapter.Items[viewHolder.AdapterPosition]);
-
                 ResetViewHolder(viewHolder, direction);
+                if (direction == ItemTouchHelper.Left) {
+                     SwipeActionSelected(PlatformConfig.Preferences.TrailingSwipeAction, viewHolder);
+
+                } else if (direction == ItemTouchHelper.Right) {
+                    SwipeActionSelected(PlatformConfig.Preferences.LeadingSwipeAction, viewHolder);
+                   
+                }
             }
 
             void ResetViewHolder(RecyclerView.ViewHolder viewHolder, int direction)
@@ -1447,6 +1451,89 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         adapter.NotifyItemChanged(position);
                     },
                     400);
+            }
+
+            async void SwipeActionSelected(Preferences.SwipeAction action, RecyclerView.ViewHolder viewHolder)
+            {
+                if (SwipeActionAllowed(action))
+                {
+                    switch (action)
+                    {
+                        case Preferences.SwipeAction.Delete:
+                            fragment.DeleteAction();
+                            break;
+                        case Preferences.SwipeAction.More:
+                            var values = new List<Preferences.SwipeAction> { Preferences.SwipeAction.Categories, Preferences.SwipeAction.Delete, Preferences.SwipeAction.More };
+                            var index = await Dialogs.ShowListDialog(context, Resource.String.edit_contact_dialog_title, values.Select(x => x.ToString()).ToArray(), true);
+                            if (index >= 0) {
+                                SwipeActionSelected(Preferences.SwipeAction.Categories, viewHolder);
+                            }
+                            break;
+                        case Preferences.SwipeAction.MoveToWorkTray:
+                            fragment.CopyToOwnWorktray(adapter.Items[viewHolder.AdapterPosition]);
+                            break;
+                        case Preferences.SwipeAction.Categories:
+                            fragment.ShowCategories(adapter.Items[viewHolder.AdapterPosition]);
+                            break;
+                        case Preferences.SwipeAction.MarkAsReadUnread:
+                            if (adapter.SelectedItems.Any(dp => !dp.IsReadByCurrent))
+                            {
+                                fragment.MarkAsRead();
+                            }
+                            if (adapter.SelectedItems.Any(dp => dp.IsReadByCurrent))
+                            {
+                                fragment.MarkAsUnread();
+                            }
+                            break;
+                        case Preferences.SwipeAction.RemoveFromFolder:
+                            fragment.DeleteFromFolderAction();
+                            break;
+                    }
+                }
+            }
+
+            bool SwipeActionAllowed(Preferences.SwipeAction action)
+            {
+                switch (action)
+                {
+                    case Preferences.SwipeAction.Delete:
+                        return ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || adapter.SelectedItems.All(dp => dp.Direction == DocumentDirection.Draft); ;
+                    case Preferences.SwipeAction.MoveToFolder:
+                        return folder.InternalType == FolderInternalType.FilterView || folder.InternalType == FolderInternalType.Static || folder.InternalType == FolderInternalType.Worktray;
+                    case Preferences.SwipeAction.RemoveFromFolder:
+                        return folder.InternalType == FolderInternalType.FilterView || folder.InternalType == FolderInternalType.Static || folder.InternalType == FolderInternalType.Worktray;
+                    default:
+                        return true;
+                }
+            }
+
+            string GetSwipeActionTitle(Preferences.SwipeAction action)
+            {
+                switch (action)
+                {
+                    case Preferences.SwipeAction.Delete:
+                        return context.Resources.GetString(Resource.String.delete);
+                    case Preferences.SwipeAction.More:
+                        return context.Resources.GetString(Resource.String.more);
+                    case Preferences.SwipeAction.MoveToFolder:
+                        return context.Resources.GetString(Resource.String.move_to_folder);
+                    case Preferences.SwipeAction.MarkAsReadUnread:
+                        if (adapter.SelectedItems.Any(dp => !dp.IsReadByCurrent))
+                        {
+                            return context.Resources.GetString(Resource.String.mark_as_read);
+                        } 
+                        if (adapter.SelectedItems.Any(dp => dp.IsReadByCurrent)) 
+                        {
+                            return context.Resources.GetString(Resource.String.marks_as_unread);
+                        }
+                        return "";
+                    case Preferences.SwipeAction.Categories:
+                        return context.Resources.GetString(Resource.String.categories);
+                    case Preferences.SwipeAction.RemoveFromFolder:
+                        return context.Resources.GetString(Resource.String.remove_from_folder);
+                    default:
+                        return "Forgot case ?";
+                }
             }
         }
 
