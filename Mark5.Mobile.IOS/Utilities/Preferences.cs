@@ -131,7 +131,7 @@ namespace Mark5.Mobile.IOS.Utilities
                     new NSString(Keys.AuthorizationInterval), NSNumber.FromInt16(-1)
                 },
                 {
-                    new NSString(Keys.EmailLeadingSwipeActions), NSArray.FromStrings(EmailSwipeAction.SwipeAction.Delete.ToString())
+                    new NSString(Keys.EmailLeadingSwipeActions), NSArray.FromStrings(EmailSwipeAction.SwipeAction.Categories.ToString())
                 },
                 {
                     new NSString(Keys.EmailTrailingSwipeActions), NSArray.FromStrings (EmailSwipeAction.SwipeAction.More.ToString(), EmailSwipeAction.SwipeAction.CopyToWorkTray.ToString(), EmailSwipeAction.SwipeAction.MarkAsRead.ToString())
@@ -294,8 +294,8 @@ namespace Mark5.Mobile.IOS.Utilities
         }
 
         public void ResetSwipeActions() {
-            EmailLeadingSwipeActions = new List<EmailSwipeAction> { new EmailSwipeAction(EmailSwipeAction.SwipeAction.Delete) };
-            EmailTrailingSwipeActions = new List<EmailSwipeAction> { new EmailSwipeAction(EmailSwipeAction.SwipeAction.More), new EmailSwipeAction(EmailSwipeAction.SwipeAction.MarkAsRead), new EmailSwipeAction(EmailSwipeAction.SwipeAction.SetPriority) }; 
+            EmailLeadingSwipeActions = new List<EmailSwipeAction> { new EmailSwipeAction(EmailSwipeAction.SwipeAction.Categories) };
+            EmailTrailingSwipeActions = new List<EmailSwipeAction> { new EmailSwipeAction(EmailSwipeAction.SwipeAction.More), new EmailSwipeAction(EmailSwipeAction.SwipeAction.CopyToWorkTray), new EmailSwipeAction(EmailSwipeAction.SwipeAction.MarkAsRead) }; 
         }
 
         #endregion

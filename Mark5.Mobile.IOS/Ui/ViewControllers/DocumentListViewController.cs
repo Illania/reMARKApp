@@ -1634,7 +1634,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     case EmailSwipeAction.SwipeAction.RemoveFromFolder:
                         return Localization.GetString("delete_from_folder");
                     default:
-                        CommonConfig.Logger.Error("Missed case for EmailSwipeAction : " + swipeAction.Action.ToString());
+                        CommonConfig.Logger.Error($"Missing implementation for EmailSwipeAction : {swipeAction.Action.ToString()}");
                         return "";
                 }
             }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Foundation;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.IOS.Ui.Common;
 
 namespace Mark5.Mobile.IOS.Utilities
@@ -75,7 +76,8 @@ namespace Mark5.Mobile.IOS.Utilities
                     return Localization.GetString("delete_from_folder");
 
                 default:
-                    return "FORGOT A CASE?";
+                    CommonConfig.Logger.Error($"Missing implementation for case : {action.ToString()}");
+                    return "";
             }
 
         }
