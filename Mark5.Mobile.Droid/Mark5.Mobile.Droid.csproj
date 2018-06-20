@@ -209,6 +209,9 @@
     <Reference Include="Xamarin.Firebase.Messaging">
       <HintPath>..\packages\Xamarin.Firebase.Messaging.60.1142.0\lib\MonoAndroid80\Xamarin.Firebase.Messaging.dll</HintPath>
     </Reference>
+    <Reference Include="Xamarin.iOS">
+      <HintPath>..\..\..\..\..\Library\Frameworks\Xamarin.iOS.framework\Versions\Current\lib\mono\Xamarin.iOS\Xamarin.iOS.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Resources\Resource.designer.cs" />
@@ -819,6 +822,7 @@
     <AndroidAsset Include="Assets\insertTemplate.js" />
     <AndroidAsset Include="Assets\plain.html" />
     <AndroidAsset Include="Assets\replyHeader.html" />
+    <AndroidAsset Include="Assets\editorScript.js" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Import Project="..\packages\NETStandard.Library.2.0.1\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.1\build\netstandard2.0\NETStandard.Library.targets')" />

@@ -1,25 +1,21 @@
-﻿using System;
+using System;
+using System.Linq;
+using System.Text.RegularExpressions;
 using CoreAnimation;
 using CoreGraphics;
+using Foundation;
+using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Extensions;
+using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
-using Mark5.Mobile.Common.Extensions;
-using Foundation;
 
-namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
+namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 {
-    public class RecipientsView : MailViewerSubview
+    public class RecipientsView : DocumentSubView
     {
-        public enum Type
-        {
-            To,
-            Cc,
-            Bcc,
-            From,
-            ReplyTo
-        }
-
         enum State
         {
             Compressed,
@@ -34,7 +30,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
         const string EmailSeparator = ", ";
         const string RecipentRegex = @"[^,]*";
 
-        readonly Type addressType;
+        readonly DocumentAddressType addressType;
         readonly float buttonSize = 20f;
         readonly UIFont addressesFont = Theme.DefaultFont;
         readonly uint partiallyExpandedLines = 3;
@@ -43,13 +39,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
         UITextView textView;
         UIButton expandButton;
 
-
         State currentState;
         CADisplayLink displayLink;
 
         NSLayoutConstraint expandButtonWidthConstraint;
 
-        public RecipientsView(Type addressType)
+        public event EventHandler<RecipientTappedEventArgs> RecipientTapped = delegate { };
+
+        public RecipientsView(DocumentAddressType addressType)
         {
             this.addressType = addressType;
 
@@ -98,6 +95,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
                 textView.LeftAnchor.ConstraintEqualTo(titleLabel.RightAnchor, InnerMargin),
                 textView.BottomAnchor.ConstraintEqualTo(ContainerView.BottomAnchor, -VerticalMargin),
             });
+            textView.AddGestureRecognizer(new UITapGestureRecognizer(HandleTextTapped));
 
             expandButton = new LargeHitAreaButton
             {
@@ -149,27 +147,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
                         expandButton.Transform = CGAffineTransform.MakeRotation(0f);
                         break;
                     case State.PartiallyExpanded:
-                        textView.TextContainer.MaximumNumberOfLines = addressType == Type.From ? 0 : partiallyExpandedLines;
+                        textView.TextContainer.MaximumNumberOfLines = addressType == DocumentAddressType.From ? 0 : partiallyExpandedLines;
                         textView.TextContainer.LineBreakMode = UILineBreakMode.WordWrap;
-                        expandButtonWidthConstraint.Constant = (addressType == Type.From || partiallyExpandedLines >= GetNumberLines())
-                            ? 0f : buttonSize;
+                        expandButton.Enabled = !(addressType == DocumentAddressType.From || partiallyExpandedLines >= GetNumberLines());
+                        expandButtonWidthConstraint.Constant = expandButton.Enabled ? buttonSize : 0f;
                         expandButton.Transform = CGAffineTransform.MakeRotation(0f);
                         break;
                     case State.FullyExpanded:
                         textView.TextContainer.MaximumNumberOfLines = 0;
                         textView.TextContainer.LineBreakMode = UILineBreakMode.WordWrap;
-                        expandButtonWidthConstraint.Constant = buttonSize;
+                        expandButton.Enabled = !(addressType == DocumentAddressType.From || partiallyExpandedLines >= GetNumberLines());
+                        expandButtonWidthConstraint.Constant = expandButton.Enabled ? buttonSize : 0f;
                         expandButton.Transform = CGAffineTransform.MakeRotation((nfloat)(Math.PI / 2.0f));
                         break;
                 }
 
                 Superview?.Superview?.Superview?.Superview?.LayoutIfNeeded();
             }, (finished) =>
-            {
-                displayLink.Invalidate();
-                displayLink = null;
-                EndAnimating(this, EventArgs.Empty);
-            });
+                {
+                    displayLink.Invalidate();
+                    displayLink = null;
+                    EndAnimating(this, EventArgs.Empty);
+                });
         }
 
         public override void WillMoveToSuperview(UIView newsuper)
@@ -190,64 +189,112 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
             }
         }
 
-        string GetTitle()
+        void HandleTextTapped(UITapGestureRecognizer gestureRecognizer)
         {
-            switch (addressType)
-            {
-                case Type.To:
-                    return Localization.GetString("to");
-                case Type.Cc:
-                    return Localization.GetString("cc");
-                case Type.Bcc:
-                    return Localization.GetString("bcc");
-                case Type.From:
-                    return Localization.GetString("from");
-                case Type.ReplyTo:
-                    return Localization.GetString("reply_to");
-                default:
-                    throw new ArgumentException(string.Format("Unknown type. [addressType={0}]", addressType));
-            }
-        }
+            if (currentState == State.Compressed)
+                return;
 
-        string GetValue()
-        {
-            switch (addressType)
-            {
-                case Type.To:
-                    return MailMessage?.To?.AsString;
-                case Type.Cc:
-                    return MailMessage?.Cc?.AsString;
-                case Type.Bcc:
-                    return MailMessage?.Bcc?.AsString;
-                case Type.From:
-                    return MailMessage?.From?.AsString;
-                case Type.ReplyTo:
-                    return MailMessage?.ReplyTo?.AsString;
-                default:
-                    throw new ArgumentException(string.Format("Unknown type. [addressType={0}]", addressType));
-            }
+            var location = gestureRecognizer.LocationInView(textView);
+
+            var tapPosition = textView.GetClosestPositionToPoint(location);
+            var caretPosition = textView.GetCaretRectForPosition(tapPosition);
+
+            if (Math.Abs(caretPosition.X - location.X) > 25) //If true, the click is too far away from the text to be considered "valid"
+                return;
+
+            var offset = (int)textView.GetOffsetFromPosition(textView.BeginningOfDocument, tapPosition);
+
+            var beforeSubstring = textView.Text.SafeSubstring(0, offset).SafeSubstringAfterLast(EmailSeparator, StringComparison.CurrentCultureIgnoreCase).Trim();
+            var afterSubstring = offset >= textView.Text.Length ? "" : textView.Text.SafeSubstring(offset).SafeSubstringBefore(EmailSeparator, StringComparison.CurrentCultureIgnoreCase).Trim();
+
+            var tappedRecipent = beforeSubstring + afterSubstring;
+
+            CommonConfig.Logger.Trace(string.Format($"Tapped recipent. [recipent={tappedRecipent}]"));
+
+            RecipientTapped?.Invoke(this, new RecipientTappedEventArgs(tappedRecipent));
         }
 
         public override void RefreshView()
         {
-            if (MailMessage != null)
+            if (DocumentPreview != null)
             {
+                Func<DocumentAddress, string> addressText = (da) =>
+                {
+                    if (!string.IsNullOrWhiteSpace(da.Name) && string.IsNullOrWhiteSpace(da.Address))
+                        return da.Name;
+                    if (!string.IsNullOrWhiteSpace(da.Name) && !string.IsNullOrWhiteSpace(da.Address))
+                        return da.Name + " <" + da.Address + ">";
+                    if (string.IsNullOrWhiteSpace(da.Name) && !string.IsNullOrWhiteSpace(da.Address))
+                        return da.Address;
+
+                    return string.Empty;
+                };
+
+                var prettyAddresses = DocumentPreview.Addresses.Where(da => da.AddressType == addressType).Select(addressText);
+                string text;
+                if (addressType == DocumentAddressType.From)
+                    text = prettyAddresses.Any() ? string.Join(EmailSeparator, prettyAddresses) : (DocumentPreview.Creator ?? " ");
+                else
+                    text = string.Join(EmailSeparator, prettyAddresses);
+
                 textView.TextStorage.BeginEditing();
-                textView.TextStorage.SetString(GetValue().ToNSAttributedString());
-                textView.TextStorage.AddAttribute(UIStringAttributeKey.Font, Theme.DefaultFont, new NSRange(0, textView.Text.Length));
+                textView.TextStorage.SetString(text.ToNSAttributedString());
                 textView.TextStorage.EndEditing();
+
+                CorrectMarkup();
             }
         }
 
         public override void UpdateVisibility()
         {
-            if (MailMessage == null)
+            if (DocumentPreview == null)
             {
                 Hidden = true;
                 return;
             }
 
-            Hidden = string.IsNullOrWhiteSpace(GetValue());
+            Hidden = addressType != DocumentAddressType.From && !DocumentPreview.Addresses.Any(da => da.AddressType == addressType);
+        }
+
+        public bool IsEmpty()
+        {
+            return !DocumentPreview.Addresses.Any(da => da.AddressType == addressType);
+        }
+
+        string GetTitle()
+        {
+            switch (addressType)
+            {
+                case DocumentAddressType.To:
+                    return Localization.GetString("to");
+                case DocumentAddressType.Cc:
+                    return Localization.GetString("cc");
+                case DocumentAddressType.Bcc:
+                    return Localization.GetString("bcc");
+                case DocumentAddressType.From:
+                    return Localization.GetString("from");
+                default:
+                    throw new ArgumentException(string.Format("Unknown type. [addressType={0}]", addressType));
+            }
+        }
+
+        void CorrectMarkup()
+        {
+            textView.TextStorage.BeginEditing();
+
+            textView.TextStorage.AddAttribute(UIStringAttributeKey.Font, addressesFont, new NSRange(0, textView.Text.Length));
+            textView.TextStorage.RemoveAttribute(UIStringAttributeKey.ForegroundColor, new NSRange(0, textView.Text.Length));
+
+            var matches = Regex.Matches(textView.Text, RecipentRegex, RegexOptions.IgnoreCase);
+
+            foreach (Match match in matches)
+            {
+                var textInMatch = textView.Text.SafeSubstring(match.Index, match.Length);
+                if (Validator.ContainsValidEmails(textInMatch))
+                    textView.TextStorage.AddAttribute(UIStringAttributeKey.ForegroundColor, Theme.DarkBlue, new NSRange(match.Index, match.Length));
+            }
+
+            textView.TextStorage.EndEditing();
         }
 
         int GetNumberLines()
@@ -273,6 +320,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
                 TransitionToState(State.PartiallyExpanded);
             else
                 TransitionToState(State.Compressed);
+        }
+    }
+
+    public class RecipientTappedEventArgs : EventArgs
+    {
+        public string Recipent { get; }
+
+        public RecipientTappedEventArgs(string recipent)
+        {
+            Recipent = recipent;
         }
     }
 }

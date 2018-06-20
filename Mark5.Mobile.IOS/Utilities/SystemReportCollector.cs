@@ -42,7 +42,8 @@ namespace Mark5.Mobile.IOS.Utilities
             mcvc.SetSubject("MARK5 for iOS Feedback");
             mcvc.AddAttachmentData(NSData.FromString(report), "text/plain", "MARK5_Android_System_Report.txt");
             mcvc.Finished += Mcvc_Finished;
-            mcvc.NavigationBar.TintColor = Theme.White;
+            mcvc.NavigationBar.TintColor = Theme.DarkBlue;
+            
             return mcvc;
         }
 

@@ -30,6 +30,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         void Initialize()
         {
+            ContainerView.BackgroundColor = Theme.White;
+
             titleLabel = new UILabel
             {
                 Text = Localization.GetString("attachments") + ":",

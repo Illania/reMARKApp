@@ -1,8 +1,10 @@
-﻿using System.Diagnostics;
+﻿using System;
 using Android.App;
 using Android.Content;
 using Android.OS;
 using Android.Support.V4.Hardware.Fingerprint;
+using Android.Support.V7.Preferences;
+using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
 
@@ -11,25 +13,23 @@ namespace Mark5.Mobile.Droid.Utilities
     public class ApplicationLifecycleHandler : Java.Lang.Object, Application.IActivityLifecycleCallbacks
     {
         const string AuthenticationFragmentTag = "authenticationFragmentTag";
+        const string lastClosedKey = "lastClosedKey";
 
         bool authenticated;
         int activitiesStarted;
-        Stopwatch stopWatch;
 
         public bool ApplicationVisible => activitiesStarted > 0;
 
-        public ApplicationLifecycleHandler()
-        {
-            stopWatch = new Stopwatch();
-        }
-
         public void OnActivityStarted(Activity activity)
         {
+            if (activity is SplashActivity)
+                return;
+
             if (!authenticated &&
                  !ApplicationVisible &&
                  activity is BaseAppCompatActivity &&
                  PlatformConfig.Preferences.AuthorizationEnabled &&
-                 stopWatch.Elapsed.Minutes >= PlatformConfig.Preferences.AuthorizationInterval &&
+                 ShouldAuthenticate() &&
                  IsAuthenticationPossible(activity))
             {
                 if ((AuthenticationDialogFragment)activity.FragmentManager.FindFragmentByTag(AuthenticationFragmentTag) == null)
@@ -39,24 +39,63 @@ namespace Mark5.Mobile.Droid.Utilities
                 }
             }
             else
-                stopWatch.Reset();
+                ResetLastClosedTime();
 
             activitiesStarted++;
         }
 
         public void OnActivityStopped(Activity activity)
         {
+            if (activity is SplashActivity)
+                return;
+
             activitiesStarted--;
             authenticated = false;
 
             if (!ApplicationVisible && PlatformConfig.Preferences.AuthorizationEnabled)
-                stopWatch.Start();
+                SaveLastClosedTime();
+        }
+
+        void SaveLastClosedTime()
+        {
+            var prefManager = PreferenceManager.GetDefaultSharedPreferences(Application.Context);
+            var editor = prefManager.Edit();
+            editor.PutString(lastClosedKey, DateTime.UtcNow.ToString("s"));
+            editor.Apply();
+        }
+
+        DateTime? GetLastClosedTime()
+        {
+            var prefManager = PreferenceManager.GetDefaultSharedPreferences(Application.Context);
+            var timeString = prefManager.GetString(lastClosedKey, string.Empty);
+            if (timeString == string.Empty)
+                return null;
+
+            return DateTime.SpecifyKind(Convert.ToDateTime(timeString), DateTimeKind.Utc);
+        }
+
+        void ResetLastClosedTime()
+        {
+            var prefManager = PreferenceManager.GetDefaultSharedPreferences(Application.Context);
+            var editor = prefManager.Edit();
+            editor.PutString(lastClosedKey, string.Empty);
+            editor.Apply();
+        }
+
+        bool ShouldAuthenticate()
+        {
+            var lastTime = GetLastClosedTime();
+            if (lastTime == null)
+                return false;
+
+            var timeDifference = DateTime.UtcNow - lastTime.Value;
+            return timeDifference.TotalMinutes >= PlatformConfig.Preferences.AuthorizationInterval;
         }
 
         public void OnAuthenticationSuccessful()
         {
             authenticated = true;
-            stopWatch.Reset();
+            ResetLastClosedTime();
         }
 
         bool IsAuthenticationPossible(Activity activity)

@@ -172,7 +172,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             };
             insertButtonItem = new UIBarButtonItem
             {
-                Image = UIImage.FromBundle("Create").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
+                Image = UIImage.FromBundle("Attachment").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
                 Enabled = false
             };
 
@@ -191,6 +191,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 Alignment = UIStackViewAlignment.Fill,
                 Distribution = UIStackViewDistribution.Fill,
                 Spacing = 0f,
+                TranslatesAutoresizingMaskIntoConstraints = false,
             };
 
             headerStackView.AddArrangedSubview(toView = new ToView());
@@ -202,7 +203,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             headerStackView.AddArrangedSubview(subjectView = new SubjectView());
             headerStackView.AddArrangedSubview(attachmentsView = new AttachmentsView());
 
-            SetHeaderView(headerStackView);
+            var containerView = new UIView
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                BackgroundColor = Theme.LightGray,
+            };
+
+            containerView.AddSubview(headerStackView);
+            containerView.AddConstraints(new[]
+            {
+                headerStackView.TopAnchor.ConstraintEqualTo(containerView.TopAnchor),
+                headerStackView.LeftAnchor.ConstraintEqualTo(containerView.LeftAnchor),
+                headerStackView.RightAnchor.ConstraintEqualTo(containerView.RightAnchor),
+                headerStackView.BottomAnchor.ConstraintEqualTo(containerView.BottomAnchor),
+            });
+
+            SetHeaderView(containerView);
         }
 
         void InitializeHandlers()

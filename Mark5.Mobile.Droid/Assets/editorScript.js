@@ -1,9 +1,7 @@
-﻿document.addEventListener("DOMContentLoaded", function() {
-    window.webkit.messageHandlers.domloaded.postMessage({});
-});
-
+﻿
 document.addEventListener("input", function() {
-    window.webkit.messageHandlers.input.postMessage(getCaretYCoordinate());
+    Android.OnInput(getCaretYCoordinate());
+   /*window.webkit.messageHandlers.input.postMessage(getCaretYCoordinate());*/
 });
 
 getCaretYCoordinate = function() {
@@ -27,3 +25,4 @@ getCaretYCoordinate = function() {
     }
     return y;
 };
+

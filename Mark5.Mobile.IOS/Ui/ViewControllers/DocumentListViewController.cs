@@ -276,9 +276,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             searchController.SearchBar.Placeholder = Localization.GetString("filter");
 
             if (!Integration.IsRunningAtLeast(11))
-            {
                 TableView.TableHeaderView = searchController.SearchBar;
-            }
         }
 
         void InitializeHandlers()
@@ -985,41 +983,56 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             BeginInvokeOnMainThread(() =>
             {
-                var index = ((DataSource)TableView.Source).Items.FindIndex(dp => dp.Id == message.DocumentPreviewId);
-
-                if (index >= 0)
+                foreach (var tableView in new UITableView[] { TableView, ((UITableViewController)searchController?.SearchResultsController)?.TableView })
                 {
-                    var documentPreview = ((DataSource)TableView.Source).Items[index];
-                    documentPreview.IsReadByCurrent = message.IsReadByCurrent;
-                    documentPreview.IsReadByAnyone = message.IsReadByAnyone;
+                    if (tableView == null || tableView.Source == null)
+                        continue;
 
-                    var selectedRow = TableView.IndexPathForSelectedRow;
+                    var index = ((DataSource)tableView.Source).Items.FindIndex(dp => dp.Id == message.DocumentPreviewId);
 
-                    TableView.ReloadRows(new[] { NSIndexPath.FromRowSection(index, 0) }, UITableViewRowAnimation.Fade);
+                    if (index >= 0)
+                    {
+                        var documentPreview = ((DataSource)tableView.Source).Items[index];
+                        documentPreview.IsReadByCurrent = message.IsReadByCurrent;
+                        documentPreview.IsReadByAnyone = message.IsReadByAnyone;
 
-                    if (selectedRow != null)
-                        TableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
+                        var selectedRow = tableView.IndexPathForSelectedRow;
+
+                        tableView.ReloadRows(new[] { NSIndexPath.FromRowSection(index, 0) }, UITableViewRowAnimation.Fade);
+
+                        if (selectedRow != null)
+                            tableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
+                    }
+
                 }
+
             });
+
         }
 
         void CommentsCountChangedHandler(EntityPreviewCommentCountChangedMessage message)
         {
             BeginInvokeOnMainThread(() =>
             {
-                var index = ((DataSource)TableView.Source).Items.FindIndex(dp => dp.Id == message.EntityId);
-
-                if (index >= 0)
+                foreach (var tableView in new UITableView[] { TableView, ((UITableViewController)searchController?.SearchResultsController)?.TableView })
                 {
-                    var documentPreview = ((DataSource)TableView.Source).Items[index];
-                    documentPreview.CommentsCount = message.CommentsCount;
+                    if (tableView == null || tableView.Source == null)
+                        continue;
 
-                    var selectedRow = TableView.IndexPathForSelectedRow;
+                    var index = ((DataSource)tableView.Source).Items.FindIndex(dp => dp.Id == message.EntityId);
 
-                    TableView.ReloadRows(new[] { NSIndexPath.FromRowSection(index, 0) }, UITableViewRowAnimation.Fade);
+                    if (index >= 0)
+                    {
+                        var documentPreview = ((DataSource)tableView.Source).Items[index];
+                        documentPreview.CommentsCount = message.CommentsCount;
 
-                    if (selectedRow != null)
-                        TableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
+                        var selectedRow = tableView.IndexPathForSelectedRow;
+
+                        tableView.ReloadRows(new[] { NSIndexPath.FromRowSection(index, 0) }, UITableViewRowAnimation.Fade);
+
+                        if (selectedRow != null)
+                            tableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
+                    }
                 }
             });
         }
@@ -1028,20 +1041,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             BeginInvokeOnMainThread(() =>
             {
-                var index = ((DataSource)TableView.Source).Items.FindIndex(dp => dp.Id == message.EntityId);
-
-                if (index >= 0)
+                foreach (var tableView in new UITableView[] { TableView, ((UITableViewController)searchController?.SearchResultsController)?.TableView })
                 {
-                    var documentPreview = ((DataSource)TableView.Source).Items[index];
-                    documentPreview.Categories.Clear();
-                    documentPreview.Categories.AddRange(message.Categories);
+                    if (tableView == null || tableView.Source == null)
+                        continue;
 
-                    var selectedRow = TableView.IndexPathForSelectedRow;
+                    var index = ((DataSource)tableView.Source).Items.FindIndex(dp => dp.Id == message.EntityId);
 
-                    TableView.ReloadRows(new[] { NSIndexPath.FromRowSection(index, 0) }, UITableViewRowAnimation.Fade);
+                    if (index >= 0)
+                    {
+                        var documentPreview = ((DataSource)tableView.Source).Items[index];
+                        documentPreview.Categories.Clear();
+                        documentPreview.Categories.AddRange(message.Categories);
 
-                    if (selectedRow != null)
-                        TableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
+                        var selectedRow = tableView.IndexPathForSelectedRow;
+
+                        tableView.ReloadRows(new[] { NSIndexPath.FromRowSection(index, 0) }, UITableViewRowAnimation.Fade);
+
+                        if (selectedRow != null)
+                            tableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
+                    }
                 }
             });
         }
