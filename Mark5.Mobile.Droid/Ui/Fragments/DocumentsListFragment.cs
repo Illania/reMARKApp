@@ -10,7 +10,6 @@ using Android.Graphics.Drawables;
 using Android.OS;
 using Android.Support.Design.Widget;
 using Android.Support.V4.Content;
-using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
@@ -45,10 +44,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         const string FirstRowIdKey = "FirstRowId_ab73aa33-930f-4139-94b1-b7828d5f4de7";
         const string LastRowIdKey = "LastRowId_a92f8e84-7274-48e3-9296-3d52a9b3231c";
 
-
         const int AutoRefreshIntervalMs = 5 * 1000; // 5 seconds
 
         bool refreshing;
+        bool selectEnabled = true;
 
         IMenu menu;
         CoordinatorLayout coordinatorLayout;
@@ -475,33 +474,42 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             menu.Clear();
 
-            if (CurrentAdapter.SelectedItemCount == CurrentAdapter.ItemCount)
-                menu.Add(Menu.None, MenuItemActions.DeselectAll, MenuItemActions.DeselectAll, Resource.String.deselect_all);
+            var selectAllItem = menu.Add(Menu.None, MenuItemActions.SelectDeselectAll, MenuItemActions.SelectDeselectAll, "");
+            if (selectEnabled)
+            {
+                selectAllItem.SetTitle(Resource.String.select_all);
+                selectAllItem.SetIcon(Resource.Drawable.action_select_all);
+            }
             else
-                menu.Add(Menu.None, MenuItemActions.SelectAll, MenuItemActions.SelectAll, Resource.String.select_all);
+            {
+                selectAllItem.SetTitle(Resource.String.deselect_all);
+                selectAllItem.SetIcon(Resource.Drawable.action_deselect_all);
+            }
 
-            if (CurrentAdapter.SelectedItems.Any(dp => !dp.IsReadByCurrent))
-                menu.Add(Menu.None, MenuItemActions.MarkAsRead, MenuItemActions.MarkAsRead, Resource.String.mark_as_read);
+            if (CurrentAdapter.SelectedItems.Any(dp => !dp.IsReadByCurrent) || !CurrentAdapter.SelectedItems.Any())
+                menu.Add(MenuItemGroup.Actions, MenuItemActions.MarkAsRead, MenuItemActions.MarkAsRead, Resource.String.mark_as_read);
 
             if (CurrentAdapter.SelectedItems.Any(dp => dp.IsReadByCurrent))
-                menu.Add(Menu.None, MenuItemActions.MarkAsUnread, MenuItemActions.MarkAsUnread, Resource.String.marks_as_unread);
+                menu.Add(MenuItemGroup.Actions, MenuItemActions.MarkAsUnread, MenuItemActions.MarkAsUnread, Resource.String.marks_as_unread);
 
-            menu.Add(Menu.None, MenuItemActions.CopyToWorktray, MenuItemActions.CopyToWorktray, Resource.String.copy_to_worktray);
-            menu.Add(Menu.None, MenuItemActions.CopyToFolder, MenuItemActions.CopyToFolder, Resource.String.copy_to_folder);
+            menu.Add(MenuItemGroup.Actions, MenuItemActions.CopyToWorktray, MenuItemActions.CopyToWorktray, Resource.String.copy_to_worktray);
+            menu.Add(MenuItemGroup.Actions, MenuItemActions.CopyToFolder, MenuItemActions.CopyToFolder, Resource.String.copy_to_folder);
 
             if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
-                menu.Add(Menu.None, MenuItemActions.MoveToFolder, MenuItemActions.MoveToFolder, Resource.String.move_to_folder);
+                menu.Add(MenuItemGroup.Actions, MenuItemActions.MoveToFolder, MenuItemActions.MoveToFolder, Resource.String.move_to_folder);
 
-            menu.Add(Menu.None, MenuItemActions.SetPriority, MenuItemActions.SetPriority, Resource.String.set_priority);
+            menu.Add(MenuItemGroup.Actions, MenuItemActions.SetPriority, MenuItemActions.SetPriority, Resource.String.set_priority);
 
             if (CurrentAdapter.SelectedItemCount == 1)
-                menu.Add(Menu.None, MenuItemActions.Categories, MenuItemActions.Categories, Resource.String.categories);
+                menu.Add(MenuItemGroup.Actions, MenuItemActions.Categories, MenuItemActions.Categories, Resource.String.categories);
 
             if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
-                menu.Add(Menu.None, MenuItemActions.DeleteFromFolder, MenuItemActions.DeleteFromFolder, Resource.String.delete_from_folder);
+                menu.Add(MenuItemGroup.Actions, MenuItemActions.DeleteFromFolder, MenuItemActions.DeleteFromFolder, Resource.String.delete_from_folder);
 
             if (ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || CurrentAdapter.SelectedItems.All(dp => dp.Direction == DocumentDirection.Draft))
-                menu.Add(Menu.None, MenuItemActions.Delete, MenuItemActions.Delete, Resource.String.delete);
+                menu.Add(MenuItemGroup.Actions, MenuItemActions.Delete, MenuItemActions.Delete, Resource.String.delete);
+
+            menu.SetGroupEnabled(MenuItemGroup.Actions, CurrentAdapter.SelectedItems.Any());
 
             return true;
         }
@@ -548,15 +556,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return true;
             }
 
-            if (item.ItemId == MenuItemActions.SelectAll)
+            if (item.ItemId == MenuItemActions.SelectDeselectAll)
             {
-                SelectAll();
-                return true;
-            }
-
-            if (item.ItemId == MenuItemActions.DeselectAll)
-            {
-                UnSelectAll();
+                SelectDeselectAll(item);
                 return true;
             }
 
@@ -593,6 +595,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             CurrentAdapter.ClearSelections();
             actionMode = null;
+            selectEnabled = true;
         }
 
         public async Task CopyToOwnWorktray(List<DocumentPreview> documentPreviews)
@@ -731,17 +734,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        void SelectAll()
+        void SelectDeselectAll(IMenuItem item)
         {
-            CurrentAdapter.SetSelected(CurrentAdapter.Items, true);
-            actionMode.Title = CurrentAdapter.SelectedItemCount.ToString();
-            actionMode.Invalidate();
-        }
+            if (selectEnabled)
+                CurrentAdapter.SetSelected(CurrentAdapter.Items, true);
+            else
+                CurrentAdapter.SetSelected(CurrentAdapter.Items, false);
 
-        void UnSelectAll()
-        {
-            CurrentAdapter.SetSelected(CurrentAdapter.Items, false);
             actionMode.Title = CurrentAdapter.SelectedItemCount.ToString();
+            selectEnabled = !selectEnabled;
             actionMode.Invalidate();
         }
 
@@ -801,8 +802,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         static class MenuItemActions
         {
-            public const int SelectAll = 05;
-            public const int DeselectAll = 06;
+            public const int SelectDeselectAll = 05;
             public const int MarkAsRead = 10;
             public const int MarkAsUnread = 11;
             public const int CopyToWorktray = 20;
@@ -812,6 +812,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public const int Categories = 50;
             public const int DeleteFromFolder = 60;
             public const int Delete = 61;
+        }
+
+        static class MenuItemGroup
+        {
+            public const int Actions = 1;
         }
 
         #endregion

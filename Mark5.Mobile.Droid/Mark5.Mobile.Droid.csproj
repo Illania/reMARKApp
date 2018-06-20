@@ -780,6 +780,8 @@
     <AndroidResource Include="Resources\drawable-xxxhdpi\ic_fp_40px.png" />
     <AndroidResource Include="Resources\drawable\ic_fingerprint_error.xml" />
     <AndroidResource Include="Resources\drawable\ic_fingerprint_success.xml" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\action_deselect_all.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\action_select_all.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FastScrollRecycler\FastScrollRecycler.csproj">
