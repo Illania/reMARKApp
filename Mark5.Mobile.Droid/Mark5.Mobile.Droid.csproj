@@ -782,6 +782,12 @@
     <AndroidResource Include="Resources\drawable\ic_fingerprint_success.xml" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\action_deselect_all.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\action_select_all.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\action_deselect_all.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\action_select_all.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\action_deselect_all.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\action_select_all.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\action_deselect_all.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\action_select_all.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FastScrollRecycler\FastScrollRecycler.csproj">
