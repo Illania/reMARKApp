@@ -1377,7 +1377,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 if (dX > 0) //Swiping to right
                 {
-                    Preferences.SwipeAction action = PlatformConfig.Preferences.LeadingSwipeAction;
+                    Preferences.EmailSwipeAction action = PlatformConfig.Preferences.EmailLeadingSwipeAction;
                     int bgColor = SwipeActionAllowed(action) ? Resource.Color.brown : Resource.Color.lightgray;
                     leftBackground = new ColorDrawable(new Color(ContextCompat.GetColor(context, bgColor)));
                     string text = GetSwipeActionTitle(action);
@@ -1394,7 +1394,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
                 else if (dX < 0)
                 {
-                    Preferences.SwipeAction action = PlatformConfig.Preferences.TrailingSwipeAction;
+                    Preferences.EmailSwipeAction action = PlatformConfig.Preferences.EmailTrailingSwipeAction;
                     int bgColor = SwipeActionAllowed(action) ? Resource.Color.darkblue : Resource.Color.lightgray;
                     rightBackground = new ColorDrawable(new Color(ContextCompat.GetColor(context, bgColor)));
                     string text = GetSwipeActionTitle(action);
@@ -1426,10 +1426,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 ResetViewHolder(viewHolder, direction);
                 if (direction == ItemTouchHelper.Left) {
-                     SwipeActionSelected(PlatformConfig.Preferences.TrailingSwipeAction, viewHolder);
+                     SwipeActionSelected(PlatformConfig.Preferences.EmailTrailingSwipeAction, viewHolder);
 
                 } else if (direction == ItemTouchHelper.Right) {
-                    SwipeActionSelected(PlatformConfig.Preferences.LeadingSwipeAction, viewHolder);
+                    SwipeActionSelected(PlatformConfig.Preferences.EmailLeadingSwipeAction, viewHolder);
                    
                 }
             }
@@ -1452,30 +1452,31 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     },
                     400);
             }
-
-            async void SwipeActionSelected(Preferences.SwipeAction action, RecyclerView.ViewHolder viewHolder)
+       
+            async void SwipeActionSelected(Preferences.EmailSwipeAction action, RecyclerView.ViewHolder viewHolder)
             {
                 if (SwipeActionAllowed(action))
                 {
                     switch (action)
                     {
-                        case Preferences.SwipeAction.Delete:
+                        case Preferences.EmailSwipeAction.Delete:
                             fragment.DeleteAction();
                             break;
-                        case Preferences.SwipeAction.More:
-                            var values = new List<Preferences.SwipeAction> { Preferences.SwipeAction.Categories, Preferences.SwipeAction.Delete, Preferences.SwipeAction.More };
+                        case Preferences.EmailSwipeAction.More:
+                            var values = Preferences.GetAllAvailableActions;
                             var index = await Dialogs.ShowListDialog(context, Resource.String.edit_contact_dialog_title, values.Select(x => x.ToString()).ToArray(), true);
-                            if (index >= 0) {
-                                SwipeActionSelected(Preferences.SwipeAction.Categories, viewHolder);
+                            if (index >= 0)
+                            {
+                                SwipeActionSelected(Preferences.GetAllAvailableActions[index], viewHolder);
                             }
                             break;
-                        case Preferences.SwipeAction.MoveToWorkTray:
+                        case Preferences.EmailSwipeAction.CopyToWorkTray:
                             fragment.CopyToOwnWorktray(adapter.Items[viewHolder.AdapterPosition]);
                             break;
-                        case Preferences.SwipeAction.Categories:
+                        case Preferences.EmailSwipeAction.Categories:
                             fragment.ShowCategories(adapter.Items[viewHolder.AdapterPosition]);
                             break;
-                        case Preferences.SwipeAction.MarkAsReadUnread:
+                        case Preferences.EmailSwipeAction.MarkAsReadUnread:
                             if (adapter.SelectedItems.Any(dp => !dp.IsReadByCurrent))
                             {
                                 fragment.MarkAsRead();
@@ -1485,52 +1486,65 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                                 fragment.MarkAsUnread();
                             }
                             break;
-                        case Preferences.SwipeAction.RemoveFromFolder:
+                        case Preferences.EmailSwipeAction.RemoveFromFolder:
                             fragment.DeleteFromFolderAction();
                             break;
+                        case Preferences.EmailSwipeAction.Priorities:
+                            fragment.SetPriority();
+                            break;
+                        case Preferences.EmailSwipeAction.MoveToFolder:
+                            fragment.StartActivity(CopyMoveToFolderListActivity.CreateIntent(context, CopyMoveToFolderListActivity.ModeType.Move, ModuleType.Documents,
+                                                                                             adapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList(), folder));
+                            break;
+                        
                     }
                 }
+
             }
 
-            bool SwipeActionAllowed(Preferences.SwipeAction action)
+            bool SwipeActionAllowed(Preferences.EmailSwipeAction action)
             {
                 switch (action)
                 {
-                    case Preferences.SwipeAction.Delete:
+                    case Preferences.EmailSwipeAction.Delete:
                         return ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || adapter.SelectedItems.All(dp => dp.Direction == DocumentDirection.Draft); ;
-                    case Preferences.SwipeAction.MoveToFolder:
+                    case Preferences.EmailSwipeAction.MoveToFolder:
                         return folder.InternalType == FolderInternalType.FilterView || folder.InternalType == FolderInternalType.Static || folder.InternalType == FolderInternalType.Worktray;
-                    case Preferences.SwipeAction.RemoveFromFolder:
+                    case Preferences.EmailSwipeAction.RemoveFromFolder:
                         return folder.InternalType == FolderInternalType.FilterView || folder.InternalType == FolderInternalType.Static || folder.InternalType == FolderInternalType.Worktray;
                     default:
                         return true;
                 }
             }
 
-            string GetSwipeActionTitle(Preferences.SwipeAction action)
+            string GetSwipeActionTitle(Preferences.EmailSwipeAction action)
             {
                 switch (action)
                 {
-                    case Preferences.SwipeAction.Delete:
+                    case Preferences.EmailSwipeAction.Delete:
                         return context.Resources.GetString(Resource.String.delete);
-                    case Preferences.SwipeAction.More:
+                    case Preferences.EmailSwipeAction.More:
                         return context.Resources.GetString(Resource.String.more);
-                    case Preferences.SwipeAction.MoveToFolder:
+                    case Preferences.EmailSwipeAction.MoveToFolder:
                         return context.Resources.GetString(Resource.String.move_to_folder);
-                    case Preferences.SwipeAction.MarkAsReadUnread:
+                    case Preferences.EmailSwipeAction.MarkAsReadUnread:
                         if (adapter.SelectedItems.Any(dp => !dp.IsReadByCurrent))
                         {
                             return context.Resources.GetString(Resource.String.mark_as_read);
-                        } 
-                        if (adapter.SelectedItems.Any(dp => dp.IsReadByCurrent)) 
+                        }
+                        if (adapter.SelectedItems.Any(dp => dp.IsReadByCurrent))
                         {
                             return context.Resources.GetString(Resource.String.marks_as_unread);
                         }
                         return "";
-                    case Preferences.SwipeAction.Categories:
+                    case Preferences.EmailSwipeAction.Categories:
                         return context.Resources.GetString(Resource.String.categories);
-                    case Preferences.SwipeAction.RemoveFromFolder:
+                    case Preferences.EmailSwipeAction.RemoveFromFolder:
                         return context.Resources.GetString(Resource.String.remove_from_folder);
+                    case Preferences.EmailSwipeAction.CopyToWorkTray:
+                        return context.Resources.GetString(Resource.String.copy_to_worktray);
+                    case Preferences.EmailSwipeAction.CopyToFolder:
+                        return context.Resources.GetString(Resource.String.copy_to_folder);
                     default:
                         return "Forgot case ?";
                 }

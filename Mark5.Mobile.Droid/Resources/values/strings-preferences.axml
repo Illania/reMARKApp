@@ -169,7 +169,11 @@
 	<string name="ssl_off">Disabled</string>
 	<string name="ssl_on">Enabled</string>
 	<string name="ssl_self_signed">Enabled (allow self-signed)</string>
-    <string name="pref_email_swipe_leading_key">pref_email_swipe_leading_key</string>
     <string name="pref_email_swipe_leading_title">Left swipe action</string>
     <string name="pref_email_swipe_leading_summary">Select action when swiping to right</string>
+    <string name="pref_email_swipe_trailing_title">Right swipe action</string>
+    <string name="pref_email_swipe_trailing_summary">Select action when swiping to left</string>
+    <string name="pref_email_swipe_dialog_title">Select action</string>
+    <string name="pref_key_swipe_trailing">pref_key_swipe_trailing</string>
+    <string name="pref_key_swipe_leading">pref_key_swipe_leading</string>
 </resources>
