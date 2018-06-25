@@ -200,7 +200,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
             webViewProgressView?.RemoveFromSuperview();
             loadIndicatorView?.RemoveFromSuperview();
             headerContainerView?.RemoveFromSuperview();
-            webView?.RemoveFromSuperview();
+            //webView?.RemoveFromSuperview(); //TODO This has been commented out to avoid eventual crashes 
+            // Github link: https://github.com/xamarin/xamarin-macios/issues/4130#issuecomment-399243880
 
             webViewProgressView = null;
             loadIndicatorView = null;
