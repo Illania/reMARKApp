@@ -432,7 +432,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             var html = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/plain", "html"));
             var htmlDocument = new HtmlDocument();
             htmlDocument.LoadHtml(html);
-            var preNode = htmlDocument.DocumentNode.SelectSingleNode("//pre[@id='plaintext']");
+            var preNode = htmlDocument.DocumentNode.SelectSingleNode("//div[@id='plaintext']");
             preNode.InnerHtml = text;
 
             if (config.MakeEditable)
