@@ -5,6 +5,7 @@ using Mark5.Mobile.Common.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Xamarin.Android;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
@@ -174,10 +175,11 @@ namespace Mark5.Mobile.Droid.Utilities
         public EmailSwipeAction EmailLeadingSwipeAction
         {
 
-            get {
+            get
+            {
                 var all = sp.All;
                 var pref = sp.GetString(Application.Context.GetString(Resource.String.pref_key_swipe_leading), Application.Context.Resources.GetString(Resource.String.pref_email_swipe_actions_leading_default));
-                return (EmailSwipeAction)Enum.Parse(typeof(EmailSwipeAction),pref);
+                return (EmailSwipeAction)Enum.Parse(typeof(EmailSwipeAction), pref);
             }
 
             set
@@ -190,10 +192,11 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public EmailSwipeAction EmailTrailingSwipeAction
         {
-            get {
+            get
+            {
                 var pref = sp.GetString(Application.Context.GetString(Resource.String.pref_key_swipe_trailing), Application.Context.Resources.GetString(Resource.String.pref_email_swipe_actions_trailing_default));
                 return (EmailSwipeAction)Enum.Parse(typeof(EmailSwipeAction), pref);
-            } 
+            }
 
             set
             {
@@ -203,22 +206,18 @@ namespace Mark5.Mobile.Droid.Utilities
             }
         }
 
-        public static List<EmailSwipeAction> GetAllAvailableActions = new List<EmailSwipeAction>(new EmailSwipeAction[] 
+
+
+        public List<EmailSwipeAction> GetAllAvailableActions()
         {
-            EmailSwipeAction.Categories,
-            EmailSwipeAction.Delete,
-            EmailSwipeAction.MarkAsReadUnread,
-            EmailSwipeAction.More,
-            EmailSwipeAction.MoveToFolder,
-            EmailSwipeAction.CopyToFolder,
-            EmailSwipeAction.CopyToWorkTray,
-            EmailSwipeAction.Priorities,
-            EmailSwipeAction.RemoveFromFolder
-        });
+            var arr = Application.Context.Resources.GetStringArray(Resource.Array.pref_email_swipe_actions_entryvalues).ToList();
+            var selectArr = arr.Select(x => (EmailSwipeAction)Enum.Parse(typeof(EmailSwipeAction), x));
+            return selectArr.ToList();
+        }
 
         public List<EmailSwipeAction> GetAvailableSwipeActions()
         {
-            var exceptLeading = GetAllAvailableActions.Where(x =>
+            var exceptLeading = GetAllAvailableActions().Where(x =>
             {
                 return x != EmailLeadingSwipeAction;
             });

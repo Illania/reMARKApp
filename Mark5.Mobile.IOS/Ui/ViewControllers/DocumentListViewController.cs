@@ -344,7 +344,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (TableView.IndexPathsForSelectedRows == null || TableView.IndexPathsForSelectedRows.Length < 1)
                 return;
-
+            
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
             var d = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
 
@@ -571,6 +571,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
             var d = new PopoverPresentationControllerDelegate(TableView, TableView.CellAt(indexPath));
+
+
+
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("categories"),
                 UIAlertActionStyle.Default,
@@ -1275,6 +1278,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Localization.GetString("more"),
                     (a, ip) =>
                     {
+
                         viewControllerWeakReference.Unwrap()?.ShowMoreActionSheet(indexPath, documentPreview);
                     });
                 moreAction.BackgroundColor = Theme.DarkerBlue;
