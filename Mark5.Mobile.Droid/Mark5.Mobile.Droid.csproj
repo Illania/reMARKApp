@@ -451,6 +451,7 @@
     <Compile Include="Utilities\Fingerprint\FingerprintUiHelper.cs" />
     <Compile Include="Utilities\ApplicationLifecycleHandler.cs" />
     <Compile Include="Ui\Fragments\AuthenticationDialogFragment.cs" />
+    <Compile Include="Ui\Fragments\SwipeActionsFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -783,6 +784,10 @@
     <AndroidResource Include="Resources\drawable-xxxhdpi\ic_fp_40px.png" />
     <AndroidResource Include="Resources\drawable\ic_fingerprint_error.xml" />
     <AndroidResource Include="Resources\drawable\ic_fingerprint_success.xml" />
+    <AndroidResource Include="Resources\layout\swipe_actions_fragment.axml" />
+    <AndroidResource Include="Resources\layout\mock_email.axml" />
+    <AndroidResource Include="Resources\drawable\square_rounded_corners.axml" />
+    <AndroidResource Include="Resources\drawable\gray_border.axml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FastScrollRecycler\FastScrollRecycler.csproj">
