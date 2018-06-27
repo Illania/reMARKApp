@@ -28,26 +28,28 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true" />
     <LinearLayout
+        android:id="@+id/left_swipe_container"
         android:layout_marginTop="10dp"
         android:background="@drawable/gray_border"
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_marginLeft="25dp"
+        android:clickable="true"
         android:layout_marginRight="25dp"
         android:layout_height="90dp">
         <android.support.v7.widget.AppCompatTextView
             android:id="@+id/swipe_action_left_btn"
-            android:text="MORE"
-            android:layout_width="0dp"
+            android:layout_width="80dp"
             android:textSize="12sp"
+            android:textColor="@color/white"
             android:gravity="center"
             android:background="@color/brown"
-            android:layout_weight="0.25"
+            android:layout_weight="0"
             android:layout_height="match_parent"
             android:layout_centerInParent="true" />
         <include
             layout="@layout/mock_email"
-            android:layout_weight="0.75"
+            android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="match_parent" />
     </LinearLayout>
@@ -63,22 +65,25 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true" />
     <LinearLayout
+        android:id="@+id/right_swipe_container"
         android:layout_marginTop="10dp"
         android:background="@drawable/gray_border"
+        android:clickable="true"
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_marginLeft="25dp"
         android:layout_marginRight="25dp"
         android:layout_height="90dp">
         <include
-            android:layout_weight="0.75"
+            android:layout_weight="1"
             layout="@layout/mock_email"
             android:layout_width="0dp"
             android:layout_height="fill_parent" />
         <android.support.v7.widget.AppCompatTextView
-            android:layout_weight="0.25"
+            android:layout_weight="0"
+            android:layout_width="80dp"
             android:id="@+id/swipe_action_right_btn"
-            android:text="MORE"
+            android:textColor="@color/white"
             android:textSize="12sp"
             android:gravity="center"
             android:background="@color/darkblue"
@@ -86,10 +91,13 @@
     </LinearLayout>
     <android.support.v7.widget.AppCompatButton
         android:id="@+id/swipe_defaults_btn"
+        android:clickable="true"
         android:textAlignment="center"
+        android:textAppearance="@style/searchListTitleSelected"
         android:textAllCaps="true"
         android:text="@string/swipe_actions_defaults"
         android:layout_width="match_parent"
+        android:layout_marginTop="30dp"
         android:layout_height="48dp"
         android:layout_gravity="center"
         android:layout_alignParentBottom="true"

@@ -20,6 +20,7 @@
             android:id="@+id/mock_email_top_second"
             android:layout_width="match_parent"
             android:layout_height="10dp"
+            android:layout_marginRight="40dp"
             android:layout_marginTop="10dp"
             android:src="@drawable/square_rounded_corners" />
         <ImageView

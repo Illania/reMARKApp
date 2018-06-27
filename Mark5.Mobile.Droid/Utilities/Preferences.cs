@@ -177,7 +177,6 @@ namespace Mark5.Mobile.Droid.Utilities
 
             get
             {
-                var all = sp.All;
                 var pref = sp.GetString(Application.Context.GetString(Resource.String.pref_key_swipe_leading), Application.Context.Resources.GetString(Resource.String.pref_email_swipe_actions_leading_default));
                 return (EmailSwipeAction)Enum.Parse(typeof(EmailSwipeAction), pref);
             }
@@ -185,7 +184,7 @@ namespace Mark5.Mobile.Droid.Utilities
             set
             {
                 var e = sp.Edit();
-                e.PutInt(Application.Context.GetString(Resource.String.pref_key_swipe_leading), (int)value);
+                e.PutString(Application.Context.GetString(Resource.String.pref_key_swipe_leading), $"{(int)value}");
                 e.Commit();
             }
         }
@@ -201,7 +200,7 @@ namespace Mark5.Mobile.Droid.Utilities
             set
             {
                 var e = sp.Edit();
-                e.PutInt(Application.Context.GetString(Resource.String.pref_key_swipe_trailing), (int)value);
+                e.PutString(Application.Context.GetString(Resource.String.pref_key_swipe_trailing),$"{(int)value}");
                 e.Commit();
             }
         }

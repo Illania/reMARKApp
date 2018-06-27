@@ -434,8 +434,9 @@
     <string name="youre_offline_message">This action cannot be performed offline</string>
     <string name="more">More</string>
     <string name="remove_from_folder">Remove from folder</string>
-    <string name="swipe_actions_info">Select a swipe button below and select which actions to quickly access when swiping emails in your inbox.</string>
+    <string name="swipe_actions_info">Select a swipe button below and choose which actions to quickly access when swiping emails in your inbox.</string>
     <string name="swipe_actions_right_title">Swipe right</string>
     <string name="swipe_actions_left_title">Swipe left</string>
     <string name="swipe_actions_defaults">Reset to default</string>
+    <string name="swipe_actions_dialog_title">Select action</string>
 </resources>
