@@ -253,10 +253,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 StartActivity(i);
             }
 
-            if(preference.Key == GetString(Resource.String.pref_key_swipe_options)) {
-              
-            }
-
             return base.OnPreferenceTreeClick(preference);
         }
 
