@@ -279,7 +279,7 @@ namespace Mark5.Mobile.IOS
                     vc.SetRefreshDataOnAppear();
                     vc.SetData(n.ObjectId);
 
-                    // we want to remove the previouse document view controller in case user is opening emails from notifications - one after another.
+                    // we want to remove the previous document view controller in case user is opening emails from notifications - one after another.
                     if(Window.RootViewController.PresentedViewController != null && Window.RootViewController.PresentedViewController is NavigationController) {
                         var navController = Window.RootViewController.PresentedViewController as NavigationController;
                         if(navController.TopViewController is DocumentViewController) {
