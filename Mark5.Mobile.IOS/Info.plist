@@ -30,8 +30,6 @@
 	</array>
 	<key>XSAppIconAssets</key>
 	<string>Assets.xcassets/AppIcon.appiconset</string>
-	<key>CFBundleShortVersionString</key>
-	<string>2.5.2</string>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 	<key>CFBundleDevelopmentRegion</key>
@@ -62,13 +60,15 @@
 	<string>We need access to your photos to be able to save photo attachments on your phone.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>We need access to your camera to be able to attach pictures to email.</string>
-	<key>CFBundleVersion</key>
-	<string>223</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
 	</array>
 	<key>NSFaceIDUsageDescription</key>
 	<string>MARK5 needs your permission to use Face ID to provide additional security</string>
+	<key>CFBundleShortVersionString</key>
+	<string>2.6</string>
+	<key>CFBundleVersion</key>
+	<string>227</string>
 </dict>
 </plist>

@@ -228,6 +228,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnDestroyView()
         {
+            base.OnDestroyView();
             rootView.ViewTreeObserver.GlobalLayout -= RootView_OnGlobalLayout;
         }
 
