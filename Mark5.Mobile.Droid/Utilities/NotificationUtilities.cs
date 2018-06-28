@@ -34,7 +34,6 @@ namespace Mark5.Mobile.Droid.Utilities
                                            .SetCategory(NotificationCompat.CategoryMessage)
                                            .SetAutoCancel(true)
                                            .SetGroup(ReceivedEmailGroupKey)
-                                           .SetNumber(1)
                                            .SetPriority((int)NotificationPriority.High)
                                            .SetStyle(new NotificationCompat.BigTextStyle().BigText(notification.Message));
 
