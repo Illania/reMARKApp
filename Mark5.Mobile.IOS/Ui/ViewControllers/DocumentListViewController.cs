@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -31,10 +30,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public Folder Folder { get; set; }
 
         UIBarButtonItem composeDocumentItem;
+        UIBarButtonItem selectAllItem;
         UIBarButtonItem exitEditItem;
         UIBarButtonItem editItem;
 
         bool refreshing;
+        bool selectAllEnabled;
 
         UISearchController searchController;
         CancellationTokenSource searchCancellationTokenSource;
@@ -191,6 +192,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.Recycle();
 
             composeDocumentItem = null;
+            selectAllItem = null;
             exitEditItem = null;
             editItem = null;
 
@@ -231,6 +233,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Image = UIImage.FromBundle("Create")
             };
             NavigationItem.SetRightBarButtonItem(composeDocumentItem, false);
+
+            selectAllItem = new UIBarButtonItem
+            {
+                Image = UIImage.FromBundle("SelectAll")
+            };
 
             exitEditItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
             editItem = new UIBarButtonItem(UIBarButtonSystemItem.Edit);
@@ -280,6 +287,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (exitEditItem != null)
                 exitEditItem.Clicked += ExitEditItem_Clicked;
 
+            if (selectAllItem != null)
+                selectAllItem.Clicked += SelectAllItem_Clicked;
+
             if (editItem != null)
                 editItem.Clicked += EditItem_Clicked;
 
@@ -293,6 +303,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (exitEditItem != null)
                 exitEditItem.Clicked -= ExitEditItem_Clicked;
+
+            if (selectAllItem != null)
+                selectAllItem.Clicked -= SelectAllItem_Clicked;
 
             if (editItem != null)
                 editItem.Clicked -= EditItem_Clicked;
@@ -407,6 +420,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 eas.PopoverPresentationController.Delegate = d;
 
             PresentViewController(eas, true, null);
+        }
+
+        void SelectAllItem_Clicked(object sender, EventArgs e)
+        {
+            if (selectAllEnabled)
+            {
+                SelectAll();
+                selectAllItem.Image = UIImage.FromBundle("DeselectAll");
+            }
+            else
+            {
+                DeselectAll();
+                selectAllItem.Image = UIImage.FromBundle("SelectAll");
+            }
+
+            selectAllEnabled = !selectAllEnabled;
+
         }
 
         #endregion
@@ -663,6 +693,32 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 CommonConfig.Logger.Error($"Error while setting priority for documents", ex);
                 await Dialogs.ShowErrorAlertAsync(this, ex);
+            }
+        }
+
+        void SelectAll()
+        {
+            var dataSource = (DataSource)TableView.Source;
+            var currentSection = 0;
+            var rowsInSection = dataSource.RowsInSection(null, currentSection);
+
+            for (int i = 0; i < rowsInSection; i++)
+            {
+                var path = NSIndexPath.FromItemSection(i, currentSection);
+                TableView.SelectRow(path, false, UITableViewScrollPosition.None);
+            }
+        }
+
+        void DeselectAll()
+        {
+            var dataSource = (DataSource)TableView.Source;
+            var currentSection = 0;
+            var rowsInSection = dataSource.RowsInSection(null, currentSection);
+
+            for (int i = 0; i < rowsInSection; i++)
+            {
+                var path = NSIndexPath.FromItemSection(i, currentSection);
+                TableView.DeselectRow(path, false);
             }
         }
 
@@ -1031,14 +1087,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
             TableView.SetEditing(true, true);
-            NavigationItem.SetRightBarButtonItem(exitEditItem, true);
+            NavigationItem.SetRightBarButtonItems(new[] { exitEditItem, selectAllItem }, true);
             NavigationItem.SetLeftBarButtonItem(editItem, true);
+
+            selectAllEnabled = true;
+            selectAllItem.Image = UIImage.FromBundle("SelectAll");
         }
 
         void EndEditing()
         {
             TableView.SetEditing(false, true);
-            NavigationItem.SetRightBarButtonItem(composeDocumentItem, false);
+            NavigationItem.SetRightBarButtonItems(new[] { composeDocumentItem }, false);
             NavigationItem.SetLeftBarButtonItem(NavigationItem.BackBarButtonItem, true);
         }
 
