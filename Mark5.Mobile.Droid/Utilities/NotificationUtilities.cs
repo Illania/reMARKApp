@@ -48,7 +48,7 @@ namespace Mark5.Mobile.Droid.Utilities
             StackIfNeeded(context, ReceivedEmailChannelId, ReceivedEmailGroupKey);
         }
 
-        static void StackIfNeeded(Context context, string channelId, string channelName)
+        static void StackIfNeeded(Context context, string channelId, string groupKey)
         {
             if (Build.VERSION.SdkInt < BuildVersionCodes.M)
                 return;
@@ -78,14 +78,14 @@ namespace Mark5.Mobile.Droid.Utilities
 
             builder.SetCategory(NotificationCompat.CategoryMessage);
             builder.SetAutoCancel(true);
-            builder.SetGroup(channelName);
+            builder.SetGroup(groupKey);
             builder.SetGroupSummary(true);
             builder.SetPriority((int)NotificationPriority.High);
 
             var n = builder.Build();
             n.Defaults = 0;
 
-            nm.Notify(channelName, StackNotification, n);
+            nm.Notify(StackNotification, n);
         }
 
         static void CreateChannelIfNotExists(Context context, string channelId, string channelName, NotificationImportance importance)
