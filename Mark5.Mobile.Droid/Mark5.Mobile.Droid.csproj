@@ -203,14 +203,8 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\netstandard2.0\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\netstandard2.0\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="Xamarin.Firebase.Messaging">
       <HintPath>..\packages\Xamarin.Firebase.Messaging.60.1142.0\lib\MonoAndroid80\Xamarin.Firebase.Messaging.dll</HintPath>
-    </Reference>
-    <Reference Include="Xamarin.iOS">
-      <HintPath>..\..\..\..\..\Library\Frameworks\Xamarin.iOS.framework\Versions\Current\lib\mono\Xamarin.iOS\Xamarin.iOS.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -783,6 +777,14 @@
     <AndroidResource Include="Resources\drawable-xxxhdpi\ic_fp_40px.png" />
     <AndroidResource Include="Resources\drawable\ic_fingerprint_error.xml" />
     <AndroidResource Include="Resources\drawable\ic_fingerprint_success.xml" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\action_deselect_all.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\action_select_all.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\action_deselect_all.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\action_select_all.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\action_deselect_all.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\action_select_all.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\action_deselect_all.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\action_select_all.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FastScrollRecycler\FastScrollRecycler.csproj">
