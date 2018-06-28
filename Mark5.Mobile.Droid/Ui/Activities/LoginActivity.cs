@@ -141,6 +141,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         {
             CommonConfig.Logger.Info($"Attempting login...");
 
+            var btn = (FloatingActionButton)sender;
+
+            btn.Clickable = false;
+
             Action dismissAction = null;
             CancellationToken token;
 
@@ -183,13 +187,22 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 }
 
                 if (errors)
+                {
+                    btn.Clickable = true;
                     return;
+                }
 
-                if (sslMode == SslMode.AllowSelfSigned && !await Dialogs.ShowYesNoDialogAsync(this, Resource.String.warning, Resource.String.ssl_accept_selfsigned_warning))
+                if (sslMode == SslMode.AllowSelfSigned && !await Dialogs.ShowYesNoDialogAsync(this, Resource.String.warning, Resource.String.ssl_accept_selfsigned_warning)) 
+                {
+                    btn.Clickable = true;
                     return;
+                }
 
-                if (sslMode == SslMode.Off && !await Dialogs.ShowYesNoDialogAsync(this, Resource.String.warning, Resource.String.ssl_off_warning))
+                if (sslMode == SslMode.Off && !await Dialogs.ShowYesNoDialogAsync(this, Resource.String.warning, Resource.String.ssl_off_warning)) 
+                {
+                    btn.Clickable = true;
                     return;
+                }
 
                 CommonConfig.Logger.Info($"Logging in... [username={username}, hostname={hostname}, port={port}, ssl={sslMode}]");
 
@@ -215,6 +228,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 {
                     CommonConfig.Logger.Info($"Authentication was cancelled...");
                     cts = null;
+                    btn.Clickable = true;
                     return;
                 }
 
@@ -254,11 +268,14 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 if (!String.IsNullOrEmpty(ServerConfig.SystemSettings.SystemInfo.CustomerName))
                     CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.CustomerName, ServerConfig.SystemSettings.SystemInfo.CustomerName);
 
+                btn.Clickable = true;
+
                 StartActivity(MainActivity.CreateIntent(this));
                 Finish();
             }
             catch (Exception ex)
             {
+                btn.Clickable = true;
                 if (token.IsCancellationRequested)
                     return;
 
@@ -268,7 +285,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 if (ex.InnerException != null)
                     CommonConfig.Logger.Error("Log in failed - inner exception", ex.InnerException);
-
+                
                 await Dialogs.ShowConfirmDialogAsync(this, Resource.String.log_in_failed_title, Resource.String.log_in_failed_message);
             }
         }
