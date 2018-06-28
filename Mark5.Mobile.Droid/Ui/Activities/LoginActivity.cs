@@ -188,12 +188,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 if (errors)
                     return;
-               
 
                 if (sslMode == SslMode.AllowSelfSigned && !await Dialogs.ShowYesNoDialogAsync(this, Resource.String.warning, Resource.String.ssl_accept_selfsigned_warning)) 
                     return;
                 
-
                 if (sslMode == SslMode.Off && !await Dialogs.ShowYesNoDialogAsync(this, Resource.String.warning, Resource.String.ssl_off_warning)) 
                     return;
 
