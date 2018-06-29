@@ -43,6 +43,15 @@ namespace Mark5.ServiceReference.AppService
             return Channel.EndGetFolders(asyncResult);
         }
 
+        public IAsyncResult BeginSearchFolders(SearchFoldersParameters parameters, AsyncCallback callback, object asyncState) {
+            return Channel.BeginSearchFolders(parameters, callback, asyncState);
+        }
+
+        public SearchFoldersResult EndSearchFolders(IAsyncResult asyncResult)
+        {
+            return Channel.EndSearchFolders(asyncResult);
+        }
+
         #endregion
 
         #region Documents module
