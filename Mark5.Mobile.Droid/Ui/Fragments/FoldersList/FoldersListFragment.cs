@@ -843,7 +843,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public virtual bool OnQueryTextChange(string newText)
         {
             SearchHandler.RemoveCallbacksAndMessages(null);
-            SearchHandler.PostDelayed(() =>
+            SearchHandler.PostDelayed(async () =>
                 {
                     if (string.IsNullOrWhiteSpace(newText))
                     {
@@ -855,10 +855,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     {
                         var root = Folder.RootForModule(RemoteFolder.Module);
 
-                        var resultList = new List<Folder>();
-                        SearchRecursively(root, newText, resultList);
+                        var localFolders = new List<Folder>();
+                        SearchRecursively(root, newText, localFolders);
 
-                        SearchAdapter.RefreshSearch(resultList);
+                        var remoteFolders = new List<Folder>();
+
+                        try
+                        {
+                            remoteFolders = await Managers.FoldersManager.SearchFolders(newText);
+                        }
+                        catch (Exception ex)
+                        {
+                            CommonConfig.Logger.Error(ex);
+                        }
+                        
+                        var mergedFolders = localFolders.Union(remoteFolders, new FolderComparer()).ToList();
+
+                        SearchAdapter.RefreshSearch(mergedFolders);
                     }
                 },
                 500);
