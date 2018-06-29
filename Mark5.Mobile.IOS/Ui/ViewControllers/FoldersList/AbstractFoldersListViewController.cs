@@ -911,13 +911,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 var root = Folder.RootForModule(ParentFolder.Module);
 
-                var resultList = new List<Folder>();
-                await Task.Run(() => SearchRecursively(root, searchText, resultList, cancellationToken));
+                var localFolders = new List<Folder>();
+                await Task.Run(() => SearchRecursively(root, searchText, localFolders, cancellationToken));
+
+                var remoteFolders = new List<Folder>();
+                 
+                try {
+                    remoteFolders = await Managers.FoldersManager.SearchFolders(searchText);
+                } catch (Exception ex) {
+                    CommonConfig.Logger.Error(ex);
+                }
 
                 if (cancellationToken.IsCancellationRequested)
                     return;
+                
+                var mergedFolders = localFolders.Union(remoteFolders, new FolderComparer()).ToList();
 
-                dataSource?.SetFolders(resultList);
+                dataSource?.SetFolders(mergedFolders);
                 await RefreshSearchFoldersInfo();
             }
             catch (Exception ex)
