@@ -1,5 +1,4 @@
-﻿using System;
-using Android.App;
+﻿using Android.App;
 using Android.Content;
 using Android.Support.V7.Preferences;
 using Android.Webkit;
@@ -10,7 +9,7 @@ namespace Mark5.Mobile.Droid.Utilities
     {
         const string appVersionKey = "latestAppVersionKey";
 
-        Context context;
+        readonly Context context;
 
         public OnBoardingUtilities(Context context)
         {

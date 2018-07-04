@@ -262,6 +262,8 @@
 		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\RecipientsView.cs" />
 		<Compile Include="Ui\ViewControllers\SwipeActionViewController.cs" />
 		<Compile Include="Utilities\EmailSwipeActions.cs" />
+		<Compile Include="Utilities\OnBoardingUtilities.cs" />
+		<Compile Include="Ui\ViewControllers\OnBoardingViewController.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

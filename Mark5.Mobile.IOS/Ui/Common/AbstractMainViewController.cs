@@ -74,6 +74,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             base.ViewDidAppear(animated);
 
+            new OnBoardingUtilities().TryShowingOnBoardingDialog(this);
+
             CheckAutoSavedDocument();
         }
 
