@@ -200,7 +200,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
             webViewProgressView?.RemoveFromSuperview();
             loadIndicatorView?.RemoveFromSuperview();
             headerContainerView?.RemoveFromSuperview();
-            webView?.RemoveFromSuperview();
+            //webView?.RemoveFromSuperview(); //TODO This has been commented out to avoid eventual crashes 
+            // Github link: https://github.com/xamarin/xamarin-macios/issues/4130#issuecomment-399243880
 
             webViewProgressView = null;
             loadIndicatorView = null;
@@ -432,7 +433,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             var html = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/plain", "html"));
             var htmlDocument = new HtmlDocument();
             htmlDocument.LoadHtml(html);
-            var preNode = htmlDocument.DocumentNode.SelectSingleNode("//div[@id='plaintext']");
+            var preNode = htmlDocument.DocumentNode.SelectSingleNode("//pre[@id='plaintext']");
             preNode.InnerHtml = text;
 
             if (config.MakeEditable)
