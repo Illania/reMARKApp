@@ -123,6 +123,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         {
             base.OnResume();
 
+            new OnBoardingUtilities(this).TryShowingOnBoardingDialog();
+
             if (permissionsAsked)
                 return;
 
