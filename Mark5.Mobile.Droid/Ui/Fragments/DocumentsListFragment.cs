@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -28,6 +28,7 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
+using Android.Content.Res;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -146,7 +147,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }));
             recyclerView.SetAdapter(adapter);
 
-            swipeHelperCallback = new SwipeHelperCallback(Context, this, adapter, refreshLayout);
+
+            swipeHelperCallback = new SwipeHelperCallback(Context, this, adapter, refreshLayout, Folder);
             itemTouchHelper = new ItemTouchHelper(swipeHelperCallback);
             itemTouchHelper.AttachToRecyclerView(recyclerView);
 
@@ -518,13 +520,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (item.ItemId == MenuItemActions.MarkAsRead)
             {
-                MarkAsRead();
+                MarkAsRead(CurrentAdapter.SelectedItems);
                 return true;
             }
 
             if (item.ItemId == MenuItemActions.MarkAsUnread)
             {
-                MarkAsUnread();
+                MarkAsUnread(CurrentAdapter.SelectedItems);
                 return true;
             }
 
@@ -552,7 +554,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.SetPriority)
             {
-                SetPriority();
+                SetPriority(CurrentAdapter.SelectedItems);
                 return true;
             }
 
@@ -572,13 +574,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.DeleteFromFolder)
             {
-                DeleteFromFolderAction();
+                DeleteFromFolderAction(CurrentAdapter.SelectedItems);
                 return true;
             }
 
             if (item.ItemId == MenuItemActions.Delete)
             {
-                DeleteAction();
+                DeleteAction(CurrentAdapter.SelectedItems);
                 return true;
             }
 
@@ -621,19 +623,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        async void MarkAsRead()
+        async void MarkAsRead(List<DocumentPreview> items)
         {
-            CommonConfig.Logger.Info($"Attempting to mark as read [businessEntities.Count={CurrentAdapter.SelectedItemCount}]...");
+            CommonConfig.Logger.Info($"Attempting to mark as read [businessEntities.Count={items.Count}]...");
 
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.marking_as_read, Resource.String.please_wait);
 
             try
             {
-                CommonConfig.UsageAnalytics.LogEvent(new SetReadStatusEvent(CurrentAdapter.SelectedItems.Count));
+                CommonConfig.UsageAnalytics.LogEvent(new SetReadStatusEvent(items.Count));
 
-                await Managers.DocumentsManager.SetDocumentsReadStatusAsync(CurrentAdapter.SelectedItems, true);
-                adapter.RefreshItems(CurrentAdapter.SelectedItems);
-                searchAdapter.RefreshItems(CurrentAdapter.SelectedItems);
+                await Managers.DocumentsManager.SetDocumentsReadStatusAsync(items, true);
+                adapter.RefreshItems(items);
+                searchAdapter.RefreshItems(items);
 
                 dismissAction();
                 actionMode?.Finish();
@@ -642,25 +644,24 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 dismissAction();
 
-                CommonConfig.Logger.Error($"Marking as read failed [businessEntities.Count={CurrentAdapter.SelectedItemCount}]", ex);
+                CommonConfig.Logger.Error($"Marking as read failed [businessEntities.Count={items.Count}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
             }
         }
 
-        async void MarkAsUnread()
+        async void MarkAsUnread(List<DocumentPreview> items)
         {
-            CommonConfig.Logger.Info($"Attempting to mark as unread [businessEntities.Count={CurrentAdapter.SelectedItemCount}]...");
+            CommonConfig.Logger.Info($"Attempting to mark as unread [businessEntities.Count={items.Count}]...");
 
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.marking_as_unread, Resource.String.please_wait);
 
             try
             {
-                CommonConfig.UsageAnalytics.LogEvent(new SetReadStatusEvent(CurrentAdapter.SelectedItems.Count));
-
-                await Managers.DocumentsManager.SetDocumentsReadStatusAsync(CurrentAdapter.SelectedItems, false);
-                adapter.RefreshItems(CurrentAdapter.SelectedItems);
-                searchAdapter.RefreshItems(CurrentAdapter.SelectedItems);
+                CommonConfig.UsageAnalytics.LogEvent(new SetReadStatusEvent(items.Count));
+                await Managers.DocumentsManager.SetDocumentsReadStatusAsync(items, false);
+                adapter.RefreshItems(items);
+                searchAdapter.RefreshItems(items);
 
                 dismissAction();
                 actionMode?.Finish();
@@ -669,7 +670,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 dismissAction();
 
-                CommonConfig.Logger.Error($"Marking as unread failed [businessEntities.Count={CurrentAdapter.SelectedItemCount}]", ex);
+                CommonConfig.Logger.Error($"Marking as unread failed [businessEntities.Count={items.Count}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
             }
@@ -696,7 +697,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             });
         }
 
-        async void SetPriority()
+        async void SetPriority(List<DocumentPreview> items)
         {
             var possiblePriorities = new List<Priority>
             {
@@ -704,7 +705,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 Priority.Normal,
                 Priority.Low
             };
-            var selectedPriority = CurrentAdapter.SelectedItems.All(dp => dp.Priority == CurrentAdapter.SelectedItems[0].Priority) ? CurrentAdapter.SelectedItems[0].Priority : Priority.None;
+
+            var selectedPriority = items.All(dp => dp.Priority == items[0].Priority) ? items[0].Priority : Priority.None;
 
             if (!possiblePriorities.Contains(selectedPriority))
                 selectedPriority = Priority.Normal;
@@ -713,13 +715,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (priority == default(Priority) || priority == selectedPriority)
                 return;
 
-            CommonConfig.Logger.Info($"Attempting to set priority [businessEntities.Count={CurrentAdapter.SelectedItemCount}]...");
+            CommonConfig.Logger.Info($"Attempting to set priority [businessEntities.Count={items.Count}]...");
 
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.setting_priority, Resource.String.please_wait);
 
             try
             {
-                await Managers.DocumentsManager.SetDocumentsPriorityAsync(CurrentAdapter.SelectedItems, priority);
+                await Managers.DocumentsManager.SetDocumentsPriorityAsync(items, priority);
 
                 dismissAction();
                 actionMode?.Finish();
@@ -728,10 +730,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 dismissAction();
 
-                CommonConfig.Logger.Error($"Setting priority failed [businessEntities.Count={CurrentAdapter.SelectedItemCount}]", ex);
+                CommonConfig.Logger.Error($"Setting priority failed [businessEntities.Count={items.Count}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
             }
+          
         }
 
         void SelectDeselectAll(IMenuItem item)
@@ -746,19 +749,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             actionMode.Invalidate();
         }
 
-        async void DeleteFromFolderAction()
+        async void DeleteFromFolderAction(List<DocumentPreview> items)
         {
             var yesNo = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete_from_folder, Resource.String.delete_from_folder_are_you_sure);
             if (!yesNo)
                 return;
 
-            CommonConfig.Logger.Info($"Attempting to delete from folder [businessEntities.Count={CurrentAdapter.SelectedItemCount}]...");
+            CommonConfig.Logger.Info($"Attempting to delete from folder [businessEntities.Count={items.Count}]...");
 
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.deleting_from_folder, Resource.String.please_wait);
 
             try
             {
-                await Managers.CommonActionsManager.RemoveFromFolder(CurrentAdapter.SelectedItems.OfType<IBusinessEntity>().ToList(), Folder);
+                await Managers.CommonActionsManager.RemoveFromFolder(items.OfType<IBusinessEntity>().ToList(), Folder);
 
                 dismissAction();
                 actionMode?.Finish();
@@ -767,25 +770,25 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 dismissAction();
 
-                CommonConfig.Logger.Error($"Deleting from folder failed [businessEntities.Count={CurrentAdapter.SelectedItemCount}]", ex);
+                CommonConfig.Logger.Error($"Deleting from folder failed [businessEntities.Count={items.Count}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
             }
         }
 
-        async void DeleteAction()
+        async void DeleteAction(List<DocumentPreview> items)
         {
             var yesNo = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete, Resource.String.delete_are_you_sure);
             if (!yesNo)
                 return;
 
-            CommonConfig.Logger.Info($"Attempting to delete [businessEntities.Count={CurrentAdapter.SelectedItemCount}]...");
+            CommonConfig.Logger.Info($"Attempting to delete [businessEntities.Count={items.Count}]...");
 
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.deleting, Resource.String.please_wait);
 
             try
             {
-                await Managers.CommonActionsManager.Delete(CurrentAdapter.SelectedItems.OfType<IBusinessEntity>().ToList());
+                await Managers.CommonActionsManager.Delete(items.OfType<IBusinessEntity>().ToList());
 
                 dismissAction();
                 actionMode?.Finish();
@@ -794,7 +797,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 dismissAction();
 
-                CommonConfig.Logger.Error($"Deleting failed [businessEntities.Count={CurrentAdapter.SelectedItemCount}]", ex);
+                CommonConfig.Logger.Error($"Deleting failed [businessEntities.Count={items.Count}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
             }
@@ -1354,19 +1357,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             readonly DocumentsListAdapter adapter;
             readonly DocumentsListFragment fragment;
             readonly SwipeRefreshLayout refreshLayout;
+            readonly Folder folder;
 
-            readonly Drawable leftBackground;
-            readonly Drawable rightBackground;
+            Drawable leftBackground;
+            Drawable rightBackground;
 
-            public SwipeHelperCallback(Context context, DocumentsListFragment fragment, DocumentsListAdapter adapter, SwipeRefreshLayout refreshLayout)
+            public SwipeHelperCallback(Context context, DocumentsListFragment fragment, DocumentsListAdapter adapter, SwipeRefreshLayout refreshLayout, Folder folder)
             {
                 this.context = context;
                 this.fragment = fragment;
                 this.adapter = adapter;
                 this.refreshLayout = refreshLayout;
+                this.folder = folder;
 
-                leftBackground = new ColorDrawable(new Color(ContextCompat.GetColor(context, Resource.Color.brown)));
-                rightBackground = new ColorDrawable(new Color(ContextCompat.GetColor(context, Resource.Color.darkblue)));
+
             }
 
             public override int GetMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder)
@@ -1394,9 +1398,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public override void OnChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, bool isCurrentlyActive)
             {
+                
                 if (actionState != ItemTouchHelper.ActionStateSwipe || viewHolder.AdapterPosition == -1) //Sometimes it gets called for viewHolders that are already gone
                     return;
-
+                
                 var itemView = viewHolder.ItemView;
                 var itemViewHeight = itemView.Bottom - itemView.Top;
 
@@ -1413,13 +1418,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 if (dX > 0) //Swiping to right
                 {
-                    var text = context.Resources.GetString(Resource.String.categories);
-
+                    Preferences.EmailSwipeAction action = PlatformConfig.Preferences.EmailLeadingSwipeAction;
+                    int bgColor = SwipeActionAllowed(action) ? Resource.Color.brown : Resource.Color.lightgray;
+                    leftBackground = new ColorDrawable(new Color(ContextCompat.GetColor(context, bgColor)));
+                    string text = GetSwipeActionTitle(action, viewHolder.AdapterPosition);
                     leftBackground.SetBounds(itemView.Left, itemView.Top, (int)dX, itemView.Bottom);
                     leftBackground.Draw(c);
-
                     var textLayout = new StaticLayout(text, paint, c.Width, Layout.Alignment.AlignNormal, 1, 0, false);
-
                     var textLeft = itemView.Left + iconMargin;
                     var textTop = itemView.Top + (itemViewHeight - textHeight) / 2;
 
@@ -1430,13 +1435,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
                 else if (dX < 0)
                 {
-                    var text = context.Resources.GetString(Resource.String.copy_to_worktray_multiline);
-
+                    Preferences.EmailSwipeAction action = PlatformConfig.Preferences.EmailTrailingSwipeAction;
+                    int bgColor = SwipeActionAllowed(action) ? Resource.Color.darkblue : Resource.Color.lightgray;
+                    rightBackground = new ColorDrawable(new Color(ContextCompat.GetColor(context, bgColor)));
+                    string text = GetSwipeActionTitle(action, viewHolder.AdapterPosition);
                     rightBackground.SetBounds(itemView.Right + (int)dX, itemView.Top, itemView.Right, itemView.Bottom);
                     rightBackground.Draw(c);
-
                     var textLayout = new StaticLayout(text, paint, c.Width, Layout.Alignment.AlignNormal, 1, 0, false);
-
                     var iconWidth = text.Split(new string[]
                             {
                                 "\n"
@@ -1460,12 +1465,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public override void OnSwiped(RecyclerView.ViewHolder viewHolder, int direction)
             {
-                if (direction == ItemTouchHelper.Left)
-                    fragment.CopyToOwnWorktray(adapter.Items[viewHolder.AdapterPosition]);
-                else if (direction == ItemTouchHelper.Right)
-                    fragment.ShowCategories(adapter.Items[viewHolder.AdapterPosition]);
-
                 ResetViewHolder(viewHolder, direction);
+                if (direction == ItemTouchHelper.Left) {
+                     SwipeActionSelected(PlatformConfig.Preferences.EmailTrailingSwipeAction, viewHolder);
+
+                } else if (direction == ItemTouchHelper.Right) {
+                    SwipeActionSelected(PlatformConfig.Preferences.EmailLeadingSwipeAction, viewHolder);
+                   
+                }
             }
 
             void ResetViewHolder(RecyclerView.ViewHolder viewHolder, int direction)
@@ -1485,6 +1492,104 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         adapter.NotifyItemChanged(position);
                     },
                     400);
+            }
+       
+            async void SwipeActionSelected(Preferences.EmailSwipeAction action, RecyclerView.ViewHolder viewHolder)
+            {
+                if (SwipeActionAllowed(action))
+                {
+                    switch (action)
+                    {
+                        case Preferences.EmailSwipeAction.Delete:
+                            fragment.DeleteAction(new List<DocumentPreview>() { adapter.Items[viewHolder.AdapterPosition] });
+                            break;
+                        case Preferences.EmailSwipeAction.More:
+                            var index = await Dialogs.ShowListDialog(context, Resource.String.pref_email_swipe_dialog_title , Resource.Array.pref_email_swipe_actions_entries, true);
+                            if (index >= 0)
+                            {
+                                SwipeActionSelected(PlatformConfig.Preferences.GetAllAvailableActions()[index], viewHolder);
+                            }
+                            break;
+                        case Preferences.EmailSwipeAction.CopyToWorkTray:
+                            fragment.CopyToOwnWorktray(adapter.Items[viewHolder.AdapterPosition]);
+                            break;
+                        case Preferences.EmailSwipeAction.Categories:
+                            fragment.ShowCategories(adapter.Items[viewHolder.AdapterPosition]);
+                            break;
+                        case Preferences.EmailSwipeAction.MarkAsReadUnread:
+                            if (!adapter.Items[viewHolder.AdapterPosition].IsReadByCurrent)
+                            {
+                                fragment.MarkAsRead(new List<DocumentPreview>() { adapter.Items[viewHolder.AdapterPosition] });
+                            }
+                            if (adapter.Items[viewHolder.AdapterPosition].IsReadByCurrent)
+                            {
+                                fragment.MarkAsUnread(new List<DocumentPreview>() { adapter.Items[viewHolder.AdapterPosition] });
+                            }
+                            break;
+                        case Preferences.EmailSwipeAction.RemoveFromFolder:
+                            fragment.DeleteFromFolderAction(new List<DocumentPreview>() { adapter.Items[viewHolder.AdapterPosition] });
+                            break;
+                        case Preferences.EmailSwipeAction.Priorities:
+                            fragment.SetPriority(new List<DocumentPreview>() { adapter.Items[viewHolder.AdapterPosition] });
+                            break;
+                        case Preferences.EmailSwipeAction.MoveToFolder:
+                            fragment.StartActivity(CopyMoveToFolderListActivity.CreateIntent(context, CopyMoveToFolderListActivity.ModeType.Move, ModuleType.Documents,
+                                                                                             adapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList(), folder));
+                            break;
+                        
+                    }
+                }
+
+            }
+
+            bool SwipeActionAllowed(Preferences.EmailSwipeAction action)
+            {
+                switch (action)
+                {
+                    case Preferences.EmailSwipeAction.Delete:
+                        return ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || adapter.SelectedItems.All(dp => dp.Direction == DocumentDirection.Draft); ;
+                    case Preferences.EmailSwipeAction.MoveToFolder:
+                        return folder.InternalType == FolderInternalType.FilterView || folder.InternalType == FolderInternalType.Static || folder.InternalType == FolderInternalType.Worktray;
+                    case Preferences.EmailSwipeAction.RemoveFromFolder:
+                        return folder.InternalType == FolderInternalType.FilterView || folder.InternalType == FolderInternalType.Static || folder.InternalType == FolderInternalType.Worktray;
+                    default:
+                        return true;
+                }
+            }
+
+            string GetSwipeActionTitle(Preferences.EmailSwipeAction action, int position)
+            {
+                switch (action)
+                {
+                    case Preferences.EmailSwipeAction.Delete:
+                        return context.Resources.GetString(Resource.String.delete);
+                    case Preferences.EmailSwipeAction.More:
+                        return context.Resources.GetString(Resource.String.more);
+                    case Preferences.EmailSwipeAction.MoveToFolder:
+                        return context.Resources.GetString(Resource.String.move_to_folder);
+                    case Preferences.EmailSwipeAction.MarkAsReadUnread:
+                        if (!adapter.Items[position].IsReadByCurrent)
+                        {
+                            return context.Resources.GetString(Resource.String.mark_as_read);
+                        }
+                        if (adapter.Items[position].IsReadByCurrent)
+                        {
+                            return context.Resources.GetString(Resource.String.marks_as_unread);
+                        }
+                        return "";
+                    case Preferences.EmailSwipeAction.Categories:
+                        return context.Resources.GetString(Resource.String.categories);
+                    case Preferences.EmailSwipeAction.RemoveFromFolder:
+                        return context.Resources.GetString(Resource.String.remove_from_folder);
+                    case Preferences.EmailSwipeAction.CopyToWorkTray:
+                        return context.Resources.GetString(Resource.String.copy_to_worktray);
+                    case Preferences.EmailSwipeAction.CopyToFolder:
+                        return context.Resources.GetString(Resource.String.copy_to_folder);
+                    case Preferences.EmailSwipeAction.Priorities:
+                        return context.Resources.GetString(Resource.String.priority);
+                    default:
+                        return "Forgot case ?";
+                }
             }
         }
 

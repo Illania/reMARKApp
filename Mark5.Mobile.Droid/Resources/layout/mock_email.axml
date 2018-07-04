@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:layout_marginRight="20dp">
+        <ImageView
+            android:id="@+id/mock_email_top_first"
+            android:layout_width="match_parent"
+            android:layout_marginRight="80dp"
+            android:layout_height="10dp"
+            android:src="@drawable/square_rounded_corners" />
+        <ImageView
+            android:id="@+id/mock_email_top_second"
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:layout_marginRight="40dp"
+            android:layout_marginTop="10dp"
+            android:src="@drawable/square_rounded_corners" />
+        <ImageView
+            android:id="@+id/mock_email_middle_first"
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:layout_marginTop="10dp"
+            android:src="@drawable/square_rounded_corners" />
+        <ImageView
+            android:id="@+id/mock_email_middle_second"
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:layout_marginTop="5dp"
+            android:src="@drawable/square_rounded_corners" />
+        <ImageView
+            android:id="@+id/mock_email_middle_third"
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:layout_marginTop="5dp"
+            android:src="@drawable/square_rounded_corners" />
+    </LinearLayout>
+    <ImageView
+        android:layout_marginLeft="10dp"
+        android:id="@+id/mock_right_top"
+        android:layout_height="10dp"
+        android:layout_weight="0"
+        android:layout_width="40dp"
+        android:src="@drawable/square_rounded_corners" />
+</LinearLayout>
