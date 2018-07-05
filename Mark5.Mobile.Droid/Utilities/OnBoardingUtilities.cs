@@ -31,7 +31,7 @@ namespace Mark5.Mobile.Droid.Utilities
 
             var storedVersion = PreferenceManager.GetDefaultSharedPreferences(context).GetInt(appVersionKey, 0);
 
-            return storedVersion != 0 && pi.VersionCode > storedVersion;
+            return pi.VersionCode > storedVersion;
         }
 
         public void TryShowingOnBoardingDialog()

@@ -28,8 +28,7 @@ namespace Mark5.Mobile.IOS.Utilities
             var storedVersion = userDefaults.IntForKey(appVersionKey);
             var currentVersion = Int32.Parse(NSBundle.MainBundle.InfoDictionary.ValueForKey(new NSString("CFBundleVersion")).ToString());
 
-            return storedVersion != 0 && currentVersion > storedVersion;
-
+            return currentVersion > storedVersion;
         }
 
         public void TryShowingOnBoardingDialog(UIViewController vc)
