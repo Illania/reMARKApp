@@ -1,4 +1,5 @@
-﻿using Android.App;
+﻿using System.IO;
+using Android.App;
 using Android.Content;
 using Android.Support.V7.Preferences;
 using Android.Webkit;
@@ -23,25 +24,25 @@ namespace Mark5.Mobile.Droid.Utilities
             var prefManager = PreferenceManager.GetDefaultSharedPreferences(context);
             var editor = prefManager.Edit();
             editor.PutInt(appVersionKey, pi.VersionCode);
-        }
-
-        bool ApplicationHasBeenUpdated()
-        {
-            var pi = context.PackageManager.GetPackageInfo(context.PackageName, 0);
-
-            var storedVersion = PreferenceManager.GetDefaultSharedPreferences(context).GetInt(appVersionKey, 0);
-
-            return pi.VersionCode > storedVersion;
+            editor.Commit();
         }
 
         public void TryShowingOnBoardingDialog()
         {
-            //if(ApplicationHasBeenUpdated(context))
-            //{
+            if (ApplicationHasBeenUpdated())
+            {
                 SaveAppVersionCode();
 
                 var webView = new WebView(context);
-                
+                var currentVersionCode = context.PackageManager.GetPackageInfo(context.PackageName, 0).VersionCode;
+
+                string changeloghtml;
+                using (var sr = new StreamReader(context.Assets.Open("changelogs/changelog_" + currentVersionCode + ".html")))
+                    changeloghtml = sr.ReadToEnd();
+
+                webView.StopLoading();
+                webView.LoadDataWithBaseURL(null, changeloghtml, "text/html", "UTF-8", null);
+
                 AlertDialog.Builder builder = new AlertDialog.Builder(context)
                     .SetTitle(context.GetString(Resource.String.whatsnew))
                     .SetView(webView)
@@ -50,9 +51,18 @@ namespace Mark5.Mobile.Droid.Utilities
                     var dialog = sender as AlertDialog;
                     dialog.Dismiss();
                 });
-                
+
                 builder.Show();
-            //}
+            }
+        }
+
+        bool ApplicationHasBeenUpdated()
+        {
+            var pi = context.PackageManager.GetPackageInfo(context.PackageName, 0);
+
+            var storedVersionCode = PreferenceManager.GetDefaultSharedPreferences(context).GetInt(appVersionKey, 0);
+
+            return pi.VersionCode > storedVersionCode;
         }
     }
 }

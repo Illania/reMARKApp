@@ -24,13 +24,6 @@ namespace Mark5.Mobile.IOS.Utilities
             userDefaults.Synchronize();
         }
 
-        bool ApplicationHasBeenUpdated()
-        {
-            var storedVersionCode = userDefaults.IntForKey(appVersionKey);
-
-            return currentVersionCode > storedVersionCode;
-        }
-
         public void TryShowingOnBoardingDialog(UIViewController vc)
         {
             if (ApplicationHasBeenUpdated())
@@ -47,6 +40,13 @@ namespace Mark5.Mobile.IOS.Utilities
 
                 vc.PresentViewController(new NavigationController(pvc), true, null);
             }
+        }
+
+        bool ApplicationHasBeenUpdated()
+        {
+            var storedVersionCode = userDefaults.IntForKey(appVersionKey);
+            
+            return currentVersionCode > storedVersionCode;
         }
     }
 }
