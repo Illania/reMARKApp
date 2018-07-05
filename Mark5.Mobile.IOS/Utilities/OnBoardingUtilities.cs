@@ -1,4 +1,5 @@
 ﻿using Mark5.Mobile.IOS.Ui.Common;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.ViewControllers;
 using Foundation;
 using System;
@@ -6,7 +7,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
-    public class OnBoardingUtilities
+    public class OnBoardingUtilities : IOnBoardingUtilities
     {
         const string appVersionKey = "latestAppVersionKey";
         readonly int currentVersionCode;
@@ -46,7 +47,7 @@ namespace Mark5.Mobile.IOS.Utilities
         {
             var storedVersionCode = userDefaults.IntForKey(appVersionKey);
             
-            return currentVersionCode > storedVersionCode;
+            return storedVersionCode != 0 && currentVersionCode > storedVersionCode;
         }
     }
 }
