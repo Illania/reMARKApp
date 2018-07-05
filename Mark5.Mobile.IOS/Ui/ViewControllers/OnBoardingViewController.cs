@@ -4,19 +4,23 @@ using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
 using Foundation;
 using UIKit;
+using WebKit;
+using System.IO;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    public class OnBoardingViewController : AbstractViewController
+    public class OnBoardingViewController : AbstractViewController, IWKNavigationDelegate, IUIScrollViewDelegate
     {
+        public int VersionCode { get; set; }
+
         UIView mainView;
-        UITextView topTextView;
+        WKWebView webView;
         UIButton okButton;
 
 
         public override void ViewDidLoad()
         {
-            base.ViewDidLoad();
+            base.ViewDidLoad(); 
 
             mainView = new UIView
             {
@@ -33,21 +37,40 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 mainView.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor)
             });
 
-            topTextView = new UITextView
+            var wkPreferences = new WKPreferences
             {
-                Text = "WEijfowejiafwijfaewjifaewifaweijoafweiojaewfijoæfwaæifaæijowifaewiæoefw",//Localization.GetString("whats_new"),
+                JavaScriptEnabled = false
+            };
+
+            var config = new WKWebViewConfiguration
+            {
+                SuppressesIncrementalRendering = false,
+                AllowsInlineMediaPlayback = false,
+                Preferences = wkPreferences,
+                DataDetectorTypes = WKDataDetectorTypes.None,
+                WebsiteDataStore = WKWebsiteDataStore.NonPersistentDataStore
+            };
+
+            webView = new WKWebView(CGRect.Empty, config)
+            {
+                Hidden = false,
+                NavigationDelegate = this,
                 TranslatesAutoresizingMaskIntoConstraints = false,
             };
 
+            webView.ScrollView.Bounces = false;
+            webView.ScrollView.BouncesZoom = false;
+            webView.ScrollView.Delegate = this;
+            webView.ScrollView.KeyboardDismissMode = UIScrollViewKeyboardDismissMode.None;
 
-            mainView.Add(topTextView);
+            mainView.Add(webView);
 
             mainView.AddConstraints(new[]
             {
-                topTextView.TopAnchor.ConstraintEqualTo(mainView.TopAnchor),
-                topTextView.WidthAnchor.ConstraintEqualTo(mainView.WidthAnchor),
-                topTextView.CenterXAnchor.ConstraintEqualTo(mainView.CenterXAnchor),
-                topTextView.BottomAnchor.ConstraintEqualTo(mainView.BottomAnchor)
+                webView.TopAnchor.ConstraintEqualTo(mainView.TopAnchor),
+                webView.WidthAnchor.ConstraintEqualTo(mainView.WidthAnchor),
+                webView.CenterXAnchor.ConstraintEqualTo(mainView.CenterXAnchor),
+                webView.BottomAnchor.ConstraintEqualTo(mainView.BottomAnchor)
             });
                                     
             okButton = new UIButton
@@ -68,13 +91,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 okButton.HeightAnchor.ConstraintEqualTo(65f),
                 okButton.WidthAnchor.ConstraintEqualTo(mainView.WidthAnchor),
                 okButton.CenterXAnchor.ConstraintEqualTo(mainView.CenterXAnchor),
-                okButton.TopAnchor.ConstraintEqualTo(topTextView.BottomAnchor),
+                okButton.TopAnchor.ConstraintEqualTo(webView.BottomAnchor),
                 okButton.BottomAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? mainView.SafeAreaLayoutGuide.BottomAnchor : BottomLayoutGuide.GetTopAnchor(), 2)
             });
 
-            //View.BackgroundColor = UIColor.Black.ColorWithAlpha(0.3f);
-
-            // spoView.LayoutIfNeeded();
+            View.BackgroundColor = UIColor.Black.ColorWithAlpha(0.3f);
 
         }
 
@@ -83,6 +104,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.ViewDidAppear(animated);
 
             okButton.TouchUpInside += CancelButton_TouchUpInside;
+
+            var html = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/changelogs/changelog_"+VersionCode, "html"));
+            webView?.StopLoading();
+            webView?.LoadHtmlString(html, null);
         }
 
         public override void ViewDidDisappear(bool animated)

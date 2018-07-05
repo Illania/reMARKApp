@@ -596,6 +596,7 @@
 		<BundleResource Include="Resources\startscreens\start-screen-bg-retinahd47.png" />
 		<BundleResource Include="Resources\startscreens\start-screen-bg-retinahd55-landscape.png" />
 		<BundleResource Include="Resources\startscreens\start-screen-bg-retinahd55.png" />
+		<BundleResource Include="Resources\html\changelogs\changelog_228.html" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="Ui\ViewControllers\ContactsList\" />
@@ -660,6 +661,7 @@
 	  <Folder Include="Assets_icons.xcassets\DeselectAll.imageset\" />
 	  <Folder Include="Ui\ViewControllers\DocumentView\HeaderView\" />
 	  <Folder Include="Assets_icons.xcassets\Arrow-Expand.imageset\" />
+	  <Folder Include="Resources\html\changelogs\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 	<Import Project="..\packages\NETStandard.Library.2.0.1\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.1\build\netstandard2.0\NETStandard.Library.targets')" />
