@@ -596,7 +596,7 @@
 		<BundleResource Include="Resources\startscreens\start-screen-bg-retinahd47.png" />
 		<BundleResource Include="Resources\startscreens\start-screen-bg-retinahd55-landscape.png" />
 		<BundleResource Include="Resources\startscreens\start-screen-bg-retinahd55.png" />
-		<BundleResource Include="Resources\html\changelogs\changelog_228.html" />
+		<BundleResource Include="Resources\html\changelogs\changelog_227.html" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="Ui\ViewControllers\ContactsList\" />

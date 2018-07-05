@@ -1,5 +1,4 @@
 ﻿using Mark5.Mobile.IOS.Ui.Common;
-using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.ViewControllers;
 using Foundation;
 using System;
@@ -7,7 +6,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
-    public class OnBoardingUtilities : IOnBoardingUtilities
+    public class OnBoardingUtilities
     {
         const string appVersionKey = "latestAppVersionKey";
         readonly int currentVersionCode;
@@ -25,28 +24,29 @@ namespace Mark5.Mobile.IOS.Utilities
             userDefaults.Synchronize();
         }
 
-        public void TryShowingOnBoardingDialog(UIViewController vc)
+        public void TryShowingOnBoardingDialog(UIViewController viewController)
         {
-            if (ApplicationHasBeenUpdated())
+            //if (ApplicationHasBeenUpdated())
+            //{
+            SaveAppVersionCode();
+
+            var pvc = new OnBoardingViewController
             {
-                SaveAppVersionCode();
+                VersionCode = currentVersionCode
+            };
+            pvc.ModalPresentationStyle = UIModalPresentationStyle.Custom;
+            //var customPresentationController = new OnBoardingPresentationController(pvc, viewController);
+            //pvc.TransitioningDelegate = customPresentationController;
 
-                var pvc = new OnBoardingViewController
-                {
-                    VersionCode = currentVersionCode
-                };
-                pvc.ModalPresentationStyle = UIModalPresentationStyle.Custom;
-                var customPresentationController = new OnBoardingPresentationController(pvc, vc);
-                pvc.TransitioningDelegate = customPresentationController;
-
-                vc.PresentViewController(new NavigationController(pvc), true, null);
-            }
+            viewController.DefinesPresentationContext = true;
+            viewController.PresentViewController(pvc, true, null);
+            //}
         }
 
         bool ApplicationHasBeenUpdated()
         {
             var storedVersionCode = userDefaults.IntForKey(appVersionKey);
-            
+
             return currentVersionCode > storedVersionCode;
         }
     }

@@ -17,25 +17,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         WKWebView webView;
         UIButton okButton;
 
-
         public override void ViewDidLoad()
         {
-            base.ViewDidLoad(); 
+            base.ViewDidLoad();
+
+            View.BackgroundColor = new UIColor(0f, 0.0f);
 
             mainView = new UIView
             {
+                LayoutMargins = new UIEdgeInsets(50f, 50f, 50f, 50f),
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                Alpha = 1f
             };
 
             View.Add(mainView);
 
             View.AddConstraints(new[]
             {
-                mainView.HeightAnchor.ConstraintEqualTo(View.HeightAnchor),
-                mainView.WidthAnchor.ConstraintEqualTo(View.WidthAnchor),
-                mainView.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor)
+                mainView.LeadingAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.LeadingAnchor : View.LeadingAnchor, 50f),
+                mainView.TrailingAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.TrailingAnchor : View.TrailingAnchor, -50f),
+                mainView.TopAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.TopAnchor : View.TopAnchor, 50f),
+                mainView.BottomAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.BottomAnchor : View.BottomAnchor, -50f)
             });
+
 
             var wkPreferences = new WKPreferences
             {
@@ -72,14 +75,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 webView.CenterXAnchor.ConstraintEqualTo(mainView.CenterXAnchor),
                 webView.BottomAnchor.ConstraintEqualTo(mainView.BottomAnchor)
             });
-                                    
+
             okButton = new UIButton
             {
                 TintColor = Theme.LightGray,
                 BackgroundColor = Theme.DarkBlue,
-                ContentEdgeInsets = new UIEdgeInsets(12.5f, 40f, 12.5f, 40f),
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                ClipsToBounds = true
             };
             okButton.SetTitleColor(Theme.White, UIControlState.Normal);
             okButton.SetTitle(Localization.GetString("ok"), UIControlState.Normal);
@@ -92,20 +93,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 okButton.WidthAnchor.ConstraintEqualTo(mainView.WidthAnchor),
                 okButton.CenterXAnchor.ConstraintEqualTo(mainView.CenterXAnchor),
                 okButton.TopAnchor.ConstraintEqualTo(webView.BottomAnchor),
-                okButton.BottomAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? mainView.SafeAreaLayoutGuide.BottomAnchor : BottomLayoutGuide.GetTopAnchor(), 2)
+                okButton.BottomAnchor.ConstraintEqualTo(mainView.BottomAnchor)
             });
-
-            View.BackgroundColor = UIColor.Black.ColorWithAlpha(0.3f);
-
         }
 
         public override void ViewDidAppear(bool animated)
         {
             base.ViewDidAppear(animated);
 
+            UIView.Animate(0.2, () =>
+            {
+                View.BackgroundColor = new UIColor(0f, 0.5f);
+            });
+                
+
             okButton.TouchUpInside += CancelButton_TouchUpInside;
 
-            var html = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/changelogs/changelog_"+VersionCode, "html"));
+            var html = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/changelogs/changelog_" + VersionCode, "html"));
             webView?.StopLoading();
             webView?.LoadHtmlString(html, null);
         }
@@ -119,23 +123,29 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void CancelButton_TouchUpInside(object sender, EventArgs e)
         {
-            DismissViewController(true, null);
+            UIView.Animate(0.2, () =>
+            {
+                View.BackgroundColor = new UIColor(0f, 0.0f);
+            }, () => 
+            {
+                DismissViewController(true, null);
+            });
         }
     }
 
-    public class OnBoardingPresentationController : UIPresentationController, IUIViewControllerTransitioningDelegate
+    /*public class OnBoardingPresentationController : UIPresentationController, IUIViewControllerTransitioningDelegate
     {
         public OnBoardingPresentationController(UIViewController presentedViewController, UIViewController presentingViewController) : base(presentedViewController, presentingViewController)
         {
         }
 
-        public override CGRect FrameOfPresentedViewInContainerView => ContainerView.Bounds.Inset(-400, 400);
+        public override CGRect FrameOfPresentedViewInContainerView => ContainerView.Bounds.Inset(100, 100);
 
         public override void ContainerViewWillLayoutSubviews()
         {
             base.ContainerViewWillLayoutSubviews();
 
-            PresentedView.Frame = FrameOfPresentedViewInContainerView; 
+            PresentedView.Frame = FrameOfPresentedViewInContainerView;
         }
 
         [Export("presentationControllerForPresentedViewController:presentingViewController:sourceViewController:")]
@@ -143,5 +153,5 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             return this;
         }
-    }
+    }*/
 }

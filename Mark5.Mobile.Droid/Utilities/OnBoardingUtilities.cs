@@ -1,12 +1,12 @@
-﻿using System.IO;
-using Android.App;
+﻿using Android.App;
 using Android.Content;
 using Android.Support.V7.Preferences;
 using Android.Webkit;
-using Mark5.Mobile.Common.Utilities;
+using System.IO;
+
 namespace Mark5.Mobile.Droid.Utilities
 {
-    public class OnBoardingUtilities : Java.Lang.Object, IOnBoardingUtilities
+    public class OnBoardingUtilities
     {
         const string appVersionKey = "latestAppVersionKey";
 
