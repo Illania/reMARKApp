@@ -59,9 +59,10 @@ namespace Mark5.Mobile.Droid.Utilities
         bool ApplicationHasBeenUpdated()
         {
             var currentVersionCode = context.PackageManager.GetPackageInfo(context.PackageName, 0).VersionCode;
+
             var storedVersionCode = PreferenceManager.GetDefaultSharedPreferences(context).GetInt(appVersionKey, 0);
 
-            return storedVersionCode != 0 && currentVersionCode > storedVersionCode;
+            return currentVersionCode > storedVersionCode;
         }
     }
 }

@@ -47,7 +47,7 @@ namespace Mark5.Mobile.IOS.Utilities
         {
             var storedVersionCode = userDefaults.IntForKey(appVersionKey);
             
-            return storedVersionCode != 0 && currentVersionCode > storedVersionCode;
+            return currentVersionCode > storedVersionCode;
         }
     }
 }
