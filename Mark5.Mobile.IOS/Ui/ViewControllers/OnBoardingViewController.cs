@@ -2,17 +2,14 @@
 using CoreGraphics;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
-using Foundation;
 using UIKit;
 using WebKit;
-using System.IO;
-using Mark5.Mobile.Common;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
     public class OnBoardingViewController : AbstractViewController, IWKNavigationDelegate, IUIScrollViewDelegate
     {
-        public int VersionCode { get; set; }
+        public string ChangelogHtml { get; set; }
 
         UIView mainView;
         WKWebView webView;
@@ -112,20 +109,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 
             okButton.TouchUpInside += CancelButton_TouchUpInside;
 
-            string html = "";
-
-            try
-            {
-                //TODO: Add a proper changelog.
-                html = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/changelogs/changelog_" + VersionCode, "html"));
-            } 
-            catch (ArgumentNullException ex)
-            {
-                CommonConfig.Logger.Error("There is no changelog for this version code!", ex);
-            }
-
             webView?.StopLoading();
-            webView?.LoadHtmlString(html, null);
+            webView?.LoadHtmlString(ChangelogHtml, null);
         }
 
         public override void ViewDidDisappear(bool animated)

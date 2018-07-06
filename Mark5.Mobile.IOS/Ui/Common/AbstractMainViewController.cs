@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Utilities;

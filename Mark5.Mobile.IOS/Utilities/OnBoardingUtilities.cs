@@ -1,7 +1,8 @@
-﻿using Mark5.Mobile.IOS.Ui.Common;
-using Mark5.Mobile.IOS.Ui.ViewControllers;
+﻿using System;
+using System.IO;
 using Foundation;
-using System;
+using Mark5.Mobile.Common;
+using Mark5.Mobile.IOS.Ui.ViewControllers;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Utilities
@@ -30,9 +31,22 @@ namespace Mark5.Mobile.IOS.Utilities
             {
                 SaveAppVersionCode();
 
+                string html = "";
+
+                try
+                {
+                    //TODO: Add a proper changelog.
+                    html = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/changelogs/changelog_" + currentVersionCode, "html"));
+                }
+                catch (ArgumentNullException ex)
+                {
+                    CommonConfig.Logger.Error("There is no changelog for this version code!", ex);
+                    return;
+                }
+
                 var pvc = new OnBoardingViewController
                 {
-                    VersionCode = currentVersionCode
+                    ChangelogHtml = html
                 };
                 pvc.ModalPresentationStyle = UIModalPresentationStyle.Custom;
 

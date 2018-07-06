@@ -38,6 +38,7 @@ namespace Mark5.Mobile.Droid.Utilities
 
                 try
                 {
+                    //TODO: Add proper chagelog.
                     using (var sr = new StreamReader(context.Assets.Open("changelogs/changelog_" + currentVersionCode + ".html")))
                         changeloghtml = sr.ReadToEnd();
                 }
