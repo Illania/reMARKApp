@@ -26,28 +26,25 @@ namespace Mark5.Mobile.IOS.Utilities
 
         public void TryShowingOnBoardingDialog(UIViewController viewController)
         {
-            //if (ApplicationHasBeenUpdated())
-            //{
-            SaveAppVersionCode();
-
-            var pvc = new OnBoardingViewController
+            if (ApplicationHasBeenUpdated())
             {
-                VersionCode = currentVersionCode
-            };
-            pvc.ModalPresentationStyle = UIModalPresentationStyle.Custom;
-            //var customPresentationController = new OnBoardingPresentationController(pvc, viewController);
-            //pvc.TransitioningDelegate = customPresentationController;
+                SaveAppVersionCode();
 
-            viewController.DefinesPresentationContext = true;
-            viewController.PresentViewController(pvc, true, null);
-            //}
+                var pvc = new OnBoardingViewController
+                {
+                    VersionCode = currentVersionCode
+                };
+                pvc.ModalPresentationStyle = UIModalPresentationStyle.Custom;
+
+                viewController.PresentViewController(pvc, true, null);
+            }
         }
 
         bool ApplicationHasBeenUpdated()
         {
             var storedVersionCode = userDefaults.IntForKey(appVersionKey);
 
-            return currentVersionCode > storedVersionCode;
+            return true;//currentVersionCode > storedVersionCode;
         }
     }
 }

@@ -6,6 +6,7 @@ using Foundation;
 using UIKit;
 using WebKit;
 using System.IO;
+using Mark5.Mobile.Common;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
@@ -35,10 +36,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 mainView.LeadingAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.LeadingAnchor : View.LeadingAnchor, 50f),
                 mainView.TrailingAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.TrailingAnchor : View.TrailingAnchor, -50f),
-                mainView.TopAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.TopAnchor : View.TopAnchor, 50f),
-                mainView.BottomAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.BottomAnchor : View.BottomAnchor, -50f)
+                mainView.TopAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.TopAnchor : View.TopAnchor, 
+                                                     Integration.GetScreenSizeInPixels() == Integration.IPhoneRetina58Resolution ? 100f : 50f),
+                mainView.BottomAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.BottomAnchor : View.BottomAnchor, 
+                                                        Integration.GetScreenSizeInPixels() == Integration.IPhoneRetina58Resolution ? -100f : -50f)
             });
-
 
             var wkPreferences = new WKPreferences
             {
@@ -101,7 +103,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidAppear(animated);
 
-            UIView.Animate(0.2, () =>
+            UIView.Animate(0.2, () => 
             {
                 View.BackgroundColor = new UIColor(0f, 0.5f);
             });
@@ -109,7 +111,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             okButton.TouchUpInside += CancelButton_TouchUpInside;
 
-            var html = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/changelogs/changelog_" + VersionCode, "html"));
+            string html = "";
+
+            try
+            {
+                html = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/changelogs/changelog_" + VersionCode, "html"));
+            } 
+            catch (ArgumentNullException ex)
+            {
+                CommonConfig.Logger.Error("There is no changelog for this version code!", ex);
+            }
+
             webView?.StopLoading();
             webView?.LoadHtmlString(html, null);
         }
@@ -132,26 +144,4 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             });
         }
     }
-
-    /*public class OnBoardingPresentationController : UIPresentationController, IUIViewControllerTransitioningDelegate
-    {
-        public OnBoardingPresentationController(UIViewController presentedViewController, UIViewController presentingViewController) : base(presentedViewController, presentingViewController)
-        {
-        }
-
-        public override CGRect FrameOfPresentedViewInContainerView => ContainerView.Bounds.Inset(100, 100);
-
-        public override void ContainerViewWillLayoutSubviews()
-        {
-            base.ContainerViewWillLayoutSubviews();
-
-            PresentedView.Frame = FrameOfPresentedViewInContainerView;
-        }
-
-        [Export("presentationControllerForPresentedViewController:presentingViewController:sourceViewController:")]
-        public UIPresentationController GetPresentationControllerForPresentedViewController(UIViewController presentedViewController, UIViewController presentingViewController, UIViewController sourceViewController)
-        {
-            return this;
-        }
-    }*/
 }
