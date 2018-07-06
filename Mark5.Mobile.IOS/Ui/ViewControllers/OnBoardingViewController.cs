@@ -16,6 +16,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         WKWebView webView;
         UIButton okButton;
 
+        NSLayoutConstraint[] sharedConstraints;
+        NSLayoutConstraint compactConstraint;
+        NSLayoutConstraint regularConstraint;
+
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
@@ -31,18 +35,29 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             View.Add(mainView);
 
-            View.AddConstraints(new[]
+            sharedConstraints = new[]
             {
-                mainView.LeadingAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.LeadingAnchor : View.LeadingAnchor, 50f),
-                mainView.TrailingAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.TrailingAnchor : View.TrailingAnchor, -50f),
-                mainView.TopAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.TopAnchor : View.TopAnchor, 
-                                                     Integration.GetScreenSizeInPixels() == Integration.IPhoneRetina58Resolution ? 100f : 50f),
-                mainView.BottomAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.BottomAnchor : View.BottomAnchor, 
-                                                        Integration.GetScreenSizeInPixels() == Integration.IPhoneRetina58Resolution ? -100f : -50f)
-            });
+                mainView.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
+                mainView.CenterYAnchor.ConstraintEqualTo(View.CenterYAnchor),
+                mainView.WidthAnchor.ConstraintEqualTo(Integration.IsIPhone() ? 250f : 300f)
+            };
 
+            if (TraitCollection.VerticalSizeClass == UIUserInterfaceSizeClass.Compact)
+                compactConstraint = mainView.HeightAnchor.ConstraintEqualTo(Integration.IsIPhone() ? UIScreen.MainScreen.Bounds.Height - 50f : 600f);
+            else
+                compactConstraint = mainView.HeightAnchor.ConstraintEqualTo(Integration.IsIPhone() ? UIScreen.MainScreen.Bounds.Width - 50f : 600f);
+                
+            regularConstraint = mainView.HeightAnchor.ConstraintEqualTo(Integration.IsIPhone() ? 500f : 600f);
+
+            View.AddConstraints(sharedConstraints);
+            View.AddConstraint(regularConstraint);
+
+            if(Integration.IsIPhone())
+                View.AddConstraint(compactConstraint);
+            
             titleTextView = new UITextView
             {
+                UserInteractionEnabled = false,
                 Font = UIFont.SystemFontOfSize(30f),
                 Text = Localization.GetString("whats_new"),
                 TextColor = Theme.DarkBlue,
@@ -55,9 +70,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             mainView.AddConstraints(new[]
             {
-                titleTextView.TopAnchor.ConstraintEqualTo(mainView.TopAnchor, 10f),
-                titleTextView.TrailingAnchor.ConstraintEqualTo(mainView.TrailingAnchor, -10f),
-                titleTextView.LeadingAnchor.ConstraintEqualTo(mainView.LeadingAnchor, 10f),
+                titleTextView.TopAnchor.ConstraintEqualTo(mainView.TopAnchor, Integration.IsIPhone() ? 10f : 20f),
+                titleTextView.TrailingAnchor.ConstraintEqualTo(mainView.TrailingAnchor, Integration.IsIPhone() ? -10f : -20f),
+                titleTextView.LeadingAnchor.ConstraintEqualTo(mainView.LeadingAnchor, Integration.IsIPhone() ? 10f : 20f),
                 titleTextView.HeightAnchor.ConstraintEqualTo(50f)
             });
 
@@ -82,7 +97,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 UserInteractionEnabled = true
             };
-            
+
             webView.ScrollView.Bounces = false;
             webView.ScrollView.BouncesZoom = false;
             webView.ScrollView.Delegate = this;
@@ -95,8 +110,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 webView.TopAnchor.ConstraintEqualTo(titleTextView.BottomAnchor),
                 webView.WidthAnchor.ConstraintEqualTo(mainView.WidthAnchor),
-                webView.CenterXAnchor.ConstraintEqualTo(mainView.CenterXAnchor),
-                webView.BottomAnchor.ConstraintEqualTo(mainView.BottomAnchor)
+                webView.CenterXAnchor.ConstraintEqualTo(mainView.CenterXAnchor)
             });
 
             okButton = new UIButton
@@ -116,19 +130,39 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 okButton.WidthAnchor.ConstraintEqualTo(mainView.WidthAnchor),
                 okButton.CenterXAnchor.ConstraintEqualTo(mainView.CenterXAnchor),
                 okButton.TopAnchor.ConstraintEqualTo(webView.BottomAnchor),
-                okButton.BottomAnchor.ConstraintEqualTo(mainView.BottomAnchor)
+                okButton.BottomAnchor.ConstraintEqualTo(mainView.BottomAnchor),
+                webView.BottomAnchor.ConstraintEqualTo(okButton.TopAnchor)
             });
+        }
+
+        public override void TraitCollectionDidChange(UITraitCollection previousTraitCollection)
+        {
+            base.TraitCollectionDidChange(previousTraitCollection);
+
+            if (Integration.IsIPad())
+                return;
+
+            if (TraitCollection.VerticalSizeClass == UIUserInterfaceSizeClass.Compact)
+            {
+                regularConstraint.Active = false;
+                compactConstraint.Active = true;
+            }
+            else
+            {
+                compactConstraint.Active = false;
+                regularConstraint.Active = true;
+            }
         }
 
         public override void ViewDidAppear(bool animated)
         {
             base.ViewDidAppear(animated);
 
-            UIView.Animate(0.2, () => 
+            UIView.Animate(0.2, () =>
             {
                 View.BackgroundColor = new UIColor(0f, 0.5f);
             });
-                
+
             okButton.TouchUpInside += CancelButton_TouchUpInside;
 
             webView?.StopLoading();
@@ -147,7 +181,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             UIView.Animate(0.2, () =>
             {
                 View.BackgroundColor = new UIColor(0f, 0.0f);
-            }, () => 
+            }, () =>
             {
                 DismissViewController(true, null);
             });
