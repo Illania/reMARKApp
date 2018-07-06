@@ -2,6 +2,7 @@
 using Android.Content;
 using Android.Support.V7.Preferences;
 using Android.Webkit;
+using Mark5.Mobile.Common;
 using System.IO;
 
 namespace Mark5.Mobile.Droid.Utilities
@@ -9,21 +10,20 @@ namespace Mark5.Mobile.Droid.Utilities
     public class OnBoardingUtilities
     {
         const string appVersionKey = "latestAppVersionKey";
-
         readonly Context context;
+        readonly int currentVersionCode;
 
         public OnBoardingUtilities(Context context)
         {
             this.context = context;
+            currentVersionCode = context.PackageManager.GetPackageInfo(context.PackageName, 0).VersionCode;
         }
 
         public void SaveAppVersionCode()
         {
-            var pi = context.PackageManager.GetPackageInfo(context.PackageName, 0);
-
             var prefManager = PreferenceManager.GetDefaultSharedPreferences(context);
             var editor = prefManager.Edit();
-            editor.PutInt(appVersionKey, pi.VersionCode);
+            editor.PutInt(appVersionKey, currentVersionCode);
             editor.Commit();
         }
 
@@ -34,11 +34,18 @@ namespace Mark5.Mobile.Droid.Utilities
                 SaveAppVersionCode();
 
                 var webView = new WebView(context);
-                var currentVersionCode = context.PackageManager.GetPackageInfo(context.PackageName, 0).VersionCode;
+                string changeloghtml = "";
 
-                string changeloghtml;
-                using (var sr = new StreamReader(context.Assets.Open("changelogs/changelog_" + currentVersionCode + ".html")))
-                    changeloghtml = sr.ReadToEnd();
+                try
+                {
+                    using (var sr = new StreamReader(context.Assets.Open("changelogs/changelog_" + currentVersionCode + ".html")))
+                        changeloghtml = sr.ReadToEnd();
+                }
+                catch (Java.IO.FileNotFoundException ex)
+                {
+                    CommonConfig.Logger.Error("There is no changelog for this version code!", ex);
+                    return;
+                }
 
                 webView.StopLoading();
                 webView.LoadDataWithBaseURL(null, changeloghtml, "text/html", "UTF-8", null);
@@ -58,8 +65,6 @@ namespace Mark5.Mobile.Droid.Utilities
 
         bool ApplicationHasBeenUpdated()
         {
-            var currentVersionCode = context.PackageManager.GetPackageInfo(context.PackageName, 0).VersionCode;
-
             var storedVersionCode = PreferenceManager.GetDefaultSharedPreferences(context).GetInt(appVersionKey, 0);
 
             return currentVersionCode > storedVersionCode;
