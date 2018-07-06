@@ -30,7 +30,6 @@ namespace Mark5.Mobile.IOS.Utilities
             if (ApplicationHasBeenUpdated())
             {
                 SaveAppVersionCode();
-
                 string html = "";
 
                 try
@@ -58,7 +57,7 @@ namespace Mark5.Mobile.IOS.Utilities
         {
             var storedVersionCode = userDefaults.IntForKey(appVersionKey);
 
-            return currentVersionCode > storedVersionCode;
+            return true;//currentVersionCode > storedVersionCode;
         }
     }
 }
