@@ -49,10 +49,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             var config = new WKWebViewConfiguration
             {
-                SuppressesIncrementalRendering = false,
                 AllowsInlineMediaPlayback = false,
-                Preferences = wkPreferences,
                 DataDetectorTypes = WKDataDetectorTypes.None,
+                Preferences = wkPreferences,
+                SuppressesIncrementalRendering = false,
                 WebsiteDataStore = WKWebsiteDataStore.NonPersistentDataStore
             };
 
@@ -61,11 +61,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Hidden = false,
                 NavigationDelegate = this,
                 TranslatesAutoresizingMaskIntoConstraints = false,
+                UserInteractionEnabled = true
             };
-
+            
             webView.ScrollView.Bounces = false;
             webView.ScrollView.BouncesZoom = false;
             webView.ScrollView.Delegate = this;
+            webView.ScrollView.ScrollEnabled = true;
             webView.ScrollView.KeyboardDismissMode = UIScrollViewKeyboardDismissMode.None;
 
             mainView.Add(webView);
@@ -108,13 +110,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 View.BackgroundColor = new UIColor(0f, 0.5f);
             });
                 
-
             okButton.TouchUpInside += CancelButton_TouchUpInside;
 
             string html = "";
 
             try
             {
+                //TODO: Add a proper changelog.
                 html = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/changelogs/changelog_" + VersionCode, "html"));
             } 
             catch (ArgumentNullException ex)
