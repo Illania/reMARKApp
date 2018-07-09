@@ -914,10 +914,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 var localFolders = new List<Folder>();
                 await Task.Run(() => SearchRecursively(root, searchText, localFolders, cancellationToken));
 
-                var remoteFolders = new List<Folder>();
-                 
                 try {
-                    remoteFolders = await Managers.FoldersManager.SearchFolders(searchText);
+                #pragma warning disable CS4014 // we dont want to await this call
+                    Task.Run(async () => {
+                        if (cancellationToken.IsCancellationRequested)
+                            return;
+                        var remoteFolders = await Managers.FoldersManager.SearchFolders(searchText);
+                        dataSource?.SetFolders(remoteFolders, searchText);
+                        await RefreshSearchFoldersInfo();
+                    });
+                #pragma warning restore CS4014 
                 } catch (Exception ex) {
                     CommonConfig.Logger.Error(ex);
                 }
@@ -925,9 +931,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 if (cancellationToken.IsCancellationRequested)
                     return;
                 
-                var mergedFolders = localFolders.Union(remoteFolders, new FolderComparer()).ToList();
-
-                dataSource?.SetFolders(mergedFolders);
+                dataSource?.SetFolders(localFolders,searchText);
                 await RefreshSearchFoldersInfo();
             }
             catch (Exception ex)
@@ -935,6 +939,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 CommonConfig.Logger.Error(ex);
             }
         }
+
+        protected async Task SearchRemote(string searchText) => await Managers.FoldersManager.SearchFolders(searchText);
 
         void SearchRecursively(Folder folder, string searchText, List<Folder> resultList, CancellationToken ct)
         {
@@ -1594,6 +1600,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             public bool Empty => items.Count < 1;
             public List<Folder> Items => items.ToList();
 
+            internal string searchQuery = String.Empty;
+
             readonly WeakReference<AbstractFoldersListViewController> viewControllerWeakReference;
             readonly WeakReference<UITableView> tableViewWeakReference;
             readonly List<Folder> items = new List<Folder>();
@@ -1664,12 +1672,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 viewControllerWeakReference.Unwrap()?.FolderDeselected(f);
             }
 
-            public void SetFolders(List<Folder> folders)
+            public void SetFolders(List<Folder> folders, string searchText)
             {
-                items.Clear();
-                items.AddRange(folders);
-                loading = false;
-                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                if(searchQuery.Equals(searchText)) {
+                    items.Union(folders, new FolderComparer()).ToList();
+                    tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                } else {
+                    items.Clear();
+                    items.AddRange(folders);
+                    loading = false;
+                    tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                }
+
+                searchQuery = searchText;
             }
 
             public void Reset()

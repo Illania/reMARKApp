@@ -188,7 +188,7 @@ namespace Mark5.Mobile.Common.Manager
             {
                 Token = Token,
                 Name = searchText,
-                ModuleType = (Mark5.ServiceReference.DataContract.ModuleType)ModuleType.Documents
+                ModuleType = (DataContract.ModuleType)ModuleType.Documents
             });
 
             var folders = foldersResult.Folders.WhereNotNull().Select(f => f.Convert()).OrderBy(f => f.Position).ToList();
