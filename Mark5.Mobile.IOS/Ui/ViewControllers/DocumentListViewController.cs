@@ -602,10 +602,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var alertController = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
             var d = new PopoverPresentationControllerDelegate(TableView, TableView.CellAt(indexPath));
 
-
-
-
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("categories"),
+            alertController.AddAction(UIAlertAction.Create(Localization.GetString("categories"),
                 UIAlertActionStyle.Default,
                 a =>
                 {
@@ -613,7 +610,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     EndEditing();
                 }));
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"),
+            alertController.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"),
                 UIAlertActionStyle.Default,
                 a =>
                 {
@@ -621,8 +618,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     EndEditing();
                 }));
 
-            if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"),
+            if (folder.InternalType == FolderInternalType.FilterView || folder.InternalType == FolderInternalType.Static || folder.InternalType == FolderInternalType.Worktray)
+                alertController.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"),
                     UIAlertActionStyle.Default,
                     a =>
                     {
@@ -630,20 +627,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         EndEditing();
                     }));
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"), UIAlertActionStyle.Default, a => ShowPriorityActionSheet(selectedDocument, TableView, TableView.CellAt(indexPath))));
+            alertController.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"), UIAlertActionStyle.Default, a => ShowPriorityActionSheet(selectedDocument, TableView, TableView.CellAt(indexPath))));
 
-            if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, a => RemoveFromFolder(selectedDocument, d)));
+            if (folder.InternalType == FolderInternalType.FilterView || folder.InternalType == FolderInternalType.Static || folder.InternalType == FolderInternalType.Worktray)
+                alertController.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, a => RemoveFromFolder(selectedDocument, d)));
 
             if (ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || selectedDocument.Direction == DocumentDirection.Draft)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedDocument, d)));
+                alertController.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedDocument, d)));
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
+            alertController.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
 
-            if (eas.PopoverPresentationController != null)
-                eas.PopoverPresentationController.Delegate = d;
+            if (alertController.PopoverPresentationController != null)
+                alertController.PopoverPresentationController.Delegate = d;
 
-            PresentViewController(eas, true, null);
+            PresentViewController(alertController, true, null);
         }
 
         async void ShowPriorityActionSheet(List<DocumentPreview> selectedDocuments, UIBarButtonItem barButtonItem)
@@ -1323,60 +1320,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return true;
             }
 
-            public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
-            {
-                var actions = new List<UITableViewRowAction>();
-
-                var documentPreview = Items[indexPath.Row];
-
-                if (documentPreview.IsReadByCurrent)
-                {
-                    var markAsUnreadAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
-                        Localization.GetString("mark_as_unread_ml"),
-                        (a, ip) =>
-                        {
-                            viewControllerWeakReference.Unwrap()?.MarkAsUnread(documentPreview);
-                            viewControllerWeakReference.Unwrap()?.EndEditing();
-                        });
-                    markAsUnreadAction.BackgroundColor = Theme.Brown;
-                    actions.Add(markAsUnreadAction);
-                }
-                else
-                {
-                    var markAsReadAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
-                        Localization.GetString("mark_as_read_ml"),
-                        (a, ip) =>
-                        {
-                            viewControllerWeakReference.Unwrap()?.MarkAsRead(documentPreview);
-                            viewControllerWeakReference.Unwrap()?.EndEditing();
-                        });
-                    markAsReadAction.BackgroundColor = Theme.Brown;
-                    actions.Add(markAsReadAction);
-                }
-
-                var copyToWorktrayAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
-                    Localization.GetString("copy_to_worktray_ml"),
-                    (a, ip) =>
-                    {
-                        viewControllerWeakReference.Unwrap()?.CopyToWorktray(documentPreview);
-                        viewControllerWeakReference.Unwrap()?.EndEditing();
-                    });
-                copyToWorktrayAction.BackgroundColor = Theme.DarkBlue;
-                actions.Add(copyToWorktrayAction);
-
-                var moreAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
-                    Localization.GetString("more"),
-                    (a, ip) =>
-                    {
-
-                        viewControllerWeakReference.Unwrap()?.ShowMoreActionSheet(indexPath, documentPreview);
-                    });
-                moreAction.BackgroundColor = Theme.DarkerBlue;
-                actions.Add(moreAction);
-
-                return actions.ToArray();
-            }
-
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
                 if (tableView.Editing)
@@ -1384,14 +1327,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var dp = Items[indexPath.Row];
                 viewControllerWeakReference.Unwrap()?.DocumentSelected(dp);
-            }
-
-            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
-            {
-                if (loading || Empty)
-                    return false;
-
-                return true;
             }
 
             public void PrependItems(IEnumerable<DocumentPreview> documentPreviews)
