@@ -849,7 +849,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     {
                         var folder = Folder.RootForModule(RemoteFolder.Module);
                         var matchingFolders = folder.SubFolders.Flatten(f => f.SubFolders).OrderBy(f => f.Name).ToList();
-                        SearchAdapter.RefreshSearch(matchingFolders);
+                    SearchAdapter.RefreshSearch(matchingFolders,newText);
                     }
                     else
                     {
@@ -858,20 +858,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         var localFolders = new List<Folder>();
                         SearchRecursively(root, newText, localFolders);
 
-                        var remoteFolders = new List<Folder>();
-
                         try
                         {
-                            remoteFolders = await Managers.FoldersManager.SearchFolders(newText);
+                            #pragma warning disable CS4014 // We dont need to await this call
+                            Task.Run(async () => {
+                                var remoteFolders = await Managers.FoldersManager.SearchFolders(newText);
+                                SearchAdapter.RefreshSearch(remoteFolders, newText);
+                            });
+                            #pragma warning restore CS4014
+
                         }
                         catch (Exception ex)
                         {
                             CommonConfig.Logger.Error(ex);
                         }
                         
-                        var mergedFolders = localFolders.Union(remoteFolders, new FolderComparer()).ToList();
-
-                        SearchAdapter.RefreshSearch(mergedFolders);
+                        SearchAdapter.RefreshSearch(localFolders, newText);
                     }
                 },
                 500);
@@ -1251,6 +1253,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected class SearchFolderListAdapter : FolderListAdapter
         {
+            string searchQuery = String.Empty;
+
             public SearchFolderListAdapter(Context context, RecyclerView parentRecyclerView)
                 : base(context, parentRecyclerView)
             {
@@ -1268,9 +1272,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 NotifyItemRangeRemoved(0, itemCount);
             }
 
-            public void RefreshSearch(List<Folder> folders)
+            public void RefreshSearch(List<Folder> folders, string searchText)
             {
-                Refresh(folders, Section.None);
+                if(searchQuery.Equals(searchText)) {
+                    var mergedFolders = foldersInSection[Section.None].Union(folders, new FolderComparer()).ToList();
+                    Refresh(mergedFolders, Section.None);
+                } else {
+                    Refresh(folders, Section.None);
+                }
+
+                searchQuery = searchText;
             }
         }
 

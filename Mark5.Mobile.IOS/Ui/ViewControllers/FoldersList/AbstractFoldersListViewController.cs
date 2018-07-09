@@ -940,8 +940,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             }
         }
 
-        protected async Task SearchRemote(string searchText) => await Managers.FoldersManager.SearchFolders(searchText);
-
         void SearchRecursively(Folder folder, string searchText, List<Folder> resultList, CancellationToken ct)
         {
             if (folder.SubFolders == null || folder.SubFolders.Count < 1)
