@@ -1,0 +1,37 @@
+﻿using System;
+using System.Diagnostics;
+using System.Text;
+using Foundation;
+
+namespace Mark5.Mobile.IOS.Common.CallId
+{
+    public class ErrorLogger
+    {
+        readonly string logPath;
+        readonly string logFilePath;
+
+        public ErrorLogger()
+        {
+            var fm = NSFileManager.DefaultManager;
+
+            logPath = NSFileManager.DefaultManager.GetContainerUrl(CallIdContainerUtilities.AppGroupId).Path;
+            logFilePath = $"{logPath}/Mark5.Mobile.IOS.Extensions.CallId_{DateTime.Now.ToString("yyyy_M_dd")}.log";
+
+            if (!fm.FileExists(logFilePath))
+                fm.CreateFile(logFilePath, new NSData(), new NSFileAttributes());
+        }
+
+        public void WriteToLog(Exception exception)
+        {
+            var logMessageBuilder = new StringBuilder();
+            logMessageBuilder.Append("[").Append(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.ffff")).Append("] ");
+
+            logMessageBuilder.AppendLine("Stacktrace: ").Append(new StackTrace(true));
+
+            if (exception != null)
+                logMessageBuilder.AppendLine($"{exception.GetType()}: ").AppendLine(exception.Message).Append(" ").Append(exception.StackTrace);
+
+            var log = logMessageBuilder.ToString();
+        }
+    }
+}

@@ -1,4 +1,4 @@
-﻿using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model;
 using System.Collections.Generic;
 using Foundation;
 using System.Linq;
@@ -53,6 +53,7 @@ namespace Mark5.Mobile.IOS.Utilities
             public const string EmailTrailingSwipeActions = "EmailTrailingSwipeActions";
             public const string EmailLeadingSwipeActions = "EmailLeadingSwipeActions";
 
+            public const string CallerIdentificationEnabledKey = "CallerIdentificationEnabled"; 
         }
 
         readonly NSUserDefaults ud;
@@ -126,6 +127,9 @@ namespace Mark5.Mobile.IOS.Utilities
                 },
                 {
                     new NSString(Keys.EnableReportingKey), NSNumber.FromBoolean(true)
+                },
+                {
+                    new NSString(Keys.CallerIdentificationEnabledKey), NSNumber.FromBoolean(false)
                 },
                 {
                     new NSString(Keys.AuthorizationInterval), NSNumber.FromInt16(-1)
@@ -231,6 +235,16 @@ namespace Mark5.Mobile.IOS.Utilities
             set
             {
                 ud.SetBool(value, Keys.ResetOnLaunchKey);
+                ud.Synchronize();
+            }
+        }
+
+        public bool CallerIdentificationEnabled
+        {
+            get => ud.BoolForKey(Keys.CallerIdentificationEnabledKey);
+            set
+            {
+                ud.SetBool(value, Keys.CallerIdentificationEnabledKey);
                 ud.Synchronize();
             }
         }

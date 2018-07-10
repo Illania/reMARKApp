@@ -12,6 +12,7 @@
         <android.support.v7.preference.Preference android:key="@string/pref_key_swipe_options" android:title="@string/pref_swipe_options_title" android:summary="@string/pref_swipe_options_summary" />
     </android.support.v7.preference.PreferenceScreen>
     <android.support.v7.preference.PreferenceScreen android:key="@string/pref_key_cat_contacts" android:title="@string/pref_cat_contacts">
+                <android.support.v7.preference.CheckBoxPreference android:key="@string/pref_key_callidentification_identification_enabled" android:title="@string/pref_callidentification_title" android:summaryOn="@string/pref_callidentification_summary_on" android:summaryOff="@string/pref_callidentification_summary_off" android:defaultValue="@bool/pref_callidentification_enabled_default" />
         <android.support.v7.preference.PreferenceScreen android:key="@string/pref_key_contacts_view_options" android:title="@string/pref_contacts_view_options_title" android:summary="@string/pref_contacts_view_options_summary">
             <android.support.v7.preference.CheckBoxPreference android:key="@string/pref_key_contacts_sub_comm_fax" android:title="@string/pref_contacts_sub_comm_fax_title" android:defaultValue="@bool/pref_contacts_sub_comm_fax_default" />
             <android.support.v7.preference.CheckBoxPreference android:key="@string/pref_key_contacts_sub_comm_telex" android:title="@string/pref_contacts_sub_comm_telex_title" android:defaultValue="@bool/pref_contacts_sub_comm_telex_default" />

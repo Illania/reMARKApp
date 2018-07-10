@@ -54,7 +54,7 @@
 		<ErrorReport>prompt</ErrorReport>
 		<WarningLevel>4</WarningLevel>
 		<ConsolePause>false</ConsolePause>
-		<MtouchArch>ARMv7, ARM64</MtouchArch>
+		<MtouchArch>ARM64</MtouchArch>
 		<CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
 		<CodesignKey>iPhone Developer</CodesignKey>
 		<MtouchDebug>true</MtouchDebug>
@@ -69,7 +69,7 @@
 		<ErrorReport>prompt</ErrorReport>
 		<WarningLevel>4</WarningLevel>
 		<CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
-		<MtouchArch>ARMv7, ARM64</MtouchArch>
+		<MtouchArch>ARM64</MtouchArch>
 		<ConsolePause>false</ConsolePause>
 		<CodesignKey>iPhone Distribution: Nordic IT Europe ApS (5Q7TTRG4M4)</CodesignKey>
 		<RunCodeAnalysis>true</RunCodeAnalysis>
@@ -348,6 +348,15 @@
 		<ProjectReference Include="..\TinyMessenger\TinyMessenger.csproj">
 			<Project>{a54356bd-9cc4-4de0-a8dc-9b2d9d6ed288}</Project>
 			<Name>TinyMessenger</Name>
+		</ProjectReference>
+		<ProjectReference Include="..\Mark5.Mobile.IOS.Extensions.CallId\Mark5.Mobile.IOS.Extensions.CallId.csproj">
+		  <IsAppExtension>true</IsAppExtension>
+		  <Project>{D8B702CE-A49B-4A21-88F3-9648E0051AB6}</Project>
+		  <Name>Mark5.Mobile.IOS.Extensions.CallId</Name>
+		</ProjectReference>
+		<ProjectReference Include="..\Mark5.Mobile.IOS.Common\Mark5.Mobile.IOS.Common.csproj">
+		  <Project>{9735C6AC-AAEE-4768-B8DB-E29A2FAFF4F9}</Project>
+		  <Name>Mark5.Mobile.IOS.Common</Name>
 		</ProjectReference>
 	</ItemGroup>
 	<ItemGroup>

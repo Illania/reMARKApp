@@ -89,8 +89,8 @@
 		<item name="colorControlActivated">@color/lightgray</item>
 	</style>
 	<style name="mark5progressbarhorizontaldark" parent="Base.Widget.AppCompat.ProgressBar.Horizontal">
-        <item name="colorControlHighlight">@color/darkblue</item>
-        <item name="colorControlActivated">@color/darkblue</item>
+		<item name="colorControlHighlight">@color/darkblue</item>
+		<item name="colorControlActivated">@color/darkblue</item>
 	</style>
 	<style name="mark5tablayout" parent="Widget.Design.TabLayout">
 		<item name="tabSelectedTextColor">@color/lightblue</item>
@@ -102,8 +102,8 @@
 	</style>
 	<style name="mark5colorbutton" parent="Widget.AppCompat.Button.Colored">
 	</style>
-    <style name="mark5colorbuttonflat" parent="Widget.AppCompat.Button.Borderless">
-    </style>
+	<style name="mark5colorbuttonflat" parent="Widget.AppCompat.Button.Borderless">
+	</style>
 	<!-- Fonts -->
 	<style name="fontListPrimary" parent="TextAppearance.AppCompat.Body1">
 		<item name="android:textColor">@color/darkgray</item>
@@ -236,5 +236,9 @@
 	<style name="tabTextAppearance" parent="TextAppearance.Design.Tab">
 		<item name="android:textColor">@color/darkblue</item>
 		<item name="textAllCaps">false</item>
+	</style>
+	<style name="fontCallerId" parent="TextAppearance.AppCompat.Body1">
+		<item name="android:textColor">@color/black</item>
+		<item name="android:textSize">17sp</item>
 	</style>
 </resources>
