@@ -169,7 +169,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             if (desiredHeaderHeight < 1)
                 return;
 
-            SetHeaderPadding(desiredHeaderHeight);
+            SetHeaderPadding(desiredHeaderHeight / webView.ScrollView.ZoomScale);
         }
 
         protected override void Recycle()
