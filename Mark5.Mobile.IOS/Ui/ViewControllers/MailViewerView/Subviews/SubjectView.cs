@@ -6,30 +6,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
 {
     public class SubjectView : MailViewerSubview
     {
-        UITextView textView;
+        UILabel subjectLabel;
 
         public SubjectView()
         {
-            textView = new UITextView
+            subjectLabel = new UILabel
             {
-                Font = Theme.DefaultFont.WithRelativeSize(4f),
-                Editable = false,
-                AutocapitalizationType = UITextAutocapitalizationType.Sentences,
-                AutocorrectionType = UITextAutocorrectionType.Yes,
-                SpellCheckingType = UITextSpellCheckingType.Yes,
-                TextContainerInset = UIEdgeInsets.Zero,
+                BackgroundColor = Theme.Clear,
+                TextColor = Theme.DarkerBlue,
+                Font = Theme.DefaultLightBoldFont.WithRelativeSize(4f),
+                Opaque = false,
                 ClipsToBounds = false,
-                ScrollEnabled = false,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
-            textView.TextContainer.LineFragmentPadding = 0f;
-            ContainerView.AddSubview(textView);
+            subjectLabel.Lines = 0;
+            subjectLabel.LineBreakMode = UILineBreakMode.WordWrap;
+            ContainerView.AddSubview(subjectLabel);
             ContainerView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(textView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
-                NSLayoutConstraint.Create(textView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin),
-                NSLayoutConstraint.Create(textView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin),
-                NSLayoutConstraint.Create(textView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -VerticalMargin)
+                NSLayoutConstraint.Create(subjectLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
+                NSLayoutConstraint.Create(subjectLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin),
+                NSLayoutConstraint.Create(subjectLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin),
+                NSLayoutConstraint.Create(subjectLabel, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -5f)
             });
         }
 
@@ -37,15 +35,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
         {
             if (newsuper == null)
             {
-                textView?.RemoveFromSuperview();
-                textView = null;
+                subjectLabel?.RemoveFromSuperview();
+                subjectLabel = null;
             }
         }
 
         public override void RefreshView()
         {
             if (MailMessage != null)
-                textView.Text = MailMessage.Subject;
+                subjectLabel.Text = MailMessage.Subject;
         }
 
         public override void UpdateVisibility()

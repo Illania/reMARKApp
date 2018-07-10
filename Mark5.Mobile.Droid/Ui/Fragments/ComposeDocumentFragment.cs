@@ -5,10 +5,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
+using Android.Graphics;
 using Android.OS;
 using Android.Provider;
 using Android.Support.Design.Widget;
-using Android.Support.V4.Content;
+using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
@@ -63,9 +64,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         bool templateLoaded;
 
         ProgressBar progress;
-        ScrollView scrollView;
+        NestedScrollView scrollView;
         LinearLayoutCompat linearLayout;
 
+        View rootView;
         ToView toView;
         CcView ccView;
         BccView bccView;
@@ -80,6 +82,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         FloatingActionButton fab;
 
         Worker autoSaveWorkingCopyWorker;
+        Rect visibleRect = new Rect();
 
         public static (ComposeDocumentFragment fragment, string tag) NewInstance(DocumentCreationModeFlag documentCreationModeFlag, CopyToNewOption? copyToNewOption, bool? restoreWorkingCopy,
                                                                                  DocumentDirection? previousDocumentDirection, int? previousDocumentFolderId, int? previousDocumentId,
@@ -161,11 +164,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             CommonConfig.Logger.Info($"{nameof(ComposeDocumentFragment)} [restoreWorkingCopy={restoreWorkingCopy}, documentCreationModeFlag={documentCreationModeFlag}, copyToNewOption={copyToNewOption}, previousDocumentFolderId={previousDocumentFolderId}, previousDocumentId={previousDocumentId}]");
 
-            var rootView = inflater.Inflate(Resource.Layout.linear_layout_with_progress, container, false);
+            rootView = inflater.Inflate(Resource.Layout.linear_layout_with_progress, container, false);
+            rootView.ViewTreeObserver.GlobalLayout += RootView_OnGlobalLayout;
 
             progress = rootView.FindViewById<ProgressBar>(Resource.Id.progress);
             progress.Visibility = ViewStates.Gone;
-            scrollView = rootView.FindViewById<ScrollView>(Resource.Id.scroll_view);
+            scrollView = rootView.FindViewById<NestedScrollView>(Resource.Id.scroll_view);
             scrollView.Visibility = ViewStates.Visible;
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
 
@@ -200,7 +204,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             attachmentsView.Clicked += AttachmentsView_Clicked;
             subViews.Add(attachmentsView);
 
-            contentView = new ContentView(Context);
+            contentView = new ContentView(Context, MoveViewToCaret);
             subViews.Add(contentView);
 
             foreach (var subview in subViews)
@@ -220,6 +224,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             HasOptionsMenu = true;
 
             return rootView;
+        }
+
+        public override void OnDestroyView()
+        {
+            base.OnDestroyView();
+            rootView.ViewTreeObserver.GlobalLayout -= RootView_OnGlobalLayout;
         }
 
         public override async void OnResume()
@@ -485,8 +495,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     if (string.IsNullOrWhiteSpace(path))
                         throw new Exception("Unable to opent attachment");
 
-                    var uri = FileProvider.GetUriForFile(Context, Context.PackageName + ".fileprovider", new Java.IO.File(path));
-                    var mimeType = MimeTypeMap.GetMimeType(Path.GetExtension(path));
+                    var uri = Android.Support.V4.Content.FileProvider.GetUriForFile(Context, Context.PackageName + ".fileprovider", new Java.IO.File(path));
+                    var mimeType = MimeTypeMap.GetMimeType(System.IO.Path.GetExtension(path));
 
                     var openFileIntent = new Intent(Intent.ActionView);
                     openFileIntent.SetDataAndType(uri, mimeType);
@@ -566,6 +576,51 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #endregion
 
+        #region Scrolling related
+
+        void RootView_OnGlobalLayout(object sender, EventArgs e)
+        {
+            if (View == null)
+                return;
+
+            int[] windowCoordinates = new int[2];
+            View.GetLocationOnScreen(windowCoordinates);
+
+            visibleRect.Top = windowCoordinates[1];
+            visibleRect.Bottom = windowCoordinates[1] + View.Height;
+            visibleRect.Left = windowCoordinates[0];
+            visibleRect.Right = windowCoordinates[0] + View.Width;
+        }
+
+        void MoveViewToCaret(View webView, int relativeCaretPositionDp)
+        {
+            if (relativeCaretPositionDp <= 0)
+                return;
+
+            int[] webViewWindowLocation = new int[2];
+
+            webView.GetLocationOnScreen(webViewWindowLocation);
+            var webViewYPosition = webViewWindowLocation[1];
+
+            var relativeCaretPositionPx = Conversion.ConvertDpToPixels(relativeCaretPositionDp);
+
+            var absoluteCaretPositionTop = relativeCaretPositionPx + webViewYPosition - 10; //Added a little bit of padding
+            var caretSize = 50;
+            var absoluteCaretPositionBottom = absoluteCaretPositionTop + caretSize;
+
+            int delta = 0;
+
+            if (absoluteCaretPositionBottom > visibleRect.Bottom)
+                delta = absoluteCaretPositionBottom - visibleRect.Bottom;
+            else if (absoluteCaretPositionTop < visibleRect.Top)
+                delta = absoluteCaretPositionTop - visibleRect.Top;
+
+            if (delta != 0)
+                Activity.RunOnUiThread(() => scrollView.ScrollBy(0, delta));
+        }
+
+        #endregion
+
         #region Actions
 
         public void AskIfShouldSave()
@@ -594,10 +649,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void SendDocument(bool saveDraft = false)
         {
+            fab.Enabled = false;
+
             if (saveDraft)
                 CommonConfig.UsageAnalytics.LogEvent(new ComposeSaveDraftEvent());
 
-            Action sendAction = async () =>
+            async void sendAction()
             {
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, saveDraft ? Resource.String.saving_draft : Resource.String.sending_document, Resource.String.please_wait);
 
@@ -631,19 +688,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     CommonConfig.Logger.Error($"Failed to queue document for upload [saveDraft={saveDraft}, restoreWorkingCopy={restoreWorkingCopy}, documentCreationModeFlag={documentCreationModeFlag}, copyToNewOption={copyToNewOption}, previousDocumentFolderId={previousDocumentFolderId}, previousDocumentId={previousDocumentId}]", t.Exception.InnerException);
                     await Dialogs.ShowErrorDialogAsync(Activity, t.Exception.InnerException);
+                    fab.Enabled = true;
                 }
                 else
                     Activity?.Finish();
-            };
+            }
 
             var allEmailsValid = new RecipientsView[] { toView, ccView, bccView }.All(rv => rv.AllEmailsValid);
 
             if (!allEmailsValid && subjectView.Empty)
-                Dialogs.ShowYesNoDialog(Context, Resource.String.invalid_emails_and_subject_title, Resource.String.invalid_emails_and_subject_content, sendAction, null);
+                Dialogs.ShowYesNoDialog(Context, Resource.String.invalid_emails_and_subject_title, Resource.String.invalid_emails_and_subject_content, sendAction, () => fab.Enabled = true);
             else if (!allEmailsValid)
-                Dialogs.ShowYesNoDialog(Context, Resource.String.invalid_emails_title, Resource.String.invalid_emails_content, sendAction, null);
+                Dialogs.ShowYesNoDialog(Context, Resource.String.invalid_emails_title, Resource.String.invalid_emails_content, sendAction, () => fab.Enabled = true);
             else if (subjectView.Empty)
-                Dialogs.ShowYesNoDialog(Context, Resource.String.invalid_subject_title, Resource.String.invalid_subject_content, sendAction, null);
+                Dialogs.ShowYesNoDialog(Context, Resource.String.invalid_subject_title, Resource.String.invalid_subject_content, sendAction, () => fab.Enabled = true);
             else
                 sendAction();
         }

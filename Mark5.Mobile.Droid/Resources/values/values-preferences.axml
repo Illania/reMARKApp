@@ -29,6 +29,30 @@
         <item>2</item>
         <item>3</item>
     </string-array>
+    <string name="pref_email_swipe_actions_trailing_default">2</string>
+    <string name="pref_email_swipe_actions_leading_default">4</string>
+    <string-array name="pref_email_swipe_actions_entries">
+        <item>Mark as read/unread</item>
+        <item>Move to folder</item>
+        <item>Copy to worktray</item>
+        <item>Copy to folder</item>
+        <item>Categories</item>
+        <item>Priorities</item>
+        <item>Remove from folder</item>
+        <item>Delete</item>
+        <item>More</item>
+    </string-array>
+    <string-array name="pref_email_swipe_actions_entryvalues">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+    </string-array>
     <bool name="pref_documents_read_indicator_me_default">true</bool>
     <bool name="pref_documents_compact_list_default">false</bool>
     <string name="pref_documents_mark_as_read_default">0</string>

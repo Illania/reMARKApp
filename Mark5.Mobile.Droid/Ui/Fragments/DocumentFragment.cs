@@ -775,7 +775,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             string DisplayText(CopyToNewOption ctno)
             {
-                switch(ctno)
+                switch (ctno)
                 {
                     case CopyToNewOption.Addresses:
                         return GetString(Resource.String.copy_to_new_addresses);

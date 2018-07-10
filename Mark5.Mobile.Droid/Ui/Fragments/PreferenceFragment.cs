@@ -124,6 +124,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         sslPreference.SummaryFormatted = summary;
                         break;
                 }
+
+            var swipeOptions = FindPreference(GetString(Resource.String.pref_key_swipe_options));
+            if(swipeOptions != null) {
+                swipeOptions.PreferenceClick += (object sender, Preference.PreferenceClickEventArgs e) => {
+                   
+                    SwipeActionsFragment swipeActionsFragment;
+                    string swipeActionsFragmentTag;
+                    var fragmentTransaction = Activity.SupportFragmentManager.BeginTransaction();
+                    (swipeActionsFragment, swipeActionsFragmentTag) = SwipeActionsFragment.NewInstance();
+                    fragmentTransaction.Replace(Resource.Id.fragment_container, swipeActionsFragment, swipeActionsFragmentTag);
+                    fragmentTransaction.AddToBackStack(null);
+                    fragmentTransaction.Commit();
+                };
+            }
         }
 
         public override bool OnPreferenceTreeClick(Preference preference)

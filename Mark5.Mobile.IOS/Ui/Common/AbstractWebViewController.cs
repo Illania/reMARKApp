@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -25,11 +25,17 @@ namespace Mark5.Mobile.IOS.Ui.Common
         UIActivityIndicatorView loadIndicatorView;
         WKWebView webView;
         UIView headerContainerView;
+        UIView headerView;
         UIProgressView webViewProgressView;
 
         TaskCompletionSource<bool> loadTcs;
 
         string headerPaddingJsTemplate;
+        bool headerAnimationRunning;
+
+        nfloat keyboardHeight;
+
+        NSObject keyboardDisShowNotification;
 
         public override void ViewDidLoad()
         {
@@ -57,8 +63,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             userContentController.AddScriptMessageHandler(this, "resized");
             userContentController.AddScriptMessageHandler(this, "domloaded");
             userContentController.AddScriptMessageHandler(this, "mutated");
-            userContentController.AddScriptMessageHandler(this, "keypressed");
-            userContentController.AddScriptMessageHandler(this, "enterpressed");
+            userContentController.AddScriptMessageHandler(this, "input");
 
             var configuration = new WKWebViewConfiguration
             {
@@ -149,28 +154,22 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 webViewProgressView.LeadingAnchor.ConstraintEqualTo(View.LeadingAnchor),
                 webViewProgressView.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor)
             });
+
+            keyboardDisShowNotification = UIKeyboard.Notifications.ObserveDidShow(HandleKeyboardDidShow);
         }
 
         public override void ViewWillLayoutSubviews()
         {
             base.ViewWillLayoutSubviews();
 
-            if (webView == null)
+            if (webView == null || headerAnimationRunning)
                 return;
 
-            var desireHeaderSize = headerContainerView.SystemLayoutSizeFittingSize(UIView.UILayoutFittingCompressedSize);
-            var desiredHeaderHeight = desireHeaderSize.Height;
+            var desiredHeaderHeight = headerContainerView.SystemLayoutSizeFittingSize(UIView.UILayoutFittingCompressedSize).Height;
             if (desiredHeaderHeight < 1)
                 return;
 
-            var constraint = webView.Constraints.FirstOrDefault(c => c.GetIdentifier() == "headerContainer.height");
-            if (constraint == null)
-                return;
-            constraint.Constant = desiredHeaderHeight;
-
-            var headerPaddingJs = headerPaddingJsTemplate;
-            headerPaddingJs = ProcessWebTemplate(headerPaddingJs, desireHeaderSize.Height);
-            webView?.EvaluateJavaScript(headerPaddingJs, null);
+            SetHeaderPadding(desiredHeaderHeight);
         }
 
         protected override void Recycle()
@@ -180,6 +179,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
             webView.NavigationDelegate = null;
             webView.ScrollView.Delegate = null;
 
+            keyboardDisShowNotification.Dispose();
+
             var userContentController = webView?.Configuration?.UserContentController;
             if (userContentController != null)
             {
@@ -187,8 +188,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 userContentController.RemoveScriptMessageHandler("resized");
                 userContentController.RemoveScriptMessageHandler("domloaded");
                 userContentController.RemoveScriptMessageHandler("mutated");
-                userContentController.RemoveScriptMessageHandler("keypressed");
-                userContentController.RemoveScriptMessageHandler("enterpressed");
+                userContentController.RemoveScriptMessageHandler("input");
             }
 
             webView.RemoveObserver(this, new NSString("estimatedProgress"));
@@ -200,16 +200,33 @@ namespace Mark5.Mobile.IOS.Ui.Common
             webViewProgressView?.RemoveFromSuperview();
             loadIndicatorView?.RemoveFromSuperview();
             headerContainerView?.RemoveFromSuperview();
-            webView?.RemoveFromSuperview();
+            //webView?.RemoveFromSuperview(); //TODO This has been commented out to avoid eventual crashes 
+            // Github link: https://github.com/xamarin/xamarin-macios/issues/4130#issuecomment-399243880
 
             webViewProgressView = null;
             loadIndicatorView = null;
             headerContainerView = null;
+            headerView = null;
             webView = null;
         }
 
+        void HandleKeyboardDidShow(object sender, UIKeyboardEventArgs e)
+        {
+            keyboardHeight = e.FrameEnd.Height;
+            if (Integration.IsRunningAtLeast(11))
+                keyboardHeight -= View.SafeAreaInsets.Bottom;
+        }
+
+        protected void HeaderView_BeginAnimating(object sender, EventArgs e) => headerAnimationRunning = true;
+
+        protected void HeaderView_EndAnimating(object sender, EventArgs e) => headerAnimationRunning = false;
+
+        protected void HeaderView_Animating(object sender, EventArgs e) => SetHeaderPadding(headerView.Layer.PresentationLayer.Frame.Height / webView.ScrollView.ZoomScale);
+
         protected void SetHeaderView(UIView headerView)
         {
+            this.headerView = headerView;
+
             foreach (var subview in headerContainerView.Subviews)
                 subview.RemoveFromSuperview();
 
@@ -416,7 +433,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             var html = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/plain", "html"));
             var htmlDocument = new HtmlDocument();
             htmlDocument.LoadHtml(html);
-            var preNode = htmlDocument.DocumentNode.SelectSingleNode("//div[@id='plaintext']");
+            var preNode = htmlDocument.DocumentNode.SelectSingleNode("//pre[@id='plaintext']");
             preNode.InnerHtml = text;
 
             if (config.MakeEditable)
@@ -553,6 +570,27 @@ namespace Mark5.Mobile.IOS.Ui.Common
             });
         }
 
+        void MoveViewToCaret(int caretPosition)
+        {
+            var bottomCaretPosition = caretPosition + 30; //Line height
+
+            var verticalOffset = bottomCaretPosition - (webView.ScrollView.Bounds.Height - keyboardHeight - webView.ScrollView.ContentInset.Top); //The last is only for iOS 10 
+
+            CGPoint offset;
+
+            if (verticalOffset > 0)
+            {
+                offset = new CGPoint(webView.ScrollView.ContentOffset.X, verticalOffset + webView.ScrollView.ContentOffset.Y);
+                webView.ScrollView.SetContentOffset(offset, true);
+            }
+            else if (caretPosition < 0)
+            {
+                var yOffset = webView.ScrollView.ContentOffset.Y + caretPosition;
+                offset = new CGPoint(webView.ScrollView.ContentOffset.X, yOffset < 0 ? 0 : yOffset);
+                webView.ScrollView.SetContentOffset(offset, true);
+            }
+        }
+
         public override void ObserveValue(NSString keyPath, NSObject ofObject, NSDictionary change, IntPtr context)
         {
             if (webView == null)
@@ -591,11 +629,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 return;
 
             if (headerContainerView.Bounds.Height > 0)
-            {
-                var headerPaddingJs = headerPaddingJsTemplate;
-                headerPaddingJs = ProcessWebTemplate(headerPaddingJs, headerContainerView.Bounds.Height / webView.ScrollView.ZoomScale);
-                webView?.EvaluateJavaScript(headerPaddingJs, null);
-            }
+                SetHeaderPadding(headerContainerView.Bounds.Height / webView.ScrollView.ZoomScale);
         }
 
         [Export("webView:decidePolicyForNavigationAction:decisionHandler:")]
@@ -605,14 +639,10 @@ namespace Mark5.Mobile.IOS.Ui.Common
         }
 
         [Export("webView:didFinishNavigation:")]
-        async void DidFinishNavigation(WKWebView webView, WKNavigation navigation)
+        void DidFinishNavigation(WKWebView webView, WKNavigation navigation)
         {
             if (headerContainerView.Bounds.Height > 0)
-            {
-                var headerPaddingJs = headerPaddingJsTemplate;
-                headerPaddingJs = ProcessWebTemplate(headerPaddingJs, headerContainerView.Bounds.Height / webView.ScrollView.ZoomScale);
-                await webView?.EvaluateJavaScriptAsync(headerPaddingJs);
-            }
+                SetHeaderPadding(headerContainerView.Bounds.Height / webView.ScrollView.ZoomScale);
 
             loadTcs.SetResult(true);
         }
@@ -620,11 +650,20 @@ namespace Mark5.Mobile.IOS.Ui.Common
         [Export("webView:didFailNavigation:withError:")]
         void DidFailNavigation(WKWebView webView, WKNavigation navigation, NSError error) => loadTcs.SetResult(false);
 
+        void SetHeaderPadding(nfloat height)
+        {
+            var headerPaddingJs = headerPaddingJsTemplate;
+            headerPaddingJs = ProcessWebTemplate(headerPaddingJs, (int)height);
+            webView?.EvaluateJavaScript(headerPaddingJs, null);
+        }
+
         void IWKScriptMessageHandler.DidReceiveScriptMessage(WKUserContentController userContentController, WKScriptMessage message)
         {
             var messageName = message?.Name;
             if (messageName == null)
                 return;
+
+            var messageBody = message?.Body?.ToString();
 
             if (messageName == "domloaded")
                 OnWebViewDomLoaded();
@@ -638,12 +677,10 @@ namespace Mark5.Mobile.IOS.Ui.Common
             if (messageName == "mutated")
                 OnWebViewMutated();
 
-            if (messageName == "keypressed")
-                OnWebViewKeyPressed();
-
-            if (messageName == "enterpressed")
-                OnWebViewEnterPressed();
+            if (messageName == "input" && int.TryParse(messageBody, out int caretYposition))
+                OnWebViewInput(caretYposition);
         }
+
 
         protected virtual void OnWebViewDomLoaded() { }
 
@@ -653,9 +690,10 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         protected virtual void OnWebViewMutated() { }
 
-        protected virtual void OnWebViewKeyPressed() { }
-
-        protected virtual void OnWebViewEnterPressed() { }
+        protected virtual void OnWebViewInput(int caretPosition)
+        {
+            MoveViewToCaret(caretPosition);
+        }
 
         protected virtual bool CanNavigate(WKNavigationAction action)
         {

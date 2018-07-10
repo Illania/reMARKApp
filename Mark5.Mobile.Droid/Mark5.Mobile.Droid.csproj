@@ -203,8 +203,8 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\netstandard2.0\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\netstandard2.0\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Xamarin.Firebase.Messaging">
+      <HintPath>..\packages\Xamarin.Firebase.Messaging.60.1142.0\lib\MonoAndroid80\Xamarin.Firebase.Messaging.dll</HintPath>
     </Reference>
     <Reference Include="PhoneNumbers">
         <HintPath>..\packages\libphonenumber-csharp.8.8.8\lib\netstandard2.0\PhoneNumbers.dll</HintPath>
@@ -450,6 +450,7 @@
     <Compile Include="Ui\Fragments\AuthenticationDialogFragment.cs" />
     <Compile Include="Utilities\CallerId\CallerIdDatabaseProvider.cs" />
     <Compile Include="Utilities\CallerId\CallStateBroadcastReceiver.cs" />
+    <Compile Include="Ui\Fragments\SwipeActionsFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -788,6 +789,18 @@
     <AndroidResource Include="Resources\drawable-xxxhdpi\ic_fp_40px.png" />
     <AndroidResource Include="Resources\drawable\ic_fingerprint_error.xml" />
     <AndroidResource Include="Resources\drawable\ic_fingerprint_success.xml" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\action_deselect_all.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\action_select_all.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\action_deselect_all.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\action_select_all.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\action_deselect_all.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\action_select_all.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\action_deselect_all.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\action_select_all.png" />
+    <AndroidResource Include="Resources\layout\swipe_actions_fragment.axml" />
+    <AndroidResource Include="Resources\layout\mock_email.axml" />
+    <AndroidResource Include="Resources\drawable\square_rounded_corners.axml" />
+    <AndroidResource Include="Resources\drawable\gray_border.axml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FastScrollRecycler\FastScrollRecycler.csproj">
@@ -819,6 +832,7 @@
     <AndroidAsset Include="Assets\insertTemplate.js" />
     <AndroidAsset Include="Assets\plain.html" />
     <AndroidAsset Include="Assets\replyHeader.html" />
+    <AndroidAsset Include="Assets\editorScript.js" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Import Project="..\packages\NETStandard.Library.2.0.1\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.1\build\netstandard2.0\NETStandard.Library.targets')" />

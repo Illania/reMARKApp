@@ -229,6 +229,7 @@
     <string name="mark_as_read">Mark as read</string>
     <string name="marking_as_read">Marking as read...</string>
     <string name="marking_as_unread">Marking as unread...</string>
+    <string name="marking_as_read_unread">Mark as read/unread</string>
     <string name="marks_as_unread">Mark as unread</string>
     <string name="move_to_folder">Move to folder</string>
     <string name="moving_to_folder">Moving to folder</string>
@@ -382,6 +383,8 @@
     <string name="search_shortcodes">Search shortcodes</string>
     <string name="search_shortcodes_result">Result</string>
     <string name="select">Select</string>
+    <string name="select_all">Select all</string>
+    <string name="deselect_all">Deselect all</string>
     <string name="select_email_address">Select email address</string>
     <string name="select_a_line">Select a mailbox</string>
     <string name="select_categories">Select categories</string>
@@ -435,4 +438,11 @@
     <string name="yesterday">Yesterday</string>
     <string name="youre_offline_title">You are offline</string>
     <string name="youre_offline_message">This action cannot be performed offline</string>
+    <string name="more">More</string>
+    <string name="remove_from_folder">Remove from folder</string>
+    <string name="swipe_actions_info">Select a swipe button below and choose which actions to quickly access when swiping emails in your inbox.</string>
+    <string name="swipe_actions_right_title">Swipe right</string>
+    <string name="swipe_actions_left_title">Swipe left</string>
+    <string name="swipe_actions_defaults">Reset to default</string>
+    <string name="swipe_actions_dialog_title">Select action</string>
 </resources>

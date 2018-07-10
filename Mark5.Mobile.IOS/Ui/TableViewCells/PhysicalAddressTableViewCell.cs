@@ -50,7 +50,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
             iconImage = new UIImageView
             {
-                Image = UIImage.FromBundle(Path.Combine("icons", "map.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
+                Image = UIImage.FromBundle("Map").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
 

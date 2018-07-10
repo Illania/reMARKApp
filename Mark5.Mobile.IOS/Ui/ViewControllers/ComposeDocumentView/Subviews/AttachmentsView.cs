@@ -30,6 +30,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         void Initialize()
         {
+            ContainerView.BackgroundColor = Theme.White;
+
             titleLabel = new UILabel
             {
                 Text = Localization.GetString("attachments") + ":",
@@ -236,7 +238,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 AddArrangedSubview(filenameButton);
 
                 deleteButton = new UIButton();
-                deleteButton.SetImage(UIImage.FromBundle(Path.Combine("icons", "remove.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+                deleteButton.SetImage(UIImage.FromBundle("Remove").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
                 deleteButton.BackgroundColor = Theme.Clear;
                 deleteButton.TranslatesAutoresizingMaskIntoConstraints = false;
                 deleteButton.ContentEdgeInsets = new UIEdgeInsets(5.0f, 5.0f, 5.0f, 5.0f);
@@ -284,7 +286,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 AddArrangedSubview(filenameButton);
 
                 deleteButton = new UIButton();
-                deleteButton.SetImage(UIImage.FromBundle(Path.Combine("icons", "remove.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+                deleteButton.SetImage(UIImage.FromBundle("Remove").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
                 deleteButton.BackgroundColor = Theme.Clear;
                 deleteButton.TranslatesAutoresizingMaskIntoConstraints = false;
                 deleteButton.ContentEdgeInsets = new UIEdgeInsets(5.0f, 5.0f, 5.0f, 5.0f);

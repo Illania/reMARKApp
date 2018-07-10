@@ -88,6 +88,15 @@
 			<key>DefaultValue</key>
 			<false/>
 		</dict>
+			<dict>
+			<key>Type</key>
+			<string>PSMultiValueSpecifier</string>
+			<key>Key</key>
+			<string>EmailSwipeActions</string>
+			<key>Title</key>
+			<string>email_swipe_actions</string>
+			
+		</dict>
 		<dict>
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>

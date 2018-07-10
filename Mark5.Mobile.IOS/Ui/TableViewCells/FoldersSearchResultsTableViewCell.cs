@@ -90,12 +90,12 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         static UIImage GetIcon(Folder folder)
         {
             if (folder.InternalType == FolderInternalType.Worktray)
-                return UIImage.FromBundle(Path.Combine("icons", "folderslist", "worktray.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+                return UIImage.FromBundle("Folderslist-Worktray").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
 
             if (folder.Type == FolderType.Draft)
-                return UIImage.FromBundle(Path.Combine("icons", "folderslist", "draft.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+                return UIImage.FromBundle("Folderslist-Draft").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
 
-            return UIImage.FromBundle(Path.Combine("icons", "folderslist", "folder.png")).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+            return UIImage.FromBundle("Folderslist-Folder").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
         }
     }
 }

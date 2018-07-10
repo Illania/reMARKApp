@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using MailBee.Mime;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Utilities.Extensions;
@@ -10,43 +11,65 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
 {
     public class AttachmentsView : MailViewerSubview
     {
-        readonly WeakReference<MailViewerViewController> mailViewerViewControllerWeakReference;
+        const int columnSize = 2;
+
         UILabel titleLabel;
         UIStackView stackView;
+        UIScrollView scrollView;
 
-        public AttachmentsView(MailViewerViewController mailViewerViewController)
+        public event EventHandler<Attachment> AttachmentTapped = delegate { };
+
+        public AttachmentsView()
         {
-            mailViewerViewControllerWeakReference = mailViewerViewController.Wrap();
+            ContainerView.BackgroundColor = Theme.White;
 
             titleLabel = new UILabel
             {
                 Text = Localization.GetString("attachments") + ":",
                 Font = Theme.DefaultFont,
                 TextColor = Theme.DarkGray,
+                Opaque = false,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
             ContainerView.AddSubview(titleLabel);
             ContainerView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
-                NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin)
+                titleLabel.TopAnchor.ConstraintEqualTo(ContainerView.TopAnchor, 10f),
+                titleLabel.LeftAnchor.ConstraintEqualTo(ContainerView.LeftAnchor, HorizontalMargin),
+            });
+
+            scrollView = new UIScrollView
+            {
+                Opaque = false,
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                ShowsHorizontalScrollIndicator = false,
+            };
+            ContainerView.AddSubview(scrollView);
+            ContainerView.AddConstraints(new[]
+            {
+                scrollView.TopAnchor.ConstraintEqualTo(titleLabel.BottomAnchor, 1f),
+                scrollView.LeftAnchor.ConstraintEqualTo(ContainerView.LeftAnchor),
+                scrollView.RightAnchor.ConstraintEqualTo(ContainerView.RightAnchor),
+                scrollView.BottomAnchor.ConstraintEqualTo(ContainerView.BottomAnchor),
             });
 
             stackView = new UIStackView
             {
-                Axis = UILayoutConstraintAxis.Vertical,
-                Alignment = UIStackViewAlignment.Fill,
+                Opaque = false,
+                Axis = UILayoutConstraintAxis.Horizontal,
+                Alignment = UIStackViewAlignment.Top,
                 Distribution = UIStackViewDistribution.Fill,
-                Spacing = InnerMargin,
+                Spacing = 10f,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
-            ContainerView.AddSubview(stackView);
+            scrollView.AddSubview(stackView);
             ContainerView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, titleLabel, NSLayoutAttribute.Bottom, 1f, InnerMargin),
-                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin),
-                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin),
-                NSLayoutConstraint.Create(stackView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -VerticalMargin)
+                stackView.TopAnchor.ConstraintEqualTo(scrollView.TopAnchor),
+                stackView.LeftAnchor.ConstraintEqualTo(scrollView.LeftAnchor, HorizontalMargin),
+                stackView.RightAnchor.ConstraintEqualTo(scrollView.RightAnchor, -HorizontalMargin),
+                stackView.BottomAnchor.ConstraintEqualTo(scrollView.BottomAnchor),
+                stackView.HeightAnchor.ConstraintEqualTo(scrollView.HeightAnchor),
             });
         }
 
@@ -58,8 +81,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
                 titleLabel = null;
 
                 stackView?.RemoveFromSuperview();
-                foreach (var v in stackView.ArrangedSubviews)
-                    v.RemoveFromSuperview();
                 stackView = null;
             }
         }
@@ -71,11 +92,34 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
 
             stackView.ArrangedSubviews.ForEach(v => v.RemoveFromSuperview());
 
+            List<Attachment> attachments = new List<Attachment>();
+
             foreach (var att in MailMessage.Attachments)
+                attachments.Add((Attachment)att);
+
+            foreach (var batch in attachments.Batch(columnSize))
+                stackView.AddArrangedSubview(PrepareColumnStack(batch));
+        }
+
+        UIStackView PrepareColumnStack(IEnumerable<Attachment> batch)
+        {
+            var columnStack = new UIStackView
             {
-                var alssv = new AttachmentsSubView(mailViewerViewControllerWeakReference, (Attachment)att);
-                stackView.AddArrangedSubview(alssv);
+                Opaque = false,
+                Axis = UILayoutConstraintAxis.Vertical,
+                Alignment = UIStackViewAlignment.Leading,
+                Distribution = UIStackViewDistribution.Fill,
+                Spacing = 5f,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+
+            foreach (var ad in batch)
+            {
+                var alssv = new AttachmentsSubView(this, ad);
+                columnStack.AddArrangedSubview(alssv);
             }
+
+            return columnStack;
         }
 
         public override void UpdateVisibility()
@@ -88,51 +132,59 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
 
             Hidden = MailMessage.Attachments.Count < 1;
         }
+
+        public void OpenAttachment(Attachment attachment) => AttachmentTapped?.Invoke(this, attachment);
     }
 
     class AttachmentsSubView : UIView
     {
-        readonly WeakReference<MailViewerViewController> mailViewerViewControllerWeakReference;
+        readonly WeakReference<AttachmentsView> viewWeakReference;
         readonly Attachment attachment;
 
-        readonly UIButton attachmentButton;
+        UIButton attachmentButton;
 
-        public AttachmentsSubView(WeakReference<MailViewerViewController> mailViewerViewControllerWeakReference, Attachment attachment)
+        public AttachmentsSubView(AttachmentsView attachmentsView, Attachment attachment)
         {
             this.attachment = attachment;
-            this.mailViewerViewControllerWeakReference = mailViewerViewControllerWeakReference;
+            this.viewWeakReference = attachmentsView.Wrap();
 
             TranslatesAutoresizingMaskIntoConstraints = false;
 
-            attachmentButton = new UIButton(UIButtonType.RoundedRect);
+            attachmentButton = new UIButton(UIButtonType.RoundedRect)
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                HorizontalAlignment = UIControlContentHorizontalAlignment.Left,
+                Opaque = false,
+                ContentEdgeInsets = new UIEdgeInsets(3.5f, 7.5f, 3.5f, 7.5f),
+                BackgroundColor = Theme.Gray,
+            };
             attachmentButton.TitleLabel.Font = Theme.DefaultFont;
+            attachmentButton.Layer.CornerRadius = 5f;
             attachmentButton.SetTitle(attachment.Name + " (" + UI.PrettyFileSize(attachment.Size) + ")", UIControlState.Normal);
-            attachmentButton.HorizontalAlignment = UIControlContentHorizontalAlignment.Left;
-            attachmentButton.TranslatesAutoresizingMaskIntoConstraints = false;
+            attachmentButton.SetContentHuggingPriority((float)UILayoutPriority.DefaultHigh, UILayoutConstraintAxis.Vertical);
+            attachmentButton.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            attachmentButton.TouchUpInside += AttachmentButton_TouchUpInside;
             AddSubview(attachmentButton);
             AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(attachmentButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, this, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(attachmentButton, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(attachmentButton, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, this, NSLayoutAttribute.Bottom, 1f, 0f),
-                NSLayoutConstraint.Create(attachmentButton, NSLayoutAttribute.Right, NSLayoutRelation.Equal, this, NSLayoutAttribute.Right, 1f, 0f)
+                attachmentButton.TopAnchor.ConstraintEqualTo(TopAnchor),
+                attachmentButton.LeftAnchor.ConstraintEqualTo(LeftAnchor),
+                attachmentButton.BottomAnchor.ConstraintEqualTo(BottomAnchor),
+                attachmentButton.RightAnchor.ConstraintEqualTo(RightAnchor),
             });
         }
 
+        void AttachmentButton_TouchUpInside(object sender, EventArgs e) => viewWeakReference.Unwrap()?.OpenAttachment(attachment);
+
         public override void WillMoveToSuperview(UIView newsuper)
         {
-            if (newsuper != null)
+            if (newsuper == null)
             {
-                if (attachmentButton != null)
-                    attachmentButton.TouchUpInside += AttachmentButton_TouchUpInside;
-            }
-            else
-            {
-                if (attachmentButton != null)
-                    attachmentButton.TouchUpInside -= AttachmentButton_TouchUpInside;
+                attachmentButton.RemoveFromSuperview();
+                attachmentButton.TouchUpInside -= AttachmentButton_TouchUpInside;
+                attachmentButton = null;
             }
         }
 
-        void AttachmentButton_TouchUpInside(object sender, EventArgs e) => mailViewerViewControllerWeakReference.Unwrap()?.OpenAttachment(attachment);
     }
 }

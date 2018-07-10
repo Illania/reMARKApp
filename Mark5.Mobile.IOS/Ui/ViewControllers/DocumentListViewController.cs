@@ -1,6 +1,5 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -31,10 +30,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public Folder Folder { get; set; }
 
         UIBarButtonItem composeDocumentItem;
+        UIBarButtonItem selectAllItem;
         UIBarButtonItem exitEditItem;
         UIBarButtonItem editItem;
 
         bool refreshing;
+        bool selectAllEnabled;
 
         UISearchController searchController;
         CancellationTokenSource searchCancellationTokenSource;
@@ -191,6 +192,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.Recycle();
 
             composeDocumentItem = null;
+            selectAllItem = null;
             exitEditItem = null;
             editItem = null;
 
@@ -228,9 +230,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             composeDocumentItem = new UIBarButtonItem
             {
-                Image = UIImage.FromBundle(Path.Combine("icons", "create.png"))
+                Image = UIImage.FromBundle("Create")
             };
             NavigationItem.SetRightBarButtonItem(composeDocumentItem, false);
+
+            selectAllItem = new UIBarButtonItem
+            {
+                Image = UIImage.FromBundle("SelectAll")
+            };
 
             exitEditItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
             editItem = new UIBarButtonItem(UIBarButtonSystemItem.Edit);
@@ -269,9 +276,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             searchController.SearchBar.Placeholder = Localization.GetString("filter");
 
             if (!Integration.IsRunningAtLeast(11))
-            {
                 TableView.TableHeaderView = searchController.SearchBar;
-            }
         }
 
         void InitializeHandlers()
@@ -281,6 +286,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (exitEditItem != null)
                 exitEditItem.Clicked += ExitEditItem_Clicked;
+
+            if (selectAllItem != null)
+                selectAllItem.Clicked += SelectAllItem_Clicked;
 
             if (editItem != null)
                 editItem.Clicked += EditItem_Clicked;
@@ -295,6 +303,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (exitEditItem != null)
                 exitEditItem.Clicked -= ExitEditItem_Clicked;
+
+            if (selectAllItem != null)
+                selectAllItem.Clicked -= SelectAllItem_Clicked;
 
             if (editItem != null)
                 editItem.Clicked -= EditItem_Clicked;
@@ -346,7 +357,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (TableView.IndexPathsForSelectedRows == null || TableView.IndexPathsForSelectedRows.Length < 1)
                 return;
-
+            
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
             var d = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
 
@@ -409,6 +420,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 eas.PopoverPresentationController.Delegate = d;
 
             PresentViewController(eas, true, null);
+        }
+
+        void SelectAllItem_Clicked(object sender, EventArgs e)
+        {
+            if (selectAllEnabled)
+            {
+                SelectAll();
+                selectAllItem.Image = UIImage.FromBundle("DeselectAll");
+            }
+            else
+            {
+                DeselectAll();
+                selectAllItem.Image = UIImage.FromBundle("SelectAll");
+            }
+
+            selectAllEnabled = !selectAllEnabled;
+
         }
 
         #endregion
@@ -569,12 +597,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Actions
 
-        void ShowMoreActionSheet(NSIndexPath indexPath, DocumentPreview selectedDocument)
+        void ShowMoreActionSheet(NSIndexPath indexPath, DocumentPreview selectedDocument, Folder folder)
         {
-            var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
+            var alertController = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
             var d = new PopoverPresentationControllerDelegate(TableView, TableView.CellAt(indexPath));
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("categories"),
+            alertController.AddAction(UIAlertAction.Create(Localization.GetString("categories"),
                 UIAlertActionStyle.Default,
                 a =>
                 {
@@ -582,7 +610,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     EndEditing();
                 }));
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"),
+            alertController.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"),
                 UIAlertActionStyle.Default,
                 a =>
                 {
@@ -590,8 +618,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     EndEditing();
                 }));
 
-            if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"),
+            if (folder.InternalType == FolderInternalType.FilterView || folder.InternalType == FolderInternalType.Static || folder.InternalType == FolderInternalType.Worktray)
+                alertController.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"),
                     UIAlertActionStyle.Default,
                     a =>
                     {
@@ -599,20 +627,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         EndEditing();
                     }));
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"), UIAlertActionStyle.Default, a => ShowPriorityActionSheet(selectedDocument, TableView, TableView.CellAt(indexPath))));
+            alertController.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"), UIAlertActionStyle.Default, a => ShowPriorityActionSheet(selectedDocument, TableView, TableView.CellAt(indexPath))));
 
-            if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, a => RemoveFromFolder(selectedDocument, d)));
+            if (folder.InternalType == FolderInternalType.FilterView || folder.InternalType == FolderInternalType.Static || folder.InternalType == FolderInternalType.Worktray)
+                alertController.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, a => RemoveFromFolder(selectedDocument, d)));
 
             if (ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || selectedDocument.Direction == DocumentDirection.Draft)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedDocument, d)));
+                alertController.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedDocument, d)));
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
+            alertController.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
 
-            if (eas.PopoverPresentationController != null)
-                eas.PopoverPresentationController.Delegate = d;
+            if (alertController.PopoverPresentationController != null)
+                alertController.PopoverPresentationController.Delegate = d;
 
-            PresentViewController(eas, true, null);
+            PresentViewController(alertController, true, null);
         }
 
         async void ShowPriorityActionSheet(List<DocumentPreview> selectedDocuments, UIBarButtonItem barButtonItem)
@@ -631,6 +659,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void ShowPriorityActionSheet(DocumentPreview selectedDocument, UITableView tv, UITableViewCell cell)
         {
+            var priorities = new List<Priority> { Priority.Low, Priority.Normal, Priority.Urgent };
+            var priorityStrings = priorities.Select(p => UI.PrettyPriorityString(p));
+            var result = await Dialogs.ShowListActionSheetAsync(this, priorityStrings.ToArray(), tv, cell);
+
+            if (result < 0)
+                return;
+
+            var priority = priorities[result];
+
+            await SetPriority(new List<DocumentPreview> { selectedDocument }, priority);
+        }
+
+        async void ShowPriorityActionSheet(DocumentPreview selectedDocument, UITableView tv, NSIndexPath indexPath)
+        {
+
+            var cell = TableView.CellAt(indexPath);
             var priorities = new List<Priority> { Priority.Low, Priority.Normal, Priority.Urgent };
             var priorityStrings = priorities.Select(p => UI.PrettyPriorityString(p));
             var result = await Dialogs.ShowListActionSheetAsync(this, priorityStrings.ToArray(), tv, cell);
@@ -665,6 +709,32 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 CommonConfig.Logger.Error($"Error while setting priority for documents", ex);
                 await Dialogs.ShowErrorAlertAsync(this, ex);
+            }
+        }
+
+        void SelectAll()
+        {
+            var dataSource = (DataSource)TableView.Source;
+            var currentSection = 0;
+            var rowsInSection = dataSource.RowsInSection(null, currentSection);
+
+            for (int i = 0; i < rowsInSection; i++)
+            {
+                var path = NSIndexPath.FromItemSection(i, currentSection);
+                TableView.SelectRow(path, false, UITableViewScrollPosition.None);
+            }
+        }
+
+        void DeselectAll()
+        {
+            var dataSource = (DataSource)TableView.Source;
+            var currentSection = 0;
+            var rowsInSection = dataSource.RowsInSection(null, currentSection);
+
+            for (int i = 0; i < rowsInSection; i++)
+            {
+                var path = NSIndexPath.FromItemSection(i, currentSection);
+                TableView.DeselectRow(path, false);
             }
         }
 
@@ -929,41 +999,56 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             BeginInvokeOnMainThread(() =>
             {
-                var index = ((DataSource)TableView.Source).Items.FindIndex(dp => dp.Id == message.DocumentPreviewId);
-
-                if (index >= 0)
+                foreach (var tableView in new UITableView[] { TableView, ((UITableViewController)searchController?.SearchResultsController)?.TableView })
                 {
-                    var documentPreview = ((DataSource)TableView.Source).Items[index];
-                    documentPreview.IsReadByCurrent = message.IsReadByCurrent;
-                    documentPreview.IsReadByAnyone = message.IsReadByAnyone;
+                    if (tableView == null || tableView.Source == null)
+                        continue;
 
-                    var selectedRow = TableView.IndexPathForSelectedRow;
+                    var index = ((DataSource)tableView.Source).Items.FindIndex(dp => dp.Id == message.DocumentPreviewId);
 
-                    TableView.ReloadRows(new[] { NSIndexPath.FromRowSection(index, 0) }, UITableViewRowAnimation.Fade);
+                    if (index >= 0)
+                    {
+                        var documentPreview = ((DataSource)tableView.Source).Items[index];
+                        documentPreview.IsReadByCurrent = message.IsReadByCurrent;
+                        documentPreview.IsReadByAnyone = message.IsReadByAnyone;
 
-                    if (selectedRow != null)
-                        TableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
+                        var selectedRow = tableView.IndexPathForSelectedRow;
+
+                        tableView.ReloadRows(new[] { NSIndexPath.FromRowSection(index, 0) }, UITableViewRowAnimation.Fade);
+
+                        if (selectedRow != null)
+                            tableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
+                    }
+
                 }
+
             });
+
         }
 
         void CommentsCountChangedHandler(EntityPreviewCommentCountChangedMessage message)
         {
             BeginInvokeOnMainThread(() =>
             {
-                var index = ((DataSource)TableView.Source).Items.FindIndex(dp => dp.Id == message.EntityId);
-
-                if (index >= 0)
+                foreach (var tableView in new UITableView[] { TableView, ((UITableViewController)searchController?.SearchResultsController)?.TableView })
                 {
-                    var documentPreview = ((DataSource)TableView.Source).Items[index];
-                    documentPreview.CommentsCount = message.CommentsCount;
+                    if (tableView == null || tableView.Source == null)
+                        continue;
 
-                    var selectedRow = TableView.IndexPathForSelectedRow;
+                    var index = ((DataSource)tableView.Source).Items.FindIndex(dp => dp.Id == message.EntityId);
 
-                    TableView.ReloadRows(new[] { NSIndexPath.FromRowSection(index, 0) }, UITableViewRowAnimation.Fade);
+                    if (index >= 0)
+                    {
+                        var documentPreview = ((DataSource)tableView.Source).Items[index];
+                        documentPreview.CommentsCount = message.CommentsCount;
 
-                    if (selectedRow != null)
-                        TableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
+                        var selectedRow = tableView.IndexPathForSelectedRow;
+
+                        tableView.ReloadRows(new[] { NSIndexPath.FromRowSection(index, 0) }, UITableViewRowAnimation.Fade);
+
+                        if (selectedRow != null)
+                            tableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
+                    }
                 }
             });
         }
@@ -972,20 +1057,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             BeginInvokeOnMainThread(() =>
             {
-                var index = ((DataSource)TableView.Source).Items.FindIndex(dp => dp.Id == message.EntityId);
-
-                if (index >= 0)
+                foreach (var tableView in new UITableView[] { TableView, ((UITableViewController)searchController?.SearchResultsController)?.TableView })
                 {
-                    var documentPreview = ((DataSource)TableView.Source).Items[index];
-                    documentPreview.Categories.Clear();
-                    documentPreview.Categories.AddRange(message.Categories);
+                    if (tableView == null || tableView.Source == null)
+                        continue;
 
-                    var selectedRow = TableView.IndexPathForSelectedRow;
+                    var index = ((DataSource)tableView.Source).Items.FindIndex(dp => dp.Id == message.EntityId);
 
-                    TableView.ReloadRows(new[] { NSIndexPath.FromRowSection(index, 0) }, UITableViewRowAnimation.Fade);
+                    if (index >= 0)
+                    {
+                        var documentPreview = ((DataSource)tableView.Source).Items[index];
+                        documentPreview.Categories.Clear();
+                        documentPreview.Categories.AddRange(message.Categories);
 
-                    if (selectedRow != null)
-                        TableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
+                        var selectedRow = tableView.IndexPathForSelectedRow;
+
+                        tableView.ReloadRows(new[] { NSIndexPath.FromRowSection(index, 0) }, UITableViewRowAnimation.Fade);
+
+                        if (selectedRow != null)
+                            tableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
+                    }
                 }
             });
         }
@@ -999,6 +1090,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         #endregion
 
         #region Utilities
+        static bool SwipeActionAllowed(EmailSwipeAction.SwipeAction action, DocumentPreview documentPreview, Folder folder)
+        {
+            switch (action)
+            {
+                case EmailSwipeAction.SwipeAction.MoveToFolder:
+                    return folder.InternalType == FolderInternalType.FilterView || folder.InternalType == FolderInternalType.Static || folder.InternalType == FolderInternalType.Worktray;
+                case EmailSwipeAction.SwipeAction.Delete:
+                    return ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || documentPreview.Direction == DocumentDirection.Draft;
+                case EmailSwipeAction.SwipeAction.RemoveFromFolder:
+                    return folder.InternalType == FolderInternalType.FilterView || folder.InternalType == FolderInternalType.Static || folder.InternalType == FolderInternalType.Worktray;
+                default:
+                    return true;
+            }
+        }
 
         void StartEditing()
         {
@@ -1012,14 +1117,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
             TableView.SetEditing(true, true);
-            NavigationItem.SetRightBarButtonItem(exitEditItem, true);
+            NavigationItem.SetRightBarButtonItems(new[] { exitEditItem, selectAllItem }, true);
             NavigationItem.SetLeftBarButtonItem(editItem, true);
+
+            selectAllEnabled = true;
+            selectAllItem.Image = UIImage.FromBundle("SelectAll");
         }
 
         void EndEditing()
         {
             TableView.SetEditing(false, true);
-            NavigationItem.SetRightBarButtonItem(composeDocumentItem, false);
+            NavigationItem.SetRightBarButtonItems(new[] { composeDocumentItem }, false);
             NavigationItem.SetLeftBarButtonItem(NavigationItem.BackBarButtonItem, true);
         }
 
@@ -1129,6 +1237,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
+
         #endregion
 
         #region DataSource
@@ -1209,59 +1318,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return false;
 
                 return true;
-            }
-
-            public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
-            {
-                var actions = new List<UITableViewRowAction>();
-
-                var documentPreview = Items[indexPath.Row];
-
-                if (documentPreview.IsReadByCurrent)
-                {
-                    var markAsUnreadAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
-                        Localization.GetString("mark_as_unread_ml"),
-                        (a, ip) =>
-                        {
-                            viewControllerWeakReference.Unwrap()?.MarkAsUnread(documentPreview);
-                            viewControllerWeakReference.Unwrap()?.EndEditing();
-                        });
-                    markAsUnreadAction.BackgroundColor = Theme.Brown;
-                    actions.Add(markAsUnreadAction);
-                }
-                else
-                {
-                    var markAsReadAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
-                        Localization.GetString("mark_as_read_ml"),
-                        (a, ip) =>
-                        {
-                            viewControllerWeakReference.Unwrap()?.MarkAsRead(documentPreview);
-                            viewControllerWeakReference.Unwrap()?.EndEditing();
-                        });
-                    markAsReadAction.BackgroundColor = Theme.Brown;
-                    actions.Add(markAsReadAction);
-                }
-
-                var copyToWorktrayAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
-                    Localization.GetString("copy_to_worktray_ml"),
-                    (a, ip) =>
-                    {
-                        viewControllerWeakReference.Unwrap()?.CopyToWorktray(documentPreview);
-                        viewControllerWeakReference.Unwrap()?.EndEditing();
-                    });
-                copyToWorktrayAction.BackgroundColor = Theme.DarkBlue;
-                actions.Add(copyToWorktrayAction);
-
-                var moreAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
-                    Localization.GetString("more"),
-                    (a, ip) =>
-                    {
-                        viewControllerWeakReference.Unwrap()?.ShowMoreActionSheet(indexPath, documentPreview);
-                    });
-                moreAction.BackgroundColor = Theme.DarkerBlue;
-                actions.Add(moreAction);
-
-                return actions.ToArray();
             }
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
@@ -1368,6 +1424,293 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 tableViewWeakReference.Unwrap()?.SelectRow(NSIndexPath.FromRowSection(row, 0), true, UITableViewScrollPosition.Middle);
             }
+
+            #region SwipeRelated
+
+            class SwipeActionUIWrapper
+            {
+                public UITableViewRowAction Action { get; set; }
+                public bool Disabled;
+            }
+
+            UIContextualAction BuildLeadingContextualAction(UITableView tableView, NSIndexPath indexPath)
+            {
+                var documentPreview = Items[indexPath.Row];
+
+                EmailSwipeAction leadingAction = PlatformConfig.Preferences.EmailLeadingSwipeActions.First();
+
+                var folder = viewControllerWeakReference.Unwrap()?.Folder;
+
+                string title = SwipeActionTitle(leadingAction, documentPreview);
+
+                var contextualAction = UIContextualAction.FromContextualActionStyle(UIContextualActionStyle.Normal, title, (someAction, view, success) =>
+                {
+                    OnSwipeActionClick(leadingAction, indexPath, documentPreview, folder, tableView);
+                });
+
+                if(SwipeActionAllowed(leadingAction.Action, documentPreview, folder)) {
+                    contextualAction.BackgroundColor = Theme.LightBrown;
+                } else {
+                    contextualAction.BackgroundColor = Theme.LightGray;
+                }
+
+                return contextualAction;
+            }
+
+            public override UISwipeActionsConfiguration GetLeadingSwipeActionsConfiguration(UITableView tableView, NSIndexPath indexPath)
+            {
+                var leadingSwipe = UISwipeActionsConfiguration.FromActions(new UIContextualAction[] { BuildLeadingContextualAction(tableView, indexPath) });
+
+                leadingSwipe.PerformsFirstActionWithFullSwipe = true;
+
+                return leadingSwipe;
+            }
+
+            public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
+            {
+                var actionWrappers = new List<SwipeActionUIWrapper>();
+
+                var documentPreview = Items[indexPath.Row];
+
+                List<EmailSwipeAction> trailingSwipeActions = PlatformConfig.Preferences.EmailTrailingSwipeActions;
+
+                trailingSwipeActions.Reverse();
+                var folder = viewControllerWeakReference.Unwrap()?.Folder;
+
+                foreach (EmailSwipeAction swipeAction in trailingSwipeActions)
+                {
+                    SwipeActionUIWrapper actionWrapper = new SwipeActionUIWrapper();
+
+                    switch (swipeAction.Action)
+                    {
+                        case EmailSwipeAction.SwipeAction.MarkAsRead:
+                            if (documentPreview.IsReadByCurrent)
+                            {
+                                actionWrapper.Action = UITableViewRowAction.Create(
+                                    UITableViewRowActionStyle.Default,
+                                    SwipeActionTitle(swipeAction, documentPreview),
+                                    (a, ip) =>
+                                    {
+                                        OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView);
+                                    });
+                            }
+                            else
+                            {
+                                actionWrapper.Action = UITableViewRowAction.Create(
+                                    UITableViewRowActionStyle.Default,
+                                    SwipeActionTitle(swipeAction, documentPreview),
+                                    (a, ip) =>
+                                    {
+                                        OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView);
+                                    });
+                            }
+                            break;
+                        case EmailSwipeAction.SwipeAction.CopyToWorkTray:
+                            actionWrapper.Action = UITableViewRowAction.Create(
+                                UITableViewRowActionStyle.Default,
+                                SwipeActionTitle(swipeAction, documentPreview),
+                                (a, ip) =>
+                                {
+                                    OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView);
+                                });
+                            break;
+                        case EmailSwipeAction.SwipeAction.More:
+                            actionWrapper.Action = UITableViewRowAction.Create(
+                                UITableViewRowActionStyle.Default,
+                                SwipeActionTitle(swipeAction, documentPreview),
+                                (a, ip) =>
+                                {
+                                    OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView);
+                                });
+                            break;
+                        case EmailSwipeAction.SwipeAction.CopyToFolder:
+                            actionWrapper.Action = UITableViewRowAction.Create(
+                                UITableViewRowActionStyle.Default,
+                                SwipeActionTitle(swipeAction, documentPreview),
+                                (a, ip) =>
+                                {
+                                    OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView);
+                                });
+                            break;
+                        case EmailSwipeAction.SwipeAction.Categories:
+                            actionWrapper.Action = UITableViewRowAction.Create(
+                                UITableViewRowActionStyle.Default,
+                                SwipeActionTitle(swipeAction, documentPreview),
+                                (a, ip) =>
+                                {
+                                    OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView);
+                                });
+                            break;
+                        case EmailSwipeAction.SwipeAction.SetPriority:
+                            actionWrapper.Action = UITableViewRowAction.Create(
+                                UITableViewRowActionStyle.Default,
+                                SwipeActionTitle(swipeAction, documentPreview),
+                                (a, ip) =>
+                                {
+                                    OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView);
+                                });
+                            break;
+                        case EmailSwipeAction.SwipeAction.Delete:
+                            actionWrapper.Action = UITableViewRowAction.Create(
+                                UITableViewRowActionStyle.Default,
+                                SwipeActionTitle(swipeAction, documentPreview),
+                                (a, ip) =>
+                                {
+                                    OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView);
+                                });
+
+                            actionWrapper.Disabled = !SwipeActionAllowed(swipeAction.Action, documentPreview, folder);
+                            break;
+                        case EmailSwipeAction.SwipeAction.MoveToFolder:
+                            actionWrapper.Action = UITableViewRowAction.Create(
+                                UITableViewRowActionStyle.Default,
+                                SwipeActionTitle(swipeAction, documentPreview),
+                                (a, ip) => { OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView); });
+                        
+                            actionWrapper.Disabled = !SwipeActionAllowed(swipeAction.Action, documentPreview, folder);
+                            break;
+                        case EmailSwipeAction.SwipeAction.RemoveFromFolder:
+                            actionWrapper.Action = UITableViewRowAction.Create(
+                                UITableViewRowActionStyle.Default,
+                                SwipeActionTitle(swipeAction, documentPreview),
+                                (a, ip) =>
+                                {
+                                   OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView);
+                                });
+                            actionWrapper.Disabled = !SwipeActionAllowed(swipeAction.Action, documentPreview, folder);
+                            break;
+                        default:
+                            break;
+                    }
+
+                    actionWrappers.Add(actionWrapper);
+                }
+
+                for (int i = 0; i < actionWrappers.Count; i++)
+                {
+                    if (actionWrappers[i].Disabled)
+                    {
+                        actionWrappers[i].Action.BackgroundColor = Theme.LightGray;
+                    }
+                    else
+                    {
+                        if (i == 0)
+                        {
+                            actionWrappers[i].Action.BackgroundColor = Theme.Brown;
+                        }
+                        else if (i == 1)
+                        {
+                            actionWrappers[i].Action.BackgroundColor = Theme.DarkBlue;
+                        }
+                        else
+                        {
+                            actionWrappers[i].Action.BackgroundColor = Theme.DarkerBlue;
+                        }
+                    }
+                }
+
+                UITableViewRowAction[] returnActions = actionWrappers.Select(a => a.Action).ToArray();
+
+                return returnActions;
+            }
+
+
+            string SwipeActionTitle(EmailSwipeAction swipeAction, DocumentPreview documentPreview)
+            {
+                switch (swipeAction.Action)
+                {
+                    case EmailSwipeAction.SwipeAction.MarkAsRead:
+                        if (documentPreview.IsReadByCurrent)
+                        {
+                            return Localization.GetString("mark_as_unread_ml");
+                        }
+                        else
+                        {
+                            return Localization.GetString("mark_as_read_ml");
+                        }
+
+                    case EmailSwipeAction.SwipeAction.CopyToWorkTray:
+                        return Localization.GetString("copy_to_worktray_ml");
+                    case EmailSwipeAction.SwipeAction.More:
+                        return Localization.GetString("more");
+                    case EmailSwipeAction.SwipeAction.CopyToFolder:
+                        return Localization.GetString("copy_to_folder");
+                    case EmailSwipeAction.SwipeAction.Categories:
+                        return Localization.GetString("categories");
+                    case EmailSwipeAction.SwipeAction.SetPriority:
+                        return Localization.GetString("set_priority");
+                    case EmailSwipeAction.SwipeAction.Delete:
+                        return Localization.GetString("delete");
+                    case EmailSwipeAction.SwipeAction.MoveToFolder:
+                        return Localization.GetString("move_to_folder");
+                    case EmailSwipeAction.SwipeAction.RemoveFromFolder:
+                        return Localization.GetString("delete_from_folder");
+                    default:
+                        CommonConfig.Logger.Error($"Missing implementation for EmailSwipeAction : {swipeAction.Action.ToString()}");
+                        return "";
+                }
+            }
+
+            void OnSwipeActionClick(EmailSwipeAction swipeAction, NSIndexPath indexPath, DocumentPreview documentPreview, Folder folder, UITableView tableView)
+            {
+                var popoverDelegate = new PopoverPresentationControllerDelegate(tableView, tableView.CellAt(indexPath));
+
+                switch (swipeAction.Action)
+                {
+                    case EmailSwipeAction.SwipeAction.MarkAsRead:
+                        if (documentPreview.IsReadByCurrent)
+                        {
+                            viewControllerWeakReference.Unwrap()?.MarkAsUnread(documentPreview);
+                            viewControllerWeakReference.Unwrap()?.EndEditing();
+                        }
+                        else
+                        {
+                            viewControllerWeakReference.Unwrap()?.MarkAsRead(documentPreview);
+                            viewControllerWeakReference.Unwrap()?.EndEditing();
+                        }
+                        break;
+                    case EmailSwipeAction.SwipeAction.CopyToWorkTray:
+                        viewControllerWeakReference.Unwrap()?.CopyToWorktray(documentPreview);
+                        viewControllerWeakReference.Unwrap()?.EndEditing();
+                        break;
+                    case EmailSwipeAction.SwipeAction.More:
+                        viewControllerWeakReference.Unwrap()?.ShowMoreActionSheet(indexPath, documentPreview, folder);
+                        break;
+                    case EmailSwipeAction.SwipeAction.CopyToFolder:
+                        viewControllerWeakReference.Unwrap()?.CopyToFolder(documentPreview);
+                        viewControllerWeakReference.Unwrap()?.EndEditing();
+                        break;
+                    case EmailSwipeAction.SwipeAction.Categories:
+                        viewControllerWeakReference.Unwrap()?.ShowCategories(documentPreview);
+                        viewControllerWeakReference.Unwrap()?.EndEditing();
+                        break;
+                    case EmailSwipeAction.SwipeAction.SetPriority:
+                        viewControllerWeakReference.Unwrap()?.ShowPriorityActionSheet(documentPreview, tableView, indexPath);
+                        break;
+                    case EmailSwipeAction.SwipeAction.Delete:
+                        if (SwipeActionAllowed(EmailSwipeAction.SwipeAction.Delete, documentPreview, folder))
+                        {
+                            viewControllerWeakReference.Unwrap()?.Delete(documentPreview, popoverDelegate);
+                        }
+                        break;
+                    case EmailSwipeAction.SwipeAction.MoveToFolder:
+                        if (SwipeActionAllowed(EmailSwipeAction.SwipeAction.Delete, documentPreview, folder))
+                        {
+                            viewControllerWeakReference.Unwrap()?.MoveToFolder(documentPreview);
+                        }
+                        break;
+
+                    case EmailSwipeAction.SwipeAction.RemoveFromFolder:
+                        viewControllerWeakReference.Unwrap()?.RemoveFromFolder(documentPreview, popoverDelegate);
+                        break;
+                    default:
+                        CommonConfig.Logger.Error("Missed case for EmailSwipeAction : " + swipeAction.Action.ToString());
+                        break;
+                }
+            }
+
+            #endregion
+
         }
 
         #endregion

@@ -189,6 +189,7 @@
 "mark_as_read_ml" = "Mark as\nread";
 "mark_as_unread" = "Mark as unread";
 "mark_as_unread_ml" = "Mark as\nunread";
+"mark_as_read_unread" = "Mark as read/unread";
 "marking_document_as_read___" = "Marking email as read...";
 "marking_document_as_unread___" = "Marking email as unread...";
 "me" = "Me";
@@ -348,6 +349,8 @@
 "short_id" = "Short ID";
 "shortcodes" = "Shortcodes";
 "show_more___" = "Show more...";
+"show_more" = "Show more";
+"show_less" = "Show less";
 "skype" = "Skype";
 "subject" = "Subject";
 "system" = "System";
@@ -391,3 +394,9 @@
 "zip" = "Zip";
 "youre_offline_title" = "You are offline";
 "youre_offline_message" = "This action cannot be performed offline";
+"email_swipe_actions" = "Swipe options";
+"swipe_settings_info" = "Select a swipe button below and choose which actions to quickly access when you swipe emails in your inbox.";
+"swipe_reset_default" = "Reset to Default";
+"swipe_settings_leading_title" = "SWIPE RIGHT";
+"swipe_settings_middle_title" = "SWIPE LEFT - MIDDLE BUTTON";
+"swipe_settings_last_title" = "SWIPE LEFT - LAST BUTTON";

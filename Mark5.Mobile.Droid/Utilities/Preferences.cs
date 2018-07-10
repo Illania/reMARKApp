@@ -2,7 +2,10 @@ using Android.App;
 using Android.Content;
 using Android.Support.V7.Preferences;
 using Mark5.Mobile.Common.Model;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using Xamarin.Android;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
@@ -157,5 +160,93 @@ namespace Mark5.Mobile.Droid.Utilities
             Local = 2,
             AlwaysAsk = 3,
         }
+
+        public const int MarkAsRead = 10;
+        public const int MarkAsUnread = 11;
+        public const int CopyToWorktray = 20;
+        public const int CopyToFolder = 30;
+        public const int MoveToFolder = 31;
+        public const int SetPriority = 40;
+        public const int Categories = 50;
+        public const int DeleteFromFolder = 60;
+        public const int Delete = 61;
+
+        #region Email swipe actions related
+
+        public enum EmailSwipeAction
+        {
+            MarkAsReadUnread = 1,
+            MoveToFolder = 2,
+            CopyToWorkTray = 3,
+            CopyToFolder = 4,
+            Categories = 5,
+            Priorities = 6,
+            RemoveFromFolder = 7,
+            Delete = 8,
+            More = 9
+        }
+
+        public EmailSwipeAction EmailLeadingSwipeAction
+        {
+
+            get
+            {
+                var pref = sp.GetString(Application.Context.GetString(Resource.String.pref_key_swipe_leading), Application.Context.Resources.GetString(Resource.String.pref_email_swipe_actions_leading_default));
+                return (EmailSwipeAction)Enum.Parse(typeof(EmailSwipeAction), pref);
+            }
+
+            set
+            {
+                var e = sp.Edit();
+                e.PutString(Application.Context.GetString(Resource.String.pref_key_swipe_leading), $"{(int)value}");
+                e.Commit();
+            }
+        }
+
+        public EmailSwipeAction EmailTrailingSwipeAction
+        {
+            get
+            {
+                var pref = sp.GetString(Application.Context.GetString(Resource.String.pref_key_swipe_trailing), Application.Context.Resources.GetString(Resource.String.pref_email_swipe_actions_trailing_default));
+                return (EmailSwipeAction)Enum.Parse(typeof(EmailSwipeAction), pref);
+            }
+
+            set
+            {
+                var e = sp.Edit();
+                e.PutString(Application.Context.GetString(Resource.String.pref_key_swipe_trailing),$"{(int)value}");
+                e.Commit();
+            }
+        }
+
+
+
+        public List<EmailSwipeAction> GetAllAvailableActions()
+        {
+            var arr = Application.Context.Resources.GetStringArray(Resource.Array.pref_email_swipe_actions_entryvalues).ToList();
+            var selectArr = arr.Select(x => (EmailSwipeAction)Enum.Parse(typeof(EmailSwipeAction), x));
+            return selectArr.ToList();
+        }
+
+        public List<EmailSwipeAction> GetAvailableSwipeActions()
+        {
+            var exceptLeading = GetAllAvailableActions().Where(x =>
+            {
+                return x != EmailLeadingSwipeAction;
+            });
+            var exceptTrailing = exceptLeading.Where(x =>
+            {
+                return x != EmailTrailingSwipeAction;
+            });
+            return exceptTrailing.ToList();
+        }
+
+        public void ResetSwipeActions()
+        {
+            EmailLeadingSwipeAction = EmailSwipeAction.Categories;
+            EmailTrailingSwipeAction = EmailSwipeAction.CopyToWorkTray;
+        }
+
+        #endregion
     }
 }
