@@ -29,10 +29,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
             ContainerView.AddSubview(dateLabel);
             ContainerView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(dateLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
-                NSLayoutConstraint.Create(dateLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin),
-                NSLayoutConstraint.Create(dateLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin),
-                NSLayoutConstraint.Create(dateLabel, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -VerticalMargin)
+                dateLabel.TopAnchor.ConstraintEqualTo(ContainerView.TopAnchor,VerticalMargin),
+                dateLabel.LeftAnchor.ConstraintEqualTo(ContainerView.LeftAnchor,HorizontalMargin),
+                dateLabel.RightAnchor.ConstraintEqualTo(ContainerView.RightAnchor,-HorizontalMargin),
+                dateLabel.BottomAnchor.ConstraintEqualTo(ContainerView.BottomAnchor,-VerticalMargin)
             });
 
             SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
