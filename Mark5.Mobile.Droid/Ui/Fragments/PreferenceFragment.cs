@@ -59,10 +59,27 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnActivityResult(int requestCode, int resultCode, Intent data)
         {
-            if (resultCode == (int)Android.App.Result.Ok && requestCode == RequestCodes.NotificationRingtoneRequest)
+            if (resultCode == (int)Android.App.Result.Ok)
             {
-                var uri = data.GetParcelableExtra(RingtoneManager.ExtraRingtonePickedUri);
-                PlatformConfig.Preferences.NotificationsRingtone = uri?.ToString() ?? string.Empty;
+                if (requestCode == RequestCodes.NotificationRingtoneRequest)
+                {
+                    var uri = data.GetParcelableExtra(RingtoneManager.ExtraRingtonePickedUri);
+                    PlatformConfig.Preferences.NotificationsRingtone = uri?.ToString() ?? string.Empty;
+                }
+            }
+            //The only way the user can return from the settings screen is by pressing back, hence requestCode = canceled.
+            else if (resultCode == (int)Android.App.Result.Canceled)
+            {
+                if (Build.VERSION.SdkInt >= BuildVersionCodes.M && requestCode == RequestCodes.DrawOnTopRequest) //Only relevant if version is M or above.
+                {
+                    PlatformConfig.Preferences.CallerIdentificationEnabled = Settings.CanDrawOverlays(Context); //Sets the preference based on what the user selected in the settings screen for drawing overlays.
+                    if (PlatformConfig.Preferences.CallerIdentificationEnabled)
+                    {
+                        PlatformConfig.CallStateBroadcastReceiver.Register();
+                    }
+
+                    Activity.OnBackPressed();
+                }
             }
         }
 
@@ -266,6 +283,32 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
                 Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
             }
+            if (key == GetString(Resource.String.pref_key_callidentification_identification_enabled))
+            {
+                var valueChangedTo = PlatformConfig.Preferences.CallerIdentificationEnabled;
+                if (valueChangedTo)
+                {
+                    if (Build.VERSION.SdkInt >= BuildVersionCodes.M) //If version is api 22 or above
+                    {
+                        Dialogs.ShowConfirmDialog(Context, Resource.String.redirect_to_draw_settings_title, Resource.String.redirect_to_draw_settings_content,
+                                                () =>
+                        {
+
+                            var intent = new Intent(Settings.ActionManageOverlayPermission, Android.Net.Uri.Parse("package:" + Context.PackageName));
+                            StartActivityForResult(intent, RequestCodes.DrawOnTopRequest);
+                        });
+                    }
+                    else
+                    {
+                        Dialogs.ShowConfirmDialog(Context, Resource.String.must_save_persons_companies_offline_title, Resource.String.must_save_persons_companies_offline_content, null);
+                        PlatformConfig.CallStateBroadcastReceiver.Register();
+                    }
+                }
+                else
+                {
+                    PlatformConfig.CallStateBroadcastReceiver.Unregister();
+                }
+            }
         }
 
         public bool OnPreferenceStartScreen(PreferenceFragmentCompat caller, PreferenceScreen pref)
@@ -287,6 +330,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         static class RequestCodes
         {
             public const int NotificationRingtoneRequest = 1;
+            public const int DrawOnTopRequest = 2;
         }
     }
 }

@@ -169,7 +169,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             if (desiredHeaderHeight < 1)
                 return;
 
-            SetHeaderPadding(desiredHeaderHeight);
+            SetHeaderPadding(desiredHeaderHeight / webView.ScrollView.ZoomScale);
         }
 
         protected override void Recycle()
@@ -221,7 +221,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         protected void HeaderView_EndAnimating(object sender, EventArgs e) => headerAnimationRunning = false;
 
-        protected void HeaderView_Animating(object sender, EventArgs e) => SetHeaderPadding(headerView.Layer.PresentationLayer.Frame.Height);
+        protected void HeaderView_Animating(object sender, EventArgs e) => SetHeaderPadding(headerView.Layer.PresentationLayer.Frame.Height / webView.ScrollView.ZoomScale);
 
         protected void SetHeaderView(UIView headerView)
         {

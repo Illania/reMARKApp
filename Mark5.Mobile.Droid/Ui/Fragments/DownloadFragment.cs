@@ -302,7 +302,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 onStartedAction();
 
-                var queue = new Queue<int>();
+                var shortcodeQueue = new Queue<int>();
+                var contactsQueue = new Queue<(int id, string name)>();
 
                 var lastBatchCount = -1;
                 var startRowId = -1;
@@ -315,7 +316,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     {
                         var result = await Managers.ContactsManager.GetContactPreviewsAsync(folder, startRowId, SourceType.Remote);
 
-                        result.ForEach(cp => queue.Enqueue(cp.Id));
+                        result.ForEach(cp => contactsQueue.Enqueue((cp.Id, cp.Name)));
                         startRowId = result.LastOrDefault()?.RowId ?? -1;
                         lastBatchCount = result.Count;
 
@@ -326,7 +327,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     {
                         var result = await Managers.ShortcodesManager.GetShortcodePreviewsAsync(folder, startRowId, SourceType.Remote);
 
-                        result.ForEach(cp => queue.Enqueue(cp.Id));
+                        result.ForEach(cp => shortcodeQueue.Enqueue(cp.Id));
                         startRowId = result.LastOrDefault()?.RowId ?? -1;
                         lastBatchCount = result.Count;
 
@@ -334,11 +335,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         result = null;
                     }
 
-                    onProgressAction(new ProgressInfo(true, queue.Count, -1, -1));
+                    var count = folder.Module == ModuleType.Contacts ? contactsQueue.Count : shortcodeQueue.Count;
+
+                    onProgressAction(new ProgressInfo(true, count, -1, -1));
                 } while (lastBatchCount >= Managers.ContactsManager.MaxToFetch && !ct.IsCancellationRequested);
 
-                var totalItemsCount = queue.Count;
-                var leftItemsCount = queue.Count;
+                int queueCount = 0;
+                if (folder.Module == ModuleType.Contacts)
+                    queueCount = contactsQueue.Count;
+                else if (folder.Module == ModuleType.Shortcodes)
+                    queueCount = shortcodeQueue.Count;
+
+                var totalItemsCount = queueCount;
+                var leftItemsCount = queueCount;
                 var failedItems = new List<int>();
 
                 if (ct.IsCancellationRequested)
@@ -351,12 +360,32 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 onProgressAction(new ProgressInfo(false, totalItemsCount, leftItemsCount, failedItems.Count));
 
+                try
+                {
+                    await CallerIdDatabaseProvider.CallerIdDatabase.CreateTable();
+                    await CallerIdDatabaseProvider.CallerIdDatabase.CleanTable(folder.Id);
+                }
+                catch (Exception ex)
+                {
+                    onException(ex);
+                }
                 do
                 {
                     int item;
+                    string contactName = null;
+
                     try
                     {
-                        item = queue.Dequeue();
+                        if (folder.Module == ModuleType.Contacts)
+                        {
+                            (var qId, var qName) = contactsQueue.Dequeue();
+                            item = qId;
+                            contactName = qName;
+                        }
+                        else //if (folder.Module == ModuleType.Shortcodes)
+                        {
+                            item = shortcodeQueue.Dequeue();
+                        }
                         leftItemsCount--;
                     }
                     catch (InvalidOperationException)
@@ -369,6 +398,26 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         if (folder.Module == ModuleType.Contacts)
                         {
                             var contact = await Managers.ContactsManager.GetContactAsync(folder, item, SourceType.Remote);
+
+                            try
+                            {
+                                if (contact.CommunicationAddresses.Count > 0)
+                                {
+                                    var caList = contact.CommunicationAddresses.Where(ca => ca.Type == CommunicationAddressType.Phone || ca.Type == CommunicationAddressType.Mobile).ToList();
+
+                                    if (caList.Count > 0)
+                                    {
+                                        foreach (CommunicationAddress ca in caList)
+                                        {
+                                            await CallerIdDatabaseProvider.CallerIdDatabase.AddContact(folder.Id, contactName, ca.Address);
+                                        }
+                                    }
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                onException(ex);
+                            }
 
                             async Task DeepDownload(Contact c)
                             {

@@ -206,6 +206,9 @@
     <Reference Include="Xamarin.Firebase.Messaging">
       <HintPath>..\packages\Xamarin.Firebase.Messaging.60.1142.0\lib\MonoAndroid80\Xamarin.Firebase.Messaging.dll</HintPath>
     </Reference>
+    <Reference Include="PhoneNumbers">
+        <HintPath>..\packages\libphonenumber-csharp.8.8.8\lib\netstandard2.0\PhoneNumbers.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Resources\Resource.designer.cs" />
@@ -445,6 +448,8 @@
     <Compile Include="Utilities\Fingerprint\FingerprintUiHelper.cs" />
     <Compile Include="Utilities\ApplicationLifecycleHandler.cs" />
     <Compile Include="Ui\Fragments\AuthenticationDialogFragment.cs" />
+    <Compile Include="Utilities\CallerId\CallerIdDatabaseProvider.cs" />
+    <Compile Include="Utilities\CallerId\CallStateBroadcastReceiver.cs" />
     <Compile Include="Ui\Fragments\SwipeActionsFragment.cs" />
     <Compile Include="Utilities\OnBoardingUtilities.cs" />
   </ItemGroup>
@@ -468,6 +473,7 @@
     <Folder Include="Ui\Views\AddEditViews\AddEditContactViews\" />
     <Folder Include="Ui\Views\AddEditViews\AddEditShortcodeViews\" />
     <Folder Include="Utilities\Fingerprint\" />
+    <Folder Include="Utilities\CallerId\" />
     <Folder Include="Assets\changelogs\" />
   </ItemGroup>
   <ItemGroup>
@@ -772,6 +778,11 @@
     <AndroidResource Include="Resources\drawable-xxxhdpi\expand_down.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\remove.png" />
     <AndroidResource Include="Resources\layout\countries_dropdown.axml" />
+    <AndroidResource Include="Resources\drawable-hdpi\caller.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\caller.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\caller.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\caller.png" />
+    <AndroidResource Include="Resources\drawable\caller_id_background.xml" />
     <AndroidResource Include="Resources\layout\fingerprint_dialog_container.xml" />
     <AndroidResource Include="Resources\layout\fingerprint_dialog_content.xml" />
     <AndroidResource Include="Resources\drawable-hdpi\ic_fp_40px.png" />

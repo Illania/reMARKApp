@@ -134,8 +134,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     CommonConfig.Logger.Info($"Registering {nameof(ReachabilityBroadcastReceiver)}...");
                     PlatformConfig.ReachabilityBroadcastReceiver.Register();
 
+                    if (PlatformConfig.Preferences.CallerIdentificationEnabled)
+                    {
+                        CommonConfig.Logger.Info($"Registering {nameof(CallStateBroadcastReceiver)}...");
+                        PlatformConfig.CallStateBroadcastReceiver.Register();                    
+                    }
+               
                     CommonConfig.Logger.Info("Retrieving system settings...");
-
                     ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
 
                     if (!String.IsNullOrEmpty(ServerConfig.SystemSettings.SystemInfo.CustomerName))
