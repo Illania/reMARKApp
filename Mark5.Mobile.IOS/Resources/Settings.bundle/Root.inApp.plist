@@ -4,6 +4,8 @@
 <dict>
 	<key>StringsTable</key>
 	<string>Root</string>
+	<key>Custom Property</key>
+	<string></string>
 	<key>PreferenceSpecifiers</key>
 	<array>
 		<dict>
@@ -243,6 +245,24 @@
 			<string>AlwaysUseDefaultLine</string>
 			<key>DefaultValue</key>
 			<true/>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>Title</key>
+			<string>contacts</string>
+			<key>FooterText</key>
+			<string>caller_identification_desc</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>IASKCustomViewSpecifier</string>
+			<key>Title</key>
+			<string>caller_identification</string>
+			<key>Key</key>
+			<string>CallerIdentificationEnabled</string>
+			<key>DefaultValue</key>
+			<string></string>
 		</dict>
 		<dict>
 			<key>Type</key>

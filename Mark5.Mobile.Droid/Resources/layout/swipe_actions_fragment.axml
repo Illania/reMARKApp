@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/swipe_actions_info"
+        android:text="@string/swipe_actions_info"
+        android:textAppearance="@style/fontSmall"
+        android:gravity="left"
+        android:layout_marginLeft="25dp"
+        android:layout_marginRight="25dp"
+        android:layout_marginTop="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true" />
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/swipe_actions_lbl_right"
+        android:text="@string/swipe_actions_right_title"
+        android:textAppearance="@style/searchListTitleSelected"
+        android:gravity="left"
+        android:layout_marginLeft="25dp"
+        android:layout_marginRight="25dp"
+        android:layout_marginTop="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true" />
+    <LinearLayout
+        android:id="@+id/left_swipe_container"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/gray_border"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_marginLeft="25dp"
+        android:clickable="true"
+        android:layout_marginRight="25dp"
+        android:layout_height="90dp">
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/swipe_action_left_btn"
+            android:layout_width="80dp"
+            android:textSize="12sp"
+            android:textColor="@color/white"
+            android:gravity="center"
+            android:background="@color/brown"
+            android:layout_weight="0"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true" />
+        <include
+            layout="@layout/mock_email"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/swipe_actions_lbl_left"
+        android:text="@string/swipe_actions_left_title"
+        android:textAppearance="@style/searchListTitleSelected"
+        android:gravity="left"
+        android:layout_marginLeft="25dp"
+        android:layout_marginRight="25dp"
+        android:layout_marginTop="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true" />
+    <LinearLayout
+        android:id="@+id/right_swipe_container"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/gray_border"
+        android:clickable="true"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_marginLeft="25dp"
+        android:layout_marginRight="25dp"
+        android:layout_height="90dp">
+        <include
+            android:layout_weight="1"
+            layout="@layout/mock_email"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent" />
+        <android.support.v7.widget.AppCompatTextView
+            android:layout_weight="0"
+            android:layout_width="80dp"
+            android:id="@+id/swipe_action_right_btn"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:background="@color/darkblue"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/swipe_defaults_btn"
+        android:clickable="true"
+        android:textAlignment="center"
+        android:textAppearance="@style/searchListTitleSelected"
+        android:textAllCaps="true"
+        android:text="@string/swipe_actions_defaults"
+        android:layout_width="match_parent"
+        android:layout_marginTop="30dp"
+        android:layout_height="48dp"
+        android:layout_gravity="center"
+        android:layout_alignParentBottom="true"
+        android:background="?attr/selectableItemBackground"
+        android:gravity="center" />
+</LinearLayout>

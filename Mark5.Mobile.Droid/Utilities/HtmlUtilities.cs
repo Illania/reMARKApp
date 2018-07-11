@@ -103,7 +103,7 @@ namespace Mark5.Mobile.Droid.Utilities
 
             var htmlDocument = new HtmlDocument();
             htmlDocument.LoadHtml(html);
-            var preNode = htmlDocument.DocumentNode.SelectSingleNode("//div[@id='plaintext']");
+            var preNode = htmlDocument.DocumentNode.SelectSingleNode("//pre[@id='plaintext']");
             preNode.InnerHtml = text;
 
             if (config.MakeEditable)

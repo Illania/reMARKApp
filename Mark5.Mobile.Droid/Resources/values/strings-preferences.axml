@@ -1,4 +1,4 @@
-﻿﻿<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <resources>
 	<string name="dialog_creating_report">Creating system report</string>
 	<string name="dialog_logging_out_title">Logging out</string>
@@ -37,6 +37,7 @@
 	<string name="pref_cat_about">About</string>
 	<string name="pref_cat_account">Account</string>
 	<string name="pref_cat_advanced">Advanced</string>
+	<string name="pref_cat_callidentification">Caller Identification</string>
 	<string name="pref_cat_cache">Cache</string>
 	<string name="pref_cat_compose">Composing emails</string>
 	<string name="pref_cat_contacts">Contacts</string>
@@ -55,6 +56,9 @@
 	<string name="pref_compose_template_mode_title">Template behavior</string>
 	<string name="pref_compose_view_options_summary">Turn on or off visibility of compose view fields</string>
 	<string name="pref_compose_view_options_title">Compose view options</string>
+	<string name="pref_callidentification_summary_off">Caller identification of MARK5 contacts is disabled</string>
+	<string name="pref_callidentification_summary_on">Caller identification of MARK5 contacts is enabled</string>
+	<string name="pref_callidentification_title">Caller Identification</string>
 	<string name="pref_contacts_sub_account_title">Account</string>
 	<string name="pref_contacts_sub_address_title">Addresses</string>
 	<string name="pref_contacts_sub_birthdate_title">Birthdate</string>
@@ -106,12 +110,14 @@
 	<string name="pref_key_cat_account">pref_key_cat_account</string>
 	<string name="pref_key_cat_advanced">pref_key_cat_advanced</string>
 	<string name="pref_key_cat_cache">pref_key_cat_cache</string>
+	<string name="pref_key_cat_callidentification">pref_key_cat_callidentification</string>
 	<string name="pref_key_cat_compose">pref_key_cat_compose</string>
 	<string name="pref_key_cat_contacts">pref_key_cat_contacts</string>
 	<string name="pref_key_cat_documents">pref_key_cat_documents</string>
 	<string name="pref_key_cat_notifications">pref_key_cat_notifications</string>
 	<string name="pref_key_cat_shortcodes">pref_key_cat_shortcodes</string>
 	<string name="pref_key_cat_search">pref_key_cat_search</string>
+	<string name="pref_key_callidentification_identification_enabled">pref_key_callidentification_identification_enabled</string>
     <string name="pref_key_cat_security">pref_key_cat_security</string>
 	<string name="pref_key_compose_priority_enabled">pref_key_compose_priority_enabled</string>
 	<string name="pref_key_compose_remove_line">pref_key_compose_remove_line</string>
@@ -148,6 +154,8 @@
 	<string name="pref_key_search_contacts_to_get">pref_key_search_contacts_to_get</string>
 	<string name="pref_key_search_shortcodes_to_get">pref_key_search_shortcodes_to_get</string>
 	<string name="pref_key_search_partial_word">pref_key_search_partial_word</string>
+    <string name="pref_key_email_leading_swipe_action">pref_key_email_leading_swipe_action</string>
+    <string name="pref_key_email_trailing_swipe_action">pref_key_email_trailing_swipe_action</string>
     <string name="pref_notification_hide_read_summary_off">Do not hide read notifications in the list</string>
     <string name="pref_notification_hide_read_summary_on">Do not show read notifications in the list</string>
 	<string name="pref_notification_hide_read_title">Hide read notifications</string>
@@ -167,4 +175,14 @@
 	<string name="ssl_off">Disabled</string>
 	<string name="ssl_on">Enabled</string>
 	<string name="ssl_self_signed">Enabled (allow self-signed)</string>
+    <string name="pref_email_swipe_leading_title">Left swipe action</string>
+    <string name="pref_email_swipe_leading_summary">Select action when swiping to right</string>
+    <string name="pref_email_swipe_trailing_title">Right swipe action</string>
+    <string name="pref_email_swipe_trailing_summary">Select action when swiping to left</string>
+    <string name="pref_email_swipe_dialog_title">Select action</string>
+    <string name="pref_key_swipe_trailing">pref_key_swipe_trailing</string>
+    <string name="pref_key_swipe_leading">pref_key_swipe_leading</string>
+    <string name="pref_key_swipe_options">pref_key_swipe_options</string>
+    <string name="pref_swipe_options_summary">Customize swipe options to take quick action on emails in your inbox.</string>
+    <string name="pref_swipe_options_title">Swipe options</string>
 </resources>

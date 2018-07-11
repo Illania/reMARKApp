@@ -123,6 +123,8 @@
 "empty_token_disable_title" = "Problem while disabling notifications";
 "empty_token_disable_content" = "It is not possible to disable notifications at the moment. Please try again later or restart the app.";
 "email" = "Email";
+"enable_callid_extension_title" = "Enable extension";
+"enable_callid_extension_message" = "To enable caller indentification you must save the folders \"All companies\" and/or \"All persons\". Afterwards go to Settings => Phone => Call Blocking &... and enable MARK5.";
 "enable_notifications" = "Notify";
 "enable_sync" = "Enable\nsync";
 "enabled" = "Enabled";

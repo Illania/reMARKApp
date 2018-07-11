@@ -71,6 +71,7 @@ namespace Mark5.Mobile.Droid
 
                     PlatformConfig.SSLCertificateVerificationManager = new SSLCertificateVerificationManager();
                     PlatformConfig.ReachabilityBroadcastReceiver = new ReachabilityBroadcastReceiver();
+                    PlatformConfig.CallStateBroadcastReceiver = new CallStateBroadcastReceiver();
                     PlatformConfig.Preferences = new Preferences();
                 })
                 .Wait();

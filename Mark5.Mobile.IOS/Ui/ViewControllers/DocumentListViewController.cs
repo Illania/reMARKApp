@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -357,7 +357,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (TableView.IndexPathsForSelectedRows == null || TableView.IndexPathsForSelectedRows.Length < 1)
                 return;
-
+            
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
             var d = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
 
@@ -602,88 +602,41 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var alertController = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
             var d = new PopoverPresentationControllerDelegate(TableView, TableView.CellAt(indexPath));
 
-            var availableActions = PlatformConfig.Preferences.GetAvailableSwipeActions();
-
-            foreach (var item in availableActions)
-            {
-                switch (item.Action)
+            alertController.AddAction(UIAlertAction.Create(Localization.GetString("categories"),
+                UIAlertActionStyle.Default,
+                a =>
                 {
-                    case EmailSwipeAction.SwipeAction.MarkAsRead:
+                    ShowCategories(selectedDocument);
+                    EndEditing();
+                }));
 
-                        if (selectedDocument.IsReadByCurrent)
-                        {
-                            alertController.AddAction(UIAlertAction.Create(Localization.GetString("mark_as_unread"), UIAlertActionStyle.Default, a =>
-                            {
-                                MarkAsUnread(selectedDocument);
-                                EndEditing();
-                            }));
-                        }
-                        else
-                        {
-                            alertController.AddAction(UIAlertAction.Create(Localization.GetString("mark_as_read"), UIAlertActionStyle.Default, a =>
-                            {
-                                MarkAsRead(selectedDocument);
-                                EndEditing();
-                            }));
-                        }
-                        break;
-                    case EmailSwipeAction.SwipeAction.CopyToWorkTray:
-                        alertController.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"), UIAlertActionStyle.Default, a =>
-                        {
-                            CopyToWorktray(selectedDocument);
-                            EndEditing();
-                        }));
-                        break;
-                    case EmailSwipeAction.SwipeAction.Delete:
-                        if (SwipeActionAllowed(item.Action, selectedDocument, folder))
-                            alertController.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedDocument, d)));
+            alertController.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"),
+                UIAlertActionStyle.Default,
+                a =>
+                {
+                    CopyToFolder(selectedDocument);
+                    EndEditing();
+                }));
 
-                        break;
-                    case EmailSwipeAction.SwipeAction.Categories:
-                        alertController.AddAction(UIAlertAction.Create(Localization.GetString("categories"),
-                                                                       UIAlertActionStyle.Default,
-                                                                       a =>
-                                                                       {
-                                                                           ShowCategories(selectedDocument);
-                                                                           EndEditing();
-                                                                       }));
-                        break;
-                    case EmailSwipeAction.SwipeAction.CopyToFolder:
-                        alertController.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"),
-                                                                       UIAlertActionStyle.Default,
-                                                                       a =>
-                                                                       {
-                                                                           CopyToFolder(selectedDocument);
-                                                                           EndEditing();
-                                                                       }));
+            if (folder.InternalType == FolderInternalType.FilterView || folder.InternalType == FolderInternalType.Static || folder.InternalType == FolderInternalType.Worktray)
+                alertController.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"),
+                    UIAlertActionStyle.Default,
+                    a =>
+                    {
+                        MoveToFolder(selectedDocument);
+                        EndEditing();
+                    }));
 
-                        break;
-                    case EmailSwipeAction.SwipeAction.MoveToFolder:
-                        if(SwipeActionAllowed(item.Action, selectedDocument, folder)) { 
-                            alertController.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"),
-                                UIAlertActionStyle.Default,
-                                a =>
-                                {
-                                    MoveToFolder(selectedDocument);
-                                    EndEditing();
-                                }));
-                        }
-                        break;
-                    case EmailSwipeAction.SwipeAction.SetPriority:
-                        alertController.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"), UIAlertActionStyle.Default, a => ShowPriorityActionSheet(selectedDocument, TableView, TableView.CellAt(indexPath))));
+            alertController.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"), UIAlertActionStyle.Default, a => ShowPriorityActionSheet(selectedDocument, TableView, TableView.CellAt(indexPath))));
 
-                        break;
-                    case EmailSwipeAction.SwipeAction.RemoveFromFolder:
-                        if (SwipeActionAllowed(item.Action, selectedDocument, folder))
-                        {
-                            alertController.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, a => RemoveFromFolder(selectedDocument, d)));
-                        }
-                        break;
+            if (folder.InternalType == FolderInternalType.FilterView || folder.InternalType == FolderInternalType.Static || folder.InternalType == FolderInternalType.Worktray)
+                alertController.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, a => RemoveFromFolder(selectedDocument, d)));
 
-                }
-            }
+            if (ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || selectedDocument.Direction == DocumentDirection.Draft)
+                alertController.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedDocument, d)));
 
             alertController.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
+
             if (alertController.PopoverPresentationController != null)
                 alertController.PopoverPresentationController.Delegate = d;
 
@@ -1359,6 +1312,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return Items.Count;
             }
 
+            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
+            {
+                if (loading || Empty)
+                    return false;
+
+                return true;
+            }
+
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
                 if (tableView.Editing)
@@ -1366,14 +1327,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var dp = Items[indexPath.Row];
                 viewControllerWeakReference.Unwrap()?.DocumentSelected(dp);
-            }
-
-            public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
-            {
-                if (loading || Empty)
-                    return false;
-
-                return true;
             }
 
             public void PrependItems(IEnumerable<DocumentPreview> documentPreviews)

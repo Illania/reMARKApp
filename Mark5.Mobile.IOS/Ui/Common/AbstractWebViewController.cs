@@ -169,7 +169,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             if (desiredHeaderHeight < 1)
                 return;
 
-            SetHeaderPadding(desiredHeaderHeight);
+            SetHeaderPadding(desiredHeaderHeight / webView.ScrollView.ZoomScale);
         }
 
         protected override void Recycle()
@@ -200,7 +200,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
             webViewProgressView?.RemoveFromSuperview();
             loadIndicatorView?.RemoveFromSuperview();
             headerContainerView?.RemoveFromSuperview();
-            webView?.RemoveFromSuperview();
+            //webView?.RemoveFromSuperview(); //TODO This has been commented out to avoid eventual crashes 
+            // Github link: https://github.com/xamarin/xamarin-macios/issues/4130#issuecomment-399243880
 
             webViewProgressView = null;
             loadIndicatorView = null;
@@ -220,7 +221,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         protected void HeaderView_EndAnimating(object sender, EventArgs e) => headerAnimationRunning = false;
 
-        protected void HeaderView_Animating(object sender, EventArgs e) => SetHeaderPadding(headerView.Layer.PresentationLayer.Frame.Height);
+        protected void HeaderView_Animating(object sender, EventArgs e) => SetHeaderPadding(headerView.Layer.PresentationLayer.Frame.Height / webView.ScrollView.ZoomScale);
 
         protected void SetHeaderView(UIView headerView)
         {
@@ -432,7 +433,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             var html = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/plain", "html"));
             var htmlDocument = new HtmlDocument();
             htmlDocument.LoadHtml(html);
-            var preNode = htmlDocument.DocumentNode.SelectSingleNode("//div[@id='plaintext']");
+            var preNode = htmlDocument.DocumentNode.SelectSingleNode("//pre[@id='plaintext']");
             preNode.InnerHtml = text;
 
             if (config.MakeEditable)
