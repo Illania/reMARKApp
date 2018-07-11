@@ -2,6 +2,7 @@
 using Android.Content;
 using Android.Support.V7.Preferences;
 using Android.Webkit;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Mark5.Mobile.Droid.Utilities
@@ -9,15 +10,6 @@ namespace Mark5.Mobile.Droid.Utilities
     public static class OnBoardingUtilities
     {
         const string appVersionKey = "latestAppVersionKey";
-
-        public static void SaveAppVersionCode(Context context)
-        {
-            var currentVersionCode = context.PackageManager.GetPackageInfo(context.PackageName, 0).VersionCode;
-            var prefManager = PreferenceManager.GetDefaultSharedPreferences(context);
-            var editor = prefManager.Edit();
-            editor.PutInt(appVersionKey, currentVersionCode);
-            editor.Commit();
-        }
 
         public static void ShowOnBoardingIfNecessary(Context context)
         {
@@ -27,10 +19,16 @@ namespace Mark5.Mobile.Droid.Utilities
 
                 var currentVersionCode = context.PackageManager.GetPackageInfo(context.PackageName, 0).VersionCode;
                 var webView = new WebView(context);
-                string changeloghtml = "";
+                var changelogPath = "changelogs/changelog_" + currentVersionCode + ".html";
+                var changeloghtml = "";
+
+                var changelogs = new List<string>(context.Assets.List("changelogs"));
+
+                if (!changelogs.Contains(currentVersionCode + ".html"))
+                    return;
 
                 //TODO: Add proper chagelog.
-                using (var sr = new StreamReader(context.Assets.Open("changelogs/changelog_" + currentVersionCode + ".html")))
+                using (var sr = new StreamReader(context.Assets.Open(changelogPath)))
                     changeloghtml = sr.ReadToEnd();
 
                 webView.LoadDataWithBaseURL(null, changeloghtml, "text/html", "UTF-8", null);
@@ -54,6 +52,15 @@ namespace Mark5.Mobile.Droid.Utilities
             var storedVersionCode = PreferenceManager.GetDefaultSharedPreferences(context).GetInt(appVersionKey, 0);
 
             return currentVersionCode > storedVersionCode;
+        }
+
+        static void SaveAppVersionCode(Context context)
+        {
+            var currentVersionCode = context.PackageManager.GetPackageInfo(context.PackageName, 0).VersionCode;
+            var prefManager = PreferenceManager.GetDefaultSharedPreferences(context);
+            var editor = prefManager.Edit();
+            editor.PutInt(appVersionKey, currentVersionCode);
+            editor.Commit();
         }
     }
 }

@@ -75,7 +75,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             try
             {
-                OnBoardingUtilities.TryShowingOnBoardingDialog(this);
+                OnBoardingUtilities.ShowOnBoardingIfNecessary(this);
             }
             catch (ArgumentNullException ex)
             {

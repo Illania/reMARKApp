@@ -74,8 +74,6 @@ namespace Mark5.Mobile.Droid.Ui.Common
         {
             base.OnPause();
 
-            OnBoardingUtilities.SaveAppVersionCode(this);
-
             var connectionBar = FindViewById(Resource.Id.connection_bar);
             if (connectionBar != null)
             {

@@ -187,8 +187,6 @@ namespace Mark5.Mobile.IOS
             Services.DocumentsDownloadService?.Stop();
 
             LocalAuthenticationManager.NotifyApplicationEnteredBackground();
-
-            OnBoardingUtilities.SaveAppVersionCode();
         }
 
         public override void ReceiveMemoryWarning(UIApplication application)
