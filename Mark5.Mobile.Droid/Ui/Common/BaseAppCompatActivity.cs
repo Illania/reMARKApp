@@ -74,6 +74,8 @@ namespace Mark5.Mobile.Droid.Ui.Common
         {
             base.OnPause();
 
+            OnBoardingUtilities.SaveAppVersionCode(this);
+
             var connectionBar = FindViewById(Resource.Id.connection_bar);
             if (connectionBar != null)
             {
@@ -86,8 +88,6 @@ namespace Mark5.Mobile.Droid.Ui.Common
         protected override void OnDestroy()
         {
             base.OnDestroy();
-
-            new OnBoardingUtilities(this).SaveAppVersionCode();
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)

@@ -7,41 +7,28 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
-    public class OnBoardingUtilities
+    public static class OnBoardingUtilities
     {
         const string appVersionKey = "latestAppVersionKey";
-        readonly int currentVersionCode;
-        readonly NSUserDefaults userDefaults;
 
-        public OnBoardingUtilities()
+        public static void SaveAppVersionCode()
         {
-            userDefaults = NSUserDefaults.StandardUserDefaults;
-            currentVersionCode = Int32.Parse(NSBundle.MainBundle.InfoDictionary.ValueForKey(new NSString("CFBundleVersion")).ToString());
-        }
-
-        public void SaveAppVersionCode()
-        {
+            var userDefaults = NSUserDefaults.StandardUserDefaults;
             userDefaults.SetInt(currentVersionCode, appVersionKey);
             userDefaults.Synchronize();
         }
 
-        public void TryShowingOnBoardingDialog(UIViewController viewController)
+        public static void TryShowingOnBoardingDialog(UIViewController viewController)
         {
             if (ApplicationHasBeenUpdated())
             {
                 SaveAppVersionCode();
+
+                var currentVersionCode = Int32.Parse(NSBundle.MainBundle.InfoDictionary.ValueForKey(new NSString("CFBundleVersion")).ToString());
                 string html = "";
 
-                try
-                {
-                    //TODO: Add a proper changelog.
-                    html = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/changelogs/changelog_" + currentVersionCode, "html"));
-                }
-                catch (ArgumentNullException ex)
-                {
-                    CommonConfig.Logger.Error("There is no changelog for this version code!", ex);
-                    return;
-                }
+                //TODO: Add a proper changelog.
+                html = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/changelogs/changelog_" + currentVersionCode, "html"));
 
                 var pvc = new OnBoardingViewController
                 {
@@ -53,8 +40,10 @@ namespace Mark5.Mobile.IOS.Utilities
             }
         }
 
-        bool ApplicationHasBeenUpdated()
+        static bool ApplicationHasBeenUpdated()
         {
+            var userDefaults = NSUserDefaults.StandardUserDefaults;
+            var currentVersionCode = Int32.Parse(NSBundle.MainBundle.InfoDictionary.ValueForKey(new NSString("CFBundleVersion")).ToString());
             var storedVersionCode = userDefaults.IntForKey(appVersionKey);
 
             return currentVersionCode > storedVersionCode;

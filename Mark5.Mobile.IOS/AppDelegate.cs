@@ -188,7 +188,7 @@ namespace Mark5.Mobile.IOS
 
             LocalAuthenticationManager.NotifyApplicationEnteredBackground();
 
-            new OnBoardingUtilities().SaveAppVersionCode();
+            OnBoardingUtilities.SaveAppVersionCode();
         }
 
         public override void ReceiveMemoryWarning(UIApplication application)

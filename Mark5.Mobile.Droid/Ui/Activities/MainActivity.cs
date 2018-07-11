@@ -123,7 +123,15 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         {
             base.OnResume();
 
-            new OnBoardingUtilities(this).TryShowingOnBoardingDialog();
+            try
+            {
+                OnBoardingUtilities.ShowOnBoardingIfNecessary(this);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Error trying to show onboarding.", ex);
+                return;
+            }
 
             if (permissionsAsked)
                 return;

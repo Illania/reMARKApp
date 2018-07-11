@@ -2,53 +2,37 @@
 using Android.Content;
 using Android.Support.V7.Preferences;
 using Android.Webkit;
-using Mark5.Mobile.Common;
 using System.IO;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
-    public class OnBoardingUtilities
+    public static class OnBoardingUtilities
     {
         const string appVersionKey = "latestAppVersionKey";
-        readonly Context context;
-        readonly int currentVersionCode;
 
-        public OnBoardingUtilities(Context context)
+        public static void SaveAppVersionCode(Context context)
         {
-            this.context = context;
-            currentVersionCode = context.PackageManager.GetPackageInfo(context.PackageName, 0).VersionCode;
-        }
-
-        public void SaveAppVersionCode()
-        {
+            var currentVersionCode = context.PackageManager.GetPackageInfo(context.PackageName, 0).VersionCode;
             var prefManager = PreferenceManager.GetDefaultSharedPreferences(context);
             var editor = prefManager.Edit();
             editor.PutInt(appVersionKey, currentVersionCode);
             editor.Commit();
         }
 
-        public void TryShowingOnBoardingDialog()
+        public static void ShowOnBoardingIfNecessary(Context context)
         {
-            if (ApplicationHasBeenUpdated())
+            if (ApplicationHasBeenUpdated(context))
             {
-                SaveAppVersionCode();
+                SaveAppVersionCode(context);
 
+                var currentVersionCode = context.PackageManager.GetPackageInfo(context.PackageName, 0).VersionCode;
                 var webView = new WebView(context);
                 string changeloghtml = "";
 
-                try
-                {
-                    //TODO: Add proper chagelog.
-                    using (var sr = new StreamReader(context.Assets.Open("changelogs/changelog_" + currentVersionCode + ".html")))
-                        changeloghtml = sr.ReadToEnd();
-                }
-                catch (Java.IO.FileNotFoundException ex)
-                {
-                    CommonConfig.Logger.Error("There is no changelog for this version code!", ex);
-                    return;
-                }
+                //TODO: Add proper chagelog.
+                using (var sr = new StreamReader(context.Assets.Open("changelogs/changelog_" + currentVersionCode + ".html")))
+                    changeloghtml = sr.ReadToEnd();
 
-                webView.StopLoading();
                 webView.LoadDataWithBaseURL(null, changeloghtml, "text/html", "UTF-8", null);
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(context)
@@ -64,8 +48,9 @@ namespace Mark5.Mobile.Droid.Utilities
             }
         }
 
-        bool ApplicationHasBeenUpdated()
+        static bool ApplicationHasBeenUpdated(Context context)
         {
+            var currentVersionCode = context.PackageManager.GetPackageInfo(context.PackageName, 0).VersionCode;
             var storedVersionCode = PreferenceManager.GetDefaultSharedPreferences(context).GetInt(appVersionKey, 0);
 
             return currentVersionCode > storedVersionCode;
