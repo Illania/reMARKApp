@@ -467,7 +467,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                     shortIdTextField.LeftAnchor.ConstraintEqualTo(shortIdView.LeftAnchor,4f),
                     shortIdTextField.RightAnchor.ConstraintEqualTo(shortIdView.RightAnchor,-4f),
                     shortIdTextField.BottomAnchor.ConstraintEqualTo(shortIdView.BottomAnchor,-4f),
-                    shortIdLabel.HeightAnchor.ConstraintEqualTo(shortIdTextField.HeightAnchor,0f)
+                    shortIdLabel.HeightAnchor.ConstraintEqualTo(shortIdTextField.HeightAnchor)
                 });
 
                 AddArrangedSubview(shortIdView);
@@ -520,7 +520,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                     descriptionTextField.LeftAnchor.ConstraintEqualTo(descriptionView.LeftAnchor,4f),
                     descriptionTextField.RightAnchor.ConstraintEqualTo(descriptionView.RightAnchor,-4f),
                     descriptionTextField.BottomAnchor.ConstraintEqualTo(descriptionView.BottomAnchor,-4f),
-                    descriptionLabel.HeightAnchor.ConstraintEqualTo(descriptionTextField.HeightAnchor,0f)
+                    descriptionLabel.HeightAnchor.ConstraintEqualTo(descriptionTextField.HeightAnchor)
                 });
 
                 AddArrangedSubview(descriptionView);
@@ -574,7 +574,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                     physicalAddressTextField.LeftAnchor.ConstraintEqualTo(physicalAddressView.LeftAnchor,4f),
                     physicalAddressTextField.RightAnchor.ConstraintEqualTo(physicalAddressView.RightAnchor,-4f),
                     physicalAddressTextField.BottomAnchor.ConstraintEqualTo(physicalAddressView.BottomAnchor,-4f),
-                    physicalAddressLabel.HeightAnchor.ConstraintEqualTo(physicalAddressTextField.HeightAnchor,0f)
+                    physicalAddressLabel.HeightAnchor.ConstraintEqualTo(physicalAddressTextField.HeightAnchor)
                 });
 
                 AddArrangedSubview(physicalAddressView);
@@ -781,7 +781,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                     countryValue.LeftAnchor.ConstraintEqualTo(countryView.LeftAnchor,4f),
                     countryValue.RightAnchor.ConstraintEqualTo(countryView.RightAnchor,-4f),
                     countryValue.BottomAnchor.ConstraintEqualTo(countryView.BottomAnchor,-4f),
-                    countryLabel.HeightAnchor.ConstraintEqualTo(countryValue.HeightAnchor,0f)
+                    countryLabel.HeightAnchor.ConstraintEqualTo(countryValue.HeightAnchor)
                 });
 
                 AddArrangedSubview(countryView);
@@ -831,7 +831,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                     categoriesValue.LeftAnchor.ConstraintEqualTo(categoriesView.LeftAnchor,4f),
                     categoriesValue.RightAnchor.ConstraintEqualTo(categoriesView.RightAnchor,-4f),
                     categoriesValue.BottomAnchor.ConstraintEqualTo(categoriesView.BottomAnchor,-4f),
-                    categoriesLabel.HeightAnchor.ConstraintEqualTo(categoriesValue.HeightAnchor,0f)
+                    categoriesLabel.HeightAnchor.ConstraintEqualTo(categoriesValue.HeightAnchor)
                 });
 
                 AddArrangedSubview(categoriesView);
