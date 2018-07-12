@@ -222,8 +222,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 commentTextScrollView.LeftAnchor.ConstraintEqualTo(commentView.LeftAnchor,7f),
                 commentTextScrollView.RightAnchor.ConstraintEqualTo(addCommentButton.LeftAnchor,-7f),
                 commentTextScrollView.BottomAnchor.ConstraintEqualTo(commentView.BottomAnchor,-7f),
-                commentTextScrollView.HeightAnchor.ConstraintGreaterThanOrEqualTo(null),
-                commentTextScrollViewHeightConstraint = commentTextScrollView.HeightAnchor.ConstraintEqualTo(null),
+                commentTextScrollView.HeightAnchor.ConstraintGreaterThanOrEqualTo(0f),
+                commentTextScrollViewHeightConstraint = commentTextScrollView.HeightAnchor.ConstraintEqualTo(0f),
                    
                 addCommentButton.RightAnchor.ConstraintEqualTo(commentView.RightAnchor,-7f),
                 addCommentButton.CenterYAnchor.ConstraintEqualTo(commentTextScrollView.CenterYAnchor)
