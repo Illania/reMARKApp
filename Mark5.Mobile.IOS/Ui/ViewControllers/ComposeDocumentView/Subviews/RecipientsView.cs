@@ -131,7 +131,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             {
                 TextView.TopAnchor.ConstraintEqualTo(ContainerView.TopAnchor, VerticalMargin),
                 TextView.LeftAnchor.ConstraintEqualTo(Label.RightAnchor, InnerMargin),
-                TextView.BottomAnchor.ConstraintEqualTo(ContainerView.BottomAnchor, -VerticalMargin)
+                TextView.BottomAnchor.ConstraintEqualTo(ContainerView.BottomAnchor, -VerticalMargin),
                 rightConstraint,
             });
 
