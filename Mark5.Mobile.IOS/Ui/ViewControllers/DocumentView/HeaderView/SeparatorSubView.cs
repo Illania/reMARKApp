@@ -25,11 +25,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             AddSubview(line);
             var constraints = new[]
             {
-                NSLayoutConstraint.Create(line, NSLayoutAttribute.Top, NSLayoutRelation.Equal, this, NSLayoutAttribute.Top, 1f, SeparatorVerticalMargin),
-                NSLayoutConstraint.Create(line, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(line, NSLayoutAttribute.Right, NSLayoutRelation.Equal, this, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(line, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, this, NSLayoutAttribute.Bottom, 1f, -SeparatorVerticalMargin),
-                NSLayoutConstraint.Create(line, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 1f),
+                line.TopAnchor.ConstraintEqualTo(this.TopAnchor, SeparatorVerticalMargin),
+                line.LeftAnchor.ConstraintEqualTo(this.LeftAnchor),
+                line.RightAnchor.ConstraintEqualTo(this.RightAnchor),
+                line.BottomAnchor.ConstraintEqualTo(this.BottomAnchor, -SeparatorVerticalMargin),
+                line.HeightAnchor.ConstraintEqualTo(1f)
             };
             foreach (var constraint in constraints)
                 constraint.Priority = 500;

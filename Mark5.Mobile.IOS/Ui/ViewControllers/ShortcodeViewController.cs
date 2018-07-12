@@ -167,10 +167,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             headerView.AddSubview(nameLabel);
             headerView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(nameLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.Top, 1f, 10f),
-                NSLayoutConstraint.Create(nameLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(nameLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(nameLabel, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 25f)
+                nameLabel.TopAnchor.ConstraintEqualTo(headerView.TopAnchor, 10f),
+                nameLabel.LeftAnchor.ConstraintEqualTo(headerView.LeftAnchor),
+                nameLabel.RightAnchor.ConstraintEqualTo(headerView.RightAnchor),
+                nameLabel.HeightAnchor.ConstraintEqualTo(25f)
             });
 
             var buttonsView = new UIView
@@ -180,8 +180,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             headerView.AddSubview(buttonsView);
             headerView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(buttonsView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, nameLabel, NSLayoutAttribute.Bottom, 1f, 35f),
-                NSLayoutConstraint.Create(buttonsView, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.CenterX, 1f, 0f)
+                buttonsView.TopAnchor.ConstraintEqualTo(nameLabel.BottomAnchor, 35f),
+                buttonsView.CenterXAnchor.ConstraintEqualTo(headerView.CenterXAnchor)
             });
 
             button1 = new UIButton
@@ -195,12 +195,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             buttonsView.AddSubview(button1);
             buttonsView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(button1, NSLayoutAttribute.Top, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(button1, NSLayoutAttribute.Left, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(button1, NSLayoutAttribute.Right, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(button1, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Bottom, 1f, 0f),
-                NSLayoutConstraint.Create(button1, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 60),
-                NSLayoutConstraint.Create(button1, NSLayoutAttribute.Width, NSLayoutRelation.Equal, 1f, 40f)
+                button1.TopAnchor.ConstraintEqualTo(button1.TopAnchor),
+                button1.LeftAnchor.ConstraintEqualTo(button1.LeftAnchor),
+                button1.RightAnchor.ConstraintEqualTo(button1.RightAnchor),
+                button1.BottomAnchor.ConstraintEqualTo(button1.BottomAnchor),
+                button1.HeightAnchor.ConstraintEqualTo(60f),
+                button1.WidthAnchor.ConstraintEqualTo(40f)
             });
 
             TableView.TableHeaderView = headerView;
