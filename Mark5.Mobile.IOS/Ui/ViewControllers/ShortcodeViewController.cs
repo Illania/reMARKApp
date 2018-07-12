@@ -195,10 +195,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             buttonsView.AddSubview(button1);
             buttonsView.AddConstraints(new[]
             {
-                button1.TopAnchor.ConstraintEqualTo(button1.TopAnchor),
-                button1.LeftAnchor.ConstraintEqualTo(button1.LeftAnchor),
-                button1.RightAnchor.ConstraintEqualTo(button1.RightAnchor),
-                button1.BottomAnchor.ConstraintEqualTo(button1.BottomAnchor),
+                button1.TopAnchor.ConstraintEqualTo(buttonsView.TopAnchor),
+                button1.LeftAnchor.ConstraintEqualTo(buttonsView.LeftAnchor),
+                button1.RightAnchor.ConstraintEqualTo(buttonsView.RightAnchor),
+                button1.BottomAnchor.ConstraintEqualTo(buttonsView.BottomAnchor),
                 button1.HeightAnchor.ConstraintEqualTo(60f),
                 button1.WidthAnchor.ConstraintEqualTo(40f)
             });
