@@ -24,10 +24,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
             ContainerView.AddSubview(subjectLabel);
             ContainerView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(subjectLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
-                NSLayoutConstraint.Create(subjectLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin),
-                NSLayoutConstraint.Create(subjectLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin),
-                NSLayoutConstraint.Create(subjectLabel, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -5f)
+                subjectLabel.TopAnchor.ConstraintEqualTo(ContainerView.TopAnchor, VerticalMargin),
+                subjectLabel.LeftAnchor.ConstraintEqualTo(ContainerView.LeftAnchor, HorizontalMargin),
+                subjectLabel.RightAnchor.ConstraintEqualTo(ContainerView.RightAnchor, -HorizontalMargin),
+                subjectLabel.BottomAnchor.ConstraintEqualTo(ContainerView.BottomAnchor, -5f)
             });
         }
 

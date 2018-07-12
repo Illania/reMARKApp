@@ -61,13 +61,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 BackgroundColor = Theme.Clear,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
-            spaceHeightConstraint = NSLayoutConstraint.Create(spaceView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 1f);
+            spaceHeightConstraint = spaceView.HeightAnchor.ConstraintEqualTo(1f);
+               
             AddSubview(spaceView);
             AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(spaceView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, this, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(spaceView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(spaceView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, this, NSLayoutAttribute.Right, 1f, 0f),
+                spaceView.TopAnchor.ConstraintEqualTo(this.TopAnchor),
+                spaceView.LeftAnchor.ConstraintEqualTo(this.LeftAnchor),
+                spaceView.RightAnchor.ConstraintEqualTo(this.RightAnchor),
                 spaceHeightConstraint
             });
 
@@ -78,10 +79,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             AddSubview(suggestionsTextView);
             AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(suggestionsTextView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, spaceView, NSLayoutAttribute.Bottom, 1f, 0f),
-                NSLayoutConstraint.Create(suggestionsTextView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(suggestionsTextView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, this, NSLayoutAttribute.Width, 1f, 0f),
-                NSLayoutConstraint.Create(suggestionsTextView, NSLayoutAttribute.Height, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1f, 20f)
+                suggestionsTextView.TopAnchor.ConstraintEqualTo(spaceView.BottomAnchor),
+                suggestionsTextView.LeftAnchor.ConstraintEqualTo(this.LeftAnchor),
+                suggestionsTextView.WidthAnchor.ConstraintEqualTo(this.WidthAnchor),
+                suggestionsTextView.HeightAnchor.ConstraintGreaterThanOrEqualTo(20f)
             });
 
             suggestionsTextView.SearchRequested += (sender, e) => DoSearch(e);
@@ -95,10 +96,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             AddSubview(separator);
             AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(separator, NSLayoutAttribute.Top, NSLayoutRelation.Equal, suggestionsTextView, NSLayoutAttribute.Bottom, 1f, 0f),
-                NSLayoutConstraint.Create(separator, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(separator, NSLayoutAttribute.Width, NSLayoutRelation.Equal, this, NSLayoutAttribute.Width, 1f, 0f),
-                NSLayoutConstraint.Create(separator, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 1f)
+                separator.TopAnchor.ConstraintEqualTo(suggestionsTextView.BottomAnchor),
+                separator.LeftAnchor.ConstraintEqualTo(this.LeftAnchor),
+                separator.WidthAnchor.ConstraintEqualTo(this.WidthAnchor),
+                separator.HeightAnchor.ConstraintEqualTo(1f)
             });
         }
 
@@ -114,10 +115,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             AddSubview(suggestionsTableView);
             AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(suggestionsTableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, separator, NSLayoutAttribute.Bottom, 1f, 0f),
-                NSLayoutConstraint.Create(suggestionsTableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(suggestionsTableView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, this, NSLayoutAttribute.Width, 1f, 0f),
-                NSLayoutConstraint.Create(suggestionsTableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, this, NSLayoutAttribute.Bottom, 1f, 0f)
+                suggestionsTableView.TopAnchor.ConstraintEqualTo(separator.BottomAnchor),
+                suggestionsTableView.LeftAnchor.ConstraintEqualTo(this.LeftAnchor),
+                suggestionsTableView.WidthAnchor.ConstraintEqualTo(this.WidthAnchor),
+                suggestionsTableView.BottomAnchor.ConstraintEqualTo(this.BottomAnchor)
             });
         }
 

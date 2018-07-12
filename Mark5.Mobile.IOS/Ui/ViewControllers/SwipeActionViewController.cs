@@ -101,11 +101,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (Integration.IsIPad())
             {
-                scrollView.AddConstraint(NSLayoutConstraint.Create(topLabel, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, scrollView.ReadableContentGuide, NSLayoutAttribute.Leading, 1f, 0f));
+                scrollView.AddConstraint(topLabel.LeadingAnchor.ConstraintEqualTo(scrollView.ReadableContentGuide.LeadingAnchor)));
             }
             else
             {
-                scrollView.AddConstraint(NSLayoutConstraint.Create(topLabel, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, scrollView.ReadableContentGuide, NSLayoutAttribute.Leading, 2f, 0f));
+                scrollView.AddConstraint(topLabel.LeadingAnchor.ConstraintEqualTo(2f*scrollView.ReadableContentGuide.Leading)));
             }
 
             scrollView.AddConstraints(new[]
@@ -147,11 +147,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (Integration.IsIPad())
             {
-                scrollView.AddConstraint(NSLayoutConstraint.Create(content, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, scrollView.ReadableContentGuide, NSLayoutAttribute.Leading, 1f, 0f));
+                scrollView.AddConstraint(content.LeadingAnchor.ConstraintEqualTo(scrollView.ReadableContentGuide.LeadingAnchor)));
             }
             else
             {
-                scrollView.AddConstraint(NSLayoutConstraint.Create(content, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, scrollView.ReadableContentGuide, NSLayoutAttribute.Leading, 2f, 0f));
+                scrollView.AddConstraint(content.LeadingAnchor.ConstraintEqualTo(2f*scrollView.ReadableContentGuide.LeadingAnchor)));
             }
 
             scrollView.AddConstraints(new[]
