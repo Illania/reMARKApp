@@ -914,25 +914,40 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 var localFolders = new List<Folder>();
                 await Task.Run(() => SearchRecursively(root, searchText, localFolders, cancellationToken));
 
-                try {
-                #pragma warning disable CS4014 // we dont want to await this call
-                    Task.Run(async () => {
-                        if (cancellationToken.IsCancellationRequested)
-                            return;
-                        var remoteFolders = await Managers.FoldersManager.SearchFolders(searchText);
-                        dataSource?.SetFolders(remoteFolders, searchText);
-                        await RefreshSearchFoldersInfo();
-                    });
-                #pragma warning restore CS4014 
-                } catch (Exception ex) {
-                    CommonConfig.Logger.Error(ex);
-                }
+                SearchRemoteFolders(searchText,cancellationToken);
 
                 if (cancellationToken.IsCancellationRequested)
                     return;
                 
                 dataSource?.SetFolders(localFolders,searchText);
                 await RefreshSearchFoldersInfo();
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error(ex);
+            }
+        }
+
+        void SearchRemoteFolders(string searchText, CancellationToken cancellationToken) {
+            try
+            {
+                #pragma warning disable CS4014 // we dont want to await this call
+                Task.Run(async () => {
+                    if (cancellationToken.IsCancellationRequested)
+                        return;
+
+                    var remoteFolders = await Managers.FoldersManager.SearchFolders(searchText);
+
+                    var tableViewController = searchController?.SearchResultsController as UITableViewController;
+                    var dataSource = tableViewController?.TableView?.Source as SearchDataSource;
+
+                    if (cancellationToken.IsCancellationRequested)
+                        return;
+                    
+                    dataSource?.SetFolders(remoteFolders, searchText);
+                    await RefreshSearchFoldersInfo();
+                });
+                #pragma warning restore CS4014
             }
             catch (Exception ex)
             {
