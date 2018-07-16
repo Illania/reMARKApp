@@ -46,15 +46,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 compactConstraint = mainView.HeightAnchor.ConstraintEqualTo(Integration.IsIPhone() ? UIScreen.MainScreen.Bounds.Height - 50f : 600f);
             else
                 compactConstraint = mainView.HeightAnchor.ConstraintEqualTo(Integration.IsIPhone() ? UIScreen.MainScreen.Bounds.Width - 50f : 600f);
-                
+
             regularConstraint = mainView.HeightAnchor.ConstraintEqualTo(Integration.IsIPhone() ? 500f : 600f);
 
             View.AddConstraints(sharedConstraints);
             View.AddConstraint(regularConstraint);
 
-            if(Integration.IsIPhone())
+            if (Integration.IsIPhone())
                 View.AddConstraint(compactConstraint);
-            
+
             titleTextView = new UITextView
             {
                 UserInteractionEnabled = false,
@@ -103,6 +103,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             webView.ScrollView.Delegate = this;
             webView.ScrollView.ScrollEnabled = true;
             webView.ScrollView.KeyboardDismissMode = UIScrollViewKeyboardDismissMode.None;
+            webView.ScrollView.ShowsVerticalScrollIndicator = true;
 
             mainView.Add(webView);
 

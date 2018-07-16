@@ -73,15 +73,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             base.ViewDidAppear(animated);
 
-            try
-            {
-                OnBoardingUtilities.ShowOnBoardingIfNecessary(this);
-            }
-            catch (ArgumentNullException ex)
-            {
-                CommonConfig.Logger.Error("An error occured when showing onboarding.", ex);
-                return;
-            }
+            OnBoardingUtilities.ShowOnBoardingIfNecessary(this);
 
             CheckAutoSavedDocument();
         }

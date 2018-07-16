@@ -835,7 +835,7 @@
     <AndroidAsset Include="Assets\plain.html" />
     <AndroidAsset Include="Assets\replyHeader.html" />
     <AndroidAsset Include="Assets\editorScript.js" />
-    <AndroidAsset Include="Assets\changelogs\changelog_220.html" />
+    <AndroidAsset Include="Assets\changelogs\changelog_2.6.html" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Import Project="..\packages\NETStandard.Library.2.0.1\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.1\build\netstandard2.0\NETStandard.Library.targets')" />
