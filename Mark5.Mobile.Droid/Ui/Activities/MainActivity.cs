@@ -123,20 +123,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         {
             base.OnResume();
 
-            try
-            {
-                OnBoardingUtilities.ShowOnBoardingIfNecessary(this);
-            }
-            catch (Exception ex)
-            {
-                CommonConfig.Logger.Error("Error trying to show onboarding.", ex);
-                return;
-            }
+            OnBoardingUtilities.ShowOnBoardingIfNecessary(this);
 
             if (permissionsAsked)
                 return;
 
-            if (Build.VERSION.SdkInt >= BuildVersionCodes.M && (ContextCompat.CheckSelfPermission(this, Manifest.Permission.ReadContacts) != Permission.Granted || ContextCompat.CheckSelfPermission(this, Manifest.Permission.ReadExternalStorage) != Permission.Granted 
+            if (Build.VERSION.SdkInt >= BuildVersionCodes.M && (ContextCompat.CheckSelfPermission(this, Manifest.Permission.ReadContacts) != Permission.Granted || ContextCompat.CheckSelfPermission(this, Manifest.Permission.ReadExternalStorage) != Permission.Granted
                                                                 || ContextCompat.CheckSelfPermission(this, Manifest.Permission.ReadPhoneState) != Permission.Granted))
             {
                 Action permissionRequestAction = () =>
@@ -146,12 +138,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                         {
                             Manifest.Permission.ReadExternalStorage,
                             Manifest.Permission.ReadContacts,
-                            Manifest.Permission.ReadPhoneState  
+                            Manifest.Permission.ReadPhoneState
                         },
                         769);
 #pragma warning restore XA0001 // Find issues with Android API usage
                 };
-                
+
 
                 var snackbar = Snackbar.Make(coordinatorLayout, Resource.String.permissions_snackbar_text, Snackbar.LengthIndefinite).SetAction(Resource.String.permissions_snackbar_action, v => permissionRequestAction());
 

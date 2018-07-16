@@ -7,7 +7,7 @@
 	<key>CFBundleName</key>
 	<string>MARK5</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.nordic-it.mark5.mobile.ios.extensions.callid</string>
+	<string>com.nordic-it.mark5.mobile.ios.callid</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleInfoDictionaryVersion</key>

@@ -83,11 +83,6 @@ namespace Mark5.Mobile.Droid.Ui.Common
             }
         }
 
-        protected override void OnDestroy()
-        {
-            base.OnDestroy();
-        }
-
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
             if (item.ItemId == Android.Resource.Id.Home)
