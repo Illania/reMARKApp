@@ -101,7 +101,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (Integration.IsIPad())
             {
-                scrollView.AddConstraint(NSLayoutConstraint.Create(topLabel, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, scrollView.ReadableContentGuide, NSLayoutAttribute.Leading, 1f, 0f));
+                scrollView.AddConstraint(topLabel.LeadingAnchor.ConstraintEqualTo(scrollView.ReadableContentGuide.LeadingAnchor));
             }
             else
             {
@@ -147,7 +147,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (Integration.IsIPad())
             {
-                scrollView.AddConstraint(NSLayoutConstraint.Create(content, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, scrollView.ReadableContentGuide, NSLayoutAttribute.Leading, 1f, 0f));
+                scrollView.AddConstraint(content.LeadingAnchor.ConstraintEqualTo(scrollView.ReadableContentGuide.LeadingAnchor));
             }
             else
             {

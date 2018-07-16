@@ -575,10 +575,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 View.AddSubview(suggestionsListView);
                 View.AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(suggestionsListView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
-                    NSLayoutConstraint.Create(suggestionsListView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                    NSLayoutConstraint.Create(suggestionsListView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
-                    NSLayoutConstraint.Create(suggestionsListView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f)
+                    suggestionsListView.TopAnchor.ConstraintEqualTo(View.TopAnchor),
+                    suggestionsListView.LeftAnchor.ConstraintEqualTo(View.LeftAnchor),
+                    suggestionsListView.RightAnchor.ConstraintEqualTo(View.RightAnchor),
+                    suggestionsListView.BottomAnchor.ConstraintEqualTo(View.BottomAnchor)
                 });
 
                 View.SendSubviewToBack(suggestionsListView);

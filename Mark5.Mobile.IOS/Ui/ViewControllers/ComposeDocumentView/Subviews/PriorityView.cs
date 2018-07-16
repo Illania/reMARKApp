@@ -45,8 +45,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             ContainerView.AddSubview(label);
             ContainerView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(label, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
-                NSLayoutConstraint.Create(label, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin)
+                label.TopAnchor.ConstraintEqualTo(ContainerView.TopAnchor, VerticalMargin),
+                label.LeftAnchor.ConstraintEqualTo(ContainerView.LeftAnchor, HorizontalMargin)
             });
 
             selectedPriorityLabel = new UILabel
@@ -63,10 +63,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             ContainerView.AddSubview(selectedPriorityLabel);
             ContainerView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(selectedPriorityLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
-                NSLayoutConstraint.Create(selectedPriorityLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, label, NSLayoutAttribute.Right, 1f, InnerMargin),
-                NSLayoutConstraint.Create(selectedPriorityLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin),
-                NSLayoutConstraint.Create(selectedPriorityLabel, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -VerticalMargin)
+                selectedPriorityLabel.TopAnchor.ConstraintEqualTo(ContainerView.TopAnchor, VerticalMargin),
+                selectedPriorityLabel.LeftAnchor.ConstraintEqualTo(label.RightAnchor, InnerMargin),
+                selectedPriorityLabel.RightAnchor.ConstraintEqualTo(ContainerView.RightAnchor, -HorizontalMargin),
+                selectedPriorityLabel.BottomAnchor.ConstraintEqualTo(ContainerView.BottomAnchor, -VerticalMargin)
             });
         }
 

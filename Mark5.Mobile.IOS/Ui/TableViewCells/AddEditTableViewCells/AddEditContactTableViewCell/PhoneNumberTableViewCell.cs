@@ -73,7 +73,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
             };
             prefixTextField.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             ContentView.Add(prefixTextField);
-            prefixWidthConstraint = NSLayoutConstraint.Create(prefixTextField, NSLayoutAttribute.Width, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1f, 0.0f);
+            prefixWidthConstraint = prefixTextField.WidthAnchor.ConstraintGreaterThanOrEqualTo(0.0f);
 
             chevronButton = GetChevron();
             chevronButton.TranslatesAutoresizingMaskIntoConstraints = false;

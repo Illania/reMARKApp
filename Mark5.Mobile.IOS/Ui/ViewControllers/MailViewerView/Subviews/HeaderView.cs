@@ -72,10 +72,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
             AddSubview(contentView);
             AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, this, NSLayoutAttribute.Top, 1f, ExternalVerticalMargin),
-                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, this, NSLayoutAttribute.Left, 1f, 0),
-                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, this, NSLayoutAttribute.Right, 1f, 0),
-                NSLayoutConstraint.Create(contentView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, this, NSLayoutAttribute.Bottom, 1f, 0f)
+                contentView.TopAnchor.ConstraintEqualTo(this.TopAnchor,ExternalVerticalMargin),
+                contentView.LeftAnchor.ConstraintEqualTo(this.LeftAnchor),
+                contentView.RightAnchor.ConstraintEqualTo(this.RightAnchor),
+                contentView.BottomAnchor.ConstraintEqualTo(this.BottomAnchor)
             });
 
             subViews.Add(subjectView = new SubjectView());
@@ -112,8 +112,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
 
             contentView.AddConstraints(new[]
              {
-                NSLayoutConstraint.Create(bottomView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, contentView, NSLayoutAttribute.Width, 1f, 0f),
-                NSLayoutConstraint.Create(bottomView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, ExternalVerticalMargin),
+                bottomView.WidthAnchor.ConstraintEqualTo(contentView.WidthAnchor),
+                bottomView.HeightAnchor.ConstraintEqualTo(ExternalVerticalMargin)
             });
 
             hiddenViews.Add(firstSeparator);
@@ -207,35 +207,35 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
 
             compressedConstraints = new[]
             {
-                NSLayoutConstraint.Create(dateView, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, container, NSLayoutAttribute.Leading, 1f, 0f),
-                NSLayoutConstraint.Create(dateView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, container, NSLayoutAttribute.Top, 1f, VerticalMargin),
+                dateView.LeadingAnchor.ConstraintEqualTo(container.LeadingAnchor),
+                dateView.TopAnchor.ConstraintEqualTo(container.TopAnchor, VerticalMargin),
 
-                NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, container, NSLayoutAttribute.Trailing, 1f, -HorizontalMargin),
-                NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, dateView, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, dateView, NSLayoutAttribute.Trailing, 1f, 0f),
-                NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, dateView, NSLayoutAttribute.CenterY, 1f, 0f),
+                showMoreButton.TrailingAnchor.ConstraintEqualTo(container.TrailingAnchor, -HorizontalMargin),
+                showMoreButton.TopAnchor.ConstraintEqualTo(dateView.TopAnchor),
+                showMoreButton.LeadingAnchor.ConstraintEqualTo(dateView.TrailingAnchor),
+                showMoreButton.CenterYAnchor.ConstraintEqualTo(dateView.CenterYAnchor),
 
-                NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Top, NSLayoutRelation.Equal, dateView, NSLayoutAttribute.Bottom, 1f, 0f),
-                NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, container, NSLayoutAttribute.Bottom, 1f, -VerticalMargin),
-                NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, showMoreButton, NSLayoutAttribute.Trailing, 1f, 0f),
-                NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 0f),
-                NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Width, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 0f),
+                firstSeparator.TopAnchor.ConstraintEqualTo(dateView.BottomAnchor),
+                firstSeparator.BottomAnchor.ConstraintEqualTo(container.BottomAnchor, -VerticalMargin),
+                firstSeparator.TrailingAnchor.ConstraintEqualTo(showMoreButton.TrailingAnchor),
+                firstSeparator.HeightAnchor.ConstraintEqualTo(0f),
+                firstSeparator.WidthAnchor.ConstraintEqualTo(0f)
             };
 
             expandedConstraints = new[]
             {
-                NSLayoutConstraint.Create(dateView, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, container, NSLayoutAttribute.Leading, 1f, 0f),
-                NSLayoutConstraint.Create(dateView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, container, NSLayoutAttribute.Top, 1f, 0f),
+                dateView.LeadingAnchor.ConstraintEqualTo(container.LeadingAnchor),
+                dateView.TopAnchor.ConstraintEqualTo(container.TopAnchor),
 
-                NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, container, NSLayoutAttribute.Trailing, 1f, -HorizontalMargin),
-                NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, dateView, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, dateView, NSLayoutAttribute.Trailing, 1f, 0f),
-                NSLayoutConstraint.Create(showMoreButton, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, dateView, NSLayoutAttribute.CenterY, 1f, 0f),
+                showMoreButton.TrailingAnchor.ConstraintEqualTo(container.TrailingAnchor, -HorizontalMargin),
+                showMoreButton.TopAnchor.ConstraintEqualTo(dateView.TopAnchor),
+                showMoreButton.LeadingAnchor.ConstraintEqualTo(dateView.TrailingAnchor),
+                showMoreButton.CenterYAnchor.ConstraintEqualTo(dateView.CenterYAnchor),
 
-                NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Top, NSLayoutRelation.Equal, showMoreButton, NSLayoutAttribute.Bottom, 1f, 0f),
-                NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, container, NSLayoutAttribute.Bottom, 1f, -VerticalMargin),
-                NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, showMoreButton, NSLayoutAttribute.Trailing, 1f, 0f),
-                NSLayoutConstraint.Create(firstSeparator, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, container, NSLayoutAttribute.Leading, 1f, 0f),
+                firstSeparator.TopAnchor.ConstraintEqualTo(showMoreButton.BottomAnchor),
+                firstSeparator.BottomAnchor.ConstraintEqualTo(container.BottomAnchor, -VerticalMargin),
+                firstSeparator.TrailingAnchor.ConstraintEqualTo(showMoreButton.TrailingAnchor),
+                firstSeparator.LeadingAnchor.ConstraintEqualTo(container.LeadingAnchor)
             };
 
             container.AddConstraints(compressedConstraints);
