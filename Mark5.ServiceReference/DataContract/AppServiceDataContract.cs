@@ -67,6 +67,23 @@ namespace Mark5.ServiceReference.DataContract
         public List<Folder> Folders { get; set; } = new List<Folder>();
     }
 
+    [DataContract(Name = "SearchFoldersParameters", Namespace = "com.nordic-it.appservice.v3")]
+    public class SearchFoldersParameters : AbstractParameters
+    {
+        [DataMember(Name = "Name", Order = 0)]
+        public string Name { get; set; }
+
+        [DataMember(Name = "ModuleType", Order = 0)]
+        public ModuleType ModuleType { get; set; }
+    }
+
+    [DataContract(Name = "SearchFoldersResult", Namespace = "com.nordic-it.appservice.v3")]
+    public class SearchFoldersResult 
+    {
+        [DataMember(Name = "Folders", Order = 0)]
+        public List<Folder> Folders { get; set; } = new List<Folder>();
+    }
+
     [DataContract(Name = "Folder", Namespace = "com.nordic-it.appservice.v3", IsReference = true)]
     public class Folder
     {

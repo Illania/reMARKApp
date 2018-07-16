@@ -911,19 +911,46 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 var root = Folder.RootForModule(ParentFolder.Module);
 
-                var resultList = new List<Folder>();
-                await Task.Run(() => SearchRecursively(root, searchText, resultList, cancellationToken));
+                var localFolders = new List<Folder>();
+                await Task.Run(() => SearchRecursively(root, searchText, localFolders, cancellationToken));
+
+                SearchRemoteFolders(searchText,cancellationToken);
 
                 if (cancellationToken.IsCancellationRequested)
                     return;
-
-                dataSource?.SetFolders(resultList);
+                
+                dataSource?.SetFolders(localFolders,searchText);
                 await RefreshSearchFoldersInfo();
             }
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error(ex);
             }
+        }
+
+        void SearchRemoteFolders(string searchText, CancellationToken cancellationToken) {
+            #pragma warning disable CS4014 // we dont want to await this call
+            Task.Run(async () => {
+                try {
+                    if (cancellationToken.IsCancellationRequested)
+                        return;
+
+                    var remoteFolders = await Managers.FoldersManager.SearchFolders(searchText);
+
+                    var tableViewController = searchController?.SearchResultsController as UITableViewController;
+                    var dataSource = tableViewController?.TableView?.Source as SearchDataSource;
+
+                    if (cancellationToken.IsCancellationRequested)
+                        return;
+                    
+                    dataSource?.SetFolders(remoteFolders, searchText);
+                    await RefreshSearchFoldersInfo();
+                } catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error("Error while searching folders on the server", ex);
+                }
+            });
+            #pragma warning restore CS4014
         }
 
         void SearchRecursively(Folder folder, string searchText, List<Folder> resultList, CancellationToken ct)
@@ -1584,6 +1611,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             public bool Empty => items.Count < 1;
             public List<Folder> Items => items.ToList();
 
+            internal string searchQuery = String.Empty;
+
             readonly WeakReference<AbstractFoldersListViewController> viewControllerWeakReference;
             readonly WeakReference<UITableView> tableViewWeakReference;
             readonly List<Folder> items = new List<Folder>();
@@ -1654,12 +1683,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 viewControllerWeakReference.Unwrap()?.FolderDeselected(f);
             }
 
-            public void SetFolders(List<Folder> folders)
+            public void SetFolders(List<Folder> folders, string searchText)
             {
-                items.Clear();
-                items.AddRange(folders);
-                loading = false;
-                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                if(searchQuery.Equals(searchText)) {
+                    items.Union(folders, new FolderComparer()).ToList();
+                    tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                } else {
+                    items.Clear();
+                    items.AddRange(folders);
+                    loading = false;
+                    tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                }
+
+                searchQuery = searchText;
             }
 
             public void Reset()

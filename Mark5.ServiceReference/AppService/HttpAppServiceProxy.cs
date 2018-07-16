@@ -439,5 +439,10 @@ namespace Mark5.ServiceReference.AppService
         {
             return await InvokeAsync<TestResult, TestParameters>("Test", parameters, ct, true);
         }
+
+        public async Task<SearchFoldersResult> SearchFolders(SearchFoldersParameters parameters, CancellationToken ct = default(CancellationToken))
+        {
+            return await InvokeAsync<SearchFoldersResult, SearchFoldersParameters>("SearchFolders", parameters, ct, true);
+        }
     }
 }
