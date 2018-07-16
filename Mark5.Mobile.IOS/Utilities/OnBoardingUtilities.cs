@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using Foundation;
 using Mark5.Mobile.Common;
