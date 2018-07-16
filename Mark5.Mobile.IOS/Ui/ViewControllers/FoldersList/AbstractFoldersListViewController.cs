@@ -929,10 +929,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         }
 
         void SearchRemoteFolders(string searchText, CancellationToken cancellationToken) {
-            try
-            {
-                #pragma warning disable CS4014 // we dont want to await this call
-                Task.Run(async () => {
+            #pragma warning disable CS4014 // we dont want to await this call
+            Task.Run(async () => {
+                try {
                     if (cancellationToken.IsCancellationRequested)
                         return;
 
@@ -946,13 +945,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     
                     dataSource?.SetFolders(remoteFolders, searchText);
                     await RefreshSearchFoldersInfo();
-                });
-                #pragma warning restore CS4014
-            }
-            catch (Exception ex)
-            {
-                CommonConfig.Logger.Error(ex);
-            }
+                } catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error("Error while searching folders on the server", ex);
+                }
+            });
+            #pragma warning restore CS4014
         }
 
         void SearchRecursively(Folder folder, string searchText, List<Folder> resultList, CancellationToken ct)
