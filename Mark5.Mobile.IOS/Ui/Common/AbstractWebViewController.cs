@@ -72,7 +72,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 Preferences = preferences,
                 UserContentController = userContentController,
                 DataDetectorTypes = WKDataDetectorTypes.All,
-                WebsiteDataStore = WKWebsiteDataStore.NonPersistentDataStore
+                WebsiteDataStore = WKWebsiteDataStore.NonPersistentDataStore,
+                SelectionGranularity = WKSelectionGranularity.Character
             };
 
             webView = new WKWebView(CGRect.Empty, configuration)
@@ -420,6 +421,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 sw.Restart();
             }
 
+            await InjectOverflowCorrection(htmlDocument);
+
             sw.Stop();
 
             return htmlDocument.DocumentNode.OuterHtml;
@@ -443,6 +446,20 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 await InjectReplyHeader(htmlDocument, config.ReplyHeaderParameters);
 
             return htmlDocument.DocumentNode.OuterHtml;
+        }
+
+        Task InjectOverflowCorrection(HtmlDocument html)
+        { 
+            return Task.Run(() =>
+            {
+                var body = html.DocumentNode.SelectSingleNode("//html");
+                if (body == null)
+                    return null;
+
+                body.SetAttributeValue("style", "overflow:hidden;");
+
+                return html;
+            });
         }
 
         Task<string> MakeHtmlSafe(string html)
