@@ -452,11 +452,11 @@ namespace Mark5.Mobile.IOS.Ui.Common
         { 
             return Task.Run(() =>
             {
-                var body = html.DocumentNode.SelectSingleNode("//html");
-                if (body == null)
+                var htmlNode = html.DocumentNode.SelectSingleNode("//html");
+                if (htmlNode == null)
                     return null;
 
-                body.SetAttributeValue("style", "overflow:hidden;");
+                htmlNode.SetAttributeValue("style", "overflow:hidden;");
 
                 return html;
             });
@@ -529,6 +529,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 viewportElement.SetAttributeValue("id", "viewport");
                 viewportElement.SetAttributeValue("name", "viewport");
                 viewportElement.SetAttributeValue("content", "initial-scale=1, minimum-scale=0.75, maximum-scale=1.25, user-scalable=yes");
+
                 headNode.PrependChild(viewportElement);
             });
         }
