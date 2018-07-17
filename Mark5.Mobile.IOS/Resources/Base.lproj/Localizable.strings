@@ -381,6 +381,7 @@
 "warning_selfsigned_on" = "Self signed certificates will be accepted. Please be aware that this lowers security of communication between MARK5 server and your device.";
 "warning_ssl_off" = "SSL is disabled. Please be aware that all the communication between your device and MARK5 server will not be secure.";
 "webpage" = "Webpage";
+"whats_new" = "What\'s new";
 "wrong_hostname_summary" = "You need to provide valid hostname.";
 "wrong_hostname_title" = "Wrong hostname";
 "wrong_password_summary" = "You need to provide valid password.";

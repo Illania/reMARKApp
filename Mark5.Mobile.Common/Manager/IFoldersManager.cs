@@ -29,5 +29,7 @@ namespace Mark5.Mobile.Common.Manager
         Task<bool> IsSavedFolderOfflineInfo(ModuleType module, int folderId);
 
         Task<SavedOfflineFolderInfo> GetSavedFolderOfflineInfo(Folder folder);
+
+        Task<List<Folder>> SearchFolders(string searchText);
     }
 }

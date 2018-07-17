@@ -24,8 +24,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
             ContainerView.AddSubview(label);
             ContainerView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(label, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
-                NSLayoutConstraint.Create(label, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin)
+                label.TopAnchor.ConstraintEqualTo(ContainerView.TopAnchor, VerticalMargin),
+                label.LeftAnchor.ConstraintEqualTo(ContainerView.LeftAnchor, HorizontalMargin)
             });
 
             textView = new UITextView
@@ -44,10 +44,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
             ContainerView.AddSubview(textView);
             ContainerView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(textView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
-                NSLayoutConstraint.Create(textView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, label, NSLayoutAttribute.Right, 1f, InnerMargin),
-                NSLayoutConstraint.Create(textView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1f, -HorizontalMargin),
-                NSLayoutConstraint.Create(textView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -VerticalMargin)
+                textView.TopAnchor.ConstraintEqualTo(ContainerView.TopAnchor, VerticalMargin),
+                textView.LeftAnchor.ConstraintEqualTo(label.RightAnchor, InnerMargin),
+                textView.RightAnchor.ConstraintEqualTo(ContainerView.RightAnchor, -HorizontalMargin),
+                textView.BottomAnchor.ConstraintEqualTo(ContainerView.BottomAnchor, -VerticalMargin)
             });
         }
 

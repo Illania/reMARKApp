@@ -328,18 +328,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 mainView.Add(valueTextField);
                 mainView.AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(icon, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Bottom, 1f, -8f),
-                    NSLayoutConstraint.Create(icon, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Left, 1f, 8f),
-                    NSLayoutConstraint.Create(icon, NSLayoutAttribute.Width, NSLayoutRelation.Equal, 1f, 15f),
-                    NSLayoutConstraint.Create(icon, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 15f),
-                    NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Top, 1f, 4f),
-                    NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, icon, NSLayoutAttribute.Right, 1f, 8f),
-                    NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Right, 1f, -8f),
-                    NSLayoutConstraint.Create(valueTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, titleLabel, NSLayoutAttribute.Bottom, 1f, 2f),
-                    NSLayoutConstraint.Create(valueTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, titleLabel, NSLayoutAttribute.Left, 1f, 0f),
-                    NSLayoutConstraint.Create(valueTextField, NSLayoutAttribute.Right, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Right, 1f, -8f),
-                    NSLayoutConstraint.Create(valueTextField, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Bottom, 1f, -4f),
-                    NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Height, NSLayoutRelation.Equal, valueTextField, NSLayoutAttribute.Height, 1f, 0f)
+                    icon.BottomAnchor.ConstraintEqualTo(mainView.BottomAnchor,-8f),
+                    icon.LeftAnchor.ConstraintEqualTo(mainView.LeftAnchor,8f),
+                    icon.WidthAnchor.ConstraintEqualTo(15f),
+                    icon.HeightAnchor.ConstraintEqualTo(15f),
+                    titleLabel.TopAnchor.ConstraintEqualTo(mainView.TopAnchor,4f),
+                    titleLabel.LeftAnchor.ConstraintEqualTo(icon.RightAnchor,8f),
+                    titleLabel.RightAnchor.ConstraintEqualTo(mainView.RightAnchor,-8f),
+                    valueTextField.TopAnchor.ConstraintEqualTo(titleLabel.BottomAnchor,2f),
+                    valueTextField.LeftAnchor.ConstraintEqualTo(titleLabel.LeftAnchor),
+                    valueTextField.RightAnchor.ConstraintEqualTo(mainView.RightAnchor,-8f),
+                    valueTextField.BottomAnchor.ConstraintEqualTo(mainView.BottomAnchor,-4f),
+                    titleLabel.HeightAnchor.ConstraintEqualTo(valueTextField.HeightAnchor)
                 });
 
                 AddArrangedSubview(mainView);
@@ -511,18 +511,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 mainView.Add(valueTextField);
                 mainView.AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(icon, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Bottom, 1f, -8f),
-                    NSLayoutConstraint.Create(icon, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Left, 1f, 8f),
-                    NSLayoutConstraint.Create(icon, NSLayoutAttribute.Width, NSLayoutRelation.Equal, 1f, 15f),
-                    NSLayoutConstraint.Create(icon, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 15f),
-                    NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Top, 1f, 4f),
-                    NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, icon, NSLayoutAttribute.Right, 1f, 8f),
-                    NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Right, 1f, -8f),
-                    NSLayoutConstraint.Create(valueTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, titleLabel, NSLayoutAttribute.Bottom, 1f, 2f),
-                    NSLayoutConstraint.Create(valueTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, titleLabel, NSLayoutAttribute.Left, 1f, 0f),
-                    NSLayoutConstraint.Create(valueTextField, NSLayoutAttribute.Right, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Right, 1f, -8f),
-                    NSLayoutConstraint.Create(valueTextField, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Bottom, 1f, -4f),
-                    NSLayoutConstraint.Create(titleLabel, NSLayoutAttribute.Height, NSLayoutRelation.Equal, valueTextField, NSLayoutAttribute.Height, 1f, 0f)
+                    icon.BottomAnchor.ConstraintEqualTo(mainView.BottomAnchor,-8f),
+                    icon.LeftAnchor.ConstraintEqualTo(mainView.LeftAnchor,8f),
+                    icon.WidthAnchor.ConstraintEqualTo(15f),
+                    icon.HeightAnchor.ConstraintEqualTo(15f),
+                    titleLabel.TopAnchor.ConstraintEqualTo(mainView.TopAnchor,4f),
+                    titleLabel.LeftAnchor.ConstraintEqualTo(icon.RightAnchor,8f),
+                    titleLabel.RightAnchor.ConstraintEqualTo(mainView.RightAnchor,-8f),
+                    valueTextField.TopAnchor.ConstraintEqualTo(titleLabel.BottomAnchor,2f),
+                    valueTextField.LeftAnchor.ConstraintEqualTo(titleLabel.LeftAnchor),
+                    valueTextField.RightAnchor.ConstraintEqualTo(mainView.RightAnchor,-8f),
+                    valueTextField.BottomAnchor.ConstraintEqualTo(mainView.BottomAnchor,-4f),
+                    titleLabel.HeightAnchor.ConstraintEqualTo(valueTextField.HeightAnchor)
                 });
 
                 AddArrangedSubview(mainView);
@@ -697,14 +697,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 fromView.Add(fromValue);
                 fromView.AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(fromLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, fromView, NSLayoutAttribute.Top, 1f, 4f),
-                    NSLayoutConstraint.Create(fromLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, fromView, NSLayoutAttribute.Left, 1f, 4f),
-                    NSLayoutConstraint.Create(fromLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, fromView, NSLayoutAttribute.Right, 1f, -4f),
-                    NSLayoutConstraint.Create(fromValue, NSLayoutAttribute.Top, NSLayoutRelation.Equal, fromLabel, NSLayoutAttribute.Bottom, 1f, 2f),
-                    NSLayoutConstraint.Create(fromValue, NSLayoutAttribute.Left, NSLayoutRelation.Equal, fromView, NSLayoutAttribute.Left, 1f, 4f),
-                    NSLayoutConstraint.Create(fromValue, NSLayoutAttribute.Right, NSLayoutRelation.Equal, fromView, NSLayoutAttribute.Right, 1f, -4f),
-                    NSLayoutConstraint.Create(fromValue, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, fromView, NSLayoutAttribute.Bottom, 1f, -4f),
-                    NSLayoutConstraint.Create(fromLabel, NSLayoutAttribute.Height, NSLayoutRelation.Equal, fromValue, NSLayoutAttribute.Height, 1f, 0f)
+                    fromLabel.TopAnchor.ConstraintEqualTo(fromView.TopAnchor,4f),
+                    fromLabel.LeftAnchor.ConstraintEqualTo(fromView.LeftAnchor,4f),
+                    fromLabel.RightAnchor.ConstraintEqualTo(fromView.RightAnchor,-4f),
+                    fromValue.TopAnchor.ConstraintEqualTo(fromLabel.BottomAnchor,2f),
+                    fromValue.LeftAnchor.ConstraintEqualTo(fromView.LeftAnchor,4f),
+                    fromValue.RightAnchor.ConstraintEqualTo(fromView.RightAnchor,-4f),
+                    fromValue.BottomAnchor.ConstraintEqualTo(fromView.BottomAnchor,-4f),
+                    fromLabel.HeightAnchor.ConstraintEqualTo(fromValue.HeightAnchor)
                 });
 
                 var lineView = new UIView
@@ -766,14 +766,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 toView.Add(toValue);
                 toView.AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(toLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, toView, NSLayoutAttribute.Top, 1f, 4f),
-                    NSLayoutConstraint.Create(toLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, toView, NSLayoutAttribute.Left, 1f, 4f),
-                    NSLayoutConstraint.Create(toLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, toView, NSLayoutAttribute.Right, 1f, -4f),
-                    NSLayoutConstraint.Create(toValue, NSLayoutAttribute.Top, NSLayoutRelation.Equal, toLabel, NSLayoutAttribute.Bottom, 1f, 2f),
-                    NSLayoutConstraint.Create(toValue, NSLayoutAttribute.Left, NSLayoutRelation.Equal, toView, NSLayoutAttribute.Left, 1f, 4f),
-                    NSLayoutConstraint.Create(toValue, NSLayoutAttribute.Right, NSLayoutRelation.Equal, toView, NSLayoutAttribute.Right, 1f, -4f),
-                    NSLayoutConstraint.Create(toValue, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, toView, NSLayoutAttribute.Bottom, 1f, -4f),
-                    NSLayoutConstraint.Create(toLabel, NSLayoutAttribute.Height, NSLayoutRelation.Equal, toValue, NSLayoutAttribute.Height, 1f, 0f)
+                    toLabel.TopAnchor.ConstraintEqualTo(toView.TopAnchor,4f),
+                    toLabel.LeftAnchor.ConstraintEqualTo(toView.LeftAnchor,4f),
+                    toLabel.RightAnchor.ConstraintEqualTo(toView.RightAnchor,-4f),
+                    toValue.TopAnchor.ConstraintEqualTo(toLabel.BottomAnchor,2f),
+                    toValue.LeftAnchor.ConstraintEqualTo(toView.LeftAnchor,4f),
+                    toValue.RightAnchor.ConstraintEqualTo(toView.RightAnchor,-4f),
+                    toValue.BottomAnchor.ConstraintEqualTo(toView.BottomAnchor,-4f),
+                    toLabel.HeightAnchor.ConstraintEqualTo(toValue.HeightAnchor)
                 });
 
                 mainView.AddSubview(fromView);
@@ -781,18 +781,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 mainView.AddSubview(toView);
                 mainView.AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(fromView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Top, 1f, 0f),
-                    NSLayoutConstraint.Create(fromView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Left, 1f, 0f),
-                    NSLayoutConstraint.Create(fromView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Bottom, 1f, 0f),
-                    NSLayoutConstraint.Create(lineView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, fromView, NSLayoutAttribute.Right, 1f, 10f),
-                    NSLayoutConstraint.Create(lineView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, 1f, 15f),
-                    NSLayoutConstraint.Create(lineView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 1f),
-                    NSLayoutConstraint.Create(lineView, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.CenterY, 1f, 0f),
-                    NSLayoutConstraint.Create(toView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Top, 1f, 0f),
-                    NSLayoutConstraint.Create(toView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, lineView, NSLayoutAttribute.Right, 1f, 10f),
-                    NSLayoutConstraint.Create(toView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Bottom, 1f, 0f),
-                    NSLayoutConstraint.Create(toView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, mainView, NSLayoutAttribute.Right, 1f, 0f),
-                    NSLayoutConstraint.Create(toView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, fromView, NSLayoutAttribute.Width, 1f, 0f)
+                    fromView.TopAnchor.ConstraintEqualTo(mainView.TopAnchor),
+                    fromView.LeftAnchor.ConstraintEqualTo(mainView.LeftAnchor),
+                    fromView.BottomAnchor.ConstraintEqualTo(mainView.BottomAnchor),
+                    lineView.LeftAnchor.ConstraintEqualTo(fromView.RightAnchor,10f),
+                    lineView.WidthAnchor.ConstraintEqualTo(15f),
+                    lineView.HeightAnchor.ConstraintEqualTo(1f),
+                    lineView.CenterYAnchor.ConstraintEqualTo(mainView.CenterYAnchor),
+                    toView.TopAnchor.ConstraintEqualTo(mainView.TopAnchor),
+                    toView.LeftAnchor.ConstraintEqualTo(lineView.RightAnchor,10f),
+                    toView.BottomAnchor.ConstraintEqualTo(mainView.BottomAnchor),
+                    toView.RightAnchor.ConstraintEqualTo(mainView.RightAnchor),
+                    toView.WidthAnchor.ConstraintEqualTo(fromView.WidthAnchor)
                 });
 
                 AddArrangedSubview(mainView);
@@ -994,14 +994,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 lineView.Add(lineValue);
                 lineView.AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(lineLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, lineView, NSLayoutAttribute.Top, 1f, 4f),
-                    NSLayoutConstraint.Create(lineLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, lineView, NSLayoutAttribute.Left, 1f, 4f),
-                    NSLayoutConstraint.Create(lineLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, lineView, NSLayoutAttribute.Right, 1f, -4f),
-                    NSLayoutConstraint.Create(lineValue, NSLayoutAttribute.Top, NSLayoutRelation.Equal, lineLabel, NSLayoutAttribute.Bottom, 1f, 2f),
-                    NSLayoutConstraint.Create(lineValue, NSLayoutAttribute.Left, NSLayoutRelation.Equal, lineView, NSLayoutAttribute.Left, 1f, 4f),
-                    NSLayoutConstraint.Create(lineValue, NSLayoutAttribute.Right, NSLayoutRelation.Equal, lineView, NSLayoutAttribute.Right, 1f, -4f),
-                    NSLayoutConstraint.Create(lineValue, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, lineView, NSLayoutAttribute.Bottom, 1f, -4f),
-                    NSLayoutConstraint.Create(lineLabel, NSLayoutAttribute.Height, NSLayoutRelation.Equal, lineValue, NSLayoutAttribute.Height, 1f, 0f)
+                    lineLabel.TopAnchor.ConstraintEqualTo(lineView.TopAnchor,4f),
+                    lineLabel.LeftAnchor.ConstraintEqualTo(lineView.LeftAnchor,4f),
+                    lineLabel.RightAnchor.ConstraintEqualTo(lineView.RightAnchor,-4f),
+                    lineValue.TopAnchor.ConstraintEqualTo(lineLabel.BottomAnchor,2f),
+                    lineValue.LeftAnchor.ConstraintEqualTo(lineView.LeftAnchor,4f),
+                    lineValue.RightAnchor.ConstraintEqualTo(lineView.RightAnchor,-4f),
+                    lineValue.BottomAnchor.ConstraintEqualTo(lineView.BottomAnchor,-4f),
+                    lineLabel.HeightAnchor.ConstraintEqualTo(lineValue.HeightAnchor)
                 });
 
                 AddArrangedSubview(lineView);
@@ -1044,14 +1044,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 categoriesView.Add(categoriesValue);
                 categoriesView.AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(categoriesLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, categoriesView, NSLayoutAttribute.Top, 1f, 4f),
-                    NSLayoutConstraint.Create(categoriesLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, categoriesView, NSLayoutAttribute.Left, 1f, 4f),
-                    NSLayoutConstraint.Create(categoriesLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, categoriesView, NSLayoutAttribute.Right, 1f, -4f),
-                    NSLayoutConstraint.Create(categoriesValue, NSLayoutAttribute.Top, NSLayoutRelation.Equal, categoriesLabel, NSLayoutAttribute.Bottom, 1f, 2f),
-                    NSLayoutConstraint.Create(categoriesValue, NSLayoutAttribute.Left, NSLayoutRelation.Equal, categoriesView, NSLayoutAttribute.Left, 1f, 4f),
-                    NSLayoutConstraint.Create(categoriesValue, NSLayoutAttribute.Right, NSLayoutRelation.Equal, categoriesView, NSLayoutAttribute.Right, 1f, -4f),
-                    NSLayoutConstraint.Create(categoriesValue, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, categoriesView, NSLayoutAttribute.Bottom, 1f, -4f),
-                    NSLayoutConstraint.Create(categoriesLabel, NSLayoutAttribute.Height, NSLayoutRelation.Equal, categoriesValue, NSLayoutAttribute.Height, 1f, 0f)
+                    categoriesLabel.TopAnchor.ConstraintEqualTo(categoriesView.TopAnchor,4f),
+                    categoriesLabel.LeftAnchor.ConstraintEqualTo(categoriesView.LeftAnchor,4f),
+                    categoriesLabel.RightAnchor.ConstraintEqualTo(categoriesView.RightAnchor,-4f),
+                    categoriesValue.TopAnchor.ConstraintEqualTo(categoriesLabel.BottomAnchor,2f),
+                    categoriesValue.LeftAnchor.ConstraintEqualTo(categoriesView.LeftAnchor,4f),
+                    categoriesValue.RightAnchor.ConstraintEqualTo(categoriesView.RightAnchor,-4f),
+                    categoriesValue.BottomAnchor.ConstraintEqualTo(categoriesView.BottomAnchor,-4f),
+                    categoriesLabel.HeightAnchor.ConstraintEqualTo(categoriesValue.HeightAnchor)
                 });
 
                 AddArrangedSubview(categoriesView);
@@ -1094,14 +1094,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 priorityView.Add(priorityValue);
                 priorityView.AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(priorityLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, priorityView, NSLayoutAttribute.Top, 1f, 4f),
-                    NSLayoutConstraint.Create(priorityLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, priorityView, NSLayoutAttribute.Left, 1f, 4f),
-                    NSLayoutConstraint.Create(priorityLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, priorityView, NSLayoutAttribute.Right, 1f, -4f),
-                    NSLayoutConstraint.Create(priorityValue, NSLayoutAttribute.Top, NSLayoutRelation.Equal, priorityLabel, NSLayoutAttribute.Bottom, 1f, 2f),
-                    NSLayoutConstraint.Create(priorityValue, NSLayoutAttribute.Left, NSLayoutRelation.Equal, priorityView, NSLayoutAttribute.Left, 1f, 4f),
-                    NSLayoutConstraint.Create(priorityValue, NSLayoutAttribute.Right, NSLayoutRelation.Equal, priorityView, NSLayoutAttribute.Right, 1f, -4f),
-                    NSLayoutConstraint.Create(priorityValue, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, priorityView, NSLayoutAttribute.Bottom, 1f, -4f),
-                    NSLayoutConstraint.Create(priorityLabel, NSLayoutAttribute.Height, NSLayoutRelation.Equal, priorityValue, NSLayoutAttribute.Height, 1f, 0f)
+                    priorityLabel.TopAnchor.ConstraintEqualTo(priorityView.TopAnchor,4f),
+                    priorityLabel.LeftAnchor.ConstraintEqualTo(priorityView.LeftAnchor,4f),
+                    priorityLabel.RightAnchor.ConstraintEqualTo(priorityView.RightAnchor,-4f),
+                    priorityValue.TopAnchor.ConstraintEqualTo(priorityLabel.BottomAnchor,2f),
+                    priorityValue.LeftAnchor.ConstraintEqualTo(priorityView.LeftAnchor,4f),
+                    priorityValue.RightAnchor.ConstraintEqualTo(priorityView.RightAnchor,-4f),
+                    priorityValue.BottomAnchor.ConstraintEqualTo(priorityView.BottomAnchor,-4f),
+                    priorityLabel.HeightAnchor.ConstraintEqualTo(priorityValue.HeightAnchor)
                 });
 
                 AddArrangedSubview(priorityView);
@@ -1249,14 +1249,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 referenceView.Add(referenceTextField);
                 referenceView.AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(referenceLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, referenceView, NSLayoutAttribute.Top, 1f, 4f),
-                    NSLayoutConstraint.Create(referenceLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, referenceView, NSLayoutAttribute.Left, 1f, 4f),
-                    NSLayoutConstraint.Create(referenceLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, referenceView, NSLayoutAttribute.Right, 1f, -4f),
-                    NSLayoutConstraint.Create(referenceTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, referenceLabel, NSLayoutAttribute.Bottom, 1f, 2f),
-                    NSLayoutConstraint.Create(referenceTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, referenceView, NSLayoutAttribute.Left, 1f, 4f),
-                    NSLayoutConstraint.Create(referenceTextField, NSLayoutAttribute.Right, NSLayoutRelation.Equal, referenceView, NSLayoutAttribute.Right, 1f, -4f),
-                    NSLayoutConstraint.Create(referenceTextField, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, referenceView, NSLayoutAttribute.Bottom, 1f, -4f),
-                    NSLayoutConstraint.Create(referenceLabel, NSLayoutAttribute.Height, NSLayoutRelation.Equal, referenceTextField, NSLayoutAttribute.Height, 1f, 0f)
+                    referenceLabel.TopAnchor.ConstraintEqualTo(referenceView.TopAnchor,4f),
+                    referenceLabel.LeftAnchor.ConstraintEqualTo(referenceView.LeftAnchor,4f),
+                    referenceLabel.RightAnchor.ConstraintEqualTo(referenceView.RightAnchor,-4f),
+                    referenceTextField.TopAnchor.ConstraintEqualTo(referenceLabel.BottomAnchor,2f),
+                    referenceTextField.LeftAnchor.ConstraintEqualTo(referenceView.LeftAnchor,4f),
+                    referenceTextField.RightAnchor.ConstraintEqualTo(referenceView.RightAnchor,-4f),
+                    referenceTextField.BottomAnchor.ConstraintEqualTo(referenceView.BottomAnchor,-4f),
+                    referenceLabel.HeightAnchor.ConstraintEqualTo(referenceTextField.HeightAnchor)
                 });
 
                 AddArrangedSubview(referenceView);
@@ -1302,14 +1302,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 commentView.Add(commentTextField);
                 commentView.AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(commentLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, commentView, NSLayoutAttribute.Top, 1f, 4f),
-                    NSLayoutConstraint.Create(commentLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, commentView, NSLayoutAttribute.Left, 1f, 4f),
-                    NSLayoutConstraint.Create(commentLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, commentView, NSLayoutAttribute.Right, 1f, -4f),
-                    NSLayoutConstraint.Create(commentTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, commentLabel, NSLayoutAttribute.Bottom, 1f, 2f),
-                    NSLayoutConstraint.Create(commentTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, commentView, NSLayoutAttribute.Left, 1f, 4f),
-                    NSLayoutConstraint.Create(commentTextField, NSLayoutAttribute.Right, NSLayoutRelation.Equal, commentView, NSLayoutAttribute.Right, 1f, -4f),
-                    NSLayoutConstraint.Create(commentTextField, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, commentView, NSLayoutAttribute.Bottom, 1f, -4f),
-                    NSLayoutConstraint.Create(commentLabel, NSLayoutAttribute.Height, NSLayoutRelation.Equal, commentTextField, NSLayoutAttribute.Height, 1f, 0f)
+                    commentLabel.TopAnchor.ConstraintEqualTo(commentView.TopAnchor,4f),
+                    commentLabel.LeftAnchor.ConstraintEqualTo(commentView.LeftAnchor,4f),
+                    commentLabel.RightAnchor.ConstraintEqualTo(commentView.RightAnchor,-4f),
+                    commentTextField.TopAnchor.ConstraintEqualTo(commentLabel.BottomAnchor,2f),
+                    commentTextField.LeftAnchor.ConstraintEqualTo(commentView.LeftAnchor,4f),
+                    commentTextField.RightAnchor.ConstraintEqualTo(commentView.RightAnchor,-4f),
+                    commentTextField.BottomAnchor.ConstraintEqualTo(commentView.BottomAnchor,-4f),
+                    commentLabel.HeightAnchor.ConstraintEqualTo(commentTextField.HeightAnchor)
                 });
 
                 AddArrangedSubview(commentView);
@@ -1355,14 +1355,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 attachmentNameView.Add(attachmentNameTextField);
                 attachmentNameView.AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(attachmentNameLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, attachmentNameView, NSLayoutAttribute.Top, 1f, 4f),
-                    NSLayoutConstraint.Create(attachmentNameLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, attachmentNameView, NSLayoutAttribute.Left, 1f, 4f),
-                    NSLayoutConstraint.Create(attachmentNameLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, attachmentNameView, NSLayoutAttribute.Right, 1f, -4f),
-                    NSLayoutConstraint.Create(attachmentNameTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, attachmentNameLabel, NSLayoutAttribute.Bottom, 1f, 2f),
-                    NSLayoutConstraint.Create(attachmentNameTextField, NSLayoutAttribute.Left, NSLayoutRelation.Equal, attachmentNameView, NSLayoutAttribute.Left, 1f, 4f),
-                    NSLayoutConstraint.Create(attachmentNameTextField, NSLayoutAttribute.Right, NSLayoutRelation.Equal, attachmentNameView, NSLayoutAttribute.Right, 1f, -4f),
-                    NSLayoutConstraint.Create(attachmentNameTextField, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, attachmentNameView, NSLayoutAttribute.Bottom, 1f, -4f),
-                    NSLayoutConstraint.Create(attachmentNameLabel, NSLayoutAttribute.Height, NSLayoutRelation.Equal, attachmentNameTextField, NSLayoutAttribute.Height, 1f, 0f)
+                    attachmentNameLabel.TopAnchor.ConstraintEqualTo(attachmentNameView.TopAnchor,4f),
+                    attachmentNameLabel.LeftAnchor.ConstraintEqualTo(attachmentNameView.LeftAnchor,4f),
+                    attachmentNameLabel.RightAnchor.ConstraintEqualTo(attachmentNameView.RightAnchor,-4f),
+                    attachmentNameTextField.TopAnchor.ConstraintEqualTo(attachmentNameLabel.BottomAnchor,2f),
+                    attachmentNameTextField.LeftAnchor.ConstraintEqualTo(attachmentNameView.LeftAnchor,4f),
+                    attachmentNameTextField.RightAnchor.ConstraintEqualTo(attachmentNameView.RightAnchor,-4f),
+                    attachmentNameTextField.BottomAnchor.ConstraintEqualTo(attachmentNameView.BottomAnchor,-4f),
+                    attachmentNameLabel.HeightAnchor.ConstraintEqualTo(attachmentNameTextField.HeightAnchor)
                 });
 
                 AddArrangedSubview(attachmentNameView);
@@ -1532,14 +1532,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 view.Add(text);
                 view.AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(label, NSLayoutAttribute.Top, NSLayoutRelation.Equal, view, NSLayoutAttribute.Top, 1f, 4f),
-                    NSLayoutConstraint.Create(label, NSLayoutAttribute.Left, NSLayoutRelation.Equal, view, NSLayoutAttribute.Left, 1f, 4f),
-                    NSLayoutConstraint.Create(label, NSLayoutAttribute.Right, NSLayoutRelation.Equal, view, NSLayoutAttribute.Right, 1f, -4f),
-                    NSLayoutConstraint.Create(text, NSLayoutAttribute.Top, NSLayoutRelation.Equal, label, NSLayoutAttribute.Bottom, 1f, 2f),
-                    NSLayoutConstraint.Create(text, NSLayoutAttribute.Left, NSLayoutRelation.Equal, view, NSLayoutAttribute.Left, 1f, 4f),
-                    NSLayoutConstraint.Create(text, NSLayoutAttribute.Right, NSLayoutRelation.Equal, view, NSLayoutAttribute.Right, 1f, -4f),
-                    NSLayoutConstraint.Create(text, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, view, NSLayoutAttribute.Bottom, 1f, -4f),
-                    NSLayoutConstraint.Create(label, NSLayoutAttribute.Height, NSLayoutRelation.Equal, text, NSLayoutAttribute.Height, 1f, 0f)
+                    label.TopAnchor.ConstraintEqualTo(view.TopAnchor,4f),
+                    label.LeftAnchor.ConstraintEqualTo(view.LeftAnchor,4f),
+                    label.RightAnchor.ConstraintEqualTo(view.RightAnchor,-4f),
+                    text.TopAnchor.ConstraintEqualTo(label.BottomAnchor,2f),
+                    text.LeftAnchor.ConstraintEqualTo(view.LeftAnchor,4f),
+                    text.RightAnchor.ConstraintEqualTo(view.RightAnchor,-4f),
+                    text.BottomAnchor.ConstraintEqualTo(view.BottomAnchor,-4f),
+                    label.HeightAnchor.ConstraintEqualTo(text.HeightAnchor)
                 });
 
                 AddArrangedSubview(view);

@@ -140,18 +140,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             NSLayoutConstraint tableViewBottomConstraint = null;
 
             if (Integration.IsRunningAtLeast(11))
-                tableViewBottomConstraint = NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View.SafeAreaLayoutGuide, NSLayoutAttribute.Bottom, 1f, 0f);
+                tableViewBottomConstraint = tableView.BottomAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.BottomAnchor);
             else
-                tableViewBottomConstraint = NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f);
+                tableViewBottomConstraint = tableView.BottomAnchor.ConstraintEqualTo(View.BottomAnchor);
 
             View.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(tableView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
+                tableView.LeftAnchor.ConstraintEqualTo(View.LeftAnchor),
+                tableView.TopAnchor.ConstraintEqualTo(View.TopAnchor),
+                tableView.RightAnchor.ConstraintEqualTo(View.RightAnchor),
                 tableViewBottomConstraint
             });
-
         }
 
         void InitializeEditView()
@@ -165,15 +164,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             commentView.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
 
             if (Integration.IsRunningAtLeast(11))
-                commentViewBottomConstraint = NSLayoutConstraint.Create(commentView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View.SafeAreaLayoutGuide, NSLayoutAttribute.Bottom, 1f, 0f);
+                commentViewBottomConstraint = commentView.BottomAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.BottomAnchor);
             else
-                commentViewBottomConstraint = NSLayoutConstraint.Create(commentView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, View, NSLayoutAttribute.Bottom, 1f, 0f);
+                commentViewBottomConstraint = commentView.BottomAnchor.ConstraintEqualTo(View.BottomAnchor);
 
             View.AddSubview(commentView);
             View.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(commentView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(commentView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, 0f),
+                commentView.LeftAnchor.ConstraintEqualTo(View.LeftAnchor),
+                commentView.RightAnchor.ConstraintEqualTo(View.RightAnchor),
                 commentViewBottomConstraint,
             });
 
@@ -186,10 +185,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             commentView.AddSubview(borderView);
             commentView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(borderView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, commentView, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(borderView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, commentView, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(borderView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, commentView, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(borderView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, .75f)
+                borderView.TopAnchor.ConstraintEqualTo(commentView.TopAnchor),
+                borderView.LeftAnchor.ConstraintEqualTo(commentView.LeftAnchor),
+                borderView.RightAnchor.ConstraintEqualTo(commentView.RightAnchor),
+                borderView.HeightAnchor.ConstraintEqualTo(.75f)
             });
 
             addCommentButton = new UIButton(UIButtonType.System)
@@ -219,15 +218,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             commentView.AddSubview(commentTextScrollView);
             commentView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(commentTextScrollView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, commentView, NSLayoutAttribute.Top, 1f, 7f),
-                NSLayoutConstraint.Create(commentTextScrollView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, commentView, NSLayoutAttribute.Left, 1f, 7f),
-                NSLayoutConstraint.Create(commentTextScrollView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, addCommentButton, NSLayoutAttribute.Left, 1f, -7f),
-                NSLayoutConstraint.Create(commentTextScrollView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, commentView, NSLayoutAttribute.Bottom, 1f, -7f),
-                NSLayoutConstraint.Create(commentTextScrollView, NSLayoutAttribute.Height, NSLayoutRelation.GreaterThanOrEqual, null, NSLayoutAttribute.NoAttribute, 1f, 0f),
-                commentTextScrollViewHeightConstraint = NSLayoutConstraint.Create(commentTextScrollView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, 0f),
-
-                NSLayoutConstraint.Create(addCommentButton, NSLayoutAttribute.Right, NSLayoutRelation.Equal, commentView, NSLayoutAttribute.Right, 1f, -7f),
-                NSLayoutConstraint.Create(addCommentButton, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, commentTextScrollView, NSLayoutAttribute.CenterY, 1f, 0f)
+                commentTextScrollView.TopAnchor.ConstraintEqualTo(commentView.TopAnchor,7f),
+                commentTextScrollView.LeftAnchor.ConstraintEqualTo(commentView.LeftAnchor,7f),
+                commentTextScrollView.RightAnchor.ConstraintEqualTo(addCommentButton.LeftAnchor,-7f),
+                commentTextScrollView.BottomAnchor.ConstraintEqualTo(commentView.BottomAnchor,-7f),
+                commentTextScrollView.HeightAnchor.ConstraintGreaterThanOrEqualTo(0f),
+                commentTextScrollViewHeightConstraint = commentTextScrollView.HeightAnchor.ConstraintEqualTo(0f),
+                   
+                addCommentButton.RightAnchor.ConstraintEqualTo(commentView.RightAnchor,-7f),
+                addCommentButton.CenterYAnchor.ConstraintEqualTo(commentTextScrollView.CenterYAnchor)
             });
 
             commentTextView = new UITextView
@@ -244,11 +243,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             commentTextScrollView.AddSubview(commentTextView);
             commentTextScrollView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(commentTextView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, commentTextScrollView, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(commentTextView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, commentTextScrollView, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(commentTextView, NSLayoutAttribute.Right, NSLayoutRelation.Equal, commentTextScrollView, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(commentTextView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, commentTextScrollView, NSLayoutAttribute.Bottom, 1f, 0f),
-                NSLayoutConstraint.Create(commentTextView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, commentTextScrollView, NSLayoutAttribute.Width, 1f, 0f)
+                commentTextView.TopAnchor.ConstraintEqualTo(commentTextScrollView.TopAnchor),
+                commentTextView.LeftAnchor.ConstraintEqualTo(commentTextScrollView.LeftAnchor),
+                commentTextView.RightAnchor.ConstraintEqualTo(commentTextScrollView.RightAnchor),
+                commentTextView.BottomAnchor.ConstraintEqualTo(commentTextScrollView.BottomAnchor),
+                commentTextView.WidthAnchor.ConstraintEqualTo(commentTextScrollView.WidthAnchor)
             });
         }
 

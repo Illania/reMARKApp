@@ -26,6 +26,12 @@ namespace Mark5.ServiceReference.AppService
 
         GetFoldersResult EndGetFolders(IAsyncResult asyncResult);
 
+        [OperationContract(Action = "SearchFolders", AsyncPattern = true)]
+        [FaultContract(typeof(AppServiceFaultDetail), Name = "AppServiceFaultDetail", Namespace = "com.nordic-it.appservice.v3")]
+        IAsyncResult BeginSearchFolders(SearchFoldersParameters parameters, AsyncCallback callback, object asyncState);
+
+        SearchFoldersResult EndSearchFolders(IAsyncResult asyncResult);
+
         #endregion
 
         #region Documents module

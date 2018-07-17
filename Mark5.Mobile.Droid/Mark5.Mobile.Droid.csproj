@@ -451,6 +451,7 @@
     <Compile Include="Utilities\CallerId\CallerIdDatabaseProvider.cs" />
     <Compile Include="Utilities\CallerId\CallStateBroadcastReceiver.cs" />
     <Compile Include="Ui\Fragments\SwipeActionsFragment.cs" />
+    <Compile Include="Utilities\OnBoardingUtilities.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -473,6 +474,7 @@
     <Folder Include="Ui\Views\AddEditViews\AddEditShortcodeViews\" />
     <Folder Include="Utilities\Fingerprint\" />
     <Folder Include="Utilities\CallerId\" />
+    <Folder Include="Assets\changelogs\" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\anim\enter_from_left.xml" />
@@ -833,6 +835,7 @@
     <AndroidAsset Include="Assets\plain.html" />
     <AndroidAsset Include="Assets\replyHeader.html" />
     <AndroidAsset Include="Assets\editorScript.js" />
+    <AndroidAsset Include="Assets\changelogs\changelog_2.6.html" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Import Project="..\packages\NETStandard.Library.2.0.1\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.1\build\netstandard2.0\NETStandard.Library.targets')" />

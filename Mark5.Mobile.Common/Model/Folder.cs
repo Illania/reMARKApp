@@ -269,5 +269,20 @@ namespace Mark5.Mobile.Common.Model
         {
             return $"[Folder: Id={Id}, ParentFolderId={ParentFolderId}, Name={Name}, Module={Module}]";
         }
+
+    }
+
+    public class FolderComparer : IEqualityComparer<Folder> {
+
+        public bool Equals(Folder x, Folder y)
+        {
+            return x != null && y != null && x.Id.Equals(y.Id);
+        }
+
+        public int GetHashCode(Folder obj)
+        {
+            return obj.Id;
+        }
+
     }
 }

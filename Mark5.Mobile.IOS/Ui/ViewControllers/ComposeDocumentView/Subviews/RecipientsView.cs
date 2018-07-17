@@ -65,8 +65,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             ContainerView.AddSubview(Label);
             ContainerView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(Label, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
-                NSLayoutConstraint.Create(Label, NSLayoutAttribute.Left, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Left, 1f, HorizontalMargin)
+                Label.TopAnchor.ConstraintEqualTo(ContainerView.TopAnchor, VerticalMargin),
+                Label.LeftAnchor.ConstraintEqualTo(ContainerView.LeftAnchor, HorizontalMargin)
             });
 
             var textStorage = new NSTextStorage();
@@ -94,10 +94,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
                 ContainerView.AddSubview(addButton);
                 ContainerView.AddConstraints(new[]
-                     {
-                        NSLayoutConstraint.Create(addButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1.0f, VerticalMargin - addButton.ContentEdgeInsets.Top),
-                        NSLayoutConstraint.Create(addButton, NSLayoutAttribute.Right, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Right, 1.0f, -HorizontalMargin - addButton.ContentEdgeInsets.Right),
-                    });
+                {
+                    addButton.TopAnchor.ConstraintEqualTo(ContainerView.TopAnchor, VerticalMargin - addButton.ContentEdgeInsets.Top),
+                    addButton.RightAnchor.ConstraintEqualTo(ContainerView.RightAnchor, -HorizontalMargin - addButton.ContentEdgeInsets.Right)
+                });
             }
 
             TextView = new CustomUITextView(CGRect.Empty, textContainer)
@@ -124,14 +124,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             TextView.ShouldChangeText = HandleShouldTextViewChange;
             ContainerView.AddSubview(TextView);
 
-            var rightConstraint = NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Right,
-                                                            NSLayoutRelation.Equal, hideAddButton ? ContainerView : addButton, hideAddButton ? NSLayoutAttribute.Right : NSLayoutAttribute.Left, 1f,
-                                                            hideAddButton ? -HorizontalMargin : -InnerMargin);
+            var rightConstraint = hideAddButton ? TextView.RightAnchor.ConstraintEqualTo(ContainerView.RightAnchor, -HorizontalMargin)
+                                                          : TextView.RightAnchor.ConstraintEqualTo(addButton.LeftAnchor, -InnerMargin);
+
             ContainerView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Top, 1f, VerticalMargin),
-                NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, Label, NSLayoutAttribute.Right, 1f, InnerMargin),
-                NSLayoutConstraint.Create(TextView, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, ContainerView, NSLayoutAttribute.Bottom, 1f, -VerticalMargin),
+                TextView.TopAnchor.ConstraintEqualTo(ContainerView.TopAnchor, VerticalMargin),
+                TextView.LeftAnchor.ConstraintEqualTo(Label.RightAnchor, InnerMargin),
+                TextView.BottomAnchor.ConstraintEqualTo(ContainerView.BottomAnchor, -VerticalMargin),
                 rightConstraint,
             });
 

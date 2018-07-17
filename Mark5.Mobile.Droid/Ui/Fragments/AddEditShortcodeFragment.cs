@@ -4,6 +4,7 @@ using Android.App;
 using Android.Content;
 using Android.OS;
 using Android.Support.Design.Widget;
+using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
@@ -37,7 +38,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         LinearLayoutCompat linearLayout;
         ProgressBar progressBar;
-        ScrollView scrollView;
+        NestedScrollView scrollView;
         FloatingActionButton fab;
 
         DocumentAddressType requestAddressType;
@@ -105,7 +106,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             linearLayout.DescendantFocusability = DescendantFocusability.BeforeDescendants;
             linearLayout.FocusableInTouchMode = true;
 
-            scrollView = rootView.FindViewById<ScrollView>(Resource.Id.scroll_view);
+            scrollView = rootView.FindViewById<NestedScrollView>(Resource.Id.scroll_view);
             progressBar = rootView.FindViewById<ProgressBar>(Resource.Id.progress);
 
             fab = ((View)container.Parent.Parent).FindViewById<FloatingActionButton>(Resource.Id.fab);

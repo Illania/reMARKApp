@@ -182,6 +182,20 @@ namespace Mark5.Mobile.Common.Manager
             return infos.FirstOrDefault(sfi => sfi.FolderId == folder.Id && sfi.Module == folder.Module);
         }
 
+        public async Task<List<Folder>> SearchFolders(string searchText)
+        {
+            var foldersResult = await AppServiceProxy.SearchFolders(new DataContract.SearchFoldersParameters
+            {
+                Token = Token,
+                Name = searchText,
+                ModuleType = (DataContract.ModuleType)ModuleType.Documents
+            });
+
+            var folders = foldersResult.Folders.WhereNotNull().Select(f => f.Convert()).OrderBy(f => f.Position).ToList();
+
+            return folders;
+        }
+
         #region Helper methods
 
         void ProcessFolders(List<Folder> folders, Folder parentFolder)

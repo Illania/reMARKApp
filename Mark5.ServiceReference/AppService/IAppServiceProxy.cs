@@ -19,6 +19,8 @@ namespace Mark5.ServiceReference.AppService
 
         Task<GetFoldersResult> GetFoldersAsync(GetFoldersParameters parameters, CancellationToken ct = default(CancellationToken));
 
+        Task<SearchFoldersResult> SearchFolders(SearchFoldersParameters parameters, CancellationToken ct = default(CancellationToken));
+
         #endregion
 
         #region Documents module

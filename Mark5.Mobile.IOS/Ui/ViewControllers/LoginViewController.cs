@@ -213,10 +213,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             View.AddSubview(logoContainer);
             View.AddConstraints(new[]
             {
-                logoContainerCenterYConstraint = NSLayoutConstraint.Create(logoContainer, NSLayoutAttribute.CenterY, NSLayoutRelation.Equal, View, NSLayoutAttribute.CenterY, 1f, LogoImageViewToViewInitialDistance),
-                NSLayoutConstraint.Create(logoContainer, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, View, NSLayoutAttribute.CenterX, 1f, 0f),
-                NSLayoutConstraint.Create(logoContainer, NSLayoutAttribute.Width, NSLayoutRelation.Equal, View, NSLayoutAttribute.Width, 1f, 0f),
-                NSLayoutConstraint.Create(logoContainer, NSLayoutAttribute.Height, NSLayoutRelation.Equal, View, NSLayoutAttribute.Height, 1f, 0f)
+                logoContainerCenterYConstraint = logoContainer.CenterYAnchor.ConstraintEqualTo(View.CenterYAnchor, LogoImageViewToViewInitialDistance),
+                logoContainer.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
+                logoContainer.WidthAnchor.ConstraintEqualTo(View.WidthAnchor),
+                logoContainer.HeightAnchor.ConstraintEqualTo(View.HeightAnchor)
             });
 
             logoImageView = new UIImageView
@@ -233,10 +233,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             logoContainer.AddSubview(logoImageView);
             logoContainer.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(logoImageView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, logoContainer, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(logoImageView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, logoContainer, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(logoImageView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, logoContainer, NSLayoutAttribute.Width, 1f, 0f),
-                NSLayoutConstraint.Create(logoImageView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, logoContainer, NSLayoutAttribute.Height, 1f, 0f)
+                logoImageView.TopAnchor.ConstraintEqualTo(logoContainer.TopAnchor),
+                logoImageView.LeftAnchor.ConstraintEqualTo(logoContainer.LeftAnchor),
+                logoImageView.WidthAnchor.ConstraintEqualTo(logoContainer.WidthAnchor),
+                logoImageView.HeightAnchor.ConstraintEqualTo(logoContainer.HeightAnchor)
             });
 
             var backgroundImageView = new UIImageView
@@ -249,10 +249,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             View.AddSubview(backgroundImageView);
             View.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(backgroundImageView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(backgroundImageView, NSLayoutAttribute.Left, NSLayoutRelation.Equal, View, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(backgroundImageView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, View, NSLayoutAttribute.Width, 1f, 0f),
-                NSLayoutConstraint.Create(backgroundImageView, NSLayoutAttribute.Height, NSLayoutRelation.Equal, View, NSLayoutAttribute.Height, 1f, 0f)
+                backgroundImageView.TopAnchor.ConstraintEqualTo(View.TopAnchor),
+                backgroundImageView.LeftAnchor.ConstraintEqualTo(View.LeftAnchor),
+                backgroundImageView.WidthAnchor.ConstraintEqualTo(View.WidthAnchor),
+                backgroundImageView.HeightAnchor.ConstraintEqualTo(View.HeightAnchor)
             });
             View.SendSubviewToBack(backgroundImageView);
 
@@ -266,16 +266,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 View.AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(settingsButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View.SafeAreaLayoutGuide, NSLayoutAttribute.Top, 1f, 0f),
-                    NSLayoutConstraint.Create(settingsButton, NSLayoutAttribute.Right, NSLayoutRelation.Equal,  View.SafeAreaLayoutGuide, NSLayoutAttribute.Right, 1f, -10f)
+                    settingsButton.TopAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.TopAnchor),
+                    settingsButton.RightAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.RightAnchor, -10f)
                 });
             }
             else
             {
                 View.AddConstraints(new[]
                 {
-                    NSLayoutConstraint.Create(settingsButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, View, NSLayoutAttribute.Top, 1f, 20f),
-                    NSLayoutConstraint.Create(settingsButton, NSLayoutAttribute.Right, NSLayoutRelation.Equal, View, NSLayoutAttribute.Right, 1f, -5f)
+                    settingsButton.TopAnchor.ConstraintEqualTo(View.TopAnchor, 20f),
+                    settingsButton.RightAnchor.ConstraintEqualTo(View.RightAnchor, -5f)
                 });
             }
         }
@@ -295,10 +295,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             View.AddSubview(usernameTextField);
             View.AddConstraints(new[]
             {
-                usernameTextFieldTopConstraint = NSLayoutConstraint.Create(usernameTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, logoImageView, NSLayoutAttribute.Bottom, 1f, TextFieldToLogoImageViewInitialDistance),
-                NSLayoutConstraint.Create(usernameTextField, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, View, NSLayoutAttribute.CenterX, 1f, 0f),
-                NSLayoutConstraint.Create(usernameTextField, NSLayoutAttribute.Width, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, TextFieldWidth),
-                NSLayoutConstraint.Create(usernameTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, TextFieldHeight)
+                usernameTextFieldTopConstraint = usernameTextField.TopAnchor.ConstraintEqualTo(logoImageView.BottomAnchor, TextFieldToLogoImageViewInitialDistance),
+                usernameTextField.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
+                usernameTextField.WidthAnchor.ConstraintEqualTo(TextFieldWidth),
+                usernameTextField.HeightAnchor.ConstraintEqualTo(TextFieldHeight)
             });
 
             passwordTextField = new UITextField
@@ -317,10 +317,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             View.AddSubview(passwordTextField);
             View.AddConstraints(new[]
             {
-                passwordTextFieldTopConstraint = NSLayoutConstraint.Create(passwordTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, usernameTextField, NSLayoutAttribute.Bottom, 1f, 50f),
-                NSLayoutConstraint.Create(passwordTextField, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, View, NSLayoutAttribute.CenterX, 1f, 0f),
-                NSLayoutConstraint.Create(passwordTextField, NSLayoutAttribute.Width, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, TextFieldWidth),
-                NSLayoutConstraint.Create(passwordTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, TextFieldHeight)
+                passwordTextFieldTopConstraint = passwordTextField.TopAnchor.ConstraintEqualTo(usernameTextField.BottomAnchor, 50f),
+                passwordTextField.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
+                passwordTextField.WidthAnchor.ConstraintEqualTo(TextFieldWidth),
+                passwordTextField.HeightAnchor.ConstraintEqualTo(TextFieldHeight)
             });
 
             hostnameTextField = new UITextField
@@ -337,10 +337,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             View.AddSubview(hostnameTextField);
             View.AddConstraints(new[]
             {
-                hostnameTextFieldTopConstraint = NSLayoutConstraint.Create(hostnameTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, passwordTextField, NSLayoutAttribute.Bottom, 1f, TextFieldToTextFieldInitialDistance),
-                NSLayoutConstraint.Create(hostnameTextField, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, View, NSLayoutAttribute.CenterX, 1f, 0f),
-                NSLayoutConstraint.Create(hostnameTextField, NSLayoutAttribute.Width, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, TextFieldWidth),
-                NSLayoutConstraint.Create(hostnameTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, TextFieldHeight)
+                hostnameTextFieldTopConstraint = hostnameTextField.TopAnchor.ConstraintEqualTo(passwordTextField.BottomAnchor, TextFieldToTextFieldInitialDistance),
+                hostnameTextField.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
+                hostnameTextField.WidthAnchor.ConstraintEqualTo(TextFieldWidth),
+                hostnameTextField.HeightAnchor.ConstraintEqualTo(TextFieldHeight)
             });
 
             portTextField = new UITextField
@@ -358,10 +358,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             View.AddSubview(portTextField);
             View.AddConstraints(new[]
             {
-                portTextFieldTopConstraint = NSLayoutConstraint.Create(portTextField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, hostnameTextField, NSLayoutAttribute.Bottom, 1f, TextFieldToTextFieldInitialDistance),
-                NSLayoutConstraint.Create(portTextField, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, View, NSLayoutAttribute.CenterX, 1f, 0f),
-                NSLayoutConstraint.Create(portTextField, NSLayoutAttribute.Width, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, TextFieldWidth),
-                NSLayoutConstraint.Create(portTextField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, TextFieldHeight)
+                portTextFieldTopConstraint = portTextField.TopAnchor.ConstraintEqualTo(hostnameTextField.BottomAnchor, TextFieldToTextFieldInitialDistance),
+                portTextField.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
+                portTextField.WidthAnchor.ConstraintEqualTo(TextFieldWidth),
+                portTextField.HeightAnchor.ConstraintEqualTo(TextFieldHeight)
             });
 
             loginButton = new UIButton();
@@ -373,10 +373,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             View.AddSubview(loginButton);
             View.AddConstraints(new[]
             {
-                loginButtonTopConstraint = NSLayoutConstraint.Create(loginButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, portTextField, NSLayoutAttribute.Bottom, 1f, LoginButtonToTextFieldInitialDistance),
-                NSLayoutConstraint.Create(loginButton, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, View, NSLayoutAttribute.CenterX, 1f, 0f),
-                NSLayoutConstraint.Create(loginButton, NSLayoutAttribute.Width, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, LoginButtonWidth),
-                NSLayoutConstraint.Create(loginButton, NSLayoutAttribute.Height, NSLayoutRelation.Equal, null, NSLayoutAttribute.NoAttribute, 1f, LoginButtonHeight)
+                loginButtonTopConstraint = loginButton.TopAnchor.ConstraintEqualTo(portTextField.BottomAnchor, LoginButtonToTextFieldInitialDistance),
+                loginButton.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
+                loginButton.WidthAnchor.ConstraintEqualTo(LoginButtonWidth),
+                loginButton.HeightAnchor.ConstraintEqualTo(LoginButtonHeight)
             });
         }
 

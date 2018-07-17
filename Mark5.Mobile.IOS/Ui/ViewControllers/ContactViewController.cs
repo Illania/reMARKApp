@@ -173,10 +173,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             headerView.AddSubview(nameLabel);
             headerView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(nameLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.Top, 1f, 10f),
-                NSLayoutConstraint.Create(nameLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(nameLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(nameLabel, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 25f)
+                nameLabel.TopAnchor.ConstraintEqualTo(headerView.TopAnchor,10f),
+                nameLabel.LeftAnchor.ConstraintEqualTo(headerView.LeftAnchor),
+                nameLabel.RightAnchor.ConstraintEqualTo(headerView.RightAnchor),
+                nameLabel.HeightAnchor.ConstraintEqualTo(25f)
             });
 
             nameSubLabel = new UILabel
@@ -190,10 +190,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             headerView.AddSubview(nameSubLabel);
             headerView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(nameSubLabel, NSLayoutAttribute.Top, NSLayoutRelation.Equal, nameLabel, NSLayoutAttribute.Bottom, 1f, 5f),
-                NSLayoutConstraint.Create(nameSubLabel, NSLayoutAttribute.Left, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(nameSubLabel, NSLayoutAttribute.Right, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(nameSubLabel, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 20f)
+                nameSubLabel.TopAnchor.ConstraintEqualTo(nameLabel.BottomAnchor,5f),
+                nameSubLabel.LeftAnchor.ConstraintEqualTo(headerView.LeftAnchor),
+                nameSubLabel.RightAnchor.ConstraintEqualTo(headerView.RightAnchor),
+                nameSubLabel.HeightAnchor.ConstraintEqualTo(20f)
             });
 
             var buttonsView = new UIView
@@ -203,8 +203,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             headerView.AddSubview(buttonsView);
             headerView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(buttonsView, NSLayoutAttribute.Top, NSLayoutRelation.Equal, nameSubLabel, NSLayoutAttribute.Bottom, 1f, 10f),
-                NSLayoutConstraint.Create(buttonsView, NSLayoutAttribute.CenterX, NSLayoutRelation.Equal, headerView, NSLayoutAttribute.CenterX, 1f, 0f)
+                buttonsView.TopAnchor.ConstraintEqualTo(nameSubLabel.BottomAnchor,10f),
+                buttonsView.CenterXAnchor.ConstraintEqualTo(headerView.CenterXAnchor)
             });
 
             button1 = new UIButton
@@ -218,11 +218,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             buttonsView.AddSubview(button1);
             buttonsView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(button1, NSLayoutAttribute.Top, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(button1, NSLayoutAttribute.Left, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Left, 1f, 0f),
-                NSLayoutConstraint.Create(button1, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Bottom, 1f, 0f),
-                NSLayoutConstraint.Create(button1, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 60),
-                NSLayoutConstraint.Create(button1, NSLayoutAttribute.Width, NSLayoutRelation.Equal, 1f, 40f)
+                button1.TopAnchor.ConstraintEqualTo(buttonsView.TopAnchor),
+                button1.LeftAnchor.ConstraintEqualTo(buttonsView.LeftAnchor),
+                button1.BottomAnchor.ConstraintEqualTo(buttonsView.BottomAnchor),
+                button1.HeightAnchor.ConstraintEqualTo(60f),
+                button1.WidthAnchor.ConstraintEqualTo(40f)
             });
 
             button2 = new UIButton
@@ -236,11 +236,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             buttonsView.AddSubview(button2);
             buttonsView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(button2, NSLayoutAttribute.Top, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(button2, NSLayoutAttribute.Left, NSLayoutRelation.Equal, button1, NSLayoutAttribute.Right, 1f, 15f),
-                NSLayoutConstraint.Create(button2, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Bottom, 1f, 0f),
-                NSLayoutConstraint.Create(button2, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 60f),
-                NSLayoutConstraint.Create(button2, NSLayoutAttribute.Width, NSLayoutRelation.Equal, 1f, 40f)
+                button2.TopAnchor.ConstraintEqualTo(buttonsView.TopAnchor),
+                button2.LeftAnchor.ConstraintEqualTo(button1.RightAnchor,15f),
+                button2.BottomAnchor.ConstraintEqualTo(buttonsView.BottomAnchor),
+                button2.HeightAnchor.ConstraintEqualTo(60f),
+                button2.WidthAnchor.ConstraintEqualTo(40f)
             });
 
             button3 = new UIButton
@@ -254,11 +254,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             buttonsView.AddSubview(button3);
             buttonsView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(button3, NSLayoutAttribute.Top, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(button3, NSLayoutAttribute.Left, NSLayoutRelation.Equal, button2, NSLayoutAttribute.Right, 1f, 15f),
-                NSLayoutConstraint.Create(button3, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Bottom, 1f, 0f),
-                NSLayoutConstraint.Create(button3, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 60f),
-                NSLayoutConstraint.Create(button3, NSLayoutAttribute.Width, NSLayoutRelation.Equal, 1f, 40f)
+                button3.TopAnchor.ConstraintEqualTo(buttonsView.TopAnchor),
+                button3.LeftAnchor.ConstraintEqualTo(button2.RightAnchor,15f),
+                button3.BottomAnchor.ConstraintEqualTo(buttonsView.BottomAnchor),
+                button3.HeightAnchor.ConstraintEqualTo(60f),
+                button3.WidthAnchor.ConstraintEqualTo(40f)
             });
 
             button4 = new UIButton
@@ -272,12 +272,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             buttonsView.AddSubview(button4);
             buttonsView.AddConstraints(new[]
             {
-                NSLayoutConstraint.Create(button4, NSLayoutAttribute.Top, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Top, 1f, 0f),
-                NSLayoutConstraint.Create(button4, NSLayoutAttribute.Left, NSLayoutRelation.Equal, button3, NSLayoutAttribute.Right, 1f, 15f),
-                NSLayoutConstraint.Create(button4, NSLayoutAttribute.Right, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Right, 1f, 0f),
-                NSLayoutConstraint.Create(button4, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, buttonsView, NSLayoutAttribute.Bottom, 1f, 0f),
-                NSLayoutConstraint.Create(button4, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1f, 60f),
-                NSLayoutConstraint.Create(button4, NSLayoutAttribute.Width, NSLayoutRelation.Equal, 1f, 40f)
+                button4.TopAnchor.ConstraintEqualTo(buttonsView.TopAnchor),
+                button4.LeftAnchor.ConstraintEqualTo(button3.RightAnchor,15f),
+                button4.RightAnchor.ConstraintEqualTo(buttonsView.RightAnchor),
+                button4.BottomAnchor.ConstraintEqualTo(buttonsView.BottomAnchor),
+                button4.HeightAnchor.ConstraintEqualTo(60f),
+                button4.WidthAnchor.ConstraintEqualTo(40f)
             });
 
             TableView.TableHeaderView = headerView;

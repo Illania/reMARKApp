@@ -51,6 +51,22 @@ namespace Mark5.ServiceReference.AppService
                 return (GetFoldersResult)EndInvoke("GetFolders", new object[0], asyncResult);
             }
 
+            public IAsyncResult BeginSearchFolders(SearchFoldersParameters parameters, AsyncCallback callback, object asyncState)
+            {
+                return BeginInvoke("SearchFolders",
+                    new object[]
+                    {
+                        parameters
+                    },
+                    callback,
+                    asyncState);
+            }
+
+            public SearchFoldersResult EndSearchFolders(IAsyncResult asyncResult)
+            {
+                return (SearchFoldersResult)EndInvoke("SearchFolders", new object[0], asyncResult);
+            }
+
             #endregion
 
             #region Documents module
