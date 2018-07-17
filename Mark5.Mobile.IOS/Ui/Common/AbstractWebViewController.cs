@@ -455,10 +455,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 var htmlNode = html.DocumentNode.SelectSingleNode("//html");
                 if (htmlNode == null)
                     return null;
-
                 htmlNode.SetAttributeValue("style", "overflow:hidden;");
-
-                return html;
             });
         }
 
