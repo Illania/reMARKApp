@@ -83,6 +83,7 @@ namespace Mark5.Mobile.IOS.Utilities
         public static readonly CGSize IPhoneRetina47ZoomResolution = new CGSize(640f, 1136f);
         public static readonly CGSize IPhoneRetina55Resolution = new CGSize(1242f, 2208f);
         public static readonly CGSize IPhoneRetina55ZoomResolution = new CGSize(1125f, 2001f);
+        public static readonly CGSize IPhoneRetina58Resolution = new CGSize(1125f, 2436f);
         public static readonly CGSize IPadRetina79ScreenSize = new CGSize(1536f, 2048f);
         public static readonly CGSize IPadRetina97ScreenSize = new CGSize(1536f, 2048f);
         public static readonly CGSize IPadProRetina105ProScreenSize = new CGSize(1668f, 2224f);

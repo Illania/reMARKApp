@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Utilities;
@@ -73,6 +72,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
         public override void ViewDidAppear(bool animated)
         {
             base.ViewDidAppear(animated);
+
+            OnBoardingUtilities.ShowOnBoardingIfNecessary(this);
 
             CheckAutoSavedDocument();
         }
