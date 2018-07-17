@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Android.Graphics;
 using Android.OS;
 using Android.Support.V4.Content;
+using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Util;
@@ -30,7 +31,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         List<ObjectLink> objectLinks;
 
         ProgressBar progress;
-        ScrollView scrollView;
+        NestedScrollView scrollView;
         LinearLayoutCompat linearLayout;
 
         public static (ObjectLinksFragment fragment, string tag) NewInstance(IBusinessEntity businessEntity)
@@ -69,7 +70,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             rootView.SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightgray)));
 
             progress = rootView.FindViewById<ProgressBar>(Resource.Id.progress);
-            scrollView = rootView.FindViewById<ScrollView>(Resource.Id.scroll_view);
+            scrollView = rootView.FindViewById<NestedScrollView>(Resource.Id.scroll_view);
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
             var padding = (int)(TypedValue.ApplyDimension(ComplexUnitType.Dip, 10f, Resources.DisplayMetrics) + 0.5f);
             linearLayout.SetPadding(padding, padding, padding, padding);
