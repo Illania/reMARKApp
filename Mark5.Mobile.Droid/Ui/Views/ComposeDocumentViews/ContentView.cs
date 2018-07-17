@@ -178,11 +178,17 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             Document.HtmlBody = await AsyncHelpers.RunOnUiThreadAsync((Activity)Context, () => GetContentAsync());
         }
 
-        public async Task InsertTemplate(Template template)
+        public async Task InsertTemplate(Template template, bool initializing)
         {
             string insertTemplateJs;
-            using (var sr = new StreamReader(context.Assets.Open("insertTemplate.js")))
-                insertTemplateJs = sr.ReadToEnd();
+
+            if(initializing) {
+                using (var sr = new StreamReader(context.Assets.Open("initTemplate.js")))
+                    insertTemplateJs = sr.ReadToEnd();
+            } else {
+                using (var sr = new StreamReader(context.Assets.Open("insertTemplate.js")))
+                    insertTemplateJs = sr.ReadToEnd();
+            }
 
             if (template.ContentType == ContentType.PlainText)
             {
@@ -198,10 +204,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             var result = await newContentWebView.EvaluateJavaScriptAsync(insertTemplateJs);
         }
 
+
         public async Task InsertLocalTemplate(string localTemplate)
         {
             string insertTemplateJs;
-            using (var sr = new StreamReader(context.Assets.Open("insertTemplate.js")))
+            using (var sr = new StreamReader(context.Assets.Open("initTemplate.js")))
                 insertTemplateJs = sr.ReadToEnd();
 
             var localTemplateText = Regex.Replace(localTemplate, @"\r\n?|\n", "\\n", RegexOptions.Multiline);
