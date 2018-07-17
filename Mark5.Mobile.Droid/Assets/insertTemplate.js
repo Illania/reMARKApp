@@ -3,10 +3,9 @@ var templateNode = document.createElement('div');
 templateNode.setAttribute('id', 'template_%%1%%');
 var templateContent = `%%2%%`;
 
-var editor = document.getElementById('editor');
 var selection = window.getSelection();
 
-if(selection !== undefined && selection.length > 0) {
+if(selection !== undefined) {
     var range = selection.getRangeAt(0);
     range.deleteContents();
 
@@ -33,8 +32,5 @@ if(selection !== undefined && selection.length > 0) {
         selection.removeAllRanges();
         selection.addRange(range);
     }
-} else {
-    var editor = document.getElementById('editor');
-    editor.prepend(templateNode);
 }
 
