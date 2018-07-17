@@ -1655,6 +1655,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var popoverDelegate = new PopoverPresentationControllerDelegate(tableView, tableView.CellAt(indexPath));
 
+                CommonConfig.UsageAnalytics.LogEvent(new SwipeActionUsedEvent());
+
                 switch (swipeAction.Action)
                 {
                     case EmailSwipeAction.SwipeAction.MarkAsRead:

@@ -5,6 +5,8 @@ using Mark5.Mobile.IOS.Utilities;
 using Mark5.Mobile.IOS.Utilities.Extensions;
 using UIKit;
 using System.Linq;
+using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
@@ -45,19 +47,32 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (leadingSwipeButton != null)
             {
                 var action = PlatformConfig.Preferences.EmailLeadingSwipeActions.First();
-                if (action != null) leadingSwipeButton.SetTitle(action.GetName(), UIControlState.Normal);
+                if (action != null) {
+                    BeginInvokeOnMainThread(() =>
+                    {
+                        leadingSwipeButton.SetTitle(action.GetName(), UIControlState.Normal);
+                    });
+                }
             }
 
             if (middleSwipeButton != null)
             {
                 var action = PlatformConfig.Preferences.EmailTrailingSwipeActions.ElementAt(1);
-                if (action != null) middleSwipeButton.SetTitle(action.GetName(), UIControlState.Normal);
+                if (action != null) {
+                    BeginInvokeOnMainThread(() =>
+                    {
+                        middleSwipeButton.SetTitle(action.GetName(), UIControlState.Normal);
+                    });
+                } 
             }
 
             if (lastSwipeButton != null)
             {
                 var action = PlatformConfig.Preferences.EmailTrailingSwipeActions.Last();
-                if (action != null) lastSwipeButton.SetTitle(action.GetName(), UIControlState.Normal);
+                if (action != null) BeginInvokeOnMainThread(() =>
+                {
+                    lastSwipeButton.SetTitle(action.GetName(), UIControlState.Normal);
+                });
             }
         }
 
@@ -369,6 +384,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             defaultsBtn.TouchUpInside += (object sender, EventArgs e) =>
             {
+                CommonConfig.UsageAnalytics.LogEvent(new SwipeActionChangedEvent());
                 PlatformConfig.Preferences.ResetSwipeActions();
             };
         }
@@ -614,6 +630,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         #region Actions
         void SetAction(nint tag, EmailSwipeAction.SwipeAction action)
         {
+
+            CommonConfig.UsageAnalytics.LogEvent(new SwipeActionChangedEvent());
+
             switch (tag)
             {
                 case 0:

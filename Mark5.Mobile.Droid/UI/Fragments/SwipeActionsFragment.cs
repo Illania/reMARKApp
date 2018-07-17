@@ -9,6 +9,7 @@ using Mark5.Mobile.Droid.Utilities;
 using Android.Support.V7.Preferences;
 using Android.Widget;
 using Android.Support.V7.Widget;
+using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -55,9 +56,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                                                                            PlatformConfig.Preferences.EmailLeadingSwipeAction, 
                                                                            null,
                                                                            (action) => { return GetActionTitle(action); });
-                    if(option != null) {
-                        PlatformConfig.Preferences.EmailLeadingSwipeAction = option;
-                    }
+                    
+                    CommonConfig.UsageAnalytics.LogEvent(new SwipeActionChangedEvent());
+                    PlatformConfig.Preferences.EmailLeadingSwipeAction = option;
+
                 };
             }
 
@@ -70,16 +72,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                                                                            PlatformConfig.Preferences.EmailTrailingSwipeAction,
                                                                            null,
                                                                            (action) => { return GetActionTitle(action); });
-                    if (option != null)
-                    {
-                        PlatformConfig.Preferences.EmailTrailingSwipeAction = option;
-                    }
+                   
+                    CommonConfig.UsageAnalytics.LogEvent(new SwipeActionChangedEvent());
+                    PlatformConfig.Preferences.EmailTrailingSwipeAction = option;
+
                 };
             }
 
             var defaultsBtn = rootView.FindViewById(Resource.Id.swipe_defaults_btn);
             if(defaultsBtn != null) {
                 defaultsBtn.Click += (object sender, System.EventArgs e) => {
+                    CommonConfig.UsageAnalytics.LogEvent(new SwipeActionChangedEvent());
                     PlatformConfig.Preferences.ResetSwipeActions();
                 };
             }

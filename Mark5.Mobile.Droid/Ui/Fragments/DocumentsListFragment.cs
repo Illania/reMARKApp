@@ -1496,6 +1496,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
        
             async void SwipeActionSelected(Preferences.EmailSwipeAction action, RecyclerView.ViewHolder viewHolder)
             {
+                CommonConfig.UsageAnalytics.LogEvent(new SwipeActionUsedEvent());
+
                 if (SwipeActionAllowed(action))
                 {
                     switch (action)

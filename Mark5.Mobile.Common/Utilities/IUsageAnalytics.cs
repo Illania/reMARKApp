@@ -727,4 +727,22 @@ namespace Mark5.Mobile.Common.Utilities
 
     #endregion
 
+    #region Swipe Related
+
+    public class SwipeActionUsedEvent : AnalyticsEvent
+    {
+        public SwipeActionUsedEvent() : base("swipe_action_used")
+        {
+        }
+
+    }
+
+    public class SwipeActionChangedEvent : AnalyticsEvent
+    {
+        public SwipeActionChangedEvent() : base("swipe_action_changed")
+        {
+        }
+    }
+
+    #endregion
 }
