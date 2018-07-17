@@ -72,7 +72,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 Preferences = preferences,
                 UserContentController = userContentController,
                 DataDetectorTypes = WKDataDetectorTypes.All,
-                WebsiteDataStore = WKWebsiteDataStore.NonPersistentDataStore
+                WebsiteDataStore = WKWebsiteDataStore.NonPersistentDataStore,
+                SelectionGranularity = WKSelectionGranularity.Character
             };
 
             webView = new WKWebView(CGRect.Empty, configuration)
@@ -420,6 +421,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 sw.Restart();
             }
 
+            await InjectOverflowCorrection(htmlDocument);
+
             sw.Stop();
 
             return htmlDocument.DocumentNode.OuterHtml;
@@ -443,6 +446,17 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 await InjectReplyHeader(htmlDocument, config.ReplyHeaderParameters);
 
             return htmlDocument.DocumentNode.OuterHtml;
+        }
+
+        Task InjectOverflowCorrection(HtmlDocument html)
+        { 
+            return Task.Run(() =>
+            {
+                var htmlNode = html.DocumentNode.SelectSingleNode("//html");
+                if (htmlNode == null)
+                    return;
+                htmlNode.SetAttributeValue("style", "overflow:hidden;");
+            });
         }
 
         Task<string> MakeHtmlSafe(string html)
@@ -512,6 +526,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 viewportElement.SetAttributeValue("id", "viewport");
                 viewportElement.SetAttributeValue("name", "viewport");
                 viewportElement.SetAttributeValue("content", "initial-scale=1, minimum-scale=0.75, maximum-scale=1.25, user-scalable=yes");
+
                 headNode.PrependChild(viewportElement);
             });
         }
