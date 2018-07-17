@@ -156,13 +156,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
                 cell.TextLabel.Text = specifier.Title;
-
-                if (CallIdExtensionUtilities.IsCallIdExtensionEnabled().Result)
-                    cell.DetailTextLabel.Text = "Enabled";
-                else
-                    cell.DetailTextLabel.Text = "Disabled";
-                    
-                cell.DetailTextLabel.TextColor = Theme.DarkGray;
+                try {
+                    if (CallIdExtensionUtilities.IsCallIdExtensionEnabled().Result)
+                        cell.DetailTextLabel.Text = "Enabled";
+                    else
+                        cell.DetailTextLabel.Text = "Disabled";
+                        
+                    cell.DetailTextLabel.TextColor = Theme.DarkGray;
+                } catch(Exception ex) {
+                    CommonConfig.Logger.Error("Call ID extension not available exception ", ex);
+                }
                 return cell;
             }
 

@@ -921,7 +921,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                 ProcessTemplate(template, previousDocumentPreview);
 
-                var insertTemplateJs = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/insertTemplate", "js"));
+                var insertTemplateJs = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/initTemplate", "js"));
                 if (template.ContentType == ContentType.PlainText)
                 {
                     var templateText = Regex.Replace(template.Content, @"\r\n?|\n", "\\n", RegexOptions.Multiline);
@@ -998,8 +998,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         {
             if (string.IsNullOrEmpty(PlatformConfig.Preferences.LocalTemplate))
                 return;
-
-            var insertTemplateJs = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/insertTemplate", "js"));
+            var insertTemplateJs = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/initTemplate", "js"));
             var localTemplateText = Regex.Replace(PlatformConfig.Preferences.LocalTemplate, @"\r\n?|\n", "\\n", RegexOptions.Multiline);
             insertTemplateJs = ProcessWebTemplate(insertTemplateJs, "text", "local", localTemplateText);
 
