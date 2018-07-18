@@ -1157,6 +1157,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 var f = items[indexPath.LongSection][indexPath.Row];
                 var actions = new List<UITableViewRowAction>();
 
+                if (indexPath.LongSection < 0 || indexPath.Row < 0 || indexPath.LongSection > items.Count || indexPath.Row > items[indexPath.LongSection].Count)
+                    return actions.ToArray();
+
                 if (FavoriteStatus.ContainsKey(f.Id))
                     if (FavoriteStatus[f.Id])
                     {
