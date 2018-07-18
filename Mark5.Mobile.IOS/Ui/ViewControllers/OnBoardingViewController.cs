@@ -50,7 +50,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 View.AddConstraints(new[]
                 {
                     mainView.WidthAnchor.ConstraintEqualTo(500f),
-                    mainView.HeightAnchor.ConstraintEqualTo(800f)
+                    mainView.HeightAnchor.ConstraintEqualTo(750f)
                 });
             }
 

@@ -59,7 +59,7 @@ namespace Mark5.Mobile.Droid.Utilities
             var currentVersionCode = float.Parse(context.PackageManager.GetPackageInfo(context.PackageName, 0).VersionName);
             var storedVersionCode = PreferenceManager.GetDefaultSharedPreferences(context).GetFloat(appVersionKey, 0);
 
-            return currentVersionCode > storedVersionCode;
+            return true;//currentVersionCode > storedVersionCode;
         }
 
         static void SaveAppVersionName(Context context)
