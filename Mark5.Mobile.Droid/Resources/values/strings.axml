@@ -203,7 +203,7 @@
     <string name="invalid_subject_title">Empty subject</string>
     <string name="invalid_subject_content">The subject line is empty. Do you still want to send the email?</string>
     <string name="invalid_emails_and_subject_title">Invalid emails and empty subject</string>
-    <string name="invalid_emails_and_subject_content">Not all emails you entered are valid and the subject line is empty. Do you still want to send the mail?</string>
+    <string name="invalid_emails_and_subject_content">Not all emails you entered are valid and the subject line is empty. Do you still want to send the email?</string>
     <string name="invalid_line_draft_title">Invalid mailbox</string>
     <string name="invalid_line_draft_content">You need to select a mailbox to save this draft</string>
     <string name="large_attachment">This attachment is larger than 20MB. Do you want to download it?</string>
