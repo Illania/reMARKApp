@@ -654,6 +654,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (saveDraft)
                 CommonConfig.UsageAnalytics.LogEvent(new ComposeSaveDraftEvent());
 
+
             async void sendAction()
             {
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, saveDraft ? Resource.String.saving_draft : Resource.String.sending_document, Resource.String.please_wait);
@@ -696,12 +697,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var allEmailsValid = new RecipientsView[] { toView, ccView, bccView }.All(rv => rv.AllEmailsValid);
 
+            if (saveDraft && lineView.LineSelectedIsAmbiguous)
+            {
+                Dialogs.ShowConfirmDialog(Context, Resource.String.invalid_line_draft_title, Resource.String.invalid_line_draft_content, () => fab.Enabled = true);
+                return;
+            }
+
             if (!allEmailsValid && subjectView.Empty)
-                Dialogs.ShowYesNoDialog(Context, Resource.String.invalid_emails_and_subject_title, Resource.String.invalid_emails_and_subject_content, sendAction, () => fab.Enabled = true);
+                Dialogs.ShowYesNoDialog(Context, saveDraft ? Resource.String.invalid_emails_and_subject_draft_title : Resource.String.invalid_emails_and_subject_title,
+                                        saveDraft ? Resource.String.invalid_emails_and_subject_draft_content : Resource.String.invalid_emails_and_subject_content, sendAction, () => fab.Enabled = true);
             else if (!allEmailsValid)
-                Dialogs.ShowYesNoDialog(Context, Resource.String.invalid_emails_title, Resource.String.invalid_emails_content, sendAction, () => fab.Enabled = true);
+                Dialogs.ShowYesNoDialog(Context, saveDraft ? Resource.String.invalid_emails_draft_title : Resource.String.invalid_emails_title, 
+                                        saveDraft ? Resource.String.invalid_emails_draft_content : Resource.String.invalid_emails_content, sendAction, () => fab.Enabled = true);
             else if (subjectView.Empty)
-                Dialogs.ShowYesNoDialog(Context, Resource.String.invalid_subject_title, Resource.String.invalid_subject_content, sendAction, () => fab.Enabled = true);
+                Dialogs.ShowYesNoDialog(Context, saveDraft ? Resource.String.invalid_subject_draft_title : Resource.String.invalid_subject_title, 
+                                        saveDraft ? Resource.String.invalid_subject_draft_content : Resource.String.invalid_subject_content, sendAction, () => fab.Enabled = true);
             else
                 sendAction();
         }
