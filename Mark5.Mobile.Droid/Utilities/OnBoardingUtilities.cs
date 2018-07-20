@@ -4,7 +4,6 @@ using Android.Support.V7.Preferences;
 using Android.Webkit;
 using Mark5.Mobile.Common;
 using System;
-using System.Collections.Generic;
 using System.IO;
 
 namespace Mark5.Mobile.Droid.Utilities
@@ -59,7 +58,7 @@ namespace Mark5.Mobile.Droid.Utilities
             var currentVersionCode = float.Parse(context.PackageManager.GetPackageInfo(context.PackageName, 0).VersionName);
             var storedVersionCode = PreferenceManager.GetDefaultSharedPreferences(context).GetFloat(appVersionKey, 0);
 
-            return true;//currentVersionCode > storedVersionCode;
+            return currentVersionCode > storedVersionCode;
         }
 
         static void SaveAppVersionName(Context context)

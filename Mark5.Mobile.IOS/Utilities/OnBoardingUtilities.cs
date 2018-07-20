@@ -49,7 +49,7 @@ namespace Mark5.Mobile.IOS.Utilities
             var currentVersionName = float.Parse(NSBundle.MainBundle.InfoDictionary.ValueForKey(new NSString("CFBundleShortVersionString")).ToString());
             var storedVersionName = userDefaults.FloatForKey(appVersionKey);
 
-            return true;//currentVersionName > storedVersionName;
+            return currentVersionName > storedVersionName;
         }
 
         static void SaveAppVersionCode()
