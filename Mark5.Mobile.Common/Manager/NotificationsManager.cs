@@ -33,7 +33,7 @@ namespace Mark5.Mobile.Common.Manager
             this.notificationsDataAccess = notificationsDataAccess;
         }
 
-        public async Task Subscribe(DeviceType deviceType, string pushToken, SourceType sourceType = SourceType.Auto)
+        public async Task Subscribe(DeviceType deviceType, string pushToken, string fcmToken, SourceType sourceType = SourceType.Auto)
         {
             if (string.IsNullOrWhiteSpace(pushToken))
                 throw new ArgumentException("Null or white space push notification token");
@@ -48,6 +48,7 @@ namespace Mark5.Mobile.Common.Manager
                     Token = Token,
                     DeviceType = deviceType.ConvertEnum<DataContract.DeviceType>(),
                     PushToken = pushToken,
+                    FcmToken = fcmToken,
                     Enabled = true
                 });
 

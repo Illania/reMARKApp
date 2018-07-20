@@ -10,7 +10,7 @@ namespace Mark5.Mobile.Common.Manager
         ObjectType[] EnabledObjectTypes { get; }
         DocumentBodyTypeRequest DocumentBodyTypeRequest { get; set; }
 
-        Task Subscribe(DeviceType deviceType, string pushToken, SourceType sourceType = SourceType.Auto);
+        Task Subscribe(DeviceType deviceType, string pushToken, string fcmToken, SourceType sourceType = SourceType.Auto);
 
         Task UnSubscribe(DeviceType deviceType, string pushToken, SourceType sourceType = SourceType.Auto);
 

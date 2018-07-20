@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using Firebase.CloudMessaging;
 using Firebase.Core;
 using Foundation;
 using HockeyApp.iOS;
@@ -31,7 +32,7 @@ using UserNotifications;
 namespace Mark5.Mobile.IOS
 {
     [Register("AppDelegate")]
-    public class AppDelegate : UIApplicationDelegate, IUNUserNotificationCenterDelegate
+    public class AppDelegate : UIApplicationDelegate, IUNUserNotificationCenterDelegate, IMessagingDelegate
     {
         public override UIWindow Window { get; set; }
 
@@ -45,6 +46,8 @@ namespace Mark5.Mobile.IOS
                 InitializeCommon();
 
                 App.Configure(); //Firebase Analytics
+                Messaging.SharedInstance.Delegate = this;
+                Firebase.InstanceID.InstanceId.Notifications.ObserveTokenRefresh(TokenRefreshHandler);
 
                 CommonConfig.Logger.Info("MARK5 initializing...");
                 var isLoggedIn = InitializePlatform(application);
@@ -88,6 +91,11 @@ namespace Mark5.Mobile.IOS
             return false; // Always return false to pass handling of notifications to FinishedLaunching
         }
 
+        private void TokenRefreshHandler(object sender, NSNotificationEventArgs e)
+        {
+            //throw new NotImplementedException();
+        }
+
         public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
         {
             var OneDayInterval = 60 * 24;
@@ -120,6 +128,15 @@ namespace Mark5.Mobile.IOS
             }
 
             return true;
+        }
+
+        [Export("messaging:didReceiveRegistrationToken:")]
+        public void DidReceiveRegistrationToken(Messaging messaging, string fcmToken)
+        {
+            Console.WriteLine($"Firebase registration token: {fcmToken}");
+
+            // TODO: If necessary send token to application server.
+            // Note: This callback is fired at each app startup and whenever a new token is generated.
         }
 
         public override bool ShouldSaveApplicationState(UIApplication application, NSCoder coder) => true;
@@ -200,6 +217,10 @@ namespace Mark5.Mobile.IOS
         {
             CommonConfig.Logger.Info($"Received APNS token: {deviceToken}");
 
+            Messaging.SharedInstance.ApnsToken = deviceToken;
+
+            var fcmToken = Messaging.SharedInstance.FcmToken;
+
             var newToken = new string(deviceToken.ToString().Where(char.IsLetterOrDigit).ToArray());
             var oldToken = PlatformConfig.Preferences.PushNotificationToken;
             PlatformConfig.Preferences.PushNotificationToken = newToken;
@@ -213,7 +234,7 @@ namespace Mark5.Mobile.IOS
             if (!string.IsNullOrWhiteSpace(newToken))
             {
                 CommonConfig.Logger.Info("Sending new APNS token...");
-                Managers.NotificationsManager.Subscribe(DeviceType.IOS, newToken).FireAndForget();
+                Managers.NotificationsManager.Subscribe(DeviceType.IOS, newToken, fcmToken).FireAndForget();
             }
             else
             {
@@ -280,10 +301,12 @@ namespace Mark5.Mobile.IOS
                     vc.SetData(n.ObjectId);
 
                     // we want to remove the previous document view controller in case user is opening emails from notifications - one after another.
-                    if(Window.RootViewController.PresentedViewController != null && Window.RootViewController.PresentedViewController is NavigationController) {
+                    if (Window.RootViewController.PresentedViewController != null && Window.RootViewController.PresentedViewController is NavigationController)
+                    {
                         var navController = Window.RootViewController.PresentedViewController as NavigationController;
-                        if(navController.TopViewController is DocumentViewController) {
-                                navController.DismissViewController(false, null);
+                        if (navController.TopViewController is DocumentViewController)
+                        {
+                            navController.DismissViewController(false, null);
                         }
                     }
 
