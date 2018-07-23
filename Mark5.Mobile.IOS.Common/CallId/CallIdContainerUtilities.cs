@@ -20,9 +20,11 @@ namespace Mark5.Mobile.IOS.Common.CallId
         {
             await Task.Run(() =>
             {
+                var databaseLocked = false;
                 try
                 {
                     LockDatabase();
+                    databaseLocked = true;
 
                     using (var containerUrl = NSFileManager.DefaultManager.GetContainerUrl(AppGroupId))
                     {
@@ -36,7 +38,8 @@ namespace Mark5.Mobile.IOS.Common.CallId
                 }
                 finally
                 {
-                    UnlockDatabase();
+                    if (databaseLocked)
+                        UnlockDatabase();
                 }
             });
         }
@@ -44,11 +47,14 @@ namespace Mark5.Mobile.IOS.Common.CallId
         public static void WipeContainer()
         {
             var fm = NSFileManager.DefaultManager;
+            var databaseLocked = false;
+
             try
             {
                 using (var containerUrl = fm.GetContainerUrl(AppGroupId))
                 {
                     LockDatabase();
+                    databaseLocked = true;
 
                     if (containerUrl.Path != null)
                     {
@@ -77,7 +83,8 @@ namespace Mark5.Mobile.IOS.Common.CallId
             }
             finally
             {
-                UnlockDatabase();
+                if (databaseLocked)
+                    UnlockDatabase();
             }
         }
     }
