@@ -4,6 +4,7 @@ using Android.Content;
 using Android.OS;
 using Android.Support.V4.App;
 using Android.Support.V4.Content;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 
@@ -17,8 +18,10 @@ namespace Mark5.Mobile.Droid.Utilities
 
         const int StackNotification = -1000;
 
-        public static void EmailReceived(Context context, Common.Model.Notification notification)
+        public static async void EmailReceived(Context context, Common.Model.Notification notification)
         {
+            await Managers.NotificationsManager.SaveNotification(notification); 
+
             var nm = (NotificationManager)context.GetSystemService(Context.NotificationService);
             CreateChannelIfNotExists(context,ReceivedEmailChannelId,ReceivedEmailChannelName, NotificationImportance.High);
 
