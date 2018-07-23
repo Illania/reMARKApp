@@ -173,12 +173,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
         public void ClearPage()
         {
             var vc = (DocumentViewController)ViewControllers.FirstOrDefault();
-            var index = viewControllerCache.FindIndex(v => v.DocumentPreview.Id == vc.DocumentPreview.Id);
+
+            if (true || vc == null || viewControllerCache == null)
+                return;
+
+            var index = viewControllerCache.FindIndex(v => v != null && v.DocumentPreview.Id == vc.DocumentPreview.Id);
             if (index >= 0)
             {
                 viewControllerCache[index].RecycleIfNeeded();
                 viewControllerCache.RemoveAt(index);
             }
+
             SetToolbarItems(null, true);
             NavigationItem.SetRightBarButtonItems(new UIBarButtonItem[0], false);
         }
