@@ -174,7 +174,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
         {
             var vc = (DocumentViewController)ViewControllers.FirstOrDefault();
 
-            if (true || vc == null || viewControllerCache == null)
+            if (vc == null || viewControllerCache == null)
                 return;
 
             var index = viewControllerCache.FindIndex(v => v != null && v.DocumentPreview.Id == vc.DocumentPreview.Id);
