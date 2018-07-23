@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
@@ -41,7 +41,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
             InitNavigationBar();
 
             if (InitialDocumentPreview != null && Folder != null)
-                SetPage(Folder, InitialDocumentPreview);
+                SetPage(Folder, InitialDocumentPreview, false);
         }
 
         public override void ViewWillAppear(bool animated)
@@ -165,9 +165,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
 
         #region Public methods
 
-        public void SetPage(Folder folder, DocumentPreview documentPreview)
+        public void SetPage(Folder folder, DocumentPreview documentPreview, bool isSearchActive)
         {
-            ChangePage(folder, documentPreview, UIPageViewControllerNavigationDirection.Forward);
+            ChangePage(folder, documentPreview, UIPageViewControllerNavigationDirection.Forward, isSearchActive);
         }
 
         public void ClearPage()
@@ -211,13 +211,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
             ChangePage(Folder, documentPreview, direction);
         }
 
-        void ChangePage(Folder folder, DocumentPreview documentPreview, UIPageViewControllerNavigationDirection direction)
+        void ChangePage(Folder folder, DocumentPreview documentPreview, UIPageViewControllerNavigationDirection direction, bool isSearchActive = false)
         {
             SetToolbarItems(null, true);
 
             var vc = GetDocumentViewController(folder, documentPreview);
             SetViewControllers(new[] { vc }, direction, false, (finished) => UpdateToolBar(vc));
-            UpdateNavigationBar(documentPreview);
+            CommonConfig.MessengerHub.Publish(new GoToDocumentMessage(this, documentPreview.Id));
+            UpdateNavigationBar(documentPreview, isSearchActive);
         }
 
         DocumentViewController GetDocumentViewController(Folder folder, DocumentPreview documentPreview)
@@ -247,13 +248,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
             SetToolbarItems(ti, true);
         }
 
-        void UpdateNavigationBar(DocumentPreview documentPreview)
+        void UpdateNavigationBar(DocumentPreview documentPreview, bool isSearchActive = false)
         {
-            if (SplitViewController == null || SplitViewController.Collapsed)
-            {
-                nextDocumentButtonItem.Enabled = HasNext(documentPreview);
-                previousDocumentButtonItem.Enabled = HasPrevious(documentPreview);
+            nextDocumentButtonItem.Enabled = HasNext(documentPreview);
+            previousDocumentButtonItem.Enabled = HasPrevious(documentPreview);
 
+            if (isSearchActive && SplitViewController != null && !SplitViewController.Collapsed)
+            {
+                if (documentPreview.Direction == DocumentDirection.Draft)
+                {
+                    var rightButtons = new UIBarButtonItem[1];
+                    rightButtons[0] = editDocumentButtonItem;
+
+                    NavigationItem.SetRightBarButtonItems(rightButtons, false);
+                }
+                else
+                {
+                    var rightButtons = new UIBarButtonItem[0];
+                    NavigationItem.SetRightBarButtonItems(rightButtons, false);
+                }
+            }
+            else
+            {
                 if (documentPreview.Direction == DocumentDirection.Draft)
                 {
                     var rightButtons = new UIBarButtonItem[3];
@@ -268,21 +284,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
                     var rightButtons = new UIBarButtonItem[2];
                     rightButtons[0] = nextDocumentButtonItem;
                     rightButtons[1] = previousDocumentButtonItem;
-                    NavigationItem.SetRightBarButtonItems(rightButtons, false);
-                }
-            }
-            else
-            {
-                if (documentPreview.Direction == DocumentDirection.Draft)
-                {
-                    var rightButtons = new UIBarButtonItem[1];
-                    rightButtons[0] = editDocumentButtonItem;
-
-                    NavigationItem.SetRightBarButtonItems(rightButtons, false);
-                }
-                else
-                {
-                    var rightButtons = new UIBarButtonItem[0];
                     NavigationItem.SetRightBarButtonItems(rightButtons, false);
                 }
             }
