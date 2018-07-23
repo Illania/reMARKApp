@@ -201,6 +201,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             webViewProgressView?.RemoveFromSuperview();
             loadIndicatorView?.RemoveFromSuperview();
             headerContainerView?.RemoveFromSuperview();
+            webView.Hidden = true; //TODO because we can't use the next line, we have a problem on the ipad, as the view continues to be visible when coming back from folder
             //webView?.RemoveFromSuperview(); //TODO This has been commented out to avoid eventual crashes 
             // Github link: https://github.com/xamarin/xamarin-macios/issues/4130#issuecomment-399243880
 
@@ -449,7 +450,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         }
 
         Task InjectOverflowCorrection(HtmlDocument html)
-        { 
+        {
             return Task.Run(() =>
             {
                 var htmlNode = html.DocumentNode.SelectSingleNode("//html");
