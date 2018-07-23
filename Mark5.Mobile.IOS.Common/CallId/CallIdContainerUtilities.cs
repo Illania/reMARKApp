@@ -50,23 +50,26 @@ namespace Mark5.Mobile.IOS.Common.CallId
                 {
                     LockDatabase();
 
-                    var filesInDir = fm.GetDirectoryContent(containerUrl.Path, out NSError err);
-                    if (err != null)
-                        throw new NSErrorException(err);
-
-                    foreach (string s in filesInDir)
+                    if (containerUrl.Path != null)
                     {
-                        var pathToRemove = containerUrl.Path + "/" + s;
+                        var filesInDir = fm.GetDirectoryContent(containerUrl.Path, out NSError err);
+                        if (err != null)
+                            throw new NSErrorException(err);
 
-                        if (fm.FileExists(pathToRemove))
+                        foreach (string s in filesInDir)
                         {
-                            if (s.Contains("log") || s == DatabaseName) //Only wipe log files and database.
+                            var pathToRemove = containerUrl.Path + "/" + s;
+
+                            if (fm.FileExists(pathToRemove))
                             {
-                                fm.Remove(pathToRemove, out err);
-                            }
-                            if (err != null)
-                            {
-                                throw new Exception("Error wiping shared container: " + err.LocalizedFailureReason);
+                                if (s.Contains("log") || s == DatabaseName) //Only wipe log files and database.
+                                {
+                                    fm.Remove(pathToRemove, out err);
+                                }
+                                if (err != null)
+                                {
+                                    throw new Exception("Error wiping shared container: " + err.LocalizedFailureReason);
+                                }
                             }
                         }
                     }
