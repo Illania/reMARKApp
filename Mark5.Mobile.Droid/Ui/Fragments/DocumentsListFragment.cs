@@ -1369,17 +1369,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 this.adapter = adapter;
                 this.refreshLayout = refreshLayout;
                 this.folder = folder;
-
-
             }
 
             public override int GetMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder)
             {
                 if (!Enabled)
                     return MakeMovementFlags(0, 0);
-
-                if (fragment.Folder?.InternalType == FolderInternalType.Worktray)
-                    return MakeMovementFlags(0, ItemTouchHelper.Right);
 
                 return MakeMovementFlags(0, ItemTouchHelper.Left | ItemTouchHelper.Right);
             }
