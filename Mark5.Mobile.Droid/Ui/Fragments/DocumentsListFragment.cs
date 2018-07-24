@@ -734,7 +734,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
             }
-          
+
         }
 
         void SelectDeselectAll(IMenuItem item)
@@ -1398,10 +1398,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public override void OnChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, bool isCurrentlyActive)
             {
-                
+
                 if (actionState != ItemTouchHelper.ActionStateSwipe || viewHolder.AdapterPosition == -1) //Sometimes it gets called for viewHolders that are already gone
                     return;
-                
+
                 var itemView = viewHolder.ItemView;
                 var itemViewHeight = itemView.Bottom - itemView.Top;
 
@@ -1466,12 +1466,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public override void OnSwiped(RecyclerView.ViewHolder viewHolder, int direction)
             {
                 ResetViewHolder(viewHolder, direction);
-                if (direction == ItemTouchHelper.Left) {
-                     SwipeActionSelected(PlatformConfig.Preferences.EmailTrailingSwipeAction, viewHolder);
+                if (direction == ItemTouchHelper.Left)
+                {
+                    SwipeActionSelected(PlatformConfig.Preferences.EmailTrailingSwipeAction, viewHolder);
 
-                } else if (direction == ItemTouchHelper.Right) {
+                }
+                else if (direction == ItemTouchHelper.Right)
+                {
                     SwipeActionSelected(PlatformConfig.Preferences.EmailLeadingSwipeAction, viewHolder);
-                   
+
                 }
             }
 
@@ -1493,7 +1496,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     },
                     400);
             }
-       
+
             async void SwipeActionSelected(Preferences.EmailSwipeAction action, RecyclerView.ViewHolder viewHolder)
             {
                 CommonConfig.UsageAnalytics.LogEvent(new SwipeActionUsedEvent());
@@ -1505,8 +1508,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         case Preferences.EmailSwipeAction.Delete:
                             fragment.DeleteAction(new List<DocumentPreview>() { adapter.Items[viewHolder.AdapterPosition] });
                             break;
+                        case Preferences.EmailSwipeAction.CopyToFolder:
+                            fragment.StartActivity(CopyMoveToFolderListActivity.CreateIntent(context, CopyMoveToFolderListActivity.ModeType.Copy, ModuleType.Documents,
+                                                                                             new List<DocumentPreview> { adapter.Items[viewHolder.AdapterPosition] }.Cast<IBusinessEntity>().ToList(), folder));
+                            break;
                         case Preferences.EmailSwipeAction.More:
-                            var index = await Dialogs.ShowListDialog(context, Resource.String.pref_email_swipe_dialog_title , Resource.Array.pref_email_swipe_actions_entries, true);
+                            var index = await Dialogs.ShowListDialog(context, Resource.String.pref_email_swipe_dialog_title, Resource.Array.pref_email_swipe_actions_entries, true);
                             if (index >= 0)
                             {
                                 SwipeActionSelected(PlatformConfig.Preferences.GetAllAvailableActions()[index], viewHolder);
@@ -1536,9 +1543,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                             break;
                         case Preferences.EmailSwipeAction.MoveToFolder:
                             fragment.StartActivity(CopyMoveToFolderListActivity.CreateIntent(context, CopyMoveToFolderListActivity.ModeType.Move, ModuleType.Documents,
-                                                                                             adapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList(), folder));
+                                                                                             new List<DocumentPreview> { adapter.Items[viewHolder.AdapterPosition] }.Cast<IBusinessEntity>().ToList(), folder));
                             break;
-                        
+
                     }
                 }
 
