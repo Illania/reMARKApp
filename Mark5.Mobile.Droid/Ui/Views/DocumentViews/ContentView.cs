@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Android.Content;
-using Android.Support.V4.View;
 using Android.Views;
 using Android.Webkit;
 using Mark5.Mobile.Common.Model;
