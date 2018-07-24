@@ -650,7 +650,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var actions = new List<UITableViewRowAction>();
 
-                if (indexPath.Row < 0 || indexPath.Row > Items.Count)
+                if (indexPath.Row < 0 || indexPath.Row >= Items.Count)
                     return actions.ToArray();
 
                 var documentPreview = Items[indexPath.Row];

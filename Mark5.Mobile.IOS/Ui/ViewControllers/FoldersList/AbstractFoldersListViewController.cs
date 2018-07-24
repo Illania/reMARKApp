@@ -1156,7 +1156,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             {
                 var actions = new List<UITableViewRowAction>();
 
-                if (indexPath.LongSection < 0 || indexPath.Row < 0 || indexPath.LongSection > items.Count || indexPath.Row > items[indexPath.LongSection].Count)
+                if (indexPath.LongSection < 0 || indexPath.Row < 0 || indexPath.LongSection >= items.Count || indexPath.Row >= items[indexPath.LongSection].Count)
                     return actions.ToArray();
                 
                 var f = items[indexPath.LongSection][indexPath.Row];
@@ -1464,7 +1464,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             {
                 var actions = new List<UITableViewRowAction>();
 
-                if (indexPath.Row < 0 || indexPath.Row > items.Count)
+                if (indexPath.Row < 0 || indexPath.Row >= items.Count)
                     return actions.ToArray();
 
                 var f = items[indexPath.Row];
@@ -1717,7 +1717,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             {
                 var actions = new List<UITableViewRowAction>();
 
-                if (indexPath.Row < 0 || indexPath.Row > items.Count)
+                if (indexPath.Row < 0 || indexPath.Row >= items.Count)
                     return actions.ToArray();
                 
                 var f = items[indexPath.Row];

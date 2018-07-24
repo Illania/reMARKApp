@@ -827,7 +827,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             {
                 var actions = new List<UITableViewRowAction>();
 
-                if (indexPath.Section < 0 || indexPath.Row < 0 || indexPath.Section > items.Count || indexPath.Row > items[indexPath.Section].Count)
+                if (indexPath.Section < 0 || indexPath.Row < 0 || indexPath.Section >= items.Count || indexPath.Row >= items[indexPath.Section].Count)
                     return actions.ToArray();
 
                 var shortcodePreview = items[indexPath.Section][indexPath.Row];
