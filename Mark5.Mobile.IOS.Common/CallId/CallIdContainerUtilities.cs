@@ -20,9 +20,11 @@ namespace Mark5.Mobile.IOS.Common.CallId
         {
             await Task.Run(() =>
             {
+                var databaseLocked = false;
                 try
                 {
                     LockDatabase();
+                    databaseLocked = true;
 
                     using (var containerUrl = NSFileManager.DefaultManager.GetContainerUrl(AppGroupId))
                     {
@@ -36,7 +38,8 @@ namespace Mark5.Mobile.IOS.Common.CallId
                 }
                 finally
                 {
-                    UnlockDatabase();
+                    if (databaseLocked)
+                        UnlockDatabase();
                 }
             });
         }
@@ -44,29 +47,35 @@ namespace Mark5.Mobile.IOS.Common.CallId
         public static void WipeContainer()
         {
             var fm = NSFileManager.DefaultManager;
+            var databaseLocked = false;
+
             try
             {
                 using (var containerUrl = fm.GetContainerUrl(AppGroupId))
                 {
                     LockDatabase();
+                    databaseLocked = true;
 
-                    var filesInDir = fm.GetDirectoryContent(containerUrl.Path, out NSError err);
-                    if (err != null)
-                        throw new NSErrorException(err);
-
-                    foreach (string s in filesInDir)
+                    if (containerUrl.Path != null)
                     {
-                        var pathToRemove = containerUrl.Path + "/" + s;
+                        var filesInDir = fm.GetDirectoryContent(containerUrl.Path, out NSError err);
+                        if (err != null)
+                            throw new NSErrorException(err);
 
-                        if (fm.FileExists(pathToRemove))
+                        foreach (string s in filesInDir)
                         {
-                            if (s.Contains("log") || s == DatabaseName) //Only wipe log files and database.
+                            var pathToRemove = containerUrl.Path + "/" + s;
+
+                            if (fm.FileExists(pathToRemove))
                             {
-                                fm.Remove(pathToRemove, out err);
-                            }
-                            if (err != null)
-                            {
-                                throw new Exception("Error wiping shared container: " + err.LocalizedFailureReason);
+                                if (s.Contains("log") || s == DatabaseName) //Only wipe log files and database.
+                                {
+                                    fm.Remove(pathToRemove, out err);
+                                }
+                                if (err != null)
+                                {
+                                    throw new Exception("Error wiping shared container: " + err.LocalizedFailureReason);
+                                }
                             }
                         }
                     }
@@ -74,7 +83,8 @@ namespace Mark5.Mobile.IOS.Common.CallId
             }
             finally
             {
-                UnlockDatabase();
+                if (databaseLocked)
+                    UnlockDatabase();
             }
         }
     }

@@ -16,10 +16,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         WKWebView webView;
         UIButton okButton;
 
-        NSLayoutConstraint[] sharedConstraints;
-        NSLayoutConstraint compactConstraint;
-        NSLayoutConstraint regularConstraint;
-
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
@@ -35,25 +31,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             View.Add(mainView);
 
-            sharedConstraints = new[]
+            View.AddConstraints(new[]
             {
                 mainView.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
-                mainView.CenterYAnchor.ConstraintEqualTo(View.CenterYAnchor),
-                mainView.WidthAnchor.ConstraintEqualTo(Integration.IsIPhone() ? 250f : 300f)
-            };
-
-            if (TraitCollection.VerticalSizeClass == UIUserInterfaceSizeClass.Compact)
-                compactConstraint = mainView.HeightAnchor.ConstraintEqualTo(Integration.IsIPhone() ? UIScreen.MainScreen.Bounds.Height - 50f : 600f);
-            else
-                compactConstraint = mainView.HeightAnchor.ConstraintEqualTo(Integration.IsIPhone() ? UIScreen.MainScreen.Bounds.Width - 50f : 600f);
-
-            regularConstraint = mainView.HeightAnchor.ConstraintEqualTo(Integration.IsIPhone() ? 500f : 600f);
-
-            View.AddConstraints(sharedConstraints);
-            View.AddConstraint(regularConstraint);
+                mainView.CenterYAnchor.ConstraintEqualTo(View.CenterYAnchor)
+            });
 
             if (Integration.IsIPhone())
-                View.AddConstraint(compactConstraint);
+            {
+                View.AddConstraints(new[]
+                {
+                    mainView.WidthAnchor.ConstraintEqualTo(View.WidthAnchor),
+                    mainView.HeightAnchor.ConstraintEqualTo(View.HeightAnchor)
+                });
+            }
+            else
+            {
+                View.AddConstraints(new[]
+                {
+                    mainView.WidthAnchor.ConstraintEqualTo(500f),
+                    mainView.HeightAnchor.ConstraintEqualTo(750f)
+                });
+            }
 
             titleTextView = new UITextView
             {
@@ -70,10 +69,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             mainView.AddConstraints(new[]
             {
-                titleTextView.TopAnchor.ConstraintEqualTo(mainView.TopAnchor, Integration.IsIPhone() ? 10f : 20f),
-                titleTextView.TrailingAnchor.ConstraintEqualTo(mainView.TrailingAnchor, Integration.IsIPhone() ? -10f : -20f),
-                titleTextView.LeadingAnchor.ConstraintEqualTo(mainView.LeadingAnchor, Integration.IsIPhone() ? 10f : 20f),
-                titleTextView.HeightAnchor.ConstraintEqualTo(50f)
+                titleTextView.TopAnchor.ConstraintEqualTo(mainView.TopAnchor, Integration.IsIPhone() ? 50f : 20f),
+                titleTextView.TrailingAnchor.ConstraintEqualTo(mainView.TrailingAnchor, Integration.IsIPhone() ? -20f : -30f),
+                titleTextView.LeadingAnchor.ConstraintEqualTo(mainView.LeadingAnchor, Integration.IsIPhone() ? 20f : 30f),
+                titleTextView.HeightAnchor.ConstraintEqualTo(70f)
             });
 
             var wkPreferences = new WKPreferences
@@ -109,8 +108,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             mainView.AddConstraints(new[]
             {
-                webView.TopAnchor.ConstraintEqualTo(titleTextView.BottomAnchor),
-                webView.WidthAnchor.ConstraintEqualTo(mainView.WidthAnchor),
+                webView.TopAnchor.ConstraintEqualTo(titleTextView.BottomAnchor, -10f),
+                webView.TrailingAnchor.ConstraintEqualTo(mainView.TrailingAnchor, Integration.IsIPhone() ? 10f : -20f),
+                webView.LeadingAnchor.ConstraintEqualTo(mainView.LeadingAnchor, Integration.IsIPhone() ? 10f : 20f),
                 webView.CenterXAnchor.ConstraintEqualTo(mainView.CenterXAnchor)
             });
 
@@ -134,25 +134,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 okButton.BottomAnchor.ConstraintEqualTo(mainView.BottomAnchor),
                 webView.BottomAnchor.ConstraintEqualTo(okButton.TopAnchor)
             });
-        }
-
-        public override void TraitCollectionDidChange(UITraitCollection previousTraitCollection)
-        {
-            base.TraitCollectionDidChange(previousTraitCollection);
-
-            if (Integration.IsIPad())
-                return;
-
-            if (TraitCollection.VerticalSizeClass == UIUserInterfaceSizeClass.Compact)
-            {
-                regularConstraint.Active = false;
-                compactConstraint.Active = true;
-            }
-            else
-            {
-                compactConstraint.Active = false;
-                regularConstraint.Active = true;
-            }
         }
 
         public override void ViewDidAppear(bool animated)

@@ -4,7 +4,6 @@ using Android.Support.V7.Preferences;
 using Android.Webkit;
 using Mark5.Mobile.Common;
 using System;
-using System.Collections.Generic;
 using System.IO;
 
 namespace Mark5.Mobile.Droid.Utilities
