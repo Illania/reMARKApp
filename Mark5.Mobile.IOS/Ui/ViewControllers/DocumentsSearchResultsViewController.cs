@@ -281,6 +281,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var point = recognizer.LocationInView(TableView);
             var indexPath = TableView.IndexPathForRowAtPoint(point);
 
+            if (indexPath == null)
+                return;
+
             if (!TableView.CellAt(indexPath)?.UserInteractionEnabled ?? true)
                 return;
 
