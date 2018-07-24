@@ -448,6 +448,7 @@
     <Compile Include="Utilities\Fingerprint\FingerprintUiHelper.cs" />
     <Compile Include="Utilities\ApplicationLifecycleHandler.cs" />
     <Compile Include="Ui\Fragments\AuthenticationDialogFragment.cs" />
+    <Compile Include="Utilities\NotificationUtilities.cs" />
     <Compile Include="Utilities\CallerId\CallerIdDatabaseProvider.cs" />
     <Compile Include="Utilities\CallerId\CallStateBroadcastReceiver.cs" />
     <Compile Include="Ui\Fragments\SwipeActionsFragment.cs" />
