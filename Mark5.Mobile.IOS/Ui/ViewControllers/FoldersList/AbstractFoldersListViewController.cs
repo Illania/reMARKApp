@@ -1154,8 +1154,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
             {
-                var f = items[indexPath.LongSection][indexPath.Row];
                 var actions = new List<UITableViewRowAction>();
+
+                if (indexPath.LongSection < 0 || indexPath.Row < 0 || indexPath.LongSection >= items.Count || indexPath.Row >= items[indexPath.LongSection].Count)
+                    return actions.ToArray();
+                
+                var f = items[indexPath.LongSection][indexPath.Row];
 
                 if (FavoriteStatus.ContainsKey(f.Id))
                     if (FavoriteStatus[f.Id])
@@ -1458,8 +1462,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
             {
-                var f = items[indexPath.Row];
                 var actions = new List<UITableViewRowAction>();
+
+                if (indexPath.Row < 0 || indexPath.Row >= items.Count)
+                    return actions.ToArray();
+
+                var f = items[indexPath.Row];
 
                 if (FavoriteStatus.ContainsKey(f.Id))
                     if (FavoriteStatus[f.Id])
@@ -1707,8 +1715,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
             {
-                var f = items[indexPath.Row];
                 var actions = new List<UITableViewRowAction>();
+
+                if (indexPath.Row < 0 || indexPath.Row >= items.Count)
+                    return actions.ToArray();
+                
+                var f = items[indexPath.Row];
 
                 if (FavoriteStatus.ContainsKey(f.Id))
                     if (FavoriteStatus[f.Id])
