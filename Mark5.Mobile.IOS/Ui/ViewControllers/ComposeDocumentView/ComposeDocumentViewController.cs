@@ -789,6 +789,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async Task<bool> SaveDraft()
         {
+            if (lineView.LineSelectedIsAmbiguous)
+            {
+                await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("warning"), Localization.GetString("no_line_selected_draft"));
+                return false;
+            }
+
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("saving_draft___"));
 
             CommonConfig.UsageAnalytics.LogEvent(new ComposeSaveDraftEvent());
