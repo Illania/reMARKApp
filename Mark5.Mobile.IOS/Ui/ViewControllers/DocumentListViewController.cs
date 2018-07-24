@@ -1497,6 +1497,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var actionWrappers = new List<SwipeActionUIWrapper>();
 
+                if (indexPath.Row < 0 || indexPath.Row >= Items.Count)
+                    return actionWrappers.Select(a => a.Action).ToArray();
+
                 var documentPreview = Items[indexPath.Row];
 
                 List<EmailSwipeAction> trailingSwipeActions = PlatformConfig.Preferences.EmailTrailingSwipeActions;
