@@ -67,8 +67,8 @@
 	<key>NSFaceIDUsageDescription</key>
 	<string>MARK5 needs your permission to use Face ID to provide additional security</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.6</string>
+	<string>2.7</string>
 	<key>CFBundleVersion</key>
-	<string>229</string>
+	<string>230</string>
 </dict>
 </plist>

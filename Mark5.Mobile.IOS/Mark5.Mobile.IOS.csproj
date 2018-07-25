@@ -606,7 +606,7 @@
 		<BundleResource Include="Resources\startscreens\start-screen-bg-retinahd47.png" />
 		<BundleResource Include="Resources\startscreens\start-screen-bg-retinahd55-landscape.png" />
 		<BundleResource Include="Resources\startscreens\start-screen-bg-retinahd55.png" />
-		<BundleResource Include="Resources\html\changelogs\changelog_2.6.html" />
+		<BundleResource Include="Resources\html\changelogs\changelog_2.7.html" />
 		<BundleResource Include="Resources\html\initTemplate.js" />
 	</ItemGroup>
 	<ItemGroup>
