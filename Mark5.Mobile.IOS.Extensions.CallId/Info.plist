@@ -22,7 +22,7 @@
 		<string>CallDirectoryHandler</string>
 	</dict>
 	<key>CFBundleIdentifier</key>
-	<string>com.nordic-it.mark5.mobile.ios.extensions.callid</string>
+	<string>com.nordic-it.mark5.mobile.ios.callid</string>
 	<key>CFBundleVersion</key>
 	<string>230</string>
 	<key>CFBundleShortVersionString</key>
