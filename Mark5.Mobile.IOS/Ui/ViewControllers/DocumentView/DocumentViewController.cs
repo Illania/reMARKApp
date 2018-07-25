@@ -46,7 +46,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         UIBarButtonItem flagButton;
         UIBarButtonItem fileToButton;
-        UIBarButtonItem commentsButton;
+        UIButton commentsButton;
+        BadgeBarButtonItem commentsBadgeButton;
         UIBarButtonItem replyActionsButton;
         UIBarButtonItem userActionsButton;
 
@@ -58,6 +59,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         TinyMessageSubscriptionToken readStatusChangedToken;
         TinyMessageSubscriptionToken draftSentToken;
+        TinyMessageSubscriptionToken commentsCountChangedToken;
 
         public DocumentViewController()
         {
@@ -181,6 +183,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitToolbar()
         {
+            commentsButton = new UIButton
+            {
+                Frame = new CoreGraphics.CGRect(0f, 0f, 25f, 25f),
+                Enabled = false,
+            };
+            commentsButton.SetImage(UIImage.FromBundle("Comments").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+
             ToolbarItems = new[]
             {
                 flagButton = new UIBarButtonItem
@@ -201,9 +210,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     Enabled = false
                 },
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
-                commentsButton = new UIBarButtonItem
+                commentsBadgeButton = new BadgeBarButtonItem(commentsButton)
                 {
-                    Image = UIImage.FromBundle("Comments"),
                     Enabled = false
                 },
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
@@ -234,7 +242,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (replyActionsButton != null)
                 replyActionsButton.Clicked += ReplyActionsButton_Clicked;
             if (commentsButton != null)
-                commentsButton.Clicked += CommentsButton_Clicked;
+                commentsButton.TouchUpInside += CommentsButton_Clicked;
             if (userActionsButton != null)
                 userActionsButton.Clicked += UserActionsButton_Clicked;
 
@@ -264,7 +272,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (replyActionsButton != null)
                 replyActionsButton.Clicked -= ReplyActionsButton_Clicked;
             if (commentsButton != null)
-                commentsButton.Clicked -= CommentsButton_Clicked;
+                commentsButton.TouchUpInside -= CommentsButton_Clicked;
             if (userActionsButton != null)
                 userActionsButton.Clicked -= UserActionsButton_Clicked;
 
@@ -279,6 +287,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             readStatusChangedToken = CommonConfig.MessengerHub.Subscribe<DocumentPreviewReadStatusChangedMessage>(ReadStatusChangedHandler, m => m.DocumentPreviewId == document?.Id);
             draftSentToken = CommonConfig.MessengerHub.Subscribe<DraftSentMessage>(DraftSentHandler, m => m.DocumentId == document?.Id);
+            commentsCountChangedToken = CommonConfig.MessengerHub.Subscribe<EntityPreviewCommentCountChangedMessage>(CommentsCountChangedHandler, m => m.EntityId == document?.Id);
+
         }
 
         void UnsubscribeFromMessages()
@@ -384,6 +394,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             flagButton.Enabled = false;
             fileToButton.Enabled = false;
             replyActionsButton.Enabled = false;
+            commentsBadgeButton.SetBadgeValue("0", false);
+            commentsBadgeButton.Enabled = false;
             commentsButton.Enabled = false;
             userActionsButton.Enabled = false;
 
@@ -535,6 +547,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 flagButton.Enabled = document != null;
                 fileToButton.Enabled = document != null;
                 replyActionsButton.Enabled = document != null;
+                commentsBadgeButton.BadgeValue = document?.Comments?.Count.ToString();
+                commentsBadgeButton.Enabled = document != null;
                 commentsButton.Enabled = document != null;
                 userActionsButton.Enabled = document != null;
             }
@@ -1048,6 +1062,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 else
                     DismissViewController(true, null);
             });
+        }
+
+        void CommentsCountChangedHandler(EntityPreviewCommentCountChangedMessage m)
+        {
+            BeginInvokeOnMainThread(() => commentsBadgeButton.SetBadgeValue(document.Comments.Count().ToString(), false));
         }
 
         #endregion
