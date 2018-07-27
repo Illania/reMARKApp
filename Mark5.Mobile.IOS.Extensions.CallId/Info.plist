@@ -23,9 +23,9 @@
 	</dict>
 	<key>CFBundleIdentifier</key>
 	<string>com.nordic-it.mark5.mobile.ios.callid</string>
-	<key>CFBundleVersion</key>
-	<string>230</string>
 	<key>CFBundleShortVersionString</key>
 	<string>2.7</string>
+	<key>CFBundleVersion</key>
+	<string>231</string>
 </dict>
 </plist>
