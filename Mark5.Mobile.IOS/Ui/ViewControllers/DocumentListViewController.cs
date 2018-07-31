@@ -1726,14 +1726,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         }
                         break;
                     case EmailSwipeAction.SwipeAction.MoveToFolder:
-                        if (SwipeActionAllowed(EmailSwipeAction.SwipeAction.Delete, documentPreview, folder))
+                        if (SwipeActionAllowed(EmailSwipeAction.SwipeAction.MoveToFolder, documentPreview, folder))
                         {
                             viewControllerWeakReference.Unwrap()?.MoveToFolder(documentPreview);
                         }
                         break;
-
                     case EmailSwipeAction.SwipeAction.RemoveFromFolder:
-                        viewControllerWeakReference.Unwrap()?.RemoveFromFolder(documentPreview, popoverDelegate);
+                        if (SwipeActionAllowed(EmailSwipeAction.SwipeAction.RemoveFromFolder, documentPreview, folder))
+                        {
+                            viewControllerWeakReference.Unwrap()?.RemoveFromFolder(documentPreview, popoverDelegate);
+                        }
                         break;
                     default:
                         CommonConfig.Logger.Error("Missed case for EmailSwipeAction : " + swipeAction.Action.ToString());
