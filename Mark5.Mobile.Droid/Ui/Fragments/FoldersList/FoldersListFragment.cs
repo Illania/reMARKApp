@@ -217,8 +217,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     fab.Visibility = ViewStates.Visible;
                 }
             }
-
-
         }
 
         public override void OnSaveInstanceState(Bundle outState)
