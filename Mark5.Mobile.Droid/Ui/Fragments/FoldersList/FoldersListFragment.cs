@@ -1330,6 +1330,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 // Locate and cache view references
                 SectionTitle = itemView as AppCompatTextView;
+                SectionTitle.TextSize = 18;
             }
         }
 
