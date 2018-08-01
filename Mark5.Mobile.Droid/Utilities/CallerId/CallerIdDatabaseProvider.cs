@@ -102,27 +102,36 @@ namespace Mark5.Mobile.Droid.Utilities
 
             var splitNumber = number.Split('|');
 
-            var countryNumber = splitNumber[0];
-
-            if (countryNumber == "") //No country code is defined, so the number will not be handled.
+            if (splitNumber.Length != 3)
                 return;
 
+            var countryNumber = splitNumber[0];
             var regCode = splitNumber[1];
             var baseNumber = splitNumber[2];
 
-            if (regCode != String.Empty) //If there actually is a regional code, then this will be appended with the base number.
-                baseNumber = regCode + baseNumber;
+            if (countryNumber == String.Empty) //No country code is defined, so we try to use the regional as country
+            {
+                countryNumber = regCode;
+            }
+            else
+            {
+                if (regCode != String.Empty) //If there actually is a regional code, then this will be appended with the base number.
+                    baseNumber = regCode + baseNumber;
+            }
+
+            if (countryNumber == String.Empty) //We need to have a country number to continue
+                return;
 
             var phoneNumberUtil = PhoneNumberUtil.GetInstance();
 
             //Get region code for parsing the number. Parsing will remove any char's like '(' or '-'.
-            var countryString = phoneNumberUtil.GetRegionCodeForCountryCode(Convert.ToInt32(countryNumber));
             try
             {
+                var countryString = phoneNumberUtil.GetRegionCodeForCountryCode(Convert.ToInt32(countryNumber));
                 PhoneNumber phoneNumber = phoneNumberUtil.Parse(baseNumber, countryString);
                 number = phoneNumberUtil.Format(phoneNumber, PhoneNumberFormat.E164);
             }
-            catch (NumberParseException)
+            catch (Exception)
             {
                 return; //Number has been stored incorrectly, e.g. it contains letters, so it is ignored.
             }
