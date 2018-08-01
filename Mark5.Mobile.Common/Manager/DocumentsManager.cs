@@ -37,10 +37,10 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task<List<DocumentPreview>> GetDocumentPreviewsAsync(Folder folder, int startId = -1, int endId = -1, SourceType sourceType = SourceType.Auto)
         {
-            return await GetDocumentPreviewsAsync(folder.Id, startId, endId, sourceType);
+            return await GetDocumentPreviewsAsync(folder.Id, folder.Guid, startId, endId, sourceType);
         }
 
-        public async Task<List<DocumentPreview>> GetDocumentPreviewsAsync(int folderId, int startId = -1, int endId = -1, SourceType sourceType = SourceType.Auto)
+        public async Task<List<DocumentPreview>> GetDocumentPreviewsAsync(int folderId, Guid folderGuid, int startId = -1, int endId = -1, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
@@ -51,6 +51,7 @@ namespace Mark5.Mobile.Common.Manager
                 {
                     Token = Token,
                     FolderId = folderId,
+                    FolderGuid = folderGuid,
                     StartId = startId,
                     EndId = endId,
                     MaxToFetch = MaxToFetch,

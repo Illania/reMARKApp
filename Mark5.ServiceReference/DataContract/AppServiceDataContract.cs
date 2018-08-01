@@ -186,6 +186,9 @@ namespace Mark5.ServiceReference.DataContract
         [DataMember(Name = "FolderId", Order = 0)]
         public int FolderId { get; set; } = -1;
 
+        [DataMember(Name = "FolderGuid", Order = 0)]
+        public Guid FolderGuid { get; set; } = Guid.Empty;
+
         [DataMember(Name = "StartId", Order = 0)]
         public int StartId { get; set; } = -1;
 
@@ -197,6 +200,8 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "ReverseSortOrder", Order = 0)]
         public bool ReverseSortOrder { get; set; }
+
+
     }
 
     [DataContract(Name = "GetDocumentPreviewsResult", Namespace = "com.nordic-it.appservice.v3")]
