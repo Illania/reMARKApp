@@ -66,7 +66,7 @@ namespace Mark5.Mobile.Droid.Utilities.Service
                     if (PlatformConfig.Preferences.NotificationsVibrate)
                         nb.SetVibrate(new[] { 500L, 250L, 500L });
 
-                    nm.Notify((int)(Java.Lang.JavaSystem.CurrentTimeMillis() / 1000), nb.Build());
+                    nm.Notify(GroupName, (int)(Java.Lang.JavaSystem.CurrentTimeMillis() / 1000), nb.Build());
 
                     CommonConfig.MessengerHub.Publish(new NewNotificationsReceivedMessage(this));
                 }
@@ -117,7 +117,7 @@ namespace Mark5.Mobile.Droid.Utilities.Service
             var n = builder.Build();
             n.Defaults = 0;
 
-            nm.Notify(StackNotification, n);
+            nm.Notify(GroupName, StackNotification, n);
         }
 
         public void CreateChannelIfNotExists(NotificationManager nm)
