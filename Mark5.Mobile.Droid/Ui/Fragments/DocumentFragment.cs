@@ -113,6 +113,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_with_buttons_and_progress, container, false);
 
+            var scrollView = rootView.FindViewById<ScrollView>(Resource.Id.scroll_view);
+            scrollView.Focusable = true;
+            scrollView.FocusableInTouchMode = true;
+            scrollView.DescendantFocusability = DescendantFocusability.BeforeDescendants;
+
             progress = rootView.FindViewById<ProgressBar>(Resource.Id.progress);
             relativeLayout = rootView.FindViewById<RelativeLayout>(Resource.Id.relative_layout);
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);

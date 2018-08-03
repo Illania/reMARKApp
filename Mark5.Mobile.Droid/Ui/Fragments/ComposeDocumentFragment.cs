@@ -282,7 +282,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (requestCode == RequestCodes.TemplatePreviewRequestCode && resultCode == (int)Result.Ok)
             {
                 var template = Serializer.Deserialize<TemplatePreview>(data.GetStringExtra(TemplatesListActivity.TemplatePreviewResultKey));
-                await GetTemplate(template);
+                await GetTemplate(template, false);
+            }
+            if (requestCode == RequestCodes.TemplatePreviewInitialRequestCode && resultCode == (int)Result.Ok)
+            {
+                var template = Serializer.Deserialize<TemplatePreview>(data.GetStringExtra(TemplatesListActivity.TemplatePreviewResultKey));
+                await GetTemplate(template, true);
             }
         }
 
@@ -401,6 +406,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public const int ShortcodesRequestCode = 444;
             public const int PhonebookRequestCode = 555;
             public const int TemplatePreviewRequestCode = 666;
+            public const int TemplatePreviewInitialRequestCode = 777;
+
         }
 
         #region Subviews event handlers
@@ -653,7 +660,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (saveDraft)
                 CommonConfig.UsageAnalytics.LogEvent(new ComposeSaveDraftEvent());
-            
+
             async void sendAction()
             {
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, saveDraft ? Resource.String.saving_draft : Resource.String.sending_document, Resource.String.please_wait);
@@ -820,7 +827,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (item.ItemId == MenuItemActions.InsertTemplate)
             {
                 CommonConfig.UsageAnalytics.LogEvent(new ComposeInsertTemplateEvent());
-                GetAllTemplates();
+                GetAllTemplates(false);
             }
 
             if (item.ItemId == MenuItemActions.AddAttachment)
@@ -888,7 +895,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 case Preferences.TemplateUsageMode.Default:
                     CommonConfig.UsageAnalytics.LogEvent(new ComposeAddTemplateEvent(TemplateType.Default));
 
-                    await GetDefaultTemplate();
+                    await GetDefaultTemplate(true);
                     break;
                 case Preferences.TemplateUsageMode.Local:
                     CommonConfig.UsageAnalytics.LogEvent(new ComposeAddTemplateEvent(TemplateType.Local));
@@ -902,13 +909,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     switch (result)
                     {
                         case 0:
-                            await GetDefaultTemplate();
+                            await GetDefaultTemplate(true);
                             break;
                         case 1:
                             await GetLocalTemplate();
                             break;
                         case 2:
-                            GetAllTemplates();
+                            GetAllTemplates(true);
                             break;
                         default:
                             CommonConfig.UsageAnalytics.LogEvent(new ComposeAddTemplateEvent(null));
@@ -920,7 +927,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             templateLoaded = true;
         }
 
-        async Task GetDefaultTemplate()
+        async Task GetDefaultTemplate(bool initializing)
         {
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.loading_template, Resource.String.please_wait);
 
@@ -928,7 +935,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var template = await Managers.DocumentsManager.GetDefaultTemplateAsync(documentCreationModeFlag);
                 if (template != null)
-                    await ApplyTemplate(template, true);
+                    await ApplyTemplate(template, initializing);
             }
             catch (Exception ex)
             {
@@ -943,12 +950,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        void GetAllTemplates()
+        void GetAllTemplates(bool initializing)
         {
-            StartActivityForResult(TemplatesListActivity.CreateIntent(Context), RequestCodes.TemplatePreviewRequestCode);
+            StartActivityForResult(TemplatesListActivity.CreateIntent(Context), initializing ? RequestCodes.TemplatePreviewInitialRequestCode
+                                   : RequestCodes.TemplatePreviewRequestCode);
         }
 
-        async Task GetTemplate(TemplatePreview templatePreview)
+        async Task GetTemplate(TemplatePreview templatePreview, bool initializing)
         {
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.loading_template, Resource.String.please_wait);
 
@@ -956,7 +964,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var template = await Managers.DocumentsManager.GetTemplateAsync(templatePreview.Id);
                 if (template != null)
-                    await ApplyTemplate(template, false);
+                    await ApplyTemplate(template, initializing);
             }
             catch (Exception ex)
             {

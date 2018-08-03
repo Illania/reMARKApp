@@ -835,7 +835,7 @@
     <AndroidAsset Include="Assets\plain.html" />
     <AndroidAsset Include="Assets\replyHeader.html" />
     <AndroidAsset Include="Assets\editorScript.js" />
-    <AndroidAsset Include="Assets\changelogs\changelog_2.6.html" />
+    <AndroidAsset Include="Assets\changelogs\changelog_2.7.html" />
     <AndroidAsset Include="Assets\initTemplate.js" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
