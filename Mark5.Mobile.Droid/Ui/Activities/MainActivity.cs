@@ -48,7 +48,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         }
 
         #region Activity lifecycle
-        protected override void OnCreate(Bundle savedInstanceState)
+        protected override async void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
 
@@ -109,6 +109,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 CommonConfig.Logger.Info($"Restored {nameof(MainActivity)}");
             }
+
+            var lol = await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
         }
 
         protected override void OnPostCreate(Bundle savedInstanceState)

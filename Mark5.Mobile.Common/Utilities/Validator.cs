@@ -11,6 +11,7 @@ namespace Mark5.Mobile.Common.Utilities
         const string EmailAddressRegex = @"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?";
         const string OnlyEmailAddressRegex = @"^" + EmailAddressRegex + @"$";
         const string OnlyHexStringRegex = @"^#[A-Fa-f0-9]{0,2}[A-Fa-f0-9]{1,2}[A-Fa-f0-9]{1,2}[A-Fa-f0-9]{1,2}$";
+        const string OnlyUsernameRegex = @"^[a-zA-Z]+$";
 
         public static bool IsUsernameValid(string username)
         {
@@ -81,6 +82,17 @@ namespace Mark5.Mobile.Common.Utilities
         {
             phoneNumber = new string(text.ToCharArray().Where(c => char.IsDigit(c) || c == '+').ToArray());
             return !string.IsNullOrEmpty(phoneNumber);
+        }
+
+        public static bool ContainsValidUsernames(string text, out MatchCollection matches)
+        {
+            matches = ExtractUsernames(text);
+            return matches.Count > 0;
+        }
+
+        public static MatchCollection ExtractUsernames(string text)
+        {
+            return Regex.Matches(text ?? string.Empty, OnlyUsernameRegex, RegexOptions.IgnoreCase);
         }
     }
 }

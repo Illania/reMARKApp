@@ -192,6 +192,16 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                         Type = CommunicationAddressType.Email
                     });
                 }
+
+                foreach (var user in GetInternalUsers())
+                {
+                    DocumentPreview.Addresses.Add(new DocumentAddress
+                    {
+                        Address = user, //this probably isn't right
+                        AddressType = AddressType,
+                        Type = CommunicationAddressType.Internal
+                    });
+                }
             });
 
             return;
@@ -318,6 +328,27 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             emailEditor.Text = string.Join(", ", recipients);
         }
+
+        void SetInternalUsers(string users)
+        {
+            if (Validator.ContainsValidUsernames(users, out MatchCollection matches))
+            {
+                var sb = new StringBuilder();
+                sb.Append(string.Join(EmailSeparator, matches.Cast<Match>().Select(m => m.Value)));
+
+                sb.Append(EmailSeparator);
+
+                emailEditor.Text = sb.ToString();
+            }
+            else
+            {
+                CommonConfig.Logger.Info($"No valid users found in {users}");
+            }
+        }
+
+        IEnumerable<string> GetInternalUsers() => emailEditor.Text.Split(new[] { EmailSeparator }, StringSplitOptions.RemoveEmptyEntries)
+                                                             .Where(s => Validator.IsHostNameValid(s))
+                                                             .Select(s => s.Trim());
 
         void Clear()
         {
