@@ -32,7 +32,8 @@ namespace Mark5.ServiceReference.AppService
             requestUri = $"{(ssl ? "https" : "http")}://{hostname}:{port}/app3";
         }
 
-        async Task<R> InvokeAsync<R, P>(string soapAction, P parameters, CancellationToken ct, bool useShortTimeout = false) where R : class where P : class
+        async Task<R> InvokeAsync<R, P>(string soapAction, P parameters, CancellationToken ct, bool useShortTimeout = false,
+                                           bool checkXmlCharacters = true) where R : class where P : class
         {
             HttpStatusCode statusCode = 0;
             try
@@ -44,7 +45,7 @@ namespace Mark5.ServiceReference.AppService
                     Timeout = TimeSpan.FromSeconds(useShortTimeout ? Config.HttpClientShortTimeoutSeconds : Config.HttpClientTimeoutSeconds),
                 })
                 {
-                    var req = CreateRequest(soapAction, parameters);
+                    var req = CreateRequest(soapAction, parameters, checkXmlCharacters);
                     var res = await c.SendAsync(req, ct);
                     statusCode = res.StatusCode;
                     return await ProcessResponse<R>(soapAction, res);
@@ -66,7 +67,7 @@ namespace Mark5.ServiceReference.AppService
             }
         }
 
-        HttpRequestMessage CreateRequest<P>(string soapAction, P parameters) where P : class
+        HttpRequestMessage CreateRequest<P>(string soapAction, P parameters, bool checkXmlCharacters = true) where P : class
         {
             var req = new HttpRequestMessage(HttpMethod.Post, requestUri);
 
@@ -79,7 +80,7 @@ namespace Mark5.ServiceReference.AppService
                 ConformanceLevel = ConformanceLevel.Document,
                 NewLineHandling = NewLineHandling.None,
                 NamespaceHandling = NamespaceHandling.OmitDuplicates,
-                CheckCharacters = true,
+                CheckCharacters = checkXmlCharacters,
                 Indent = false
             }))
             {
@@ -207,7 +208,7 @@ namespace Mark5.ServiceReference.AppService
 
         public async Task<SendDocumentResult> SendDocumentAsync(SendDocumentParameters parameters, CancellationToken ct = default(CancellationToken))
         {
-            return await InvokeAsync<SendDocumentResult, SendDocumentParameters>("SendDocument", parameters, ct);
+            return await InvokeAsync<SendDocumentResult, SendDocumentParameters>("SendDocument", parameters, ct, checkXmlCharacters: false);
         }
 
         public async Task<SetDocumentsReadStatusResult> SetDocumentsReadStatusAsync(SetDocumentsReadStatusParameters parameters, CancellationToken ct = default(CancellationToken))
