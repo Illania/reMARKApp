@@ -32,6 +32,7 @@ namespace Mark5.Mobile.Common.Utilities
     {
         Recents,
         Contacts,
+        Internal,
         Shortcodes,
         Phonebook,
     }

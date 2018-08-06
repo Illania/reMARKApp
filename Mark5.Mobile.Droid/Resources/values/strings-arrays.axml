@@ -26,6 +26,7 @@
 	<string-array name="picker_choice">
 		<item>Recent addresses</item>
 		<item>Contacts</item>
+        <item>Internal contacts</item>
 		<item>Shortcodes</item>
 		<item>Phonebook</item>
 	</string-array>
