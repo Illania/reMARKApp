@@ -597,6 +597,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             {
                 Localization.GetString("contact_picker_recent_addresses"),
                 Localization.GetString("contact_picker_contacts"),
+                Localization.GetString("contact_picker_internal_contacts"),
                 Localization.GetString("contact_picker_shortcodes"),
                 Localization.GetString("contact_picker_phonebook")
             };
@@ -611,9 +612,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     await DoOpenContacts(sender as RecipientsView);
                     break;
                 case 2:
-                    await DoOpenShortcodes();
+                    await DoOpenInternalContacts(sender as RecipientsView);
                     break;
                 case 3:
+                    await DoOpenShortcodes();
+                    break;
+                case 4:
                     await DoOpenPhonebook(sender as RecipientsView);
                     break;
                 default:
@@ -1064,6 +1068,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             var pa = await vc.Result;
             if (pa != null)
                 recipientsView.AddRecipent(pa.Name, pa.Address);
+        }
+
+        async Task DoOpenInternalContacts(RecipientsView recipientsView)
+        {
+            CommonConfig.UsageAnalytics.LogEvent(new ComposeContactPickerEvent(ContactPickerChoice.Internal));
+
+            //TODO
         }
 
         async Task DoOpenRecents(RecipientsView recipientsView)
