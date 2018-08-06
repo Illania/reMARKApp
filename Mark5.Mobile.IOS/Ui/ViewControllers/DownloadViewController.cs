@@ -813,7 +813,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     }
                     catch (Exception ex)
                     {
-                        onException(ex);
+                        CommonConfig.Logger.Error("Error while creating or cleaning contacts table for Call Id Extension", ex);
                     }
                 }
 
@@ -853,9 +853,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                                     if (caList.Count > 0)
                                     {
-                                        foreach (CommunicationAddress ca in caList)
+                                        try
                                         {
-                                            await CallIdDataAccess.AddContactToExtensionContactsTable(folder.Id, contactName, ca.Address);
+                                            foreach (CommunicationAddress ca in caList)
+                                            {
+                                                await CallIdDataAccess.AddContactToExtensionContactsTable(folder.Id, contactName, ca.Address);
+                                            }
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            CommonConfig.Logger.Error("Error while adding contact to contacts table for Call Id Extension", ex);
                                         }
                                     }
                                 }
@@ -901,8 +908,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     CommonConfig.Logger.Info($"Folder {folder.Name} downloaded. {totalItemsCount} items downloaded. {failedItems.Count} items failed. [folder.id={folder.Id}, folder.module={folder.Module}]");
                     CommonConfig.Logger.Warning($"Following items failed to download: {string.Join(", ", failedItems)}. [folder.id={folder.Id}]");
 
-                    if (folder.Module == ModuleType.Contacts)
-                        CallIdExtensionUtilities.ReloadExtension();
+                    try
+                    {
+                        if (folder.Module == ModuleType.Contacts)
+                            CallIdExtensionUtilities.ReloadExtension();
+                    }
+                    catch (Exception ex)
+                    {
+                        CommonConfig.Logger.Error("Error while reloading Call Id Extension", ex);
+                    }
 
                     if (totalItemsCount > 0)
                         await Managers.FoldersManager.AddSavedFolderInfo(folder);
