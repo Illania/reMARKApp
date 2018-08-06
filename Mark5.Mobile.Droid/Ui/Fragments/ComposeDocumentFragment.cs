@@ -440,6 +440,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             StartActivityForResult(PhonebookContactsListActivity.CreateIntent(Context), RequestCodes.PhonebookRequestCode);
         }
 
+        void DoOpenInternalContacts()
+        {
+            CommonConfig.UsageAnalytics.LogEvent(new ComposeContactPickerEvent(ContactPickerChoice.Internal));
+
+            //TODO
+        }
+
         void Subview_Edited(object sender, EventArgs e)
         {
             ((AppCompatActivity)Activity).SupportActionBar.Title = !subjectView.Empty ? subjectView.Subject : GetString(Resource.String.new_document);
@@ -570,14 +577,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     DoOpenContacts();
                     break;
                 case 2:
-                    DoOpenShortcodes();
+                    DoOpenInternalContacts();
                     break;
                 case 3:
+                    DoOpenShortcodes();
+                    break;
+                case 4:
                     DoOpenPhonebook();
                     break;
             }
 
-            if (choice != 2)
+            if (choice != 3)
                 focusedRecipientView.RequestEditorFocus();
         }
 
