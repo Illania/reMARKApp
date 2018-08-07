@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
-
-using Android.App;
+﻿using Android.App;
 using Android.Content;
+using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
@@ -10,7 +9,7 @@ using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-    [Activity(Label = "PickerInternalContactsListActivity")]
+    [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class PickerInternalContactsListActivity : BaseAppCompatActivity
     {
         public const string RecipientResultKey = "RecipientResult_3bd4ef72-32c1-4fd8-ae7a-2b9b3a7bdf47";
