@@ -273,6 +273,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 focusedRecipientView.AddRecipent(recipient.Name, recipient.Address);
                 UpdateSendButtonState();
             }
+            if (requestCode == RequestCodes.InternalContactsRequestCode && resultCode == (int)Result.Ok)
+            {
+                var user = Serializer.Deserialize<SystemUser>(data.GetStringExtra(PickerInternalContactsListActivity.RecipientResultKey));
+                focusedRecipientView.AddInternalUsers(user.Username);
+                UpdateSendButtonState();
+            }
             if (requestCode == RequestCodes.ShortcodesRequestCode && resultCode == (int)Result.Ok)
             {
                 var shortcode = Serializer.Deserialize<Shortcode>(data.GetStringExtra(PickerShortcodesFolderListActivity.ShortcodesResultKey));
@@ -403,6 +409,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public const int AttachmentRequestCode = 111;
             public const int RecentAddressesRequestCode = 222;
             public const int ContactsRequestCode = 333;
+            public const int InternalContactsRequestCode = 334;
             public const int ShortcodesRequestCode = 444;
             public const int PhonebookRequestCode = 555;
             public const int TemplatePreviewRequestCode = 666;
@@ -430,7 +437,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             CommonConfig.UsageAnalytics.LogEvent(new ComposeContactPickerEvent(ContactPickerChoice.Internal));
 
-            //TODO
+            StartActivityForResult(PickerInternalContactsListActivity.CreateIntent(Context), RequestCodes.InternalContactsRequestCode);
         }
 
         void DoOpenShortcodes()
