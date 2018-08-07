@@ -3,6 +3,7 @@
 using Android.App;
 using Android.Content;
 using Android.OS;
+using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
@@ -13,6 +14,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     public class PickerInternalContactsListActivity : BaseAppCompatActivity
     {
         public const string RecipientResultKey = "RecipientResult_3bd4ef72-32c1-4fd8-ae7a-2b9b3a7bdf47";
+
+        Toolbar toolbar;
 
         public static Intent CreateIntent(Context context)
         {
@@ -27,8 +30,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             OverridePendingTransition(Resource.Animation.slide_up, Resource.Animation.no_change);
 
-            SetTitle(Resource.String.select_users);
+            SetTitle(Resource.String.select_user);
             SetContentView(Resource.Layout.base_layout);
+
+            toolbar = FindViewById<Toolbar>(Resource.Id.toolbar);
+            SetSupportActionBar(toolbar);
+            SupportActionBar.SetDisplayHomeAsUpEnabled(true);
 
             if (savedInstanceState == null)
             {
