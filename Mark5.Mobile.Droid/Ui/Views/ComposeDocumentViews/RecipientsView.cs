@@ -197,7 +197,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 {
                     DocumentPreview.Addresses.Add(new DocumentAddress
                     {
-                        Address = user, //this probably isn't right
+                        Address = user, 
                         AddressType = AddressType,
                         Type = CommunicationAddressType.Internal
                     });
@@ -239,6 +239,41 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             else
             {
                 CommonConfig.Logger.Info(string.Format("No valid emails found in {0}.", emails));
+            }
+        }
+
+        public void SetInternalUsers(IEnumerable<string> users)
+        {
+            SetInternalUsers(string.Join(EmailSeparator, users));
+        }
+
+        public void AddInternalUsers(IEnumerable<string> users)
+        {
+            AddInternalUsers(string.Join(EmailSeparator, users));
+        }
+
+        public void AddInternalUsers(string users)
+        {
+            if (Validator.ContainsValidUsernames(users, out MatchCollection matches))
+            {
+                var newUsers = new StringBuilder();
+                newUsers.Append(emailEditor.Text);
+                if (!emailEditor.Text.EndsWith(EmailSeparator, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(emailEditor.Text))
+                    newUsers.Append(EmailSeparator);
+                newUsers.Append(string.Join(EmailSeparator, matches.Cast<Match>().Select(m => m.Value)));
+                newUsers.Append(EmailSeparator);
+
+                emailEditor.Text = newUsers.ToString();
+
+                CorrectMarkup();
+
+                SetCursorAtEnd();
+
+                Edited(this, EventArgs.Empty);
+            }
+            else
+            {
+                CommonConfig.Logger.Info(string.Format("No valid internal users found in {0}.", users));
             }
         }
 
@@ -319,15 +354,16 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         IEnumerable<string> GetEmails() => Validator.ContainsValidEmails(emailEditor.Text, out MatchCollection matches) ?
                                                     matches.Cast<Match>().Select(m => m.Value).Distinct().ToList() :
                                                     new List<string>();
+        
+        void SetRecipients(IEnumerable<string> recipients)
+        {
+            emailEditor.Text = string.Join(", ", recipients);
+        }
 
         IEnumerable<string> GetRecipents() => emailEditor.Text.Split(new[] { EmailSeparator }, StringSplitOptions.RemoveEmptyEntries)
                 .Where(s => Validator.ContainsValidEmail(s))
                 .Select(s => s.Trim());
 
-        void SetRecipients(IEnumerable<string> recipients)
-        {
-            emailEditor.Text = string.Join(", ", recipients);
-        }
 
         void SetInternalUsers(string users)
         {
