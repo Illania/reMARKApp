@@ -231,6 +231,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                         AddressType = AddressType,
                         Type = CommunicationAddressType.Email
                     });
+
+                foreach (var user in GetInternalUsers())
+                    DocumentPreview.Addresses.Add(new DocumentAddress
+                    {
+                        Address = user,
+                        AddressType = AddressType,
+                        Type = CommunicationAddressType.Internal
+                    });
             });
 
             return Task.CompletedTask;
@@ -453,6 +461,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         #endregion
 
+        void SetInternalUsers(string users)
+        {
+            if (Validator.ContainsValidUsernames(users, out MatchCollection matches))
+            {
+                var sb = new StringBuilder();
+                sb.Append(string.Join(EmailSeparator, matches.Cast<Match>().Select(m => m.Value)));
+                
+                sb.Append(EmailSeparator);
+                
+                TextView.Text = sb.ToString();
+            }
+            else
+            {
+                CommonConfig.Logger.Info($"No valid users found in {users}");
+            }
+        }
+        
+        IEnumerable<string> GetInternalUsers() => TextView.Text.Split(new[] { EmailSeparator }, StringSplitOptions.RemoveEmptyEntries)
+                                                          .Where(s => Validator.IsHostNameValid(s))
+                                                          .Select(s => s.Trim());
         #region Public methods
 
         public bool ContainsInvalidEmail() => TextView.Text.Split(new[] { EmailSeparator }, StringSplitOptions.RemoveEmptyEntries)

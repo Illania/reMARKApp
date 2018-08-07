@@ -341,6 +341,7 @@
 "search_unread" = "Unread emails";
 "search_where" = "Where: ";
 "search_with_attachments" = "With attachments";
+"select_user" = "Select user";
 "select_users" = "Select users";
 "send" = "Send";
 "send_text" = "Send message";
