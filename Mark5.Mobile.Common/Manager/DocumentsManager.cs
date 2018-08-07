@@ -17,6 +17,7 @@ using Mark5.ServiceReference.AppService;
 using Mark5.ServiceReference.FileTransferService;
 using PCLStorage;
 using DataContract = Mark5.ServiceReference.DataContract;
+using Polly;
 
 namespace Mark5.Mobile.Common.Manager
 {
@@ -649,6 +650,8 @@ namespace Mark5.Mobile.Common.Manager
 
         internal async Task SendDocumentAsync(Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId, long sendOnTimestamp, bool confirmRead, bool confirmDelivery, List<Guid> temporaryAttachmentGuids, SourceType sourceType = SourceType.Auto)
         {
+            const int attempts = 3;
+            var retries = 0;
             CommonConfig.UsageAnalytics.LogEvent(new DocumentSentEvent(flag));
 
             if (sourceType == SourceType.Auto)
@@ -656,27 +659,37 @@ namespace Mark5.Mobile.Common.Manager
 
             if (sourceType == SourceType.Remote)
             {
-                var result = await AppServiceProxy.SendDocumentAsync(new DataContract.SendDocumentParameters
+                //retry 3 times with 200ms intervals
+                var policy = Policy.Handle<Exception>().WaitAndRetryAsync(attempts,attempt => TimeSpan.FromMilliseconds(200), (exception, calculatedWaitDuration) => 
                 {
-                    Token = Token,
-                    Document = document.Convert(),
-                    DocumentPreview = documentPreview.Convert(),
-                    CreationModeFlag = flag.ConvertEnum<DataContract.DocumentCreationModeFlag>(),
-                    PreceedingDocumentId = precedingDocumentId,
-                    PreceedingDocumentFolderId = precedingDocumentFolderId,
-                    SendOn = sendOnTimestamp.ConvertTimestampMillisecondsToDateTime(),
-                    ConfirmRead = confirmRead,
-                    ConfirmDelivery = confirmDelivery,
-                    TemporaryAttachmentGuids = temporaryAttachmentGuids ?? new List<Guid>()
+                    retries++;
+                    CommonConfig.Logger.Error($"Failed to send document on {retries} retry", exception.InnerException);
                 });
 
-                document.Id = result.Id;
-                document.Guid = result.Guid;
-                documentPreview.Id = result.Id;
-                documentPreview.Guid = result.Guid;
-                documentPreview.ReferenceNumber = result.ReferenceNumber;
+                await policy.ExecuteAsync(async () => {
+                    var result = await AppServiceProxy.SendDocumentAsync(new DataContract.SendDocumentParameters
+                    {
+                        Token = Token,
+                        Document = document.Convert(),
+                        DocumentPreview = documentPreview.Convert(),
+                        CreationModeFlag = flag.ConvertEnum<DataContract.DocumentCreationModeFlag>(),
+                        PreceedingDocumentId = precedingDocumentId,
+                        PreceedingDocumentFolderId = precedingDocumentFolderId,
+                        SendOn = sendOnTimestamp.ConvertTimestampMillisecondsToDateTime(),
+                        ConfirmRead = confirmRead,
+                        ConfirmDelivery = confirmDelivery,
+                        TemporaryAttachmentGuids = temporaryAttachmentGuids ?? new List<Guid>()
+                    });
+
+                    document.Id = result.Id;
+                    document.Guid = result.Guid;
+                    documentPreview.Id = result.Id;
+                    documentPreview.Guid = result.Guid;
+                    documentPreview.ReferenceNumber = result.ReferenceNumber;
+                });
 
                 await ExecutePostSendActionsAsync(document, documentPreview, flag, precedingDocumentId, precedingDocumentFolderId);
+
 
                 return;
             }
