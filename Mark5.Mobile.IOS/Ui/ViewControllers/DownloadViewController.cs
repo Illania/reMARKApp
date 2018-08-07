@@ -804,14 +804,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 onProgressAction(new ProgressInfo(false, totalItemsCount, leftItemsCount, failedItems.Count));
 
-                try
+                if (folder.Module == ModuleType.Contacts)
                 {
-                    await CallIdContainerUtilities.CreateExtensionContactsTable();
-                    await CallIdDataAccess.CleanExtensionContactsTable(folder.Id);
-                }
-                catch (Exception ex)
-                {
-                    onException(ex);
+                    try
+                    {
+                        await CallIdContainerUtilities.CreateExtensionContactsTable();
+                        await CallIdDataAccess.CleanExtensionContactsTable(folder.Id);
+                    }
+                    catch (Exception ex)
+                    {
+                        CommonConfig.Logger.Error("Error while creating or cleaning contacts table for Call Id Extension", ex);
+                    }
                 }
 
                 do
@@ -826,10 +829,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                             (var qId, var qName) = contactsQueue.Dequeue();
                             item = qId;
                             contactName = qName;
-                        } 
+                        }
                         else //if (folder.Module == ModuleType.Shortcodes)
-                            item = shortcodeQueue.Dequeue();   
-                        
+                            item = shortcodeQueue.Dequeue();
+
                         leftItemsCount--;
                     }
                     catch (InvalidOperationException)
@@ -844,19 +847,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                             var contact = await Managers.ContactsManager.GetContactAsync(folder, item, SourceType.Remote);
                             try
                             {
-                                if(contact.CommunicationAddresses.Count > 0)
+                                if (contact.CommunicationAddresses.Count > 0)
                                 {
                                     var caList = contact.CommunicationAddresses.Where(ca => ca.Type == CommunicationAddressType.Phone || ca.Type == CommunicationAddressType.Mobile).ToList();
 
                                     if (caList.Count > 0)
                                     {
-                                        foreach (CommunicationAddress ca in caList)
+                                        try
                                         {
-                                            await CallIdDataAccess.AddContactToExtensionContactsTable(folder.Id, contactName, ca.Address);
+                                            foreach (CommunicationAddress ca in caList)
+                                            {
+                                                await CallIdDataAccess.AddContactToExtensionContactsTable(folder.Id, contactName, ca.Address);
+                                            }
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            CommonConfig.Logger.Error("Error while adding contact to contacts table for Call Id Extension", ex);
                                         }
                                     }
                                 }
-                            } 
+                            }
                             catch (Exception ex)
                             {
                                 onException(ex);
@@ -879,7 +889,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                             await DeepDownload(contact);
                         }
-                        if (folder.Module == ModuleType.Shortcodes)
+                        else if (folder.Module == ModuleType.Shortcodes)
                             await Managers.ShortcodesManager.GetShortcodeAsync(folder, item, SourceType.Remote);
                     }
                     catch (Exception ex)
@@ -898,7 +908,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     CommonConfig.Logger.Info($"Folder {folder.Name} downloaded. {totalItemsCount} items downloaded. {failedItems.Count} items failed. [folder.id={folder.Id}, folder.module={folder.Module}]");
                     CommonConfig.Logger.Warning($"Following items failed to download: {string.Join(", ", failedItems)}. [folder.id={folder.Id}]");
 
-                    CallIdExtensionUtilities.ReloadExtension();
+                    try
+                    {
+                        if (folder.Module == ModuleType.Contacts)
+                            CallIdExtensionUtilities.ReloadExtension();
+                    }
+                    catch (Exception ex)
+                    {
+                        CommonConfig.Logger.Error("Error while reloading Call Id Extension", ex);
+                    }
 
                     if (totalItemsCount > 0)
                         await Managers.FoldersManager.AddSavedFolderInfo(folder);
