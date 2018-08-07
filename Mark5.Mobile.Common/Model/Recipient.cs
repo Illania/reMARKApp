@@ -67,7 +67,7 @@ namespace Mark5.Mobile.Common.Model
         //This is used by the SuggestionAdapter in Android for the text to be inserted
         public override string ToString()
         {
-            return string.IsNullOrEmpty(Name) ? Address : string.Format("{0} <{1}>", Name, Address);
+            return string.IsNullOrEmpty(Address) ? Name : string.IsNullOrEmpty(Name) ? Address : string.Format("{0} <{1}>", Name, Address);
         }
 
         #endregion

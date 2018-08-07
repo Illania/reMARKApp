@@ -302,6 +302,7 @@
         RecentAddress,
         Phonebook,
         Contact,
+        InternalContact
     }
 
     #endregion

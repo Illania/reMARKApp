@@ -18,6 +18,7 @@ namespace Mark5.Mobile.Common.Utilities
 
             GetSuggestionFromRecentAddresses(phrase, token, handler);
             GetSuggestionFromContacts(phrase, token, handler);
+            GetSuggestionFromInternalContacts(phrase, token, handler);
             GetSuggestionFromPhonebook(phrase, token, handler);
         }
 
@@ -64,12 +65,30 @@ namespace Mark5.Mobile.Common.Utilities
                 var filtered = new List<Recipient>();
                 try
                 {
-                    filtered = await Manager.Managers.ContactsManager.GetSuggestions(phrase);
+                    filtered = await Managers.ContactsManager.GetSuggestions(phrase);
                 }
                 catch (Exception ex)
                 {
                     CommonConfig.Logger.Error("Error while retrieving suggestions from database", ex);
                 }
+                handler(filtered, token);
+            });
+        }
+
+        static void GetSuggestionFromInternalContacts(string phrase, CancellationToken token, Action<List<Recipient>, CancellationToken> handler)
+        {
+            if (token.IsCancellationRequested)
+                return;
+
+            Task.Run(async () =>
+            {
+                var filtered = new List<Recipient>();
+                var systemUsersDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
+                var internalUsers = systemUsersDepartments.Users.FindAll(user => user.Username.ContainsCaseInsensitive(phrase));
+
+                foreach (SystemUser user in internalUsers)
+                    filtered.Add(new Recipient(user.Username, user.FirstName + " " + user.LastName, RecipientType.InternalContact));   
+                
                 handler(filtered, token);
             });
         }
