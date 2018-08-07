@@ -23,6 +23,11 @@ namespace Mark5.Mobile.Common.Manager
 {
     class DocumentsManager : AbstractManager, IDocumentsManager
     {
+        void HandleAction(Exception arg1, TimeSpan arg2)
+        {
+        }
+
+
         public int MaxToFetch { get; set; } = 500;
         public DocumentBodyTypeRequest DocumentBodyTypeRequest { get; set; } = DocumentBodyTypeRequest.HtmlOnly;
 
@@ -651,6 +656,7 @@ namespace Mark5.Mobile.Common.Manager
         internal async Task SendDocumentAsync(Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId, long sendOnTimestamp, bool confirmRead, bool confirmDelivery, List<Guid> temporaryAttachmentGuids, SourceType sourceType = SourceType.Auto)
         {
             const int attempts = 3;
+            var retries = 0;
             CommonConfig.UsageAnalytics.LogEvent(new DocumentSentEvent(flag));
 
             if (sourceType == SourceType.Auto)
@@ -658,12 +664,11 @@ namespace Mark5.Mobile.Common.Manager
 
             if (sourceType == SourceType.Remote)
             {
-                var policy = Policy.Handle<Exception>().RetryAsync(attempts, (exception, attempt) => {
-                    //if we exhaust attempts and encounter exception -> throw
-                    if (attempt == attempts && exception != null)
-                    {
-                        throw new Exception($"Failed to send document after {attempts} attempts", exception);
-                    } 
+                //retry 3 times with 200ms intervals
+                var policy = Policy.Handle<Exception>().WaitAndRetryAsync(attempts,attempt => TimeSpan.FromMilliseconds(200), (exception, calculatedWaitDuration) => 
+                {
+                    retries++;
+                    CommonConfig.Logger.Error($"Failed to send document on {retries} retry", exception.InnerException);
                 });
 
                 await policy.ExecuteAsync(async () => {
