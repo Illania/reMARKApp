@@ -242,41 +242,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
         }
 
-        public void SetInternalUsers(IEnumerable<string> users)
-        {
-            SetInternalUsers(string.Join(EmailSeparator, users));
-        }
-
-        public void AddInternalUsers(IEnumerable<string> users)
-        {
-            AddInternalUsers(string.Join(EmailSeparator, users));
-        }
-
-        public void AddInternalUsers(string users)
-        {
-            if (Validator.ContainsValidUsernames(users, out MatchCollection matches))
-            {
-                var newUsers = new StringBuilder();
-                newUsers.Append(emailEditor.Text);
-                if (!emailEditor.Text.EndsWith(EmailSeparator, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(emailEditor.Text))
-                    newUsers.Append(EmailSeparator);
-                newUsers.Append(string.Join(EmailSeparator, matches.Cast<Match>().Select(m => m.Value)));
-                newUsers.Append(EmailSeparator);
-
-                emailEditor.Text = newUsers.ToString();
-
-                CorrectMarkup();
-
-                SetCursorAtEnd();
-
-                Edited(this, EventArgs.Empty);
-            }
-            else
-            {
-                CommonConfig.Logger.Info(string.Format("No valid internal users found in {0}.", users));
-            }
-        }
-
         public void AddRecipent(string name, string address)
         {
             var newEmails = new StringBuilder();
