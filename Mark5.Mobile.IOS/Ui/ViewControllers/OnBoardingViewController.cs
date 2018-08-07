@@ -12,7 +12,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public string ChangelogHtml { get; set; }
 
         UIView mainView;
-        UITextView titleTextView;
         WKWebView webView;
         UIButton okButton;
 
@@ -25,7 +24,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             mainView = new UIView
             {
                 BackgroundColor = Theme.White,
-                LayoutMargins = new UIEdgeInsets(50f, 50f, 50f, 50f),
+                //LayoutMargins = new UIEdgeInsets(50f, 50f, 50f, 50f),
                 TranslatesAutoresizingMaskIntoConstraints = false,
             };
 
@@ -53,27 +52,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     mainView.HeightAnchor.ConstraintEqualTo(750f)
                 });
             }
-
-            titleTextView = new UITextView
-            {
-                UserInteractionEnabled = false,
-                Font = UIFont.SystemFontOfSize(30f),
-                Text = Localization.GetString("whats_new"),
-                TextColor = Theme.DarkBlue,
-                TranslatesAutoresizingMaskIntoConstraints = false
-            };
-
-            titleTextView.ToggleBoldface(this);
-
-            mainView.Add(titleTextView);
-
-            mainView.AddConstraints(new[]
-            {
-                titleTextView.TopAnchor.ConstraintEqualTo(mainView.TopAnchor, Integration.IsIPhone() ? 50f : 20f),
-                titleTextView.TrailingAnchor.ConstraintEqualTo(mainView.TrailingAnchor, Integration.IsIPhone() ? -20f : -30f),
-                titleTextView.LeadingAnchor.ConstraintEqualTo(mainView.LeadingAnchor, Integration.IsIPhone() ? 20f : 30f),
-                titleTextView.HeightAnchor.ConstraintEqualTo(70f)
-            });
 
             var wkPreferences = new WKPreferences
             {
@@ -108,7 +86,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             mainView.AddConstraints(new[]
             {
-                webView.TopAnchor.ConstraintEqualTo(titleTextView.BottomAnchor, -10f),
+                webView.TopAnchor.ConstraintEqualTo(mainView.TopAnchor, Integration.IsIPhone() ? 50f : 20f),
                 webView.TrailingAnchor.ConstraintEqualTo(mainView.TrailingAnchor, Integration.IsIPhone() ? 10f : -20f),
                 webView.LeadingAnchor.ConstraintEqualTo(mainView.LeadingAnchor, Integration.IsIPhone() ? 10f : 20f),
                 webView.CenterXAnchor.ConstraintEqualTo(mainView.CenterXAnchor)
