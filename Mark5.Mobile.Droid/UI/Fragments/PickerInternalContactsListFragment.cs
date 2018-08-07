@@ -27,8 +27,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         const string SelectedSystemUsersKey = "SelectedSystemUsers_a5882c46-4209-48d8-9759-139286f1e476";
 
-        List<IBusinessEntity> businessEntities;
-
         SelectInternalUsersAdapter CurrentAdapter => (SelectInternalUsersAdapter)recyclerView.GetAdapter();
 
         SwipeRefreshLayout refreshLayout;
@@ -36,7 +34,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         SearchView searchView;
         SelectInternalUsersAdapter adapter;
         SelectInternalUsersAdapter searchAdapter;
-        AppCompatButton copyButton;
 
         public static (PickerInternalContactsListFragment fragment, string tag) NewInstance()
         {
