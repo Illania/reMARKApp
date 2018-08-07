@@ -23,11 +23,6 @@ namespace Mark5.Mobile.Common.Manager
 {
     class DocumentsManager : AbstractManager, IDocumentsManager
     {
-        void HandleAction(Exception arg1, TimeSpan arg2)
-        {
-        }
-
-
         public int MaxToFetch { get; set; } = 500;
         public DocumentBodyTypeRequest DocumentBodyTypeRequest { get; set; } = DocumentBodyTypeRequest.HtmlOnly;
 
