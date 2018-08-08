@@ -59,7 +59,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             newContentWebView.Settings.JavaScriptEnabled = true;
             newContentWebView.Settings.DomStorageEnabled = true;
             AddView(newContentWebView);
-
+            /*
             showOldContentButton = new AppCompatButton(context)
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
@@ -68,6 +68,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             {
                 Resource.Attribute.selectableItemBackground
             });
+
             showOldContentButton.SetBackgroundResource(typedArray.GetResourceId(0, 0));
             typedArray.Recycle();
             showOldContentButton.SetTextAppearanceCompat(context, Resource.Style.fontSmallBold);
@@ -76,7 +77,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             showOldContentButton.Visibility = ViewStates.Gone;
             showOldContentButton.Click += ShowOldContentButton_Click;
             AddView(showOldContentButton);
-
+            */
             oldContentWebView = new CustomWebView(context)
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
@@ -121,15 +122,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
             else
             {
-                var previousDocumentLoaded = false;
-
                 await newContentSemaphore.WaitAsync();
-                newContentWebView.LoadEditor(context);
-
 
                 if (PreviousDocument != null && PreviousDocumentDirection == DocumentDirection.Draft ||
                     (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption.HasFlag(CopyToNewOption.Content)))
                 {
+                    newContentWebView.LoadEditor(context);
                     if (!string.IsNullOrWhiteSpace(PreviousDocument?.HtmlBody))
                     {
                         await newContentSemaphore.WaitAsync();
@@ -150,25 +148,19 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                         var config = HtmlProcessingConfiguration.DefaultForEditing;
                         config.InjectReplyHeader = true;
                         config.ReplyHeaderParameters = GetReplyHeaderParameters(PreviousDocumentPreview);
-
-                        await oldContentSemaphore.WaitAsync();
-                        await oldContentWebView.LoadHtml(context, PreviousDocument.HtmlBody, config);
-
-                        previousDocumentLoaded = true;
+                        var html = await HtmlUtilities.ProcessHtml(context, PreviousDocument.HtmlBody, config);
+                        newContentWebView.LoadEditorWithPreviousContent(html, context);
                     }
                     else if (!string.IsNullOrWhiteSpace(PreviousDocument?.PlainTextBody))
                     {
                         var config = PlainTextProcessingConfiguration.DefaultForEditing;
                         config.InjectReplyHeader = true;
                         config.ReplyHeaderParameters = GetReplyHeaderParameters(PreviousDocumentPreview);
-
-                        await oldContentSemaphore.WaitAsync();
-                        await oldContentWebView.LoadPlainText(context, PreviousDocument.PlainTextBody, config);
-
-                        previousDocumentLoaded = true;
+                        var html = await HtmlUtilities.ProcessPlainText(context, PreviousDocument.PlainTextBody, config);
+                        newContentWebView.LoadEditorWithPreviousContent(html, context);
+                    } else {
+                        newContentWebView.LoadEditor(context);
                     }
-
-                    showOldContentButton.Visibility = previousDocumentLoaded ? ViewStates.Visible : ViewStates.Gone;
                 }
             }
         }
