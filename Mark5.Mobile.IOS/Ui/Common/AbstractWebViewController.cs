@@ -336,6 +336,27 @@ namespace Mark5.Mobile.IOS.Ui.Common
             webView?.LoadHtmlString(html, null);
         }
 
+        protected void LoadEditorWithPreviousContent(string htmlContent)
+        {
+            var html = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/editor", "html"));
+
+            var htmlDocument = new HtmlDocument();
+            htmlDocument.LoadHtml(html);
+            var bodyNode = htmlDocument.DocumentNode.SelectSingleNode("//body");
+            var editorNode = bodyNode?.SelectSingleNode("//div[@id='editor']");
+
+            if(editorNode == null) {
+                CommonConfig.Logger.Error("resources/html/editor.html is missing 'editor' element");
+            } else {
+                editorNode.InnerHtml = htmlContent;
+                html = htmlDocument.DocumentNode.OuterHtml;
+            }
+
+            webView?.StopLoading();
+            webView?.LoadHtmlString(html, null);
+
+        }
+
         protected virtual async Task<string> GetContent()
         {
             return await webView?.EvaluateJavaScriptAsync("document.documentElement.outerHTML") as NSString;
