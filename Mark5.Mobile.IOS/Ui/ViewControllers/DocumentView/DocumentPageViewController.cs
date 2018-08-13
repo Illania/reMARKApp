@@ -42,6 +42,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
 
             if (InitialDocumentPreview != null && Folder != null)
                 SetPage(Folder, InitialDocumentPreview, false);
+
+            DataSource = new DocumentPageDataSource();
         }
 
         public override void ViewWillAppear(bool animated)
@@ -216,6 +218,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
             ChangePage(Folder, documentPreview, direction);
         }
 
+        DocumentViewController GoToPageAndReturnVC(DocumentPreview documentPreview, UIPageViewControllerNavigationDirection direction, bool isSearchActive = false)
+        {
+            CommonConfig.UsageAnalytics.LogEvent(new DocumentQuickSwitchEvent());
+            var vc = GetDocumentViewController(Folder, documentPreview);
+            CommonConfig.MessengerHub.Publish(new GoToDocumentMessage(this, documentPreview.Id));
+            UpdateNavigationBar(documentPreview, isSearchActive);
+            return vc;
+        }
+
         void ChangePage(Folder folder, DocumentPreview documentPreview, UIPageViewControllerNavigationDirection direction, bool isSearchActive = false)
         {
             SetToolbarItems(null, true);
@@ -301,5 +312,49 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
         }
 
         #endregion
+
+        #region DataSource
+        protected class DocumentPageDataSource : UIPageViewControllerDataSource
+        {
+            public override UIViewController GetNextViewController(UIPageViewController pageViewController, UIViewController referenceViewController)
+            {
+                try {
+                    var vc = (DocumentViewController)pageViewController.ViewControllers.FirstOrDefault();
+                    var documentPreview = vc.DocumentPreview;
+                    var pageVC = (DocumentPageViewController)pageViewController;
+                    var index = pageVC.DocumentPreviews.FindIndex(dp => dp.Id == documentPreview.Id);
+                    if (index < 0 || index >= pageVC.DocumentPreviews.Count - 1)
+                        return null;
+                    var nextDocumentPreview = pageVC.DocumentPreviews[index + 1];
+                    return pageVC.GoToPageAndReturnVC(nextDocumentPreview, UIPageViewControllerNavigationDirection.Forward);
+                } catch (Exception ex) {
+                    CommonConfig.Logger.Error("Could not swipe to next DocumentViewController", ex);
+                    return null;
+                }
+            }
+
+            public override UIViewController GetPreviousViewController(UIPageViewController pageViewController, UIViewController referenceViewController)
+            {
+                try
+                {
+                    var vc = (DocumentViewController)pageViewController.ViewControllers.FirstOrDefault();
+                    var documentPreview = vc.DocumentPreview;
+                    var pageVC = (DocumentPageViewController)pageViewController;
+                    var index = pageVC.DocumentPreviews.FindIndex(dp => dp.Id == documentPreview.Id);
+                    if (index < 1)
+                        return null;
+                    var previousDocumentPreview = pageVC.DocumentPreviews[index - 1];
+                    return pageVC.GoToPageAndReturnVC(previousDocumentPreview, UIPageViewControllerNavigationDirection.Reverse);
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error("Could not swipe to previous DocumentViewController", ex);
+                    return null;
+                }
+            }
+        }
+        #endregion
     }
+
+   
 }
