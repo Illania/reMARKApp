@@ -159,9 +159,9 @@ namespace Mark5.Mobile.IOS.Ui.Common
             keyboardDisShowNotification = UIKeyboard.Notifications.ObserveDidShow(HandleKeyboardDidShow);
         }
 
-        public override void ViewWillLayoutSubviews()
+        public override void ViewDidLayoutSubviews()
         {
-            base.ViewWillLayoutSubviews();
+            base.ViewDidLayoutSubviews();
 
             if (webView == null || headerAnimationRunning)
                 return;
@@ -172,7 +172,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             SetHeaderPadding(desiredHeaderHeight / webView.ScrollView.ZoomScale);
         }
-
+       
         protected override void Recycle()
         {
             base.Recycle();
