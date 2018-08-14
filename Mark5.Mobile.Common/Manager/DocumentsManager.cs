@@ -650,8 +650,7 @@ namespace Mark5.Mobile.Common.Manager
 
         internal async Task SendDocumentAsync(Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId, long sendOnTimestamp, bool confirmRead, bool confirmDelivery, List<Guid> temporaryAttachmentGuids, SourceType sourceType = SourceType.Auto)
         {
-            const int attempts = 3;
-            var retries = 0;
+           
             CommonConfig.UsageAnalytics.LogEvent(new DocumentSentEvent(flag));
 
             if (sourceType == SourceType.Auto)
@@ -659,6 +658,9 @@ namespace Mark5.Mobile.Common.Manager
 
             if (sourceType == SourceType.Remote)
             {
+                const int attempts = 3;
+                var retries = 0;
+
                 //retry 3 times with 200ms intervals
                 var policy = Policy.Handle<Exception>().WaitAndRetryAsync(attempts,attempt => TimeSpan.FromMilliseconds(200), (exception, calculatedWaitDuration) => 
                 {
