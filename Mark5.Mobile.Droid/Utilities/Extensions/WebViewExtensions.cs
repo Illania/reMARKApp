@@ -4,7 +4,6 @@ using System.IO;
 using System.Threading.Tasks;
 using Android.Content;
 using Android.Webkit;
-using HtmlAgilityPack;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Droid.Model;
 using Mark5.Mobile.Droid.Utilities;
@@ -56,31 +55,6 @@ namespace Mark5.Mobile.IOS.Utilities.Extensions
             string html;
             using (var sr = new StreamReader(ctx.Assets.Open("editor.html")))
                 html = sr.ReadToEnd();
-
-            webView.StopLoading();
-            webView.LoadDataWithBaseURL(null, html, "text/html", "UTF-8", null);
-        }
-
-        public static void LoadEditorWithPreviousContent(this WebView webView, string htmlContent, Context ctx)
-        {
-            string html;
-            using (var sr = new StreamReader(ctx.Assets.Open("editor.html")))
-                html = sr.ReadToEnd();
-
-            var htmlDocument = new HtmlDocument();
-            htmlDocument.LoadHtml(html);
-            var bodyNode = htmlDocument.DocumentNode.SelectSingleNode("//body");
-            var editorNode = bodyNode?.SelectSingleNode("//div[@id='editor']");
-
-            if (editorNode == null)
-            {
-                CommonConfig.Logger.Error("assets/editor.html is missing 'editor' element");
-            }
-            else
-            {
-                editorNode.InnerHtml = htmlContent;
-                html = htmlDocument.DocumentNode.OuterHtml;
-            }
 
             webView.StopLoading();
             webView.LoadDataWithBaseURL(null, html, "text/html", "UTF-8", null);
