@@ -36,7 +36,7 @@ namespace Mark5.Mobile.Droid.Service
                         Managers.NotificationsManager.UnSubscribe(DeviceType.Android, token).FireAndForget();
                     }
 
-                    Managers.NotificationsManager.Subscribe(DeviceType.Android, token).FireAndForget();
+                    Managers.NotificationsManager.Subscribe(DeviceType.Android, token, null).FireAndForget();
                 }
             }
             catch (Exception ex)
