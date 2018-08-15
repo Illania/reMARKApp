@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
@@ -10,6 +11,7 @@ using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Testers;
 using Mark5.Mobile.Common.Utilities;
+using Polly;
 
 namespace Mark5.Mobile.Droid.Service
 {
@@ -25,9 +27,24 @@ namespace Mark5.Mobile.Droid.Service
 
         public event EventHandler<ReachabilityRefreshedEventArgs> ReachabilityRefreshed = delegate { };
 
-        public Reachability()
+        CancellationTokenSource cancellationTokenSource;
+
+        private static Reachability instance;
+
+        private Reachability()
         {
             IsReachable = CheckNetworkAvailability();
+        }
+
+        public static Reachability Instance
+        {
+            get
+            {
+                if (instance == null)
+                    instance = new Reachability();
+
+                return instance;
+            }
         }
 
         public async Task<bool> Refresh(ReachabilityMode mode = ReachabilityMode.NetworkAvailability | ReachabilityMode.Service, bool testOnly = false)
@@ -60,12 +77,24 @@ namespace Mark5.Mobile.Droid.Service
                 ReachabilityRefreshed(this, new ReachabilityRefreshedEventArgs(lastResult != result, result));
             }
 
+            if (cancellationTokenSource != null)
+            {
+                cancellationTokenSource.Cancel();
+                cancellationTokenSource = null;
+            }
+
+            if (!result)
+            {
+                cancellationTokenSource = new CancellationTokenSource();
+                CheckServiceAvailabilityContinuesly(cancellationTokenSource.Token);
+            }
+
             return result;
         }
 
         public bool CheckNetworkAvailability()
         {
-            var cm = (ConnectivityManager) Application.Context.GetSystemService(Context.ConnectivityService);
+            var cm = (ConnectivityManager) Application.Context.GetSystemService(Android.Content.Context.ConnectivityService);
             var result = cm.ActiveNetworkInfo?.IsConnected ?? false;
 
             CommonConfig.Logger.Info($"Network availability: {result}");
@@ -149,6 +178,43 @@ namespace Mark5.Mobile.Droid.Service
                 CommonConfig.Logger.Info("Cannot check service availability", ex);
 
                 return false;
+            }
+        }
+
+        async Task CheckServiceAvailabilityContinuesly(CancellationToken cancellationToken)
+        {
+            var retries = 0;
+
+            var policy = Policy.Handle<Exception>().WaitAndRetryForeverAsync(
+                sleepDurationProvider: attempt => TimeSpan.FromSeconds(2),// Wait 2 s between each try.
+                    onRetry: (exception, calculatedWaitDuration) => // Capture some info for logging!
+                    {
+                        retries++;
+                        CommonConfig.Logger.Info("Retries : " + retries);
+                    });
+
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                try
+                {
+                    await policy.ExecuteAsync(async token =>
+                    {
+                        var response = await CheckWithService();
+
+                        if (response)
+                        {
+                            cancellationTokenSource.Cancel();
+                            ReachabilityRefreshed(this, new ReachabilityRefreshedEventArgs(true, true));
+                        }
+
+                    }, cancellationToken);
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error("Pinging failed : ", ex);
+                }
+
+                await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
             }
         }
     }

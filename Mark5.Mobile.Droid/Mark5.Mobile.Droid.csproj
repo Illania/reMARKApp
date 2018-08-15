@@ -209,6 +209,9 @@
     <Reference Include="PhoneNumbers">
         <HintPath>..\packages\libphonenumber-csharp.8.8.8\lib\netstandard2.0\PhoneNumbers.dll</HintPath>
     </Reference>
+    <Reference Include="Polly">
+      <HintPath>..\packages\Polly.6.1.0\lib\netstandard2.0\Polly.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Resources\Resource.designer.cs" />

@@ -1,12 +1,15 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Testers;
 using Mark5.Mobile.Common.Utilities;
+using Polly;
 
 namespace Mark5.Mobile.IOS.Service
 {
@@ -22,9 +25,23 @@ namespace Mark5.Mobile.IOS.Service
 
         public event EventHandler<ReachabilityRefreshedEventArgs> ReachabilityRefreshed = delegate { };
 
-        public Reachability()
+        private static Reachability instance;
+
+        CancellationTokenSource cancellationTokenSource;
+
+        private Reachability()
         {
             IsReachable = CheckNetworkAvailability();
+        }
+
+        public static Reachability Instance
+        {
+            get {
+                if (instance == null)
+                    instance = new Reachability();
+
+                return instance;
+            }
         }
 
         public async Task<bool> Refresh(ReachabilityMode mode = ReachabilityMode.NetworkAvailability | ReachabilityMode.Service, bool testOnly = false)
@@ -55,6 +72,16 @@ namespace Mark5.Mobile.IOS.Service
                 CommonConfig.Logger.Info($"Reachability checked: {result}");
 
                 ReachabilityRefreshed(this, new ReachabilityRefreshedEventArgs(lastResult != result, result));
+            }
+
+            if(cancellationTokenSource != null) {
+                cancellationTokenSource.Cancel();
+                cancellationTokenSource = null;
+            } 
+
+            if(!result) {
+                cancellationTokenSource = new CancellationTokenSource();
+                CheckServiceAvailabilityContinuesly(cancellationTokenSource.Token);
             }
 
             return result;
@@ -141,6 +168,43 @@ namespace Mark5.Mobile.IOS.Service
                 CommonConfig.Logger.Info($"Service availability: false");
 
                 return false;
+            }
+        }
+
+        async Task CheckServiceAvailabilityContinuesly(CancellationToken cancellationToken)
+        {
+            var retries = 0;
+
+            var policy = Policy.Handle<Exception>().WaitAndRetryForeverAsync(
+                sleepDurationProvider: attempt => TimeSpan.FromSeconds(2),// Wait 2 s between each try.
+                    onRetry: (exception, calculatedWaitDuration) => // Capture some info for logging!
+                    {
+                        retries++;
+                        CommonConfig.Logger.Info("Retries : " + retries);
+                    });
+
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                try
+                {
+                    await policy.ExecuteAsync(async token =>
+                    {
+                        var response = await CheckWithService();
+
+                        if (response)
+                        {
+                            cancellationTokenSource.Cancel();
+                            ReachabilityRefreshed(this, new ReachabilityRefreshedEventArgs(true, true));
+                        }
+
+                    }, cancellationToken);
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error("Pinging failed : ", ex);
+                }
+
+                await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
             }
         }
     }
