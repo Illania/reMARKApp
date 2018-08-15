@@ -12,8 +12,6 @@
 	<string>6.0</string>
 	<key>CFBundlePackageType</key>
 	<string>XPC!</string>
-	<key>CFBundleShortVersionString</key>
-	<string>2.5</string>
 	<key>MinimumOSVersion</key>
 	<string>10.0</string>
 	<key>NSExtension</key>
@@ -23,9 +21,11 @@
 		<key>NSExtensionPrincipalClass</key>
 		<string>CallDirectoryHandler</string>
 	</dict>
-	<key>CFBundleVersion</key>
-	<string>221</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.nordic-it.mark5.mobile.ios.extensions.callid</string>
+	<string>com.nordic-it.mark5.mobile.ios.callid</string>
+	<key>CFBundleShortVersionString</key>
+	<string>2.7</string>
+	<key>CFBundleVersion</key>
+	<string>231</string>
 </dict>
 </plist>

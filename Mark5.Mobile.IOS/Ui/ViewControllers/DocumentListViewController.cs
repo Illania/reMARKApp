@@ -51,6 +51,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         TinyMessageSubscriptionToken removedFromFolderToken;
         TinyMessageSubscriptionToken movedFromFolderToken;
         TinyMessageSubscriptionToken deletedToken;
+        TinyMessageSubscriptionToken goToDocumentToken;
 
         bool compactList = PlatformConfig.Preferences.CompactDocumentsList;
 
@@ -325,6 +326,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             removedFromFolderToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(HandleRemovedFromFolder, m => m.ObjectType == ObjectType.Document);
             movedFromFolderToken = CommonConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(HandleMovedFromFolder, m => m.ObjectType == ObjectType.Document);
             deletedToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedMessage>(HandleDeleted, m => m.ObjectType == ObjectType.Document);
+            goToDocumentToken = CommonConfig.MessengerHub.Subscribe<GoToDocumentMessage>(HandleAction);
         }
 
         void UnsubscribeFromMessages()
@@ -335,6 +337,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             removedFromFolderToken?.Dispose();
             movedFromFolderToken?.Dispose();
             deletedToken?.Dispose();
+            goToDocumentToken?.Dispose();
         }
 
         #endregion
@@ -357,7 +360,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (TableView.IndexPathsForSelectedRows == null || TableView.IndexPathsForSelectedRows.Length < 1)
                 return;
-            
+
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
             var d = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
 
@@ -546,12 +549,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 nc.PopToViewController(nc.ViewControllers[0], false);
 
                 var vc = (DocumentPageViewController)nc.ViewControllers[0];
+                vc.DocumentPreviews = ((DataSource)TableView.Source).Items;
 
                 if (vc.IsShowingDocumentWithId(documentPreview.Id))
                     return;
 
                 vc.HidesBottomBarWhenPushed = false;
-                vc.SetPage(Folder, documentPreview);
+                vc.SetPage(Folder, documentPreview, searchController.Active);
             }
             else
             {
@@ -1087,6 +1091,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void HandleDeleted(EntityRemovedMessage m) => RemoveDocumentsFromList(m.EntitiesId);
 
+        void HandleAction(GoToDocumentMessage message)
+        {
+            BeginInvokeOnMainThread(() =>
+            {
+                foreach (var tableView in new UITableView[] { TableView, ((UITableViewController)searchController?.SearchResultsController)?.TableView })
+                {
+                    if (tableView == null || tableView.Source == null)
+                        continue;
+
+                    var index = ((DataSource)tableView.Source).Items.FindIndex(dp => dp.Id == message.DocumentId);
+
+                    if (index >= 0)
+                    {
+                        tableView.SelectRow(NSIndexPath.FromRowSection(index, 0), true, UITableViewScrollPosition.None);
+                        tableView.ScrollToRow(NSIndexPath.FromRowSection(index, 0), UITableViewScrollPosition.None, true);
+                    }
+                }
+            });
+        }
+
         #endregion
 
         #region Utilities
@@ -1448,9 +1472,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     OnSwipeActionClick(leadingAction, indexPath, documentPreview, folder, tableView);
                 });
 
-                if(SwipeActionAllowed(leadingAction.Action, documentPreview, folder)) {
+                if (SwipeActionAllowed(leadingAction.Action, documentPreview, folder))
+                {
                     contextualAction.BackgroundColor = Theme.LightBrown;
-                } else {
+                }
+                else
+                {
                     contextualAction.BackgroundColor = Theme.LightGray;
                 }
 
@@ -1469,6 +1496,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
             {
                 var actionWrappers = new List<SwipeActionUIWrapper>();
+
+                if (indexPath.Row < 0 || indexPath.Row >= Items.Count)
+                    return actionWrappers.Select(a => a.Action).ToArray();
 
                 var documentPreview = Items[indexPath.Row];
 
@@ -1566,7 +1596,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                                 UITableViewRowActionStyle.Default,
                                 SwipeActionTitle(swipeAction, documentPreview),
                                 (a, ip) => { OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView); });
-                        
+
                             actionWrapper.Disabled = !SwipeActionAllowed(swipeAction.Action, documentPreview, folder);
                             break;
                         case EmailSwipeAction.SwipeAction.RemoveFromFolder:
@@ -1575,7 +1605,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                                 SwipeActionTitle(swipeAction, documentPreview),
                                 (a, ip) =>
                                 {
-                                   OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView);
+                                    OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView);
                                 });
                             actionWrapper.Disabled = !SwipeActionAllowed(swipeAction.Action, documentPreview, folder);
                             break;
@@ -1696,14 +1726,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         }
                         break;
                     case EmailSwipeAction.SwipeAction.MoveToFolder:
-                        if (SwipeActionAllowed(EmailSwipeAction.SwipeAction.Delete, documentPreview, folder))
+                        if (SwipeActionAllowed(EmailSwipeAction.SwipeAction.MoveToFolder, documentPreview, folder))
                         {
                             viewControllerWeakReference.Unwrap()?.MoveToFolder(documentPreview);
                         }
                         break;
-
                     case EmailSwipeAction.SwipeAction.RemoveFromFolder:
-                        viewControllerWeakReference.Unwrap()?.RemoveFromFolder(documentPreview, popoverDelegate);
+                        if (SwipeActionAllowed(EmailSwipeAction.SwipeAction.RemoveFromFolder, documentPreview, folder))
+                        {
+                            viewControllerWeakReference.Unwrap()?.RemoveFromFolder(documentPreview, popoverDelegate);
+                        }
                         break;
                     default:
                         CommonConfig.Logger.Error("Missed case for EmailSwipeAction : " + swipeAction.Action.ToString());

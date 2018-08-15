@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
@@ -41,7 +41,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
             InitNavigationBar();
 
             if (InitialDocumentPreview != null && Folder != null)
-                SetPage(Folder, InitialDocumentPreview);
+                SetPage(Folder, InitialDocumentPreview, false);
+
+            DataSource = new DocumentPageDataSource();
         }
 
         public override void ViewWillAppear(bool animated)
@@ -165,20 +167,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
 
         #region Public methods
 
-        public void SetPage(Folder folder, DocumentPreview documentPreview)
+        public void SetPage(Folder folder, DocumentPreview documentPreview, bool isSearchActive)
         {
-            ChangePage(folder, documentPreview, UIPageViewControllerNavigationDirection.Forward);
+            ChangePage(folder, documentPreview, UIPageViewControllerNavigationDirection.Forward, isSearchActive);
         }
 
         public void ClearPage()
         {
             var vc = (DocumentViewController)ViewControllers.FirstOrDefault();
-            var index = viewControllerCache.FindIndex(v => v.DocumentPreview.Id == vc.DocumentPreview.Id);
+
+            if (vc == null || viewControllerCache == null)
+                return;
+
+            var index = viewControllerCache.FindIndex(v => v != null && v.DocumentPreview.Id == vc.DocumentPreview.Id);
             if (index >= 0)
             {
                 viewControllerCache[index].RecycleIfNeeded();
                 viewControllerCache.RemoveAt(index);
             }
+
             SetToolbarItems(null, true);
             NavigationItem.SetRightBarButtonItems(new UIBarButtonItem[0], false);
         }
@@ -211,13 +218,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
             ChangePage(Folder, documentPreview, direction);
         }
 
-        void ChangePage(Folder folder, DocumentPreview documentPreview, UIPageViewControllerNavigationDirection direction)
+        DocumentViewController GoToPageAndReturnVC(DocumentPreview documentPreview, UIPageViewControllerNavigationDirection direction, bool isSearchActive = false)
+        {
+            CommonConfig.UsageAnalytics.LogEvent(new DocumentQuickSwitchEvent());
+            var vc = GetDocumentViewController(Folder, documentPreview);
+            CommonConfig.MessengerHub.Publish(new GoToDocumentMessage(this, documentPreview.Id));
+            UpdateNavigationBar(documentPreview, isSearchActive);
+            return vc;
+        }
+
+        void ChangePage(Folder folder, DocumentPreview documentPreview, UIPageViewControllerNavigationDirection direction, bool isSearchActive = false)
         {
             SetToolbarItems(null, true);
 
             var vc = GetDocumentViewController(folder, documentPreview);
             SetViewControllers(new[] { vc }, direction, false, (finished) => UpdateToolBar(vc));
-            UpdateNavigationBar(documentPreview);
+            CommonConfig.MessengerHub.Publish(new GoToDocumentMessage(this, documentPreview.Id));
+            UpdateNavigationBar(documentPreview, isSearchActive);
         }
 
         DocumentViewController GetDocumentViewController(Folder folder, DocumentPreview documentPreview)
@@ -247,13 +264,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
             SetToolbarItems(ti, true);
         }
 
-        void UpdateNavigationBar(DocumentPreview documentPreview)
+        void UpdateNavigationBar(DocumentPreview documentPreview, bool isSearchActive = false)
         {
-            if (SplitViewController == null || SplitViewController.Collapsed)
-            {
-                nextDocumentButtonItem.Enabled = HasNext(documentPreview);
-                previousDocumentButtonItem.Enabled = HasPrevious(documentPreview);
+            nextDocumentButtonItem.Enabled = HasNext(documentPreview);
+            previousDocumentButtonItem.Enabled = HasPrevious(documentPreview);
 
+            if (isSearchActive && SplitViewController != null && !SplitViewController.Collapsed)
+            {
+                if (documentPreview.Direction == DocumentDirection.Draft)
+                {
+                    var rightButtons = new UIBarButtonItem[1];
+                    rightButtons[0] = editDocumentButtonItem;
+
+                    NavigationItem.SetRightBarButtonItems(rightButtons, false);
+                }
+                else
+                {
+                    var rightButtons = new UIBarButtonItem[0];
+                    NavigationItem.SetRightBarButtonItems(rightButtons, false);
+                }
+            }
+            else
+            {
                 if (documentPreview.Direction == DocumentDirection.Draft)
                 {
                     var rightButtons = new UIBarButtonItem[3];
@@ -271,21 +303,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
                     NavigationItem.SetRightBarButtonItems(rightButtons, false);
                 }
             }
-            else
-            {
-                if (documentPreview.Direction == DocumentDirection.Draft)
-                {
-                    var rightButtons = new UIBarButtonItem[1];
-                    rightButtons[0] = editDocumentButtonItem;
-
-                    NavigationItem.SetRightBarButtonItems(rightButtons, false);
-                }
-                else
-                {
-                    var rightButtons = new UIBarButtonItem[0];
-                    NavigationItem.SetRightBarButtonItems(rightButtons, false);
-                }
-            }
         }
 
         public void UpdatePriority()
@@ -295,5 +312,49 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
         }
 
         #endregion
+
+        #region DataSource
+        protected class DocumentPageDataSource : UIPageViewControllerDataSource
+        {
+            public override UIViewController GetNextViewController(UIPageViewController pageViewController, UIViewController referenceViewController)
+            {
+                try {
+                    var vc = (DocumentViewController)pageViewController.ViewControllers.FirstOrDefault();
+                    var documentPreview = vc.DocumentPreview;
+                    var pageVC = (DocumentPageViewController)pageViewController;
+                    var index = pageVC.DocumentPreviews.FindIndex(dp => dp.Id == documentPreview.Id);
+                    if (index < 0 || index >= pageVC.DocumentPreviews.Count - 1)
+                        return null;
+                    var nextDocumentPreview = pageVC.DocumentPreviews[index + 1];
+                    return pageVC.GoToPageAndReturnVC(nextDocumentPreview, UIPageViewControllerNavigationDirection.Forward);
+                } catch (Exception ex) {
+                    CommonConfig.Logger.Error("Could not swipe to next DocumentViewController", ex);
+                    return null;
+                }
+            }
+
+            public override UIViewController GetPreviousViewController(UIPageViewController pageViewController, UIViewController referenceViewController)
+            {
+                try
+                {
+                    var vc = (DocumentViewController)pageViewController.ViewControllers.FirstOrDefault();
+                    var documentPreview = vc.DocumentPreview;
+                    var pageVC = (DocumentPageViewController)pageViewController;
+                    var index = pageVC.DocumentPreviews.FindIndex(dp => dp.Id == documentPreview.Id);
+                    if (index < 1)
+                        return null;
+                    var previousDocumentPreview = pageVC.DocumentPreviews[index - 1];
+                    return pageVC.GoToPageAndReturnVC(previousDocumentPreview, UIPageViewControllerNavigationDirection.Reverse);
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error("Could not swipe to previous DocumentViewController", ex);
+                    return null;
+                }
+            }
+        }
+        #endregion
     }
+
+   
 }

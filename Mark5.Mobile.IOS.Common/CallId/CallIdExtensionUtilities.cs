@@ -6,7 +6,7 @@ namespace Mark5.Mobile.IOS.Common.CallId
 {
     public static class CallIdExtensionUtilities
     {
-        static readonly string extensionId = "com.nordic-it.mark5.mobile.ios.extensions.callid";
+        static readonly string extensionId = "com.nordic-it.mark5.mobile.ios.callid";
 
         public static Task<bool> IsCallIdExtensionEnabled()
         {

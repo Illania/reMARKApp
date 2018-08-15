@@ -68,7 +68,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         void CancelItem_Clicked(object sender, EventArgs e)
         {
             DismissViewController(true, null);
-            tcs.SetResult(null);
+            tcs.TrySetResult(null);
         }
 
         protected async override void FolderSelected(Folder folder, bool isFromFavorite)

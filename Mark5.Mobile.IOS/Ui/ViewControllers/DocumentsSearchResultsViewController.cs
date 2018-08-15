@@ -281,6 +281,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var point = recognizer.LocationInView(TableView);
             var indexPath = TableView.IndexPathForRowAtPoint(point);
 
+            if (indexPath == null)
+                return;
+
             if (!TableView.CellAt(indexPath)?.UserInteractionEnabled ?? true)
                 return;
 
@@ -649,6 +652,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
             {
                 var actions = new List<UITableViewRowAction>();
+
+                if (indexPath.Row < 0 || indexPath.Row >= Items.Count)
+                    return actions.ToArray();
 
                 var documentPreview = Items[indexPath.Row];
 

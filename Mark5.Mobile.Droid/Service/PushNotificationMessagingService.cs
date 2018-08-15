@@ -117,7 +117,7 @@ namespace Mark5.Mobile.Droid.Utilities.Service
             var n = builder.Build();
             n.Defaults = 0;
 
-            nm.Notify(GroupName, StackNotification, n);
+            nm.Notify(StackNotification, n);
         }
 
         public void CreateChannelIfNotExists(NotificationManager nm)

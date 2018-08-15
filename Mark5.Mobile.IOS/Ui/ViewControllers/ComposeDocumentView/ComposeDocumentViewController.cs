@@ -460,7 +460,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                             await InsertLocalTemplate();
                             break;
                         case 2:
-                            await InsertTemplate();
+                            await InsertTemplate(false);
                             break;
                     }
                     break;
@@ -510,7 +510,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             if (source == 0)
             {
                 CommonConfig.UsageAnalytics.LogEvent(new ComposeInsertTemplateEvent());
-                await InsertTemplate();
+                await InsertTemplate(true);
             }
 
             if (source == 1)
@@ -789,6 +789,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async Task<bool> SaveDraft()
         {
+            if (lineView.LineSelectedIsAmbiguous)
+            {
+                await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("warning"), Localization.GetString("no_line_selected_draft"));
+                return false;
+            }
+
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("saving_draft___"));
 
             CommonConfig.UsageAnalytics.LogEvent(new ComposeSaveDraftEvent());
@@ -948,7 +954,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             }
         }
 
-        async Task InsertTemplate()
+        async Task InsertTemplate(bool insertAtCursor)
         {
             var tp = new TemplatesListViewController();
             PresentViewController(new NavigationController(tp, UIModalPresentationStyle.PageSheet), true, null);
@@ -967,7 +973,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                 ProcessTemplate(template, previousDocumentPreview);
 
-                var insertTemplateJs = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/insertTemplate", "js"));
+                var insertTemplateJs = File.ReadAllText(NSBundle.MainBundle.PathForResource(
+                    insertAtCursor ? "html/insertTemplate" : "html/initTemplate", "js"));
                 if (template.ContentType == ContentType.PlainText)
                 {
                     var templateText = Regex.Replace(template.Content, @"\r\n?|\n", "\\n", RegexOptions.Multiline);
