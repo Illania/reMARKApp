@@ -332,6 +332,9 @@
 		<Reference Include="Firebase.CloudMessaging">
 		  <HintPath>..\packages\Xamarin.Firebase.iOS.CloudMessaging.2.0.8.1\lib\Xamarin.iOS10\Firebase.CloudMessaging.dll</HintPath>
 		</Reference>
+		<Reference Include="ModernHttpClient">
+		  <HintPath>..\packages\modernhttpclient.2.4.2\lib\Xamarin.iOS10\ModernHttpClient.dll</HintPath>
+		 </Reference>
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Mark5.Mobile.Common\Mark5.Mobile.Common.csproj">
