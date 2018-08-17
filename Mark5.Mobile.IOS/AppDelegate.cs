@@ -47,7 +47,6 @@ namespace Mark5.Mobile.IOS
 
                 App.Configure(); //Firebase Analytics
                 Messaging.SharedInstance.Delegate = this;
-                Firebase.InstanceID.InstanceId.Notifications.ObserveTokenRefresh(TokenRefreshHandler);
 
                 CommonConfig.Logger.Info("MARK5 initializing...");
                 var isLoggedIn = InitializePlatform(application);
@@ -91,11 +90,6 @@ namespace Mark5.Mobile.IOS
             return false; // Always return false to pass handling of notifications to FinishedLaunching
         }
 
-        private void TokenRefreshHandler(object sender, NSNotificationEventArgs e)
-        {
-            //throw new NotImplementedException();
-        }
-
         public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
         {
             var OneDayInterval = 60 * 24;
@@ -128,15 +122,6 @@ namespace Mark5.Mobile.IOS
             }
 
             return true;
-        }
-
-        [Export("messaging:didReceiveRegistrationToken:")]
-        public void DidReceiveRegistrationToken(Messaging messaging, string fcmToken)
-        {
-            Console.WriteLine($"Firebase registration token: {fcmToken}");
-
-            // TODO: If necessary send token to application server.
-            // Note: This callback is fired at each app startup and whenever a new token is generated.
         }
 
         public override bool ShouldSaveApplicationState(UIApplication application, NSCoder coder) => true;
@@ -217,9 +202,9 @@ namespace Mark5.Mobile.IOS
         {
             CommonConfig.Logger.Info($"Received APNS token: {deviceToken}");
 
-            Messaging.SharedInstance.ApnsToken = deviceToken;
-
-            var fcmToken = Messaging.SharedInstance.FcmToken;
+            var serviceVersion = ServerConfig.SystemSettings?.SystemInfo?.ServiceVersion;
+            if (serviceVersion != null && serviceVersion.CompareTo(new Version(3, 2, 0)) >= 0)
+                return;
 
             var newToken = new string(deviceToken.ToString().Where(char.IsLetterOrDigit).ToArray());
             var oldToken = PlatformConfig.Preferences.PushNotificationToken;
@@ -234,7 +219,7 @@ namespace Mark5.Mobile.IOS
             if (!string.IsNullOrWhiteSpace(newToken))
             {
                 CommonConfig.Logger.Info("Sending new APNS token...");
-                Managers.NotificationsManager.Subscribe(DeviceType.IOS, newToken, fcmToken).FireAndForget();
+                Managers.NotificationsManager.Subscribe(DeviceType.IOS, newToken).FireAndForget();
             }
             else
             {
@@ -246,6 +231,39 @@ namespace Mark5.Mobile.IOS
         {
             CommonConfig.Logger.Error("Failed to received APNS Token", new NSErrorException(error));
             PlatformConfig.Preferences.PushNotificationToken = string.Empty;
+        }
+
+        [Export("messaging:didReceiveRegistrationToken:")]
+        public void DidReceiveRegistrationToken(Messaging messaging, string fcmToken)
+        {
+            CommonConfig.Logger.Info($"New FCM token {fcmToken}");
+            UpdateFcmToken(fcmToken);
+        }
+
+        public void UpdateFcmToken(string newToken)
+        {
+            var serviceVersion = ServerConfig.SystemSettings?.SystemInfo?.ServiceVersion;
+            if (serviceVersion != null && serviceVersion.CompareTo(new Version(3, 2, 0)) < 0)
+                return;
+
+            var oldToken = PlatformConfig.Preferences.PushNotificationToken;
+            PlatformConfig.Preferences.PushNotificationToken = newToken;
+
+            if (!string.IsNullOrWhiteSpace(oldToken) && oldToken != newToken)
+            {
+                CommonConfig.Logger.Info("New FCM token is different, so try to unsubscribe old one...");
+                Managers.NotificationsManager.UnSubscribe(DeviceType.IOS, oldToken).FireAndForget();
+            }
+
+            if (!string.IsNullOrWhiteSpace(newToken))
+            {
+                CommonConfig.Logger.Info("Sending new FCM token...");
+                Managers.NotificationsManager.Subscribe(DeviceType.IOS, newToken).FireAndForget();
+            }
+            else
+            {
+                CommonConfig.Logger.Info("Received empty or null FCM token...");
+            }
         }
 
         [Export("userNotificationCenter:willPresentNotification:withCompletionHandler:")]
@@ -492,7 +510,7 @@ namespace Mark5.Mobile.IOS
                         {
                             if (result)
                             {
-                                BeginInvokeOnMainThread(application.RegisterForRemoteNotifications);
+                                BeginInvokeOnMainThread(application.RegisterForRemoteNotifications); //TODO need to do it for FCM
                             }
                             else
                             {
