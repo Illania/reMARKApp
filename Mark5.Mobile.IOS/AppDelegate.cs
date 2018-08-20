@@ -230,8 +230,13 @@ namespace Mark5.Mobile.IOS
             PlatformConfig.Preferences.PushNotificationToken = string.Empty;
         }
 
-        [Export("messaging:didReceiveRegistrationToken:")]
+        [Export("messaging:didReceiveRegistrationToken:")]  //FCM Token
         public void DidReceiveRegistrationToken(Messaging messaging, string fcmToken)
+        {
+            UpdateFcmToken(fcmToken);
+        }
+
+        void UpdateFcmToken(string fcmToken)
         {
             CommonConfig.Logger.Info($"Received FCM token: {fcmToken}");
 
@@ -523,24 +528,28 @@ namespace Mark5.Mobile.IOS
                     CommonConfig.Logger.Info("Refreshing APNS token...");
 
                     UNUserNotificationCenter.Current.RequestAuthorization(UNAuthorizationOptions.Alert | UNAuthorizationOptions.Badge | UNAuthorizationOptions.Sound,
-                        (result, error) =>
-                        {
-                            if (result)
-                            {
-                                BeginInvokeOnMainThread(application.RegisterForRemoteNotifications); //TODO need to do it for FCM
-                            }
-                            else
-                            {
-                                if (error != null)
-                                    CommonConfig.Logger.Error(new NSErrorException(error));
-                            }
-                        });
+                        OnAuthorizationRequested);
                 });
 
                 CommonConfig.Logger.Info($"Initialized - will present {nameof(SplitMainViewController)}");
 
                 return true;
             }).Result;
+        }
+
+        public void OnAuthorizationRequested(bool result, NSError error)
+        {
+            if (result)
+            {
+                BeginInvokeOnMainThread(UIApplication.SharedApplication.RegisterForRemoteNotifications);
+                if (!string.IsNullOrWhiteSpace(Messaging.SharedInstance.FcmToken))
+                    UpdateFcmToken(Messaging.SharedInstance.FcmToken);
+            }
+            else
+            {
+                if (error != null)
+                    CommonConfig.Logger.Error(new NSErrorException(error));
+            }
         }
     }
 }
