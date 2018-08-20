@@ -198,33 +198,30 @@ namespace Mark5.Mobile.IOS
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true, true);
         }
 
+        #region Notification handling
+
         public override void RegisteredForRemoteNotifications(UIApplication application, NSData deviceToken)
         {
             CommonConfig.Logger.Info($"Received APNS token: {deviceToken}");
 
             var serviceVersion = ServerConfig.SystemSettings?.SystemInfo?.ServiceVersion;
-            if (serviceVersion != null && serviceVersion.CompareTo(new Version(3, 2, 0)) >= 0)
+
+            if (serviceVersion == null)
+            {
+                CommonConfig.Logger.Info($"It is not possible to update the APNS token because the server version is null");
                 return;
+            }
+
+
+            if (serviceVersion != null && serviceVersion.CompareTo(new Version(3, 2, 0)) >= 0)
+            {
+                CommonConfig.Logger.Info($"Not sending the APNS token because the current service version is equal or higher than 3.2.0");
+                return;
+            }
 
             var newToken = new string(deviceToken.ToString().Where(char.IsLetterOrDigit).ToArray());
-            var oldToken = PlatformConfig.Preferences.PushNotificationToken;
-            PlatformConfig.Preferences.PushNotificationToken = newToken;
 
-            if (!string.IsNullOrWhiteSpace(oldToken) && oldToken != newToken)
-            {
-                CommonConfig.Logger.Info("New APNS token is different, so try to unsubscribe old one...");
-                Managers.NotificationsManager.UnSubscribe(DeviceType.IOS, oldToken).FireAndForget();
-            }
-
-            if (!string.IsNullOrWhiteSpace(newToken))
-            {
-                CommonConfig.Logger.Info("Sending new APNS token...");
-                Managers.NotificationsManager.Subscribe(DeviceType.IOS, newToken).FireAndForget();
-            }
-            else
-            {
-                CommonConfig.Logger.Info("Received empty or null APNS token...");
-            }
+            UpdatePushNotificationToken(newToken);
         }
 
         public override void FailedToRegisterForRemoteNotifications(UIApplication application, NSError error)
@@ -236,33 +233,44 @@ namespace Mark5.Mobile.IOS
         [Export("messaging:didReceiveRegistrationToken:")]
         public void DidReceiveRegistrationToken(Messaging messaging, string fcmToken)
         {
-            CommonConfig.Logger.Info($"New FCM token {fcmToken}");
-            UpdateFcmToken(fcmToken);
+            CommonConfig.Logger.Info($"Received FCM token: {fcmToken}");
+
+            var serviceVersion = ServerConfig.SystemSettings?.SystemInfo?.ServiceVersion;
+
+            if (serviceVersion == null)
+            {
+                CommonConfig.Logger.Info($"It is not possible to update the push notification token because the server version is null");
+                return;
+            }
+
+            if (serviceVersion.CompareTo(new Version(3, 2, 0)) < 0)
+            {
+                CommonConfig.Logger.Info($"Not sending the FCM token because the current service version is lesss than 3.2.0");
+                return;
+            }
+
+            UpdatePushNotificationToken(fcmToken);
         }
 
-        public void UpdateFcmToken(string newToken)
+        void UpdatePushNotificationToken(string newToken)
         {
-            var serviceVersion = ServerConfig.SystemSettings?.SystemInfo?.ServiceVersion;
-            if (serviceVersion != null && serviceVersion.CompareTo(new Version(3, 2, 0)) < 0)
-                return;
-
             var oldToken = PlatformConfig.Preferences.PushNotificationToken;
             PlatformConfig.Preferences.PushNotificationToken = newToken;
 
             if (!string.IsNullOrWhiteSpace(oldToken) && oldToken != newToken)
             {
-                CommonConfig.Logger.Info("New FCM token is different, so try to unsubscribe old one...");
+                CommonConfig.Logger.Info("New push notification token is different, so try to unsubscribe old one...");
                 Managers.NotificationsManager.UnSubscribe(DeviceType.IOS, oldToken).FireAndForget();
             }
 
             if (!string.IsNullOrWhiteSpace(newToken))
             {
-                CommonConfig.Logger.Info("Sending new FCM token...");
+                CommonConfig.Logger.Info("Sending new push notification token...");
                 Managers.NotificationsManager.Subscribe(DeviceType.IOS, newToken).FireAndForget();
             }
             else
             {
-                CommonConfig.Logger.Info("Received empty or null FCM token...");
+                CommonConfig.Logger.Info("Received empty or null push notification token...");
             }
         }
 
@@ -340,6 +348,14 @@ namespace Mark5.Mobile.IOS
                 completionHandler();
             }
         }
+
+        [Export("application:didReceiveRemoteNotification:fetchCompletionHandler:")]
+        public override void DidReceiveRemoteNotification(UIApplication application, NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler)
+        {
+            CommonConfig.Logger.Info("DID RECEIVE REMOTE NOTIFICATION CALLED");
+        }
+
+        #endregion
 
         public override void PerformFetch(UIApplication application, Action<UIBackgroundFetchResult> completionHandler)
         {
