@@ -352,7 +352,8 @@ namespace Mark5.Mobile.IOS
         [Export("application:didReceiveRemoteNotification:fetchCompletionHandler:")]
         public override void DidReceiveRemoteNotification(UIApplication application, NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler)
         {
-            CommonConfig.Logger.Info("DID RECEIVE REMOTE NOTIFICATION CALLED");
+            //This needs to be implemented to support silent notifications. 
+            //Let's not forget the silent notifications limitations (2-3 notifications per hour max, and other limitations per day)
         }
 
         #endregion
