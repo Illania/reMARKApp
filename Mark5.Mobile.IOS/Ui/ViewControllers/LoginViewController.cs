@@ -673,7 +673,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 UNUserNotificationCenter.Current.RequestAuthorization(UNAuthorizationOptions.Alert | UNAuthorizationOptions.Badge | UNAuthorizationOptions.Sound, (result, error) =>
                 {
-                    ((AppDelegate)UIApplication.SharedApplication.Delegate).OnAuthorizationRequested(result, error);
+                    ((AppDelegate)UIApplication.SharedApplication.Delegate)?.OnAuthorizationRequested(result, error);
                 });
 
                 CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Hostname, hostname);
