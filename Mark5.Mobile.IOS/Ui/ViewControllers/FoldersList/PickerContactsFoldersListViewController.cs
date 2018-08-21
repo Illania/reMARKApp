@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList;
@@ -68,7 +69,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         void CancelItem_Clicked(object sender, EventArgs e)
         {
             DismissViewController(true, null);
-            tcs.SetResult(null);
+            if (!tcs.TrySetResult(null))
+                CommonConfig.Logger.Error("Result was already set!");
+
         }
 
         protected async override void FolderSelected(Folder folder, bool isFromFavorite)
@@ -83,7 +86,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             var result = await vc.Result;
             if (result != null)
-                tcs.SetResult(result);
+            {
+                if (!tcs.TrySetResult(result))
+                    CommonConfig.Logger.Error("Result was already set!");
+            }
         }
 
         protected override async void FolderExpand(Folder folder)
