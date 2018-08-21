@@ -196,8 +196,7 @@ namespace Mark5.Mobile.IOS.Service
                     }
 
                 }, cancellationToken);
-              
-                await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
+
             }
         }
     }
