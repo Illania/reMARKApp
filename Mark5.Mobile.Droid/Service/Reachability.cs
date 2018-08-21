@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Polly;
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
@@ -11,7 +12,7 @@ using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Testers;
 using Mark5.Mobile.Common.Utilities;
-using Polly;
+
 
 namespace Mark5.Mobile.Droid.Service
 {
@@ -86,7 +87,7 @@ namespace Mark5.Mobile.Droid.Service
             if (!result)
             {
                 cancellationTokenSource = new CancellationTokenSource();
-                CheckServiceAvailabilityContinuesly(cancellationTokenSource.Token);
+                CheckServiceAvailabilitycontinuously(cancellationTokenSource.Token);
             }
 
             return result;
@@ -181,7 +182,7 @@ namespace Mark5.Mobile.Droid.Service
             }
         }
 
-        async Task CheckServiceAvailabilityContinuesly(CancellationToken cancellationToken)
+        async Task CheckServiceAvailabilitycontinuously(CancellationToken cancellationToken)
         {
             var retries = 0;
 
@@ -190,32 +191,23 @@ namespace Mark5.Mobile.Droid.Service
                     onRetry: (exception, calculatedWaitDuration) => // Capture some info for logging!
                     {
                         retries++;
-                        CommonConfig.Logger.Info("Retries : " + retries);
+                        CommonConfig.Logger.Debug("Retries : " + retries);
                     });
 
             while (!cancellationToken.IsCancellationRequested)
             {
-                try
+                await policy.ExecuteAsync(async token =>
                 {
-                    await policy.ExecuteAsync(async token =>
+                    var response = await CheckWithService();
+
+                    if (response)
                     {
-                        var response = await CheckWithService();
+                        cancellationTokenSource.Cancel();
+                        ReachabilityRefreshed(this, new ReachabilityRefreshedEventArgs(true, true));
+                    }
 
-                        if (response)
-                        {
-                            cancellationTokenSource.Cancel();
-                            ReachabilityRefreshed(this, new ReachabilityRefreshedEventArgs(true, true));
-                        }
-
-                    }, cancellationToken);
-                }
-                catch (Exception ex)
-                {
-                    CommonConfig.Logger.Error("Pinging failed : ", ex);
-                }
-
-                await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
-            }
+                }, cancellationToken);
+           }
         }
     }
 }
