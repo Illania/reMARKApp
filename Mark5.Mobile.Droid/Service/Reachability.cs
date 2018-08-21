@@ -1,5 +1,4 @@
-﻿using Polly;
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
@@ -12,7 +11,6 @@ using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Testers;
 using Mark5.Mobile.Common.Utilities;
-
 
 namespace Mark5.Mobile.Droid.Service
 {
@@ -184,30 +182,18 @@ namespace Mark5.Mobile.Droid.Service
 
         async Task CheckServiceAvailabilityContinuously(CancellationToken cancellationToken)
         {
-            var retries = 0;
-
-            var policy = Policy.Handle<Exception>().WaitAndRetryForeverAsync(
-                sleepDurationProvider: attempt => TimeSpan.FromSeconds(2),// Wait 2 s between each try.
-                    onRetry: (exception, calculatedWaitDuration) => // Capture some info for logging!
-                    {
-                        retries++;
-                        CommonConfig.Logger.Debug("Retries : " + retries);
-                    });
-
             while (!cancellationToken.IsCancellationRequested)
             {
-                await policy.ExecuteAsync(async token =>
+                var response = await CheckWithService();
+
+                if (response)
                 {
-                    var response = await CheckWithService();
+                    cancellationTokenSource.Cancel();
+                    ReachabilityRefreshed(this, new ReachabilityRefreshedEventArgs(true, true));
+                }
 
-                    if (response)
-                    {
-                        cancellationTokenSource.Cancel();
-                        ReachabilityRefreshed(this, new ReachabilityRefreshedEventArgs(true, true));
-                    }
-
-                }, cancellationToken);
-           }
+                await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
+            }
         }
     }
 }
