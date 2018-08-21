@@ -813,7 +813,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void ShowCategories(DocumentPreview selectedDocument)
         {
-            var vc = new CategoriesListViewController
+            var vc = new NewCategoriesListViewController
             {
                 BusinessEntityPreview = selectedDocument
             };

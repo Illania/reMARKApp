@@ -265,6 +265,7 @@
 		<Compile Include="Utilities\OnBoardingUtilities.cs" />
 		<Compile Include="Ui\ViewControllers\OnBoardingViewController.cs" />
 		<Compile Include="Ui\Common\BadgeBarButtonItem.cs" />
+		<Compile Include="Ui\ViewControllers\NewCategoriesListViewController.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
