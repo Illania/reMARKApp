@@ -87,7 +87,7 @@ namespace Mark5.Mobile.Droid.Service
             if (!result)
             {
                 cancellationTokenSource = new CancellationTokenSource();
-                CheckServiceAvailabilitycontinuously(cancellationTokenSource.Token);
+                CheckServiceAvailabilityContinuously(cancellationTokenSource.Token);
             }
 
             return result;
@@ -182,7 +182,7 @@ namespace Mark5.Mobile.Droid.Service
             }
         }
 
-        async Task CheckServiceAvailabilitycontinuously(CancellationToken cancellationToken)
+        async Task CheckServiceAvailabilityContinuously(CancellationToken cancellationToken)
         {
             var retries = 0;
 
