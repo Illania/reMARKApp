@@ -402,3 +402,8 @@
 "swipe_settings_leading_title" = "SWIPE RIGHT";
 "swipe_settings_middle_title" = "SWIPE LEFT - MIDDLE BUTTON";
 "swipe_settings_last_title" = "SWIPE LEFT - LAST BUTTON";
+"available" = "Available";
+"selected" = "Selected";
+"changes_not_saved" = "Changes not saved!";
+"changes_not_saved_description" = "Current changes are not saved and will be discarded";
+

@@ -813,11 +813,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void ShowCategories(DocumentPreview selectedDocument)
         {
-            var vc = new NewCategoriesListViewController
-            {
-                BusinessEntityPreview = selectedDocument
-            };
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+            PresentViewController(new NavigationController(new NewCategoriesListViewController(selectedDocument), UIModalPresentationStyle.PageSheet), true, null);
         }
 
         void CopyToFolder(DocumentPreview selectedDocument) =>
