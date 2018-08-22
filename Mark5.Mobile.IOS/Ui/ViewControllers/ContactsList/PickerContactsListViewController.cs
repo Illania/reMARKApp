@@ -50,6 +50,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                     var address = emailAddresses[index];
 
                     tcs.SetResult(new Recipient(contactPreview.Name, address, RecipientType.Contact));
+                    DisableSearchController();
                     DismissViewController(true, null);
                 }
                 else
