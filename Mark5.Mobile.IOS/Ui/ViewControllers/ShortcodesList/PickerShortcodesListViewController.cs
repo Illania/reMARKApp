@@ -36,6 +36,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                 var shortcode = await Managers.ShortcodesManager.GetShortcodeAsync(Folder, shortcodePreview.Id);
                 dismissAction();
                 tcs.SetResult(shortcode);
+                DisableSearchController();
                 DismissViewController(true, null);
             }
             catch (Exception ex)
