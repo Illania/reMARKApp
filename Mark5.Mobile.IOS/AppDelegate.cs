@@ -343,7 +343,7 @@ namespace Mark5.Mobile.IOS
                 CommonConfig.OnStopTransmission = ActivityIndicator.Hide;
                 CommonConfig.MessengerHub = new TinyMessengerHub();
                 CommonConfig.Phonebook = new Phonebook();
-                CommonConfig.Reachability = new Reachability();
+                CommonConfig.Reachability = Reachability.Instance;
                 CommonConfig.UsageAnalytics = new UsageAnalytics();
                 CommonConfig.ConcurrentQueueType = typeof(PortableConcurrentQueue<>);
                 CommonConfig.TimeZoneInfoDeserializer = TimeZoneInfo.FromSerializedString;
