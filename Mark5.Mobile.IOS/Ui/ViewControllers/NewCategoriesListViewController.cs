@@ -42,7 +42,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InitializeSearchBar();
         }
 
-        public NewCategoriesListViewController(BusinessEntityPreview businessEntityPreview)
+        public NewCategoriesListViewController(BusinessEntityPreview businessEntityPreview) : base(UITableViewStyle.Grouped)
         {
             this.BusinessEntityPreview = businessEntityPreview;
             if (businessEntityPreview is DocumentPreview documentPreview)
@@ -282,7 +282,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
 
                 var cell = tableView.DequeueReusableCell(CategoriesTableViewCell.DefaultId) as CategoriesTableViewCell ?? new CategoriesTableViewCell();
+
                 cell.Initialize(items[indexPath.Row]);
+                cell.Accessory = UITableViewCellAccessory.None;
+
                 return cell;
             }
 
@@ -421,7 +424,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
 
                 var cell = tableView.DequeueReusableCell(CategoriesTableViewCell.DefaultId) as CategoriesTableViewCell ?? new CategoriesTableViewCell();
+
                 cell.Initialize(items[indexPath.LongSection][indexPath.Row]);
+                if (indexPath.LongSection == Section.Selected)
+                    cell.Accessory = UITableViewCellAccessory.Checkmark;
+                
                 return cell;
             }
 
