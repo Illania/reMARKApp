@@ -27,6 +27,11 @@ namespace Mark5.Mobile.Common.Model
         {
             return $"[Category: Id={Id}, Name={Name}]";
         }
+
+        public override bool Equals(object obj)
+        {
+            return (obj is Category y) && this.Id.Equals(y.Id);
+        }
     }
 
     public class CategoryComparer : IEqualityComparer<Category>

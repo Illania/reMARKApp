@@ -3,11 +3,9 @@ using Foundation;
 using System;
 using System.Linq;
 using System.Threading;
-using System.Globalization;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
@@ -22,7 +20,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
     {
         BusinessEntityPreview BusinessEntityPreview { get; set; }
         List<Category> categories = new List<Category>();
-
+        List<Category> allCategories = new List<Category>();
         UIBarButtonItem cancelBtnItem;
         UIBarButtonItem saveBtnItem;
         UISearchController searchController;
@@ -70,6 +68,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public override async void ViewDidAppear(bool animated)
         {
+            base.ViewDidAppear(animated);
+
             if (((DataSource)TableView.Source).Empty)
                 await RefreshDataAsync();
 
@@ -117,21 +117,40 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public async Task RefreshDataAsync()
         {
-            var availableCategories = await GetAvailableCategories();
-           
-            ((DataSource)TableView.Source).SetItems(DataSource.Section.Available, availableCategories);
-           
-            if(searchController != null)
-                searchController.Active = false;
+            if (BusinessEntityPreview is DocumentPreview documentPreview)
+            {
+                allCategories = await Managers.DocumentsManager.GetAllCategoriesAsync();
+            }
+
+            if (BusinessEntityPreview is ContactPreview contactPreview)
+            {
+                allCategories = await Managers.ContactsManager.GetAllCategoriesAsync();  
+            }
+
+            ReloadTable();
         }
 
-        protected virtual void CategorySelected(Category category)
-        {
-            MoveCategory(category);
+        public void ReloadTable() {
+            var availableCategories = new List<Category>();
 
-            #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-            RefreshDataAsync();
-            #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+            if (BusinessEntityPreview is DocumentPreview documentPreview)
+            {
+                ((DataSource)TableView.Source).SetItems(DataSource.Section.Selected, categories);
+                availableCategories = allCategories.Where(x => !categories.Contains(x)).ToList();
+            }
+
+            if (BusinessEntityPreview is ContactPreview contactPreview)
+            {
+                ((DataSource)TableView.Source).SetItems(DataSource.Section.Selected, categories);
+                availableCategories = allCategories.Where(x => !categories.Contains(x)).ToList();
+            }
+
+            ((DataSource)TableView.Source).SetItems(DataSource.Section.Available, availableCategories);
+
+            if (searchController != null)
+                searchController.Active = false;
+
+            TableView.ReloadData();
         }
 
         protected virtual void MoveCategory(Category category) 
@@ -149,24 +168,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        async Task<List<Category>> GetAvailableCategories() {
+        List<Category> GetAvailableCategories() {
             if (BusinessEntityPreview is DocumentPreview documentPreview)
             {
                 ((DataSource)TableView.Source).SetItems(DataSource.Section.Selected, categories);
-                var allAvailableCategories = await Managers.DocumentsManager.GetAllCategoriesAsync();
-                return allAvailableCategories.Where(x => !categories.Any(y => y.Guid == x.Guid)).ToList();
+                return allCategories.Where(x => !categories.Contains(x)).ToList();
             }
 
             if (BusinessEntityPreview is ContactPreview contactPreview)
             {
                 ((DataSource)TableView.Source).SetItems(DataSource.Section.Selected, categories);
-                var allAvailableCategories = await Managers.ContactsManager.GetAllCategoriesAsync();
-                return allAvailableCategories.Where(x => !categories.Contains(x)).ToList();
+                return allCategories.Where(x => !categories.Contains(x)).ToList();
             }
 
             return new List<Category>();
         }
-
 
         #region Search related
         protected virtual void InitializeSearchBar()
@@ -239,15 +255,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (BusinessEntityPreview is DocumentPreview documentPreview)
                 {
                     ((DataSource)TableView.Source).SetItems(DataSource.Section.Selected, documentPreview.Categories);
-                    var allAvailableCategories = await Managers.DocumentsManager.GetAllCategoriesAsync();
-                    searchResultCategories = allAvailableCategories.Where(x => x.Name.ToLower().Contains(searchText.ToLower()) && !categories.Any(y => y.Guid == x.Guid)).ToList();
+                    searchResultCategories = allCategories.Where(x => x.Name.ToLower().Contains(searchText.ToLower()) && !categories.Contains(x)).ToList();
                 }
 
                 if (BusinessEntityPreview is ContactPreview contactPreview)
                 {
                     ((DataSource)TableView.Source).SetItems(DataSource.Section.Selected, contactPreview.Categories);
-                    var allAvailableCategories = await Managers.ContactsManager.GetAllCategoriesAsync();
-                    searchResultCategories = allAvailableCategories.Where(x => x.Name.ToLower().Contains(searchText.ToLower()) && !categories.Any(y => y.Guid == x.Guid)).ToList();
+                    searchResultCategories = allCategories.Where(x => x.Name.ToLower().Contains(searchText.ToLower()) && !categories.Contains(x)).ToList();
                 }
 
                 if (cancellationToken.IsCancellationRequested)
@@ -307,7 +321,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
                 var category = items[indexPath.Row];
-                viewControllerWeakReference.Unwrap()?.CategorySelected(category);
+                viewControllerWeakReference.Unwrap()?.MoveCategory(category);
+                viewControllerWeakReference.Unwrap()?.ReloadTable();
             }
 
             public void SetSearchCategories(List<Category> categories, string searchText)
@@ -341,26 +356,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void InitializeNavigationBar()
         {
             Title = Localization.GetString("categories");
-            cancelBtnItem = new UIBarButtonItem(UIBarButtonSystemItem.Cancel, CancelBtnItem_Clicked);
+            cancelBtnItem = new UIBarButtonItem(UIBarButtonSystemItem.Cancel);
+            cancelBtnItem.Clicked += async (sender, e) => await CancelBtnItem_ClickedAsync(sender, e);
             NavigationItem.SetLeftBarButtonItem(cancelBtnItem, false);
-
             saveBtnItem = new UIBarButtonItem(UIBarButtonSystemItem.Save, SaveBtnItem_Clicked);
-
             NavigationItem.SetRightBarButtonItem(saveBtnItem, false);
         }
 
-        void CancelBtnItem_Clicked(object sender, EventArgs e)
+        async Task CancelBtnItem_ClickedAsync(object sender, EventArgs e)
         {
-            if (BusinessEntityPreview is DocumentPreview documentPreview && categories.Equals(documentPreview.Categories) || BusinessEntityPreview is ContactPreview contactPreview && categories.Equals(contactPreview.Categories))
+            if (BusinessEntityPreview is DocumentPreview documentPreview && categories.Equals(documentPreview.Categories) 
+                || BusinessEntityPreview is ContactPreview contactPreview && categories.Equals(contactPreview.Categories))
             {
                 DismissViewController(true, null);
             }
             else
             {
-                var alertController = UIAlertController.Create(Localization.GetString("changes_not_saved"), Localization.GetString("changes_not_saved_description"), UIAlertControllerStyle.Alert);
-                alertController.AddAction(UIAlertAction.Create(Localization.GetString("ok"), UIAlertActionStyle.Default, x => DismissViewController(true, null)));
-                alertController.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
-                PresentViewController(alertController, true, null);
+                var response = await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("changes_not_saved"),
+                                                                 Localization.GetString("changes_not_saved_description"),
+                                                                 Localization.GetString("ok"), 
+                                                                 Localization.GetString("cancel"));
+                if (response)
+                    DismissViewController(true, null);
             }
         }
 
@@ -479,20 +496,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                
                 if (indexPath.LongSection == Section.Selected)
                 {
-                    BeginInvokeOnMainThread(async () =>
+                    var availableCategories = viewControllerWeakReference.Unwrap()?.GetAvailableCategories();
+                    if (items[Section.Available].Count <= 1)
                     {
-                        var availableCategories = await viewControllerWeakReference.Unwrap()?.GetAvailableCategories();
-                        if (items[Section.Available].Count <= 1)
-                        {
-                            tableView.ReloadSections(NSIndexSet.FromIndex(Section.Available), UITableViewRowAnimation.Middle);
-                        }
-                        else {
-                            tableView.InsertRows(new NSIndexPath[] { NSIndexPath.Create(Section.Available, availableCategories.Count() - 1) }, UITableViewRowAnimation.Middle);
-                        }
-
-                        tableView.EndUpdates();
-                        tableView.AllowsSelection = true;
-                    });
+                        tableView.ReloadSections(NSIndexSet.FromIndex(Section.Available), UITableViewRowAnimation.Middle);
+                    }
+                    else {
+                        tableView.InsertRows(new NSIndexPath[] { NSIndexPath.Create(Section.Available, availableCategories.Count() - 1) }, UITableViewRowAnimation.Middle);
+                    }
                 }
                 else
                 {
@@ -503,9 +514,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     } else {
                         tableView.InsertRows(new NSIndexPath[] { NSIndexPath.Create(Section.Selected, count - 1) }, UITableViewRowAnimation.Middle);
                     }
-                    tableView.EndUpdates();
-                    tableView.AllowsSelection = true;
                 }
+
+                tableView.EndUpdates();
+                tableView.AllowsSelection = true;
             }
 
             public override nint RowsInSection(UITableView tableview, nint section)
