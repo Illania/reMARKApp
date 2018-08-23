@@ -240,14 +240,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     ((DataSource)TableView.Source).SetItems(DataSource.Section.Selected, documentPreview.Categories);
                     var allAvailableCategories = await Managers.DocumentsManager.GetAllCategoriesAsync();
-                    searchResultCategories = allAvailableCategories.Where(x => x.Name.Contains(searchText) && !categories.Any(y => y.Guid == x.Guid)).ToList();
+                    searchResultCategories = allAvailableCategories.Where(x => x.Name.ToLower().Contains(searchText.ToLower()) && !categories.Any(y => y.Guid == x.Guid)).ToList();
                 }
 
                 if (BusinessEntityPreview is ContactPreview contactPreview)
                 {
                     ((DataSource)TableView.Source).SetItems(DataSource.Section.Selected, contactPreview.Categories);
                     var allAvailableCategories = await Managers.ContactsManager.GetAllCategoriesAsync();
-                    searchResultCategories = allAvailableCategories.Where(x => x.Name.Contains(searchText) && !categories.Any(y => y.Guid == x.Guid)).ToList();
+                    searchResultCategories = allAvailableCategories.Where(x => x.Name.ToLower().Contains(searchText.ToLower()) && !categories.Any(y => y.Guid == x.Guid)).ToList();
                 }
 
                 if (cancellationToken.IsCancellationRequested)
@@ -466,7 +466,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
-                tableView.AllowsSelection = false; // to prevent exceptions when quick tapping
+                tableView.AllowsSelection = false; // to prevent exceptions when 'quickly' tapping rows
                 tableView.BeginUpdates();
                 var category = items[indexPath.LongSection][indexPath.Row];
                 MoveCategory(indexPath.LongSection, category);
