@@ -117,28 +117,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public async Task RefreshDataAsync()
         {
-            if (BusinessEntityPreview is DocumentPreview documentPreview)
-            {
-                ((DataSource)TableView.Source).SetItems(DataSource.Section.Selected, categories);
-                var allAvailableCategories = await Managers.DocumentsManager.GetAllCategoriesAsync();
-
-                var availableCategories = allAvailableCategories.Where(x => !categories.Any(y => y.Guid == x.Guid)).ToList();
-                ((DataSource)TableView.Source).SetItems(DataSource.Section.Available, availableCategories);
-            }
-
-            if (BusinessEntityPreview is ContactPreview contactPreview)
-            {
-                ((DataSource)TableView.Source).SetItems(DataSource.Section.Selected, categories);
-                var allAvailableCategories = await Managers.ContactsManager.GetAllCategoriesAsync();
-                var availableCategories = allAvailableCategories.Where(x => !categories.Contains(x)).ToList();
-                ((DataSource)TableView.Source).SetItems(DataSource.Section.Available, availableCategories);
-            }
-
+            var availableCategories = await GetAvailableCategories();
+           
+            ((DataSource)TableView.Source).SetItems(DataSource.Section.Available, availableCategories);
+           
             if(searchController != null)
                 searchController.Active = false;
         }
 
         protected virtual void CategorySelected(Category category)
+        {
+            MoveCategory(category);
+
+            #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+            RefreshDataAsync();
+            #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+        }
+
+        protected virtual void MoveCategory(Category category) 
         {
             if (category == null)
                 return;
@@ -151,11 +147,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 categories.Add(category);
             }
-
-            #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-            RefreshDataAsync();
-            #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
         }
+
+        async Task<List<Category>> GetAvailableCategories() {
+            if (BusinessEntityPreview is DocumentPreview documentPreview)
+            {
+                ((DataSource)TableView.Source).SetItems(DataSource.Section.Selected, categories);
+                var allAvailableCategories = await Managers.DocumentsManager.GetAllCategoriesAsync();
+                return allAvailableCategories.Where(x => !categories.Any(y => y.Guid == x.Guid)).ToList();
+            }
+
+            if (BusinessEntityPreview is ContactPreview contactPreview)
+            {
+                ((DataSource)TableView.Source).SetItems(DataSource.Section.Selected, categories);
+                var allAvailableCategories = await Managers.ContactsManager.GetAllCategoriesAsync();
+                return allAvailableCategories.Where(x => !categories.Contains(x)).ToList();
+            }
+
+            return new List<Category>();
+        }
+
 
         #region Search related
         protected virtual void InitializeSearchBar()
@@ -282,7 +293,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
 
                 var cell = tableView.DequeueReusableCell(CategoriesTableViewCell.DefaultId) as CategoriesTableViewCell ?? new CategoriesTableViewCell();
-
                 cell.Initialize(items[indexPath.Row]);
                 cell.Accessory = UITableViewCellAccessory.None;
 
@@ -426,16 +436,76 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var cell = tableView.DequeueReusableCell(CategoriesTableViewCell.DefaultId) as CategoriesTableViewCell ?? new CategoriesTableViewCell();
 
                 cell.Initialize(items[indexPath.LongSection][indexPath.Row]);
+                cell.Accessory = UITableViewCellAccessory.None;
                 if (indexPath.LongSection == Section.Selected)
                     cell.Accessory = UITableViewCellAccessory.Checkmark;
                 
                 return cell;
             }
 
+            void MoveCategory(nint section, Category category) {
+
+                if (category == null)
+                    return;
+
+                if(section == Section.Available) {
+                    if(items[Section.Available].Contains(category)) {
+                        items[Section.Available].Remove(category);
+                        items[Section.Selected].Add(category);
+                    }
+                }
+
+                if(section == Section.Selected) {
+                    if (items[Section.Selected].Contains(category))
+                    {
+                        items[Section.Selected].Remove(category);
+                        items[Section.Available].Add(category);
+                    } 
+                }
+            }
+
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
-                var selectedCategory = items[indexPath.LongSection][indexPath.Row];
-                viewControllerWeakReference.Unwrap()?.CategorySelected(selectedCategory);
+                tableView.AllowsSelection = false; // to prevent exceptions when quick tapping
+                tableView.BeginUpdates();
+                var category = items[indexPath.LongSection][indexPath.Row];
+                MoveCategory(indexPath.LongSection, category);
+                viewControllerWeakReference.Unwrap()?.MoveCategory(category);
+
+                // dont delete the row if it's the last element, because we are displaying "No categories" cell
+                if(items[indexPath.LongSection].Count >= 1) {
+                    tableView.DeleteRows(new NSIndexPath[] { NSIndexPath.Create(indexPath.LongSection, indexPath.Row) }, UITableViewRowAnimation.Middle);
+                }
+               
+                if (indexPath.LongSection == Section.Selected)
+                {
+                    BeginInvokeOnMainThread(async () =>
+                    {
+                        var availableCategories = await viewControllerWeakReference.Unwrap()?.GetAvailableCategories();
+                        if (items[Section.Available].Count <= 1)
+                        {
+                            tableView.ReloadSections(NSIndexSet.FromIndex(Section.Available), UITableViewRowAnimation.Middle);
+                        }
+                        else {
+                            tableView.InsertRows(new NSIndexPath[] { NSIndexPath.Create(Section.Available, availableCategories.Count() - 1) }, UITableViewRowAnimation.Middle);
+                        }
+
+                        tableView.EndUpdates();
+                        tableView.AllowsSelection = true;
+                    });
+                }
+                else
+                {
+                    var count = items[Section.Selected].Count;
+                    if (count <= 1)
+                    {
+                        tableView.ReloadSections(NSIndexSet.FromIndex(Section.Selected), UITableViewRowAnimation.Middle);
+                    } else {
+                        tableView.InsertRows(new NSIndexPath[] { NSIndexPath.Create(Section.Selected, count - 1) }, UITableViewRowAnimation.Middle);
+                    }
+                    tableView.EndUpdates();
+                    tableView.AllowsSelection = true;
+                }
             }
 
             public override nint RowsInSection(UITableView tableview, nint section)
