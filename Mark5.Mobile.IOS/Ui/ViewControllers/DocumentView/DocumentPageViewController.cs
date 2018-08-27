@@ -49,7 +49,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
             base.ViewWillAppear(animated);
 
             if (NavigationController != null)
+            {
+                if (!Integration.IsRunningAtLeast(11) && NavigationController.NavigationBar != null)
+                    NavigationController.NavigationBar.Translucent = false;
+
                 NavigationController.ToolbarHidden = false;
+            }
 
             InitializeHandlers();
         }
@@ -59,7 +64,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
             base.ViewWillDisappear(animated);
 
             if (NavigationController != null)
+            {
+                if (!Integration.IsRunningAtLeast(11) && NavigationController.NavigationBar != null)
+                    NavigationController.NavigationBar.Translucent = true;
+
                 NavigationController.ToolbarHidden = true;
+            }
 
             DeinitializeHandlers();
         }
