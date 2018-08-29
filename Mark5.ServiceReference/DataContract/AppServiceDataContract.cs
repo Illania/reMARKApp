@@ -78,7 +78,7 @@ namespace Mark5.ServiceReference.DataContract
     }
 
     [DataContract(Name = "SearchFoldersResult", Namespace = "com.nordic-it.appservice.v3")]
-    public class SearchFoldersResult 
+    public class SearchFoldersResult
     {
         [DataMember(Name = "Folders", Order = 0)]
         public List<Folder> Folders { get; set; } = new List<Folder>();
@@ -2346,6 +2346,9 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "Permissions", Order = 0)]
         public DocumentsModulePermissions Permissions { get; set; } = new DocumentsModulePermissions();
+
+        [DataMember(Name = "WorktrayEnabled", Order = 1)]
+        public bool? WorktrayEnabled { get; set; } = null;
     }
 
     [DataContract(Name = "ContactsModuleInfo", Namespace = "com.nordic-it.appservice.v3")]
@@ -2359,6 +2362,9 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "Permissions", Order = 0)]
         public Permissions Permissions { get; set; } = new Permissions();
+
+        [DataMember(Name = "WorktrayEnabled", Order = 1)]
+        public bool? WorktrayEnabled { get; set; } = null;
     }
 
     [DataContract(Name = "ShortcodesModuleInfo", Namespace = "com.nordic-it.appservice.v3")]
@@ -2366,6 +2372,9 @@ namespace Mark5.ServiceReference.DataContract
     {
         [DataMember(Name = "Permissions", Order = 0)]
         public Permissions Permissions { get; set; } = new Permissions();
+
+        [DataMember(Name = "WorktrayEnabled", Order = 1)]
+        public bool? WorktrayEnabled { get; set; } = null;
     }
 
     [DataContract(Name = "CalendarModuleInfo", Namespace = "com.nordic-it.appservice.v3")]
