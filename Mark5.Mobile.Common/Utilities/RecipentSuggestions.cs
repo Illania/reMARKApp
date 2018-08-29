@@ -87,7 +87,7 @@ namespace Mark5.Mobile.Common.Utilities
                 var internalUsers = systemUsersDepartments.Users.FindAll(user => user.Username.ContainsCaseInsensitive(phrase));
 
                 foreach (SystemUser user in internalUsers)
-                    filtered.Add(new Recipient(user.Username, user.FirstName + " " + user.LastName, RecipientType.InternalContact));   
+                    filtered.Add(new Recipient(user.FirstName + " " + user.LastName, user.Username, RecipientType.InternalContact));   
                 
                 handler(filtered, token);
             });
