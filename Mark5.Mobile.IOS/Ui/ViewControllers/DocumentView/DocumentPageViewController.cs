@@ -51,8 +51,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
             base.ViewWillAppear(animated);
 
             if (NavigationController != null)
+            {
+                if (NavigationController.NavigationBar != null)
+                {
+                    NavigationController.NavigationBar.Translucent = false;
+                }
                 NavigationController.ToolbarHidden = false;
-
+            }
             InitializeHandlers();
         }
 
@@ -60,9 +65,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
         {
             base.ViewWillDisappear(animated);
 
-            if (NavigationController != null)
+            if (NavigationController != null) 
+            {
+                if(NavigationController.NavigationBar != null) 
+                {
+                    NavigationController.NavigationBar.Translucent = true;
+                }
                 NavigationController.ToolbarHidden = true;
-
+            }
             DeinitializeHandlers();
         }
 
@@ -179,11 +189,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
             if (vc == null || viewControllerCache == null)
                 return;
 
-            var index = viewControllerCache.FindIndex(v => v != null && v.DocumentPreview.Id == vc.DocumentPreview.Id);
+            var index = viewControllerCache?.FindIndex(v => v != null && v.DocumentPreview.Id == vc.DocumentPreview.Id);
             if (index >= 0)
             {
-                viewControllerCache[index].RecycleIfNeeded();
-                viewControllerCache.RemoveAt(index);
+                viewControllerCache[index.Value].RecycleIfNeeded();
+                viewControllerCache.RemoveAt(index.Value);
             }
 
             SetToolbarItems(null, true);
