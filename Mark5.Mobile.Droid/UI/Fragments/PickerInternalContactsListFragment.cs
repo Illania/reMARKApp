@@ -62,7 +62,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(CopyToUserWorktrayFragment)} [businessEntities.Count={businessEntities?.Count}]...");
+            CommonConfig.Logger.Info($"Creating {nameof(PickerInternalContactsListFragment)}");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
 
@@ -90,14 +90,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            CommonConfig.Logger.Info($"Created {nameof(PickerInternalContactsListFragment)} [[businessEntities.Count={businessEntities?.Count}]");
+            CommonConfig.Logger.Info($"Created {nameof(PickerInternalContactsListFragment)}");
         }
 
         public override async void OnResume()
         {
             base.OnResume();
 
-            CommonConfig.Logger.Info($"Resuming {nameof(PickerInternalContactsListFragment)} [businessEntities.Count={businessEntities?.Count}]...");
+            CommonConfig.Logger.Info($"Resuming {nameof(PickerInternalContactsListFragment)}");
 
             if (adapter.ItemCount < 1)
             {
