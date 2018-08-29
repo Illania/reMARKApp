@@ -25,7 +25,6 @@ namespace Mark5.Mobile.IOS.Extensions.CallId
             catch (Exception ex)
             {
                 new ErrorLogger().WriteToLog(ex);
-                throw; //This will prompt the user with an error dialog, instead of hiding the fact that an exception occured.
             }
             cxContext.CompleteRequest(null);
         }

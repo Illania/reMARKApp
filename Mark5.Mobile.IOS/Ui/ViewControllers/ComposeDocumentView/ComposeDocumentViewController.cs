@@ -361,7 +361,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 }
                 else
                 {
-                    LoadEditor();
+                   
 
                     if (previousDocumentPreview != null &&
                            (DocumentCreationModeFlag == DocumentCreationModeFlag.Reply && CopyToNewOption == CopyToNewOption.None ||
@@ -388,20 +388,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                     if (previousDocumentContent != null)
                     {
-                        ToolbarItems = new[]
-                        {
-                            new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
-                            new UIBarButtonItem(Localization.GetString("edit_original_email"), UIBarButtonItemStyle.Plain, async (sender, e) =>
-                            {
-                                var vc = new EditOriginalDocumentViewController { Content = previousDocumentContent };
-                                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-                                var editedContent = await vc.Result;
-                                if (editedContent != null)
-                                    previousDocumentContent = editedContent;
-                            }),
-                            new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace)
-                        };
-                        NavigationController.SetToolbarHidden(false, false);
+                        LoadEditorWithPreviousContent(previousDocumentContent);
+
+                    } else {
+                        LoadEditor();
                     }
                 }
 
@@ -460,7 +450,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                             await InsertLocalTemplate();
                             break;
                         case 2:
-                            await InsertTemplate();
+                            await InsertTemplate(false);
                             break;
                     }
                     break;
@@ -510,7 +500,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             if (source == 0)
             {
                 CommonConfig.UsageAnalytics.LogEvent(new ComposeInsertTemplateEvent());
-                await InsertTemplate();
+                await InsertTemplate(true);
             }
 
             if (source == 1)
@@ -958,7 +948,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             }
         }
 
-        async Task InsertTemplate()
+        async Task InsertTemplate(bool insertAtCursor)
         {
             var tp = new TemplatesListViewController();
             PresentViewController(new NavigationController(tp, UIModalPresentationStyle.PageSheet), true, null);
@@ -977,7 +967,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                 ProcessTemplate(template, previousDocumentPreview);
 
-                var insertTemplateJs = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/insertTemplate", "js"));
+                var insertTemplateJs = File.ReadAllText(NSBundle.MainBundle.PathForResource(
+                    insertAtCursor ? "html/insertTemplate" : "html/initTemplate", "js"));
                 if (template.ContentType == ContentType.PlainText)
                 {
                     var templateText = Regex.Replace(template.Content, @"\r\n?|\n", "\\n", RegexOptions.Multiline);

@@ -673,6 +673,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
 
         #region Utilities
 
+        protected void DisableSearchController()
+        {
+            if (searchController != null)
+                searchController.Active = false;
+        }
+
         void StartEditing()
         {
             TableView.SetEditing(true, true);

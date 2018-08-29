@@ -159,9 +159,9 @@ namespace Mark5.Mobile.IOS.Ui.Common
             keyboardDisShowNotification = UIKeyboard.Notifications.ObserveDidShow(HandleKeyboardDidShow);
         }
 
-        public override void ViewWillLayoutSubviews()
+        public override void ViewDidLayoutSubviews()
         {
-            base.ViewWillLayoutSubviews();
+            base.ViewDidLayoutSubviews();
 
             if (webView == null || headerAnimationRunning)
                 return;
@@ -172,7 +172,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             SetHeaderPadding(desiredHeaderHeight / webView.ScrollView.ZoomScale);
         }
-
+       
         protected override void Recycle()
         {
             base.Recycle();
@@ -334,6 +334,27 @@ namespace Mark5.Mobile.IOS.Ui.Common
             var html = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/editor", "html"));
             webView?.StopLoading();
             webView?.LoadHtmlString(html, null);
+        }
+
+        protected void LoadEditorWithPreviousContent(string htmlContent)
+        {
+            var html = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/editor", "html"));
+
+            var htmlDocument = new HtmlDocument();
+            htmlDocument.LoadHtml(html);
+            var bodyNode = htmlDocument.DocumentNode.SelectSingleNode("//body");
+            var editorNode = bodyNode?.SelectSingleNode("//div[@id='editor']");
+
+            if(editorNode == null) {
+                CommonConfig.Logger.Error("resources/html/editor.html is missing 'editor' element");
+            } else {
+                editorNode.InnerHtml = htmlContent;
+                html = htmlDocument.DocumentNode.OuterHtml;
+            }
+
+            webView?.StopLoading();
+            webView?.LoadHtmlString(html, null);
+
         }
 
         protected virtual async Task<string> GetContent()

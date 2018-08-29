@@ -14,6 +14,7 @@ using Mark5.Mobile.Droid.Utilities;
 using PCLStorage;
 using TinyMessenger;
 using Xamarin.Android.Net;
+using Mark5.Mobile.Common.Service;
 
 namespace Mark5.Mobile.Droid
 {
@@ -55,7 +56,7 @@ namespace Mark5.Mobile.Droid
                     CommonConfig.HttpClientHandler = () => new AndroidClientHandler { AutomaticDecompression = Config.AcceptedResponseCompression };
                     CommonConfig.MessengerHub = new TinyMessengerHub();
                     CommonConfig.Phonebook = new Phonebook();
-                    CommonConfig.Reachability = new Reachability();
+                CommonConfig.Reachability =  Reachability.Instance;
                     CommonConfig.ConcurrentQueueType = typeof(PortableConcurrentQueue<>);
                     CommonConfig.Utf8Normalizer = s => s;
                     CommonConfig.UsageAnalytics = new UsageAnalytics(FirebaseAnalytics.GetInstance(this));

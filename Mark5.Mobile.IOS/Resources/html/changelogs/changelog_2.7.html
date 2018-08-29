@@ -2,35 +2,87 @@
 <html>
 <head>
     <meta charset="utf-8" name="viewport" content="user-scalable = no;" />
-    <link id="fonts" rel="stylesheet" type="text/css" href="html/fonts.css">
     <style id="style2" type="text/css">
         html {
             height: 100%;
+            width: 100%;
         }
 
         body {
             padding: 50px;
             padding-top: 0px;
+            color: rgb(18, 61, 87);
+            font-size: 20pt;
+            font-family: Avenir Book;
         }
 
-        #changelog {
-            font-family: arial;
-            font-size: 32pt;
+        p.title {
+            font-size: 400%;
+        }
+
+        p.subtitle {
+            font-size: 160%;
+            text-align: justify;
+        }
+
+        p.sectionTitle {
+            font-size: 160%;
+        }
+
+        p.sectionText {
+            font-size: 140%;
+            text-align: justify;
+        }
+
+        p.appendix {
+            padding-top: 25px;
+            font-size: 140%;
+            font-style: italic;
         }
     </style>
 </head>
 <body>
-    <div id="changelog" contenteditable="false">
-        <p>
-            This new version of MARK5 includes:
-            <ul>
-                <li>Customizable swipe actions</li>
-                <li>Insertion of template where the cursor is</li>
-                <li>"Select all" on document list </li>
-                <li>Filtering folders includes service results</li>
-                <li>Various fixes and improvements</li>
-            </ul>
+    <div>
+
+        <p class="subtitle"> We have made a few changes in the MARK5 app. Scroll down to see what has been updated: </p>
+        <p class="sectionTitle"> 1. CUSTOMIZABLE SWIPE ACTIONS </p>
+        <p class="sectionText">
+            You can now customize swipe actions. To customize swipe actions, go to settings and select "Swipe options"
+            under emails.
         </p>
+
+        <p class="sectionTitle"> 2. SELECT ALL EMAILS ACCESSIBLE IN APP </p>
+        <p class="sectionText">
+            You can now select all emails in the folder you are
+            working in. To do so, long press on any email. A
+            selection view will appear with a button in the top right
+            corner. Tab it to select all so you can edit everything at
+            once.
+        </p>
+
+        <p class="sectionTitle"> 3. INSERT TEMPLATES WHERE THE CURSOR IS </p>
+        <p class="sectionText">
+            When you are writing an email, place the cursor where you wish to insert a template in the text.
+            Click the attach icon and insert a template and it will appear where you placed the cursor.
+        </p>
+
+        <p class="sectionTitle"> 4. CALL ID </p>
+        <p class="sectionText">
+            You now have the option to see the names of MARK5 contacts on your phone if they call you.
+            To do so, swipe left on the folder where the contacts are placed.
+            Select “Save offline” and enable Call ID in
+            settings. Please notice that in order for Call ID to work
+            you need to add the country code to the phone
+            numbers.
+        </p>
+
+        <p class="sectionTitle"> 5. VARIOUS FIXES AND IMPROVEMENTS </p>
+
+        <p class="appendix">
+            We hope that you are happy with this new version of MARK5. If you discover any bugs, please do not hesitate to contact us and we will look into
+            it as soon as possible.
+        </p>
+
     </div>
 </body>
 </html>
