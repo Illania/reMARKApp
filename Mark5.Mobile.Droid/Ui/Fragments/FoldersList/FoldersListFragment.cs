@@ -129,6 +129,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (RecyclerView.GetAdapter() != Adapter)
                     return;
 
+
                 emptyView.Visibility = Adapter.ItemCount < 1 ? ViewStates.Visible : ViewStates.Gone;
                 RecyclerView.Visibility = Adapter.ItemCount > 0 ? ViewStates.Visible : ViewStates.Gone;
                 menu?.FindItem(Resource.Id.action_filter)?.SetEnabled(Adapter.ItemCount > 0);

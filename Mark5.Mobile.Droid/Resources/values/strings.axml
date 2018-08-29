@@ -448,4 +448,6 @@
     <string name="swipe_actions_left_title">Swipe left</string>
     <string name="swipe_actions_defaults">Reset to default</string>
     <string name="swipe_actions_dialog_title">Select action</string>
+    <string name="available">Available</string>
+    <string name="selected">Selected</string>
 </resources>
