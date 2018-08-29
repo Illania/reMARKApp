@@ -53,7 +53,7 @@ namespace Mark5.Mobile.IOS.Utilities
             public const string EmailTrailingSwipeActions = "EmailTrailingSwipeActions";
             public const string EmailLeadingSwipeActions = "EmailLeadingSwipeActions";
 
-            public const string CallerIdentificationEnabledKey = "CallerIdentificationEnabled"; 
+            public const string CallerIdentificationEnabledKey = "CallerIdentificationEnabled";
         }
 
         readonly NSUserDefaults ud;
@@ -253,7 +253,7 @@ namespace Mark5.Mobile.IOS.Utilities
 
         public void SetEmailLeadingSwipeAction(EmailSwipeAction.SwipeAction action)
         {
-            EmailLeadingSwipeActions = new List<EmailSwipeAction> { new EmailSwipeAction(action) }; 
+            EmailLeadingSwipeActions = new List<EmailSwipeAction> { new EmailSwipeAction(action) };
         }
 
         public void SetEmailTrailingLastAction(EmailSwipeAction.SwipeAction action)
@@ -272,7 +272,8 @@ namespace Mark5.Mobile.IOS.Utilities
 
         public List<EmailSwipeAction> EmailLeadingSwipeActions
         {
-            get {
+            get
+            {
                 var udActions = ud.ArrayForKey(Keys.EmailLeadingSwipeActions).ToList();
                 return udActions.Select(x => new EmailSwipeAction(x.ToString())).ToList();
             }
@@ -306,12 +307,13 @@ namespace Mark5.Mobile.IOS.Utilities
         {
             var exceptLeading = EmailSwipeAction.GetAllAvailableActions.Where(all => !EmailLeadingSwipeActions.Any(leading => leading.Action == all.Action));
             var exceptTrailing = exceptLeading.Where(leading => !EmailTrailingSwipeActions.Any(trailing => trailing.Action == leading.Action));
-            return exceptTrailing.ToList();                          
+            return exceptTrailing.ToList();
         }
 
-        public void ResetSwipeActions() {
+        public void ResetSwipeActions()
+        {
             EmailLeadingSwipeActions = new List<EmailSwipeAction> { new EmailSwipeAction(EmailSwipeAction.SwipeAction.Categories) };
-            EmailTrailingSwipeActions = new List<EmailSwipeAction> { new EmailSwipeAction(EmailSwipeAction.SwipeAction.More), new EmailSwipeAction(EmailSwipeAction.SwipeAction.CopyToWorkTray), new EmailSwipeAction(EmailSwipeAction.SwipeAction.MarkAsRead) }; 
+            EmailTrailingSwipeActions = new List<EmailSwipeAction> { new EmailSwipeAction(EmailSwipeAction.SwipeAction.More), new EmailSwipeAction(EmailSwipeAction.SwipeAction.CopyToWorkTray), new EmailSwipeAction(EmailSwipeAction.SwipeAction.MarkAsRead) };
         }
 
         #endregion

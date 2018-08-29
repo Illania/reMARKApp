@@ -671,7 +671,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 dismissAction?.Invoke();
 
-                UNUserNotificationCenter.Current.RequestAuthorization(UNAuthorizationOptions.Alert | UNAuthorizationOptions.Badge | UNAuthorizationOptions.Sound, (result, error) => { });
+                UNUserNotificationCenter.Current.RequestAuthorization(UNAuthorizationOptions.Alert | UNAuthorizationOptions.Badge | UNAuthorizationOptions.Sound, (result, error) =>
+                {
+                    ((AppDelegate)UIApplication.SharedApplication.Delegate)?.OnAuthorizationRequested(result, error);
+                });
 
                 CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Hostname, hostname);
                 CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.SSL, sslMode.ToString());
