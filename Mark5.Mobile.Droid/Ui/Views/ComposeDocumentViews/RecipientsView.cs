@@ -16,6 +16,7 @@ using Android.Text.Style;
 using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.PortableCollections;
@@ -36,6 +37,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         readonly AppCompatMultiAutoCompleteTextView emailEditor;
         readonly DocumentAddressType AddressType;
 
+        SystemUsersDepartments systemUsersDepartments;
         string savedRecipient;
 
         bool textHasChangedFlag;
@@ -111,6 +113,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 Gravity = GravityFlags.CenterVertical,
             };
             AddView(addButton, addButtonLp);
+
+            AsyncHelpers.RunOnUiThreadAsync((Activity)Context, async () =>
+            {
+                systemUsersDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
+            });
         }
 
         #region Public Methods
@@ -181,7 +188,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             DocumentPreview.Addresses.RemoveAll(a => a.AddressType == AddressType);
 
-            await AsyncHelpers.RunOnUiThreadAsync((Activity)Context, () =>
+            await AsyncHelpers.RunOnUiThreadAsync((Activity)Context, async () =>
             {
                 foreach (var email in GetEmails())
                 {
@@ -193,14 +200,24 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                     });
                 }
 
-                foreach (var user in GetInternalUsers())
+                var internalUsers = (List<string>)GetInternalUsers();
+
+                if (internalUsers.Count > 0)
                 {
-                    DocumentPreview.Addresses.Add(new DocumentAddress
+                    foreach (var user in internalUsers)
                     {
-                        Address = user, 
-                        AddressType = AddressType,
-                        Type = CommunicationAddressType.Internal
-                    });
+                        var userGuid = systemUsersDepartments.Users.FirstOrDefault(su => su.Username == user)?.Guid;
+
+                        if (userGuid != null)
+                        {
+                            DocumentPreview.Addresses.Add(new DocumentAddress
+                            {
+                                Address = userGuid.ToString(),
+                                AddressType = AddressType,
+                                Type = CommunicationAddressType.Internal
+                            });
+                        }
+                    }
                 }
             });
 
@@ -319,7 +336,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         IEnumerable<string> GetEmails() => Validator.ContainsValidEmails(emailEditor.Text, out MatchCollection matches) ?
                                                     matches.Cast<Match>().Select(m => m.Value).Distinct().ToList() :
                                                     new List<string>();
-        
+
         void SetRecipients(IEnumerable<string> recipients)
         {
             emailEditor.Text = string.Join(", ", recipients);
@@ -347,9 +364,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
         }
 
-        IEnumerable<string> GetInternalUsers() => emailEditor.Text.Split(new[] { EmailSeparator }, StringSplitOptions.RemoveEmptyEntries)
-                                                             .Where(s => Validator.IsHostNameValid(s))
-                                                             .Select(s => s.Trim());
+        IEnumerable<string> GetInternalUsers() => Validator.ContainsValidUsernames(emailEditor.Text, out MatchCollection matches) ?
+                                                    matches.Cast<Match>().Select(m => m.Value).Distinct().ToList() :
+                                                    new List<string>();
 
         void Clear()
         {
@@ -447,12 +464,19 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             if (string.IsNullOrEmpty(emailEditor.Text))
                 return;
 
-            var matches = Validator.ExtractValidEmails(emailEditor.Text);
+            var emailMatches = Validator.ExtractValidEmails(emailEditor.Text);
+            var internalUserMatches = Validator.ExtractUsernames(emailEditor.Text);
 
             ResetStyle();
 
-            foreach (Match match in matches)
+            foreach (Match match in emailMatches)
                 SetEmailStyle(match.Index, match.Index + match.Length);
+
+            foreach (Match match in internalUserMatches)
+            {
+                if(systemUsersDepartments.Users.FirstOrDefault(su => su.Username == match.Value) != null)
+                    SetEmailStyle(match.Index, match.Index + match.Length);
+            }
         }
 
         void ResetStyle()
