@@ -844,39 +844,37 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public virtual bool OnQueryTextChange(string newText)
         {
             SearchHandler.RemoveCallbacksAndMessages(null);
-            SearchHandler.PostDelayed(async () =>
-                {
-                    if (string.IsNullOrWhiteSpace(newText))
-                    {
-                        var folder = Folder.RootForModule(RemoteFolder.Module);
-                        var matchingFolders = folder.SubFolders.Flatten(f => f.SubFolders).OrderBy(f => f.Name).ToList();
-                    SearchAdapter.RefreshSearch(matchingFolders,newText);
-                    }
-                    else
-                    {
-                        var root = Folder.RootForModule(RemoteFolder.Module);
+            SearchHandler.PostDelayed(() =>
+               {
+                   if (string.IsNullOrWhiteSpace(newText))
+                   {
+                       var folder = Folder.RootForModule(RemoteFolder.Module);
+                       var matchingFolders = folder.SubFolders.Flatten(f => f.SubFolders).OrderBy(f => f.Name).ToList();
+                       SearchAdapter.RefreshSearch(matchingFolders, newText);
+                   }
+                   else
+                   {
+                       var root = Folder.RootForModule(RemoteFolder.Module);
 
-                        var localFolders = new List<Folder>();
-                        SearchRecursively(root, newText, localFolders);
+                       var localFolders = new List<Folder>();
+                       SearchRecursively(root, newText, localFolders);
 
-                        try
-                        {
-                            #pragma warning disable CS4014 // We dont need to await this call
-                            Task.Run(async () => {
-                                var remoteFolders = await Managers.FoldersManager.SearchFolders(newText);
-                                SearchAdapter.RefreshSearch(remoteFolders, newText);
-                            });
-                            #pragma warning restore CS4014
+                       Task.Run(async () =>
+                       {
+                           try
+                           {
+                               var remoteFolders = await Managers.FoldersManager.SearchFolders(newText);
+                               SearchAdapter.RefreshSearch(remoteFolders, newText);
+                           }
+                           catch (Exception ex)
+                           {
+                               CommonConfig.Logger.Error("Error while retrieving folder search results from server", ex);
+                           }
+                       });
 
-                        }
-                        catch (Exception ex)
-                        {
-                            CommonConfig.Logger.Error(ex);
-                        }
-                        
-                        SearchAdapter.RefreshSearch(localFolders, newText);
-                    }
-                },
+                       SearchAdapter.RefreshSearch(localFolders, newText);
+                   }
+               },
                 500);
             return false;
         }
@@ -1275,10 +1273,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public void RefreshSearch(List<Folder> folders, string searchText)
             {
-                if(searchQuery.Equals(searchText)) {
+                if (searchQuery.Equals(searchText))
+                {
                     var mergedFolders = foldersInSection[Section.None].Union(folders, new FolderComparer()).ToList();
                     Refresh(mergedFolders, Section.None);
-                } else {
+                }
+                else
+                {
                     Refresh(folders, Section.None);
                 }
 

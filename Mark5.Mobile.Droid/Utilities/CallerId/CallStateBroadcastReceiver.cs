@@ -10,6 +10,7 @@ using Android.Support.V4.Graphics.Drawable;
 using Android.Support.V7.Widget;
 using Android.Telephony;
 using Android.Views;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Droid.Ui.Common;
 using PhoneNumbers;
 using static Android.Views.View;
@@ -58,7 +59,9 @@ namespace Mark5.Mobile.Droid.Utilities
 
                 var wm = context.GetSystemService(Context.WindowService).JavaCast<IWindowManager>();
 
-                var overlayParams = new WindowManagerLayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent, WindowManagerTypes.Phone,
+                var wmt = Build.VERSION.SdkInt >= BuildVersionCodes.O ? WindowManagerTypes.ApplicationOverlay : WindowManagerTypes.Phone;
+
+                var overlayParams = new WindowManagerLayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent, wmt,
                                                                    WindowManagerFlags.NotFocusable | WindowManagerFlags.ShowWhenLocked, Format.Transparent);
 
                 if (state == TelephonyManager.ExtraStateRinging) //Phone ringing
