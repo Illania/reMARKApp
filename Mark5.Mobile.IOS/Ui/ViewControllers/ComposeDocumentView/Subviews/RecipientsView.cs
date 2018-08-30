@@ -18,7 +18,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 {
     public class RecipientsView : ComposeDocumentSubView
     {
-        protected const string RecipientsSeperator = ", ";
+        protected const string RecipientSeperator = ", ";
         protected const string RecipentRegex = @".*<.*@.*>";
         protected const string RecipentFormat = "{0} <{1}>";
 
@@ -317,13 +317,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 var beforeCursorString = TextView.Text.SafeSubstring(0, (int)selection.Location);
                 var afterCursorString = TextView.Text.SafeSubstring((int)selection.Location, TextView.Text.Length - (int)selection.Location - 1);
 
-                var indexInSecondPartString = afterCursorString.IndexOf(RecipientsSeperator, StringComparison.CurrentCultureIgnoreCase);
+                var indexInSecondPartString = afterCursorString.IndexOf(RecipientSeperator, StringComparison.CurrentCultureIgnoreCase);
                 if (indexInSecondPartString == -1)
                     indexInSecondPartString = afterCursorString.Length;
-                var indexAfter = beforeCursorString.Length + indexInSecondPartString + RecipientsSeperator.Length;
+                var indexAfter = beforeCursorString.Length + indexInSecondPartString + RecipientSeperator.Length;
 
-                var indexBefore = beforeCursorString.LastIndexOf(RecipientsSeperator, StringComparison.CurrentCultureIgnoreCase);
-                var start = indexBefore < 0 ? 0 : indexBefore + RecipientsSeperator.Length;
+                var indexBefore = beforeCursorString.LastIndexOf(RecipientSeperator, StringComparison.CurrentCultureIgnoreCase);
+                var start = indexBefore < 0 ? 0 : indexBefore + RecipientSeperator.Length;
 
                 var length = indexAfter - start;
 
@@ -353,13 +353,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 TextView.SelectedRange = new NSRange(TextView.Text.Length, 0);
 
             var textSubstring = TextView.Text.SafeSubstring(0, (int)(TextView.SelectedRange.Location + TextView.SelectedRange.Length));
-            if (textSubstring.EndsWith(RecipientsSeperator.Trim(), StringComparison.CurrentCultureIgnoreCase))
+            if (textSubstring.EndsWith(RecipientSeperator.Trim(), StringComparison.CurrentCultureIgnoreCase))
             {
-                var startIndex = TextView.Text.LastIndexOf(RecipientsSeperator, StringComparison.CurrentCultureIgnoreCase);
+                var startIndex = TextView.Text.LastIndexOf(RecipientSeperator, StringComparison.CurrentCultureIgnoreCase);
                 if (startIndex < 0)
                     startIndex = 0;
                 else
-                    startIndex += RecipientsSeperator.Length;
+                    startIndex += RecipientSeperator.Length;
 
                 TextView.SelectedRange = new NSRange(startIndex, TextView.Text.Length - startIndex);
             }
@@ -373,7 +373,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             }
             else if (textViewToChange == TextView && (text == Environment.NewLine || text == "," || text == "\t"))
             {
-                var splittedField = textViewToChange.Text.Split(new[] { RecipientsSeperator }, StringSplitOptions.None);
+                var splittedField = textViewToChange.Text.Split(new[] { RecipientSeperator }, StringSplitOptions.None);
                 if (splittedField.Last().Equals(string.Empty))
                 {
                     CommaOrEnterPressed(this, EventArgs.Empty);
@@ -381,9 +381,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 }
 
                 textViewToChange.TextStorage.BeginEditing();
-                textViewToChange.TextStorage.Insert(RecipientsSeperator.ToNSAttributedString(), range.Location + range.Length);
+                textViewToChange.TextStorage.Insert(RecipientSeperator.ToNSAttributedString(), range.Location + range.Length);
                 textViewToChange.TextStorage.EndEditing();
-                textViewToChange.SelectedRange = new NSRange(range.Location + range.Length + RecipientsSeperator.Length, 0);
+                textViewToChange.SelectedRange = new NSRange(range.Location + range.Length + RecipientSeperator.Length, 0);
 
                 CorrectMarkup();
                 CommaOrEnterPressed(this, EventArgs.Empty);
@@ -402,10 +402,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         void HandleEditingEnded(object sender, EventArgs e)
         {
-            if (!string.IsNullOrEmpty(TextView.Text) && !TextView.Text.EndsWith(RecipientsSeperator, StringComparison.CurrentCultureIgnoreCase))
+            if (!string.IsNullOrEmpty(TextView.Text) && !TextView.Text.EndsWith(RecipientSeperator, StringComparison.CurrentCultureIgnoreCase))
             {
                 TextView.TextStorage.BeginEditing();
-                TextView.TextStorage.Insert(RecipientsSeperator.ToNSAttributedString(), TextView.Text.Length);
+                TextView.TextStorage.Insert(RecipientSeperator.ToNSAttributedString(), TextView.Text.Length);
                 TextView.TextStorage.EndEditing();
             }
 
@@ -421,7 +421,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             var text = TextView.Text;
             var splittedField = text.Split(new[]
                 {
-                    RecipientsSeperator
+                    RecipientSeperator
                 },
                 StringSplitOptions.None);
             if (splittedField.Any())
@@ -511,9 +511,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             if (Validator.ContainsValidUsernames(users, out MatchCollection matches))
             {
                 var sb = new StringBuilder();
-                sb.Append(string.Join(RecipientsSeperator, matches.Cast<Match>().Select(m => m.Value)));
+                sb.Append(string.Join(RecipientSeperator, matches.Cast<Match>().Select(m => m.Value)));
                 
-                sb.Append(RecipientsSeperator);
+                sb.Append(RecipientSeperator);
                 
                 TextView.Text = sb.ToString();
             }
@@ -528,7 +528,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                                                            : new string[0];
         #region Public methods
 
-        public bool ContainsInvalidEmail() => TextView.Text.Split(new[] { RecipientsSeperator }, StringSplitOptions.RemoveEmptyEntries)
+        public bool ContainsInvalidEmail() => TextView.Text.Split(new[] { RecipientSeperator }, StringSplitOptions.RemoveEmptyEntries)
                                                       .Any(a => !Validator.ContainsValidEmails(a));
 
         public IEnumerable<string> GetEmails() => Validator.ContainsValidEmails(TextView.Text, out MatchCollection matches)
@@ -537,7 +537,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         public IEnumerable<string> GetRecipents()
         {
-            return TextView.Text.Split(new[] { RecipientsSeperator }, StringSplitOptions.RemoveEmptyEntries)
+            return TextView.Text.Split(new[] { RecipientSeperator }, StringSplitOptions.RemoveEmptyEntries)
                 .Where(Validator.ContainsValidEmails)
                 .Select(s => s.Trim())
                 .ToArray();
@@ -545,12 +545,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         public void SetInternalUsers(IEnumerable<string> internalUsers)
         {
-            SetInternalUsers(string.Join(RecipientsSeperator, internalUsers));
+            SetInternalUsers(string.Join(RecipientSeperator, internalUsers));
         }
 
         public void SetEmails(IEnumerable<string> emails)
         {
-            SetEmails(string.Join(RecipientsSeperator, emails));
+            SetEmails(string.Join(RecipientSeperator, emails));
         }
 
         public void SetEmails(string emails)
@@ -558,9 +558,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             if (Validator.ContainsValidEmails(emails, out MatchCollection matches))
             {
                 var sb = new StringBuilder();
-                sb.Append(string.Join(RecipientsSeperator, matches.Cast<Match>().Select(m => m.Value)));
+                sb.Append(string.Join(RecipientSeperator, matches.Cast<Match>().Select(m => m.Value)));
 
-                sb.Append(RecipientsSeperator);
+                sb.Append(RecipientSeperator);
 
                 TextView.TextStorage.BeginEditing();
                 TextView.TextStorage.SetString(sb.ToString().ToNSAttributedString());
@@ -580,7 +580,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         public void SetRecipents(IEnumerable<string> recipents)
         {
-            SetRecipents(string.Join(RecipientsSeperator, recipents));
+            SetRecipents(string.Join(RecipientSeperator, recipents));
         }
 
         public void SetRecipents(string recipents)
@@ -602,19 +602,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         public void AddInternalUsers(IEnumerable<string> emails)
         {
-            AddInternalUsers(string.Join(RecipientsSeperator, emails));
+            AddInternalUsers(string.Join(RecipientSeperator, emails));
         }
 
-        public void AddInternalUsers(string emails)
+        public void AddInternalUsers(string internalUsers)
         {
-            if (Validator.ContainsValidUsernames(emails, out MatchCollection matches))
+            if (Validator.ContainsValidUsernames(internalUsers, out MatchCollection matches))
             {
                 var newInternalUsers = new StringBuilder();
                 newInternalUsers.Append(TextView.Text);
-                if (!TextView.Text.EndsWith(RecipientsSeperator, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(TextView.Text))
-                    newInternalUsers.Append(RecipientsSeperator);
+                if (!TextView.Text.EndsWith(RecipientSeperator, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(TextView.Text))
+                    newInternalUsers.Append(RecipientSeperator);
                 newInternalUsers.Append(string.Join(RecipientSeperator, matches.Cast<Match>().Where(m => SystemUsersDepartments.Users.FirstOrDefault(su => su.Username == m.Value).Username == m.Value).Select(m => m.Value)));
-                newInternalUsers.Append(RecipientsSeperator);
+                newInternalUsers.Append(RecipientSeperator);
 
                 TextView.TextStorage.BeginEditing();
                 TextView.TextStorage.SetString(newInternalUsers.ToString().ToNSAttributedString());
@@ -634,7 +634,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         public void AddEmails(IEnumerable<string> emails)
         {
-            AddEmails(string.Join(RecipientsSeperator, emails));
+            AddEmails(string.Join(RecipientSeperator, emails));
         }
 
         public void AddEmails(string emails)
@@ -643,10 +643,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             {
                 var newEmails = new StringBuilder();
                 newEmails.Append(TextView.Text);
-                if (!TextView.Text.EndsWith(RecipientsSeperator, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(TextView.Text))
-                    newEmails.Append(RecipientsSeperator);
-                newEmails.Append(string.Join(RecipientsSeperator, matches.Cast<Match>().Select(m => m.Value)));
-                newEmails.Append(RecipientsSeperator);
+                if (!TextView.Text.EndsWith(RecipientSeperator, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(TextView.Text))
+                    newEmails.Append(RecipientSeperator);
+                newEmails.Append(string.Join(RecipientSeperator, matches.Cast<Match>().Select(m => m.Value)));
+                newEmails.Append(RecipientSeperator);
 
                 TextView.TextStorage.BeginEditing();
                 TextView.TextStorage.SetString(newEmails.ToString().ToNSAttributedString());
@@ -668,13 +668,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         {
             var newEmails = new StringBuilder();
             newEmails.Append(TextView.Text);
-            if (!TextView.Text.EndsWith(RecipientsSeperator, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(TextView.Text))
-                newEmails.Append(RecipientsSeperator);
+            if (!TextView.Text.EndsWith(RecipientSeperator, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(TextView.Text))
+                newEmails.Append(RecipientSeperator);
             if (string.IsNullOrWhiteSpace(name))
                 newEmails.Append(address);
             else
                 newEmails.Append(string.Format(RecipentFormat, name, address));
-            newEmails.Append(RecipientsSeperator);
+            newEmails.Append(RecipientSeperator);
 
             TextView.TextStorage.BeginEditing();
             TextView.TextStorage.SetString(newEmails.ToString().ToNSAttributedString());

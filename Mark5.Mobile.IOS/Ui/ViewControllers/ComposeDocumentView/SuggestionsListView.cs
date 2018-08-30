@@ -372,13 +372,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 var text = TextView.Text;
                 var splittedRecipients = text.Split(new[]
                         {
-                        RecipientsSeperator
+                        RecipientSeperator
                     },
                         StringSplitOptions.None)
                     .ToList();
                 splittedRecipients.RemoveAt(splittedRecipients.Count - 1);
                 splittedRecipients.Add(printableSuggestion.ToString());
-                TextView.Text = string.Join(RecipientsSeperator, splittedRecipients) + RecipientsSeperator;
+                TextView.Text = string.Join(RecipientSeperator, splittedRecipients) + RecipientSeperator;
 
                 CorrectMarkup();
             }
