@@ -239,6 +239,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info($"Resuming {nameof(ComposeDocumentFragment)}...");
 
             await LoadDocument();
+            await LoadSystemUserDepartments();
 
             CommonConfig.Logger.Info($"Resumed {nameof(ComposeDocumentFragment)}...");
         }
@@ -276,7 +277,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (requestCode == RequestCodes.InternalContactsRequestCode && resultCode == (int)Result.Ok)
             {
                 var user = Serializer.Deserialize<SystemUser>(data.GetStringExtra(PickerInternalContactsListActivity.RecipientResultKey));
-                focusedRecipientView.AddRecipent(user.Username, user.FirstName + " " + user.LastName);
+                focusedRecipientView.AddRecipent(user.FirstName + " " + user.LastName, user.Username);
                 UpdateSendButtonState();
             }
             if (requestCode == RequestCodes.ShortcodesRequestCode && resultCode == (int)Result.Ok)
@@ -374,6 +375,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 Activity?.OnBackPressed();
             }
+        }
+
+        async Task LoadSystemUserDepartments()
+        {
+            var systemUserDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
+
+            toView.SystemUsersDepartments = systemUserDepartments;
+            ccView.SystemUsersDepartments = systemUserDepartments;
+            bccView.SystemUsersDepartments = systemUserDepartments;
+
         }
 
         async Task ShowDocument()
