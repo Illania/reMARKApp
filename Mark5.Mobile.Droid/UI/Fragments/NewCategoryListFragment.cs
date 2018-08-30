@@ -17,6 +17,7 @@ using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 using TinyMessenger;
@@ -24,20 +25,29 @@ using TinyMessenger;
 namespace Mark5.Mobile.Droid
 {
 
-    public class NewCategoriesListFragment : BaseFragment, SearchView.IOnQueryTextListener
+    public class NewCategoriesListFragment : BaseFragment, SearchView.IOnQueryTextListener, IMenuItemOnActionExpandListener
     {
         protected Handler SearchHandler = new Handler();
         protected SearchCategoriesAdapter SearchAdapter;
         protected SwipeRefreshLayout RefreshLayout;
         protected RecyclerView RecyclerView;
+        protected SearchView SearchView;
         protected bool SearchEnabled;
+        protected bool HideSearch;
         const string BusinessEntityPreviewBundleKey = "BusinessEntityPreview_8938f3ae-6cb4-48c1-9c19-34cf533bcaed";
+
+
+        protected List<Category> selectedCategories = new List<Category>();
+        protected List<Category> allCategories = new List<Category>();
+        protected List<Category> availableCategories = new List<Category>();
 
         BusinessEntityPreview businessEntityPreview;
 
         CategoriesListAdapter Adapter;
 
         TinyMessageSubscriptionToken categoriesEditedToken;
+
+        protected CategoriesListAdapter CurrentAdapter => SearchEnabled ? SearchAdapter : Adapter;
 
         IMenu menu;
 
@@ -96,6 +106,11 @@ namespace Mark5.Mobile.Droid
                 menu?.FindItem(Resource.Id.action_filter)?.SetEnabled(Adapter.ItemCount > 0);
             }));
 
+            Adapter.ItemClicked += Adapter_ItemClicked;
+
+            SearchAdapter = new SearchCategoriesAdapter(Context, RecyclerView);
+            SearchAdapter.ItemClicked += Adapter_ItemClicked;
+
             RecyclerView.SetAdapter(Adapter);
 
             HasOptionsMenu = true;
@@ -128,6 +143,20 @@ namespace Mark5.Mobile.Droid
             Adapter.SetSections(sections);
         }
 
+        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
+        {
+            this.menu = menu;
+
+            inflater.Inflate(Resource.Menu.menu_main, menu);
+
+            var filterItem = menu.FindItem(Resource.Id.action_filter);
+            filterItem.SetOnActionExpandListener(this);
+            SearchView = (SearchView)filterItem.ActionView;
+            SearchView.QueryHint = GetString(Resource.String.filter);
+            SearchView.SetOnQueryTextListener(this);
+        }
+
+
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void GetData()
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
@@ -136,9 +165,6 @@ namespace Mark5.Mobile.Droid
 
             await Task.Delay(300); // Let the animation finish
 
-            var selectedCategories = new List<Category>();
-            var allCategories = new List<Category>();
-            var availableCategories = new List<Category>();
 
             switch (businessEntityPreview.ObjectType)
             {
@@ -170,22 +196,6 @@ namespace Mark5.Mobile.Droid
             UnsubscribeFromMessages();
         }
 
-        public override bool OnOptionsItemSelected(IMenuItem item)
-        {
-            if (item.ItemId == 10)
-            {
-                var (eclf, tag) = EditCategoriesListFragment.NewInstance(businessEntityPreview);
-
-                var ft = ((AppCompatActivity)Activity).SupportFragmentManager.BeginTransaction();
-                ft.SetCustomAnimations(Resource.Animation.fade_in, Resource.Animation.fade_out, Resource.Animation.fade_in, Resource.Animation.fade_out);
-                ft.Replace(Resource.Id.fragment_container, eclf, tag);
-                ft.AddToBackStack(null);
-                ft.Commit();
-                return true;
-            }
-
-            return base.OnOptionsItemSelected(item);
-        }
 
         void SubscribeToMessages()
         {
@@ -218,8 +228,6 @@ namespace Mark5.Mobile.Droid
             }
         }
 
-      
-
         #region RecyclerView Adapter/ViewHolder
 
         protected class CategoriesListAdapter : RecyclerView.Adapter
@@ -238,6 +246,8 @@ namespace Mark5.Mobile.Droid
 
             readonly int sectionHeight = Conversion.ConvertDpToPixels(56);
 
+            public event EventHandler<int> ItemClicked = delegate { };
+
             public CategoriesListAdapter(Context context, RecyclerView parentRecyclerView)
             {
                 parentView = parentRecyclerView;
@@ -255,6 +265,8 @@ namespace Mark5.Mobile.Droid
                     viewHolder.Name = category.Name;
                     viewHolder.HexColor = category.HexColor;
                     viewHolder.Description = category.Description;
+                    viewHolder.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, position)));
+
                 }
                 else
                 {
@@ -350,7 +362,13 @@ namespace Mark5.Mobile.Droid
                 if (viewType == ViewType.CategotyView)
                 {
                     var itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.list_item_categories, parent, false);
-                    return new CategoryViewHolder(itemView);
+                    var viewHolder = new CategoryViewHolder(itemView);
+                    viewHolder.ItemClicked += (sender, e) =>
+                    {
+                        var position = parentView.GetChildLayoutPosition(e);
+                        ItemClicked(e, position);
+                    };
+                    return viewHolder;
                 } else {
                     var itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.list_item_section, parent, false);
                     return new SectionViewHolder(itemView);
@@ -383,6 +401,36 @@ namespace Mark5.Mobile.Droid
                     NotifyItemChanged(sectionPosition);
             }
         }
+
+        #region List item event handlers
+
+        protected virtual void Adapter_ItemClicked(object sender, int position)
+        {
+            var (category, section) = CurrentAdapter.GetItemAtPosition(position);
+            MoveCategory(section, category);
+            CurrentAdapter.Refresh(selectedCategories, Section.Selected);
+            CurrentAdapter.Refresh(availableCategories, Section.Available);
+        }
+
+        void MoveCategory(Section section, Category category)
+        {
+            if (category == null)
+                return;
+
+            if (section == Section.Available || section == Section.None)
+            {
+                selectedCategories.Add(category);
+                availableCategories.Remove(category);
+            }
+
+            if (section == Section.Selected)
+            {
+                selectedCategories.Remove(category);
+                availableCategories.Add(category);
+            }
+        }
+
+        #endregion
 
         #region Filtering 
 
@@ -418,6 +466,23 @@ namespace Mark5.Mobile.Droid
             return false;
         }
 
+        bool IMenuItemOnActionExpandListener.OnMenuItemActionCollapse(IMenuItem item)
+        {
+            if (item.ItemId == Resource.Id.action_filter)
+            {
+                menu?.FindItem(10)?.SetVisible(true);
+
+                SearchHandler.RemoveCallbacksAndMessages(null);
+                SearchAdapter.Clear();
+                RecyclerView.SwapAdapter(Adapter, true);
+                RefreshLayout.Enabled = true;
+                SearchEnabled = false;
+                return true;
+            }
+
+            return false;
+        }
+
         public virtual bool OnQueryTextChange(string newText)
         {
             SearchHandler.RemoveCallbacksAndMessages(null);
@@ -425,36 +490,13 @@ namespace Mark5.Mobile.Droid
             {
                 if (string.IsNullOrWhiteSpace(newText))
                 {
-                    /*
-                    var folder = Folder.RootForModule(RemoteFolder.Module);
-                    var matchingFolders = folder.SubFolders.Flatten(f => f.SubFolders).OrderBy(f => f.Name).ToList();
-                    SearchAdapter.RefreshSearch(matchingFolders, newText);
-
-                    */
+                    SearchAdapter.RefreshSearch(availableCategories, newText);  
                 }
                 else
                 {
-                    /*
-                    var root = Folder.RootForModule(RemoteFolder.Module);
+                    List<Category> searchResultCategories = allCategories.Where(x => x.Name.ToLower().Contains(newText.ToLower()) && !selectedCategories.Contains(x)).ToList();
 
-                    var localFolders = new List<Folder>();
-                    SearchRecursively(root, newText, localFolders);
-
-                    Task.Run(async () =>
-                    {
-                        try
-                        {
-                            var remoteFolders = await Managers.FoldersManager.SearchFolders(newText);
-                            SearchAdapter.RefreshSearch(remoteFolders, newText);
-                        }
-                        catch (Exception ex)
-                        {
-                            CommonConfig.Logger.Error("Error while retrieving folder search results from server", ex);
-                        }
-                    });
-
-                    SearchAdapter.RefreshSearch(localFolders, newText);
-                    */
+                    SearchAdapter.RefreshSearch(searchResultCategories, newText);
                 }
             },
                 500);
@@ -528,7 +570,7 @@ namespace Mark5.Mobile.Droid
         class CategoryViewHolder : RecyclerView.ViewHolder
         {
             public string Name { set => nameTextView.Text = value; }
-
+            public event EventHandler<View> ItemClicked = delegate { };
             public string Description
             {
                 set
@@ -572,6 +614,7 @@ namespace Mark5.Mobile.Droid
                 descriptionTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_categoty_description);
                 colorImageView = itemView.FindViewById<View>(Resource.Id.list_item_category_color);
                 selectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
+
             }
         }
 
