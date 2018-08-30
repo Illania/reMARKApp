@@ -78,7 +78,7 @@ namespace Mark5.ServiceReference.DataContract
     }
 
     [DataContract(Name = "SearchFoldersResult", Namespace = "com.nordic-it.appservice.v3")]
-    public class SearchFoldersResult 
+    public class SearchFoldersResult
     {
         [DataMember(Name = "Folders", Order = 0)]
         public List<Folder> Folders { get; set; } = new List<Folder>();
