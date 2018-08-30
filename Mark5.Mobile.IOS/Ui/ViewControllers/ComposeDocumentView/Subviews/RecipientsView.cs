@@ -446,7 +446,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             var duration = CollapseExpandAnimationEnabled ? 0.2d : 0;
             Animate(duration,
                 () =>
-               {
+                {
                     TextView.TextContainer.MaximumNumberOfLines = 0;
                     TextView.TextContainer.LineBreakMode = UILineBreakMode.WordWrap;
 
@@ -482,9 +482,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             {
                 var sb = new StringBuilder();
                 sb.Append(string.Join(EmailSeparator, matches.Cast<Match>().Select(m => m.Value)));
-
+                
                 sb.Append(EmailSeparator);
-
+                
                 TextView.Text = sb.ToString();
             }
             else
