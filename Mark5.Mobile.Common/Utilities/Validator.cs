@@ -84,6 +84,11 @@ namespace Mark5.Mobile.Common.Utilities
             return !string.IsNullOrEmpty(phoneNumber);
         }
 
+        public static bool ContainsValidUserNames(string text)
+        {
+            return ContainsValidUsernames(text, out MatchCollection mc);
+        }
+
         public static bool ContainsValidUsernames(string text, out MatchCollection matches)
         {
             matches = ExtractUsernames(text);
