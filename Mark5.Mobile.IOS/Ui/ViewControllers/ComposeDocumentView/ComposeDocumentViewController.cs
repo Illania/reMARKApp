@@ -69,6 +69,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         SuggestionsListView suggestionsListView;
         Worker autoSaveWorkingCopyWorker;
 
+        SystemUsersDepartments systemUserDepartments;
+
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
@@ -272,6 +274,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         async void RefreshData()
         {
             await LoadDocument();
+            await LoadSystemUsersDepartments();
             await LoadTemplate();
 
             insertButtonItem.Enabled = true;
@@ -405,6 +408,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                 await Dialogs.ShowErrorAlertAsync(this, ex);
             }
+        }
+
+        async Task LoadSystemUsersDepartments()
+        {
+            systemUserDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
+            var subViews = headerStackView.Subviews.OfType<RecipientsView>().ToArray();
+
+            foreach (var subView in subViews)
+                subView.SystemUsersDepartments = systemUserDepartments;
         }
 
         async Task LoadTemplate()
@@ -561,6 +573,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             if (suggestionsListView == null)
             {
                 suggestionsListView = new SuggestionsListView(this);
+                suggestionsListView.SystemUsersDepartments = systemUserDepartments;
 
                 View.AddSubview(suggestionsListView);
                 View.AddConstraints(new[]
