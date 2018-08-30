@@ -17,6 +17,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 {
     public class SuggestionsListView : UIView
     {
+        public SystemUsersDepartments SystemUsersDepartments { private get; set; }
+
         UIView spaceView;
         SuggestionsTextView suggestionsTextView;
         SeparatorSubView separator;
@@ -190,7 +192,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 suggestionsListViewSource.Searching = true;
                 searchCancellationTokenSource = new CancellationTokenSource();
                 searchCancellationTokenSources.Add(searchCancellationTokenSource);
-                RecipentSuggestions.GetSuggestions(searchText, searchCancellationTokenSource.Token, HandleSugguestions);
+                RecipentSuggestions.GetSuggestions(searchText, SystemUsersDepartments, searchCancellationTokenSource.Token, HandleSugguestions);
             }
             else
             {
