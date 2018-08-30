@@ -16,7 +16,6 @@ using Android.Text.Style;
 using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.PortableCollections;
@@ -34,18 +33,32 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         public event EventHandler Edited = delegate { };
         public event EventHandler AddButtonClicked = delegate { };
 
+        public bool Empty => !Validator.ContainsValidEmail(emailEditor.Text);
+        public bool AllEmailsValid { get { return Validator.ExtractValidEmails(emailEditor.Text).Count == emailEditor.Text.Split(',').Count(s => !string.IsNullOrWhiteSpace(s)); } }
+
+        public SystemUsersDepartments SystemUsersDepartments
+        {
+            get
+            {
+                return SystemUsersDepartments;
+            }
+            set
+            {
+                systemUsersDepartments = value;
+                ((SuggestionsAdapter.SuggestionsFilter)adapter.Filter).SystemUsersDepartments = value;
+            }
+        }
+
         readonly AppCompatMultiAutoCompleteTextView emailEditor;
         readonly DocumentAddressType AddressType;
 
         SystemUsersDepartments systemUsersDepartments;
+        SuggestionsAdapter adapter;
+
         string savedRecipient;
 
-        bool textHasChangedFlag;
         string textBeforeChange;
-
-        public bool Empty => !Validator.ContainsValidEmail(emailEditor.Text);
-
-        public bool AllEmailsValid { get { return Validator.ExtractValidEmails(emailEditor.Text).Count == emailEditor.Text.Split(',').Count(s => !string.IsNullOrWhiteSpace(s)); } }
+        bool textHasChangedFlag;
 
         public RecipientsView(Context context, DocumentAddressType type)
             : base(context)
@@ -89,7 +102,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             emailEditor.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
             emailEditor.SetBackgroundColor(Color.Transparent);
 
-            var adapter = new SuggestionsAdapter();
+            adapter = new SuggestionsAdapter();
             emailEditor.Adapter = adapter;
             emailEditor.SetTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
             emailEditor.Threshold = 2;
@@ -113,11 +126,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 Gravity = GravityFlags.CenterVertical,
             };
             AddView(addButton, addButtonLp);
-
-            AsyncHelpers.RunOnUiThreadAsync((Activity)Context, async () =>
-            {
-                systemUsersDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
-            });
         }
 
         #region Public Methods
@@ -200,7 +208,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                     });
                 }
 
-                var internalUsers = (List<string>)GetInternalUsers();
+                var internalUsers = GetInternalUsers().ToList();
 
                 if (internalUsers.Count > 0)
                 {
@@ -474,7 +482,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
             foreach (Match match in internalUserMatches)
             {
-                if(systemUsersDepartments.Users.FirstOrDefault(su => su.Username == match.Value) != null)
+                if (systemUsersDepartments != null && systemUsersDepartments.Users.FirstOrDefault(su => su.Username == match.Value) != null)
                     SetEmailStyle(match.Index, match.Index + match.Length);
             }
         }
@@ -613,6 +621,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             public class SuggestionsFilter : Filter
             {
                 public bool Loading => answersReceived < 3;
+                public SystemUsersDepartments SystemUsersDepartments { get; set; }
 
                 readonly SuggestionsAdapter suggestionsAdapter;
 
@@ -645,7 +654,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                         suggestionsAdapter.ActualConstraint = constraint.ToString();
                         searchCancellationTokenSource = new CancellationTokenSource();
                         searchCancellationTokenSources.Add(searchCancellationTokenSource);
-                        RecipentSuggestions.GetSuggestions(suggestionsAdapter.ActualConstraint, searchCancellationTokenSource.Token, HandleSugguestions);
+                        RecipentSuggestions.GetSuggestions(suggestionsAdapter.ActualConstraint, SystemUsersDepartments, searchCancellationTokenSource.Token, HandleSugguestions);
                     }
                     else
                     {

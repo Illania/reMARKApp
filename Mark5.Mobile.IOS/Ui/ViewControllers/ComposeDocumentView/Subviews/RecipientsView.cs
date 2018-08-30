@@ -22,26 +22,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         protected const string RecipentRegex = @".*<.*@.*>";
         protected const string RecipentFormat = "{0} <{1}>";
 
-        public bool SuggestionOverlayActive;
-        bool selectionChangedProgrammatically;
-        protected bool CollapseExpandAnimationEnabled = true;
-
-        string savedRecipient;
-
+        public SystemUsersDepartments SystemUsersDepartments { get; set; }
         public DocumentAddressType AddressType { get; protected set; }
+        public bool Empty => !Validator.ContainsValidEmail(TextView.Text);
 
+        public bool SuggestionOverlayActive;
+
+        protected bool CollapseExpandAnimationEnabled = true;
         protected UILabel Label;
         protected CustomUITextView TextView;
+
+        bool expanded;
+        bool selectionChangedProgrammatically;
+        string savedRecipient;
+
         UITapGestureRecognizer textViewTapGestureRecognizer;
 
         public event EventHandler Edited = delegate { };
         public event EventHandler<string> SearchRequested = delegate { };
         public event EventHandler CommaOrEnterPressed = delegate { };
         public event EventHandler AddButtonTapped = delegate { };
-
-        bool expanded;
-
-        public bool Empty => !Validator.ContainsValidEmail(TextView.Text);
 
         public RecipientsView(DocumentAddressType type, bool hideAddButton = false)
         {
@@ -232,13 +232,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                         Type = CommunicationAddressType.Email
                     });
 
-                foreach (var user in GetInternalUsers())
-                    DocumentPreview.Addresses.Add(new DocumentAddress
-                    {
-                        Address = user,
-                        AddressType = AddressType,
-                        Type = CommunicationAddressType.Internal
-                    });
+                var internalUsers = GetInternalUsers().ToList();
+
+                if (internalUsers.Count > 0)
+                {
+                    foreach (var user in GetInternalUsers())
+                    {                        
+                    var userGuid = SystemUsersDepartments.Users.FirstOrDefault(su => su.Username == user)?.Guid;
+
+                        if (userGuid != null)
+                        {
+                            DocumentPreview.Addresses.Add(new DocumentAddress
+                            {
+                                Address = userGuid.ToString(),
+                                AddressType = AddressType,
+                                Type = CommunicationAddressType.Internal
+                            });
+                        }
+                    }
+                }
             });
 
             return Task.CompletedTask;
@@ -405,12 +417,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             TextView.TextStorage.AddAttribute(UIStringAttributeKey.Font, Theme.DefaultFont, new NSRange(0, TextView.Text.Length));
             TextView.TextStorage.RemoveAttribute(UIStringAttributeKey.ForegroundColor, new NSRange(0, TextView.Text.Length));
 
-            var matches = Regex.Matches(TextView.Text, @"[^,]*", RegexOptions.IgnoreCase);
+            var emailMatches = Validator.ExtractValidEmails(TextView.Text);
+            var internalUserMatches = Validator.ExtractUsernames(TextView.Text);
 
-            foreach (Match match in matches)
+            foreach (Match match in emailMatches)
+                TextView.TextStorage.AddAttribute(UIStringAttributeKey.ForegroundColor, Theme.TintColor, new NSRange(match.Index, match.Length));
+
+            foreach (Match match in internalUserMatches)
             {
-                var textInMatch = TextView.Text.SafeSubstring(match.Index, match.Length);
-                if (Validator.ContainsValidEmails(textInMatch))
+                if (SystemUsersDepartments != null && SystemUsersDepartments.Users.FirstOrDefault(su => su.Username == match.Value) != null)
                     TextView.TextStorage.AddAttribute(UIStringAttributeKey.ForegroundColor, Theme.TintColor, new NSRange(match.Index, match.Length));
             }
 
@@ -431,7 +446,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             var duration = CollapseExpandAnimationEnabled ? 0.2d : 0;
             Animate(duration,
                 () =>
-                {
+               {
                     TextView.TextContainer.MaximumNumberOfLines = 0;
                     TextView.TextContainer.LineBreakMode = UILineBreakMode.WordWrap;
 
@@ -467,9 +482,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             {
                 var sb = new StringBuilder();
                 sb.Append(string.Join(EmailSeparator, matches.Cast<Match>().Select(m => m.Value)));
-                
+
                 sb.Append(EmailSeparator);
-                
+
                 TextView.Text = sb.ToString();
             }
             else
@@ -477,10 +492,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 CommonConfig.Logger.Info($"No valid users found in {users}");
             }
         }
-        
-        IEnumerable<string> GetInternalUsers() => TextView.Text.Split(new[] { EmailSeparator }, StringSplitOptions.RemoveEmptyEntries)
-                                                          .Where(s => Validator.IsHostNameValid(s))
-                                                          .Select(s => s.Trim());
+
+        IEnumerable<string> GetInternalUsers() => Validator.ContainsValidUsernames(TextView.Text, out MatchCollection matches)
+                                                           ? matches.Cast<Match>().Select(m => m.Value).Distinct().ToArray()
+                                                           : new string[0];
         #region Public methods
 
         public bool ContainsInvalidEmail() => TextView.Text.Split(new[] { EmailSeparator }, StringSplitOptions.RemoveEmptyEntries)
