@@ -273,8 +273,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async void RefreshData()
         {
-            await LoadDocument();
             await LoadSystemUsersDepartments();
+            await LoadDocument();
             await LoadTemplate();
 
             insertButtonItem.Enabled = true;

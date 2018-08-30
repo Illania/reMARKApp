@@ -26,7 +26,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 {
     public class RecipientsView : ComposeDocumentView
     {
-        const string EmailSeparator = ", ";
+        const string RecipientSeperator = ", ";
         const string RecipentRegex = @".*<.*@.*>";
         const string RecipentFormat = "{0} <{1}>";
 
@@ -40,7 +40,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             get
             {
-                return SystemUsersDepartments;
+                return systemUsersDepartments;
             }
             set
             {
@@ -134,15 +134,23 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             if (RestoreWorkingCopy)
             {
-                SetEmails(DocumentPreview.Addresses.Where(a => a.AddressType == AddressType).Select(a => a.Address));
+                SetEmails(DocumentPreview.Addresses.Where(a => a.AddressType == AddressType && a.Type == CommunicationAddressType.Email).Select(a => a.Address));
+                AddInternalUsersFromGuids(DocumentPreview.Addresses.Where(a => a.AddressType == AddressType && a.Type == CommunicationAddressType.Internal).Select(a => a.Address));
+
                 return Task.CompletedTask;
             }
 
             if (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption.HasFlag(CopyToNewOption.Addresses))
-                SetEmails(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == AddressType).Select(a => a.Address));
+            {
+                SetEmails(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == AddressType && a.Type == CommunicationAddressType.Email).Select(a => a.Address));
+                AddInternalUsersFromGuids(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == AddressType && a.Type == CommunicationAddressType.Internal).Select(a => a.Address));
+            }
 
             if (DocumentCreationModeFlag == DocumentCreationModeFlag.Edit)
-                SetEmails(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == AddressType).Select(a => a.Address));
+            {
+                SetEmails(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == AddressType && a.Type == CommunicationAddressType.Email).Select(a => a.Address));
+                AddInternalUsersFromGuids(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == AddressType && a.Type == CommunicationAddressType.Internal).Select(a => a.Address));
+            }
 
             if (DocumentCreationModeFlag == DocumentCreationModeFlag.Reply)
             {
@@ -151,15 +159,24 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
                 if (PreviousDocumentPreview.Direction == DocumentDirection.Incoming)
                 {
-                    var replyToAddresses = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.ReplyTo).Select(da => da.Address);
-                    if (replyToAddresses == null || !replyToAddresses.Any())
-                        SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.From).Select(da => da.Address));
+                    var replyToAddresses = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.ReplyTo && da.Type == CommunicationAddressType.Email).Select(da => da.Address);
+                    var replyToInternals = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.ReplyTo && da.Type == CommunicationAddressType.Internal).Select(da => da.Address);
+
+                    if (replyToAddresses == null && replyToInternals == null || !replyToAddresses.Any() && !replyToInternals.Any())
+                    {
+                        SetEmails(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == DocumentAddressType.From && a.Type == CommunicationAddressType.Email).Select(a => a.Address));
+                        AddInternalUsersFromGuids(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == DocumentAddressType.From && a.Type == CommunicationAddressType.Internal).Select(a => a.Address));
+                    }
                     else
+                    {
                         SetEmails(replyToAddresses);
+                        AddInternalUsersFromGuids(replyToInternals);
+                    }
                 }
                 else if (PreviousDocumentPreview.Direction == DocumentDirection.Outgoing)
                 {
-                    SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.To).Select(da => da.Address));
+                    SetEmails(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == DocumentAddressType.To && a.Type == CommunicationAddressType.Email).Select(a => a.Address));
+                    AddInternalUsersFromGuids(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == DocumentAddressType.To && a.Type == CommunicationAddressType.Internal).Select(a => a.Address));
                 }
             }
 
@@ -167,27 +184,40 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             {
                 if (PreviousDocumentPreview.Direction == DocumentDirection.Incoming)
                 {
-                    var replyToAddresses = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.ReplyTo).Select(da => da.Address);
+                    var replyToAddresses = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.ReplyTo && da.Type == CommunicationAddressType.Email).Select(da => da.Address);
+                    var replyToInternals = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.ReplyTo && da.Type == CommunicationAddressType.Internal).Select(da => da.Address);
 
                     if (AddressType == DocumentAddressType.To)
                     {
-                        if (replyToAddresses == null || !replyToAddresses.Any())
-                            SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.From || da.AddressType == DocumentAddressType.To).Select(da => da.Address).Distinct());
+                        if (replyToAddresses == null && replyToInternals == null || !replyToAddresses.Any() && !replyToInternals.Any())
+                        {
+                            SetEmails(PreviousDocumentPreview.Addresses.Where(da => (da.AddressType == DocumentAddressType.From || da.AddressType == DocumentAddressType.To) && da.Type == CommunicationAddressType.Email).Select(a => a.Address).Distinct());
+                            AddInternalUsersFromGuids(PreviousDocumentPreview.Addresses.Where(da => (da.AddressType == DocumentAddressType.From || da.AddressType == DocumentAddressType.To) && da.Type == CommunicationAddressType.Internal).Select(a => a.Address).Distinct());
+                        }
                         else
-                            SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.To).Select(da => da.Address).Union(replyToAddresses));
+                        {
+                            SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.To && da.Type == CommunicationAddressType.Email).Select(da => da.Address).Union(replyToAddresses));
+                            AddInternalUsersFromGuids(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.To && da.Type == CommunicationAddressType.Internal).Select(da => da.Address).Union(replyToInternals));
+                        }
                     }
                     else if (AddressType == DocumentAddressType.Cc)
                     {
-                        var ccAddresses = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.Cc).Select(da => da.Address);
-                        SetEmails(ccAddresses);
+                        SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.Cc && da.Type == CommunicationAddressType.Email).Select(da => da.Address));
+                        AddInternalUsersFromGuids(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.Cc && da.Type == CommunicationAddressType.Internal).Select(da => da.Address));
                     }
                 }
                 if (PreviousDocumentPreview.Direction == DocumentDirection.Outgoing)
-                    SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == AddressType).Select(da => da.Address));
+                {
+                    SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == AddressType && da.Type == CommunicationAddressType.Email).Select(da => da.Address));
+                    AddInternalUsersFromGuids(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == AddressType && da.Type == CommunicationAddressType.Internal).Select(da => da.Address));
+                }
             }
 
             if (PreconfiguredEmailAddresses != null && PreconfiguredEmailAddresses.ContainsKey(AddressType))
+            {
                 AddEmails(PreconfiguredEmailAddresses[AddressType]);
+                AddInternalUsersFromGuids(PreconfiguredEmailAddresses[AddressType]);
+            }
 
             return Task.CompletedTask;
         }
@@ -196,7 +226,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             DocumentPreview.Addresses.RemoveAll(a => a.AddressType == AddressType);
 
-            await AsyncHelpers.RunOnUiThreadAsync((Activity)Context, async () =>
+            await AsyncHelpers.RunOnUiThreadAsync((Activity)Context, () =>
             {
                 foreach (var email in GetEmails())
                 {
@@ -232,14 +262,49 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             return;
         }
 
+        public void AddInternalUsersFromGuids(IEnumerable<string> internalUsersGuids)
+        {
+            AddInternalUsers(string.Join(RecipientSeperator, ConvertGuidsToUsernames(internalUsersGuids)));
+        }
+
+        public void AddInternalUsers(IEnumerable<string> internalUsers)
+        {
+            AddInternalUsers(string.Join(RecipientSeperator, internalUsers));
+        }
+
+        public void AddInternalUsers(string internalUsers)
+        {
+            if (Validator.ContainsValidUsernames(internalUsers, out MatchCollection matches))
+            {
+                var newInternalUsers = new StringBuilder();
+                newInternalUsers.Append(emailEditor.Text);
+                if (!emailEditor.Text.EndsWith(RecipientSeperator, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(emailEditor.Text))
+                    newInternalUsers.Append(RecipientSeperator);
+                newInternalUsers.Append(string.Join(RecipientSeperator, matches.Cast<Match>().Where(m => systemUsersDepartments.Users.FirstOrDefault(su => su.Username == m.Value).Username == m.Value).Select(m => m.Value)));
+                newInternalUsers.Append(RecipientSeperator);
+
+                emailEditor.Text = newInternalUsers.ToString();
+
+                CorrectMarkup();
+
+                SetCursorAtEnd();
+
+                Edited(this, EventArgs.Empty);
+            }
+            else
+            {
+                CommonConfig.Logger.Info(string.Format("No valid internal users found in {0}.", internalUsers));
+            }
+        }
+
         public void SetEmails(IEnumerable<string> emails)
         {
-            SetEmails(string.Join(EmailSeparator, emails));
+            SetEmails(string.Join(RecipientSeperator, emails));
         }
 
         public void AddEmails(IEnumerable<string> emails)
         {
-            AddEmails(string.Join(EmailSeparator, emails));
+            AddEmails(string.Join(RecipientSeperator, emails));
         }
 
         public void AddEmails(string emails)
@@ -248,10 +313,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             {
                 var newEmails = new StringBuilder();
                 newEmails.Append(emailEditor.Text);
-                if (!emailEditor.Text.EndsWith(EmailSeparator, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(emailEditor.Text))
-                    newEmails.Append(EmailSeparator);
-                newEmails.Append(string.Join(EmailSeparator, matches.Cast<Match>().Select(m => m.Value)));
-                newEmails.Append(EmailSeparator);
+                if (!emailEditor.Text.EndsWith(RecipientSeperator, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(emailEditor.Text))
+                    newEmails.Append(RecipientSeperator);
+                newEmails.Append(string.Join(RecipientSeperator, matches.Cast<Match>().Select(m => m.Value)));
+                newEmails.Append(RecipientSeperator);
 
                 emailEditor.Text = newEmails.ToString();
 
@@ -271,13 +336,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             var newEmails = new StringBuilder();
             newEmails.Append(emailEditor.Text);
-            if (!emailEditor.Text.EndsWith(EmailSeparator, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(emailEditor.Text))
-                newEmails.Append(EmailSeparator);
+            if (!emailEditor.Text.EndsWith(RecipientSeperator, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(emailEditor.Text))
+                newEmails.Append(RecipientSeperator);
             if (string.IsNullOrWhiteSpace(name))
                 newEmails.Append(address);
             else
                 newEmails.Append(string.Format(RecipentFormat, name, address));
-            newEmails.Append(EmailSeparator);
+            newEmails.Append(RecipientSeperator);
 
             emailEditor.Text = newEmails.ToString();
 
@@ -329,9 +394,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             if (Validator.ContainsValidEmails(emails, out MatchCollection matches))
             {
                 var sb = new StringBuilder();
-                sb.Append(string.Join(EmailSeparator, matches.Cast<Match>().Select(m => m.Value)));
+                sb.Append(string.Join(RecipientSeperator, matches.Cast<Match>().Select(m => m.Value)));
 
-                sb.Append(EmailSeparator);
+                sb.Append(RecipientSeperator);
 
                 emailEditor.Text = sb.ToString();
             }
@@ -350,7 +415,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             emailEditor.Text = string.Join(", ", recipients);
         }
 
-        IEnumerable<string> GetRecipents() => emailEditor.Text.Split(new[] { EmailSeparator }, StringSplitOptions.RemoveEmptyEntries)
+        IEnumerable<string> GetRecipents() => emailEditor.Text.Split(new[] { RecipientSeperator }, StringSplitOptions.RemoveEmptyEntries)
                 .Where(s => Validator.ContainsValidEmail(s))
                 .Select(s => s.Trim());
 
@@ -360,9 +425,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             if (Validator.ContainsValidUsernames(users, out MatchCollection matches))
             {
                 var sb = new StringBuilder();
-                sb.Append(string.Join(EmailSeparator, matches.Cast<Match>().Select(m => m.Value)));
+                sb.Append(string.Join(RecipientSeperator, matches.Cast<Match>().Select(m => m.Value)));
 
-                sb.Append(EmailSeparator);
+                sb.Append(RecipientSeperator);
 
                 emailEditor.Text = sb.ToString();
             }
@@ -379,6 +444,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         void Clear()
         {
             emailEditor.Text = string.Empty;
+        }
+
+        IEnumerable<string> ConvertGuidsToUsernames(IEnumerable<string> systemUserGuids)
+        {
+            return SystemUsersDepartments.Users.Where(su => systemUserGuids.Any(g => g == su.Guid.ToString())).Select(su => su.Username);
         }
 
         #endregion
@@ -432,7 +502,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 }
 
                 if (textHasChangedFlag && spannable.Any())
-                    spannable.Append(EmailSeparator);
+                    spannable.Append(RecipientSeperator);
 
                 if (textHasChangedFlag)
                     e.Editable.Replace(0, e.Editable.Length(), spannable);

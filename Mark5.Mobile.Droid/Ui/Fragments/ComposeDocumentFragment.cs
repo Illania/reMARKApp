@@ -238,8 +238,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             CommonConfig.Logger.Info($"Resuming {nameof(ComposeDocumentFragment)}...");
 
-            await LoadDocument();
             await LoadSystemUserDepartments();
+            await LoadDocument();
 
             CommonConfig.Logger.Info($"Resumed {nameof(ComposeDocumentFragment)}...");
         }
@@ -309,6 +309,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             bccView.AddEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Bcc).Select(da => da.Address));
         }
 
+        async Task LoadSystemUserDepartments()
+        {
+            var systemUserDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
+
+            toView.SystemUsersDepartments = systemUserDepartments;
+            ccView.SystemUsersDepartments = systemUserDepartments;
+            bccView.SystemUsersDepartments = systemUserDepartments;
+
+        }
+
         async Task LoadDocument()
         {
 
@@ -375,16 +385,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 Activity?.OnBackPressed();
             }
-        }
-
-        async Task LoadSystemUserDepartments()
-        {
-            var systemUserDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
-
-            toView.SystemUsersDepartments = systemUserDepartments;
-            ccView.SystemUsersDepartments = systemUserDepartments;
-            bccView.SystemUsersDepartments = systemUserDepartments;
-
         }
 
         async Task ShowDocument()

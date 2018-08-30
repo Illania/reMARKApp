@@ -18,7 +18,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 {
     public class RecipientsView : ComposeDocumentSubView
     {
-        protected const string EmailSeparator = ", ";
+        protected const string RecipientsSeperator = ", ";
         protected const string RecipentRegex = @".*<.*@.*>";
         protected const string RecipentFormat = "{0} <{1}>";
 
@@ -161,15 +161,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         {
             if (RestoreWorkingCopy)
             {
-                SetEmails(DocumentPreview.Addresses.Where(a => a.AddressType == AddressType).Select(a => a.Address));
+                SetEmails(DocumentPreview.Addresses.Where(a => a.AddressType == AddressType && a.Type == CommunicationAddressType.Email).Select(a => a.Address));
+                AddInternalUsersFromGuids(DocumentPreview.Addresses.Where(a => a.AddressType == AddressType && a.Type == CommunicationAddressType.Internal).Select(a => a.Address));
+
                 return Task.CompletedTask;
             }
 
             if (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption.HasFlag(CopyToNewOption.Addresses))
-                SetEmails(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == AddressType).Select(a => a.Address));
+            {
+                SetEmails(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == AddressType && a.Type == CommunicationAddressType.Email).Select(a => a.Address));
+                AddInternalUsersFromGuids(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == AddressType && a.Type == CommunicationAddressType.Internal).Select(a => a.Address));
+            }
 
             if (DocumentCreationModeFlag == DocumentCreationModeFlag.Edit)
-                SetEmails(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == AddressType).Select(a => a.Address));
+            {
+                SetEmails(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == AddressType && a.Type == CommunicationAddressType.Email).Select(a => a.Address));
+                AddInternalUsersFromGuids(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == AddressType && a.Type == CommunicationAddressType.Internal).Select(a => a.Address));
+            }
 
             if (DocumentCreationModeFlag == DocumentCreationModeFlag.Reply)
             {
@@ -178,15 +186,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
                 if (PreviousDocumentPreview.Direction == DocumentDirection.Incoming)
                 {
-                    var replyToAddresses = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.ReplyTo).Select(da => da.Address);
-                    if (replyToAddresses == null || !replyToAddresses.Any())
-                        SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.From).Select(da => da.Address));
+                    var replyToAddresses = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.ReplyTo && da.Type == CommunicationAddressType.Email).Select(da => da.Address);
+                    var replyToInternals = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.ReplyTo && da.Type == CommunicationAddressType.Internal).Select(da => da.Address);
+
+                    if (replyToAddresses == null && replyToInternals == null || !replyToAddresses.Any() && !replyToInternals.Any())
+                    {
+                        SetEmails(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == DocumentAddressType.From && a.Type == CommunicationAddressType.Email).Select(a => a.Address));
+                        AddInternalUsersFromGuids(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == DocumentAddressType.From && a.Type == CommunicationAddressType.Internal).Select(a => a.Address));
+                    }
                     else
+                    {
                         SetEmails(replyToAddresses);
+                        AddInternalUsersFromGuids(replyToInternals);
+                    }
                 }
                 else if (PreviousDocumentPreview.Direction == DocumentDirection.Outgoing)
                 {
-                    SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.To).Select(da => da.Address));
+                    SetEmails(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == DocumentAddressType.To && a.Type == CommunicationAddressType.Email).Select(a => a.Address));
+                    AddInternalUsersFromGuids(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == DocumentAddressType.To && a.Type == CommunicationAddressType.Internal).Select(a => a.Address));
                 }
             }
 
@@ -194,27 +211,40 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             {
                 if (PreviousDocumentPreview.Direction == DocumentDirection.Incoming)
                 {
-                    var replyToAddresses = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.ReplyTo).Select(da => da.Address);
+                    var replyToAddresses = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.ReplyTo && da.Type == CommunicationAddressType.Email).Select(da => da.Address);
+                    var replyToInternals = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.ReplyTo && da.Type == CommunicationAddressType.Internal).Select(da => da.Address);
 
                     if (AddressType == DocumentAddressType.To)
                     {
-                        if (replyToAddresses == null || !replyToAddresses.Any())
-                            SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.From || da.AddressType == DocumentAddressType.To).Select(da => da.Address).Distinct());
+                        if (replyToAddresses == null && replyToInternals == null || !replyToAddresses.Any() && !replyToInternals.Any())
+                        {
+                            SetEmails(PreviousDocumentPreview.Addresses.Where(da => (da.AddressType == DocumentAddressType.From || da.AddressType == DocumentAddressType.To) && da.Type == CommunicationAddressType.Email).Select(a => a.Address).Distinct());
+                            AddInternalUsersFromGuids(PreviousDocumentPreview.Addresses.Where(da => (da.AddressType == DocumentAddressType.From || da.AddressType == DocumentAddressType.To) && da.Type == CommunicationAddressType.Internal).Select(a => a.Address).Distinct());
+                        }
                         else
-                            SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.To).Select(da => da.Address).Union(replyToAddresses));
+                        {
+                            SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.To && da.Type == CommunicationAddressType.Email).Select(da => da.Address).Union(replyToAddresses));
+                            AddInternalUsersFromGuids(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.To && da.Type == CommunicationAddressType.Internal).Select(da => da.Address).Union(replyToInternals));
+                        }
                     }
                     else if (AddressType == DocumentAddressType.Cc)
                     {
-                        var ccAddresses = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.Cc).Select(da => da.Address);
-                        SetEmails(ccAddresses);
+                        SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.Cc && da.Type == CommunicationAddressType.Email).Select(da => da.Address));
+                        AddInternalUsersFromGuids(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.Cc && da.Type == CommunicationAddressType.Internal).Select(da => da.Address));
                     }
                 }
                 if (PreviousDocumentPreview.Direction == DocumentDirection.Outgoing)
-                    SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == AddressType).Select(da => da.Address));
+                {
+                    SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == AddressType && da.Type == CommunicationAddressType.Email).Select(da => da.Address));
+                    AddInternalUsersFromGuids(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == AddressType && da.Type == CommunicationAddressType.Internal).Select(da => da.Address));
+                }
             }
 
             if (PreconfiguredEmailAddresses != null && PreconfiguredEmailAddresses.ContainsKey(AddressType))
+            {
                 AddEmails(PreconfiguredEmailAddresses[AddressType]);
+                AddInternalUsersFromGuids(PreconfiguredEmailAddresses[AddressType]);
+            }
 
             return Task.CompletedTask;
         }
@@ -287,13 +317,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 var beforeCursorString = TextView.Text.SafeSubstring(0, (int)selection.Location);
                 var afterCursorString = TextView.Text.SafeSubstring((int)selection.Location, TextView.Text.Length - (int)selection.Location - 1);
 
-                var indexInSecondPartString = afterCursorString.IndexOf(EmailSeparator, StringComparison.CurrentCultureIgnoreCase);
+                var indexInSecondPartString = afterCursorString.IndexOf(RecipientsSeperator, StringComparison.CurrentCultureIgnoreCase);
                 if (indexInSecondPartString == -1)
                     indexInSecondPartString = afterCursorString.Length;
-                var indexAfter = beforeCursorString.Length + indexInSecondPartString + EmailSeparator.Length;
+                var indexAfter = beforeCursorString.Length + indexInSecondPartString + RecipientsSeperator.Length;
 
-                var indexBefore = beforeCursorString.LastIndexOf(EmailSeparator, StringComparison.CurrentCultureIgnoreCase);
-                var start = indexBefore < 0 ? 0 : indexBefore + EmailSeparator.Length;
+                var indexBefore = beforeCursorString.LastIndexOf(RecipientsSeperator, StringComparison.CurrentCultureIgnoreCase);
+                var start = indexBefore < 0 ? 0 : indexBefore + RecipientsSeperator.Length;
 
                 var length = indexAfter - start;
 
@@ -323,13 +353,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 TextView.SelectedRange = new NSRange(TextView.Text.Length, 0);
 
             var textSubstring = TextView.Text.SafeSubstring(0, (int)(TextView.SelectedRange.Location + TextView.SelectedRange.Length));
-            if (textSubstring.EndsWith(EmailSeparator.Trim(), StringComparison.CurrentCultureIgnoreCase))
+            if (textSubstring.EndsWith(RecipientsSeperator.Trim(), StringComparison.CurrentCultureIgnoreCase))
             {
-                var startIndex = TextView.Text.LastIndexOf(EmailSeparator, StringComparison.CurrentCultureIgnoreCase);
+                var startIndex = TextView.Text.LastIndexOf(RecipientsSeperator, StringComparison.CurrentCultureIgnoreCase);
                 if (startIndex < 0)
                     startIndex = 0;
                 else
-                    startIndex += EmailSeparator.Length;
+                    startIndex += RecipientsSeperator.Length;
 
                 TextView.SelectedRange = new NSRange(startIndex, TextView.Text.Length - startIndex);
             }
@@ -343,7 +373,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             }
             else if (textViewToChange == TextView && (text == Environment.NewLine || text == "," || text == "\t"))
             {
-                var splittedField = textViewToChange.Text.Split(new[] { EmailSeparator }, StringSplitOptions.None);
+                var splittedField = textViewToChange.Text.Split(new[] { RecipientsSeperator }, StringSplitOptions.None);
                 if (splittedField.Last().Equals(string.Empty))
                 {
                     CommaOrEnterPressed(this, EventArgs.Empty);
@@ -351,9 +381,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 }
 
                 textViewToChange.TextStorage.BeginEditing();
-                textViewToChange.TextStorage.Insert(EmailSeparator.ToNSAttributedString(), range.Location + range.Length);
+                textViewToChange.TextStorage.Insert(RecipientsSeperator.ToNSAttributedString(), range.Location + range.Length);
                 textViewToChange.TextStorage.EndEditing();
-                textViewToChange.SelectedRange = new NSRange(range.Location + range.Length + EmailSeparator.Length, 0);
+                textViewToChange.SelectedRange = new NSRange(range.Location + range.Length + RecipientsSeperator.Length, 0);
 
                 CorrectMarkup();
                 CommaOrEnterPressed(this, EventArgs.Empty);
@@ -372,10 +402,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         void HandleEditingEnded(object sender, EventArgs e)
         {
-            if (!string.IsNullOrEmpty(TextView.Text) && !TextView.Text.EndsWith(EmailSeparator, StringComparison.CurrentCultureIgnoreCase))
+            if (!string.IsNullOrEmpty(TextView.Text) && !TextView.Text.EndsWith(RecipientsSeperator, StringComparison.CurrentCultureIgnoreCase))
             {
                 TextView.TextStorage.BeginEditing();
-                TextView.TextStorage.Insert(EmailSeparator.ToNSAttributedString(), TextView.Text.Length);
+                TextView.TextStorage.Insert(RecipientsSeperator.ToNSAttributedString(), TextView.Text.Length);
                 TextView.TextStorage.EndEditing();
             }
 
@@ -391,7 +421,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             var text = TextView.Text;
             var splittedField = text.Split(new[]
                 {
-                    EmailSeparator
+                    RecipientsSeperator
                 },
                 StringSplitOptions.None);
             if (splittedField.Any())
@@ -481,9 +511,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             if (Validator.ContainsValidUsernames(users, out MatchCollection matches))
             {
                 var sb = new StringBuilder();
-                sb.Append(string.Join(EmailSeparator, matches.Cast<Match>().Select(m => m.Value)));
+                sb.Append(string.Join(RecipientsSeperator, matches.Cast<Match>().Select(m => m.Value)));
                 
-                sb.Append(EmailSeparator);
+                sb.Append(RecipientsSeperator);
                 
                 TextView.Text = sb.ToString();
             }
@@ -498,7 +528,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                                                            : new string[0];
         #region Public methods
 
-        public bool ContainsInvalidEmail() => TextView.Text.Split(new[] { EmailSeparator }, StringSplitOptions.RemoveEmptyEntries)
+        public bool ContainsInvalidEmail() => TextView.Text.Split(new[] { RecipientsSeperator }, StringSplitOptions.RemoveEmptyEntries)
                                                       .Any(a => !Validator.ContainsValidEmails(a));
 
         public IEnumerable<string> GetEmails() => Validator.ContainsValidEmails(TextView.Text, out MatchCollection matches)
@@ -507,15 +537,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         public IEnumerable<string> GetRecipents()
         {
-            return TextView.Text.Split(new[] { EmailSeparator }, StringSplitOptions.RemoveEmptyEntries)
+            return TextView.Text.Split(new[] { RecipientsSeperator }, StringSplitOptions.RemoveEmptyEntries)
                 .Where(Validator.ContainsValidEmails)
                 .Select(s => s.Trim())
                 .ToArray();
         }
 
+        public void SetInternalUsers(IEnumerable<string> internalUsers)
+        {
+            SetInternalUsers(string.Join(RecipientsSeperator, internalUsers));
+        }
+
         public void SetEmails(IEnumerable<string> emails)
         {
-            SetEmails(string.Join(EmailSeparator, emails));
+            SetEmails(string.Join(RecipientsSeperator, emails));
         }
 
         public void SetEmails(string emails)
@@ -523,9 +558,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             if (Validator.ContainsValidEmails(emails, out MatchCollection matches))
             {
                 var sb = new StringBuilder();
-                sb.Append(string.Join(EmailSeparator, matches.Cast<Match>().Select(m => m.Value)));
+                sb.Append(string.Join(RecipientsSeperator, matches.Cast<Match>().Select(m => m.Value)));
 
-                sb.Append(EmailSeparator);
+                sb.Append(RecipientsSeperator);
 
                 TextView.TextStorage.BeginEditing();
                 TextView.TextStorage.SetString(sb.ToString().ToNSAttributedString());
@@ -545,7 +580,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         public void SetRecipents(IEnumerable<string> recipents)
         {
-            SetRecipents(string.Join(EmailSeparator, recipents));
+            SetRecipents(string.Join(RecipientsSeperator, recipents));
         }
 
         public void SetRecipents(string recipents)
@@ -560,9 +595,46 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             Edited(this, EventArgs.Empty);
         }
 
+        public void AddInternalUsersFromGuids(IEnumerable<string> internalUsersGuids)
+        {
+            AddInternalUsers(string.Join(RecipientSeperator, ConvertGuidsToUsernames(internalUsersGuids)));
+        }
+
+        public void AddInternalUsers(IEnumerable<string> emails)
+        {
+            AddInternalUsers(string.Join(RecipientsSeperator, emails));
+        }
+
+        public void AddInternalUsers(string emails)
+        {
+            if (Validator.ContainsValidUsernames(emails, out MatchCollection matches))
+            {
+                var newInternalUsers = new StringBuilder();
+                newInternalUsers.Append(TextView.Text);
+                if (!TextView.Text.EndsWith(RecipientsSeperator, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(TextView.Text))
+                    newInternalUsers.Append(RecipientsSeperator);
+                newInternalUsers.Append(string.Join(RecipientSeperator, matches.Cast<Match>().Where(m => SystemUsersDepartments.Users.FirstOrDefault(su => su.Username == m.Value).Username == m.Value).Select(m => m.Value)));
+                newInternalUsers.Append(RecipientsSeperator);
+
+                TextView.TextStorage.BeginEditing();
+                TextView.TextStorage.SetString(newInternalUsers.ToString().ToNSAttributedString());
+                TextView.TextStorage.EndEditing();
+                TextView.SelectedRange = new NSRange(TextView.Text.Length, 0);
+
+                CorrectMarkup();
+
+                Edited(this, EventArgs.Empty);
+            }
+            else
+            {
+                if (CommonConfig.Logger.IsDebugEnabled())
+                    CommonConfig.Logger.Debug(string.Format("No valid internal users found in {0}.", internalUsers));
+            }
+        }
+
         public void AddEmails(IEnumerable<string> emails)
         {
-            AddEmails(string.Join(EmailSeparator, emails));
+            AddEmails(string.Join(RecipientsSeperator, emails));
         }
 
         public void AddEmails(string emails)
@@ -571,10 +643,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             {
                 var newEmails = new StringBuilder();
                 newEmails.Append(TextView.Text);
-                if (!TextView.Text.EndsWith(EmailSeparator, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(TextView.Text))
-                    newEmails.Append(EmailSeparator);
-                newEmails.Append(string.Join(EmailSeparator, matches.Cast<Match>().Select(m => m.Value)));
-                newEmails.Append(EmailSeparator);
+                if (!TextView.Text.EndsWith(RecipientsSeperator, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(TextView.Text))
+                    newEmails.Append(RecipientsSeperator);
+                newEmails.Append(string.Join(RecipientsSeperator, matches.Cast<Match>().Select(m => m.Value)));
+                newEmails.Append(RecipientsSeperator);
 
                 TextView.TextStorage.BeginEditing();
                 TextView.TextStorage.SetString(newEmails.ToString().ToNSAttributedString());
@@ -596,13 +668,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         {
             var newEmails = new StringBuilder();
             newEmails.Append(TextView.Text);
-            if (!TextView.Text.EndsWith(EmailSeparator, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(TextView.Text))
-                newEmails.Append(EmailSeparator);
+            if (!TextView.Text.EndsWith(RecipientsSeperator, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(TextView.Text))
+                newEmails.Append(RecipientsSeperator);
             if (string.IsNullOrWhiteSpace(name))
                 newEmails.Append(address);
             else
                 newEmails.Append(string.Format(RecipentFormat, name, address));
-            newEmails.Append(EmailSeparator);
+            newEmails.Append(RecipientsSeperator);
 
             TextView.TextStorage.BeginEditing();
             TextView.TextStorage.SetString(newEmails.ToString().ToNSAttributedString());
@@ -655,6 +727,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 SetRecipients(currentRecipients);
             else
                 Clear();
+        }
+
+        IEnumerable<string> ConvertGuidsToUsernames(IEnumerable<string> systemUserGuids)
+        {
+            return SystemUsersDepartments.Users.Where(su => systemUserGuids.Any(g => g == su.Guid.ToString())).Select(su => su.Username);
         }
 
         public void Clear()
