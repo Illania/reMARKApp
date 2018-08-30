@@ -11,14 +11,14 @@ namespace Mark5.Mobile.Common.Utilities
 {
     public static class RecipentSuggestions
     {
-        public static void GetSuggestions(string phrase, CancellationToken token, Action<List<Recipient>, CancellationToken> handler)
+        public static void GetSuggestions(string phrase, SystemUsersDepartments systemUsersDepartments, CancellationToken token, Action<List<Recipient>, CancellationToken> handler)
         {
             if (token.IsCancellationRequested)
                 return;
 
             GetSuggestionFromRecentAddresses(phrase, token, handler);
             GetSuggestionFromContacts(phrase, token, handler);
-            GetSuggestionFromInternalContacts(phrase, token, handler);
+            GetSuggestionFromInternalContacts(phrase, systemUsersDepartments, token, handler);
             GetSuggestionFromPhonebook(phrase, token, handler);
         }
 
@@ -75,18 +75,21 @@ namespace Mark5.Mobile.Common.Utilities
             });
         }
 
-        static void GetSuggestionFromInternalContacts(string phrase, CancellationToken token, Action<List<Recipient>, CancellationToken> handler)
+        static void GetSuggestionFromInternalContacts(string phrase, SystemUsersDepartments systemUsersDepartments, CancellationToken token, Action<List<Recipient>, CancellationToken> handler)
         {
             if (token.IsCancellationRequested)
+                return;
+
+            if (systemUsersDepartments == null)
                 return;
 
             Task.Run(async () =>
             {
                 var filtered = new List<Recipient>();
-                var systemUsersDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
-                var internalUsers = systemUsersDepartments.Users.FindAll(user => user.Username.ContainsCaseInsensitive(phrase));
 
-                foreach (SystemUser user in internalUsers)
+                var matchingInternalUsers = systemUsersDepartments.Users.FindAll(user => user.Username.ContainsCaseInsensitive(phrase));
+
+                foreach (SystemUser user in matchingInternalUsers)
                     filtered.Add(new Recipient(user.FirstName + " " + user.LastName, user.Username, RecipientType.InternalContact));   
                 
                 handler(filtered, token);
