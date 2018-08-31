@@ -10,14 +10,11 @@ using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
-using FastScrollRecycler;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 using TinyMessenger;
@@ -156,10 +153,9 @@ namespace Mark5.Mobile.Droid
             SearchView.SetOnQueryTextListener(this);
         }
 
-
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void GetData()
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+        #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
             RefreshLayout.Post(() => RefreshLayout.Refreshing = true);
 
@@ -308,10 +304,14 @@ namespace Mark5.Mobile.Droid
                     NotifyItemChanged(position);
             }
 
-
             public override int GetItemViewType(int position)
             {
                 return SectionsPositionToSection().ContainsKey(position) ? ViewType.SectionView : ViewType.CategotyView;
+            }
+
+            public void MoveCategory(Category category, Section section) 
+            {
+
             }
 
             public (Category Category, Section Section) GetItemAtPosition(int position)
@@ -408,8 +408,16 @@ namespace Mark5.Mobile.Droid
         {
             var (category, section) = CurrentAdapter.GetItemAtPosition(position);
             MoveCategory(section, category);
-            CurrentAdapter.Refresh(selectedCategories, Section.Selected);
-            CurrentAdapter.Refresh(availableCategories, Section.Available);
+
+            if (CurrentAdapter is SearchCategoriesAdapter)
+            {
+                CurrentAdapter.NotifyItemRemoved(position);
+                //CurrentAdapter.NotifyItemRangeChanged(position, availableCategories.Count - position);
+
+            } else {
+                CurrentAdapter.Refresh(selectedCategories, Section.Selected);
+                CurrentAdapter.Refresh(availableCategories, Section.Available);
+            }
         }
 
         void MoveCategory(Section section, Category category)
@@ -454,7 +462,6 @@ namespace Mark5.Mobile.Droid
             if (item.ItemId == Resource.Id.action_filter)
             {
                 menu?.FindItem(10)?.SetVisible(false);
-
                 SearchEnabled = true;
                 RefreshLayout.Enabled = false;
                 Adapter.ClearSelections();
@@ -476,6 +483,8 @@ namespace Mark5.Mobile.Droid
                 SearchAdapter.Clear();
                 RecyclerView.SwapAdapter(Adapter, true);
                 RefreshLayout.Enabled = true;
+                Adapter.Refresh(selectedCategories, Section.Selected);
+                Adapter.Refresh(availableCategories, Section.Available);
                 SearchEnabled = false;
                 return true;
             }
