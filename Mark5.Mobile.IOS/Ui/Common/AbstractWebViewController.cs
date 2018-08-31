@@ -609,11 +609,11 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         public override void ObserveValue(NSString keyPath, NSObject ofObject, NSDictionary change, IntPtr context)
         {
-            if (webView == null)
+            if (webView == null || webViewProgressView == null)
                 return;
 
             if (ofObject == webView && keyPath == "estimatedProgress")
-                webViewProgressView.SetProgress((float)webView.EstimatedProgress, true);
+                webViewProgressView?.SetProgress((float)webView.EstimatedProgress, true);
 
             if (ofObject == webView && keyPath == "loading")
                 UIView.AnimateNotify(.2d, () =>
@@ -621,8 +621,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
                     webViewProgressView.Alpha = webView.IsLoading ? 1f : 0f;
                 }, (finished) =>
                 {
-                    if (finished && !webView.IsLoading)
-                        webViewProgressView.SetProgress(0f, false);
+                    if (finished && webView?.IsLoading == false)
+                        webViewProgressView?.SetProgress(0f, false);
                 });
         }
 
