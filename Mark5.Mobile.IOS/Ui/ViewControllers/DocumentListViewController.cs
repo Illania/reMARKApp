@@ -79,13 +79,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillAppear(animated);
 
-            NavigationItem.Title = Folder.Name;
+            NavigationItem.Title = Folder?.Name;
 
             if (Integration.IsRunningAtLeast(11))
             {
-                if (NavigationController != null)
+                if (NavigationController?.NavigationBar != null)
                     NavigationController.NavigationBar.PrefersLargeTitles = true;
-                NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+
+                if (NavigationItem != null)
+                    NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
             }
 
             InitializeHandlers();
@@ -97,7 +99,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 foreach (var selectedIndexPath in TableView?.IndexPathsForSelectedRows)
                     TableView.DeselectRow(selectedIndexPath, true);
 
-            if (searchController.SearchResultsController is UITableViewController searchTableViewController)
+            if (searchController?.SearchResultsController is UITableViewController searchTableViewController)
             {
                 if (searchTableViewController?.TableView?.IndexPathForSelectedRow != null)
                     searchTableViewController.TableView.DeselectRow(TableView.IndexPathForSelectedRow, true);
@@ -106,7 +108,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     foreach (var selectedIndexPath in searchTableViewController.TableView?.IndexPathsForSelectedRows)
                         searchTableViewController.TableView.DeselectRow(selectedIndexPath, true);
             }
-
 
             ReachabilityBar.Attach(this);
         }
@@ -294,7 +295,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (editItem != null)
                 editItem.Clicked += EditItem_Clicked;
 
-            RefreshControl.ValueChanged += RefreshControl_ValueChanged;
+            if (RefreshControl != null)
+                RefreshControl.ValueChanged += RefreshControl_ValueChanged;
         }
 
         void DeinitializeHandlers()
@@ -311,7 +313,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (editItem != null)
                 editItem.Clicked -= EditItem_Clicked;
 
-            RefreshControl.ValueChanged -= RefreshControl_ValueChanged;
+            if (RefreshControl != null)
+                RefreshControl.ValueChanged -= RefreshControl_ValueChanged;
         }
 
         #endregion
