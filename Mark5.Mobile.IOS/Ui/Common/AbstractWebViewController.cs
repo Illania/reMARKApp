@@ -348,6 +348,15 @@ namespace Mark5.Mobile.IOS.Ui.Common
             return tcs.Task;
         }
 
+        protected Task<(NSObject, NSError)> InsertTemplate(string type, int id, string content)
+        {
+            var tcs = new TaskCompletionSource<(NSObject, NSError)>();
+            var sanitizedContent = content.Replace("\"", "'");
+            var js = $"InsertContent(\'{type}\',{id},\"{sanitizedContent}\")";
+            webView.EvaluateJavaScript("javascript: " + js, (result, error) => tcs.SetResult((result, error)));
+            return tcs.Task;
+        }
+
         protected async Task<string> ProcessHtml(string html, HtmlProcessingConfiguration config)
         {
             var sw = Stopwatch.StartNew();
