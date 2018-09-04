@@ -132,18 +132,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void ReloadTable() {
             var availableCategories = new List<Category>();
+           
+            categories.Sort((x, y) => String.Compare(x.Name, y.Name, true));
 
-            if (BusinessEntityPreview is DocumentPreview documentPreview)
-            {
-                ((DataSource)TableView.Source).SetItems(DataSource.Section.Selected, categories);
-                availableCategories = allCategories.Where(x => !categories.Contains(x)).ToList();
-            }
+            ((DataSource)TableView.Source).SetItems(DataSource.Section.Selected, categories);
+            availableCategories = allCategories.Where(x => !categories.Contains(x)).ToList();
 
-            if (BusinessEntityPreview is ContactPreview contactPreview)
-            {
-                ((DataSource)TableView.Source).SetItems(DataSource.Section.Selected, categories);
-                availableCategories = allCategories.Where(x => !categories.Contains(x)).ToList();
-            }
+            availableCategories.Sort((x, y) => String.Compare(x.Name, y.Name, true));
 
             ((DataSource)TableView.Source).SetItems(DataSource.Section.Available, availableCategories);
 
@@ -460,15 +455,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return cell;
             }
 
-            void MoveCategory(nint section, Category category) {
+            int MoveCategory(nint section, Category category) {
 
                 if (category == null)
-                    return;
+                    return -1;
 
                 if(section == Section.Available) {
                     if(items[Section.Available].Contains(category)) {
                         items[Section.Available].Remove(category);
                         items[Section.Selected].Add(category);
+                        items[Section.Selected].Sort((x, y) => String.Compare(x.Name, y.Name, true));
+                        return items[Section.Selected].IndexOf(category); 
                     }
                 }
 
@@ -477,8 +474,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     {
                         items[Section.Selected].Remove(category);
                         items[Section.Available].Add(category);
-                    } 
+                        items[Section.Available].Sort((x, y) => String.Compare(x.Name, y.Name, true));
+                        return items[Section.Available].IndexOf(category);
+                    }
                 }
+
+                return -1;
             }
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
@@ -486,7 +487,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 tableView.AllowsSelection = false; // to prevent exceptions when 'quickly' tapping rows
                 tableView.BeginUpdates();
                 var category = items[indexPath.LongSection][indexPath.Row];
-                MoveCategory(indexPath.LongSection, category);
+                var newIndex = MoveCategory(indexPath.LongSection, category);
                 viewControllerWeakReference.Unwrap()?.MoveCategory(category);
 
                 // dont delete the row if it's the last element, because we are displaying "No categories" cell
@@ -502,7 +503,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         tableView.ReloadSections(NSIndexSet.FromIndex(Section.Available), UITableViewRowAnimation.Middle);
                     }
                     else {
-                        tableView.InsertRows(new NSIndexPath[] { NSIndexPath.Create(Section.Available, availableCategories.Count() - 1) }, UITableViewRowAnimation.Middle);
+                        tableView.InsertRows(new NSIndexPath[] { NSIndexPath.Create(Section.Available, newIndex) }, UITableViewRowAnimation.Middle);
                     }
                 }
                 else
@@ -512,7 +513,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     {
                         tableView.ReloadSections(NSIndexSet.FromIndex(Section.Selected), UITableViewRowAnimation.Middle);
                     } else {
-                        tableView.InsertRows(new NSIndexPath[] { NSIndexPath.Create(Section.Selected, count - 1) }, UITableViewRowAnimation.Middle);
+                        tableView.InsertRows(new NSIndexPath[] { NSIndexPath.Create(Section.Selected, newIndex) }, UITableViewRowAnimation.Middle);
                     }
                 }
 

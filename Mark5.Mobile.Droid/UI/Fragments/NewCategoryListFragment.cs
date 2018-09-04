@@ -688,7 +688,6 @@ namespace Mark5.Mobile.Droid
                 descriptionTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_categoty_description);
                 colorImageView = itemView.FindViewById<View>(Resource.Id.list_item_category_color);
                 selectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
-
             }
         }
 
@@ -707,5 +706,4 @@ namespace Mark5.Mobile.Droid
 
         #endregion
     }
-   
 }
