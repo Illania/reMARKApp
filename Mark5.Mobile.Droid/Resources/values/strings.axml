@@ -450,4 +450,6 @@
     <string name="swipe_actions_dialog_title">Select action</string>
     <string name="available">Available</string>
     <string name="selected">Selected</string>
+    <string name="changes_not_saved">Changes not saved!</string>
+    <string name="changes_not_saved_description">Current changes are not saved and will be discarded"</string>
 </resources>

@@ -365,8 +365,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async Task CancelBtnItem_ClickedAsync(object sender, EventArgs e)
         {
-            if (BusinessEntityPreview is DocumentPreview documentPreview && categories.Equals(documentPreview.Categories) 
-                || BusinessEntityPreview is ContactPreview contactPreview && categories.Equals(contactPreview.Categories))
+            if (BusinessEntityPreview is DocumentPreview documentPreview && categories.SequenceEqual(documentPreview.Categories) 
+                || BusinessEntityPreview is ContactPreview contactPreview && categories.SequenceEqual(contactPreview.Categories))
             {
                 DismissViewController(true, null);
             }

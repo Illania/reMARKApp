@@ -21,34 +21,28 @@ using TinyMessenger;
 
 namespace Mark5.Mobile.Droid
 {
-
-    public class NewCategoriesListFragment : BaseFragment, SearchView.IOnQueryTextListener, IMenuItemOnActionExpandListener
+    public class NewCategoriesListFragment : BaseFragment, SearchView.IOnQueryTextListener, IMenuItemOnActionExpandListener, IMenuItemOnMenuItemClickListener
     {
-        protected Handler SearchHandler = new Handler();
-        protected SearchCategoriesAdapter SearchAdapter;
-        protected SwipeRefreshLayout RefreshLayout;
-        protected RecyclerView RecyclerView;
-        protected SearchView SearchView;
-        protected bool SearchEnabled;
-        protected bool HideSearch;
         const string BusinessEntityPreviewBundleKey = "BusinessEntityPreview_8938f3ae-6cb4-48c1-9c19-34cf533bcaed";
-
-
-        protected List<Category> selectedCategories = new List<Category>();
-        protected List<Category> allCategories = new List<Category>();
-        protected List<Category> availableCategories = new List<Category>();
-
-        BusinessEntityPreview businessEntityPreview;
-
-        CategoriesListAdapter Adapter;
-
-        TinyMessageSubscriptionToken categoriesEditedToken;
-
-        protected CategoriesListAdapter CurrentAdapter => SearchEnabled ? SearchAdapter : Adapter;
-
+        const int searchBtnId = 10;
+        bool SearchEnabled;
+        protected bool hideSearch;
+        Handler SearchHandler;
+        SearchCategoriesAdapter SearchAdapter;
+        SwipeRefreshLayout RefreshLayout;
+        RecyclerView RecyclerView;
+        SearchView SearchView;
         IMenu menu;
 
-        List<Section> sections { get; set; }
+        BusinessEntityPreview BusinessEntityPreview;
+        CategoriesListAdapter ListAdapter;
+        TinyMessageSubscriptionToken CategoriesEditedToken;
+        CategoriesListAdapter CurrentAdapter => SearchEnabled ? SearchAdapter : ListAdapter;
+        List<Category> originalCategories = new List<Category>();
+        List<Category> selectedCategories = new List<Category>();
+        List<Category> allCategories = new List<Category>();
+        List<Category> availableCategories = new List<Category>();
+        List<Section> Sections { get; set; }
 
         public static (NewCategoriesListFragment fragment, string tag) NewInstance(BusinessEntityPreview businessEntity)
         {
@@ -73,42 +67,44 @@ namespace Mark5.Mobile.Droid
         {
             base.OnCreate(savedInstanceState);
             if (Arguments.ContainsKey(BusinessEntityPreviewBundleKey))
-                businessEntityPreview = Serializer.Deserialize<BusinessEntityPreview>(Arguments.GetString(BusinessEntityPreviewBundleKey));
+                BusinessEntityPreview = Serializer.Deserialize<BusinessEntityPreview>(Arguments.GetString(BusinessEntityPreviewBundleKey));
 
             SubscribeToMessages();
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(NewCategoriesListFragment)} [businessEntity.id={businessEntityPreview?.Id}, businessEntity.objectType={businessEntityPreview?.ObjectType}]");
+            CommonConfig.Logger.Info($"Creating {nameof(NewCategoriesListFragment)} [businessEntity.id={BusinessEntityPreview?.Id}, businessEntity.objectType={BusinessEntityPreview?.ObjectType}]");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
 
             var emptyView = rootView.FindViewById<AppCompatTextView>(Resource.Id.empty_view);
             emptyView.Visibility = ViewStates.Gone;
             RefreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipe_refresh_layout);
-            RefreshLayout.Enabled = false;
+            RefreshLayout.SetEnabled(false);
 
             RecyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recycler_view);
             RecyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
             RecyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
 
-            Adapter = new CategoriesListAdapter(Context, RecyclerView);
-            Adapter.RegisterAdapterDataObserver(new LambdaEmptyAdapterObserver(() =>
+            ListAdapter = new CategoriesListAdapter(Context, RecyclerView);
+            ListAdapter.RegisterAdapterDataObserver(new LambdaEmptyAdapterObserver(() =>
             {
-                if (RecyclerView.GetAdapter() != Adapter)
+                if (RecyclerView.GetAdapter() != ListAdapter)
                     return;
 
-                RecyclerView.Visibility = Adapter.ItemCount > 0 ? ViewStates.Visible : ViewStates.Gone;
-                menu?.FindItem(Resource.Id.action_filter)?.SetEnabled(Adapter.ItemCount > 0);
+                RecyclerView.Visibility = ListAdapter.ItemCount > 0 ? ViewStates.Visible : ViewStates.Gone;
+                menu?.FindItem(Resource.Id.action_filter)?.SetEnabled(ListAdapter.ItemCount > 0);
             }));
 
-            Adapter.ItemClicked += Adapter_ItemClicked;
+            ListAdapter.ItemClicked += Adapter_ItemClicked;
+
+            SearchHandler = new Handler();
 
             SearchAdapter = new SearchCategoriesAdapter(Context, RecyclerView);
             SearchAdapter.ItemClicked += Adapter_ItemClicked;
 
-            RecyclerView.SetAdapter(Adapter);
+            RecyclerView.SetAdapter(ListAdapter);
 
             HasOptionsMenu = true;
 
@@ -122,68 +118,15 @@ namespace Mark5.Mobile.Droid
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.categories);
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
-            CommonConfig.Logger.Info($"Created {nameof(NewCategoriesListFragment)} [businessEntity.id={businessEntityPreview?.Id}, businessEntity.objectType={businessEntityPreview?.ObjectType}]");
+            CommonConfig.Logger.Info($"Created {nameof(NewCategoriesListFragment)} [businessEntity.id={BusinessEntityPreview?.Id}, businessEntity.objectType={BusinessEntityPreview?.ObjectType}]");
         }
 
         public override void OnResume()
         {
             base.OnResume();
-            CommonConfig.Logger.Info($"Refreshing {nameof(NewCategoriesListFragment)} [businessEntity.id={businessEntityPreview?.Id}, businessEntity.objectType={businessEntityPreview?.ObjectType}]");
-            SetSections();
+            CommonConfig.Logger.Info($"Refreshing {nameof(NewCategoriesListFragment)} [businessEntity.id={BusinessEntityPreview?.Id}, businessEntity.objectType={BusinessEntityPreview?.ObjectType}]");
+            SetDefaultSections();
             GetData();
-        }
-
-        protected virtual void SetSections()
-        {
-            CommonConfig.Logger.Info("Setting sections according to the folder");
-            sections = new List<Section> { Section.Selected, Section.Available };
-            Adapter.SetSections(sections);
-        }
-
-        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
-        {
-            this.menu = menu;
-
-            inflater.Inflate(Resource.Menu.menu_main, menu);
-
-            var filterItem = menu.FindItem(Resource.Id.action_filter);
-            filterItem.SetOnActionExpandListener(this);
-            SearchView = (SearchView)filterItem.ActionView;
-            SearchView.QueryHint = GetString(Resource.String.filter);
-            SearchView.SetOnQueryTextListener(this);
-        }
-
-        #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
-        async void GetData()
-        #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
-        {
-            RefreshLayout.Post(() => RefreshLayout.Refreshing = true);
-
-            await Task.Delay(300); // Let the animation finish
-
-
-            switch (businessEntityPreview.ObjectType)
-            {
-                case ObjectType.Document:
-                    var documentPreview = businessEntityPreview as DocumentPreview;
-                    selectedCategories = documentPreview.Categories;
-                    allCategories = await Managers.DocumentsManager.GetAllCategoriesAsync(Restored ? SourceType.Local : SourceType.Auto);
-                    break;
-                case ObjectType.Contact:
-                    allCategories = await Managers.ContactsManager.GetAllCategoriesAsync(Restored ? SourceType.Local : SourceType.Auto);
-                    var contactPreview = businessEntityPreview as ContactPreview;
-                    selectedCategories = contactPreview.Categories;
-                    break;
-                default:
-                    throw new ArgumentException("The business entity provided does not have categories in the model");
-            }
-
-            availableCategories = allCategories.Where(x => !selectedCategories.Contains(x)).ToList();
-
-            Adapter.Refresh(selectedCategories, Section.Selected);
-            Adapter.Refresh(availableCategories, Section.Available);
-
-            RefreshLayout.Post(() => RefreshLayout.Refreshing = false);
         }
 
         public override void OnDestroy()
@@ -192,30 +135,112 @@ namespace Mark5.Mobile.Droid
             UnsubscribeFromMessages();
         }
 
+        protected virtual void SetDefaultSections()
+        {
+            CommonConfig.Logger.Info("Setting sections");
+            Sections = new List<Section> { Section.Selected, Section.Available };
+            ListAdapter.SetSections(Sections);
+        }
+
+        async void GetData()
+        {
+            RefreshLayout.Post(() => RefreshLayout.Refreshing = true);
+
+            await Task.Delay(300); // Let the animation finish
+
+            switch (BusinessEntityPreview.ObjectType)
+            {
+                case ObjectType.Document:
+                    var documentPreview = BusinessEntityPreview as DocumentPreview;
+                    selectedCategories.AddRange(documentPreview.Categories);
+                    originalCategories.AddRange(documentPreview.Categories);
+                    allCategories = await Managers.DocumentsManager.GetAllCategoriesAsync(Restored ? SourceType.Local : SourceType.Auto);
+                    break;
+                case ObjectType.Contact:
+                    allCategories = await Managers.ContactsManager.GetAllCategoriesAsync(Restored ? SourceType.Local : SourceType.Auto);
+                    var contactPreview = BusinessEntityPreview as ContactPreview;
+                    selectedCategories.AddRange(contactPreview.Categories);
+                    originalCategories.AddRange(contactPreview.Categories);
+                    break;
+                default:
+                    throw new ArgumentException("The business entity provided does not have categories in the model");
+            }
+
+            availableCategories = allCategories.Where(x => !selectedCategories.Contains(x)).ToList();
+
+            ListAdapter.SetSectionData(selectedCategories, Section.Selected);
+            ListAdapter.SetSectionData(availableCategories, Section.Available);
+
+            RefreshLayout.Post(() => { 
+                RefreshLayout.Refreshing = false;
+                RefreshLayout.SetEnabled(false);
+            });
+        }
 
         void SubscribeToMessages()
         {
-            categoriesEditedToken = CommonConfig.MessengerHub.Subscribe<EntityCategoriesChangedMessage>(HandleCategoriesChanged,
-                                                                                                        (arg) => arg.EntityId == businessEntityPreview?.Id
-                                                                                                      && arg.ObjectType == businessEntityPreview?.ObjectType);
+            CategoriesEditedToken = CommonConfig.MessengerHub.Subscribe<EntityCategoriesChangedMessage>(
+                HandleCategoriesChanged,(arg) => arg.EntityId == BusinessEntityPreview?.Id 
+                && arg.ObjectType == BusinessEntityPreview?.ObjectType
+            );
         }
 
         void UnsubscribeFromMessages()
         {
-            categoriesEditedToken?.Dispose();
+            CategoriesEditedToken?.Dispose();
+        }
+
+        public void AskIfShouldSave()
+        {
+            if(!selectedCategories.SequenceEqual(originalCategories)) {
+                Dialogs.ShowYesNoDialog(Context, Resource.String.changes_not_saved, Resource.String.changes_not_saved_description, Activity.Finish , null, Resource.String.ok, Resource.String.cancel);
+            } else {
+                if (Activity != null)
+                {
+                    Activity.Finish();
+                }
+            }
+        }
+
+        async Task SaveAndFinish() {
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.updating_categories, Resource.String.please_wait);
+            try
+            {
+                switch (BusinessEntityPreview.ObjectType)
+                {
+                    case ObjectType.Document:
+                        var documentPreview = BusinessEntityPreview as DocumentPreview;
+                        await Managers.DocumentsManager.SetCategoriesAsync(documentPreview, selectedCategories);
+                        break;
+                    case ObjectType.Contact:
+                        var contactPreview = BusinessEntityPreview as ContactPreview;
+                        await Managers.ContactsManager.SetCategoriesAsync(contactPreview, selectedCategories);
+                        break;
+                    default:
+                        throw new ArgumentException("Invalid BusinessEntityPreview!");
+                }
+                dismissAction();
+                Activity?.Finish();
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+                CommonConfig.Logger.Error($"Update of categories failed", ex);
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+            }
         }
 
         void HandleCategoriesChanged(EntityCategoriesChangedMessage obj)
         {
-            switch (businessEntityPreview.ObjectType)
+            switch (BusinessEntityPreview.ObjectType)
             {
                 case ObjectType.Document:
-                    var documentPreview = businessEntityPreview as DocumentPreview;
+                    var documentPreview = BusinessEntityPreview as DocumentPreview;
                     documentPreview.Categories.Clear();
                     documentPreview.Categories.AddRange(obj.Categories);
                     break;
                 case ObjectType.Contact:
-                    var contactPreview = businessEntityPreview as ContactPreview;
+                    var contactPreview = BusinessEntityPreview as ContactPreview;
                     contactPreview.Categories.Clear();
                     contactPreview.Categories.AddRange(obj.Categories);
                     break;
@@ -224,9 +249,110 @@ namespace Mark5.Mobile.Droid
             }
         }
 
-        #region RecyclerView Adapter/ViewHolder
+        protected virtual void Adapter_ItemClicked(object sender, int position)
+        {
+            var (category, section) = CurrentAdapter.GetItemAtPosition(position);
+            MoveCategory(section, category);
 
-        protected class CategoriesListAdapter : RecyclerView.Adapter
+            if (CurrentAdapter is SearchCategoriesAdapter adapter)
+            {
+                CurrentAdapter.SetSectionData(availableCategories, Section.None);
+            }
+            else
+            {
+                if(section == Section.Available) {
+                    CurrentAdapter.RemoveItem(section,  category );
+                    CurrentAdapter.AppendItem(Section.Selected, category );
+                } else {
+                    CurrentAdapter.RemoveItem(section, category );
+                    CurrentAdapter.AppendItem(Section.Available, category );
+                }
+            }
+        }
+
+        void MoveCategory(Section section, Category category)
+        {
+            if (category == null)
+                return;
+
+            if (section == Section.Available || section == Section.None)
+            {
+                selectedCategories.Add(category);
+                availableCategories.Remove(category);
+            }
+
+            if (section == Section.Selected)
+            {
+                selectedCategories.Remove(category);
+                availableCategories.Add(category);
+            }
+        }
+
+        #region ActionBar related
+        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
+        {
+            this.menu = menu;
+            inflater.Inflate(Resource.Menu.menu_main, menu);
+
+            var saveItem = menu.Add(Menu.None, searchBtnId, 10, Resource.String.save);
+            saveItem.SetShowAsAction(ShowAsAction.Always);
+            saveItem.SetOnMenuItemClickListener(this);
+
+            var filterItem = menu.FindItem(Resource.Id.action_filter);
+            filterItem.SetOnActionExpandListener(this);
+            SearchView = (SearchView)filterItem.ActionView;
+            SearchView.QueryHint = GetString(Resource.String.filter);
+            SearchView.SetOnQueryTextListener(this);
+        }
+
+        bool IMenuItemOnActionExpandListener.OnMenuItemActionCollapse(IMenuItem item)
+        {
+            if (item.ItemId == Resource.Id.action_filter)
+            {
+                menu?.FindItem(searchBtnId)?.SetVisible(true);
+
+                SearchHandler.RemoveCallbacksAndMessages(null);
+                SearchAdapter.Clear();
+                RecyclerView.SwapAdapter(ListAdapter, true);
+                ListAdapter.SetSectionData(selectedCategories, Section.Selected);
+                ListAdapter.SetSectionData(availableCategories, Section.Available);
+                SearchEnabled = false;
+                return true;
+            }
+
+            return false;
+        }
+
+        public virtual bool OnMenuItemActionExpand(IMenuItem item)
+        {
+            if (item.ItemId == Resource.Id.action_filter)
+            {
+                menu?.FindItem(searchBtnId)?.SetVisible(false);
+                SearchEnabled = true;
+                ListAdapter.ClearSelections();
+                RecyclerView.SwapAdapter(SearchAdapter, true);
+                (this as SearchView.IOnQueryTextListener).OnQueryTextChange(string.Empty);
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool OnMenuItemClick(IMenuItem item)
+        {
+            if (item.ItemId == searchBtnId)
+            {
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+                SaveAndFinish();
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+            }
+
+            return false;
+        }
+        #endregion
+
+        #region RecyclerView Adapters/ViewHolders
+        class CategoriesListAdapter : RecyclerView.Adapter
         {
             public override int ItemCount { get { return categoriesInSection.Sum(f => f.Value.Count) + (sectionsInView.Count == 1 ? 0 : sectionsInView.Count); } }
 
@@ -262,7 +388,6 @@ namespace Mark5.Mobile.Droid
                     viewHolder.HexColor = category.HexColor;
                     viewHolder.Description = category.Description;
                     viewHolder.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, position)));
-
                 }
                 else
                 {
@@ -307,11 +432,6 @@ namespace Mark5.Mobile.Droid
             public override int GetItemViewType(int position)
             {
                 return SectionsPositionToSection().ContainsKey(position) ? ViewType.SectionView : ViewType.CategotyView;
-            }
-
-            public void MoveCategory(Category category, Section section) 
-            {
-
             }
 
             public (Category Category, Section Section) GetItemAtPosition(int position)
@@ -382,7 +502,7 @@ namespace Mark5.Mobile.Droid
                 NotifyDataSetChanged();
             }
 
-            public void Refresh(List<Category> categories, Section section)
+            public void SetSectionData(List<Category> categories, Section section)
             {
                 var sectionPosition = SectionsPositionToSection().FirstOrDefault(c => c.Value == section).Key;
                 var offset = sectionsInView.Count == 1 ? 0 : 1;
@@ -395,50 +515,47 @@ namespace Mark5.Mobile.Droid
                 }
 
                 var newItemCount = categories.Count;
+                categories.Sort((c1, c2) => String.Compare(c1.Name, c2.Name, true));
                 categoriesInSection[section].AddRange(categories);
                 NotifyItemRangeInserted(sectionPosition + offset, newItemCount);
                 if (sectionsInView.Count > 1)
                     NotifyItemChanged(sectionPosition);
             }
-        }
 
-        #region List item event handlers
-
-        protected virtual void Adapter_ItemClicked(object sender, int position)
-        {
-            var (category, section) = CurrentAdapter.GetItemAtPosition(position);
-            MoveCategory(section, category);
-
-            if (CurrentAdapter is SearchCategoriesAdapter)
+            int GetPosition(Section section, int categoryId)
             {
-                CurrentAdapter.NotifyItemRemoved(position);
-                //CurrentAdapter.NotifyItemRangeChanged(position, availableCategories.Count - position);
+                var position = -1;
+                for (var i = 0; i < categoriesInSection[section].Count; i++)
 
-            } else {
-                CurrentAdapter.Refresh(selectedCategories, Section.Selected);
-                CurrentAdapter.Refresh(availableCategories, Section.Available);
-            }
-        }
+                    if (categoriesInSection[section][i].Id == categoryId)
+                    {
+                        position = i;
+                        break;
+                    }
 
-        void MoveCategory(Section section, Category category)
-        {
-            if (category == null)
-                return;
-
-            if (section == Section.Available || section == Section.None)
-            {
-                selectedCategories.Add(category);
-                availableCategories.Remove(category);
+                return position;
             }
 
-            if (section == Section.Selected)
+            public void RemoveItem(Section section, Category category)
             {
-                selectedCategories.Remove(category);
-                availableCategories.Add(category);
+                var offset = sectionsInView.Count == 1 ? 0 : 1;
+                var position = GetPosition(section, category.Id);
+                categoriesInSection[section].RemoveAt(position);
+                NotifyItemRemoved(position + offset);
+                NotifyDataSetChanged();
+            }
+
+            public void AppendItem(Section section, Category category)
+            {
+                categoriesInSection[section].Add(category);
+                categoriesInSection[section].Sort((c1,c2) => String.Compare(c1.Name,c2.Name,true));
+                var index = categoriesInSection[section].IndexOf(category);
+                var offset = sectionsInView.Count == 1 ? 0 : 1;
+                var count = categoriesInSection[section].Count();
+                NotifyItemInserted(offset + index);
+                NotifyDataSetChanged();
             }
         }
-
-        #endregion
 
         #region Filtering 
 
@@ -454,41 +571,6 @@ namespace Mark5.Mobile.Droid
 
         public bool OnQueryTextSubmit(string query)
         {
-            return false;
-        }
-
-        public virtual bool OnMenuItemActionExpand(IMenuItem item)
-        {
-            if (item.ItemId == Resource.Id.action_filter)
-            {
-                menu?.FindItem(10)?.SetVisible(false);
-                SearchEnabled = true;
-                RefreshLayout.Enabled = false;
-                Adapter.ClearSelections();
-                RecyclerView.SwapAdapter(SearchAdapter, true);
-                (this as SearchView.IOnQueryTextListener).OnQueryTextChange(string.Empty);
-                return true;
-            }
-
-            return false;
-        }
-
-        bool IMenuItemOnActionExpandListener.OnMenuItemActionCollapse(IMenuItem item)
-        {
-            if (item.ItemId == Resource.Id.action_filter)
-            {
-                menu?.FindItem(10)?.SetVisible(true);
-
-                SearchHandler.RemoveCallbacksAndMessages(null);
-                SearchAdapter.Clear();
-                RecyclerView.SwapAdapter(Adapter, true);
-                RefreshLayout.Enabled = true;
-                Adapter.Refresh(selectedCategories, Section.Selected);
-                Adapter.Refresh(availableCategories, Section.Available);
-                SearchEnabled = false;
-                return true;
-            }
-
             return false;
         }
 
@@ -511,24 +593,9 @@ namespace Mark5.Mobile.Droid
                 500);
             return false;
         }
-
-        void SearchRecursively(Folder folder, string searchText, List<Folder> resultList)
-        {
-            if (folder.SubFolders == null || folder.SubFolders.Count < 1)
-                return;
-
-            foreach (var subFolder in folder.SubFolders)
-            {
-                if (subFolder.Name.IndexOf(searchText, StringComparison.CurrentCultureIgnoreCase) >= 0)
-                    resultList.Add(subFolder);
-
-                SearchRecursively(subFolder, searchText, resultList);
-            }
-        }
-
         #endregion
 
-        protected class SearchCategoriesAdapter : CategoriesListAdapter
+        class SearchCategoriesAdapter : CategoriesListAdapter
         {
             string searchQuery = String.Empty;
 
@@ -552,16 +619,14 @@ namespace Mark5.Mobile.Droid
 
             public void RefreshSearch(List<Category> categories, string searchText)
             {
-                if (searchQuery.Equals(searchText))
-                {
-                    Refresh(categories, Section.None);
-                }
-                else
-                {
-                    Refresh(categories, Section.None);
-                }
-
+                SetSectionData(categories, Section.None);
                 searchQuery = searchText;
+            }
+
+            public void RemoveItemAtPosition(int position) 
+            {
+                categoriesInSection[Section.None].RemoveAt(position);
+                NotifyItemRemoved(position);
             }
         }
 
@@ -627,19 +692,20 @@ namespace Mark5.Mobile.Droid
             }
         }
 
+        static class ViewType
+        {
+            internal static readonly int CategotyView = 0;
+            internal static readonly int SectionView = 1;
+        }
+
+        public enum Section
+        {
+            Selected,
+            Available,
+            None
+        }
+
         #endregion
     }
-
-    static class ViewType
-    {
-        internal static readonly int CategotyView = 0;
-        internal static readonly int SectionView = 1;
-    }
-
-    public enum Section
-    {
-        Selected,
-        Available,
-        None
-    }
+   
 }
