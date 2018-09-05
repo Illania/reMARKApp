@@ -450,7 +450,7 @@
     <Compile Include="Utilities\CallerId\CallStateBroadcastReceiver.cs" />
     <Compile Include="Ui\Fragments\SwipeActionsFragment.cs" />
     <Compile Include="Utilities\OnBoardingUtilities.cs" />
-    <Compile Include="Ui\Fragments\CategoryListFragment.cs" />
+    <Compile Include="Ui\Fragments\CategoriesListFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
