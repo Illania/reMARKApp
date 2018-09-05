@@ -24,7 +24,7 @@ namespace Mark5.Mobile.Droid
     public class NewCategoriesListFragment : BaseFragment, SearchView.IOnQueryTextListener, IMenuItemOnActionExpandListener, IMenuItemOnMenuItemClickListener
     {
         const string BusinessEntityPreviewBundleKey = "BusinessEntityPreview_8938f3ae-6cb4-48c1-9c19-34cf533bcaed";
-        const int searchBtnId = 10;
+        const int saveBtnId = 10;
         bool SearchEnabled;
         protected bool hideSearch;
         Handler SearchHandler;
@@ -256,7 +256,13 @@ namespace Mark5.Mobile.Droid
 
             if (CurrentAdapter is SearchCategoriesAdapter adapter)
             {
-                CurrentAdapter.SetSectionData(availableCategories, Section.None);
+                CloseSearch();
+                var filterItem = menu?.FindItem(Resource.Id.action_filter);
+                if(filterItem != null) 
+                {
+                    filterItem.SetVisible(true);
+                    filterItem.CollapseActionView();
+                }
             }
             else
             {
@@ -294,7 +300,7 @@ namespace Mark5.Mobile.Droid
             this.menu = menu;
             inflater.Inflate(Resource.Menu.menu_main, menu);
 
-            var saveItem = menu.Add(Menu.None, searchBtnId, 10, Resource.String.save);
+            var saveItem = menu.Add(Menu.None, saveBtnId, 10, Resource.String.save);
             saveItem.SetShowAsAction(ShowAsAction.Always);
             saveItem.SetOnMenuItemClickListener(this);
 
@@ -305,18 +311,21 @@ namespace Mark5.Mobile.Droid
             SearchView.SetOnQueryTextListener(this);
         }
 
+        void CloseSearch() {
+            menu?.FindItem(saveBtnId)?.SetVisible(true);
+            SearchHandler.RemoveCallbacksAndMessages(null);
+            SearchAdapter.Clear();
+            RecyclerView.SwapAdapter(ListAdapter, true);
+            ListAdapter.SetSectionData(selectedCategories, Section.Selected);
+            ListAdapter.SetSectionData(availableCategories, Section.Available);
+            SearchEnabled = false;
+        }
+
         bool IMenuItemOnActionExpandListener.OnMenuItemActionCollapse(IMenuItem item)
         {
             if (item.ItemId == Resource.Id.action_filter)
             {
-                menu?.FindItem(searchBtnId)?.SetVisible(true);
-
-                SearchHandler.RemoveCallbacksAndMessages(null);
-                SearchAdapter.Clear();
-                RecyclerView.SwapAdapter(ListAdapter, true);
-                ListAdapter.SetSectionData(selectedCategories, Section.Selected);
-                ListAdapter.SetSectionData(availableCategories, Section.Available);
-                SearchEnabled = false;
+                CloseSearch();
                 return true;
             }
 
@@ -327,7 +336,7 @@ namespace Mark5.Mobile.Droid
         {
             if (item.ItemId == Resource.Id.action_filter)
             {
-                menu?.FindItem(searchBtnId)?.SetVisible(false);
+                menu?.FindItem(saveBtnId)?.SetVisible(false);
                 SearchEnabled = true;
                 ListAdapter.ClearSelections();
                 RecyclerView.SwapAdapter(SearchAdapter, true);
@@ -340,7 +349,7 @@ namespace Mark5.Mobile.Droid
 
         public bool OnMenuItemClick(IMenuItem item)
         {
-            if (item.ItemId == searchBtnId)
+            if (item.ItemId == saveBtnId)
             {
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                 SaveAndFinish();
