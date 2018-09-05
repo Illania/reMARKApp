@@ -973,20 +973,38 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                 ProcessTemplate(template, previousDocumentPreview);
 
-                var insertTemplateJs = File.ReadAllText(NSBundle.MainBundle.PathForResource(
-                    insertAtCursor ? "html/insertTemplate" : "html/initTemplate", "js"));
-                if (template.ContentType == ContentType.PlainText)
+                if (insertAtCursor)
                 {
-                    var templateText = Regex.Replace(template.Content, @"\r\n?|\n", "\\n", RegexOptions.Multiline);
-                    insertTemplateJs = ProcessWebTemplate(insertTemplateJs, "text", template.Id, templateText);
-                }
-                if (template.ContentType == ContentType.Html)
-                {
-                    var templateText = Regex.Replace(template.Content, @"\r\n?|\n", " ", RegexOptions.Multiline);
-                    insertTemplateJs = ProcessWebTemplate(insertTemplateJs, "html", template.Id, templateText);
-                }
+                    var type = String.Empty;
+                    var content = String.Empty;
 
-                var result = await EvaluateJavaScriptAsync(insertTemplateJs);
+                    if (template.ContentType == ContentType.PlainText)
+                    {
+                        content = Regex.Replace(template.Content, @"\r\n?|\n", "\\n", RegexOptions.Multiline);
+                        type = "text";
+                    }
+                    if (template.ContentType == ContentType.Html)
+                    {
+                        content = Regex.Replace(template.Content, @"\r\n?|\n", " ", RegexOptions.Multiline);
+                        type = "html";
+                    }
+
+                    var result = await InsertTemplate(type, template.Id, content);
+                } else {
+                    var insertTemplateJs = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/initTemplate", "js"));
+                    if (template.ContentType == ContentType.PlainText)
+                    {
+                        var templateText = Regex.Replace(template.Content, @"\r\n?|\n", "\\n", RegexOptions.Multiline);
+                        insertTemplateJs = ProcessWebTemplate(insertTemplateJs, "text", template.Id, templateText);
+                    }
+                    if (template.ContentType == ContentType.Html)
+                    {
+                        var templateText = Regex.Replace(template.Content, @"\r\n?|\n", " ", RegexOptions.Multiline);
+                        insertTemplateJs = ProcessWebTemplate(insertTemplateJs, "html", template.Id, templateText);
+                    }
+
+                    var result = await EvaluateJavaScriptAsync(insertTemplateJs);
+                }
             }
             catch (Exception ex)
             {
