@@ -186,7 +186,7 @@ namespace Mark5.ServiceReference.DataContract
         [DataMember(Name = "FolderId", Order = 0)]
         public int FolderId { get; set; } = -1;
 
-        [DataMember(Name = "FolderGuid", Order = 0)]
+        [DataMember(Name = "FolderGuid", Order = 1)]
         public Guid FolderGuid { get; set; } = Guid.Empty;
 
         [DataMember(Name = "StartId", Order = 0)]
