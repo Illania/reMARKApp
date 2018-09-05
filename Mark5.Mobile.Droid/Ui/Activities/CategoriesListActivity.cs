@@ -17,7 +17,7 @@ namespace Mark5.Mobile.Droid
         public const string CategoriesResultKey = "CategoriesResult_0b8c55ac-2dbe-441e-af92-daa330d040fe";
 
         Toolbar toolbar;
-        NewCategoriesListFragment clf;
+        CategoriesListFragment clf;
 
         public static Intent CreateIntent(Context context, BusinessEntityPreview bep)
         {
@@ -49,7 +49,7 @@ namespace Mark5.Mobile.Droid
                 string tag;
                 var bep = Serializer.Deserialize<BusinessEntityPreview>(Intent.Extras.GetString(BusinessEntityPreviewIntentKey));
                 var ft = SupportFragmentManager.BeginTransaction();
-                (clf, tag) = NewCategoriesListFragment.NewInstance(bep);
+                (clf, tag) = CategoriesListFragment.NewInstance(bep);
 
                 ft.Replace(Resource.Id.fragment_container, clf, tag);
                 ft.Commit();
@@ -58,7 +58,7 @@ namespace Mark5.Mobile.Droid
             }
             else
             {
-                clf = (NewCategoriesListFragment)SupportFragmentManager.FindFragmentById(Resource.Id.fragment_container);
+                clf = (CategoriesListFragment)SupportFragmentManager.FindFragmentById(Resource.Id.fragment_container);
                 CommonConfig.Logger.Info($"Restored {nameof(CategoriesListActivity)}");
             }
         }

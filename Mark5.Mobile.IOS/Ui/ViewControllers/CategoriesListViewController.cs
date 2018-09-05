@@ -28,18 +28,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         CancellationTokenSource searchCancellationTokenSource;
         readonly List<CancellationTokenSource> searchCancellationTokenSourceList = new List<CancellationTokenSource>();
 
-        public override void LoadView()
-        {
-            base.LoadView();
-
-            if (BusinessEntityPreview != null)
-                CommonConfig.UsageAnalytics.LogEvent(new OpenCategoriesEvent(BusinessEntityPreview.ModuleType));
-
-            InitializeView();
-            InitializeNavigationBar();
-            InitializeSearchBar();
-        }
-
         public CategoriesListViewController(BusinessEntityPreview businessEntityPreview) : base(UITableViewStyle.Grouped)
         {
             this.BusinessEntityPreview = businessEntityPreview;
@@ -52,6 +40,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 categories.AddRange(contactPreview.Categories);
             }
+        }
+
+        public override void LoadView()
+        {
+            base.LoadView();
+
+            if (BusinessEntityPreview != null)
+                CommonConfig.UsageAnalytics.LogEvent(new OpenCategoriesEvent(BusinessEntityPreview.ModuleType));
+
+            InitializeView();
+            InitializeNavigationBar();
+            InitializeSearchBar();
         }
 
         public override void ViewWillAppear(bool animated)
@@ -74,9 +74,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 await RefreshDataAsync();
 
             if (Integration.IsRunningAtLeast(11))
-            {
-                NavigationItem.SearchController = searchController;
-            }
+               NavigationItem.SearchController = searchController;
+        }
+
+        public override void ViewWillDisappear(bool animated)
+        {
+            base.ViewWillDisappear(animated);
+            DeinitializeHandlers();
         }
 
         public override void DidReceiveMemoryWarning()
@@ -107,6 +111,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             searchController = null;
         }
 
+        #region Initializing/deinitializing
         void InitializeView()
         {
             TableView.Source = new DataSource(this, TableView);
@@ -115,17 +120,32 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             TableView.AllowsSelection = true;
         }
 
+        void InitializeNavigationBar()
+        {
+            Title = Localization.GetString("categories");
+            cancelBtnItem = new UIBarButtonItem(UIBarButtonSystemItem.Cancel);
+            cancelBtnItem.Clicked += CancelBtnItem_Clicked;
+            NavigationItem.SetLeftBarButtonItem(cancelBtnItem, false);
+            saveBtnItem = new UIBarButtonItem(UIBarButtonSystemItem.Save);
+            saveBtnItem.Clicked += SaveBtnItem_Clicked;
+            NavigationItem.SetRightBarButtonItem(saveBtnItem, false);
+        }
+
+        protected virtual void DeinitializeHandlers()
+        {
+            if (cancelBtnItem != null)
+                cancelBtnItem.Clicked -= CancelBtnItem_Clicked;
+
+            if (saveBtnItem != null)
+                saveBtnItem.Clicked -= SaveBtnItem_Clicked;
+        }
+        #endregion
+
         public async Task RefreshDataAsync()
         {
-            if (BusinessEntityPreview is DocumentPreview documentPreview)
-            {
-                allCategories = await Managers.DocumentsManager.GetAllCategoriesAsync();
-            }
-
-            if (BusinessEntityPreview is ContactPreview contactPreview)
-            {
-                allCategories = await Managers.ContactsManager.GetAllCategoriesAsync();  
-            }
+            allCategories = BusinessEntityPreview is DocumentPreview documentPreview
+                ? await Managers.DocumentsManager.GetAllCategoriesAsync()
+                : await Managers.ContactsManager.GetAllCategoriesAsync();
 
             ReloadTable();
         }
@@ -164,19 +184,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         }
 
         List<Category> GetAvailableCategories() {
-            if (BusinessEntityPreview is DocumentPreview documentPreview)
-            {
-                ((DataSource)TableView.Source).SetItems(DataSource.Section.Selected, categories);
-                return allCategories.Where(x => !categories.Contains(x)).ToList();
-            }
-
-            if (BusinessEntityPreview is ContactPreview contactPreview)
-            {
-                ((DataSource)TableView.Source).SetItems(DataSource.Section.Selected, categories);
-                return allCategories.Where(x => !categories.Contains(x)).ToList();
-            }
-
-            return new List<Category>();
+            ((DataSource)TableView.Source).SetItems(DataSource.Section.Selected, categories);
+            return allCategories.Where(x => !categories.Contains(x)).ToList();
         }
 
         #region Search related
@@ -247,17 +256,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var searchResultCategories = new List<Category>();
 
-                if (BusinessEntityPreview is DocumentPreview documentPreview)
-                {
-                    ((DataSource)TableView.Source).SetItems(DataSource.Section.Selected, documentPreview.Categories);
-                    searchResultCategories = allCategories.Where(x => x.Name.ToLower().Contains(searchText.ToLower()) && !categories.Contains(x)).ToList();
-                }
-
-                if (BusinessEntityPreview is ContactPreview contactPreview)
-                {
-                    ((DataSource)TableView.Source).SetItems(DataSource.Section.Selected, contactPreview.Categories);
-                    searchResultCategories = allCategories.Where(x => x.Name.ToLower().Contains(searchText.ToLower()) && !categories.Contains(x)).ToList();
-                }
+                searchResultCategories = allCategories.Where(x => x.Name.ToLower().Contains(searchText.ToLower()) && !categories.Contains(x)).ToList();
 
                 if (cancellationToken.IsCancellationRequested)
                     return;
@@ -266,102 +265,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error(ex);
-            }
-        }
-
-        protected class SearchDataSource : UITableViewSource
-        {
-            public bool Empty => items.Count < 1;
-            public List<Category> Items => items.ToList();
-
-            string searchQuery = String.Empty;
-
-            readonly WeakReference<CategoriesListViewController> viewControllerWeakReference;
-            readonly WeakReference<UITableView> tableViewWeakReference;
-            readonly List<Category> items = new List<Category>();
-
-            bool loading = true;
-
-            public SearchDataSource(CategoriesListViewController viewController, UITableView tableView)
-            {
-                viewControllerWeakReference = viewController.Wrap();
-                tableViewWeakReference = tableView.Wrap();
-            }
-
-            public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
-            {
-                if (loading)
-                    return tableView.DequeueReusableCell(WaitTableViewCell.DefaultId) as WaitTableViewCell ?? new WaitTableViewCell();
-
-                if (Empty)
-                {
-                    var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.DefaultId) as EmptyTableViewCell ?? new EmptyTableViewCell();
-                    emptyCell.Initialize(Localization.GetString("no_categories"));
-                    return emptyCell;
-                }
-
-                var cell = tableView.DequeueReusableCell(CategoriesTableViewCell.DefaultId) as CategoriesTableViewCell ?? new CategoriesTableViewCell();
-                cell.Initialize(items[indexPath.Row]);
-                cell.Accessory = UITableViewCellAccessory.None;
-
-                return cell;
-            }
-
-            public override nint RowsInSection(UITableView tableview, nint section)
-            {
-                return loading || Empty ? 1 : (nint)items.Count;
-            }
-
-            public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
-            {
-                var category = items[indexPath.Row];
-                viewControllerWeakReference.Unwrap()?.MoveCategory(category);
-                viewControllerWeakReference.Unwrap()?.ReloadTable();
-            }
-
-            public void SetSearchCategories(List<Category> categories, string searchText)
-            {
-                if ((items != null) && searchQuery.Equals(searchText))
-                {
-                    items.Union(categories, new CategoryComparer()).ToList();
-                    tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
-                }
-                else
-                {
-                    items.Clear();
-                    items.AddRange(categories);
-                    loading = false;
-                    tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
-                }
-
-                searchQuery = searchText;
-            }
-
-            public void Reset()
-            {
-                loading = true;
-                items.Clear();
-                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                CommonConfig.Logger.Error("Error while searching.", ex);
             }
         }
         #endregion
 
         #region Navigation bar related
-        void InitializeNavigationBar()
-        {
-            Title = Localization.GetString("categories");
-            cancelBtnItem = new UIBarButtonItem(UIBarButtonSystemItem.Cancel);
-            cancelBtnItem.Clicked += async (sender, e) => await CancelBtnItem_ClickedAsync(sender, e);
-            NavigationItem.SetLeftBarButtonItem(cancelBtnItem, false);
-            saveBtnItem = new UIBarButtonItem(UIBarButtonSystemItem.Save, SaveBtnItem_Clicked);
-            NavigationItem.SetRightBarButtonItem(saveBtnItem, false);
-        }
-
-        async Task CancelBtnItem_ClickedAsync(object sender, EventArgs e)
-        {
-            if (BusinessEntityPreview is DocumentPreview documentPreview && categories.SequenceEqual(documentPreview.Categories) 
-                || BusinessEntityPreview is ContactPreview contactPreview && categories.SequenceEqual(contactPreview.Categories))
+        async void CancelBtnItem_Clicked(object sender, EventArgs e) {
+            if (BusinessEntityPreview is DocumentPreview documentPreview && categories.SequenceEqual(documentPreview.Categories)
+              || BusinessEntityPreview is ContactPreview contactPreview && categories.SequenceEqual(contactPreview.Categories))
             {
                 DismissViewController(true, null);
             }
@@ -369,7 +281,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var response = await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("changes_not_saved"),
                                                                  Localization.GetString("changes_not_saved_description"),
-                                                                 Localization.GetString("ok"), 
+                                                                 Localization.GetString("ok"),
                                                                  Localization.GetString("cancel"));
                 if (response)
                     DismissViewController(true, null);
@@ -537,14 +449,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(section), UITableViewRowAnimation.Fade);
             }
 
-            public void Reload()
-            {
-                tableViewWeakReference.Unwrap()?.BeginUpdates();
-                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(Section.Available), UITableViewRowAnimation.Fade);
-                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(Section.Selected), UITableViewRowAnimation.Fade);
-                tableViewWeakReference.Unwrap()?.EndUpdates();
-            }
-
             public override nint NumberOfSections(UITableView tableView) => items.Keys.Count;
 
             public void Reset()
@@ -578,6 +482,82 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override void WillDisplayHeaderView(UITableView tableView, UIView headerView, nint section) => headerView.ApplyTheme();
 
+        }
+
+        class SearchDataSource : UITableViewSource
+        {
+            public bool Empty => items.Count < 1;
+            public List<Category> Items => items.ToList();
+
+            string searchQuery = String.Empty;
+
+            readonly WeakReference<CategoriesListViewController> viewControllerWeakReference;
+            readonly WeakReference<UITableView> tableViewWeakReference;
+            readonly List<Category> items = new List<Category>();
+
+            bool loading = true;
+
+            public SearchDataSource(CategoriesListViewController viewController, UITableView tableView)
+            {
+                viewControllerWeakReference = viewController.Wrap();
+                tableViewWeakReference = tableView.Wrap();
+            }
+
+            public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
+            {
+                if (loading)
+                    return tableView.DequeueReusableCell(WaitTableViewCell.DefaultId) as WaitTableViewCell ?? new WaitTableViewCell();
+
+                if (Empty)
+                {
+                    var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.DefaultId) as EmptyTableViewCell ?? new EmptyTableViewCell();
+                    emptyCell.Initialize(Localization.GetString("no_categories"));
+                    return emptyCell;
+                }
+
+                var cell = tableView.DequeueReusableCell(CategoriesTableViewCell.DefaultId) as CategoriesTableViewCell ?? new CategoriesTableViewCell();
+                cell.Initialize(items[indexPath.Row]);
+                cell.Accessory = UITableViewCellAccessory.None;
+
+                return cell;
+            }
+
+            public override nint RowsInSection(UITableView tableview, nint section)
+            {
+                return loading || Empty ? 1 : (nint)items.Count;
+            }
+
+            public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
+            {
+                var category = items[indexPath.Row];
+                viewControllerWeakReference.Unwrap()?.MoveCategory(category);
+                viewControllerWeakReference.Unwrap()?.ReloadTable();
+            }
+
+            public void SetSearchCategories(List<Category> categories, string searchText)
+            {
+                if ((items != null) && searchQuery.Equals(searchText))
+                {
+                    items.Union(categories, new CategoryComparer()).ToList();
+                    tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                }
+                else
+                {
+                    items.Clear();
+                    items.AddRange(categories);
+                    loading = false;
+                    tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+                }
+
+                searchQuery = searchText;
+            }
+
+            public void Reset()
+            {
+                loading = true;
+                items.Clear();
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+            }
         }
         #endregion
     }

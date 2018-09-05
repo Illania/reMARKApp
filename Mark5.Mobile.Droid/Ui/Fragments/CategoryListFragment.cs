@@ -21,7 +21,7 @@ using TinyMessenger;
 
 namespace Mark5.Mobile.Droid
 {
-    public class NewCategoriesListFragment : BaseFragment, SearchView.IOnQueryTextListener, IMenuItemOnActionExpandListener, IMenuItemOnMenuItemClickListener
+    public class CategoriesListFragment : BaseFragment, SearchView.IOnQueryTextListener, IMenuItemOnActionExpandListener, IMenuItemOnMenuItemClickListener
     {
         const string BusinessEntityPreviewBundleKey = "BusinessEntityPreview_8938f3ae-6cb4-48c1-9c19-34cf533bcaed";
         const int saveBtnId = 10;
@@ -44,7 +44,7 @@ namespace Mark5.Mobile.Droid
         List<Category> availableCategories = new List<Category>();
         List<Section> Sections { get; set; }
 
-        public static (NewCategoriesListFragment fragment, string tag) NewInstance(BusinessEntityPreview businessEntity)
+        public static (CategoriesListFragment fragment, string tag) NewInstance(BusinessEntityPreview businessEntity)
         {
             CommonConfig.UsageAnalytics.LogEvent(new OpenCategoriesEvent(businessEntity.ModuleType));
 
@@ -53,12 +53,12 @@ namespace Mark5.Mobile.Droid
             if (businessEntity != null)
                 args.PutString(BusinessEntityPreviewBundleKey, Serializer.Serialize(businessEntity));
 
-            var fragment = new NewCategoriesListFragment
+            var fragment = new CategoriesListFragment
             {
                 Arguments = args
             };
 
-            var tag = $"{nameof(NewCategoriesListFragment)} [businessEntity.id={businessEntity.Id}, businessEntity.objectType={businessEntity.ObjectType}]";
+            var tag = $"{nameof(CategoriesListFragment)} [businessEntity.id={businessEntity.Id}, businessEntity.objectType={businessEntity.ObjectType}]";
 
             return (fragment, tag);
         }
@@ -74,7 +74,7 @@ namespace Mark5.Mobile.Droid
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(NewCategoriesListFragment)} [businessEntity.id={BusinessEntityPreview?.Id}, businessEntity.objectType={BusinessEntityPreview?.ObjectType}]");
+            CommonConfig.Logger.Info($"Creating {nameof(CategoriesListFragment)} [businessEntity.id={BusinessEntityPreview?.Id}, businessEntity.objectType={BusinessEntityPreview?.ObjectType}]");
 
             var rootView = inflater.Inflate(Resource.Layout.list, container, false);
 
@@ -118,13 +118,13 @@ namespace Mark5.Mobile.Droid
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.categories);
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
-            CommonConfig.Logger.Info($"Created {nameof(NewCategoriesListFragment)} [businessEntity.id={BusinessEntityPreview?.Id}, businessEntity.objectType={BusinessEntityPreview?.ObjectType}]");
+            CommonConfig.Logger.Info($"Created {nameof(CategoriesListFragment)} [businessEntity.id={BusinessEntityPreview?.Id}, businessEntity.objectType={BusinessEntityPreview?.ObjectType}]");
         }
 
         public override void OnResume()
         {
             base.OnResume();
-            CommonConfig.Logger.Info($"Refreshing {nameof(NewCategoriesListFragment)} [businessEntity.id={BusinessEntityPreview?.Id}, businessEntity.objectType={BusinessEntityPreview?.ObjectType}]");
+            CommonConfig.Logger.Info($"Refreshing {nameof(CategoriesListFragment)} [businessEntity.id={BusinessEntityPreview?.Id}, businessEntity.objectType={BusinessEntityPreview?.ObjectType}]");
             SetDefaultSections();
             GetData();
         }
@@ -145,8 +145,6 @@ namespace Mark5.Mobile.Droid
         async void GetData()
         {
             RefreshLayout.Post(() => RefreshLayout.Refreshing = true);
-
-            await Task.Delay(300); // Let the animation finish
 
             switch (BusinessEntityPreview.ObjectType)
             {
@@ -192,13 +190,11 @@ namespace Mark5.Mobile.Droid
 
         public void AskIfShouldSave()
         {
-            if(!selectedCategories.SequenceEqual(originalCategories)) {
+            originalCategories.Sort((c1, c2) => String.Compare(c1.Name, c2.Name, true));
+            if (!selectedCategories.SequenceEqual(originalCategories)) {
                 Dialogs.ShowYesNoDialog(Context, Resource.String.changes_not_saved, Resource.String.changes_not_saved_description, Activity.Finish , null, Resource.String.ok, Resource.String.cancel);
             } else {
-                if (Activity != null)
-                {
-                    Activity.Finish();
-                }
+                Activity?.Finish();
             }
         }
 

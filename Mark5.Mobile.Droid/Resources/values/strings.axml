@@ -19,6 +19,7 @@
     <string name="attachments">Attachments:</string>
     <string name="autosave_recover_title">Recover email</string>
     <string name="autosave_recover_content">MARK5 recovered an autosaved email. Do you want to continue editing it?</string>
+    <string name="available">Available</string>
     <string name="bcc">Bcc</string>
     <string name="birthdate">Birthdate</string>
     <string name="by">by</string>
@@ -30,6 +31,8 @@
     <string name="categories">Categories</string>
     <string name="cc">Cc</string>
     <string name="choose_application">Choose an application</string>
+    <string name="changes_not_saved">Changes not saved!</string>
+    <string name="changes_not_saved_description">Current changes are not saved and will be discarded"</string>
     <string name="close_drawer">Close navigation drawer</string>
     <string name="comments">Comments</string>
     <string name="confirm">Confirm</string>
@@ -443,13 +446,10 @@
     <string name="youre_offline_message">This action cannot be performed offline</string>
     <string name="more">More</string>
     <string name="remove_from_folder">Remove from folder</string>
+    <string name="selected">Selected</string>
     <string name="swipe_actions_info">Select a swipe button below and choose which actions to quickly access when swiping emails in your inbox.</string>
     <string name="swipe_actions_right_title">Swipe right</string>
     <string name="swipe_actions_left_title">Swipe left</string>
     <string name="swipe_actions_defaults">Reset to default</string>
     <string name="swipe_actions_dialog_title">Select action</string>
-    <string name="available">Available</string>
-    <string name="selected">Selected</string>
-    <string name="changes_not_saved">Changes not saved!</string>
-    <string name="changes_not_saved_description">Current changes are not saved and will be discarded"</string>
 </resources>
