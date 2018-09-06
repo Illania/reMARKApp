@@ -177,6 +177,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 ((AppCompatActivity)Activity).SupportActionBar.Subtitle = RemoteFolder.Root ? null : RemoteFolder.Name;
             }
 
+            SetSections();
+
             CommonConfig.Logger.Info($"Created {nameof(FoldersListFragment)} [folder.id={RemoteFolder?.Id}, folder.name={RemoteFolder?.Name}]");
         }
 
@@ -216,7 +218,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
 
-            SetSections();
             RefreshData();
         }
 
