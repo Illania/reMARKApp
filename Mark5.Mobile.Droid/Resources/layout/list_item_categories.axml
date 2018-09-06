@@ -41,5 +41,14 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/fontListSmallLight" />
         </android.support.v7.widget.LinearLayoutCompat>
+        <android.support.v7.widget.AppCompatImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginLeft="16dp"
+            android:gravity="center"
+            android:id="@+id/list_item_check_mark"
+            android:src="@drawable/check_mark"
+        />
     </android.support.v7.widget.LinearLayoutCompat>
 </FrameLayout>

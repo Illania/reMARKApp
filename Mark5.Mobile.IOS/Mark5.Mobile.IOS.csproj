@@ -116,7 +116,6 @@
 		<Compile Include="Ui\TableViewCells\PhysicalAddressTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\ShortcodesTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\WaitTableViewCell.cs" />
-		<Compile Include="Ui\ViewControllers\CategoriesListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\CommentsListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ContactViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ContactsSearchResultsViewController.cs" />
@@ -218,7 +217,6 @@
 		<Compile Include="Ui\TableViewCells\AddEditTableViewCells\AddEditShortcodeTableViewCell\AddressTableViewCell.cs" />
 		<Compile Include="Utilities\AsyncHelpers.cs" />
 		<Compile Include="Ui\Common\AbstractTableViewController.cs" />
-		<Compile Include="Ui\ViewControllers\EditCategoriesListViewController.cs" />
 		<Compile Include="Ui\Common\KeyboardObserverInputAccessoryView.cs" />
 		<Compile Include="Ui\Common\DarkNavigationController.cs" />
 		<Compile Include="Utilities\Extensions\UIKeyboardEventArgsExtensions.cs" />
@@ -265,6 +263,7 @@
 		<Compile Include="Utilities\OnBoardingUtilities.cs" />
 		<Compile Include="Ui\ViewControllers\OnBoardingViewController.cs" />
 		<Compile Include="Ui\Common\BadgeBarButtonItem.cs" />
+		<Compile Include="Ui\ViewControllers\CategoriesListViewController.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

@@ -280,7 +280,6 @@
     <Compile Include="Ui\Common\LambdaEmptyAdapterObserver.cs" />
     <Compile Include="Ui\Common\SmoothActionBarDrawerToggle.cs" />
     <Compile Include="Ui\Common\ViewUtilities.cs" />
-    <Compile Include="Ui\Fragments\CategoriesListFragment.cs" />
     <Compile Include="Ui\Fragments\CommentsListFragment.cs" />
     <Compile Include="Ui\Fragments\ComposeDocumentFragment.cs" />
     <Compile Include="Ui\Fragments\ContactFragment.cs" />
@@ -291,7 +290,6 @@
     <Compile Include="Ui\Fragments\DocumentsListFragment.cs" />
     <Compile Include="Ui\Fragments\DocumentsSearchCriteriaFragment.cs" />
     <Compile Include="Ui\Fragments\DocumentsSearchResultsFragment.cs" />
-    <Compile Include="Ui\Fragments\EditCategoriesListFragment.cs" />
     <Compile Include="Ui\Fragments\FoldersNotificationsListFragment.cs" />
     <Compile Include="Ui\Fragments\NotificationsListFragment.cs" />
     <Compile Include="Ui\Fragments\ObjectActionsFragment.cs" />
@@ -452,6 +450,7 @@
     <Compile Include="Utilities\CallerId\CallStateBroadcastReceiver.cs" />
     <Compile Include="Ui\Fragments\SwipeActionsFragment.cs" />
     <Compile Include="Utilities\OnBoardingUtilities.cs" />
+    <Compile Include="Ui\Fragments\CategoriesListFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -803,6 +802,10 @@
     <AndroidResource Include="Resources\layout\mock_email.axml" />
     <AndroidResource Include="Resources\drawable\square_rounded_corners.axml" />
     <AndroidResource Include="Resources\drawable\gray_border.axml" />
+    <AndroidResource Include="Resources\drawable-hdpi\check_mark.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\check_mark.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\check_mark.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\check_mark.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FastScrollRecycler\FastScrollRecycler.csproj">
