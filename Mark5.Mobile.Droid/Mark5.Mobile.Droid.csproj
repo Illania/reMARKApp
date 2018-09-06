@@ -802,6 +802,10 @@
     <AndroidResource Include="Resources\layout\mock_email.axml" />
     <AndroidResource Include="Resources\drawable\square_rounded_corners.axml" />
     <AndroidResource Include="Resources\drawable\gray_border.axml" />
+    <AndroidResource Include="Resources\drawable-hdpi\check_mark.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\check_mark.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\check_mark.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\check_mark.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FastScrollRecycler\FastScrollRecycler.csproj">

@@ -385,14 +385,16 @@ namespace Mark5.Mobile.Droid
             {
                 if (holder is CategoryViewHolder)
                 {
+                    var (category,section) = GetItemAtPosition(position);
                     var fh = holder as CategoryViewHolder;
-                    var category = GetItemAtPosition(position).Category;
                     var viewHolder = holder as CategoryViewHolder;
 
                     viewHolder.Name = category.Name;
                     viewHolder.HexColor = category.HexColor;
                     viewHolder.Description = category.Description;
                     viewHolder.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, position)));
+
+                    viewHolder.CheckMark.Visibility = (section == Section.Available || section == Section.None) ? ViewStates.Gone : ViewStates.Visible;
                 }
                 else
                 {
@@ -488,6 +490,7 @@ namespace Mark5.Mobile.Droid
                 {
                     var itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.list_item_categories, parent, false);
                     var viewHolder = new CategoryViewHolder(itemView);
+
                     viewHolder.ItemClicked += (sender, e) =>
                     {
                         var position = parentView.GetChildLayoutPosition(e);
@@ -686,6 +689,8 @@ namespace Mark5.Mobile.Droid
             readonly AppCompatTextView descriptionTextView;
             readonly View selectedOverlay;
 
+            public AppCompatImageView CheckMark;
+
             public CategoryViewHolder(View itemView)
                 : base(itemView)
             {
@@ -693,6 +698,7 @@ namespace Mark5.Mobile.Droid
                 descriptionTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_categoty_description);
                 colorImageView = itemView.FindViewById<View>(Resource.Id.list_item_category_color);
                 selectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
+                CheckMark = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_check_mark);
             }
         }
 
