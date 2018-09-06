@@ -337,6 +337,9 @@
 		<Reference Include="HtmlAgilityPack">
 		  <HintPath>..\packages\HtmlAgilityPack.1.8.7\lib\netstandard2.0\HtmlAgilityPack.dll</HintPath>
 		</Reference>
+		<Reference Include="Polly">
+		  <HintPath>..\packages\Polly.6.1.0\lib\netstandard2.0\Polly.dll</HintPath>
+		</Reference>
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Mark5.Mobile.Common\Mark5.Mobile.Common.csproj">
