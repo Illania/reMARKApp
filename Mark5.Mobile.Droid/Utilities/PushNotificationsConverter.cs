@@ -15,11 +15,40 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public static PushNotification ConvertToPushNotification(this RemoteMessage m)
         {
-            return new PushNotification
+            if (m.Data.ContainsKey("data"))
             {
-                Data = Serializer.Deserialize<PushNotificationData>(m.Data["data"]),
-                Notification = Serializer.Deserialize<PushNotificationNotification>(m.Data["notification"])
-            };
+                return new PushNotification
+                {
+                    Data = Serializer.Deserialize<PushNotificationData>(m.Data["data"]),
+                    Notification = Serializer.Deserialize<PushNotificationNotification>(m.Data["notification"])
+                };
+            }
+            else
+            {
+                var data = new PushNotificationData
+                {
+                    Silent = m.Data.ContainsKey("silent") ? int.Parse(m.Data["silent"]) : 0,
+                    Guid = m.Data.ContainsKey("guid") ? Guid.Parse(m.Data["guid"]) : Guid.Empty,
+                    Type = m.Data.ContainsKey("type") ? (EventType)Enum.Parse(typeof(EventType), m.Data["type"]) : EventType.None,
+                    ObjectId = m.Data.ContainsKey("objectId") ? int.Parse(m.Data["objectId"]) : 0,
+                    FolderId = m.Data.ContainsKey("folderId") ? int.Parse(m.Data["folderId"]) : 0,
+                    ObjectType = m.Data.ContainsKey("objectType") ? (ObjectType)Enum.Parse(typeof(ObjectType), m.Data["objectType"]) : ObjectType.None,
+                    RemindOn = m.Data.ContainsKey("remindOn") ? m.Data["remindOn"] : null,
+                };
+
+                var notification = new PushNotificationNotification
+                {
+                    Title = m.Data.ContainsKey("title") ? m.Data["title"] : null,
+                    Body = m.Data.ContainsKey("body") ? m.Data["body"] : null,
+                    Icon = m.Data.ContainsKey("icon") ? m.Data["icon"] : null,
+                };
+
+                return new PushNotification
+                {
+                    Data = data,
+                    Notification = notification,
+                };
+            }
         }
 
         public static Notification ConvertToNotification(this PushNotification pn)

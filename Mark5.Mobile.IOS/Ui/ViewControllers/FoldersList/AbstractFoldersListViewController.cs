@@ -914,7 +914,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 var localFolders = new List<Folder>();
                 await Task.Run(() => SearchRecursively(root, searchText, localFolders, cancellationToken));
 
-#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+#pragma warning disable CS401 // Because this call is not awaited, execution of the current method continues before the call is completed
                 Task.Run(() => SearchRemoteFolders(searchText, cancellationToken));
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 

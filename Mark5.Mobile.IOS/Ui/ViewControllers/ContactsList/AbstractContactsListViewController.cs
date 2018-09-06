@@ -590,10 +590,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
         void ShowCategories(ContactPreview selectedContact)
         {
-            var vc = new CategoriesListViewController
-            {
-                BusinessEntityPreview = selectedContact
-            };
+            var vc = new CategoriesListViewController(selectedContact);
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
@@ -727,6 +724,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
         #endregion
 
         #region Utilities
+
+        protected void DisableSearchController()
+        {
+            if (searchController != null)
+                searchController.Active = false;
+        }
 
         void StartEditing()
         {

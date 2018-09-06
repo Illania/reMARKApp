@@ -1,5 +1,6 @@
 ﻿using SQLite;
 using System;
+using System.Collections.Generic;
 
 namespace Mark5.Mobile.Common.Model
 {
@@ -26,5 +27,25 @@ namespace Mark5.Mobile.Common.Model
         {
             return $"[Category: Id={Id}, Name={Name}]";
         }
+
+        public override bool Equals(object obj)
+        {
+            return (obj is Category y) && this.Id.Equals(y.Id);
+        }
+    }
+
+    public class CategoryComparer : IEqualityComparer<Category>
+    {
+
+        public bool Equals(Category x, Category y)
+        {
+            return x != null && y != null && x.Id.Equals(y.Id);
+        }
+
+        public int GetHashCode(Category obj)
+        {
+            return obj.Id;
+        }
+
     }
 }

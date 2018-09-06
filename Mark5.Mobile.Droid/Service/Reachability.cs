@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
@@ -25,9 +26,24 @@ namespace Mark5.Mobile.Droid.Service
 
         public event EventHandler<ReachabilityRefreshedEventArgs> ReachabilityRefreshed = delegate { };
 
-        public Reachability()
+        CancellationTokenSource cancellationTokenSource;
+
+        private static Reachability instance;
+
+        private Reachability()
         {
             IsReachable = CheckNetworkAvailability();
+        }
+
+        public static Reachability Instance
+        {
+            get
+            {
+                if (instance == null)
+                    instance = new Reachability();
+
+                return instance;
+            }
         }
 
         public async Task<bool> Refresh(ReachabilityMode mode = ReachabilityMode.NetworkAvailability | ReachabilityMode.Service, bool testOnly = false)
@@ -60,12 +76,24 @@ namespace Mark5.Mobile.Droid.Service
                 ReachabilityRefreshed(this, new ReachabilityRefreshedEventArgs(lastResult != result, result));
             }
 
+            if (cancellationTokenSource != null)
+            {
+                cancellationTokenSource.Cancel();
+                cancellationTokenSource = null;
+            }
+
+            if (!result)
+            {
+                cancellationTokenSource = new CancellationTokenSource();
+                CheckServiceAvailabilityContinuously(cancellationTokenSource.Token);
+            }
+
             return result;
         }
 
         public bool CheckNetworkAvailability()
         {
-            var cm = (ConnectivityManager) Application.Context.GetSystemService(Context.ConnectivityService);
+            var cm = (ConnectivityManager) Application.Context.GetSystemService(Android.Content.Context.ConnectivityService);
             var result = cm.ActiveNetworkInfo?.IsConnected ?? false;
 
             CommonConfig.Logger.Info($"Network availability: {result}");
@@ -149,6 +177,22 @@ namespace Mark5.Mobile.Droid.Service
                 CommonConfig.Logger.Info("Cannot check service availability", ex);
 
                 return false;
+            }
+        }
+
+        async Task CheckServiceAvailabilityContinuously(CancellationToken cancellationToken)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                var response = await CheckWithService();
+
+                if (response)
+                {
+                    cancellationTokenSource.Cancel();
+                    ReachabilityRefreshed(this, new ReachabilityRefreshedEventArgs(true, true));
+                }
+
+                await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
             }
         }
     }

@@ -850,10 +850,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void DoAssignCategory()
         {
-            var vc = new CategoriesListViewController
-            {
-                BusinessEntityPreview = documentPreview
-            };
+            var vc = new CategoriesListViewController(documentPreview);
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
