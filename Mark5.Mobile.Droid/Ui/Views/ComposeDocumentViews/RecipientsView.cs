@@ -238,25 +238,21 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                     });
                 }
 
-                var internalUsers = GetInternalUsers().ToList();
-
-                if (internalUsers.Count > 0)
+                foreach (var user in GetInternalUsers())
                 {
-                    foreach (var user in internalUsers)
-                    {
-                        var userGuid = systemUsersDepartments.Users.FirstOrDefault(su => su.Username == user)?.Guid;
+                    var userGuid = systemUsersDepartments.Users.FirstOrDefault(su => su.Username == user)?.Guid;
 
-                        if (userGuid != null)
+                    if (userGuid != null)
+                    {
+                        DocumentPreview.Addresses.Add(new DocumentAddress
                         {
-                            DocumentPreview.Addresses.Add(new DocumentAddress
-                            {
-                                Address = userGuid.ToString(),
-                                AddressType = AddressType,
-                                Type = CommunicationAddressType.Internal
-                            });
-                        }
+                            Address = userGuid.ToString(),
+                            AddressType = AddressType,
+                            Type = CommunicationAddressType.Internal
+                        });
                     }
                 }
+
             });
 
             return;

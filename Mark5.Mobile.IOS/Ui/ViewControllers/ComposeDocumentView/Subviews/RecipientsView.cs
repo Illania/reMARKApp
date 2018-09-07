@@ -262,25 +262,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                         Type = CommunicationAddressType.Email
                     });
 
-                var internalUsers = GetInternalUsers().ToList();
-
-                if (internalUsers.Count > 0)
+                foreach (var user in GetInternalUsers())
                 {
-                    foreach (var user in GetInternalUsers())
-                    {                        
                     var userGuid = SystemUsersDepartments.Users.FirstOrDefault(su => su.Username == user)?.Guid;
 
-                        if (userGuid != null)
+                    if (userGuid != null)
+                    {
+                        DocumentPreview.Addresses.Add(new DocumentAddress
                         {
-                            DocumentPreview.Addresses.Add(new DocumentAddress
-                            {
-                                Address = userGuid.ToString(),
-                                AddressType = AddressType,
-                                Type = CommunicationAddressType.Internal
-                            });
-                        }
+                            Address = userGuid.ToString(),
+                            AddressType = AddressType,
+                            Type = CommunicationAddressType.Internal
+                        });
                     }
                 }
+
             });
 
             return Task.CompletedTask;
