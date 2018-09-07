@@ -240,7 +240,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
                 foreach (var user in GetInternalUsers())
                 {
-                    var userGuid = systemUsersDepartments.Users.FirstOrDefault(su => su.Username == user)?.Guid;
+                    var userGuid = systemUsersDepartments.Users.FirstOrDefault(su => String.Equals(su.Username,user,StringComparison.OrdinalIgnoreCase))?.Guid;
 
                     if (userGuid != null)
                     {
@@ -276,7 +276,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 newInternalUsers.Append(emailEditor.Text);
                 if (!emailEditor.Text.EndsWith(RecipientSeperator, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(emailEditor.Text))
                     newInternalUsers.Append(RecipientSeperator);
-                newInternalUsers.Append(string.Join(RecipientSeperator, matches.Where(m => systemUsersDepartments.Users.FirstOrDefault(su => su.Username == m.Value).Username == m.Value).Select(m => m.Value)));
+                newInternalUsers.Append(string.Join(RecipientSeperator, matches.Where(m => systemUsersDepartments.Users.FirstOrDefault(su => String.Equals(su.Username, m.Value, StringComparison.OrdinalIgnoreCase)).Username == m.Value).Select(m => m.Value)));
                 newInternalUsers.Append(RecipientSeperator);
 
                 emailEditor.Text = newInternalUsers.ToString();
@@ -548,7 +548,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
             foreach (Match match in internalUserMatches)
             {
-                if (systemUsersDepartments != null && systemUsersDepartments.Users.FirstOrDefault(su => su.Username == match.Value) != null)
+                if (systemUsersDepartments != null && systemUsersDepartments.Users.FirstOrDefault(su => String.Equals(su.Username, match.Value, StringComparison.OrdinalIgnoreCase)) != null)
                     SetEmailStyle(match.Index, match.Index + match.Length);
             }
         }

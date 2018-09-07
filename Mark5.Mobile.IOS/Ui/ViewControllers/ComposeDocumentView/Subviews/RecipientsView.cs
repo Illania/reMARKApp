@@ -264,7 +264,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
                 foreach (var user in GetInternalUsers())
                 {
-                    var userGuid = SystemUsersDepartments.Users.FirstOrDefault(su => su.Username == user)?.Guid;
+                    var userGuid = SystemUsersDepartments.Users.FirstOrDefault(su => String.Equals(su.Username, user, StringComparison.OrdinalIgnoreCase))?.Guid;
 
                     if (userGuid != null)
                     {
@@ -451,7 +451,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
             foreach (Match match in internalUserMatches)
             {
-                if (SystemUsersDepartments != null && SystemUsersDepartments.Users.FirstOrDefault(su => su.Username == match.Value) != null)
+                if (SystemUsersDepartments != null && SystemUsersDepartments.Users.FirstOrDefault(su => String.Equals(su.Username, match.Value, StringComparison.OrdinalIgnoreCase)) != null)
                     TextView.TextStorage.AddAttribute(UIStringAttributeKey.ForegroundColor, Theme.TintColor, new NSRange(match.Index, match.Length));
             }
 
@@ -504,10 +504,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         void SetInternalUsers(string users)
         {
-            if (Validator.ContainsValidUsernames(users, out MatchCollection matches))
+            if (Validator.ContainsValidUsernames(users, out IEnumerable<Match> matches))
             {
                 var sb = new StringBuilder();
-                sb.Append(string.Join(RecipientSeperator, matches.Cast<Match>().Select(m => m.Value)));
+                sb.Append(string.Join(RecipientSeperator, matches.Select(m => m.Value)));
                 
                 sb.Append(RecipientSeperator);
                 
@@ -519,8 +519,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             }
         }
 
-        IEnumerable<string> GetInternalUsers() => Validator.ContainsValidUsernames(TextView.Text, out MatchCollection matches)
-                                                           ? matches.Cast<Match>().Select(m => m.Value).Distinct().ToArray()
+        IEnumerable<string> GetInternalUsers() => Validator.ContainsValidUsernames(TextView.Text, out IEnumerable<Match> matches)
+                                                           ? matches.Select(m => m.Value).Distinct().ToArray()
                                                            : new string[0];
         #region Public methods
 
@@ -603,13 +603,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         public void AddInternalUsers(string internalUsers)
         {
-            if (Validator.ContainsValidUsernames(internalUsers, out MatchCollection matches))
+            if (Validator.ContainsValidUsernames(internalUsers, out IEnumerable<Match> matches))
             {
                 var newInternalUsers = new StringBuilder();
                 newInternalUsers.Append(TextView.Text);
                 if (!TextView.Text.EndsWith(RecipientSeperator, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(TextView.Text))
                     newInternalUsers.Append(RecipientSeperator);
-                newInternalUsers.Append(string.Join(RecipientSeperator, matches.Cast<Match>().Where(m => SystemUsersDepartments.Users.FirstOrDefault(su => su.Username == m.Value).Username == m.Value).Select(m => m.Value)));
+                newInternalUsers.Append(string.Join(RecipientSeperator, matches.Where(m => SystemUsersDepartments.Users.FirstOrDefault(su => String.Equals(su.Username, m.Value, StringComparison.OrdinalIgnoreCase)).Username == m.Value).Select(m => m.Value)));
                 newInternalUsers.Append(RecipientSeperator);
 
                 TextView.TextStorage.BeginEditing();
