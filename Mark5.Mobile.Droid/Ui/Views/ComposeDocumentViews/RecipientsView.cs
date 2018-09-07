@@ -270,13 +270,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public void AddInternalUsers(string internalUsers)
         {
-            if (Validator.ContainsValidUsernames(internalUsers, out MatchCollection matches))
+            if (Validator.ContainsValidUsernames(internalUsers, out IEnumerable<Match> matches))
             {
                 var newInternalUsers = new StringBuilder();
                 newInternalUsers.Append(emailEditor.Text);
                 if (!emailEditor.Text.EndsWith(RecipientSeperator, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(emailEditor.Text))
                     newInternalUsers.Append(RecipientSeperator);
-                newInternalUsers.Append(string.Join(RecipientSeperator, matches.Cast<Match>().Where(m => systemUsersDepartments.Users.FirstOrDefault(su => su.Username == m.Value).Username == m.Value).Select(m => m.Value)));
+                newInternalUsers.Append(string.Join(RecipientSeperator, matches.Where(m => systemUsersDepartments.Users.FirstOrDefault(su => su.Username == m.Value).Username == m.Value).Select(m => m.Value)));
                 newInternalUsers.Append(RecipientSeperator);
 
                 emailEditor.Text = newInternalUsers.ToString();
@@ -418,10 +418,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         void SetInternalUsers(string users)
         {
-            if (Validator.ContainsValidUsernames(users, out MatchCollection matches))
+            if (Validator.ContainsValidUsernames(users, out IEnumerable<Match> matches))
             {
                 var sb = new StringBuilder();
-                sb.Append(string.Join(RecipientSeperator, matches.Cast<Match>().Select(m => m.Value)));
+                sb.Append(string.Join(RecipientSeperator, matches.Select(m => m.Value)));
 
                 sb.Append(RecipientSeperator);
 
@@ -433,8 +433,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
         }
 
-        IEnumerable<string> GetInternalUsers() => Validator.ContainsValidUsernames(emailEditor.Text, out MatchCollection matches) ?
-                                                    matches.Cast<Match>().Select(m => m.Value).Distinct().ToList() :
+        IEnumerable<string> GetInternalUsers() => Validator.ContainsValidUsernames(emailEditor.Text, out IEnumerable<Match> matches) ?
+                                                    matches.Select(m => m.Value).Distinct().ToList() :
                                                     new List<string>();
 
         void Clear()

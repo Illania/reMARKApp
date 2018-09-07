@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Mark5.Mobile.Common.Utilities
@@ -86,18 +87,23 @@ namespace Mark5.Mobile.Common.Utilities
 
         public static bool ContainsValidUsernames(string text)
         {
-            return ContainsValidUsernames(text, out MatchCollection mc);
+            return ContainsValidUsernames(text, out IEnumerable<Match> mc);
         }
 
-        public static bool ContainsValidUsernames(string text, out MatchCollection matches)
+        public static bool ContainsValidUsernames(string text, out IEnumerable<Match> matches)
         {
+            var emailMatches = ExtractValidEmails(text).Cast<Match>();
             matches = ExtractUsernames(text);
-            return matches.Count > 0;
+
+            if (emailMatches.Any())
+                matches = matches.Cast<Match>().Where(m => emailMatches.FirstOrDefault(em => em.Index <= m.Index && (em.Index+em.Length) >= (m.Index+m.Length)) == null).Select(m => m);
+
+            return matches.Any();
         }
 
-        public static MatchCollection ExtractUsernames(string text)
+        public static IEnumerable<Match> ExtractUsernames(string text)
         {
-            return Regex.Matches(text ?? string.Empty, UsernameRegex, RegexOptions.IgnoreCase);
+            return Regex.Matches(text ?? string.Empty, UsernameRegex, RegexOptions.IgnoreCase).Cast<Match>();
         }
     }
 }
