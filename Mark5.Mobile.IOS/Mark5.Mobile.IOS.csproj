@@ -116,7 +116,6 @@
 		<Compile Include="Ui\TableViewCells\PhysicalAddressTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\ShortcodesTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\WaitTableViewCell.cs" />
-		<Compile Include="Ui\ViewControllers\CategoriesListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\CommentsListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ContactViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ContactsSearchResultsViewController.cs" />
@@ -218,7 +217,6 @@
 		<Compile Include="Ui\TableViewCells\AddEditTableViewCells\AddEditShortcodeTableViewCell\AddressTableViewCell.cs" />
 		<Compile Include="Utilities\AsyncHelpers.cs" />
 		<Compile Include="Ui\Common\AbstractTableViewController.cs" />
-		<Compile Include="Ui\ViewControllers\EditCategoriesListViewController.cs" />
 		<Compile Include="Ui\Common\KeyboardObserverInputAccessoryView.cs" />
 		<Compile Include="Ui\Common\DarkNavigationController.cs" />
 		<Compile Include="Utilities\Extensions\UIKeyboardEventArgsExtensions.cs" />
@@ -265,6 +263,7 @@
 		<Compile Include="Utilities\OnBoardingUtilities.cs" />
 		<Compile Include="Ui\ViewControllers\OnBoardingViewController.cs" />
 		<Compile Include="Ui\Common\BadgeBarButtonItem.cs" />
+		<Compile Include="Ui\ViewControllers\CategoriesListViewController.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
@@ -280,33 +279,15 @@
 		<Reference Include="InAppSettingsKit">
 			<HintPath>..\Components\InAppSettingsKit-2.6.0.0\lib\ios-unified\InAppSettingsKit.dll</HintPath>
 		</Reference>
-		<Reference Include="PreMailer.Net">
-			<HintPath>..\packages\PreMailer.Net.2.0.0-beta2\lib\netstandard1.3\PreMailer.Net.dll</HintPath>
-		</Reference>
 		<Reference Include="SQLite-net">
 		  <HintPath>..\packages\sqlite-net-pcl.1.4.118\lib\netstandard1.1\SQLite-net.dll</HintPath>
 		</Reference>
 		<Reference Include="MailBee.NET">
 		  <HintPath>..\packages\MailBee.NET.11.2.0\lib\netstandard2.0\MailBee.NET.dll</HintPath>
 		</Reference>
-		<Reference Include="SQLitePCLRaw.core">
-		  <HintPath>..\packages\SQLitePCLRaw.core.1.1.9\lib\Xamarin.iOS10\SQLitePCLRaw.core.dll</HintPath>
-		</Reference>
-		<Reference Include="SQLitePCLRaw.provider.sqlite3">
-		  <HintPath>..\packages\SQLitePCLRaw.provider.sqlite3.ios_unified.1.1.9\lib\Xamarin.iOS10\SQLitePCLRaw.provider.sqlite3.dll</HintPath>
-		</Reference>
-		<Reference Include="SQLitePCLRaw.batteries_green">
-		  <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.9\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_green.dll</HintPath>
-		</Reference>
-		<Reference Include="SQLitePCLRaw.batteries_v2">
-		  <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.9\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_v2.dll</HintPath>
-		</Reference>
 		<Reference Include="System.Web.Services" />
 		<Reference Include="PCLStorage">
 		  <HintPath>..\packages\PCLStorage.1.0.2\lib\portable-Xamarin.iOS+Xamarin.Mac\PCLStorage.dll</HintPath>
-		</Reference>
-		<Reference Include="AngleSharp">
-		  <HintPath>..\packages\AngleSharp.0.9.9.2\lib\portable-windows8+net45+windowsphone8+wpa+monoandroid+monotouch\AngleSharp.dll</HintPath>
 		</Reference>
 		<Reference Include="HockeySDK">
 		  <HintPath>..\packages\HockeySDK.Xamarin.5.1.2\lib\Xamarin.iOS10\HockeySDK.dll</HintPath>
@@ -314,17 +295,47 @@
 		<Reference Include="HockeySDK.iOSBindings">
 		  <HintPath>..\packages\HockeySDK.Xamarin.5.1.2\lib\Xamarin.iOS10\HockeySDK.iOSBindings.dll</HintPath>
 		</Reference>
-		<Reference Include="HtmlAgilityPack">
-		  <HintPath>..\packages\HtmlAgilityPack.1.7.1\lib\netstandard2.0\HtmlAgilityPack.dll</HintPath>
-		</Reference>
-		<Reference Include="Firebase.Analytics">
-		  <HintPath>..\packages\Xamarin.Firebase.iOS.Analytics.4.0.5\lib\Xamarin.iOS10\Firebase.Analytics.dll</HintPath>
-		</Reference>
 		<Reference Include="Newtonsoft.Json">
 		  <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\netstandard2.0\Newtonsoft.Json.dll</HintPath>
 		</Reference>
 		<Reference Include="ModernHttpClient">
 		  <HintPath>..\packages\modernhttpclient.2.4.2\lib\Xamarin.iOS10\ModernHttpClient.dll</HintPath>
+		</Reference>
+		<Reference Include="Polly">
+		  <HintPath>..\packages\Polly.6.1.0\lib\netstandard2.0\Polly.dll</HintPath>
+		</Reference>
+		<Reference Include="Firebase.Core">
+		  <HintPath>..\packages\Xamarin.Firebase.iOS.Core.5.0.5\lib\Xamarin.iOS10\Firebase.Core.dll</HintPath>
+		</Reference>
+		<Reference Include="Firebase.InstanceID">
+		  <HintPath>..\packages\Xamarin.Firebase.iOS.InstanceID.3.1.1\lib\Xamarin.iOS10\Firebase.InstanceID.dll</HintPath>
+		</Reference>
+		<Reference Include="Firebase.CloudMessaging">
+		  <HintPath>..\packages\Xamarin.Firebase.iOS.CloudMessaging.3.0.3\lib\Xamarin.iOS10\Firebase.CloudMessaging.dll</HintPath>
+		</Reference>
+		<Reference Include="Firebase.Analytics">
+		  <HintPath>..\packages\Xamarin.Firebase.iOS.Analytics.5.0.1\lib\Xamarin.iOS10\Firebase.Analytics.dll</HintPath>
+		</Reference>
+		<Reference Include="AngleSharp">
+		  <HintPath>..\packages\AngleSharp.0.9.10\lib\portable-windows8+net45+windowsphone8+wpa+monoandroid+monotouch\AngleSharp.dll</HintPath>
+		</Reference>
+		<Reference Include="PreMailer.Net">
+		  <HintPath>..\packages\PreMailer.Net.2.0.0\lib\netstandard2.0\PreMailer.Net.dll</HintPath>
+		</Reference>
+		<Reference Include="SQLitePCLRaw.core">
+		  <HintPath>..\packages\SQLitePCLRaw.core.1.1.11\lib\Xamarin.iOS10\SQLitePCLRaw.core.dll</HintPath>
+		</Reference>
+		<Reference Include="SQLitePCLRaw.provider.sqlite3">
+		  <HintPath>..\packages\SQLitePCLRaw.provider.sqlite3.ios_unified.1.1.11\lib\Xamarin.iOS10\SQLitePCLRaw.provider.sqlite3.dll</HintPath>
+		</Reference>
+		<Reference Include="SQLitePCLRaw.batteries_green">
+		  <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.11\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_green.dll</HintPath>
+		</Reference>
+		<Reference Include="SQLitePCLRaw.batteries_v2">
+		  <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.11\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_v2.dll</HintPath>
+		</Reference>
+		<Reference Include="HtmlAgilityPack">
+		  <HintPath>..\packages\HtmlAgilityPack.1.8.7\lib\netstandard2.0\HtmlAgilityPack.dll</HintPath>
 		</Reference>
 		<Reference Include="Polly">
 		  <HintPath>..\packages\Polly.6.1.0\lib\netstandard2.0\Polly.dll</HintPath>
@@ -681,9 +692,10 @@
 	  <Folder Include="Resources\html\changelogs\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
-	<Import Project="..\packages\NETStandard.Library.2.0.1\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.1\build\netstandard2.0\NETStandard.Library.targets')" />
 	<Import Project="..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets" Condition="Exists('..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets')" />
 	<Import Project="..\packages\Xamarin.Firebase.iOS.Analytics.4.0.5\build\Xamarin.Firebase.iOS.Analytics.targets" Condition="Exists('..\packages\Xamarin.Firebase.iOS.Analytics.4.0.5\build\Xamarin.Firebase.iOS.Analytics.targets')" />
 	<Import Project="..\packages\Xamarin.Build.Download.0.4.11\build\Xamarin.Build.Download.targets" Condition="Exists('..\packages\Xamarin.Build.Download.0.4.11\build\Xamarin.Build.Download.targets')" />
 	<Import Project="..\packages\Xamarin.Firebase.iOS.InstanceID.3.1.1\build\Xamarin.Firebase.iOS.InstanceID.targets" Condition="Exists('..\packages\Xamarin.Firebase.iOS.InstanceID.3.1.1\build\Xamarin.Firebase.iOS.InstanceID.targets')" />
+	<Import Project="..\packages\Xamarin.Firebase.iOS.Analytics.5.0.1\build\Xamarin.Firebase.iOS.Analytics.targets" Condition="Exists('..\packages\Xamarin.Firebase.iOS.Analytics.5.0.1\build\Xamarin.Firebase.iOS.Analytics.targets')" />
+	<Import Project="..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets')" />
 </Project>
