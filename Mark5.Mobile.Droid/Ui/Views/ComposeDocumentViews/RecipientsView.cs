@@ -249,23 +249,22 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
             await AsyncHelpers.RunOnUiThreadAsync((Activity)Context, () =>
             {
-            foreach (var email in GetEmails())
-            {
-                DocumentPreview.Addresses.Add(new DocumentAddress
+                foreach (var email in GetEmails())
                 {
-                    Address = email,
-                    AddressType = AddressType,
-                    Type = CommunicationAddressType.Email
-                });
-            }
-
+                    DocumentPreview.Addresses.Add(new DocumentAddress
+                    {
+                        Address = email,
+                        AddressType = AddressType,
+                        Type = CommunicationAddressType.Email
+                    });
+                }
 
                 if (ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Major >= 3 && ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Minor >= 2)
                 {
                     foreach (var user in GetInternalUsers())
                     {
-                        var userGuid = systemUsersDepartments.Users.FirstOrDefault(su => String.Equals(su.Username,user,StringComparison.OrdinalIgnoreCase))?.Guid;
-                        
+                        var userGuid = systemUsersDepartments.Users.FirstOrDefault(su => String.Equals(su.Username, user, StringComparison.OrdinalIgnoreCase))?.Guid;
+
                         if (userGuid != null)
                         {
                             DocumentPreview.Addresses.Add(new DocumentAddress
