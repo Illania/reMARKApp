@@ -162,7 +162,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             if (RestoreWorkingCopy)
             {
                 SetEmails(DocumentPreview.Addresses.Where(a => a.AddressType == AddressType && a.Type == CommunicationAddressType.Email).Select(a => a.Address));
-                AddInternalUsersFromGuids(DocumentPreview.Addresses.Where(a => a.AddressType == AddressType && a.Type == CommunicationAddressType.Internal).Select(a => a.Address));
+
+                if (ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Major >= 3 && ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Minor >= 2)
+                    AddInternalUsersFromGuids(DocumentPreview.Addresses.Where(a => a.AddressType == AddressType && a.Type == CommunicationAddressType.Internal).Select(a => a.Address));
 
                 return Task.CompletedTask;
             }
@@ -170,13 +172,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             if (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption.HasFlag(CopyToNewOption.Addresses))
             {
                 SetEmails(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == AddressType && a.Type == CommunicationAddressType.Email).Select(a => a.Address));
-                AddInternalUsersFromGuids(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == AddressType && a.Type == CommunicationAddressType.Internal).Select(a => a.Address));
+
+                if (ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Major >= 3 && ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Minor >= 2)
+                    AddInternalUsersFromGuids(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == AddressType && a.Type == CommunicationAddressType.Internal).Select(a => a.Address));
             }
 
             if (DocumentCreationModeFlag == DocumentCreationModeFlag.Edit)
             {
                 SetEmails(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == AddressType && a.Type == CommunicationAddressType.Email).Select(a => a.Address));
-                AddInternalUsersFromGuids(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == AddressType && a.Type == CommunicationAddressType.Internal).Select(a => a.Address));
+
+                if (ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Major >= 3 && ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Minor >= 2)
+                    AddInternalUsersFromGuids(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == AddressType && a.Type == CommunicationAddressType.Internal).Select(a => a.Address));
             }
 
             if (DocumentCreationModeFlag == DocumentCreationModeFlag.Reply)
@@ -187,23 +193,29 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 if (PreviousDocumentPreview.Direction == DocumentDirection.Incoming)
                 {
                     var replyToAddresses = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.ReplyTo && da.Type == CommunicationAddressType.Email).Select(da => da.Address);
-                    var replyToInternals = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.ReplyTo && da.Type == CommunicationAddressType.Internal).Select(da => da.Address);
 
-                    if (replyToAddresses == null && replyToInternals == null || !replyToAddresses.Any() && !replyToInternals.Any())
-                    {
+                    if (replyToAddresses == null || !replyToAddresses.Any())
                         SetEmails(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == DocumentAddressType.From && a.Type == CommunicationAddressType.Email).Select(a => a.Address));
-                        AddInternalUsersFromGuids(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == DocumentAddressType.From && a.Type == CommunicationAddressType.Internal).Select(a => a.Address));
-                    }
                     else
-                    {
                         SetEmails(replyToAddresses);
-                        AddInternalUsersFromGuids(replyToInternals);
+                    
+
+                    if (ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Major >= 3 && ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Minor >= 2)
+                    {
+                        var replyToInternals = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.ReplyTo && da.Type == CommunicationAddressType.Internal).Select(da => da.Address);
+
+                        if (replyToInternals == null && !replyToInternals.Any())
+                            AddInternalUsersFromGuids(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == DocumentAddressType.From && a.Type == CommunicationAddressType.Internal).Select(a => a.Address));
+                        else
+                            AddInternalUsersFromGuids(replyToInternals);
                     }
                 }
                 else if (PreviousDocumentPreview.Direction == DocumentDirection.Outgoing)
                 {
                     SetEmails(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == DocumentAddressType.To && a.Type == CommunicationAddressType.Email).Select(a => a.Address));
-                    AddInternalUsersFromGuids(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == DocumentAddressType.To && a.Type == CommunicationAddressType.Internal).Select(a => a.Address));
+
+                    if (ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Major >= 3 && ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Minor >= 2)
+                        AddInternalUsersFromGuids(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == DocumentAddressType.To && a.Type == CommunicationAddressType.Internal).Select(a => a.Address));
                 }
             }
 
@@ -212,38 +224,47 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 if (PreviousDocumentPreview.Direction == DocumentDirection.Incoming)
                 {
                     var replyToAddresses = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.ReplyTo && da.Type == CommunicationAddressType.Email).Select(da => da.Address);
-                    var replyToInternals = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.ReplyTo && da.Type == CommunicationAddressType.Internal).Select(da => da.Address);
 
                     if (AddressType == DocumentAddressType.To)
                     {
-                        if (replyToAddresses == null && replyToInternals == null || !replyToAddresses.Any() && !replyToInternals.Any())
-                        {
+                        if (replyToAddresses == null || !replyToAddresses.Any())
                             SetEmails(PreviousDocumentPreview.Addresses.Where(da => (da.AddressType == DocumentAddressType.From || da.AddressType == DocumentAddressType.To) && da.Type == CommunicationAddressType.Email).Select(a => a.Address).Distinct());
-                            AddInternalUsersFromGuids(PreviousDocumentPreview.Addresses.Where(da => (da.AddressType == DocumentAddressType.From || da.AddressType == DocumentAddressType.To) && da.Type == CommunicationAddressType.Internal).Select(a => a.Address).Distinct());
-                        }
                         else
-                        {
                             SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.To && da.Type == CommunicationAddressType.Email).Select(da => da.Address).Union(replyToAddresses));
-                            AddInternalUsersFromGuids(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.To && da.Type == CommunicationAddressType.Internal).Select(da => da.Address).Union(replyToInternals));
+
+                        if (ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Major >= 3 && ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Minor >= 2)
+                        {
+                            var replyToInternals = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.ReplyTo && da.Type == CommunicationAddressType.Internal).Select(da => da.Address);
+
+                            if (replyToInternals == null || !replyToInternals.Any())
+                                AddInternalUsersFromGuids(PreviousDocumentPreview.Addresses.Where(da => (da.AddressType == DocumentAddressType.From || da.AddressType == DocumentAddressType.To) && da.Type == CommunicationAddressType.Internal).Select(a => a.Address).Distinct());
+                            else
+                                AddInternalUsersFromGuids(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.To && da.Type == CommunicationAddressType.Internal).Select(da => da.Address).Union(replyToInternals));
                         }
                     }
                     else if (AddressType == DocumentAddressType.Cc)
                     {
                         SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.Cc && da.Type == CommunicationAddressType.Email).Select(da => da.Address));
-                        AddInternalUsersFromGuids(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.Cc && da.Type == CommunicationAddressType.Internal).Select(da => da.Address));
+
+                        if (ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Major >= 3 && ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Minor >= 2)
+                            AddInternalUsersFromGuids(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.Cc && da.Type == CommunicationAddressType.Internal).Select(da => da.Address));
                     }
                 }
                 if (PreviousDocumentPreview.Direction == DocumentDirection.Outgoing)
                 {
                     SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == AddressType && da.Type == CommunicationAddressType.Email).Select(da => da.Address));
-                    AddInternalUsersFromGuids(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == AddressType && da.Type == CommunicationAddressType.Internal).Select(da => da.Address));
+
+                    if (ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Major >= 3 && ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Minor >= 2)
+                        AddInternalUsersFromGuids(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == AddressType && da.Type == CommunicationAddressType.Internal).Select(da => da.Address));
                 }
             }
 
             if (PreconfiguredEmailAddresses != null && PreconfiguredEmailAddresses.ContainsKey(AddressType))
             {
                 AddEmails(PreconfiguredEmailAddresses[AddressType]);
-                AddInternalUsersFromGuids(PreconfiguredEmailAddresses[AddressType]);
+
+                if (ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Major >= 3 && ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Minor >= 2)
+                    AddInternalUsersFromGuids(PreconfiguredEmailAddresses[AddressType]);
             }
 
             return Task.CompletedTask;
@@ -262,18 +283,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                         Type = CommunicationAddressType.Email
                     });
 
-                foreach (var user in GetInternalUsers())
+                if (ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Major >= 3 && ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Minor >= 2)
                 {
-                    var userGuid = SystemUsersDepartments.Users.FirstOrDefault(su => String.Equals(su.Username, user, StringComparison.OrdinalIgnoreCase))?.Guid;
-
-                    if (userGuid != null)
+                    foreach (var user in GetInternalUsers())
                     {
-                        DocumentPreview.Addresses.Add(new DocumentAddress
+                        var userGuid = SystemUsersDepartments.Users.FirstOrDefault(su => String.Equals(su.Username, user, StringComparison.OrdinalIgnoreCase))?.Guid;
+                        
+                        if (userGuid != null)
                         {
-                            Address = userGuid.ToString(),
-                            AddressType = AddressType,
-                            Type = CommunicationAddressType.Internal
-                        });
+                            DocumentPreview.Addresses.Add(new DocumentAddress
+                            {
+                                Address = userGuid.ToString(),
+                                AddressType = AddressType,
+                                Type = CommunicationAddressType.Internal
+                            });
+                        }
                     }
                 }
 
@@ -449,10 +473,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             foreach (Match match in emailMatches)
                 TextView.TextStorage.AddAttribute(UIStringAttributeKey.ForegroundColor, Theme.TintColor, new NSRange(match.Index, match.Length));
 
-            foreach (Match match in internalUserMatches)
+            if (ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Major >= 3 && ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Minor >= 2)
             {
-                if (SystemUsersDepartments != null && SystemUsersDepartments.Users.FirstOrDefault(su => String.Equals(su.Username, match.Value, StringComparison.OrdinalIgnoreCase)) != null)
-                    TextView.TextStorage.AddAttribute(UIStringAttributeKey.ForegroundColor, Theme.TintColor, new NSRange(match.Index, match.Length));
+                foreach (Match match in internalUserMatches)
+                {
+                    if (SystemUsersDepartments != null && SystemUsersDepartments.Users.FirstOrDefault(su => String.Equals(su.Username, match.Value, StringComparison.OrdinalIgnoreCase)) != null)
+                        TextView.TextStorage.AddAttribute(UIStringAttributeKey.ForegroundColor, Theme.TintColor, new NSRange(match.Index, match.Length));
+                }
             }
 
             TextView.TextStorage.EndEditing();
@@ -539,11 +566,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 .ToArray();
         }
 
-        public void SetInternalUsers(IEnumerable<string> internalUsers)
-        {
-            SetInternalUsers(string.Join(RecipientSeperator, internalUsers));
-        }
-
         public void SetEmails(IEnumerable<string> emails)
         {
             SetEmails(string.Join(RecipientSeperator, emails));
@@ -594,11 +616,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         public void AddInternalUsersFromGuids(IEnumerable<string> internalUsersGuids)
         {
             AddInternalUsers(string.Join(RecipientSeperator, ConvertGuidsToUsernames(internalUsersGuids)));
-        }
-
-        public void AddInternalUsers(IEnumerable<string> emails)
-        {
-            AddInternalUsers(string.Join(RecipientSeperator, emails));
         }
 
         public void AddInternalUsers(string internalUsers)

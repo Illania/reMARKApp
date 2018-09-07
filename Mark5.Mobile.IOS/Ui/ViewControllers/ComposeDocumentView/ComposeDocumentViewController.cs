@@ -273,7 +273,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async void RefreshData()
         {
-            await LoadSystemUsersDepartments();
+            if (ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Major >= 3 && ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Minor >= 2)
+                await LoadSystemUsersDepartments();
             await LoadDocument();
             await LoadTemplate();
 

@@ -18,7 +18,8 @@ namespace Mark5.Mobile.Common.Utilities
 
             GetSuggestionFromRecentAddresses(phrase, token, handler);
             GetSuggestionFromContacts(phrase, token, handler);
-            GetSuggestionFromInternalContacts(phrase, systemUsersDepartments, token, handler);
+            if (ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Major >= 3 && ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Minor >= 2)
+                GetSuggestionFromInternalContacts(phrase, systemUsersDepartments, token, handler);
             GetSuggestionFromPhonebook(phrase, token, handler);
         }
 
