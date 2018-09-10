@@ -299,7 +299,15 @@ namespace Mark5.Mobile.Common.Storage
             var documentWorkingCopy = await GetDocumentWorkingCopyAsync();
             var documentWorkingCopyAttachments = await GetDocumentWorkingCopyAttachmentsAsync();
 
-            var folder = await CommonConfig.DocumentsToUploadFolder.CreateFolderAsync(Guid.NewGuid().ToString(), CreationCollisionOption.FailIfExists);
+            var folderName = documentWorkingCopy.Document.Guid.ToString();
+
+            if (await CommonConfig.DocumentsToUploadFolder.CheckExistsAsync(folderName) == ExistenceCheckResult.FileExists)
+            {
+                CommonConfig.Logger.Error("The document to send is already there!");
+                return;
+            }
+
+            var folder = await CommonConfig.DocumentsToUploadFolder.CreateFolderAsync(folderName, CreationCollisionOption.FailIfExists);
 
             var lockFile = await folder.CreateFileAsync(".lock", CreationCollisionOption.FailIfExists);
 
