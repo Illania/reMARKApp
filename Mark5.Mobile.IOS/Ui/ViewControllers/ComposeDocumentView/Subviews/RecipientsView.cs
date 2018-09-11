@@ -24,7 +24,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         public SystemUsersDepartments SystemUsersDepartments { get; set; }
         public DocumentAddressType AddressType { get; protected set; }
-        public bool Empty => !Validator.ContainsValidEmail(TextView.Text);
+        public bool Empty => (ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Major >= 3 && ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Minor >= 2)
+        ? !Validator.ContainsValidEmail(TextView.Text) && !Validator.ContainsValidUsernames(TextView.Text) : !Validator.ContainsValidEmail(TextView.Text);
 
         public bool SuggestionOverlayActive;
 

@@ -317,7 +317,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             toView.SystemUsersDepartments = systemUserDepartments;
             ccView.SystemUsersDepartments = systemUserDepartments;
             bccView.SystemUsersDepartments = systemUserDepartments;
-
         }
 
         async Task LoadDocument()

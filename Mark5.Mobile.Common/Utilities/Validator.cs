@@ -92,18 +92,19 @@ namespace Mark5.Mobile.Common.Utilities
 
         public static bool ContainsValidUsernames(string text, out IEnumerable<Match> matches)
         {
-            var emailMatches = ExtractValidEmails(text).Cast<Match>();
             matches = ExtractUsernames(text);
-
-            if (emailMatches.Any())
-                matches = matches.Cast<Match>().Where(m => emailMatches.FirstOrDefault(em => em.Index <= m.Index && (em.Index+em.Length) >= (m.Index+m.Length)) == null).Select(m => m);
-
             return matches.Any();
         }
 
         public static IEnumerable<Match> ExtractUsernames(string text)
         {
-            return Regex.Matches(text ?? string.Empty, UsernameRegex, RegexOptions.IgnoreCase).Cast<Match>();
+            var emailMatches = ExtractValidEmails(text).Cast<Match>();
+            var matches = Regex.Matches(text ?? string.Empty, UsernameRegex, RegexOptions.IgnoreCase).Cast<Match>();
+
+            if (emailMatches.Any())
+                matches = matches.Cast<Match>().Where(m => emailMatches.FirstOrDefault(em => em.Index <= m.Index && (em.Index + em.Length) >= (m.Index + m.Length)) == null).Select(m => m);
+
+            return matches;
         }
     }
 }

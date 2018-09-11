@@ -33,8 +33,27 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         public event EventHandler Edited = delegate { };
         public event EventHandler AddButtonClicked = delegate { };
 
-        public bool Empty => !Validator.ContainsValidEmail(emailEditor.Text);
-        public bool AllEmailsValid { get { return Validator.ExtractValidEmails(emailEditor.Text).Count == emailEditor.Text.Split(',').Count(s => !string.IsNullOrWhiteSpace(s)); } }
+        public bool Empty => (ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Major >= 3 && ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Minor >= 2)
+        ? !Validator.ContainsValidEmail(emailEditor.Text) && !Validator.ContainsValidUsernames(emailEditor.Text) : !Validator.ContainsValidEmail(emailEditor.Text);
+
+        public bool AllEmailsValid
+        {
+            get
+            {
+                return Validator.ExtractValidEmails(emailEditor.Text).Count == (emailEditor.Text.Split(',').Count(s => !string.IsNullOrWhiteSpace(s)) - Validator.ExtractUsernames(emailEditor.Text).Count());
+            }
+        }
+
+        public bool AllInternalUsersValid
+        {
+            get
+            {
+                return systemUsersDepartments != null 
+                    && Validator.ExtractUsernames(emailEditor.Text).Count(u => systemUsersDepartments.Users.FirstOrDefault(su => String.Equals(su.Username, u.Value, StringComparison.OrdinalIgnoreCase)) != null) 
+                                == Validator.ExtractUsernames(emailEditor.Text).Count();
+            }
+        }
+
 
         public SystemUsersDepartments SystemUsersDepartments
         {
@@ -229,7 +248,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                         }
                         else if (AddressType == DocumentAddressType.Cc)
                             AddInternalUsersFromGuids(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.Cc && da.Type == CommunicationAddressType.Internal).Select(da => da.Address));
-                        
+
                     }
                     if (PreviousDocumentPreview.Direction == DocumentDirection.Outgoing)
                         AddInternalUsersFromGuids(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == AddressType && da.Type == CommunicationAddressType.Internal).Select(da => da.Address));
