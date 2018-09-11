@@ -606,8 +606,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     Localization.GetString("contact_picker_recent_addresses"),
                     Localization.GetString("contact_picker_contacts"),
                     Localization.GetString("contact_picker_shortcodes"),
-                    Localization.GetString("contact_picker_phonebook")
-                    Localization.GetString("contact_picker_internal_contacts"),
+                    Localization.GetString("contact_picker_phonebook"),
+                    Localization.GetString("contact_picker_internal_contacts")
                 };
             }
             else

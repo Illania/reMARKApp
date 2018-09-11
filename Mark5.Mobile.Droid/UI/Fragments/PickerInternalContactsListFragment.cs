@@ -21,11 +21,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class PickerInternalContactsListFragment : BaseFragment, IMenuItemOnActionExpandListener, SearchView.IOnQueryTextListener
     {
-        readonly Dictionary<int, SystemUser> selectedSystemUsers = new Dictionary<int, SystemUser>();
-
         readonly Handler searchHandler = new Handler();
-
-        const string SelectedSystemUsersKey = "SelectedSystemUsers_a5882c46-4209-48d8-9759-139286f1e476";
 
         SelectInternalUsersAdapter CurrentAdapter => (SelectInternalUsersAdapter)recyclerView.GetAdapter();
 
@@ -38,27 +34,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public static (PickerInternalContactsListFragment fragment, string tag) NewInstance()
         {
             var fragment = new PickerInternalContactsListFragment();
-
             var tag = $"{nameof(PickerInternalContactsListFragment)}]";
 
             return (fragment, tag);
         }
 
         #region Fragment overrides
-
-        public override void OnCreate(Bundle savedInstanceState)
-        {
-            base.OnCreate(savedInstanceState);
-
-            if (savedInstanceState?.ContainsKey(SelectedSystemUsersKey) == true)
-            {
-                var selectedUsers = Serializer.Deserialize<List<SystemUser>>(savedInstanceState.GetString(SelectedSystemUsersKey));
-
-                selectedSystemUsers.Clear();
-                foreach (var s in selectedUsers)
-                    selectedSystemUsers.Add(s.Id, s);
-            }
-        }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
@@ -74,11 +55,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             recyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
             recyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
 
-            adapter = new SelectInternalUsersAdapter(selectedSystemUsers);
+            adapter = new SelectInternalUsersAdapter();
             adapter.ItemClicked += Adapter_ItemClicked;
             recyclerView.SetAdapter(adapter);
 
-            searchAdapter = new SelectInternalUsersAdapter(selectedSystemUsers);
+            searchAdapter = new SelectInternalUsersAdapter();
             searchAdapter.ItemClicked += Adapter_ItemClicked;
 
             HasOptionsMenu = true;
@@ -105,14 +86,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await RefreshData();
             }
-        }
-
-        public override void OnSaveInstanceState(Bundle outState)
-        {
-            base.OnSaveInstanceState(outState);
-
-            if (selectedSystemUsers != null)
-                outState.PutString(SelectedSystemUsersKey, Serializer.Serialize(selectedSystemUsers.Values.ToList()));
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
@@ -232,16 +205,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class SelectInternalUsersAdapter : RecyclerView.Adapter, ISectionedAdapter
         {
-            readonly Dictionary<int, SystemUser> selectedSystemUsersInView;
-
             public override int ItemCount => Items.Count;
 
             public List<SystemUser> Items { get; } = new List<SystemUser>(100);
-
-            public SelectInternalUsersAdapter(Dictionary<int, SystemUser> selectedSystemUsersInView)
-            {
-                this.selectedSystemUsersInView = selectedSystemUsersInView;
-            }
 
             public event EventHandler<SystemUser> ItemClicked = delegate { };
 
@@ -257,8 +223,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 suvh.FullName = su.FirstName + " " + su.LastName;
                 suvh.Username = su.Username;
-
-                suvh.Selected = selectedSystemUsersInView.ContainsKey(su.Id);
             }
 
             public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
