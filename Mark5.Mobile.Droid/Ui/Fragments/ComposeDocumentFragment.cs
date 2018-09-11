@@ -580,7 +580,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async void RecipientView_AddButtonClicked(object sender, EventArgs e)
         {
-
             int choice;
 
             if (ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Major >= 3 && ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Minor >= 2)
