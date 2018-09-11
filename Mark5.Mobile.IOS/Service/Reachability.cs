@@ -71,16 +71,18 @@ namespace Mark5.Mobile.IOS.Service
                 CommonConfig.Logger.Info($"Reachability checked: {result}");
 
                 ReachabilityRefreshed(this, new ReachabilityRefreshedEventArgs(lastResult != result, result));
-            }
 
-            if(cancellationTokenSource != null) {
-                cancellationTokenSource.Cancel();
-                cancellationTokenSource = null;
-            } 
+                if (cancellationTokenSource != null)
+                {
+                    cancellationTokenSource.Cancel();
+                    cancellationTokenSource = null;
+                }
 
-            if(!result) {
-                cancellationTokenSource = new CancellationTokenSource();
-                CheckServiceAvailabilityContinuously(cancellationTokenSource.Token);
+                if (!result)
+                {
+                    cancellationTokenSource = new CancellationTokenSource();
+                    CheckServiceAvailabilityContinuously(cancellationTokenSource.Token);
+                }
             }
 
             return result;
@@ -184,6 +186,10 @@ namespace Mark5.Mobile.IOS.Service
 
                 await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
             }
+        }
+
+        public void OnPause()
+        {
         }
     }
 }

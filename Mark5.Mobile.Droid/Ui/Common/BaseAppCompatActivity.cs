@@ -56,6 +56,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 connectionBar.LongClick += ConnectionBar_LongClick;
                 connectionBar.Visibility = CommonConfig.Reachability.IsReachable ? ViewStates.Gone : ViewStates.Visible;
                 CommonConfig.Reachability.ReachabilityRefreshed += ReachabilityService_ReachabilityRefreshed;
+                CommonConfig.Reachability.Refresh();
             }
 
             if (Fab != null)
@@ -79,6 +80,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             {
                 connectionBar.Click -= ConnectionBar_Click;
                 connectionBar.LongClick -= ConnectionBar_LongClick;
+                CommonConfig.Reachability.OnPause();
                 CommonConfig.Reachability.ReachabilityRefreshed -= ReachabilityService_ReachabilityRefreshed;
             }
         }
