@@ -597,16 +597,32 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async void RecipientView_AddButtonTapped(object sender, EventArgs e)
         {
-            var strings = new[]
+            string[] strings;
+
+            if (ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Major >= 3 && ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Minor >= 2)
             {
-                Localization.GetString("contact_picker_recent_addresses"),
-                Localization.GetString("contact_picker_contacts"),
-                Localization.GetString("contact_picker_internal_contacts"),
-                Localization.GetString("contact_picker_shortcodes"),
-                Localization.GetString("contact_picker_phonebook")
-            };
+                strings = new[]
+                {
+                    Localization.GetString("contact_picker_recent_addresses"),
+                    Localization.GetString("contact_picker_contacts"),
+                    Localization.GetString("contact_picker_shortcodes"),
+                    Localization.GetString("contact_picker_phonebook")
+                    Localization.GetString("contact_picker_internal_contacts"),
+                };
+            }
+            else
+            {
+                strings = new[]
+                {
+                    Localization.GetString("contact_picker_recent_addresses"),
+                    Localization.GetString("contact_picker_contacts"),
+                    Localization.GetString("contact_picker_shortcodes"),
+                    Localization.GetString("contact_picker_phonebook")
+                };
+            }
 
             var choice = await Dialogs.ShowListActionSheetAsync(this, strings, (UIView)sender);
+
             switch (choice)
             {
                 case 0:
@@ -616,13 +632,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     await DoOpenContacts(sender as RecipientsView);
                     break;
                 case 2:
-                    await DoOpenInternalContacts(sender as RecipientsView);
-                    break;
-                case 3:
                     await DoOpenShortcodes();
                     break;
-                case 4:
+                case 3:
                     await DoOpenPhonebook(sender as RecipientsView);
+                    break;
+                case 4:
+                    await DoOpenInternalContacts(sender as RecipientsView);
                     break;
                 default:
                     return;

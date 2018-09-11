@@ -23,11 +23,17 @@
 		<item>SSL Enabled (allow self-signed)</item>
 		<item>SSL Disabled</item>
 	</string-array>
-	<string-array name="picker_choice">
+	<string-array name="picker_choice_with_internal_contacts">
 		<item>Recent addresses</item>
 		<item>Contacts</item>
+        <item>Shortcodes</item>
+        <item>Phonebook</item>
         <item>Internal contacts</item>
-		<item>Shortcodes</item>
-		<item>Phonebook</item>
 	</string-array>
+    <string-array name="picker_choice">
+        <item>Recent addresses</item>
+        <item>Contacts</item>
+        <item>Shortcodes</item>
+        <item>Phonebook</item>
+    </string-array>
 </resources>

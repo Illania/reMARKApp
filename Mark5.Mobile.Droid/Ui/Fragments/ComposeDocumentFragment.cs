@@ -580,7 +580,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async void RecipientView_AddButtonClicked(object sender, EventArgs e)
         {
-            var choice = await Dialogs.ShowListDialog(Context, Resource.String.picker_title, Resource.Array.picker_choice, true);
+
+            int choice;
+
+            if (ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Major >= 3 && ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Minor >= 2)
+                choice = await Dialogs.ShowListDialog(Context, Resource.String.picker_title, Resource.Array.picker_choice_with_internal_contacts, true);
+            else
+                choice = await Dialogs.ShowListDialog(Context, Resource.String.picker_title, Resource.Array.picker_choice, true);
 
             if (choice < 0)
                 return;
@@ -596,14 +602,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     DoOpenContacts();
                     break;
                 case 2:
-                    DoOpenInternalContacts();
-                    break;
-                case 3:
                     DoOpenShortcodes();
                     break;
-                case 4:
+                case 3:
                     DoOpenPhonebook();
                     break;
+                case 4:
+                    DoOpenInternalContacts();
+                    break;
+                default:
+                    return;
             }
 
             if (choice != 3)
