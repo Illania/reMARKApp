@@ -284,6 +284,7 @@
     <string name="phonebook">Phonebook</string>
     <string name="picker_title">Add address from</string>
     <string name="please_wait">Please wait...</string>
+    <string name="please_restart">Please restart MARK5</string>
     <string name="port">Port</string>
     <string name="port_invalid">Port is not valid</string>
     <string name="preparing">Preparing...</string>

@@ -4,6 +4,7 @@ using Foundation;
 using InAppSettingsKit;
 using LocalAuthentication;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
@@ -360,6 +361,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
 
                 PlatformConfig.Preferences.ResetOnLaunch = true;
+
+                await AuthenticatorFactory.Create().RetainConnectionInfoAsync();
 
                 dismissAction();
 

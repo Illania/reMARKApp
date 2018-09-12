@@ -87,6 +87,42 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             CommonConfig.Logger.Info($"Started {nameof(LoginActivity)}");
         }
 
+        protected override async void OnResume()
+        {
+            base.OnResume();
+
+            await RefreshData();
+
+            CommonConfig.Logger.Info($"Resumed {nameof(LoginActivity)}");
+        }
+
+        async Task RefreshData()
+        {
+            if (!string.IsNullOrEmpty(usernameEditText.Text + hostnameEditText.Text))
+                return;
+
+            var retainedConnectionInfo = await authenticator.GetRetainedConnectionInfoAsync();
+            if (retainedConnectionInfo != null)
+            {
+                usernameEditText.Text = retainedConnectionInfo.Username;
+                hostnameEditText.Text = retainedConnectionInfo.Hostname;
+                portEditText.Text = retainedConnectionInfo.Port.ToString();
+                switch (retainedConnectionInfo.SslMode)
+                {
+                    case SslMode.On:
+                        sslSpinner.SetSelection(0);
+                        return;
+                    case SslMode.AllowSelfSigned:
+                        sslSpinner.SetSelection(1);
+                        return;
+                    case SslMode.Off:
+                        sslSpinner.SetSelection(2);
+                        return;
+                }
+            }
+        }
+
+
         protected override void OnSaveInstanceState(Bundle outState)
         {
             base.OnSaveInstanceState(outState);
@@ -189,10 +225,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 if (errors)
                     return;
 
-                if (sslMode == SslMode.AllowSelfSigned && !await Dialogs.ShowYesNoDialogAsync(this, Resource.String.warning, Resource.String.ssl_accept_selfsigned_warning)) 
+                if (sslMode == SslMode.AllowSelfSigned && !await Dialogs.ShowYesNoDialogAsync(this, Resource.String.warning, Resource.String.ssl_accept_selfsigned_warning))
                     return;
-                
-                if (sslMode == SslMode.Off && !await Dialogs.ShowYesNoDialogAsync(this, Resource.String.warning, Resource.String.ssl_off_warning)) 
+
+                if (sslMode == SslMode.Off && !await Dialogs.ShowYesNoDialogAsync(this, Resource.String.warning, Resource.String.ssl_off_warning))
                     return;
 
                 CommonConfig.Logger.Info($"Logging in... [username={username}, hostname={hostname}, port={port}, ssl={sslMode}]");
@@ -257,13 +293,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 if (!String.IsNullOrEmpty(ServerConfig.SystemSettings.SystemInfo.CustomerName))
                     CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.CustomerName, ServerConfig.SystemSettings.SystemInfo.CustomerName);
-                
+
                 StartActivity(MainActivity.CreateIntent(this));
                 Finish();
             }
             catch (Exception ex)
             {
-                
+
                 if (token.IsCancellationRequested)
                     return;
 
@@ -273,9 +309,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 if (ex.InnerException != null)
                     CommonConfig.Logger.Error("Log in failed - inner exception", ex.InnerException);
-                
+
                 await Dialogs.ShowConfirmDialogAsync(this, Resource.String.log_in_failed_title, Resource.String.log_in_failed_message);
-            } finally {
+            }
+            finally
+            {
                 btn.Clickable = true;
             }
         }
