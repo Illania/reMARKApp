@@ -378,6 +378,15 @@ namespace Mark5.Mobile.Droid.Ui.Common
             md.Show();
         }
 
+        public static void ShowBlockingAlert(Context context, int titleId)
+        {
+            var builder = new MaterialDialog.Builder(context);
+            builder.Title(titleId);
+            builder.Cancelable(false);
+            builder.Show();
+            return;
+        }
+
         #endregion
 
         #region Error dialogs
