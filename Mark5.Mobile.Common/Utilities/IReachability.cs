@@ -11,6 +11,8 @@ namespace Mark5.Mobile.Common.Utilities
 
         event EventHandler<ReachabilityRefreshedEventArgs> ReachabilityRefreshed;
 
+        void OnPause();
+
         Task<bool> Refresh(ReachabilityMode mode = ReachabilityMode.NetworkAvailability | ReachabilityMode.Service, bool testOnly = false);
     }
 
