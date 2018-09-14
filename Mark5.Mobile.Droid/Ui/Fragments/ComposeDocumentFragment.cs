@@ -736,10 +736,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     Activity?.Finish();
             }
 
-            var allRecipientsValid = (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
-                ? new RecipientsView[] { toView, ccView, bccView }.All(rv => rv.AllEmailsValid && rv.AllInternalUsersValid) 
-                : new RecipientsView[] { toView, ccView, bccView }.All(rv => rv.AllEmailsValid);
-
+            var allRecipientsValid = new RecipientsView[] { toView, ccView, bccView }.All(rv => rv.AllRecipientsValid); 
 
             if (saveDraft && lineView.LineSelectedIsAmbiguous)
             {

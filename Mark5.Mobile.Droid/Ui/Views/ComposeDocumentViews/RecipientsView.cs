@@ -36,27 +36,16 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         public bool Empty => (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
         ? !Validator.ContainsValidEmail(emailEditor.Text) && !Validator.ContainsValidUsernames(emailEditor.Text) : !Validator.ContainsValidEmail(emailEditor.Text);
 
-        public bool AllEmailsValid
+        public bool AllRecipientsValid
         {
             get
             {
-                return Validator.ExtractValidEmails(emailEditor.Text).Count == (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable 
-                                                                                ? (emailEditor.Text.Split(',').Count(s => !string.IsNullOrWhiteSpace(s)) -
-                                                                                   emailEditor.Text.Split(',').Count(s => Validator.ContainsValidUsernames(s)))
-                                                                                : emailEditor.Text.Split(',').Count(s => !string.IsNullOrWhiteSpace(s)));
+                return emailEditor.Text.Split(new[] { RecipientSeperator }, StringSplitOptions.RemoveEmptyEntries)
+                                  .All(a => ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable
+                                       ? (Validator.ContainsValidEmails(a) || Validator.ExtractUsernames(a).Any(m => IsAnExistingUser(m.Value)))
+                                       : Validator.ContainsValidEmails(a));
             }
         }
-
-        public bool AllInternalUsersValid
-        {
-            get
-            {
-                return systemUsersDepartments != null 
-                    && Validator.ExtractUsernames(emailEditor.Text).Count(u => IsAnExistingUser(u.Value)) 
-                                == emailEditor.Text.Split(',').Count(s => Validator.ContainsValidUsernames(s));
-            }
-        }
-
 
         public SystemUsersDepartments SystemUsersDepartments
         {
