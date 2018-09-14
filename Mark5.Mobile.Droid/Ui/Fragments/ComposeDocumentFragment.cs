@@ -736,7 +736,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     Activity?.Finish();
             }
 
-            var allEmailsValid = new RecipientsView[] { toView, ccView, bccView }.All(rv => rv.AllEmailsValid);
+            var allRecipientsValid = (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
+                ? new RecipientsView[] { toView, ccView, bccView }.All(rv => rv.AllEmailsValid && rv.AllInternalUsersValid) 
+                : new RecipientsView[] { toView, ccView, bccView }.All(rv => rv.AllEmailsValid);
+
 
             if (saveDraft && lineView.LineSelectedIsAmbiguous)
             {
@@ -746,10 +749,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (!saveDraft)
             {
-                if (!allEmailsValid && subjectView.Empty)
-                    Dialogs.ShowYesNoDialog(Context, Resource.String.invalid_emails_and_subject_title, Resource.String.invalid_emails_and_subject_content, sendAction, () => fab.Enabled = true);
-                else if (!allEmailsValid)
-                    Dialogs.ShowYesNoDialog(Context, Resource.String.invalid_emails_title, Resource.String.invalid_emails_content, sendAction, () => fab.Enabled = true);
+                if (!allRecipientsValid && subjectView.Empty)
+                    Dialogs.ShowYesNoDialog(Context, Resource.String.invalid_recipients_and_subject_title, Resource.String.invalid_recipients_and_subject_content, sendAction, () => fab.Enabled = true);
+                else if (!allRecipientsValid)
+                    Dialogs.ShowYesNoDialog(Context, Resource.String.invalid_recipients_title, Resource.String.invalid_recipients_content, sendAction, () => fab.Enabled = true);
                 else if (subjectView.Empty)
                     Dialogs.ShowYesNoDialog(Context, Resource.String.invalid_subject_title, Resource.String.invalid_subject_content, sendAction, () => fab.Enabled = true);
                 else

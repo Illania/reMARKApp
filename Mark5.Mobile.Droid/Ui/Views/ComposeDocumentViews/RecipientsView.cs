@@ -155,7 +155,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             {
                 SetEmails(DocumentPreview.Addresses.Where(a => a.AddressType == AddressType && a.Type == CommunicationAddressType.Email).Select(a => a.Address));
 
-                if (ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Major >= 3 && ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Minor >= 2)
+                if (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
                     AddInternalUsersFromGuids(DocumentPreview.Addresses.Where(a => a.AddressType == AddressType && a.Type == CommunicationAddressType.Internal).Select(a => a.Address));
 
                 return Task.CompletedTask;
@@ -208,7 +208,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             if (PreconfiguredEmailAddresses != null && PreconfiguredEmailAddresses.ContainsKey(AddressType))
                 AddEmails(PreconfiguredEmailAddresses[AddressType]);
 
-            if (ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Major >= 3 && ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Minor >= 2)
+            if (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
             {
                 if (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption.HasFlag(CopyToNewOption.Addresses))
                     AddInternalUsersFromGuids(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == AddressType && a.Type == CommunicationAddressType.Internal).Select(a => a.Address));
@@ -277,7 +277,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                     });
                 }
 
-                if (ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Major >= 3 && ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Minor >= 2)
+                if (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
                 {
                     foreach (var user in GetInternalUsers())
                     {
@@ -587,7 +587,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             foreach (Match match in emailMatches)
                 SetEmailStyle(match.Index, match.Index + match.Length);
 
-            if (ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Major >= 3 && ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Minor >= 2)
+            if (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
             {
                 foreach (Match match in internalUserMatches)
                 {

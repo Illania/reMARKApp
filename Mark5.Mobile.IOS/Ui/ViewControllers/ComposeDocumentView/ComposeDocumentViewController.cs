@@ -273,7 +273,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async void RefreshData()
         {
-            if (ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Major >= 3 && ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Minor >= 2)
+            if (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
                 await LoadSystemUsersDepartments();
             await LoadDocument();
             await LoadTemplate();
@@ -599,7 +599,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         {
             string[] strings;
 
-            if (ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Major >= 3 && ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Minor >= 2)
+            if (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
             {
                 strings = new[]
                 {

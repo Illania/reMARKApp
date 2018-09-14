@@ -11,6 +11,7 @@ namespace Mark5.Mobile.Common.Model
         public string ServerTimeZoneInfoSerialized { get; set; }
         public string CustomerName { get; set; }
         public Guid CustomerGuid { get; set; }
+        public bool InternalMailsAvailable => ServiceVersion.Major >= 3 && ServiceVersion.Minor >= 2;
 
         List<ModuleType> availableModules;
         public List<ModuleType> AvailableModules
