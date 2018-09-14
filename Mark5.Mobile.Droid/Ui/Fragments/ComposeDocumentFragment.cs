@@ -238,7 +238,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             CommonConfig.Logger.Info($"Resuming {nameof(ComposeDocumentFragment)}...");
 
-            if (ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Major >= 3 && ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Minor >= 2)
+            if (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
                 await LoadSystemUserDepartments();
             await LoadDocument();
 
@@ -581,7 +581,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             int choice;
 
-            if (ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Major >= 3 && ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Minor >= 2)
+            if (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
                 choice = await Dialogs.ShowListDialog(Context, Resource.String.picker_title, Resource.Array.picker_choice_with_internal_contacts, true);
             else
                 choice = await Dialogs.ShowListDialog(Context, Resource.String.picker_title, Resource.Array.picker_choice, true);

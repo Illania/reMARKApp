@@ -33,7 +33,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         public event EventHandler Edited = delegate { };
         public event EventHandler AddButtonClicked = delegate { };
 
-        public bool Empty => (ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Major >= 3 && ServerConfig.SystemSettings.SystemInfo.ServiceVersion.Minor >= 2)
+        public bool Empty => (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
         ? !Validator.ContainsValidEmail(emailEditor.Text) && !Validator.ContainsValidUsernames(emailEditor.Text) : !Validator.ContainsValidEmail(emailEditor.Text);
 
         public bool AllEmailsValid
