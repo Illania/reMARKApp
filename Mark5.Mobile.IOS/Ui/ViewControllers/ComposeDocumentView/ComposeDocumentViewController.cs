@@ -745,9 +745,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async Task<bool> SendDocument()
         {
-            if (!ContainsValidEmails(toView, ccView, bccView))
+            if (!ContainsValidRecipients(toView, ccView, bccView))
             {
-                await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("warning"), Localization.GetString("no_email_addresses_added"));
+                await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("warning"), Localization.GetString("no_recipients_added"));
                 return false;
             }
 
@@ -757,9 +757,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 return false;
             }
 
-            if (ContainsInvalidEmails(toView, ccView, bccView))
+            if (ContainsInvalidRecipients(toView, ccView, bccView))
             {
-                var result = await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("warning"), Localization.GetString("incorrect_email_addresses_added"));
+                var result = await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("warning"), Localization.GetString("incorrect_recipients_added"));
                 if (!result)
                     return false;
             }
@@ -1277,7 +1277,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         #region Utilities
 
-        static bool ContainsValidEmails(params RecipientsView[] rvs)
+        static bool ContainsValidRecipients(params RecipientsView[] rvs)
         {
             var containsValidEmails = false;
 
@@ -1287,10 +1287,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             return containsValidEmails;
         }
 
-        static bool ContainsInvalidEmails(params RecipientsView[] rvs)
+        static bool ContainsInvalidRecipients(params RecipientsView[] rvs)
         {
             foreach (var rv in rvs)
-                if (rv.ContainsInvalidEmail())
+                if (rv.ContainsInvalidRecipients())
                     return true;
 
             return false;

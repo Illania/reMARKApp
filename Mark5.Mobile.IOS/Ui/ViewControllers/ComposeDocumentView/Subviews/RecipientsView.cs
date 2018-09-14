@@ -551,8 +551,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                                                            : new string[0];
         #region Public methods
 
-        public bool ContainsInvalidEmail() => TextView.Text.Split(new[] { RecipientSeperator }, StringSplitOptions.RemoveEmptyEntries)
-                                                      .Any(a => !Validator.ContainsValidEmails(a));
+        public bool ContainsInvalidRecipients() => TextView.Text.Split(new[] { RecipientSeperator }, StringSplitOptions.RemoveEmptyEntries)
+                                                           .Any(a => (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable) 
+                                                                ? (!Validator.ContainsValidEmails(a) || !Validator.ContainsValidUsernames(a)) : !Validator.ContainsValidEmails(a));
 
         public IEnumerable<string> GetEmails() => Validator.ContainsValidEmails(TextView.Text, out MatchCollection matches)
                                                            ? matches.Cast<Match>().Select(m => m.Value).Distinct().ToArray()
