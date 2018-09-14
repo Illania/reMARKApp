@@ -51,6 +51,8 @@ namespace Mark5.Mobile.Droid.Utilities
                     CommonConfig.Logger.Info("SystemSettingsJobService: Retrieving system settings...");
 
                     ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Remote);
+
+                    await Managers.SystemManager.GetSystemUsersDepartmentsAsync(SourceType.Remote);
                 }
                 catch (Exception ex)
                 {
