@@ -624,7 +624,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             emailEditor.SetSelection(emailEditor.Text.Count());
         }
 
-
         #endregion
 
         #region Support class
