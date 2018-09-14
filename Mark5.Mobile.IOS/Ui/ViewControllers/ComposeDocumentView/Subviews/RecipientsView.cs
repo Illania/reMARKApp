@@ -477,7 +477,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             {
                 foreach (Match match in internalUserMatches)
                 {
-                    if (SystemUsersDepartments != null && SystemUsersDepartments.Users.FirstOrDefault(su => String.Equals(su.Username, match.Value, StringComparison.OrdinalIgnoreCase)) != null)
+                    if (SystemUsersDepartments != null && IsAnExistingUser(match.Value))
                         TextView.TextStorage.AddAttribute(UIStringAttributeKey.ForegroundColor, Theme.TintColor, new NSRange(match.Index, match.Length));
                 }
             }
@@ -552,8 +552,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         #region Public methods
 
         public bool ContainsInvalidRecipients() => TextView.Text.Split(new[] { RecipientSeperator }, StringSplitOptions.RemoveEmptyEntries)
-                                                           .Any(a => (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable) 
-                                                                ? (!Validator.ContainsValidEmails(a) || !Validator.ContainsValidUsernames(a)) : !Validator.ContainsValidEmails(a));
+                                                           .Any(a => ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable 
+                                                                ? (!Validator.ContainsValidEmails(a) && !Validator.ExtractUsernames(a).Any(m => IsAnExistingUser(m.Value))) 
+                                                                : !Validator.ContainsValidEmails(a));
 
         public IEnumerable<string> GetEmails() => Validator.ContainsValidEmails(TextView.Text, out MatchCollection matches)
                                                            ? matches.Cast<Match>().Select(m => m.Value).Distinct().ToArray()
@@ -627,7 +628,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 newInternalUsers.Append(TextView.Text);
                 if (!TextView.Text.EndsWith(RecipientSeperator, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(TextView.Text))
                     newInternalUsers.Append(RecipientSeperator);
-                newInternalUsers.Append(string.Join(RecipientSeperator, matches.Where(m => SystemUsersDepartments.Users.FirstOrDefault(su => String.Equals(su.Username, m.Value, StringComparison.OrdinalIgnoreCase)).Username == m.Value).Select(m => m.Value)));
+                newInternalUsers.Append(string.Join(RecipientSeperator, matches.Where(m => IsAnExistingUser(m.Value)).Select(m => m.Value)));
                 newInternalUsers.Append(RecipientSeperator);
 
                 TextView.TextStorage.BeginEditing();
@@ -784,6 +785,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         {
             return TextView.Text;
         }
+
+        bool IsAnExistingUser(string s) => SystemUsersDepartments.Users.FirstOrDefault(su => String.Equals(su.Username, s, StringComparison.OrdinalIgnoreCase)) != null;
 
         #endregion
     }

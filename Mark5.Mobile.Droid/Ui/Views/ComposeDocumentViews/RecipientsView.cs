@@ -40,7 +40,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             get
             {
-                return Validator.ExtractValidEmails(emailEditor.Text).Count == (emailEditor.Text.Split(',').Count(s => !string.IsNullOrWhiteSpace(s)) - Validator.ExtractUsernames(emailEditor.Text).Count());
+                return Validator.ExtractValidEmails(emailEditor.Text).Count == (emailEditor.Text.Split(',').Count(s => !string.IsNullOrWhiteSpace(s)) - emailEditor.Text.Split(',').Count(s => Validator.ContainsValidUsernames(s)));
             }
         }
 
@@ -49,8 +49,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             get
             {
                 return systemUsersDepartments != null 
-                    && Validator.ExtractUsernames(emailEditor.Text).Count(u => systemUsersDepartments.Users.FirstOrDefault(su => String.Equals(su.Username, u.Value, StringComparison.OrdinalIgnoreCase)) != null) 
-                                == Validator.ExtractUsernames(emailEditor.Text).Count();
+                    && Validator.ExtractUsernames(emailEditor.Text).Count(u => IsAnExistingUser(u.Value)) 
+                                == emailEditor.Text.Split(',').Count(s => Validator.ContainsValidUsernames(s));
             }
         }
 
@@ -317,7 +317,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 newInternalUsers.Append(emailEditor.Text);
                 if (!emailEditor.Text.EndsWith(RecipientSeperator, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(emailEditor.Text))
                     newInternalUsers.Append(RecipientSeperator);
-                newInternalUsers.Append(string.Join(RecipientSeperator, matches.Where(m => systemUsersDepartments.Users.FirstOrDefault(su => String.Equals(su.Username, m.Value, StringComparison.OrdinalIgnoreCase)).Username == m.Value).Select(m => m.Value)));
+                newInternalUsers.Append(string.Join(RecipientSeperator, matches.Where(m => IsAnExistingUser(m.Value)).Select(m => m.Value)));
                 newInternalUsers.Append(RecipientSeperator);
 
                 emailEditor.Text = newInternalUsers.ToString();
@@ -591,11 +591,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             {
                 foreach (Match match in internalUserMatches)
                 {
-                    if (systemUsersDepartments != null && systemUsersDepartments.Users.FirstOrDefault(su => String.Equals(su.Username, match.Value, StringComparison.OrdinalIgnoreCase)) != null)
+                    if (systemUsersDepartments != null && IsAnExistingUser(match.Value))
                         SetEmailStyle(match.Index, match.Index + match.Length);
                 }
             }
         }
+
+        bool IsAnExistingUser(string s) => systemUsersDepartments.Users.FirstOrDefault(su => String.Equals(su.Username, s, StringComparison.OrdinalIgnoreCase)) != null;
 
         void ResetStyle()
         {
@@ -621,6 +623,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             emailEditor.SetSelection(emailEditor.Text.Count());
         }
+
 
         #endregion
 
