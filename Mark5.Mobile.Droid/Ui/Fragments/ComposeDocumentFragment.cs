@@ -579,12 +579,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async void RecipientView_AddButtonClicked(object sender, EventArgs e)
         {
-            int choice;
-
-            if (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
-                choice = await Dialogs.ShowListDialog(Context, Resource.String.picker_title, Resource.Array.picker_choice_with_internal_contacts, true);
-            else
-                choice = await Dialogs.ShowListDialog(Context, Resource.String.picker_title, Resource.Array.picker_choice, true);
+            var choice = ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable 
+                                     ? await Dialogs.ShowListDialog(Context, Resource.String.picker_title, Resource.Array.picker_choice_with_internal_contacts, true)
+                                     : await Dialogs.ShowListDialog(Context, Resource.String.picker_title, Resource.Array.picker_choice, true);
 
             if (choice < 0)
                 return;
