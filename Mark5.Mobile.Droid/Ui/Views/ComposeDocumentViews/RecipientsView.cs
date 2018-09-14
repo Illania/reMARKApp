@@ -186,7 +186,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                     if (AddressType == DocumentAddressType.To)
                     {
                         if (replyToAddresses == null || !replyToAddresses.Any())
-                            SetEmails(PreviousDocumentPreview.Addresses.Where(da => (da.AddressType == DocumentAddressType.From || da.AddressType == DocumentAddressType.To) && da.Type == CommunicationAddressType.Email).Select(a => a.Address).Distinct());
+                            SetEmails(PreviousDocumentPreview.Addresses.Where(da => (da.AddressType == DocumentAddressType.From || da.AddressType == DocumentAddressType.To) && da.Type == CommunicationAddressType.Email).Select(da => da.Address).Distinct());
                         else
                             SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.To && da.Type == CommunicationAddressType.Email).Select(da => da.Address).Union(replyToAddresses));
                     }
