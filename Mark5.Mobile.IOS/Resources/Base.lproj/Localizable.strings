@@ -26,6 +26,7 @@
 "attachments" = "Attachments";
 "autosave_recover_title" = "Recover email";
 "autosave_recover_content" = "MARK5 recovered an autosaved email. Do you want to continue editing it?";
+"available" = "Available";
 "back" = "Back";
 "bcc" = "Bcc";
 "big_attachment_warning" = "This attachment is {0} large. Do you still want to download this file?";
@@ -40,6 +41,8 @@
 "categories" = "Categories";
 "cc" = "Cc";
 "chrome" = "Open in Google Chrome";
+"changes_not_saved" = "Changes not saved!";
+"changes_not_saved_description" = "Current changes are not saved and will be discarded";
 "city" = "City";
 "country" = "Country";
 "clear_contacts_cache_summary" = "Do you want to remove cached contacts?";
@@ -349,6 +352,7 @@
 "set_priority" = "Set priority";
 "setting_priority___" = "Setting priority...";
 "settings" = "Settings";
+"selected" = "Selected";
 "short_id" = "Short ID";
 "shortcodes" = "Shortcodes";
 "show_more___" = "Show more...";

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using Firebase.CloudMessaging;
 using Firebase.Core;
 using Foundation;
 using HockeyApp.iOS;
@@ -31,7 +32,7 @@ using UserNotifications;
 namespace Mark5.Mobile.IOS
 {
     [Register("AppDelegate")]
-    public class AppDelegate : UIApplicationDelegate, IUNUserNotificationCenterDelegate
+    public class AppDelegate : UIApplicationDelegate, IUNUserNotificationCenterDelegate, IMessagingDelegate
     {
         public override UIWindow Window { get; set; }
 
@@ -45,6 +46,7 @@ namespace Mark5.Mobile.IOS
                 InitializeCommon();
 
                 App.Configure(); //Firebase Analytics
+                Messaging.SharedInstance.Delegate = this;
 
                 CommonConfig.Logger.Info("MARK5 initializing...");
                 var isLoggedIn = InitializePlatform(application);
@@ -196,35 +198,85 @@ namespace Mark5.Mobile.IOS
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true, true);
         }
 
+        #region Notification handling
+
         public override void RegisteredForRemoteNotifications(UIApplication application, NSData deviceToken)
         {
             CommonConfig.Logger.Info($"Received APNS token: {deviceToken}");
 
+            var serviceVersion = ServerConfig.SystemSettings?.SystemInfo?.ServiceVersion;
+
+            if (serviceVersion == null)
+            {
+                CommonConfig.Logger.Info($"It is not possible to update the APNS token because the server version is null");
+                return;
+            }
+
+
+            if (serviceVersion != null && serviceVersion.CompareTo(new Version(3, 2, 0)) >= 0)
+            {
+                CommonConfig.Logger.Info($"Not sending the APNS token because the current service version is equal or higher than 3.2.0");
+                return;
+            }
+
             var newToken = new string(deviceToken.ToString().Where(char.IsLetterOrDigit).ToArray());
-            var oldToken = PlatformConfig.Preferences.PushNotificationToken;
-            PlatformConfig.Preferences.PushNotificationToken = newToken;
 
-            if (!string.IsNullOrWhiteSpace(oldToken) && oldToken != newToken)
-            {
-                CommonConfig.Logger.Info("New APNS token is different, so try to unsubscribe old one...");
-                Managers.NotificationsManager.UnSubscribe(DeviceType.IOS, oldToken).FireAndForget();
-            }
-
-            if (!string.IsNullOrWhiteSpace(newToken))
-            {
-                CommonConfig.Logger.Info("Sending new APNS token...");
-                Managers.NotificationsManager.Subscribe(DeviceType.IOS, newToken).FireAndForget();
-            }
-            else
-            {
-                CommonConfig.Logger.Info("Received empty or null APNS token...");
-            }
+            UpdatePushNotificationToken(newToken);
         }
 
         public override void FailedToRegisterForRemoteNotifications(UIApplication application, NSError error)
         {
             CommonConfig.Logger.Error("Failed to received APNS Token", new NSErrorException(error));
             PlatformConfig.Preferences.PushNotificationToken = string.Empty;
+        }
+
+        [Export("messaging:didReceiveRegistrationToken:")]  //FCM Token
+        public void DidReceiveRegistrationToken(Messaging messaging, string fcmToken)
+        {
+            UpdateFcmToken(fcmToken);
+        }
+
+        void UpdateFcmToken(string fcmToken)
+        {
+            CommonConfig.Logger.Info($"Received FCM token: {fcmToken}");
+
+            var serviceVersion = ServerConfig.SystemSettings?.SystemInfo?.ServiceVersion;
+
+            if (serviceVersion == null)
+            {
+                CommonConfig.Logger.Info($"It is not possible to update the push notification token because the server version is null");
+                return;
+            }
+
+            if (serviceVersion.CompareTo(new Version(3, 2, 0)) < 0)
+            {
+                CommonConfig.Logger.Info($"Not sending the FCM token because the current service version is lesss than 3.2.0");
+                return;
+            }
+
+            UpdatePushNotificationToken(fcmToken);
+        }
+
+        void UpdatePushNotificationToken(string newToken)
+        {
+            var oldToken = PlatformConfig.Preferences.PushNotificationToken;
+            PlatformConfig.Preferences.PushNotificationToken = newToken;
+
+            if (!string.IsNullOrWhiteSpace(oldToken) && oldToken != newToken)
+            {
+                CommonConfig.Logger.Info("New push notification token is different, so try to unsubscribe old one...");
+                Managers.NotificationsManager.UnSubscribe(DeviceType.IOS, oldToken).FireAndForget();
+            }
+
+            if (!string.IsNullOrWhiteSpace(newToken))
+            {
+                CommonConfig.Logger.Info("Sending new push notification token...");
+                Managers.NotificationsManager.Subscribe(DeviceType.IOS, newToken).FireAndForget();
+            }
+            else
+            {
+                CommonConfig.Logger.Info("Received empty or null push notification token...");
+            }
         }
 
         [Export("userNotificationCenter:willPresentNotification:withCompletionHandler:")]
@@ -280,10 +332,12 @@ namespace Mark5.Mobile.IOS
                     vc.SetData(n.ObjectId);
 
                     // we want to remove the previous document view controller in case user is opening emails from notifications - one after another.
-                    if(Window.RootViewController.PresentedViewController != null && Window.RootViewController.PresentedViewController is NavigationController) {
+                    if (Window.RootViewController.PresentedViewController != null && Window.RootViewController.PresentedViewController is NavigationController)
+                    {
                         var navController = Window.RootViewController.PresentedViewController as NavigationController;
-                        if(navController.TopViewController is DocumentViewController) {
-                                navController.DismissViewController(false, null);
+                        if (navController.TopViewController is DocumentViewController)
+                        {
+                            navController.DismissViewController(false, null);
                         }
                     }
 
@@ -299,6 +353,15 @@ namespace Mark5.Mobile.IOS
                 completionHandler();
             }
         }
+
+        [Export("application:didReceiveRemoteNotification:fetchCompletionHandler:")]
+        public override void DidReceiveRemoteNotification(UIApplication application, NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler)
+        {
+            //This needs to be implemented to support silent notifications. 
+            //Let's not forget the silent notifications limitations (2-3 notifications per hour max, and other limitations per day)
+        }
+
+        #endregion
 
         public override void PerformFetch(UIApplication application, Action<UIBackgroundFetchResult> completionHandler)
         {
@@ -336,6 +399,7 @@ namespace Mark5.Mobile.IOS
                 CommonConfig.AttachmentsFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("Caches", "v2", "att"), CreationCollisionOption.OpenIfExists);
                 CommonConfig.DocumentsToUploadFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("v2", "documents_upload"), CreationCollisionOption.OpenIfExists);
                 CommonConfig.DocumentWorkingCopyFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("v2", "document_work"), CreationCollisionOption.OpenIfExists);
+                CommonConfig.RetainedDataFolder = await mainFolder.CreateFolderAsync("retained", CreationCollisionOption.OpenIfExists);
                 CommonConfig.Logger = new ConsoleAndFileLogger();
                 CommonConfig.DeviceInfoProvider = new DeviceInfoProvider();
                 CommonConfig.HttpClientHandler = () => new NativeMessageHandler { AutomaticDecompression = Config.AcceptedResponseCompression };
@@ -465,24 +529,28 @@ namespace Mark5.Mobile.IOS
                     CommonConfig.Logger.Info("Refreshing APNS token...");
 
                     UNUserNotificationCenter.Current.RequestAuthorization(UNAuthorizationOptions.Alert | UNAuthorizationOptions.Badge | UNAuthorizationOptions.Sound,
-                        (result, error) =>
-                        {
-                            if (result)
-                            {
-                                BeginInvokeOnMainThread(application.RegisterForRemoteNotifications);
-                            }
-                            else
-                            {
-                                if (error != null)
-                                    CommonConfig.Logger.Error(new NSErrorException(error));
-                            }
-                        });
+                        OnAuthorizationRequested);
                 });
 
                 CommonConfig.Logger.Info($"Initialized - will present {nameof(SplitMainViewController)}");
 
                 return true;
             }).Result;
+        }
+
+        public void OnAuthorizationRequested(bool result, NSError error)
+        {
+            if (result)
+            {
+                BeginInvokeOnMainThread(UIApplication.SharedApplication.RegisterForRemoteNotifications);
+                if (!string.IsNullOrWhiteSpace(Messaging.SharedInstance.FcmToken))
+                    UpdateFcmToken(Messaging.SharedInstance.FcmToken);
+            }
+            else
+            {
+                if (error != null)
+                    CommonConfig.Logger.Error(new NSErrorException(error));
+            }
         }
     }
 }

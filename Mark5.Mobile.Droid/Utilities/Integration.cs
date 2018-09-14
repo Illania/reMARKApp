@@ -1,10 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.Net;
 using Android.OS;
+using Android.Preferences;
 using Android.Support.V4.Net;
 using Android.Widget;
+using Mark5.Mobile.Common;
+using Mark5.Mobile.Droid.Ui.Activities;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
@@ -36,7 +41,7 @@ namespace Mark5.Mobile.Droid.Utilities
         public static bool IsConnectedToMeteredConnection()
         {
             var ctx = Application.Context;
-            var cm = (ConnectivityManager) ctx.GetSystemService(Context.ConnectivityService);
+            var cm = (ConnectivityManager)ctx.GetSystemService(Context.ConnectivityService);
             return ConnectivityManagerCompat.IsActiveNetworkMetered(cm);
         }
 
@@ -45,7 +50,7 @@ namespace Mark5.Mobile.Droid.Utilities
             if (string.IsNullOrWhiteSpace(text))
                 return;
 
-            var cm = (ClipboardManager) context.GetSystemService(Context.ClipboardService);
+            var cm = (ClipboardManager)context.GetSystemService(Context.ClipboardService);
             cm.PrimaryClip = ClipData.NewPlainText(text, text);
 
             Toast.MakeText(context, Resource.String.copied_to_clipboard, ToastLength.Short).Show();
@@ -106,10 +111,21 @@ namespace Mark5.Mobile.Droid.Utilities
             }
         }
 
-        public static void ClearDataAndStop()
+        public static async Task ClearData(Context context)
         {
-            var am = Application.Context.GetSystemService(Context.ActivityService) as ActivityManager;
-            am.ClearApplicationUserData();
+            var preferences = PreferenceManager.GetDefaultSharedPreferences(context);
+            var editor = preferences.Edit();
+            editor.Clear();
+            editor.Commit();
+
+            var foldersToRemove = new List<PCLStorage.IFolder> { CommonConfig.DataFolder,
+                CommonConfig.DatabaseFolder,
+                CommonConfig.AttachmentsFolder,
+                CommonConfig.DocumentsToUploadFolder,
+                CommonConfig.DocumentWorkingCopyFolder };
+
+            foreach (var folder in foldersToRemove)
+                await folder.DeleteAsync();
         }
     }
 }

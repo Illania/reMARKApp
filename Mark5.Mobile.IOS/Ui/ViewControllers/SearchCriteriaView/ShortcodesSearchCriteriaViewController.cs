@@ -161,7 +161,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                     text.LeftAnchor.ConstraintEqualTo(view.LeftAnchor, 12f),
                     text.RightAnchor.ConstraintEqualTo(view.RightAnchor, -8f),
                     text.BottomAnchor.ConstraintEqualTo(view.BottomAnchor, -4f),
-                    label.HeightAnchor.ConstraintEqualTo(text.HeightAnchor, 0f)
+                    label.HeightAnchor.ConstraintEqualTo(text.HeightAnchor)
                 });
 
                 AddArrangedSubview(view);
@@ -259,7 +259,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                     text.LeftAnchor.ConstraintEqualTo(view.LeftAnchor, 12f),
                     text.RightAnchor.ConstraintEqualTo(view.RightAnchor, -8f),
                     text.BottomAnchor.ConstraintEqualTo(view.BottomAnchor, -4f),
-                    label.HeightAnchor.ConstraintEqualTo(text.HeightAnchor, 0f)
+                    label.HeightAnchor.ConstraintEqualTo(text.HeightAnchor),
                 });
 
                 AddArrangedSubview(view);
@@ -358,7 +358,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                     text.LeftAnchor.ConstraintEqualTo(view.LeftAnchor, 12f),
                     text.RightAnchor.ConstraintEqualTo(view.RightAnchor, -8f),
                     text.BottomAnchor.ConstraintEqualTo(view.BottomAnchor, -4f),
-                    label.HeightAnchor.ConstraintEqualTo(text.HeightAnchor, 0f)
+                    label.HeightAnchor.ConstraintEqualTo(text.HeightAnchor),
                 });
 
                 AddArrangedSubview(view);

@@ -67,18 +67,13 @@ namespace Mark5.Mobile.Droid
         {
             if (clf != null)
             {
-                var intent = new Intent();
-                intent.PutExtra(CategoriesResultKey, Serializer.Serialize(clf.Categories));
-                SetResult(Result.Ok, intent);
-            }
-
-            base.OnBackPressed();
+                clf.AskIfShouldSave();
+            }          
         }
 
         public override void Finish()
         {
             base.Finish();
-
             OverridePendingTransition(Resource.Animation.no_change, Resource.Animation.slide_down);
         }
     }

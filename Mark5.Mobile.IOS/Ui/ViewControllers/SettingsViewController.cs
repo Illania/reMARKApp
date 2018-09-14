@@ -4,6 +4,7 @@ using Foundation;
 using InAppSettingsKit;
 using LocalAuthentication;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
@@ -156,14 +157,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
                 cell.TextLabel.Text = specifier.Title;
-                try {
+                try
+                {
                     if (CallIdExtensionUtilities.IsCallIdExtensionEnabled().Result)
                         cell.DetailTextLabel.Text = "Enabled";
                     else
                         cell.DetailTextLabel.Text = "Disabled";
-                        
+
                     cell.DetailTextLabel.TextColor = Theme.DarkGray;
-                } catch(Exception ex) {
+                }
+                catch (Exception ex)
+                {
                     CommonConfig.Logger.Error("Call ID extension not available exception ", ex);
                 }
                 return cell;
@@ -225,7 +229,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return cell;
             }
 
-            if(specifier.Key == EmailSwipeActions) 
+            if (specifier.Key == EmailSwipeActions)
             {
                 var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
                 cell.TextLabel.Text = specifier.Title;
@@ -357,6 +361,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
 
                 PlatformConfig.Preferences.ResetOnLaunch = true;
+
+                await AuthenticatorFactory.Create().RetainConnectionInfoAsync();
 
                 dismissAction();
 

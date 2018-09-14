@@ -126,9 +126,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
 
             var swipeOptions = FindPreference(GetString(Resource.String.pref_key_swipe_options));
-            if(swipeOptions != null) {
-                swipeOptions.PreferenceClick += (object sender, Preference.PreferenceClickEventArgs e) => {
-                   
+            if (swipeOptions != null)
+            {
+                swipeOptions.PreferenceClick += (object sender, Preference.PreferenceClickEventArgs e) =>
+                {
+
                     SwipeActionsFragment swipeActionsFragment;
                     string swipeActionsFragmentTag;
                     var fragmentTransaction = Activity.SupportFragmentManager.BeginTransaction();
@@ -241,7 +243,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     Resource.String.dialog_logout_content,
                     async () =>
                     {
-                        Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.dialog_logging_out_title, Resource.String.please_wait);
+                        var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.dialog_logging_out_title, Resource.String.please_wait);
 
                         try
                         {
@@ -253,7 +255,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                             CommonConfig.Logger.Error("Error while unsubscribing during log out!", ex);
                         }
 
-                        Integration.ClearDataAndStop();
+                        await AuthenticatorFactory.Create().RetainConnectionInfoAsync();
+                        await Integration.ClearData(Context);
+                        dismissAction();
+
+                        Dialogs.ShowBlockingAlert(Activity, Resource.String.please_restart);
+
                     });
                 return true;
             }

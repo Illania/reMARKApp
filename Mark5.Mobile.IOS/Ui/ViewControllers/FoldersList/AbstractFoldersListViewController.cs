@@ -914,9 +914,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 var localFolders = new List<Folder>();
                 await Task.Run(() => SearchRecursively(root, searchText, localFolders, cancellationToken));
 
-#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-                Task.Run(() => SearchRemoteFolders(searchText, cancellationToken));
-#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+                var t = Task.Run(() => SearchRemoteFolders(searchText, cancellationToken));
 
                 if (cancellationToken.IsCancellationRequested)
                     return;
@@ -1173,7 +1171,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 if (indexPath.LongSection < 0 || indexPath.Row < 0 || indexPath.LongSection >= items.Count || indexPath.Row >= items[indexPath.LongSection].Count)
                     return actions.ToArray();
-                
+
                 var f = items[indexPath.LongSection][indexPath.Row];
 
                 if (FavoriteStatus.ContainsKey(f.Id))
@@ -1737,7 +1735,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 if (indexPath.Row < 0 || indexPath.Row >= items.Count)
                     return actions.ToArray();
-                
+
                 var f = items[indexPath.Row];
 
                 if (FavoriteStatus.ContainsKey(f.Id))

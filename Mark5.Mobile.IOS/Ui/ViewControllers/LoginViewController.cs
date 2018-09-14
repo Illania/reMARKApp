@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using CoreAnimation;
 using CoreGraphics;
 using Foundation;
@@ -100,13 +101,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             didChangeFrameNotificationObserver = UIKeyboard.Notifications.ObserveDidChangeFrame(OnKeyboardDidChangeFrameNotification);
         }
 
-        public override void ViewDidAppear(bool animated)
+        public override async void ViewDidAppear(bool animated)
         {
             base.ViewDidAppear(animated);
 
             CommonConfig.Logger.Info("Appeared");
 
             StartLogoScaleAnimation();
+
+            await RefreshData();
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -378,6 +381,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 loginButton.WidthAnchor.ConstraintEqualTo(LoginButtonWidth),
                 loginButton.HeightAnchor.ConstraintEqualTo(LoginButtonHeight)
             });
+        }
+
+        async Task RefreshData()
+        {
+            var retainedConnectionInfo = await authenticator.GetRetainedConnectionInfoAsync();
+            if (retainedConnectionInfo != null)
+            {
+                usernameTextField.Text = retainedConnectionInfo.Username;
+                hostnameTextField.Text = retainedConnectionInfo.Hostname;
+                portTextField.Text = retainedConnectionInfo.Port.ToString();
+                sslMode = retainedConnectionInfo.SslMode;
+            }
         }
 
         #endregion
@@ -671,7 +686,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 dismissAction?.Invoke();
 
-                UNUserNotificationCenter.Current.RequestAuthorization(UNAuthorizationOptions.Alert | UNAuthorizationOptions.Badge | UNAuthorizationOptions.Sound, (result, error) => { });
+                UNUserNotificationCenter.Current.RequestAuthorization(UNAuthorizationOptions.Alert | UNAuthorizationOptions.Badge | UNAuthorizationOptions.Sound, (result, error) =>
+                {
+                    ((AppDelegate)UIApplication.SharedApplication.Delegate)?.OnAuthorizationRequested(result, error);
+                });
 
                 CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Hostname, hostname);
                 CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.SSL, sslMode.ToString());
