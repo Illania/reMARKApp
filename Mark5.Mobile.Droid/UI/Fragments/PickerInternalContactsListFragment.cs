@@ -251,19 +251,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 SetItems(items);
             }
 
-            public int GetPosition(SystemUser systemUser)
-            {
-                var position = -1;
-                for (var i = 0; i < Items.Count; i++)
-                    if (Items[i].Id == systemUser.Id)
-                    {
-                        position = i;
-                        break;
-                    }
-
-                return position;
-            }
-
             string ISectionedAdapter.GetSectionName(int position)
             {
                 return Items[position].Username?.SafeSubstring(0, 1)?.ToUpper() ?? "";
