@@ -293,7 +293,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public void AddInternalUsersFromGuids(IEnumerable<string> internalUsersGuids)
         {
-            AddInternalUsers(string.Join(RecipientSeperator, ConvertGuidsToUsernames(internalUsersGuids)));
+            AddInternalUsers(ConvertGuidsToUsernames(internalUsersGuids));
         }
 
         public void AddInternalUsers(IEnumerable<string> internalUsers)
@@ -441,7 +441,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         void SetRecipients(IEnumerable<string> recipients)
         {
-            emailEditor.Text = string.Join(", ", recipients);
+            emailEditor.Text = string.Join(RecipientSeperator, recipients);
         }
 
         IEnumerable<string> GetRecipents() => emailEditor.Text.Split(new[] { RecipientSeperator }, StringSplitOptions.RemoveEmptyEntries)
@@ -466,9 +466,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
         }
 
-        IEnumerable<string> GetInternalUsers() => Validator.ContainsValidUsernames(emailEditor.Text, out IEnumerable<Match> matches) ?
-                                                    matches.Select(m => m.Value).Distinct().ToList() :
-                                                    new List<string>();
+        IEnumerable<string> GetInternalUsers() => Validator.ExtractUsernames(emailEditor.Text).Select(m => m.Value).Distinct().ToList();
 
         void Clear()
         {
@@ -589,7 +587,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
         }
 
-        bool IsAnExistingUser(string s) => systemUsersDepartments.Users.FirstOrDefault(su => String.Equals(su.Username, s, StringComparison.OrdinalIgnoreCase)) != null;
+        bool IsAnExistingUser(string s) => systemUsersDepartments.Users.Any(su => String.Equals(su.Username, s, StringComparison.OrdinalIgnoreCase));
 
         void ResetStyle()
         {

@@ -545,9 +545,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             }
         }
 
-        IEnumerable<string> GetInternalUsers() => Validator.ContainsValidUsernames(TextView.Text, out IEnumerable<Match> matches)
-                                                           ? matches.Select(m => m.Value).Distinct().ToArray()
-                                                           : new string[0];
+        IEnumerable<string> GetInternalUsers() => Validator.ExtractUsernames(emailEditor.Text).Select(m => m.Value).Distinct().ToList();
+
         #region Public methods
 
         public bool ContainsInvalidRecipients() => TextView.Text.Split(new[] { RecipientSeperator }, StringSplitOptions.RemoveEmptyEntries)
@@ -702,7 +701,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         public void SetRecipients(IEnumerable<string> recipients)
         {
-            var emailText = string.Join(", ", recipients);
+            var emailText = string.Join(RecipientSeperator, recipients);
 
             TextView.TextStorage.BeginEditing();
             TextView.TextStorage.SetString(emailText.ToNSAttributedString());
@@ -785,7 +784,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             return TextView.Text;
         }
 
-        bool IsAnExistingUser(string s) => SystemUsersDepartments.Users.FirstOrDefault(su => String.Equals(su.Username, s, StringComparison.OrdinalIgnoreCase)) != null;
+        bool IsAnExistingUser(string s) => SystemUsersDepartments.Users.Any(su => String.Equals(su.Username, s, StringComparison.OrdinalIgnoreCase));
 
         #endregion
     }
