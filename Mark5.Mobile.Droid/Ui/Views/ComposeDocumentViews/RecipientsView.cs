@@ -40,7 +40,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             get
             {
-                return Validator.ExtractValidEmails(emailEditor.Text).Count == (emailEditor.Text.Split(',').Count(s => !string.IsNullOrWhiteSpace(s)) - emailEditor.Text.Split(',').Count(s => Validator.ContainsValidUsernames(s)));
+                return Validator.ExtractValidEmails(emailEditor.Text).Count == (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable 
+                                                                                ? (emailEditor.Text.Split(',').Count(s => !string.IsNullOrWhiteSpace(s)) -
+                                                                                   emailEditor.Text.Split(',').Count(s => Validator.ContainsValidUsernames(s)))
+                                                                                : emailEditor.Text.Split(',').Count(s => !string.IsNullOrWhiteSpace(s)));
             }
         }
 
