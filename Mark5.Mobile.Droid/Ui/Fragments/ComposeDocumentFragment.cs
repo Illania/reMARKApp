@@ -609,7 +609,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     return;
             }
 
-            if (choice != 3)
+            if (choice != 2)
                 focusedRecipientView.RequestEditorFocus();
         }
 
