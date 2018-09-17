@@ -837,7 +837,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.AddAttachment)
             {
-
                 CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.Local));
                 AddAttachment();
             }
@@ -1000,6 +999,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 subjectView.SetSubject(template.Subject);
 
             lineView.SetLine(template.LineGuid);
+
+            if (template.Attachments.Any())
+                template.Attachments.ForEach(a => attachmentsView.AddAttachment(a));
         }
 
         static void ProcessTemplate(Template template, DocumentPreview documentPreview)
