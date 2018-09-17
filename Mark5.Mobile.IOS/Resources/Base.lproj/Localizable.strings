@@ -363,6 +363,8 @@
 "tap_select_line" = "Tap to select a mailbox";
 "telex" = "Telex";
 "templates" = "Templates";
+"template_attachment_title" = "Attachment from template";
+"template_attachment_content" = "It is not possible to open attachments from templates";
 "template_null" = "You do not have a default template set.";
 "template_question" = "Which template do you want to use?";
 "template_selection_another" = "Another template";
