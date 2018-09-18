@@ -615,18 +615,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         public void AddInternalUsersFromGuids(IEnumerable<string> internalUsersGuids)
         {
-            AddInternalUsers(string.Join(RecipientSeperator, ConvertGuidsToUsernames(internalUsersGuids)));
+            AddInternalUsers(ConvertGuidsToUsernames(internalUsersGuids));
         }
 
-        public void AddInternalUsers(string internalUsers)
+        public void AddInternalUsers(IEnumerable<string> internalUsers)
         {
-            if (Validator.ContainsValidUsernames(internalUsers, out IEnumerable<Match> matches))
+            if (internalUsers.Any())
             {
                 var newInternalUsers = new StringBuilder();
                 newInternalUsers.Append(TextView.Text);
                 if (!TextView.Text.EndsWith(RecipientSeperator, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(TextView.Text))
                     newInternalUsers.Append(RecipientSeperator);
-                newInternalUsers.Append(string.Join(RecipientSeperator, matches.Where(m => IsAnExistingUser(m.Value)).Select(m => m.Value)));
+                newInternalUsers.Append(string.Join(RecipientSeperator, internalUsers));
                 newInternalUsers.Append(RecipientSeperator);
 
                 TextView.TextStorage.BeginEditing();

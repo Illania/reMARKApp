@@ -298,18 +298,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public void AddInternalUsers(IEnumerable<string> internalUsers)
         {
-            AddInternalUsers(string.Join(RecipientSeperator, internalUsers));
-        }
-
-        public void AddInternalUsers(string internalUsers)
-        {
-            if (Validator.ContainsValidUsernames(internalUsers, out IEnumerable<Match> matches))
+            if (internalUsers.Any())
             {
                 var newInternalUsers = new StringBuilder();
                 newInternalUsers.Append(emailEditor.Text);
                 if (!emailEditor.Text.EndsWith(RecipientSeperator, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(emailEditor.Text))
                     newInternalUsers.Append(RecipientSeperator);
-                newInternalUsers.Append(string.Join(RecipientSeperator, matches.Where(m => IsAnExistingUser(m.Value)).Select(m => m.Value)));
+                newInternalUsers.Append(string.Join(RecipientSeperator, internalUsers));
                 newInternalUsers.Append(RecipientSeperator);
 
                 emailEditor.Text = newInternalUsers.ToString();

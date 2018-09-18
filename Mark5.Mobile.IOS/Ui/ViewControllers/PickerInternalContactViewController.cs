@@ -128,7 +128,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void InternalContactSelected(SystemUser user)
         {
-            tcs.SetResult(new Recipient(user.FirstName + " " + user.LastName, user.Username, RecipientType.InternalContact));
+            tcs.SetResult(new Recipient(user.FirstName + " " + user.LastName, user.Username, RecipientType.Internal));
             DismissViewController(true, null);
         }
 
