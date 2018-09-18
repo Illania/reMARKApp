@@ -301,7 +301,7 @@ namespace Mark5.Mobile.Common.Storage
 
             var folderName = documentWorkingCopy.Document.Guid.ToString();
 
-            if (await CommonConfig.DocumentsToUploadFolder.CheckExistsAsync(folderName) == ExistenceCheckResult.FileExists)
+            if (await CommonConfig.DocumentsToUploadFolder.CheckExistsAsync(folderName) == ExistenceCheckResult.FolderExists)
             {
                 CommonConfig.Logger.Error("The document to send is already there!");
                 return;

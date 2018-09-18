@@ -304,7 +304,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async Task LoadDocument()
         {
-
             if (documentLoaded)
                 return;
 
@@ -350,6 +349,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     document.Id = previousDocumentId.Value;
                     documentPreview.Id = previousDocumentId.Value;
                 }
+
+                document.Guid = Guid.NewGuid();
 
                 await ShowDocument();
                 dismissAction();
