@@ -388,13 +388,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         EndEditing();
                     }));
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"),
-                UIAlertActionStyle.Default,
-                a =>
+            if (ServerConfig.SystemSettings.DocumentsModuleInfo.WorktrayEnabled ?? true)
+            {
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"),
+                                                   UIAlertActionStyle.Default,
+                                                   a =>
                 {
                     CopyToWorktray(selectedDocuments);
                     EndEditing();
                 }));
+            }
+
             eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"),
                 UIAlertActionStyle.Default,
                 a =>
@@ -1535,13 +1539,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                             }
                             break;
                         case EmailSwipeAction.SwipeAction.CopyToWorkTray:
-                            actionWrapper.Action = UITableViewRowAction.Create(
-                                UITableViewRowActionStyle.Default,
-                                SwipeActionTitle(swipeAction, documentPreview),
-                                (a, ip) =>
+                            if (ServerConfig.SystemSettings.DocumentsModuleInfo.WorktrayEnabled ?? true)
+                            {
+                                actionWrapper.Action = UITableViewRowAction.Create(
+                                    UITableViewRowActionStyle.Default,
+                                    SwipeActionTitle(swipeAction, documentPreview),
+                                    (a, ip) =>
                                 {
                                     OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView);
                                 });
+                            }
                             break;
                         case EmailSwipeAction.SwipeAction.More:
                             actionWrapper.Action = UITableViewRowAction.Create(

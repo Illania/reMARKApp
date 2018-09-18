@@ -294,13 +294,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             var rows = TableView.IndexPathsForSelectedRows.ToArray();
             var selectedContacts = rows.Select(ip => ((DataSource)TableView.Source).FindItemAtIndexPath(ip)).ToList();
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"),
-                UIAlertActionStyle.Default,
-                a =>
+            if (ServerConfig.SystemSettings.ContactsModuleInfo.WorktrayEnabled ?? true)
+            {
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"),
+                                                   UIAlertActionStyle.Default,
+                                                   a =>
                 {
                     CopyToWorktray(selectedContacts);
                     EndEditing();
                 }));
+            }
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"),
                 UIAlertActionStyle.Default,
@@ -896,15 +899,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
                 var contactPreview = items[indexPath.Section][indexPath.Row];
 
-                var copyToWorktrayAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
-                                                                       Localization.GetString("copy_to_worktray_ml"),
-                                                                       (a, ip) =>
+                if (ServerConfig.SystemSettings.ContactsModuleInfo.WorktrayEnabled ?? true)
                 {
-                    viewControllerWeakReference.Unwrap()?.CopyToWorktray(contactPreview);
-                    viewControllerWeakReference.Unwrap()?.EndEditing();
-                });
-                copyToWorktrayAction.BackgroundColor = Theme.DarkBlue;
-                actions.Add(copyToWorktrayAction);
+                    var copyToWorktrayAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
+                                                                           Localization.GetString("copy_to_worktray_ml"),
+                                                                           (a, ip) =>
+                    {
+                        viewControllerWeakReference.Unwrap()?.CopyToWorktray(contactPreview);
+                        viewControllerWeakReference.Unwrap()?.EndEditing();
+                    });
+                    copyToWorktrayAction.BackgroundColor = Theme.DarkBlue;
+                    actions.Add(copyToWorktrayAction);
+                }
 
                 var moreAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
                                                              Localization.GetString("more"),

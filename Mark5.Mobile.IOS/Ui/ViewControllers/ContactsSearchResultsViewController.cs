@@ -470,10 +470,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         viewControllerWeakReference.Unwrap()?.CopyToWorktray(contactPreview);
                         viewControllerWeakReference.Unwrap()?.EndEditing();
                     });
+                    copyToWorktrayAction.BackgroundColor = Theme.DarkBlue;
+                    actions.Add(copyToWorktrayAction);
                 }
 
-                copyToWorktrayAction.BackgroundColor = Theme.DarkBlue;
-                actions.Add(copyToWorktrayAction);
 
                 var moreAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
                                                              Localization.GetString("more"),
