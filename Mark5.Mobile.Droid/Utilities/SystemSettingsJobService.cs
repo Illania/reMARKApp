@@ -52,7 +52,8 @@ namespace Mark5.Mobile.Droid.Utilities
 
                     ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Remote);
 
-                    await Managers.SystemManager.GetSystemUsersDepartmentsAsync(SourceType.Remote);
+                    if (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
+                        await Managers.SystemManager.GetSystemUsersDepartmentsAsync(SourceType.Remote);
                 }
                 catch (Exception ex)
                 {

@@ -273,7 +273,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 CommonConfig.Logger.Info("Retrieving system settings...");
 
                 ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync();
-                await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
+                if (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
+                    await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
                 SystemSettingsJobService.ScheduleJob();
 
                 CommonConfig.Logger.Info($"Starting services...");
