@@ -494,7 +494,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (CurrentAdapter.SelectedItems.Any(dp => dp.IsReadByCurrent))
                 menu.Add(MenuItemGroup.Actions, MenuItemActions.MarkAsUnread, MenuItemActions.MarkAsUnread, Resource.String.marks_as_unread);
 
-            menu.Add(MenuItemGroup.Actions, MenuItemActions.CopyToWorktray, MenuItemActions.CopyToWorktray, Resource.String.copy_to_worktray);
+            if (ServerConfig.SystemSettings.DocumentsModuleInfo.WorktrayEnabled ?? true)
+                menu.Add(MenuItemGroup.Actions, MenuItemActions.CopyToWorktray, MenuItemActions.CopyToWorktray, Resource.String.copy_to_worktray);
+
             menu.Add(MenuItemGroup.Actions, MenuItemActions.CopyToFolder, MenuItemActions.CopyToFolder, Resource.String.copy_to_folder);
 
             if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
