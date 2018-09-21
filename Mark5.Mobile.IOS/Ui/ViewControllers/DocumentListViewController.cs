@@ -388,13 +388,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         EndEditing();
                     }));
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"),
-                UIAlertActionStyle.Default,
-                a =>
+            if (ServerConfig.SystemSettings.DocumentsModuleInfo.WorktrayEnabled ?? true)
+            {
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"),
+                                                   UIAlertActionStyle.Default,
+                                                   a =>
                 {
                     CopyToWorktray(selectedDocuments);
                     EndEditing();
                 }));
+            }
+
             eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"),
                 UIAlertActionStyle.Default,
                 a =>
@@ -1117,6 +1121,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             switch (action)
             {
+                case EmailSwipeAction.SwipeAction.CopyToWorkTray:
+                    return ServerConfig.SystemSettings.DocumentsModuleInfo.WorktrayEnabled ?? true;
                 case EmailSwipeAction.SwipeAction.MoveToFolder:
                     return folder.InternalType == FolderInternalType.FilterView || folder.InternalType == FolderInternalType.Static || folder.InternalType == FolderInternalType.Worktray;
                 case EmailSwipeAction.SwipeAction.Delete:
@@ -1535,13 +1541,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                             }
                             break;
                         case EmailSwipeAction.SwipeAction.CopyToWorkTray:
-                            actionWrapper.Action = UITableViewRowAction.Create(
-                                UITableViewRowActionStyle.Default,
-                                SwipeActionTitle(swipeAction, documentPreview),
-                                (a, ip) =>
+                                actionWrapper.Action = UITableViewRowAction.Create(
+                                    UITableViewRowActionStyle.Default,
+                                    SwipeActionTitle(swipeAction, documentPreview),
+                                    (a, ip) =>
                                 {
                                     OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView);
                                 });
+                            actionWrapper.Disabled = !SwipeActionAllowed(swipeAction.Action, documentPreview, folder);
                             break;
                         case EmailSwipeAction.SwipeAction.More:
                             actionWrapper.Action = UITableViewRowAction.Create(
@@ -1701,8 +1708,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         }
                         break;
                     case EmailSwipeAction.SwipeAction.CopyToWorkTray:
-                        viewControllerWeakReference.Unwrap()?.CopyToWorktray(documentPreview);
-                        viewControllerWeakReference.Unwrap()?.EndEditing();
+                        if (SwipeActionAllowed(EmailSwipeAction.SwipeAction.Delete, documentPreview, folder))
+                        {
+                            viewControllerWeakReference.Unwrap()?.CopyToWorktray(documentPreview);
+                            viewControllerWeakReference.Unwrap()?.EndEditing();
+                        }
                         break;
                     case EmailSwipeAction.SwipeAction.More:
                         viewControllerWeakReference.Unwrap()?.ShowMoreActionSheet(indexPath, documentPreview, folder);

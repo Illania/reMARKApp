@@ -342,13 +342,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"),
-                                               UIAlertActionStyle.Default,
-                                               a =>
+            if (ServerConfig.SystemSettings.ShortcodesModuleInfo.WorktrayEnabled ?? true)
             {
-                var vc = new CopyToWorktrayViewController { BusinessEntities = new List<IBusinessEntity> { shortcode } };
-                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-            }));
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"),
+                                                   UIAlertActionStyle.Default,
+                                                   a =>
+                {
+                    var vc = new CopyToWorktrayViewController { BusinessEntities = new List<IBusinessEntity> { shortcode } };
+                    PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+                }));
+            }
+
             eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"),
                                                UIAlertActionStyle.Default,
                                                a =>
