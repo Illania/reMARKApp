@@ -1552,8 +1552,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 switch (action)
                 {
+                    case Preferences.EmailSwipeAction.CopyToWorkTray:
+                        return ServerConfig.SystemSettings.DocumentsModuleInfo.WorktrayEnabled ?? true;
                     case Preferences.EmailSwipeAction.Delete:
-                        return ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || adapter.SelectedItems.All(dp => dp.Direction == DocumentDirection.Draft); ;
+                        return ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || adapter.SelectedItems.All(dp => dp.Direction == DocumentDirection.Draft);
                     case Preferences.EmailSwipeAction.MoveToFolder:
                         return folder.InternalType == FolderInternalType.FilterView || folder.InternalType == FolderInternalType.Static || folder.InternalType == FolderInternalType.Worktray;
                     case Preferences.EmailSwipeAction.RemoveFromFolder:

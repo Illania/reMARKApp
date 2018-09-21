@@ -1121,6 +1121,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             switch (action)
             {
+                case EmailSwipeAction.SwipeAction.CopyToWorkTray:
+                    return ServerConfig.SystemSettings.DocumentsModuleInfo.WorktrayEnabled ?? true;
                 case EmailSwipeAction.SwipeAction.MoveToFolder:
                     return folder.InternalType == FolderInternalType.FilterView || folder.InternalType == FolderInternalType.Static || folder.InternalType == FolderInternalType.Worktray;
                 case EmailSwipeAction.SwipeAction.Delete:
@@ -1539,8 +1541,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                             }
                             break;
                         case EmailSwipeAction.SwipeAction.CopyToWorkTray:
-                            if (ServerConfig.SystemSettings.DocumentsModuleInfo.WorktrayEnabled ?? true)
-                            {
                                 actionWrapper.Action = UITableViewRowAction.Create(
                                     UITableViewRowActionStyle.Default,
                                     SwipeActionTitle(swipeAction, documentPreview),
@@ -1548,7 +1548,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                                 {
                                     OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView);
                                 });
-                            }
+                            actionWrapper.Disabled = !SwipeActionAllowed(swipeAction.Action, documentPreview, folder);
                             break;
                         case EmailSwipeAction.SwipeAction.More:
                             actionWrapper.Action = UITableViewRowAction.Create(
@@ -1708,8 +1708,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         }
                         break;
                     case EmailSwipeAction.SwipeAction.CopyToWorkTray:
-                        viewControllerWeakReference.Unwrap()?.CopyToWorktray(documentPreview);
-                        viewControllerWeakReference.Unwrap()?.EndEditing();
+                        if (SwipeActionAllowed(EmailSwipeAction.SwipeAction.Delete, documentPreview, folder))
+                        {
+                            viewControllerWeakReference.Unwrap()?.CopyToWorktray(documentPreview);
+                            viewControllerWeakReference.Unwrap()?.EndEditing();
+                        }
                         break;
                     case EmailSwipeAction.SwipeAction.More:
                         viewControllerWeakReference.Unwrap()?.ShowMoreActionSheet(indexPath, documentPreview, folder);
