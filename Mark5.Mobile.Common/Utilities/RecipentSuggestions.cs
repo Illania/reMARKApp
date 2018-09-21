@@ -88,10 +88,10 @@ namespace Mark5.Mobile.Common.Utilities
             {
                 var filtered = new List<Recipient>();
 
-                var matchingInternalUsers = systemUsersDepartments.Users.FindAll(user => user.Username.ContainsCaseInsensitive(phrase));
+                var matchingInternalUsers = systemUsersDepartments.Users.FindAll(user => user.FirstName.ContainsCaseInsensitive(phrase) || user.LastName.ContainsCaseInsensitive(phrase) || user.Username.ContainsCaseInsensitive(phrase));
 
                 foreach (SystemUser user in matchingInternalUsers)
-                    filtered.Add(new Recipient(user.FirstName + " " + user.LastName, user.Username, RecipientType.Internal));   
+                    filtered.Add(new Recipient(user.FirstName + " " + user.LastName, null, RecipientType.Internal));   
                 
                 handler(filtered, token);
             });
