@@ -42,7 +42,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         protected List<int> preselectedUserIds;
         protected int actionButtonTextResId;
         protected bool includeCurrentUser;
-        protected bool allowNoUserSelected;
+        protected bool? allowNoUserSelected;
 
         #region Fragment overrides
 
@@ -89,7 +89,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             actionButton = rootView.FindViewById<AppCompatButton>(Resource.Id.button);
             actionButton.SetText(actionButtonTextResId);
-            actionButton.Enabled = false;
+            actionButton.Enabled = allowNoUserSelected ?? false;
             actionButton.Click += ActionButton_Click;
 
             HasOptionsMenu = true;
@@ -219,7 +219,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.select_users);
                 ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
-                if (!allowNoUserSelected)
+                if (!allowNoUserSelected.Value)
                 {
                     actionButton.Enabled = false;
                 }
