@@ -11,7 +11,7 @@ namespace Mark5.Mobile.Common.Model
         public string ServerTimeZoneInfoSerialized { get; set; }
         public string CustomerName { get; set; }
         public Guid CustomerGuid { get; set; }
-        public bool InternalMailsAvailable => ServiceVersion.Major >= 3 && ServiceVersion.Minor >= 2;
+        public bool InternalMailsAvailable => ServiceVersionGreaterThanOrEqual(3, 2, 0);
 
         List<ModuleType> availableModules;
         public List<ModuleType> AvailableModules
@@ -45,6 +45,11 @@ namespace Mark5.Mobile.Common.Model
                 CommonConfig.Logger.Error("Error while deserializing server timezone info", ex);
                 return null;
             }
+        }
+
+        public bool ServiceVersionGreaterThanOrEqual(int major, int minor, int build)
+        {
+            return new Version(major, minor, build) >= ServiceVersion;
         }
     }
 }
