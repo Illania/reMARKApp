@@ -313,20 +313,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async Task LoadSystemUsersDepartments()
         {
-            SystemUsersDepartments systemUsersDepartments;
+            SystemUsersDepartments systemUsersDepartments = null;
 
             try
             {
-                systemUserDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
+                systemUsersDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
             } catch (Exception ex)
             {
                 if (ex is HttpAppServiceException)
-                    systemUserDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync(SourceType.Local);
+                    systemUsersDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync(SourceType.Local);
             } 
 
-            toView.SystemUsersDepartments = systemUserDepartments;
-            ccView.SystemUsersDepartments = systemUserDepartments;
-            bccView.SystemUsersDepartments = systemUserDepartments;
+            toView.SystemUsersDepartments = systemUsersDepartments;
+            ccView.SystemUsersDepartments = systemUsersDepartments;
+            bccView.SystemUsersDepartments = systemUsersDepartments;
         }
 
         async Task LoadDocument()
