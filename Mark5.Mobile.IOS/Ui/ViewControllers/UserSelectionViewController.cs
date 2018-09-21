@@ -14,7 +14,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    public class ResponsibleUsersSelectionController : AbstractTableViewController
+    public class UserSelectionViewController : AbstractTableViewController
     {
         public List<int> PreselectedSystemUserIds { get; set; }
 
@@ -210,13 +210,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
             }
 
-            readonly WeakReference<ResponsibleUsersSelectionController> viewControllerWeakReference;
+            readonly WeakReference<UserSelectionViewController> viewControllerWeakReference;
             readonly WeakReference<UITableView> tableViewWeakReference;
 
             bool loading = true;
             readonly List<SystemUser> items = new List<SystemUser>();
 
-            public DataSource(ResponsibleUsersSelectionController viewController, UITableView tableView)
+            public DataSource(UserSelectionViewController viewController, UITableView tableView)
             {
                 viewControllerWeakReference = viewController.Wrap();
                 tableViewWeakReference = tableView.Wrap();
