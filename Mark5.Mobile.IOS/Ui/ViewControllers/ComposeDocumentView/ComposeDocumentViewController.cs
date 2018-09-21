@@ -20,6 +20,7 @@ using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView;
 using Mark5.Mobile.IOS.Utilities;
+using Mark5.ServiceReference.Exceptions;
 using MobileCoreServices;
 using Photos;
 using UIKit;
@@ -413,7 +414,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async Task LoadSystemUsersDepartments()
         {
-            systemUserDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
+            SystemUsersDepartments systemUsersDepartments;
+
+            try
+            {
+                systemUserDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
+            }
+            catch (Exception ex)
+            {
+                if (ex is HttpAppServiceException)
+                    systemUserDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync(SourceType.Local);
+            }
+
             var subViews = headerStackView.Subviews.OfType<RecipientsView>().ToArray();
 
             foreach (var subView in subViews)

@@ -24,7 +24,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         public SystemUsersDepartments SystemUsersDepartments { get; set; }
         public DocumentAddressType AddressType { get; protected set; }
-        public bool Empty => (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
+        public bool Empty => ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable
         ? !Validator.ContainsValidEmail(TextView.Text) && !Validator.ContainsValidUsernames(TextView.Text,SystemUsersDepartments) : !Validator.ContainsValidEmail(TextView.Text);
 
         public bool SuggestionOverlayActive;
@@ -744,7 +744,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         IEnumerable<string> ConvertGuidsToUsernames(IEnumerable<string> systemUserGuids)
         {
-            return SystemUsersDepartments.Users.Where(su => systemUserGuids.Any(g => g == su.Guid.ToString())).Select(su => su.Username);
+            return SystemUsersDepartments?.Users.Where(su => systemUserGuids.Any(g => g == su.Guid.ToString())).Select(su => su.Username);
         }
 
         public void Clear()

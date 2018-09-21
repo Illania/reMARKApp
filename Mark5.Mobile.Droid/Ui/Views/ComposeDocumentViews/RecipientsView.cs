@@ -470,7 +470,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         IEnumerable<string> ConvertGuidsToUsernames(IEnumerable<string> systemUserGuids)
         {
-            return SystemUsersDepartments.Users.Where(su => systemUserGuids.Any(g => g == su.Guid.ToString())).Select(su => su.Username);
+            return SystemUsersDepartments?.Users.Where(su => systemUserGuids.Any(g => g == su.Guid.ToString())).Select(su => su.Username);
         }
 
         #endregion

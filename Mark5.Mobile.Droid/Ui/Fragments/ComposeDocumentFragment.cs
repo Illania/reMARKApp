@@ -25,6 +25,7 @@ using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
 using Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews;
 using Mark5.Mobile.Droid.Utilities;
+using Mark5.ServiceReference.Exceptions;
 using PCLStorage;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
@@ -239,7 +240,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info($"Resuming {nameof(ComposeDocumentFragment)}...");
 
             if (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
-                await LoadSystemUserDepartments();
+                await LoadSystemUsersDepartments();
             await LoadDocument();
 
             CommonConfig.Logger.Info($"Resumed {nameof(ComposeDocumentFragment)}...");
@@ -310,9 +311,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             bccView.AddEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Bcc).Select(da => da.Address));
         }
 
-        async Task LoadSystemUserDepartments()
+        async Task LoadSystemUsersDepartments()
         {
-            var systemUserDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
+            SystemUsersDepartments systemUsersDepartments;
+
+            try
+            {
+                systemUserDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
+            } catch (Exception ex)
+            {
+                if (ex is HttpAppServiceException)
+                    systemUserDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync(SourceType.Local);
+            } 
 
             toView.SystemUsersDepartments = systemUserDepartments;
             ccView.SystemUsersDepartments = systemUserDepartments;
