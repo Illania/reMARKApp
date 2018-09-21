@@ -34,7 +34,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         public event EventHandler AddButtonClicked = delegate { };
 
         public bool Empty => (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
-        ? !Validator.ContainsValidEmail(emailEditor.Text) && !Validator.ContainsValidUsernames(emailEditor.Text) : !Validator.ContainsValidEmail(emailEditor.Text);
+        ? !Validator.ContainsValidEmail(emailEditor.Text) && !Validator.ContainsValidUsernames(emailEditor.Text,systemUsersDepartments) : !Validator.ContainsValidEmail(emailEditor.Text);
 
         public bool AllRecipientsValid
         {
@@ -42,7 +42,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             {
                 return emailEditor.Text.Split(new[] { RecipientSeperator }, StringSplitOptions.RemoveEmptyEntries)
                                   .All(a => ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable
-                                       ? (Validator.ContainsValidEmails(a) || Validator.ExtractUsernames(a).Any(m => IsAnExistingUser(m.Value)))
+                                       ? (Validator.ContainsValidEmails(a) || Validator.ContainsValidUsernames(a,systemUsersDepartments))
                                        : Validator.ContainsValidEmails(a));
             }
         }
@@ -446,7 +446,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         void SetInternalUsers(string users)
         {
-            if (Validator.ContainsValidUsernames(users, out IEnumerable<Match> matches))
+            if (Validator.ContainsValidUsernames(users, systemUsersDepartments, out IEnumerable<Match> matches))
             {
                 var sb = new StringBuilder();
                 sb.Append(string.Join(RecipientSeperator, matches.Select(m => m.Value)));
@@ -461,7 +461,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
         }
 
-        IEnumerable<string> GetInternalUsers() => Validator.ExtractUsernames(emailEditor.Text).Select(m => m.Value).Distinct().ToList();
+        IEnumerable<string> GetInternalUsers() => Validator.ExtractUsernames(emailEditor.Text,systemUsersDepartments).Select(m => m.Value).Distinct().ToList();
 
         void Clear()
         {
@@ -565,7 +565,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 return;
 
             var emailMatches = Validator.ExtractValidEmails(emailEditor.Text);
-            var internalUserMatches = Validator.ExtractUsernames(emailEditor.Text);
 
             ResetStyle();
 
@@ -574,15 +573,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
             if (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
             {
+                var internalUserMatches = Validator.ExtractUsernames(emailEditor.Text, systemUsersDepartments);
+
                 foreach (Match match in internalUserMatches)
                 {
-                    if (systemUsersDepartments != null && IsAnExistingUser(match.Value))
-                        SetEmailStyle(match.Index, match.Index + match.Length);
+                    SetEmailStyle(match.Index, match.Index + match.Length);
                 }
             }
         }
-
-        bool IsAnExistingUser(string s) => systemUsersDepartments.Users.Any(su => String.Equals(su.Username, s, StringComparison.OrdinalIgnoreCase));
 
         void ResetStyle()
         {

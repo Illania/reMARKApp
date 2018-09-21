@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Common.Utilities
 {
@@ -85,24 +87,23 @@ namespace Mark5.Mobile.Common.Utilities
             return !string.IsNullOrEmpty(phoneNumber);
         }
 
-        public static bool ContainsValidUsernames(string text)
+        public static bool ContainsValidUsernames(string text, SystemUsersDepartments systemUserDepartments)
         {
-            return ContainsValidUsernames(text, out IEnumerable<Match> mc);
+            return ContainsValidUsernames(text, systemUserDepartments, out IEnumerable<Match> mc);
         }
 
-        public static bool ContainsValidUsernames(string text, out IEnumerable<Match> matches)
+        public static bool ContainsValidUsernames(string text, SystemUsersDepartments systemUserDepartments, out IEnumerable<Match> matches)
         {
-            matches = ExtractUsernames(text);
+            matches = ExtractUsernames(text,systemUserDepartments);
             return matches.Any();
         }
 
-        public static IEnumerable<Match> ExtractUsernames(string text)
+        public static IEnumerable<Match> ExtractUsernames(string text, SystemUsersDepartments systemUsersDepartments)
         {
-            var validEmailMatches = ExtractValidEmails(text).Cast<Match>();
             var matches = Regex.Matches(text ?? string.Empty, UsernameRegex, RegexOptions.IgnoreCase).Cast<Match>();
 
-            if (validEmailMatches.Any())
-                matches = matches.Cast<Match>().Where(m => validEmailMatches.FirstOrDefault(em => em.Index <= m.Index && (em.Index + em.Length) >= (m.Index + m.Length)) == null).Select(m => m);
+            if (systemUsersDepartments != null)
+                matches = matches.Cast<Match>().Where(m => !m.Value.Contains("@") && systemUsersDepartments.Users.Any(su => String.Equals(su.Username, m.Value, StringComparison.OrdinalIgnoreCase))).Select(m => m);
 
             return matches;
         }

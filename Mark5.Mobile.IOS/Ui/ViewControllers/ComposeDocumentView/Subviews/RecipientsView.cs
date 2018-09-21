@@ -25,7 +25,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         public SystemUsersDepartments SystemUsersDepartments { get; set; }
         public DocumentAddressType AddressType { get; protected set; }
         public bool Empty => (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
-        ? !Validator.ContainsValidEmail(TextView.Text) && !Validator.ContainsValidUsernames(TextView.Text) : !Validator.ContainsValidEmail(TextView.Text);
+        ? !Validator.ContainsValidEmail(TextView.Text) && !Validator.ContainsValidUsernames(TextView.Text,SystemUsersDepartments) : !Validator.ContainsValidEmail(TextView.Text);
 
         public bool SuggestionOverlayActive;
 
@@ -467,17 +467,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             TextView.TextStorage.RemoveAttribute(UIStringAttributeKey.ForegroundColor, new NSRange(0, TextView.Text.Length));
 
             var emailMatches = Validator.ExtractValidEmails(TextView.Text);
-            var internalUserMatches = Validator.ExtractUsernames(TextView.Text);
 
             foreach (Match match in emailMatches)
                 TextView.TextStorage.AddAttribute(UIStringAttributeKey.ForegroundColor, Theme.TintColor, new NSRange(match.Index, match.Length));
 
             if (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
             {
+                var internalUserMatches = Validator.ExtractUsernames(TextView.Text,SystemUsersDepartments);
+
                 foreach (Match match in internalUserMatches)
                 {
-                    if (SystemUsersDepartments != null && IsAnExistingUser(match.Value))
-                        TextView.TextStorage.AddAttribute(UIStringAttributeKey.ForegroundColor, Theme.TintColor, new NSRange(match.Index, match.Length));
+                    TextView.TextStorage.AddAttribute(UIStringAttributeKey.ForegroundColor, Theme.TintColor, new NSRange(match.Index, match.Length));
                 }
             }
 
@@ -530,7 +530,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         void SetInternalUsers(string users)
         {
-            if (Validator.ContainsValidUsernames(users, out IEnumerable<Match> matches))
+            if (Validator.ContainsValidUsernames(users, SystemUsersDepartments, out IEnumerable<Match> matches))
             {
                 var sb = new StringBuilder();
                 sb.Append(string.Join(RecipientSeperator, matches.Select(m => m.Value)));
@@ -545,13 +545,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             }
         }
 
-        IEnumerable<string> GetInternalUsers() => Validator.ExtractUsernames(emailEditor.Text).Select(m => m.Value).Distinct().ToList();
+        IEnumerable<string> GetInternalUsers() => Validator.ExtractUsernames(TextView.Text, SystemUsersDepartments).Select(m => m.Value).Distinct().ToList();
 
         #region Public methods
 
         public bool ContainsInvalidRecipients() => TextView.Text.Split(new[] { RecipientSeperator }, StringSplitOptions.RemoveEmptyEntries)
                                                            .Any(a => ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable 
-                                                                ? (!Validator.ContainsValidEmails(a) && !Validator.ExtractUsernames(a).Any(m => IsAnExistingUser(m.Value))) 
+                                                                ? (!Validator.ContainsValidEmails(a) && !Validator.ContainsValidUsernames(a,SystemUsersDepartments)) 
                                                                 : !Validator.ContainsValidEmails(a));
 
         public IEnumerable<string> GetEmails() => Validator.ContainsValidEmails(TextView.Text, out MatchCollection matches)
