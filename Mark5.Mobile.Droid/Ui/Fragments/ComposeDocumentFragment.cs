@@ -278,8 +278,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             if (requestCode == RequestCodes.InternalContactsRequestCode && resultCode == (int)Result.Ok)
             {
-                var user = Serializer.Deserialize<SystemUser>(data.GetStringExtra(PickerInternalContactsListActivity.RecipientResultKey));
-                focusedRecipientView.AddRecipent(user.FirstName + " " + user.LastName, user.Username);
+                var users = Serializer.Deserialize<List<SystemUser>>(data.GetStringExtra(PickerInternalContactsListActivity.RecipientResultKey));
+                foreach (var user in users)
+                {
+                    focusedRecipientView.AddRecipent(user.FirstName + " " + user.LastName, user.Username);
+                }
                 UpdateSendButtonState();
             }
             if (requestCode == RequestCodes.ShortcodesRequestCode && resultCode == (int)Result.Ok)
