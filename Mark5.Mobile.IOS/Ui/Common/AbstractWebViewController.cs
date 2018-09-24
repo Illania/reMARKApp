@@ -172,7 +172,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             SetHeaderPadding(desiredHeaderHeight / webView.ScrollView.ZoomScale);
         }
-       
+
         protected override void Recycle()
         {
             base.Recycle();
@@ -276,8 +276,10 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         protected void Clear()
         {
-            webView.Hidden = true;
-            loadIndicatorView.StopAnimating();
+            if (webView != null)
+                webView.Hidden = true;
+
+            loadIndicatorView?.StopAnimating();
         }
 
         protected async Task LoadHtmlString(string html, HtmlProcessingConfiguration config)
@@ -345,9 +347,12 @@ namespace Mark5.Mobile.IOS.Ui.Common
             var bodyNode = htmlDocument.DocumentNode.SelectSingleNode("//body");
             var editorNode = bodyNode?.SelectSingleNode("//div[@id='editor']");
 
-            if(editorNode == null) {
+            if (editorNode == null)
+            {
                 CommonConfig.Logger.Error("resources/html/editor.html is missing 'editor' element");
-            } else {
+            }
+            else
+            {
                 editorNode.InnerHtml = htmlContent;
                 html = htmlDocument.DocumentNode.OuterHtml;
             }

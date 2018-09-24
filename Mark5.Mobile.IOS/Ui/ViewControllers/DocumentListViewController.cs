@@ -598,7 +598,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var point = recognizer.LocationInView(TableView);
             var indexPath = TableView.IndexPathForRowAtPoint(point);
 
-            if (!TableView.CellAt(indexPath)?.UserInteractionEnabled ?? true)
+            if (indexPath == null || (!TableView.CellAt(indexPath)?.UserInteractionEnabled ?? true))
                 return;
 
             TableView.SelectRow(indexPath, true, UITableViewScrollPosition.None);
@@ -1541,13 +1541,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                             }
                             break;
                         case EmailSwipeAction.SwipeAction.CopyToWorkTray:
-                                actionWrapper.Action = UITableViewRowAction.Create(
-                                    UITableViewRowActionStyle.Default,
-                                    SwipeActionTitle(swipeAction, documentPreview),
-                                    (a, ip) =>
-                                {
-                                    OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView);
-                                });
+                            actionWrapper.Action = UITableViewRowAction.Create(
+                                UITableViewRowActionStyle.Default,
+                                SwipeActionTitle(swipeAction, documentPreview),
+                                (a, ip) =>
+                            {
+                                OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView);
+                            });
                             actionWrapper.Disabled = !SwipeActionAllowed(swipeAction.Action, documentPreview, folder);
                             break;
                         case EmailSwipeAction.SwipeAction.More:
