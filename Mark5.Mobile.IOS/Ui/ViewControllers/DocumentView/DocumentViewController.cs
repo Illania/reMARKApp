@@ -391,13 +391,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             documentId = null;
             notificationGuid = default(Guid);
 
-            flagButton.Enabled = false;
-            fileToButton.Enabled = false;
-            replyActionsButton.Enabled = false;
-            commentsBadgeButton.SetBadgeValue("0", false);
-            commentsBadgeButton.Enabled = false;
-            commentsButton.Enabled = false;
-            userActionsButton.Enabled = false;
+            if (flagButton != null)
+                flagButton.Enabled = false;
+
+            if (fileToButton != null)
+                fileToButton.Enabled = false;
+
+            if (replyActionsButton != null)
+                replyActionsButton.Enabled = false;
+
+            if (commentsBadgeButton != null)
+            {
+                commentsBadgeButton.SetBadgeValue("0", false);
+                commentsBadgeButton.Enabled = false;
+            }
+
+            if (commentsButton != null)
+                commentsButton.Enabled = false;
+
+            if (userActionsButton != null)
+                userActionsButton.Enabled = false;
 
             Clear();
         }
