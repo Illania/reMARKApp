@@ -494,7 +494,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (CurrentAdapter.SelectedItems.Any(dp => dp.IsReadByCurrent))
                 menu.Add(MenuItemGroup.Actions, MenuItemActions.MarkAsUnread, MenuItemActions.MarkAsUnread, Resource.String.marks_as_unread);
 
-            menu.Add(MenuItemGroup.Actions, MenuItemActions.CopyToWorktray, MenuItemActions.CopyToWorktray, Resource.String.copy_to_worktray);
+            if (ServerConfig.SystemSettings.DocumentsModuleInfo.WorktrayEnabled ?? true)
+                menu.Add(MenuItemGroup.Actions, MenuItemActions.CopyToWorktray, MenuItemActions.CopyToWorktray, Resource.String.copy_to_worktray);
+
             menu.Add(MenuItemGroup.Actions, MenuItemActions.CopyToFolder, MenuItemActions.CopyToFolder, Resource.String.copy_to_folder);
 
             if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
@@ -1550,8 +1552,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 switch (action)
                 {
+                    case Preferences.EmailSwipeAction.CopyToWorkTray:
+                        return ServerConfig.SystemSettings.DocumentsModuleInfo.WorktrayEnabled ?? true;
                     case Preferences.EmailSwipeAction.Delete:
-                        return ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || adapter.SelectedItems.All(dp => dp.Direction == DocumentDirection.Draft); ;
+                        return ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || adapter.SelectedItems.All(dp => dp.Direction == DocumentDirection.Draft);
                     case Preferences.EmailSwipeAction.MoveToFolder:
                         return folder.InternalType == FolderInternalType.FilterView || folder.InternalType == FolderInternalType.Static || folder.InternalType == FolderInternalType.Worktray;
                     case Preferences.EmailSwipeAction.RemoveFromFolder:
