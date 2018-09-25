@@ -49,7 +49,7 @@ namespace Mark5.Mobile.Common.Model
 
         public bool ServiceVersionGreaterThanOrEqual(int major, int minor, int build)
         {
-            return new Version(major, minor, build) >= ServiceVersion;
+            return new Version(major, minor, build) <= ServiceVersion;
         }
     }
 }
