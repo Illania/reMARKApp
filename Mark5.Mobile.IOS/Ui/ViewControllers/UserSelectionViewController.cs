@@ -149,9 +149,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             try
             {
                 var usersDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
-                if(IncludeCurrentUser ?? true)
-                    usersDepartments.Users.Add(ServerConfig.SystemSettings.UserInfo.User);
-                ((DataSource)TableView.Source).SetItems(usersDepartments.Users);
+
+                if (usersDepartments != null)
+                {
+                    if(IncludeCurrentUser ?? true)
+                        usersDepartments.Users.Add(ServerConfig.SystemSettings.UserInfo.User);
+                    ((DataSource)TableView.Source).SetItems(usersDepartments.Users);
+                }
 
                 if (PreselectedSystemUserIds != null)
                     ((DataSource)TableView.Source).SelectedUserIds = PreselectedSystemUserIds;

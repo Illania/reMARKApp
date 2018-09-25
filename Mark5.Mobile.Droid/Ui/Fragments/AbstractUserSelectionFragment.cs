@@ -164,10 +164,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     refreshLayout.Refreshing = true;
 
                 var userDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync(Restored ? SourceType.Local : SourceType.Auto);
-                if (includeCurrentUser)
-                    Adapter.SetItems(userDepartments.Users.OrderBy(su => su.Username).ToList());
-                else
-                    Adapter.SetItems(userDepartments.Users.Where(su => su.Username != ServerConfig.SystemSettings.UserInfo.User.Username).OrderBy(su => su.Username).ToList());
+
+                if(userDepartments != null)
+                {
+                    if (includeCurrentUser)
+                        Adapter.SetItems(userDepartments.Users.OrderBy(su => su.Username).ToList());
+                    else
+                        Adapter.SetItems(userDepartments.Users.Where(su => su.Username != ServerConfig.SystemSettings.UserInfo.User.Username).OrderBy(su => su.Username).ToList());
+                }
 
                 if (preselectedUserIds != null && preselectedUserIds.Any())
                 {
