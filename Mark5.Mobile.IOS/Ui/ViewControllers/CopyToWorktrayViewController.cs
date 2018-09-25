@@ -333,7 +333,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var indexPath = NSIndexPath.FromRowSection(index, 1);
 
             TableView.ScrollToRow(indexPath, UITableViewScrollPosition.Middle, true);
-            TableView.CellAt(indexPath).Accessory = UITableViewCellAccessory.Checkmark;
         }
 
         class DataSource : UITableViewSource
