@@ -333,7 +333,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var indexPath = NSIndexPath.FromRowSection(index, 1);
 
             TableView.SelectRow(indexPath, false, UITableViewScrollPosition.Middle);
-            TableView.CellAt(indexPath).Accessory = UITableViewCellAccessory.Checkmark;
+            ((DataSource)TableView.Source).RowSelected(TableView, indexPath);
         }
 
         class DataSource : UITableViewSource
