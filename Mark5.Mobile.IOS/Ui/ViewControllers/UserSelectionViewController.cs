@@ -17,6 +17,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
     public class UserSelectionViewController : AbstractTableViewController
     {
         public List<int> PreselectedSystemUserIds { get; set; }
+        public bool? IncludeCurrentUser { get; set; }
 
         readonly public TaskCompletionSource<List<SystemUser>> tcs = new TaskCompletionSource<List<SystemUser>>();
         public Task<List<SystemUser>> Result => tcs.Task;
@@ -148,7 +149,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             try
             {
                 var usersDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
-                usersDepartments.Users.Add(ServerConfig.SystemSettings.UserInfo.User);
+                if(IncludeCurrentUser ?? true)
+                    usersDepartments.Users.Add(ServerConfig.SystemSettings.UserInfo.User);
                 ((DataSource)TableView.Source).SetItems(usersDepartments.Users);
 
                 if (PreselectedSystemUserIds != null)
@@ -162,8 +164,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        class DataSource : UITableViewSource
+        public class DataSource : UITableViewSource
         {
+            public List<SystemUser> Items => items;
             public bool Empty => items.Count < 1;
 
             public List<int> SelectedUserIds

@@ -1125,12 +1125,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         {
             CommonConfig.UsageAnalytics.LogEvent(new ComposeContactPickerEvent(ContactPickerChoice.Internal));
 
-            var vc = new PickerInternalContactViewController();
+            var vc = new MultipleUserSelectionViewController();
+            vc.IncludeCurrentUser = false;
             PresentViewController(new NavigationController(vc), true, null);
 
             var pa = await vc.Result;
-            if (pa != null)
-                recipientsView.AddRecipent(pa.Name, pa.Address);
+            foreach(var su in pa)
+                recipientsView.AddRecipent(su.FirstName + " " + su.LastName, su.Username);
         }
 
         async Task DoOpenRecents(RecipientsView recipientsView)
