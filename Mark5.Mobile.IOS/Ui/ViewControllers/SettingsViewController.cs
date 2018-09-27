@@ -472,9 +472,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
             if (PlatformConfig.Preferences.UseTemplate == Preferences.TemplateUsageMode.Local || PlatformConfig.Preferences.UseTemplate == Preferences.TemplateUsageMode.AlwaysAsk)
-            {
                 hiddenKeys.Add(LocalTemplateKey);
-            }
           
             SetHiddenKeys((string[])hiddenKeys.ToArray(), false);
         }

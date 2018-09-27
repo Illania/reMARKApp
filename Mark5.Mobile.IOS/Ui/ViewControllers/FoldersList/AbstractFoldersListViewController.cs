@@ -639,7 +639,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 if (PlatformConfig.Preferences.SyncFavoriteFoldersEnabled && !CommonConfig.Reachability.IsReachable)
                 {
-                    throw new Exception("Internet connection required when favorite synchonization is enabled");
+                    throw new Exception(Localization.GetString("sync_error_description"));
                 }
                
                 await Managers.FoldersManager.AddFavoriteFolderAsync(folder.Module, folder);
@@ -687,7 +687,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 if (PlatformConfig.Preferences.SyncFavoriteFoldersEnabled && !CommonConfig.Reachability.IsReachable)
                 {
-                    throw new Exception("Internet connection required when favorite synchonization is enabled");
+                    throw new Exception(Localization.GetString("sync_error_description"));
                 }
 
                 await Managers.FoldersManager.RemoveFavoriteFolderAsync(folder.Module, folder);
