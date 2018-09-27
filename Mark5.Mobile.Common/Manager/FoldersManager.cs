@@ -54,6 +54,16 @@ namespace Mark5.Mobile.Common.Manager
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
+        public async Task<FavoriteFolders> GetFavoriteFoldersFromService() 
+        {
+            var result = await AppServiceProxy.GetFavoriteFolders(new DataContract.GetFavoriteFoldersParameters()
+            {
+                Token = ConnectionInfo.Token
+            });
+
+            return new FavoriteFolders(result);
+        }
+
         public async Task<List<Folder>> GetFavoriteFoldersAsync(ModuleType module)
         {
             var rootFavoriteFolder = Folder.FavoritesRootForModule(module);
@@ -115,6 +125,31 @@ namespace Mark5.Mobile.Common.Manager
             favoriteFolders[module] = moduleFavoriteFolders;
 
             await FileSystemStorage.SaveFavoriteFoldersAsync(favoriteFolders);
+        }
+
+        public async Task<bool> UploadFavoriteFoldersAsync()
+        {
+            FavoriteFolders favoriteFolders = new FavoriteFolders();
+
+            var localFavoritesDic = await FileSystemStorage.GetFavoriteFoldersAsync();
+
+            List<DataContract.Favorite> dcFavorites = new List<DataContract.Favorite>();
+
+            foreach(KeyValuePair<ModuleType, List<Folder>> entry in localFavoritesDic) {
+                dcFavorites.Add(new DataContract.Favorite()
+                {
+                    ModuleType = (DataContract.ModuleType)entry.Key,
+                    Folders = (List<DataContract.Folder>)entry.Value.Select(x => x.Convert())
+                });
+            }
+
+            var result = await AppServiceProxy.UpdateFavoriteFolders(new DataContract.UpdateFavoriteFoldersParameters
+            {
+                Favorites = dcFavorites,
+                Token = ConnectionInfo.Token
+            });
+
+            return true;
         }
 
         public async Task<bool> IsFolderFavouriteAsync(ModuleType module, Folder folder)
@@ -210,6 +245,7 @@ namespace Mark5.Mobile.Common.Manager
             }
         }
 
+    
         #endregion
     }
 }

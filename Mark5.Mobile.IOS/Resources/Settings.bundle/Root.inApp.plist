@@ -13,6 +13,8 @@
 			<string>PSGroupSpecifier</string>
 			<key>Title</key>
 			<string>documents</string>
+			<key>FooterText</key>
+			<string>large_attachment_warning_desc</string>
 		</dict>
 		<dict>
 			<key>Type</key>
@@ -95,13 +97,6 @@
 			<string>EmailSwipeActions</string>
 			<key>Title</key>
 			<string>email_swipe_actions</string>
-			
-		</dict>
-		<dict>
-			<key>Type</key>
-			<string>PSGroupSpecifier</string>
-			<key>FooterText</key>
-			<string>large_attachment_warning_desc</string>
 		</dict>
 		<dict>
 			<key>Type</key>
@@ -153,26 +148,23 @@
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 			<key>Title</key>
-			<string>large_attachment_warning</string>
-			<key>Key</key>
-			<string>LargeAttachmentWarning</string>
-			<key>DefaultValue</key>
-			<true/>
-		</dict>
-		<dict>
-			<key>Type</key>
-			<string>PSGroupSpecifier</string>
-		</dict>
-		<dict>
-			<key>Type</key>
-			<string>PSToggleSwitchSpecifier</string>
-			<key>Title</key>
 			<string>hide_read_notifications</string>
 			<key>Key</key>
 			<string>HideReadNotifications</string>
 			<key>DefaultValue</key>
 			<false/>
 		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>large_attachment_warning</string>
+			<key>Key</key>
+			<string>LargeAttachmentWarning</string>
+			<key>DefaultValue</key>
+			<true/>
+		</dict>
+		
 		<dict>
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
@@ -352,6 +344,24 @@
 			<key>DefaultValue</key>
 			<string>No</string>
 		</dict>
+		 <dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>Key</key>
+			<string>SyncFavoriteFoldersGroup</string>
+			<key>Title</key>
+			<string>sync</string>
+			<key>FooterText</key>
+			<string>sync_favorite_folders_footer</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>sync_favorite_folders</string>
+			<key>Key</key>
+			<string>SyncFavoriteFolders</string>
+		</dict>
 		<dict>
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
@@ -395,6 +405,8 @@
 			<string>PSGroupSpecifier</string>
 			<key>Title</key>
 			<string>Security</string>
+			<key>FooterText</key>
+			<string>auth_interval_desc</string>
 		</dict>
 		<dict>
 			<key>Type</key>
@@ -421,12 +433,6 @@
 				<integer>10</integer>
 				<integer>30</integer>
 			</array>
-		</dict>
-		<dict>
-			<key>Type</key>
-			<string>PSGroupSpecifier</string>
-			<key>FooterText</key>
-			<string>auth_interval_desc</string>
 		</dict>
 		<dict>
 			<key>Type</key>

@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using CoreGraphics;
 using Foundation;
 using InAppSettingsKit;
@@ -16,6 +19,8 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
+    //Documentation : https://github.com/futuretap/InAppSettingsKit
+
     public class SettingsViewController : AbstractAppSettingsViewController, ISettingsDelegate
     {
         const string UseServerTimezoneKey = "UseServerTimezone";
@@ -36,7 +41,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         const string UsernameKey = "username";
         const string UseTemplateKey = "UseTemplate";
         const string VersionKey = "version";
-        const string EmailSwipeActions = "EmailSwipeActions";
+        const string EmailSwipeActionsKey = "EmailSwipeActions";
+        const string SyncFavoriteFoldersKey = "SyncFavoriteFolders";
+        const string SyncFavoriteFoldersGroupKey = "SyncFavoriteFoldersGroup";
 
         public SettingsViewController()
         {
@@ -228,7 +235,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return cell;
             }
 
-            if (specifier.Key == EmailSwipeActions)
+            if (specifier.Key == EmailSwipeActionsKey)
             {
                 var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
                 cell.TextLabel.Text = specifier.Title;
@@ -398,15 +405,78 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return;
             }
 
+            if (key == SyncFavoriteFoldersKey)
+            {
+                await HandleSync();
+            }
+
             if (key == UseTemplateKey)
                 RefreshHiddenSettings();
         }
 
+        async Task HandleSync()
+        {
+            // when disabling sync -> do nothing
+            if(!PlatformConfig.Preferences.SyncFavoriteFoldersEnabled)
+                return;
+
+            try
+            {
+                var favoriteFolders = await Managers.FoldersManager.GetFavoriteFoldersFromService();
+                if (favoriteFolders.Favorites == null)
+                {
+                    var uploadSuccess = await Managers.FoldersManager.UploadFavoriteFoldersAsync();
+                    if (!uploadSuccess)
+                        throw (new Exception("Could not upload favorite folders"));
+                }
+                else
+                {
+                    var selectedOption = await Dialogs.ShowListActionSheetWithTitleAsync(this,new string[] { Localization.GetString("sync_fav_folders_use_server"), Localization.GetString("sync_fav_folders_use_device") },View, Localization.GetString("sync_fav_folders_action_title"),$"{Localization.GetString("sync_fav_folders_action_description")} : {favoriteFolders.UpdatedAt.ToLongDateString()}");
+                   
+                    if (selectedOption == 0)
+                    {
+                        foreach(var favs in favoriteFolders.Favorites) {
+                            await Managers.FoldersManager.SetFavoriteFoldersAsync(favs.ModuleType, favs.Folders);
+                        }
+                    }
+                    else if (selectedOption == 1)
+                    {
+                        await Managers.FoldersManager.UploadFavoriteFoldersAsync();
+
+                    } else {
+                        PlatformConfig.Preferences.SyncFavoriteFoldersEnabled = false;
+                        return;
+                    }
+                }
+
+                PlatformConfig.Preferences.SyncFavoriteFoldersEnabled = true;
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Error while shynchonizing favorite folders", ex);
+                PlatformConfig.Preferences.SyncFavoriteFoldersEnabled = false;
+                Dialogs.ShowErrorAlert(this, ex);
+            }
+        }
+
         void RefreshHiddenSettings()
         {
-            SetHiddenKeys(PlatformConfig.Preferences.UseTemplate == Preferences.TemplateUsageMode.Local || PlatformConfig.Preferences.UseTemplate == Preferences.TemplateUsageMode.AlwaysAsk
-                          ? null
-                          : new[] { LocalTemplateKey }, false);
+            List<string> hiddenKeys = new List<string>();
+
+            var serviceVersion = ServerConfig.SystemSettings?.SystemInfo?.ServiceVersion;
+
+            if (serviceVersion == null || serviceVersion.CompareTo(new Version(3, 2, 0)) < 0)
+            {
+                hiddenKeys.Add(SyncFavoriteFoldersGroupKey);
+                hiddenKeys.Add(SyncFavoriteFoldersKey);
+            }
+
+            if (PlatformConfig.Preferences.UseTemplate == Preferences.TemplateUsageMode.Local || PlatformConfig.Preferences.UseTemplate == Preferences.TemplateUsageMode.AlwaysAsk)
+            {
+                hiddenKeys.Add(LocalTemplateKey);
+            }
+          
+            SetHiddenKeys((string[])hiddenKeys.ToArray(), false);
         }
 
         class CustomSpecifierValuesViewController : SpecifierValuesViewController

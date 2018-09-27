@@ -31,5 +31,9 @@ namespace Mark5.Mobile.Common.Manager
         Task<SavedOfflineFolderInfo> GetSavedFolderOfflineInfo(Folder folder);
 
         Task<List<Folder>> SearchFolders(string searchText);
+
+        Task<FavoriteFolders> GetFavoriteFoldersFromService();
+
+        Task<bool> UploadFavoriteFoldersAsync();
     }
 }

@@ -999,6 +999,19 @@ namespace Mark5.Mobile.Common.Model.Converters
             };
         }
 
+        public static DataContract.Folder Convert(this Folder folder) {
+            return new DataContract.Folder
+            {
+                Guid = folder.Guid,
+                HasSubFolders = folder.HasSubFolders,
+                Id = folder.Id,
+                ParentFolderId = folder.ParentFolderId,
+                Name = folder.Name,
+                Subscribed = folder.Subscribed,
+                Position = folder.Position
+            };
+        }
+
         #endregion
     }
 }
