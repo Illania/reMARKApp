@@ -131,21 +131,25 @@ namespace Mark5.Mobile.Common.Manager
         {
             FavoriteFolders favoriteFolders = new FavoriteFolders();
 
-            var localFavoritesDic = await FileSystemStorage.GetFavoriteFoldersAsync();
+            var localFavorites = await FileSystemStorage.GetFavoriteFoldersAsync();
 
-            List<DataContract.Favorite> dcFavorites = new List<DataContract.Favorite>();
+            List<DataContract.Favorite> favorites = new List<DataContract.Favorite>();
 
-            foreach(KeyValuePair<ModuleType, List<Folder>> entry in localFavoritesDic) {
-                dcFavorites.Add(new DataContract.Favorite()
+            foreach(KeyValuePair<ModuleType, List<Folder>> entry in localFavorites) 
+            {
+                var favorite = new DataContract.Favorite { ModuleType = (DataContract.ModuleType)entry.Key };
+
+                foreach(var folder in entry.Value) 
                 {
-                    ModuleType = (DataContract.ModuleType)entry.Key,
-                    Folders = (List<DataContract.Folder>)entry.Value.Select(x => x.Convert())
-                });
+                    favorite.Folders.Add(folder.Convert());
+                }
+
+                favorites.Add(favorite);
             }
 
             var result = await AppServiceProxy.UpdateFavoriteFolders(new DataContract.UpdateFavoriteFoldersParameters
             {
-                Favorites = dcFavorites,
+                Favorites = favorites,
                 Token = ConnectionInfo.Token
             });
 

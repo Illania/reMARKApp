@@ -632,11 +632,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         public async void AddToFavorites(Folder folder)
         {
+
             try
             {
                 CommonConfig.UsageAnalytics.LogEvent(new SetFolderFavoriteEvent(folder.Module, 1));
 
+                if (PlatformConfig.Preferences.SyncFavoriteFoldersEnabled && !CommonConfig.Reachability.IsReachable)
+                {
+                    throw new Exception("Internet connection required when favorite synchonization is enabled");
+                }
+               
                 await Managers.FoldersManager.AddFavoriteFolderAsync(folder.Module, folder);
+
+                if (PlatformConfig.Preferences.SyncFavoriteFoldersEnabled && CommonConfig.Reachability.IsReachable)
+                {
+                    await Managers.FoldersManager.UploadFavoriteFoldersAsync();
+                }
 
                 if (TableView.Source is GrouppedDataSource gds)
                 {
@@ -674,7 +685,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             {
                 CommonConfig.UsageAnalytics.LogEvent(new SetFolderFavoriteEvent(folder.Module, 1));
 
+                if (PlatformConfig.Preferences.SyncFavoriteFoldersEnabled && !CommonConfig.Reachability.IsReachable)
+                {
+                    throw new Exception("Internet connection required when favorite synchonization is enabled");
+                }
+
                 await Managers.FoldersManager.RemoveFavoriteFolderAsync(folder.Module, folder);
+
+                if (PlatformConfig.Preferences.SyncFavoriteFoldersEnabled && CommonConfig.Reachability.IsReachable)
+                {
+                    await Managers.FoldersManager.UploadFavoriteFoldersAsync();
+                }
 
                 if (TableView.Source is GrouppedDataSource gds)
                 {
