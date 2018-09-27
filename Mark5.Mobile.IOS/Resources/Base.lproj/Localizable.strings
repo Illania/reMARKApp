@@ -363,7 +363,7 @@
 "sync_fav_folders_action_description" = "Server favorites last time updated at";
 "sync_fav_folders_use_server" = "Use from server";
 "sync_fav_folders_use_device" = "Use from current device";
-"sync_error_description" = "Internet connection required when favorite synchronization is enabled in settings"
+"sync_error_description" = "Internet connection required when favorite synchronization is enabled in settings";
 "take_photo" = "Capture new photo";
 "tap_select_line" = "Tap to select a mailbox";
 "telex" = "Telex";
