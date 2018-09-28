@@ -553,11 +553,14 @@ namespace Mark5.Mobile.Common.Storage
             await folder.DeleteAsync();
         }
 
-        public static async Task MoveDocumentToUploadToFailed(Guid guid)
+        public static async Task MoveDocumentToUploadToFailed(Guid guid, Exception failedToSendException)
         {
             var folder = (await CommonConfig.DocumentsToUploadFolder.GetFoldersAsync()).FirstOrDefault(f => f.Name == guid.ToString());
             if (folder == null)
                 return;
+
+            var failedToSendExFile = await folder.CreateFileAsync("failedToSendException.json", CreationCollisionOption.ReplaceExisting);
+            await failedToSendExFile.WriteAllTextAsync(Serializer.Serialize(failedToSendException));
 
             var failedFolder = await CommonConfig.DocumentsToUploadFolder.CreateFolderAsync("failed", CreationCollisionOption.OpenIfExists);
             if (failedFolder == null)

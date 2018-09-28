@@ -130,7 +130,7 @@ namespace Mark5.Mobile.Common.Service
                         {
                             CommonConfig.Logger.Error($"Document failed sent [documentToUploadGuid={documentToUploadGuid}]", ex);
 
-                            await FileSystemStorage.MoveDocumentToUploadToFailed(documentToUploadGuid);
+                            await FileSystemStorage.MoveDocumentToUploadToFailed(documentToUploadGuid, ex);
 
                             CommonConfig.MessengerHub.Publish(new DocumentUploadStatusChangedMessage(this, DocumentUploadStatusChangedMessage.Status.DocumentSentFailed, documentToUploadGuid));
                         }
