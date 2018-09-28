@@ -1049,8 +1049,8 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetCalendarEventsParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class GetCalendarEventsParameters : AbstractParameters
     {
-        [DataMember(Name = "FolderId", Order = 0)]
-        public int FolderId { get; set; } = -1;
+        [DataMember(Name = "CalendarIds", Order = 0)]
+        public List<int> CalendarIds { get; set; } = new List<int>();
 
         [DataMember(Name = "GetAppointments", Order = 0)]
         public bool GetAppointments { get; set; }
@@ -1078,8 +1078,8 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetCalendarAppointmentParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class GetCalendarAppointmentParameters : AbstractParameters
     {
-        [DataMember(Name = "FolderId", Order = 0)]
-        public int FolderId { get; set; } = -1;
+        [DataMember(Name = "CalendarId", Order = 0)]
+        public int CalendarId { get; set; } = -1;
 
         [DataMember(Name = "CalendarAppointmentId", Order = 0)]
         public int CalendarAppointmentId { get; set; } = -1;
@@ -1095,8 +1095,8 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetCalendarTaskParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class GetCalendarTaskParameters : AbstractParameters
     {
-        [DataMember(Name = "FolderId", Order = 0)]
-        public int FolderId { get; set; } = -1;
+        [DataMember(Name = "CalendarId", Order = 0)]
+        public int CalendarId { get; set; } = -1;
 
         [DataMember(Name = "CalendarTaskId", Order = 0)]
         public int CalendarTaskId { get; set; } = -1;
@@ -1107,13 +1107,14 @@ namespace Mark5.ServiceReference.DataContract
     {
         [DataMember(Name = "CalendarTask", Order = 0)]
         public CalendarTask CalendarTask { get; set; }
+
     }
 
     [DataContract(Name = "CreateOrUpdateCalendarAppointmentParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class CreateOrUpdateCalendarAppointmentParameters : AbstractParameters
     {
-        [DataMember(Name = "FolderId", Order = 0)]
-        public int FolderId { get; set; } = -1;
+        [DataMember(Name = "CalendarId", Order = 0)]
+        public int CalendarId { get; set; } = -1;
 
         [DataMember(Name = "CalendarAppointment", Order = 0)]
         public CalendarAppointment CalendarAppointment { get; set; }
@@ -1135,8 +1136,8 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "CreateOrUpdateCalendarTaskParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class CreateOrUpdateCalendarTaskParameters : AbstractParameters
     {
-        [DataMember(Name = "FolderId", Order = 0)]
-        public int FolderId { get; set; } = -1;
+        [DataMember(Name = "CalendarId", Order = 0)]
+        public int CalendarId { get; set; } = -1;
 
         [DataMember(Name = "CalendarTask", Order = 0)]
         public CalendarTask CalendarTask { get; set; }
@@ -1153,6 +1154,25 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "Guid", Order = 0)]
         public Guid Guid { get; set; }
+    }
+
+    [DataContract(Name = "Calendar", Namespace = "com.nordic-it.appservice.v3")]
+    public class Calendar
+    {
+        [DataMember(Name = "Id", Order = 0)]
+        public int Id { get; set; }
+
+        [DataMember(Name = "Guid", Order = 0)]
+        public Guid Guid { get; set; }
+
+        [DataMember(Name = "Name", Order = 0)]
+        public string Name { get; set; }
+
+        [DataMember(Name = "ColorHex", Order = 0)]
+        public string ColorHex { get; set; }
+
+        [DataMember(Name = "Shared", Order = 0)]
+        public bool Shared { get; set; }
     }
 
     [DataContract(Name = "CalendarAppointment", Namespace = "com.nordic-it.appservice.v3")]
@@ -1182,9 +1202,6 @@ namespace Mark5.ServiceReference.DataContract
         [DataMember(Name = "Private", Order = 0)]
         public bool Private { get; set; }
 
-        [DataMember(Name = "Category", Order = 0)]
-        public CalendarCategory Category { get; set; }
-
         [DataMember(Name = "Status", Order = 0)]
         public AppointmentStatus Status { get; set; }
 
@@ -1200,8 +1217,8 @@ namespace Mark5.ServiceReference.DataContract
         [DataMember(Name = "Type", Order = 0)]
         public CalendarOccurenceType Type { get; set; }
 
-        [DataMember(Name = "Resources", Order = 0)]
-        public List<CalendarResource> Resources { get; set; } = new List<CalendarResource>();
+        [DataMember(Name = "CalendarId", Order = 0)]
+        public int CalendarId { get; set; }
 
         [DataMember(Name = "ReminderDate", Order = 0)]
         public DateTime ReminderDate { get; set; }
@@ -1249,6 +1266,9 @@ namespace Mark5.ServiceReference.DataContract
         [DataMember(Name = "Type", Order = 0)]
         public CalendarOccurenceType Type { get; set; }
 
+        [DataMember(Name = "CalendarId", Order = 0)]
+        public int CalendarId { get; set; }
+
         [DataMember(Name = "ReminderDate", Order = 0)]
         public DateTime ReminderDate { get; set; }
 
@@ -1286,49 +1306,6 @@ namespace Mark5.ServiceReference.DataContract
         public DelegationStatus DelegationStatus { get; set; }
     }
 
-    [DataContract(Name = "CalendarCategory", Namespace = "com.nordic-it.appservice.v3")]
-    public class CalendarCategory
-    {
-        [DataMember(Name = "Id", Order = 0)]
-        public int Id { get; set; } = -1;
-
-        [DataMember(Name = "Guid", Order = 0)]
-        public Guid Guid { get; set; }
-
-        [DataMember(Name = "Name", Order = 0)]
-        public string Name { get; set; }
-
-        [DataMember(Name = "Description", Order = 0)]
-        public string Description { get; set; }
-
-        [DataMember(Name = "ColorHex", Order = 0)]
-        public string ColorHex { get; set; }
-
-        [DataMember(Name = "Type", Order = 0)]
-        public CalendarCategoryType Type { get; set; }
-
-        [DataMember(Name = "SubType", Order = 0)]
-        public CalendarCategorySubType SubType { get; set; }
-    }
-
-    [DataContract(Name = "CalendarResource", Namespace = "com.nordic-it.appservice.v3")]
-    public class CalendarResource
-    {
-        [DataMember(Name = "Id", Order = 0)]
-        public int Id { get; set; }
-
-        [DataMember(Name = "Guid", Order = 0)]
-        public Guid Guid { get; set; }
-
-        [DataMember(Name = "Name", Order = 0)]
-        public string Name { get; set; }
-
-        [DataMember(Name = "ColorHex", Order = 0)]
-        public string ColorHex { get; set; }
-
-        [DataMember(Name = "Shared", Order = 0)]
-        public bool Shared { get; set; }
-    }
 
     [DataContract(Name = "Participant", Namespace = "com.nordic-it.appservice.v3")]
     public class Participant
@@ -1353,39 +1330,6 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "Note", Order = 0)]
         public string Note { get; set; }
-    }
-
-    [DataContract(Name = "CalendarCategoryType", Namespace = "com.nordic-it.appservice.v3")]
-    public enum CalendarCategoryType
-    {
-        [EnumMember(Value = "None")] None = 0,
-        [EnumMember(Value = "Appointment")] Appointment = 1,
-        [EnumMember(Value = "Task")] Task = 2,
-        [EnumMember(Value = "Event")] Event = 3,
-        [EnumMember(Value = "PhoneCall")] PhoneCall = 4,
-    }
-
-    [DataContract(Name = "CalendarCategorySubType", Namespace = "com.nordic-it.appservice.v3")]
-    public enum CalendarCategorySubType
-    {
-        [EnumMember(Value = "None")] None = 0,
-        [EnumMember(Value = "Event")] Event = 1,
-        [EnumMember(Value = "Custom")] Custom = 2,
-        [EnumMember(Value = "MeetingInternal")] MeetingInternal = 3,
-        [EnumMember(Value = "MeetingExternal")] MeetingExternal = 4,
-        [EnumMember(Value = "PhoneCallIn")] PhoneCallIn = 5,
-        [EnumMember(Value = "PhoneCallOut")] PhoneCallOut = 6,
-        [EnumMember(Value = "FollowUp")] FollowUp = 7,
-        [EnumMember(Value = "Planning")] Planning = 8,
-        [EnumMember(Value = "Visit")] Visit = 9,
-        [EnumMember(Value = "Lunch")] Lunch = 10,
-        [EnumMember(Value = "Proposal")] Proposal = 11,
-        [EnumMember(Value = "Service")] Service = 12,
-        [EnumMember(Value = "Birthday")] Birthday = 13,
-        [EnumMember(Value = "Anniversary")] Anniversary = 14,
-        [EnumMember(Value = "Private")] Private = 15,
-        [EnumMember(Value = "Holiday")] Holiday = 16,
-        [EnumMember(Value = "Vacation")] Vacation = 17,
     }
 
     [DataContract(Name = "AppointmentStatus", Namespace = "com.nordic-it.appservice.v3")]
@@ -2380,11 +2324,8 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "CalendarModuleInfo", Namespace = "com.nordic-it.appservice.v3")]
     public class CalendarModuleInfo
     {
-        [DataMember(Name = "CalendarCategories", Order = 0)]
-        public List<CalendarCategory> CalendarCategories { get; set; } = new List<CalendarCategory>();
-
-        [DataMember(Name = "CalendarResources", Order = 0)]
-        public List<CalendarResource> CalendarResources { get; set; } = new List<CalendarResource>();
+        [DataMember(Name = "Calendars", Order = 0)]
+        public List<Calendar> Calendars { get; set; } = new List<Calendar>();
 
         [DataMember(Name = "Permissions", Order = 0)]
         public Permissions Permissions { get; set; } = new Permissions();

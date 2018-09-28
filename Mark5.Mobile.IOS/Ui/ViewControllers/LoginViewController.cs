@@ -386,7 +386,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         async Task RefreshData()
         {
             var retainedConnectionInfo = await authenticator.GetRetainedConnectionInfoAsync();
-            if (retainedConnectionInfo != null)
+            if (retainedConnectionInfo != null && string.IsNullOrEmpty(hostnameTextField.Text) && string.IsNullOrEmpty(usernameTextField.Text))
             {
                 usernameTextField.Text = retainedConnectionInfo.Username;
                 hostnameTextField.Text = retainedConnectionInfo.Hostname;

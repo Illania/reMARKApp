@@ -40,9 +40,9 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Location = ca.Location,
                 StartDateTimestamp = ca.StartDate.ConvertDateTimeToTimestampMilliseconds(),
                 EndDateTimestamp = ca.EndDate.ConvertDateTimeToTimestampMilliseconds(),
+                CalendarId = ca.CalendarId,
                 AllDay = ca.AllDay,
                 Private = ca.Private,
-                Category = ca.Category?.Convert(),
                 Status = ca.Status.ConvertEnum<AppointmentStatus>(),
                 CreatorId = ca.CreatorId,
                 Creator = ca.Creator,
@@ -52,8 +52,6 @@ namespace Mark5.Mobile.Common.Model.Converters
                 SnoozeDelay = ca.SnoozeDelay
             };
 
-            if (ca.Resources != null)
-                result.Resources.AddRange(ca.Resources.WhereNotNull().Select(Convert));
             if (ca.Participants != null)
                 result.Participants.AddRange(ca.Participants.WhereNotNull().Select(Convert));
 
@@ -69,6 +67,7 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Subject = ca.Subject,
                 StartDateTimestamp = ca.StartDate.ConvertDateTimeToTimestampMilliseconds(),
                 EndDateTimestamp = ca.EndDate.ConvertDateTimeToTimestampMilliseconds(),
+                CalendarId = ca.CalendarId,
                 Private = ca.Private,
                 Status = ca.Status.ConvertEnum<TaskStatus>(),
                 CreatorId = ca.CreatorId,
@@ -97,36 +96,20 @@ namespace Mark5.Mobile.Common.Model.Converters
             return result;
         }
 
-        public static CalendarCategory Convert(this DataContract.CalendarCategory cc)
-        {
-            return new CalendarCategory
-            {
-                ColorHex = cc.ColorHex,
-                Description = cc.Description,
-                Guid = cc.Guid,
-                Id = cc.Id,
-                Name = cc.Name,
-                SubType = cc.SubType.ConvertEnum<CalendarCategorySubType>(),
-                Type = cc.Type.ConvertEnum<CalendarCategoryType>()
-            };
-        }
-
         public static CalendarModuleInfo Convert(this DataContract.CalendarModuleInfo cmi)
         {
             var result = new CalendarModuleInfo
             {
                 Permissions = cmi.Permissions?.Convert()
             };
-            if (cmi.CalendarCategories != null)
-                result.CalendarCategories.AddRange(cmi.CalendarCategories.WhereNotNull().Select(Convert));
-            if (cmi.CalendarResources != null)
-                result.CalendarResources.AddRange(cmi.CalendarResources.WhereNotNull().Select(Convert));
+            if (cmi.Calendars != null)
+                result.Calendars.AddRange(cmi.Calendars.WhereNotNull().Select(Convert));
             return result;
         }
 
-        public static CalendarResource Convert(this DataContract.CalendarResource cr)
+        public static Calendar Convert(this DataContract.Calendar cr)
         {
-            return new CalendarResource
+            return new Calendar
             {
                 ColorHex = cr.ColorHex,
                 Guid = cr.Guid,
@@ -789,7 +772,6 @@ namespace Mark5.Mobile.Common.Model.Converters
                 EndDate = ca.EndDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
                 AllDay = ca.AllDay,
                 Private = ca.Private,
-                Category = ca.Category?.Convert(),
                 Status = ca.Status.ConvertEnum<DataContract.AppointmentStatus>(),
                 CreatorId = ca.CreatorId,
                 Creator = ca.Creator,
@@ -797,7 +779,7 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Type = ca.Type.ConvertEnum<DataContract.CalendarOccurenceType>(),
                 ReminderDate = ca.ReminderDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
                 SnoozeDelay = ca.SnoozeDelay,
-                Resources = ca.Resources.Select(r => r.Convert()).ToList(),
+                CalendarId = ca.CalendarId,
                 Participants = ca.Participants.Select(p => p.Convert()).ToList()
             };
         }
@@ -832,9 +814,9 @@ namespace Mark5.Mobile.Common.Model.Converters
             };
         }
 
-        public static DataContract.CalendarResource Convert(this CalendarResource cr)
+        public static DataContract.Calendar Convert(this Calendar cr)
         {
-            return new DataContract.CalendarResource
+            return new DataContract.Calendar
             {
                 ColorHex = cr.ColorHex,
                 Guid = cr.Guid,
@@ -937,20 +919,6 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Id = ad.Id,
                 Name = ad.Name,
                 SizeInBytes = ad.SizeInBytes
-            };
-        }
-
-        public static DataContract.CalendarCategory Convert(this CalendarCategory cc)
-        {
-            return new DataContract.CalendarCategory
-            {
-                Id = cc.Id,
-                Guid = cc.Guid,
-                Name = cc.Name,
-                Description = cc.Description,
-                ColorHex = cc.ColorHex,
-                Type = cc.Type.ConvertEnum<DataContract.CalendarCategoryType>(),
-                SubType = cc.SubType.ConvertEnum<DataContract.CalendarCategorySubType>()
             };
         }
 

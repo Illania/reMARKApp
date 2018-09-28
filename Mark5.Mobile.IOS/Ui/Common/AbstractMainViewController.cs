@@ -103,7 +103,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         void SearchButton_TouchUpInside(object sender, EventArgs e)
         {
-            var nc = new DarkNavigationController(new SearchCriteriaViewController(), UIModalPresentationStyle.FullScreen)
+            var nc = new NavigationController(new CalendarTestViewController(), UIModalPresentationStyle.FullScreen)
             {
                 ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve,
                 RestorationIdentifier = "NavigationController_" + nameof(SearchCriteriaViewController)

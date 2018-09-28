@@ -410,30 +410,30 @@ namespace Mark5.Mobile.Common.Manager
 
                     return new ShortcodeContainer(result.ShortcodePreview.Convert(), result.Shortcode.Convert());
                 }
+                //TODO
+                //if (notification.ObjectType == ObjectType.CalendarTask)
+                //{
+                //    var result = await AppServiceProxy.GetCalendarTaskAsync(new DataContract.GetCalendarTaskParameters
+                //    {
+                //        Token = Token,
+                //        FolderId = folderId,
+                //        CalendarTaskId = objectId
+                //    });
 
-                if (notification.ObjectType == ObjectType.CalendarTask)
-                {
-                    var result = await AppServiceProxy.GetCalendarTaskAsync(new DataContract.GetCalendarTaskParameters
-                    {
-                        Token = Token,
-                        FolderId = folderId,
-                        CalendarTaskId = objectId
-                    });
+                //    return result.CalendarTask.Convert();
+                //}
 
-                    return result.CalendarTask.Convert();
-                }
+                //if (notification.ObjectType == ObjectType.CalendarAppointment)
+                //{
+                //    var result = await AppServiceProxy.GetCalendarAppointmentAsync(new DataContract.GetCalendarAppointmentParameters
+                //    {
+                //        Token = Token,
+                //        FolderId = folderId,
+                //        CalendarAppointmentId = objectId
+                //    });
 
-                if (notification.ObjectType == ObjectType.CalendarAppointment)
-                {
-                    var result = await AppServiceProxy.GetCalendarAppointmentAsync(new DataContract.GetCalendarAppointmentParameters
-                    {
-                        Token = Token,
-                        FolderId = folderId,
-                        CalendarAppointmentId = objectId
-                    });
-
-                    return result.CalendarAppointment.Convert();
-                }
+                //    return result.CalendarAppointment.Convert();
+                //}
             }
 
             if (sourceType == SourceType.Local)

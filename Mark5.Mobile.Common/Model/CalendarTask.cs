@@ -61,6 +61,9 @@ namespace Mark5.Mobile.Common.Model
         [Column("Delegator")]
         public string Delegator { get; set; }
 
+        [Column("CalendarId")]
+        public int CalendarId { get; set; } = -1;
+
         List<int> userIds;
 
         [Ignore]

@@ -31,9 +31,6 @@ namespace Mark5.Mobile.Common.Model
         [Column("Private")]
         public bool Private { get; set; }
 
-        [Ignore]
-        public CalendarCategory Category { get; set; }
-
         [Column("Status")]
         public AppointmentStatus Status { get; set; }
 
@@ -49,19 +46,8 @@ namespace Mark5.Mobile.Common.Model
         [Column("Type")]
         public CalendarOccurenceType Type { get; set; }
 
-        List<CalendarResource> resources;
-
-        [Ignore]
-        public List<CalendarResource> Resources
-        {
-            get
-            {
-                if (resources == null)
-                    resources = new List<CalendarResource>();
-                return resources;
-            }
-            set => resources = value;
-        }
+        [Column("CalendarId")]
+        public int CalendarId { get; set; } = -1;
 
         [Column("ReminderDateTimestamp")]
         public long ReminderDateTimestamp { get; set; } = -1;
@@ -84,12 +70,6 @@ namespace Mark5.Mobile.Common.Model
         }
 
         #region Serialization
-
-        [Column("CategoryString")]
-        public string CategoryString { get => Serializer.Serialize(Category); set => Category = Serializer.Deserialize<CalendarCategory>(value); }
-
-        [Column("ResourcesString")]
-        public string ResourcesString { get => Serializer.Serialize(Resources); set => Resources = Serializer.Deserialize<List<CalendarResource>>(value); }
 
         [Column("ParticipantsString")]
         public string ParticipantsString { get => Serializer.Serialize(Participants); set => Participants = Serializer.Deserialize<List<Participant>>(value); }
