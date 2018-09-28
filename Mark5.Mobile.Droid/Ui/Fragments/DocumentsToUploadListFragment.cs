@@ -15,6 +15,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Utilities;
 using TinyMessenger;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
@@ -195,6 +196,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 menu.Add(Menu.None, 10, 10, Resource.String.resend);
                 menu.Add(Menu.None, 20, 20, Resource.String.delete);
+                if (adapter.SelectedItems.Count == 1)
+                    menu.Add(Menu.None, 30, 30, Resource.String.create_failed_to_send_report);
             }
 
             return false;
@@ -233,6 +236,26 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     actionMode?.Finish();
                     await RefreshData();
                 }, TaskScheduler.FromCurrentSynchronizationContext());
+                return true;
+            }
+
+            if (item.ItemId == 30)
+            {
+                var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.dialog_creating_report, Resource.String.please_wait);
+                Task.Run(async () => 
+                {
+                    var ex = await Managers.DocumentsManager.GetFailedDocumentException(selectedItems[0].Guid);
+                    return SystemReportCollector.CreateFailedDocumentReport(ex); 
+                }).ContinueWith(t =>
+                {
+                    dismissAction();
+
+                    if (!t.IsFaulted)
+                        Context.StartActivity(SystemReportCollector.CreateShareReportIntent(Context, t.Result));
+
+                }, TaskScheduler.FromCurrentSynchronizationContext());
+
+
                 return true;
             }
 

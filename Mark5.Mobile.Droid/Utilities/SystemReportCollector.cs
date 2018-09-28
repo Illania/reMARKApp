@@ -184,5 +184,10 @@ namespace Mark5.Mobile.Droid.Utilities
 
             return sb.ToString();
         }
+
+        public static string CreateFailedDocumentReport(Exception ex)
+        {
+            return "";
+        }
     }
 }

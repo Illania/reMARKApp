@@ -58,6 +58,7 @@
     <string name="copy_to_new_content">Content</string>
     <string name="copy_to_new_attachments">Attachments</string>
     <string name="create_new_document">Create new email</string>
+    <string name="create_failed_to_send_report">Create report</string>
     <string name="create_system_report">Create system report</string>
     <string name="creator">Creator:</string>
     <string name="person">Person</string>

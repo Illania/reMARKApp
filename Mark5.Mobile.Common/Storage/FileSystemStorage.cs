@@ -424,6 +424,29 @@ namespace Mark5.Mobile.Common.Storage
             return Serializer.Deserialize<DocumentPreview>(fileContent);
         }
 
+        public static async Task<Exception> GetFailedDocumentException(Guid guid)
+        {
+            var failedFolder = (await CommonConfig.DocumentsToUploadFolder.CreateFolderAsync("failed", CreationCollisionOption.OpenIfExists));
+            if (failedFolder == null)
+                return null;
+
+            var folder = await failedFolder.GetFolderAsync(guid.ToString());
+            if (folder == null)
+                return null;
+
+            var fileExists = await folder.CheckExistsAsync("failedToSendException.json") == ExistenceCheckResult.FileExists;
+            if (!fileExists)
+                return null;
+
+            var file = await folder.GetFileAsync("failedToSendException.json");
+            if (file == null)
+                return null;
+
+            var fileContent = await file.ReadAllTextAsync();
+
+            return Serializer.Deserialize<Exception>(fileContent);
+        }
+
         public static async Task<DocumentPreview> GetFailedDocumentToUploadDocumentPreview(Guid guid)
         {
             var failedFolder = (await CommonConfig.DocumentsToUploadFolder.CreateFolderAsync("failed", CreationCollisionOption.OpenIfExists));
@@ -579,6 +602,14 @@ namespace Mark5.Mobile.Common.Storage
             var failedFolderGuid = (await failedFolder.GetFoldersAsync()).FirstOrDefault(f => f.Name == guid.ToString());
             if (failedFolderGuid == null)
                 return;
+
+            IFile failedToSendExceptionFile;
+
+            if (await failedFolderGuid.CheckExistsAsync("failedToSendException.json") == ExistenceCheckResult.FileExists)
+            {
+                failedToSendExceptionFile = await failedFolderGuid.GetFileAsync("failedToSendException.json");
+                await failedToSendExceptionFile.DeleteAsync();
+            }
 
             await failedFolderGuid.MoveRecursivelyAsync(CommonConfig.DocumentsToUploadFolder, CreationCollisionOption.FailIfExists);
             await failedFolderGuid.DeleteAsync();
