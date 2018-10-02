@@ -241,6 +241,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == 30)
             {
+                if (selectedItems.Count != 1)
+                    return true;
+
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.dialog_creating_report, Resource.String.please_wait);
                 Task.Run(async () => 
                 {
