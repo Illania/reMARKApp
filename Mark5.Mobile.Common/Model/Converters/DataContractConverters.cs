@@ -232,7 +232,8 @@ namespace Mark5.Mobile.Common.Model.Converters
         {
             var result = new ContactsModuleInfo
             {
-                Permissions = cmi.Permissions?.Convert()
+                Permissions = cmi.Permissions?.Convert(),
+                WorktrayEnabled = cmi.WorktrayEnabled,
             };
             if (cmi.Countries != null)
                 result.Countries.AddRange(cmi.Countries.WhereNotNull().Select(Convert));
@@ -315,7 +316,8 @@ namespace Mark5.Mobile.Common.Model.Converters
                 IsMissingAttachmentWarningEnabled = dmi.IsMissingAttachmentWarningEnabled,
                 MaximumAttachmentSizeBytes = dmi.MaximumAttachmentSizeBytes,
                 OnSendToSystemUser = dmi.OnSendToSystemUser.ConvertEnum<OnSendToSystemUser>(),
-                Permissions = dmi.Permissions?.Convert()
+                Permissions = dmi.Permissions?.Convert(),
+                WorktrayEnabled = dmi.WorktrayEnabled,
             };
             if (dmi.AttachmentKeywords != null)
                 result.AttachmentKeywords.AddRange(dmi.AttachmentKeywords.Where(s => !string.IsNullOrWhiteSpace(s)));
@@ -590,7 +592,8 @@ namespace Mark5.Mobile.Common.Model.Converters
         {
             return new ShortcodesModuleInfo
             {
-                Permissions = smi.Permissions?.Convert()
+                Permissions = smi.Permissions?.Convert(),
+                WorktrayEnabled = smi.WorktrayEnabled,
             };
         }
 

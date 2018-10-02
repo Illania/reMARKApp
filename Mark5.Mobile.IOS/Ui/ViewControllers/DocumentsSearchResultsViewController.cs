@@ -204,13 +204,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         EndEditing();
                     }));
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"),
-                UIAlertActionStyle.Default,
-                a =>
+            if (ServerConfig.SystemSettings.DocumentsModuleInfo.WorktrayEnabled ?? true)
+            {
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"),
+                                                   UIAlertActionStyle.Default,
+                                                   a =>
                 {
                     CopyToWorktray(selectedDocuments);
                     EndEditing();
                 }));
+            }
+
             eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"),
                 UIAlertActionStyle.Default,
                 a =>
@@ -299,13 +303,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
             var d = new PopoverPresentationControllerDelegate(TableView, TableView.CellAt(indexPath));
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"),
-                UIAlertActionStyle.Default,
-                a =>
+            if (ServerConfig.SystemSettings.DocumentsModuleInfo.WorktrayEnabled ?? true)
+            {
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"),
+                                                   UIAlertActionStyle.Default,
+                                                   a =>
                 {
                     CopyToWorktray(selectedDocument);
                     EndEditing();
                 }));
+            }
+
             eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"),
                 UIAlertActionStyle.Default,
                 a =>
@@ -683,15 +691,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     actions.Add(markAsReadAction);
                 }
 
-                var copyToWorktrayAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
-                    Localization.GetString("copy_to_worktray_ml"),
-                    (a, ip) =>
+                if (ServerConfig.SystemSettings.DocumentsModuleInfo.WorktrayEnabled ?? true)
                 {
-                    viewControllerWeakReference.Unwrap()?.CopyToWorktray(documentPreview);
-                    viewControllerWeakReference.Unwrap()?.EndEditing();
-                });
-                copyToWorktrayAction.BackgroundColor = Theme.DarkBlue;
-                actions.Add(copyToWorktrayAction);
+                    var copyToWorktrayAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
+                                                                           Localization.GetString("copy_to_worktray_ml"),
+                                                                           (a, ip) =>
+                    {
+                        viewControllerWeakReference.Unwrap()?.CopyToWorktray(documentPreview);
+                        viewControllerWeakReference.Unwrap()?.EndEditing();
+                    });
+                    copyToWorktrayAction.BackgroundColor = Theme.DarkBlue;
+                    actions.Add(copyToWorktrayAction);
+                }
 
                 var moreAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
                                                              Localization.GetString("more"),

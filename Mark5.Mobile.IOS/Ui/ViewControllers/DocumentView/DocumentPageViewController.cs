@@ -65,9 +65,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
         {
             base.ViewWillDisappear(animated);
 
-            if (NavigationController != null) 
+            if (NavigationController != null)
             {
-                if(NavigationController.NavigationBar != null) 
+                if (NavigationController.NavigationBar != null)
                 {
                     NavigationController.NavigationBar.Translucent = true;
                 }
@@ -184,12 +184,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
 
         public void ClearPage()
         {
-            var vc = (DocumentViewController)ViewControllers.FirstOrDefault();
+            var vc = (DocumentViewController)ViewControllers?.FirstOrDefault();
 
             if (vc == null || viewControllerCache == null)
                 return;
 
-            var index = viewControllerCache?.FindIndex(v => v != null && v.DocumentPreview.Id == vc.DocumentPreview.Id);
+            var index = viewControllerCache?.FindIndex(v => v != null && v.DocumentPreview?.Id == vc.DocumentPreview?.Id);
             if (index >= 0)
             {
                 viewControllerCache[index.Value].RecycleIfNeeded();
@@ -328,7 +328,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
         {
             public override UIViewController GetNextViewController(UIPageViewController pageViewController, UIViewController referenceViewController)
             {
-                try {
+                try
+                {
                     var vc = (DocumentViewController)pageViewController.ViewControllers.FirstOrDefault();
                     var documentPreview = vc.DocumentPreview;
                     var pageVC = (DocumentPageViewController)pageViewController;
@@ -337,7 +338,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
                         return null;
                     var nextDocumentPreview = pageVC.DocumentPreviews[index + 1];
                     return pageVC.GoToPageAndReturnVC(nextDocumentPreview, UIPageViewControllerNavigationDirection.Forward);
-                } catch (Exception ex) {
+                }
+                catch (Exception ex)
+                {
                     CommonConfig.Logger.Error("Could not swipe to next DocumentViewController", ex);
                     return null;
                 }
@@ -366,5 +369,5 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
         #endregion
     }
 
-   
+
 }

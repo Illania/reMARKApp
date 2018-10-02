@@ -78,6 +78,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         public void Initialize(Comment comment)
         {
+            if (comment == null)
+                return;
+
             authorLabel.Text = comment.UserId == ServerConfig.SystemSettings.UserInfo.User.Id
                 ? Localization.GetString("me")
                 : comment.UserName.ToUpper(CultureInfo.CurrentCulture);

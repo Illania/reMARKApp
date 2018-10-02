@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -349,6 +349,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     await subView.InitializeView();
                 }
 
+                document.Guid = Guid.NewGuid();
+
                 if (RestoreWorkingCopy)
                 {
                     var files = await Managers.DocumentsManager.GetDocumentWorkingCopyAttachmentsAsync();
@@ -369,8 +371,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 }
                 else
                 {
-
-
                     if (previousDocumentPreview != null &&
                            (DocumentCreationModeFlag == DocumentCreationModeFlag.Reply && CopyToNewOption == CopyToNewOption.None ||
                             DocumentCreationModeFlag == DocumentCreationModeFlag.ReplyAll && CopyToNewOption == CopyToNewOption.None ||
@@ -762,7 +762,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     await subView.UpdateDocument();
 
                 document.HtmlBody = await GetContent();
-
                 documentPreview.Direction = DocumentDirection.Outgoing;
 
                 await Managers.DocumentsManager.SaveDocumentWorkingCopyAsync(new DocumentWorkingCopy
