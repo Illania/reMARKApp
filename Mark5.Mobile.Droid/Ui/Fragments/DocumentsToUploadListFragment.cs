@@ -257,8 +257,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         Context.StartActivity(SystemReportCollector.CreateShareReportIntent(Context, t.Result));
 
                 }, TaskScheduler.FromCurrentSynchronizationContext());
-
-
                 return true;
             }
 
