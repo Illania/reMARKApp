@@ -318,7 +318,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     viewControllerWeakReference.Unwrap()?.CreateFailedDocumentReport(items[indexPath.Section][indexPath.Row].Guid);
                 });
-                actions[2].BackgroundColor = Theme.Blue;
+                actions[2].BackgroundColor = Theme.DarkerBlue;
                 return actions;
             }
 

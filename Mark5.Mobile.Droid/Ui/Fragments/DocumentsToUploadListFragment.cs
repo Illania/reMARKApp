@@ -197,7 +197,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 menu.Add(Menu.None, 10, 10, Resource.String.resend);
                 menu.Add(Menu.None, 20, 20, Resource.String.delete);
                 if (adapter.SelectedItems.Count == 1)
-                    menu.Add(Menu.None, 30, 30, Resource.String.create_failed_to_send_report);
+                    menu.Add(Menu.None, 30, 30, Resource.String.create_report);
             }
 
             return false;
