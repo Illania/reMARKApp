@@ -416,6 +416,8 @@
     <string name="subscribe_folder">Subscribe</string>
     <string name="subscribing_folders">Subscribing to folders...</string>
     <string name="templates">Templates</string>
+    <string name="template_attachment_title">Attachment from template</string>
+    <string name="template_attachment_content">It is not possible to open attachments from templates</string>
     <string name="template_null">You do not have a default template set</string>
     <string name="template_question">Which template do you want to use?</string>
     <string-array name="template_question_options">

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -52,6 +52,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         bool documentLoaded;
         bool templateLoaded;
         string previousDocumentContent;
+        bool refreshing;
 
         UIBarButtonItem cancelButtonItem;
         UIBarButtonItem insertButtonItem;
@@ -271,6 +272,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async void RefreshData()
         {
+            if (refreshing)
+                return;
+
+            refreshing = true;
+
             await LoadDocument();
             await LoadTemplate();
 
@@ -280,6 +286,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             autoSaveWorkingCopyWorker?.Stop();
             autoSaveWorkingCopyWorker = new Worker(SaveWorkingCopy, AutoSaveWorkingCopyInterval);
             autoSaveWorkingCopyWorker.Start();
+
+            refreshing = false;
         }
 
         async Task LoadDocument()
@@ -615,6 +623,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async void AttachmentsView_Tapped(object sender, AttachmentsView.TappedEventArgs e)
         {
+            if (e.AttachmentDescription.FromTemplate)
+            {
+                await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("template_attachment_title"), Localization.GetString("template_attachment_content"));
+                return;
+            }
+
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("opening_attachment___"));
 
             CommonConfig.UsageAnalytics.LogEvent(new ComposeOpenAttachmentEvent());
@@ -931,6 +945,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 }
 
                 var result = await EvaluateJavaScriptAsync(insertTemplateJs);
+
+                if (template.Attachments.Any())
+                    attachmentsView?.AddAttachmenstFromTemplate(template);
             }
             catch (Exception ex)
             {
@@ -998,6 +1015,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                     var result = await EvaluateJavaScriptAsync(insertTemplateJs);
                 }
+
+                if (template.Attachments.Any())
+                    attachmentsView?.AddAttachmenstFromTemplate(template);
             }
             catch (Exception ex)
             {
