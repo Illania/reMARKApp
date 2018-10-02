@@ -190,7 +190,6 @@ namespace Mark5.Mobile.Droid.Utilities
             var sb = new StringBuilder();
 
             sb.AppendLine("Exception Type: " + ex.GetType());
-            sb.AppendLine("Caused by: " + ex.InnerException);
             sb.AppendLine();
             sb.AppendLine("===== Stack Trace =====");
             sb.AppendLine(ex.StackTrace);
@@ -203,11 +202,11 @@ namespace Mark5.Mobile.Droid.Utilities
             var sb = new StringBuilder();
 
             sb.AppendLine("===== Document Failed Report =====");
-            sb.Append(CreateExceptionReport(ex));
-            sb.AppendLine();
             sb.Append(CreateSystemInfoReport());
             sb.AppendLine();
             sb.Append(CreateServerInfoReport());
+            sb.AppendLine();
+            sb.Append(CreateExceptionReport(ex));
 
             return sb.ToString();
         }

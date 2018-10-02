@@ -170,10 +170,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         async void CreateFailedDocumentReport(Guid guid)
         {
             var ex = await Managers.DocumentsManager.GetFailedDocumentException(guid);
-            var report = SystemReportCollector.CreateFailedDocumentReport(ex);
-            var src = SystemReportCollector.CreateShareReportController(report);
-            CommonConfig.Logger.Info(report);
-            PresentViewController(src, true, null);
+            PresentViewController(SystemReportCollector.CreateShareReportController(SystemReportCollector.CreateFailedDocumentReport(ex)), true, null);
         }
 
         async void ResendFailedDocumentToUpload((Guid Guid, DocumentPreview DocumentPreview) data)
