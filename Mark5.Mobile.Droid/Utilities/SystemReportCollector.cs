@@ -189,10 +189,10 @@ namespace Mark5.Mobile.Droid.Utilities
         {
             var sb = new StringBuilder();
 
+            sb.AppendLine("===== Exception =====");
             sb.AppendLine("Exception Type: " + ex.GetType());
             sb.AppendLine();
-            sb.AppendLine("===== Stack Trace =====");
-            sb.AppendLine(ex.StackTrace);
+            sb.AppendLine("Stack trace: " +ex.StackTrace);
 
             return sb.ToString();
         }
