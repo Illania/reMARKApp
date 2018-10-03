@@ -17,10 +17,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             args.PutInt(ActionButtonTextResIdBundleKey, Resource.String.confirm);
             args.PutBoolean(IncludeCurrentUserBundleKey, false);
-            args.PutBoolean(AllowNoUserSelectedBundleKey, true);
 
-            PickerInternalContactsListFragment fragment = new PickerInternalContactsListFragment();
-            fragment.Arguments = args;
+            PickerInternalContactsListFragment fragment = new PickerInternalContactsListFragment
+            {
+                Arguments = args
+            };
 
             var tag = $"{nameof(PickerInternalContactsListFragment)}";
 

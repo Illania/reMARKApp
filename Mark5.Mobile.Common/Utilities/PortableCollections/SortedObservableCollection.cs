@@ -6,8 +6,8 @@ namespace Mark5.Mobile.Common.Utilities.PortableCollections
 {
     public class SortedObservableCollection<TItem> : ObservableCollection<TItem>
     {
-        Comparison<TItem> lookupComparison;
-        Comparison<TItem> sortingComparison;
+        readonly Comparison<TItem> lookupComparison;
+        readonly Comparison<TItem> sortingComparison;
 
         public SortedObservableCollection(Comparison<TItem> lookup, Comparison<TItem> sorting)
         {

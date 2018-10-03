@@ -84,15 +84,15 @@ namespace Mark5.Mobile.Common.Utilities
             if (systemUsersDepartments == null)
                 return;
 
-            Task.Run(async () =>
+            Task.Run(() =>
             {
                 var filtered = new List<Recipient>();
 
                 var matchingInternalUsers = systemUsersDepartments.Users.FindAll(user => user.FirstName.ContainsCaseInsensitive(phrase) || user.LastName.ContainsCaseInsensitive(phrase) || user.Username.ContainsCaseInsensitive(phrase));
 
                 foreach (SystemUser user in matchingInternalUsers)
-                    filtered.Add(new Recipient((user.FirstName != null && user.LastName != null) ? user.FirstName + " " + user.LastName : null, user.Username, RecipientType.Internal));   
-                
+                    filtered.Add(new Recipient((user.FirstName != null && user.LastName != null) ? user.FirstName + " " + user.LastName : null, user.Username, RecipientType.Internal));
+
                 handler(filtered, token);
             });
         }
