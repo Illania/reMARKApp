@@ -32,7 +32,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
         const int AutoSaveWorkingCopyInterval = 5000; // 5 seconds
 
-        string DefaultTitle = Localization.GetString("new_document");
+        readonly string DefaultTitle = Localization.GetString("new_document");
 
         public bool RestoreWorkingCopy { get; set; }
 
@@ -346,6 +346,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     await subView.InitializeView();
                 }
 
+                document.Guid = Guid.NewGuid();
+
                 if (RestoreWorkingCopy)
                 {
                     var files = await Managers.DocumentsManager.GetDocumentWorkingCopyAttachmentsAsync();
@@ -366,8 +368,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 }
                 else
                 {
-                   
-
                     if (previousDocumentPreview != null &&
                            (DocumentCreationModeFlag == DocumentCreationModeFlag.Reply && CopyToNewOption == CopyToNewOption.None ||
                             DocumentCreationModeFlag == DocumentCreationModeFlag.ReplyAll && CopyToNewOption == CopyToNewOption.None ||
@@ -395,7 +395,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     {
                         LoadEditorWithPreviousContent(previousDocumentContent);
 
-                    } else {
+                    }
+                    else
+                    {
                         LoadEditor();
                     }
                 }
@@ -792,7 +794,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     await subView.UpdateDocument();
 
                 document.HtmlBody = await GetContent();
-
                 documentPreview.Direction = DocumentDirection.Outgoing;
 
                 await Managers.DocumentsManager.SaveDocumentWorkingCopyAsync(new DocumentWorkingCopy
@@ -1026,7 +1027,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     }
 
                     var result = await InsertTemplate(type, template.Id, content);
-                } else {
+                }
+                else
+                {
                     var insertTemplateJs = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/initTemplate", "js"));
                     if (template.ContentType == ContentType.PlainText)
                     {
