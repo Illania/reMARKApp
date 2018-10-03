@@ -42,5 +42,7 @@ namespace Mark5.Mobile.Common.Model
         }
 
         public long SizeInBytes { get; set; }
+
+        public bool FromTemplate { get; set; }
     }
 }
