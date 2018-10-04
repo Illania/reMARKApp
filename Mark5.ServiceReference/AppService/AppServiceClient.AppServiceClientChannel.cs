@@ -873,42 +873,6 @@ namespace Mark5.ServiceReference.AppService
             }
 
             #endregion
-
-            #region Folder Favorites
-
-            public IAsyncResult GeFavoriteFolders(GetFavoriteFoldersParameters parameters, AsyncCallback callback, object asyncState)
-            {
-                return BeginInvoke("GetFavoriteFolders",
-                    new object[]
-                    {
-                        parameters
-                    },
-                    callback,
-                    asyncState);
-            }
-
-            public GetFavoriteFoldersResult EndGetFavoriteFolders(IAsyncResult asyncResult)
-            {
-                return (GetFavoriteFoldersResult)EndInvoke("GetFavoriteFolders", new object[0], asyncResult);
-            }
-
-            public IAsyncResult UpdateFavoriteFolders(UpdateFavoriteFoldersParameters parameters, AsyncCallback callback, object asyncState)
-            {
-                return BeginInvoke("UpdateFavoriteFolders",
-                    new object[]
-                    {
-                        parameters
-                    },
-                    callback,
-                    asyncState);
-            }
-
-            public UpdateFavoriteFoldersResult EndUpdateFavoriteFolders(IAsyncResult asyncResult)
-            {
-                return (UpdateFavoriteFoldersResult)EndInvoke("UpdateFavoriteFolders", new object[0], asyncResult);
-            }
-
-            #endregion
         }
     }
 }
