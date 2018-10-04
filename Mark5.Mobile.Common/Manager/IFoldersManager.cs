@@ -34,6 +34,8 @@ namespace Mark5.Mobile.Common.Manager
 
         Task<FavoriteFolders> GetFavoriteFoldersFromService();
 
+        Task<FavoriteFolders> GetFavoriteFoldersFromService(List<ModuleType> modules);
+
         Task<bool> UploadFavoriteFoldersAsync();
 
         Task<bool> AddFavorites(List<Folder> folders, ModuleType moduleType);

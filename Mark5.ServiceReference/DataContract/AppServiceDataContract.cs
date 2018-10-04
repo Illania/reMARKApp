@@ -2655,7 +2655,7 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetFavoriteFoldersParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class GetFavoriteFoldersParameters : AbstractParameters
     {
-        public List<ModuleType> Modules = new List<ModuleType>();
+        public List<ModuleType> Modules { get; set; } = new List<ModuleType>();
     }
 
     [DataContract(Name = "GetFavoriteFoldersResult", Namespace = "com.nordic-it.appservice.v3")]

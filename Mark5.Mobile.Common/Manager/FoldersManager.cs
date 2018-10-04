@@ -54,10 +54,24 @@ namespace Mark5.Mobile.Common.Manager
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task<FavoriteFolders> GetFavoriteFoldersFromService() 
+        public Task<FavoriteFolders> GetFavoriteFoldersFromService()
         {
+            return GetFavoriteFoldersFromService(new List<ModuleType>() { ModuleType.Contacts, ModuleType.Documents, ModuleType.Shortcodes });
+        }
+
+        public async Task<FavoriteFolders> GetFavoriteFoldersFromService(List<ModuleType> modules) 
+        {
+
+            List<DataContract.ModuleType> dcModules = new List<DataContract.ModuleType>();
+
+            foreach(var module in modules) 
+            {
+                dcModules.Add((DataContract.ModuleType)module);
+            }
+
             var result = await AppServiceProxy.GetFavoriteFolders(new DataContract.GetFavoriteFoldersParameters()
             {
+                Modules = dcModules,
                 Token = ConnectionInfo.Token
             });
 
