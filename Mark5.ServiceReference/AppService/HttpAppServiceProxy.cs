@@ -455,5 +455,16 @@ namespace Mark5.ServiceReference.AppService
         {
             return await InvokeAsync<UpdateFavoriteFoldersResult, UpdateFavoriteFoldersParameters>("UpdateFavoriteFolders", parameters, ct);
         }
+
+        public async Task<AddFavoriteFoldersResult> AddFavoriteFolders(AddFavoriteFoldersParameters parameters, CancellationToken ct = default(CancellationToken))
+        {
+            return await InvokeAsync<AddFavoriteFoldersResult, AddFavoriteFoldersParameters>("AddFavoriteFolders", parameters, ct);
+        }
+
+        public async Task<RemoveFavoriteFoldersResult> RemoveFavoriteFolders(RemoveFavoriteFoldersParameters parameters, CancellationToken ct = default(CancellationToken))
+        {
+            return await InvokeAsync<RemoveFavoriteFoldersResult, RemoveFavoriteFoldersParameters>("RemoveFavoriteFolders", parameters, ct);
+        }
+
     }
 }
