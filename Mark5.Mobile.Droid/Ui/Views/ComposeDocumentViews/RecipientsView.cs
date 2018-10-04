@@ -34,7 +34,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         public event EventHandler AddButtonClicked = delegate { };
 
         public bool Empty => (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
-        ? !Validator.ContainsValidEmail(emailEditor.Text) && !Validator.ContainsValidUsernames(emailEditor.Text,systemUsersDepartments) : !Validator.ContainsValidEmail(emailEditor.Text);
+        ? !Validator.ContainsValidEmail(emailEditor.Text) && !Validator.ContainsValidUsernames(emailEditor.Text, systemUsersDepartments) : !Validator.ContainsValidEmail(emailEditor.Text);
 
         public bool AllRecipientsValid
         {
@@ -42,7 +42,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             {
                 return emailEditor.Text.Split(new[] { RecipientSeperator }, StringSplitOptions.RemoveEmptyEntries)
                                   .All(a => ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable
-                                       ? (Validator.ContainsValidEmails(a) || Validator.ContainsValidUsernames(a,systemUsersDepartments))
+                                       ? (Validator.ContainsValidEmails(a) || Validator.ContainsValidUsernames(a, systemUsersDepartments))
                                        : Validator.ContainsValidEmails(a));
             }
         }
@@ -200,7 +200,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             if (PreconfiguredEmailAddresses != null && PreconfiguredEmailAddresses.ContainsKey(AddressType))
                 AddEmails(PreconfiguredEmailAddresses[AddressType]);
 
-            if (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
+            if (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable && PreviousDocumentPreview != null &&
+                PreviousDocumentPreview.Addresses.Any(a => a.Type == CommunicationAddressType.Internal))
             {
                 if (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption.HasFlag(CopyToNewOption.Addresses))
                     AddInternalUsersFromGuids(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == AddressType && a.Type == CommunicationAddressType.Internal).Select(a => a.Address));
@@ -245,9 +246,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                     if (PreviousDocumentPreview.Direction == DocumentDirection.Outgoing)
                         AddInternalUsersFromGuids(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == AddressType && da.Type == CommunicationAddressType.Internal).Select(da => da.Address));
                 }
-
-                if (PreconfiguredEmailAddresses != null && PreconfiguredEmailAddresses.ContainsKey(AddressType))
-                    AddInternalUsersFromGuids(PreconfiguredEmailAddresses[AddressType]);
             }
 
             return Task.CompletedTask;
@@ -356,7 +354,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
         }
 
-        public void AddRecipent(string name, string address)
+        public void AddRecipient(string name, string address)
         {
             var newEmails = new StringBuilder();
             newEmails.Append(emailEditor.Text);
@@ -382,7 +380,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             if (lineAddress == savedRecipient)
                 return;
 
-            var currentRecipients = GetRecipents().ToList();
+            var currentRecipients = GetRecipients().ToList();
 
             if (currentRecipients.Count <= 1)
                 return;
@@ -439,8 +437,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             emailEditor.Text = string.Join(RecipientSeperator, recipients);
         }
 
-        IEnumerable<string> GetRecipents() => emailEditor.Text.Split(new[] { RecipientSeperator }, StringSplitOptions.RemoveEmptyEntries)
-                .Where(s => Validator.ContainsValidEmail(s))
+        IEnumerable<string> GetRecipients() => emailEditor.Text.Split(new[] { RecipientSeperator }, StringSplitOptions.RemoveEmptyEntries)
+                .Where(Validator.ContainsValidEmail)
                 .Select(s => s.Trim());
 
 
@@ -461,7 +459,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
         }
 
-        IEnumerable<string> GetInternalUsers() => Validator.ExtractUsernames(emailEditor.Text,systemUsersDepartments).Select(m => m.Value).Distinct().ToList();
+        IEnumerable<string> GetInternalUsers() => Validator.ExtractUsernames(emailEditor.Text, systemUsersDepartments).Select(m => m.Value.Trim()).Distinct().ToList();
 
         void Clear()
         {
@@ -749,7 +747,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                         suggestionsAdapter.ActualConstraint = constraint.ToString();
                         searchCancellationTokenSource = new CancellationTokenSource();
                         searchCancellationTokenSources.Add(searchCancellationTokenSource);
-                        RecipentSuggestions.GetSuggestions(suggestionsAdapter.ActualConstraint, SystemUsersDepartments, searchCancellationTokenSource.Token, HandleSugguestions);
+                        RecipentSuggestions.GetSuggestions(suggestionsAdapter.ActualConstraint, SystemUsersDepartments, searchCancellationTokenSource.Token, HandleSuggestions);
                     }
                     else
                     {
@@ -769,7 +767,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
                 #region SuggestionService handlers
 
-                void HandleSugguestions(List<Recipient> newSuggestions, CancellationToken token)
+                void HandleSuggestions(List<Recipient> newSuggestions, CancellationToken token)
                 {
                     if (token.IsCancellationRequested)
                         return;

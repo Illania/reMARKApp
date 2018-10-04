@@ -261,19 +261,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (requestCode == RequestCodes.RecentAddressesRequestCode && resultCode == (int)Result.Ok)
             {
                 var recipient = Serializer.Deserialize<Recipient>(data.GetStringExtra(RecentAddressesListActivity.RecipientResultKey));
-                focusedRecipientView.AddRecipent(recipient.Name, recipient.Address);
+                focusedRecipientView.AddRecipient(recipient.Name, recipient.Address);
                 UpdateSendButtonState();
             }
             if (requestCode == RequestCodes.PhonebookRequestCode && resultCode == (int)Result.Ok)
             {
                 var recipient = Serializer.Deserialize<Recipient>(data.GetStringExtra(PhonebookContactsListActivity.RecipientResultKey));
-                focusedRecipientView.AddRecipent(recipient.Name, recipient.Address);
+                focusedRecipientView.AddRecipient(recipient.Name, recipient.Address);
                 UpdateSendButtonState();
             }
             if (requestCode == RequestCodes.ContactsRequestCode && resultCode == (int)Result.Ok)
             {
                 var recipient = Serializer.Deserialize<Recipient>(data.GetStringExtra(PickerContactFolderListActivity.RecipientResultKey));
-                focusedRecipientView.AddRecipent(recipient.Name, recipient.Address);
+                focusedRecipientView.AddRecipient(recipient.Name, recipient.Address);
                 UpdateSendButtonState();
             }
             if (requestCode == RequestCodes.InternalContactsRequestCode && resultCode == (int)Result.Ok)
@@ -281,7 +281,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var users = Serializer.Deserialize<List<SystemUser>>(data.GetStringExtra(PickerInternalContactsListActivity.RecipientResultKey));
                 foreach (var user in users)
                 {
-                    focusedRecipientView.AddRecipent(user.FirstName + " " + user.LastName, user.Username);
+                    focusedRecipientView.AddRecipient("", user.Username);
                 }
                 UpdateSendButtonState();
             }
@@ -320,12 +320,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             try
             {
-                systemUsersDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
-            } catch (Exception ex)
+                systemUsersDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync(SourceType.Local);
+            }
+            catch (Exception ex)
             {
-                if (ex is HttpAppServiceException)
-                    systemUsersDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync(SourceType.Local);
-            } 
+                CommonConfig.Logger.Error("Error while retrieving system users.", ex);
+            }
 
             toView.SystemUsersDepartments = systemUsersDepartments;
             ccView.SystemUsersDepartments = systemUsersDepartments;
@@ -598,7 +598,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async void RecipientView_AddButtonClicked(object sender, EventArgs e)
         {
-            var choice = ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable 
+            var choice = ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable
                                      ? await Dialogs.ShowListDialog(Context, Resource.String.picker_title, Resource.Array.picker_choice_with_internal_contacts, true)
                                      : await Dialogs.ShowListDialog(Context, Resource.String.picker_title, Resource.Array.picker_choice, true);
 
@@ -752,7 +752,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     Activity?.Finish();
             }
 
-            var allRecipientsValid = new RecipientsView[] { toView, ccView, bccView }.All(rv => rv.AllRecipientsValid); 
+            var allRecipientsValid = new RecipientsView[] { toView, ccView, bccView }.All(rv => rv.AllRecipientsValid);
 
             if (saveDraft && lineView.LineSelectedIsAmbiguous)
             {

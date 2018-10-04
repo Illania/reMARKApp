@@ -14,7 +14,7 @@ namespace Mark5.Mobile.Common.Utilities
         const string EmailAddressRegex = @"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?";
         const string OnlyEmailAddressRegex = @"^" + EmailAddressRegex + @"$";
         const string OnlyHexStringRegex = @"^#[A-Fa-f0-9]{0,2}[A-Fa-f0-9]{1,2}[A-Fa-f0-9]{1,2}[A-Fa-f0-9]{1,2}$";
-        const string UsernameRegex = @"([A-Za-z]+)";
+        const string RecipientRegex = @"([^,])([^,]*)";
 
         public static bool IsUsernameValid(string username)
         {
@@ -94,16 +94,16 @@ namespace Mark5.Mobile.Common.Utilities
 
         public static bool ContainsValidUsernames(string text, SystemUsersDepartments systemUserDepartments, out IEnumerable<Match> matches)
         {
-            matches = ExtractUsernames(text,systemUserDepartments);
+            matches = ExtractUsernames(text, systemUserDepartments);
             return matches.Any();
         }
 
         public static IEnumerable<Match> ExtractUsernames(string text, SystemUsersDepartments systemUsersDepartments)
         {
-            var matches = Regex.Matches(text ?? string.Empty, UsernameRegex, RegexOptions.IgnoreCase).Cast<Match>();
+            var matches = Regex.Matches(text ?? string.Empty, RecipientRegex, RegexOptions.IgnoreCase).Cast<Match>();
 
             if (systemUsersDepartments != null)
-                matches = matches.Cast<Match>().Where(m => !m.Value.Contains("@") && systemUsersDepartments.Users.Any(su => String.Equals(su.Username, m.Value, StringComparison.OrdinalIgnoreCase))).Select(m => m);
+                matches = matches.Cast<Match>().Where(m => !m.Value.Contains("@") && systemUsersDepartments.Users.Any(su => String.Equals(su.Username, m.Value.Trim(), StringComparison.OrdinalIgnoreCase))).Select(m => m);
 
             return matches;
         }
