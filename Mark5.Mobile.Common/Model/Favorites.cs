@@ -8,26 +8,26 @@ namespace Mark5.Mobile.Common.Model
 {
     public class FavoriteFolders
     {
-        public List<Favorite> Favorites { get; set; }
+        public List<ModuleFavorite> Favorites { get; set; }
 
         public DateTime UpdatedAt { get; set; }
 
         public FavoriteFolders() 
         {
-            Favorites = new List<Favorite>();
+            Favorites = new List<ModuleFavorite>();
         }
 
         public FavoriteFolders(GetFavoriteFoldersResult getFavoriteFoldersResult)
         {
             UpdatedAt = getFavoriteFoldersResult.UpdatedAt;
 
-            if (getFavoriteFoldersResult.Favorites != null) 
+            if (getFavoriteFoldersResult.ModuleFavorites != null) 
             {
-                Favorites = new List<Favorite>();
+                Favorites = new List<ModuleFavorite>();
 
-                foreach(var fav in getFavoriteFoldersResult.Favorites) 
+                foreach(var fav in getFavoriteFoldersResult.ModuleFavorites) 
                 {
-                    var newFav = new Favorite() { ModuleType = (ModuleType)fav.ModuleType };
+                    var newFav = new ModuleFavorite() { ModuleType = (ModuleType)fav.ModuleType };
 
                     foreach (var folder in fav.Folders)
                     {
@@ -40,7 +40,7 @@ namespace Mark5.Mobile.Common.Model
         }
     }
 
-    public class Favorite
+    public class ModuleFavorite
     {
         public List<Folder> Folders { get; set; } = new List<Folder>();
 

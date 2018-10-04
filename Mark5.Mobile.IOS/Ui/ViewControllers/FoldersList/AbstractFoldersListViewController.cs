@@ -632,22 +632,27 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         public async void AddToFavorites(Folder folder)
         {
-
             try
             {
                 CommonConfig.UsageAnalytics.LogEvent(new SetFolderFavoriteEvent(folder.Module, 1));
 
                 if (PlatformConfig.Preferences.SyncFavoriteFoldersEnabled && !CommonConfig.Reachability.IsReachable)
                 {
-                    throw new Exception(Localization.GetString("sync_error_description"));
+                    throw new Exception(Localization.GetString("sync_error_network"));
                 }
-               
-                await Managers.FoldersManager.AddFavoriteFolderAsync(folder.Module, folder);
 
                 if (PlatformConfig.Preferences.SyncFavoriteFoldersEnabled && CommonConfig.Reachability.IsReachable)
                 {
-                    await Managers.FoldersManager.UploadFavoriteFoldersAsync();
+                    var result = await Managers.FoldersManager.AddFavorites(new List<Folder>() { folder }, folder.Module);
+                    if(result)
+                    {
+                        await Managers.FoldersManager.AddFavoriteFolderAsync(folder.Module, folder);
+                    } else {
+                        throw new Exception(Localization.GetString("sync_error_general"));
+                    }
                 }
+
+                await Managers.FoldersManager.AddFavoriteFolderAsync(folder.Module, folder);
 
                 if (TableView.Source is GrouppedDataSource gds)
                 {
@@ -674,7 +679,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error("Could not add folder to favorites", ex);
-
                 await Dialogs.ShowErrorAlertAsync(this, ex);
             }
         }
@@ -687,15 +691,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 if (PlatformConfig.Preferences.SyncFavoriteFoldersEnabled && !CommonConfig.Reachability.IsReachable)
                 {
-                    throw new Exception(Localization.GetString("sync_error_description"));
+                    throw new Exception(Localization.GetString("sync_error_network"));
                 }
-
-                await Managers.FoldersManager.RemoveFavoriteFolderAsync(folder.Module, folder);
 
                 if (PlatformConfig.Preferences.SyncFavoriteFoldersEnabled && CommonConfig.Reachability.IsReachable)
                 {
-                    await Managers.FoldersManager.UploadFavoriteFoldersAsync();
+                    var result = await Managers.FoldersManager.RemoveFavorites(new List<Folder>() { folder }, folder.Module);
+                    if (result)
+                    {
+                        await Managers.FoldersManager.RemoveFavoriteFolderAsync(folder.Module, folder);
+                    }
+                    else
+                    {
+                        throw new Exception(Localization.GetString("sync_error_general"));  
+                    }
                 }
+
+                await Managers.FoldersManager.RemoveFavoriteFolderAsync(folder.Module, folder);
 
                 if (TableView.Source is GrouppedDataSource gds)
                 {
@@ -722,7 +734,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error("Could not remove folder from favorites", ex);
-
                 await Dialogs.ShowErrorAlertAsync(this, ex);
             }
         }

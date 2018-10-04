@@ -133,11 +133,11 @@ namespace Mark5.Mobile.Common.Manager
 
             var localFavorites = await FileSystemStorage.GetFavoriteFoldersAsync();
 
-            List<DataContract.Favorite> favorites = new List<DataContract.Favorite>();
+            List<DataContract.ModuleFavorite> favorites = new List<DataContract.ModuleFavorite>();
 
             foreach(KeyValuePair<ModuleType, List<Folder>> entry in localFavorites) 
             {
-                var favorite = new DataContract.Favorite { ModuleType = (DataContract.ModuleType)entry.Key };
+                var favorite = new DataContract.ModuleFavorite { ModuleType = (DataContract.ModuleType)entry.Key };
 
                 foreach(var folder in entry.Value) 
                 {
@@ -149,9 +149,49 @@ namespace Mark5.Mobile.Common.Manager
 
             var result = await AppServiceProxy.UpdateFavoriteFolders(new DataContract.UpdateFavoriteFoldersParameters
             {
-                Favorites = favorites,
+                ModuleFavorites = favorites,
                 Token = ConnectionInfo.Token
             });
+
+            return true;
+        }
+
+        public async Task<bool> AddFavorites(List<Folder> folders, ModuleType moduleType)
+        {
+            DataContract.ModuleFavorite moduleFavorite = new DataContract.ModuleFavorite { ModuleType = (DataContract.ModuleType)moduleType };
+
+            foreach(var folder in folders)
+            {
+                moduleFavorite.Folders.Add(folder.Convert());
+            }
+
+            DataContract.AddFavoriteFoldersParameters favParams = new DataContract.AddFavoriteFoldersParameters()
+            {
+                ModuleFavorites = new List<DataContract.ModuleFavorite>() { moduleFavorite },
+                Token = ConnectionInfo.Token
+            };
+
+            var result = await AppServiceProxy.AddFavoriteFolders(favParams);
+
+            return true;
+        }
+
+        public async Task<bool> RemoveFavorites(List<Folder> folders , ModuleType moduleType)
+        {
+            DataContract.ModuleFavorite moduleFavorite = new DataContract.ModuleFavorite { ModuleType = (DataContract.ModuleType)moduleType };
+
+            foreach (var folder in folders)
+            {
+                moduleFavorite.Folders.Add(folder.Convert());
+            }
+
+            DataContract.RemoveFavoriteFoldersParameters favParams = new DataContract.RemoveFavoriteFoldersParameters()
+            {
+                ModuleFavorites = new List<DataContract.ModuleFavorite>() { moduleFavorite },
+                Token = ConnectionInfo.Token
+            };
+
+            var result = await AppServiceProxy.RemoveFavoriteFolders(favParams);
 
             return true;
         }
@@ -249,7 +289,6 @@ namespace Mark5.Mobile.Common.Manager
             }
         }
 
-    
         #endregion
     }
 }

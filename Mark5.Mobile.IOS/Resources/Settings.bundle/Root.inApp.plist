@@ -358,7 +358,7 @@
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 			<key>Title</key>
-			<string>sync_favorite_folders</string>
+			<string>sync_favorite_folders_title</string>
 			<key>Key</key>
 			<string>SyncFavoriteFolders</string>
 		</dict>
