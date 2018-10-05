@@ -185,8 +185,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                                 {
                                     PreconfiguredEmailAddresses = new Dictionary<DocumentAddressType, string[]>() { { DocumentAddressType.To, new string[] { "appfeedback@nordic-it.com" } } },
                                     PreConfiguredSubject = Localization.GetString("mark5_ios_feedback"),
-                                    PreconfiguredContent = t.Result,
-                                    PreviousDocumentDirection = DocumentDirection.Outgoing
+                                    PreconfiguredContent = t.Result
                                 };
 
                                 vc.PresentViewController(new NavigationController(cvc, UIModalPresentationStyle.PageSheet), true, null);
@@ -231,8 +230,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                                 {
                                     PreconfiguredEmailAddresses = new Dictionary<DocumentAddressType, string[]>() { { DocumentAddressType.To, new string[] { "appfeedback@nordic-it.com" } } },
                                     PreConfiguredSubject = Localization.GetString("mark5_ios_feedback"),
-                                    PreconfiguredContent = t.Result,
-                                    PreviousDocumentDirection = DocumentDirection.Outgoing
+                                    PreconfiguredContent = t.Result
                                 };
 
                                 vc.PresentViewController(new NavigationController(cvc, UIModalPresentationStyle.PageSheet), true, null);
