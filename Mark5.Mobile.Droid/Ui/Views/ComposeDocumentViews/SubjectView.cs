@@ -19,7 +19,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public bool Empty => string.IsNullOrEmpty(subjectTextView?.Text);
 
-        public string Subject => subjectTextView?.Text;
+        public string Subject { get => subjectTextView?.Text; set => subjectTextView.Text = value; }
 
         public SubjectView(Context context)
             : base(context)

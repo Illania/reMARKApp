@@ -228,6 +228,7 @@
     <string name="low_priority_document">This email has low priority</string>
     <string name="make_online">Go online</string>
     <string name="map">Map</string>
+    <string name="mark5_android_feedback">MARK5 android feedback</string>
     <string name="mark5_server_reachability">MARK5 Server:</string>
     <string name="mark5_service_reachability">MARK5 App Service:</string>
     <string name="mark_all_as_read">Mark all as read</string>
@@ -391,6 +392,8 @@
     <string name="select">Select</string>
     <string name="select_all">Select all</string>
     <string name="deselect_all">Deselect all</string>
+    <string name="send_report_with_mark5_content">Do you want to send the generated report with MARK5?</string>
+    <string name="send_report_with_mark5_title">Send with MARK5</string>
     <string name="select_email_address">Select email address</string>
     <string name="select_a_line">Select a mailbox</string>
     <string name="select_categories">Select categories</string>

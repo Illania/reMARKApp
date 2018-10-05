@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Android.Content;
 using Android.Graphics;
@@ -18,6 +19,7 @@ using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 
@@ -182,12 +184,25 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.dialog_creating_report, Resource.String.please_wait);
 
                 Task.Run(() => { return SystemReportCollector.CreateFullReport(); })
-                    .ContinueWith(t =>
+                    .ContinueWith(async t =>
                         {
                             dismissAction();
 
                             if (!t.IsFaulted)
-                                StartActivity(SystemReportCollector.CreateShareReportIntent(Activity, t.Result));
+                            {
+                                var sendWithMark5 = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.send_report_with_mark5_title, Resource.String.send_report_with_mark5_content);
+
+                                if (sendWithMark5)
+                                {
+                                    var cdIntent = ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, CopyToNewOption.None,
+                                                                         preconfiguredEmailAddresses: new Dictionary<DocumentAddressType, string[]>() { { DocumentAddressType.To, new string[] { "appfeedback@nordic-it.com" } } },
+                                                                         preconfiguredSubject: GetString(Resource.String.mark5_android_feedback), preconfiguredContent: t.Result);
+                                    StartActivity(cdIntent);
+                                }
+                                else
+                                    StartActivity(SystemReportCollector.CreateShareReportIntent(Context, t.Result));
+                            }
+
                         },
                         TaskScheduler.FromCurrentSynchronizationContext());
 
