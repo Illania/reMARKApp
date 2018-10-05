@@ -16,6 +16,10 @@ namespace Mark5.Mobile.Common.Manager
 
         Task RemoveFavoriteFolderAsync(ModuleType module, Folder folder);
 
+        Task ClearFavorites();
+
+        Task ClearFavorites(List<ModuleType> modules);
+
         Task<bool> IsFolderFavouriteAsync(ModuleType module, Folder folder);
 
         Task<bool> IsFolderFavouriteAsync(ModuleType module, int folderId);
@@ -32,9 +36,9 @@ namespace Mark5.Mobile.Common.Manager
 
         Task<List<Folder>> SearchFolders(string searchText);
 
-        Task<FavoriteFolders> GetFavoriteFoldersFromService();
+        Task<ModuleFavoritesWrapper> GetModuleFavoritesFromService();
 
-        Task<FavoriteFolders> GetFavoriteFoldersFromService(List<ModuleType> modules);
+        Task<ModuleFavoritesWrapper> GetModuleFavoritesFromService(List<ModuleType> modules);
 
         Task<bool> UploadFavoriteFoldersAsync();
 

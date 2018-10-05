@@ -162,4 +162,10 @@
         <item>30</item>
     </string-array>
     <string name="pref_auth_default">-1</string>
+    <bool name="pref_key_sync_favorites_value">false</bool>
+    <string name="pref_key_sync_favorites">pref_key_sync_favorites</string>
+    <string name="pref_sync_favorites">pref_sync_favorites</string>
+    <string name="sync_favorite_folders_title">Sync favorite folders</string>
+    <string name="pref_sync_title">Favorite sync</string>
+    <string name="sync_favorite_folders_summary">Synchronize emails, contacts, shortcodes favorite folders across devices</string>
 </resources>

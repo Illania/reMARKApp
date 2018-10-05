@@ -159,13 +159,13 @@ namespace Mark5.ServiceReference.AppService
 
         #region Folder favorites
 
-        Task<GetFavoriteFoldersResult> GetFavoriteFolders(GetFavoriteFoldersParameters parameters, CancellationToken ct = default(CancellationToken));
+        Task<GetModuleFavoritesResult> GetModuleFavorites(GetModuleFavoritesParameters parameters, CancellationToken ct = default(CancellationToken));
 
-        Task<UpdateFavoriteFoldersResult> UpdateFavoriteFolders(UpdateFavoriteFoldersParameters parameters, CancellationToken ct = default(CancellationToken));
+        Task<UpdateModuleFavoritesResult> UpdateModuleFavorites(UpdateModuleFavoritesParameters parameters, CancellationToken ct = default(CancellationToken));
 
-        Task<AddFavoriteFoldersResult> AddFavoriteFolders(AddFavoriteFoldersParameters parameters, CancellationToken ct = default(CancellationToken));
+        Task<AddModuleFavoritesResult> AddModuleFavorites(AddModuleFavoritesParameters parameters, CancellationToken ct = default(CancellationToken));
 
-        Task<RemoveFavoriteFoldersResult> RemoveFavoriteFolders(RemoveFavoriteFoldersParameters parameters, CancellationToken ct = default(CancellationToken));
+        Task<RemoveModuleFavoritesResult> RemoveModuleFavorites(RemoveModuleFavoritesParameters parameters, CancellationToken ct = default(CancellationToken));
 
         #endregion
     }

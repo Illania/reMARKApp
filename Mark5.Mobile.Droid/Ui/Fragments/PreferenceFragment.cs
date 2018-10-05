@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Android.Content;
 using Android.Graphics;
@@ -126,9 +128,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
 
             var swipeOptions = FindPreference(GetString(Resource.String.pref_key_swipe_options));
-            if(swipeOptions != null) {
-                swipeOptions.PreferenceClick += (object sender, Preference.PreferenceClickEventArgs e) => {
-                   
+            if (swipeOptions != null)
+            {
+                swipeOptions.PreferenceClick += (object sender, Preference.PreferenceClickEventArgs e) =>
+                {
+
                     SwipeActionsFragment swipeActionsFragment;
                     string swipeActionsFragmentTag;
                     var fragmentTransaction = Activity.SupportFragmentManager.BeginTransaction();
@@ -138,10 +142,101 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     fragmentTransaction.Commit();
                 };
             }
+
+
+            var checkBox = (CheckBoxPreference)FindPreference(GetString(Resource.String.pref_key_sync_favorites_enabled));
+            if (checkBox != null)
+            {
+                checkBox.PreferenceClick += async (object sender, Preference.PreferenceClickEventArgs e) => {
+
+                    if(checkBox.Checked) {
+                        if(!CommonConfig.Reachability.IsReachable) 
+                        {
+                            // display alert -> only possible with internet connection
+                        } else {
+
+                            await HandleSync();
+                            /*
+                            var result = await Managers.FoldersManager.GetFavoriteFoldersFromService();
+
+                            if(result != null) {
+                                // favorites exist on server
+                            } else {
+                                // upload local favorites to server 
+
+                                await Managers.FoldersManager.UploadFavoriteFoldersAsync();
+                            }
+                            */
+                        }
+                    } else {
+                        // do sync -> 
+                        // checkBox.Checked = false;
+                        // return;
+                    }
+                };
+            }
         }
+
+
+        async Task HandleSync()
+        {
+           
+
+            try
+            {
+                var favoriteFolders = await Managers.FoldersManager.GetModuleFavorites();
+                if (favoriteFolders.Favorites == null)
+                {
+                    var uploadSuccess = await Managers.FoldersManager.UploadFavoriteFoldersAsync();
+                    if (!uploadSuccess)
+                        throw (new Exception("Could not upload favorite folders"));
+                }
+                else
+                {
+                    var values = new List<ContactType> { ContactType.Company, ContactType.Department, ContactType.Person };
+
+                    var index = await Dialogs.ShowListDialog(Context, Resource.String.edit_contact_dialog_title, values.Select(v => GetString(UI.ContactTypeResourceId(v))).ToArray(), true);
+
+                    //var selectedOption = await Dialogs.ShowListActionSheetWithTitleAsync(this, new string[] { Localization.GetString("sync_fav_folders_use_server"), Localization.GetString("sync_fav_folders_use_device") }, View, Localization.GetString("sync_fav_folders_action_title"), $"{Localization.GetString("sync_fav_folders_action_description")} : {favoriteFolders.UpdatedAt.ToLongDateString()}");
+                    var selectedOption = 0;
+                    if (selectedOption == 0)
+                    {
+                        foreach (var favs in favoriteFolders.Favorites)
+                        {
+                            await Managers.FoldersManager.SetFavoriteFoldersAsync(favs.ModuleType, favs.Folders);
+                        }
+                    }
+                    else if (selectedOption == 1)
+                    {
+                        await Managers.FoldersManager.UploadFavoriteFoldersAsync();
+
+                    }
+                    else
+                    {
+                        //PlatformConfig.Preferences.SyncFavoriteFoldersEnabled = false;
+                        return;
+                    }
+                }
+
+                //PlatformConfig.Preferences.SyncFavoriteFoldersEnabled = true;
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Error while shynchonizing favorite folders", ex);
+                //PlatformConfig.Preferences.SyncFavoriteFoldersEnabled = false;
+                //Dialogs.ShowErrorAlert(this, ex);
+            }
+        }
+
 
         public override bool OnPreferenceTreeClick(Preference preference)
         {
+
+            if (preference.Key == GetString(Resource.String.pref_key_sync_favorites_enabled))
+            {
+                return false;
+            }
+
             if (preference.Key == GetString(Resource.String.pref_key_documents_use_server_timezone))
                 Dialogs.ShowConfirmDialog(Context, Resource.String.dialog_restart_required_title, Resource.String.dialog_restart_required_content);
 

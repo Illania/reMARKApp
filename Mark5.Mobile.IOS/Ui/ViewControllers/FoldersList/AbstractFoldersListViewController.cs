@@ -466,6 +466,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 {
                     var gds = (GrouppedDataSource)TableView.Source;
 
+                    if (PlatformConfig.Preferences.SyncFavoriteFoldersEnabled && CommonConfig.Reachability.IsReachable) {
+                        await Managers.FoldersManager.GetModuleFavoritesFromService(new List<ModuleType>() { ParentFolder.Module });
+                    }
+
                     var favorites = await Managers.FoldersManager.GetFavoriteFoldersAsync(ParentFolder.Module);
 
                     if (ParentFolder.Module == ModuleType.Documents)
@@ -502,7 +506,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             RefreshControl.ValueChanged += RefreshControl_ValueChanged;
         }
 
-        async void QuickRefreshData()
+        public async void QuickRefreshData()
         {
             try
             {

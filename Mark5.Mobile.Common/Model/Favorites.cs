@@ -6,24 +6,24 @@ using Mark5.ServiceReference.DataContract;
 
 namespace Mark5.Mobile.Common.Model
 {
-    public class FavoriteFolders
+    public class ModuleFavoritesWrapper
     {
-        public List<ModuleFavorite> Favorites { get; set; }
+        public List<ModuleFavorite> ModuleFovorites { get; set; }
 
         public DateTime UpdatedAt { get; set; }
 
-        public FavoriteFolders() 
+        public ModuleFavoritesWrapper() 
         {
-            Favorites = new List<ModuleFavorite>();
+            ModuleFovorites = new List<ModuleFavorite>();
         }
 
-        public FavoriteFolders(GetFavoriteFoldersResult getFavoriteFoldersResult)
+        public ModuleFavoritesWrapper(GetModuleFavoritesResult getFavoriteFoldersResult)
         {
             UpdatedAt = getFavoriteFoldersResult.UpdatedAt;
 
             if (getFavoriteFoldersResult.ModuleFavorites != null) 
             {
-                Favorites = new List<ModuleFavorite>();
+                ModuleFovorites = new List<ModuleFavorite>();
 
                 foreach(var fav in getFavoriteFoldersResult.ModuleFavorites) 
                 {
@@ -34,7 +34,7 @@ namespace Mark5.Mobile.Common.Model
                         newFav.Folders.Add(folder.Convert());
                     }
 
-                    Favorites.Add(newFav);
+                    ModuleFovorites.Add(newFav);
                 }
             }
         }

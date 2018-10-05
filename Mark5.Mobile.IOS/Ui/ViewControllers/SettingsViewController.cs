@@ -417,33 +417,46 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         async Task HandleSync()
         {
             // when disabling sync -> do nothing
-            if(!PlatformConfig.Preferences.SyncFavoriteFoldersEnabled)
+            if (!PlatformConfig.Preferences.SyncFavoriteFoldersEnabled)
                 return;
 
             try
             {
-                var favoriteFolders = await Managers.FoldersManager.GetFavoriteFoldersFromService();
-                if (favoriteFolders.Favorites == null)
+                var modulesResponse = await Managers.FoldersManager.GetModuleFavoritesFromService();
+                if (modulesResponse.ModuleFovorites == null)
                 {
                     var uploadSuccess = await Managers.FoldersManager.UploadFavoriteFoldersAsync();
                     if (!uploadSuccess)
-                        throw (new Exception("Could not upload favorite folders"));
+                        throw (new Exception(Localization.GetString("sync_error_general")));
                 }
                 else
                 {
-                    var selectedOption = await Dialogs.ShowListActionSheetWithTitleAsync(this,new string[] { Localization.GetString("sync_fav_folders_use_server"), Localization.GetString("sync_fav_folders_use_device") },View, Localization.GetString("sync_fav_folders_action_title"),$"{Localization.GetString("sync_fav_folders_action_description")} : {favoriteFolders.UpdatedAt.ToLongDateString()}");
-                   
+                    var selectedOption = await Dialogs.ShowListActionSheetWithTitleAsync(this, new string[] { Localization.GetString("sync_fav_folders_use_server"), Localization.GetString("sync_fav_folders_use_device") }, View, Localization.GetString("sync_fav_folders_action_title"), $"{Localization.GetString("sync_fav_folders_action_description")} : {modulesResponse.UpdatedAt.ToLongDateString()}");
+
                     if (selectedOption == 0)
                     {
-                        foreach(var favs in favoriteFolders.Favorites) {
-                            await Managers.FoldersManager.SetFavoriteFoldersAsync(favs.ModuleType, favs.Folders);
+                        if (modulesResponse.ModuleFovorites != null && modulesResponse.ModuleFovorites.Count == 0)
+                        {
+                            await Managers.FoldersManager.ClearFavorites();
+                        }
+                        else
+                        {
+                            var missingModules = new List<ModuleType> { ModuleType.Calendar, ModuleType.Contacts, ModuleType.Documents };
+
+                            foreach (var favorite in modulesResponse.ModuleFovorites)
+                            {
+                                await Managers.FoldersManager.SetFavoriteFoldersAsync(favorite.ModuleType, favorite.Folders);
+                                missingModules.RemoveAll(x => x == favorite.ModuleType);
+                            }
                         }
                     }
                     else if (selectedOption == 1)
                     {
                         await Managers.FoldersManager.UploadFavoriteFoldersAsync();
 
-                    } else {
+                    }
+                    else
+                    {
                         PlatformConfig.Preferences.SyncFavoriteFoldersEnabled = false;
                         return;
                     }
@@ -473,7 +486,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (PlatformConfig.Preferences.UseTemplate == Preferences.TemplateUsageMode.Local || PlatformConfig.Preferences.UseTemplate == Preferences.TemplateUsageMode.AlwaysAsk)
                 hiddenKeys.Add(LocalTemplateKey);
-          
+
             SetHiddenKeys((string[])hiddenKeys.ToArray(), false);
         }
 

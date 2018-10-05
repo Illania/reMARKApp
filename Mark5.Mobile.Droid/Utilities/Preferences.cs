@@ -42,12 +42,13 @@ namespace Mark5.Mobile.Droid.Utilities
 
         #region Caller Identification
 
-        public bool CallerIdentificationEnabled {
+        public bool CallerIdentificationEnabled
+        {
             get => sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_callidentification_identification_enabled), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_callidentification_enabled_default));
-            set 
+            set
             {
                 var e = sp.Edit();
-                e.PutBoolean(Application.Context.GetString(Resource.String.pref_key_callidentification_identification_enabled),value);
+                e.PutBoolean(Application.Context.GetString(Resource.String.pref_key_callidentification_identification_enabled), value);
                 e.Commit();
             }
         }
@@ -214,7 +215,7 @@ namespace Mark5.Mobile.Droid.Utilities
             set
             {
                 var e = sp.Edit();
-                e.PutString(Application.Context.GetString(Resource.String.pref_key_swipe_trailing),$"{(int)value}");
+                e.PutString(Application.Context.GetString(Resource.String.pref_key_swipe_trailing), $"{(int)value}");
                 e.Commit();
             }
         }
@@ -245,6 +246,22 @@ namespace Mark5.Mobile.Droid.Utilities
         {
             EmailLeadingSwipeAction = EmailSwipeAction.Categories;
             EmailTrailingSwipeAction = EmailSwipeAction.CopyToWorkTray;
+        }
+
+        #endregion
+
+        #region Folders favorites
+
+        public bool SyncFavoritesEnabled {
+            get {
+                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_sync_favorites_enabled), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_key_sync_favorites_value));
+            }
+
+            set {
+                var e = sp.Edit();
+                e.PutBoolean(Application.Context.GetString(Resource.String.pref_key_sync_favorites_enabled), value);
+                e.Commit();
+            }
         }
 
         #endregion
