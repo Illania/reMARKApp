@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.DataAccess.Exceptions;
+using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Exceptions;
+using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 using Mark5.Mobile.IOS.Utilities;
 using Mark5.ServiceReference.Exceptions;
 using SVProgressHUD;
@@ -168,12 +170,30 @@ namespace Mark5.Mobile.IOS.Ui.Common
                                                      a =>
                 {
                     var dismissAction = ShowInfiniteProgressDialog(Localization.GetString("creating_system_report___"));
-                    Task.Run(() => SystemReportCollector.CreateFullReport()).ContinueWith(t =>
+                    Task.Run(() => SystemReportCollector.CreateFullReport()).ContinueWith(async t =>
                     {
                         dismissAction();
 
                         if (!t.IsFaulted)
-                            vc.PresentViewController(SystemReportCollector.CreateShareReportController(t.Result), true, () => { tcs.SetResult(true); });
+                        {
+
+                            var sendWithMark5 = await ShowYesNoAlertAsync(vc, Localization.GetString("send_report_with_mark5_title"), Localization.GetString("send_report_with_mark5_content"));
+
+                            if (sendWithMark5)
+                            {
+                                var cvc = new ComposeDocumentViewController
+                                {
+                                    PreconfiguredEmailAddresses = new Dictionary<DocumentAddressType, string[]>() { { DocumentAddressType.To, new string[] { "appfeedback@nordic-it.com" } } },
+                                    PreConfiguredSubject = Localization.GetString("mark5_ios_feedback"),
+                                    PreconfiguredContent = t.Result,
+                                    PreviousDocumentDirection = DocumentDirection.Outgoing
+                                };
+
+                                vc.PresentViewController(new NavigationController(cvc, UIModalPresentationStyle.PageSheet), true, null);
+                            }
+                            else 
+                                vc.PresentViewController(SystemReportCollector.CreateShareReportController(t.Result), true, () => { tcs.SetResult(true); });
+                        }
                         else
                             tcs.SetResult(true);
                     }, TaskScheduler.FromCurrentSynchronizationContext());
@@ -197,12 +217,29 @@ namespace Mark5.Mobile.IOS.Ui.Common
                                                      a =>
                 {
                     var dismissAction = ShowInfiniteProgressDialog(Localization.GetString("creating_system_report___"));
-                    Task.Run(() => SystemReportCollector.CreateFullReport()).ContinueWith(t =>
+                    Task.Run(() => SystemReportCollector.CreateFullReport()).ContinueWith(async t =>
                     {
                         dismissAction();
 
                         if (!t.IsFaulted)
-                            vc.PresentViewController(SystemReportCollector.CreateShareReportController(t.Result), true, null);
+                        {
+                            var sendWithMark5 = await ShowYesNoAlertAsync(vc, Localization.GetString("send_report_with_mark5_title"), Localization.GetString("send_report_with_mark5_content"));
+
+                            if (sendWithMark5)
+                            {
+                                var cvc = new ComposeDocumentViewController
+                                {
+                                    PreconfiguredEmailAddresses = new Dictionary<DocumentAddressType, string[]>() { { DocumentAddressType.To, new string[] { "appfeedback@nordic-it.com" } } },
+                                    PreConfiguredSubject = Localization.GetString("mark5_ios_feedback"),
+                                    PreconfiguredContent = t.Result,
+                                    PreviousDocumentDirection = DocumentDirection.Outgoing
+                                };
+
+                                vc.PresentViewController(new NavigationController(cvc, UIModalPresentationStyle.PageSheet), true, null);
+                            }
+                            else
+                                vc.PresentViewController(SystemReportCollector.CreateShareReportController(t.Result), true, null);
+                        }
                     }, TaskScheduler.FromCurrentSynchronizationContext());
                 }));
             }

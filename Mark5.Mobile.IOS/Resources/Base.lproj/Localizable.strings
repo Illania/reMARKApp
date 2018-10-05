@@ -188,6 +188,7 @@
 "low" = "Low";
 "mark5_server_reachability" = "MARK5 server: ";
 "mark5_service_reachability" = "MARK5 service: ";
+"mark5_ios_feedback" = "Mark5 iOS feedback";
 "mark_as_read" = "Mark as read";
 "mark_as_read_ml" = "Mark as\nread";
 "mark_as_unread" = "Mark as unread";
@@ -347,6 +348,8 @@
 "send" = "Send";
 "send_text" = "Send message";
 "sending_document___" = "Sending email...";
+"send_report_with_mark5_content" = "Do you want to send the generated report with mark5?";
+"send_report_with_mark5_title" = "Send with mark5?";
 "set_priority" = "Set priority";
 "setting_priority___" = "Setting priority...";
 "settings" = "Settings";

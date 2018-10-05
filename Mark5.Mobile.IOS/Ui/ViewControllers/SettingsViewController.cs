@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using CoreGraphics;
 using Foundation;
 using InAppSettingsKit;
@@ -11,6 +12,7 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Common.CallId;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
+using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 using Mark5.Mobile.IOS.Utilities;
 using Mark5.Mobile.IOS.Utilities.Extensions;
 using UIKit;
@@ -279,8 +281,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     dismissAction();
 
-                    var mrc = SystemReportCollector.CreateMailReportController(report);
-                    PresentViewController(mrc, true, null);
+                    var sendWithMark5 = await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("send_report_with_mark5_title"), Localization.GetString("send_report_with_mark5_content"));
+
+                    if (sendWithMark5)
+                    {
+                        var cvc = new ComposeDocumentViewController
+                        {
+                            PreconfiguredEmailAddresses = new Dictionary<DocumentAddressType, string[]>() { { DocumentAddressType.To, new string[] { "appfeedback@nordic-it.com" } } },
+                            PreConfiguredSubject = Localization.GetString("mark5_ios_feedback"),
+                            PreconfiguredContent = report,
+                            PreviousDocumentDirection = DocumentDirection.Outgoing
+                        };
+
+                        PresentViewController(new NavigationController(cvc, UIModalPresentationStyle.PageSheet), true, null);
+                    }
+                    else
+                        PresentViewController(SystemReportCollector.CreateMailReportController(report), true, null);
                 }
                 catch (Exception ex)
                 {
@@ -302,10 +318,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     dismissAction();
 
-                    var src = SystemReportCollector.CreateShareReportController(report);
-                    if (src.PopoverPresentationController != null)
-                        src.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(sender.TableView, sender.TableView.CellAt(sender.SettingsReader.GetIndexPath(specifier.Key)));
-                    PresentViewController(src, true, null);
+                    var sendWithMark5 = await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("send_report_with_mark5_title"), Localization.GetString("send_report_with_mark5_content"));
+
+                    if (sendWithMark5)
+                    {
+                        var cvc = new ComposeDocumentViewController
+                        {
+                            PreconfiguredEmailAddresses = new Dictionary<DocumentAddressType, string[]>() { { DocumentAddressType.To, new string[] { "appfeedback@nordic-it.com" } } },
+                            PreConfiguredSubject = Localization.GetString("mark5_ios_feedback"),
+                            PreconfiguredContent = report,
+                            PreviousDocumentDirection = DocumentDirection.Outgoing
+                        };
+                        PresentViewController(new NavigationController(cvc, UIModalPresentationStyle.PageSheet), true, null);
+                    }
+                    else
+                    {
+                        var src = SystemReportCollector.CreateShareReportController(report);
+                        if (src.PopoverPresentationController != null)
+                            src.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(sender.TableView, sender.TableView.CellAt(sender.SettingsReader.GetIndexPath(specifier.Key)));
+                        PresentViewController(src, true, null);
+                    }
                 }
                 catch (Exception ex)
                 {

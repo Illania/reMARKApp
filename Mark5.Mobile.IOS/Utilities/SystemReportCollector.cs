@@ -39,11 +39,11 @@ namespace Mark5.Mobile.IOS.Utilities
         {
             var mcvc = new MFMailComposeViewController();
             mcvc.SetToRecipients(new[] { "appfeedback@nordic-it.com" });
-            mcvc.SetSubject("MARK5 for iOS Feedback");
-            mcvc.AddAttachmentData(NSData.FromString(report), "text/plain", "MARK5_Android_System_Report.txt");
+            mcvc.SetSubject(Localization.GetString("mark5_ios_feedback"));
+            mcvc.AddAttachmentData(NSData.FromString(report), "text/plain", "MARK5_iOS_System_Report.txt");
             mcvc.Finished += Mcvc_Finished;
             mcvc.NavigationBar.TintColor = Theme.DarkBlue;
-            
+
             return mcvc;
         }
 
