@@ -163,10 +163,34 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (preference.Key == GetString(Resource.String.pref_key_about_send_feedback))
             {
-                var sendIntent = new Intent();
-                sendIntent.SetAction(Intent.ActionSendto);
-                sendIntent.SetData(Android.Net.Uri.Parse("mailto:appfeedback@nordic-it.com?subject=MARK5%20for%20Android%20Feedback"));
-                StartActivity(sendIntent);
+                var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.dialog_creating_report, Resource.String.please_wait);
+                Task.Run(() => { return SystemReportCollector.CreateFullReport(); })
+                    .ContinueWith(async t =>
+                {
+                    dismissAction();
+
+                    if (!t.IsFaulted)
+                    {
+                        var sendWithMark5 = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.send_report_with_mark5_title, Resource.String.send_report_with_mark5_content);
+
+                        if (sendWithMark5)
+                        {
+                            var cdIntent = ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, CopyToNewOption.None,
+                                                                                 preconfiguredEmailAddresses: new Dictionary<DocumentAddressType, string[]>() { { DocumentAddressType.To, new string[] { "appfeedback@nordic-it.com" } } },
+                                                                                 preconfiguredSubject: GetString(Resource.String.mark5_android_feedback), preconfiguredContent: t.Result);
+                            StartActivity(cdIntent);
+                        }
+                        else
+                        {
+                            var sendIntent = new Intent();
+                            sendIntent.SetAction(Intent.ActionSendto);
+                            sendIntent.SetData(Android.Net.Uri.Parse("mailto:appfeedback@nordic-it.com?subject=MARK5%20for%20Android%20Feedback&body="+t.Result));
+                            StartActivity(sendIntent);
+                        }
+
+                    }
+
+                },TaskScheduler.FromCurrentSynchronizationContext());
                 return true;
             }
 

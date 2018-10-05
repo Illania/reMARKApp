@@ -38,7 +38,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                                           DocumentDirection previousDocumentDirection = DocumentDirection.None,
                                           int? previousDocumentFolderId = null,
                                           int? previousDocumentId = null,
-                                          Dictionary<DocumentAddressType, string[]> preconfiguredEmailAddresses = null
+                                          Dictionary<DocumentAddressType, string[]> preconfiguredEmailAddresses = null,
                                           string preconfiguredContent = null,
                                           string preconfiguredSubject = null)
         {
