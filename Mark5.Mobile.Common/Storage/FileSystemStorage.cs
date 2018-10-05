@@ -603,14 +603,6 @@ namespace Mark5.Mobile.Common.Storage
             if (failedFolderGuid == null)
                 return;
 
-            IFile failedToSendExceptionFile;
-
-            if (await failedFolderGuid.CheckExistsAsync("failedToSendException.json") == ExistenceCheckResult.FileExists)
-            {
-                failedToSendExceptionFile = await failedFolderGuid.GetFileAsync("failedToSendException.json");
-                await failedToSendExceptionFile.DeleteAsync();
-            }
-
             await failedFolderGuid.MoveRecursivelyAsync(CommonConfig.DocumentsToUploadFolder, CreationCollisionOption.FailIfExists);
             await failedFolderGuid.DeleteAsync();
         }
