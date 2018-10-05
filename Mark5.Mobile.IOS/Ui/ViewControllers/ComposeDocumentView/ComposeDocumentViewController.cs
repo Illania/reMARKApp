@@ -427,6 +427,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             try
             {
                 systemUserDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync(SourceType.Local);
+                systemUserDepartments.Users.Add(ServerConfig.SystemSettings.UserInfo.User);
             }
             catch (Exception ex)
             {
