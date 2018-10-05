@@ -304,7 +304,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async Task LoadDocument()
         {
-
             if (documentLoaded)
                 return;
 
@@ -350,6 +349,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     document.Id = previousDocumentId.Value;
                     documentPreview.Id = previousDocumentId.Value;
                 }
+
+                document.Guid = Guid.NewGuid();
 
                 await ShowDocument();
                 dismissAction();
@@ -469,6 +470,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (option == 0) //Open attachment
             {
+                if (e.AttachmentDescription?.FromTemplate == true)
+                {
+                    await Dialogs.ShowConfirmDialogAsync(Context, Resource.String.template_attachment_title, Resource.String.template_attachment_content);
+                    return;
+                }
+
                 CommonConfig.UsageAnalytics.LogEvent(new ComposeOpenAttachmentEvent());
 
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.opening_attachment, Resource.String.please_wait);
@@ -500,7 +507,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 try
                 {
                     if (string.IsNullOrWhiteSpace(path))
-                        throw new Exception("Unable to opent attachment");
+                        throw new Exception("Unable to open attachment");
 
                     var uri = Android.Support.V4.Content.FileProvider.GetUriForFile(Context, Context.PackageName + ".fileprovider", new Java.IO.File(path));
                     var mimeType = MimeTypeMap.GetMimeType(System.IO.Path.GetExtension(path));
@@ -527,8 +534,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     dismissAction();
                 }
             }
-
-            if (option == 1) //Remove attachment
+            else if (option == 1) //Remove attachment
             {
                 CommonConfig.UsageAnalytics.LogEvent(new ComposeRemoveAttachmentEvent());
 
@@ -832,7 +838,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.AddAttachment)
             {
-
                 CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.Local));
                 AddAttachment();
             }
@@ -995,6 +1000,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 subjectView.SetSubject(template.Subject);
 
             lineView.SetLine(template.LineGuid);
+
+            if (template.Attachments.Any())
+                template.Attachments.ForEach(a => attachmentsView.AddAttachment(a));
         }
 
         static void ProcessTemplate(Template template, DocumentPreview documentPreview)

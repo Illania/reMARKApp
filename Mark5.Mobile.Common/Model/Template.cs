@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using Mark5.Mobile.Common.Utilities;
 using SQLite;
 
 namespace Mark5.Mobile.Common.Model
@@ -24,6 +26,23 @@ namespace Mark5.Mobile.Common.Model
 
         [Column("Content")]
         public string Content { get; set; }
+
+        List<AttachmentDescription> attachments;
+
+        [Ignore]
+        public List<AttachmentDescription> Attachments
+        {
+            get
+            {
+                if (attachments == null)
+                    attachments = new List<AttachmentDescription>();
+                return attachments;
+            }
+            set => attachments = value;
+        }
+
+        [Column("AttachmentsString")]
+        public string AttachmentsString { get => Serializer.Serialize(Attachments); set => Attachments = Serializer.Deserialize<List<AttachmentDescription>>(value); }
 
         public override string ToString()
         {
