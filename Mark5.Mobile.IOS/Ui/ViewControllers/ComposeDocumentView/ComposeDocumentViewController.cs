@@ -424,16 +424,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async Task LoadSystemUsersDepartments()
         {
-            SystemUsersDepartments systemUsersDepartments;
-
             try
             {
-                systemUserDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
+                systemUserDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync(SourceType.Local);
             }
             catch (Exception ex)
             {
-                if (ex is HttpAppServiceException)
-                    systemUserDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync(SourceType.Local);
+                CommonConfig.Logger.Error("Error while retrieving system users", ex);
             }
 
             var subViews = headerStackView.Subviews.OfType<RecipientsView>().ToArray();
@@ -619,31 +616,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async void RecipientView_AddButtonTapped(object sender, EventArgs e)
         {
-            string[] strings;
-
-            if (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
-            {
-                strings = new[]
+            var strings = new List<string>
                 {
                     Localization.GetString("contact_picker_recent_addresses"),
                     Localization.GetString("contact_picker_contacts"),
                     Localization.GetString("contact_picker_shortcodes"),
                     Localization.GetString("contact_picker_phonebook"),
-                    Localization.GetString("contact_picker_internal_contacts")
                 };
-            }
-            else
-            {
-                strings = new[]
-                {
-                    Localization.GetString("contact_picker_recent_addresses"),
-                    Localization.GetString("contact_picker_contacts"),
-                    Localization.GetString("contact_picker_shortcodes"),
-                    Localization.GetString("contact_picker_phonebook")
-                };
-            }
 
-            var choice = await Dialogs.ShowListActionSheetAsync(this, strings, (UIView)sender);
+            if (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
+                strings.Add(Localization.GetString("contact_picker_internal_contacts"));
+
+            var choice = await Dialogs.ShowListActionSheetAsync(this, strings.ToArray(), (UIView)sender);
 
             switch (choice)
             {
@@ -1147,16 +1131,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         async Task DoOpenInternalContacts(RecipientsView recipientsView)
         {
             CommonConfig.UsageAnalytics.LogEvent(new ComposeContactPickerEvent(ContactPickerChoice.Internal));
-            
+
             var vc = new MultipleUserSelectionViewController();
             vc.IncludeCurrentUser = false;
             PresentViewController(new NavigationController(vc), true, null);
 
             var pa = await vc.Result;
-            if(pa != null)
+            if (pa != null)
             {
-                foreach(var su in pa)
-                    recipientsView.AddRecipent(su.FirstName + " " + su.LastName, su.Username);
+                foreach (var su in pa)
+                    recipientsView.AddRecipent(string.Empty, su.Username);
             }
         }
 
