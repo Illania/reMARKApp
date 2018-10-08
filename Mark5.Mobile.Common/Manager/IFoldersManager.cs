@@ -36,11 +36,11 @@ namespace Mark5.Mobile.Common.Manager
 
         Task<List<Folder>> SearchFolders(string searchText);
 
-        Task<ModuleFavoritesWrapper> GetModuleFavoriteFolders();
+        Task<ModuleFavorites> GetModuleFavorites();
 
-        Task<ModuleFavoritesWrapper> GetModuleFavoriteFolders(List<ModuleType> modules);
+        Task<ModuleFavorites> GetModuleFavorites(List<ModuleType> modules);
 
-        Task<bool> SendModuleFavoriteFolders();
+        Task<bool> SendModuleFavorites();
 
         Task<bool> AddFavorites(List<Folder> folders, ModuleType moduleType);
 

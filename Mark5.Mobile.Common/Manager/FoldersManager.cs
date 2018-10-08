@@ -54,12 +54,12 @@ namespace Mark5.Mobile.Common.Manager
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public Task<ModuleFavoritesWrapper> GetModuleFavoriteFolders()
+        public Task<ModuleFavorites> GetModuleFavorites()
         {
-            return GetModuleFavoriteFolders(new List<ModuleType>() { ModuleType.Contacts, ModuleType.Documents, ModuleType.Shortcodes });
+            return GetModuleFavorites(new List<ModuleType>() { ModuleType.Contacts, ModuleType.Documents, ModuleType.Shortcodes });
         }
 
-        public async Task<ModuleFavoritesWrapper> GetModuleFavoriteFolders(List<ModuleType> modules)
+        public async Task<ModuleFavorites> GetModuleFavorites(List<ModuleType> modules)
         {
 
             List<DataContract.ModuleType> dataContractModules = new List<DataContract.ModuleType>();
@@ -75,7 +75,7 @@ namespace Mark5.Mobile.Common.Manager
                 Token = ConnectionInfo.Token
             });
 
-            return new ModuleFavoritesWrapper(result);
+            return new ModuleFavorites(result);
         }
 
         public async Task<List<Folder>> GetFavoriteFoldersAsync(ModuleType module)
@@ -146,7 +146,7 @@ namespace Mark5.Mobile.Common.Manager
             await FileSystemStorage.SaveFavoriteFoldersAsync(favoriteFolders);
         }
 
-        public async Task<bool> SendModuleFavoriteFolders()
+        public async Task<bool> SendModuleFavorites()
         {
             ModuleFavorite favoriteFolders = new ModuleFavorite();
 
@@ -168,7 +168,7 @@ namespace Mark5.Mobile.Common.Manager
 
             var result = await AppServiceProxy.UpdateModuleFavorites(new DataContract.UpdateModuleFavoritesParameters
             {
-                ModuleFavorites = favorites,
+                ModuleFavoritesList = favorites,
                 Token = ConnectionInfo.Token
             });
 
@@ -186,7 +186,7 @@ namespace Mark5.Mobile.Common.Manager
 
             DataContract.AddModuleFavoritesParameters favParams = new DataContract.AddModuleFavoritesParameters()
             {
-                ModuleFavorites = new List<DataContract.ModuleFavorite>() { moduleFavorite },
+                ModuleFavoritesList = new List<DataContract.ModuleFavorite>() { moduleFavorite },
                 Token = ConnectionInfo.Token
             };
 
@@ -206,7 +206,7 @@ namespace Mark5.Mobile.Common.Manager
 
             DataContract.RemoveModuleFavoritesParameters favParams = new DataContract.RemoveModuleFavoritesParameters()
             {
-                ModuleFavorites = new List<DataContract.ModuleFavorite>() { moduleFavorite },
+                ModuleFavoritesList = new List<DataContract.ModuleFavorite>() { moduleFavorite },
                 Token = ConnectionInfo.Token
             };
 

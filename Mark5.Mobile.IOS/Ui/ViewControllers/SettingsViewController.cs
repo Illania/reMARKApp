@@ -422,20 +422,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
-                var modulesResponse = await Managers.FoldersManager.GetModuleFavoriteFolders();
-                if (modulesResponse.ModuleFovorites == null)
+                var response = await Managers.FoldersManager.GetModuleFavorites();
+                if (response.ModuleFovoritesList == null)
                 {
-                    var uploadSuccess = await Managers.FoldersManager.SendModuleFavoriteFolders();
+                    var uploadSuccess = await Managers.FoldersManager.SendModuleFavorites();
                     if (!uploadSuccess)
                         throw (new Exception(Localization.GetString("sync_error_general")));
                 }
                 else
                 {
-                    var selectedOption = await Dialogs.ShowListActionSheetWithTitleAsync(this, new string[] { Localization.GetString("sync_fav_folders_use_server"), Localization.GetString("sync_fav_folders_use_device") }, View, Localization.GetString("sync_fav_folders_action_title"), $"{Localization.GetString("sync_fav_folders_action_description")} : {modulesResponse.UpdatedAt.ToLongDateString()}");
+                    var selectedOption = await Dialogs.ShowListActionSheetWithTitleAsync(this, new string[] { Localization.GetString("sync_fav_folders_use_server"), Localization.GetString("sync_fav_folders_use_device") }, View, Localization.GetString("sync_fav_folders_action_title"), $"{Localization.GetString("sync_fav_folders_action_description")} : {response.UpdatedAt.ToLongDateString()}");
 
                     if (selectedOption == 0)
                     {
-                        if (modulesResponse.ModuleFovorites != null && modulesResponse.ModuleFovorites.Count == 0)
+                        if (response.ModuleFovoritesList != null && response.ModuleFovoritesList.Count == 0)
                         {
                             await Managers.FoldersManager.ClearFavorites();
                         }
@@ -443,7 +443,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         {
                             var missingModules = new List<ModuleType> { ModuleType.Shortcodes, ModuleType.Contacts, ModuleType.Documents };
 
-                            foreach (var favorite in modulesResponse.ModuleFovorites)
+                            foreach (var favorite in response.ModuleFovoritesList)
                             {
                                 await Managers.FoldersManager.SetFavoriteFoldersAsync(favorite.ModuleType, favorite.Folders);
                                 missingModules.RemoveAll(x => x == favorite.ModuleType);
@@ -454,7 +454,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     }
                     else if (selectedOption == 1)
                     {
-                        await Managers.FoldersManager.SendModuleFavoriteFolders();
+                        await Managers.FoldersManager.SendModuleFavorites();
 
                     }
                     else
