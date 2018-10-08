@@ -467,7 +467,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     var gds = (GrouppedDataSource)TableView.Source;
 
                     if (PlatformConfig.Preferences.SyncFavoriteFoldersEnabled && CommonConfig.Reachability.IsReachable) {
-                        await Managers.FoldersManager.GetModuleFavoritesFromService(new List<ModuleType>() { ParentFolder.Module });
+                        await Managers.FoldersManager.GetModuleFavoriteFolders(new List<ModuleType>() { ParentFolder.Module });
                     }
 
                     var favorites = await Managers.FoldersManager.GetFavoriteFoldersAsync(ParentFolder.Module);

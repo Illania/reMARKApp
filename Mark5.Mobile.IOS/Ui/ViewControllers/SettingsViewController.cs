@@ -422,10 +422,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
-                var modulesResponse = await Managers.FoldersManager.GetModuleFavoritesFromService();
+                var modulesResponse = await Managers.FoldersManager.GetModuleFavoriteFolders();
                 if (modulesResponse.ModuleFovorites == null)
                 {
-                    var uploadSuccess = await Managers.FoldersManager.UploadFavoriteFoldersAsync();
+                    var uploadSuccess = await Managers.FoldersManager.SendModuleFavoriteFolders();
                     if (!uploadSuccess)
                         throw (new Exception(Localization.GetString("sync_error_general")));
                 }
@@ -441,18 +441,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         }
                         else
                         {
-                            var missingModules = new List<ModuleType> { ModuleType.Calendar, ModuleType.Contacts, ModuleType.Documents };
+                            var missingModules = new List<ModuleType> { ModuleType.Shortcodes, ModuleType.Contacts, ModuleType.Documents };
 
                             foreach (var favorite in modulesResponse.ModuleFovorites)
                             {
                                 await Managers.FoldersManager.SetFavoriteFoldersAsync(favorite.ModuleType, favorite.Folders);
                                 missingModules.RemoveAll(x => x == favorite.ModuleType);
                             }
+
+                            await Managers.FoldersManager.ClearFavorites(missingModules);
                         }
                     }
                     else if (selectedOption == 1)
                     {
-                        await Managers.FoldersManager.UploadFavoriteFoldersAsync();
+                        await Managers.FoldersManager.SendModuleFavoriteFolders();
 
                     }
                     else
