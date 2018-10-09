@@ -153,6 +153,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     } 
                 };
             }
+
+            var serviceVersion = ServerConfig.SystemSettings?.SystemInfo?.ServiceVersion;
+            if (serviceVersion == null || serviceVersion.CompareTo(new Version(3, 2, 0)) < 0)
+            {
+                var screen = (PreferenceScreen)FindPreference(GetString(Resource.String.pref_sync_favorites));
+                PreferenceScreen.RemovePreference(screen);
+            }
         }
 
         async Task HandleSync()
