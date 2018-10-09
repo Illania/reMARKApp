@@ -184,7 +184,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                                 var cvc = new ComposeDocumentViewController
                                 {
                                     PreconfiguredEmailAddresses = new Dictionary<DocumentAddressType, string[]>() { { DocumentAddressType.To, new string[] { "appfeedback@nordic-it.com" } } },
-                                    PreConfiguredSubject = Localization.GetString("mark5_ios_feedback"),
+                                    PreconfiguredSubject = Localization.GetString("mark5_ios_feedback"),
                                     PreconfiguredContent = t.Result
                                 };
 
@@ -229,7 +229,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                                 var cvc = new ComposeDocumentViewController
                                 {
                                     PreconfiguredEmailAddresses = new Dictionary<DocumentAddressType, string[]>() { { DocumentAddressType.To, new string[] { "appfeedback@nordic-it.com" } } },
-                                    PreConfiguredSubject = Localization.GetString("mark5_ios_feedback"),
+                                    PreconfiguredSubject = Localization.GetString("mark5_ios_feedback"),
                                     PreconfiguredContent = t.Result
                                 };
 

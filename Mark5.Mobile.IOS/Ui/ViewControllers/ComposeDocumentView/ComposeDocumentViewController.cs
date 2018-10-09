@@ -43,7 +43,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         public int? PreviousDocumentId { get; set; }
         public string PreconfiguredContent { get; set; }
         public Dictionary<DocumentAddressType, string[]> PreconfiguredEmailAddresses { get; set; }
-        public string PreConfiguredSubject { get; set; }
+        public string PreconfiguredSubject { get; set; }
 
         DocumentPreview documentPreview = new DocumentPreview();
         Document document = new Document();
@@ -343,8 +343,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     await subView.InitializeView();
                 }
 
-                if (PreConfiguredSubject != null)
-                    subjectView.Subject = PreConfiguredSubject;
+                if (PreconfiguredSubject != null)
+                    subjectView.Subject = PreconfiguredSubject;
 
                 if (RestoreWorkingCopy)
                 {

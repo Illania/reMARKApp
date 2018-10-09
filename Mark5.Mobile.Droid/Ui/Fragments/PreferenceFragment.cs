@@ -187,7 +187,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                             sendIntent.SetData(Android.Net.Uri.Parse("mailto:appfeedback@nordic-it.com?subject=MARK5%20for%20Android%20Feedback&body="+t.Result));
                             StartActivity(sendIntent);
                         }
-
                     }
 
                 },TaskScheduler.FromCurrentSynchronizationContext());

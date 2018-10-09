@@ -95,7 +95,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 string preconfiguredContent = null;
                 string preconfiguredSubject = null;
 
-
                 if (Intent.HasExtra(DocumentCreationModeFlagIntentKey))
                     documentCreationMode = (DocumentCreationModeFlag)Intent.Extras.GetInt(DocumentCreationModeFlagIntentKey);
 
@@ -122,7 +121,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 if (Intent.HasExtra(PreconfiguredSubjectIntentKey))
                     preconfiguredSubject = Intent.Extras.GetString(PreconfiguredSubjectIntentKey);
-
 
                 (cdf, cdfFragmentTag) = ComposeDocumentFragment.NewInstance(documentCreationMode.Value,
                                                                             copyToNewOption,

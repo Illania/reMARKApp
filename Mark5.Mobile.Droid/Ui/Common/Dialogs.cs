@@ -412,7 +412,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
                     var dismissAction = ShowInfiniteProgressDialog(context, Resource.String.dialog_creating_report, Resource.String.please_wait);
                     Task.Run(() => { return SystemReportCollector.CreateFullReport(); })
                         .ContinueWith(async t =>
-                    {
+                        {
                         dismissAction();
 
                         if (!t.IsFaulted)
