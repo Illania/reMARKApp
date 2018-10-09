@@ -38,7 +38,7 @@ namespace Mark5.Mobile.IOS.Utilities
             return vc;
         }
 
-        public static MFMailComposeViewController CreateMailReportController(string report)
+        public static MFMailComposeViewController CreateMailFeedbackController(string report)
         {
             var mcvc = new MFMailComposeViewController();
             mcvc.SetToRecipients(new[] { "appfeedback@nordic-it.com" });

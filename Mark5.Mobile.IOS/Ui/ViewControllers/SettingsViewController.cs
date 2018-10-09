@@ -295,7 +295,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         PresentViewController(new NavigationController(cvc, UIModalPresentationStyle.PageSheet), true, null);
                     }
                     else
-                        PresentViewController(SystemReportCollector.CreateMailReportController(report), true, null);
+                        PresentViewController(SystemReportCollector.CreateMailFeedbackController(report), true, null);
                 }
                 catch (Exception ex)
                 {
