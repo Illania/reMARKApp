@@ -42,8 +42,10 @@ namespace Mark5.Mobile.Common.Manager
 
         Task<bool> SendModuleFavorites();
 
-        Task<bool> AddFavorites(List<Folder> folders, ModuleType moduleType);
+        Task<bool> AddModuleFavorites(List<Folder> folders, ModuleType moduleType);
 
-        Task<bool> RemoveFavorites(List<Folder> folders, ModuleType moduleType);
+        Task<bool> RemoveModuleFavorites(List<Folder> folders, ModuleType moduleType);
+
+
     }
 }

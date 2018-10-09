@@ -458,6 +458,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             CommonConfig.Logger.Info($"Refreshing favourite folders...");
 
+            if(PlatformConfig.Preferences.SyncFavoritesEnabled && CommonConfig.Reachability.IsReachable) {
+                await Managers.FoldersManager.GetModuleFavorites(new List<ModuleType>() { RemoteFolder.Module });
+            }
+
             var favouriteFolders = await Managers.FoldersManager.GetFavoriteFoldersAsync(RemoteFolder.Module);
             Adapter.Refresh(favouriteFolders, Section.Favourites);
         }
@@ -748,20 +752,40 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             CommonConfig.Logger.Info($"Setting favourite status of {selectedFolders.Count} folders to {favourite}");
 
-            Task t = null;
-            foreach (var folder in selectedFolders)
+            if (PlatformConfig.Preferences.SyncFavoritesEnabled && !CommonConfig.Reachability.IsReachable)
             {
-                if (favourite)
-                    t = Managers.FoldersManager.AddFavoriteFolderAsync(folder.Module, folder);
-                else
-                    t = Managers.FoldersManager.RemoveFavoriteFolderAsync(folder.Module, folder);
-                await t;
+                Dialogs.ShowErrorDialog(Activity, new Exception(GetString(Resource.String.sync_error_network)));
+                return;
             }
 
-            if (t.IsFaulted)
+            if (PlatformConfig.Preferences.SyncFavoritesEnabled && CommonConfig.Reachability.IsReachable)
             {
-                CommonConfig.Logger.Error($"Error while changing favourite status for folders", t.Exception.InnerException);
-                Dialogs.ShowErrorDialog(Activity, t.Exception.InnerException);
+                bool result;
+                if (favourite)
+                {
+                    result = await Managers.FoldersManager.AddModuleFavorites(selectedFolders, selectedFolders.First().Module);
+                } else {
+                    result = await Managers.FoldersManager.RemoveModuleFavorites(selectedFolders, selectedFolders.First().Module);
+                }
+                if (!result)
+                {
+                    Dialogs.ShowErrorDialog(Activity, new Exception(GetString(Resource.String.sync_error_general)));
+                    return;
+                }
+            }
+
+            Task task = null;
+
+            foreach (var folder in selectedFolders)
+            {
+                task = favourite ? Managers.FoldersManager.AddFavoriteFolderAsync(folder.Module, folder) : Managers.FoldersManager.RemoveFavoriteFolderAsync(folder.Module, folder);
+                await task;
+            }
+
+            if (task.IsFaulted)
+            {
+                CommonConfig.Logger.Error($"Error while changing favourite status for folders", task.Exception.InnerException);
+                Dialogs.ShowErrorDialog(Activity, task.Exception.InnerException);
             }
             else
             {

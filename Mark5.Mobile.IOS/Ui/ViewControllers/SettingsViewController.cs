@@ -416,7 +416,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async Task HandleSync()
         {
-            // when disabling sync -> do nothing
             if (!PlatformConfig.Preferences.SyncFavoriteFoldersEnabled)
                 return;
 
@@ -455,7 +454,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     else if (selectedOption == 1)
                     {
                         await Managers.FoldersManager.SendModuleFavorites();
-
                     }
                     else
                     {

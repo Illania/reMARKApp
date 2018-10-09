@@ -2663,7 +2663,7 @@ namespace Mark5.ServiceReference.DataContract
     public class GetModuleFavoritesResult
     {
         [DataMember(Name = "ModuleFavoritesList", Order = 0)]
-        public List<ModuleFavorite> ModuleFavoritesList { get; set; }
+        public List<ModuleFavorites> ModuleFavoritesList { get; set; }
 
         [DataMember(Name = "UpdatedAt", Order = 0)]
         public DateTime UpdatedAt { get; set; }
@@ -2673,7 +2673,7 @@ namespace Mark5.ServiceReference.DataContract
     public class UpdateModuleFavoritesParameters : AbstractParameters
     {
         [DataMember(Name = "ModuleFavoritesList", Order = 0)]
-        public List<ModuleFavorite> ModuleFavoritesList { get; set; } = new List<ModuleFavorite>();
+        public List<ModuleFavorites> ModuleFavoritesList { get; set; } = new List<ModuleFavorites>();
     }
 
     [DataContract(Name = "UpdateModuleFavoritesResult", Namespace = "com.nordic-it.appservice.v3")]
@@ -2683,8 +2683,8 @@ namespace Mark5.ServiceReference.DataContract
         public DateTime UpdatedAt { get; set; }
     }
 
-    [DataContract(Name = "ModuleFavorite", Namespace = "com.nordic-it.appservice.v3")]
-    public class ModuleFavorite
+    [DataContract(Name = "ModuleFavorites", Namespace = "com.nordic-it.appservice.v3")]
+    public class ModuleFavorites
     {
         [DataMember(Name = "Folders", Order = 0)]
         public List<Folder> Folders { get; set; } = new List<Folder>();
@@ -2697,7 +2697,7 @@ namespace Mark5.ServiceReference.DataContract
     public class AddModuleFavoritesParameters : AbstractParameters
     {
         [DataMember(Name = "ModuleFavoritesList", Order = 0)]
-        public List<ModuleFavorite> ModuleFavoritesList { get; set; }
+        public List<ModuleFavorites> ModuleFavoritesList { get; set; }
     }
 
     [DataContract(Name = "AddModuleFavoritesResult", Namespace = "com.nordic-it.appservice.v3")]
@@ -2711,7 +2711,7 @@ namespace Mark5.ServiceReference.DataContract
     public class RemoveModuleFavoritesParameters : AbstractParameters
     {
         [DataMember(Name = "ModuleFavoritesList", Order = 0)]
-        public List<ModuleFavorite> ModuleFavoritesList { get; set; }
+        public List<ModuleFavorites> ModuleFavoritesList { get; set; }
     }
 
     [DataContract(Name = "RemoveModuleFavoritesResult", Namespace = "com.nordic-it.appservice.v3")]

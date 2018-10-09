@@ -257,6 +257,24 @@ namespace Mark5.Mobile.Droid.Ui.Common
             return tcs.Task;
         }
 
+        public static Task<int> ShowListDialog(Context context, int titleId, string description, string[] items, bool includeCancel)
+        {
+            var tcs = new TaskCompletionSource<int>();
+            var builder = new MaterialDialog.Builder(context);
+            builder.Title(titleId);
+            builder.Content(description);
+            builder.Items(items);
+            builder.ItemsCallback(new ListCallback(i => tcs.SetResult(i)));
+            if (includeCancel)
+            {
+                builder.NegativeText(Resource.String.cancel);
+                builder.OnNegative(new SingleButtonCallback(() => tcs.SetResult(-1)));
+            }
+            builder.Cancelable(false);
+            builder.Show();
+            return tcs.Task;
+        }
+
         public static Task<long> ShowDatePicker(Context context, long initialTimestamp = -1, long minTimestamp = -1, long maxTimestamp = -1, bool addRemoveDateChoice = false)
         {
             var tcs = new TaskCompletionSource<long>();

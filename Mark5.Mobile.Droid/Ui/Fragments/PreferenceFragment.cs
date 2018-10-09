@@ -148,86 +148,70 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (checkBox != null)
             {
                 checkBox.PreferenceClick += async (object sender, Preference.PreferenceClickEventArgs e) => {
-
                     if(checkBox.Checked) {
-                        if(!CommonConfig.Reachability.IsReachable) 
-                        {
-                            // display alert -> only possible with internet connection
-                        } else {
-
-                            await HandleSync();
-                            /*
-                            var result = await Managers.FoldersManager.GetFavoriteFoldersFromService();
-
-                            if(result != null) {
-                                // favorites exist on server
-                            } else {
-                                // upload local favorites to server 
-
-                                await Managers.FoldersManager.UploadFavoriteFoldersAsync();
-                            }
-                            */
-                        }
-                    } else {
-                        // do sync -> 
-                        // checkBox.Checked = false;
-                        // return;
-                    }
+                        await HandleSync();
+                    } 
                 };
             }
         }
 
-
         async Task HandleSync()
         {
-           
+            if (!PlatformConfig.Preferences.SyncFavoritesEnabled)
+                return;
 
             try
             {
-                var favoriteFolders = await Managers.FoldersManager.GetModuleFavorites();
-                if (favoriteFolders.Favorites == null)
+                var response = await Managers.FoldersManager.GetModuleFavorites();
+                if (response.ModuleFovoritesList == null)
                 {
-                    var uploadSuccess = await Managers.FoldersManager.UploadFavoriteFoldersAsync();
+                    var uploadSuccess = await Managers.FoldersManager.SendModuleFavorites();
                     if (!uploadSuccess)
-                        throw (new Exception("Could not upload favorite folders"));
+                        throw new Exception(GetString(Resource.String.sync_error_general));
                 }
                 else
                 {
-                    var values = new List<ContactType> { ContactType.Company, ContactType.Department, ContactType.Person };
+                    var selectedOption = await Dialogs.ShowListDialog(Activity, Resource.String.sync_fav_folders_action_title, $"{GetString(Resource.String.sync_fav_folders_action_description)} { response.UpdatedAt.ToShortDateString() }", new string[] { GetString(Resource.String.sync_fav_folders_use_server), GetString(Resource.String.sync_fav_folders_use_device) }, true);
 
-                    var index = await Dialogs.ShowListDialog(Context, Resource.String.edit_contact_dialog_title, values.Select(v => GetString(UI.ContactTypeResourceId(v))).ToArray(), true);
-
-                    //var selectedOption = await Dialogs.ShowListActionSheetWithTitleAsync(this, new string[] { Localization.GetString("sync_fav_folders_use_server"), Localization.GetString("sync_fav_folders_use_device") }, View, Localization.GetString("sync_fav_folders_action_title"), $"{Localization.GetString("sync_fav_folders_action_description")} : {favoriteFolders.UpdatedAt.ToLongDateString()}");
-                    var selectedOption = 0;
                     if (selectedOption == 0)
                     {
-                        foreach (var favs in favoriteFolders.Favorites)
+                        if (response.ModuleFovoritesList != null && response.ModuleFovoritesList.Count == 0)
                         {
-                            await Managers.FoldersManager.SetFavoriteFoldersAsync(favs.ModuleType, favs.Folders);
+                            await Managers.FoldersManager.ClearFavorites();
+                        }
+                        else
+                        {
+                            var missingModules = new List<ModuleType> { ModuleType.Shortcodes, ModuleType.Contacts, ModuleType.Documents };
+
+                            foreach (var favorite in response.ModuleFovoritesList)
+                            {
+                                await Managers.FoldersManager.SetFavoriteFoldersAsync(favorite.ModuleType, favorite.Folders);
+                                missingModules.RemoveAll(x => x == favorite.ModuleType);
+                            }
+
+                            await Managers.FoldersManager.ClearFavorites(missingModules);
                         }
                     }
                     else if (selectedOption == 1)
                     {
-                        await Managers.FoldersManager.UploadFavoriteFoldersAsync();
-
+                        await Managers.FoldersManager.SendModuleFavorites();
                     }
                     else
                     {
-                        //PlatformConfig.Preferences.SyncFavoriteFoldersEnabled = false;
+                        PlatformConfig.Preferences.SyncFavoritesEnabled = false;
                         return;
                     }
                 }
 
-                //PlatformConfig.Preferences.SyncFavoriteFoldersEnabled = true;
+                PlatformConfig.Preferences.SyncFavoritesEnabled = true;
             }
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error("Error while shynchonizing favorite folders", ex);
-                //PlatformConfig.Preferences.SyncFavoriteFoldersEnabled = false;
-                //Dialogs.ShowErrorAlert(this, ex);
+                PlatformConfig.Preferences.SyncFavoritesEnabled = false;
+                Dialogs.ShowErrorDialog(Activity, ex);
             }
         }
-
 
         public override bool OnPreferenceTreeClick(Preference preference)
         {
