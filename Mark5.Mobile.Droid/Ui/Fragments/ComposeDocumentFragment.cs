@@ -130,10 +130,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 args.PutString(PreconfiguredEmailAddressesBundleKey, Serializer.Serialize(preconfiguredEmailAddresses));
 
             if (preconfiguredContent != null)
-                args.PutString(PreconfiguredContentBundleKey, Serializer.Serialize(preconfiguredContent));
+                args.PutString(PreconfiguredContentBundleKey, preconfiguredContent);
 
             if (preconfiguredSubject != null)
-                args.PutString(PreconfiguredSubjectBundleKey, Serializer.Serialize(preconfiguredSubject));
+                args.PutString(PreconfiguredSubjectBundleKey, preconfiguredSubject);
 
             var fragment = new ComposeDocumentFragment();
             fragment.Arguments = args;
@@ -169,10 +169,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 preconfiguredEmailAddresses = Serializer.Deserialize<Dictionary<DocumentAddressType, string[]>>(Arguments.GetString(PreconfiguredEmailAddressesBundleKey));
 
             if (Arguments.ContainsKey(PreconfiguredContentBundleKey))
-                preconfiguredContent = Serializer.Deserialize<string>(Arguments.GetString(PreconfiguredContentBundleKey));
+                preconfiguredContent = Arguments.GetString(PreconfiguredContentBundleKey);
 
             if (Arguments.ContainsKey(PreconfiguredSubjectBundleKey))
-                preconfiguredSubject = Serializer.Deserialize<string>(Arguments.GetString(PreconfiguredSubjectBundleKey));
+                preconfiguredSubject = Arguments.GetString(PreconfiguredSubjectBundleKey);
 
             restoreWorkingCopy = restoreWorkingCopy || Restored;
         }

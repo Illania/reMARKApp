@@ -61,10 +61,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 intent.PutExtra(PreconfiguredEmailAddressesIntentKey, Serializer.Serialize(preconfiguredEmailAddresses));
 
             if (preconfiguredContent != null)
-                intent.PutExtra(PreconfiguredContentIntentKey, Serializer.Serialize(preconfiguredContent));
+                intent.PutExtra(PreconfiguredContentIntentKey, preconfiguredContent);
 
             if (preconfiguredSubject != null)
-                intent.PutExtra(PreconfiguredSubjectIntentKey, Serializer.Serialize(preconfiguredSubject));
+                intent.PutExtra(PreconfiguredSubjectIntentKey, preconfiguredSubject);
 
             return intent;
         }
@@ -118,10 +118,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     preconfiguredEmailAddresses = Serializer.Deserialize<Dictionary<DocumentAddressType, string[]>>(Intent.Extras.GetString(PreconfiguredEmailAddressesIntentKey));
 
                 if (Intent.HasExtra(PreconfiguredContentIntentKey))
-                    preconfiguredContent = Serializer.Deserialize<string>(Intent.Extras.GetString(PreconfiguredContentIntentKey));
+                    preconfiguredContent = Intent.Extras.GetString(PreconfiguredContentIntentKey);
 
                 if (Intent.HasExtra(PreconfiguredSubjectIntentKey))
-                    preconfiguredSubject = Serializer.Deserialize<string>(Intent.Extras.GetString(PreconfiguredSubjectIntentKey));
+                    preconfiguredSubject = Intent.Extras.GetString(PreconfiguredSubjectIntentKey);
 
 
                 (cdf, cdfFragmentTag) = ComposeDocumentFragment.NewInstance(documentCreationMode.Value,
