@@ -264,6 +264,7 @@
 		<Compile Include="Ui\ViewControllers\OnBoardingViewController.cs" />
 		<Compile Include="Ui\Common\BadgeBarButtonItem.cs" />
 		<Compile Include="Ui\ViewControllers\CategoriesListViewController.cs" />
+		<Compile Include="Ui\ViewControllers\OnBoardingViewControllers\OnBoardingModelViewController.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
@@ -585,6 +586,8 @@
 		<ImageAsset Include="Assets_icons.xcassets\Arrow-Expand.imageset\Contents.json" />
 		<ImageAsset Include="Assets_icons.xcassets\Arrow-Expand.imageset\arrow_expand%402x.png" />
 		<ImageAsset Include="Assets_icons.xcassets\Arrow-Expand.imageset\arrow_expand%403x.png" />
+		<ImageAsset Include="Assets.xcassets\OnBoardingOne.imageset\Contents.json" />
+		<ImageAsset Include="Assets.xcassets\OnBoardingOne.imageset\iPhone 6-7-8 – 3.pdf" />
 	</ItemGroup>
 	<ItemGroup>
 		<BundleResource Include="Resources\Base.lproj\Localizable.strings" />
@@ -681,6 +684,8 @@
 	  <Folder Include="Ui\ViewControllers\DocumentView\HeaderView\" />
 	  <Folder Include="Assets_icons.xcassets\Arrow-Expand.imageset\" />
 	  <Folder Include="Resources\html\changelogs\" />
+	  <Folder Include="Ui\ViewControllers\OnBoardingViewControllers\" />
+	  <Folder Include="Assets.xcassets\OnBoardingOne.imageset\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 	<Import Project="..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets" Condition="Exists('..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets')" />

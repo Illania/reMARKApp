@@ -13,23 +13,16 @@ namespace Mark5.Mobile.IOS.Utilities
 
         public static void ShowOnBoardingIfNecessary(UIViewController viewController)
         {
-            try
+            try  //TODO need to remove html
             {
                 if (ApplicationHasBeenUpdated())
                 {
                     SaveAppVersionCode();
 
                     var currentVersionName = float.Parse(NSBundle.MainBundle.InfoDictionary.ValueForKey(new NSString("CFBundleShortVersionString")).ToString());
-                    var changelogPath = NSBundle.MainBundle.PathForResource("html/changelogs/changelog_" + currentVersionName, "html");
-
-                    if (!File.Exists(changelogPath))
-                        return;
-
-                    var html = File.ReadAllText(changelogPath);
 
                     var pvc = new OnBoardingViewController
                     {
-                        ChangelogHtml = html
                     };
                     pvc.ModalPresentationStyle = UIModalPresentationStyle.Custom;
 
@@ -45,6 +38,8 @@ namespace Mark5.Mobile.IOS.Utilities
 
         static bool ApplicationHasBeenUpdated()
         {
+            return true; //TODO testing
+
             var userDefaults = NSUserDefaults.StandardUserDefaults;
             var currentVersionName = float.Parse(NSBundle.MainBundle.InfoDictionary.ValueForKey(new NSString("CFBundleShortVersionString")).ToString());
             var storedVersionName = userDefaults.FloatForKey(appVersionKey);
