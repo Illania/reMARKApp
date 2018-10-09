@@ -21,7 +21,7 @@ namespace Mark5.Mobile.Droid.Utilities
             var sendIntent = new Intent();
             sendIntent.SetAction(Intent.ActionSend);
             sendIntent.PutExtra(Intent.ExtraEmail, new[] { "appfeedback@nordic-it.com" });
-            sendIntent.PutExtra(Intent.ExtraSubject, context.GetText(Resource.String.mark5_android_feedback));
+            sendIntent.PutExtra(Intent.ExtraSubject, context.GetText(Resource.String.mark5_android_system_report));
             sendIntent.PutExtra(Intent.ExtraText, report);
             sendIntent.SetType("text/plain");
             return Intent.CreateChooser(sendIntent, context.GetText(Resource.String.share));

@@ -229,6 +229,7 @@
     <string name="make_online">Go online</string>
     <string name="map">Map</string>
     <string name="mark5_android_feedback">MARK5 android feedback</string>
+    <string name="mark5_android_system_report">MARK5 system report feedback</string>
     <string name="mark5_server_reachability">MARK5 Server:</string>
     <string name="mark5_service_reachability">MARK5 App Service:</string>
     <string name="mark_all_as_read">Mark all as read</string>

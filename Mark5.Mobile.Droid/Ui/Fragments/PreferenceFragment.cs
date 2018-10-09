@@ -184,7 +184,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         {
                             var sendIntent = new Intent();
                             sendIntent.SetAction(Intent.ActionSendto);
-                            sendIntent.SetData(Android.Net.Uri.Parse("mailto:appfeedback@nordic-it.com?subject=MARK5%20for%20Android%20Feedback&body="+t.Result));
+                            sendIntent.SetData(Android.Net.Uri.Parse("mailto:appfeedback@nordic-it.com?subject=MARK5%20Android%20Feedback&body="+t.Result));
                             StartActivity(sendIntent);
                         }
                     }

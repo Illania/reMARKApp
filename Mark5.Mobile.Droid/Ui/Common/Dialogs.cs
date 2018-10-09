@@ -423,7 +423,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
                             {
                                 var cdIntent = ComposeDocumentActivity.CreateIntent(context, DocumentCreationModeFlag.New, CopyToNewOption.None,
                                                                      preconfiguredEmailAddresses: new Dictionary<DocumentAddressType, string[]>() { { DocumentAddressType.To, new string[] { "appfeedback@nordic-it.com" } } },
-                                                                     preconfiguredSubject: context.GetString(Resource.String.mark5_android_feedback), preconfiguredContent: t.Result);
+                                                                     preconfiguredSubject: context.GetString(Resource.String.mark5_android_system_report), preconfiguredContent: t.Result);
                                 context.StartActivity(cdIntent);
                             }
                             else
@@ -469,7 +469,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
                             {
                                 var cdIntent = ComposeDocumentActivity.CreateIntent(context, DocumentCreationModeFlag.New, CopyToNewOption.None,
                                                                      preconfiguredEmailAddresses: new Dictionary<DocumentAddressType, string[]>() { { DocumentAddressType.To, new string[] { "appfeedback@nordic-it.com" } } },
-                                                                     preconfiguredSubject: context.GetString(Resource.String.mark5_android_feedback), preconfiguredContent: t.Result);
+                                                                     preconfiguredSubject: context.GetString(Resource.String.mark5_android_system_report), preconfiguredContent: t.Result);
                                 context.StartActivity(cdIntent);
                             }
                             else

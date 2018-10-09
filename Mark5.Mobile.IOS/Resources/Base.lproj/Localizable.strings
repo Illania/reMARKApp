@@ -189,6 +189,7 @@
 "mark5_server_reachability" = "MARK5 server: ";
 "mark5_service_reachability" = "MARK5 service: ";
 "mark5_ios_feedback" = "MARK5 iOS feedback";
+"mark5_ios_system_report" = "MARK5 iOS system report";
 "mark_as_read" = "Mark as read";
 "mark_as_read_ml" = "Mark as\nread";
 "mark_as_unread" = "Mark as unread";
