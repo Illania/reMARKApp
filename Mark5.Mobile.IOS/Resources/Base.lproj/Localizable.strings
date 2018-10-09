@@ -1,4 +1,4 @@
-"account" = "Account";
+ "account" = "Account";
 "actions" = "Actions";
 "attention" = "Attention";
 "area" = "Area";
@@ -348,8 +348,9 @@
 "send" = "Send";
 "send_text" = "Send message";
 "sending_document___" = "Sending email...";
+"send_with_mark5_title" = "Send with MARK5?";
+"send_feedback_with_mark5_content" = "Do you want to send feedback with MARK5?";
 "send_report_with_mark5_content" = "Do you want to send the generated report with MARK5?";
-"send_report_with_mark5_title" = "Send with MARK5?";
 "set_priority" = "Set priority";
 "setting_priority___" = "Setting priority...";
 "settings" = "Settings";

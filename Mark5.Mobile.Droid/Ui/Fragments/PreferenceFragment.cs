@@ -171,7 +171,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                     if (!t.IsFaulted)
                     {
-                        var sendWithMark5 = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.send_report_with_mark5_title, Resource.String.send_report_with_mark5_content);
+                        var sendWithMark5 = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.send_with_mark5_title, Resource.String.send_feedback_with_mark5_content);
 
                         if (sendWithMark5)
                         {
@@ -214,7 +214,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                             if (!t.IsFaulted)
                             {
-                                var sendWithMark5 = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.send_report_with_mark5_title, Resource.String.send_report_with_mark5_content);
+                        var sendWithMark5 = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.send_with_mark5_title, Resource.String.send_report_with_mark5_content);
 
                                 if (sendWithMark5)
                                 {
