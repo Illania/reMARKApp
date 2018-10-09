@@ -18,7 +18,7 @@ namespace Mark5.Mobile.IOS.Utilities
 
         public static UIActivityViewController CreateShareReportController(string report)
         {
-            return new UIActivityViewController(new[] { new NSString(report) }, null)
+            var vc = new UIActivityViewController(new[] { new NSString(report) }, null)
             {
                 ExcludedActivityTypes = new[]
                 {
@@ -33,13 +33,16 @@ namespace Mark5.Mobile.IOS.Utilities
                     UIActivityType.SaveToCameraRoll
                 }
             };
+            vc.SetValueForKey(NSObject.FromObject(Localization.GetString("mark5_ios_system_report")), new NSString("subject"));
+
+            return vc;
         }
 
         public static MFMailComposeViewController CreateMailReportController(string report)
         {
             var mcvc = new MFMailComposeViewController();
             mcvc.SetToRecipients(new[] { "appfeedback@nordic-it.com" });
-            mcvc.SetSubject(Localization.GetString("mark5_ios_system_report"));
+            mcvc.SetSubject(Localization.GetString("mark5_ios_feedback"));
             mcvc.AddAttachmentData(NSData.FromString(report), "text/plain", "MARK5_iOS_System_Report.txt");
             mcvc.Finished += Mcvc_Finished;
             mcvc.NavigationBar.TintColor = Theme.DarkBlue;

@@ -219,7 +219,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                                 {
                                     var cdIntent = ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, CopyToNewOption.None,
                                                                          preconfiguredEmailAddresses: new Dictionary<DocumentAddressType, string[]>() { { DocumentAddressType.To, new string[] { "appfeedback@nordic-it.com" } } },
-                                                                         preconfiguredSubject: GetString(Resource.String.mark5_android_feedback), preconfiguredContent: t.Result);
+                                                                         preconfiguredSubject: GetString(Resource.String.mark5_android_system_report), preconfiguredContent: t.Result);
                                     StartActivity(cdIntent);
                                 }
                                 else
