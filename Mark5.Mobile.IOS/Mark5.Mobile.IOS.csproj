@@ -616,7 +616,6 @@
 		<BundleResource Include="Resources\startscreens\start-screen-bg-retinahd47.png" />
 		<BundleResource Include="Resources\startscreens\start-screen-bg-retinahd55-landscape.png" />
 		<BundleResource Include="Resources\startscreens\start-screen-bg-retinahd55.png" />
-		<BundleResource Include="Resources\html\changelogs\changelog_2.7.html" />
 		<BundleResource Include="Resources\html\initTemplate.js" />
 	</ItemGroup>
 	<ItemGroup>
@@ -682,7 +681,6 @@
 	  <Folder Include="Assets_icons.xcassets\DeselectAll.imageset\" />
 	  <Folder Include="Ui\ViewControllers\DocumentView\HeaderView\" />
 	  <Folder Include="Assets_icons.xcassets\Arrow-Expand.imageset\" />
-	  <Folder Include="Resources\html\changelogs\" />
 	  <Folder Include="Assets.xcassets\OnBoardingOne.imageset\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />

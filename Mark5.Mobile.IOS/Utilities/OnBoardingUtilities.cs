@@ -13,18 +13,16 @@ namespace Mark5.Mobile.IOS.Utilities
 
         public static void ShowOnBoardingIfNecessary(UIViewController viewController)
         {
-            try  //TODO need to remove html
+            try
             {
                 if (ApplicationHasBeenUpdated())
                 {
                     SaveAppVersionCode();
 
-                    var currentVersionName = float.Parse(NSBundle.MainBundle.InfoDictionary.ValueForKey(new NSString("CFBundleShortVersionString")).ToString());
-
                     var pvc = new OnBoardingViewController
                     {
+                        ModalPresentationStyle = UIModalPresentationStyle.FormSheet
                     };
-                    pvc.ModalPresentationStyle = UIModalPresentationStyle.Custom;
 
                     viewController.PresentViewController(pvc, true, null);
                 }
