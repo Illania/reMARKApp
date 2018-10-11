@@ -585,8 +585,18 @@
 		<ImageAsset Include="Assets_icons.xcassets\Arrow-Expand.imageset\Contents.json" />
 		<ImageAsset Include="Assets_icons.xcassets\Arrow-Expand.imageset\arrow_expand%402x.png" />
 		<ImageAsset Include="Assets_icons.xcassets\Arrow-Expand.imageset\arrow_expand%403x.png" />
-		<ImageAsset Include="Assets.xcassets\OnBoardingOne.imageset\Contents.json" />
-		<ImageAsset Include="Assets.xcassets\OnBoardingOne.imageset\iPhone 6-7-8 – 3.pdf" />
+		<ImageAsset Include="Assets_onboarding.xcassets\Contents.json" />
+		<ImageAsset Include="Assets_onboarding.xcassets\2.8_1.imageset\Contents.json" />
+		<ImageAsset Include="Assets_onboarding.xcassets\2.8_1.imageset\Slide 1.pdf" />
+		<ImageAsset Include="Assets_onboarding.xcassets\2.8_2.imageset\Contents.json" />
+		<ImageAsset Include="Assets_onboarding.xcassets\2.8_2.imageset\Slide 2.pdf" />
+		<ImageAsset Include="Assets_onboarding.xcassets\2.8_3.imageset\Contents.json" />
+		<ImageAsset Include="Assets_onboarding.xcassets\2.8_3.imageset\Slide 3.pdf" />
+		<ImageAsset Include="Assets_onboarding.xcassets\2.8_4.imageset\Contents.json" />
+		<ImageAsset Include="Assets_onboarding.xcassets\2.8_4.imageset\Slide 3.pdf" />
+		<ImageAsset Include="Assets_onboarding.xcassets\2.8_5.imageset\Contents.json" />
+		<ImageAsset Include="Assets_onboarding.xcassets\2.8_5.imageset\Slide 5.pdf" />
+		<ImageAsset Include="Assets_onboarding.xcassets\2.8_4.imageset\Slide 4.pdf" />
 	</ItemGroup>
 	<ItemGroup>
 		<BundleResource Include="Resources\Base.lproj\Localizable.strings" />
@@ -682,6 +692,11 @@
 	  <Folder Include="Ui\ViewControllers\DocumentView\HeaderView\" />
 	  <Folder Include="Assets_icons.xcassets\Arrow-Expand.imageset\" />
 	  <Folder Include="Assets.xcassets\OnBoardingOne.imageset\" />
+	  <Folder Include="Assets_onboarding.xcassets\2.8_1.imageset\" />
+	  <Folder Include="Assets_onboarding.xcassets\2.8_2.imageset\" />
+	  <Folder Include="Assets_onboarding.xcassets\2.8_3.imageset\" />
+	  <Folder Include="Assets_onboarding.xcassets\2.8_4.imageset\" />
+	  <Folder Include="Assets_onboarding.xcassets\2.8_5.imageset\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 	<Import Project="..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets" Condition="Exists('..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets')" />

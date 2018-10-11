@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Mark5.Mobile.IOS.Ui.Common;
+using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
@@ -15,13 +16,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             var pc = UIPageControl.Appearance;
             pc.BackgroundColor = Theme.LightBlue;
+            pc.CurrentPageIndicatorTintColor = Theme.DarkBlue;
+            pc.PageIndicatorTintColor = Theme.White;
 
             var content = new List<OnBoardingPageModel>
             {
-                new OnBoardingPageModel("What's new", "We have made a few changes in the MARK5 app. Press next to see whay has happened", "OnBoardingOne"),
-                new OnBoardingPageModel("What's new", "We have made a few changes in the MARK5 app. Press next to see whay has happened", "OnBoardingOne"),
-                new OnBoardingPageModel("What's new", "We have made a few changes in the MARK5 app. Press next to see whay has happened", "OnBoardingOne"),
+                new OnBoardingPageModel("What's new", "We have made a few changes in the MARK5 app. Press next to see what has happened", "2.8_1"),
+                new OnBoardingPageModel("Category flow", "We have made it easier to assign categories. " +
+                                        "Tap the categories you wish to assign from “select categories” and they will appear in the top under “categories added”. " +
+                                        "To remove them from “categories added” just tap them again and they will reappear under “select categories”. " +
+                                        "Click save when you are done.", "2.8_2"),
+                new OnBoardingPageModel("Swipe between emails", "You can now browse through your emails by swiping to the left or to the right.", "2.8_3"),
+                new OnBoardingPageModel("Login details are saved", "From now on MARK5 saves your login details when you log out of the app. " +
+                                        "This means that you only need to type in your password when you want to login again.","2.8_4"),
+                new OnBoardingPageModel("Compatible with iOS 12", "The MARK5 app is compatible with the new version of iOS.", "2.8_5"),
             };
+
+            if (Integration.IsIPad())
+                PreferredContentSize = new CoreGraphics.CGSize(UIImage.FromBundle(content[0].ImageName).Size.Width + 60, 750);
 
             DataSource = new OnBoardingDataSource(this, content);
         }
@@ -66,7 +78,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public override nint GetPresentationIndex(UIPageViewController pageViewController)
         {
-            return 0;
+            var currentPage = pageViewController.ViewControllers[0] as OnBoardingPageViewController;
+            return currentPage.Index;
         }
 
         public override UIViewController GetNextViewController(UIPageViewController pageViewController, UIViewController referenceViewController)
@@ -161,15 +174,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             };
             titleLabel.TextAlignment = UITextAlignment.Center;
             titleLabel.Text = pageModel.Title;
-            titleLabel.Font = Theme.DefaultBoldFont.WithSize(24);
+            titleLabel.TextColor = Theme.DarkBlue;
+            titleLabel.Font = Theme.DefaultBoldFont.WithSize(22);
 
             descriptionTextView = new UITextView
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
             };
             descriptionTextView.Text = pageModel.Content;
-            descriptionTextView.Font = Theme.DefaultFont.WithSize(18);
-            descriptionTextView.TextAlignment = UITextAlignment.Center;
+            descriptionTextView.Font = Theme.DefaultFont.WithSize(16);
+            descriptionTextView.TextColor = Theme.DarkBlue;
+            descriptionTextView.TextAlignment = UITextAlignment.Justified;
             descriptionTextView.BackgroundColor = UIColor.Clear;
 
             nextDoneButton = new UIButton(UIButtonType.System)
@@ -192,7 +207,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             View.AddConstraints(new NSLayoutConstraint[]
             {
-                headlineImage.TopAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.TopAnchor),
+                headlineImage.TopAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.TopAnchor, Integration.IsIPad() ? 30: 0),
                 headlineImage.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
 
                 titleLabel.TopAnchor.ConstraintEqualTo(headlineImage.BottomAnchor, 10),
@@ -215,7 +230,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     TranslatesAutoresizingMaskIntoConstraints = false,
                     ContentEdgeInsets = new UIEdgeInsets(5, 10f, 5f, 10f)
                 };
-                skipButton.SetTitle("Skip", UIControlState.Normal);
+                skipButton.SetTitle("Close", UIControlState.Normal);
                 skipButton.TitleLabel.Font = Theme.DefaultFont.WithSize(18);
                 skipButton.TitleLabel.TextAlignment = UITextAlignment.Center;
                 skipButton.TouchUpInside += SkipButton_TouchUpInside;
