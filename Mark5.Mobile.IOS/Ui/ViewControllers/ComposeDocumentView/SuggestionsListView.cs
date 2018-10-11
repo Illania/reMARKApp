@@ -377,7 +377,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                         StringSplitOptions.None)
                     .ToList();
                 splittedRecipients.RemoveAt(splittedRecipients.Count - 1);
-                splittedRecipients.Add(printableSuggestion.ToString());
+                if (printableSuggestion.Address.Contains('@'))
+                {
+                    splittedRecipients.Add(printableSuggestion.ToString());
+                } else {
+                    splittedRecipients.Add(printableSuggestion.Address);
+                }
+               
                 TextView.Text = string.Join(RecipientSeperator, splittedRecipients) + RecipientSeperator;
 
                 CorrectMarkup();

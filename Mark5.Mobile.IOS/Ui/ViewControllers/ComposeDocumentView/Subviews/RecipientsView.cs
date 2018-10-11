@@ -284,14 +284,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 {
                     foreach (var user in GetInternalUsers())
                     {
-                        var userGuid = SystemUsersDepartments.Users.FirstOrDefault(su => String.Equals(su.Username, user, StringComparison.OrdinalIgnoreCase))?.Guid;
+                        var systemUser = SystemUsersDepartments?.Users?.FirstOrDefault(su => String.Equals(su.Username, user, StringComparison.OrdinalIgnoreCase));
 
-                        if (userGuid != null)
+                        if (systemUser != null)
                         {
                             DocumentPreview.Addresses.Add(new DocumentAddress
                             {
-                                Address = userGuid.ToString(),
+                                Address = systemUser.Guid.ToString(),
                                 AddressType = AddressType,
+                                Name = systemUser.Username,
                                 Type = CommunicationAddressType.Internal
                             });
                         }

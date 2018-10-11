@@ -271,13 +271,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 {
                     foreach (var user in GetInternalUsers())
                     {
-                        var userGuid = systemUsersDepartments.Users.FirstOrDefault(su => String.Equals(su.Username, user, StringComparison.OrdinalIgnoreCase))?.Guid;
-
-                        if (userGuid != null)
+                        var systemUser = systemUsersDepartments.Users.FirstOrDefault(su => String.Equals(su.Username, user, StringComparison.OrdinalIgnoreCase));
+                      
+                        if (systemUser != null)
                         {
                             DocumentPreview.Addresses.Add(new DocumentAddress
                             {
-                                Address = userGuid.ToString(),
+                                Address = systemUser.Username,
                                 AddressType = AddressType,
                                 Type = CommunicationAddressType.Internal
                             });

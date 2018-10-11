@@ -188,8 +188,8 @@
     <Compile Include="Ui\ViewControllers\PhonebookContactsListViewController.cs" />
     <Compile Include="Ui\ViewControllers\FoldersList\PickerContactsFoldersListViewController.cs" />
     <Compile Include="Ui\ViewControllers\ContactsList\ContactsListViewController.cs" />
-    <Compile Include="Ui\ViewControllers\ContactsList\AbstractContactsListViewController.cs" />
     <Compile Include="Ui\ViewControllers\ContactsList\PickerContactsListViewController.cs" />
+    <Compile Include="Ui\ViewControllers\ContactsList\AbstractContactsListViewController.cs" />
     <Compile Include="Ui\ViewControllers\FoldersList\PickerShortcodesFoldersListViewController.cs" />
     <Compile Include="Ui\ViewControllers\ShortcodesList\AbstractShortcodesListViewController.cs" />
     <Compile Include="Ui\ViewControllers\ShortcodesList\ShortcodesListViewController.cs" />

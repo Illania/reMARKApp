@@ -428,16 +428,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             {
                 systemUserDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync(SourceType.Local);
                 systemUserDepartments.Users.Add(ServerConfig.SystemSettings.UserInfo.User);
+
+                var subViews = headerStackView.Subviews.OfType<RecipientsView>().ToArray();
+
+                foreach (var subView in subViews)
+                    subView.SystemUsersDepartments = systemUserDepartments;
             }
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error("Error while retrieving system users", ex);
             }
-
-            var subViews = headerStackView.Subviews.OfType<RecipientsView>().ToArray();
-
-            foreach (var subView in subViews)
-                subView.SystemUsersDepartments = systemUserDepartments;
         }
 
         async Task LoadTemplate()

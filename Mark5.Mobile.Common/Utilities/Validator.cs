@@ -103,7 +103,7 @@ namespace Mark5.Mobile.Common.Utilities
             var matches = Regex.Matches(text ?? string.Empty, RecipientRegex, RegexOptions.IgnoreCase).Cast<Match>();
 
             if (systemUsersDepartments != null)
-                matches = matches.Cast<Match>().Where(m => !m.Value.Contains("@") && systemUsersDepartments.Users.Any(su => String.Equals(su.Username, m.Value.Trim(), StringComparison.OrdinalIgnoreCase))).Select(m => m);
+                matches = matches.Cast<Match>().Where(m => !m.Value.Contains('@') && systemUsersDepartments.Users.Any(su => String.Equals(su.Username, m.Value.Trim(), StringComparison.OrdinalIgnoreCase))).Select(m => m);
 
             return matches;
         }
