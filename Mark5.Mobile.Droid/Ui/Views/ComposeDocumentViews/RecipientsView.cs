@@ -277,7 +277,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                         {
                             DocumentPreview.Addresses.Add(new DocumentAddress
                             {
-                                Address = systemUser.Username,
+                                Address = systemUser.Guid.ToString(),
+                                Name = systemUser.Username,
                                 AddressType = AddressType,
                                 Type = CommunicationAddressType.Internal
                             });

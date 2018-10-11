@@ -321,7 +321,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             try
             {
                 systemUsersDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync(SourceType.Local);
-                systemUserDepartments.Users.Add(ServerConfig.SystemSettings.UserInfo.User);
+                systemUsersDepartments.Users.Add(ServerConfig.SystemSettings.UserInfo.User);
             }
             catch (Exception ex)
             {

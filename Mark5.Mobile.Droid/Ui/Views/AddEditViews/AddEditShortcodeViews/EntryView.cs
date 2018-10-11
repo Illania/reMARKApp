@@ -185,7 +185,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEditShortcodeViews
         {
             readonly AppCompatEditText emailEditText;
 
-            public EntryRow(Context context, EntryView entryView
+            public EntryRow(Context context, EntryView entryView)
                 : base(context, entryView)
             {
                 emailEditText = new AppCompatEditText(context)
