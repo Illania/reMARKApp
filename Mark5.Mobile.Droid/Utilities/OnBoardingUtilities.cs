@@ -46,7 +46,6 @@ namespace Mark5.Mobile.Droid.Utilities
 
         static bool ApplicationHasBeenUpdated(Context context)
         {
-            return true; //TODO testing
             var currentVersionCode = float.Parse(context.PackageManager.GetPackageInfo(context.PackageName, 0).VersionName);
             var storedVersionCode = PreferenceManager.GetDefaultSharedPreferences(context).GetFloat(appVersionKey, 0);
 
@@ -62,7 +61,6 @@ namespace Mark5.Mobile.Droid.Utilities
             editor.Commit();
         }
 
-
         static View CreateView(Context context)
         {
             var linearLayoout = new LinearLayoutCompat(context)
@@ -77,9 +75,13 @@ namespace Mark5.Mobile.Droid.Utilities
 
             var content = new List<OnBoardingPageModel>
             {
-                new OnBoardingPageModel("What's new", "We have made a few changes in the MARK5 app. Press next to see whay has happened", Resource.Drawable.m5),
-                new OnBoardingPageModel("What's new", "We have made a few changes in the MARK5 app. Press next to see whay has happened", Resource.Drawable.m5),
-                new OnBoardingPageModel("What's new", "We have made a few changes in the MARK5 app. Press next to see whay has happened", Resource.Drawable.m5),
+                new OnBoardingPageModel("What's new", "We have made a few changes in the MARK5 app. Press next to see what has happened", Resource.Drawable.onboarding_1),
+                new OnBoardingPageModel("Category flow", "We have made it easier to assign categories. " +
+                                        "Tap the categories you wish to assign from “select categories” and they will appear in the top under “categories added”. " +
+                                        "To remove them from “categories added” just tap them again and they will reappear under “select categories”. " +
+                                        "Click save when you are done.", Resource.Drawable.onboarding_2),
+                new OnBoardingPageModel("Login details are saved", "From now on MARK5 saves your login details when you log out of the app. " +
+                                        "This means that you only need to type in your password when you want to login again.",Resource.Drawable.onboarding_3),
             };
 
             viewPager.Adapter = new OnBoardingPageAdapter(context, content);
@@ -178,7 +180,7 @@ namespace Mark5.Mobile.Droid.Utilities
                     Gravity = GravityFlags.Top,
                     MovementMethod = Android.Text.Method.ScrollingMovementMethod.Instance,
                 };
-
+                contentTextView.JustificationMode = Android.Text.JustificationMode.InterWord;
                 contentTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
                 contentTextView.SetTextColor(new Color(ContextCompat.GetColor(context, Resource.Color.darkblue)));
                 contentTextView.SetPadding(paddingValue, paddingValue, paddingValue, paddingValue);
@@ -192,7 +194,7 @@ namespace Mark5.Mobile.Droid.Utilities
                 {
                     var skipButton = new AppCompatButton(context)
                     {
-                        Text = "Skip",
+                        Text = "Close",
                         Id = View.GenerateViewId(),
                     };
                     skipButton.SetTextColor(new Color(ContextCompat.GetColor(context, Resource.Color.darkblue)));

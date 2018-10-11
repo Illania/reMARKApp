@@ -808,7 +808,9 @@
     <AndroidResource Include="Resources\drawable-xhdpi\check_mark.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\check_mark.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\check_mark.png" />
-    <AndroidResource Include="Resources\drawable\m5.xml" />
+    <AndroidResource Include="Resources\drawable\onboarding_1.xml" />
+    <AndroidResource Include="Resources\drawable\onboarding_2.xml" />
+    <AndroidResource Include="Resources\drawable\onboarding_3.xml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FastScrollRecycler\FastScrollRecycler.csproj">
