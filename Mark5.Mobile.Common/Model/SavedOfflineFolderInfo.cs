@@ -16,17 +16,13 @@ namespace Mark5.Mobile.Common.Model
             if (x is null || y is null)
                 return false;
             
-            return x.FolderId == x.FolderId;
+            return x.FolderGuid == y.FolderGuid;
         }
 
         public int GetHashCode(SavedOfflineFolderInfo folder)
         {
-            //Check whether the object is null 
             if (folder is null) return 0;
-
-            //Get hash code for the Numf field if it is not null. 
-            int hashNumf = folder.FolderId == null ? 0 : folder.FolderId.GetHashCode();
-
+            int hashNumf = folder.FolderGuid == null ? 0 : folder.FolderGuid.GetHashCode();
             return hashNumf;
         }
     }

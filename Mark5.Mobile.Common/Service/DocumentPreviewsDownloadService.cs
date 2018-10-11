@@ -29,11 +29,11 @@ namespace Mark5.Mobile.Common.Service
 
                 while (!ct.IsCancellationRequested)
                 {
-                    List<SavedOfflineFolderInfo> offlineDocumentFolderIds = (await FileSystemStorage.GetSavedOfflineFolderInfosAsync())
+                    List<SavedOfflineFolderInfo> offlineDocumentFolders = (await FileSystemStorage.GetSavedOfflineFolderInfosAsync())
                                                     .Where(f => f.Module == ModuleType.Documents)
                                                     .ToList();
 
-                    var offlineDocumentFolders = offlineDocumentFolderIds.Except(folderIdSkipList) as List<SavedOfflineFolderInfo>;
+                    var documentFolders = offlineDocumentFolders.Except(folderIdSkipList) as List<SavedOfflineFolderInfo>;
 
                     foreach (var folder in offlineDocumentFolders)
                     {
