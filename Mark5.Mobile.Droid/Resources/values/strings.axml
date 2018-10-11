@@ -29,6 +29,7 @@
     <string name="cannot_edit_comment_title">Cannot edit comment</string>
     <string name="cannot_open_attachment_without_ext">Attachments without extensions cannot be opened</string>
     <string name="categories">Categories</string>
+    <string name="categories_added">Categories added</string>
     <string name="cc">Cc</string>
     <string name="choose_application">Choose an application</string>
     <string name="changes_not_saved">Changes not saved!</string>
