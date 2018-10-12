@@ -48,7 +48,7 @@ namespace Mark5.Mobile.IOS.Utilities
         {
             try
             {
-                Analytics.SetUserProperty(new NSString(value), new NSString(property.ToString().ToLowerInvariant()));
+                Analytics.SetUserProperty(new NSString(value), new NSString(property.ToString().ToLowerInvariant().SafeSubstring(0, 35)));
             }
             catch (Exception ex)
             {
