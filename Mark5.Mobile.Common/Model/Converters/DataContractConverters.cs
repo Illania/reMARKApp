@@ -26,7 +26,8 @@ namespace Mark5.Mobile.Common.Model.Converters
             {
                 Id = ad.Id,
                 Name = ad.Name,
-                SizeInBytes = ad.SizeInBytes
+                SizeInBytes = ad.SizeInBytes,
+                FromTemplate = ad.FromTemplate,
             };
         }
 
@@ -642,15 +643,20 @@ namespace Mark5.Mobile.Common.Model.Converters
 
         public static Template Convert(this DataContract.Template t)
         {
-            return new Template
+            var result = new Template
             {
                 Id = t.Id,
                 Guid = t.Guid,
                 Subject = t.Subject,
                 Content = t.Content,
                 ContentType = t.ContentType.ConvertEnum<ContentType>(),
-                LineGuid = t.LineGuid
+                LineGuid = t.LineGuid,
             };
+
+            if (t.Attachments != null)
+                result.Attachments.AddRange(t.Attachments.WhereNotNull().Select(Convert));
+
+            return result;
         }
 
         public static TemplatePreview Convert(this DataContract.TemplatePreview tp)
@@ -936,7 +942,8 @@ namespace Mark5.Mobile.Common.Model.Converters
             {
                 Id = ad.Id,
                 Name = ad.Name,
-                SizeInBytes = ad.SizeInBytes
+                SizeInBytes = ad.SizeInBytes,
+                FromTemplate = ad.FromTemplate
             };
         }
 

@@ -94,6 +94,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             return Task.CompletedTask;
         }
 
+        public void AddAttachmenstFromTemplate(Template template)
+        {
+            foreach (var attachmentDescription in template.Attachments)
+                AddAttachment(attachmentDescription);
+        }
+
         public override Task UpdateDocument()
         {
             var remoteAttachments = attachmentDescriptionsInView.ToArray();

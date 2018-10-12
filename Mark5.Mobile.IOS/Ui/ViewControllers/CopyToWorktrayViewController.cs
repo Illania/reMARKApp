@@ -332,7 +332,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             var indexPath = NSIndexPath.FromRowSection(index, 1);
 
-            TableView.ScrollToRow(indexPath, UITableViewScrollPosition.Middle, true);
+            TableView.SelectRow(indexPath, false, UITableViewScrollPosition.Middle);
+            ((DataSource)TableView.Source).RowSelected(TableView, indexPath);
         }
 
         class DataSource : UITableViewSource
