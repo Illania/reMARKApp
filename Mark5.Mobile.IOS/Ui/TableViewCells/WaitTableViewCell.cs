@@ -29,7 +29,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 spinner.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
                 spinner.HeightAnchor.ConstraintEqualTo(20f),
                 spinner.WidthAnchor.ConstraintEqualTo(20f),
-                ContentView.HeightAnchor.ConstraintGreaterThanOrEqualTo(44f)
             });
         }
     }
