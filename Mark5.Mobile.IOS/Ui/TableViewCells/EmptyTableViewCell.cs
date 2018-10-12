@@ -8,30 +8,32 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
     {
         public static readonly NSString DefaultId = new NSString(nameof(EmptyTableViewCell));
 
-        readonly UILabel label;
+        readonly UITextView label;
 
         public EmptyTableViewCell()
             : base(UITableViewCellStyle.Default, DefaultId)
         {
+            TranslatesAutoresizingMaskIntoConstraints = false;
+
             UserInteractionEnabled = false;
             SelectionStyle = UITableViewCellSelectionStyle.None;
             Accessory = UITableViewCellAccessory.None;
 
-            label = new UILabel
+            label = new UITextView
             {
                 Font = Theme.DefaultFont,
                 TextColor = Theme.DarkGray,
                 TextAlignment = UITextAlignment.Center,
-                Lines = 1,
-                TranslatesAutoresizingMaskIntoConstraints = false
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                TextContainerInset = new UIEdgeInsets(12, 0, 12, 0),
             };
             ContentView.Add(label);
             ContentView.AddConstraints(new[]
             {
-                label.CenterXAnchor.ConstraintEqualTo(ContentView.CenterXAnchor),
-                label.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
-                label.HeightAnchor.ConstraintEqualTo(22f),
-                label.WidthAnchor.ConstraintEqualTo(ContentView.WidthAnchor, 1f, -16f),
+                label.TopAnchor.ConstraintEqualTo(ContentView.TopAnchor),
+                label.BottomAnchor.ConstraintEqualTo(ContentView.BottomAnchor),
+                label.LeftAnchor.ConstraintEqualTo(ContentView.LeftAnchor),
+                label.RightAnchor.ConstraintEqualTo(ContentView.RightAnchor),
             });
         }
 
