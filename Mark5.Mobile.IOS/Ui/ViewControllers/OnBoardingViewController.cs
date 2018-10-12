@@ -162,12 +162,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void InitializeView()
         {
             View.BackgroundColor = Theme.LightBlue;
+
+           
             headlineImage = new UIImageView
             {
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
-            headlineImage.Image = UIImage.FromBundle(pageModel.ImageName);
 
+            UIView imgBackground = new UIView{
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            imgBackground.BackgroundColor = Theme.LightGray;
+
+            headlineImage.Image = UIImage.FromBundle(pageModel.ImageName);
+            headlineImage.AutoresizingMask = UIViewAutoresizing.FlexibleHeight;
+            headlineImage.ContentMode = UIViewContentMode.ScaleAspectFit;
             titleLabel = new UILabel
             {
                 TranslatesAutoresizingMaskIntoConstraints = false
@@ -186,6 +195,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             descriptionTextView.TextColor = Theme.DarkBlue;
             descriptionTextView.TextAlignment = UITextAlignment.Justified;
             descriptionTextView.BackgroundColor = UIColor.Clear;
+            descriptionTextView.Editable = false;
+
+            descriptionTextView.ScrollRangeToVisible(new Foundation.NSRange(0, 0));
 
             nextDoneButton = new UIButton(UIButtonType.System)
             {
@@ -200,6 +212,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             nextDoneButton.BackgroundColor = Theme.DarkBlue;
             nextDoneButton.TouchUpInside += NextDoneButton_TouchUpInside;
 
+            View.AddSubview(imgBackground);
             View.AddSubview(headlineImage);
             View.AddSubview(titleLabel);
             View.AddSubview(descriptionTextView);
@@ -207,8 +220,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             View.AddConstraints(new NSLayoutConstraint[]
             {
+                imgBackground.WidthAnchor.ConstraintEqualTo(View.WidthAnchor),
+                imgBackground.TopAnchor.ConstraintEqualTo(View.TopAnchor),
+                imgBackground.BottomAnchor.ConstraintEqualTo(View.CenterYAnchor),
+
                 headlineImage.TopAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.TopAnchor, Integration.IsIPad() ? 30: 0),
                 headlineImage.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
+                headlineImage.BottomAnchor.ConstraintEqualTo(View.CenterYAnchor),
 
                 titleLabel.TopAnchor.ConstraintEqualTo(headlineImage.BottomAnchor, 10),
                 titleLabel.LeftAnchor.ConstraintEqualTo(View.LeftAnchor, 20),
