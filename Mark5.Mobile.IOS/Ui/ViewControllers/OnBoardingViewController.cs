@@ -163,16 +163,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             View.BackgroundColor = Theme.LightBlue;
 
-           
+
             headlineImage = new UIImageView
             {
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
-
-            UIView imgBackground = new UIView{
-                TranslatesAutoresizingMaskIntoConstraints = false
-            };
-            imgBackground.BackgroundColor = Theme.LightGray;
 
             headlineImage.Image = UIImage.FromBundle(pageModel.ImageName);
             headlineImage.AutoresizingMask = UIViewAutoresizing.FlexibleHeight;
@@ -212,23 +207,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             nextDoneButton.BackgroundColor = Theme.DarkBlue;
             nextDoneButton.TouchUpInside += NextDoneButton_TouchUpInside;
 
-            View.AddSubview(imgBackground);
             View.AddSubview(headlineImage);
             View.AddSubview(titleLabel);
             View.AddSubview(descriptionTextView);
             View.AddSubview(nextDoneButton);
 
+            if (Integration.IsRunningAtLeast(11))
+            {
+                View.AddConstraint(headlineImage.TopAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.TopAnchor, Integration.IsIPad() ? 30: 20));
+            } else {
+                View.AddConstraint(headlineImage.TopAnchor.ConstraintEqualTo(View.TopAnchor, Integration.IsIPad() ? 30 : 20));
+            }
+
             View.AddConstraints(new NSLayoutConstraint[]
             {
-                imgBackground.WidthAnchor.ConstraintEqualTo(View.WidthAnchor),
-                imgBackground.TopAnchor.ConstraintEqualTo(View.TopAnchor),
-                imgBackground.BottomAnchor.ConstraintEqualTo(View.CenterYAnchor),
-
-                headlineImage.TopAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.TopAnchor, Integration.IsIPad() ? 30: 0),
                 headlineImage.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
-                headlineImage.BottomAnchor.ConstraintEqualTo(View.CenterYAnchor),
-
-                titleLabel.TopAnchor.ConstraintEqualTo(headlineImage.BottomAnchor, 10),
+               
+                titleLabel.TopAnchor.ConstraintEqualTo(headlineImage.BottomAnchor, 20),
                 titleLabel.LeftAnchor.ConstraintEqualTo(View.LeftAnchor, 20),
                 titleLabel.RightAnchor.ConstraintEqualTo(View.RightAnchor, -20),
 
@@ -239,6 +234,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 nextDoneButton.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
                 nextDoneButton.TopAnchor.ConstraintEqualTo(descriptionTextView.BottomAnchor),
                 nextDoneButton.BottomAnchor.ConstraintEqualTo(View.BottomAnchor),
+            });
+
+            if (!Integration.IsIPad())
+                View.AddConstraints(new NSLayoutConstraint[] { 
+                headlineImage.BottomAnchor.ConstraintEqualTo(View.CenterYAnchor) 
             });
 
             if (!isLast)
