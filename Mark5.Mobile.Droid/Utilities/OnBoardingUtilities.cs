@@ -161,6 +161,8 @@ namespace Mark5.Mobile.Droid.Utilities
                     : (int)(displayMetrics.HeightPixels * 0.20);
                 imageView.SetMaxHeight(height);
 
+                imageView.SetPadding(0, paddingValue * 3, 0, 0);
+
                 var titleTextView = new AppCompatTextView(context)
                 {
                     Text = pageModel.Title,
