@@ -39,6 +39,7 @@
 "cannot_open_attachment_content" = "There is no app installed that can open this file.";
 "cannot_open_attachment_title" = "Cannot open attachment";
 "categories" = "Categories";
+"categories_added"="Caregories Added";
 "cc" = "Cc";
 "chrome" = "Open in Google Chrome";
 "changes_not_saved" = "Changes not saved!";
@@ -344,6 +345,7 @@
 "search_where" = "Where: ";
 "search_with_attachments" = "With attachments";
 "select_users" = "Select users";
+"select_categories"="Select Categories";
 "send" = "Send";
 "send_text" = "Send message";
 "sending_document___" = "Sending email...";
