@@ -516,6 +516,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 if (!favortiesSame)
                     gds.SetFolders(GrouppedDataSource.Section.Favorites, favorites);
 
+                if (EditModeItem != null)
+                    EditModeItem.Enabled = gds.GetItemsInSection(GrouppedDataSource.Section.Favorites) > 0;
+
                 await Task.Delay(150); // Let animations finish
                 RefreshFoldersInfo();
             }
