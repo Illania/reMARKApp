@@ -380,6 +380,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
             var sanitizedContent = content.Replace("\"", "'");
             var js = $"InsertContent(\'{type}\',{id},\"{sanitizedContent}\")";
             webView.EvaluateJavaScript("javascript: " + js, (result, error) => tcs.SetResult((result, error)));
+            webView.BecomeFirstResponder();
+            webView.EndEditing(true);
             return tcs.Task;
         }
 
