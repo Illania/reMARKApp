@@ -1510,7 +1510,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                                                                                              new List<DocumentPreview> { adapter.Items[viewHolder.AdapterPosition] }.Cast<IBusinessEntity>().ToList(), folder));
                             break;
                         case Preferences.EmailSwipeAction.More:
-                            var index = await Dialogs.ShowListDialog(context, Resource.String.pref_email_swipe_dialog_title, Resource.Array.pref_email_swipe_actions_entries, true);
+                            var index = await Dialogs.ShowListDialog(context, Resource.String.pref_email_swipe_dialog_title, Resource.Array.pref_email_swipe_actions_entries_without_more, true);
                             if (index >= 0)
                             {
                                 SwipeActionSelected(PlatformConfig.Preferences.GetAllAvailableActions()[index], viewHolder);
