@@ -887,30 +887,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             });
         }
 
-        Task<string> MergeContent(string newContent, string oldContent)
-        {
-            return Task.Run(() =>
-            {
-                var newHtmlDocument = new HtmlDocument();
-                newHtmlDocument.LoadHtml(newContent);
-                var oldHtmlDocument = new HtmlDocument();
-                oldHtmlDocument.LoadHtml(oldContent);
-
-                var html = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/blank", "html"));
-                var mergedHtmlDocument = new HtmlDocument();
-                mergedHtmlDocument.LoadHtml(html);
-
-                var newNode = mergedHtmlDocument.DocumentNode.SelectSingleNode("//div[@id='new']");
-                newNode.AppendChildren(newHtmlDocument.DocumentNode.SelectSingleNode("//body").ChildNodes);
-                newNode.Attributes.Remove("id");
-                var oldNode = mergedHtmlDocument.DocumentNode.SelectSingleNode("//div[@id='old']");
-                oldNode.AppendChildren(oldHtmlDocument.DocumentNode.SelectSingleNode("//body").ChildNodes);
-                oldNode.Attributes.Remove("id");
-
-                return mergedHtmlDocument.DocumentNode.OuterHtml;
-            });
-        }
-
         #endregion
 
         #region Templates loading
