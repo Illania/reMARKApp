@@ -872,6 +872,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 var editorNode = bodyNode?.SelectSingleNode("//div[@id='editor']");
                 editorNode?.Attributes.FirstOrDefault(attr => attr.Name == "contentEditable")?.Remove();
 
+                var previousContentNode = bodyNode?.SelectSingleNode("//div[@id='previousContent']");
+                previousContentNode?.Attributes.FirstOrDefault(attr => attr.Name == "contentEditable")?.Remove();
+
                 var html = htmlDocument.DocumentNode.OuterHtml;
 
                 html = PreMailer.Net.PreMailer.MoveCssInline(html, true, null, null, true, true).Html;
