@@ -850,14 +850,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             var newContent = await base.GetContent();
             newContent = await CleanContent(newContent);
 
-            var oldContent = previousDocumentContent;
-            if (!string.IsNullOrWhiteSpace(oldContent))
-            {
-                oldContent = await CleanContent(oldContent);
-                var mergedContent = await MergeContent(newContent, oldContent);
-                return mergedContent;
-            }
-
             return newContent;
         }
 
