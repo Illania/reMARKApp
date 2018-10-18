@@ -24,8 +24,8 @@
 	<key>CFBundleIdentifier</key>
 	<string>com.nordic-it.mark5.mobile.ios.callid</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.7</string>
+	<string>2.8</string>
 	<key>CFBundleVersion</key>
-	<string>234</string>
+	<string>236</string>
 </dict>
 </plist>
