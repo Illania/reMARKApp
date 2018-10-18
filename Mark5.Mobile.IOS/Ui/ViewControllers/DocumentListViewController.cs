@@ -1397,18 +1397,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override nint RowsInSection(UITableView tableview, nint section)
             {
-                if (loading || Empty)
-                    return 1;
-
-                return Items.Count;
+                return loading || Empty ? 1 : (nint)Items.Count;
             }
 
             public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
             {
-                if (loading || Empty)
-                    return false;
-
-                return true;
+                return loading || Empty ? false : true;
             }
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
