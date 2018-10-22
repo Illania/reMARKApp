@@ -406,10 +406,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             if (preconfiguredSubject != null)
-                subjectView.Subject = preconfiguredSubject;
+                subjectView.SetSubject(preconfiguredSubject);
 
             if (preconfiguredContent != null)
-                await contentView.InsertContent(preconfiguredContent);
+                await contentView.InsertPlainText(preconfiguredContent);
 
             var files = await Managers.DocumentsManager.GetDocumentWorkingCopyAttachmentsAsync();
             attachmentsView.InitializeFileDescriptions(files.Select(f => new FileDescription(f)).ToArray());

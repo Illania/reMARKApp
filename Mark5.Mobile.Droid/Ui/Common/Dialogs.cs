@@ -420,12 +420,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
                             var sendWithMark5 = await ShowYesNoDialogAsync(context, Resource.String.send_with_mark5_title, Resource.String.send_report_with_mark5_content);
 
                             if (sendWithMark5)
-                            {
-                                var cdIntent = ComposeDocumentActivity.CreateIntent(context, DocumentCreationModeFlag.New, CopyToNewOption.None,
-                                                                     preconfiguredEmailAddresses: new Dictionary<DocumentAddressType, string[]>() { { DocumentAddressType.To, new string[] { "appfeedback@nordic-it.com" } } },
-                                                                     preconfiguredSubject: context.GetString(Resource.String.mark5_android_system_report), preconfiguredContent: t.Result);
-                                context.StartActivity(cdIntent);
-                            }
+                                context.StartActivity(ComposeDocumentActivity.CreateShareReportIntent(context, "MARK5 Android System Report", t.Result));
                             else
                                 context.StartActivity(SystemReportCollector.CreateShareReportIntent(context, t.Result));
                         }
@@ -466,12 +461,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
                             var sendWithMark5 = await ShowYesNoDialogAsync(context, Resource.String.send_with_mark5_title, Resource.String.send_report_with_mark5_content);
 
                             if (sendWithMark5)
-                            {
-                                var cdIntent = ComposeDocumentActivity.CreateIntent(context, DocumentCreationModeFlag.New, CopyToNewOption.None,
-                                                                     preconfiguredEmailAddresses: new Dictionary<DocumentAddressType, string[]>() { { DocumentAddressType.To, new string[] { "appfeedback@nordic-it.com" } } },
-                                                                     preconfiguredSubject: context.GetString(Resource.String.mark5_android_system_report), preconfiguredContent: t.Result);
-                                context.StartActivity(cdIntent);
-                            }
+                                context.StartActivity(ComposeDocumentActivity.CreateShareReportIntent(context, "MARK5 Android System Report", t.Result));
                             else
                                 context.StartActivity(SystemReportCollector.CreateShareReportIntent(context, t.Result));
 

@@ -217,7 +217,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             await newContentWebView.EvaluateJavaScriptAsync(insertTemplateJs);
         }
 
-        public async Task InsertContent(string content)
+        public async Task InsertPlainText(string content)
         {
             await newContentSemaphore.WaitAsync();
             await newContentWebView.LoadPlainText(context, content, PlainTextProcessingConfiguration.DefaultForEditing);
