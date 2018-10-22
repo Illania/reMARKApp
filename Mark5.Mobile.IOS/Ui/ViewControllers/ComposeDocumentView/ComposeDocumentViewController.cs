@@ -72,6 +72,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         SuggestionsListView suggestionsListView;
         Worker autoSaveWorkingCopyWorker;
 
+        public static ComposeDocumentViewController CreateShareReportViewController(string preconfiguredSubject, string preconfiguredContent)
+        {
+            return new ComposeDocumentViewController
+            {
+                PreconfiguredEmailAddresses = new Dictionary<DocumentAddressType, string[]>() { { DocumentAddressType.To, new string[] { "appfeedback@nordic-it.com" } } },
+                PreconfiguredSubject = preconfiguredSubject,
+                PreconfiguredContent = preconfiguredContent
+            };
+        }
+
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();

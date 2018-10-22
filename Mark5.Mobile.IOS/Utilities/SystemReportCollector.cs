@@ -33,7 +33,7 @@ namespace Mark5.Mobile.IOS.Utilities
                     UIActivityType.SaveToCameraRoll
                 }
             };
-            vc.SetValueForKey(NSObject.FromObject(Localization.GetString("mark5_ios_system_report")), new NSString("subject"));
+            vc.SetValueForKey(NSObject.FromObject("MARK5 iOS System Report"), new NSString("subject"));
 
             return vc;
         }
@@ -42,7 +42,7 @@ namespace Mark5.Mobile.IOS.Utilities
         {
             var mcvc = new MFMailComposeViewController();
             mcvc.SetToRecipients(new[] { "appfeedback@nordic-it.com" });
-            mcvc.SetSubject(Localization.GetString("mark5_ios_feedback"));
+            mcvc.SetSubject("MARK5 iOS Feedback");
             mcvc.AddAttachmentData(NSData.FromString(report), "text/plain", "MARK5_iOS_System_Report.txt");
             mcvc.Finished += Mcvc_Finished;
             mcvc.NavigationBar.TintColor = Theme.DarkBlue;

@@ -285,14 +285,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     if (sendWithMark5)
                     {
-                        var cvc = new ComposeDocumentViewController
-                        {
-                            PreconfiguredEmailAddresses = new Dictionary<DocumentAddressType, string[]>() { { DocumentAddressType.To, new string[] { "appfeedback@nordic-it.com" } } },
-                            PreconfiguredSubject = Localization.GetString("mark5_ios_feedback"),
-                            PreconfiguredContent = report
-                        };
-
-                        PresentViewController(new NavigationController(cvc, UIModalPresentationStyle.PageSheet), true, null);
+                        var cvc = ComposeDocumentViewController.CreateShareReportViewController("MARK5 iOS Feedback", report);
+                        PresentViewController(new NavigationController(cvc, UIModalPresentationStyle.PageSheet), true, null); 
                     }
                     else
                         PresentViewController(SystemReportCollector.CreateMailFeedbackController(report), true, null);
@@ -321,12 +315,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     if (sendWithMark5)
                     {
-                        var cvc = new ComposeDocumentViewController
-                        {
-                            PreconfiguredEmailAddresses = new Dictionary<DocumentAddressType, string[]>() { { DocumentAddressType.To, new string[] { "appfeedback@nordic-it.com" } } },
-                            PreconfiguredSubject = Localization.GetString("mark5_ios_system_report"),
-                            PreconfiguredContent = report
-                        };
+                        var cvc = ComposeDocumentViewController.CreateShareReportViewController("MARK5 iOS System Report", report);
                         PresentViewController(new NavigationController(cvc, UIModalPresentationStyle.PageSheet), true, null);
                     }
                     else

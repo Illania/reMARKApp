@@ -181,13 +181,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
                             if (sendWithMark5)
                             {
-                                var cvc = new ComposeDocumentViewController
-                                {
-                                    PreconfiguredEmailAddresses = new Dictionary<DocumentAddressType, string[]>() { { DocumentAddressType.To, new string[] { "appfeedback@nordic-it.com" } } },
-                                    PreconfiguredSubject = Localization.GetString("mark5_ios_system_report"),
-                                    PreconfiguredContent = t.Result
-                                };
-
+                                var cvc = ComposeDocumentViewController.CreateShareReportViewController("MARK5 iOS System Report", t.Result);
                                 vc.PresentViewController(new NavigationController(cvc, UIModalPresentationStyle.PageSheet), true, null);
                             }
                             else 
@@ -226,13 +220,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
                             if (sendWithMark5)
                             {
-                                var cvc = new ComposeDocumentViewController
-                                {
-                                    PreconfiguredEmailAddresses = new Dictionary<DocumentAddressType, string[]>() { { DocumentAddressType.To, new string[] { "appfeedback@nordic-it.com" } } },
-                                    PreconfiguredSubject = Localization.GetString("mark5_ios_system_report"),
-                                    PreconfiguredContent = t.Result
-                                };
-
+                                var cvc = ComposeDocumentViewController.CreateShareReportViewController("MARK5 iOS System Report", t.Result);
                                 vc.PresentViewController(new NavigationController(cvc, UIModalPresentationStyle.PageSheet), true, null);
                             }
                             else
