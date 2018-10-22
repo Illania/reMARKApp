@@ -420,7 +420,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
                             var sendWithMark5 = await ShowYesNoDialogAsync(context, Resource.String.send_with_mark5_title, Resource.String.send_report_with_mark5_content);
 
                             if (sendWithMark5)
-                                context.StartActivity(ComposeDocumentActivity.CreateShareReportIntent(context, "MARK5 Android System Report", t.Result));
+                                context.StartActivity(SystemReportCollector.CreateShareReportComposeDocumentActivityIntent(Context, t.Result));
                             else
                                 context.StartActivity(SystemReportCollector.CreateShareReportIntent(context, t.Result));
                         }
@@ -461,7 +461,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
                             var sendWithMark5 = await ShowYesNoDialogAsync(context, Resource.String.send_with_mark5_title, Resource.String.send_report_with_mark5_content);
 
                             if (sendWithMark5)
-                                context.StartActivity(ComposeDocumentActivity.CreateShareReportIntent(context, "MARK5 Android System Report", t.Result));
+                                context.StartActivity(SystemReportCollector.CreateShareReportComposeDocumentActivityIntent(Context, t.Result));
                             else
                                 context.StartActivity(SystemReportCollector.CreateShareReportIntent(context, t.Result));
 

@@ -174,7 +174,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         var sendWithMark5 = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.send_with_mark5_title, Resource.String.send_report_with_mark5_content);
 
                         if (sendWithMark5)
-                            StartActivity(ComposeDocumentActivity.CreateShareReportIntent(Context, "MARK5 Android Feedback", t.Result));
+                            StartActivity(SystemReportCollector.CreateShareFeedbackComposeDocumentActivityIntent(Context, t.Result));
                         else
                         {
                             var sendIntent = new Intent();
@@ -211,7 +211,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                                 var sendWithMark5 = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.send_with_mark5_title, Resource.String.send_report_with_mark5_content);
 
                                 if (sendWithMark5)
-                                    StartActivity(ComposeDocumentActivity.CreateShareReportIntent(Context, "MARK5 Android System Report", t.Result));
+                                    StartActivity(SystemReportCollector.CreateShareReportComposeDocumentActivityIntent(Context, t.Result));
                                 else
                                     StartActivity(SystemReportCollector.CreateShareReportIntent(Context, t.Result));
                             }

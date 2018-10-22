@@ -11,11 +11,38 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Ui.Activities;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
     public static class SystemReportCollector
     {
+        public static Intent CreateShareReportComposeDocumentActivityIntent(Context context, string preconfiguredContent)
+        {
+            var intent = new Intent(context, typeof(ComposeDocumentActivity));
+
+            intent.PutExtra(DocumentCreationModeFlagIntentKey, (int)DocumentCreationModeFlag.New);
+            intent.PutExtra(CopyToNewOptionIntentKey, (int)CopyToNewOption.None);
+            intent.PutExtra(PreconfiguredEmailAddressesIntentKey, Serializer.Serialize(new Dictionary<DocumentAddressType, string[]>() { { DocumentAddressType.To, new string[] { "appfeedback@nordic-it.com" } } }));
+            intent.PutExtra(PreconfiguredSubjectIntentKey, "MARK5 Android System Report");
+            intent.PutExtra(PreconfiguredContentIntentKey, preconfiguredContent);
+
+            return intent;
+        }
+
+        public static Intent CreateShareFeedbackComposeDocumentActivityIntent(Context context, string preconfiguredContent)
+        {
+            var intent = new Intent(context, typeof(ComposeDocumentActivity));
+
+            intent.PutExtra(DocumentCreationModeFlagIntentKey, (int)DocumentCreationModeFlag.New);
+            intent.PutExtra(CopyToNewOptionIntentKey, (int)CopyToNewOption.None);
+            intent.PutExtra(PreconfiguredEmailAddressesIntentKey, Serializer.Serialize(new Dictionary<DocumentAddressType, string[]>() { { DocumentAddressType.To, new string[] { "appfeedback@nordic-it.com" } } }));
+            intent.PutExtra(PreconfiguredSubjectIntentKey, "MARK5 Android Feedback");
+            intent.PutExtra(PreconfiguredContentIntentKey, preconfiguredContent);
+
+            return intent;
+        }
+
         public static Intent CreateShareReportIntent(Context context, string report)
         {
             var sendIntent = new Intent();
