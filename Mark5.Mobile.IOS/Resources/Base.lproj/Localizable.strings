@@ -187,8 +187,6 @@
 "login_failed_desc" = "Could not log in to MARK5. Please check your username, password and server address.\n\nYou may also want to verify SSL settings, by tapping Settings in top right corner of the screen.";
 "low" = "Low";
 "mark5_server_reachability" = "MARK5 server: ";
-"mark5_service_reachability" = "MARK5 service: ";
-"mark5_ios_feedback" = "MARK5 iOS Feedback";
 "mark5_ios_system_report" = "MARK5 iOS System Report";
 "mark_as_read" = "Mark as read";
 "mark_as_read_ml" = "Mark as\nread";
