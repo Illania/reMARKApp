@@ -267,12 +267,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 try
                 {
-                    if (!SystemReportCollector.CanMailReport)
-                    {
-                        await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("cannot_mail_report_title"), Localization.GetString("cannot_mail_report_content"));
-                        return;
-                    }
-
                     var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("creating_system_report___"));
 
                     var report = await SystemReportCollector.CreateFullReportAsync();
@@ -287,7 +281,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         PresentViewController(new NavigationController(cvc, UIModalPresentationStyle.PageSheet), true, null); 
                     }
                     else
+                    {
+                        if (!SystemReportCollector.CanMailReport)
+                        {
+                            await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("cannot_mail_report_title"), Localization.GetString("cannot_mail_report_content"));
+                            return;
+                        }
                         PresentViewController(SystemReportCollector.CreateMailFeedbackController(report), true, null);
+                    }
                 }
                 catch (Exception ex)
                 {
