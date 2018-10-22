@@ -41,7 +41,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         public DocumentDirection PreviousDocumentDirection { get; set; }
         public int? PreviousDocumentFolderId { get; set; }
         public int? PreviousDocumentId { get; set; }
+        public string PreconfiguredContent { get; set; }
         public Dictionary<DocumentAddressType, string[]> PreconfiguredEmailAddresses { get; set; }
+        public string PreconfiguredSubject { get; set; }
 
         DocumentPreview documentPreview = new DocumentPreview();
         Document document = new Document();
@@ -351,6 +353,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                 document.Guid = Guid.NewGuid();
 
+                if (PreconfiguredSubject != null)
+                    subjectView.Subject = PreconfiguredSubject;
+
                 if (RestoreWorkingCopy)
                 {
                     var files = await Managers.DocumentsManager.GetDocumentWorkingCopyAttachmentsAsync();
@@ -359,6 +364,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                 if (RestoreWorkingCopy)
                     await LoadHtmlString(document.HtmlBody, HtmlProcessingConfiguration.DefaultForEditing);
+                else if (PreconfiguredContent != null)
+                    await LoadPlainText(PreconfiguredContent, PlainTextProcessingConfiguration.DefaultForEditing);
                 else if (previousDocumentPreview != null && PreviousDocumentDirection == DocumentDirection.Draft ||
                          (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption.HasFlag(CopyToNewOption.Content)))
                 {

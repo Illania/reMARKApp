@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Android.App;
@@ -11,20 +12,39 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Ui.Activities;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
     public static class SystemReportCollector
     {
+        public static Intent CreateShareReportComposeDocumentActivityIntent(Context context, string preconfiguredContent)
+        {
+            return ComposeDocumentActivity.CreateShareReportIntent(context, "MARK5 Android System Report", preconfiguredContent);
+        }
+
+        public static Intent CreateShareFeedbackComposeDocumentActivityIntent(Context context, string preconfiguredContent)
+        {
+            return ComposeDocumentActivity.CreateShareReportIntent(context, "MARK5 Android Feedback", preconfiguredContent);
+        }
+
         public static Intent CreateShareReportIntent(Context context, string report)
         {
             var sendIntent = new Intent();
             sendIntent.SetAction(Intent.ActionSend);
             sendIntent.PutExtra(Intent.ExtraEmail, new[] { "appfeedback@nordic-it.com" });
-            sendIntent.PutExtra(Intent.ExtraSubject, "MARK5 for Android System report");
+            sendIntent.PutExtra(Intent.ExtraSubject, "MARK5 Android System Report");
             sendIntent.PutExtra(Intent.ExtraText, report);
             sendIntent.SetType("text/plain");
             return Intent.CreateChooser(sendIntent, context.GetText(Resource.String.share));
+        } 
+
+        public static Intent CreateShareFeedbackIntent(string report)
+        {
+            var sendIntent = new Intent();
+            sendIntent.SetAction(Intent.ActionSendto);
+            sendIntent.SetData(Android.Net.Uri.Parse("mailto:appfeedback@nordic-it.com?subject=MARK5%20Android%20Feedback&body=" + report));
+            return sendIntent;
         }
 
         public static string CreateFullReport()

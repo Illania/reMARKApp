@@ -400,6 +400,9 @@
     <string name="select_users">Select users</string>
     <string name="send">Send</string>
     <string name="sending_document">Sending email</string>
+    <string name="send_with_mark5_title">Send with MARK5</string>
+    <string name="send_report_with_mark5_content">Do you want to send the generated report with MARK5?</string>
+    <string name="send_feedback_with_mark5_content">Do you want to send feedback with MARK5?</string>
     <string name="set_priority">Set priority</string>
     <string name="setting_priority">Setting priority...</string>
     <string name="settings">Settings</string>

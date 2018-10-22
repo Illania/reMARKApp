@@ -188,7 +188,7 @@
 "login_failed_desc" = "Could not log in to MARK5. Please check your username, password and server address.\n\nYou may also want to verify SSL settings, by tapping Settings in top right corner of the screen.";
 "low" = "Low";
 "mark5_server_reachability" = "MARK5 server: ";
-"mark5_service_reachability" = "MARK5 service: ";
+"mark5_ios_system_report" = "MARK5 iOS System Report";
 "mark_as_read" = "Mark as read";
 "mark_as_read_ml" = "Mark as\nread";
 "mark_as_unread" = "Mark as unread";
@@ -349,6 +349,9 @@
 "send" = "Send";
 "send_text" = "Send message";
 "sending_document___" = "Sending email...";
+"send_with_mark5_title" = "Send with MARK5?";
+"send_feedback_with_mark5_content" = "Do you want to send feedback with MARK5?";
+"send_report_with_mark5_content" = "Do you want to send the generated report with MARK5?";
 "set_priority" = "Set priority";
 "setting_priority___" = "Setting priority...";
 "settings" = "Settings";
