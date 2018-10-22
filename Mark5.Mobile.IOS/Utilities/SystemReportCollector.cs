@@ -156,5 +156,29 @@ namespace Mark5.Mobile.IOS.Utilities
             sb.AppendLine(((ConsoleAndFileLogger)CommonConfig.Logger).ReadLogFile());
             return sb.ToString();
         }
+
+        public static string CreateExceptionReport(Exception ex)
+        {
+            var sb = new StringBuilder();
+
+            sb.AppendLine("===== Exception =====");
+            sb.AppendLine("Exception Type: " + ex.GetType());
+            sb.AppendLine();
+            sb.AppendLine("Stack trace: " + ex.StackTrace);
+
+            return sb.ToString();
+        }
+
+        public static string CreateFailedDocumentReport(Exception ex)
+        {
+            var sb = new StringBuilder();
+
+            sb.AppendLine("===== Document Failed Report =====");
+            sb.Append(CreateSystemInfoReport());
+            sb.AppendLine();
+            sb.Append(CreateExceptionReport(ex));
+
+            return sb.ToString();
+        }
     }
 }
