@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Foundation;
@@ -7,6 +8,7 @@ using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
+using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 using MessageUI;
 using UIKit;
 
@@ -36,6 +38,26 @@ namespace Mark5.Mobile.IOS.Utilities
             vc.SetValueForKey(NSObject.FromObject("MARK5 iOS System Report"), new NSString("subject"));
 
             return vc;
+        }
+
+        public static ComposeDocumentViewController CreateShareReportComposeDocumentViewController(string preconfiguredContent)
+        {
+            return new ComposeDocumentViewController
+            {
+                PreconfiguredEmailAddresses = new Dictionary<DocumentAddressType, string[]>() { { DocumentAddressType.To, new string[] { "appfeedback@nordic-it.com" } } },
+                PreconfiguredSubject = "MARK5 iOS System Report",
+                PreconfiguredContent = preconfiguredContent
+            };
+        }
+
+        public static ComposeDocumentViewController CreateShareFeedbackComposeDocumentViewController(string preconfiguredContent)
+        {
+            return new ComposeDocumentViewController
+            {
+                PreconfiguredEmailAddresses = new Dictionary<DocumentAddressType, string[]>() { { DocumentAddressType.To, new string[] { "appfeedback@nordic-it.com" } } },
+                PreconfiguredSubject = "MARK5 iOS Feedback",
+                PreconfiguredContent = preconfiguredContent
+            };
         }
 
         public static MFMailComposeViewController CreateMailFeedbackController(string report)

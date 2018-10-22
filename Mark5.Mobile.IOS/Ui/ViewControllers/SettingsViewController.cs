@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using CoreGraphics;
 using Foundation;
 using InAppSettingsKit;
@@ -12,7 +11,6 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Common.CallId;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
-using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 using Mark5.Mobile.IOS.Utilities;
 using Mark5.Mobile.IOS.Utilities.Extensions;
 using UIKit;
@@ -285,7 +283,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     if (sendWithMark5)
                     {
-                        var cvc = ComposeDocumentViewController.CreateShareReportViewController("MARK5 iOS Feedback", report);
+                        var cvc = SystemReportCollector.CreateShareFeedbackComposeDocumentViewController(report);
                         PresentViewController(new NavigationController(cvc, UIModalPresentationStyle.PageSheet), true, null); 
                     }
                     else
@@ -315,7 +313,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     if (sendWithMark5)
                     {
-                        var cvc = ComposeDocumentViewController.CreateShareReportViewController("MARK5 iOS System Report", report);
+                        var cvc = SystemReportCollector.CreateShareReportComposeDocumentViewController(report);
                         PresentViewController(new NavigationController(cvc, UIModalPresentationStyle.PageSheet), true, null);
                     }
                     else
