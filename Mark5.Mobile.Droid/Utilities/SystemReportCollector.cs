@@ -39,6 +39,14 @@ namespace Mark5.Mobile.Droid.Utilities
             return Intent.CreateChooser(sendIntent, context.GetText(Resource.String.share));
         } 
 
+        public static Intent CreateShareFeedbackIntent(string report)
+        {
+            var sendIntent = new Intent();
+            sendIntent.SetAction(Intent.ActionSendto);
+            sendIntent.SetData(Android.Net.Uri.Parse("mailto:appfeedback@nordic-it.com?subject=MARK5%20Android%20Feedback&body=" + report));
+            return sendIntent;
+        }
+
         public static string CreateFullReport()
         {
             var sb = new StringBuilder();

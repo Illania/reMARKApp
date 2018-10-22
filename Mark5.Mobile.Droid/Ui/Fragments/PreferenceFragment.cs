@@ -176,12 +176,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         if (sendWithMark5)
                             StartActivity(SystemReportCollector.CreateShareFeedbackComposeDocumentActivityIntent(Context, t.Result));
                         else
-                        {
-                            var sendIntent = new Intent();
-                            sendIntent.SetAction(Intent.ActionSendto);
-                            sendIntent.SetData(Android.Net.Uri.Parse("mailto:appfeedback@nordic-it.com?subject=MARK5%20Android%20Feedback&body="+t.Result));
-                            StartActivity(sendIntent);
-                        }
+                            StartActivity(SystemReportCollector.CreateShareFeedbackIntent(t.Result));
+
                     }
 
                 },TaskScheduler.FromCurrentSynchronizationContext());
