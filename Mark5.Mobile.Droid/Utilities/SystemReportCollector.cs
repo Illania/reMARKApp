@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Android.App;
@@ -19,28 +20,12 @@ namespace Mark5.Mobile.Droid.Utilities
     {
         public static Intent CreateShareReportComposeDocumentActivityIntent(Context context, string preconfiguredContent)
         {
-            var intent = new Intent(context, typeof(ComposeDocumentActivity));
-
-            intent.PutExtra(DocumentCreationModeFlagIntentKey, (int)DocumentCreationModeFlag.New);
-            intent.PutExtra(CopyToNewOptionIntentKey, (int)CopyToNewOption.None);
-            intent.PutExtra(PreconfiguredEmailAddressesIntentKey, Serializer.Serialize(new Dictionary<DocumentAddressType, string[]>() { { DocumentAddressType.To, new string[] { "appfeedback@nordic-it.com" } } }));
-            intent.PutExtra(PreconfiguredSubjectIntentKey, "MARK5 Android System Report");
-            intent.PutExtra(PreconfiguredContentIntentKey, preconfiguredContent);
-
-            return intent;
+            return ComposeDocumentActivity.CreateShareReportIntent(context, "MARK5 Android System Report", preconfiguredContent);
         }
 
         public static Intent CreateShareFeedbackComposeDocumentActivityIntent(Context context, string preconfiguredContent)
         {
-            var intent = new Intent(context, typeof(ComposeDocumentActivity));
-
-            intent.PutExtra(DocumentCreationModeFlagIntentKey, (int)DocumentCreationModeFlag.New);
-            intent.PutExtra(CopyToNewOptionIntentKey, (int)CopyToNewOption.None);
-            intent.PutExtra(PreconfiguredEmailAddressesIntentKey, Serializer.Serialize(new Dictionary<DocumentAddressType, string[]>() { { DocumentAddressType.To, new string[] { "appfeedback@nordic-it.com" } } }));
-            intent.PutExtra(PreconfiguredSubjectIntentKey, "MARK5 Android Feedback");
-            intent.PutExtra(PreconfiguredContentIntentKey, preconfiguredContent);
-
-            return intent;
+            return ComposeDocumentActivity.CreateShareReportIntent(context, "MARK5 Android Feedback", preconfiguredContent);
         }
 
         public static Intent CreateShareReportIntent(Context context, string report)
@@ -48,11 +33,11 @@ namespace Mark5.Mobile.Droid.Utilities
             var sendIntent = new Intent();
             sendIntent.SetAction(Intent.ActionSend);
             sendIntent.PutExtra(Intent.ExtraEmail, new[] { "appfeedback@nordic-it.com" });
-            sendIntent.PutExtra(Intent.ExtraSubject, "MARK5 Android Feedback");
+            sendIntent.PutExtra(Intent.ExtraSubject, "MARK5 Android System Report");
             sendIntent.PutExtra(Intent.ExtraText, report);
             sendIntent.SetType("text/plain");
             return Intent.CreateChooser(sendIntent, context.GetText(Resource.String.share));
-        }
+        } 
 
         public static string CreateFullReport()
         {

@@ -69,6 +69,19 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             return intent;
         }
 
+        public static Intent CreateShareReportIntent(Context context, string preconfiguredSubject, string preconfiguredContent)
+        {
+            var intent = new Intent(context, typeof(ComposeDocumentActivity));
+
+            intent.PutExtra(ComposeDocumentActivity.DocumentCreationModeFlagIntentKey, (int)DocumentCreationModeFlag.New);
+            intent.PutExtra(ComposeDocumentActivity.CopyToNewOptionIntentKey, (int)CopyToNewOption.None);
+            intent.PutExtra(ComposeDocumentActivity.PreconfiguredEmailAddressesIntentKey, Serializer.Serialize(new Dictionary<DocumentAddressType, string[]>() { { DocumentAddressType.To, new string[] { "appfeedback@nordic-it.com" } } }));
+            intent.PutExtra(ComposeDocumentActivity.PreconfiguredSubjectIntentKey, preconfiguredSubject);
+            intent.PutExtra(ComposeDocumentActivity.PreconfiguredContentIntentKey, preconfiguredContent);
+
+            return intent;
+        }
+
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
