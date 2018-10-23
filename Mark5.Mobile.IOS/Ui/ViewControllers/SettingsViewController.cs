@@ -427,9 +427,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
             if (key == SyncFavoriteFoldersKey)
-            {
                 await HandleSync();
-            }
 
             if (key == UseTemplateKey)
                 RefreshHiddenSettings();

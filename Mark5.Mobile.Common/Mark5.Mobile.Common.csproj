@@ -23,7 +23,4 @@
     <Folder Include="Model\HubMessages\" />
     <Folder Include="Utilities\Extensions\" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Remove="Manager\IFolderFavoritesManager.cs" />
-  </ItemGroup>
 </Project>

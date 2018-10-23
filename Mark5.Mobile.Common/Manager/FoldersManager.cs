@@ -54,39 +54,6 @@ namespace Mark5.Mobile.Common.Manager
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public Task<ModuleFavorites> GetModuleFavorites()
-        {
-            return GetModuleFavorites(new List<ModuleType>() { ModuleType.Contacts, ModuleType.Documents, ModuleType.Shortcodes });
-        }
-
-        public async Task<ModuleFavorites> GetModuleFavorites(List<ModuleType> modules)
-        {
-
-            List<DataContract.ModuleType> dataContractModules = new List<DataContract.ModuleType>();
-
-            foreach (var module in modules)
-            {
-                dataContractModules.Add(module.ConvertEnum<DataContract.ModuleType>());
-            }
-
-            var result = await AppServiceProxy.GetModuleFavorites(new DataContract.GetModuleFavoritesParameters()
-            {
-                Modules = dataContractModules,
-                Token = ConnectionInfo.Token
-            });
-
-            ModuleFavorites moduleFavorites = result.Convert();
-
-            if(moduleFavorites.ModuleFovoritesList != null) {
-                foreach (var module in moduleFavorites.ModuleFovoritesList)
-                {
-                    await SetFavoriteFoldersAsync(module.ModuleType, module.Folders);
-                }
-            }
-
-            return moduleFavorites;
-        }
-
         public async Task<List<Folder>> GetFavoriteFoldersAsync(ModuleType module)
         {
             var rootFavoriteFolder = Folder.FavoritesRootForModule(module);
@@ -153,53 +120,6 @@ namespace Mark5.Mobile.Common.Manager
             favoriteFolders[module] = moduleFavoriteFolders;
 
             await FileSystemStorage.SaveFavoriteFoldersAsync(favoriteFolders);
-        }
-
-        public async Task UpdateModuleFavorites()
-        {
-            Dictionary<ModuleType, List<Folder>> localFavorites = await FileSystemStorage.GetFavoriteFoldersAsync();
-
-            await AppServiceProxy.UpdateModuleFavorites(new DataContract.UpdateModuleFavoritesParameters
-            {
-                ModuleFavoritesList = localFavorites.Convert(),
-                Token = ConnectionInfo.Token
-            });
-        }
-
-        public async Task AddModuleFavorites(List<Folder> folders, ModuleType moduleType)
-        {
-            DataContract.ModuleFavorites moduleFavorite = new DataContract.ModuleFavorites { ModuleType = (DataContract.ModuleType)moduleType };
-
-            foreach (var folder in folders)
-            {
-                moduleFavorite.Folders.Add(folder.Convert());
-            }
-
-            DataContract.AddModuleFavoritesParameters favParams = new DataContract.AddModuleFavoritesParameters()
-            {
-                ModuleFavoritesList = new List<DataContract.ModuleFavorites>() { moduleFavorite },
-                Token = ConnectionInfo.Token
-            };
-
-            await AppServiceProxy.AddModuleFavorites(favParams);
-        }
-
-        public async Task RemoveModuleFavorites(List<Folder> folders, ModuleType moduleType)
-        {
-            DataContract.ModuleFavorites moduleFavorite = new DataContract.ModuleFavorites { ModuleType = (DataContract.ModuleType)moduleType };
-
-            foreach (var folder in folders)
-            {
-                moduleFavorite.Folders.Add(folder.Convert());
-            }
-
-            DataContract.RemoveModuleFavoritesParameters favParams = new DataContract.RemoveModuleFavoritesParameters()
-            {
-                ModuleFavoritesList = new List<DataContract.ModuleFavorites>() { moduleFavorite },
-                Token = ConnectionInfo.Token
-            };
-
-            await AppServiceProxy.RemoveModuleFavorites(favParams);
         }
 
         public async Task<bool> IsFolderFavouriteAsync(ModuleType module, Folder folder)
@@ -281,6 +201,113 @@ namespace Mark5.Mobile.Common.Manager
             return folders;
         }
 
+        public Task<ModuleFavorites> GetModuleFavorites()
+        {
+            return GetModuleFavorites(new List<ModuleType>() { ModuleType.Contacts, ModuleType.Documents, ModuleType.Shortcodes });
+        }
+
+        public async Task<ModuleFavorites> GetModuleFavorites(List<ModuleType> modules)
+        {
+
+            List<DataContract.ModuleType> dataContractModules = new List<DataContract.ModuleType>();
+
+            foreach (var module in modules)
+            {
+                dataContractModules.Add(module.ConvertEnum<DataContract.ModuleType>());
+            }
+
+            var result = await AppServiceProxy.GetModuleFavorites(new DataContract.GetModuleFavoritesParameters()
+            {
+                Modules = dataContractModules,
+                Token = ConnectionInfo.Token
+            });
+
+            ModuleFavorites moduleFavorites = result.Convert();
+
+            if (moduleFavorites.ModuleFovoritesList != null)
+            {
+                foreach (var module in moduleFavorites.ModuleFovoritesList)
+                {
+                    await SetFavoriteFoldersAsync(module.ModuleType, module.Folders);
+                }
+            }
+
+            return moduleFavorites;
+        }
+
+        public async Task UpdateModuleFavorites()
+        {
+            Dictionary<ModuleType, List<Folder>> localFavorites = await FileSystemStorage.GetFavoriteFoldersAsync();
+
+            await AppServiceProxy.UpdateModuleFavorites(new DataContract.UpdateModuleFavoritesParameters
+            {
+                ModuleFavoritesList = localFavorites.Convert(),
+                Token = ConnectionInfo.Token
+            });
+        }
+
+        public async Task AddModuleFavorites(List<Folder> folders, ModuleType moduleType)
+        {
+            DataContract.ModuleFavorites moduleFavorite = new DataContract.ModuleFavorites { ModuleType = (DataContract.ModuleType)moduleType };
+
+            foreach (var folder in folders)
+            {
+                moduleFavorite.Folders.Add(folder.Convert());
+            }
+
+            DataContract.AddModuleFavoritesParameters favParams = new DataContract.AddModuleFavoritesParameters()
+            {
+                ModuleFavoritesList = new List<DataContract.ModuleFavorites>() { moduleFavorite },
+                Token = ConnectionInfo.Token
+            };
+
+            await AppServiceProxy.AddModuleFavorites(favParams);
+        }
+
+        public async Task RemoveModuleFavorites(List<Folder> folders, ModuleType moduleType)
+        {
+            DataContract.ModuleFavorites moduleFavorite = new DataContract.ModuleFavorites { ModuleType = (DataContract.ModuleType)moduleType };
+
+            foreach (var folder in folders)
+            {
+                moduleFavorite.Folders.Add(folder.Convert());
+            }
+
+            DataContract.RemoveModuleFavoritesParameters favParams = new DataContract.RemoveModuleFavoritesParameters()
+            {
+                ModuleFavoritesList = new List<DataContract.ModuleFavorites>() { moduleFavorite },
+                Token = ConnectionInfo.Token
+            };
+
+            await AppServiceProxy.RemoveModuleFavorites(favParams);
+        }
+
+        public async Task ClearFavorites()
+        {
+            await ClearFavorites(new List<ModuleType> { ModuleType.Calendar, ModuleType.Contacts, ModuleType.Documents });
+        }
+
+        public async Task ClearFavorites(List<ModuleType> modules)
+        {
+            var favorites = await FileSystemStorage.GetFavoriteFoldersAsync();
+
+            foreach (var module in modules)
+            {
+                if (favorites.ContainsKey(module))
+                {
+                    favorites[module] = new List<Folder>();
+                }
+                else
+                {
+                    favorites.Add(module, new List<Folder>());
+                }
+
+                Folder.FavoritesRootForModule(module).SubFolders = favorites[module];
+            }
+
+            await FileSystemStorage.SaveFavoriteFoldersAsync(favorites);
+        }
+
         #region Helper methods
 
         void ProcessFolders(List<Folder> folders, Folder parentFolder)
@@ -293,30 +320,6 @@ namespace Mark5.Mobile.Common.Manager
                 if (folder.HasSubFolders && folder.SubFolders.Count > 0)
                     ProcessFolders(folder.SubFolders, folder);
             }
-        }
-
-        public async Task ClearFavorites()
-        {
-            await ClearFavorites( new List<ModuleType> { ModuleType.Calendar, ModuleType.Contacts, ModuleType.Documents });
-        }
-
-        public async Task ClearFavorites(List<ModuleType> modules)
-        {
-            var favorites = await FileSystemStorage.GetFavoriteFoldersAsync();
-
-            foreach(var module in modules) 
-            {
-                if(favorites.ContainsKey(module)) 
-                {
-                    favorites[module] = new List<Folder>();
-                } else {
-                    favorites.Add(module, new List<Folder>());
-                }
-
-                Folder.FavoritesRootForModule(module).SubFolders = favorites[module];
-            }
-
-            await FileSystemStorage.SaveFavoriteFoldersAsync(favorites);
         }
 
         #endregion

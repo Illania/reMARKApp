@@ -149,9 +149,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (checkBox != null)
             {
                 checkBox.PreferenceClick += async (object sender, Preference.PreferenceClickEventArgs e) => {
-                    if(checkBox.Checked) {
+                    if(checkBox.Checked)
                         await HandleSync();
-                    } 
                 };
             }
 
@@ -159,9 +158,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (serviceVersion == null || serviceVersion.CompareTo(new Version(3, 2, 0)) < 0)
             {
                 var screen = (PreferenceScreen)FindPreference(GetString(Resource.String.pref_sync_favorites));
-                if(screen != null) {
+                if(screen != null)
                     PreferenceScreen.RemovePreference(screen);
-                }
             }
         }
 
@@ -223,11 +221,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override bool OnPreferenceTreeClick(Preference preference)
         {
-
             if (preference.Key == GetString(Resource.String.pref_key_sync_favorites_enabled))
-            {
                 return false;
-            }
 
             if (preference.Key == GetString(Resource.String.pref_key_documents_use_server_timezone))
                 Dialogs.ShowConfirmDialog(Context, Resource.String.dialog_restart_required_title, Resource.String.dialog_restart_required_content);

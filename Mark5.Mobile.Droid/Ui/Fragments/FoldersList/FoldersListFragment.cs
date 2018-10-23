@@ -459,7 +459,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info($"Refreshing favourite folders...");
 
             if(PlatformConfig.Preferences.SyncFavoritesEnabled && CommonConfig.Reachability.IsReachable) {
-                await Managers.FoldersManager.GetModuleFavorites(new List<ModuleType>() { RemoteFolder.Module });
+                try 
+                {
+                    await Managers.FoldersManager.GetModuleFavorites(new List<ModuleType>() { RemoteFolder.Module });
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error("Unable to get favorite folders from server...", ex);
+                }
             }
 
             var favouriteFolders = await Managers.FoldersManager.GetFavoriteFoldersAsync(RemoteFolder.Module);

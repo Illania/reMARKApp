@@ -252,12 +252,15 @@ namespace Mark5.Mobile.Droid.Utilities
 
         #region Folders favorites
 
-        public bool SyncFavoritesEnabled {
-            get {
+        public bool SyncFavoritesEnabled 
+        {
+            get 
+            {
                 return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_sync_favorites_enabled), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_key_sync_favorites_value));
             }
 
-            set {
+            set 
+            {
                 var e = sp.Edit();
                 e.PutBoolean(Application.Context.GetString(Resource.String.pref_key_sync_favorites_enabled), value);
                 e.Commit();
