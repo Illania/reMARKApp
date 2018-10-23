@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -31,7 +31,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
         const int AutoSaveWorkingCopyInterval = 5000; // 5 seconds
 
-        string DefaultTitle = Localization.GetString("new_document");
+        readonly string DefaultTitle = Localization.GetString("new_document");
 
         public bool RestoreWorkingCopy { get; set; }
 
@@ -41,7 +41,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         public DocumentDirection PreviousDocumentDirection { get; set; }
         public int? PreviousDocumentFolderId { get; set; }
         public int? PreviousDocumentId { get; set; }
+        public string PreconfiguredContent { get; set; }
         public Dictionary<DocumentAddressType, string[]> PreconfiguredEmailAddresses { get; set; }
+        public string PreconfiguredSubject { get; set; }
 
         DocumentPreview documentPreview = new DocumentPreview();
         Document document = new Document();
@@ -52,6 +54,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         bool documentLoaded;
         bool templateLoaded;
         string previousDocumentContent;
+        bool refreshing;
 
         UIBarButtonItem cancelButtonItem;
         UIBarButtonItem insertButtonItem;
@@ -271,6 +274,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async void RefreshData()
         {
+            if (refreshing)
+                return;
+
+            refreshing = true;
+
             await LoadDocument();
             await LoadTemplate();
 
@@ -280,6 +288,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             autoSaveWorkingCopyWorker?.Stop();
             autoSaveWorkingCopyWorker = new Worker(SaveWorkingCopy, AutoSaveWorkingCopyInterval);
             autoSaveWorkingCopyWorker.Start();
+
+            refreshing = false;
         }
 
         async Task LoadDocument()
@@ -341,6 +351,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     await subView.InitializeView();
                 }
 
+                document.Guid = Guid.NewGuid();
+
+                if (PreconfiguredSubject != null)
+                    subjectView.Subject = PreconfiguredSubject;
+
                 if (RestoreWorkingCopy)
                 {
                     var files = await Managers.DocumentsManager.GetDocumentWorkingCopyAttachmentsAsync();
@@ -349,6 +364,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                 if (RestoreWorkingCopy)
                     await LoadHtmlString(document.HtmlBody, HtmlProcessingConfiguration.DefaultForEditing);
+                else if (PreconfiguredContent != null)
+                    await LoadPlainText(PreconfiguredContent, PlainTextProcessingConfiguration.DefaultForEditing);
                 else if (previousDocumentPreview != null && PreviousDocumentDirection == DocumentDirection.Draft ||
                          (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption.HasFlag(CopyToNewOption.Content)))
                 {
@@ -361,8 +378,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 }
                 else
                 {
-                   
-
                     if (previousDocumentPreview != null &&
                            (DocumentCreationModeFlag == DocumentCreationModeFlag.Reply && CopyToNewOption == CopyToNewOption.None ||
                             DocumentCreationModeFlag == DocumentCreationModeFlag.ReplyAll && CopyToNewOption == CopyToNewOption.None ||
@@ -390,7 +405,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     {
                         LoadEditorWithPreviousContent(previousDocumentContent);
 
-                    } else {
+                    }
+                    else
+                    {
                         LoadEditor();
                     }
                 }
@@ -613,6 +630,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async void AttachmentsView_Tapped(object sender, AttachmentsView.TappedEventArgs e)
         {
+            if (e.AttachmentDescription.FromTemplate)
+            {
+                await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("template_attachment_title"), Localization.GetString("template_attachment_content"));
+                return;
+            }
+
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("opening_attachment___"));
 
             CommonConfig.UsageAnalytics.LogEvent(new ComposeOpenAttachmentEvent());
@@ -746,7 +769,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     await subView.UpdateDocument();
 
                 document.HtmlBody = await GetContent();
-
                 documentPreview.Direction = DocumentDirection.Outgoing;
 
                 await Managers.DocumentsManager.SaveDocumentWorkingCopyAsync(new DocumentWorkingCopy
@@ -835,14 +857,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             var newContent = await base.GetContent();
             newContent = await CleanContent(newContent);
 
-            var oldContent = previousDocumentContent;
-            if (!string.IsNullOrWhiteSpace(oldContent))
-            {
-                oldContent = await CleanContent(oldContent);
-                var mergedContent = await MergeContent(newContent, oldContent);
-                return mergedContent;
-            }
-
             return newContent;
         }
 
@@ -865,6 +879,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 var editorNode = bodyNode?.SelectSingleNode("//div[@id='editor']");
                 editorNode?.Attributes.FirstOrDefault(attr => attr.Name == "contentEditable")?.Remove();
 
+                var previousContentNode = bodyNode?.SelectSingleNode("//div[@id='previousContent']");
+                previousContentNode?.Attributes.FirstOrDefault(attr => attr.Name == "contentEditable")?.Remove();
+
                 var html = htmlDocument.DocumentNode.OuterHtml;
 
                 html = PreMailer.Net.PreMailer.MoveCssInline(html, true, null, null, true, true).Html;
@@ -874,30 +891,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 html = p.Dom.ProcessToString(RuleSet.GetSafeHtmlRules(), null);
 
                 return html;
-            });
-        }
-
-        Task<string> MergeContent(string newContent, string oldContent)
-        {
-            return Task.Run(() =>
-            {
-                var newHtmlDocument = new HtmlDocument();
-                newHtmlDocument.LoadHtml(newContent);
-                var oldHtmlDocument = new HtmlDocument();
-                oldHtmlDocument.LoadHtml(oldContent);
-
-                var html = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/blank", "html"));
-                var mergedHtmlDocument = new HtmlDocument();
-                mergedHtmlDocument.LoadHtml(html);
-
-                var newNode = mergedHtmlDocument.DocumentNode.SelectSingleNode("//div[@id='new']");
-                newNode.AppendChildren(newHtmlDocument.DocumentNode.SelectSingleNode("//body").ChildNodes);
-                newNode.Attributes.Remove("id");
-                var oldNode = mergedHtmlDocument.DocumentNode.SelectSingleNode("//div[@id='old']");
-                oldNode.AppendChildren(oldHtmlDocument.DocumentNode.SelectSingleNode("//body").ChildNodes);
-                oldNode.Attributes.Remove("id");
-
-                return mergedHtmlDocument.DocumentNode.OuterHtml;
             });
         }
 
@@ -930,6 +923,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 }
 
                 var result = await EvaluateJavaScriptAsync(insertTemplateJs);
+
+                if (template.Attachments.Any())
+                    attachmentsView?.AddAttachmenstFromTemplate(template);
             }
             catch (Exception ex)
             {
@@ -980,7 +976,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     }
 
                     var result = await InsertTemplate(type, template.Id, content);
-                } else {
+                }
+                else
+                {
                     var insertTemplateJs = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/initTemplate", "js"));
                     if (template.ContentType == ContentType.PlainText)
                     {
@@ -995,6 +993,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                     var result = await EvaluateJavaScriptAsync(insertTemplateJs);
                 }
+
+                if (template.Attachments.Any())
+                    attachmentsView?.AddAttachmenstFromTemplate(template);
             }
             catch (Exception ex)
             {

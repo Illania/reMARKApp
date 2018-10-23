@@ -39,6 +39,7 @@
 "cannot_open_attachment_content" = "There is no app installed that can open this file.";
 "cannot_open_attachment_title" = "Cannot open attachment";
 "categories" = "Categories";
+"categories_added"="Caregories Added";
 "cc" = "Cc";
 "chrome" = "Open in Google Chrome";
 "changes_not_saved" = "Changes not saved!";
@@ -77,6 +78,7 @@
 "copying___" = "Copying...";
 "copying_to_own_worktray___" = "Copying to own worktray...";
 "copying_to_worktray___" = "Copying to worktray...";
+"create_report" = "Create report";
 "creating_system_report___" = "Creating system report...";
 "creator" = "Creator";
 "date" = "Date";
@@ -187,7 +189,7 @@
 "login_failed_desc" = "Could not log in to MARK5. Please check your username, password and server address.\n\nYou may also want to verify SSL settings, by tapping Settings in top right corner of the screen.";
 "low" = "Low";
 "mark5_server_reachability" = "MARK5 server: ";
-"mark5_service_reachability" = "MARK5 service: ";
+"mark5_ios_system_report" = "MARK5 iOS System Report";
 "mark_as_read" = "Mark as read";
 "mark_as_read_ml" = "Mark as\nread";
 "mark_as_unread" = "Mark as unread";
@@ -344,9 +346,13 @@
 "search_where" = "Where: ";
 "search_with_attachments" = "With attachments";
 "select_users" = "Select users";
+"select_categories"="Select Categories";
 "send" = "Send";
 "send_text" = "Send message";
 "sending_document___" = "Sending email...";
+"send_with_mark5_title" = "Send with MARK5?";
+"send_feedback_with_mark5_content" = "Do you want to send feedback with MARK5?";
+"send_report_with_mark5_content" = "Do you want to send the generated report with MARK5?";
 "set_priority" = "Set priority";
 "setting_priority___" = "Setting priority...";
 "settings" = "Settings";
@@ -363,6 +369,8 @@
 "tap_select_line" = "Tap to select a mailbox";
 "telex" = "Telex";
 "templates" = "Templates";
+"template_attachment_title" = "Attachment from template";
+"template_attachment_content" = "It is not possible to open attachments from templates";
 "template_null" = "You do not have a default template set.";
 "template_question" = "Which template do you want to use?";
 "template_selection_another" = "Another template";

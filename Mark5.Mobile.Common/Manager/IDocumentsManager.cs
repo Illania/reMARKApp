@@ -61,6 +61,8 @@ namespace Mark5.Mobile.Common.Manager
 
         Task<List<(Guid Guid, DocumentPreview DocumentPreview)>> GetDocumentsToUploadDocumentPreviews();
 
+        Task<Exception> GetFailedDocumentException(Guid guid);
+
         Task<List<(Guid Guid, DocumentPreview DocumentPreview)>> GetFailedDocumentsToUploadDocumentPreviews();
 
         Task<(DocumentPreview DocumentPreview, Document Document)> GetFailedDocumentToUpload(Guid guid);

@@ -63,7 +63,7 @@ namespace Mark5.Mobile.Droid.Service
                 result &= await CheckWithServiceConnection();
             if (result && mode.HasFlag(ReachabilityMode.Service))
                 result &= await CheckWithService();
-
+              
             IsCheckingReachability = false;
 
             if (!testOnly)
@@ -74,21 +74,29 @@ namespace Mark5.Mobile.Droid.Service
                 CommonConfig.Logger.Info($"Reachability checked: {result}");
 
                 ReachabilityRefreshed(this, new ReachabilityRefreshedEventArgs(lastResult != result, result));
+
+                if (cancellationTokenSource != null)
+                {
+                    cancellationTokenSource.Cancel();
+                    cancellationTokenSource = null;
+                }
+
+                if (!result)
+                {
+                    cancellationTokenSource = new CancellationTokenSource();
+                    CheckServiceAvailabilityContinuously(cancellationTokenSource.Token);
+                }
             }
 
-            if (cancellationTokenSource != null)
+            return result;
+        }
+
+        public void OnPause() {
+            if(cancellationTokenSource != null)  
             {
                 cancellationTokenSource.Cancel();
                 cancellationTokenSource = null;
             }
-
-            if (!result)
-            {
-                cancellationTokenSource = new CancellationTokenSource();
-                CheckServiceAvailabilityContinuously(cancellationTokenSource.Token);
-            }
-
-            return result;
         }
 
         public bool CheckNetworkAvailability()

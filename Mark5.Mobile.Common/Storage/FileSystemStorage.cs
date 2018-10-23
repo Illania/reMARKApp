@@ -16,6 +16,7 @@ namespace Mark5.Mobile.Common.Storage
         static class Filenames
         {
             public const string ConnectionInfo = "connectionInfo.json";
+            public const string RetainedConnectionInfo = "retainedConnectionInfo.json";
             public const string InstallationId = "installationId.json";
             public const string SystemSettings = "systemSettings.json";
             public const string SystemUserDepartments = "systemUserDepartments.json";
@@ -31,6 +32,7 @@ namespace Mark5.Mobile.Common.Storage
         static readonly IDictionary<string, SemaphoreSlim> semaphores = new Dictionary<string, SemaphoreSlim>
         {
             [Filenames.ConnectionInfo] = new SemaphoreSlim(1),
+            [Filenames.RetainedConnectionInfo] = new SemaphoreSlim(1),
             [Filenames.InstallationId] = new SemaphoreSlim(1),
             [Filenames.SystemSettings] = new SemaphoreSlim(1),
             [Filenames.SystemUserDepartments] = new SemaphoreSlim(1),
@@ -55,6 +57,18 @@ namespace Mark5.Mobile.Common.Storage
         public static async Task SaveConnectionInfoAsync(ConnectionInfo connectionInfo, CancellationToken ct = default(CancellationToken))
         {
             await SaveAsync(connectionInfo, Filenames.ConnectionInfo, ct);
+        }
+
+        public static async Task RetainConnectionInfoAsync(CancellationToken ct = default(CancellationToken))
+        {
+            var currentInfo = await GetConnectionInfoAsync(ct);
+            if (currentInfo != null)
+                await SaveAsync(currentInfo, Filenames.RetainedConnectionInfo, ct, CommonConfig.RetainedDataFolder);
+        }
+
+        public static async Task<ConnectionInfo> GetRetainedConnectionInfoAsync(CancellationToken ct = default(CancellationToken))
+        {
+            return await GetAsync<ConnectionInfo>(Filenames.RetainedConnectionInfo, ct, CommonConfig.RetainedDataFolder);
         }
 
         #endregion
@@ -242,8 +256,10 @@ namespace Mark5.Mobile.Common.Storage
 
         #region Private methods
 
-        static async Task<T> GetAsync<T>(string filename, CancellationToken ct = default(CancellationToken)) where T : class
+        static async Task<T> GetAsync<T>(string filename, CancellationToken ct = default(CancellationToken), IFolder parentFolder = null) where T : class
         {
+            parentFolder = parentFolder ?? CommonConfig.DataFolder;
+
             try
             {
                 await semaphores[filename].WaitAsync();
@@ -251,10 +267,10 @@ namespace Mark5.Mobile.Common.Storage
                 if (objectCache.ContainsKey(filename))
                     return (T)objectCache[filename];
 
-                var fileExists = await CommonConfig.DataFolder.CheckExistsAsync(filename, ct);
+                var fileExists = await parentFolder.CheckExistsAsync(filename, ct);
                 if (fileExists == ExistenceCheckResult.FileExists)
                 {
-                    var file = await CommonConfig.DataFolder.GetFileAsync(filename, ct);
+                    var file = await parentFolder.GetFileAsync(filename, ct);
                     return await Serializer.DeserializeAsync<T>(await file.ReadAllTextAsync());
                 }
 
@@ -266,16 +282,18 @@ namespace Mark5.Mobile.Common.Storage
             }
         }
 
-        static async Task SaveAsync<T>(T obj, string filename, CancellationToken ct = default(CancellationToken)) where T : class
+        static async Task SaveAsync<T>(T obj, string filename, CancellationToken ct = default(CancellationToken), IFolder parentFolder = null) where T : class
         {
+            parentFolder = parentFolder ?? CommonConfig.DataFolder;
+
             try
             {
                 await semaphores[filename].WaitAsync();
 
-                var fileExists = await CommonConfig.DataFolder.CheckExistsAsync(filename, ct);
+                var fileExists = await parentFolder.CheckExistsAsync(filename, ct);
                 if (fileExists != ExistenceCheckResult.FileExists)
-                    await CommonConfig.DataFolder.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting, ct);
-                var file = await CommonConfig.DataFolder.GetFileAsync(filename, ct);
+                    await parentFolder.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting, ct);
+                var file = await parentFolder.GetFileAsync(filename, ct);
                 await file.WriteAllTextAsync(await Serializer.SerializeAsync(obj));
 
                 objectCache[filename] = obj;
@@ -299,7 +317,15 @@ namespace Mark5.Mobile.Common.Storage
             var documentWorkingCopy = await GetDocumentWorkingCopyAsync();
             var documentWorkingCopyAttachments = await GetDocumentWorkingCopyAttachmentsAsync();
 
-            var folder = await CommonConfig.DocumentsToUploadFolder.CreateFolderAsync(Guid.NewGuid().ToString(), CreationCollisionOption.FailIfExists);
+            var folderName = documentWorkingCopy.Document.Guid.ToString();
+
+            if (await CommonConfig.DocumentsToUploadFolder.CheckExistsAsync(folderName) == ExistenceCheckResult.FolderExists)
+            {
+                CommonConfig.Logger.Error("The document to send is already there!");
+                return;
+            }
+
+            var folder = await CommonConfig.DocumentsToUploadFolder.CreateFolderAsync(folderName, CreationCollisionOption.FailIfExists);
 
             var lockFile = await folder.CreateFileAsync(".lock", CreationCollisionOption.FailIfExists);
 
@@ -404,6 +430,29 @@ namespace Mark5.Mobile.Common.Storage
             var fileContent = await file.ReadAllTextAsync();
 
             return Serializer.Deserialize<DocumentPreview>(fileContent);
+        }
+
+        public static async Task<Exception> GetFailedDocumentException(Guid guid)
+        {
+            var failedFolder = (await CommonConfig.DocumentsToUploadFolder.CreateFolderAsync("failed", CreationCollisionOption.OpenIfExists));
+            if (failedFolder == null)
+                return null;
+
+            var folder = await failedFolder.GetFolderAsync(guid.ToString());
+            if (folder == null)
+                return null;
+
+            var fileExists = await folder.CheckExistsAsync("failedToSendException.json") == ExistenceCheckResult.FileExists;
+            if (!fileExists)
+                return null;
+
+            var file = await folder.GetFileAsync("failedToSendException.json");
+            if (file == null)
+                return null;
+
+            var fileContent = await file.ReadAllTextAsync();
+
+            return Serializer.Deserialize<Exception>(fileContent);
         }
 
         public static async Task<DocumentPreview> GetFailedDocumentToUploadDocumentPreview(Guid guid)
@@ -535,11 +584,14 @@ namespace Mark5.Mobile.Common.Storage
             await folder.DeleteAsync();
         }
 
-        public static async Task MoveDocumentToUploadToFailed(Guid guid)
+        public static async Task MoveDocumentToUploadToFailed(Guid guid, Exception failedToSendException)
         {
             var folder = (await CommonConfig.DocumentsToUploadFolder.GetFoldersAsync()).FirstOrDefault(f => f.Name == guid.ToString());
             if (folder == null)
                 return;
+
+            var failedToSendExFile = await folder.CreateFileAsync("failedToSendException.json", CreationCollisionOption.ReplaceExisting);
+            await failedToSendExFile.WriteAllTextAsync(Serializer.Serialize(failedToSendException));
 
             var failedFolder = await CommonConfig.DocumentsToUploadFolder.CreateFolderAsync("failed", CreationCollisionOption.OpenIfExists);
             if (failedFolder == null)

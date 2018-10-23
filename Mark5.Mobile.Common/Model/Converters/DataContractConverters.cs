@@ -26,7 +26,8 @@ namespace Mark5.Mobile.Common.Model.Converters
             {
                 Id = ad.Id,
                 Name = ad.Name,
-                SizeInBytes = ad.SizeInBytes
+                SizeInBytes = ad.SizeInBytes,
+                FromTemplate = ad.FromTemplate,
             };
         }
 
@@ -231,7 +232,8 @@ namespace Mark5.Mobile.Common.Model.Converters
         {
             var result = new ContactsModuleInfo
             {
-                Permissions = cmi.Permissions?.Convert()
+                Permissions = cmi.Permissions?.Convert(),
+                WorktrayEnabled = cmi.WorktrayEnabled,
             };
             if (cmi.Countries != null)
                 result.Countries.AddRange(cmi.Countries.WhereNotNull().Select(Convert));
@@ -314,7 +316,8 @@ namespace Mark5.Mobile.Common.Model.Converters
                 IsMissingAttachmentWarningEnabled = dmi.IsMissingAttachmentWarningEnabled,
                 MaximumAttachmentSizeBytes = dmi.MaximumAttachmentSizeBytes,
                 OnSendToSystemUser = dmi.OnSendToSystemUser.ConvertEnum<OnSendToSystemUser>(),
-                Permissions = dmi.Permissions?.Convert()
+                Permissions = dmi.Permissions?.Convert(),
+                WorktrayEnabled = dmi.WorktrayEnabled,
             };
             if (dmi.AttachmentKeywords != null)
                 result.AttachmentKeywords.AddRange(dmi.AttachmentKeywords.Where(s => !string.IsNullOrWhiteSpace(s)));
@@ -589,7 +592,8 @@ namespace Mark5.Mobile.Common.Model.Converters
         {
             return new ShortcodesModuleInfo
             {
-                Permissions = smi.Permissions?.Convert()
+                Permissions = smi.Permissions?.Convert(),
+                WorktrayEnabled = smi.WorktrayEnabled,
             };
         }
 
@@ -639,15 +643,20 @@ namespace Mark5.Mobile.Common.Model.Converters
 
         public static Template Convert(this DataContract.Template t)
         {
-            return new Template
+            var result = new Template
             {
                 Id = t.Id,
                 Guid = t.Guid,
                 Subject = t.Subject,
                 Content = t.Content,
                 ContentType = t.ContentType.ConvertEnum<ContentType>(),
-                LineGuid = t.LineGuid
+                LineGuid = t.LineGuid,
             };
+
+            if (t.Attachments != null)
+                result.Attachments.AddRange(t.Attachments.WhereNotNull().Select(Convert));
+
+            return result;
         }
 
         public static TemplatePreview Convert(this DataContract.TemplatePreview tp)
@@ -933,7 +942,8 @@ namespace Mark5.Mobile.Common.Model.Converters
             {
                 Id = ad.Id,
                 Name = ad.Name,
-                SizeInBytes = ad.SizeInBytes
+                SizeInBytes = ad.SizeInBytes,
+                FromTemplate = ad.FromTemplate
             };
         }
 

@@ -169,7 +169,8 @@ namespace Mark5.Mobile.Droid
             ListAdapter.SetSectionData(selectedCategories, Section.Selected);
             ListAdapter.SetSectionData(availableCategories, Section.Available);
 
-            RefreshLayout.Post(() => { 
+            RefreshLayout.Post(() =>
+            {
                 RefreshLayout.Refreshing = false;
                 RefreshLayout.SetEnabled(false);
             });
@@ -178,8 +179,8 @@ namespace Mark5.Mobile.Droid
         void SubscribeToMessages()
         {
             CategoriesEditedToken = CommonConfig.MessengerHub.Subscribe<EntityCategoriesChangedMessage>(
-                HandleCategoriesChanged,(arg) => arg.EntityId == BusinessEntityPreview?.Id 
-                && arg.ObjectType == BusinessEntityPreview?.ObjectType
+                HandleCategoriesChanged, (arg) => arg.EntityId == BusinessEntityPreview?.Id
+                 && arg.ObjectType == BusinessEntityPreview?.ObjectType
             );
         }
 
@@ -191,14 +192,18 @@ namespace Mark5.Mobile.Droid
         public void AskIfShouldSave()
         {
             originalCategories.Sort((c1, c2) => String.Compare(c1.Name, c2.Name, true));
-            if (!selectedCategories.SequenceEqual(originalCategories)) {
-                Dialogs.ShowYesNoDialog(Context, Resource.String.changes_not_saved, Resource.String.changes_not_saved_description, Activity.Finish , null, Resource.String.ok, Resource.String.cancel);
-            } else {
+            if (!selectedCategories.SequenceEqual(originalCategories))
+            {
+                Dialogs.ShowYesNoDialog(Context, Resource.String.changes_not_saved, Resource.String.changes_not_saved_description, Activity.Finish, null, Resource.String.ok, Resource.String.cancel);
+            }
+            else
+            {
                 Activity?.Finish();
             }
         }
 
-        async Task SaveAndFinish() {
+        async Task SaveAndFinish()
+        {
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.updating_categories, Resource.String.please_wait);
             try
             {
@@ -254,7 +259,7 @@ namespace Mark5.Mobile.Droid
             {
                 CloseSearch();
                 var filterItem = menu?.FindItem(Resource.Id.action_filter);
-                if(filterItem != null) 
+                if (filterItem != null)
                 {
                     filterItem.SetVisible(true);
                     filterItem.CollapseActionView();
@@ -262,12 +267,15 @@ namespace Mark5.Mobile.Droid
             }
             else
             {
-                if(section == Section.Available) {
-                    CurrentAdapter.RemoveItem(section,  category );
-                    CurrentAdapter.AppendItem(Section.Selected, category );
-                } else {
-                    CurrentAdapter.RemoveItem(section, category );
-                    CurrentAdapter.AppendItem(Section.Available, category );
+                if (section == Section.Available)
+                {
+                    CurrentAdapter.RemoveItem(section, category);
+                    CurrentAdapter.AppendItem(Section.Selected, category);
+                }
+                else
+                {
+                    CurrentAdapter.RemoveItem(section, category);
+                    CurrentAdapter.AppendItem(Section.Available, category);
                 }
             }
         }
@@ -307,7 +315,8 @@ namespace Mark5.Mobile.Droid
             SearchView.SetOnQueryTextListener(this);
         }
 
-        void CloseSearch() {
+        void CloseSearch()
+        {
             menu?.FindItem(saveBtnId)?.SetVisible(true);
             SearchHandler.RemoveCallbacksAndMessages(null);
             SearchAdapter.Clear();
@@ -385,7 +394,7 @@ namespace Mark5.Mobile.Droid
             {
                 if (holder is CategoryViewHolder)
                 {
-                    var (category,section) = GetItemAtPosition(position);
+                    var (category, section) = GetItemAtPosition(position);
                     var fh = holder as CategoryViewHolder;
                     var viewHolder = holder as CategoryViewHolder;
 
@@ -408,10 +417,10 @@ namespace Mark5.Mobile.Droid
                         switch (section)
                         {
                             case Section.Available:
-                                title = context.GetString(Resource.String.available);
+                                title = context.GetString(Resource.String.select_categories);
                                 break;
                             case Section.Selected:
-                                title = context.GetString(Resource.String.selected);
+                                title = context.GetString(Resource.String.categories_added);
                                 break;
                         }
 
@@ -497,7 +506,9 @@ namespace Mark5.Mobile.Droid
                         ItemClicked(e, position);
                     };
                     return viewHolder;
-                } else {
+                }
+                else
+                {
                     var itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.list_item_section, parent, false);
                     return new SectionViewHolder(itemView);
                 }
@@ -556,7 +567,7 @@ namespace Mark5.Mobile.Droid
             public void AppendItem(Section section, Category category)
             {
                 categoriesInSection[section].Add(category);
-                categoriesInSection[section].Sort((c1,c2) => String.Compare(c1.Name,c2.Name,true));
+                categoriesInSection[section].Sort((c1, c2) => String.Compare(c1.Name, c2.Name, true));
                 var index = categoriesInSection[section].IndexOf(category);
                 var offset = sectionsInView.Count == 1 ? 0 : 1;
                 var count = categoriesInSection[section].Count();
@@ -589,7 +600,7 @@ namespace Mark5.Mobile.Droid
             {
                 if (string.IsNullOrWhiteSpace(newText))
                 {
-                    SearchAdapter.RefreshSearch(availableCategories, newText);  
+                    SearchAdapter.RefreshSearch(availableCategories, newText);
                 }
                 else
                 {
@@ -631,7 +642,7 @@ namespace Mark5.Mobile.Droid
                 searchQuery = searchText;
             }
 
-            public void RemoveItemAtPosition(int position) 
+            public void RemoveItemAtPosition(int position)
             {
                 categoriesInSection[Section.None].RemoveAt(position);
                 NotifyItemRemoved(position);

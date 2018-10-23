@@ -40,6 +40,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         const string PreviousDocumentFolderIdBundleKey = "PreviousDocumentFolderId_def12a0b-0156-4189-9c67-e41ed7c944a5";
         const string PreviousDocumentIdBundleKey = "PreviousDocumentId_b8e521b8-8a8a-42ce-9d67-99b61abdafd2";
         const string PreconfiguredEmailAddressesBundleKey = "PreconfiguredEmailAdresses_d5a9b692-2f14-4865-bf25-d317f0f4abd2";
+        const string PreconfiguredContentBundleKey = "PreconfiguredContent_5ca57487-4b87-483f-a712-94c648c0495c";
+        const string PreconfiguredSubjectBundleKey = "PreconfiguredSubject_f68ab59f-6b38-4b59-ace3-92c5c38626f1";
 
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
         const int AutoSaveWorkingCopyInterval = 5000; // 2.5 seconds
@@ -48,6 +50,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         int? previousDocumentFolderId;
         int? previousDocumentId;
         Dictionary<DocumentAddressType, string[]> preconfiguredEmailAddresses;
+        string preconfiguredContent;
+        string preconfiguredSubject;
 
         bool restoreWorkingCopy;
 
@@ -86,7 +90,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public static (ComposeDocumentFragment fragment, string tag) NewInstance(DocumentCreationModeFlag documentCreationModeFlag, CopyToNewOption? copyToNewOption, bool? restoreWorkingCopy,
                                                                                  DocumentDirection? previousDocumentDirection, int? previousDocumentFolderId, int? previousDocumentId,
-                                                                                 Dictionary<DocumentAddressType, string[]> preconfiguredEmailAddresses)
+                                                                                 Dictionary<DocumentAddressType, string[]> preconfiguredEmailAddresses, string preconfiguredContent,
+                                                                                 string preconfiguredSubject)
         {
             if (copyToNewOption != null && copyToNewOption != CopyToNewOption.None)
                 CommonConfig.UsageAnalytics.LogEvent(new ComposeCopyToNewEvent());
@@ -124,6 +129,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (preconfiguredEmailAddresses != null)
                 args.PutString(PreconfiguredEmailAddressesBundleKey, Serializer.Serialize(preconfiguredEmailAddresses));
 
+            if (preconfiguredContent != null)
+                args.PutString(PreconfiguredContentBundleKey, preconfiguredContent);
+
+            if (preconfiguredSubject != null)
+                args.PutString(PreconfiguredSubjectBundleKey, preconfiguredSubject);
+
             var fragment = new ComposeDocumentFragment();
             fragment.Arguments = args;
 
@@ -156,6 +167,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (Arguments.ContainsKey(PreconfiguredEmailAddressesBundleKey))
                 preconfiguredEmailAddresses = Serializer.Deserialize<Dictionary<DocumentAddressType, string[]>>(Arguments.GetString(PreconfiguredEmailAddressesBundleKey));
+
+            if (Arguments.ContainsKey(PreconfiguredContentBundleKey))
+                preconfiguredContent = Arguments.GetString(PreconfiguredContentBundleKey);
+
+            if (Arguments.ContainsKey(PreconfiguredSubjectBundleKey))
+                preconfiguredSubject = Arguments.GetString(PreconfiguredSubjectBundleKey);
 
             restoreWorkingCopy = restoreWorkingCopy || Restored;
         }
@@ -304,7 +321,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async Task LoadDocument()
         {
-
             if (documentLoaded)
                 return;
 
@@ -351,6 +367,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     documentPreview.Id = previousDocumentId.Value;
                 }
 
+                document.Guid = Guid.NewGuid();
+
                 await ShowDocument();
                 dismissAction();
 
@@ -386,6 +404,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await subView.RefreshView();
             }
+
+            if (preconfiguredSubject != null)
+                subjectView.SetSubject(preconfiguredSubject);
+
+            if (preconfiguredContent != null)
+                await contentView.InsertPlainText(preconfiguredContent);
 
             var files = await Managers.DocumentsManager.GetDocumentWorkingCopyAttachmentsAsync();
             attachmentsView.InitializeFileDescriptions(files.Select(f => new FileDescription(f)).ToArray());
@@ -469,6 +493,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (option == 0) //Open attachment
             {
+                if (e.AttachmentDescription?.FromTemplate == true)
+                {
+                    await Dialogs.ShowConfirmDialogAsync(Context, Resource.String.template_attachment_title, Resource.String.template_attachment_content);
+                    return;
+                }
+
                 CommonConfig.UsageAnalytics.LogEvent(new ComposeOpenAttachmentEvent());
 
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.opening_attachment, Resource.String.please_wait);
@@ -500,7 +530,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 try
                 {
                     if (string.IsNullOrWhiteSpace(path))
-                        throw new Exception("Unable to opent attachment");
+                        throw new Exception("Unable to open attachment");
 
                     var uri = Android.Support.V4.Content.FileProvider.GetUriForFile(Context, Context.PackageName + ".fileprovider", new Java.IO.File(path));
                     var mimeType = MimeTypeMap.GetMimeType(System.IO.Path.GetExtension(path));
@@ -527,8 +557,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     dismissAction();
                 }
             }
-
-            if (option == 1) //Remove attachment
+            else if (option == 1) //Remove attachment
             {
                 CommonConfig.UsageAnalytics.LogEvent(new ComposeRemoveAttachmentEvent());
 
@@ -832,7 +861,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.AddAttachment)
             {
-
                 CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.Local));
                 AddAttachment();
             }
@@ -995,6 +1023,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 subjectView.SetSubject(template.Subject);
 
             lineView.SetLine(template.LineGuid);
+
+            if (template.Attachments.Any())
+                template.Attachments.ForEach(a => attachmentsView.AddAttachment(a));
         }
 
         static void ProcessTemplate(Template template, DocumentPreview documentPreview)

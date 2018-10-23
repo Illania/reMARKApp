@@ -527,6 +527,9 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "SizeInBytes", Order = 0)]
         public long SizeInBytes { get; set; }
+
+        [DataMember(Name = "FromTemplate", Order = 1)]
+        public bool FromTemplate { get; set; }
     }
 
     [DataContract(Name = "Comment", Namespace = "com.nordic-it.appservice.v3")]
@@ -609,6 +612,9 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "Content", Order = 0)]
         public string Content { get; set; }
+
+        [DataMember(Name = "Attachments", Order = 1)]
+        public List<AttachmentDescription> Attachments { get; set; } = new List<AttachmentDescription>();
     }
 
     [DataContract(Name = "DocumentCreationModeFlag", Namespace = "com.nordic-it.appservice.v3")]
@@ -2351,6 +2357,9 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "Permissions", Order = 0)]
         public DocumentsModulePermissions Permissions { get; set; } = new DocumentsModulePermissions();
+
+        [DataMember(Name = "WorktrayEnabled", Order = 1)]
+        public bool? WorktrayEnabled { get; set; } = null;
     }
 
     [DataContract(Name = "ContactsModuleInfo", Namespace = "com.nordic-it.appservice.v3")]
@@ -2364,6 +2373,9 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "Permissions", Order = 0)]
         public Permissions Permissions { get; set; } = new Permissions();
+
+        [DataMember(Name = "WorktrayEnabled", Order = 1)]
+        public bool? WorktrayEnabled { get; set; } = null;
     }
 
     [DataContract(Name = "ShortcodesModuleInfo", Namespace = "com.nordic-it.appservice.v3")]
@@ -2371,6 +2383,9 @@ namespace Mark5.ServiceReference.DataContract
     {
         [DataMember(Name = "Permissions", Order = 0)]
         public Permissions Permissions { get; set; } = new Permissions();
+
+        [DataMember(Name = "WorktrayEnabled", Order = 1)]
+        public bool? WorktrayEnabled { get; set; } = null;
     }
 
     [DataContract(Name = "CalendarModuleInfo", Namespace = "com.nordic-it.appservice.v3")]

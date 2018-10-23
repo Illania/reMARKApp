@@ -29,6 +29,7 @@
     <string name="cannot_edit_comment_title">Cannot edit comment</string>
     <string name="cannot_open_attachment_without_ext">Attachments without extensions cannot be opened</string>
     <string name="categories">Categories</string>
+    <string name="categories_added">Categories added</string>
     <string name="cc">Cc</string>
     <string name="choose_application">Choose an application</string>
     <string name="changes_not_saved">Changes not saved!</string>
@@ -58,6 +59,7 @@
     <string name="copy_to_new_content">Content</string>
     <string name="copy_to_new_attachments">Attachments</string>
     <string name="create_new_document">Create new email</string>
+    <string name="create_report">Create report</string>
     <string name="create_system_report">Create system report</string>
     <string name="creator">Creator:</string>
     <string name="person">Person</string>
@@ -284,6 +286,7 @@
     <string name="phonebook">Phonebook</string>
     <string name="picker_title">Add address from</string>
     <string name="please_wait">Please wait...</string>
+    <string name="please_restart">Please restart MARK5</string>
     <string name="port">Port</string>
     <string name="port_invalid">Port is not valid</string>
     <string name="preparing">Preparing...</string>
@@ -398,6 +401,9 @@
     <string name="select_users">Select users</string>
     <string name="send">Send</string>
     <string name="sending_document">Sending email</string>
+    <string name="send_with_mark5_title">Send with MARK5</string>
+    <string name="send_report_with_mark5_content">Do you want to send the generated report with MARK5?</string>
+    <string name="send_feedback_with_mark5_content">Do you want to send feedback with MARK5?</string>
     <string name="set_priority">Set priority</string>
     <string name="setting_priority">Setting priority...</string>
     <string name="settings">Settings</string>
@@ -415,6 +421,8 @@
     <string name="subscribe_folder">Subscribe</string>
     <string name="subscribing_folders">Subscribing to folders...</string>
     <string name="templates">Templates</string>
+    <string name="template_attachment_title">Attachment from template</string>
+    <string name="template_attachment_content">It is not possible to open attachments from templates</string>
     <string name="template_null">You do not have a default template set</string>
     <string name="template_question">Which template do you want to use?</string>
     <string-array name="template_question_options">

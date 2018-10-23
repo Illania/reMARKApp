@@ -12,6 +12,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         public WaitTableViewCell()
             : base(UITableViewCellStyle.Default, DefaultId)
         {
+            TranslatesAutoresizingMaskIntoConstraints = false;
+
             UserInteractionEnabled = false;
             SelectionStyle = UITableViewCellSelectionStyle.None;
             Accessory = UITableViewCellAccessory.None;
@@ -25,11 +27,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             ContentView.Add(spinner);
             ContentView.AddConstraints(new[]
             {
+                spinner.TopAnchor.ConstraintEqualTo(ContentView.TopAnchor, 12),
+                spinner.BottomAnchor.ConstraintEqualTo(ContentView.BottomAnchor, -12),
                 spinner.CenterXAnchor.ConstraintEqualTo(ContentView.CenterXAnchor),
-                spinner.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
-                spinner.HeightAnchor.ConstraintEqualTo(20f),
-                spinner.WidthAnchor.ConstraintEqualTo(20f),
-                ContentView.HeightAnchor.ConstraintGreaterThanOrEqualTo(44f)
             });
         }
     }

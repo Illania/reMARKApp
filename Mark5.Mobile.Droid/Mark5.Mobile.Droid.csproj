@@ -477,7 +477,6 @@
     <Folder Include="Ui\Views\AddEditViews\AddEditShortcodeViews\" />
     <Folder Include="Utilities\Fingerprint\" />
     <Folder Include="Utilities\CallerId\" />
-    <Folder Include="Assets\changelogs\" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\anim\enter_from_left.xml" />
@@ -810,6 +809,9 @@
     <AndroidResource Include="Resources\drawable-xhdpi\check_mark.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\check_mark.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\check_mark.png" />
+    <AndroidResource Include="Resources\drawable\onboarding_1.xml" />
+    <AndroidResource Include="Resources\drawable\onboarding_2.xml" />
+    <AndroidResource Include="Resources\drawable\onboarding_3.xml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FastScrollRecycler\FastScrollRecycler.csproj">
@@ -842,7 +844,6 @@
     <AndroidAsset Include="Assets\plain.html" />
     <AndroidAsset Include="Assets\replyHeader.html" />
     <AndroidAsset Include="Assets\editorScript.js" />
-    <AndroidAsset Include="Assets\changelogs\changelog_2.7.html" />
     <AndroidAsset Include="Assets\initTemplate.js" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
