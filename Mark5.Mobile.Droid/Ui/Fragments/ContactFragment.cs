@@ -211,7 +211,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (contactPreview == null)
                 return;
 
-            menu.Add(Menu.None, MenuItemActions.CopyToWorktray, MenuItemActions.CopyToWorktray, Resource.String.copy_to_worktray);
+            if (ServerConfig.SystemSettings.ContactsModuleInfo.WorktrayEnabled ?? true)
+                menu.Add(Menu.None, MenuItemActions.CopyToWorktray, MenuItemActions.CopyToWorktray, Resource.String.copy_to_worktray);
+
             menu.Add(Menu.None, MenuItemActions.CopyToFolder, MenuItemActions.CopyToFolder, Resource.String.copy_to_folder);
 
             if (folder?.InternalType == FolderInternalType.FilterView || folder?.InternalType == FolderInternalType.Static || folder?.InternalType == FolderInternalType.Worktray)

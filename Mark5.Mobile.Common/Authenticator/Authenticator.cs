@@ -28,13 +28,13 @@ namespace Mark5.Mobile.Common.Authenticator
                                                       CommonConfig.OnStartTransmission,
                                                       CommonConfig.OnStopTransmission);
             var result = await proxy.AuthenticateAsync(new DataContract.AuthenticateParameters
-                {
-                    Username = username,
-                    Password = password,
-                    DeviceType = deviceType.ConvertEnum<DataContract.DeviceType>(),
-                    FriendlyDeviceName = deviceName,
-                    InstallationId = deviceId
-                },
+            {
+                Username = username,
+                Password = password,
+                DeviceType = deviceType.ConvertEnum<DataContract.DeviceType>(),
+                FriendlyDeviceName = deviceName,
+                InstallationId = deviceId
+            },
                 ct);
 
             var connectionInfo = new ConnectionInfo
@@ -61,5 +61,17 @@ namespace Mark5.Mobile.Common.Authenticator
         {
             await FileSystemStorage.SaveConnectionInfoAsync(connectionInfo, ct);
         }
+
+        public async Task<ConnectionInfo> GetRetainedConnectionInfoAsync(CancellationToken ct = default(CancellationToken))
+        {
+            return await FileSystemStorage.GetRetainedConnectionInfoAsync(ct);
+        }
+
+        public async Task RetainConnectionInfoAsync(CancellationToken ct = default(CancellationToken))
+        {
+            await FileSystemStorage.RetainConnectionInfoAsync(ct);
+            return;
+        }
+
     }
 }

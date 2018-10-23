@@ -14,7 +14,6 @@ using Mark5.Mobile.Droid.Utilities;
 using PCLStorage;
 using TinyMessenger;
 using Xamarin.Android.Net;
-using Mark5.Mobile.Common.Service;
 
 namespace Mark5.Mobile.Droid
 {
@@ -51,12 +50,13 @@ namespace Mark5.Mobile.Droid
                     CommonConfig.AttachmentsFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("..", "cache", "att"), CreationCollisionOption.OpenIfExists);
                     CommonConfig.DocumentsToUploadFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "documents_upload"), CreationCollisionOption.OpenIfExists);
                     CommonConfig.DocumentWorkingCopyFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "document_work"), CreationCollisionOption.OpenIfExists);
+                    CommonConfig.RetainedDataFolder = await mainFolder.CreateFolderAsync("retained", CreationCollisionOption.OpenIfExists);
                     CommonConfig.Logger = new SimpleLogger();
                     CommonConfig.DeviceInfoProvider = new DeviceInfoProvider();
                     CommonConfig.HttpClientHandler = () => new AndroidClientHandler { AutomaticDecompression = Config.AcceptedResponseCompression };
                     CommonConfig.MessengerHub = new TinyMessengerHub();
                     CommonConfig.Phonebook = new Phonebook();
-                CommonConfig.Reachability =  Reachability.Instance;
+                    CommonConfig.Reachability = Reachability.Instance;
                     CommonConfig.ConcurrentQueueType = typeof(PortableConcurrentQueue<>);
                     CommonConfig.Utf8Normalizer = s => s;
                     CommonConfig.UsageAnalytics = new UsageAnalytics(FirebaseAnalytics.GetInstance(this));

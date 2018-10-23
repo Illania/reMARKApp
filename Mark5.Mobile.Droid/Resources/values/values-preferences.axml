@@ -42,6 +42,16 @@
         <item>Delete</item>
         <item>More</item>
     </string-array>
+     <string-array name="pref_email_swipe_actions_entries_without_more">
+        <item>Mark as read/unread</item>
+        <item>Move to folder</item>
+        <item>Copy to worktray</item>
+        <item>Copy to folder</item>
+        <item>Categories</item>
+        <item>Priorities</item>
+        <item>Remove from folder</item>
+        <item>Delete</item>
+    </string-array>
     <string-array name="pref_email_swipe_actions_entryvalues">
         <item>1</item>
         <item>2</item>

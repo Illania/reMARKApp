@@ -2,8 +2,6 @@ using Mark5.Mobile.Common.Model;
 using System.Collections.Generic;
 using Foundation;
 using System.Linq;
-using System;
-using Mark5.Mobile.IOS.Ui.Common;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
@@ -165,7 +163,6 @@ namespace Mark5.Mobile.IOS.Utilities
         }
 
         public bool ShowCreatorOutgoing => ud.BoolForKey(Keys.ShowCreatorOutgoing);
-
 
         public bool UseServerTimezone => ud.BoolForKey(Keys.UseServerTimezoneKey);
 

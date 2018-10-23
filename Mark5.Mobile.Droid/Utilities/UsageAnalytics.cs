@@ -59,7 +59,7 @@ namespace Mark5.Mobile.Droid.Utilities
         {
             try
             {
-                firebaseAnalytics.SetUserProperty(property.ToString().ToLowerInvariant(), value);
+                firebaseAnalytics.SetUserProperty(property.ToString().ToLowerInvariant().SafeSubstring(0, 35), value);
             }
             catch (Exception ex)
             {

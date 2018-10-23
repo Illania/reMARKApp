@@ -608,6 +608,11 @@ namespace Mark5.Mobile.Common.Manager
             return docs;
         }
 
+        public async Task<Exception> GetFailedDocumentException(Guid guid)
+        {
+            return await FileSystemStorage.GetFailedDocumentException(guid);
+        }
+
         public async Task<List<(Guid Guid, DocumentPreview DocumentPreview)>> GetFailedDocumentsToUploadDocumentPreviews()
         {
             var docs = new List<(Guid, DocumentPreview)>();

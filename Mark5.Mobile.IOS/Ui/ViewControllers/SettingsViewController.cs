@@ -7,6 +7,7 @@ using Foundation;
 using InAppSettingsKit;
 using LocalAuthentication;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
@@ -273,20 +274,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 try
                 {
-                    if (!SystemReportCollector.CanMailReport)
-                    {
-                        await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("cannot_mail_report_title"), Localization.GetString("cannot_mail_report_content"));
-                        return;
-                    }
-
                     var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("creating_system_report___"));
 
                     var report = await SystemReportCollector.CreateFullReportAsync();
 
                     dismissAction();
 
-                    var mrc = SystemReportCollector.CreateMailReportController(report);
-                    PresentViewController(mrc, true, null);
+                    var sendWithMark5 = await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("send_with_mark5_title"), Localization.GetString("send_feedback_with_mark5_content"));
+
+                    if (sendWithMark5)
+                    {
+                        var cvc = SystemReportCollector.CreateShareFeedbackComposeDocumentViewController(report);
+                        PresentViewController(new NavigationController(cvc, UIModalPresentationStyle.PageSheet), true, null); 
+                    }
+                    else
+                    {
+                        if (!SystemReportCollector.CanMailReport)
+                        {
+                            await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("cannot_mail_report_title"), Localization.GetString("cannot_mail_report_content"));
+                            return;
+                        }
+                        PresentViewController(SystemReportCollector.CreateMailFeedbackController(report), true, null);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -308,10 +317,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     dismissAction();
 
-                    var src = SystemReportCollector.CreateShareReportController(report);
-                    if (src.PopoverPresentationController != null)
-                        src.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(sender.TableView, sender.TableView.CellAt(sender.SettingsReader.GetIndexPath(specifier.Key)));
-                    PresentViewController(src, true, null);
+                    var sendWithMark5 = await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("send_with_mark5_title"), Localization.GetString("send_report_with_mark5_content"));
+
+                    if (sendWithMark5)
+                    {
+                        var cvc = SystemReportCollector.CreateShareReportComposeDocumentViewController(report);
+                        PresentViewController(new NavigationController(cvc, UIModalPresentationStyle.PageSheet), true, null);
+                    }
+                    else
+                    {
+                        var src = SystemReportCollector.CreateShareReportController(report);
+                        if (src.PopoverPresentationController != null)
+                            src.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(sender.TableView, sender.TableView.CellAt(sender.SettingsReader.GetIndexPath(specifier.Key)));
+                        PresentViewController(src, true, null);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -367,6 +386,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
 
                 PlatformConfig.Preferences.ResetOnLaunch = true;
+
+                await AuthenticatorFactory.Create().RetainConnectionInfoAsync();
 
                 dismissAction();
 

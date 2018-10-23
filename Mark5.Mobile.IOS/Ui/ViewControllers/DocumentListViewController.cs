@@ -388,13 +388,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         EndEditing();
                     }));
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"),
-                UIAlertActionStyle.Default,
-                a =>
+            if (ServerConfig.SystemSettings.DocumentsModuleInfo.WorktrayEnabled ?? true)
+            {
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"),
+                                                   UIAlertActionStyle.Default,
+                                                   a =>
                 {
                     CopyToWorktray(selectedDocuments);
                     EndEditing();
                 }));
+            }
+
             eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"),
                 UIAlertActionStyle.Default,
                 a =>
@@ -594,7 +598,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var point = recognizer.LocationInView(TableView);
             var indexPath = TableView.IndexPathForRowAtPoint(point);
 
-            if (!TableView.CellAt(indexPath)?.UserInteractionEnabled ?? true)
+            if (indexPath == null || (!TableView.CellAt(indexPath)?.UserInteractionEnabled ?? true))
                 return;
 
             TableView.SelectRow(indexPath, true, UITableViewScrollPosition.None);
@@ -607,45 +611,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void ShowMoreActionSheet(NSIndexPath indexPath, DocumentPreview selectedDocument, Folder folder)
         {
             var alertController = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
-            var d = new PopoverPresentationControllerDelegate(TableView, TableView.CellAt(indexPath));
 
-            alertController.AddAction(UIAlertAction.Create(Localization.GetString("categories"),
-                UIAlertActionStyle.Default,
-                a =>
-                {
-                    ShowCategories(selectedDocument);
-                    EndEditing();
-                }));
+            var popoverDelegate = new PopoverPresentationControllerDelegate(TableView, TableView.CellAt(indexPath));
 
-            alertController.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"),
-                UIAlertActionStyle.Default,
-                a =>
-                {
-                    CopyToFolder(selectedDocument);
-                    EndEditing();
-                }));
+            List<EmailSwipeAction> availableSwipeActions = PlatformConfig.Preferences.GetAvailableSwipeActions();
 
-            if (folder.InternalType == FolderInternalType.FilterView || folder.InternalType == FolderInternalType.Static || folder.InternalType == FolderInternalType.Worktray)
-                alertController.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"),
-                    UIAlertActionStyle.Default,
-                    a =>
-                    {
-                        MoveToFolder(selectedDocument);
-                        EndEditing();
-                    }));
-
-            alertController.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"), UIAlertActionStyle.Default, a => ShowPriorityActionSheet(selectedDocument, TableView, TableView.CellAt(indexPath))));
-
-            if (folder.InternalType == FolderInternalType.FilterView || folder.InternalType == FolderInternalType.Static || folder.InternalType == FolderInternalType.Worktray)
-                alertController.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, a => RemoveFromFolder(selectedDocument, d)));
-
-            if (ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || selectedDocument.Direction == DocumentDirection.Draft)
-                alertController.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedDocument, d)));
+            foreach (var swipeAction in availableSwipeActions) {
+                var title = SwipeActionTitle(swipeAction.Action, selectedDocument);
+                var actionAllowed = SwipeActionAllowed(swipeAction.Action, selectedDocument, folder);
+                if(actionAllowed && swipeAction.Action != EmailSwipeAction.SwipeAction.More) {
+                    UIAlertActionStyle actionStyle = swipeAction.Action == EmailSwipeAction.SwipeAction.More ? UIAlertActionStyle.Destructive : UIAlertActionStyle.Default;
+                    alertController.AddAction(UIAlertAction.Create(title, actionStyle, a => OnSwipeActionClick(swipeAction, indexPath, selectedDocument, folder, TableView)));
+                }
+            }
 
             alertController.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
 
             if (alertController.PopoverPresentationController != null)
-                alertController.PopoverPresentationController.Delegate = d;
+                alertController.PopoverPresentationController.Delegate = popoverDelegate;
 
             PresentViewController(alertController, true, null);
         }
@@ -1117,6 +1100,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             switch (action)
             {
+                case EmailSwipeAction.SwipeAction.CopyToWorkTray:
+                    return ServerConfig.SystemSettings.DocumentsModuleInfo.WorktrayEnabled ?? true;
                 case EmailSwipeAction.SwipeAction.MoveToFolder:
                     return folder.InternalType == FolderInternalType.FilterView || folder.InternalType == FolderInternalType.Static || folder.InternalType == FolderInternalType.Worktray;
                 case EmailSwipeAction.SwipeAction.Delete:
@@ -1125,6 +1110,89 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return folder.InternalType == FolderInternalType.FilterView || folder.InternalType == FolderInternalType.Static || folder.InternalType == FolderInternalType.Worktray;
                 default:
                     return true;
+            }
+        }
+
+        void OnSwipeActionClick(EmailSwipeAction swipeAction, NSIndexPath indexPath, DocumentPreview documentPreview, Folder folder, UITableView tableView)
+        {
+            CommonConfig.UsageAnalytics.LogEvent(new SwipeActionUsedEvent());
+
+            var popoverDelegate = new PopoverPresentationControllerDelegate(tableView, tableView.CellAt(indexPath));
+          
+            if (SwipeActionAllowed(swipeAction.Action, documentPreview, folder)) {
+                switch (swipeAction.Action)
+                {
+                    case EmailSwipeAction.SwipeAction.MarkAsRead:
+                        if (documentPreview.IsReadByCurrent)
+                        {
+                            MarkAsUnread(documentPreview);
+                            EndEditing();
+                        }
+                        else
+                        {
+                            MarkAsRead(documentPreview);
+                            EndEditing();
+                        }
+                        break;
+                    case EmailSwipeAction.SwipeAction.CopyToWorkTray:
+                        CopyToWorktray(documentPreview);
+                        EndEditing();
+                        break;
+                    case EmailSwipeAction.SwipeAction.More:
+                        ShowMoreActionSheet(indexPath, documentPreview, folder);
+                        break;
+                    case EmailSwipeAction.SwipeAction.CopyToFolder:
+                        CopyToFolder(documentPreview);
+                        EndEditing();
+                        break;
+                    case EmailSwipeAction.SwipeAction.Categories:
+                        ShowCategories(documentPreview);
+                        EndEditing();
+                        break;
+                    case EmailSwipeAction.SwipeAction.SetPriority:
+                        ShowPriorityActionSheet(documentPreview, tableView, indexPath);
+                        break;
+                    case EmailSwipeAction.SwipeAction.Delete:
+                        Delete(documentPreview, popoverDelegate);
+                        break;
+                    case EmailSwipeAction.SwipeAction.MoveToFolder:
+                        MoveToFolder(documentPreview);
+                        break;
+                    case EmailSwipeAction.SwipeAction.RemoveFromFolder:
+                        RemoveFromFolder(documentPreview, popoverDelegate);
+                        break;
+                    default:
+                        CommonConfig.Logger.Error("Missed case for EmailSwipeAction : " + swipeAction.Action.ToString());
+                        break;
+                }
+            }
+        }
+
+        string SwipeActionTitle(EmailSwipeAction.SwipeAction swipeAction, DocumentPreview documentPreview)
+        {
+            switch (swipeAction)
+            {
+                case EmailSwipeAction.SwipeAction.MarkAsRead:
+                    return documentPreview.IsReadByCurrent ? Localization.GetString("mark_as_unread_ml") : Localization.GetString("mark_as_read_ml");
+                case EmailSwipeAction.SwipeAction.CopyToWorkTray:
+                    return Localization.GetString("copy_to_worktray_ml");
+                case EmailSwipeAction.SwipeAction.More:
+                    return Localization.GetString("more");
+                case EmailSwipeAction.SwipeAction.CopyToFolder:
+                    return Localization.GetString("copy_to_folder");
+                case EmailSwipeAction.SwipeAction.Categories:
+                    return Localization.GetString("categories");
+                case EmailSwipeAction.SwipeAction.SetPriority:
+                    return Localization.GetString("set_priority");
+                case EmailSwipeAction.SwipeAction.Delete:
+                    return Localization.GetString("delete");
+                case EmailSwipeAction.SwipeAction.MoveToFolder:
+                    return Localization.GetString("move_to_folder");
+                case EmailSwipeAction.SwipeAction.RemoveFromFolder:
+                    return Localization.GetString("delete_from_folder");
+                default:
+                    CommonConfig.Logger.Error($"Missing implementation for EmailSwipeAction : {swipeAction.ToString()}");
+                    return "";
             }
         }
 
@@ -1329,18 +1397,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override nint RowsInSection(UITableView tableview, nint section)
             {
-                if (loading || Empty)
-                    return 1;
-
-                return Items.Count;
+                return loading || Empty ? 1 : (nint)Items.Count;
             }
 
             public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
             {
-                if (loading || Empty)
-                    return false;
-
-                return true;
+                return loading || Empty ? false : true;
             }
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
@@ -1464,21 +1526,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var folder = viewControllerWeakReference.Unwrap()?.Folder;
 
-                string title = SwipeActionTitle(leadingAction, documentPreview);
+                string title = viewControllerWeakReference.Unwrap()?.SwipeActionTitle(leadingAction.Action, documentPreview);
 
                 var contextualAction = UIContextualAction.FromContextualActionStyle(UIContextualActionStyle.Normal, title, (someAction, view, success) =>
                 {
-                    OnSwipeActionClick(leadingAction, indexPath, documentPreview, folder, tableView);
+                    viewControllerWeakReference.Unwrap()?.OnSwipeActionClick(leadingAction, indexPath, documentPreview, folder, tableView);
                 });
 
-                if (SwipeActionAllowed(leadingAction.Action, documentPreview, folder))
-                {
-                    contextualAction.BackgroundColor = Theme.LightBrown;
-                }
-                else
-                {
-                    contextualAction.BackgroundColor = Theme.LightGray;
-                }
+                contextualAction.BackgroundColor = SwipeActionAllowed(leadingAction.Action, documentPreview, folder) ? Theme.LightBrown : Theme.LightGray;
 
                 return contextualAction;
             }
@@ -1517,75 +1572,76 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                             {
                                 actionWrapper.Action = UITableViewRowAction.Create(
                                     UITableViewRowActionStyle.Default,
-                                    SwipeActionTitle(swipeAction, documentPreview),
+                                    viewControllerWeakReference.Unwrap()?.SwipeActionTitle(swipeAction.Action, documentPreview),
                                     (a, ip) =>
                                     {
-                                        OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView);
+                                        viewControllerWeakReference.Unwrap()?.OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView);
                                     });
                             }
                             else
                             {
                                 actionWrapper.Action = UITableViewRowAction.Create(
                                     UITableViewRowActionStyle.Default,
-                                    SwipeActionTitle(swipeAction, documentPreview),
+                                    viewControllerWeakReference.Unwrap()?.SwipeActionTitle(swipeAction.Action, documentPreview),
                                     (a, ip) =>
                                     {
-                                        OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView);
+                                        viewControllerWeakReference.Unwrap()?.OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView);
                                     });
                             }
                             break;
                         case EmailSwipeAction.SwipeAction.CopyToWorkTray:
                             actionWrapper.Action = UITableViewRowAction.Create(
                                 UITableViewRowActionStyle.Default,
-                                SwipeActionTitle(swipeAction, documentPreview),
+                                viewControllerWeakReference.Unwrap()?.SwipeActionTitle(swipeAction.Action, documentPreview),
                                 (a, ip) =>
-                                {
-                                    OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView);
-                                });
+                            {
+                                viewControllerWeakReference.Unwrap()?.OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView);
+                            });
+                            actionWrapper.Disabled = !SwipeActionAllowed(swipeAction.Action, documentPreview, folder);
                             break;
                         case EmailSwipeAction.SwipeAction.More:
                             actionWrapper.Action = UITableViewRowAction.Create(
                                 UITableViewRowActionStyle.Default,
-                                SwipeActionTitle(swipeAction, documentPreview),
+                                viewControllerWeakReference.Unwrap()?.SwipeActionTitle(swipeAction.Action, documentPreview),
                                 (a, ip) =>
                                 {
-                                    OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView);
+                                    viewControllerWeakReference.Unwrap()?.OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView);
                                 });
                             break;
                         case EmailSwipeAction.SwipeAction.CopyToFolder:
                             actionWrapper.Action = UITableViewRowAction.Create(
                                 UITableViewRowActionStyle.Default,
-                                SwipeActionTitle(swipeAction, documentPreview),
+                                viewControllerWeakReference.Unwrap()?.SwipeActionTitle(swipeAction.Action, documentPreview),
                                 (a, ip) =>
                                 {
-                                    OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView);
+                                    viewControllerWeakReference.Unwrap()?.OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView);
                                 });
                             break;
                         case EmailSwipeAction.SwipeAction.Categories:
                             actionWrapper.Action = UITableViewRowAction.Create(
                                 UITableViewRowActionStyle.Default,
-                                SwipeActionTitle(swipeAction, documentPreview),
+                                viewControllerWeakReference.Unwrap()?.SwipeActionTitle(swipeAction.Action, documentPreview),
                                 (a, ip) =>
                                 {
-                                    OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView);
+                                    viewControllerWeakReference.Unwrap()?.OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView);
                                 });
                             break;
                         case EmailSwipeAction.SwipeAction.SetPriority:
                             actionWrapper.Action = UITableViewRowAction.Create(
                                 UITableViewRowActionStyle.Default,
-                                SwipeActionTitle(swipeAction, documentPreview),
+                                viewControllerWeakReference.Unwrap()?.SwipeActionTitle(swipeAction.Action, documentPreview),
                                 (a, ip) =>
                                 {
-                                    OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView);
+                                    viewControllerWeakReference.Unwrap()?.OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView);
                                 });
                             break;
                         case EmailSwipeAction.SwipeAction.Delete:
                             actionWrapper.Action = UITableViewRowAction.Create(
                                 UITableViewRowActionStyle.Default,
-                                SwipeActionTitle(swipeAction, documentPreview),
+                                viewControllerWeakReference.Unwrap()?.SwipeActionTitle(swipeAction.Action, documentPreview),
                                 (a, ip) =>
                                 {
-                                    OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView);
+                                    viewControllerWeakReference.Unwrap()?.OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView);
                                 });
 
                             actionWrapper.Disabled = !SwipeActionAllowed(swipeAction.Action, documentPreview, folder);
@@ -1593,18 +1649,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         case EmailSwipeAction.SwipeAction.MoveToFolder:
                             actionWrapper.Action = UITableViewRowAction.Create(
                                 UITableViewRowActionStyle.Default,
-                                SwipeActionTitle(swipeAction, documentPreview),
-                                (a, ip) => { OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView); });
+                                viewControllerWeakReference.Unwrap()?.SwipeActionTitle(swipeAction.Action, documentPreview),
+                                (a, ip) => { viewControllerWeakReference.Unwrap()?.OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView); });
 
                             actionWrapper.Disabled = !SwipeActionAllowed(swipeAction.Action, documentPreview, folder);
                             break;
                         case EmailSwipeAction.SwipeAction.RemoveFromFolder:
                             actionWrapper.Action = UITableViewRowAction.Create(
                                 UITableViewRowActionStyle.Default,
-                                SwipeActionTitle(swipeAction, documentPreview),
+                                viewControllerWeakReference.Unwrap()?.SwipeActionTitle(swipeAction.Action, documentPreview),
                                 (a, ip) =>
                                 {
-                                    OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView);
+                                    viewControllerWeakReference.Unwrap()?.OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView);
                                 });
                             actionWrapper.Disabled = !SwipeActionAllowed(swipeAction.Action, documentPreview, folder);
                             break;
@@ -1642,108 +1698,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 return returnActions;
             }
-
-
-            string SwipeActionTitle(EmailSwipeAction swipeAction, DocumentPreview documentPreview)
-            {
-                switch (swipeAction.Action)
-                {
-                    case EmailSwipeAction.SwipeAction.MarkAsRead:
-                        if (documentPreview.IsReadByCurrent)
-                        {
-                            return Localization.GetString("mark_as_unread_ml");
-                        }
-                        else
-                        {
-                            return Localization.GetString("mark_as_read_ml");
-                        }
-
-                    case EmailSwipeAction.SwipeAction.CopyToWorkTray:
-                        return Localization.GetString("copy_to_worktray_ml");
-                    case EmailSwipeAction.SwipeAction.More:
-                        return Localization.GetString("more");
-                    case EmailSwipeAction.SwipeAction.CopyToFolder:
-                        return Localization.GetString("copy_to_folder");
-                    case EmailSwipeAction.SwipeAction.Categories:
-                        return Localization.GetString("categories");
-                    case EmailSwipeAction.SwipeAction.SetPriority:
-                        return Localization.GetString("set_priority");
-                    case EmailSwipeAction.SwipeAction.Delete:
-                        return Localization.GetString("delete");
-                    case EmailSwipeAction.SwipeAction.MoveToFolder:
-                        return Localization.GetString("move_to_folder");
-                    case EmailSwipeAction.SwipeAction.RemoveFromFolder:
-                        return Localization.GetString("delete_from_folder");
-                    default:
-                        CommonConfig.Logger.Error($"Missing implementation for EmailSwipeAction : {swipeAction.Action.ToString()}");
-                        return "";
-                }
-            }
-
-            void OnSwipeActionClick(EmailSwipeAction swipeAction, NSIndexPath indexPath, DocumentPreview documentPreview, Folder folder, UITableView tableView)
-            {
-                var popoverDelegate = new PopoverPresentationControllerDelegate(tableView, tableView.CellAt(indexPath));
-
-                CommonConfig.UsageAnalytics.LogEvent(new SwipeActionUsedEvent());
-
-                switch (swipeAction.Action)
-                {
-                    case EmailSwipeAction.SwipeAction.MarkAsRead:
-                        if (documentPreview.IsReadByCurrent)
-                        {
-                            viewControllerWeakReference.Unwrap()?.MarkAsUnread(documentPreview);
-                            viewControllerWeakReference.Unwrap()?.EndEditing();
-                        }
-                        else
-                        {
-                            viewControllerWeakReference.Unwrap()?.MarkAsRead(documentPreview);
-                            viewControllerWeakReference.Unwrap()?.EndEditing();
-                        }
-                        break;
-                    case EmailSwipeAction.SwipeAction.CopyToWorkTray:
-                        viewControllerWeakReference.Unwrap()?.CopyToWorktray(documentPreview);
-                        viewControllerWeakReference.Unwrap()?.EndEditing();
-                        break;
-                    case EmailSwipeAction.SwipeAction.More:
-                        viewControllerWeakReference.Unwrap()?.ShowMoreActionSheet(indexPath, documentPreview, folder);
-                        break;
-                    case EmailSwipeAction.SwipeAction.CopyToFolder:
-                        viewControllerWeakReference.Unwrap()?.CopyToFolder(documentPreview);
-                        viewControllerWeakReference.Unwrap()?.EndEditing();
-                        break;
-                    case EmailSwipeAction.SwipeAction.Categories:
-                        viewControllerWeakReference.Unwrap()?.ShowCategories(documentPreview);
-                        viewControllerWeakReference.Unwrap()?.EndEditing();
-                        break;
-                    case EmailSwipeAction.SwipeAction.SetPriority:
-                        viewControllerWeakReference.Unwrap()?.ShowPriorityActionSheet(documentPreview, tableView, indexPath);
-                        break;
-                    case EmailSwipeAction.SwipeAction.Delete:
-                        if (SwipeActionAllowed(EmailSwipeAction.SwipeAction.Delete, documentPreview, folder))
-                        {
-                            viewControllerWeakReference.Unwrap()?.Delete(documentPreview, popoverDelegate);
-                        }
-                        break;
-                    case EmailSwipeAction.SwipeAction.MoveToFolder:
-                        if (SwipeActionAllowed(EmailSwipeAction.SwipeAction.MoveToFolder, documentPreview, folder))
-                        {
-                            viewControllerWeakReference.Unwrap()?.MoveToFolder(documentPreview);
-                        }
-                        break;
-                    case EmailSwipeAction.SwipeAction.RemoveFromFolder:
-                        if (SwipeActionAllowed(EmailSwipeAction.SwipeAction.RemoveFromFolder, documentPreview, folder))
-                        {
-                            viewControllerWeakReference.Unwrap()?.RemoveFromFolder(documentPreview, popoverDelegate);
-                        }
-                        break;
-                    default:
-                        CommonConfig.Logger.Error("Missed case for EmailSwipeAction : " + swipeAction.Action.ToString());
-                        break;
-                }
-            }
-
             #endregion
-
         }
 
         #endregion
