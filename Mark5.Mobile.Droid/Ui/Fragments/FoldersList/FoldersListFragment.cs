@@ -742,7 +742,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             actionMode.Finish();
         }
 
-        async void SetFolderFavouriteStatusForSelection(bool favourite)
+        async void SetFolderFavouriteStatusForSelection(bool isFolderFavorite)
         {
             var selectedFolders = CurrentAdapter.GetSelectedItems().ToList();
             if (!selectedFolders.Any())
@@ -750,24 +750,27 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             CommonConfig.UsageAnalytics.LogEvent(new SetFolderFavoriteEvent(selectedFolders.First().Module, selectedFolders.Count()));
 
-            CommonConfig.Logger.Info($"Setting favourite status of {selectedFolders.Count} folders to {favourite}");
+            CommonConfig.Logger.Info($"Setting favourite status of {selectedFolders.Count} folders to {isFolderFavorite}");
 
             if (PlatformConfig.Preferences.SyncFavoritesEnabled && !CommonConfig.Reachability.IsReachable)
             {
                 Dialogs.ShowErrorDialog(Activity, new Exception(GetString(Resource.String.sync_error_network)));
                 return;
             }
-
+           
             if (PlatformConfig.Preferences.SyncFavoritesEnabled && CommonConfig.Reachability.IsReachable)
             {
-                bool result;
-                if (favourite)
-                {
-                    result = await Managers.FoldersManager.AddModuleFavorites(selectedFolders, selectedFolders.First().Module);
-                } else {
-                    result = await Managers.FoldersManager.RemoveModuleFavorites(selectedFolders, selectedFolders.First().Module);
+                try {
+                    if (isFolderFavorite)
+                    {
+                        await Managers.FoldersManager.AddModuleFavorites(selectedFolders, selectedFolders.First().Module);
+                    } 
+                    else 
+                    {
+                        await Managers.FoldersManager.RemoveModuleFavorites(selectedFolders, selectedFolders.First().Module);
+                    }
                 }
-                if (!result)
+                catch
                 {
                     Dialogs.ShowErrorDialog(Activity, new Exception(GetString(Resource.String.sync_error_general)));
                     return;
@@ -778,7 +781,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             foreach (var folder in selectedFolders)
             {
-                task = favourite ? Managers.FoldersManager.AddFavoriteFolderAsync(folder.Module, folder) : Managers.FoldersManager.RemoveFavoriteFolderAsync(folder.Module, folder);
+                task = isFolderFavorite ? Managers.FoldersManager.AddFavoriteFolderAsync(folder.Module, folder) : Managers.FoldersManager.RemoveFavoriteFolderAsync(folder.Module, folder);
                 await task;
             }
 

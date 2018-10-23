@@ -1012,6 +1012,52 @@ namespace Mark5.Mobile.Common.Model.Converters
             };
         }
 
+        public static ModuleFavorites Convert(this DataContract.GetModuleFavoritesResult moduleFavoritesResult)
+        {
+            ModuleFavorites moduleFavorites = new ModuleFavorites
+            {
+                UpdatedAt = moduleFavoritesResult.UpdatedAt
+            };
+
+            if (moduleFavoritesResult.ModuleFavoritesList != null)
+            {
+                moduleFavorites.ModuleFovoritesList = new List<ModuleFavorite>();
+
+                foreach (var fav in moduleFavoritesResult.ModuleFavoritesList)
+                {
+                    var newFav = new ModuleFavorite() { ModuleType = (ModuleType)fav.ModuleType };
+
+                    foreach (var folder in fav.Folders)
+                    {
+                        newFav.Folders.Add(folder.Convert());
+                    }
+
+                    moduleFavorites.ModuleFovoritesList.Add(newFav);
+                }
+            }
+
+            return moduleFavorites;
+        }
+
+        public static List<DataContract.ModuleFavorites> Convert(this Dictionary<ModuleType, List<Folder>> favoriteDictionary)
+        {
+            List<DataContract.ModuleFavorites> favorites = new List<DataContract.ModuleFavorites>();
+
+            foreach (KeyValuePair<ModuleType, List<Folder>> entry in favoriteDictionary)
+            {
+                var favorite = new DataContract.ModuleFavorites { ModuleType = (DataContract.ModuleType)entry.Key };
+
+                foreach (var folder in entry.Value)
+                {
+                    favorite.Folders.Add(folder.Convert());
+                }
+
+                favorites.Add(favorite);
+            }
+
+            return favorites;
+        }
+
         #endregion
     }
 }

@@ -424,9 +424,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var response = await Managers.FoldersManager.GetModuleFavorites();
                 if (response.ModuleFovoritesList == null)
                 {
-                    var uploadSuccess = await Managers.FoldersManager.SendModuleFavorites();
-                    if (!uploadSuccess)
-                        throw (new Exception(Localization.GetString("sync_error_general")));
+                    await Managers.FoldersManager.UpdateModuleFavorites();
                 }
                 else
                 {
@@ -453,7 +451,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     }
                     else if (selectedOption == 1)
                     {
-                        await Managers.FoldersManager.SendModuleFavorites();
+                        await Managers.FoldersManager.UpdateModuleFavorites();
                     }
                     else
                     {
@@ -468,7 +466,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 CommonConfig.Logger.Error("Error while shynchonizing favorite folders", ex);
                 PlatformConfig.Preferences.SyncFavoriteFoldersEnabled = false;
-                Dialogs.ShowErrorAlert(this, ex);
+                Dialogs.ShowErrorAlert(this, new Exception(Localization.GetString("sync_error_general")));
             }
         }
 

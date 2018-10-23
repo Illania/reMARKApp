@@ -66,7 +66,7 @@ namespace Mark5.Mobile.Common.Manager
 
             foreach (var module in modules)
             {
-                dataContractModules.Add((DataContract.ModuleType)module);
+                dataContractModules.Add(module.ConvertEnum<DataContract.ModuleType>());
             }
 
             var result = await AppServiceProxy.GetModuleFavorites(new DataContract.GetModuleFavoritesParameters()
@@ -75,11 +75,13 @@ namespace Mark5.Mobile.Common.Manager
                 Token = ConnectionInfo.Token
             });
 
-            ModuleFavorites moduleFavorites = new ModuleFavorites(result);
+            ModuleFavorites moduleFavorites = result.Convert();
 
-            foreach(var module in moduleFavorites.ModuleFovoritesList) 
-            {
-                await SetFavoriteFoldersAsync(module.ModuleType, module.Folders);
+            if(moduleFavorites.ModuleFovoritesList != null) {
+                foreach (var module in moduleFavorites.ModuleFovoritesList)
+                {
+                    await SetFavoriteFoldersAsync(module.ModuleType, module.Folders);
+                }
             }
 
             return moduleFavorites;
@@ -153,36 +155,18 @@ namespace Mark5.Mobile.Common.Manager
             await FileSystemStorage.SaveFavoriteFoldersAsync(favoriteFolders);
         }
 
-        public async Task<bool> SendModuleFavorites()
+        public async Task UpdateModuleFavorites()
         {
-            ModuleFavorite favoriteFolders = new ModuleFavorite();
+            Dictionary<ModuleType, List<Folder>> localFavorites = await FileSystemStorage.GetFavoriteFoldersAsync();
 
-            var localFavorites = await FileSystemStorage.GetFavoriteFoldersAsync();
-
-            List<DataContract.ModuleFavorites> favorites = new List<DataContract.ModuleFavorites>();
-
-            foreach (KeyValuePair<ModuleType, List<Folder>> entry in localFavorites)
+            await AppServiceProxy.UpdateModuleFavorites(new DataContract.UpdateModuleFavoritesParameters
             {
-                var favorite = new DataContract.ModuleFavorites { ModuleType = (DataContract.ModuleType)entry.Key };
-
-                foreach (var folder in entry.Value)
-                {
-                    favorite.Folders.Add(folder.Convert());
-                }
-
-                favorites.Add(favorite);
-            }
-
-            var result = await AppServiceProxy.UpdateModuleFavorites(new DataContract.UpdateModuleFavoritesParameters
-            {
-                ModuleFavoritesList = favorites,
+                ModuleFavoritesList = localFavorites.Convert(),
                 Token = ConnectionInfo.Token
             });
-
-            return true;
         }
 
-        public async Task<bool> AddModuleFavorites(List<Folder> folders, ModuleType moduleType)
+        public async Task AddModuleFavorites(List<Folder> folders, ModuleType moduleType)
         {
             DataContract.ModuleFavorites moduleFavorite = new DataContract.ModuleFavorites { ModuleType = (DataContract.ModuleType)moduleType };
 
@@ -197,12 +181,10 @@ namespace Mark5.Mobile.Common.Manager
                 Token = ConnectionInfo.Token
             };
 
-            var result = await AppServiceProxy.AddModuleFavorites(favParams);
-
-            return true;
+            await AppServiceProxy.AddModuleFavorites(favParams);
         }
 
-        public async Task<bool> RemoveModuleFavorites(List<Folder> folders, ModuleType moduleType)
+        public async Task RemoveModuleFavorites(List<Folder> folders, ModuleType moduleType)
         {
             DataContract.ModuleFavorites moduleFavorite = new DataContract.ModuleFavorites { ModuleType = (DataContract.ModuleType)moduleType };
 
@@ -217,9 +199,7 @@ namespace Mark5.Mobile.Common.Manager
                 Token = ConnectionInfo.Token
             };
 
-            var result = await AppServiceProxy.RemoveModuleFavorites(favParams);
-
-            return true;
+            await AppServiceProxy.RemoveModuleFavorites(favParams);
         }
 
         public async Task<bool> IsFolderFavouriteAsync(ModuleType module, Folder folder)

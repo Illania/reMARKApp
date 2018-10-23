@@ -16,28 +16,6 @@ namespace Mark5.Mobile.Common.Model
         {
             ModuleFovoritesList = new List<ModuleFavorite>();
         }
-
-        public ModuleFavorites(GetModuleFavoritesResult moduleFavoritesResult)
-        {
-            UpdatedAt = moduleFavoritesResult.UpdatedAt;
-
-            if (moduleFavoritesResult.ModuleFavoritesList != null) 
-            {
-                ModuleFovoritesList = new List<ModuleFavorite>();
-
-                foreach(var fav in moduleFavoritesResult.ModuleFavoritesList) 
-                {
-                    var newFav = new ModuleFavorite() { ModuleType = (ModuleType)fav.ModuleType };
-
-                    foreach (var folder in fav.Folders)
-                    {
-                        newFav.Folders.Add(folder.Convert());
-                    }
-
-                    ModuleFovoritesList.Add(newFav);
-                }
-            }
-        }
     }
 
     public class ModuleFavorite

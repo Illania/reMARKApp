@@ -158,7 +158,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (serviceVersion == null || serviceVersion.CompareTo(new Version(3, 2, 0)) < 0)
             {
                 var screen = (PreferenceScreen)FindPreference(GetString(Resource.String.pref_sync_favorites));
-                PreferenceScreen.RemovePreference(screen);
+                if(screen != null) {
+                    PreferenceScreen.RemovePreference(screen);
+                }
             }
         }
 
@@ -172,9 +174,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var response = await Managers.FoldersManager.GetModuleFavorites();
                 if (response.ModuleFovoritesList == null)
                 {
-                    var uploadSuccess = await Managers.FoldersManager.SendModuleFavorites();
-                    if (!uploadSuccess)
-                        throw new Exception(GetString(Resource.String.sync_error_general));
+                    await Managers.FoldersManager.UpdateModuleFavorites();
                 }
                 else
                 {
@@ -201,7 +201,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     }
                     else if (selectedOption == 1)
                     {
-                        await Managers.FoldersManager.SendModuleFavorites();
+                        await Managers.FoldersManager.UpdateModuleFavorites();
                     }
                     else
                     {
