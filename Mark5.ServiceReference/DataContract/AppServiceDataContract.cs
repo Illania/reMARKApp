@@ -200,8 +200,6 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "ReverseSortOrder", Order = 0)]
         public bool ReverseSortOrder { get; set; }
-
-
     }
 
     [DataContract(Name = "GetDocumentPreviewsResult", Namespace = "com.nordic-it.appservice.v3")]
