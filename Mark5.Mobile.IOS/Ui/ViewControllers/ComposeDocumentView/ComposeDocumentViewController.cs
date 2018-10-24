@@ -42,7 +42,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         public DocumentDirection PreviousDocumentDirection { get; set; }
         public int? PreviousDocumentFolderId { get; set; }
         public int? PreviousDocumentId { get; set; }
+        public string PreconfiguredContent { get; set; }
         public Dictionary<DocumentAddressType, string[]> PreconfiguredEmailAddresses { get; set; }
+        public string PreconfiguredSubject { get; set; }
 
         DocumentPreview documentPreview = new DocumentPreview();
         Document document = new Document();
@@ -356,6 +358,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                 document.Guid = Guid.NewGuid();
 
+                if (PreconfiguredSubject != null)
+                    subjectView.Subject = PreconfiguredSubject;
+
                 if (RestoreWorkingCopy)
                 {
                     var files = await Managers.DocumentsManager.GetDocumentWorkingCopyAttachmentsAsync();
@@ -364,6 +369,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                 if (RestoreWorkingCopy)
                     await LoadHtmlString(document.HtmlBody, HtmlProcessingConfiguration.DefaultForEditing);
+                else if (PreconfiguredContent != null)
+                    await LoadPlainText(PreconfiguredContent, PlainTextProcessingConfiguration.DefaultForEditing);
                 else if (previousDocumentPreview != null && PreviousDocumentDirection == DocumentDirection.Draft ||
                          (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption.HasFlag(CopyToNewOption.Content)))
                 {
@@ -881,14 +888,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             var newContent = await base.GetContent();
             newContent = await CleanContent(newContent);
 
-            var oldContent = previousDocumentContent;
-            if (!string.IsNullOrWhiteSpace(oldContent))
-            {
-                oldContent = await CleanContent(oldContent);
-                var mergedContent = await MergeContent(newContent, oldContent);
-                return mergedContent;
-            }
-
             return newContent;
         }
 
@@ -911,6 +910,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 var editorNode = bodyNode?.SelectSingleNode("//div[@id='editor']");
                 editorNode?.Attributes.FirstOrDefault(attr => attr.Name == "contentEditable")?.Remove();
 
+                var previousContentNode = bodyNode?.SelectSingleNode("//div[@id='previousContent']");
+                previousContentNode?.Attributes.FirstOrDefault(attr => attr.Name == "contentEditable")?.Remove();
+
                 var html = htmlDocument.DocumentNode.OuterHtml;
 
                 html = PreMailer.Net.PreMailer.MoveCssInline(html, true, null, null, true, true).Html;
@@ -920,30 +922,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 html = p.Dom.ProcessToString(RuleSet.GetSafeHtmlRules(), null);
 
                 return html;
-            });
-        }
-
-        Task<string> MergeContent(string newContent, string oldContent)
-        {
-            return Task.Run(() =>
-            {
-                var newHtmlDocument = new HtmlDocument();
-                newHtmlDocument.LoadHtml(newContent);
-                var oldHtmlDocument = new HtmlDocument();
-                oldHtmlDocument.LoadHtml(oldContent);
-
-                var html = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/blank", "html"));
-                var mergedHtmlDocument = new HtmlDocument();
-                mergedHtmlDocument.LoadHtml(html);
-
-                var newNode = mergedHtmlDocument.DocumentNode.SelectSingleNode("//div[@id='new']");
-                newNode.AppendChildren(newHtmlDocument.DocumentNode.SelectSingleNode("//body").ChildNodes);
-                newNode.Attributes.Remove("id");
-                var oldNode = mergedHtmlDocument.DocumentNode.SelectSingleNode("//div[@id='old']");
-                oldNode.AppendChildren(oldHtmlDocument.DocumentNode.SelectSingleNode("//body").ChildNodes);
-                oldNode.Attributes.Remove("id");
-
-                return mergedHtmlDocument.DocumentNode.OuterHtml;
             });
         }
 

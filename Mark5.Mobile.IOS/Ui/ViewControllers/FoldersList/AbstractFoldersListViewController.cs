@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -515,6 +514,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 if (!favortiesSame)
                     gds.SetFolders(GrouppedDataSource.Section.Favorites, favorites);
+
+                if (EditModeItem != null)
+                    EditModeItem.Enabled = gds.GetItemsInSection(GrouppedDataSource.Section.Favorites) > 0;
 
                 await Task.Delay(150); // Let animations finish
                 RefreshFoldersInfo();

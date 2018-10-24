@@ -22,6 +22,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         const string PreviousDocumentFolderIdIntentKey = "PreviousDocumentFolderId_ac0d9a31-2ddc-497b-8fbe-7fd5a51b2257";
         const string PreviousDocumentIdIntentKey = "PreviousDocumentId_a2066147-a27b-454f-bc5c-03e6b8266697";
         const string PreconfiguredEmailAddressesIntentKey = "PreconfiguredEmailAddresses_25ff402c-268e-477c-890c-80d68e60ab01";
+        const string PreconfiguredContentIntentKey = "PreconfiguredContent_78fe5450-4294-461b-b51a-41222f1b2b14";
+        const string PreconfiguredSubjectIntentKey = "PreconfiguredSubject_831fc95b-a407-4cfe-a1fc-6bd12986286f";
 
         const string cdfFragmentTagKey = "fragmentTagKey";
         string cdfFragmentTag;
@@ -36,7 +38,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                                           DocumentDirection previousDocumentDirection = DocumentDirection.None,
                                           int? previousDocumentFolderId = null,
                                           int? previousDocumentId = null,
-                                          Dictionary<DocumentAddressType, string[]> preconfiguredEmailAddresses = null)
+                                          Dictionary<DocumentAddressType, string[]> preconfiguredEmailAddresses = null,
+                                          string preconfiguredContent = null,
+                                          string preconfiguredSubject = null)
         {
             var intent = new Intent(context, typeof(ComposeDocumentActivity));
 
@@ -55,6 +59,25 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (preconfiguredEmailAddresses != null)
                 intent.PutExtra(PreconfiguredEmailAddressesIntentKey, Serializer.Serialize(preconfiguredEmailAddresses));
+
+            if (preconfiguredContent != null)
+                intent.PutExtra(PreconfiguredContentIntentKey, preconfiguredContent);
+
+            if (preconfiguredSubject != null)
+                intent.PutExtra(PreconfiguredSubjectIntentKey, preconfiguredSubject);
+
+            return intent;
+        }
+
+        public static Intent CreateShareReportIntent(Context context, string preconfiguredSubject, string preconfiguredContent)
+        {
+            var intent = new Intent(context, typeof(ComposeDocumentActivity));
+
+            intent.PutExtra(ComposeDocumentActivity.DocumentCreationModeFlagIntentKey, (int)DocumentCreationModeFlag.New);
+            intent.PutExtra(ComposeDocumentActivity.CopyToNewOptionIntentKey, (int)CopyToNewOption.None);
+            intent.PutExtra(ComposeDocumentActivity.PreconfiguredEmailAddressesIntentKey, Serializer.Serialize(new Dictionary<DocumentAddressType, string[]>() { { DocumentAddressType.To, new string[] { "appfeedback@nordic-it.com" } } }));
+            intent.PutExtra(ComposeDocumentActivity.PreconfiguredSubjectIntentKey, preconfiguredSubject);
+            intent.PutExtra(ComposeDocumentActivity.PreconfiguredContentIntentKey, preconfiguredContent);
 
             return intent;
         }
@@ -82,6 +105,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 int? previousDocumentFolderId = null;
                 int? previousDocumentId = null;
                 Dictionary<DocumentAddressType, string[]> preconfiguredEmailAddresses = null;
+                string preconfiguredContent = null;
+                string preconfiguredSubject = null;
 
                 if (Intent.HasExtra(DocumentCreationModeFlagIntentKey))
                     documentCreationMode = (DocumentCreationModeFlag)Intent.Extras.GetInt(DocumentCreationModeFlagIntentKey);
@@ -104,13 +129,21 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 if (Intent.HasExtra(PreconfiguredEmailAddressesIntentKey))
                     preconfiguredEmailAddresses = Serializer.Deserialize<Dictionary<DocumentAddressType, string[]>>(Intent.Extras.GetString(PreconfiguredEmailAddressesIntentKey));
 
+                if (Intent.HasExtra(PreconfiguredContentIntentKey))
+                    preconfiguredContent = Intent.Extras.GetString(PreconfiguredContentIntentKey);
+
+                if (Intent.HasExtra(PreconfiguredSubjectIntentKey))
+                    preconfiguredSubject = Intent.Extras.GetString(PreconfiguredSubjectIntentKey);
+
                 (cdf, cdfFragmentTag) = ComposeDocumentFragment.NewInstance(documentCreationMode.Value,
                                                                             copyToNewOption,
                                                                             restoreWorkingCopy,
                                                                             previousDocumentDirection,
                                                                             previousDocumentFolderId,
                                                                             previousDocumentId,
-                                                                            preconfiguredEmailAddresses);
+                                                                            preconfiguredEmailAddresses,
+                                                                            preconfiguredContent,
+                                                                            preconfiguredSubject);
 
                 var ft = SupportFragmentManager.BeginTransaction();
                 ft.Replace(Resource.Id.fragment_container, cdf, cdfFragmentTag);

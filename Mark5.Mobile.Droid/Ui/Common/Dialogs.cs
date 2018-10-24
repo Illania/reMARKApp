@@ -14,6 +14,8 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Model.Exceptions;
 using Mark5.Mobile.Droid.Utilities;
 using Mark5.ServiceReference.Exceptions;
+using Mark5.Mobile.Droid.Ui.Activities;
+using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Droid.Ui.Common
 {
@@ -409,16 +411,22 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 {
                     var dismissAction = ShowInfiniteProgressDialog(context, Resource.String.dialog_creating_report, Resource.String.please_wait);
                     Task.Run(() => { return SystemReportCollector.CreateFullReport(); })
-                        .ContinueWith(t =>
-                            {
-                                dismissAction();
+                        .ContinueWith(async t =>
+                        {
+                        dismissAction();
 
-                                if (!t.IsFaulted)
-                                    context.StartActivity(SystemReportCollector.CreateShareReportIntent(context, t.Result));
+                        if (!t.IsFaulted)
+                        {
+                            var sendWithMark5 = await ShowYesNoDialogAsync(context, Resource.String.send_with_mark5_title, Resource.String.send_report_with_mark5_content);
 
-                                tcs.SetResult(true);
-                            },
-                            TaskScheduler.FromCurrentSynchronizationContext());
+                            if (sendWithMark5)
+                                context.StartActivity(SystemReportCollector.CreateShareReportComposeDocumentActivityIntent(context, t.Result));
+                            else
+                                context.StartActivity(SystemReportCollector.CreateShareReportIntent(context, t.Result));
+                        }
+
+                        tcs.SetResult(true);
+                    }, TaskScheduler.FromCurrentSynchronizationContext());
                 }));
             }
             builder.Cancelable(false);
@@ -444,16 +452,22 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 {
                     var dismissAction = ShowInfiniteProgressDialog(context, Resource.String.dialog_creating_report, Resource.String.please_wait);
                     Task.Run(() => { return SystemReportCollector.CreateFullReport(); })
-                        .ContinueWith(t =>
-                            {
-                                dismissAction();
+                        .ContinueWith(async t =>
+                    {
+                        dismissAction();
 
-                                if (!t.IsFaulted)
-                                    context.StartActivity(SystemReportCollector.CreateShareReportIntent(context, t.Result));
+                        if (!t.IsFaulted)
+                        {
+                            var sendWithMark5 = await ShowYesNoDialogAsync(context, Resource.String.send_with_mark5_title, Resource.String.send_report_with_mark5_content);
 
-                                action?.Invoke();
-                            },
-                            TaskScheduler.FromCurrentSynchronizationContext());
+                            if (sendWithMark5)
+                                context.StartActivity(SystemReportCollector.CreateShareReportComposeDocumentActivityIntent(context, t.Result));
+                            else
+                                context.StartActivity(SystemReportCollector.CreateShareReportIntent(context, t.Result));
+
+                            action?.Invoke();
+                        }
+                    }, TaskScheduler.FromCurrentSynchronizationContext());
                 }));
             }
             builder.Cancelable(false);

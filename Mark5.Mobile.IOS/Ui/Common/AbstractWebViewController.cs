@@ -201,10 +201,10 @@ namespace Mark5.Mobile.IOS.Ui.Common
             webViewProgressView?.RemoveFromSuperview();
             loadIndicatorView?.RemoveFromSuperview();
             headerContainerView?.RemoveFromSuperview();
-            webView.Hidden = true; //TODO because we can't use the next line, we have a problem on the ipad, as the view continues to be visible when coming back from folder
-            //webView?.RemoveFromSuperview(); //TODO This has been commented out to avoid eventual crashes 
-            // Github link: https://github.com/xamarin/xamarin-macios/issues/4130#issuecomment-399243880
-
+            webView.Hidden = true;
+            if (Integration.IsIPhone())
+                webView?.RemoveFromSuperview(); //TODO This has been commented out to avoid eventual crashes 
+                                                // Github link: https://github.com/xamarin/xamarin-macios/issues/4130#issuecomment-399243880
             webViewProgressView = null;
             loadIndicatorView = null;
             headerContainerView = null;
@@ -338,28 +338,33 @@ namespace Mark5.Mobile.IOS.Ui.Common
             webView?.LoadHtmlString(html, null);
         }
 
-        protected void LoadEditorWithPreviousContent(string htmlContent)
+        protected void LoadEditorWithPreviousContent(string previousDocumentContent)
         {
-            var html = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/editor", "html"));
+            var html = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/replyEditor", "html"));
 
             var htmlDocument = new HtmlDocument();
             htmlDocument.LoadHtml(html);
             var bodyNode = htmlDocument.DocumentNode.SelectSingleNode("//body");
-            var editorNode = bodyNode?.SelectSingleNode("//div[@id='editor']");
+            var previousContentNode = bodyNode?.SelectSingleNode("//div[@id='previousContent']");
 
-            if (editorNode == null)
-            {
-                CommonConfig.Logger.Error("resources/html/editor.html is missing 'editor' element");
-            }
+            if (previousContentNode == null)
+                CommonConfig.Logger.Error("resources/html/replyEditor.html is missing 'previousContent' element");
             else
             {
-                editorNode.InnerHtml = htmlContent;
+                var previousContentDocument = new HtmlDocument();
+                previousContentDocument.LoadHtml(previousDocumentContent);
+                var prevBody = previousContentDocument.DocumentNode.SelectSingleNode("//body");
+
+                if (prevBody == null)
+                    previousContentNode.InnerHtml = previousDocumentContent;
+                else
+                    previousContentNode.AppendChildren(prevBody.ChildNodes);
+
                 html = htmlDocument.DocumentNode.OuterHtml;
             }
 
             webView?.StopLoading();
             webView?.LoadHtmlString(html, null);
-
         }
 
         protected virtual async Task<string> GetContent()
@@ -380,6 +385,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
             var sanitizedContent = content.Replace("\"", "'");
             var js = $"InsertContent(\'{type}\',{id},\"{sanitizedContent}\")";
             webView.EvaluateJavaScript("javascript: " + js, (result, error) => tcs.SetResult((result, error)));
+            webView.BecomeFirstResponder();
+            webView.EndEditing(true);
             return tcs.Task;
         }
 

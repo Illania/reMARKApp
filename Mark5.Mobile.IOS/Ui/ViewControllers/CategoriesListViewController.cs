@@ -74,7 +74,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 await RefreshDataAsync();
 
             if (Integration.IsRunningAtLeast(11))
-               NavigationItem.SearchController = searchController;
+                NavigationItem.SearchController = searchController;
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -150,9 +150,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             ReloadTable();
         }
 
-        public void ReloadTable() {
+        public void ReloadTable()
+        {
             var availableCategories = new List<Category>();
-           
+
             categories.Sort((x, y) => String.Compare(x.Name, y.Name, true));
 
             ((DataSource)TableView.Source).SetItems(DataSource.Section.Selected, categories);
@@ -168,7 +169,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             TableView.ReloadData();
         }
 
-        protected virtual void MoveCategory(Category category) 
+        protected virtual void MoveCategory(Category category)
         {
             if (category == null)
                 return;
@@ -183,7 +184,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        List<Category> GetAvailableCategories() {
+        List<Category> GetAvailableCategories()
+        {
             ((DataSource)TableView.Source).SetItems(DataSource.Section.Selected, categories);
             return allCategories.Where(x => !categories.Contains(x)).ToList();
         }
@@ -271,7 +273,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         #endregion
 
         #region Navigation bar related
-        async void CancelBtnItem_Clicked(object sender, EventArgs e) {
+        async void CancelBtnItem_Clicked(object sender, EventArgs e)
+        {
             if (BusinessEntityPreview is DocumentPreview documentPreview && categories.SequenceEqual(documentPreview.Categories)
               || BusinessEntityPreview is ContactPreview contactPreview && categories.SequenceEqual(contactPreview.Categories))
             {
@@ -288,7 +291,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        async void SaveBtnItem_Clicked(object sender, EventArgs e) 
+        async void SaveBtnItem_Clicked(object sender, EventArgs e)
         {
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("updating_categories___"));
             CommonConfig.Logger.Info($"Updating categories... [entity={BusinessEntityPreview}]");
@@ -363,25 +366,29 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 cell.Accessory = UITableViewCellAccessory.None;
                 if (indexPath.LongSection == Section.Selected)
                     cell.Accessory = UITableViewCellAccessory.Checkmark;
-                
+
                 return cell;
             }
 
-            int MoveCategory(nint section, Category category) {
+            int MoveCategory(nint section, Category category)
+            {
 
                 if (category == null)
                     return -1;
 
-                if(section == Section.Available) {
-                    if(items[Section.Available].Contains(category)) {
+                if (section == Section.Available)
+                {
+                    if (items[Section.Available].Contains(category))
+                    {
                         items[Section.Available].Remove(category);
                         items[Section.Selected].Add(category);
                         items[Section.Selected].Sort((x, y) => String.Compare(x.Name, y.Name, true));
-                        return items[Section.Selected].IndexOf(category); 
+                        return items[Section.Selected].IndexOf(category);
                     }
                 }
 
-                if(section == Section.Selected) {
+                if (section == Section.Selected)
+                {
                     if (items[Section.Selected].Contains(category))
                     {
                         items[Section.Selected].Remove(category);
@@ -403,10 +410,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 viewControllerWeakReference.Unwrap()?.MoveCategory(category);
 
                 // dont delete the row if it's the last element, because we are displaying "No categories" cell
-                if(items[indexPath.LongSection].Count >= 1) {
+                if (items[indexPath.LongSection].Count >= 1)
+                {
                     tableView.DeleteRows(new NSIndexPath[] { NSIndexPath.Create(indexPath.LongSection, indexPath.Row) }, UITableViewRowAnimation.Middle);
                 }
-               
+
                 if (indexPath.LongSection == Section.Selected)
                 {
                     var availableCategories = viewControllerWeakReference.Unwrap()?.GetAvailableCategories();
@@ -414,7 +422,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     {
                         tableView.ReloadSections(NSIndexSet.FromIndex(Section.Available), UITableViewRowAnimation.Middle);
                     }
-                    else {
+                    else
+                    {
                         tableView.InsertRows(new NSIndexPath[] { NSIndexPath.Create(Section.Available, newIndex) }, UITableViewRowAnimation.Middle);
                     }
                 }
@@ -424,7 +433,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     if (count <= 1)
                     {
                         tableView.ReloadSections(NSIndexSet.FromIndex(Section.Selected), UITableViewRowAnimation.Middle);
-                    } else {
+                    }
+                    else
+                    {
                         tableView.InsertRows(new NSIndexPath[] { NSIndexPath.Create(Section.Selected, newIndex) }, UITableViewRowAnimation.Middle);
                     }
                 }
@@ -472,10 +483,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             public override string TitleForHeader(UITableView tableView, nint section)
             {
                 if (section == Section.Available)
-                    return Localization.GetString("available");
+                    return Localization.GetString("select_categories");
 
                 if (section == Section.Selected)
-                    return Localization.GetString("selected");
+                    return Localization.GetString("categories_added");
 
                 return "";
             }

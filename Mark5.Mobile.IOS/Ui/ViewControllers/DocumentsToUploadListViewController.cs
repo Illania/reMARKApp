@@ -167,6 +167,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Actions
 
+        async void CreateFailedDocumentReport(Guid guid)
+        {
+            var ex = await Managers.DocumentsManager.GetFailedDocumentException(guid);
+            PresentViewController(SystemReportCollector.CreateShareReportController(SystemReportCollector.CreateFailedDocumentReport(ex)), true, null);
+        }
+
         async void ResendFailedDocumentToUpload((Guid Guid, DocumentPreview DocumentPreview) data)
         {
             await Managers.DocumentsManager.RequeueFailedToUpload(data.Guid);
@@ -291,7 +297,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
             {
-                var actions = new UITableViewRowAction[2];
+                var actions = new UITableViewRowAction[3];
                 actions[0] = UITableViewRowAction.Create(UITableViewRowActionStyle.Destructive,
                                                          Localization.GetString("delete"),
                                                          (a, nsip) =>
@@ -306,6 +312,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     viewControllerWeakReference.Unwrap()?.ResendFailedDocumentToUpload(items[indexPath.Section][indexPath.Row]);
                 });
                 actions[1].BackgroundColor = Theme.DarkBlue;
+                actions[2] = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
+                                         Localization.GetString("create_report"),
+                                         (a, nsip) =>
+                {
+                    viewControllerWeakReference.Unwrap()?.CreateFailedDocumentReport(items[indexPath.Section][indexPath.Row].Guid);
+                });
+                actions[2].BackgroundColor = Theme.DarkerBlue;
                 return actions;
             }
 
