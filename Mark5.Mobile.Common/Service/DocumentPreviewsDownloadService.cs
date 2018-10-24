@@ -32,7 +32,7 @@ namespace Mark5.Mobile.Common.Service
                                                     .Where(f => f.Module == ModuleType.Documents)
                                                     .ToList();
 
-                    var foldersToSync = offlineDocumentFolders.Where(offlineDocumentFolder => !folderSkipList.Any(skipFolder => skipFolder == offlineDocumentFolder));
+                    var foldersToSync = offlineDocumentFolders.Where(offlineDocumentFolder => !folderSkipList.Any(skipFolder => skipFolder.FolderGuid == offlineDocumentFolder.FolderGuid));
                    
                     foreach (var folder in foldersToSync)
                     {
@@ -42,12 +42,10 @@ namespace Mark5.Mobile.Common.Service
                         try
                         {
                             await documentManager.GetDocumentPreviewsAsync(folder.FolderId, folder.FolderGuid,-1, -1, SourceType.Remote);
-                            throw new Exception("ss");
                         }
                         catch (Exception ex)
                         {
                             folderSkipList.Add(folder);
-
                             CommonConfig.Logger.Error($"Failed to download document previews from folder [folderId={folder.FolderId}]", ex);
                         }
 
