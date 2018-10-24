@@ -197,7 +197,8 @@
 		<Compile Include="Ui\ViewControllers\TemplatesListViewController.cs" />
 		<Compile Include="Model\FileDescription.cs" />
 		<Compile Include="Ui\Common\DocumentInteractionController.cs" />
-		<Compile Include="Ui\ViewControllers\ResponsibleUsersSelectionController.cs" />
+		<Compile Include="Ui\ViewControllers\UserSelectionViewController.cs" />
+		<Compile Include="Ui\ViewControllers\MultipleUserSelectionViewController.cs" />
 		<Compile Include="Ui\ViewControllers\FoldersList\PickerParentContactFoldersListView.cs" />
 		<Compile Include="Ui\ViewControllers\ContactsList\PickerParentContactListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\AddEditContactViewController.cs" />
