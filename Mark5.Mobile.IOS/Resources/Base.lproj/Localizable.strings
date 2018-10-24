@@ -63,6 +63,7 @@
 "continue" = "Continue";
 "contact_picker_recent_addresses" = "Recent addresses";
 "contact_picker_contacts" = "Contacts";
+"contact_picker_internal_contacts" = "Internal contacts";
 "contact_picker_shortcodes" = "Shortcodes";
 "contact_picker_phonebook" = "Phonebook";
 "continue" = "Continue";
@@ -166,7 +167,7 @@
 "from" = "From";
 "hostname" = "Hostname";
 "im" = "IM";
-"incorrect_email_addresses_added" = "There are email addresses that seem to be incorrect. Do you want to send this email anyway?";
+"incorrect_recipients_added" = "There are recipients that seem to be incorrect. Do you want to send this email anyway?";
 "insert_template" = "Insert template";
 "internal" = "Internal";
 "internet_access" = "Internet access: ";
@@ -217,7 +218,7 @@
 "no_documents_failed" = "No documents failed to send";
 "no_documents_found" = "No emails were found";
 "no_documents_pending" = "No documents are pending send";
-"no_email_addresses_added" = "You need to add at least one email address to send this email.";
+"no_recipients_added" = "You need to add at least one recipient to send this email.";
 "no_email_addresses_content" = "The contact does not have email addresses";
 "no_email_addresses_title" = "No email addresses";
 "no_folders_found" = "No folders found";
@@ -345,6 +346,7 @@
 "search_unread" = "Unread emails";
 "search_where" = "Where: ";
 "search_with_attachments" = "With attachments";
+"select_user" = "Select user";
 "select_users" = "Select users";
 "select_categories"="Select Categories";
 "send" = "Send";

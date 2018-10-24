@@ -275,6 +275,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync();
                 SystemSettingsJobService.ScheduleJob();
 
+                await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
+
                 CommonConfig.Logger.Info($"Starting services...");
                 Services.DocumentsUploadService.Start();
                 Services.DocumentPreviewsDownloadService.Start();
@@ -299,7 +301,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }
             catch (Exception ex)
             {
-
                 if (token.IsCancellationRequested)
                     return;
 
