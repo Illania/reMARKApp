@@ -32,6 +32,8 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public bool UnreadIndicatorMe => sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_documents_read_indicator_me), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_documents_read_indicator_me_default));
 
+        public bool ShowTimeOlderEmails => sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_documents_show_time_older_emails), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_documents_show_time_older_emails_default));
+
         public bool CompactDocumentsList => sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_documents_compact_list), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_documents_compact_list_default));
 
         public bool LargeAttachmentWarning => sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_documents_large_attachment_warn), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_documents_large_attachment_warn_default));
@@ -42,12 +44,13 @@ namespace Mark5.Mobile.Droid.Utilities
 
         #region Caller Identification
 
-        public bool CallerIdentificationEnabled {
+        public bool CallerIdentificationEnabled
+        {
             get => sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_callidentification_identification_enabled), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_callidentification_enabled_default));
-            set 
+            set
             {
                 var e = sp.Edit();
-                e.PutBoolean(Application.Context.GetString(Resource.String.pref_key_callidentification_identification_enabled),value);
+                e.PutBoolean(Application.Context.GetString(Resource.String.pref_key_callidentification_identification_enabled), value);
                 e.Commit();
             }
         }
@@ -214,7 +217,7 @@ namespace Mark5.Mobile.Droid.Utilities
             set
             {
                 var e = sp.Edit();
-                e.PutString(Application.Context.GetString(Resource.String.pref_key_swipe_trailing),$"{(int)value}");
+                e.PutString(Application.Context.GetString(Resource.String.pref_key_swipe_trailing), $"{(int)value}");
                 e.Commit();
             }
         }
