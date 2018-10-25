@@ -308,10 +308,12 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             if (dateLabel == null)
                 return;
 
-            dateLabel.Text = dp.DateReceivedTimestamp.ConvertTimestampMillisecondsToDateTime()
-                .ConvertUtcToUserTime()
-                .ConvertDateTimeToTimestampMilliseconds()
-                .FormatUserTimestampAsCompactShortDateTimeString();
+            var timestampMs = dp.DateReceivedTimestamp.ConvertTimestampMillisecondsToDateTime()
+                                .ConvertUtcToUserTime()
+                                .ConvertDateTimeToTimestampMilliseconds();
+            dateLabel.Text = PlatformConfig.Preferences.ShowTimeForOldEmails ?
+                timestampMs.FormatUserTimestampAsCompactMediumDateTimeString() :
+                timestampMs.FormatUserTimestampAsCompactShortDateTimeString();
         }
 
         void InitializeMiddleLabel(DocumentPreview dp)
