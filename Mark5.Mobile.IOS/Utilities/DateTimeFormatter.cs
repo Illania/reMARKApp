@@ -96,6 +96,21 @@ namespace Mark5.Mobile.IOS.Utilities
         ///     IMPORTANT!!!
         ///     THIS METHOD ACCEPTS TIMESTAMP IN SERVER TIMEZONE
         /// </summary>
+        public static string FormatUserTimestampAsCompactMediumDateTimeString(this long timestamp)
+        {
+            var serverTimezone = timestamp.ConvertTimestampMillisecondsToDateTime();
+            var nowUtc = DateTime.UtcNow.ConvertUtcToUserTime();
+
+            if (serverTimezone.Date == nowUtc.Date)
+                return timestamp.FormatUserTimestampAsTimeString();
+
+            return timestamp.FormatUserTimestampAsTimeAndDateString();
+        }
+
+        /// <summary>
+        ///     IMPORTANT!!!
+        ///     THIS METHOD ACCEPTS TIMESTAMP IN SERVER TIMEZONE
+        /// </summary>
         public static string FormatUserTimestampAsCompactLongDateTimeString(this long timestamp)
         {
             var serverTimezone = timestamp.ConvertTimestampMillisecondsToDateTime();
