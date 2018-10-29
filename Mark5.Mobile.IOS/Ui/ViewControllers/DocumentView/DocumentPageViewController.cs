@@ -179,6 +179,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
 
         public void SetPage(Folder folder, DocumentPreview documentPreview, bool isSearchActive)
         {
+            Folder = folder;
             ChangePage(folder, documentPreview, UIPageViewControllerNavigationDirection.Forward, isSearchActive);
         }
 
