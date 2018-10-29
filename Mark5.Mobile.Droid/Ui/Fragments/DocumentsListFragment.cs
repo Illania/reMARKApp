@@ -1483,15 +1483,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 viewHolder.ItemView.TranslationX = 0;
                 viewHolder.ItemView.TranslationY = 0;
 
-                adapter.SetSwipedState(position, direction);
+                adapter.SetSwipedState(position, 0);
                 adapter.NotifyItemChanged(position);
-
-                viewHolder.ItemView.PostDelayed(() =>
-                    {
-                        adapter.ResetSwipedState();
-                        adapter.NotifyItemChanged(position);
-                    },
-                    400);
             }
 
             async void SwipeActionSelected(Preferences.EmailSwipeAction action, RecyclerView.ViewHolder viewHolder)
@@ -1517,7 +1510,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                             }
                             break;
                         case Preferences.EmailSwipeAction.CopyToWorkTray:
-                            fragment.CopyToOwnWorktray(adapter.Items[viewHolder.AdapterPosition]);
+                            fragment.CopyToWorktrayAction();
                             break;
                         case Preferences.EmailSwipeAction.Categories:
                             fragment.ShowCategories(adapter.Items[viewHolder.AdapterPosition]);
