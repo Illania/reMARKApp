@@ -25,6 +25,9 @@ namespace Mark5.Mobile.IOS.Common.CallId
                 LockDatabase();
                 using (var containerUrl = NSFileManager.DefaultManager.GetContainerUrl(CallIdContainerUtilities.AppGroupId))
                 {
+                    if (containerUrl == null)
+                        return;
+
                     var fullDatabaseUrl = containerUrl.Append(CallIdContainerUtilities.DatabaseName, false);
 
                     using (var connection = new SQLiteConnection(fullDatabaseUrl.Path, true))
@@ -94,6 +97,9 @@ namespace Mark5.Mobile.IOS.Common.CallId
 
                 using (var containerUrl = NSFileManager.DefaultManager.GetContainerUrl(CallIdContainerUtilities.AppGroupId))
                 {
+                    if (containerUrl == null)
+                        return;
+
                     var fullDatabaseUrl = containerUrl.Append(CallIdContainerUtilities.DatabaseName, false);
 
                     using (var connection = new SQLiteConnection(fullDatabaseUrl.Path, true))
@@ -126,6 +132,9 @@ namespace Mark5.Mobile.IOS.Common.CallId
             {
                 using (var containerUrl = NSFileManager.DefaultManager.GetContainerUrl(CallIdContainerUtilities.AppGroupId))
                 {
+                    if (containerUrl == null)
+                        return;
+
                     var fullDatabaseUrl = containerUrl.Append(CallIdContainerUtilities.DatabaseName, false);
 
                     using (var connection = new SQLiteConnection(fullDatabaseUrl.Path, true))
