@@ -31,6 +31,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public DocumentPreview DocumentPreview => documentPreview;
 
+        WeakReference<IDocumentPageViewControllerDelegate> weakRefDocumentPageViewControllerDelegate;
+
+        public IDocumentPageViewControllerDelegate DocumentPageViewControllerDelegate
+        {
+            get
+            {
+                return weakRefDocumentPageViewControllerDelegate.TryGetTarget(out IDocumentPageViewControllerDelegate documentPageViewControllerDelegate) ? documentPageViewControllerDelegate : null;
+            }
+            set
+            {
+                weakRefDocumentPageViewControllerDelegate = new WeakReference<IDocumentPageViewControllerDelegate>(value);
+            }
+        }
+
         Guid failedDocumentToUploadGuid;
         int? folderId;
         Folder folder;
@@ -652,6 +666,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             };
 
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+        }
+
+        protected override void OnWebViewLoaded()
+        {
+            base.OnWebViewLoaded();
+            if (weakRefDocumentPageViewControllerDelegate != null)
+                DocumentPageViewControllerDelegate?.AddViewControllerToCache();
         }
 
         #endregion
