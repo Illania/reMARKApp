@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.DataAccess.Exceptions;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -355,7 +356,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             refreshing = true;
             RefreshControl.ValueChanged -= RefreshControl_ValueChanged;
 
-            if (forceClear && await Managers.FoldersManager.IsSavedFolderOfflineInfo(Folder))
+            var isFolderSavedOffline = await Managers.FoldersManager.IsSavedFolderOfflineInfo(Folder);
+
+            if (forceClear && isFolderSavedOffline)
             {
                 var result = await Dialogs.ShowYesNoCancelAlertAsync(this,
                                                                       Localization.GetString("folder_offline_title"),
@@ -391,7 +394,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             if (forceClear)
                 ((DataSource)TableView.Source)?.Reset();
 
-            var sourceType = await Managers.FoldersManager.IsSavedFolderOfflineInfo(Folder) ? SourceType.Local : SourceType.Auto;
+            var sourceType = isFolderSavedOffline ? SourceType.Local : SourceType.Auto;
 
             Managers.ContactsManager.GetAllContactPreviews(Folder,
                 cps =>
@@ -417,11 +420,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
                     refreshing = false;
 
-                    CommonConfig.Logger.Error($"Could not refresh folders [folder={Folder?.Name}, startRowId={startRowId}, forceClear={forceClear}]", ex);
+                    if (isFolderSavedOffline && ex is DataNotFoundException)
+                    {
+                        ((DataSource)TableView.Source).AppendItems(new List<ContactPreview>());
+                    }
+                    else
+                    {
+                        CommonConfig.Logger.Error($"Could not refresh folders [folder={Folder?.Name}, startRowId={startRowId}, forceClear={forceClear}]", ex);
 
-                    await Dialogs.ShowErrorAlertAsync(this, ex);
+                        await Dialogs.ShowErrorAlertAsync(this, ex);
 
-                    NavigationController?.PopViewController(true);
+                        NavigationController?.PopViewController(true);
+                    }
                 },
                 startRowId,
                 cts.Token,
