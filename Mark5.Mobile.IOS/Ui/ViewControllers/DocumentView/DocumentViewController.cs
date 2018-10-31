@@ -21,6 +21,8 @@ using TinyMessenger;
 using UIKit;
 using WebKit;
 
+using static Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.DocumentPageViewController;
+
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
     public class DocumentViewController : AbstractWebViewController, ISecondaryViewController, IUIViewControllerRestoration
@@ -672,7 +674,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.OnWebViewLoaded();
             if (weakRefDocumentPageViewControllerDelegate != null)
-                DocumentPageViewControllerDelegate?.AddViewControllerToCache();
+                DocumentPageViewControllerDelegate?.AddViewControllerToCache(this);
         }
 
         #endregion

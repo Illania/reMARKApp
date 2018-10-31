@@ -268,9 +268,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
             return vc;
         }
 
-        public void AddViewControllerToCache()
+        public void AddViewControllerToCache(DocumentViewController vc)
         {
-            DocumentViewController vc = (DocumentViewController)ViewControllers.FirstOrDefault();
             vc.DisableRecyclingOnDisappear();
             viewControllerCache.Add(vc);
             if (viewControllerCache.Count > CacheCapacity)
@@ -278,7 +277,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
                 viewControllerCache[0].RecycleIfNeeded();
                 viewControllerCache.RemoveAt(0);
             }
-
         }
 
         void UpdateToolBar(DocumentViewController vc)
@@ -398,7 +396,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
             }
         }
         #endregion
+
+        public interface IDocumentPageViewControllerDelegate
+        {
+            void AddViewControllerToCache(DocumentViewController documentViewController);
+        }
     }
-
-
 }
