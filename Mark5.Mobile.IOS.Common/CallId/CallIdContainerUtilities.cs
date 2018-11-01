@@ -28,6 +28,9 @@ namespace Mark5.Mobile.IOS.Common.CallId
 
                     using (var containerUrl = NSFileManager.DefaultManager.GetContainerUrl(AppGroupId))
                     {
+                        if (containerUrl == null)
+                            return;
+
                         var fullDatabaseUrl = containerUrl.Append(DatabaseName, false);
 
                         using (var connection = new SQLiteConnection(fullDatabaseUrl.Path, true))
