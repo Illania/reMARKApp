@@ -9,6 +9,7 @@ using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
@@ -20,8 +21,6 @@ using Mark5.Mobile.IOS.Utilities;
 using TinyMessenger;
 using UIKit;
 using WebKit;
-
-using static Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.DocumentPageViewController;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
@@ -37,14 +36,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public IDocumentPageViewControllerDelegate DocumentPageViewControllerDelegate
         {
-            get
-            {
-                return weakRefDocumentPageViewControllerDelegate.TryGetTarget(out IDocumentPageViewControllerDelegate documentPageViewControllerDelegate) ? documentPageViewControllerDelegate : null;
-            }
-            set
-            {
-                weakRefDocumentPageViewControllerDelegate = new WeakReference<IDocumentPageViewControllerDelegate>(value);
-            }
+            get => weakRefDocumentPageViewControllerDelegate?.Unwrap();
+            set => weakRefDocumentPageViewControllerDelegate = value.Wrap();
         }
 
         Guid failedDocumentToUploadGuid;
@@ -108,6 +101,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (NavigationController != null && !(ParentViewController is DocumentPageViewController))
                 NavigationController.ToolbarHidden = false;
+
+            ResetOffset();
         }
 
         public override void ViewDidAppear(bool animated)
@@ -673,8 +668,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         protected override void OnWebViewLoaded()
         {
             base.OnWebViewLoaded();
-            if (weakRefDocumentPageViewControllerDelegate != null)
-                DocumentPageViewControllerDelegate?.AddViewControllerToCache(this);
+            DocumentPageViewControllerDelegate?.AddViewControllerToCache(this);
         }
 
         #endregion

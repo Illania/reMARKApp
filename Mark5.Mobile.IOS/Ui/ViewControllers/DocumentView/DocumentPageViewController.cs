@@ -236,7 +236,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
         {
             CommonConfig.UsageAnalytics.LogEvent(new DocumentQuickSwitchEvent());
             var vc = GetDocumentViewController(Folder, documentPreview);
-           
+
             UpdateNavigationBar(documentPreview, isSearchActive);
             return vc;
         }
@@ -335,7 +335,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
         #endregion
 
         #region Delegate
-        protected class DocumentPageDelegate : UIPageViewControllerDelegate 
+        protected class DocumentPageDelegate : UIPageViewControllerDelegate
         {
             [Export("pageViewController:didFinishAnimating:previousViewControllers:transitionCompleted:")]
             public override void DidFinishAnimating(UIPageViewController pageViewController, bool finished, UIViewController[] previousViewControllers, bool completed)
@@ -344,9 +344,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
                 var documentPreview = vc.DocumentPreview;
                 var pageVC = (DocumentPageViewController)pageViewController;
                 var index = pageVC.DocumentPreviews.FindIndex(dp => dp.Id == documentPreview.Id);
-                if (index < 0 || index >= pageVC.DocumentPreviews.Count - 1)
+                if (index < 0 || index > pageVC.DocumentPreviews.Count - 1)
                     return;
-                var nextDocumentPreview = pageVC.DocumentPreviews[index + 1];
                 CommonConfig.MessengerHub.Publish(new GoToDocumentMessage(this, documentPreview.Id));
             }
         }
@@ -397,9 +396,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
         }
         #endregion
 
-        public interface IDocumentPageViewControllerDelegate
-        {
-            void AddViewControllerToCache(DocumentViewController documentViewController);
-        }
+    }
+
+    public interface IDocumentPageViewControllerDelegate
+    {
+        void AddViewControllerToCache(DocumentViewController documentViewController);
     }
 }
