@@ -101,9 +101,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (NavigationController != null && !(ParentViewController is DocumentPageViewController))
                 NavigationController.ToolbarHidden = false;
-
-            if (!refreshDataOnAppear)
-                ResetOffset();
         }
 
         public override void ViewDidAppear(bool animated)
