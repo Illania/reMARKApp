@@ -534,7 +534,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.CopyToWorktray)
             {
-                CopyToWorktrayAction();
+                CopyToWorktrayAction(CurrentAdapter.SelectedItems);
                 return true;
             }
 
@@ -678,16 +678,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        async void CopyToWorktrayAction()
+        async void CopyToWorktrayAction(List<DocumentPreview> documentPreviews)
         {
             var option = await Dialogs.ShowListDialog(Context, Resource.String.copy_to_worktray, Resource.Array.copy_to_worktray_options, true);
 
             if (option == 0)
-                await CopyToOwnWorktray(CurrentAdapter.SelectedItems);
+                await CopyToOwnWorktray(documentPreviews);
 
             if (option == 1)
             {
-                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Context, CurrentAdapter.SelectedItems.Cast<IBusinessEntity>().ToList()));
+                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Context, documentPreviews.Cast<IBusinessEntity>().ToList()));
             }
         }
 
@@ -1510,7 +1510,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                             }
                             break;
                         case Preferences.EmailSwipeAction.CopyToWorkTray:
-                            fragment.CopyToWorktrayAction();
+                            fragment.CopyToWorktrayAction(new List<DocumentPreview>() { adapter.Items[viewHolder.AdapterPosition] });
                             break;
                         case Preferences.EmailSwipeAction.Categories:
                             fragment.ShowCategories(adapter.Items[viewHolder.AdapterPosition]);
