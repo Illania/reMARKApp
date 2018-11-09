@@ -148,14 +148,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var selectedDateComponents = NSCalendar.CurrentCalendar.Components(NSCalendarUnit.Day | NSCalendarUnit.Month | NSCalendarUnit.Year
                                                                    | NSCalendarUnit.Hour | NSCalendarUnit.Minute, fromDatePicker.Date);
             var fromDate = new DateTime((int)selectedDateComponents.Year, (int)selectedDateComponents.Month, (int)selectedDateComponents.Day, (int)selectedDateComponents.Hour
-                                        , (int)selectedDateComponents.Minute, 0, DateTimeKind.Utc);
+                                        , (int)selectedDateComponents.Minute, 0, DateTimeKind.Local);
             selectedFromDateTime = fromDate.ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
 
 
             var selectedDateComponents2 = NSCalendar.CurrentCalendar.Components(NSCalendarUnit.Day | NSCalendarUnit.Month | NSCalendarUnit.Year
                                                                    | NSCalendarUnit.Hour | NSCalendarUnit.Minute, toDatePicker.Date);
             var toDate = new DateTime((int)selectedDateComponents2.Year, (int)selectedDateComponents2.Month, (int)selectedDateComponents2.Day, (int)selectedDateComponents2.Hour
-                                        , (int)selectedDateComponents2.Minute, 0, DateTimeKind.Utc);
+                                      , (int)selectedDateComponents2.Minute, 0, DateTimeKind.Local);
             selectedToDateTime = toDate.ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
 
             try
@@ -216,6 +216,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     internalStackView.AddArrangedSubview(textView);
                 }
             }
+
+            //TODO all day Appointments have the same FROM and TO timestamp (and one needs to check the AllDay boolean)
 
             if (tasks != null)
             {
@@ -282,7 +284,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override string GetTitle(UIPickerView pickerView, nint row, nint component)
             {
-                return calendars[(int)row].Name;
+                var calendar = calendars[(int)row];
+
+                return $"{calendar.Name} - {(calendar.Shared ? "SHARED" : "PRIVATE")}";
             }
 
             public override void Selected(UIPickerView pickerView, nint row, nint component)
