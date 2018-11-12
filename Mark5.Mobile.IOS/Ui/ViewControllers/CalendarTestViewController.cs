@@ -128,7 +128,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 TranslatesAutoresizingMaskIntoConstraints = false,
             };
 
-            stackView.AddArrangedSubview(calendarPicker);
+            //stackView.AddArrangedSubview(calendarPicker);
             stackView.AddArrangedSubview(fromDatePicker);
             stackView.AddArrangedSubview(toDatePicker);
             stackView.AddArrangedSubview(switchStackView);
@@ -177,7 +177,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        const int textSize = 16;
+        const int textSize = 15;
 
         void AddAppointments(List<CalendarAppointment> appointments = null, List<CalendarTask> tasks = null)
         {
@@ -208,7 +208,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     .ConvertDateTimeToTimestampMilliseconds()
                     .FormatUserTimestampAsTimeAndDateString();
 
-                    var text = $"APPOINTMENT: {appointment.Subject} {fromDate} {toDate}";
+                    var text = $"APT: {appointment.Subject}: {fromDate} - {toDate}";
                     textView.Font = UIFont.SystemFontOfSize(textSize);
 
                     textView.Text = text;
@@ -241,7 +241,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     .ConvertDateTimeToTimestampMilliseconds()
                     .FormatUserTimestampAsCompactShortDateTimeString();
 
-                    var text = $"TASK: {task.Subject} {fromDate} {toDate}";
+                    var text = $"TSK: {task.Subject} {fromDate} {toDate}";
                     textView.Font = UIFont.SystemFontOfSize(textSize);
 
                     textView.Text = text;
@@ -269,7 +269,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         class PickerSource : UIPickerViewModel
         {
-            List<Calendar> calendars = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars;
+            readonly List<Calendar> calendars = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars;
             public event EventHandler<Calendar> ValueChanged;
 
             public override nint GetComponentCount(UIPickerView pickerView)
