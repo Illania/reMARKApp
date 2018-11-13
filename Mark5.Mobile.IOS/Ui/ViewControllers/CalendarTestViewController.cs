@@ -198,19 +198,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     };
 
-                    var fromDate = appointment.StartDateTimestamp.ConvertTimestampMillisecondsToDateTime()
-                    .ConvertUtcToUserTime()
-                    .ConvertDateTimeToTimestampMilliseconds()
-                    .FormatUserTimestampAsTimeAndDateString();
+                    var text = $"APT: {appointment.Subject}";
 
-                    var toDate = appointment.EndDateTimestamp.ConvertTimestampMillisecondsToDateTime()
-                    .ConvertUtcToUserTime()
-                    .ConvertDateTimeToTimestampMilliseconds()
-                    .FormatUserTimestampAsTimeAndDateString();
+                    foreach (var occurrence in appointment.Occurrences)
+                    {
+                        var fromDate = occurrence.StartDateTimestamp.ConvertTimestampMillisecondsToDateTime()
+                        .ConvertUtcToUserTime()
+                        .ConvertDateTimeToTimestampMilliseconds()
+                        .FormatUserTimestampAsTimeAndDateString();
 
-                    var text = $"APT: {appointment.Subject}: {fromDate} - {toDate}";
+                        var toDate = occurrence.EndDateTimestamp.ConvertTimestampMillisecondsToDateTime()
+                        .ConvertUtcToUserTime()
+                        .ConvertDateTimeToTimestampMilliseconds()
+                        .FormatUserTimestampAsTimeAndDateString();
+
+                        text += $"\n{occurrence.RecurrenceIndex}: {fromDate} - {toDate}";
+                    }
+
                     textView.Font = UIFont.SystemFontOfSize(textSize);
-
                     textView.Text = text;
 
                     internalStackView.AddArrangedSubview(textView);

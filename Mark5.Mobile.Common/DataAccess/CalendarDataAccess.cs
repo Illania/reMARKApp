@@ -64,23 +64,24 @@ namespace Mark5.Mobile.Common.DataAccess
             {
                 List<CalendarAppointment> appointments = null;
 
-                await calendarDatabase.RunInConnectionAsync(c =>
-                {
-                    var query = $"select * " + $"from {nameof(CalendarAppointment)}, {nameof(FolderCalendarAppointmentLink)} " + $"where {nameof(FolderCalendarAppointmentLink.FolderId)} = {folder.Id} " + $"     and {nameof(CalendarAppointment)}.{nameof(CalendarAppointment.Id)} = {nameof(FolderCalendarAppointmentLink)}.{nameof(FolderCalendarAppointmentLink.CalendarAppointmentId)} ";
+                //TODO
+                //await calendarDatabase.RunInConnectionAsync(c =>
+                //{
+                //    var query = $"select * " + $"from {nameof(CalendarAppointment)}, {nameof(FolderCalendarAppointmentLink)} " + $"where {nameof(FolderCalendarAppointmentLink.FolderId)} = {folder.Id} " + $"     and {nameof(CalendarAppointment)}.{nameof(CalendarAppointment.Id)} = {nameof(FolderCalendarAppointmentLink)}.{nameof(FolderCalendarAppointmentLink.CalendarAppointmentId)} ";
 
-                    if (startDateTimestamp >= 0)
-                        query += $"    and {nameof(CalendarAppointment)}.{nameof(CalendarAppointment.StartDateTimestamp)} >= {startDateTimestamp} ";
-                    if (endDateTimestamp >= 0)
-                        query += $"    and {nameof(CalendarAppointment)}.{nameof(CalendarAppointment.EndDateTimestamp)} <= {endDateTimestamp} ";
-                    query += $"order by {nameof(CalendarAppointment.StartDateTimestamp)} desc ";
+                //    if (startDateTimestamp >= 0)
+                //        query += $"    and {nameof(CalendarAppointment)}.{nameof(CalendarAppointment.StartDateTimestamp)} >= {startDateTimestamp} ";
+                //    if (endDateTimestamp >= 0)
+                //        query += $"    and {nameof(CalendarAppointment)}.{nameof(CalendarAppointment.EndDateTimestamp)} <= {endDateTimestamp} ";
+                //    query += $"order by {nameof(CalendarAppointment.StartDateTimestamp)} desc ";
 
-                    var result = c.Query<CalendarAppointment>(query);
+                //    var result = c.Query<CalendarAppointment>(query);
 
-                    if (result == null || result.Count < 1)
-                        throw new DataNotFoundException("Calendar appointments could not be found.");
+                //    if (result == null || result.Count < 1)
+                //        throw new DataNotFoundException("Calendar appointments could not be found.");
 
-                    appointments = result;
-                });
+                //    appointments = result;
+                //});
 
                 return appointments;
             }

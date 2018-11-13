@@ -1190,11 +1190,8 @@ namespace Mark5.ServiceReference.DataContract
         [DataMember(Name = "Location", Order = 0)]
         public string Location { get; set; }
 
-        [DataMember(Name = "StartDate", Order = 0)]
-        public DateTime StartDate { get; set; }
-
-        [DataMember(Name = "EndDate", Order = 0)]
-        public DateTime EndDate { get; set; }
+        [DataMember(Name = "Occurrences", Order = 0)]
+        public List<CalendarAppointmentOccurrence> Occurrences { get; set; } = new List<CalendarAppointmentOccurrence>();
 
         [DataMember(Name = "AllDay", Order = 0)]
         public bool AllDay { get; set; }
@@ -1220,14 +1217,33 @@ namespace Mark5.ServiceReference.DataContract
         [DataMember(Name = "CalendarId", Order = 0)]
         public int CalendarId { get; set; }
 
-        [DataMember(Name = "ReminderDate", Order = 0)]
-        public DateTime ReminderDate { get; set; }
+        [DataMember(Name = "ReminderAlertTime", Order = 0)]
+        public DateTime ReminderAlertTime { get; set; }
 
-        [DataMember(Name = "SnoozeDelay", Order = 0)]
-        public long SnoozeDelay { get; set; } = -1;
+        [DataMember(Name = "ReminderTimeBefore", Order = 0)]
+        public long ReminderTimeBefore { get; set; } = -1;
 
         [DataMember(Name = "Participants", Order = 0)]
         public List<Participant> Participants { get; set; } = new List<Participant>();
+
+        [DataMember(Name = "RecurrenceIndex", Order = 0)]
+        public int RecurrenceIndex { get; set; }
+
+        [DataMember(Name = "RecurrenceInfo", Order = 0)]
+        public RecurrenceInfo RecurrenceInfo { get; set; }
+    }
+
+    [DataContract(Name = "CalendarAppointmentOccurrence", Namespace = "com.nordic-it.appservice.v3")]
+    public class CalendarAppointmentOccurrence
+    {
+        [DataMember(Name = "StartDate", Order = 0)]
+        public DateTime StartDate { get; set; }
+
+        [DataMember(Name = "EndDate", Order = 0)]
+        public DateTime EndDate { get; set; }
+
+        [DataMember(Name = "RecurrenceIndex", Order = 0)]
+        public int RecurrenceIndex { get; set; } = -1;
     }
 
     [DataContract(Name = "CalendarTask", Namespace = "com.nordic-it.appservice.v3")]
@@ -1269,11 +1285,11 @@ namespace Mark5.ServiceReference.DataContract
         [DataMember(Name = "CalendarId", Order = 0)]
         public int CalendarId { get; set; }
 
-        [DataMember(Name = "ReminderDate", Order = 0)]
-        public DateTime ReminderDate { get; set; }
+        [DataMember(Name = "ReminderAlertTime", Order = 0)]
+        public DateTime ReminderAlertTime { get; set; }
 
-        [DataMember(Name = "SnoozeDelay", Order = 0)]
-        public long SnoozeDelay { get; set; } = -1;
+        [DataMember(Name = "ReminderTimeBefore", Order = 0)]
+        public long ReminderTimeBefore { get; set; } = -1;
 
         [DataMember(Name = "PercentComplete", Order = 0)]
         public int PercentComplete { get; set; }
@@ -1306,6 +1322,49 @@ namespace Mark5.ServiceReference.DataContract
         public DelegationStatus DelegationStatus { get; set; }
     }
 
+    [DataContract(Name = "RecurrenceInfo", Namespace = "com.nordic-it.appservice.v3")]
+    public class RecurrenceInfo
+    {
+        [DataMember(Name = "AllDay", Order = 0)]
+        public bool AllDay { get; set; }
+
+        [DataMember(Name = "DayNumber", Order = 0)]
+        public int DayNumber { get; set; } = -1;
+
+        [DataMember(Name = "Duration", Order = 0)]
+        public TimeSpan Duration { get; set; }
+
+        [DataMember(Name = "End", Order = 0)]
+        public DateTime End { get; set; }
+
+        [DataMember(Name = "FirstDayOfWeek", Order = 0)]
+        public DayOfWeek FirstDayOfWeek { get; set; }
+
+        [DataMember(Name = "Month", Order = 0)]
+        public int Month { get; set; } = -1;
+
+        [DataMember(Name = "OccurrenceCount", Order = 0)]
+        public int OccurrenceCount { get; set; } = -1;
+
+        [DataMember(Name = "Periodicity", Order = 0)]
+        public int Periodicity { get; set; } = -1;
+
+        [DataMember(Name = "Range", Order = 0)]
+        public RecurrenceRange Range { get; set; }
+
+        [DataMember(Name = "Start", Order = 0)]
+        public DateTime Start { get; set; }
+
+        [DataMember(Name = "Type", Order = 0)]
+        public RecurrenceType Type { get; set; }
+
+        [DataMember(Name = "WeekDays", Order = 0)]
+        public WeekDays WeekDays { get; set; }
+
+        [DataMember(Name = "WeekOfMonth", Order = 0)]
+        public WeekOfMonth WeekOfMonth { get; set; }
+    }
+
 
     [DataContract(Name = "Participant", Namespace = "com.nordic-it.appservice.v3")]
     public class Participant
@@ -1331,6 +1390,100 @@ namespace Mark5.ServiceReference.DataContract
         [DataMember(Name = "Note", Order = 0)]
         public string Note { get; set; }
     }
+
+    [DataContract(Name = "WeekOfMonth", Namespace = "com.nordic-it.appservice.v3")]
+    public enum WeekOfMonth
+    {
+        [EnumMember(Value = "First")]
+        First = 0,
+
+        [EnumMember(Value = "Second")]
+        Second = 1,
+
+        [EnumMember(Value = "Third")]
+        Third = 2,
+
+        [EnumMember(Value = "Fourth")]
+        Fourth = 3,
+
+        [EnumMember(Value = "Last")]
+        Last = 4,
+
+        [EnumMember(Value = "None")]
+        None = 5
+    }
+
+
+    [DataContract(Name = "RecurrenceType", Namespace = "com.nordic-it.appservice.v3")]
+    public enum RecurrenceType
+    {
+        [EnumMember(Value = "Daily")]
+        Daily = 0,
+
+        [EnumMember(Value = "Hourly")]
+        Hourly = 1,
+
+        [EnumMember(Value = "Minutely")]
+        Minutely = 2,
+
+        [EnumMember(Value = "Monthly")]
+        Monthly = 3,
+
+        [EnumMember(Value = "Weekly")]
+        Weekly = 4,
+
+        [EnumMember(Value = "Yearly")]
+        Yearly = 5
+    }
+
+    [DataContract(Name = "RecurrenceRange", Namespace = "com.nordic-it.appservice.v3")]
+    public enum RecurrenceRange
+    {
+        [EnumMember(Value = "EndByDate")]
+        EndByDate = 0,
+
+        [EnumMember(Value = "NoEndDate")]
+        NoEndDate = 1,
+
+        [EnumMember(Value = "OccurrenceCount")]
+        OccurrenceCount = 2
+    }
+
+    [Flags]
+    [DataContract(Name = "WeekDays", Namespace = "com.nordic-it.appservice.v3")]
+    public enum WeekDays
+    {
+        [EnumMember(Value = "Sunday")]
+        Sunday = 1,
+
+        [EnumMember(Value = "Monday")]
+        Monday = 2,
+
+        [EnumMember(Value = "Tuesday")]
+        Tuesday = 4,
+
+        [EnumMember(Value = "Wednesday")]
+        Wednesday = 8,
+
+        [EnumMember(Value = "Thursday")]
+        Thursday = 16,
+
+        [EnumMember(Value = "Friday")]
+        Friday = 32,
+
+        [EnumMember(Value = "Saturday")]
+        Saturday = 64,
+
+        [EnumMember(Value = "WeekendDays")]
+        WeekendDays = Sunday | Saturday,
+
+        [EnumMember(Value = "WorkDays")]
+        WorkDays = Monday | Tuesday | Wednesday | Thursday | Friday,
+
+        [EnumMember(Value = "EveryDay")]
+        EveryDay = WeekendDays | WorkDays
+    }
+
 
     [DataContract(Name = "AppointmentStatus", Namespace = "com.nordic-it.appservice.v3")]
     public enum AppointmentStatus

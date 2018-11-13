@@ -41,10 +41,10 @@ namespace Mark5.Mobile.Common.Model
         public CalendarOccurenceType Type { get; set; }
 
         [Column("ReminderDateTimestamp")]
-        public long ReminderDateTimestamp { get; set; } = -1;
+        public long ReminderAlertTime { get; set; } = -1;
 
         [Column("SnoozeDelay")]
-        public long SnoozeDelay { get; set; } = -1;
+        public long ReminderTimeBefore { get; set; } = -1;
 
         [Column("PercentComplete")]
         public int PercentComplete { get; set; }

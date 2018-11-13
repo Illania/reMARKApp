@@ -19,8 +19,8 @@ namespace Mark5.Mobile.Common.Model
         [Column("Location")]
         public string Location { get; set; }
 
-        [Column("StartDateTimestamp")]
-        public long StartDateTimestamp { get; set; } = -1;
+        [Ignore] //TODO to fix
+        public List<CalendarAppointmentOccurrence> Occurrences { get; set; } = new List<CalendarAppointmentOccurrence>();
 
         [Column("EndDateTimestamp")]
         public long EndDateTimestamp { get; set; } = -1;
@@ -49,11 +49,14 @@ namespace Mark5.Mobile.Common.Model
         [Column("CalendarId")]
         public int CalendarId { get; set; } = -1;
 
-        [Column("ReminderDateTimestamp")]
-        public long ReminderDateTimestamp { get; set; } = -1;
+        [Column("ReminderAlertTime")]
+        public long ReminderAlertTime { get; set; } = -1;
 
-        [Column("SnoozeDelay")]
-        public long SnoozeDelay { get; set; } = -1;
+        [Column("ReminderTimeBefore")]
+        public long ReminderTimeBefore { get; set; } = -1;
+
+        [Ignore] //TODO testing
+        public RecurrenceInfo RecurrenceInfo { get; set; }
 
         List<Participant> participants;
 
@@ -78,7 +81,17 @@ namespace Mark5.Mobile.Common.Model
 
         public override string ToString()
         {
-            return $"[CalendarAppointment: Subject={Subject}, Location={Location}, StartDateTimestamp={StartDateTimestamp}, Status={Status}]";
+            return $"[CalendarAppointment: Subject={Subject}, Location={Location}, Status={Status}]";
         }
     }
+
+    public class CalendarAppointmentOccurrence
+    {
+        public long StartDateTimestamp { get; set; } = -1;
+
+        public long EndDateTimestamp { get; set; } = -1;
+
+        public int RecurrenceIndex { get; set; } = -1;
+    }
 }
+

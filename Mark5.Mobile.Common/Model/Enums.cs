@@ -1,4 +1,6 @@
-﻿namespace Mark5.Mobile.Common.Model
+﻿using System;
+
+namespace Mark5.Mobile.Common.Model
 {
     #region Managers
 
@@ -184,6 +186,48 @@
         Private = 15,
         Holiday = 16,
         Vacation = 17,
+    }
+
+    public enum WeekOfMonth
+    {
+        First = 0,
+        Second = 1,
+        Third = 2,
+        Fourth = 3,
+        Last = 4,
+        None = 5
+    }
+
+    public enum RecurrenceType
+    {
+        Daily = 0,
+        Hourly = 1,
+        Minutely = 2,
+        Monthly = 3,
+        Weekly = 4,
+        Yearly = 5
+    }
+
+    public enum RecurrenceRange
+    {
+        EndByDate = 0,
+        NoEndDate = 1,
+        OccurrenceCount = 2
+    }
+
+    [Flags]
+    public enum WeekDays
+    {
+        Sunday = 1,
+        Monday = 2,
+        Tuesday = 4,
+        Wednesday = 8,
+        Thursday = 16,
+        Friday = 32,
+        Saturday = 64,
+        WeekendDays = Sunday | Saturday,
+        WorkDays = Monday | Tuesday | Wednesday | Thursday | Friday,
+        EveryDay = WeekendDays | WorkDays
     }
 
     public enum AppointmentStatus

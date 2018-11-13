@@ -38,8 +38,6 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Guid = ca.Guid,
                 Subject = ca.Subject,
                 Location = ca.Location,
-                StartDateTimestamp = ca.StartDate.ConvertDateTimeToTimestampMilliseconds(),
-                EndDateTimestamp = ca.EndDate.ConvertDateTimeToTimestampMilliseconds(),
                 CalendarId = ca.CalendarId,
                 AllDay = ca.AllDay,
                 Private = ca.Private,
@@ -48,12 +46,28 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Creator = ca.Creator,
                 Priority = ca.Priority.ConvertEnum<Priority>(),
                 Type = ca.Type.ConvertEnum<CalendarOccurenceType>(),
-                ReminderDateTimestamp = ca.ReminderDate.ConvertDateTimeToTimestampMilliseconds(),
-                SnoozeDelay = ca.SnoozeDelay
+                ReminderAlertTime = ca.ReminderAlertTime.ConvertDateTimeToTimestampMilliseconds(),
+                ReminderTimeBefore = ca.ReminderTimeBefore,
             };
 
             if (ca.Participants != null)
                 result.Participants.AddRange(ca.Participants.WhereNotNull().Select(Convert));
+
+            if (ca.RecurrenceInfo != null)
+                result.RecurrenceInfo = ca.RecurrenceInfo.Convert();
+
+            if (ca.Occurrences != null)
+            {
+                foreach (var occurrence in ca.Occurrences)
+                {
+                    result.Occurrences.Add(new CalendarAppointmentOccurrence
+                    {
+                        StartDateTimestamp = occurrence.StartDate.ConvertDateTimeToTimestampMilliseconds(),
+                        EndDateTimestamp = occurrence.EndDate.ConvertDateTimeToTimestampMilliseconds(),
+                        RecurrenceIndex = occurrence.RecurrenceIndex,
+                    });
+                }
+            }
 
             return result;
         }
@@ -74,8 +88,8 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Creator = ca.Creator,
                 Priority = ca.Priority.ConvertEnum<Priority>(),
                 Type = ca.Type.ConvertEnum<CalendarOccurenceType>(),
-                ReminderDateTimestamp = ca.ReminderDate.ConvertDateTimeToTimestampMilliseconds(),
-                SnoozeDelay = ca.SnoozeDelay,
+                ReminderAlertTime = ca.ReminderAlertTime.ConvertDateTimeToTimestampMilliseconds(),
+                ReminderTimeBefore = ca.ReminderTimeBefore,
                 PercentComplete = ca.PercentComplete,
                 LinkedObjectId = ca.ObjectId,
                 LinkedObjectType = ca.ObjectType.ConvertEnum<ObjectType>(),
@@ -458,8 +472,7 @@ namespace Mark5.Mobile.Common.Model.Converters
 
         public static OptionalParameters Convert(this DataContract.OptionalParameters p)
         {
-            var ceop = p as DataContract.CalendarEventOptionalParameters;
-            if (ceop != null)
+            if (p is DataContract.CalendarEventOptionalParameters ceop)
                 return new CalendarEventOptionalParameters
                 {
                     CanContainAppointments = ceop.CanContainAppointments,
@@ -532,6 +545,26 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Name = ra.Name,
                 AddressType = ra.AddressType.ConvertEnum<DocumentAddressType>(),
                 Address = ra.Address
+            };
+        }
+
+        public static RecurrenceInfo Convert(this DataContract.RecurrenceInfo ra) //TODO should do also the converter in the opposite direction
+        {
+            return new RecurrenceInfo()
+            {
+                AllDay = ra.AllDay,
+                DayNumber = ra.DayNumber,
+                Duration = ra.Duration,
+                EndTimestamp = ra.End.ConvertDateTimeToTimestampMilliseconds(),
+                StartTimestamp = ra.Start.ConvertDateTimeToTimestampMilliseconds(),
+                FirstDayOfWeek = ra.FirstDayOfWeek,
+                Month = ra.Month,
+                OccurrenceCount = ra.OccurrenceCount,
+                Periodicity = ra.Periodicity,
+                Range = ra.Range.ConvertEnum<RecurrenceRange>(),
+                Type = ra.Type.ConvertEnum<RecurrenceType>(),
+                WeekDays = ra.WeekDays.ConvertEnum<WeekDays>(),
+                WeekOfMonth = ra.WeekOfMonth.ConvertEnum<WeekOfMonth>(),
             };
         }
 
@@ -762,14 +795,12 @@ namespace Mark5.Mobile.Common.Model.Converters
 
         public static DataContract.CalendarAppointment Convert(this CalendarAppointment ca)
         {
-            return new DataContract.CalendarAppointment
+            var result = new DataContract.CalendarAppointment
             {
                 Id = ca.Id,
                 Guid = ca.Guid,
                 Subject = ca.Subject,
                 Location = ca.Location,
-                StartDate = ca.StartDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
-                EndDate = ca.EndDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
                 AllDay = ca.AllDay,
                 Private = ca.Private,
                 Status = ca.Status.ConvertEnum<DataContract.AppointmentStatus>(),
@@ -777,11 +808,26 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Creator = ca.Creator,
                 Priority = ca.Priority.ConvertEnum<DataContract.Priority>(),
                 Type = ca.Type.ConvertEnum<DataContract.CalendarOccurenceType>(),
-                ReminderDate = ca.ReminderDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
-                SnoozeDelay = ca.SnoozeDelay,
+                ReminderAlertTime = ca.ReminderAlertTime.ConvertTimestampMillisecondsToDateTime(),
+                ReminderTimeBefore = ca.ReminderTimeBefore,
                 CalendarId = ca.CalendarId,
                 Participants = ca.Participants.Select(p => p.Convert()).ToList()
             };
+
+            if (ca.Occurrences != null)
+            {
+                foreach (var occurrence in ca.Occurrences)
+                {
+                    result.Occurrences.Add(new DataContract.CalendarAppointmentOccurrence
+                    {
+                        StartDate = occurrence.StartDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
+                        EndDate = occurrence.EndDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
+                        RecurrenceIndex = occurrence.RecurrenceIndex,
+                    });
+                }
+            }
+
+            return result;
         }
 
         public static DataContract.CalendarTask Convert(this CalendarTask ca)
@@ -799,8 +845,8 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Creator = ca.Creator,
                 Priority = ca.Priority.ConvertEnum<DataContract.Priority>(),
                 Type = ca.Type.ConvertEnum<DataContract.CalendarOccurenceType>(),
-                ReminderDate = ca.ReminderDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
-                SnoozeDelay = ca.SnoozeDelay,
+                ReminderAlertTime = ca.ReminderAlertTime.ConvertTimestampMillisecondsToDateTime(),
+                ReminderTimeBefore = ca.ReminderTimeBefore,
                 PercentComplete = ca.PercentComplete,
                 ObjectId = ca.LinkedObjectId,
                 ObjectType = ca.LinkedObjectType.ConvertEnum<DataContract.ObjectType>(),
