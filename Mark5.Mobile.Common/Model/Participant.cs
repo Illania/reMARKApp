@@ -9,6 +9,6 @@
         public ParticipantStatus Status { get; set; }
         public string CN { get; set; }
         public bool Customer { get; set; }
-        public string Note { get; set; }
+        public string Note { get; set; }  //TODO add emaila
     }
 }
