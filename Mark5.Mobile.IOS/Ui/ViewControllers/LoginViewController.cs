@@ -684,7 +684,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 CommonConfig.Logger.Info($"Registering {nameof(ReachabilityReceiver)}...");
                 PlatformConfig.ReachabilityReceiver.Register();
 
-                CommonConfig.Logger.Info($"Logged in - will present {nameof(SplitMainViewController)}");
+                CommonConfig.Logger.Info($"Logged in - will present {nameof(AbstractMainViewController)}");
 
                 dismissAction?.Invoke();
 
@@ -700,10 +700,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.CustomerName, ServerConfig.SystemSettings.SystemInfo.CustomerName);
 
                 UIViewController vc;
-                if (Integration.IsIPad())
-                    vc = new SplitMainViewController { ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve };
-                else
-                    vc = new SimpleMainViewController { ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve };
+
+                vc = new AbstractMainViewController { ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve };
+               
 
                 var window = ((AppDelegate)UIApplication.SharedApplication.Delegate).Window;
                 UIView.TransitionNotify(window, 0.25, UIViewAnimationOptions.TransitionCrossDissolve, () => window.RootViewController = vc, null);

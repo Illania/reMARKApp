@@ -136,8 +136,6 @@
 		<Compile Include="Ui\ViewControllers\ShortcodeViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ShortcodesSearchResultsViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ShortcodesSplitViewController.cs" />
-		<Compile Include="Ui\ViewControllers\SimpleMainViewController.cs" />
-		<Compile Include="Ui\ViewControllers\SplitMainViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ComposeDocumentView\SuggestionsListView.cs" />
 		<Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\AttachmentsView.cs" />
 		<Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\BccView.cs" />
@@ -264,6 +262,7 @@
 		<Compile Include="Ui\ViewControllers\OnBoardingViewController.cs" />
 		<Compile Include="Ui\Common\BadgeBarButtonItem.cs" />
 		<Compile Include="Ui\ViewControllers\CategoriesListViewController.cs" />
+		<Compile Include="Ui\Common\ModuleNavigationController.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
@@ -606,6 +605,9 @@
 		<ImageAsset Include="Assets_onboarding.xcassets\2.8_5.imageset\Contents.json" />
 		<ImageAsset Include="Assets_onboarding.xcassets\2.8_5.imageset\Slide 5.pdf" />
 		<ImageAsset Include="Assets_onboarding.xcassets\2.8_4.imageset\Slide 4.pdf" />
+		<ImageAsset Include="Assets_icons.xcassets\Nav-search.imageset\Contents.json" />
+		<ImageAsset Include="Assets_icons.xcassets\Nav-search.imageset\Nav-search%402.png" />
+		<ImageAsset Include="Assets_icons.xcassets\Nav-search.imageset\Nav-search%403.png" />
 	</ItemGroup>
 	<ItemGroup>
 		<BundleResource Include="Resources\Base.lproj\Localizable.strings" />
@@ -707,6 +709,7 @@
 	  <Folder Include="Assets_onboarding.xcassets\2.8_3.imageset\" />
 	  <Folder Include="Assets_onboarding.xcassets\2.8_4.imageset\" />
 	  <Folder Include="Assets_onboarding.xcassets\2.8_5.imageset\" />
+	  <Folder Include="Assets_icons.xcassets\Nav-search.imageset\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 	<Import Project="..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets" Condition="Exists('..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets')" />
