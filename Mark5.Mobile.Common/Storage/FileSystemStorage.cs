@@ -326,7 +326,7 @@ namespace Mark5.Mobile.Common.Storage
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error("Error while unsubscribing during log out!", ex);
+                CommonConfig.Logger.Error("Error while deleting file from folder!", ex);
             }
             finally
             {
