@@ -1226,9 +1226,6 @@ namespace Mark5.ServiceReference.DataContract
         [DataMember(Name = "Participants", Order = 0)]
         public List<Participant> Participants { get; set; } = new List<Participant>();
 
-        [DataMember(Name = "RecurrenceIndex", Order = 0)]
-        public int RecurrenceIndex { get; set; }
-
         [DataMember(Name = "RecurrenceInfo", Order = 0)]
         public RecurrenceInfo RecurrenceInfo { get; set; }
     }
@@ -1383,6 +1380,9 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "CN", Order = 0)]
         public string CN { get; set; }
+
+        [DataMember(Name = "Email", Order = 0)]
+        public string Email { get; set; }
 
         [DataMember(Name = "Customer", Order = 0)]
         public bool Customer { get; set; }

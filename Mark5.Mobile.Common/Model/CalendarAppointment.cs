@@ -22,9 +22,6 @@ namespace Mark5.Mobile.Common.Model
         [Ignore] //TODO to fix
         public List<CalendarAppointmentOccurrence> Occurrences { get; set; } = new List<CalendarAppointmentOccurrence>();
 
-        [Column("EndDateTimestamp")]
-        public long EndDateTimestamp { get; set; } = -1;
-
         [Column("AllDay")]
         public bool AllDay { get; set; }
 
