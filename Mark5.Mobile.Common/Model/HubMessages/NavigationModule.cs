@@ -18,19 +18,19 @@ namespace Mark5.Mobile.Common.Model.HubMessages
                 {
                     case NavigationModuleType.Calendar:
                         Title = "Calendar";
-                        Image = "Failed";
+                        Image = "Nav-calendar";
                         break;
                     case NavigationModuleType.Contacts:
                         Title = "Contacts";
-                        Image = "Failed";
+                        Image = "Nav-contacts";
                         break;
                     case NavigationModuleType.Shortcodes:
                         Title = "Shortcodes";
-                        Image = "Failed";
+                        Image = "Nav-shortcodes";
                         break;
                     case NavigationModuleType.Mail:
                         Title = "Mail";
-                        Image = "Failed";
+                        Image = "Nav-mail";
                         break;
                     case NavigationModuleType.Search:
                         Title = "Search";
@@ -38,7 +38,7 @@ namespace Mark5.Mobile.Common.Model.HubMessages
                         break;
                     case NavigationModuleType.Settings:
                         Title = "Settings";
-                        Image = "Failed";
+                        Image = "Nav-settings";
                         break;
                     case NavigationModuleType.Dummy:
                         Title = "Dummy";

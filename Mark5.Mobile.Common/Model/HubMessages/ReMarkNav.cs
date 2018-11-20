@@ -1,6 +1,4 @@
-﻿using System;
-using TinyMessenger;
-using UIKit;
+﻿using TinyMessenger;
 
 namespace Mark5.Mobile.Common.Model.HubMessages
 {
@@ -8,7 +6,7 @@ namespace Mark5.Mobile.Common.Model.HubMessages
     {
         public NavigationModule Module;
 
-        public ReMarkNav(object sender, NavigationModule module )
+        public ReMarkNav(object sender, NavigationModule module)
             : base(sender)
         {
             Module = module;
