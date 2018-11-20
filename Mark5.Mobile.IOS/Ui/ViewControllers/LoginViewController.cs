@@ -577,8 +577,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                             CommonConfig.Logger.Error("Error while unsubscribing during log out!", ex);
                         }
 
-                        PlatformConfig.Preferences.ResetOnLaunch = false;
-                        Integration.ClearData();
+                        PlatformConfig.Preferences.ResetOnLaunch = true;
+
                         await AuthenticatorFactory.Create().DeleteRetainedConnectionInfoAsync();
 
                         dismissAction();
