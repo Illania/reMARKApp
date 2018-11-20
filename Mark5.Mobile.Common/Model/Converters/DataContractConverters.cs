@@ -48,13 +48,12 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Type = ca.Type.ConvertEnum<CalendarOccurenceType>(),
                 ReminderAlertTime = ca.ReminderAlertTime.ConvertDateTimeToTimestampMilliseconds(),
                 ReminderTimeBefore = ca.ReminderTimeBefore,
+                Description = ca.Description,
+                RecurrenceInfo = ca.RecurrenceInfo?.Convert()
             };
 
             if (ca.Participants != null)
                 result.Participants.AddRange(ca.Participants.WhereNotNull().Select(Convert));
-
-            if (ca.RecurrenceInfo != null)
-                result.RecurrenceInfo = ca.RecurrenceInfo.Convert();
 
             if (ca.Occurrences != null)
             {
@@ -491,7 +490,7 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Type = p.Type.ConvertEnum<ParticipantType>(),
                 Status = p.Status.ConvertEnum<ParticipantStatus>(),
                 CN = p.CN,
-                Email = p.Email
+                Email = p.Email,
                 Customer = p.Customer,
                 Note = p.Note
             };
@@ -549,7 +548,7 @@ namespace Mark5.Mobile.Common.Model.Converters
             };
         }
 
-        public static RecurrenceInfo Convert(this DataContract.RecurrenceInfo ra) //TODO should do also the converter in the opposite direction
+        public static RecurrenceInfo Convert(this DataContract.RecurrenceInfo ra)
         {
             return new RecurrenceInfo()
             {
@@ -812,7 +811,9 @@ namespace Mark5.Mobile.Common.Model.Converters
                 ReminderAlertTime = ca.ReminderAlertTime.ConvertTimestampMillisecondsToDateTime(),
                 ReminderTimeBefore = ca.ReminderTimeBefore,
                 CalendarId = ca.CalendarId,
-                Participants = ca.Participants.Select(p => p.Convert()).ToList()
+                Participants = ca.Participants.Select(p => p.Convert()).ToList(),
+                Description = ca.Description,
+                RecurrenceInfo = ca.RecurrenceInfo?.Convert(),
             };
 
             if (ca.Occurrences != null)
@@ -919,6 +920,26 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Id = pat.Id,
                 Name = pat.Name,
                 Description = pat.Description
+            };
+        }
+
+        public static DataContract.RecurrenceInfo Convert(this RecurrenceInfo ra)
+        {
+            return new DataContract.RecurrenceInfo()
+            {
+                AllDay = ra.AllDay,
+                DayNumber = ra.DayNumber,
+                Duration = ra.Duration,
+                End = ra.EndTimestamp.ConvertTimestampMillisecondsToDateTime(),
+                Start = ra.StartTimestamp.ConvertTimestampMillisecondsToDateTime(),
+                FirstDayOfWeek = ra.FirstDayOfWeek,
+                Month = ra.Month,
+                OccurrenceCount = ra.OccurrenceCount,
+                Periodicity = ra.Periodicity,
+                Range = ra.Range.ConvertEnum<DataContract.RecurrenceRange>(),
+                Type = ra.Type.ConvertEnum<DataContract.RecurrenceType>(),
+                WeekDays = ra.WeekDays.ConvertEnum<DataContract.WeekDays>(),
+                WeekOfMonth = ra.WeekOfMonth.ConvertEnum<DataContract.WeekOfMonth>(),
             };
         }
 

@@ -16,6 +16,9 @@ namespace Mark5.Mobile.Common.Model
         [Column("Subject")]
         public string Subject { get; set; }
 
+        [Column("Description")]
+        public string Description { get; set; }
+
         [Column("Location")]
         public string Location { get; set; }
 
@@ -38,7 +41,7 @@ namespace Mark5.Mobile.Common.Model
         public string Creator { get; set; }
 
         [Column("Priority")]
-        public Priority Priority { get; set; }
+        public Priority Priority { get; set; }  //TODO It seems it's kept only for compatibility. Can we remove it?
 
         [Column("Type")]
         public CalendarOccurenceType Type { get; set; }

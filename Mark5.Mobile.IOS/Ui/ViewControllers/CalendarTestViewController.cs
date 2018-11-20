@@ -8,6 +8,7 @@ using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Manager;
+using System.Linq;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
@@ -18,6 +19,99 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.LoadView();
 
             InitializeStartView();
+        }
+
+        CalendarAppointment testAppointmentSimple;  //Good
+        CalendarAppointment testAppointmentAllDay; //Good
+        CalendarAppointment testAppointmentRecurring; //Good!
+        CalendarAppointment testAppointmentPartecipants;
+        CalendarAppointment testAppointmentAlarm;
+
+        void PrepareTests()
+        {
+            testAppointmentSimple = new CalendarAppointment
+            {
+                CalendarId = selectedCalendar.Id,
+                Location = "TestLocation",
+                Subject = "TestSubject",
+                Description = "TestDescription",
+                Creator = ServerConfig.SystemSettings.UserInfo.User.Username,
+                CreatorId = ServerConfig.SystemSettings.UserInfo.User.Id,
+                RecurrenceInfo = null,
+                AllDay = false,
+                Priority = Priority.Normal,
+                Private = false,
+                Type = CalendarOccurenceType.Normal,
+                Status = AppointmentStatus.Busy,
+            };
+
+            var occurrence = new CalendarAppointmentOccurrence()
+            {
+                StartDateTimestamp = GetFromDateTime().ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds(),
+                EndDateTimestamp = GetToDateTime().ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds(),
+            };
+
+            testAppointmentSimple.Occurrences.Add(occurrence);
+
+            testAppointmentAllDay = new CalendarAppointment
+            {
+                CalendarId = selectedCalendar.Id,
+                Location = "TestLocation",
+                Subject = "TestAllDay",
+                Description = "TestDescription",
+                Creator = ServerConfig.SystemSettings.UserInfo.User.Username,
+                CreatorId = ServerConfig.SystemSettings.UserInfo.User.Id,
+                RecurrenceInfo = null,
+                AllDay = true,
+                Priority = Priority.Normal,
+                Private = false,
+                Type = CalendarOccurenceType.Normal,
+                Status = AppointmentStatus.Busy,
+            };
+
+            occurrence = new CalendarAppointmentOccurrence()
+            {
+                StartDateTimestamp = GetFromDateTime().ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds(),
+                EndDateTimestamp = GetToDateTime().ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds(),
+            };
+
+            testAppointmentAllDay.Occurrences.Add(occurrence);
+
+
+            testAppointmentRecurring = new CalendarAppointment
+            {
+                CalendarId = selectedCalendar.Id,
+                Location = "TestLocation",
+                Subject = "TestRecurring",
+                Description = "TestDescription",
+                Creator = ServerConfig.SystemSettings.UserInfo.User.Username,
+                CreatorId = ServerConfig.SystemSettings.UserInfo.User.Id,
+                RecurrenceInfo = null,
+                AllDay = false,
+                Priority = Priority.Normal,
+                Private = false,
+                Type = CalendarOccurenceType.Pattern,
+                Status = AppointmentStatus.Busy,
+            };
+
+            occurrence = new CalendarAppointmentOccurrence()
+            {
+                StartDateTimestamp = GetFromDateTime().ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds(),
+                EndDateTimestamp = GetToDateTime().ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds(),
+            };
+
+            var recurrenceInfo = new RecurrenceInfo()
+            {
+                Type = RecurrenceType.Daily,
+                Periodicity = 3,
+                Range = RecurrenceRange.OccurrenceCount,
+                OccurrenceCount = 10,
+                WeekDays = WeekDays.EveryDay,
+                StartTimestamp = GetFromDateTime().ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds(),
+            };
+
+            testAppointmentRecurring.Occurrences.Add(occurrence);
+            testAppointmentRecurring.RecurrenceInfo = recurrenceInfo;
         }
 
         public override void ViewWillAppear(bool animated)
@@ -34,9 +128,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         UIDatePicker fromDatePicker;
         UIDatePicker toDatePicker;
-        UIPickerView calendarPicker;
-        UIStackView internalStackView;
+        UIStackView resultsStackView;
         UISwitch toggleControl;
+        UITextView deleteIdView;
 
         Calendar selectedCalendar;
         long selectedFromDateTime;
@@ -44,6 +138,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeStartView()
         {
+            selectedCalendar = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars[0];
+
             var scrollView = new UIScrollView()
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
@@ -82,21 +178,35 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 TranslatesAutoresizingMaskIntoConstraints = false,
             };
 
-            calendarPicker = new UIPickerView()
+            var getStackView = new UIStackView()
             {
+                Axis = UILayoutConstraintAxis.Horizontal,
                 TranslatesAutoresizingMaskIntoConstraints = false,
             };
-            var model = new PickerSource();
-            model.ValueChanged += Model_ValueChanged;
-            calendarPicker.Model = model;
 
-            var button = new UIButton()
+            var calButton = new UIButton()
             {
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
-            button.SetTitle("GO", UIControlState.Normal);
-            button.SetTitleColor(UIColor.Purple, UIControlState.Normal);
-            button.TouchUpInside += Button_TouchUpInside;
+            calButton.SetTitle(selectedCalendar.Name, UIControlState.Normal);
+            calButton.SetTitleColor(UIColor.Blue, UIControlState.Normal);
+            calButton.TouchUpInside += async (sender, e) =>
+            {
+                var chosen = await Dialogs.ShowListActionSheetAsync(this, ServerConfig.SystemSettings.CalendarModuleInfo.Calendars.Select(c => c.Name).ToArray());
+                selectedCalendar = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars[chosen];
+                calButton.SetTitle(selectedCalendar.Name, UIControlState.Normal);
+            };
+
+            var getButton = new UIButton()
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            getButton.SetTitle("GET", UIControlState.Normal);
+            getButton.SetTitleColor(UIColor.Purple, UIControlState.Normal);
+            getButton.TouchUpInside += Button_TouchUpInside;
+
+            getStackView.AddArrangedSubview(calButton);
+            getStackView.AddArrangedSubview(getButton);
 
             var switchStackView = new UIStackView()
             {
@@ -122,20 +232,97 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             switchStackView.AddArrangedSubview(textView);
             switchStackView.AddArrangedSubview(toggleControl);
 
-            internalStackView = new UIStackView()
+            resultsStackView = new UIStackView()
             {
                 Axis = UILayoutConstraintAxis.Vertical,
                 TranslatesAutoresizingMaskIntoConstraints = false,
             };
 
-            //stackView.AddArrangedSubview(calendarPicker);
+            var deleteStackView = new UIStackView()
+            {
+                Axis = UILayoutConstraintAxis.Horizontal,
+                TranslatesAutoresizingMaskIntoConstraints = false,
+            };
+
+            deleteIdView = new UITextView
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                TextColor = UIColor.DarkTextColor,
+                ScrollEnabled = false,
+                Editable = true,
+            };
+
+            deleteIdView.Font = UIFont.SystemFontOfSize(textSize);
+
+            var deleteButton = new UIButton()
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            deleteButton.SetTitle("DELETE", UIControlState.Normal);
+            deleteButton.SetTitleColor(UIColor.Purple, UIControlState.Normal);
+            deleteButton.TouchUpInside += DeleteButton_TouchUpInside;
+
+            deleteStackView.AddArrangedSubview(deleteIdView);
+            deleteStackView.AddArrangedSubview(deleteButton);
+
+
+            var addEditStackView = new UIStackView()
+            {
+                Axis = UILayoutConstraintAxis.Horizontal,
+                TranslatesAutoresizingMaskIntoConstraints = false,
+            };
+
+            var addButton = new UIButton()
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            addButton.SetTitle("ADD", UIControlState.Normal);
+            addButton.SetTitleColor(UIColor.Purple, UIControlState.Normal);
+            addButton.TouchUpInside += AddButton_TouchUpInside; ;
+
+            addEditStackView.AddArrangedSubview(addButton);
+
+
             stackView.AddArrangedSubview(fromDatePicker);
             stackView.AddArrangedSubview(toDatePicker);
             stackView.AddArrangedSubview(switchStackView);
-            stackView.AddArrangedSubview(button);
-            stackView.AddArrangedSubview(internalStackView);
+            stackView.AddArrangedSubview(getStackView);
+            stackView.AddArrangedSubview(addEditStackView);
+            stackView.AddArrangedSubview(resultsStackView);
+        }
 
-            selectedCalendar = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars[0];
+        async void AddButton_TouchUpInside(object sender, EventArgs e)
+        {
+            try
+            {
+                PrepareTests();
+                await Managers.CalendarManager.CreateOrUpdateCalendarAppointmentAsync(selectedCalendar.Id, testAppointmentRecurring);
+            }
+            catch (Exception ex)
+            {
+                await Dialogs.ShowErrorAlertAsync(this, ex);
+            }
+        }
+
+        async void DeleteButton_TouchUpInside(object sender, EventArgs e)
+        {
+            var id = int.Parse(deleteIdView.Text);
+
+            IBusinessEntity a;
+
+            if (toggleControl.On)
+                a = new CalendarTask { Id = id };
+            else
+                a = new CalendarAppointment { Id = id };
+
+            try
+            {
+                await Managers.CommonActionsManager.Delete(new List<IBusinessEntity> { a });
+            }
+            catch (Exception ex)
+            {
+                await Dialogs.ShowErrorAlertAsync(this, ex);
+            }
         }
 
         void Model_ValueChanged(object sender, Calendar e)
@@ -143,20 +330,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             selectedCalendar = e;
         }
 
-        async void Button_TouchUpInside(object sender, EventArgs e)
+        DateTime GetFromDateTime()
         {
             var selectedDateComponents = NSCalendar.CurrentCalendar.Components(NSCalendarUnit.Day | NSCalendarUnit.Month | NSCalendarUnit.Year
-                                                                   | NSCalendarUnit.Hour | NSCalendarUnit.Minute, fromDatePicker.Date);
+                                                       | NSCalendarUnit.Hour | NSCalendarUnit.Minute, fromDatePicker.Date);
             var fromDate = new DateTime((int)selectedDateComponents.Year, (int)selectedDateComponents.Month, (int)selectedDateComponents.Day, (int)selectedDateComponents.Hour
                                         , (int)selectedDateComponents.Minute, 0, DateTimeKind.Local);
-            selectedFromDateTime = fromDate.ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
 
+            return fromDate;
+        }
 
+        DateTime GetToDateTime()
+        {
             var selectedDateComponents2 = NSCalendar.CurrentCalendar.Components(NSCalendarUnit.Day | NSCalendarUnit.Month | NSCalendarUnit.Year
                                                                    | NSCalendarUnit.Hour | NSCalendarUnit.Minute, toDatePicker.Date);
             var toDate = new DateTime((int)selectedDateComponents2.Year, (int)selectedDateComponents2.Month, (int)selectedDateComponents2.Day, (int)selectedDateComponents2.Hour
                                       , (int)selectedDateComponents2.Minute, 0, DateTimeKind.Local);
-            selectedToDateTime = toDate.ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
+
+            return toDate;
+        }
+
+        async void Button_TouchUpInside(object sender, EventArgs e)
+        {
+            selectedFromDateTime = GetFromDateTime().ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
+            selectedToDateTime = GetToDateTime().ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
 
             try
             {
@@ -181,7 +378,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void AddAppointments(List<CalendarAppointment> appointments = null, List<CalendarTask> tasks = null)
         {
-            foreach (var subview in internalStackView.Subviews)
+            foreach (var subview in resultsStackView.Subviews)
             {
                 subview.RemoveFromSuperview();
             }
@@ -198,7 +395,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     };
 
-                    var text = $"APT: {appointment.Subject}";
+                    var text = $"APT: {appointment.Subject} - [{appointment.Id}]";
 
                     foreach (var occurrence in appointment.Occurrences)
                     {
@@ -218,7 +415,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     textView.Font = UIFont.SystemFontOfSize(textSize);
                     textView.Text = text;
 
-                    internalStackView.AddArrangedSubview(textView);
+                    resultsStackView.AddArrangedSubview(textView);
                 }
             }
 
@@ -251,7 +448,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     textView.Text = text;
 
-                    internalStackView.AddArrangedSubview(textView);
+                    resultsStackView.AddArrangedSubview(textView);
                 }
             }
 
@@ -267,36 +464,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 textView.Text = "EMPTY";
                 textView.Font = UIFont.SystemFontOfSize(textSize);
 
-                internalStackView.AddArrangedSubview(textView);
-            }
-        }
-
-
-        class PickerSource : UIPickerViewModel
-        {
-            readonly List<Calendar> calendars = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars;
-            public event EventHandler<Calendar> ValueChanged;
-
-            public override nint GetComponentCount(UIPickerView pickerView)
-            {
-                return 1;
-            }
-
-            public override nint GetRowsInComponent(UIPickerView pickerView, nint component)
-            {
-                return calendars.Count;
-            }
-
-            public override string GetTitle(UIPickerView pickerView, nint row, nint component)
-            {
-                var calendar = calendars[(int)row];
-
-                return $"{calendar.Name} - {(calendar.Shared ? "SHARED" : "PRIVATE")}";
-            }
-
-            public override void Selected(UIPickerView pickerView, nint row, nint component)
-            {
-                ValueChanged(this, calendars[(int)row]);
+                resultsStackView.AddArrangedSubview(textView);
             }
         }
 

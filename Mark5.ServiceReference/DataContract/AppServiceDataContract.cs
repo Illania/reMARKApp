@@ -1187,6 +1187,9 @@ namespace Mark5.ServiceReference.DataContract
         [DataMember(Name = "Subject", Order = 0)]
         public string Subject { get; set; }
 
+        [DataMember(Name = "Description", Order = 0)]
+        public string Description { get; set; }
+
         [DataMember(Name = "Location", Order = 0)]
         public string Location { get; set; }
 
