@@ -71,6 +71,11 @@ namespace Mark5.Mobile.Common.Storage
             return await GetAsync<ConnectionInfo>(Filenames.RetainedConnectionInfo, ct, CommonConfig.RetainedDataFolder);
         }
 
+        public static async Task DeleteRetainedConnectionInfoAsync(CancellationToken ct = default(CancellationToken))
+        {
+            await DeleteAsync<ConnectionInfo>(Filenames.RetainedConnectionInfo, ct, CommonConfig.RetainedDataFolder);
+        }
+
         #endregion
 
         #region Installation ID
@@ -297,6 +302,31 @@ namespace Mark5.Mobile.Common.Storage
                 await file.WriteAllTextAsync(await Serializer.SerializeAsync(obj));
 
                 objectCache[filename] = obj;
+            }
+            finally
+            {
+                semaphores[filename].Release();
+            }
+        }
+
+        static async Task DeleteAsync<T>(string filename, CancellationToken ct = default(CancellationToken), IFolder parentFolder = null) where T : class
+        {
+            parentFolder = parentFolder ?? CommonConfig.DataFolder;
+
+            try
+            {
+                await semaphores[filename].WaitAsync();
+
+                var fileExists = await parentFolder.CheckExistsAsync(filename, ct);
+
+                objectCache.Remove(filename);
+
+                var file = await parentFolder.GetFileAsync(filename, ct);
+                await file.DeleteAsync();
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Error while unsubscribing during log out!", ex);
             }
             finally
             {

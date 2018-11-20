@@ -16,6 +16,9 @@ using Mark5.Mobile.Droid.Utilities;
 using Mark5.ServiceReference.Exceptions;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Manager;
+using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Authenticator;
 
 namespace Mark5.Mobile.Droid.Ui.Common
 {
@@ -402,36 +405,51 @@ namespace Mark5.Mobile.Droid.Ui.Common
             var builder = new MaterialDialog.Builder(context);
             builder.Title(GetErrorTitle(context, ex));
             builder.Content(GetErrorMessage(context, ex));
-            builder.PositiveText(Resource.String.ok);
-            builder.OnPositive(new SingleButtonCallback(() => tcs.SetResult(true)));
-            if (ShouldShowCreateReport(ex))
+
+            //if token is invalid -> navigate user to login
+            if (ex is HttpAppServiceException && ((HttpAppServiceException)ex)?.Detail?.Code == AppServiceFaultCode.InvalidToken)
             {
-                builder.NeutralText(Resource.String.report);
-                builder.OnNeutral(new SingleButtonCallback(() =>
-                {
-                    var dismissAction = ShowInfiniteProgressDialog(context, Resource.String.dialog_creating_report, Resource.String.please_wait);
-                    Task.Run(() => { return SystemReportCollector.CreateFullReport(); })
-                        .ContinueWith(async t =>
-                        {
-                        dismissAction();
-
-                        if (!t.IsFaulted)
-                        {
-                            var sendWithMark5 = await ShowYesNoDialogAsync(context, Resource.String.send_with_mark5_title, Resource.String.send_report_with_mark5_content);
-
-                            if (sendWithMark5)
-                                context.StartActivity(SystemReportCollector.CreateShareReportComposeDocumentActivityIntent(context, t.Result));
-                            else
-                                context.StartActivity(SystemReportCollector.CreateShareReportIntent(context, t.Result));
-                        }
-
-                        tcs.SetResult(true);
-                    }, TaskScheduler.FromCurrentSynchronizationContext());
-                }));
+                ShowYesNoDialog(context, Resource.String.invalid_token, Resource.String.invalid_token_message,
+                    async () =>
+                    {
+                        await AuthenticatorFactory.Create().RetainConnectionInfoAsync();
+                        context.StartActivity(LoginActivity.CreateIntent(context));
+                    });
+                return tcs.Task;
             }
-            builder.Cancelable(false);
-            builder.Show();
-            return tcs.Task;
+            else
+            {
+                builder.PositiveText(Resource.String.ok);
+                builder.OnPositive(new SingleButtonCallback(() => tcs.SetResult(true)));
+                if (ShouldShowCreateReport(ex))
+                {
+                    builder.NeutralText(Resource.String.report);
+                    builder.OnNeutral(new SingleButtonCallback(() =>
+                    {
+                        var dismissAction = ShowInfiniteProgressDialog(context, Resource.String.dialog_creating_report, Resource.String.please_wait);
+                        Task.Run(() => { return SystemReportCollector.CreateFullReport(); })
+                            .ContinueWith(async t =>
+                            {
+                                dismissAction();
+
+                                if (!t.IsFaulted)
+                                {
+                                    var sendWithMark5 = await ShowYesNoDialogAsync(context, Resource.String.send_with_mark5_title, Resource.String.send_report_with_mark5_content);
+
+                                    if (sendWithMark5)
+                                        context.StartActivity(SystemReportCollector.CreateShareReportComposeDocumentActivityIntent(context, t.Result));
+                                    else
+                                        context.StartActivity(SystemReportCollector.CreateShareReportIntent(context, t.Result));
+                                }
+
+                                tcs.SetResult(true);
+                            }, TaskScheduler.FromCurrentSynchronizationContext());
+                    }));
+                }
+                builder.Cancelable(false);
+                builder.Show();
+                return tcs.Task;
+            }
         }
 
         public static void ShowErrorDialog(Context context, Exception ex, Action action = null)
