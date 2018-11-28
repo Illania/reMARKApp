@@ -5,26 +5,29 @@ using System.Threading.Tasks;
 using Android.Content;
 using Android.Graphics;
 using Android.OS;
+using Android.Views;
 using Android.Support.Design.Widget;
 using Android.Support.V4.Content;
 using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
-using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.DataAccess.Exceptions;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
+using TinyMessenger;
+using Android.Widget;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class FoldersListFragment : BaseFragment, ActionMode.ICallback, IMenuItemOnActionExpandListener, SearchView.IOnQueryTextListener
+    public class FoldersListFragment : BaseFragment, ActionMode.ICallback, IMenuItemOnActionExpandListener, Android.Support.V7.Widget.SearchView.IOnQueryTextListener
     {
         protected const string RemoteFolderBundleKey = "RemoteFolder_551ec209-d787-4a8e-b4ba-99313741ddd1";
         protected const string HideSearchBundleKey = "HideSearch_694b0906-42a6-4c04-9892-238c920f7c74";
@@ -40,7 +43,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected FolderListAdapter Adapter;
         protected SearchFolderListAdapter SearchAdapter;
-        protected SearchView SearchView;
+        protected Android.Support.V7.Widget.SearchView SearchView;
         protected RecyclerView RecyclerView;
         protected SwipeRefreshLayout RefreshLayout;
         protected List<Section> AvailableSections;
@@ -53,6 +56,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         List<int> recoveredSelectedItemsPosition;
 
         protected FolderListAdapter CurrentAdapter => SearchEnabled ? SearchAdapter : Adapter;
+
+        TinyMessageSubscriptionToken outgoingDocumentCountChangedToken;
 
         public static FoldersListFragment NewInstance()
         {
@@ -100,6 +105,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (savedInstanceState?.ContainsKey(SubFoldersDownloadedKey) == true)
                 LoadRemoteFromCache = LoadRemoteFromCache || savedInstanceState.GetBoolean(SubFoldersDownloadedKey);
+
+            SubscribeToMessages();
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -147,6 +154,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             HasOptionsMenu = true;
 
             return rootView;
+        }
+
+        async Task GetCountAsync()
+        {
+            var pendingDocs = await Managers.DocumentsManager.GetDocumentsToUploadDocumentPreviews();
+            var failedDocs = await Managers.DocumentsManager.GetFailedDocumentsToUploadDocumentPreviews();
+            var count = pendingDocs.Count() + failedDocs.Count();
+
+            CommonConfig.MessengerHub.Publish(new OugoingDocumentCountMessage(this, count, failedDocs.Any()));
         }
 
         public override void OnViewCreated(View view, Bundle savedInstanceState)
@@ -219,6 +235,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             RefreshData();
+
+            Task.Run(async () => await GetCountAsync());
         }
 
         public override void OnSaveInstanceState(Bundle outState)
@@ -253,6 +271,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info($"Pausing {nameof(FoldersListFragment)} [folder.id={RemoteFolder?.Id}, folder.name={RemoteFolder?.Name}]...");
         }
 
+        public override void OnDestroy()
+        {
+            base.OnDestroy();
+            UnsubscribeFromMessages();
+        }
+
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
             this.menu = menu;
@@ -261,7 +285,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var filterItem = menu.FindItem(Resource.Id.action_filter);
             filterItem.SetOnActionExpandListener(this);
-            SearchView = (SearchView)filterItem.ActionView;
+            SearchView = (Android.Support.V7.Widget.SearchView)filterItem.ActionView;
             SearchView.QueryHint = GetString(Resource.String.filter);
             SearchView.SetOnQueryTextListener(this);
 
@@ -365,11 +389,40 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return NewInstance(folder, HideSearch);
         }
 
+        void UpdateLocalSection(int count, bool hasFailedDocuments)
+        {
+            CommonConfig.Logger.Info($"Updating local folders...");
+            var localRootFolder = Folder.LocalRootForModule(RemoteFolder.Module);
+            if (localRootFolder != null)
+            {
+                var outgoing = localRootFolder.SubFolders.First();
+                if (outgoing != null)
+                {
+                    outgoing.FailedAndPendingDocumentCount = count;
+                    outgoing.HasFailedDocuments = hasFailedDocuments;
+                    Activity.RunOnUiThread(() =>
+                    {
+                        Adapter.Refresh(localRootFolder.SubFolders, Section.Local);
+                    });
+                }
+            }
+        }
+
+        void HandleOutgoingDocumentCountChange(OugoingDocumentCountMessage ougoingMessageCount)
+        {
+            var adapter = (FolderListAdapter)CurrentAdapter;
+            if (adapter is FolderListAdapter)
+            {
+                UpdateLocalSection(ougoingMessageCount.TotalCount, ougoingMessageCount.HasFailedDocuments);
+            }
+        }
+
         void RefreshLocal()
         {
             CommonConfig.Logger.Info($"Refreshing local folders...");
 
             var localRootFolder = Folder.LocalRootForModule(RemoteFolder.Module);
+
             Adapter.Refresh(localRootFolder.SubFolders, Section.Local);
         }
 
@@ -462,6 +515,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             Adapter.Refresh(favouriteFolders, Section.Favourites);
         }
 
+        #endregion
+
+        #region Subscribe/Unsubscribe
+        void SubscribeToMessages()
+        {
+            outgoingDocumentCountChangedToken = CommonConfig.MessengerHub.Subscribe<OugoingDocumentCountMessage>(HandleOutgoingDocumentCountChange);
+        }
+
+        void UnsubscribeFromMessages()
+        {
+            outgoingDocumentCountChangedToken?.Dispose();
+        }
         #endregion
 
         #region List item event handlers
@@ -835,7 +900,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 RefreshLayout.Enabled = false;
                 Adapter.ClearSelections();
                 RecyclerView.SwapAdapter(SearchAdapter, true);
-                (this as SearchView.IOnQueryTextListener).OnQueryTextChange(string.Empty);
+                (this as Android.Support.V7.Widget.SearchView.IOnQueryTextListener).OnQueryTextChange(string.Empty);
                 return true;
             }
 
@@ -954,15 +1019,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 //Binding of actual parameters, the view is already created
                 if (holder is FolderViewHolder)
                 {
-                    var fh = holder as FolderViewHolder;
+                    var viewHolder = holder as FolderViewHolder;
                     var folder = GetItemAtPosition(position).Folder;
 
-                    fh.FolderNameTitle.Text = folder.Name;
+                    viewHolder.FolderNameTitle.Text = folder.Name;
 
                     var sectionForPosition = GetSectionForPosition(position);
                     if (sectionForPosition == Section.Favourites || sectionForPosition == Section.None)
                     {
-                        fh.FolderNameSubTitle.Text = folder.Path;
+                        viewHolder.FolderNameSubTitle.Text = folder.Path;
                     }
                     else
                     {
@@ -976,30 +1041,34 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                             subtitleString += context.GetString(Resource.String.offline);
                         }
 
-                        fh.FolderNameSubTitle.Text = subtitleString;
+                        viewHolder.FolderNameSubTitle.Text = subtitleString;
                     }
 
-                    fh.FolderNameSubTitle.Visibility = !string.IsNullOrEmpty(fh.FolderNameSubTitle.Text) ? ViewStates.Visible : ViewStates.Gone;
+                    viewHolder.FolderNameSubTitle.Visibility = !string.IsNullOrEmpty(viewHolder.FolderNameSubTitle.Text) ? ViewStates.Visible : ViewStates.Gone;
 
-                    fh.ExpandButton.Visibility = folder.HasSubFolders && sectionForPosition != Section.None ? ViewStates.Visible : ViewStates.Invisible;
+                    viewHolder.ExpandButton.Visibility = folder.HasSubFolders && sectionForPosition != Section.None ? ViewStates.Visible : ViewStates.Invisible;
 
                     if (folder.InternalType == FolderInternalType.Worktray)
-                        fh.FolderIcon.SetImageResource(Resource.Drawable.folder_worktray);
+                        viewHolder.FolderIcon.SetImageResource(Resource.Drawable.folder_worktray);
                     else if (folder.Type == FolderType.Draft)
-                        fh.FolderIcon.SetImageResource(Resource.Drawable.folder_draft);
+                        viewHolder.FolderIcon.SetImageResource(Resource.Drawable.folder_draft);
                     else
-                        fh.FolderIcon.SetImageResource(Resource.Drawable.folder);
+                        viewHolder.FolderIcon.SetImageResource(Resource.Drawable.folder);
 
-                    fh.SelectedOverlay.Visibility = IsItemSelected(position) ? ViewStates.Visible : ViewStates.Gone;
+                    viewHolder.FailedDocumentIndicator.Visibility = folder.HasFailedDocuments ? ViewStates.Visible : ViewStates.Gone;
+
+                    viewHolder.FailedAndPendingDocumentCount.Text = folder.FailedAndPendingDocumentCount > 0 ? folder.FailedAndPendingDocumentCount.ToString() : String.Empty;
+
+                    viewHolder.SelectedOverlay.Visibility = IsItemSelected(position) ? ViewStates.Visible : ViewStates.Gone;
                 }
                 else if (holder is SectionViewHolder)
                 {
-                    var sh = holder as SectionViewHolder;
+                    var sectionViewHolder = holder as SectionViewHolder;
                     var section = SectionsPositionToSection()[position];
 
                     if (foldersInSection[section].Any())
                     {
-                        var title = string.Empty;
+                        var title = String.Empty;
 
                         switch (section)
                         {
@@ -1014,15 +1083,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                                 break;
                         }
 
-                        sh.SectionTitle.Text = title;
+                        sectionViewHolder.SectionTitle.Text = title;
 
-                        sh.ItemView.Visibility = ViewStates.Visible;
-                        sh.ItemView.LayoutParameters.Height = sectionHeight;
+                        sectionViewHolder.ItemView.Visibility = ViewStates.Visible;
+                        sectionViewHolder.ItemView.LayoutParameters.Height = sectionHeight;
                     }
                     else
                     {
-                        sh.ItemView.Visibility = ViewStates.Gone;
-                        sh.ItemView.LayoutParameters.Height = 1;
+                        sectionViewHolder.ItemView.Visibility = ViewStates.Gone;
+                        sectionViewHolder.ItemView.LayoutParameters.Height = 1;
                     }
                 }
             }
@@ -1138,7 +1207,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                     var foldersTxt = String.Empty;
 
-                    foreach(var entry in foldersInSection) {
+                    foreach (var entry in foldersInSection)
+                    {
                         foldersTxt += $" section : { entry.Key }, folders.Count() : { entry.Value.Count() },";
                     }
 
@@ -1317,6 +1387,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public AppCompatImageView FolderIcon { get; }
             public View SelectedOverlay { get; }
 
+            public ImageView FailedDocumentIndicator { get; }
+
+            public AppCompatTextView FailedAndPendingDocumentCount { get; }
+
             public event EventHandler<View> ExpandClicked = delegate { };
             public event EventHandler<View> ItemClicked = delegate { };
             public event EventHandler<View> ItemLongClicked = delegate { };
@@ -1338,6 +1412,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 internalContainerLayout.LongClick += (sender, e) => ItemLongClicked(this, itemView);
 
                 SelectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
+
+                FailedDocumentIndicator = itemView.FindViewById<ImageView>(Resource.Id.failed_document_indicator);
+
+                FailedAndPendingDocumentCount = itemView.FindViewById<AppCompatTextView>(Resource.Id.failed_and_pending_document_count);
             }
         }
 

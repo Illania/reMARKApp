@@ -10,12 +10,14 @@ using Mark5.Mobile.Common.DataAccess.Exceptions;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 using Mark5.Mobile.IOS.Utilities;
+using TinyMessenger;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
@@ -34,6 +36,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         protected UIBarButtonItem ComposeDocumentItem;
         protected UIBarButtonItem CreateContactItem;
         protected UIBarButtonItem CreateShortcodeItem;
+
+        TinyMessageSubscriptionToken outgoingDocumentCountChangedToken;
 
         UISearchController searchController;
         CancellationTokenSource searchCancellationTokenSource;
@@ -92,7 +96,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             if (TableView?.IndexPathsForSelectedRows?.Length > 0)
                 foreach (var selectedIndexPath in TableView?.IndexPathsForSelectedRows)
                     TableView.DeselectRow(selectedIndexPath, true);
+
+            SubscribeToMessages();
         }
+
+        #region Subscribe/unsubscribe
+
+        void SubscribeToMessages()
+        {
+            outgoingDocumentCountChangedToken = CommonConfig.MessengerHub.Subscribe<OugoingDocumentCountMessage>(HandleOutgoingDocumentCountChange);
+        }
+
+        void UnsubscribeFromMessages()
+        {
+            outgoingDocumentCountChangedToken?.Dispose();
+        }
+
+        #endregion
 
         public override void ViewDidAppear(bool animated)
         {
@@ -148,6 +168,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         protected override void Recycle()
         {
             base.Recycle();
+
+            UnsubscribeFromMessages();
 
             EditModeItem = null;
             ComposeDocumentItem = null;
@@ -554,6 +576,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     gds.SyncStatus = syncStatus;
                     gds.Reload();
                 }
+
+                if (ParentFolder.Module == ModuleType.Documents)
+                    Task.Run(async () => await GetCountAsync());
             }
             else
             {
@@ -596,9 +621,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 sds.FavoriteStatus = favoritesStatus;
         }
 
+        async Task GetCountAsync()
+        {
+            var pendingDocs = await Managers.DocumentsManager.GetDocumentsToUploadDocumentPreviews();
+            var failedDocs = await Managers.DocumentsManager.GetFailedDocumentsToUploadDocumentPreviews();
+            var count = pendingDocs.Count() + failedDocs.Count();
+
+            CommonConfig.MessengerHub.Publish(new OugoingDocumentCountMessage(this, count, failedDocs.Any()));
+        }
         #endregion
 
         #region List handlers
+
+        void HandleOutgoingDocumentCountChange(OugoingDocumentCountMessage ougoingMessageCount)
+        {
+            BeginInvokeOnMainThread(() =>
+            {
+                if (TableView.Source is GrouppedDataSource gds)
+                {
+                    gds.UpdateOutgoing(ougoingMessageCount.TotalCount, ougoingMessageCount.HasFailedDocuments);
+                }
+            });
+        }
 
         protected virtual void FolderSelected(Folder folder, bool isFromFavorite)
         {
@@ -1068,11 +1112,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     };
                 }
 
-                var f = items[indexPath.LongSection][indexPath.Row];
-                SyncStatus.TryGetValue(f.Id, out bool folderIsCached);
+                var folder = items[indexPath.LongSection][indexPath.Row];
+                SyncStatus.TryGetValue(folder.Id, out bool folderIsCached);
 
-                cell.Initialize(f, folderIsCached);
-                if (viewControllerWeakReference.Unwrap()?.ShouldDisableFolder(f) ?? false)
+                cell.documentCount.Text = "";
+                cell.failedDocumentIndicator.Hidden = true;
+
+                cell.Initialize(folder, folderIsCached);
+                if (viewControllerWeakReference.Unwrap()?.ShouldDisableFolder(folder) ?? false)
                     cell.Disable();
 
                 return cell;
@@ -1317,6 +1364,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     kv.Value.Clear();
 
                 tableViewWeakReference.Unwrap()?.BeginUpdates();
+
                 if (module == ModuleType.Documents)
                     tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(Section.Local), UITableViewRowAnimation.Fade);
 
@@ -1356,6 +1404,31 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 return indexPaths.ToArray();
             }
+
+            public void UpdateOutgoing(int count, bool hasFailedDocuments)
+            {
+                NSIndexPath indexPath = null;
+                for (var section = 0; section < items.Count; section++)
+                    for (var row = 0; row < items[section].Count; row++)
+                        if (items[section][row].IsOutgoing)
+                        {
+                            items[section][row].FailedAndPendingDocumentCount = count;
+                            items[section][row].HasFailedDocuments = hasFailedDocuments;
+
+                            indexPath = NSIndexPath.FromRowSection(row, section);
+                        }
+
+                if (indexPath != null)
+                {
+                    var indexPathVisible = tableViewWeakReference.Unwrap()?.IndexPathsForVisibleRows?.Contains(indexPath);
+                    if (indexPathVisible != null)
+                    {
+                        tableViewWeakReference.Unwrap()?.BeginUpdates();
+                        tableViewWeakReference.Unwrap()?.ReloadRows(new[] { indexPath }, UITableViewRowAnimation.Fade);
+                        tableViewWeakReference.Unwrap()?.EndUpdates();
+                    }
+                }
+            }
         }
 
         protected class DataSource : UITableViewSource, IDisposable
@@ -1394,8 +1467,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     return emptyCell;
                 }
 
-                var cell = tableView.DequeueReusableCell(FoldersTableViewCell.DefaultId) as FoldersTableViewCell;
-                if (cell == null)
+                if (!(tableView.DequeueReusableCell(FoldersTableViewCell.DefaultId) is FoldersTableViewCell cell))
                 {
                     cell = new FoldersTableViewCell
                     {

@@ -8,6 +8,7 @@ using Mark5.Mobile.Common.Storage;
 using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Model;
 using Mark5.ServiceReference.Exceptions;
+using System.Linq;
 
 namespace Mark5.Mobile.Common.Service
 {
@@ -143,6 +144,10 @@ namespace Mark5.Mobile.Common.Service
 
                             CommonConfig.MessengerHub.Publish(new DocumentUploadStatusChangedMessage(this, DocumentUploadStatusChangedMessage.Status.DocumentSentFailed, documentToUploadGuid));
                         }
+                        finally
+                        {
+                            GetCountAndNotify();
+                        }
                     }
                 }
             }
@@ -150,8 +155,21 @@ namespace Mark5.Mobile.Common.Service
             {
                 CommonConfig.Logger.Error("Unexpected error in upload task!", ex);
             }
+            finally
+            {
+                GetCountAndNotify();
+            }
 
             CommonConfig.Logger.Info("Stopped upload task");
+        }
+
+        async void GetCountAndNotify()
+        {
+            var pendingDocs = await Managers.DocumentsManager.GetDocumentsToUploadDocumentPreviews();
+            var failedDocs = await Managers.DocumentsManager.GetFailedDocumentsToUploadDocumentPreviews();
+            var totalCount = pendingDocs.Count() + failedDocs.Count();
+
+            CommonConfig.MessengerHub.Publish(new OugoingDocumentCountMessage(this, totalCount, failedDocs.Any()));
         }
     }
 }
