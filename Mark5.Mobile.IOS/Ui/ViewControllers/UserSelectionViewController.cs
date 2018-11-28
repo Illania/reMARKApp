@@ -14,9 +14,10 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    public class ResponsibleUsersSelectionController : AbstractTableViewController
+    public class UserSelectionViewController : AbstractTableViewController
     {
         public List<int> PreselectedSystemUserIds { get; set; }
+        public bool? IncludeCurrentUser { get; set; }
 
         readonly public TaskCompletionSource<List<SystemUser>> tcs = new TaskCompletionSource<List<SystemUser>>();
         public Task<List<SystemUser>> Result => tcs.Task;
@@ -148,8 +149,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             try
             {
                 var usersDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
-                usersDepartments.Users.Add(ServerConfig.SystemSettings.UserInfo.User);
-                ((DataSource)TableView.Source).SetItems(usersDepartments.Users);
+
+                if (usersDepartments != null)
+                {
+                    if(IncludeCurrentUser ?? true)
+                        usersDepartments.Users.Add(ServerConfig.SystemSettings.UserInfo.User);
+                    ((DataSource)TableView.Source).SetItems(usersDepartments.Users);
+                }
 
                 if (PreselectedSystemUserIds != null)
                     ((DataSource)TableView.Source).SelectedUserIds = PreselectedSystemUserIds;
@@ -162,8 +168,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        class DataSource : UITableViewSource
+        public class DataSource : UITableViewSource
         {
+            public List<SystemUser> Items => items;
             public bool Empty => items.Count < 1;
 
             public List<int> SelectedUserIds
@@ -210,13 +217,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
             }
 
-            readonly WeakReference<ResponsibleUsersSelectionController> viewControllerWeakReference;
+            readonly WeakReference<UserSelectionViewController> viewControllerWeakReference;
             readonly WeakReference<UITableView> tableViewWeakReference;
 
             bool loading = true;
             readonly List<SystemUser> items = new List<SystemUser>();
 
-            public DataSource(ResponsibleUsersSelectionController viewController, UITableView tableView)
+            public DataSource(UserSelectionViewController viewController, UITableView tableView)
             {
                 viewControllerWeakReference = viewController.Wrap();
                 tableViewWeakReference = tableView.Wrap();

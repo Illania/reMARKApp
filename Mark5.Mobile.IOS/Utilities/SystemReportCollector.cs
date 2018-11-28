@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Foundation;
@@ -7,6 +8,7 @@ using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
+using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 using MessageUI;
 using UIKit;
 
@@ -18,7 +20,7 @@ namespace Mark5.Mobile.IOS.Utilities
 
         public static UIActivityViewController CreateShareReportController(string report)
         {
-            return new UIActivityViewController(new[] { new NSString(report) }, null)
+            var vc = new UIActivityViewController(new[] { new NSString(report) }, null)
             {
                 ExcludedActivityTypes = new[]
                 {
@@ -33,17 +35,40 @@ namespace Mark5.Mobile.IOS.Utilities
                     UIActivityType.SaveToCameraRoll
                 }
             };
+            vc.SetValueForKey(NSObject.FromObject("MARK5 iOS System Report"), new NSString("subject"));
+
+            return vc;
         }
 
-        public static MFMailComposeViewController CreateMailReportController(string report)
+        public static ComposeDocumentViewController CreateShareReportComposeDocumentViewController(string preconfiguredContent)
+        {
+            return new ComposeDocumentViewController
+            {
+                PreconfiguredEmailAddresses = new Dictionary<DocumentAddressType, string[]>() { { DocumentAddressType.To, new string[] { "appfeedback@nordic-it.com" } } },
+                PreconfiguredSubject = "MARK5 iOS System Report",
+                PreconfiguredContent = preconfiguredContent
+            };
+        }
+
+        public static ComposeDocumentViewController CreateShareFeedbackComposeDocumentViewController(string preconfiguredContent)
+        {
+            return new ComposeDocumentViewController
+            {
+                PreconfiguredEmailAddresses = new Dictionary<DocumentAddressType, string[]>() { { DocumentAddressType.To, new string[] { "appfeedback@nordic-it.com" } } },
+                PreconfiguredSubject = "MARK5 iOS Feedback",
+                PreconfiguredContent = preconfiguredContent
+            };
+        }
+
+        public static MFMailComposeViewController CreateMailFeedbackController(string report)
         {
             var mcvc = new MFMailComposeViewController();
             mcvc.SetToRecipients(new[] { "appfeedback@nordic-it.com" });
-            mcvc.SetSubject("MARK5 for iOS Feedback");
-            mcvc.AddAttachmentData(NSData.FromString(report), "text/plain", "MARK5_Android_System_Report.txt");
+            mcvc.SetSubject("MARK5 iOS Feedback");
+            mcvc.AddAttachmentData(NSData.FromString(report), "text/plain", "MARK5_iOS_System_Report.txt");
             mcvc.Finished += Mcvc_Finished;
             mcvc.NavigationBar.TintColor = Theme.DarkBlue;
-            
+
             return mcvc;
         }
 
@@ -129,6 +154,30 @@ namespace Mark5.Mobile.IOS.Utilities
             var sb = new StringBuilder();
             sb.Append("===== log =====");
             sb.AppendLine(((ConsoleAndFileLogger)CommonConfig.Logger).ReadLogFile());
+            return sb.ToString();
+        }
+
+        public static string CreateExceptionReport(Exception ex)
+        {
+            var sb = new StringBuilder();
+
+            sb.AppendLine("===== Exception =====");
+            sb.AppendLine("Exception Type: " + ex.GetType());
+            sb.AppendLine();
+            sb.AppendLine("Stack trace: " + ex.StackTrace);
+
+            return sb.ToString();
+        }
+
+        public static string CreateFailedDocumentReport(Exception ex)
+        {
+            var sb = new StringBuilder();
+
+            sb.AppendLine("===== Document Failed Report =====");
+            sb.Append(CreateSystemInfoReport());
+            sb.AppendLine();
+            sb.Append(CreateExceptionReport(ex));
+
             return sb.ToString();
         }
     }

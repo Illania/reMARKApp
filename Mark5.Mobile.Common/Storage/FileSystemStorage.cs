@@ -432,6 +432,29 @@ namespace Mark5.Mobile.Common.Storage
             return Serializer.Deserialize<DocumentPreview>(fileContent);
         }
 
+        public static async Task<Exception> GetFailedDocumentException(Guid guid)
+        {
+            var failedFolder = (await CommonConfig.DocumentsToUploadFolder.CreateFolderAsync("failed", CreationCollisionOption.OpenIfExists));
+            if (failedFolder == null)
+                return null;
+
+            var folder = await failedFolder.GetFolderAsync(guid.ToString());
+            if (folder == null)
+                return null;
+
+            var fileExists = await folder.CheckExistsAsync("failedToSendException.json") == ExistenceCheckResult.FileExists;
+            if (!fileExists)
+                return null;
+
+            var file = await folder.GetFileAsync("failedToSendException.json");
+            if (file == null)
+                return null;
+
+            var fileContent = await file.ReadAllTextAsync();
+
+            return Serializer.Deserialize<Exception>(fileContent);
+        }
+
         public static async Task<DocumentPreview> GetFailedDocumentToUploadDocumentPreview(Guid guid)
         {
             var failedFolder = (await CommonConfig.DocumentsToUploadFolder.CreateFolderAsync("failed", CreationCollisionOption.OpenIfExists));
@@ -561,11 +584,14 @@ namespace Mark5.Mobile.Common.Storage
             await folder.DeleteAsync();
         }
 
-        public static async Task MoveDocumentToUploadToFailed(Guid guid)
+        public static async Task MoveDocumentToUploadToFailed(Guid guid, Exception failedToSendException)
         {
             var folder = (await CommonConfig.DocumentsToUploadFolder.GetFoldersAsync()).FirstOrDefault(f => f.Name == guid.ToString());
             if (folder == null)
                 return;
+
+            var failedToSendExFile = await folder.CreateFileAsync("failedToSendException.json", CreationCollisionOption.ReplaceExisting);
+            await failedToSendExFile.WriteAllTextAsync(Serializer.Serialize(failedToSendException));
 
             var failedFolder = await CommonConfig.DocumentsToUploadFolder.CreateFolderAsync("failed", CreationCollisionOption.OpenIfExists);
             if (failedFolder == null)

@@ -20,6 +20,7 @@ using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView;
 using Mark5.Mobile.IOS.Utilities;
+using Mark5.ServiceReference.Exceptions;
 using MobileCoreServices;
 using Photos;
 using UIKit;
@@ -41,7 +42,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         public DocumentDirection PreviousDocumentDirection { get; set; }
         public int? PreviousDocumentFolderId { get; set; }
         public int? PreviousDocumentId { get; set; }
+        public string PreconfiguredContent { get; set; }
         public Dictionary<DocumentAddressType, string[]> PreconfiguredEmailAddresses { get; set; }
+        public string PreconfiguredSubject { get; set; }
 
         DocumentPreview documentPreview = new DocumentPreview();
         Document document = new Document();
@@ -69,6 +72,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         SuggestionsListView suggestionsListView;
         Worker autoSaveWorkingCopyWorker;
+
+        SystemUsersDepartments systemUserDepartments;
 
         public override void ViewDidLoad()
         {
@@ -277,6 +282,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             refreshing = true;
 
+            if (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
+                await LoadSystemUsersDepartments();
             await LoadDocument();
             await LoadTemplate();
 
@@ -351,6 +358,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                 document.Guid = Guid.NewGuid();
 
+                if (PreconfiguredSubject != null)
+                    subjectView.Subject = PreconfiguredSubject;
+
                 if (RestoreWorkingCopy)
                 {
                     var files = await Managers.DocumentsManager.GetDocumentWorkingCopyAttachmentsAsync();
@@ -359,6 +369,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                 if (RestoreWorkingCopy)
                     await LoadHtmlString(document.HtmlBody, HtmlProcessingConfiguration.DefaultForEditing);
+                else if (PreconfiguredContent != null)
+                    await LoadPlainText(PreconfiguredContent, PlainTextProcessingConfiguration.DefaultForEditing);
                 else if (previousDocumentPreview != null && PreviousDocumentDirection == DocumentDirection.Draft ||
                          (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption.HasFlag(CopyToNewOption.Content)))
                 {
@@ -414,6 +426,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 CommonConfig.Logger.Error("Failed to load email into editor", ex);
 
                 await Dialogs.ShowErrorAlertAsync(this, ex);
+            }
+        }
+
+        async Task LoadSystemUsersDepartments()
+        {
+            try
+            {
+                systemUserDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync(SourceType.Local);
+                systemUserDepartments.Users.Add(ServerConfig.SystemSettings.UserInfo.User);
+
+                var subViews = headerStackView.Subviews.OfType<RecipientsView>().ToArray();
+
+                foreach (var subView in subViews)
+                    subView.SystemUsersDepartments = systemUserDepartments;
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Error while retrieving system users", ex);
             }
         }
 
@@ -571,6 +601,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             if (suggestionsListView == null)
             {
                 suggestionsListView = new SuggestionsListView(this);
+                suggestionsListView.SystemUsersDepartments = systemUserDepartments;
 
                 View.AddSubview(suggestionsListView);
                 View.AddConstraints(new[]
@@ -593,15 +624,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async void RecipientView_AddButtonTapped(object sender, EventArgs e)
         {
-            var strings = new[]
-            {
-                Localization.GetString("contact_picker_recent_addresses"),
-                Localization.GetString("contact_picker_contacts"),
-                Localization.GetString("contact_picker_shortcodes"),
-                Localization.GetString("contact_picker_phonebook")
-            };
+            var strings = new List<string>
+                {
+                    Localization.GetString("contact_picker_recent_addresses"),
+                    Localization.GetString("contact_picker_contacts"),
+                    Localization.GetString("contact_picker_shortcodes"),
+                    Localization.GetString("contact_picker_phonebook"),
+                };
 
-            var choice = await Dialogs.ShowListActionSheetAsync(this, strings, (UIView)sender);
+            if (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
+                strings.Add(Localization.GetString("contact_picker_internal_contacts"));
+
+            var choice = await Dialogs.ShowListActionSheetAsync(this, strings.ToArray(), (UIView)sender);
+
             switch (choice)
             {
                 case 0:
@@ -615,6 +650,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     break;
                 case 3:
                     await DoOpenPhonebook(sender as RecipientsView);
+                    break;
+                case 4:
+                    await DoOpenInternalContacts(sender as RecipientsView);
                     break;
                 default:
                     return;
@@ -727,9 +765,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async Task<bool> SendDocument()
         {
-            if (!ContainsValidEmails(toView, ccView, bccView))
+            if (!ContainsValidRecipients(toView, ccView, bccView))
             {
-                await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("warning"), Localization.GetString("no_email_addresses_added"));
+                await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("warning"), Localization.GetString("no_recipients_added"));
                 return false;
             }
 
@@ -739,9 +777,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 return false;
             }
 
-            if (ContainsInvalidEmails(toView, ccView, bccView))
+            if (ContainsInvalidRecipients(toView, ccView, bccView))
             {
-                var result = await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("warning"), Localization.GetString("incorrect_email_addresses_added"));
+                var result = await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("warning"), Localization.GetString("incorrect_recipients_added"));
                 if (!result)
                     return false;
             }
@@ -1069,6 +1107,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 recipientsView.AddRecipent(pa.Name, pa.Address);
         }
 
+        async Task DoOpenInternalContacts(RecipientsView recipientsView)
+        {
+            CommonConfig.UsageAnalytics.LogEvent(new ComposeContactPickerEvent(ContactPickerChoice.Internal));
+
+            var vc = new MultipleUserSelectionViewController();
+            vc.IncludeCurrentUser = false;
+            PresentViewController(new NavigationController(vc), true, null);
+
+            var pa = await vc.Result;
+            if (pa != null)
+            {
+                foreach (var su in pa)
+                    recipientsView.AddRecipent(string.Empty, su.Username);
+            }
+        }
+
         async Task DoOpenRecents(RecipientsView recipientsView)
         {
             CommonConfig.UsageAnalytics.LogEvent(new ComposeContactPickerEvent(ContactPickerChoice.Recents));
@@ -1243,7 +1297,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         #region Utilities
 
-        static bool ContainsValidEmails(params RecipientsView[] rvs)
+        static bool ContainsValidRecipients(params RecipientsView[] rvs)
         {
             var containsValidEmails = false;
 
@@ -1253,10 +1307,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             return containsValidEmails;
         }
 
-        static bool ContainsInvalidEmails(params RecipientsView[] rvs)
+        static bool ContainsInvalidRecipients(params RecipientsView[] rvs)
         {
             foreach (var rv in rvs)
-                if (rv.ContainsInvalidEmail())
+                if (rv.ContainsInvalidRecipients())
                     return true;
 
             return false;

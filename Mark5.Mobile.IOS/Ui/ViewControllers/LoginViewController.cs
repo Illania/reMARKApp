@@ -669,6 +669,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync();
 
+                await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
+
                 CommonConfig.Logger.Info($"Starting services...");
                 Services.DocumentsUploadService.Start();
                 Services.DocumentPreviewsDownloadService.Start();

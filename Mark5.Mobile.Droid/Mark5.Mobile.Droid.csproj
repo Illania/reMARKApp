@@ -210,7 +210,8 @@
       <HintPath>..\packages\Polly.6.1.0\lib\netstandard2.0\Polly.dll</HintPath>
     </Reference>
     <Reference Include="PhoneNumbers">
-      <HintPath>..\packages\libphonenumber-csharp.8.9.15\lib\netstandard2.0\PhoneNumbers.dll</HintPath>
+      <HintPath>..\packages\libphonenumber-csharp.8.9.16\lib\netstandard2.0\PhoneNumbers.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -454,6 +455,8 @@
     <Compile Include="Ui\Fragments\SwipeActionsFragment.cs" />
     <Compile Include="Utilities\OnBoardingUtilities.cs" />
     <Compile Include="Ui\Fragments\CategoriesListFragment.cs" />
+    <Compile Include="Ui\Activities\PickerInternalContactsListActivity.cs" />
+    <Compile Include="Ui\Fragments\PickerInternalContactsListFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
