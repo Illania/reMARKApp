@@ -24,7 +24,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         CalendarAppointment testAppointmentSimple;  //Good
         CalendarAppointment testAppointmentAllDay; //Good
         CalendarAppointment testAppointmentRecurring; //Good!
-        CalendarAppointment testAppointmentPartecipants;
+        CalendarAppointment testAppointmentPartecipants;  //Don't know how to set the status of participants, so I wait
         CalendarAppointment testAppointmentAlarm;
 
         void PrepareTests()
@@ -112,6 +112,55 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             testAppointmentRecurring.Occurrences.Add(occurrence);
             testAppointmentRecurring.RecurrenceInfo = recurrenceInfo;
+
+            testAppointmentPartecipants = new CalendarAppointment
+            {
+                CalendarId = selectedCalendar.Id,
+                Location = "TestParticipants",
+                Subject = "TestSubject",
+                Description = "TestDescription",
+                Creator = ServerConfig.SystemSettings.UserInfo.User.Username,
+                CreatorId = ServerConfig.SystemSettings.UserInfo.User.Id,
+                RecurrenceInfo = null,
+                AllDay = false,
+                Priority = Priority.Normal,
+                Private = false,
+                Type = CalendarOccurenceType.Normal,
+                Status = AppointmentStatus.Busy,
+            };
+
+            occurrence = new CalendarAppointmentOccurrence()
+            {
+                StartDateTimestamp = GetFromDateTime().ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds(),
+                EndDateTimestamp = GetToDateTime().ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds(),
+            };
+
+            testAppointmentPartecipants.Occurrences.Add(occurrence);
+
+
+            testAppointmentAlarm = new CalendarAppointment
+            {
+                CalendarId = selectedCalendar.Id,
+                Location = "TestLocation",
+                Subject = "TestAppointment",
+                Description = "TestDescription",
+                Creator = ServerConfig.SystemSettings.UserInfo.User.Username,
+                CreatorId = ServerConfig.SystemSettings.UserInfo.User.Id,
+                RecurrenceInfo = null,
+                AllDay = false,
+                Priority = Priority.Normal,
+                Private = false,
+                Type = CalendarOccurenceType.Normal,
+                Status = AppointmentStatus.Busy,
+            };
+
+            occurrence = new CalendarAppointmentOccurrence()
+            {
+                StartDateTimestamp = GetFromDateTime().ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds(),
+                EndDateTimestamp = GetToDateTime().ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds(),
+            };
+
+            testAppointmentAlarm.Occurrences.Add(occurrence);
         }
 
         public override void ViewWillAppear(bool animated)
@@ -296,7 +345,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             try
             {
                 PrepareTests();
-                await Managers.CalendarManager.CreateOrUpdateCalendarAppointmentAsync(selectedCalendar.Id, testAppointmentRecurring);
+                await Managers.CalendarManager.CreateOrUpdateCalendarAppointmentAsync(selectedCalendar.Id, testAppointmentPartecipants); //TO CHANGE FOR TESING ADD
+
             }
             catch (Exception ex)
             {
