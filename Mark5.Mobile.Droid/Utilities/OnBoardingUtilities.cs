@@ -182,7 +182,6 @@ namespace Mark5.Mobile.Droid.Utilities
                     Gravity = GravityFlags.Top,
                     MovementMethod = Android.Text.Method.ScrollingMovementMethod.Instance,
                 };
-                contentTextView.JustificationMode = Android.Text.JustificationMode.InterWord;
                 contentTextView.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
                 contentTextView.SetTextColor(new Color(ContextCompat.GetColor(context, Resource.Color.darkblue)));
                 contentTextView.SetPadding(paddingValue, paddingValue, paddingValue, paddingValue);

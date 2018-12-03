@@ -1192,7 +1192,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     var section = sectionPositionToSection[sectionPosition];
                     return (foldersInSection[section][position - sectionPosition - 1], section);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     var exceptionText = $"FolderListAdapter.GetItemAtPosition(int position) : index ouf of range exception :: Position : { position }, foldersInSection.Count() : { foldersInSection.Count() } :: ";
 
