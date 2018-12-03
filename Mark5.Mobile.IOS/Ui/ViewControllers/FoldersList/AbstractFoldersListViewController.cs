@@ -1391,7 +1391,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 {
                     if (items[Section.Local][0].IsOutgoing)
                     {
-                        items[Section.Local][0].DocumentCount = count;
+                        items[Section.Local][0].FailedAndPendingDocumentCount = count;
                         items[Section.Local][0].HasFailedDocuments = hasFailedDocuments;
 
                         indexPath = NSIndexPath.FromRowSection(0, Section.Local);

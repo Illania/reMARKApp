@@ -264,7 +264,7 @@ namespace Mark5.Mobile.Common.Model
         public bool IsOutgoing => Id == DocumentsOutgoingFolder.Id;
 
         [Ignore]
-        public int DocumentCount { get; set; } = 0;
+        public int FailedAndPendingDocumentCount { get; set; } = 0;
 
         [Ignore]
         public bool HasFailedDocuments { get; set; } = false;
