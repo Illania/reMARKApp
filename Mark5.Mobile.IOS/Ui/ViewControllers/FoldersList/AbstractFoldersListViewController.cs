@@ -465,12 +465,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 {
                     var gds = (GrouppedDataSource)TableView.Source;
 
-                    if (PlatformConfig.Preferences.SyncFavoriteFoldersEnabled && CommonConfig.Reachability.IsReachable) 
+                    if (PlatformConfig.Preferences.SyncFavoriteFoldersEnabled && CommonConfig.Reachability.IsReachable)
                     {
                         try
                         {
                             await Managers.FoldersManager.GetModuleFavorites(new List<ModuleType> { ParentFolder.Module });
-                        } 
+                        }
                         catch (Exception ex)
                         {
                             CommonConfig.Logger.Error($"Could not synchronize favorite folders with server", ex);
@@ -657,7 +657,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 if (PlatformConfig.Preferences.SyncFavoriteFoldersEnabled && CommonConfig.Reachability.IsReachable)
                 {
-                   await Managers.FoldersManager.AddModuleFavorites(new List<Folder>() { folder }, folder.Module);
+                    await Managers.FoldersManager.AddModuleFavorites(new List<Folder>() { folder }, folder.Module);
                 }
 
                 await Managers.FoldersManager.AddFavoriteFolderAsync(folder.Module, folder);
@@ -698,15 +698,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 CommonConfig.UsageAnalytics.LogEvent(new SetFolderFavoriteEvent(folder.Module, 1));
 
                 if (PlatformConfig.Preferences.SyncFavoriteFoldersEnabled && !CommonConfig.Reachability.IsReachable)
-                {
                     throw new Exception(Localization.GetString("sync_error_network"));
-                }
 
                 if (PlatformConfig.Preferences.SyncFavoriteFoldersEnabled && CommonConfig.Reachability.IsReachable)
-                {
                     await Managers.FoldersManager.RemoveModuleFavorites(new List<Folder> { folder }, folder.Module);
-                    await Managers.FoldersManager.RemoveFavoriteFolderAsync(folder.Module, folder);
-                }
 
                 await Managers.FoldersManager.RemoveFavoriteFolderAsync(folder.Module, folder);
 

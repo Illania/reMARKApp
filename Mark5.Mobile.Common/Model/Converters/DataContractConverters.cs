@@ -1009,7 +1009,8 @@ namespace Mark5.Mobile.Common.Model.Converters
             };
         }
 
-        public static DataContract.Folder Convert(this Folder folder) {
+        public static DataContract.Folder Convert(this Folder folder)
+        {
             return new DataContract.Folder
             {
                 Guid = folder.Guid,
@@ -1031,7 +1032,7 @@ namespace Mark5.Mobile.Common.Model.Converters
 
             if (moduleFavoritesResult.ModuleFavoritesList != null)
             {
-                moduleFavorites.ModuleFovoritesList = new List<ModuleFavorite>();
+                moduleFavorites.ModuleFavoritesList = new List<ModuleFavorite>();
 
                 foreach (var fav in moduleFavoritesResult.ModuleFavoritesList)
                 {
@@ -1042,7 +1043,7 @@ namespace Mark5.Mobile.Common.Model.Converters
                         newFav.Folders.Add(folder.Convert());
                     }
 
-                    moduleFavorites.ModuleFovoritesList.Add(newFav);
+                    moduleFavorites.ModuleFavoritesList.Add(newFav);
                 }
             }
 

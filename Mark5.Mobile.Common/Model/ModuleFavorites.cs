@@ -8,13 +8,13 @@ namespace Mark5.Mobile.Common.Model
 {
     public class ModuleFavorites
     {
-        public List<ModuleFavorite> ModuleFovoritesList { get; set; }
+        public List<ModuleFavorite> ModuleFavoritesList { get; set; }
 
         public DateTime UpdatedAt { get; set; }
 
-        public ModuleFavorites() 
+        public ModuleFavorites()
         {
-            ModuleFovoritesList = new List<ModuleFavorite>();
+            ModuleFavoritesList = new List<ModuleFavorite>();
         }
     }
 

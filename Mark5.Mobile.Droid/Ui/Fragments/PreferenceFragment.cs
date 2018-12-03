@@ -148,8 +148,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var checkBox = (CheckBoxPreference)FindPreference(GetString(Resource.String.pref_key_sync_favorites_enabled));
             if (checkBox != null)
             {
-                checkBox.PreferenceClick += async (object sender, Preference.PreferenceClickEventArgs e) => {
-                    if(checkBox.Checked)
+                checkBox.PreferenceClick += async (object sender, Preference.PreferenceClickEventArgs e) =>
+                {
+                    if (checkBox.Checked)
                         await HandleSync();
                 };
             }
@@ -158,7 +159,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (serviceVersion == null || serviceVersion.CompareTo(new Version(3, 2, 0)) < 0)
             {
                 var screen = (PreferenceScreen)FindPreference(GetString(Resource.String.pref_sync_favorites));
-                if(screen != null)
+                if (screen != null)
                     PreferenceScreen.RemovePreference(screen);
             }
         }
@@ -171,7 +172,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             try
             {
                 var response = await Managers.FoldersManager.GetModuleFavorites();
-                if (response.ModuleFovoritesList == null)
+                if (response.ModuleFavoritesList == null)
                 {
                     await Managers.FoldersManager.UpdateModuleFavorites();
                 }
@@ -181,7 +182,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                     if (selectedOption == 0)
                     {
-                        if (response.ModuleFovoritesList != null && response.ModuleFovoritesList.Count == 0)
+                        if (response.ModuleFavoritesList != null && response.ModuleFavoritesList.Count == 0)
                         {
                             await Managers.FoldersManager.ClearFavorites();
                         }
@@ -189,7 +190,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         {
                             var missingModules = new List<ModuleType> { ModuleType.Shortcodes, ModuleType.Contacts, ModuleType.Documents };
 
-                            foreach (var favorite in response.ModuleFovoritesList)
+                            foreach (var favorite in response.ModuleFavoritesList)
                             {
                                 await Managers.FoldersManager.SetFavoriteFoldersAsync(favorite.ModuleType, favorite.Folders);
                                 missingModules.RemoveAll(x => x == favorite.ModuleType);
@@ -258,7 +259,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                     }
 
-                },TaskScheduler.FromCurrentSynchronizationContext());
+                }, TaskScheduler.FromCurrentSynchronizationContext());
                 return true;
             }
 

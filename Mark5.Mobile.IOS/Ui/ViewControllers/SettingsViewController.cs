@@ -285,7 +285,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     if (sendWithMark5)
                     {
                         var cvc = SystemReportCollector.CreateShareFeedbackComposeDocumentViewController(report);
-                        PresentViewController(new NavigationController(cvc, UIModalPresentationStyle.PageSheet), true, null); 
+                        PresentViewController(new NavigationController(cvc, UIModalPresentationStyle.PageSheet), true, null);
                     }
                     else
                     {
@@ -427,13 +427,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
             if (key == SyncFavoriteFoldersKey)
-                await HandleSync();
+                await HandleFavoriteSync();
 
             if (key == UseTemplateKey)
                 RefreshHiddenSettings();
         }
 
-        async Task HandleSync()
+        async Task HandleFavoriteSync()
         {
             if (!PlatformConfig.Preferences.SyncFavoriteFoldersEnabled)
                 return;
@@ -441,7 +441,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             try
             {
                 var response = await Managers.FoldersManager.GetModuleFavorites();
-                if (response.ModuleFovoritesList == null)
+                if (response.ModuleFavoritesList == null)
                 {
                     await Managers.FoldersManager.UpdateModuleFavorites();
                 }
@@ -451,7 +451,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     if (selectedOption == 0)
                     {
-                        if (response.ModuleFovoritesList != null && response.ModuleFovoritesList.Count == 0)
+                        if (response.ModuleFavoritesList != null && response.ModuleFavoritesList.Count == 0)
                         {
                             await Managers.FoldersManager.ClearFavorites();
                         }
@@ -459,10 +459,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         {
                             var missingModules = new List<ModuleType> { ModuleType.Shortcodes, ModuleType.Contacts, ModuleType.Documents };
 
-                            foreach (var favorite in response.ModuleFovoritesList)
+                            foreach (var favorite in response.ModuleFavoritesList)
                             {
                                 await Managers.FoldersManager.SetFavoriteFoldersAsync(favorite.ModuleType, favorite.Folders);
-                                missingModules.RemoveAll(x => x == favorite.ModuleType);
+                                missingModules.Remove(favorite.ModuleType);
                             }
 
                             await Managers.FoldersManager.ClearFavorites(missingModules);

@@ -82,7 +82,7 @@ namespace Mark5.Mobile.Common.Manager
 
             favoriteFolders[module] = moduleFavoriteFolders;
 
-            foreach(var entry in favoriteFolders )
+            foreach (var entry in favoriteFolders)
             {
                 Folder.FavoritesRootForModule(entry.Key).SubFolders = entry.Value;
             }
@@ -208,13 +208,9 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task<ModuleFavorites> GetModuleFavorites(List<ModuleType> modules)
         {
-
             List<DataContract.ModuleType> dataContractModules = new List<DataContract.ModuleType>();
 
-            foreach (var module in modules)
-            {
-                dataContractModules.Add(module.ConvertEnum<DataContract.ModuleType>());
-            }
+            dataContractModules.AddRange(modules.Select(module => module.ConvertEnum<DataContract.ModuleType>()));
 
             var result = await AppServiceProxy.GetModuleFavorites(new DataContract.GetModuleFavoritesParameters()
             {
@@ -224,9 +220,9 @@ namespace Mark5.Mobile.Common.Manager
 
             ModuleFavorites moduleFavorites = result.Convert();
 
-            if (moduleFavorites.ModuleFovoritesList != null)
+            if (moduleFavorites.ModuleFavoritesList != null)
             {
-                foreach (var module in moduleFavorites.ModuleFovoritesList)
+                foreach (var module in moduleFavorites.ModuleFavoritesList)
                 {
                     await SetFavoriteFoldersAsync(module.ModuleType, module.Folders);
                 }
@@ -250,10 +246,7 @@ namespace Mark5.Mobile.Common.Manager
         {
             DataContract.ModuleFavorites moduleFavorite = new DataContract.ModuleFavorites { ModuleType = (DataContract.ModuleType)moduleType };
 
-            foreach (var folder in folders)
-            {
-                moduleFavorite.Folders.Add(folder.Convert());
-            }
+            moduleFavorite.Folders.AddRange(folders.Select(x => x.Convert()));
 
             DataContract.AddModuleFavoritesParameters favParams = new DataContract.AddModuleFavoritesParameters()
             {
@@ -268,10 +261,7 @@ namespace Mark5.Mobile.Common.Manager
         {
             DataContract.ModuleFavorites moduleFavorite = new DataContract.ModuleFavorites { ModuleType = (DataContract.ModuleType)moduleType };
 
-            foreach (var folder in folders)
-            {
-                moduleFavorite.Folders.Add(folder.Convert());
-            }
+            moduleFavorite.Folders.AddRange(folders.Select(x => x.Convert()));
 
             DataContract.RemoveModuleFavoritesParameters favParams = new DataContract.RemoveModuleFavoritesParameters()
             {
