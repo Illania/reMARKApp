@@ -146,7 +146,7 @@ namespace Mark5.Mobile.Common.Service
                         }
                         finally
                         {
-                            GetCountAndNotify();
+                            await Managers.DocumentsManager.NotifyPendingAndFailedCountChanged();
                         }
                     }
                 }
@@ -157,19 +157,10 @@ namespace Mark5.Mobile.Common.Service
             }
             finally
             {
-                GetCountAndNotify();
+                await Managers.DocumentsManager.NotifyPendingAndFailedCountChanged();
             }
 
             CommonConfig.Logger.Info("Stopped upload task");
-        }
-
-        async void GetCountAndNotify()
-        {
-            var pendingDocs = await Managers.DocumentsManager.GetDocumentsToUploadDocumentPreviews();
-            var failedDocs = await Managers.DocumentsManager.GetFailedDocumentsToUploadDocumentPreviews();
-            var totalCount = pendingDocs.Count() + failedDocs.Count();
-
-            CommonConfig.MessengerHub.Publish(new OugoingDocumentCountMessage(this, totalCount, failedDocs.Any()));
         }
     }
 }

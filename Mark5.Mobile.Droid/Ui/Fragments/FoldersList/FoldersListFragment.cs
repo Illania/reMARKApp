@@ -156,15 +156,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return rootView;
         }
 
-        async Task GetCountAsync()
-        {
-            var pendingDocs = await Managers.DocumentsManager.GetDocumentsToUploadDocumentPreviews();
-            var failedDocs = await Managers.DocumentsManager.GetFailedDocumentsToUploadDocumentPreviews();
-            var count = pendingDocs.Count() + failedDocs.Count();
-
-            CommonConfig.MessengerHub.Publish(new OugoingDocumentCountMessage(this, count, failedDocs.Any()));
-        }
-
         public override void OnViewCreated(View view, Bundle savedInstanceState)
         {
             base.OnViewCreated(view, savedInstanceState);
@@ -236,7 +227,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             RefreshData();
 
-            Task.Run(async () => await GetCountAsync());
+            Task.Run(async () => await Managers.DocumentsManager.NotifyPendingAndFailedCountChanged());
         }
 
         public override void OnSaveInstanceState(Bundle outState)
@@ -398,7 +389,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var outgoing = localRootFolder.SubFolders.First();
                 if (outgoing != null)
                 {
-                    outgoing.FailedAndPendingDocumentCount = count;
+                    outgoing.DocumentCount = count;
                     outgoing.HasFailedDocuments = hasFailedDocuments;
                     Activity.RunOnUiThread(() =>
                     {
@@ -1057,7 +1048,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                     viewHolder.FailedDocumentIndicator.Visibility = folder.HasFailedDocuments ? ViewStates.Visible : ViewStates.Gone;
 
-                    viewHolder.FailedAndPendingDocumentCount.Text = folder.FailedAndPendingDocumentCount > 0 ? folder.FailedAndPendingDocumentCount.ToString() : String.Empty;
+                    viewHolder.FailedAndPendingDocumentCount.Text = folder.DocumentCount > 0 ? folder.DocumentCount.ToString() : String.Empty;
 
                     viewHolder.SelectedOverlay.Visibility = IsItemSelected(position) ? ViewStates.Visible : ViewStates.Gone;
                 }

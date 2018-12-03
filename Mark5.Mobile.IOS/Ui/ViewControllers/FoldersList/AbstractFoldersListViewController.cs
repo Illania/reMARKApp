@@ -100,20 +100,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             SubscribeToMessages();
         }
 
-        #region Subscribe/unsubscribe
-
-        void SubscribeToMessages()
-        {
-            outgoingDocumentCountChangedToken = CommonConfig.MessengerHub.Subscribe<OugoingDocumentCountMessage>(HandleOutgoingDocumentCountChange);
-        }
-
-        void UnsubscribeFromMessages()
-        {
-            outgoingDocumentCountChangedToken?.Dispose();
-        }
-
-        #endregion
-
         public override void ViewDidAppear(bool animated)
         {
             base.ViewDidAppear(animated);
@@ -578,7 +564,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 }
 
                 if (ParentFolder.Module == ModuleType.Documents)
-                    Task.Run(async () => await GetCountAsync());
+                    Task.Run(async () => await Managers.DocumentsManager.NotifyPendingAndFailedCountChanged());
             }
             else
             {
@@ -621,14 +607,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 sds.FavoriteStatus = favoritesStatus;
         }
 
-        async Task GetCountAsync()
-        {
-            var pendingDocs = await Managers.DocumentsManager.GetDocumentsToUploadDocumentPreviews();
-            var failedDocs = await Managers.DocumentsManager.GetFailedDocumentsToUploadDocumentPreviews();
-            var count = pendingDocs.Count() + failedDocs.Count();
-
-            CommonConfig.MessengerHub.Publish(new OugoingDocumentCountMessage(this, count, failedDocs.Any()));
-        }
         #endregion
 
         #region List handlers
@@ -1408,24 +1386,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             public void UpdateOutgoing(int count, bool hasFailedDocuments)
             {
                 NSIndexPath indexPath = null;
-                for (var section = 0; section < items.Count; section++)
-                    for (var row = 0; row < items[section].Count; row++)
-                        if (items[section][row].IsOutgoing)
-                        {
-                            items[section][row].FailedAndPendingDocumentCount = count;
-                            items[section][row].HasFailedDocuments = hasFailedDocuments;
 
-                            indexPath = NSIndexPath.FromRowSection(row, section);
-                        }
+                if (items[Section.Local].Any())
+                {
+                    if (items[Section.Local][0].IsOutgoing)
+                    {
+                        items[Section.Local][0].DocumentCount = count;
+                        items[Section.Local][0].HasFailedDocuments = hasFailedDocuments;
+
+                        indexPath = NSIndexPath.FromRowSection(0, Section.Local);
+                    }
+                }
 
                 if (indexPath != null)
                 {
                     var indexPathVisible = tableViewWeakReference.Unwrap()?.IndexPathsForVisibleRows?.Contains(indexPath);
                     if (indexPathVisible != null)
                     {
-                        tableViewWeakReference.Unwrap()?.BeginUpdates();
                         tableViewWeakReference.Unwrap()?.ReloadRows(new[] { indexPath }, UITableViewRowAnimation.Fade);
-                        tableViewWeakReference.Unwrap()?.EndUpdates();
                     }
                 }
             }
@@ -1898,6 +1876,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 }
             }
         }
+        #endregion
+
+        #region Subscribe/unsubscribe
+
+        void SubscribeToMessages()
+        {
+            outgoingDocumentCountChangedToken = CommonConfig.MessengerHub.Subscribe<OugoingDocumentCountMessage>(HandleOutgoingDocumentCountChange);
+        }
+
+        void UnsubscribeFromMessages()
+        {
+            outgoingDocumentCountChangedToken?.Dispose();
+        }
+
         #endregion
     }
 }
