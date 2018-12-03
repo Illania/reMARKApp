@@ -54,6 +54,17 @@ namespace Mark5.Mobile.Droid.Utilities
             return timestamp.FormatUserTimestampAsDateString(context);
         }
 
+        public static string FormatUserTimestampAsCompactMediumDateTimeString(this long timestamp, Context context)
+        {
+            var serverTimezone = timestamp.ConvertTimestampMillisecondsToDateTime();
+            var nowUtc = DateTime.UtcNow.ConvertUtcToUserTime();
+
+            if (serverTimezone.Date == nowUtc.Date)
+                return timestamp.FormatUserTimestampAsTimeString(context);
+
+            return timestamp.FormatUserTimestampAsTimeAndDateString(context);
+        }
+
         public static string FormatUserTimestampAsCompactLongDateTimeString(this long timestamp, Context context)
         {
             var serverTimezone = timestamp.ConvertTimestampMillisecondsToDateTime();

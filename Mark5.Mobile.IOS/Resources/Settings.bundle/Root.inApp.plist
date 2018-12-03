@@ -90,6 +90,16 @@
 			<key>DefaultValue</key>
 			<false/>
 		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>show_time_old_emails</string>
+			<key>Key</key>
+			<string>ShowTimeForOldEmails</string>
+			<key>DefaultValue</key>
+			<false/>
+		</dict>
 			<dict>
 			<key>Type</key>
 			<string>PSMultiValueSpecifier</string>

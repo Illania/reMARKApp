@@ -42,7 +42,7 @@
         <item>Delete</item>
         <item>More</item>
     </string-array>
-     <string-array name="pref_email_swipe_actions_entries_without_more">
+    <string-array name="pref_email_swipe_actions_entries_without_more">
         <item>Mark as read/unread</item>
         <item>Move to folder</item>
         <item>Copy to worktray</item>
@@ -63,6 +63,7 @@
         <item>8</item>
         <item>9</item>
     </string-array>
+    <bool name="pref_documents_show_time_older_emails_default">false</bool>
     <bool name="pref_documents_read_indicator_me_default">true</bool>
     <bool name="pref_documents_compact_list_default">false</bool>
     <string name="pref_documents_mark_as_read_default">0</string>

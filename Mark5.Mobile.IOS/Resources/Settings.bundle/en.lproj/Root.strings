@@ -54,6 +54,7 @@
 "server" = "Server";
 "shortcodes_to_search" = "Shortcodes search results";
 "show_creator_outgoing" = "Show creator for outgoing emails";
+"show_time_old_emails" = "Show time for older emails";
 "ssl" = "SSL";
 "sync_favorite_folders_title" = "Sync favorite folders";
 "sync_favorite_folders_footer" = "Synchronize emails, contacts, shortcodes favorite folders across devices";

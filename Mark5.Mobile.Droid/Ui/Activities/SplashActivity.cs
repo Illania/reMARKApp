@@ -7,6 +7,7 @@ using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
+using Firebase.Iid;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Database;
@@ -137,9 +138,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     if (PlatformConfig.Preferences.CallerIdentificationEnabled)
                     {
                         CommonConfig.Logger.Info($"Registering {nameof(CallStateBroadcastReceiver)}...");
-                        PlatformConfig.CallStateBroadcastReceiver.Register();                    
+                        PlatformConfig.CallStateBroadcastReceiver.Register();
                     }
-               
+
                     CommonConfig.Logger.Info("Retrieving system settings...");
                     ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
 
@@ -151,6 +152,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     LocalNotificationsListener.Initialize();
 
                     DateTimeConverter.UseServerTimezone = PlatformConfig.Preferences.UseServerTimeZone;
+
+                    if (!string.IsNullOrWhiteSpace(FirebaseInstanceId.Instance.Token))
+                        PlatformConfig.Preferences.PushNotificationToken = FirebaseInstanceId.Instance.Token;
 
                     CommonConfig.Logger.Info($"Initialized - will present {nameof(MainActivity)}");
 

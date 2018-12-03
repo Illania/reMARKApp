@@ -148,6 +148,7 @@ namespace Mark5.Mobile.Common.Manager
                 infos.Add(new SavedOfflineFolderInfo
                 {
                     FolderId = folder.Id,
+                    FolderGuid = folder.Guid,
                     FolderName = folder.Name,
                     Module = folder.Module,
                     LastDownloaded = DateTime.UtcNow.ConvertDateTimeToTimestampMilliseconds()

@@ -261,7 +261,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void DataSource_ResponsibleUserRowClicked(object sender, EventArgs e)
         {
-            var vc = new ResponsibleUsersSelectionController
+            var vc = new UserSelectionViewController
             {
                 PreselectedSystemUserIds = Contact.ResponsibleUserIds,
             };

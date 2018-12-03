@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.HubMessages;
@@ -11,7 +12,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
 {
-    public class DocumentPageViewController : AbstractPageViewController
+    public class DocumentPageViewController : AbstractPageViewController, IDocumentPageViewControllerDelegate
     {
         UIBarButtonItem previousDocumentButtonItem;
         UIBarButtonItem nextDocumentButtonItem;
@@ -42,6 +43,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
 
             if (InitialDocumentPreview != null && Folder != null)
                 SetPage(Folder, InitialDocumentPreview, false);
+
+            Delegate = new DocumentPageDelegate();
 
             DataSource = new DocumentPageDataSource();
         }
@@ -179,6 +182,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
 
         public void SetPage(Folder folder, DocumentPreview documentPreview, bool isSearchActive)
         {
+            Folder = folder;
             ChangePage(folder, documentPreview, UIPageViewControllerNavigationDirection.Forward, isSearchActive);
         }
 
@@ -232,7 +236,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
         {
             CommonConfig.UsageAnalytics.LogEvent(new DocumentQuickSwitchEvent());
             var vc = GetDocumentViewController(Folder, documentPreview);
-            CommonConfig.MessengerHub.Publish(new GoToDocumentMessage(this, documentPreview.Id));
+
             UpdateNavigationBar(documentPreview, isSearchActive);
             return vc;
         }
@@ -253,19 +257,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
             if (cachedViewController != null)
                 return cachedViewController;
 
-            var vc = new DocumentViewController();
-            vc.DisableRecyclingOnDisappear();
+            DocumentViewController vc = new DocumentViewController
+            {
+                DocumentPageViewControllerDelegate = this
+            };
+
             vc.SetData(folder, documentPreview);
             vc.SetRefreshDataOnAppear();
-            viewControllerCache.Add(vc);
 
+            return vc;
+        }
+
+        public void AddViewControllerToCache(DocumentViewController vc)
+        {
+            vc.DisableRecyclingOnDisappear();
+            viewControllerCache.Add(vc);
             if (viewControllerCache.Count > CacheCapacity)
             {
                 viewControllerCache[0].RecycleIfNeeded();
                 viewControllerCache.RemoveAt(0);
             }
-
-            return vc;
         }
 
         void UpdateToolBar(DocumentViewController vc)
@@ -323,6 +334,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
 
         #endregion
 
+        #region Delegate
+        protected class DocumentPageDelegate : UIPageViewControllerDelegate
+        {
+            [Export("pageViewController:didFinishAnimating:previousViewControllers:transitionCompleted:")]
+            public override void DidFinishAnimating(UIPageViewController pageViewController, bool finished, UIViewController[] previousViewControllers, bool completed)
+            {
+                var vc = (DocumentViewController)pageViewController.ViewControllers.FirstOrDefault();
+                var documentPreview = vc.DocumentPreview;
+                var pageVC = (DocumentPageViewController)pageViewController;
+                var index = pageVC.DocumentPreviews.FindIndex(dp => dp.Id == documentPreview.Id);
+                if (index < 0 || index > pageVC.DocumentPreviews.Count - 1)
+                    return;
+                CommonConfig.MessengerHub.Publish(new GoToDocumentMessage(this, documentPreview.Id));
+            }
+        }
+        #endregion
+
         #region DataSource
         protected class DocumentPageDataSource : UIPageViewControllerDataSource
         {
@@ -367,7 +395,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
             }
         }
         #endregion
+
     }
 
-
+    public interface IDocumentPageViewControllerDelegate
+    {
+        void AddViewControllerToCache(DocumentViewController documentViewController);
+    }
 }

@@ -25,6 +25,7 @@ using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
 using Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews;
 using Mark5.Mobile.Droid.Utilities;
+using Mark5.ServiceReference.Exceptions;
 using PCLStorage;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
@@ -255,6 +256,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             CommonConfig.Logger.Info($"Resuming {nameof(ComposeDocumentFragment)}...");
 
+            if (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
+                await LoadSystemUsersDepartments();
             await LoadDocument();
 
             CommonConfig.Logger.Info($"Resumed {nameof(ComposeDocumentFragment)}...");
@@ -275,19 +278,28 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (requestCode == RequestCodes.RecentAddressesRequestCode && resultCode == (int)Result.Ok)
             {
                 var recipient = Serializer.Deserialize<Recipient>(data.GetStringExtra(RecentAddressesListActivity.RecipientResultKey));
-                focusedRecipientView.AddRecipent(recipient.Name, recipient.Address);
+                focusedRecipientView.AddRecipient(recipient.Name, recipient.Address);
                 UpdateSendButtonState();
             }
             if (requestCode == RequestCodes.PhonebookRequestCode && resultCode == (int)Result.Ok)
             {
                 var recipient = Serializer.Deserialize<Recipient>(data.GetStringExtra(PhonebookContactsListActivity.RecipientResultKey));
-                focusedRecipientView.AddRecipent(recipient.Name, recipient.Address);
+                focusedRecipientView.AddRecipient(recipient.Name, recipient.Address);
                 UpdateSendButtonState();
             }
             if (requestCode == RequestCodes.ContactsRequestCode && resultCode == (int)Result.Ok)
             {
                 var recipient = Serializer.Deserialize<Recipient>(data.GetStringExtra(PickerContactFolderListActivity.RecipientResultKey));
-                focusedRecipientView.AddRecipent(recipient.Name, recipient.Address);
+                focusedRecipientView.AddRecipient(recipient.Name, recipient.Address);
+                UpdateSendButtonState();
+            }
+            if (requestCode == RequestCodes.InternalContactsRequestCode && resultCode == (int)Result.Ok)
+            {
+                var users = Serializer.Deserialize<List<SystemUser>>(data.GetStringExtra(PickerInternalContactsListActivity.RecipientResultKey));
+                foreach (var user in users)
+                {
+                    focusedRecipientView.AddRecipient("", user.Username);
+                }
                 UpdateSendButtonState();
             }
             if (requestCode == RequestCodes.ShortcodesRequestCode && resultCode == (int)Result.Ok)
@@ -317,6 +329,25 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             toView.AddEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.To).Select(da => da.Address));
             ccView.AddEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Cc).Select(da => da.Address));
             bccView.AddEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Bcc).Select(da => da.Address));
+        }
+
+        async Task LoadSystemUsersDepartments()
+        {
+            SystemUsersDepartments systemUsersDepartments = null;
+
+            try
+            {
+                systemUsersDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync(SourceType.Local);
+                systemUsersDepartments.Users.Add(ServerConfig.SystemSettings.UserInfo.User);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Error while retrieving system users.", ex);
+            }
+
+            toView.SystemUsersDepartments = systemUsersDepartments;
+            ccView.SystemUsersDepartments = systemUsersDepartments;
+            bccView.SystemUsersDepartments = systemUsersDepartments;
         }
 
         async Task LoadDocument()
@@ -427,6 +458,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public const int AttachmentRequestCode = 111;
             public const int RecentAddressesRequestCode = 222;
             public const int ContactsRequestCode = 333;
+            public const int InternalContactsRequestCode = 334;
             public const int ShortcodesRequestCode = 444;
             public const int PhonebookRequestCode = 555;
             public const int TemplatePreviewRequestCode = 666;
@@ -448,6 +480,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.UsageAnalytics.LogEvent(new ComposeContactPickerEvent(ContactPickerChoice.Contacts));
 
             StartActivityForResult(PickerContactFolderListActivity.CreateIntent(Context), RequestCodes.ContactsRequestCode);
+        }
+
+        void DoOpenInternalContacts()
+        {
+            CommonConfig.UsageAnalytics.LogEvent(new ComposeContactPickerEvent(ContactPickerChoice.Internal));
+
+            StartActivityForResult(PickerInternalContactsListActivity.CreateIntent(Context), RequestCodes.InternalContactsRequestCode);
         }
 
         void DoOpenShortcodes()
@@ -583,7 +622,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async void RecipientView_AddButtonClicked(object sender, EventArgs e)
         {
-            var choice = await Dialogs.ShowListDialog(Context, Resource.String.picker_title, Resource.Array.picker_choice, true);
+            var choice = ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable
+                                     ? await Dialogs.ShowListDialog(Context, Resource.String.picker_title, Resource.Array.picker_choice_with_internal_contacts, true)
+                                     : await Dialogs.ShowListDialog(Context, Resource.String.picker_title, Resource.Array.picker_choice, true);
 
             if (choice < 0)
                 return;
@@ -604,6 +645,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 case 3:
                     DoOpenPhonebook();
                     break;
+                case 4:
+                    DoOpenInternalContacts();
+                    break;
+                default:
+                    return;
             }
 
             if (choice != 2)
@@ -730,7 +776,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     Activity?.Finish();
             }
 
-            var allEmailsValid = new RecipientsView[] { toView, ccView, bccView }.All(rv => rv.AllEmailsValid);
+            var allRecipientsValid = new RecipientsView[] { toView, ccView, bccView }.All(rv => rv.AllRecipientsValid);
 
             if (saveDraft && lineView.LineSelectedIsAmbiguous)
             {
@@ -740,10 +786,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (!saveDraft)
             {
-                if (!allEmailsValid && subjectView.Empty)
-                    Dialogs.ShowYesNoDialog(Context, Resource.String.invalid_emails_and_subject_title, Resource.String.invalid_emails_and_subject_content, sendAction, () => fab.Enabled = true);
-                else if (!allEmailsValid)
-                    Dialogs.ShowYesNoDialog(Context, Resource.String.invalid_emails_title, Resource.String.invalid_emails_content, sendAction, () => fab.Enabled = true);
+                if (!allRecipientsValid && subjectView.Empty)
+                    Dialogs.ShowYesNoDialog(Context, Resource.String.invalid_recipients_and_subject_title, Resource.String.invalid_recipients_and_subject_content, sendAction, () => fab.Enabled = true);
+                else if (!allRecipientsValid)
+                    Dialogs.ShowYesNoDialog(Context, Resource.String.invalid_recipients_title, Resource.String.invalid_recipients_content, sendAction, () => fab.Enabled = true);
                 else if (subjectView.Empty)
                     Dialogs.ShowYesNoDialog(Context, Resource.String.invalid_subject_title, Resource.String.invalid_subject_content, sendAction, () => fab.Enabled = true);
                 else

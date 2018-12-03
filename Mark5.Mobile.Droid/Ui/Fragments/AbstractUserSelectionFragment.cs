@@ -28,7 +28,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         protected const string PreselectedUserIdsBundleKey = "PreselectedUserIds_a8a78647-2a7f-4e36-9ada-b9ff9b727b80";
         protected const string ActionButtonTextResIdBundleKey = "ActionButtonTextResId_0482d7d6-a109-4a78-8075-f69455052af2";
         protected const string IncludeCurrentUserBundleKey = "IncludeCurrentUser_470297d6-812a-4ae8-8528-e85355aa7da7";
-        protected const string AllowNoUserSelectedBundleKey = "AllowNoUserSelected_fca35857-47a0-45c7-b8e1-d5bd4ff8bf39";
         protected const string SelectedSystemUsersKey = "SelectedSystemUsers_124e4282-1191-4d17-9615-c7a6c3d8d0a4";
 
         protected UserSelectionAdapter Adapter;
@@ -42,7 +41,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         protected List<int> preselectedUserIds;
         protected int actionButtonTextResId;
         protected bool includeCurrentUser;
-        protected bool allowNoUserSelected;
 
         #region Fragment overrides
 
@@ -58,9 +56,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (Arguments.ContainsKey(IncludeCurrentUserBundleKey))
                 includeCurrentUser = Arguments.GetBoolean(IncludeCurrentUserBundleKey);
-
-            if (Arguments.ContainsKey(AllowNoUserSelectedBundleKey))
-                allowNoUserSelected = Arguments.GetBoolean(AllowNoUserSelectedBundleKey);
 
             if (savedInstanceState?.ContainsKey(SelectedSystemUsersKey) == true)
                 preselectedUserIds = Serializer.Deserialize<List<int>>(savedInstanceState.GetString(SelectedSystemUsersKey));
@@ -89,7 +84,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             actionButton = rootView.FindViewById<AppCompatButton>(Resource.Id.button);
             actionButton.SetText(actionButtonTextResId);
-            actionButton.Enabled = false;
+            actionButton.Enabled = true;
             actionButton.Click += ActionButton_Click;
 
             HasOptionsMenu = true;
@@ -164,10 +159,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     refreshLayout.Refreshing = true;
 
                 var userDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync(Restored ? SourceType.Local : SourceType.Auto);
-                if (includeCurrentUser)
-                    Adapter.SetItems(userDepartments.Users.OrderBy(su => su.Username).ToList());
-                else
-                    Adapter.SetItems(userDepartments.Users.Where(su => su.Username != ServerConfig.SystemSettings.UserInfo.User.Username).OrderBy(su => su.Username).ToList());
+
+                if (userDepartments != null)
+                {
+                    if (includeCurrentUser)
+                        Adapter.SetItems(userDepartments.Users.OrderBy(su => su.Username).ToList());
+                    else
+                        Adapter.SetItems(userDepartments.Users.Where(su => su.Username != ServerConfig.SystemSettings.UserInfo.User.Username).OrderBy(su => su.Username).ToList());
+                }
 
                 if (preselectedUserIds != null && preselectedUserIds.Any())
                 {
@@ -218,11 +217,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.select_users);
                 ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
-
-                if (!allowNoUserSelected)
-                {
-                    actionButton.Enabled = false;
-                }
             }
             else
             {
@@ -316,8 +310,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
-                var suvh = holder as UserViewHolder;
-                if (suvh == null)
+                if (!(holder is UserViewHolder suvh))
                     return;
 
                 var su = Items[position];

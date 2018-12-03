@@ -212,7 +212,6 @@ namespace Mark5.Mobile.IOS
                 return;
             }
 
-
             if (serviceVersion != null && serviceVersion.CompareTo(new Version(3, 2, 0)) >= 0)
             {
                 CommonConfig.Logger.Info($"Not sending the APNS token because the current service version is equal or higher than 3.2.0");
@@ -372,6 +371,8 @@ namespace Mark5.Mobile.IOS
                     CommonConfig.Logger.Info("Background Fetch: Retrieving system settings...");
 
                     ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Remote);
+                    if (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
+                        await Managers.SystemManager.GetSystemUsersDepartmentsAsync(SourceType.Remote);
                     completionHandler(UIBackgroundFetchResult.NewData);
                 }
                 catch (Exception ex)
