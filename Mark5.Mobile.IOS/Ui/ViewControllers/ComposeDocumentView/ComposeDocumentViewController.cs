@@ -460,7 +460,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                             await InsertLocalTemplate();
                             break;
                         case 2:
-                            await InsertTemplate(false);
+                            await InsertOtherTemplate();
                             break;
                     }
                     break;
@@ -510,7 +510,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             if (source == 0)
             {
                 CommonConfig.UsageAnalytics.LogEvent(new ComposeInsertTemplateEvent());
-                await InsertTemplate(true);
+                await InsertOtherTemplate();
             }
 
             if (source == 1)
@@ -901,24 +901,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 if (template == null)
                     return;
 
-                ProcessTemplate(template, previousDocumentPreview);
-
-                var insertTemplateJs = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/initTemplate", "js"));
-                if (template.ContentType == ContentType.PlainText)
-                {
-                    var templateText = Regex.Replace(template.Content, @"\r\n?|\n", "\\n", RegexOptions.Multiline);
-                    insertTemplateJs = ProcessWebTemplate(insertTemplateJs, "text", template.Id, templateText);
-                }
-                if (template.ContentType == ContentType.Html)
-                {
-                    var templateText = Regex.Replace(template.Content, @"\r\n?|\n", " ", RegexOptions.Multiline);
-                    insertTemplateJs = ProcessWebTemplate(insertTemplateJs, "html", template.Id, templateText);
-                }
-
-                var result = await EvaluateJavaScriptAsync(insertTemplateJs);
-
-                if (template.Attachments.Any())
-                    attachmentsView?.AddAttachmenstFromTemplate(template);
+                await InsertTemplate(template);
             }
             catch (Exception ex)
             {
@@ -933,7 +916,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             }
         }
 
-        async Task InsertTemplate(bool insertAtCursor)
+        async Task InsertOtherTemplate()
         {
             var tp = new TemplatesListViewController();
             PresentViewController(new NavigationController(tp, UIModalPresentationStyle.PageSheet), true, null);
@@ -950,45 +933,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 if (template == null)
                     return;
 
-                ProcessTemplate(template, previousDocumentPreview);
-
-                if (insertAtCursor)
-                {
-                    var type = String.Empty;
-                    var content = String.Empty;
-
-                    if (template.ContentType == ContentType.PlainText)
-                    {
-                        content = Regex.Replace(template.Content, @"\r\n?|\n", "\\n", RegexOptions.Multiline);
-                        type = "text";
-                    }
-                    if (template.ContentType == ContentType.Html)
-                    {
-                        content = Regex.Replace(template.Content, @"\r\n?|\n", " ", RegexOptions.Multiline);
-                        type = "html";
-                    }
-
-                    var result = await InsertTemplate(type, template.Id, content);
-                }
-                else
-                {
-                    var insertTemplateJs = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/initTemplate", "js"));
-                    if (template.ContentType == ContentType.PlainText)
-                    {
-                        var templateText = Regex.Replace(template.Content, @"\r\n?|\n", "\\n", RegexOptions.Multiline);
-                        insertTemplateJs = ProcessWebTemplate(insertTemplateJs, "text", template.Id, templateText);
-                    }
-                    if (template.ContentType == ContentType.Html)
-                    {
-                        var templateText = Regex.Replace(template.Content, @"\r\n?|\n", " ", RegexOptions.Multiline);
-                        insertTemplateJs = ProcessWebTemplate(insertTemplateJs, "html", template.Id, templateText);
-                    }
-
-                    var result = await EvaluateJavaScriptAsync(insertTemplateJs);
-                }
-
-                if (template.Attachments.Any())
-                    attachmentsView?.AddAttachmenstFromTemplate(template);
+                await InsertTemplate(template);
             }
             catch (Exception ex)
             {
@@ -1007,11 +952,34 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         {
             if (string.IsNullOrEmpty(PlatformConfig.Preferences.LocalTemplate))
                 return;
-            var insertTemplateJs = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/initTemplate", "js"));
-            var localTemplateText = Regex.Replace(PlatformConfig.Preferences.LocalTemplate, @"\r\n?|\n", "\\n", RegexOptions.Multiline);
-            insertTemplateJs = ProcessWebTemplate(insertTemplateJs, "text", "local", localTemplateText);
 
-            var result = await EvaluateJavaScriptAsync(insertTemplateJs);
+            var localTemplateText = Regex.Replace(PlatformConfig.Preferences.LocalTemplate, @"\r\n?|\n", "\\n", RegexOptions.Multiline);
+
+            var result = await InsertTemplate("text", 0, localTemplateText);
+        }
+
+        async Task InsertTemplate(Template template)
+        {
+            ProcessTemplate(template, previousDocumentPreview);
+
+            var type = String.Empty;
+            var content = String.Empty;
+
+            if (template.ContentType == ContentType.PlainText)
+            {
+                content = Regex.Replace(template.Content, @"\r\n?|\n", "\\n", RegexOptions.Multiline);
+                type = "text";
+            }
+            if (template.ContentType == ContentType.Html)
+            {
+                content = Regex.Replace(template.Content, @"\r\n?|\n", " ", RegexOptions.Multiline);
+                type = "html";
+            }
+
+            var result = await InsertTemplate(type, template.Id, content);
+
+            if (template.Attachments.Any())
+                attachmentsView?.AddAttachmenstFromTemplate(template);
         }
 
         #endregion
