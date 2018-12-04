@@ -623,7 +623,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async void AttachmentsView_Tapped(object sender, AttachmentsView.TappedEventArgs e)
         {
-            if (e.AttachmentDescription.FromTemplate)
+            if (e.AttachmentDescription?.FromTemplate == true)
             {
                 await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("template_attachment_title"), Localization.GetString("template_attachment_content"));
                 return;
