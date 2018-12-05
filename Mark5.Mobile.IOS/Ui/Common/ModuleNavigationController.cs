@@ -12,6 +12,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
     {
         UIButton closeButton;
         UIView searchButtonContainer;
+        NavigationModule.NavigationModuleType currentModule;
 
         WeakReference<AbstractMainViewController.IAbstractMainViewControllerDelegate> weakReferenceAbstractMainViewControllerDelegate;
 
@@ -26,6 +27,11 @@ namespace Mark5.Mobile.IOS.Ui.Common
             {
                 weakReferenceAbstractMainViewControllerDelegate = new WeakReference<AbstractMainViewController.IAbstractMainViewControllerDelegate>(value);
             }
+        }
+
+        public ModuleNavigationController(NavigationModule.NavigationModuleType currentModule)
+        {
+            this.currentModule = currentModule;
         }
 
         public override void ViewDidLoad()
@@ -154,11 +160,12 @@ namespace Mark5.Mobile.IOS.Ui.Common
                     row++;
                 }
 
+                bool isCurrent = modules[i].Type == currentModule;
+
                 var btn = new ReMarkNavigationButton(modules[i])
                 {
-                    Selected = false,
+                    Selected = isCurrent,
                     OnClicked = BtnClicked
-
                 };
 
                 stackViews[row].AddArrangedSubview(btn);
@@ -274,7 +281,6 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 });
 
                 Button.SetImage(UIImage.FromBundle(module.Image).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
-                Button.TintColor = Theme.DarkBlue;
                 Button.Layer.BorderColor = Theme.DarkGray.CGColor;
                 Button.Layer.BorderWidth = .7f;
                 Button.Layer.CornerRadius = 32.5f;
