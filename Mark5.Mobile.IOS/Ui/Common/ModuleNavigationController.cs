@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
@@ -13,21 +14,6 @@ namespace Mark5.Mobile.IOS.Ui.Common
         UIButton closeButton;
         UIView searchButtonContainer;
         NavigationModule.NavigationModuleType currentModule;
-
-        WeakReference<AbstractMainViewController.IAbstractMainViewControllerDelegate> weakReferenceAbstractMainViewControllerDelegate;
-
-        public AbstractMainViewController.IAbstractMainViewControllerDelegate AbstractMainViewControllerDelegate
-        {
-            get
-            {
-                return weakReferenceAbstractMainViewControllerDelegate.TryGetTarget(out AbstractMainViewController.IAbstractMainViewControllerDelegate documentPageViewControllerDelegate) ? documentPageViewControllerDelegate : null;
-            }
-
-            set
-            {
-                weakReferenceAbstractMainViewControllerDelegate = new WeakReference<AbstractMainViewController.IAbstractMainViewControllerDelegate>(value);
-            }
-        }
 
         public ModuleNavigationController(NavigationModule.NavigationModuleType currentModule)
         {
@@ -64,6 +50,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             View.AddSubview(searchButtonContainer);
             View.AddConstraints(new[]
             {
+                View.WidthAnchor.ConstraintLessThanOrEqualTo(300),
                 searchButtonContainer.HeightAnchor.ConstraintEqualTo(65f),
                 searchButtonContainer.WidthAnchor.ConstraintEqualTo(65f),
                 searchButtonContainer.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
@@ -92,7 +79,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 closeButton.BottomAnchor.ConstraintEqualTo(searchButtonContainer.BottomAnchor, -10f),
             });
 
-            closeButton.TouchUpInside += (object sender, EventArgs e) => { DismissViewController(false, null); };
+            closeButton.TouchUpInside += (object sender, EventArgs e) => { DismissViewController(true, null); };
 
             var seperator = new UIView()
             {
@@ -313,7 +300,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 Button.TouchUpInside += (object sender, EventArgs e) =>
                 {
                     OnClicked?.Invoke();
-                    CommonConfig.MessengerHub.Publish(new ReMarkNav(this, module));
+                    CommonConfig.MessengerHub.Publish(new NavigationModuleChangedMessage(this, module));
                 };
             }
         }

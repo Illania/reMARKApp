@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Mark5.Mobile.Common.Model.HubMessages
+namespace Mark5.Mobile.Common.Model
 {
     public class NavigationModule
     {

@@ -69,10 +69,13 @@ namespace Mark5.Mobile.IOS
                 Window.ApplyTheme();
 
                 UIViewController vc;
+
                 if (!isLoggedIn)
                     vc = new LoginViewController();
-                else 
-                    vc = new AbstractMainViewController();
+                else if (Integration.IsIPad())
+                    vc = new SplitMainViewController();
+                else
+                    vc = new SimpleMainViewController();
 
                 Window.RootViewController = vc;
 
@@ -157,7 +160,7 @@ namespace Mark5.Mobile.IOS
             if (lastComponent == nameof(AbstractMainViewController))
                 return Window.RootViewController;
 
-           
+
             if (lastComponent == "NavigationController_" + nameof(SearchCriteriaViewController))
                 return new DarkNavigationController
                 {

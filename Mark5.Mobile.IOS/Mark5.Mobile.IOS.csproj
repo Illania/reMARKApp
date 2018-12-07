@@ -263,6 +263,8 @@
 		<Compile Include="Ui\Common\BadgeBarButtonItem.cs" />
 		<Compile Include="Ui\ViewControllers\CategoriesListViewController.cs" />
 		<Compile Include="Ui\Common\ModuleNavigationController.cs" />
+		<Compile Include="Ui\ViewControllers\SimpleMainViewController.cs" />
+		<Compile Include="Ui\ViewControllers\SplitMainViewController.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
