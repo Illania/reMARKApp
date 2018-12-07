@@ -348,7 +348,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
                     return;
                 CommonConfig.MessengerHub.Publish(new GoToDocumentMessage(this, documentPreview.Id));
 
-                ((DocumentPageViewController)pageViewController).UpdateNavigationBar(documentPreview);
+                pageVC.UpdateToolBar(vc);
+                pageVC.UpdateNavigationBar(documentPreview);
 
                 var vcPrevious = (DocumentViewController)previousViewControllers?.FirstOrDefault();
                 vcPrevious?.ResetOffset();
