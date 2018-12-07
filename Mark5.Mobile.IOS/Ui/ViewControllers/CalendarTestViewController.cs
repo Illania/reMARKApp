@@ -24,7 +24,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         CalendarAppointment testAppointmentSimple;  //Good
         CalendarAppointment testAppointmentAllDay; //Good
         CalendarAppointment testAppointmentRecurring; //Good!
-        CalendarAppointment testAppointmentPartecipants;  //Don't know how to set the status of participants, so I wait
+        CalendarAppointment testAppointmentPartecipants;  //Good!
         CalendarAppointment testAppointmentAlarm;
 
         void PrepareTests()
@@ -116,8 +116,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             testAppointmentPartecipants = new CalendarAppointment
             {
                 CalendarId = selectedCalendar.Id,
-                Location = "TestParticipants",
-                Subject = "TestSubject",
+                Location = "TestLocation",
+                Subject = "TestParticipants",
                 Description = "TestDescription",
                 Creator = ServerConfig.SystemSettings.UserInfo.User.Username,
                 CreatorId = ServerConfig.SystemSettings.UserInfo.User.Id,
@@ -134,9 +134,43 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 StartDateTimestamp = GetFromDateTime().ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds(),
                 EndDateTimestamp = GetToDateTime().ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds(),
             };
-
             testAppointmentPartecipants.Occurrences.Add(occurrence);
 
+            var participantEmail = new Participant
+            {
+                Customer = false,
+                Status = ParticipantStatus.NeedAction,
+                Type = ParticipantType.ComAddress,
+                Email = "fp@nordic-it.com",
+                CN = "",
+                Presence = ParticipantPresenence.Mandatory
+            };
+
+            var participantInternal = new Participant
+            {
+                Customer = false,
+                Status = ParticipantStatus.NeedAction,
+                Type = ParticipantType.User,
+                Email = "",
+                CN = "jbo",
+                Id = 2,
+                Presence = ParticipantPresenence.Mandatory,
+            };
+
+            var participantClient = new Participant
+            {
+                Customer = false,
+                Status = ParticipantStatus.NeedAction,
+                Type = ParticipantType.Client,
+                Email = "test@test.com",
+                CN = "TestContatto Contatto",
+                Id = 1008,
+                Presence = ParticipantPresenence.Mandatory,
+            };
+
+            testAppointmentPartecipants.Participants.Add(participantEmail);
+            testAppointmentPartecipants.Participants.Add(participantInternal);
+            testAppointmentPartecipants.Participants.Add(participantClient);
 
             testAppointmentAlarm = new CalendarAppointment
             {
@@ -442,7 +476,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         TranslatesAutoresizingMaskIntoConstraints = false,
                         TextColor = UIColor.DarkTextColor,
                         ScrollEnabled = false,
-
                     };
 
                     var text = $"APT: {appointment.Subject} - [{appointment.Id}]";
