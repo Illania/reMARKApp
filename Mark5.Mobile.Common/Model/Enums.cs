@@ -230,17 +230,6 @@ namespace Mark5.Mobile.Common.Model
         EveryDay = WeekendDays | WorkDays
     }
 
-    public enum AppointmentStatus
-    {
-        None = 0,
-        Free = 1,
-        Tentative = 2,
-        Busy = 3,
-        OutOfOffice = 4,
-        WorkingElsewhere = 5,
-        Custom = 6,
-    }
-
     public enum CalendarOccurenceType
     {
         None = 0,

@@ -1199,12 +1199,6 @@ namespace Mark5.ServiceReference.DataContract
         [DataMember(Name = "AllDay", Order = 0)]
         public bool AllDay { get; set; }
 
-        [DataMember(Name = "Private", Order = 0)]
-        public bool Private { get; set; }
-
-        [DataMember(Name = "Status", Order = 0)]
-        public AppointmentStatus Status { get; set; }
-
         [DataMember(Name = "CreatorId", Order = 0)]
         public int CreatorId { get; set; } = -1;
 
@@ -1485,19 +1479,6 @@ namespace Mark5.ServiceReference.DataContract
 
         [EnumMember(Value = "EveryDay")]
         EveryDay = WeekendDays | WorkDays
-    }
-
-
-    [DataContract(Name = "AppointmentStatus", Namespace = "com.nordic-it.appservice.v3")]
-    public enum AppointmentStatus
-    {
-        [EnumMember(Value = "None")] None = 0,
-        [EnumMember(Value = "Free")] Free = 1,
-        [EnumMember(Value = "Tentative")] Tentative = 2,
-        [EnumMember(Value = "Busy")] Busy = 3,
-        [EnumMember(Value = "OutOfOffice")] OutOfOffice = 4,
-        [EnumMember(Value = "WorkingElsewhere")] WorkingElsewhere = 5,
-        [EnumMember(Value = "Custom")] Custom = 6,
     }
 
     [DataContract(Name = "CalendarOccurenceType", Namespace = "com.nordic-it.appservice.v3")]

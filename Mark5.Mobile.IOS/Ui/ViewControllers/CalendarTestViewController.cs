@@ -40,9 +40,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 RecurrenceInfo = null,
                 AllDay = false,
                 Priority = Priority.Normal,
-                Private = false,
                 Type = CalendarOccurenceType.Normal,
-                Status = AppointmentStatus.Busy,
             };
 
             var occurrence = new CalendarAppointmentOccurrence()
@@ -64,9 +62,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 RecurrenceInfo = null,
                 AllDay = true,
                 Priority = Priority.Normal,
-                Private = false,
                 Type = CalendarOccurenceType.Normal,
-                Status = AppointmentStatus.Busy,
             };
 
             occurrence = new CalendarAppointmentOccurrence()
@@ -89,9 +85,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 RecurrenceInfo = null,
                 AllDay = false,
                 Priority = Priority.Normal,
-                Private = false,
                 Type = CalendarOccurenceType.Pattern,
-                Status = AppointmentStatus.Busy,
             };
 
             occurrence = new CalendarAppointmentOccurrence()
@@ -124,9 +118,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 RecurrenceInfo = null,
                 AllDay = false,
                 Priority = Priority.Normal,
-                Private = false,
                 Type = CalendarOccurenceType.Normal,
-                Status = AppointmentStatus.Busy,
             };
 
             occurrence = new CalendarAppointmentOccurrence()
@@ -183,9 +175,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 RecurrenceInfo = null,
                 AllDay = false,
                 Priority = Priority.Normal,
-                Private = false,
                 Type = CalendarOccurenceType.Normal,
-                Status = AppointmentStatus.Busy,
             };
 
             occurrence = new CalendarAppointmentOccurrence()

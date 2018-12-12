@@ -28,12 +28,6 @@ namespace Mark5.Mobile.Common.Model
         [Column("AllDay")]
         public bool AllDay { get; set; }
 
-        [Column("Private")]
-        public bool Private { get; set; }
-
-        [Column("Status")]
-        public AppointmentStatus Status { get; set; }
-
         [Column("CreatorId")]
         public int CreatorId { get; set; } = -1;
 
@@ -81,7 +75,7 @@ namespace Mark5.Mobile.Common.Model
 
         public override string ToString()
         {
-            return $"[CalendarAppointment: Subject={Subject}, Location={Location}, Status={Status}]";
+            return $"[CalendarAppointment: Subject={Subject}, Location={Location}]";
         }
     }
 
