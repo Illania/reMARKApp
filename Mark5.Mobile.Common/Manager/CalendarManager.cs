@@ -200,5 +200,19 @@ namespace Mark5.Mobile.Common.Manager
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
+
+        public async Task<bool> SendCalendarAppointmentInvitationsAsync(int appointmentId, Guid lineGuid)
+        {
+            var result = await AppServiceProxy.SendCalendarAppointmentInvitations(new DataContract.SendCalendarAppointmentInvitationsParameters
+            {
+                Token = Token,
+                LineGuid = lineGuid,
+                CalendarAppointmentId = appointmentId
+            });
+
+            Console.WriteLine("SENDING INVITATIONS : " + result);
+
+            return true;
+        }
     }
 }
