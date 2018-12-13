@@ -1541,6 +1541,21 @@ namespace Mark5.ServiceReference.DataContract
         [EnumMember(Value = "Declined")] Declined = 4,
     }
 
+    [DataContract(Name = "SendCalendarAppointmentInvitationsResult", Namespace = "com.nordic-it.appservice.v3")]
+    public class SendCalendarAppointmentInvitationsResult
+    {
+    }
+
+    [DataContract(Name = "SendCalendarAppointmentInvitations", Namespace = "com.nordic-it.appservice.v3")]
+    public class SendCalendarAppointmentInvitationsParameters : AbstractParameters
+    {
+        [DataMember(Name = "CalendarAppointmentId", Order = 0)]
+        public int CalendarAppointmentId { get; set; } = -1;
+
+        [DataMember(Name = "LineGuid", Order = 0)]
+        public Guid LineGuid { get; set; } = new Guid();
+    }
+
     #endregion
 
     #region Search
