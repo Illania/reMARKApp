@@ -1380,12 +1380,6 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "Email", Order = 0)]
         public string Email { get; set; }
-
-        [DataMember(Name = "Customer", Order = 0)]
-        public bool Customer { get; set; }
-
-        [DataMember(Name = "Note", Order = 0)]
-        public string Note { get; set; }
     }
 
     [DataContract(Name = "WeekOfMonth", Namespace = "com.nordic-it.appservice.v3")]

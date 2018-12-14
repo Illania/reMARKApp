@@ -9,7 +9,5 @@
         public ParticipantStatus Status { get; set; }
         public string CN { get; set; }
         public string Email { get; set; }
-        public bool Customer { get; set; }
-        public string Note { get; set; }
     }
 }

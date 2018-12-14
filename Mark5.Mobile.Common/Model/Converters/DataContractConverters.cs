@@ -489,8 +489,6 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Status = p.Status.ConvertEnum<ParticipantStatus>(),
                 CN = p.CN,
                 Email = p.Email,
-                Customer = p.Customer,
-                Note = p.Note
             };
         }
 
@@ -880,8 +878,6 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Status = p.Status.ConvertEnum<DataContract.ParticipantStatus>(),
                 CN = p.CN,
                 Email = p.Email,
-                Customer = p.Customer,
-                Note = p.Note
             };
         }
 

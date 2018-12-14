@@ -130,7 +130,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             var participantEmail = new Participant
             {
-                Customer = false,
                 Status = ParticipantStatus.NeedAction,
                 Type = ParticipantType.ComAddress,
                 Email = "fp@nordic-it.com",
@@ -140,7 +139,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             var participantInternal = new Participant
             {
-                Customer = false,
                 Status = ParticipantStatus.NeedAction,
                 Type = ParticipantType.User,
                 Email = "",
@@ -151,7 +149,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             var participantClient = new Participant
             {
-                Customer = false,
                 Status = ParticipantStatus.NeedAction,
                 Type = ParticipantType.Client,
                 Email = "test@test.com",
