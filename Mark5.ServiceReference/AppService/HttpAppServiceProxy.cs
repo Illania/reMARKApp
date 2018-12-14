@@ -321,11 +321,6 @@ namespace Mark5.ServiceReference.AppService
             return await InvokeAsync<SearchShortcodesResult, SearchShortcodesParameters>("SearchShortcodes", parameters, ct);
         }
 
-        public async Task<SearchCalendarEventsResult> SearchCalendarEventsAsync(SearchCalendarEventsParameters parameters, CancellationToken ct = default(CancellationToken))
-        {
-            return await InvokeAsync<SearchCalendarEventsResult, SearchCalendarEventsParameters>("SearchCalendarEvents", parameters, ct);
-        }
-
         public async Task<GetNotificationsResult> GetNotificationsAsync(GetNotificationsParameters parameters, CancellationToken ct = default(CancellationToken))
         {
             return await InvokeAsync<GetNotificationsResult, GetNotificationsParameters>("GetNotifications", parameters, ct);

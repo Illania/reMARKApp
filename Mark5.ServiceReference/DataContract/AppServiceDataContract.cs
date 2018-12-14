@@ -1743,86 +1743,6 @@ namespace Mark5.ServiceReference.DataContract
         public List<ShortcodePreview> ShortcodePreviews { get; set; } = new List<ShortcodePreview>();
     }
 
-    [DataContract(Name = "SearchCalendarEventsParameters", Namespace = "com.nordic-it.appservice.v3")]
-    public class SearchCalendarEventsParameters : AbstractParameters
-    {
-        [DataMember(Name = "Type", Order = 0)]
-        public SearchCalendarEventsType Type { get; set; }
-
-        [DataMember(Name = "SavedSearchFilterHash", Order = 0)]
-        public string SavedSearchFilterHash { get; set; }
-
-        // Appointment, Task
-        [DataMember(Name = "InCalendarOfUserIds", Order = 0)]
-        public List<int> InCalendarOfUserIds { get; set; } = new List<int>();
-
-        // Appointment, Task
-        [DataMember(Name = "Priority", Order = 0)]
-        public Priority Priority { get; set; }
-
-        // Appointment, Task
-        [DataMember(Name = "Subject", Order = 0)]
-        public string Subject { get; set; }
-
-        // Appointment, Task
-        [DataMember(Name = "Description", Order = 0)]
-        public string Description { get; set; }
-
-        // Task
-        [DataMember(Name = "InGroupCalendarOfUserIds", Order = 0)]
-        public List<int> InGroupCalendarOfUserIds { get; set; } = new List<int>();
-
-        // Task
-        [DataMember(Name = "TaskCreatedByUserIds", Order = 0)]
-        public List<int> TaskCreatedByUserIds { get; set; } = new List<int>();
-
-        // Task
-        [DataMember(Name = "DelegatedToUserIds", Order = 0)]
-        public List<int> DelegatedToUserIds { get; set; } = new List<int>();
-
-        // Task
-        [DataMember(Name = "DelegatedToDepartmentIds", Order = 0)]
-        public List<int> DelegatedToDepartmentIds { get; set; } = new List<int>();
-
-        // Appointment
-        [DataMember(Name = "CalendarCategoryIds", Order = 0)]
-        public List<int> CalendarCategoryIds { get; set; } = new List<int>();
-
-        // Appointment
-        [DataMember(Name = "Location", Order = 0)]
-        public string Location { get; set; }
-
-        // Appointment
-        [DataMember(Name = "ParticipantUserIds", Order = 0)]
-        public List<int> ParticipantUserIds { get; set; } = new List<int>();
-
-        // Appointment, Task
-        [DataMember(Name = "DateRange", Order = 0)]
-        public DateRange DateRange { get; set; } = new DateRange();
-
-        // Appointment, Task
-        [DataMember(Name = "FiledInFolderType", Order = 0)]
-        public FiledInFolderType FiledInFolderType { get; set; }
-
-        // Appointment, Task
-        [DataMember(Name = "FiledInFolderFolderType", Order = 0)]
-        public FiledInFolderFolderType FiledInFolderFolderType { get; set; }
-
-        // Appointment, Task
-        [DataMember(Name = "FiledInFolderIds", Order = 0)]
-        public List<int> FiledInFolderIds { get; set; } = new List<int>();
-    }
-
-    [DataContract(Name = "SearchCalendarEventsResult", Namespace = "com.nordic-it.appservice.v3")]
-    public class SearchCalendarEventsResult
-    {
-        [DataMember(Name = "CalendarAppointment", Order = 0)]
-        public List<CalendarAppointment> CalendarAppointments { get; set; } = new List<CalendarAppointment>();
-
-        [DataMember(Name = "CalendarTasks", Order = 0)]
-        public List<CalendarTask> CalendarTasks { get; set; } = new List<CalendarTask>();
-    }
-
     [DataContract(Name = "SavedSearch", Namespace = "com.nordic-it.appservice.v3")]
     public class SavedSearch
     {
@@ -1834,14 +1754,6 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "SavedSearchFilterHash", Order = 0)]
         public string SavedSearchFilterHash { get; set; }
-    }
-
-    [DataContract(Name = "SearchCalendarEventsType", Namespace = "com.nordic-it.appservice.v3")]
-    public enum SearchCalendarEventsType
-    {
-        [EnumMember(Value = "None")] None = 0,
-        [EnumMember(Value = "Appointments")] Appointments = 1,
-        [EnumMember(Value = "Tasks")] Tasks = 2,
     }
 
     [DataContract(Name = "FiledInFolderType", Namespace = "com.nordic-it.appservice.v3")]

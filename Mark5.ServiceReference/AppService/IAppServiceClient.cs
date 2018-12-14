@@ -196,12 +196,6 @@ namespace Mark5.ServiceReference.AppService
 
         SearchShortcodesResult EndSearchShortcodes(IAsyncResult asyncResult);
 
-        [OperationContract(Action = "SearchCalendarEvents", AsyncPattern = true)]
-        [FaultContract(typeof(AppServiceFaultDetail), Name = "AppServiceFaultDetail", Namespace = "com.nordic-it.appservice.v3")]
-        IAsyncResult BeginSearchCalendarEvents(SearchCalendarEventsParameters parameters, AsyncCallback callback, object asyncState);
-
-        SearchCalendarEventsResult EndSearchCalendarEvents(IAsyncResult asyncResult);
-
         #endregion
 
         #region Notifications

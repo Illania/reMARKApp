@@ -472,22 +472,6 @@ namespace Mark5.ServiceReference.AppService
                 return (SearchShortcodesResult)EndInvoke("SearchShortcodes", new object[0], asyncResult);
             }
 
-            public IAsyncResult BeginSearchCalendarEvents(SearchCalendarEventsParameters parameters, AsyncCallback callback, object asyncState)
-            {
-                return BeginInvoke("SearchCalendarEvents",
-                    new object[]
-                    {
-                        parameters
-                    },
-                    callback,
-                    asyncState);
-            }
-
-            public SearchCalendarEventsResult EndSearchCalendarEvents(IAsyncResult asyncResult)
-            {
-                return (SearchCalendarEventsResult)EndInvoke("SearchCalendarEvents", new object[0], asyncResult);
-            }
-
             #endregion
 
             #region Notifications

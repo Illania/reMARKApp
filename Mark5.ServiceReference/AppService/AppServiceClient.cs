@@ -43,7 +43,7 @@ namespace Mark5.ServiceReference.AppService
             return Channel.EndGetFolders(asyncResult);
         }
 
-        public IAsyncResult BeginSearchFolders(SearchFoldersParameters parameters, AsyncCallback callback, object asyncState) 
+        public IAsyncResult BeginSearchFolders(SearchFoldersParameters parameters, AsyncCallback callback, object asyncState)
         {
             return Channel.BeginSearchFolders(parameters, callback, asyncState);
         }
@@ -313,15 +313,6 @@ namespace Mark5.ServiceReference.AppService
             return Channel.EndSearchShortcodes(asyncResult);
         }
 
-        public IAsyncResult BeginSearchCalendarEvents(SearchCalendarEventsParameters parameters, AsyncCallback callback, object asyncState)
-        {
-            return Channel.BeginSearchCalendarEvents(parameters, callback, asyncState);
-        }
-
-        public SearchCalendarEventsResult EndSearchCalendarEvents(IAsyncResult asyncResult)
-        {
-            return Channel.EndSearchCalendarEvents(asyncResult);
-        }
 
         #endregion
 

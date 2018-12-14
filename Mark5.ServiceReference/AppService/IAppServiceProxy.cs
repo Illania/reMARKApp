@@ -91,8 +91,6 @@ namespace Mark5.ServiceReference.AppService
 
         Task<SearchShortcodesResult> SearchShortcodesAsync(SearchShortcodesParameters parameters, CancellationToken ct = default(CancellationToken));
 
-        Task<SearchCalendarEventsResult> SearchCalendarEventsAsync(SearchCalendarEventsParameters parameters, CancellationToken ct = default(CancellationToken));
-
         #endregion
 
         #region Notifications
