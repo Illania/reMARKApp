@@ -168,12 +168,23 @@ namespace Mark5.Mobile.IOS.Ui.Common
                                                      a =>
                 {
                     var dismissAction = ShowInfiniteProgressDialog(Localization.GetString("creating_system_report___"));
-                    Task.Run(() => SystemReportCollector.CreateFullReport()).ContinueWith(t =>
+                    Task.Run(() => SystemReportCollector.CreateFullReport()).ContinueWith(async t =>
                     {
                         dismissAction();
 
                         if (!t.IsFaulted)
-                            vc.PresentViewController(SystemReportCollector.CreateShareReportController(t.Result), true, () => { tcs.SetResult(true); });
+                        {
+
+                            var sendWithMark5 = await ShowYesNoAlertAsync(vc, Localization.GetString("send_with_mark5_title"), Localization.GetString("send_report_with_mark5_content"));
+
+                            if (sendWithMark5)
+                            {
+                                var cvc = SystemReportCollector.CreateShareReportComposeDocumentViewController(t.Result);
+                                vc.PresentViewController(new NavigationController(cvc, UIModalPresentationStyle.PageSheet), true, null);
+                            }
+                            else 
+                                vc.PresentViewController(SystemReportCollector.CreateShareReportController(t.Result), true, () => { tcs.SetResult(true); });
+                        }
                         else
                             tcs.SetResult(true);
                     }, TaskScheduler.FromCurrentSynchronizationContext());
@@ -197,12 +208,22 @@ namespace Mark5.Mobile.IOS.Ui.Common
                                                      a =>
                 {
                     var dismissAction = ShowInfiniteProgressDialog(Localization.GetString("creating_system_report___"));
-                    Task.Run(() => SystemReportCollector.CreateFullReport()).ContinueWith(t =>
+                    Task.Run(() => SystemReportCollector.CreateFullReport()).ContinueWith(async t =>
                     {
                         dismissAction();
 
                         if (!t.IsFaulted)
-                            vc.PresentViewController(SystemReportCollector.CreateShareReportController(t.Result), true, null);
+                        {
+                            var sendWithMark5 = await ShowYesNoAlertAsync(vc, Localization.GetString("send_with_mark5_title"), Localization.GetString("send_report_with_mark5_content"));
+
+                            if (sendWithMark5)
+                            {
+                                var cvc = SystemReportCollector.CreateShareReportComposeDocumentViewController(t.Result);
+                                vc.PresentViewController(new NavigationController(cvc, UIModalPresentationStyle.PageSheet), true, null);
+                            }
+                            else
+                                vc.PresentViewController(SystemReportCollector.CreateShareReportController(t.Result), true, null);
+                        }
                     }, TaskScheduler.FromCurrentSynchronizationContext());
                 }));
             }

@@ -7,6 +7,7 @@ using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Storage;
 using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Model;
+using Mark5.ServiceReference.Exceptions;
 
 namespace Mark5.Mobile.Common.Service
 {
@@ -120,9 +121,17 @@ namespace Mark5.Mobile.Common.Service
                                                                     uploadedAttachmentsGuids,
                                                                     SourceType.Remote);
 
+                            CommonConfig.Logger.Info($"Document sent [documentToUploadGuid={documentToUploadGuid}]");
+
                             await FileSystemStorage.DeleteDocumentToUpload(documentToUploadGuid);
 
-                            CommonConfig.Logger.Info($"Document sent [documentToUploadGuid={documentToUploadGuid}]");
+                            CommonConfig.MessengerHub.Publish(new DocumentUploadStatusChangedMessage(this, DocumentUploadStatusChangedMessage.Status.DocumentSent, documentToUploadGuid));
+                        }
+                        catch (HttpAppServiceException hasx) when (hasx?.Detail?.Code == AppServiceFaultCode.DocumentAlreadySentError)
+                        {
+                            CommonConfig.Logger.Error($"Document was already sent according to the server [documentToUploadGuid={documentToUploadGuid}]");
+
+                            await FileSystemStorage.DeleteDocumentToUpload(documentToUploadGuid);
 
                             CommonConfig.MessengerHub.Publish(new DocumentUploadStatusChangedMessage(this, DocumentUploadStatusChangedMessage.Status.DocumentSent, documentToUploadGuid));
                         }
@@ -130,7 +139,7 @@ namespace Mark5.Mobile.Common.Service
                         {
                             CommonConfig.Logger.Error($"Document failed sent [documentToUploadGuid={documentToUploadGuid}]", ex);
 
-                            await FileSystemStorage.MoveDocumentToUploadToFailed(documentToUploadGuid);
+                            await FileSystemStorage.MoveDocumentToUploadToFailed(documentToUploadGuid, ex);
 
                             CommonConfig.MessengerHub.Publish(new DocumentUploadStatusChangedMessage(this, DocumentUploadStatusChangedMessage.Status.DocumentSentFailed, documentToUploadGuid));
                         }

@@ -1,5 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
+using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Common.Utilities
 {
@@ -11,6 +14,7 @@ namespace Mark5.Mobile.Common.Utilities
         const string EmailAddressRegex = @"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?";
         const string OnlyEmailAddressRegex = @"^" + EmailAddressRegex + @"$";
         const string OnlyHexStringRegex = @"^#[A-Fa-f0-9]{0,2}[A-Fa-f0-9]{1,2}[A-Fa-f0-9]{1,2}[A-Fa-f0-9]{1,2}$";
+        const string RecipientRegex = @"([^,])([^,]*)";
 
         public static bool IsUsernameValid(string username)
         {
@@ -81,6 +85,27 @@ namespace Mark5.Mobile.Common.Utilities
         {
             phoneNumber = new string(text.ToCharArray().Where(c => char.IsDigit(c) || c == '+').ToArray());
             return !string.IsNullOrEmpty(phoneNumber);
+        }
+
+        public static bool ContainsValidUsernames(string text, SystemUsersDepartments systemUserDepartments)
+        {
+            return ContainsValidUsernames(text, systemUserDepartments, out IEnumerable<Match> mc);
+        }
+
+        public static bool ContainsValidUsernames(string text, SystemUsersDepartments systemUserDepartments, out IEnumerable<Match> matches)
+        {
+            matches = ExtractUsernames(text, systemUserDepartments);
+            return matches.Any();
+        }
+
+        public static IEnumerable<Match> ExtractUsernames(string text, SystemUsersDepartments systemUsersDepartments)
+        {
+            var matches = Regex.Matches(text ?? string.Empty, RecipientRegex, RegexOptions.IgnoreCase).Cast<Match>();
+
+            if (systemUsersDepartments != null)
+                matches = matches.Cast<Match>().Where(m => !m.Value.Contains('@') && systemUsersDepartments.Users.Any(su => String.Equals(su.Username, m.Value.Trim(), StringComparison.OrdinalIgnoreCase))).Select(m => m);
+
+            return matches;
         }
     }
 }

@@ -386,7 +386,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         async Task RefreshData()
         {
             var retainedConnectionInfo = await authenticator.GetRetainedConnectionInfoAsync();
-            if (retainedConnectionInfo != null && string.IsNullOrEmpty(hostnameTextField.Text) && string.IsNullOrEmpty(usernameTextField.Text))
+            if (retainedConnectionInfo != null && string.IsNullOrEmpty(usernameTextField.Text + hostnameTextField.Text))
             {
                 usernameTextField.Text = retainedConnectionInfo.Username;
                 hostnameTextField.Text = retainedConnectionInfo.Hostname;
@@ -668,6 +668,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 CommonConfig.Logger.Info("Retrieving system settings...");
 
                 ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync();
+
+                await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
 
                 CommonConfig.Logger.Info($"Starting services...");
                 Services.DocumentsUploadService.Start();

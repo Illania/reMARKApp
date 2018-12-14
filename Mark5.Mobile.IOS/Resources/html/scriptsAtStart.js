@@ -46,7 +46,7 @@ function InsertContent(type, id, content) {
     var templateContent = content;
 
     var selection = window.getSelection();
-    if(selection !== undefined || savedRange !== null) {
+    if(selection !== undefined && savedRange !== null) {
         var range = savedRange;
         range.deleteContents();
 
@@ -73,5 +73,19 @@ function InsertContent(type, id, content) {
             selection.addRange(range);
         }
     }
+    else {
+        var editor = document.getElementById('editor');
+
+        if (templateType == 'text') {
+            templateNode.innerText = templateContent;
+        }
+
+        if (templateType == 'html') {
+            templateNode.innerHTML = templateContent;
+        }
+
+        editor.prepend(templateNode);
+    }
+
 };
 

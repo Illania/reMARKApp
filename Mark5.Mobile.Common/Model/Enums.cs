@@ -335,6 +335,7 @@ namespace Mark5.Mobile.Common.Model
         RecentAddress,
         Phonebook,
         Contact,
+        Internal
     }
 
     #endregion

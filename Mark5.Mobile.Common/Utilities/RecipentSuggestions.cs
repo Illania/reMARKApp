@@ -11,13 +11,15 @@ namespace Mark5.Mobile.Common.Utilities
 {
     public static class RecipentSuggestions
     {
-        public static void GetSuggestions(string phrase, CancellationToken token, Action<List<Recipient>, CancellationToken> handler)
+        public static void GetSuggestions(string phrase, SystemUsersDepartments systemUsersDepartments, CancellationToken token, Action<List<Recipient>, CancellationToken> handler)
         {
             if (token.IsCancellationRequested)
                 return;
 
             GetSuggestionFromRecentAddresses(phrase, token, handler);
             GetSuggestionFromContacts(phrase, token, handler);
+            if (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
+                GetSuggestionFromInternalContacts(phrase, systemUsersDepartments, token, handler);
             GetSuggestionFromPhonebook(phrase, token, handler);
         }
 
@@ -64,12 +66,33 @@ namespace Mark5.Mobile.Common.Utilities
                 var filtered = new List<Recipient>();
                 try
                 {
-                    filtered = await Manager.Managers.ContactsManager.GetSuggestions(phrase);
+                    filtered = await Managers.ContactsManager.GetSuggestions(phrase);
                 }
                 catch (Exception ex)
                 {
                     CommonConfig.Logger.Error("Error while retrieving suggestions from database", ex);
                 }
+                handler(filtered, token);
+            });
+        }
+
+        static void GetSuggestionFromInternalContacts(string phrase, SystemUsersDepartments systemUsersDepartments, CancellationToken token, Action<List<Recipient>, CancellationToken> handler)
+        {
+            if (token.IsCancellationRequested)
+                return;
+
+            if (systemUsersDepartments == null)
+                return;
+
+            Task.Run(() =>
+            {
+                var filtered = new List<Recipient>();
+
+                var matchingInternalUsers = systemUsersDepartments.Users.FindAll(user => user.FirstName.ContainsCaseInsensitive(phrase) || user.LastName.ContainsCaseInsensitive(phrase) || user.Username.ContainsCaseInsensitive(phrase));
+
+                foreach (SystemUser user in matchingInternalUsers)
+                    filtered.Add(new Recipient((user.FirstName != null && user.LastName != null) ? user.FirstName + " " + user.LastName : null, user.Username, RecipientType.Internal));
+
                 handler(filtered, token);
             });
         }

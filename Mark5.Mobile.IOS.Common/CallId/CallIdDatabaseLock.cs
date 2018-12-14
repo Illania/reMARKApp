@@ -1,5 +1,4 @@
-﻿using System;
-using Foundation;
+﻿using Foundation;
 using Mark5.Mobile.IOS.Common.Exceptions;
 
 namespace Mark5.Mobile.IOS.Common.CallId
@@ -11,8 +10,11 @@ namespace Mark5.Mobile.IOS.Common.CallId
         public static void LockDatabase()
         {
             var fm = NSFileManager.DefaultManager;
-            using (var containerUrl = fm.GetContainerUrl(CallIdContainerUtilities.AppGroupId))
+            using (var containerUrl = fm?.GetContainerUrl(CallIdContainerUtilities.AppGroupId))
             {
+                if (containerUrl == null)
+                    return;
+
                 var lockPath = containerUrl.Append(databaseLockName, false).Path;
 
                 if (fm.FileExists(lockPath))
@@ -25,14 +27,16 @@ namespace Mark5.Mobile.IOS.Common.CallId
         public static void UnlockDatabase()
         {
             var fm = NSFileManager.DefaultManager;
-            using (var containerUrl = fm.GetContainerUrl(CallIdContainerUtilities.AppGroupId))
+            using (var containerUrl = fm?.GetContainerUrl(CallIdContainerUtilities.AppGroupId))
             {
+                if (containerUrl == null)
+                    return;
+
                 var lockPath = containerUrl.Append(databaseLockName, false).Path;
 
                 if (fm.FileExists(lockPath))
                 {
-                    NSError error = new NSError();
-                    fm.Remove(lockPath, out error);
+                    fm.Remove(lockPath, out NSError error);
                     if (error != null)
                     {
                         throw new NSErrorException(error);

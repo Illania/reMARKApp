@@ -32,6 +32,11 @@ namespace Mark5.Mobile.Common.Model
         {
             return (obj is Category y) && this.Id.Equals(y.Id);
         }
+
+        public override int GetHashCode()
+        {
+            return Id.GetHashCode();
+        }
     }
 
     public class CategoryComparer : IEqualityComparer<Category>

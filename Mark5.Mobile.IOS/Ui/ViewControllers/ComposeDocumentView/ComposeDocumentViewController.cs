@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -20,6 +20,7 @@ using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView;
 using Mark5.Mobile.IOS.Utilities;
+using Mark5.ServiceReference.Exceptions;
 using MobileCoreServices;
 using Photos;
 using UIKit;
@@ -31,7 +32,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
         const int AutoSaveWorkingCopyInterval = 5000; // 5 seconds
 
-        string DefaultTitle = Localization.GetString("new_document");
+        readonly string DefaultTitle = Localization.GetString("new_document");
 
         public bool RestoreWorkingCopy { get; set; }
 
@@ -41,7 +42,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         public DocumentDirection PreviousDocumentDirection { get; set; }
         public int? PreviousDocumentFolderId { get; set; }
         public int? PreviousDocumentId { get; set; }
+        public string PreconfiguredContent { get; set; }
         public Dictionary<DocumentAddressType, string[]> PreconfiguredEmailAddresses { get; set; }
+        public string PreconfiguredSubject { get; set; }
 
         DocumentPreview documentPreview = new DocumentPreview();
         Document document = new Document();
@@ -52,6 +55,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         bool documentLoaded;
         bool templateLoaded;
         string previousDocumentContent;
+        bool refreshing;
 
         UIBarButtonItem cancelButtonItem;
         UIBarButtonItem insertButtonItem;
@@ -68,6 +72,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         SuggestionsListView suggestionsListView;
         Worker autoSaveWorkingCopyWorker;
+
+        SystemUsersDepartments systemUserDepartments;
 
         public override void ViewDidLoad()
         {
@@ -271,6 +277,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async void RefreshData()
         {
+            if (refreshing)
+                return;
+
+            refreshing = true;
+
+            if (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
+                await LoadSystemUsersDepartments();
             await LoadDocument();
             await LoadTemplate();
 
@@ -280,6 +293,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             autoSaveWorkingCopyWorker?.Stop();
             autoSaveWorkingCopyWorker = new Worker(SaveWorkingCopy, AutoSaveWorkingCopyInterval);
             autoSaveWorkingCopyWorker.Start();
+
+            refreshing = false;
         }
 
         async Task LoadDocument()
@@ -341,6 +356,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     await subView.InitializeView();
                 }
 
+                document.Guid = Guid.NewGuid();
+
+                if (PreconfiguredSubject != null)
+                    subjectView.Subject = PreconfiguredSubject;
+
                 if (RestoreWorkingCopy)
                 {
                     var files = await Managers.DocumentsManager.GetDocumentWorkingCopyAttachmentsAsync();
@@ -349,6 +369,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                 if (RestoreWorkingCopy)
                     await LoadHtmlString(document.HtmlBody, HtmlProcessingConfiguration.DefaultForEditing);
+                else if (PreconfiguredContent != null)
+                    await LoadPlainText(PreconfiguredContent, PlainTextProcessingConfiguration.DefaultForEditing);
                 else if (previousDocumentPreview != null && PreviousDocumentDirection == DocumentDirection.Draft ||
                          (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption.HasFlag(CopyToNewOption.Content)))
                 {
@@ -361,8 +383,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 }
                 else
                 {
-                   
-
                     if (previousDocumentPreview != null &&
                            (DocumentCreationModeFlag == DocumentCreationModeFlag.Reply && CopyToNewOption == CopyToNewOption.None ||
                             DocumentCreationModeFlag == DocumentCreationModeFlag.ReplyAll && CopyToNewOption == CopyToNewOption.None ||
@@ -390,7 +410,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     {
                         LoadEditorWithPreviousContent(previousDocumentContent);
 
-                    } else {
+                    }
+                    else
+                    {
                         LoadEditor();
                     }
                 }
@@ -404,6 +426,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 CommonConfig.Logger.Error("Failed to load email into editor", ex);
 
                 await Dialogs.ShowErrorAlertAsync(this, ex);
+            }
+        }
+
+        async Task LoadSystemUsersDepartments()
+        {
+            try
+            {
+                systemUserDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync(SourceType.Local);
+                systemUserDepartments.Users.Add(ServerConfig.SystemSettings.UserInfo.User);
+
+                var subViews = headerStackView.Subviews.OfType<RecipientsView>().ToArray();
+
+                foreach (var subView in subViews)
+                    subView.SystemUsersDepartments = systemUserDepartments;
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Error while retrieving system users", ex);
             }
         }
 
@@ -450,7 +490,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                             await InsertLocalTemplate();
                             break;
                         case 2:
-                            await InsertTemplate(false);
+                            await InsertOtherTemplate();
                             break;
                     }
                     break;
@@ -500,7 +540,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             if (source == 0)
             {
                 CommonConfig.UsageAnalytics.LogEvent(new ComposeInsertTemplateEvent());
-                await InsertTemplate(true);
+                await InsertOtherTemplate();
             }
 
             if (source == 1)
@@ -561,6 +601,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             if (suggestionsListView == null)
             {
                 suggestionsListView = new SuggestionsListView(this);
+                suggestionsListView.SystemUsersDepartments = systemUserDepartments;
 
                 View.AddSubview(suggestionsListView);
                 View.AddConstraints(new[]
@@ -583,15 +624,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async void RecipientView_AddButtonTapped(object sender, EventArgs e)
         {
-            var strings = new[]
-            {
-                Localization.GetString("contact_picker_recent_addresses"),
-                Localization.GetString("contact_picker_contacts"),
-                Localization.GetString("contact_picker_shortcodes"),
-                Localization.GetString("contact_picker_phonebook")
-            };
+            var strings = new List<string>
+                {
+                    Localization.GetString("contact_picker_recent_addresses"),
+                    Localization.GetString("contact_picker_contacts"),
+                    Localization.GetString("contact_picker_shortcodes"),
+                    Localization.GetString("contact_picker_phonebook"),
+                };
 
-            var choice = await Dialogs.ShowListActionSheetAsync(this, strings, (UIView)sender);
+            if (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
+                strings.Add(Localization.GetString("contact_picker_internal_contacts"));
+
+            var choice = await Dialogs.ShowListActionSheetAsync(this, strings.ToArray(), (UIView)sender);
+
             switch (choice)
             {
                 case 0:
@@ -606,6 +651,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 case 3:
                     await DoOpenPhonebook(sender as RecipientsView);
                     break;
+                case 4:
+                    await DoOpenInternalContacts(sender as RecipientsView);
+                    break;
                 default:
                     return;
             }
@@ -613,6 +661,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async void AttachmentsView_Tapped(object sender, AttachmentsView.TappedEventArgs e)
         {
+            if (e.AttachmentDescription?.FromTemplate == true)
+            {
+                await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("template_attachment_title"), Localization.GetString("template_attachment_content"));
+                return;
+            }
+
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("opening_attachment___"));
 
             CommonConfig.UsageAnalytics.LogEvent(new ComposeOpenAttachmentEvent());
@@ -711,9 +765,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async Task<bool> SendDocument()
         {
-            if (!ContainsValidEmails(toView, ccView, bccView))
+            if (!ContainsValidRecipients(toView, ccView, bccView))
             {
-                await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("warning"), Localization.GetString("no_email_addresses_added"));
+                await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("warning"), Localization.GetString("no_recipients_added"));
                 return false;
             }
 
@@ -723,9 +777,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 return false;
             }
 
-            if (ContainsInvalidEmails(toView, ccView, bccView))
+            if (ContainsInvalidRecipients(toView, ccView, bccView))
             {
-                var result = await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("warning"), Localization.GetString("incorrect_email_addresses_added"));
+                var result = await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("warning"), Localization.GetString("incorrect_recipients_added"));
                 if (!result)
                     return false;
             }
@@ -746,7 +800,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     await subView.UpdateDocument();
 
                 document.HtmlBody = await GetContent();
-
                 documentPreview.Direction = DocumentDirection.Outgoing;
 
                 await Managers.DocumentsManager.SaveDocumentWorkingCopyAsync(new DocumentWorkingCopy
@@ -835,14 +888,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             var newContent = await base.GetContent();
             newContent = await CleanContent(newContent);
 
-            var oldContent = previousDocumentContent;
-            if (!string.IsNullOrWhiteSpace(oldContent))
-            {
-                oldContent = await CleanContent(oldContent);
-                var mergedContent = await MergeContent(newContent, oldContent);
-                return mergedContent;
-            }
-
             return newContent;
         }
 
@@ -865,6 +910,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 var editorNode = bodyNode?.SelectSingleNode("//div[@id='editor']");
                 editorNode?.Attributes.FirstOrDefault(attr => attr.Name == "contentEditable")?.Remove();
 
+                var previousContentNode = bodyNode?.SelectSingleNode("//div[@id='previousContent']");
+                previousContentNode?.Attributes.FirstOrDefault(attr => attr.Name == "contentEditable")?.Remove();
+
                 var html = htmlDocument.DocumentNode.OuterHtml;
 
                 html = PreMailer.Net.PreMailer.MoveCssInline(html, true, null, null, true, true).Html;
@@ -874,30 +922,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 html = p.Dom.ProcessToString(RuleSet.GetSafeHtmlRules(), null);
 
                 return html;
-            });
-        }
-
-        Task<string> MergeContent(string newContent, string oldContent)
-        {
-            return Task.Run(() =>
-            {
-                var newHtmlDocument = new HtmlDocument();
-                newHtmlDocument.LoadHtml(newContent);
-                var oldHtmlDocument = new HtmlDocument();
-                oldHtmlDocument.LoadHtml(oldContent);
-
-                var html = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/blank", "html"));
-                var mergedHtmlDocument = new HtmlDocument();
-                mergedHtmlDocument.LoadHtml(html);
-
-                var newNode = mergedHtmlDocument.DocumentNode.SelectSingleNode("//div[@id='new']");
-                newNode.AppendChildren(newHtmlDocument.DocumentNode.SelectSingleNode("//body").ChildNodes);
-                newNode.Attributes.Remove("id");
-                var oldNode = mergedHtmlDocument.DocumentNode.SelectSingleNode("//div[@id='old']");
-                oldNode.AppendChildren(oldHtmlDocument.DocumentNode.SelectSingleNode("//body").ChildNodes);
-                oldNode.Attributes.Remove("id");
-
-                return mergedHtmlDocument.DocumentNode.OuterHtml;
             });
         }
 
@@ -915,21 +939,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 if (template == null)
                     return;
 
-                ProcessTemplate(template, previousDocumentPreview);
-
-                var insertTemplateJs = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/initTemplate", "js"));
-                if (template.ContentType == ContentType.PlainText)
-                {
-                    var templateText = Regex.Replace(template.Content, @"\r\n?|\n", "\\n", RegexOptions.Multiline);
-                    insertTemplateJs = ProcessWebTemplate(insertTemplateJs, "text", template.Id, templateText);
-                }
-                if (template.ContentType == ContentType.Html)
-                {
-                    var templateText = Regex.Replace(template.Content, @"\r\n?|\n", " ", RegexOptions.Multiline);
-                    insertTemplateJs = ProcessWebTemplate(insertTemplateJs, "html", template.Id, templateText);
-                }
-
-                var result = await EvaluateJavaScriptAsync(insertTemplateJs);
+                await InsertTemplate(template);
             }
             catch (Exception ex)
             {
@@ -944,7 +954,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             }
         }
 
-        async Task InsertTemplate(bool insertAtCursor)
+        async Task InsertOtherTemplate()
         {
             var tp = new TemplatesListViewController();
             PresentViewController(new NavigationController(tp, UIModalPresentationStyle.PageSheet), true, null);
@@ -961,40 +971,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 if (template == null)
                     return;
 
-                ProcessTemplate(template, previousDocumentPreview);
-
-                if (insertAtCursor)
-                {
-                    var type = String.Empty;
-                    var content = String.Empty;
-
-                    if (template.ContentType == ContentType.PlainText)
-                    {
-                        content = Regex.Replace(template.Content, @"\r\n?|\n", "\\n", RegexOptions.Multiline);
-                        type = "text";
-                    }
-                    if (template.ContentType == ContentType.Html)
-                    {
-                        content = Regex.Replace(template.Content, @"\r\n?|\n", " ", RegexOptions.Multiline);
-                        type = "html";
-                    }
-
-                    var result = await InsertTemplate(type, template.Id, content);
-                } else {
-                    var insertTemplateJs = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/initTemplate", "js"));
-                    if (template.ContentType == ContentType.PlainText)
-                    {
-                        var templateText = Regex.Replace(template.Content, @"\r\n?|\n", "\\n", RegexOptions.Multiline);
-                        insertTemplateJs = ProcessWebTemplate(insertTemplateJs, "text", template.Id, templateText);
-                    }
-                    if (template.ContentType == ContentType.Html)
-                    {
-                        var templateText = Regex.Replace(template.Content, @"\r\n?|\n", " ", RegexOptions.Multiline);
-                        insertTemplateJs = ProcessWebTemplate(insertTemplateJs, "html", template.Id, templateText);
-                    }
-
-                    var result = await EvaluateJavaScriptAsync(insertTemplateJs);
-                }
+                await InsertTemplate(template);
             }
             catch (Exception ex)
             {
@@ -1013,11 +990,34 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         {
             if (string.IsNullOrEmpty(PlatformConfig.Preferences.LocalTemplate))
                 return;
-            var insertTemplateJs = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/initTemplate", "js"));
-            var localTemplateText = Regex.Replace(PlatformConfig.Preferences.LocalTemplate, @"\r\n?|\n", "\\n", RegexOptions.Multiline);
-            insertTemplateJs = ProcessWebTemplate(insertTemplateJs, "text", "local", localTemplateText);
 
-            var result = await EvaluateJavaScriptAsync(insertTemplateJs);
+            var localTemplateText = Regex.Replace(PlatformConfig.Preferences.LocalTemplate, @"\r\n?|\n", "\\n", RegexOptions.Multiline);
+
+            var result = await InsertTemplate("text", 0, localTemplateText);
+        }
+
+        async Task InsertTemplate(Template template)
+        {
+            ProcessTemplate(template, previousDocumentPreview);
+
+            var type = String.Empty;
+            var content = String.Empty;
+
+            if (template.ContentType == ContentType.PlainText)
+            {
+                content = Regex.Replace(template.Content, @"\r\n?|\n", "\\n", RegexOptions.Multiline);
+                type = "text";
+            }
+            if (template.ContentType == ContentType.Html)
+            {
+                content = Regex.Replace(template.Content, @"\r\n?|\n", " ", RegexOptions.Multiline);
+                type = "html";
+            }
+
+            var result = await InsertTemplate(type, template.Id, content);
+
+            if (template.Attachments.Any())
+                attachmentsView?.AddAttachmenstFromTemplate(template);
         }
 
         #endregion
@@ -1073,6 +1073,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             var pa = await vc.Result;
             if (pa != null)
                 recipientsView.AddRecipent(pa.Name, pa.Address);
+        }
+
+        async Task DoOpenInternalContacts(RecipientsView recipientsView)
+        {
+            CommonConfig.UsageAnalytics.LogEvent(new ComposeContactPickerEvent(ContactPickerChoice.Internal));
+
+            var vc = new MultipleUserSelectionViewController();
+            vc.IncludeCurrentUser = false;
+            PresentViewController(new NavigationController(vc), true, null);
+
+            var pa = await vc.Result;
+            if (pa != null)
+            {
+                foreach (var su in pa)
+                    recipientsView.AddRecipent(string.Empty, su.Username);
+            }
         }
 
         async Task DoOpenRecents(RecipientsView recipientsView)
@@ -1249,7 +1265,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         #region Utilities
 
-        static bool ContainsValidEmails(params RecipientsView[] rvs)
+        static bool ContainsValidRecipients(params RecipientsView[] rvs)
         {
             var containsValidEmails = false;
 
@@ -1259,10 +1275,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             return containsValidEmails;
         }
 
-        static bool ContainsInvalidEmails(params RecipientsView[] rvs)
+        static bool ContainsInvalidRecipients(params RecipientsView[] rvs)
         {
             foreach (var rv in rvs)
-                if (rv.ContainsInvalidEmail())
+                if (rv.ContainsInvalidRecipients())
                     return true;
 
             return false;

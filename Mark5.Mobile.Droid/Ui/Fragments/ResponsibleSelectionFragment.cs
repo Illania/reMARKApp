@@ -22,7 +22,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             args.PutInt(ActionButtonTextResIdBundleKey, Resource.String.confirm);
             args.PutBoolean(IncludeCurrentUserBundleKey, true);
-            args.PutBoolean(AllowNoUserSelectedBundleKey, true);
 
             ResponsibleSelectionFragment fragment = new ResponsibleSelectionFragment();
             fragment.Arguments = args;

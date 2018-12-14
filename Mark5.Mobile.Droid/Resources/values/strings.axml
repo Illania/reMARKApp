@@ -29,6 +29,7 @@
     <string name="cannot_edit_comment_title">Cannot edit comment</string>
     <string name="cannot_open_attachment_without_ext">Attachments without extensions cannot be opened</string>
     <string name="categories">Categories</string>
+    <string name="categories_added">Categories added</string>
     <string name="cc">Cc</string>
     <string name="choose_application">Choose an application</string>
     <string name="changes_not_saved">Changes not saved!</string>
@@ -58,6 +59,7 @@
     <string name="copy_to_new_content">Content</string>
     <string name="copy_to_new_attachments">Attachments</string>
     <string name="create_new_document">Create new email</string>
+    <string name="create_report">Create report</string>
     <string name="create_system_report">Create system report</string>
     <string name="creator">Creator:</string>
     <string name="person">Person</string>
@@ -201,12 +203,12 @@
     <string name="hostname_invalid">Hostname is not valid</string>
     <string name="internet_access">Internet access:</string>
     <string name="insert_template">Insert template</string>
-    <string name="invalid_emails_title">Invalid emails</string>
-    <string name="invalid_emails_content">Not all emails you entered are valid. Do you still want to send the email?</string>
+    <string name="invalid_recipients_title">Invalid recipients</string>
+    <string name="invalid_recipients_content">Not all recipients you entered are valid. Do you still want to send the email?</string>
     <string name="invalid_subject_title">Empty subject</string>
     <string name="invalid_subject_content">The subject line is empty. Do you still want to send the email?</string>
-    <string name="invalid_emails_and_subject_title">Invalid emails and empty subject</string>
-    <string name="invalid_emails_and_subject_content">Not all emails you entered are valid and the subject line is empty. Do you still want to send the email?</string>
+    <string name="invalid_recipients_and_subject_title">Invalid recipients and empty subject</string>
+    <string name="invalid_recipients_and_subject_content">Not all recipients you entered are valid and the subject line is empty. Do you still want to send the email?</string>
     <string name="invalid_line_draft_title">Invalid mailbox</string>
     <string name="invalid_line_draft_content">You need to select a mailbox to save this draft</string>
     <string name="large_attachment">This attachment is larger than 20MB. Do you want to download it?</string>
@@ -396,9 +398,13 @@
     <string name="select_categories">Select categories</string>
     <string name="select_folder">Select folder</string>
     <string name="select_folders">Select folders</string>
+    <string name="select_user">Select user</string>
     <string name="select_users">Select users</string>
     <string name="send">Send</string>
     <string name="sending_document">Sending email</string>
+    <string name="send_with_mark5_title">Send with MARK5</string>
+    <string name="send_report_with_mark5_content">Do you want to send the generated report with MARK5?</string>
+    <string name="send_feedback_with_mark5_content">Do you want to send feedback with MARK5?</string>
     <string name="set_priority">Set priority</string>
     <string name="setting_priority">Setting priority...</string>
     <string name="settings">Settings</string>
@@ -416,6 +422,8 @@
     <string name="subscribe_folder">Subscribe</string>
     <string name="subscribing_folders">Subscribing to folders...</string>
     <string name="templates">Templates</string>
+    <string name="template_attachment_title">Attachment from template</string>
+    <string name="template_attachment_content">It is not possible to open attachments from templates</string>
     <string name="template_null">You do not have a default template set</string>
     <string name="template_question">Which template do you want to use?</string>
     <string-array name="template_question_options">

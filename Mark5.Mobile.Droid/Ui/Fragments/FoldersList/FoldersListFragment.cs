@@ -1114,21 +1114,39 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public (Folder Folder, Section Section) GetItemAtPosition(int position)
             {
-                if (sectionsInView.Count == 1)
-                    return (foldersInSection[sectionsInView.First()][position], sectionsInView.First());
+                try
+                {
+                    if (sectionsInView.Count == 1)
+                        return (foldersInSection[sectionsInView.First()][position], sectionsInView.First());
 
-                var sectionPosition = 0;
-                var sectionPositionToSection = SectionsPositionToSection();
-                var sectionPositions = sectionPositionToSection.Keys.ToList();
-                for (var i = sectionPositions.Count - 1; i > 0; i--)
-                    if (position > sectionPositions[i])
+                    var sectionPosition = 0;
+                    var sectionPositionToSection = SectionsPositionToSection();
+                    var sectionPositions = sectionPositionToSection.Keys.ToList();
+                    for (var i = sectionPositions.Count - 1; i > 0; i--)
+                        if (position > sectionPositions[i])
+                        {
+                            sectionPosition = sectionPositions[i];
+                            break;
+                        }
+
+                    var section = sectionPositionToSection[sectionPosition];
+                    return (foldersInSection[section][position - sectionPosition - 1], section);
+                }
+                catch (Exception)
+                {
+                    var exceptionText = $"FolderListAdapter.GetItemAtPosition(int position) : index ouf of range exception :: Position : { position }, foldersInSection.Count() : { foldersInSection.Count() } :: ";
+
+                    var foldersTxt = String.Empty;
+
+                    foreach (var entry in foldersInSection)
                     {
-                        sectionPosition = sectionPositions[i];
-                        break;
+                        foldersTxt += $" section : { entry.Key }, folders.Count() : { entry.Value.Count() },";
                     }
 
-                var section = sectionPositionToSection[sectionPosition];
-                return (foldersInSection[section][position - sectionPosition - 1], section);
+                    exceptionText += foldersTxt;
+
+                    throw new Exception(exceptionText);
+                }
             }
 
             public IEnumerable<Folder> GetSelectedItems()

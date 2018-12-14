@@ -11,7 +11,7 @@ namespace Mark5.Mobile.Common.Service
 {
     public class DocumentPreviewsDownloadService : AbstractService, IDocumentPreviewsDownloadService
     {
-        readonly HashSet<int> folderIdSkipList = new HashSet<int>();
+        readonly List<SavedOfflineFolderInfo> folderSkipList = new List<SavedOfflineFolderInfo>();
 
         public DocumentPreviewsDownloadService()
             : base(5 * 1000 * 60)
@@ -26,29 +26,27 @@ namespace Mark5.Mobile.Common.Service
             try
             {
                 var documentManager = (DocumentsManager)Managers.DocumentsManager;
-
                 while (!ct.IsCancellationRequested)
                 {
-                    var offlineDocumentFolderIds = (await FileSystemStorage.GetSavedOfflineFolderInfosAsync())
+                    List<SavedOfflineFolderInfo> offlineDocumentFolders = (await FileSystemStorage.GetSavedOfflineFolderInfosAsync())
                                                     .Where(f => f.Module == ModuleType.Documents)
-                                                    .Select(f => f.FolderId)
-                                                    .ToArray();
-                    offlineDocumentFolderIds = offlineDocumentFolderIds.Except(folderIdSkipList).ToArray();
+                                                    .ToList();
 
-                    foreach (var folderId in offlineDocumentFolderIds)
+                    var foldersToSync = offlineDocumentFolders.Where(offlineDocumentFolder => !folderSkipList.Any(skipFolder => skipFolder.FolderGuid == offlineDocumentFolder.FolderGuid));
+                   
+                    foreach (var folder in foldersToSync)
                     {
                         if (CommonConfig.Logger.IsDebugEnabled())
-                            CommonConfig.Logger.Debug($"Downloading document previews from folder [folderId={folderId}]");
+                            CommonConfig.Logger.Debug($"Downloading document previews from folder [folderId={folder.FolderId}]");
 
                         try
                         {
-                            await documentManager.GetDocumentPreviewsAsync(folderId, -1, -1, SourceType.Remote);
+                            await documentManager.GetDocumentPreviewsAsync(folder.FolderId, folder.FolderGuid,-1, -1, SourceType.Remote);
                         }
                         catch (Exception ex)
                         {
-                            folderIdSkipList.Add(folderId);
-
-                            CommonConfig.Logger.Error($"Failed to download document previews from folder [folderId={folderId}]", ex);
+                            folderSkipList.Add(folder);
+                            CommonConfig.Logger.Error($"Failed to download document previews from folder [folderId={folder.FolderId}]", ex);
                         }
 
                         if (ct.IsCancellationRequested)

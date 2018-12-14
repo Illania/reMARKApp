@@ -9,6 +9,7 @@ using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
@@ -30,6 +31,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public bool Empty => document == null && documentPreview == null && folderId == null && folder == null && documentId == null;
 
         public DocumentPreview DocumentPreview => documentPreview;
+
+        WeakReference<IDocumentPageViewControllerDelegate> weakRefDocumentPageViewControllerDelegate;
+
+        public IDocumentPageViewControllerDelegate DocumentPageViewControllerDelegate
+        {
+            get => weakRefDocumentPageViewControllerDelegate?.Unwrap();
+            set => weakRefDocumentPageViewControllerDelegate = value.Wrap();
+        }
 
         Guid failedDocumentToUploadGuid;
         int? folderId;
@@ -652,6 +661,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             };
 
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+        }
+
+        protected override void OnWebViewLoaded()
+        {
+            base.OnWebViewLoaded();
+            DocumentPageViewControllerDelegate?.AddViewControllerToCache(this);
         }
 
         #endregion

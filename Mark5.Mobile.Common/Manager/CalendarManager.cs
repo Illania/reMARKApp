@@ -210,8 +210,6 @@ namespace Mark5.Mobile.Common.Manager
                 CalendarAppointmentId = appointmentId
             });
 
-            Console.WriteLine("SENDING INVITATIONS : " + result);
-
             return true;
         }
     }

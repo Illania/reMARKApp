@@ -96,9 +96,6 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\netstandard2.0\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="PhoneNumbers">
-        <HintPath>..\packages\libphonenumber-csharp.8.8.8\lib\netstandard2.0\PhoneNumbers.dll</HintPath>
-    </Reference>
     <Reference Include="Polly">
       <HintPath>..\packages\Polly.6.1.0\lib\netstandard2.0\Polly.dll</HintPath>
     </Reference>
@@ -210,6 +207,10 @@
     </Reference>
     <Reference Include="Polly">
       <HintPath>..\packages\Polly.6.1.0\lib\netstandard2.0\Polly.dll</HintPath>
+    </Reference>
+    <Reference Include="PhoneNumbers">
+      <HintPath>..\packages\libphonenumber-csharp.8.9.16\lib\netstandard2.0\PhoneNumbers.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -453,6 +454,8 @@
     <Compile Include="Ui\Fragments\SwipeActionsFragment.cs" />
     <Compile Include="Utilities\OnBoardingUtilities.cs" />
     <Compile Include="Ui\Fragments\CategoriesListFragment.cs" />
+    <Compile Include="Ui\Activities\PickerInternalContactsListActivity.cs" />
+    <Compile Include="Ui\Fragments\PickerInternalContactsListFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -475,7 +478,6 @@
     <Folder Include="Ui\Views\AddEditViews\AddEditShortcodeViews\" />
     <Folder Include="Utilities\Fingerprint\" />
     <Folder Include="Utilities\CallerId\" />
-    <Folder Include="Assets\changelogs\" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\anim\enter_from_left.xml" />
@@ -808,6 +810,9 @@
     <AndroidResource Include="Resources\drawable-xhdpi\check_mark.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\check_mark.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\check_mark.png" />
+    <AndroidResource Include="Resources\drawable\onboarding_1.xml" />
+    <AndroidResource Include="Resources\drawable\onboarding_2.xml" />
+    <AndroidResource Include="Resources\drawable\onboarding_3.xml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FastScrollRecycler\FastScrollRecycler.csproj">
@@ -840,7 +845,6 @@
     <AndroidAsset Include="Assets\plain.html" />
     <AndroidAsset Include="Assets\replyHeader.html" />
     <AndroidAsset Include="Assets\editorScript.js" />
-    <AndroidAsset Include="Assets\changelogs\changelog_2.7.html" />
     <AndroidAsset Include="Assets\initTemplate.js" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />

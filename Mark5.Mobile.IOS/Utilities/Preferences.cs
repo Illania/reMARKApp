@@ -25,6 +25,7 @@ namespace Mark5.Mobile.IOS.Utilities
             public const string MarkAsReadDelaySecondsKey = "MarkAsReadDelaySeconds";
             public const string DocumentBodyRequestTypeKey = "DocumentBodyRequestType";
             public const string LargeAttachmentWarningKey = "LargeAttachmentWarning";
+            public const string ShowTimeForOldEmails = "ShowTimeForOldEmails";
             public const string HideReadNotificationsKey = "HideReadNotifications";
 
             public const string ComposePriorityEnabledKey = "ComposePriorityEnabled";
@@ -89,6 +90,9 @@ namespace Mark5.Mobile.IOS.Utilities
                 },
                 {
                     new NSString(Keys.LargeAttachmentWarningKey), NSNumber.FromBoolean(true)
+                },
+                {
+                    new NSString(Keys.ShowTimeForOldEmails), NSNumber.FromBoolean(false)
                 },
                 {
                     new NSString(Keys.HideReadNotificationsKey), NSNumber.FromBoolean(false)
@@ -163,6 +167,8 @@ namespace Mark5.Mobile.IOS.Utilities
         public int DocumentsToDownload => (int)ud.IntForKey(Keys.DocumentsToDownloadKey);
 
         public int MarkAsReadDelaySeconds => (int)ud.IntForKey(Keys.MarkAsReadDelaySecondsKey);
+
+        public bool ShowTimeForOldEmails => ud.BoolForKey(Keys.ShowTimeForOldEmails);
 
         public bool UnreadIndicatorMe => ud.BoolForKey(Keys.UnreadIndicatorMeKey);
 

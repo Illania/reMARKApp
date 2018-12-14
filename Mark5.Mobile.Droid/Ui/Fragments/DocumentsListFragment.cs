@@ -534,7 +534,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.CopyToWorktray)
             {
-                CopyToWorktrayAction();
+                CopyToWorktrayAction(CurrentAdapter.SelectedItems);
                 return true;
             }
 
@@ -678,16 +678,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        async void CopyToWorktrayAction()
+        async void CopyToWorktrayAction(List<DocumentPreview> documentPreviews)
         {
             var option = await Dialogs.ShowListDialog(Context, Resource.String.copy_to_worktray, Resource.Array.copy_to_worktray_options, true);
 
             if (option == 0)
-                await CopyToOwnWorktray(CurrentAdapter.SelectedItems);
+                await CopyToOwnWorktray(documentPreviews);
 
             if (option == 1)
             {
-                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Context, CurrentAdapter.SelectedItems.Cast<IBusinessEntity>().ToList()));
+                StartActivity(CopyToUserWorktrayActivity.CreateIntent(Context, documentPreviews.Cast<IBusinessEntity>().ToList()));
             }
         }
 
@@ -1138,7 +1138,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                     dpvh.Subject = string.IsNullOrWhiteSpace(dp.Subject) ? context.GetString(Resource.String.no_subject) : dp.Subject;
                     var d = dp.DateReceivedTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds();
-                    dpvh.Date = d.FormatUserTimestampAsCompactShortDateTimeString(context);
+                    dpvh.Date = PlatformConfig.Preferences.ShowTimeOlderEmails ? d.FormatUserTimestampAsCompactMediumDateTimeString(context) : d.FormatUserTimestampAsCompactShortDateTimeString(context);
                     dpvh.BubbleDate = d.FormatUserTimestampAsCompactLongDateTimeString(context);
                     dpvh.Preview = string.IsNullOrWhiteSpace(dp.Preview) ? context.GetString(Resource.String.no_content) : Regex.Replace(dp.Preview, @"^\s+$[\r\n]*", "", RegexOptions.Multiline);
                     dpvh.Categories = dp.Categories;
@@ -1168,7 +1168,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     edpvh.ItemView.SetOnLongClickListener(new ActionOnLongClickListener(() => ItemLongClicked(this, dp)));
 
                     var d = dp.DateReceivedTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds();
-                    edpvh.Date = d.FormatUserTimestampAsCompactShortDateTimeString(context);
+                    edpvh.Date = PlatformConfig.Preferences.ShowTimeOlderEmails ? d.FormatUserTimestampAsCompactMediumDateTimeString(context) : d.FormatUserTimestampAsCompactShortDateTimeString(context);
                     edpvh.BubbleDate = d.FormatUserTimestampAsCompactLongDateTimeString(context);
                     edpvh.Name = string.IsNullOrWhiteSpace(dp.Subject) ? context.GetString(Resource.String.no_subject) : dp.Subject;
                     edpvh.Preview = string.IsNullOrWhiteSpace(dp.Preview) ? context.GetString(Resource.String.no_content) : Regex.Replace(dp.Preview, @"^\s+$[\r\n]*", "", RegexOptions.Multiline);
@@ -1483,15 +1483,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 viewHolder.ItemView.TranslationX = 0;
                 viewHolder.ItemView.TranslationY = 0;
 
-                adapter.SetSwipedState(position, direction);
+                adapter.SetSwipedState(position, 0);
                 adapter.NotifyItemChanged(position);
-
-                viewHolder.ItemView.PostDelayed(() =>
-                    {
-                        adapter.ResetSwipedState();
-                        adapter.NotifyItemChanged(position);
-                    },
-                    400);
             }
 
             async void SwipeActionSelected(Preferences.EmailSwipeAction action, RecyclerView.ViewHolder viewHolder)
@@ -1510,14 +1503,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                                                                                              new List<DocumentPreview> { adapter.Items[viewHolder.AdapterPosition] }.Cast<IBusinessEntity>().ToList(), folder));
                             break;
                         case Preferences.EmailSwipeAction.More:
-                            var index = await Dialogs.ShowListDialog(context, Resource.String.pref_email_swipe_dialog_title, Resource.Array.pref_email_swipe_actions_entries, true);
+                            var index = await Dialogs.ShowListDialog(context, Resource.String.pref_email_swipe_dialog_title, Resource.Array.pref_email_swipe_actions_entries_without_more, true);
                             if (index >= 0)
                             {
                                 SwipeActionSelected(PlatformConfig.Preferences.GetAllAvailableActions()[index], viewHolder);
                             }
                             break;
                         case Preferences.EmailSwipeAction.CopyToWorkTray:
-                            fragment.CopyToOwnWorktray(adapter.Items[viewHolder.AdapterPosition]);
+                            fragment.CopyToWorktrayAction(new List<DocumentPreview>() { adapter.Items[viewHolder.AdapterPosition] });
                             break;
                         case Preferences.EmailSwipeAction.Categories:
                             fragment.ShowCategories(adapter.Items[viewHolder.AdapterPosition]);

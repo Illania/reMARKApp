@@ -186,6 +186,9 @@ namespace Mark5.ServiceReference.DataContract
         [DataMember(Name = "FolderId", Order = 0)]
         public int FolderId { get; set; } = -1;
 
+        [DataMember(Name = "FolderGuid", Order = 1)]
+        public Guid FolderGuid { get; set; } = Guid.Empty;
+
         [DataMember(Name = "StartId", Order = 0)]
         public int StartId { get; set; } = -1;
 
@@ -522,6 +525,9 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "SizeInBytes", Order = 0)]
         public long SizeInBytes { get; set; }
+
+        [DataMember(Name = "FromTemplate", Order = 1)]
+        public bool FromTemplate { get; set; }
     }
 
     [DataContract(Name = "Comment", Namespace = "com.nordic-it.appservice.v3")]
@@ -604,6 +610,9 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "Content", Order = 0)]
         public string Content { get; set; }
+
+        [DataMember(Name = "Attachments", Order = 1)]
+        public List<AttachmentDescription> Attachments { get; set; } = new List<AttachmentDescription>();
     }
 
     [DataContract(Name = "DocumentCreationModeFlag", Namespace = "com.nordic-it.appservice.v3")]
