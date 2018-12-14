@@ -421,6 +421,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             return toDate;
         }
 
+        async void Button_SendInvitations(object sender, EventArgs e, int appointmentId)
+        {
+            try
+            {
+                // TODO : we should add line selection dropdown, so user can speficy which line he wants to use
+                Line line = ServerConfig.SystemSettings.DocumentsModuleInfo.DefaultOutgoingLine;
+                await Managers.CalendarManager.SendCalendarAppointmentInvitationsAsync(appointmentId, line.Guid);
+
+                await Dialogs.ShowConfirmAlertAsync(this, "Success", "Invitations sent successfully!");
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error(ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
+            }
+        }
+
         async void Button_TouchUpInside(object sender, EventArgs e)
         {
             selectedFromDateTime = GetFromDateTime().ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
@@ -486,6 +503,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     textView.Text = text;
 
                     resultsStackView.AddArrangedSubview(textView);
+
+                    var sendInvites = new UIButton()
+                    {
+                        BackgroundColor = Theme.DarkBlue,
+                        TranslatesAutoresizingMaskIntoConstraints = false
+                    };
+                    sendInvites.SetTitle("Send invites", UIControlState.Normal);
+
+                    sendInvites.TouchUpInside += (sender, e) =>
+                    {
+
+                        Button_SendInvitations(sender, e, appointment.Id);
+                    };
+
+                    resultsStackView.AddArrangedSubview(sendInvites);
                 }
             }
 

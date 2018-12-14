@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
 
@@ -17,5 +18,7 @@ namespace Mark5.Mobile.Common.Manager
         Task<bool> CreateOrUpdateCalendarAppointmentAsync(int calendarId, CalendarAppointment calendarAppointment, SourceType sourceType = SourceType.Auto);
 
         Task<bool> CreateOrUpdateCalendarTaskAsync(int calendarId, CalendarTask calendarTask, SourceType sourceType = SourceType.Auto);
+
+        Task<bool> SendCalendarAppointmentInvitationsAsync(int apointmentId, Guid lineGuid);
     }
 }
