@@ -165,7 +165,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 CalendarId = selectedCalendar.Id,
                 Location = "TestLocation",
-                Subject = "TestAppointment",
+                Subject = "TestAppointmentAlarm",
                 Description = "TestDescription",
                 Creator = ServerConfig.SystemSettings.UserInfo.User.Username,
                 CreatorId = ServerConfig.SystemSettings.UserInfo.User.Id,
@@ -182,6 +182,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             };
 
             testAppointmentAlarm.Occurrences.Add(occurrence);
+            testAppointmentAlarm.ReminderAlertTime = occurrence.StartDateTimestamp;
+            testAppointmentAlarm.ReminderTimeBefore = TimeSpan.FromMinutes(15).Ticks;
         }
 
         public override void ViewWillAppear(bool animated)
@@ -366,7 +368,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             try
             {
                 PrepareTests();
-                await Managers.CalendarManager.CreateOrUpdateCalendarAppointmentAsync(selectedCalendar.Id, testAppointmentPartecipants); //TO CHANGE FOR TESING ADD
+                await Managers.CalendarManager.CreateOrUpdateCalendarAppointmentAsync(selectedCalendar.Id, testAppointmentAlarm); //TO CHANGE FOR TESING ADD
 
             }
             catch (Exception ex)
