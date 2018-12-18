@@ -25,7 +25,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         CalendarAppointment testAppointmentAllDay; //Good
         CalendarAppointment testAppointmentRecurring; //Good!
         CalendarAppointment testAppointmentPartecipants;  //Good!
-        CalendarAppointment testAppointmentAlarm;
+        CalendarAppointment testAppointmentAlarm; //Good!
+        CalendarAppointment testAppointmentToEdit;
+        CalendarAppointment selectedAppointment;
 
         void PrepareTests()
         {
@@ -184,6 +186,32 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             testAppointmentAlarm.Occurrences.Add(occurrence);
             testAppointmentAlarm.ReminderAlertTime = occurrence.StartDateTimestamp;
             testAppointmentAlarm.ReminderTimeBefore = TimeSpan.FromMinutes(15).Ticks;
+
+            testAppointmentToEdit = new CalendarAppointment
+            {
+                CalendarId = selectedCalendar.Id,
+                Location = "TestLocation1",
+                Subject = "TestEdit1",
+                Description = "TestDescription1",
+                Creator = ServerConfig.SystemSettings.UserInfo.User.Username,
+                CreatorId = ServerConfig.SystemSettings.UserInfo.User.Id,
+                RecurrenceInfo = null,
+                AllDay = false,
+                Priority = Priority.Normal,
+                Type = CalendarOccurenceType.Normal,
+            };
+
+            occurrence = new CalendarAppointmentOccurrence()
+            {
+                StartDateTimestamp = GetFromDateTime().ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds(),
+                EndDateTimestamp = GetToDateTime().ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds(),
+            };
+
+            testAppointmentToEdit.Occurrences.Add(occurrence);
+            testAppointmentToEdit.ReminderAlertTime = occurrence.StartDateTimestamp;
+            testAppointmentToEdit.ReminderTimeBefore = TimeSpan.FromMinutes(15).Ticks;
+
+            selectedAppointment = testAppointmentToEdit;
         }
 
         public override void ViewWillAppear(bool animated)
@@ -201,8 +229,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UIDatePicker fromDatePicker;
         UIDatePicker toDatePicker;
         UIStackView resultsStackView;
-        UISwitch toggleControl;
         UITextView deleteIdView;
+        UITextView editIdView;
+        UITextView getIdView;
 
         Calendar selectedCalendar;
         long selectedFromDateTime;
@@ -277,8 +306,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             getButton.SetTitleColor(UIColor.Purple, UIControlState.Normal);
             getButton.TouchUpInside += Button_TouchUpInside;
 
+            getIdView = new UITextView
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                TextColor = UIColor.DarkTextColor,
+                ScrollEnabled = false,
+                Editable = true,
+            };
+
+            getIdView.Font = UIFont.SystemFontOfSize(textSize);
+
             getStackView.AddArrangedSubview(calButton);
             getStackView.AddArrangedSubview(getButton);
+            getStackView.AddArrangedSubview(getIdView);
 
             var switchStackView = new UIStackView()
             {
@@ -295,14 +335,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             textView.Text = "Appointment / Task";
             textView.Font = UIFont.SystemFontOfSize(textSize);
-
-            toggleControl = new UISwitch()
-            {
-                TranslatesAutoresizingMaskIntoConstraints = false,
-            };
-
-            switchStackView.AddArrangedSubview(textView);
-            switchStackView.AddArrangedSubview(toggleControl);
 
             resultsStackView = new UIStackView()
             {
@@ -337,7 +369,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             deleteStackView.AddArrangedSubview(deleteIdView);
             deleteStackView.AddArrangedSubview(deleteButton);
 
-
             var addEditStackView = new UIStackView()
             {
                 Axis = UILayoutConstraintAxis.Horizontal,
@@ -348,12 +379,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
-            addButton.SetTitle("ADD", UIControlState.Normal);
+            addButton.SetTitle("ADD/EDIT", UIControlState.Normal);
             addButton.SetTitleColor(UIColor.Purple, UIControlState.Normal);
-            addButton.TouchUpInside += AddButton_TouchUpInside; ;
+            addButton.TouchUpInside += AddButton_TouchUpInside;
 
+            editIdView = new UITextView
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                TextColor = UIColor.DarkTextColor,
+                ScrollEnabled = false,
+                Editable = true,
+            };
+
+            addEditStackView.AddArrangedSubview(editIdView);
             addEditStackView.AddArrangedSubview(addButton);
-
 
             stackView.AddArrangedSubview(fromDatePicker);
             stackView.AddArrangedSubview(toDatePicker);
@@ -368,8 +407,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             try
             {
                 PrepareTests();
-                await Managers.CalendarManager.CreateOrUpdateCalendarAppointmentAsync(selectedCalendar.Id, testAppointmentAlarm); //TO CHANGE FOR TESING ADD
-
+                if (!string.IsNullOrEmpty(editIdView.Text))
+                    selectedAppointment.Id = int.Parse(editIdView.Text);
+                await Managers.CalendarManager.CreateOrUpdateCalendarAppointmentAsync(selectedCalendar.Id, selectedAppointment);
             }
             catch (Exception ex)
             {
@@ -383,10 +423,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             IBusinessEntity a;
 
-            if (toggleControl.On)
-                a = new CalendarTask { Id = id };
-            else
-                a = new CalendarAppointment { Id = id };
+            a = new CalendarAppointment { Id = id };
 
             try
             {
@@ -447,16 +484,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
-                if (toggleControl.On)
-                {
-                    var list = await Managers.CalendarManager.GetCalendarTasksAsync(new List<int> { selectedCalendar.Id }, selectedFromDateTime, selectedToDateTime);
-                    AddAppointments(tasks: list);
-                }
-                else
+                if (string.IsNullOrWhiteSpace(getIdView.Text))
                 {
                     var list = await Managers.CalendarManager.GetCalendarAppointmentsAsync(new List<int> { selectedCalendar.Id }, selectedFromDateTime, selectedToDateTime);
                     AddAppointments(appointments: list);
                 }
+                else
+                {
+                    var id = int.Parse(getIdView.Text);
+                    var appointment = await Managers.CalendarManager.GetCalendarAppointmentAsync(selectedCalendar.Id, id);
+                    AddAppointments(new List<CalendarAppointment> { appointment });
+                }
+
             }
             catch (Exception ex)
             {

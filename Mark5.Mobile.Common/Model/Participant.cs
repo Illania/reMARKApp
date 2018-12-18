@@ -3,7 +3,6 @@
     public class Participant
     {
         public int Id { get; set; } = -1;
-
         public ParticipantPresenence Presence { get; set; }
         public ParticipantType Type { get; set; }
         public ParticipantStatus Status { get; set; }
