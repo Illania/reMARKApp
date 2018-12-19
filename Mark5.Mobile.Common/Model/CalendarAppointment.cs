@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Mark5.Mobile.Common.Utilities;
 using SQLite;
 
@@ -22,7 +21,7 @@ namespace Mark5.Mobile.Common.Model
         [Column("Location")]
         public string Location { get; set; }
 
-        [Ignore] //TODO to fix
+        [Ignore]
         public List<CalendarAppointmentOccurrence> Occurrences { get; set; } = new List<CalendarAppointmentOccurrence>();
 
         [Column("AllDay")]
@@ -35,7 +34,7 @@ namespace Mark5.Mobile.Common.Model
         public string Creator { get; set; }
 
         [Column("Priority")]
-        public Priority Priority { get; set; }  //TODO It seems it's kept only for compatibility. Can we remove it?
+        public Priority Priority { get; set; }  //This is kept for compatibility, later we need to check if it can be removed
 
         [Column("Type")]
         public CalendarOccurenceType Type { get; set; }
@@ -49,7 +48,7 @@ namespace Mark5.Mobile.Common.Model
         [Column("ReminderTimeBefore")]
         public long ReminderTimeBefore { get; set; } = -1;
 
-        [Ignore] //TODO testing
+        [Ignore]
         public RecurrenceInfo RecurrenceInfo { get; set; }
 
         List<Participant> participants;
@@ -71,21 +70,15 @@ namespace Mark5.Mobile.Common.Model
         [Column("ParticipantsString")]
         public string ParticipantsString { get => Serializer.Serialize(Participants); set => Participants = Serializer.Deserialize<List<Participant>>(value); }
 
+        [Column("RecurrenceInfoString")]
+        public string RecurrenceInfoString { get => Serializer.Serialize(RecurrenceInfo); set => RecurrenceInfo = Serializer.Deserialize<RecurrenceInfo>(value); }
+
         #endregion
 
         public override string ToString()
         {
             return $"[CalendarAppointment: Subject={Subject}, Location={Location}]";
         }
-    }
-
-    public class CalendarAppointmentOccurrence
-    {
-        public long StartDateTimestamp { get; set; } = -1;
-
-        public long EndDateTimestamp { get; set; } = -1;
-
-        public int RecurrenceIndex { get; set; } = -1;
     }
 }
 

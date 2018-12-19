@@ -63,6 +63,7 @@ namespace Mark5.Mobile.Common.Model.Converters
                         StartDateTimestamp = occurrence.StartDate.ConvertDateTimeToTimestampMilliseconds(),
                         EndDateTimestamp = occurrence.EndDate.ConvertDateTimeToTimestampMilliseconds(),
                         RecurrenceIndex = occurrence.RecurrenceIndex,
+                        AppointmentId = ca.Id,
                     });
                 }
             }
