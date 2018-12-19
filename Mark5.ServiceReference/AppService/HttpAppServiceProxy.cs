@@ -296,7 +296,7 @@ namespace Mark5.ServiceReference.AppService
             return await InvokeAsync<CreateOrUpdateCalendarAppointmentResult, CreateOrUpdateCalendarAppointmentParameters>("CreateOrUpdateCalendarAppointment", parameters, ct);
         }
 
-        public async Task<SendCalendarAppointmentInvitationsResult> SendCalendarAppointmentInvitations(SendCalendarAppointmentInvitationsParameters parameters, CancellationToken ct = default(CancellationToken))
+        public async Task<SendCalendarAppointmentInvitationsResult> SendCalendarAppointmentInvitationsAsync(SendCalendarAppointmentInvitationsParameters parameters, CancellationToken ct = default(CancellationToken))
         {
             return await InvokeAsync<SendCalendarAppointmentInvitationsResult, SendCalendarAppointmentInvitationsParameters>("SendCalendarAppointmentInvitations", parameters, ct);
         }
@@ -304,6 +304,11 @@ namespace Mark5.ServiceReference.AppService
         public async Task<CreateOrUpdateCalendarTaskResult> CreateOrUpdateCalendarTaskAsync(CreateOrUpdateCalendarTaskParameters parameters, CancellationToken ct = default(CancellationToken))
         {
             return await InvokeAsync<CreateOrUpdateCalendarTaskResult, CreateOrUpdateCalendarTaskParameters>("CreateOrUpdateCalendarTask", parameters, ct);
+        }
+
+        public async Task<GetCalendarAlarmsResult> GetCalendarAlarms(GetCalendarAlarmsParameters parameters, CancellationToken ct = default(CancellationToken))
+        {
+            return await InvokeAsync<GetCalendarAlarmsResult, GetCalendarAlarmsParameters>("GetCalendarAlarms", parameters, ct);
         }
 
         public async Task<GetSavedSearchesResult> GetSavedSearchesAsync(GetSavedSearchesParameters parameters, CancellationToken ct = default(CancellationToken))

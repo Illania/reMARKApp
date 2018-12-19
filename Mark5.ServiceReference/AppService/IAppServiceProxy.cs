@@ -79,7 +79,9 @@ namespace Mark5.ServiceReference.AppService
 
         Task<CreateOrUpdateCalendarTaskResult> CreateOrUpdateCalendarTaskAsync(CreateOrUpdateCalendarTaskParameters parameters, CancellationToken ct = default(CancellationToken));
 
-        Task<SendCalendarAppointmentInvitationsResult> SendCalendarAppointmentInvitations(SendCalendarAppointmentInvitationsParameters parameters, CancellationToken ct = default(CancellationToken));
+        Task<SendCalendarAppointmentInvitationsResult> SendCalendarAppointmentInvitationsAsync(SendCalendarAppointmentInvitationsParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<GetCalendarAlarmsResult> GetCalendarAlarms(GetCalendarAlarmsParameters parameters, CancellationToken ct = default(CancellationToken));
 
         #endregion
 

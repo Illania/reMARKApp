@@ -496,6 +496,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     AddAppointments(new List<CalendarAppointment> { appointment });
                 }
 
+                var alarms = await Managers.CalendarManager.GetCalendarAlarmsAsync(new List<int> { selectedCalendar.Id }, selectedFromDateTime, selectedToDateTime);
+                AddAlarms(alarms); //TODO TO TEST ALARMs
             }
             catch (Exception ex)
             {
@@ -505,7 +507,53 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         const int textSize = 15;
 
-        void AddAppointments(List<CalendarAppointment> appointments = null, List<CalendarTask> tasks = null)
+        void AddAlarms(List<CalendarAlarm> alarms)
+        {
+            foreach (var subview in resultsStackView.Subviews)
+            {
+                subview.RemoveFromSuperview();
+            }
+
+            if (alarms != null)
+            {
+                foreach (var appointment in alarms)
+                {
+                    var textView = new UITextView
+                    {
+                        TranslatesAutoresizingMaskIntoConstraints = false,
+                        TextColor = UIColor.DarkTextColor,
+                        ScrollEnabled = false,
+                    };
+
+                    var alarmDate = appointment.AlarmTimestamp.ConvertTimestampMillisecondsToDateTime()
+                        .ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds().FormatUserTimestampAsTimeAndDateString();
+
+                    var text = $"{alarmDate} - ID={appointment.Id}, APP={appointment.AppointmentId}, CAL={appointment.CalendarId}";
+
+                    textView.Font = UIFont.SystemFontOfSize(textSize);
+                    textView.Text = text;
+
+                    resultsStackView.AddArrangedSubview(textView);
+                }
+            }
+
+            if (alarms?.Count == 0 || alarms == null)
+            {
+                var textView = new UITextView
+                {
+                    TranslatesAutoresizingMaskIntoConstraints = false,
+                    TextColor = UIColor.DarkTextColor,
+                    ScrollEnabled = false,
+                };
+
+                textView.Text = "EMPTY";
+                textView.Font = UIFont.SystemFontOfSize(textSize);
+
+                resultsStackView.AddArrangedSubview(textView);
+            }
+        }
+
+        void AddAppointments(List<CalendarAppointment> appointments = null)
         {
             foreach (var subview in resultsStackView.Subviews)
             {
@@ -564,38 +612,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             //TODO all day Appointments have the same FROM and TO timestamp (and one needs to check the AllDay boolean)
 
-            if (tasks != null)
-            {
-                foreach (var task in tasks)
-                {
-                    var textView = new UITextView
-                    {
-                        TranslatesAutoresizingMaskIntoConstraints = false,
-                        TextColor = UIColor.DarkTextColor,
-                        ScrollEnabled = false,
-
-                    };
-
-                    var fromDate = task.StartDateTimestamp.ConvertTimestampMillisecondsToDateTime()
-                    .ConvertUtcToUserTime()
-                    .ConvertDateTimeToTimestampMilliseconds()
-                    .FormatUserTimestampAsCompactShortDateTimeString();
-
-                    var toDate = task.EndDateTimestamp.ConvertTimestampMillisecondsToDateTime()
-                    .ConvertUtcToUserTime()
-                    .ConvertDateTimeToTimestampMilliseconds()
-                    .FormatUserTimestampAsCompactShortDateTimeString();
-
-                    var text = $"TSK: {task.Subject} {fromDate} {toDate}";
-                    textView.Font = UIFont.SystemFontOfSize(textSize);
-
-                    textView.Text = text;
-
-                    resultsStackView.AddArrangedSubview(textView);
-                }
-            }
-
-            if ((appointments?.Count == 0 || appointments == null) && (tasks == null || tasks?.Count == 0))
+            if (appointments?.Count == 0 || appointments == null)
             {
                 var textView = new UITextView
                 {

@@ -203,7 +203,7 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task<bool> SendCalendarAppointmentInvitationsAsync(int appointmentId, Guid lineGuid)
         {
-            var result = await AppServiceProxy.SendCalendarAppointmentInvitations(new DataContract.SendCalendarAppointmentInvitationsParameters
+            var result = await AppServiceProxy.SendCalendarAppointmentInvitationsAsync(new DataContract.SendCalendarAppointmentInvitationsParameters
             {
                 Token = Token,
                 LineGuid = lineGuid,
@@ -211,6 +211,40 @@ namespace Mark5.Mobile.Common.Manager
             });
 
             return true;
+        }
+
+        public async Task<List<CalendarAlarm>> GetCalendarAlarmsAsync(List<int> calendarIds, long startDateTimestamp, long endDateTimestamp, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
+            {
+                var result = await AppServiceProxy.GetCalendarAlarms(new DataContract.GetCalendarAlarmsParameters
+                {
+                    Token = Token,
+                    CalendarIds = calendarIds,
+                    StartDate = startDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
+                    EndDate = endDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
+                });
+
+                var alarms = result.Alarms.WhereNotNull().Select(a => a.Convert()).ToList();
+
+                //TODO
+
+                return alarms;
+            }
+
+            if (sourceType == SourceType.Local)
+            {
+                List<CalendarAlarm> alarms = null;
+
+                //TODO 
+
+                return alarms;
+            }
+
+            throw new ArgumentException("Invalid sourceType provided.");
         }
     }
 }

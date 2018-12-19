@@ -1249,6 +1249,22 @@ namespace Mark5.ServiceReference.DataContract
         public int RecurrenceIndex { get; set; } = -1;
     }
 
+    [DataContract(Name = "CalendarAlarm", Namespace = "com.nordic-it.appservice.v3")]
+    public class CalendarAlarm
+    {
+        [DataMember(Name = "Id", Order = 0)]
+        public int Id { get; set; } = -1;
+
+        [DataMember(Name = "AlarmDate", Order = 0)]
+        public DateTime AlarmDate { get; set; }
+
+        [DataMember(Name = "AppointmentId", Order = 0)]
+        public int AppointmentId { get; set; } = -1;
+
+        [DataMember(Name = "CalendarId", Order = 0)]
+        public int CalendarId { get; set; } = -1;
+    }
+
     [DataContract(Name = "CalendarTask", Namespace = "com.nordic-it.appservice.v3")]
     public class CalendarTask
     {
@@ -1557,6 +1573,26 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "LineGuid", Order = 0)]
         public Guid LineGuid { get; set; } = new Guid();
+    }
+
+    [DataContract(Name = "GetCalendarAlarmsParameters", Namespace = "com.nordic-it.appservice.v3")]
+    public class GetCalendarAlarmsParameters : AbstractParameters
+    {
+        [DataMember(Name = "CalendarIds", Order = 0)]
+        public List<int> CalendarIds { get; set; } = new List<int>();
+
+        [DataMember(Name = "StartDate", Order = 0)]
+        public DateTime StartDate { get; set; }
+
+        [DataMember(Name = "EndDate", Order = 0)]
+        public DateTime EndDate { get; set; }
+    }
+
+    [DataContract(Name = "GetCalendarAlarmsResult", Namespace = "com.nordic-it.appservice.v3")]
+    public class GetCalendarAlarmsResult
+    {
+        [DataMember(Name = "Alarms", Order = 0)]
+        public List<CalendarAlarm> Alarms { get; set; }
     }
 
     #endregion

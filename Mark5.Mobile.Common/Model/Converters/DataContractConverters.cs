@@ -70,6 +70,17 @@ namespace Mark5.Mobile.Common.Model.Converters
             return result;
         }
 
+        public static CalendarAlarm Convert(this DataContract.CalendarAlarm ca)
+        {
+            return new CalendarAlarm
+            {
+                Id = ca.Id,
+                CalendarId = ca.CalendarId,
+                AppointmentId = ca.AppointmentId,
+                AlarmTimestamp = ca.AlarmDate.ConvertDateTimeToTimestampMilliseconds(),
+            };
+        }
+
         public static CalendarTask Convert(this DataContract.CalendarTask ca)
         {
             var result = new CalendarTask
