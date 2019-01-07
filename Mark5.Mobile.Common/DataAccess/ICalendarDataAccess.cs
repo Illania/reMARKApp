@@ -8,11 +8,11 @@ namespace Mark5.Mobile.Common.DataAccess
     {
         Task<CalendarAppointment> GetCalendarAppointmentAsync(int calendarAppointmentId);
 
-        Task<List<CalendarAppointment>> GetCalendarAppointmentsAsync(Folder folder, long startDateTimestamp, long endDateTimestamp);
+        Task<List<CalendarAppointment>> GetCalendarAppointmentsAsync(IEnumerable<int> calendarIds, long startDateTimestamp, long endDateTimestamp);
 
         Task SaveCalendarAppointmentAsync(CalendarAppointment calendarAppointment);
 
-        Task SaveCalendarAppointmentsAsync(Folder folder, IEnumerable<CalendarAppointment> calendarAppointments, bool clean = false);
+        Task SaveCalendarAppointmentsAsync(IEnumerable<CalendarAppointment> calendarAppointments, long startDateTimestamp, long endDateTimestamp);
 
         Task DeleteAsync(List<CalendarAppointment> appointments);
 

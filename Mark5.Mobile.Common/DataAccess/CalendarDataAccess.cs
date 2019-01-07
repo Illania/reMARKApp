@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Mark5.Mobile.Common.DataAccess.Exceptions;
 using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Model.Links;
 
 namespace Mark5.Mobile.Common.DataAccess
 {
@@ -27,7 +26,15 @@ namespace Mark5.Mobile.Common.DataAccess
                 await calendarDatabase.RunInConnectionAsync(c =>
                 {
                     var result = c.Find<CalendarAppointment>(calendarAppointmentId);
-                    appointment = result ?? throw new DataNotFoundException("Appointment could not be found");
+                    appointment = result ?? throw new DataNotFoundException("Calendar appointment could not be found");
+
+                    var occurrencesQuery = $"select * from {nameof(CalendarAppointmentOccurrence)} " +
+                        $"where {nameof(CalendarAppointmentOccurrence.AppointmentId)} = {calendarAppointmentId} ";
+
+                    var occurrencesResult = c.Query<CalendarAppointmentOccurrence>(occurrencesQuery);
+                    if (occurrencesResult == null || occurrencesResult.Count < 1)
+                        throw new DataNotFoundException("Calendar appointments occurrences could not be found");
+
                 });
 
                 return appointment;
@@ -38,30 +45,34 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-        public async Task<List<CalendarAppointment>> GetCalendarAppointmentsAsync(Folder folder, long startDateTimestamp = -1, long endDateTimestamp = -1)
+        public async Task<List<CalendarAppointment>> GetCalendarAppointmentsAsync(IEnumerable<int> calendarIds, long startDateTimestamp = -1, long endDateTimestamp = -1)
         {
             try
             {
                 List<CalendarAppointment> appointments = null;
 
-                //TODO
-                //await calendarDatabase.RunInConnectionAsync(c =>
-                //{
-                //    var query = $"select * " + $"from {nameof(CalendarAppointment)}, {nameof(FolderCalendarAppointmentLink)} " + $"where {nameof(FolderCalendarAppointmentLink.FolderId)} = {folder.Id} " + $"     and {nameof(CalendarAppointment)}.{nameof(CalendarAppointment.Id)} = {nameof(FolderCalendarAppointmentLink)}.{nameof(FolderCalendarAppointmentLink.CalendarAppointmentId)} ";
+                await calendarDatabase.RunInConnectionAsync(c =>
+                {
+                    var occurrencesQuery = $"select {nameof(CalendarAppointmentOccurrence.AppointmentId)}, {nameof(CalendarAppointmentOccurrence.RecurrenceIndex)}," +
+                        $" {nameof(CalendarAppointmentOccurrence.StartDateTimestamp)},  {nameof(CalendarAppointmentOccurrence.EndDateTimestamp)}  " +
+                        $"from {nameof(CalendarAppointmentOccurrence)}, {nameof(CalendarAppointment)} " +
+                    $"where {nameof(CalendarAppointmentOccurrence.StartDateTimestamp)} <= {endDateTimestamp}" +
+                        $" and {nameof(CalendarAppointmentOccurrence.EndDateTimestamp)} >= {startDateTimestamp} and" +
+                            $" {nameof(CalendarAppointment.CalendarId)} in ({string.Join(", ", calendarIds)})  ";
 
-                //    if (startDateTimestamp >= 0)
-                //        query += $"    and {nameof(CalendarAppointment)}.{nameof(CalendarAppointment.StartDateTimestamp)} >= {startDateTimestamp} ";
-                //    if (endDateTimestamp >= 0)
-                //        query += $"    and {nameof(CalendarAppointment)}.{nameof(CalendarAppointment.EndDateTimestamp)} <= {endDateTimestamp} ";
-                //    query += $"order by {nameof(CalendarAppointment.StartDateTimestamp)} desc ";
+                    var occurrencesResult = c.Query<CalendarAppointmentOccurrence>(occurrencesQuery);
+                    if (occurrencesResult == null || occurrencesResult.Count < 1)
+                        throw new DataNotFoundException("Calendar appointments occurrences could not be found");
 
-                //    var result = c.Query<CalendarAppointment>(query);
+                    var apIds = occurrencesResult.Select(co => co.AppointmentId);
+                    appointments = c.Table<CalendarAppointment>().Where(ca => apIds.Contains(ca.Id)).ToList();
+                    if (appointments == null || !appointments.Any())
+                        throw new DataNotFoundException("Calendar appointments could not be found");
 
-                //    if (result == null || result.Count < 1)
-                //        throw new DataNotFoundException("Calendar appointments could not be found.");
+                    foreach (var ap in appointments)
+                        ap.Occurrences.AddRange(occurrencesResult.Where(oc => oc.AppointmentId == ap.Id));
 
-                //    appointments = result;
-                //});
+                });
 
                 return appointments;
             }
@@ -75,7 +86,11 @@ namespace Mark5.Mobile.Common.DataAccess
         {
             try
             {
-                await calendarDatabase.RunInConnectionAsync(c => { c.InsertOrReplace(calendarAppointment); });
+                await calendarDatabase.RunInConnectionAsync(c =>
+                {
+                    c.InsertOrReplace(calendarAppointment);
+                    c.InsertOrReplace(calendarAppointment.Occurrences);
+                });
             }
             catch (Exception ex) when (!(ex is DataAccessException))
             {
@@ -83,21 +98,15 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-        public async Task SaveCalendarAppointmentsAsync(Folder folder, IEnumerable<CalendarAppointment> calendarAppointments, bool clean = false)
+        public async Task SaveCalendarAppointmentsAsync(IEnumerable<CalendarAppointment> calendarAppointments, long startDateTimestamp, long endDateTimestamp)
         {
             try
             {
-                //await calendarDatabase.RunInConnectionAsync(c =>
-                //{
-                //    if (clean)
-                //        c.Table<FolderCalendarAppointmentLink>().Delete(fdl => fdl.FolderId == folder.Id);
-                //    c.InsertOrReplaceAll(calendarAppointments.Select(ca => new FolderCalendarAppointmentLink
-                //    {
-                //        FolderId = folder.Id,
-                //        CalendarAppointmentId = ca.Id
-                //    }));
-                //    c.InsertOrReplaceAll(calendarAppointments);
-                //});
+                await calendarDatabase.RunInConnectionAsync(c =>
+                {
+                    c.InsertOrReplaceAll(calendarAppointments);
+                    c.InsertOrReplaceAll(calendarAppointments.Select(ca => ca.Occurrences).SelectMany(i => i));
+                });
             }
             catch (Exception ex) when (!(ex is DataAccessException))
             {

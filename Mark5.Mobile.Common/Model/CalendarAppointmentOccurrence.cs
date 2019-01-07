@@ -2,7 +2,7 @@
 
 namespace Mark5.Mobile.Common.Model
 {
-    [Table("DocumentPreview")]
+    [Table("CalendarAppointmentOccurrence")]
     public class CalendarAppointmentOccurrence
     {
         [Column("StartDateTimestamp")]
@@ -11,7 +11,7 @@ namespace Mark5.Mobile.Common.Model
         [Column("EndDateTimestamp")]
         public long EndDateTimestamp { get; set; }
 
-        [Column("ReferenceNumber")]
+        [Column("RecurrenceIndex")]
         public int RecurrenceIndex { get; set; }
 
         [Column("AppointmentId")]

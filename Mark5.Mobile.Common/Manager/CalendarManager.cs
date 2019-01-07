@@ -42,19 +42,13 @@ namespace Mark5.Mobile.Common.Manager
 
                 var appointments = result.CalendarAppointments.WhereNotNull().Select(a => a.Convert()).ToList();
 
-                //TODO await calendarDataAccess.SaveCalendarAppointmentsAsync(folder, appointments);
+                await calendarDataAccess.SaveCalendarAppointmentsAsync(appointments, startDateTimestamp, endDateTimestamp);
 
                 return appointments;
             }
 
             if (sourceType == SourceType.Local)
-            {
-                List<CalendarAppointment> appointments = null;
-
-                //TODO  appointments = await calendarDataAccess.GetCalendarAppointmentsAsync(folder, startDateTimestamp, endDateTimestamp);
-
-                return appointments;
-            }
+                return await calendarDataAccess.GetCalendarAppointmentsAsync(calendarIds, startDateTimestamp, endDateTimestamp);
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
@@ -75,7 +69,7 @@ namespace Mark5.Mobile.Common.Manager
 
                 var appointment = result.CalendarAppointment.Convert();
 
-                //TODO await calendarDataAccess.SaveCalendarAppointmentAsync(appointment);
+                await calendarDataAccess.SaveCalendarAppointmentAsync(appointment);
 
                 return appointment;
             }
