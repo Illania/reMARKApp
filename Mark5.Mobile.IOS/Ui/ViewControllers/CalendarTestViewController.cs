@@ -232,6 +232,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UITextView deleteIdView;
         UITextView editIdView;
         UITextView getIdView;
+        UIButton getButton;
 
         Calendar selectedCalendar;
         long selectedFromDateTime;
@@ -239,7 +240,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeStartView()
         {
-            selectedCalendar = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars[0];
+            selectedCalendar = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars[1];
 
             var scrollView = new UIScrollView()
             {
@@ -298,11 +299,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 calButton.SetTitle(selectedCalendar.Name, UIControlState.Normal);
             };
 
-            var getButton = new UIButton()
+            getButton = new UIButton()
             {
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
-            getButton.SetTitle("GET", UIControlState.Normal);
+            getButton.SetTitle("GET REMOTE", UIControlState.Normal);
             getButton.SetTitleColor(UIColor.Purple, UIControlState.Normal);
             getButton.TouchUpInside += Button_TouchUpInside;
 
@@ -477,32 +478,39 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
+        int count = 0;
+
         async void Button_TouchUpInside(object sender, EventArgs e)
         {
             selectedFromDateTime = GetFromDateTime().ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
             selectedToDateTime = GetToDateTime().ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
 
+            var sourceType = count % 2 == 0 ? SourceType.Remote : SourceType.Local;
+
             try
             {
-                if (string.IsNullOrWhiteSpace(getIdView.Text))
-                {
-                    var list = await Managers.CalendarManager.GetCalendarAppointmentsAsync(new List<int> { selectedCalendar.Id }, selectedFromDateTime, selectedToDateTime);
-                    AddAppointments(appointments: list);
-                }
-                else
-                {
-                    var id = int.Parse(getIdView.Text);
-                    var appointment = await Managers.CalendarManager.GetCalendarAppointmentAsync(selectedCalendar.Id, id);
-                    AddAppointments(new List<CalendarAppointment> { appointment });
-                }
+                //if (string.IsNullOrWhiteSpace(getIdView.Text))
+                //{
+                //    var list = await Managers.CalendarManager.GetCalendarAppointmentsAsync(new List<int> { selectedCalendar.Id }, selectedFromDateTime, selectedToDateTime, sourceType);
+                //    AddAppointments(list);
+                //}
+                //else
+                //{
+                //    var id = int.Parse(getIdView.Text);
+                //    var appointment = await Managers.CalendarManager.GetCalendarAppointmentAsync(selectedCalendar.Id, id);
+                //    AddAppointments(new List<CalendarAppointment> { appointment });
+                //}
 
-                var alarms = await Managers.CalendarManager.GetCalendarAlarmsAsync(new List<int> { selectedCalendar.Id }, selectedFromDateTime, selectedToDateTime);
+                var alarms = await Managers.CalendarManager.GetCalendarAlarmsAsync(new List<int> { selectedCalendar.Id }, selectedFromDateTime, selectedToDateTime, sourceType);
                 AddAlarms(alarms); //TODO TO TEST ALARMs
             }
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error(ex);
             }
+
+            count++;
+            getButton.SetTitle(count % 2 == 0 ? "GET REMOTE" : "GET LOCAL", UIControlState.Normal);
         }
 
         const int textSize = 15;

@@ -42,7 +42,7 @@ namespace Mark5.Mobile.Common.Manager
 
                 var appointments = result.CalendarAppointments.WhereNotNull().Select(a => a.Convert()).ToList();
 
-                await calendarDataAccess.SaveCalendarAppointmentsAsync(appointments, startDateTimestamp, endDateTimestamp);
+                await calendarDataAccess.SaveCalendarAppointmentsAsync(calendarIds, appointments, startDateTimestamp, endDateTimestamp);
 
                 return appointments;
             }
@@ -98,7 +98,7 @@ namespace Mark5.Mobile.Common.Manager
                 calendarAppointment.Guid = result.Guid;
 
                 return result.Updated;
-            }  //TODO save to db
+            }  //TODO save to db, remember to remove all occurrences
 
             if (sourceType == SourceType.Local)
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
@@ -135,19 +135,13 @@ namespace Mark5.Mobile.Common.Manager
 
                 var alarms = result.Alarms.WhereNotNull().Select(a => a.Convert()).ToList();
 
-                //TODO
+                await calendarDataAccess.SaveCalendarAlarmsAsync(calendarIds, alarms, startDateTimestamp, endDateTimestamp);
 
                 return alarms;
             }
 
             if (sourceType == SourceType.Local)
-            {
-                List<CalendarAlarm> alarms = null;
-
-                //TODO 
-
-                return alarms;
-            }
+                return await calendarDataAccess.GetCalendarAlarmsAsync(calendarIds, startDateTimestamp, endDateTimestamp);
 
             throw new ArgumentException("Invalid sourceType provided.");
         }

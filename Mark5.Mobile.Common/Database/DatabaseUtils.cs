@@ -41,6 +41,7 @@ namespace Mark5.Mobile.Common.Database
             {
                 c.CreateTable<CalendarAppointment>();
                 c.CreateTable<CalendarAppointmentOccurrence>();
+                c.CreateTable<CalendarAlarm>();
             });
             await DatabaseConnectionProvider.SystemDatabase.RunInConnectionAsync(c =>
             {
@@ -84,6 +85,7 @@ namespace Mark5.Mobile.Common.Database
             {
                 c.DeleteAll<CalendarAppointment>();
                 c.DeleteAll<CalendarAppointmentOccurrence>();
+                c.DeleteAll<CalendarAlarm>();
             });
             await DatabaseConnectionProvider.SystemDatabase.RunInConnectionAsync(c =>
             {

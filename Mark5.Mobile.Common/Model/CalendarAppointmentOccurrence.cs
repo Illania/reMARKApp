@@ -16,5 +16,8 @@ namespace Mark5.Mobile.Common.Model
 
         [Column("AppointmentId")]
         public int AppointmentId { get; set; }
+
+        [Column("CalendarId")]
+        public int CalendarId { get; set; }
     }
 }
