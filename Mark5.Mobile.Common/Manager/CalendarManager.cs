@@ -97,8 +97,10 @@ namespace Mark5.Mobile.Common.Manager
                 calendarAppointment.Id = result.Id;
                 calendarAppointment.Guid = result.Guid;
 
+                await calendarDataAccess.SaveCalendarAppointmentAsync(calendarAppointment);
+
                 return result.Updated;
-            }  //TODO save to db, remember to remove all occurrences
+            }
 
             if (sourceType == SourceType.Local)
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
