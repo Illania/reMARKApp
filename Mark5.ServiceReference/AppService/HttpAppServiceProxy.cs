@@ -276,19 +276,14 @@ namespace Mark5.ServiceReference.AppService
             return await InvokeAsync<CreateOrUpdateShortcodeResult, CreateOrUpdateShortcodeParameters>("CreateOrUpdateShortcode", parameters, ct);
         }
 
-        public async Task<GetCalendarEventsResult> GetCalendarEventsAsync(GetCalendarEventsParameters parameters, CancellationToken ct = default(CancellationToken))
+        public async Task<GetCalendarAppointmentsResult> GetCalendarAppointmentsAsync(GetCalendarAppointmentsParameters parameters, CancellationToken ct = default(CancellationToken))
         {
-            return await InvokeAsync<GetCalendarEventsResult, GetCalendarEventsParameters>("GetCalendarEvents", parameters, ct);
+            return await InvokeAsync<GetCalendarAppointmentsResult, GetCalendarAppointmentsParameters>("GetCalendarAppointments", parameters, ct);
         }
 
         public async Task<GetCalendarAppointmentResult> GetCalendarAppointmentAsync(GetCalendarAppointmentParameters parameters, CancellationToken ct = default(CancellationToken))
         {
             return await InvokeAsync<GetCalendarAppointmentResult, GetCalendarAppointmentParameters>("GetCalendarAppointment", parameters, ct);
-        }
-
-        public async Task<GetCalendarTaskResult> GetCalendarTaskAsync(GetCalendarTaskParameters parameters, CancellationToken ct = default(CancellationToken))
-        {
-            return await InvokeAsync<GetCalendarTaskResult, GetCalendarTaskParameters>("GetCalendarTask", parameters, ct);
         }
 
         public async Task<CreateOrUpdateCalendarAppointmentResult> CreateOrUpdateCalendarAppointmentAsync(CreateOrUpdateCalendarAppointmentParameters parameters, CancellationToken ct = default(CancellationToken))
@@ -299,11 +294,6 @@ namespace Mark5.ServiceReference.AppService
         public async Task<SendCalendarAppointmentInvitationsResult> SendCalendarAppointmentInvitationsAsync(SendCalendarAppointmentInvitationsParameters parameters, CancellationToken ct = default(CancellationToken))
         {
             return await InvokeAsync<SendCalendarAppointmentInvitationsResult, SendCalendarAppointmentInvitationsParameters>("SendCalendarAppointmentInvitations", parameters, ct);
-        }
-
-        public async Task<CreateOrUpdateCalendarTaskResult> CreateOrUpdateCalendarTaskAsync(CreateOrUpdateCalendarTaskParameters parameters, CancellationToken ct = default(CancellationToken))
-        {
-            return await InvokeAsync<CreateOrUpdateCalendarTaskResult, CreateOrUpdateCalendarTaskParameters>("CreateOrUpdateCalendarTask", parameters, ct);
         }
 
         public async Task<GetCalendarAlarmsResult> GetCalendarAlarms(GetCalendarAlarmsParameters parameters, CancellationToken ct = default(CancellationToken))

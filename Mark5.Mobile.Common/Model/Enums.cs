@@ -265,25 +265,6 @@ namespace Mark5.Mobile.Common.Model
         Tentative = 4,
     }
 
-    public enum TaskStatus
-    {
-        None = 0,
-        NotStarted = 1,
-        Active = 2,
-        Completed = 3,
-        Waiting = 4,
-        Postponed = 5,
-    }
-
-    public enum DelegationStatus
-    {
-        None = 0,
-        NoDelegation = 1,
-        Unknown = 2,
-        Accepted = 3,
-        Declined = 4,
-    }
-
     #endregion
 
     #region Search

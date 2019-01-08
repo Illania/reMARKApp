@@ -30,12 +30,10 @@ namespace Mark5.Mobile.Common.Manager
 
             if (sourceType == SourceType.Remote)
             {
-                var result = await AppServiceProxy.GetCalendarEventsAsync(new DataContract.GetCalendarEventsParameters
+                var result = await AppServiceProxy.GetCalendarAppointmentsAsync(new DataContract.GetCalendarAppointmentsParameters
                 {
                     Token = Token,
                     CalendarIds = calendarIds,
-                    GetAppointments = true,
-                    GetTasks = false,
                     StartDate = startDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
                     EndDate = endDateTimestamp.ConvertTimestampMillisecondsToDateTime()
                 });

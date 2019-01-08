@@ -26,7 +26,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         CalendarAppointment testAppointmentRecurring; //Good!
         CalendarAppointment testAppointmentPartecipants;  //Good!
         CalendarAppointment testAppointmentAlarm; //Good!
-        CalendarAppointment testAppointmentToEdit;
+        CalendarAppointment testAppointmentToEdit; //Good!
         CalendarAppointment selectedAppointment;
 
         void PrepareTests()

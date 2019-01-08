@@ -121,11 +121,10 @@ namespace Mark5.ServiceReference.Exceptions
         [EnumMember(Value = "GetShortcodesError")] GetShortcodesError = 1400,
         [EnumMember(Value = "GetShortcodeError")] GetShortcodeError = 1401,
 
-        [EnumMember(Value = "GetCalendarEventsError")] GetCalendarEventsError = 1500,
+        [EnumMember(Value = "GetCalendarAppointmentsError")] GetCalendarAppointmentsError = 1500,
         [EnumMember(Value = "GetCalendarAppointmentError")] GetCalendarAppointmentError = 1501,
-        [EnumMember(Value = "GetCalendarTaskError")] GetCalendarTaskError = 1502,
         [EnumMember(Value = "CreateOrUpdateCalendarAppointmentError")] CreateOrUpdateCalendarAppointmentError = 1503,
-        [EnumMember(Value = "CreateOrUpdateCalendarTaskError")] CreateOrUpdateCalendarTaskError = 1504,
+        [EnumMember(Value = "GetCalendarAlarmsError")] GetCalendarAlarmsError = 1505,
 
         [EnumMember(Value = "GetSavedSearchesError")] GetSavedSearchesError = 1600,
         [EnumMember(Value = "SearchDocumentsError")] SearchDocumentsError = 1601,

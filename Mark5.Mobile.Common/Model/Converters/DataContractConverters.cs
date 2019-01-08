@@ -83,44 +83,6 @@ namespace Mark5.Mobile.Common.Model.Converters
             };
         }
 
-        public static CalendarTask Convert(this DataContract.CalendarTask ca)
-        {
-            var result = new CalendarTask
-            {
-                Id = ca.Id,
-                Guid = ca.Guid,
-                Subject = ca.Subject,
-                StartDateTimestamp = ca.StartDate.ConvertDateTimeToTimestampMilliseconds(),
-                EndDateTimestamp = ca.EndDate.ConvertDateTimeToTimestampMilliseconds(),
-                CalendarId = ca.CalendarId,
-                Private = ca.Private,
-                Status = ca.Status.ConvertEnum<TaskStatus>(),
-                CreatorId = ca.CreatorId,
-                Creator = ca.Creator,
-                Priority = ca.Priority.ConvertEnum<Priority>(),
-                Type = ca.Type.ConvertEnum<CalendarOccurenceType>(),
-                ReminderAlertTime = ca.ReminderAlertTime.ConvertDateTimeToTimestampMilliseconds(),
-                ReminderTimeBefore = ca.ReminderTimeBefore,
-                PercentComplete = ca.PercentComplete,
-                LinkedObjectId = ca.ObjectId,
-                LinkedObjectType = ca.ObjectType.ConvertEnum<ObjectType>(),
-                DelegatorId = ca.DelegatorId,
-                Delegator = ca.Delegator,
-                DelegationStatus = ca.DelegationStatus.ConvertEnum<DelegationStatus>()
-            };
-
-            if (ca.UserIds != null)
-                result.UserIds.AddRange(ca.UserIds);
-            if (ca.Users != null)
-                result.Users = new Dictionary<int, string>(result.Users);
-            if (ca.DepartmentIds != null)
-                result.DepartmentIds.AddRange(ca.DepartmentIds);
-            if (ca.Departments != null)
-                result.Departments = new Dictionary<int, string>(ca.Departments);
-
-            return result;
-        }
-
         public static CalendarModuleInfo Convert(this DataContract.CalendarModuleInfo cmi)
         {
             var result = new CalendarModuleInfo
@@ -843,36 +805,6 @@ namespace Mark5.Mobile.Common.Model.Converters
             }
 
             return result;
-        }
-
-        public static DataContract.CalendarTask Convert(this CalendarTask ca)
-        {
-            return new DataContract.CalendarTask
-            {
-                Id = ca.Id,
-                Guid = ca.Guid,
-                Subject = ca.Subject,
-                StartDate = ca.StartDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
-                EndDate = ca.EndDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
-                Private = ca.Private,
-                Status = ca.Status.ConvertEnum<DataContract.TaskStatus>(),
-                CreatorId = ca.CreatorId,
-                Creator = ca.Creator,
-                Priority = ca.Priority.ConvertEnum<DataContract.Priority>(),
-                Type = ca.Type.ConvertEnum<DataContract.CalendarOccurenceType>(),
-                ReminderAlertTime = ca.ReminderAlertTime.ConvertTimestampMillisecondsToDateTime(),
-                ReminderTimeBefore = ca.ReminderTimeBefore,
-                PercentComplete = ca.PercentComplete,
-                ObjectId = ca.LinkedObjectId,
-                ObjectType = ca.LinkedObjectType.ConvertEnum<DataContract.ObjectType>(),
-                DelegatorId = ca.DelegatorId,
-                Delegator = ca.Delegator,
-                DelegationStatus = ca.DelegationStatus.ConvertEnum<DataContract.DelegationStatus>(),
-                UserIds = ca.UserIds,
-                Users = ca.Users,
-                DepartmentIds = ca.DepartmentIds,
-                Departments = ca.Departments
-            };
         }
 
         public static DataContract.Calendar Convert(this Calendar cr)
