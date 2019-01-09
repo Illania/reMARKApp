@@ -23,7 +23,7 @@ namespace Mark5.Mobile.Common.DataAccess
             {
                 CalendarAppointment appointment = null;
 
-                await calendarDatabase.RunInConnectionAsync(c =>  //TODO Which occurrence should we return...?
+                await calendarDatabase.RunInConnectionAsync(c =>
                 {
                     var result = c.Find<CalendarAppointment>(calendarAppointmentId);
                     appointment = result ?? throw new DataNotFoundException("Calendar appointment could not be found");
@@ -88,7 +88,17 @@ namespace Mark5.Mobile.Common.DataAccess
                 await calendarDatabase.RunInConnectionAsync(c =>
                 {
                     c.InsertOrReplace(calendarAppointment);
-                    c.InsertOrReplace(calendarAppointment.Occurrences);
+
+                    if (calendarAppointment.RecurrenceInfo == null)
+                    {
+                        c.Table<CalendarAppointmentOccurrence>().Delete(cao => cao.AppointmentId == calendarAppointment.Id);
+                        c.InsertAll(calendarAppointment.Occurrences);
+                    }
+                    else
+                    {
+                        //TODO .. What to do??
+                    }
+
                 });
             }
             catch (Exception ex) when (!(ex is DataAccessException))
