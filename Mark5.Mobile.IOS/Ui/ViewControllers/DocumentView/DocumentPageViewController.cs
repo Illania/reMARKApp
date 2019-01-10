@@ -232,23 +232,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
             ChangePage(Folder, documentPreview, direction);
         }
 
-        DocumentViewController GoToPageAndReturnVC(DocumentPreview documentPreview, UIPageViewControllerNavigationDirection direction, bool isSearchActive = false)
-        {
-            CommonConfig.UsageAnalytics.LogEvent(new DocumentQuickSwitchEvent());
-            var vc = GetDocumentViewController(Folder, documentPreview);
-
-            UpdateNavigationBar(documentPreview, isSearchActive);
-            return vc;
-        }
-
         void ChangePage(Folder folder, DocumentPreview documentPreview, UIPageViewControllerNavigationDirection direction, bool isSearchActive = false)
         {
             SetToolbarItems(null, true);
 
             var vc = GetDocumentViewController(folder, documentPreview);
             SetViewControllers(new[] { vc }, direction, false, (finished) => UpdateToolBar(vc));
-            CommonConfig.MessengerHub.Publish(new GoToDocumentMessage(this, documentPreview.Id));
             UpdateNavigationBar(documentPreview, isSearchActive);
+            CommonConfig.MessengerHub.Publish(new GoToDocumentMessage(this, documentPreview.Id));
         }
 
         DocumentViewController GetDocumentViewController(Folder folder, DocumentPreview documentPreview)
@@ -334,10 +325,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
 
         #endregion
 
+        #region Swipe Related
+        //Both the delegate and the datasource are used only when swiping
+
+        DocumentViewController GoToPageAndReturnVC(DocumentPreview documentPreview, UIPageViewControllerNavigationDirection direction)
+        {
+            CommonConfig.UsageAnalytics.LogEvent(new DocumentQuickSwitchEvent());
+            var vc = GetDocumentViewController(Folder, documentPreview);
+            return vc;
+        }
+
         #region Delegate
         protected class DocumentPageDelegate : UIPageViewControllerDelegate
         {
-            [Export("pageViewController:didFinishAnimating:previousViewControllers:transitionCompleted:")]
             public override void DidFinishAnimating(UIPageViewController pageViewController, bool finished, UIViewController[] previousViewControllers, bool completed)
             {
                 var vc = (DocumentViewController)pageViewController.ViewControllers.FirstOrDefault();
@@ -347,6 +347,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
                 if (index < 0 || index > pageVC.DocumentPreviews.Count - 1)
                     return;
                 CommonConfig.MessengerHub.Publish(new GoToDocumentMessage(this, documentPreview.Id));
+
+                pageVC.UpdateToolBar(vc);
+                pageVC.UpdateNavigationBar(documentPreview);
+
+                var vcPrevious = (DocumentViewController)previousViewControllers?.FirstOrDefault();
+                vcPrevious?.ResetOffset();
             }
         }
         #endregion
@@ -394,6 +400,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
                 }
             }
         }
+        #endregion
+
         #endregion
 
     }

@@ -282,9 +282,9 @@ namespace Mark5.Mobile.IOS.Ui.Common
             loadIndicatorView?.StopAnimating();
         }
 
-        protected void ResetOffset()
+        public void ResetOffset()
         {
-            webView?.ScrollView?.SetContentOffset(CGPoint.Empty, false);
+            webView?.ScrollView?.SetContentOffset(CGPoint.Empty, true);
         }
 
         protected async Task LoadHtmlString(string html, HtmlProcessingConfiguration config)
