@@ -389,7 +389,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var outgoing = localRootFolder.SubFolders.First();
                 if (outgoing != null)
                 {
-                    outgoing.DocumentCount = count;
+                    outgoing.PendingDocumentCount = count;
                     outgoing.HasFailedDocuments = hasFailedDocuments;
                     Activity.RunOnUiThread(() =>
                     {
@@ -1048,7 +1048,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                     viewHolder.FailedDocumentIndicator.Visibility = folder.HasFailedDocuments ? ViewStates.Visible : ViewStates.Gone;
 
-                    viewHolder.FailedAndPendingDocumentCount.Text = folder.DocumentCount > 0 ? folder.DocumentCount.ToString() : String.Empty;
+                    viewHolder.FailedAndPendingDocumentCount.Text = folder.PendingDocumentCount > 0 ? folder.PendingDocumentCount.ToString() : string.Empty;
 
                     viewHolder.SelectedOverlay.Visibility = IsItemSelected(position) ? ViewStates.Visible : ViewStates.Gone;
                 }

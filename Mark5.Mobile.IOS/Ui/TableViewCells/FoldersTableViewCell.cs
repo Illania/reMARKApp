@@ -159,7 +159,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             nameLabel.Text = folder.Name;
             expandButton.Hidden = !folder.HasSubFolders;
 
-            documentCount.Text = folder.FailedAndPendingDocumentCount <= 0 ? "" : $"{folder.FailedAndPendingDocumentCount}";
+            documentCount.Text = folder.PendingDocumentCount <= 0 ? "" : $"{folder.PendingDocumentCount}";
             failedDocumentIndicator.Hidden = !folder.HasFailedDocuments;
         }
 

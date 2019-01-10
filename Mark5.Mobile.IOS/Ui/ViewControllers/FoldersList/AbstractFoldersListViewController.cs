@@ -1399,7 +1399,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 if (items.ContainsKey(Section.Local) && items[Section.Local].Any() && items[Section.Local][0].IsOutgoing)
                 {
-                    items[Section.Local][0].FailedAndPendingDocumentCount = count;
+                    items[Section.Local][0].PendingDocumentCount = count;
                     items[Section.Local][0].HasFailedDocuments = hasFailedDocuments;
 
                     indexPath = NSIndexPath.FromRowSection(0, Section.Local);
