@@ -15,7 +15,6 @@
     <AndroidResgenClass>Resource</AndroidResgenClass>
     <MonoAndroidResourcePrefix>Resources</MonoAndroidResourcePrefix>
     <MonoAndroidAssetsPrefix>Assets</MonoAndroidAssetsPrefix>
-    <AndroidUseLatestPlatformSdk>true</AndroidUseLatestPlatformSdk>
     <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
     <AndroidEnableMultiDex>true</AndroidEnableMultiDex>
     <AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
@@ -814,6 +813,7 @@
     <AndroidResource Include="Resources\drawable\onboarding_1.xml" />
     <AndroidResource Include="Resources\drawable\onboarding_2.xml" />
     <AndroidResource Include="Resources\drawable\onboarding_3.xml" />
+    <AndroidResource Include="Resources\drawable\circle_red.xml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FastScrollRecycler\FastScrollRecycler.csproj">

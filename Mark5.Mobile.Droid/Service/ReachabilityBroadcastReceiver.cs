@@ -40,7 +40,7 @@ namespace Mark5.Mobile.Droid.Service
             CommonConfig.Logger.Info("Connectivity changed");
 
             GoAsync();
-            CommonConfig.Reachability.Refresh().FireAndForget();
+            CommonConfig.Reachability.Refresh();
         }
     }
 }
