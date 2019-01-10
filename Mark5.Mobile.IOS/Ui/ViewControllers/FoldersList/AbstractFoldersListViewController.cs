@@ -631,7 +631,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             BeginInvokeOnMainThread(() =>
             {
                 if (TableView.Source is GrouppedDataSource gds)
-                    gds.UpdateOutgoing(ougoingMessageCount.TotalCount, ougoingMessageCount.HasFailedDocuments);
+                    gds.UpdateOutgoing(ougoingMessageCount.PendingCount, ougoingMessageCount.HasFailedDocuments);
             });
         }
 
