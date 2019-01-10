@@ -75,6 +75,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             InitializeNavigationBar();
             InitializeView();
             InitializeSearchBar();
+
+            SubscribeToMessages();
         }
 
         public override void ViewWillAppear(bool animated)
@@ -96,8 +98,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             if (TableView?.IndexPathsForSelectedRows?.Length > 0)
                 foreach (var selectedIndexPath in TableView?.IndexPathsForSelectedRows)
                     TableView.DeselectRow(selectedIndexPath, true);
-
-            SubscribeToMessages();
         }
 
         public override void ViewDidAppear(bool animated)
@@ -334,6 +334,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         #endregion
 
+        #region Subscribe/unsubscribe
+
+        void SubscribeToMessages()
+        {
+            if (ParentFolder.Module == ModuleType.Documents && IsRootOfFoldersList)
+                outgoingDocumentCountChangedToken = CommonConfig.MessengerHub.Subscribe<OugoingDocumentCountMessage>(HandleOutgoingDocumentCountChange);
+        }
+
+        void UnsubscribeFromMessages()
+        {
+            outgoingDocumentCountChangedToken?.Dispose();
+        }
+
+        #endregion
+
         #region NavigationBar handlers
 
         void ComposeDocumentItem_Clicked(object sender, EventArgs e)
@@ -564,7 +579,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 }
 
                 if (ParentFolder.Module == ModuleType.Documents)
-                    Task.Run(async () => await Managers.DocumentsManager.NotifyPendingAndFailedCountChanged());
+                    Managers.DocumentsManager.NotifyPendingAndFailedCountChanged().FireAndForget();
             }
             else
             {
@@ -616,9 +631,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             BeginInvokeOnMainThread(() =>
             {
                 if (TableView.Source is GrouppedDataSource gds)
-                {
                     gds.UpdateOutgoing(ougoingMessageCount.TotalCount, ougoingMessageCount.HasFailedDocuments);
-                }
             });
         }
 
@@ -1093,9 +1106,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 var folder = items[indexPath.LongSection][indexPath.Row];
                 SyncStatus.TryGetValue(folder.Id, out bool folderIsCached);
 
-                cell.documentCount.Text = "";
-                cell.failedDocumentIndicator.Hidden = true;
-
                 cell.Initialize(folder, folderIsCached);
                 if (viewControllerWeakReference.Unwrap()?.ShouldDisableFolder(folder) ?? false)
                     cell.Disable();
@@ -1387,24 +1397,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             {
                 NSIndexPath indexPath = null;
 
-                if (items[Section.Local].Any())
+                if (items.ContainsKey(Section.Local) && items[Section.Local].Any() && items[Section.Local][0].IsOutgoing)
                 {
-                    if (items[Section.Local][0].IsOutgoing)
-                    {
-                        items[Section.Local][0].FailedAndPendingDocumentCount = count;
-                        items[Section.Local][0].HasFailedDocuments = hasFailedDocuments;
+                    items[Section.Local][0].FailedAndPendingDocumentCount = count;
+                    items[Section.Local][0].HasFailedDocuments = hasFailedDocuments;
 
-                        indexPath = NSIndexPath.FromRowSection(0, Section.Local);
-                    }
-                }
+                    indexPath = NSIndexPath.FromRowSection(0, Section.Local);
 
-                if (indexPath != null)
-                {
                     var indexPathVisible = tableViewWeakReference.Unwrap()?.IndexPathsForVisibleRows?.Contains(indexPath);
                     if (indexPathVisible != null)
-                    {
                         tableViewWeakReference.Unwrap()?.ReloadRows(new[] { indexPath }, UITableViewRowAnimation.Fade);
-                    }
                 }
             }
         }
@@ -1876,20 +1878,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 }
             }
         }
-        #endregion
-
-        #region Subscribe/unsubscribe
-
-        void SubscribeToMessages()
-        {
-            outgoingDocumentCountChangedToken = CommonConfig.MessengerHub.Subscribe<OugoingDocumentCountMessage>(HandleOutgoingDocumentCountChange);
-        }
-
-        void UnsubscribeFromMessages()
-        {
-            outgoingDocumentCountChangedToken?.Dispose();
-        }
-
         #endregion
     }
 }

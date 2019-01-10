@@ -1,13 +1,8 @@
-using System.IO;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common.Extensions;
-using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
-using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
@@ -96,7 +91,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             expandButton.SetImage(UIImage.FromBundle("Expand").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
             ContentView.Add(expandButton);
 
-
             failedDocumentIndicator = new UIView()
             {
                 BackgroundColor = UIColor.Red,
@@ -165,8 +159,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             nameLabel.Text = folder.Name;
             expandButton.Hidden = !folder.HasSubFolders;
 
-            documentCount.Text = folder.FailedAndPendingDocumentCount <= 0 ? "" : folder.FailedAndPendingDocumentCount.ToString();
-
+            documentCount.Text = folder.FailedAndPendingDocumentCount <= 0 ? "" : $"{folder.FailedAndPendingDocumentCount}";
             failedDocumentIndicator.Hidden = !folder.HasFailedDocuments;
         }
 

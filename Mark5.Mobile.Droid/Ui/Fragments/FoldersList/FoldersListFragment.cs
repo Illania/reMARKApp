@@ -404,7 +404,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var adapter = (FolderListAdapter)CurrentAdapter;
             if (adapter is FolderListAdapter)
             {
-                UpdateLocalSection(ougoingMessageCount.TotalCount, ougoingMessageCount.HasFailedDocuments);
+                UpdateLocalSection(ougoingMessageCount.PendingCount, ougoingMessageCount.HasFailedDocuments);
             }
         }
 

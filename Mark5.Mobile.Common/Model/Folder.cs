@@ -280,7 +280,6 @@ namespace Mark5.Mobile.Common.Model
 
     public class FolderComparer : IEqualityComparer<Folder>
     {
-
         public bool Equals(Folder x, Folder y)
         {
             return x != null && y != null && x.Id.Equals(y.Id);

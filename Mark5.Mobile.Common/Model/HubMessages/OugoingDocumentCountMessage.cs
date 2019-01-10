@@ -8,13 +8,13 @@ namespace Mark5.Mobile.Common.Model.HubMessages
      */
     public class OugoingDocumentCountMessage : TinyMessageBase
     {
-        public int TotalCount { get; } = 0;
+        public int PendingCount { get; } = 0;
         public bool HasFailedDocuments { get; }
 
         public OugoingDocumentCountMessage(object sender, int count, bool hasFailedDocuments)
             : base(sender)
         {
-            TotalCount = count;
+            PendingCount = count;
             HasFailedDocuments = hasFailedDocuments;
         }
     }

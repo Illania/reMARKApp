@@ -763,10 +763,17 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task NotifyPendingAndFailedCountChanged()
         {
-            var pendingGuids = await FileSystemStorage.GetDocumentsToUploadGuids();
-            var failedGuids = await FileSystemStorage.GetFailedDocumentsToUploadGuids();
+            try
+            {
+                var pendingGuids = await FileSystemStorage.GetDocumentsToUploadGuids();
+                var failedGuids = await FileSystemStorage.GetFailedDocumentsToUploadGuids();
 
-            CommonConfig.MessengerHub.Publish(new OugoingDocumentCountMessage(this, pendingGuids.Count(), failedGuids.Any()));
+                CommonConfig.MessengerHub.Publish(new OugoingDocumentCountMessage(this, pendingGuids.Count(), failedGuids.Any()));
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Error while counting pending and failed outgoing documents", ex);
+            }
         }
 
         #endregion
