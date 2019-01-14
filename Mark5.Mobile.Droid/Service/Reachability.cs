@@ -4,7 +4,6 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Android.App;
-using Android.Content;
 using Android.Net;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
@@ -64,7 +63,7 @@ namespace Mark5.Mobile.Droid.Service
                 result &= await CheckWithServiceConnection();
             if (result && mode.HasFlag(ReachabilityMode.Service))
                 result &= await CheckWithService();
-              
+
             IsCheckingReachability = false;
 
             if (!testOnly)

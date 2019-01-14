@@ -120,21 +120,26 @@ namespace Mark5.Mobile.Droid.Utilities
 
             sb.AppendLine("===== Network information =====");
             var cm = Application.Context.GetSystemService(Context.ConnectivityService) as ConnectivityManager;
-            NetworkInfo[] networkInfos = null;
-            networkInfos = cm.GetAllNetworks().Select(cm.GetNetworkInfo).ToArray();
+            var activeNetwork = cm.ActiveNetwork;
 
-            for (var i = 0; i < networkInfos.Length; i++)
+            if (activeNetwork != null)
             {
-                var networkInfo = networkInfos[i];
-                sb.AppendLine($"Network {i}:");
-                sb.AppendLine("  Type: " + networkInfo.Type);
+                var networkInfo = cm.GetNetworkInfo(activeNetwork);
+                var networkCapabilities = cm.GetNetworkCapabilities(activeNetwork);
+                sb.AppendLine($"Network {activeNetwork}:");
+                sb.AppendLine("  IsReachable: " + CommonConfig.Reachability?.IsReachable);
+                sb.AppendLine("  IsCellular: " + networkCapabilities.HasTransport(TransportType.Cellular));
+                sb.AppendLine("  IsVpn: " + networkCapabilities.HasTransport(TransportType.Vpn));
+                sb.AppendLine("  IsWifi: " + networkCapabilities.HasTransport(TransportType.Wifi));
+                sb.AppendLine("  IsWifiAware: " + networkCapabilities.HasTransport(TransportType.WifiAware));
+                sb.AppendLine("  NotRoaming:" + networkCapabilities.HasCapability(NetCapability.NotRoaming));
                 sb.AppendLine("  Subtype: " + networkInfo.Subtype);
-                sb.AppendLine("  State: " + networkInfo.GetState());
-                sb.AppendLine("  Available:" + networkInfo.IsAvailable);
                 sb.AppendLine("  Connected:" + networkInfo.IsConnected);
-                sb.AppendLine("  Roaming:" + networkInfo.IsRoaming);
-                sb.AppendLine("  Failover:" + networkInfo.IsFailover);
                 sb.AppendLine("  Extra info:" + networkInfo.ExtraInfo);
+            }
+            else
+            {
+                sb.AppendLine("Active network is null");
             }
 
             sb.AppendLine();
