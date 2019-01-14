@@ -26,11 +26,11 @@ namespace Mark5.Mobile.Droid.Utilities.Service
         {
             try
             {
-                var n = message.ConvertToNotification();
+                var notification = message.ConvertToNotification();
 
-                CommonConfig.Logger.Info($"Notification received: {n}");
+                CommonConfig.Logger.Info($"Notification received: {notification}");
 
-                if (n.IsSilent)
+                if (notification.IsSilent)
                     return;
 
                 if (PlatformConfig.Preferences.SilenceNotifications)
@@ -39,34 +39,34 @@ namespace Mark5.Mobile.Droid.Utilities.Service
                     return;
                 }
 
-                if (n.ObjectType == ObjectType.Document)
+                if (notification.ObjectType == ObjectType.Document)
                 {
-                    var nm = (NotificationManager)GetSystemService(NotificationService);
-                    CreateChannelIfNotExists(nm);
+                    NotificationManager notificationManager = (NotificationManager)GetSystemService(NotificationService);
+                    CreateChannelIfNotExists(notificationManager);
 
-                    await Managers.NotificationsManager.SaveNotification(n);
+                    await Managers.NotificationsManager.SaveNotification(notification);
 
-                    var i = DocumentActivity.CreateIntent(this, folderId: n.FolderId, documentId: n.ObjectId, notificationGuid: Serializer.Serialize(n.Guid));
-                    var pi = PendingIntent.GetActivity(this, 0, i, PendingIntentFlags.OneShot);
+                    Intent intent = DocumentActivity.CreateIntent(this, folderId: notification.FolderId, documentId: notification.ObjectId, notificationGuid: Serializer.Serialize(notification.Guid));
+                    PendingIntent pendingIntent = PendingIntent.GetActivity(this, notification.ObjectId, intent, PendingIntentFlags.OneShot);
 
-                    var nb = new NotificationCompat.Builder(this, "main")
+                    NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, "main")
                                                    .SetSmallIcon(Build.VERSION.SdkInt >= BuildVersionCodes.Lollipop ? Resource.Mipmap.ic_icon_lollipop : Resource.Mipmap.ic_icon)
                                                    .SetColor(ContextCompat.GetColor(this, Resource.Color.darkerblue))
-                                                   .SetContentTitle(n.Title)
-                                                   .SetContentText(n.Message)
-                                                   .SetContentIntent(pi)
+                                                   .SetContentTitle(notification.Title)
+                                                   .SetContentText(notification.Message)
+                                                   .SetContentIntent(pendingIntent)
                                                    .SetCategory(NotificationCompat.CategoryMessage)
                                                    .SetAutoCancel(true).SetGroup(GroupName)
                                                    .SetPriority((int)NotificationPriority.High)
-                                                   .SetStyle(new NotificationCompat.BigTextStyle().BigText(n.Message));
+                                                   .SetStyle(new NotificationCompat.BigTextStyle().BigText(notification.Message));
 
                     if (!string.IsNullOrWhiteSpace(PlatformConfig.Preferences.NotificationsRingtone))
-                        nb.SetSound(Android.Net.Uri.Parse(PlatformConfig.Preferences.NotificationsRingtone));
+                        notificationBuilder.SetSound(Android.Net.Uri.Parse(PlatformConfig.Preferences.NotificationsRingtone));
 
                     if (PlatformConfig.Preferences.NotificationsVibrate)
-                        nb.SetVibrate(new[] { 500L, 250L, 500L });
+                        notificationBuilder.SetVibrate(new[] { 500L, 250L, 500L });
 
-                    nm.Notify((int)(Java.Lang.JavaSystem.CurrentTimeMillis() / 1000), nb.Build());
+                    notificationManager.Notify(notification.ObjectId, notificationBuilder.Build());
 
                     CommonConfig.MessengerHub.Publish(new NewNotificationsReceivedMessage(this));
                 }
@@ -84,23 +84,23 @@ namespace Mark5.Mobile.Droid.Utilities.Service
             if (Build.VERSION.SdkInt < BuildVersionCodes.M)
                 return;
 
-            var nm = (NotificationManager)GetSystemService(NotificationService);
-            CreateChannelIfNotExists(nm);
+            NotificationManager notificationManager = (NotificationManager)GetSystemService(NotificationService);
+            CreateChannelIfNotExists(notificationManager);
 
-            var activeNotifications = nm.GetActiveNotifications().Where(sbn => sbn.Id != StackNotification).ToArray();
+            Android.Service.Notification.StatusBarNotification[] activeNotifications = notificationManager.GetActiveNotifications().Where(sbn => sbn.Id != StackNotification).ToArray();
 
             if (activeNotifications.Count() < 2)
                 return;
 
-            var builder = new NotificationCompat.Builder(this, "main");
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "main");
             builder.SetSmallIcon(Build.VERSION.SdkInt >= BuildVersionCodes.Lollipop ? Resource.Mipmap.ic_icon_lollipop : Resource.Mipmap.ic_icon);
             builder.SetColor(ContextCompat.GetColor(this, Resource.Color.darkerblue));
 
-            var inbox = new NotificationCompat.InboxStyle();
+            NotificationCompat.InboxStyle inbox = new NotificationCompat.InboxStyle();
 
-            foreach (var sbn in activeNotifications)
+            foreach (Android.Service.Notification.StatusBarNotification sbn in activeNotifications)
             {
-                var stackNotificationLine = sbn.Notification.Extras.GetString(NotificationCompat.ExtraTitle);
+                string stackNotificationLine = sbn.Notification.Extras.GetString(NotificationCompat.ExtraTitle);
                 if (!string.IsNullOrWhiteSpace(stackNotificationLine))
                     inbox.AddLine(stackNotificationLine);
             }
@@ -114,23 +114,23 @@ namespace Mark5.Mobile.Droid.Utilities.Service
             builder.SetGroupSummary(true);
             builder.SetPriority((int)NotificationPriority.High);
 
-            var n = builder.Build();
-            n.Defaults = 0;
+            Android.App.Notification notification = builder.Build();
+            notification.Defaults = 0;
 
-            nm.Notify(StackNotification, n);
+            notificationManager.Notify(StackNotification, notification);
         }
 
-        public void CreateChannelIfNotExists(NotificationManager nm)
+        public void CreateChannelIfNotExists(NotificationManager notificationManager)
         {
             if (Build.VERSION.SdkInt < BuildVersionCodes.O)
                 return;
 
-            var channel = nm.GetNotificationChannel("main");
+            NotificationChannel channel = notificationManager.GetNotificationChannel("main");
             if (channel != null)
                 return;
 
             channel = new NotificationChannel("main", "General", NotificationImportance.High);
-            nm.CreateNotificationChannel(channel);
+            notificationManager.CreateNotificationChannel(channel);
         }
     }
 }

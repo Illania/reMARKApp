@@ -102,19 +102,23 @@ namespace Mark5.Mobile.IOS
 
             try
             {
-                var userInfo = (NSDictionary)launchOptions.ObjectForKey(UIApplication.LaunchOptionsRemoteNotificationKey);
-                if (userInfo != null)
+                if (!UIDevice.CurrentDevice.CheckSystemVersion(10, 0))
                 {
-                    var n = userInfo.ConvertToNotification();
-
-                    if (n != null && n.ObjectType == ObjectType.Document)
+                    var userInfo = (NSDictionary)launchOptions.ObjectForKey(UIApplication.LaunchOptionsRemoteNotificationKey);
+                    if (userInfo != null)
                     {
-                        var vc = new DocumentViewController();
-                        vc.SetRefreshDataOnAppear();
-                        vc.SetData(n.ObjectId);
-                        Window.RootViewController.PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+                        var n = userInfo.ConvertToNotification();
+
+                        if (n != null && n.ObjectType == ObjectType.Document)
+                        {
+                            var vc = new DocumentViewController();
+                            vc.SetRefreshDataOnAppear();
+                            vc.SetData(n.ObjectId);
+                            Window.RootViewController.PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+                        }
                     }
                 }
+
             }
             catch (Exception ex)
             {
@@ -278,6 +282,7 @@ namespace Mark5.Mobile.IOS
             }
         }
 
+        // iOS 10+, called when presenting notification
         [Export("userNotificationCenter:willPresentNotification:withCompletionHandler:")]
         public void WillPresentNotification(UNUserNotificationCenter center, UNNotification notification, Action<UNNotificationPresentationOptions> options)
         {
@@ -311,6 +316,7 @@ namespace Mark5.Mobile.IOS
             }
         }
 
+        // iOS 10+, called when recieved response
         [Export("userNotificationCenter:didReceiveNotificationResponse:withCompletionHandler:")]
         public void DidReceiveNotificationResponse(UNUserNotificationCenter center, UNNotificationResponse response, Action completionHandler)
         {
