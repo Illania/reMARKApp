@@ -37,7 +37,7 @@ namespace Mark5.Mobile.Droid.Utilities
             sendIntent.PutExtra(Intent.ExtraText, report);
             sendIntent.SetType("text/plain");
             return Intent.CreateChooser(sendIntent, context.GetText(Resource.String.share));
-        } 
+        }
 
         public static Intent CreateShareFeedbackIntent(string report)
         {
@@ -121,18 +121,8 @@ namespace Mark5.Mobile.Droid.Utilities
             sb.AppendLine("===== Network information =====");
             var cm = Application.Context.GetSystemService(Context.ConnectivityService) as ConnectivityManager;
             NetworkInfo[] networkInfos = null;
-            if (Build.VERSION.SdkInt >= BuildVersionCodes.Lollipop)
-            {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                networkInfos = cm.GetAllNetworks().Select(n => cm.GetNetworkInfo(n)).ToArray();
-#pragma warning restore XA0001 // Find issues with Android API usage
-            }
-            else
-            {
-#pragma warning disable CS0618 // Type or member is obsolete
-                networkInfos = cm.GetAllNetworkInfo();
-#pragma warning restore CS0618 // Type or member is obsolete
-            }
+            networkInfos = cm.GetAllNetworks().Select(cm.GetNetworkInfo).ToArray();
+
             for (var i = 0; i < networkInfos.Length; i++)
             {
                 var networkInfo = networkInfos[i];
@@ -212,7 +202,7 @@ namespace Mark5.Mobile.Droid.Utilities
             sb.AppendLine("===== Exception =====");
             sb.AppendLine("Exception Type: " + ex.GetType());
             sb.AppendLine();
-            sb.AppendLine("Stack trace: " +ex.StackTrace);
+            sb.AppendLine("Stack trace: " + ex.StackTrace);
 
             return sb.ToString();
         }
