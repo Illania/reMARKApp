@@ -50,7 +50,7 @@ namespace Mark5.Mobile.Droid.Utilities.Service
                     PendingIntent pendingIntent = PendingIntent.GetActivity(this, notification.ObjectId, intent, PendingIntentFlags.OneShot);
 
                     NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, "main")
-                                                   .SetSmallIcon(Build.VERSION.SdkInt >= BuildVersionCodes.Lollipop ? Resource.Mipmap.ic_icon_lollipop : Resource.Mipmap.ic_icon)
+                                                   .SetSmallIcon(Resource.Mipmap.ic_icon_lollipop)
                                                    .SetColor(ContextCompat.GetColor(this, Resource.Color.darkerblue))
                                                    .SetContentTitle(notification.Title)
                                                    .SetContentText(notification.Message)
@@ -93,7 +93,7 @@ namespace Mark5.Mobile.Droid.Utilities.Service
                 return;
 
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "main");
-            builder.SetSmallIcon(Build.VERSION.SdkInt >= BuildVersionCodes.Lollipop ? Resource.Mipmap.ic_icon_lollipop : Resource.Mipmap.ic_icon);
+            builder.SetSmallIcon(Resource.Mipmap.ic_icon_lollipop);
             builder.SetColor(ContextCompat.GetColor(this, Resource.Color.darkerblue));
 
             NotificationCompat.InboxStyle inbox = new NotificationCompat.InboxStyle();
