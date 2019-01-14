@@ -407,7 +407,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             builder.Content(GetErrorMessage(context, ex));
 
             //if token is invalid -> navigate user to login
-            if (ex is HttpAppServiceException && ((HttpAppServiceException)ex)?.Detail?.Code == AppServiceFaultCode.InvalidToken)
+            if (ex is HttpAppServiceException hape && (hape?.Detail?.Code == AppServiceFaultCode.InvalidToken))
             {
                 ShowYesNoDialog(context, Resource.String.invalid_token, Resource.String.invalid_token_message,
                     async () =>
@@ -417,39 +417,37 @@ namespace Mark5.Mobile.Droid.Ui.Common
                     });
                 return tcs.Task;
             }
-            else
+
+            builder.PositiveText(Resource.String.ok);
+            builder.OnPositive(new SingleButtonCallback(() => tcs.SetResult(true)));
+            if (ShouldShowCreateReport(ex))
             {
-                builder.PositiveText(Resource.String.ok);
-                builder.OnPositive(new SingleButtonCallback(() => tcs.SetResult(true)));
-                if (ShouldShowCreateReport(ex))
+                builder.NeutralText(Resource.String.report);
+                builder.OnNeutral(new SingleButtonCallback(() =>
                 {
-                    builder.NeutralText(Resource.String.report);
-                    builder.OnNeutral(new SingleButtonCallback(() =>
-                    {
-                        var dismissAction = ShowInfiniteProgressDialog(context, Resource.String.dialog_creating_report, Resource.String.please_wait);
-                        Task.Run(() => { return SystemReportCollector.CreateFullReport(); })
-                            .ContinueWith(async t =>
+                    var dismissAction = ShowInfiniteProgressDialog(context, Resource.String.dialog_creating_report, Resource.String.please_wait);
+                    Task.Run(() => { return SystemReportCollector.CreateFullReport(); })
+                        .ContinueWith(async t =>
+                        {
+                            dismissAction();
+
+                            if (!t.IsFaulted)
                             {
-                                dismissAction();
+                                var sendWithMark5 = await ShowYesNoDialogAsync(context, Resource.String.send_with_mark5_title, Resource.String.send_report_with_mark5_content);
 
-                                if (!t.IsFaulted)
-                                {
-                                    var sendWithMark5 = await ShowYesNoDialogAsync(context, Resource.String.send_with_mark5_title, Resource.String.send_report_with_mark5_content);
+                                if (sendWithMark5)
+                                    context.StartActivity(SystemReportCollector.CreateShareReportComposeDocumentActivityIntent(context, t.Result));
+                                else
+                                    context.StartActivity(SystemReportCollector.CreateShareReportIntent(context, t.Result));
+                            }
 
-                                    if (sendWithMark5)
-                                        context.StartActivity(SystemReportCollector.CreateShareReportComposeDocumentActivityIntent(context, t.Result));
-                                    else
-                                        context.StartActivity(SystemReportCollector.CreateShareReportIntent(context, t.Result));
-                                }
-
-                                tcs.SetResult(true);
-                            }, TaskScheduler.FromCurrentSynchronizationContext());
-                    }));
-                }
-                builder.Cancelable(false);
-                builder.Show();
-                return tcs.Task;
+                            tcs.SetResult(true);
+                        }, TaskScheduler.FromCurrentSynchronizationContext());
+                }));
             }
+            builder.Cancelable(false);
+            builder.Show();
+            return tcs.Task;
         }
 
         public static void ShowErrorDialog(Context context, Exception ex, Action action = null)
