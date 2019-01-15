@@ -78,6 +78,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         NSObject didChangeFrameNotificationObserver;
         ConnectionInfo retainedConnectionInfo;
+        private bool reLogin;
+
+        public LoginViewController(bool reLogin = false)
+        {
+            this.reLogin = reLogin;
+        }
 
         #region UIViewController overrides
 
@@ -556,8 +562,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var hostname = hostnameTextField.Text;
                 var port = portTextField.Text;
 
-
-                if (retainedConnectionInfo != null && !retainedConnectionInfo.Username.Equals(username))
+                if (reLogin && retainedConnectionInfo != null && !retainedConnectionInfo.Username.Equals(username))
                 {
                     // if user tries to login with different user
                     var result = await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("dialog_different_user_title"), Localization.GetString("dialog_different_user_content"));

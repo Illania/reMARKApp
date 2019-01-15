@@ -170,7 +170,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 alert.AddAction(UIAlertAction.Create(Localization.GetString("Logout"), UIAlertActionStyle.Default, async a =>
                  {
                      await AuthenticatorFactory.Create().RetainConnectionInfoAsync();
-                     vc.PresentViewController(new LoginViewController(), true, null);
+                     vc.PresentViewController(new LoginViewController(true), true, null);
                      tcs.SetResult(true);
                  }));
 
