@@ -100,6 +100,7 @@ namespace Mark5.ServiceReference.Exceptions
 
         [EnumMember(Value = "AuthenticationError")] AuthenticationError = 1000,
         [EnumMember(Value = "AuthorisationError")] AuthorisationError = 1001,
+        [EnumMember(Value = "InvalidToken")] InvalidToken = 1002,
 
         [EnumMember(Value = "GetFoldersError")] GetFoldersError = 1100,
 

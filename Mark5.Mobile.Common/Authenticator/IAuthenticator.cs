@@ -17,5 +17,7 @@ namespace Mark5.Mobile.Common.Authenticator
         Task RetainConnectionInfoAsync(CancellationToken ct = default(CancellationToken));
 
         Task SaveConnectionInfoAsync(ConnectionInfo connectionInfo, CancellationToken ct = default(CancellationToken));
+
+        Task DeleteRetainedConnectionInfoAsync(CancellationToken ct = default(CancellationToken));
     }
 }
