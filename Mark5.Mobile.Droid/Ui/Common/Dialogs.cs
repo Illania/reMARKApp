@@ -413,7 +413,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
                     async () =>
                     {
                         await AuthenticatorFactory.Create().RetainConnectionInfoAsync();
-                        context.StartActivity(LoginActivity.CreateIntent(context));
+                        context.StartActivity(LoginActivity.CreateIntent(context, true));
                     });
                 return tcs.Task;
             }

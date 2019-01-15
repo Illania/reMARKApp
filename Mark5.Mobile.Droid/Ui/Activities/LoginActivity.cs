@@ -25,6 +25,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class LoginActivity : BaseAppCompatActivity
     {
+        const string ReLoginIntentKey = "ReLoginIntentKey";
+
         CancellationTokenSource cts;
 
         TextInputEditText usernameEditText;
@@ -37,9 +39,14 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         IAuthenticator authenticator;
         ConnectionInfo retainedConnectionInfo;
 
-        public static Intent CreateIntent(Context context)
+        bool isReLogin;
+
+        public static Intent CreateIntent(Context context, bool isReLogin = false)
         {
-            return new Intent(context, typeof(LoginActivity));
+            var intent = new Intent(context, typeof(LoginActivity));
+            intent.PutExtra(ReLoginIntentKey, isReLogin);
+
+            return intent;
         }
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -78,6 +85,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 hostnameEditText.Text = savedInstanceState.GetString("hostname");
                 portEditText.Text = savedInstanceState.GetString("port");
                 sslSpinner.SetSelection(savedInstanceState.GetInt("ssl"));
+                isReLogin = savedInstanceState.GetBoolean("reLogin");
+            }
+            else
+            {
+                isReLogin = Intent.Extras.GetBoolean(ReLoginIntentKey);
             }
 
             CommonConfig.Logger.Info($"Created {nameof(LoginActivity)}");
@@ -134,6 +146,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             outState.PutString("hostname", hostnameEditText.Text);
             outState.PutString("port", portEditText.Text);
             outState.PutInt("ssl", sslSpinner.SelectedItemPosition);
+            outState.PutBoolean("reLogin", isReLogin);
         }
 
         protected override void OnRestoreInstanceState(Bundle savedInstanceState)
@@ -188,7 +201,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             try
             {
-                if (retainedConnectionInfo != null && !retainedConnectionInfo.Username.Equals(usernameEditText.Text))
+                if (isReLogin && retainedConnectionInfo != null && !retainedConnectionInfo.Username.Equals(usernameEditText.Text))
                 {
                     Dialogs.ShowYesNoDialog(this, Resource.String.dialog_different_user_title, Resource.String.dialog_different_user_content,
                     async () =>
@@ -375,13 +388,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 CommonConfig.Logger.Error("Error while subscribing to push notifications after login", ex);
             }
-        }
-
-        bool ValidateInputs()
-        {
-
-
-            return errors;
         }
 
         static class MenuItemActions
