@@ -2670,6 +2670,16 @@ namespace Mark5.ServiceReference.DataContract
 
     #region Folder favorites
 
+    [DataContract(Name = "ModuleFavorites", Namespace = "com.nordic-it.appservice.v3")]
+    public class ModuleFavorites
+    {
+        [DataMember(Name = "Folders", Order = 0)]
+        public List<Folder> Folders { get; set; } = new List<Folder>();
+
+        [DataMember(Name = "ModuleType", Order = 0)]
+        public ModuleType ModuleType { get; set; }
+    }
+
     [DataContract(Name = "GetModuleFavoritesParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class GetModuleFavoritesParameters : AbstractParameters
     {
@@ -2699,16 +2709,6 @@ namespace Mark5.ServiceReference.DataContract
     {
         [DataMember(Name = "UpdatedAt", Order = 0)]
         public DateTime UpdatedAt { get; set; }
-    }
-
-    [DataContract(Name = "ModuleFavorites", Namespace = "com.nordic-it.appservice.v3")]
-    public class ModuleFavorites
-    {
-        [DataMember(Name = "Folders", Order = 0)]
-        public List<Folder> Folders { get; set; } = new List<Folder>();
-
-        [DataMember(Name = "ModuleType", Order = 0)]
-        public ModuleType ModuleType { get; set; }
     }
 
     [DataContract(Name = "AddModuleFavoritesParameters", Namespace = "com.nordic-it.appservice.v3")]

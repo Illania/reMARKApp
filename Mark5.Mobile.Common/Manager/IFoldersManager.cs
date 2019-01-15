@@ -32,9 +32,7 @@ namespace Mark5.Mobile.Common.Manager
 
         Task<List<Folder>> SearchFolders(string searchText);
 
-        Task<ModuleFavorites> GetModuleFavorites();
-
-        Task<ModuleFavorites> GetModuleFavorites(List<ModuleType> modules);
+        Task<ModuleFavorites> GetModuleFavorites(List<ModuleType> modules = null);
 
         Task UpdateModuleFavorites();
 
@@ -42,8 +40,6 @@ namespace Mark5.Mobile.Common.Manager
 
         Task RemoveModuleFavorites(List<Folder> folders, ModuleType moduleType);
 
-        Task ClearFavorites();
-
-        Task ClearFavorites(List<ModuleType> modules);
+        Task ClearFavorites(List<ModuleType> modules = null);
     }
 }

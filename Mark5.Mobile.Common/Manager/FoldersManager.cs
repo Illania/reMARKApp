@@ -202,13 +202,10 @@ namespace Mark5.Mobile.Common.Manager
             return folders;
         }
 
-        public Task<ModuleFavorites> GetModuleFavorites()
+        public async Task<ModuleFavorites> GetModuleFavorites(List<ModuleType> modules = null)
         {
-            return GetModuleFavorites(new List<ModuleType>() { ModuleType.Contacts, ModuleType.Documents, ModuleType.Shortcodes });
-        }
+            modules = modules ?? new List<ModuleType> { ModuleType.Contacts, ModuleType.Documents, ModuleType.Shortcodes };
 
-        public async Task<ModuleFavorites> GetModuleFavorites(List<ModuleType> modules)
-        {
             List<DataContract.ModuleType> dataContractModules = new List<DataContract.ModuleType>();
 
             dataContractModules.AddRange(modules.Select(module => module.ConvertEnum<DataContract.ModuleType>()));
@@ -273,13 +270,10 @@ namespace Mark5.Mobile.Common.Manager
             await AppServiceProxy.RemoveModuleFavorites(favParams);
         }
 
-        public async Task ClearFavorites()
+        public async Task ClearFavorites(List<ModuleType> modules = null)
         {
-            await ClearFavorites(new List<ModuleType> { ModuleType.Calendar, ModuleType.Contacts, ModuleType.Documents });
-        }
+            modules = modules ?? new List<ModuleType> { ModuleType.Contacts, ModuleType.Documents, ModuleType.Shortcodes };
 
-        public async Task ClearFavorites(List<ModuleType> modules)
-        {
             var favorites = await FileSystemStorage.GetFavoriteFoldersAsync();
 
             foreach (var module in modules)
