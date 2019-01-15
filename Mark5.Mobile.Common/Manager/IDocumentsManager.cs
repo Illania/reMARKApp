@@ -82,5 +82,7 @@ namespace Mark5.Mobile.Common.Manager
         Task DeleteDocumentWorkingCopyAsync();
 
         Task DeleteDocumentWorkingCopyAttachmentAsync(string filename);
+
+        Task NotifyPendingAndFailedCountChanged();
     }
 }
