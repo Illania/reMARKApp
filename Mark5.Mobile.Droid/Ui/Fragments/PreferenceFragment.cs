@@ -171,9 +171,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             try
             {
-                var response = await Managers.FoldersManager.GetFavoriteFoldersAsync();
+                var response = await Managers.FoldersManager.GetServiceFavoriteFoldersAsync();
                 if (response.ModuleFavoriteFolders == null)
-                    await Managers.FoldersManager.UpdateFavoriteFoldersAsync();
+                    await Managers.FoldersManager.UpdateServiceFavoriteFoldersAsync();
                 else
                 {
                     var selectedOption = await Dialogs.ShowListDialog(Activity, Resource.String.sync_fav_folders_action_title, $"{GetString(Resource.String.sync_fav_folders_action_description)} { response.UpdatedAt.ToShortDateString() }", new string[] { GetString(Resource.String.sync_fav_folders_use_server), GetString(Resource.String.sync_fav_folders_use_device) }, true);
@@ -199,7 +199,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     }
                     else if (selectedOption == 1)
                     {
-                        await Managers.FoldersManager.UpdateFavoriteFoldersAsync();
+                        await Managers.FoldersManager.UpdateServiceFavoriteFoldersAsync();
                     }
                     else
                     {

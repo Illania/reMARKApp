@@ -32,13 +32,13 @@ namespace Mark5.Mobile.Common.Manager
 
         Task<List<Folder>> SearchFolders(string searchText);
 
-        Task<ModuleFavoriteFoldersCollection> GetFavoriteFoldersAsync(List<ModuleType> modules = null);
+        Task<ModuleFavoriteFoldersCollection> GetServiceFavoriteFoldersAsync(List<ModuleType> modules = null);
 
-        Task UpdateFavoriteFoldersAsync();
+        Task UpdateServiceFavoriteFoldersAsync();
 
-        Task AddFavoriteFoldersAsync(List<Folder> folders, ModuleType moduleType);
+        Task AddServiceFavoriteFoldersAsync(List<Folder> folders, ModuleType moduleType);
 
-        Task RemoveFavoriteFoldersAsync(List<Folder> folders, ModuleType moduleType);
+        Task RemoveServiceFavoriteFoldersAsync(List<Folder> folders, ModuleType moduleType);
 
         Task ClearFavoritesAsync(List<ModuleType> modules = null);
     }

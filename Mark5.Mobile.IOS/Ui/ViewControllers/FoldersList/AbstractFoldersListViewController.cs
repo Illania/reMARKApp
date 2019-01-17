@@ -492,7 +492,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     {
                         try
                         {
-                            await Managers.FoldersManager.GetModuleFavorites(new List<ModuleType> { ParentFolder.Module });
+                            await Managers.FoldersManager.GetServiceFavoriteFoldersAsync(new List<ModuleType> { ParentFolder.Module });
                         }
                         catch (Exception ex)
                         {
@@ -692,7 +692,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 if (PlatformConfig.Preferences.SyncFavoriteFoldersEnabled && CommonConfig.Reachability.IsReachable)
                 {
-                    await Managers.FoldersManager.AddModuleFavorites(new List<Folder>() { folder }, folder.Module);
+                    await Managers.FoldersManager.AddServiceFavoriteFoldersAsync(new List<Folder>() { folder }, folder.Module);
                 }
 
                 await Managers.FoldersManager.AddFavoriteFolderAsync(folder.Module, folder);
@@ -736,7 +736,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     throw new Exception(Localization.GetString("sync_error_network"));
 
                 if (PlatformConfig.Preferences.SyncFavoriteFoldersEnabled && CommonConfig.Reachability.IsReachable)
-                    await Managers.FoldersManager.RemoveModuleFavorites(new List<Folder> { folder }, folder.Module);
+                    await Managers.FoldersManager.RemoveServiceFavoriteFoldersAsync(new List<Folder> { folder }, folder.Module);
 
                 await Managers.FoldersManager.RemoveFavoriteFolderAsync(folder.Module, folder);
 

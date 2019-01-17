@@ -440,10 +440,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
-                var response = await Managers.FoldersManager.GetFavoriteFoldersAsync();
+                var response = await Managers.FoldersManager.GetServiceFavoriteFoldersAsync();
                 if (response.ModuleFavoriteFolders == null)
                 {
-                    await Managers.FoldersManager.UpdateFavoriteFoldersAsync();
+                    await Managers.FoldersManager.UpdateServiceFavoriteFoldersAsync();
                 }
                 else
                 {
@@ -470,7 +470,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     }
                     else if (selectedOption == 1)
                     {
-                        await Managers.FoldersManager.UpdateFavoriteFoldersAsync();
+                        await Managers.FoldersManager.UpdateServiceFavoriteFoldersAsync();
                     }
                     else
                     {
