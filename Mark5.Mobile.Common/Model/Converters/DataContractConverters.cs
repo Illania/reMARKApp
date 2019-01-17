@@ -680,6 +680,28 @@ namespace Mark5.Mobile.Common.Model.Converters
             };
         }
 
+        public static ModuleFavoriteFoldersCollection Convert(this DataContract.GetFavoriteFoldersResult moduleFavoritesResult)
+        {
+            ModuleFavoriteFoldersCollection moduleFavorites = new ModuleFavoriteFoldersCollection
+            {
+                UpdatedAt = moduleFavoritesResult.UpdatedAt
+            };
+
+            if (moduleFavoritesResult.ModuleFavoriteFoldersList?.Any() == true)
+            {
+                foreach (var fav in moduleFavoritesResult.ModuleFavoriteFoldersList)
+                {
+                    var newFav = new ModuleFavoriteFolders { ModuleType = (ModuleType)fav.ModuleType };
+                    newFav.Folders.AddRange(fav.Folders.Select(Convert));
+
+                    moduleFavorites.ModuleFavoriteFolders.Add(newFav);
+                }
+            }
+
+            return moduleFavorites;
+        }
+
+
         #endregion
 
         #region Model to DataContract
@@ -1023,40 +1045,13 @@ namespace Mark5.Mobile.Common.Model.Converters
             };
         }
 
-        public static ModuleFavorites Convert(this DataContract.GetModuleFavoritesResult moduleFavoritesResult)
+        public static List<DataContract.ModuleFavoriteFolders> Convert(this Dictionary<ModuleType, List<Folder>> favoriteDictionary)
         {
-            ModuleFavorites moduleFavorites = new ModuleFavorites
-            {
-                UpdatedAt = moduleFavoritesResult.UpdatedAt
-            };
-
-            if (moduleFavoritesResult.ModuleFavoritesList != null)
-            {
-                moduleFavorites.ModuleFavoritesList = new List<ModuleFavorite>();
-
-                foreach (var fav in moduleFavoritesResult.ModuleFavoritesList)
-                {
-                    var newFav = new ModuleFavorite() { ModuleType = (ModuleType)fav.ModuleType };
-
-                    foreach (var folder in fav.Folders)
-                    {
-                        newFav.Folders.Add(folder.Convert());
-                    }
-
-                    moduleFavorites.ModuleFavoritesList.Add(newFav);
-                }
-            }
-
-            return moduleFavorites;
-        }
-
-        public static List<DataContract.ModuleFavorites> Convert(this Dictionary<ModuleType, List<Folder>> favoriteDictionary)
-        {
-            List<DataContract.ModuleFavorites> favorites = new List<DataContract.ModuleFavorites>();
+            List<DataContract.ModuleFavoriteFolders> favorites = new List<DataContract.ModuleFavoriteFolders>();
 
             foreach (KeyValuePair<ModuleType, List<Folder>> entry in favoriteDictionary)
             {
-                var favorite = new DataContract.ModuleFavorites { ModuleType = (DataContract.ModuleType)entry.Key };
+                var favorite = new DataContract.ModuleFavoriteFolders { ModuleType = (DataContract.ModuleType)entry.Key };
 
                 foreach (var folder in entry.Value)
                 {

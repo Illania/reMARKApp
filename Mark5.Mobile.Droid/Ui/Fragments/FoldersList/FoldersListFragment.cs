@@ -492,7 +492,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if(PlatformConfig.Preferences.SyncFavoritesEnabled && CommonConfig.Reachability.IsReachable) {
                 try 
                 {
-                    await Managers.FoldersManager.GetModuleFavorites(new List<ModuleType>() { RemoteFolder.Module });
+                    await Managers.FoldersManager.GetFavoriteFoldersAsync(new List<ModuleType>() { RemoteFolder.Module });
                 }
                 catch (Exception ex)
                 {
@@ -814,11 +814,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 try {
                     if (isFolderFavorite)
                     {
-                        await Managers.FoldersManager.AddModuleFavorites(selectedFolders, selectedFolders.First().Module);
+                        await Managers.FoldersManager.AddFavoriteFoldersAsync(selectedFolders, selectedFolders.First().Module);
                     } 
                     else 
                     {
-                        await Managers.FoldersManager.RemoveModuleFavorites(selectedFolders, selectedFolders.First().Module);
+                        await Managers.FoldersManager.RemoveFavoriteFoldersAsync(selectedFolders, selectedFolders.First().Module);
                     }
                 }
                 catch

@@ -3,14 +3,14 @@ using System.Collections.Generic;
 
 namespace Mark5.Mobile.Common.Model
 {
-    public class ModuleFavorites
+    public class ModuleFavoriteFoldersCollection
     {
-        public List<ModuleFavorite> ModuleFavoritesList { get; set; } = new List<ModuleFavorite>();
+        public List<ModuleFavoriteFolders> ModuleFavoriteFolders { get; set; } = new List<ModuleFavoriteFolders>();
 
         public DateTime UpdatedAt { get; set; }
     }
 
-    public class ModuleFavorite
+    public class ModuleFavoriteFolders
     {
         public List<Folder> Folders { get; set; } = new List<Folder>();
 

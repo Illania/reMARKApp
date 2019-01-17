@@ -171,37 +171,35 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             try
             {
-                var response = await Managers.FoldersManager.GetModuleFavorites();
-                if (response.ModuleFavoritesList == null)
-                {
-                    await Managers.FoldersManager.UpdateModuleFavorites();
-                }
+                var response = await Managers.FoldersManager.GetFavoriteFoldersAsync();
+                if (response.ModuleFavoriteFolders == null)
+                    await Managers.FoldersManager.UpdateFavoriteFoldersAsync();
                 else
                 {
                     var selectedOption = await Dialogs.ShowListDialog(Activity, Resource.String.sync_fav_folders_action_title, $"{GetString(Resource.String.sync_fav_folders_action_description)} { response.UpdatedAt.ToShortDateString() }", new string[] { GetString(Resource.String.sync_fav_folders_use_server), GetString(Resource.String.sync_fav_folders_use_device) }, true);
 
                     if (selectedOption == 0)
                     {
-                        if (response.ModuleFavoritesList != null && response.ModuleFavoritesList.Count == 0)
+                        if (response.ModuleFavoriteFolders != null && response.ModuleFavoriteFolders.Count == 0)
                         {
-                            await Managers.FoldersManager.ClearFavorites();
+                            await Managers.FoldersManager.ClearFavoritesAsync();
                         }
                         else
                         {
                             var missingModules = new List<ModuleType> { ModuleType.Shortcodes, ModuleType.Contacts, ModuleType.Documents };
 
-                            foreach (var favorite in response.ModuleFavoritesList)
+                            foreach (var favorite in response.ModuleFavoriteFolders)
                             {
                                 await Managers.FoldersManager.SetFavoriteFoldersAsync(favorite.ModuleType, favorite.Folders);
                                 missingModules.RemoveAll(x => x == favorite.ModuleType);
                             }
 
-                            await Managers.FoldersManager.ClearFavorites(missingModules);
+                            await Managers.FoldersManager.ClearFavoritesAsync(missingModules);
                         }
                     }
                     else if (selectedOption == 1)
                     {
-                        await Managers.FoldersManager.UpdateModuleFavorites();
+                        await Managers.FoldersManager.UpdateFavoriteFoldersAsync();
                     }
                     else
                     {
