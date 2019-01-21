@@ -442,30 +442,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var response = await Managers.FoldersManager.GetServiceFavoriteFoldersAsync();
                 if (response.ModuleFavoriteFolders == null)
-                {
                     await Managers.FoldersManager.UpdateServiceFavoriteFoldersAsync();
-                }
                 else
                 {
                     var selectedOption = await Dialogs.ShowListActionSheetWithTitleAsync(this, new string[] { Localization.GetString("sync_fav_folders_use_server"), Localization.GetString("sync_fav_folders_use_device") }, View, Localization.GetString("sync_fav_folders_action_title"), $"{Localization.GetString("sync_fav_folders_action_description")} : {response.UpdatedAt.ToLongDateString()}");
 
                     if (selectedOption == 0)
                     {
-                        if (response.ModuleFavoriteFolders != null && response.ModuleFavoriteFolders.Count == 0)
-                        {
+                        if (response.ModuleFavoriteFolders.Count == 0)
                             await Managers.FoldersManager.ClearFavoritesAsync();
-                        }
                         else
                         {
-                            var missingModules = new List<ModuleType> { ModuleType.Shortcodes, ModuleType.Contacts, ModuleType.Documents };
-
                             foreach (var favorite in response.ModuleFavoriteFolders)
-                            {
                                 await Managers.FoldersManager.SetFavoriteFoldersAsync(favorite.ModuleType, favorite.Folders);
-                                missingModules.Remove(favorite.ModuleType);
-                            }
 
-                            await Managers.FoldersManager.ClearFavoritesAsync(missingModules);
+                            var availableModules = new List<ModuleType> { ModuleType.Shortcodes, ModuleType.Contacts, ModuleType.Documents };
+                            await Managers.FoldersManager.ClearFavoritesAsync(availableModules.Except(response.ModuleFavoriteFolders.Select(mf => mf.ModuleType)).ToList());
                         }
                     }
                     else if (selectedOption == 1)
@@ -493,9 +485,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             List<string> hiddenKeys = new List<string>();
 
-            var serviceVersion = ServerConfig.SystemSettings?.SystemInfo?.ServiceVersion;
-
-            if (serviceVersion == null || serviceVersion.CompareTo(new Version(3, 2, 0)) < 0)
+            if (ServerConfig.SystemSettings?.SystemInfo?.SyncFavoritesAvailable != true)
             {
                 hiddenKeys.Add(SyncFavoriteFoldersGroupKey);
                 hiddenKeys.Add(SyncFavoriteFoldersKey);
