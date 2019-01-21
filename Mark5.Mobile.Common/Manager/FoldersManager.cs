@@ -206,7 +206,7 @@ namespace Mark5.Mobile.Common.Manager
         {
             modules = modules ?? new List<ModuleType> { ModuleType.Contacts, ModuleType.Documents, ModuleType.Shortcodes };
 
-            var result = await AppServiceProxy.GetModuleFavorites(new DataContract.GetFavoriteFoldersParameters
+            var result = await AppServiceProxy.GetFavoriteFolders(new DataContract.GetFavoriteFoldersParameters
             {
                 Modules = modules.Select(module => module.ConvertEnum<DataContract.ModuleType>()).ToList(),
                 Token = ConnectionInfo.Token
@@ -227,7 +227,7 @@ namespace Mark5.Mobile.Common.Manager
         {
             Dictionary<ModuleType, List<Folder>> localFavorites = await FileSystemStorage.GetFavoriteFoldersAsync();
 
-            await AppServiceProxy.UpdateModuleFavorites(new DataContract.UpdateFavoriteFoldersParameters
+            await AppServiceProxy.UpdateFavoriteFolders(new DataContract.UpdateFavoriteFoldersParameters
             {
                 ModuleFavoriteFoldersList = localFavorites.Convert(),
                 Token = ConnectionInfo.Token
@@ -246,7 +246,7 @@ namespace Mark5.Mobile.Common.Manager
                 Token = ConnectionInfo.Token
             };
 
-            await AppServiceProxy.AddModuleFavorites(favParams);
+            await AppServiceProxy.AddFavoriteFolders(favParams);
         }
 
         public async Task RemoveServiceFavoriteFoldersAsync(List<Folder> folders, ModuleType moduleType)
@@ -261,7 +261,7 @@ namespace Mark5.Mobile.Common.Manager
                 Token = ConnectionInfo.Token
             };
 
-            await AppServiceProxy.RemoveModuleFavorites(favParams);
+            await AppServiceProxy.RemoveFavoriteFolders(favParams);
         }
 
         public async Task ClearFavoritesAsync(List<ModuleType> modules = null)
