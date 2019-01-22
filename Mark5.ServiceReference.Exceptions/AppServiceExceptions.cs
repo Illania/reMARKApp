@@ -160,8 +160,6 @@ namespace Mark5.ServiceReference.Exceptions
 
         [EnumMember(Value = "GetFavoriteFoldersError")] GetFavoriteFoldersError = 3001,
         [EnumMember(Value = "UpdateFavoriteFoldersError")] UpdateFavoriteFoldersError = 3002,
-        [EnumMember(Value = "AddFavoriteFoldersError")] AddFavoriteFoldersError = 3003,
-        [EnumMember(Value = "RemoveFavoriteFoldersError")] RemoveFavoriteFoldersError = 3004,
     }
 
     #endregion

@@ -36,10 +36,6 @@ namespace Mark5.Mobile.Common.Manager
 
         Task UpdateServiceFavoriteFoldersAsync();
 
-        Task AddServiceFavoriteFoldersAsync(List<Folder> folders, ModuleType moduleType);
-
-        Task RemoveServiceFavoriteFoldersAsync(List<Folder> folders, ModuleType moduleType);
-
-        Task ClearFavoritesAsync(List<ModuleType> modules = null);
+        Task ClearFavoritesAsync(List<ModuleType> modules = null); //TODO need to check if used correctly
     }
 }

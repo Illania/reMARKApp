@@ -234,36 +234,6 @@ namespace Mark5.Mobile.Common.Manager
             });
         }
 
-        public async Task AddServiceFavoriteFoldersAsync(List<Folder> folders, ModuleType moduleType)
-        {
-            var moduleFavorite = new DataContract.ModuleFavoriteFolders { ModuleType = (DataContract.ModuleType)moduleType };
-
-            moduleFavorite.Folders.AddRange(folders.Select(x => x.Convert()));
-
-            DataContract.AddFavoriteFoldersParameters favParams = new DataContract.AddFavoriteFoldersParameters
-            {
-                ModuleFavoriteFoldersList = new List<DataContract.ModuleFavoriteFolders> { moduleFavorite },
-                Token = ConnectionInfo.Token
-            };
-
-            await AppServiceProxy.AddFavoriteFolders(favParams);
-        }
-
-        public async Task RemoveServiceFavoriteFoldersAsync(List<Folder> folders, ModuleType moduleType)
-        {
-            var moduleFavorite = new DataContract.ModuleFavoriteFolders { ModuleType = (DataContract.ModuleType)moduleType };
-
-            moduleFavorite.Folders.AddRange(folders.Select(x => x.Convert()));
-
-            DataContract.RemoveFavoriteFoldersParameters favParams = new DataContract.RemoveFavoriteFoldersParameters
-            {
-                ModuleFavoriteFoldersList = new List<DataContract.ModuleFavoriteFolders> { moduleFavorite },
-                Token = ConnectionInfo.Token
-            };
-
-            await AppServiceProxy.RemoveFavoriteFolders(favParams);
-        }
-
         public async Task ClearFavoritesAsync(List<ModuleType> modules = null)
         {
             modules = modules ?? new List<ModuleType> { ModuleType.Contacts, ModuleType.Documents, ModuleType.Shortcodes };

@@ -163,10 +163,6 @@ namespace Mark5.ServiceReference.AppService
 
         Task<UpdateFavoriteFoldersResult> UpdateFavoriteFolders(UpdateFavoriteFoldersParameters parameters, CancellationToken ct = default(CancellationToken));
 
-        Task<AddFavoriteFoldersResult> AddFavoriteFolders(AddFavoriteFoldersParameters parameters, CancellationToken ct = default(CancellationToken));
-
-        Task<RemoveFavoriteFoldersResult> RemoveFavoriteFolders(RemoveFavoriteFoldersParameters parameters, CancellationToken ct = default(CancellationToken));
-
         #endregion
     }
 }

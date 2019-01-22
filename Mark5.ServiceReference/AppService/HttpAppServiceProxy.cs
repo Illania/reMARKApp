@@ -448,23 +448,12 @@ namespace Mark5.ServiceReference.AppService
 
         public async Task<GetFavoriteFoldersResult> GetFavoriteFolders(GetFavoriteFoldersParameters parameters, CancellationToken ct = default(CancellationToken))
         {
-            return await InvokeAsync<GetFavoriteFoldersResult, GetFavoriteFoldersParameters>("GetModuleFavorites", parameters, ct);
+            return await InvokeAsync<GetFavoriteFoldersResult, GetFavoriteFoldersParameters>("GetFavoriteFolders", parameters, ct);
         }
 
         public async Task<UpdateFavoriteFoldersResult> UpdateFavoriteFolders(UpdateFavoriteFoldersParameters parameters, CancellationToken ct = default(CancellationToken))
         {
-            return await InvokeAsync<UpdateFavoriteFoldersResult, UpdateFavoriteFoldersParameters>("UpdateModuleFavorites", parameters, ct);
+            return await InvokeAsync<UpdateFavoriteFoldersResult, UpdateFavoriteFoldersParameters>("UpdateFavoriteFolders", parameters, ct);
         }
-
-        public async Task<AddFavoriteFoldersResult> AddFavoriteFolders(AddFavoriteFoldersParameters parameters, CancellationToken ct = default(CancellationToken))
-        {
-            return await InvokeAsync<AddFavoriteFoldersResult, AddFavoriteFoldersParameters>("AddModuleFavorites", parameters, ct);
-        }
-
-        public async Task<RemoveFavoriteFoldersResult> RemoveFavoriteFolders(RemoveFavoriteFoldersParameters parameters, CancellationToken ct = default(CancellationToken))
-        {
-            return await InvokeAsync<RemoveFavoriteFoldersResult, RemoveFavoriteFoldersParameters>("RemoveModuleFavorites", parameters, ct);
-        }
-
     }
 }
