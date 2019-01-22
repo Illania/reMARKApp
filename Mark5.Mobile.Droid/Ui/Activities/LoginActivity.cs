@@ -25,6 +25,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class LoginActivity : BaseAppCompatActivity
     {
+        const string ReLoginIntentKey = "ReLoginIntentKey";
+
         CancellationTokenSource cts;
 
         TextInputEditText usernameEditText;
@@ -35,10 +37,16 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         FloatingActionButton loginButton;
 
         IAuthenticator authenticator;
+        ConnectionInfo retainedConnectionInfo;
 
-        public static Intent CreateIntent(Context context)
+        bool isReLogin;
+
+        public static Intent CreateIntent(Context context, bool isReLogin = false)
         {
-            return new Intent(context, typeof(LoginActivity));
+            var intent = new Intent(context, typeof(LoginActivity));
+            intent.PutExtra(ReLoginIntentKey, isReLogin);
+
+            return intent;
         }
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -77,6 +85,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 hostnameEditText.Text = savedInstanceState.GetString("hostname");
                 portEditText.Text = savedInstanceState.GetString("port");
                 sslSpinner.SetSelection(savedInstanceState.GetInt("ssl"));
+                isReLogin = savedInstanceState.GetBoolean("reLogin");
+            }
+            else
+            {
+                isReLogin = Intent.Extras.GetBoolean(ReLoginIntentKey);
             }
 
             CommonConfig.Logger.Info($"Created {nameof(LoginActivity)}");
@@ -103,7 +116,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             if (!string.IsNullOrEmpty(usernameEditText.Text + hostnameEditText.Text))
                 return;
 
-            var retainedConnectionInfo = await authenticator.GetRetainedConnectionInfoAsync();
+            retainedConnectionInfo = await authenticator.GetRetainedConnectionInfoAsync();
             if (retainedConnectionInfo != null)
             {
                 usernameEditText.Text = retainedConnectionInfo.Username;
@@ -124,7 +137,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }
         }
 
-
         protected override void OnSaveInstanceState(Bundle outState)
         {
             base.OnSaveInstanceState(outState);
@@ -134,6 +146,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             outState.PutString("hostname", hostnameEditText.Text);
             outState.PutString("port", portEditText.Text);
             outState.PutInt("ssl", sslSpinner.SelectedItemPosition);
+            outState.PutBoolean("reLogin", isReLogin);
         }
 
         protected override void OnRestoreInstanceState(Bundle savedInstanceState)
@@ -188,120 +201,147 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             try
             {
-                var username = usernameEditText.Text;
-                var password = passwordEditText.Text;
-                var hostname = hostnameEditText.Text;
-                var port = portEditText.Text;
-                var sslMode = (SslMode)sslSpinner.SelectedItemPosition;
-
-                var errors = false;
-                if (!Validator.IsUsernameValid(username))
+                if (isReLogin && retainedConnectionInfo != null && !retainedConnectionInfo.Username.Equals(usernameEditText.Text))
                 {
-                    CommonConfig.Logger.Info($"Invalid username was entered: {username}");
+                    Dialogs.ShowYesNoDialog(this, Resource.String.dialog_different_user_title, Resource.String.dialog_different_user_content,
+                    async () =>
+                    {
+                        dismissAction = Dialogs.ShowInfiniteProgressDialog(this, Resource.String.dialog_logging_out_title, Resource.String.please_wait);
 
-                    usernameEditText.Error = GetText(Resource.String.username_invalid);
-                    errors = true;
+                        try
+                        {
+                            if (!string.IsNullOrWhiteSpace(PlatformConfig.Preferences.PushNotificationToken))
+                                await Managers.NotificationsManager.UnSubscribe(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken);
+                        }
+                        catch (Exception ex)
+                        {
+                            CommonConfig.Logger.Error("Error while unsubscribing during log out!", ex);
+                        }
+
+                        await AuthenticatorFactory.Create().DeleteRetainedConnectionInfoAsync();
+                        await Integration.ClearData(this);
+                        dismissAction();
+
+                        Dialogs.ShowBlockingAlert(this, Resource.String.please_restart);
+                    });
                 }
-                if (!Validator.IsPasswordValid(password))
+                else
                 {
-                    CommonConfig.Logger.Info($"Invalid password was entered: {password}");
+                    var username = usernameEditText.Text;
+                    var password = passwordEditText.Text;
+                    var hostname = hostnameEditText.Text;
+                    var port = portEditText.Text;
+                    var sslMode = (SslMode)sslSpinner.SelectedItemPosition;
 
-                    passwordEditText.Error = GetText(Resource.String.password_invalid);
-                    errors = true;
+                    var errors = false;
+                    if (!Validator.IsUsernameValid(username))
+                    {
+                        CommonConfig.Logger.Info($"Invalid username was entered: {username}");
+
+                        usernameEditText.Error = GetText(Resource.String.username_invalid);
+                        errors = true;
+                    }
+                    if (!Validator.IsPasswordValid(password))
+                    {
+                        CommonConfig.Logger.Info($"Invalid password was entered: {password}");
+
+                        passwordEditText.Error = GetText(Resource.String.password_invalid);
+                        errors = true;
+                    }
+                    if (!Validator.IsHostNameValid(hostname))
+                    {
+                        CommonConfig.Logger.Info($"Invalid hostname was entered: {hostname}");
+
+                        hostnameEditText.Error = GetText(Resource.String.hostname_invalid);
+                        errors = true;
+                    }
+                    if (!Validator.IsPortValid(port))
+                    {
+                        CommonConfig.Logger.Info($"Invalid port was entered: {port}");
+
+                        portEditText.Error = GetText(Resource.String.port_invalid);
+                        errors = true;
+                    }
+
+                    if (errors)
+                        return;
+
+                    if (sslMode == SslMode.AllowSelfSigned && !await Dialogs.ShowYesNoDialogAsync(this, Resource.String.warning, Resource.String.ssl_accept_selfsigned_warning))
+                        return;
+
+                    if (sslMode == SslMode.Off && !await Dialogs.ShowYesNoDialogAsync(this, Resource.String.warning, Resource.String.ssl_off_warning))
+                        return;
+
+                    CommonConfig.Logger.Info($"Logging in... [username={username}, hostname={hostname}, port={port}, ssl={sslMode}]");
+
+                    cts = new CancellationTokenSource();
+                    token = cts.Token;
+                    dismissAction = Dialogs.ShowInfiniteProgressDialog(this, Resource.String.logging_in, Resource.String.please_wait, cts);
+
+                    switch (sslMode)
+                    {
+                        case SslMode.AllowSelfSigned:
+                            PlatformConfig.SSLCertificateVerificationManager.EnableSelfSignedCertificates();
+                            break;
+                        default:
+                            PlatformConfig.SSLCertificateVerificationManager.DisableSelfSignedCertificates();
+                            break;
+                    }
+
+                    CommonConfig.Logger.Info("Authenticating...");
+
+                    var ci = await authenticator.AuthenticateAsync(username, password, sslMode, hostname, int.Parse(port), token);
+
+                    if (token.IsCancellationRequested)
+                    {
+                        CommonConfig.Logger.Info($"Authentication was cancelled...");
+                        cts = null;
+                        return;
+                    }
+
+                    CommonConfig.Logger.Info($"Authenticated - saving connection info {ci}...");
+
+                    await authenticator.SaveConnectionInfoAsync(ci);
+
+                    CommonConfig.Logger.Info($"Initializing {nameof(Managers)}...");
+
+                    Managers.Initialize(ci);
+                    Managers.DocumentsManager.MaxToFetch = PlatformConfig.Preferences.DocumentsToDownload;
+                    Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
+                    Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
+                    Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
+
+                    CommonConfig.Logger.Info("Retrieving system settings...");
+
+                    ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync();
+                    SystemSettingsJobService.ScheduleJob();
+
+                    await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
+
+                    CommonConfig.Logger.Info($"Starting services...");
+                    Services.DocumentsUploadService.Start();
+                    Services.DocumentPreviewsDownloadService.Start();
+                    Services.DocumentsDownloadService.Start();
+
+                    CommonConfig.Logger.Info($"Refreshing reachability status...");
+                    await CommonConfig.Reachability.Refresh();
+
+                    CommonConfig.Logger.Info($"Registering {nameof(ReachabilityBroadcastReceiver)}...");
+                    PlatformConfig.ReachabilityBroadcastReceiver.Register();
+
+                    CommonConfig.Logger.Info($"Logged in - will present {nameof(MainActivity)}");
+
+                    CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Hostname, hostname);
+                    CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.SSL, sslMode.ToString());
+
+                    if (!String.IsNullOrEmpty(ServerConfig.SystemSettings.SystemInfo.CustomerName))
+                        CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.CustomerName, ServerConfig.SystemSettings.SystemInfo.CustomerName);
+
+                    SendPushNotificationToken();
+
+                    StartActivity(MainActivity.CreateIntent(this));
+                    Finish();
                 }
-                if (!Validator.IsHostNameValid(hostname))
-                {
-                    CommonConfig.Logger.Info($"Invalid hostname was entered: {hostname}");
-
-                    hostnameEditText.Error = GetText(Resource.String.hostname_invalid);
-                    errors = true;
-                }
-                if (!Validator.IsPortValid(port))
-                {
-                    CommonConfig.Logger.Info($"Invalid port was entered: {port}");
-
-                    portEditText.Error = GetText(Resource.String.port_invalid);
-                    errors = true;
-                }
-
-                if (errors)
-                    return;
-
-                if (sslMode == SslMode.AllowSelfSigned && !await Dialogs.ShowYesNoDialogAsync(this, Resource.String.warning, Resource.String.ssl_accept_selfsigned_warning))
-                    return;
-
-                if (sslMode == SslMode.Off && !await Dialogs.ShowYesNoDialogAsync(this, Resource.String.warning, Resource.String.ssl_off_warning))
-                    return;
-
-                CommonConfig.Logger.Info($"Logging in... [username={username}, hostname={hostname}, port={port}, ssl={sslMode}]");
-
-                cts = new CancellationTokenSource();
-                token = cts.Token;
-                dismissAction = Dialogs.ShowInfiniteProgressDialog(this, Resource.String.logging_in, Resource.String.please_wait, cts);
-
-                switch (sslMode)
-                {
-                    case SslMode.AllowSelfSigned:
-                        PlatformConfig.SSLCertificateVerificationManager.EnableSelfSignedCertificates();
-                        break;
-                    default:
-                        PlatformConfig.SSLCertificateVerificationManager.DisableSelfSignedCertificates();
-                        break;
-                }
-
-                CommonConfig.Logger.Info("Authenticating...");
-
-                var ci = await authenticator.AuthenticateAsync(username, password, sslMode, hostname, int.Parse(port), token);
-
-                if (token.IsCancellationRequested)
-                {
-                    CommonConfig.Logger.Info($"Authentication was cancelled...");
-                    cts = null;
-                    return;
-                }
-
-                CommonConfig.Logger.Info($"Authenticated - saving connection info {ci}...");
-
-                await authenticator.SaveConnectionInfoAsync(ci);
-
-                CommonConfig.Logger.Info($"Initializing {nameof(Managers)}...");
-
-                Managers.Initialize(ci);
-                Managers.DocumentsManager.MaxToFetch = PlatformConfig.Preferences.DocumentsToDownload;
-                Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
-                Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
-                Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
-
-                CommonConfig.Logger.Info("Retrieving system settings...");
-
-                ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync();
-                SystemSettingsJobService.ScheduleJob();
-
-                await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
-
-                CommonConfig.Logger.Info($"Starting services...");
-                Services.DocumentsUploadService.Start();
-                Services.DocumentPreviewsDownloadService.Start();
-                Services.DocumentsDownloadService.Start();
-
-                CommonConfig.Logger.Info($"Refreshing reachability status...");
-                await CommonConfig.Reachability.Refresh();
-
-                CommonConfig.Logger.Info($"Registering {nameof(ReachabilityBroadcastReceiver)}...");
-                PlatformConfig.ReachabilityBroadcastReceiver.Register();
-
-                CommonConfig.Logger.Info($"Logged in - will present {nameof(MainActivity)}");
-
-                CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Hostname, hostname);
-                CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.SSL, sslMode.ToString());
-
-                if (!String.IsNullOrEmpty(ServerConfig.SystemSettings.SystemInfo.CustomerName))
-                    CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.CustomerName, ServerConfig.SystemSettings.SystemInfo.CustomerName);
-
-                SendPushNotificationToken();
-
-                StartActivity(MainActivity.CreateIntent(this));
-                Finish();
             }
             catch (Exception ex)
             {

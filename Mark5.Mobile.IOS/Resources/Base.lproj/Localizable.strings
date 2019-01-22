@@ -96,6 +96,8 @@
 "disable_notifications" = "Don't\nnotify";
 "disabled" = "Disabled";
 "disconnected" = "Disconnected";
+"dialog_different_user_content" = "You are trying to log in with a different user! If you want to proceede all personal settings will be deleted and you will have to start MARK5 again manually. Do you want to continue?";
+"dialog_different_user_title" = "Warning";
 "documents" = "Emails";
 "done" = "Done";
 "dont_close_app" = "Please do not close the app before download is completed.\n\nClosing the app will interrupt download and all progress will be lost!";
@@ -141,6 +143,8 @@
 "error_datanotfoundexception_title" = "You are offline";
 "error_filetransferserviceexception_title" = "Error";
 "error_generalexception_title" = "Unexpected exception";
+"error_invalid_token" = "Invalid session";
+"error_invalid_token_message" = "Session token is invalid. Please re-authenticate";
 "error_invalidsourcetypeexception_message" = "This action cannot be performed offline";
 "error_invalidsourcetypeexception_title" = "Unavailable offline";
 "error_removing_local_attachment" = "Error while removing local attachment";

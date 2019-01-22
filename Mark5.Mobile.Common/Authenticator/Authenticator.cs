@@ -73,5 +73,10 @@ namespace Mark5.Mobile.Common.Authenticator
             return;
         }
 
+        public async Task DeleteRetainedConnectionInfoAsync(CancellationToken ct = default(CancellationToken))
+        {
+            await FileSystemStorage.DeleteRetainedConnectionInfoAsync(ct);
+            return;
+        }
     }
 }

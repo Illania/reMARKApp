@@ -1,6 +1,8 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <resources>
     <string name="dialog_creating_report">Creating system report</string>
+    <string name="dialog_different_user_content">You are trying to log in with a different user! If you want to proceede all personal settings will be deleted and you will have to start MARK5 again manually. Do you want to continue?</string>
+    <string name="dialog_different_user_title">Warning</string>
     <string name="dialog_logging_out_title">Logging out</string>
     <string name="dialog_logout_content">MARK5 will be shutdown after your are logged out. All personal settings will be lost and you will have to start MARK5 again manually. Do you want to continue?</string>
     <string name="dialog_logout_title">Log out</string>

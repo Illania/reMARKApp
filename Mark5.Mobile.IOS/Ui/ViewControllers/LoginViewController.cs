@@ -77,6 +77,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         SslMode sslMode = SslMode.On;
 
         NSObject didChangeFrameNotificationObserver;
+        ConnectionInfo retainedConnectionInfo;
+        private bool reLogin;
+
+        public LoginViewController(bool reLogin = false)
+        {
+            this.reLogin = reLogin;
+        }
 
         #region UIViewController overrides
 
@@ -385,7 +392,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async Task RefreshData()
         {
-            var retainedConnectionInfo = await authenticator.GetRetainedConnectionInfoAsync();
+            retainedConnectionInfo = await authenticator.GetRetainedConnectionInfoAsync();
             if (retainedConnectionInfo != null && string.IsNullOrEmpty(usernameTextField.Text + hostnameTextField.Text))
             {
                 usernameTextField.Text = retainedConnectionInfo.Username;
@@ -549,164 +556,197 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
+
                 var username = usernameTextField.Text;
                 var password = passwordTextField.Text;
                 var hostname = hostnameTextField.Text;
                 var port = portTextField.Text;
 
-                var errors = false;
-                if (!Validator.IsUsernameValid(username))
+                if (reLogin && retainedConnectionInfo != null && !retainedConnectionInfo.Username.Equals(username))
                 {
-                    CommonConfig.Logger.Info($"Invalid username was entered: {username}");
-
-                    errors = true;
-                    await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("wrong_username_title"), Localization.GetString("wrong_username_summary"));
-
-                    hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Warning);
-                }
-                else if (!Validator.IsPasswordValid(password))
-                {
-                    CommonConfig.Logger.Info($"Invalid password was entered: {password}");
-
-                    errors = true;
-                    await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("wrong_password_title"), Localization.GetString("wrong_password_summary"));
-
-                    hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Warning);
-                }
-                else if (!Validator.IsHostNameValid(hostname))
-                {
-                    CommonConfig.Logger.Info($"Invalid hostname was entered: {hostname}");
-
-                    errors = true;
-                    await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("wrong_hostname_title"), Localization.GetString("wrong_hostname_summary"));
-
-                    hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Warning);
-                }
-                else if (!Validator.IsPortValid(port))
-                {
-                    CommonConfig.Logger.Info($"Invalid port was entered: {port}");
-
-                    errors = true;
-                    await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("wrong_port_title"), Localization.GetString("wrong_port_summary"));
-
-                    hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Warning);
-                }
-
-                if (errors)
-                {
-                    loginButton.TouchUpInside += LoginButton_TouchUpInside;
-                    return;
-                }
-
-                if (sslMode == SslMode.Off)
-                {
-                    hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Warning);
-
-                    if (!await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("warning"), Localization.GetString("warning_ssl_off"), Localization.GetString("continue"), Localization.GetString("cancel")))
+                    // if user tries to login with different user
+                    var result = await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("dialog_different_user_title"), Localization.GetString("dialog_different_user_content"));
+                    if (result)
                     {
-                        loginButton.TouchUpInside += LoginButton_TouchUpInside;
-                        return;
+                        CommonConfig.UsageAnalytics.LogEvent(new SettingsLogOutEvent());
+
+                        var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("logging_out___"));
+
+                        try
+                        {
+                            if (!string.IsNullOrWhiteSpace(PlatformConfig.Preferences.PushNotificationToken))
+                                await Managers.NotificationsManager.UnSubscribe(DeviceType.IOS, PlatformConfig.Preferences.PushNotificationToken);
+                        }
+                        catch (Exception ex)
+                        {
+                            CommonConfig.Logger.Error("Error while unsubscribing during log out!", ex);
+                        }
+
+                        PlatformConfig.Preferences.ResetOnLaunch = true;
+
+                        await AuthenticatorFactory.Create().DeleteRetainedConnectionInfoAsync();
+
+                        dismissAction();
+
+                        Dialogs.ShowBlockingAlert(this, Localization.GetString("please_restart"));
                     }
                 }
-
-                if (sslMode == SslMode.AllowSelfSigned)
-                {
-                    hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Warning);
-
-                    if (!await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("warning"), Localization.GetString("warning_selfsigned_on"), Localization.GetString("continue"), Localization.GetString("cancel")))
-                    {
-                        loginButton.TouchUpInside += LoginButton_TouchUpInside;
-                        return;
-                    }
-                }
-
-                CommonConfig.Logger.Info($"Logging in... [username={username}, hostname={hostname}, port={port}, ssl={sslMode}]");
-
-                usernameTextField.ResignFirstResponder();
-                passwordTextField.ResignFirstResponder();
-                hostnameTextField.ResignFirstResponder();
-                portTextField.ResignFirstResponder();
-
-                cts = new CancellationTokenSource();
-                token = cts.Token;
-
-                dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("logging_in___"), OnCancelLogin);
-
-                switch (sslMode)
-                {
-                    case SslMode.AllowSelfSigned:
-                        PlatformConfig.SSLCertificateVerificationManager.EnableSelfSignedCertificates();
-                        break;
-                    default:
-                        PlatformConfig.SSLCertificateVerificationManager.DisableSelfSignedCertificates();
-                        break;
-                }
-
-                CommonConfig.Logger.Info("Authenticating...");
-
-                var ci = await authenticator.AuthenticateAsync(username, password, sslMode, hostname, int.Parse(port), token);
-
-                if (token.IsCancellationRequested)
-                {
-                    CommonConfig.Logger.Info($"Authentication was cancelled...");
-                    cts = null;
-                    return;
-                }
-
-                CommonConfig.Logger.Info($"Authenticated - saving connection info {ci}...");
-
-                await authenticator.SaveConnectionInfoAsync(ci);
-
-                CommonConfig.Logger.Info($"Initializing {nameof(Managers)}...");
-
-                Managers.Initialize(ci);
-                Managers.DocumentsManager.MaxToFetch = PlatformConfig.Preferences.DocumentsToDownload;
-                Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
-                Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
-                Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
-
-                CommonConfig.Logger.Info("Retrieving system settings...");
-
-                ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync();
-
-                await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
-
-                CommonConfig.Logger.Info($"Starting services...");
-                Services.DocumentsUploadService.Start();
-                Services.DocumentPreviewsDownloadService.Start();
-                Services.DocumentsDownloadService.Start();
-
-                LocalNotificationsListener.Initialize();
-
-                CommonConfig.Logger.Info($"Refreshing reachability status...");
-                await CommonConfig.Reachability.Refresh();
-
-                CommonConfig.Logger.Info($"Registering {nameof(ReachabilityReceiver)}...");
-                PlatformConfig.ReachabilityReceiver.Register();
-
-                CommonConfig.Logger.Info($"Logged in - will present {nameof(SplitMainViewController)}");
-
-                dismissAction?.Invoke();
-
-                UNUserNotificationCenter.Current.RequestAuthorization(UNAuthorizationOptions.Alert | UNAuthorizationOptions.Badge | UNAuthorizationOptions.Sound, (result, error) =>
-                {
-                    ((AppDelegate)UIApplication.SharedApplication.Delegate)?.OnAuthorizationRequested(result, error);
-                });
-
-                CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Hostname, hostname);
-                CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.SSL, sslMode.ToString());
-
-                if (!String.IsNullOrEmpty(ServerConfig.SystemSettings.SystemInfo.CustomerName))
-                    CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.CustomerName, ServerConfig.SystemSettings.SystemInfo.CustomerName);
-
-                UIViewController vc;
-                if (Integration.IsIPad())
-                    vc = new SplitMainViewController { ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve };
                 else
-                    vc = new SimpleMainViewController { ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve };
+                {
+                    var errors = false;
+                    if (!Validator.IsUsernameValid(username))
+                    {
+                        CommonConfig.Logger.Info($"Invalid username was entered: {username}");
 
-                var window = ((AppDelegate)UIApplication.SharedApplication.Delegate).Window;
-                UIView.TransitionNotify(window, 0.25, UIViewAnimationOptions.TransitionCrossDissolve, () => window.RootViewController = vc, null);
+                        errors = true;
+                        await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("wrong_username_title"), Localization.GetString("wrong_username_summary"));
+
+                        hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Warning);
+                    }
+                    else if (!Validator.IsPasswordValid(password))
+                    {
+                        CommonConfig.Logger.Info($"Invalid password was entered: {password}");
+
+                        errors = true;
+                        await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("wrong_password_title"), Localization.GetString("wrong_password_summary"));
+
+                        hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Warning);
+                    }
+                    else if (!Validator.IsHostNameValid(hostname))
+                    {
+                        CommonConfig.Logger.Info($"Invalid hostname was entered: {hostname}");
+
+                        errors = true;
+                        await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("wrong_hostname_title"), Localization.GetString("wrong_hostname_summary"));
+
+                        hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Warning);
+                    }
+                    else if (!Validator.IsPortValid(port))
+                    {
+                        CommonConfig.Logger.Info($"Invalid port was entered: {port}");
+
+                        errors = true;
+                        await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("wrong_port_title"), Localization.GetString("wrong_port_summary"));
+
+                        hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Warning);
+                    }
+
+                    if (errors)
+                    {
+                        loginButton.TouchUpInside += LoginButton_TouchUpInside;
+                        return;
+                    }
+
+                    if (sslMode == SslMode.Off)
+                    {
+                        hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Warning);
+
+                        if (!await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("warning"), Localization.GetString("warning_ssl_off"), Localization.GetString("continue"), Localization.GetString("cancel")))
+                        {
+                            loginButton.TouchUpInside += LoginButton_TouchUpInside;
+                            return;
+                        }
+                    }
+
+                    if (sslMode == SslMode.AllowSelfSigned)
+                    {
+                        hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Warning);
+
+                        if (!await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("warning"), Localization.GetString("warning_selfsigned_on"), Localization.GetString("continue"), Localization.GetString("cancel")))
+                        {
+                            loginButton.TouchUpInside += LoginButton_TouchUpInside;
+                            return;
+                        }
+                    }
+
+                    CommonConfig.Logger.Info($"Logging in... [username={username}, hostname={hostname}, port={port}, ssl={sslMode}]");
+
+                    usernameTextField.ResignFirstResponder();
+                    passwordTextField.ResignFirstResponder();
+                    hostnameTextField.ResignFirstResponder();
+                    portTextField.ResignFirstResponder();
+
+                    cts = new CancellationTokenSource();
+                    token = cts.Token;
+
+                    dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("logging_in___"), OnCancelLogin);
+
+                    switch (sslMode)
+                    {
+                        case SslMode.AllowSelfSigned:
+                            PlatformConfig.SSLCertificateVerificationManager.EnableSelfSignedCertificates();
+                            break;
+                        default:
+                            PlatformConfig.SSLCertificateVerificationManager.DisableSelfSignedCertificates();
+                            break;
+                    }
+
+                    CommonConfig.Logger.Info("Authenticating...");
+
+                    var ci = await authenticator.AuthenticateAsync(username, password, sslMode, hostname, int.Parse(port), token);
+
+                    if (token.IsCancellationRequested)
+                    {
+                        CommonConfig.Logger.Info($"Authentication was cancelled...");
+                        cts = null;
+                        return;
+                    }
+
+                    CommonConfig.Logger.Info($"Authenticated - saving connection info {ci}...");
+
+                    await authenticator.SaveConnectionInfoAsync(ci);
+
+                    CommonConfig.Logger.Info($"Initializing {nameof(Managers)}...");
+
+                    Managers.Initialize(ci);
+                    Managers.DocumentsManager.MaxToFetch = PlatformConfig.Preferences.DocumentsToDownload;
+                    Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
+                    Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
+                    Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
+
+                    CommonConfig.Logger.Info("Retrieving system settings...");
+
+                    ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync();
+
+                    await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
+
+                    CommonConfig.Logger.Info($"Starting services...");
+                    Services.DocumentsUploadService.Start();
+                    Services.DocumentPreviewsDownloadService.Start();
+                    Services.DocumentsDownloadService.Start();
+
+                    LocalNotificationsListener.Initialize();
+
+                    CommonConfig.Logger.Info($"Refreshing reachability status...");
+                    await CommonConfig.Reachability.Refresh();
+
+                    CommonConfig.Logger.Info($"Registering {nameof(ReachabilityReceiver)}...");
+                    PlatformConfig.ReachabilityReceiver.Register();
+
+                    CommonConfig.Logger.Info($"Logged in - will present {nameof(SplitMainViewController)}");
+
+                    dismissAction?.Invoke();
+
+                    UNUserNotificationCenter.Current.RequestAuthorization(UNAuthorizationOptions.Alert | UNAuthorizationOptions.Badge | UNAuthorizationOptions.Sound, (result, error) =>
+                    {
+                        ((AppDelegate)UIApplication.SharedApplication.Delegate)?.OnAuthorizationRequested(result, error);
+                    });
+
+                    CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Hostname, hostname);
+                    CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.SSL, sslMode.ToString());
+
+                    if (!String.IsNullOrEmpty(ServerConfig.SystemSettings.SystemInfo.CustomerName))
+                        CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.CustomerName, ServerConfig.SystemSettings.SystemInfo.CustomerName);
+
+                    UIViewController vc;
+                    if (Integration.IsIPad())
+                        vc = new SplitMainViewController { ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve };
+                    else
+                        vc = new SimpleMainViewController { ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve };
+
+                    var window = ((AppDelegate)UIApplication.SharedApplication.Delegate).Window;
+                    UIView.TransitionNotify(window, 0.25, UIViewAnimationOptions.TransitionCrossDissolve, () => window.RootViewController = vc, null);
+                }
 
             }
             catch (Exception ex)

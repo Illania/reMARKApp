@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.DataAccess.Exceptions;
 using Mark5.Mobile.Common.Model.Exceptions;
+using Mark5.Mobile.IOS.Ui.ViewControllers;
 using Mark5.Mobile.IOS.Utilities;
 using Mark5.ServiceReference.Exceptions;
 using SVProgressHUD;
@@ -177,38 +179,55 @@ namespace Mark5.Mobile.IOS.Ui.Common
             hapticGenerator.Prepare();
 
             var tcs = new TaskCompletionSource<bool>();
-            var alert = UIAlertController.Create(GetErrorTitle(ex), GetErrorContent(ex), UIAlertControllerStyle.Alert);
-            alert.AddAction(UIAlertAction.Create(Localization.GetString("ok"), UIAlertActionStyle.Default, a => tcs.SetResult(true)));
-            if (ShouldShowCreateReport(ex))
+            UIAlertController alert;
+
+            if (ex is HttpAppServiceException && ((HttpAppServiceException)ex)?.Detail?.Code == AppServiceFaultCode.InvalidToken)
             {
-                alert.AddAction(UIAlertAction.Create(Localization.GetString("report"),
-                                                     UIAlertActionStyle.Cancel,
-                                                     a =>
-                {
-                    var dismissAction = ShowInfiniteProgressDialog(Localization.GetString("creating_system_report___"));
-                    Task.Run(() => SystemReportCollector.CreateFullReport()).ContinueWith(async t =>
-                    {
-                        dismissAction();
+                alert = UIAlertController.Create(GetErrorTitle(ex), GetErrorContent(ex), UIAlertControllerStyle.Alert);
 
-                        if (!t.IsFaulted)
-                        {
+                alert.AddAction(UIAlertAction.Create(Localization.GetString("Logout"), UIAlertActionStyle.Default, async a =>
+                 {
+                     await AuthenticatorFactory.Create().RetainConnectionInfoAsync();
+                     vc.PresentViewController(new LoginViewController(true), true, null);
+                     tcs.SetResult(true);
+                 }));
 
-                            var sendWithMark5 = await ShowYesNoAlertAsync(vc, Localization.GetString("send_with_mark5_title"), Localization.GetString("send_report_with_mark5_content"));
-
-                            if (sendWithMark5)
-                            {
-                                var cvc = SystemReportCollector.CreateShareReportComposeDocumentViewController(t.Result);
-                                vc.PresentViewController(new NavigationController(cvc, UIModalPresentationStyle.PageSheet), true, null);
-                            }
-                            else 
-                                vc.PresentViewController(SystemReportCollector.CreateShareReportController(t.Result), true, () => { tcs.SetResult(true); });
-                        }
-                        else
-                            tcs.SetResult(true);
-                    }, TaskScheduler.FromCurrentSynchronizationContext());
-                }));
+                alert.AddAction(UIAlertAction.Create(Localization.GetString("Cancel"), UIAlertActionStyle.Cancel, a => { tcs.SetResult(true); }));
             }
+            else
+            {
+                alert = UIAlertController.Create(GetErrorTitle(ex), GetErrorContent(ex), UIAlertControllerStyle.Alert);
+                alert.AddAction(UIAlertAction.Create(Localization.GetString("ok"), UIAlertActionStyle.Default, a => tcs.SetResult(true)));
+                if (ShouldShowCreateReport(ex))
+                {
+                    alert.AddAction(UIAlertAction.Create(Localization.GetString("report"), UIAlertActionStyle.Cancel, a =>
+                    {
+                        var dismissAction = ShowInfiniteProgressDialog(Localization.GetString("creating_system_report___"));
+                        Task.Run(() => SystemReportCollector.CreateFullReport()).ContinueWith(async t =>
+                        {
+                            dismissAction();
+
+                            if (!t.IsFaulted)
+                            {
+                                var sendWithMark5 = await ShowYesNoAlertAsync(vc, Localization.GetString("send_with_mark5_title"), Localization.GetString("send_report_with_mark5_content"));
+
+                                if (sendWithMark5)
+                                {
+                                    var cvc = SystemReportCollector.CreateShareReportComposeDocumentViewController(t.Result);
+                                    vc.PresentViewController(new NavigationController(cvc, UIModalPresentationStyle.PageSheet), true, null);
+                                }
+                                else
+                                    vc.PresentViewController(SystemReportCollector.CreateShareReportController(t.Result), true, () => { tcs.SetResult(true); });
+                            }
+                            else
+                                tcs.SetResult(true);
+                        }, TaskScheduler.FromCurrentSynchronizationContext());
+                    }));
+                }
+            }
+
             vc.PresentViewController(alert, true, () => hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Error));
+
             return tcs.Task;
         }
 
@@ -250,6 +269,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         static string GetErrorTitle(Exception ex)
         {
+            if (ex is HttpAppServiceException && ((HttpAppServiceException)ex)?.Detail?.Code == AppServiceFaultCode.InvalidToken)
+                return Localization.GetString("error_invalid_token");
             if (ex is WcfAppServiceException)
                 return Localization.GetString("error_appserviceexception_title");
             if (ex is HttpAppServiceException)
@@ -270,6 +291,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         static string GetErrorContent(Exception ex)
         {
+            if (ex is HttpAppServiceException && ((HttpAppServiceException)ex)?.Detail?.Code == AppServiceFaultCode.InvalidToken)
+                return Localization.GetString("error_invalid_token_message");
             if (ex is WcfAppServiceException)
                 return ex.Message;
             if (ex is HttpAppServiceException)
