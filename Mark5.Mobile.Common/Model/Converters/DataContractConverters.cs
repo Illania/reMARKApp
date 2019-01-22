@@ -395,7 +395,8 @@ namespace Mark5.Mobile.Common.Model.Converters
                 OptionalParameters = f.OptionalParameters?.Convert(),
                 Subscribed = f.Subscribed,
                 Position = f.Position,
-                Type = f.Type.ConvertEnum<FolderType>()
+                Type = f.Type.ConvertEnum<FolderType>(),
+                Path = f.Path,
             };
             if (f.SubFolders != null)
                 result.SubFolders.AddRange(f.SubFolders.WhereNotNull().Select(Convert));
@@ -687,8 +688,10 @@ namespace Mark5.Mobile.Common.Model.Converters
                 UpdatedAt = moduleFavoritesResult.UpdatedAt
             };
 
-            if (moduleFavoritesResult.ModuleFavoriteFoldersList?.Any() == true)
+            if (moduleFavoritesResult.ModuleFavoriteFoldersList != null)
             {
+                moduleFavorites.ModuleFavoriteFolders = new List<ModuleFavoriteFolders>();
+
                 foreach (var fav in moduleFavoritesResult.ModuleFavoriteFoldersList)
                 {
                     var newFav = new ModuleFavoriteFolders { ModuleType = (ModuleType)fav.ModuleType };
@@ -1041,7 +1044,8 @@ namespace Mark5.Mobile.Common.Model.Converters
                 ParentFolderId = folder.ParentFolderId,
                 Name = folder.Name,
                 Subscribed = folder.Subscribed,
-                Position = folder.Position
+                Position = folder.Position,
+                Path = folder.Path,
             };
         }
 

@@ -431,7 +431,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 await RefreshRemote(forceRefresh);
 
             if (AvailableSections.Contains(Section.Favourites))
-                await RefreshFavorites();
+                await RefreshFavorites(forceRefresh);
 
             if (AvailableSections.Contains(Section.Local))
                 RefreshLocal();
@@ -485,12 +485,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        async Task RefreshFavorites()
+        async Task RefreshFavorites(bool forceOnlineIfNecessary = false)
         {
             CommonConfig.Logger.Info($"Refreshing favourite folders...");
 
-            if(PlatformConfig.Preferences.SyncFavoritesEnabled && CommonConfig.Reachability.IsReachable) {
-                try 
+            if (forceOnlineIfNecessary && PlatformConfig.Preferences.SyncFavoritesEnabled && CommonConfig.Reachability.IsReachable)
+            {
+                try
                 {
                     await Managers.FoldersManager.GetServiceFavoriteFoldersAsync(new List<ModuleType>() { RemoteFolder.Module });
                 }
@@ -803,36 +804,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             CommonConfig.Logger.Info($"Setting favourite status of {selectedFolders.Count} folders to {isFolderFavorite}");
 
-            if (PlatformConfig.Preferences.SyncFavoritesEnabled && !CommonConfig.Reachability.IsReachable)
-            {
-                Dialogs.ShowErrorDialog(Activity, new Exception(GetString(Resource.String.sync_error_network)));
-                return;
-            }
-           
-            if (PlatformConfig.Preferences.SyncFavoritesEnabled && CommonConfig.Reachability.IsReachable)
-            {
-                try {
-                    if (isFolderFavorite)
-                    {
-                        await Managers.FoldersManager.AddServiceFavoriteFoldersAsync(selectedFolders, selectedFolders.First().Module);
-                    } 
-                    else 
-                    {
-                        await Managers.FoldersManager.RemoveServiceFavoriteFoldersAsync(selectedFolders, selectedFolders.First().Module);
-                    }
-                }
-                catch
-                {
-                    Dialogs.ShowErrorDialog(Activity, new Exception(GetString(Resource.String.sync_error_general)));
-                    return;
-                }
-            }
-
             Task task = null;
 
             foreach (var folder in selectedFolders)
             {
-                task = isFolderFavorite ? Managers.FoldersManager.AddFavoriteFolderAsync(folder.Module, folder) : Managers.FoldersManager.RemoveFavoriteFolderAsync(folder.Module, folder);
+                task = isFolderFavorite ? Managers.FoldersManager.AddFavoriteFolderAsync(folder.Module, folder)
+                : Managers.FoldersManager.RemoveFavoriteFolderAsync(folder.Module, folder);
                 await task;
             }
 
@@ -848,6 +825,26 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (AvailableSections.Contains(Section.Favourites))
                     await RefreshFavorites();
             }
+
+            if (PlatformConfig.Preferences.SyncFavoritesEnabled && !CommonConfig.Reachability.IsReachable)
+            {
+                Dialogs.ShowErrorDialog(Activity, new Exception(GetString(Resource.String.sync_error_network)));
+                return;
+            }
+
+            if (PlatformConfig.Preferences.SyncFavoritesEnabled && CommonConfig.Reachability.IsReachable)
+            {
+                try
+                {
+                    await Managers.FoldersManager.UpdateServiceFavoriteFoldersAsync(); //TODO need to do the same on iOS (order of execution and remove (add and remove)
+                }
+                catch
+                {
+                    Dialogs.ShowErrorDialog(Activity, new Exception(GetString(Resource.String.sync_error_general)));
+                    return;
+                }
+            }
+
         }
 
         void MakeFolderOnline()

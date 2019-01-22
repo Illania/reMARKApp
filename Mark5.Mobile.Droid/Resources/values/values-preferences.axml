@@ -177,6 +177,6 @@
     <string name="pref_key_sync_favorites">pref_key_sync_favorites</string>
     <string name="pref_sync_favorites">pref_sync_favorites</string>
     <string name="sync_favorite_folders_title">Sync favorite folders</string>
-    <string name="pref_sync_title">Favorite sync</string>
-    <string name="sync_favorite_folders_summary">Synchronize emails, contacts, shortcodes favorite folders across devices</string>
+    <string name="pref_sync_title">Sync</string>
+    <string name="sync_favorite_folders_summary">Synchronize favorite folders across devices and installations</string>
 </resources>

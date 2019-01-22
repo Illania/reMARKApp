@@ -497,6 +497,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                         catch (Exception ex)
                         {
                             CommonConfig.Logger.Error($"Could not synchronize favorite folders with server", ex);
+                            await Dialogs.ShowErrorAlertAsync(this, ex);
                         }
                     }
 
@@ -748,8 +749,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     if (EditModeItem != null)
                         EditModeItem.Enabled = gds.GetItemsInSection(GrouppedDataSource.Section.Favorites) > 0;
                 }
-
-                if (TableView.Source is DataSource ds)
+                else if (TableView.Source is DataSource ds)
                 {
                     ds.FavoriteStatus[folder.Id] = false;
 

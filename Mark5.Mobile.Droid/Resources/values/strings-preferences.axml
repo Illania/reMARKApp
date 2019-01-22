@@ -191,5 +191,5 @@
     <string name="pref_swipe_options_title">Swipe options</string>
     <string name="pref_key_sync_favorites">pref_key_sync_favorites</string>
     <string name="pref_key_sync_favorites_enabled">pref_key_sync_favorites_enabled</string>
-    <string name="pref_sync_favorites_title">Synchronisation</string>
+    <string name="pref_sync_favorites_title">Favorites synchronisation</string>
 </resources>

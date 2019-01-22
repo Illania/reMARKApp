@@ -5,7 +5,7 @@ namespace Mark5.Mobile.Common.Model
 {
     public class ModuleFavoriteFoldersCollection
     {
-        public List<ModuleFavoriteFolders> ModuleFavoriteFolders { get; set; } = new List<ModuleFavoriteFolders>();
+        public List<ModuleFavoriteFolders> ModuleFavoriteFolders { get; set; }
 
         public DateTime UpdatedAt { get; set; }
     }

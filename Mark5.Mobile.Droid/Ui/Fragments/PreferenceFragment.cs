@@ -180,27 +180,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                     if (selectedOption == 0)
                     {
-                        if (response.ModuleFavoriteFolders != null && response.ModuleFavoriteFolders.Count == 0)
-                        {
-                            await Managers.FoldersManager.ClearFavoritesAsync();
-                        }
-                        else
-                        {
-                            var missingModules = new List<ModuleType> { ModuleType.Shortcodes, ModuleType.Contacts, ModuleType.Documents };
+                        foreach (var favorite in response.ModuleFavoriteFolders)
+                            await Managers.FoldersManager.SetFavoriteFoldersAsync(favorite.ModuleType, favorite.Folders);
 
-                            foreach (var favorite in response.ModuleFavoriteFolders)
-                            {
-                                await Managers.FoldersManager.SetFavoriteFoldersAsync(favorite.ModuleType, favorite.Folders);
-                                missingModules.RemoveAll(x => x == favorite.ModuleType);
-                            }
-
-                            await Managers.FoldersManager.ClearFavoritesAsync(missingModules);
-                        }
+                        var availableModules = new List<ModuleType> { ModuleType.Shortcodes, ModuleType.Contacts, ModuleType.Documents };
+                        await Managers.FoldersManager.ClearFavoritesAsync(availableModules.Except(response.ModuleFavoriteFolders.Select(mff => mff.ModuleType)).ToList());
                     }
                     else if (selectedOption == 1)
-                    {
                         await Managers.FoldersManager.UpdateServiceFavoriteFoldersAsync();
-                    }
                     else
                     {
                         PlatformConfig.Preferences.SyncFavoritesEnabled = false;
