@@ -449,21 +449,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     if (selectedOption == 0)
                     {
-                        if (response.ModuleFavoriteFolders.Count == 0)
-                            await Managers.FoldersManager.ClearFavoritesAsync();
-                        else
-                        {
-                            foreach (var favorite in response.ModuleFavoriteFolders)
-                                await Managers.FoldersManager.SetFavoriteFoldersAsync(favorite.ModuleType, favorite.Folders);
+                        foreach (var mff in response.ModuleFavoriteFolders)
+                            await Managers.FoldersManager.SetFavoriteFoldersAsync(mff.ModuleType, mff.Folders);
 
-                            var availableModules = new List<ModuleType> { ModuleType.Shortcodes, ModuleType.Contacts, ModuleType.Documents };
-                            await Managers.FoldersManager.ClearFavoritesAsync(availableModules.Except(response.ModuleFavoriteFolders.Select(mf => mf.ModuleType)).ToList());
-                        }
+                        var availableModules = new List<ModuleType> { ModuleType.Shortcodes, ModuleType.Contacts, ModuleType.Documents };
+                        await Managers.FoldersManager.ClearFavoritesAsync(availableModules.Except(response.ModuleFavoriteFolders.Select(mf => mf.ModuleType)).ToList());
                     }
                     else if (selectedOption == 1)
-                    {
                         await Managers.FoldersManager.UpdateServiceFavoriteFoldersAsync();
-                    }
                     else
                     {
                         PlatformConfig.Preferences.SyncFavoriteFoldersEnabled = false;

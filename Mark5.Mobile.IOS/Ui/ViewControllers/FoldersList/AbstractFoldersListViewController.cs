@@ -686,13 +686,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             {
                 CommonConfig.UsageAnalytics.LogEvent(new SetFolderFavoriteEvent(folder.Module, 1));
 
+                await Managers.FoldersManager.AddFavoriteFolderAsync(folder.Module, folder);
+
                 if (PlatformConfig.Preferences.SyncFavoriteFoldersEnabled && !CommonConfig.Reachability.IsReachable)
                     throw new Exception(Localization.GetString("sync_error_network"));
 
                 if (PlatformConfig.Preferences.SyncFavoriteFoldersEnabled && CommonConfig.Reachability.IsReachable)
-                    await Managers.FoldersManager.AddServiceFavoriteFoldersAsync(new List<Folder> { folder }, folder.Module);
-
-                await Managers.FoldersManager.AddFavoriteFolderAsync(folder.Module, folder);
+                    await Managers.FoldersManager.UpdateServiceFavoriteFoldersAsync();
 
                 if (TableView.Source is GrouppedDataSource gds)
                 {
@@ -728,13 +728,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             {
                 CommonConfig.UsageAnalytics.LogEvent(new SetFolderFavoriteEvent(folder.Module, 1));
 
+                await Managers.FoldersManager.RemoveFavoriteFolderAsync(folder.Module, folder);
+
                 if (PlatformConfig.Preferences.SyncFavoriteFoldersEnabled && !CommonConfig.Reachability.IsReachable)
                     throw new Exception(Localization.GetString("sync_error_network"));
 
                 if (PlatformConfig.Preferences.SyncFavoriteFoldersEnabled && CommonConfig.Reachability.IsReachable)
-                    await Managers.FoldersManager.RemoveServiceFavoriteFoldersAsync(new List<Folder> { folder }, folder.Module);
-
-                await Managers.FoldersManager.RemoveFavoriteFolderAsync(folder.Module, folder);
+                    await Managers.FoldersManager.UpdateServiceFavoriteFoldersAsync();
 
                 if (TableView.Source is GrouppedDataSource gds)
                 {
