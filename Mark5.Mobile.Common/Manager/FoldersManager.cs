@@ -202,7 +202,7 @@ namespace Mark5.Mobile.Common.Manager
             return folders;
         }
 
-        public async Task<ModuleFavoriteFoldersCollection> GetServiceFavoriteFoldersAsync(List<ModuleType> modules = null)
+        public async Task<ModuleFavoriteFoldersCollection> GetServiceFavoriteFoldersAsync(List<ModuleType> modules = null, bool retain = true)
         {
             modules = modules ?? new List<ModuleType> { ModuleType.Contacts, ModuleType.Documents, ModuleType.Shortcodes };
 
@@ -214,7 +214,7 @@ namespace Mark5.Mobile.Common.Manager
 
             ModuleFavoriteFoldersCollection moduleFavorites = result.Convert();
 
-            if (moduleFavorites.ModuleFavoriteFolders != null)
+            if (moduleFavorites.ModuleFavoriteFolders != null && retain)
             {
                 foreach (var module in moduleFavorites.ModuleFavoriteFolders)
                     await SetFavoriteFoldersAsync(module.ModuleType, module.Folders);

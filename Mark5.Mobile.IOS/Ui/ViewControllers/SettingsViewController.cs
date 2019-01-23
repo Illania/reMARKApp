@@ -440,7 +440,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
-                var response = await Managers.FoldersManager.GetServiceFavoriteFoldersAsync();
+                var response = await Managers.FoldersManager.GetServiceFavoriteFoldersAsync(retain: false);
                 if (response.ModuleFavoriteFolders == null)
                     await Managers.FoldersManager.UpdateServiceFavoriteFoldersAsync();
                 else
