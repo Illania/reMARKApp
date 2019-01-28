@@ -26,7 +26,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             SetPadding(DistanceNone, DistanceNormal, DistanceNone, DistanceNormal);
 
             var customWebViewClient = new CustomWebViewClient();
-            customWebViewClient.MailToLinkClicked += MailToLinkClicked;
+            customWebViewClient.MailToLinkClicked += (sender, e) => MailToLinkClicked(sender, e);
 
             webView = new CustomWebView(Context);
             webView.SetWebViewClient(customWebViewClient);

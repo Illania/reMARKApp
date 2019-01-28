@@ -213,7 +213,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var contentView = new ContentView(Context);
             contentView.MailToLinkClicked += ContentView_MailToLinkClicked;
-            linearLayout.AddView(new ContentView(Context));
+            linearLayout.AddView(contentView);
 
             HasOptionsMenu = true;
 
@@ -235,12 +235,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var cc = parsed["cc"]?.Split(",");
                 var bcc = parsed["bcc"]?.Split(",");
 
+                if (cc != null && cc.Any())
+                    preconfiguredEmailAddresses.Add(DocumentAddressType.Cc, cc);
+
+                if (bcc != null && bcc.Any())
+                    preconfiguredEmailAddresses.Add(DocumentAddressType.Bcc, bcc);
+
                 StartActivity(ComposeDocumentActivity.CreateIntent(Context,
-                                                                   DocumentCreationModeFlag.New,
-                                                                   CopyToNewOption.None,
-                                                                   preconfiguredContent: body,
-                                                                   preconfiguredSubject: subject,
-                                                                   preconfiguredEmailAddresses: preconfiguredEmailAddresses));
+                                                                       DocumentCreationModeFlag.New,
+                                                                       CopyToNewOption.None,
+                                                                       preconfiguredContent: body,
+                                                                       preconfiguredSubject: subject,
+                                                                       preconfiguredEmailAddresses: preconfiguredEmailAddresses));
             }
             else
                 StartActivity(ComposeDocumentActivity.CreateIntent(Context,
