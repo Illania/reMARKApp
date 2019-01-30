@@ -17,6 +17,7 @@ using Mark5.Mobile.Common.Service;
 using Mark5.Mobile.Common.Storage;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Service;
+using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 #if !DEBUG
 using HockeyApp.Android;
@@ -59,6 +60,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 #else
             Firebase.Analytics.FirebaseAnalytics.GetInstance(this).SetAnalyticsCollectionEnabled(false);
 #endif
+
+            var openedFromNotification = Intent?.Extras?.IsEmpty == false && Intent.Extras.ContainsKey("title");
+            if (openedFromNotification && !IsTaskRoot)
+            {
+                ProcessNotification();
+                return;
+            }
 
             Task.Run(async () =>
                 {
@@ -161,19 +169,20 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     return true;
                 })
                 .ContinueWith(t =>
-                    {
-                        Services.DocumentsUploadService?.Start();
-                        Services.DocumentPreviewsDownloadService?.Start();
-                        Services.DocumentsDownloadService?.Start();
+                   {
+                       Services.DocumentsUploadService?.Start();
+                       Services.DocumentPreviewsDownloadService?.Start();
+                       Services.DocumentsDownloadService?.Start();
 
-                        if (t.Result)
-                            StartActivity(MainActivity.CreateIntent(this));
-                        else
-                            ShowLoginButton();
+                       if (t.Result)
+                           StartActivity(MainActivity.CreateIntent(this));
+                       else
+                           ShowLoginButton();
 
-                        if (Intent?.Extras?.IsEmpty == false && Intent.Extras.ContainsKey("title"))
-                            ProcessNotification();
-                    },
+                       if (openedFromNotification && IsTaskRoot)
+                           ProcessNotification();
+
+                   },
                     TaskScheduler.FromCurrentSynchronizationContext());
 
             CommonConfig.Logger.Info($"Started {nameof(SplashActivity)}");
