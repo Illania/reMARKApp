@@ -1,9 +1,8 @@
-﻿using System;
-using Android.OS;
-using Firebase.Messaging;
-using Mark5.Mobile.Common.Model;
+﻿using Firebase.Messaging;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Model;
+using Mark5.Mobile.Common.Model;
+using System;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
@@ -14,34 +13,34 @@ namespace Mark5.Mobile.Droid.Utilities
             return m.ConvertToPushNotification().ConvertToNotification();
         }
 
-        public static PushNotification ConvertToPushNotification(this RemoteMessage message)  //TODO this method is not necessary actually
+        public static PushNotification ConvertToPushNotification(this RemoteMessage m)
         {
-            if (message.Data.ContainsKey("data"))
+            if (m.Data.ContainsKey("data"))
             {
                 return new PushNotification
                 {
-                    Data = Serializer.Deserialize<PushNotificationData>(message.Data["data"]),
-                    Notification = Serializer.Deserialize<PushNotificationNotification>(message.Data["notification"])
+                    Data = Serializer.Deserialize<PushNotificationData>(m.Data["data"]),
+                    Notification = Serializer.Deserialize<PushNotificationNotification>(m.Data["notification"])
                 };
             }
             else
             {
                 var data = new PushNotificationData
                 {
-                    Silent = message.Data.ContainsKey("silent") ? int.Parse(message.Data["silent"]) : 0,
-                    Guid = message.Data.ContainsKey("guid") ? Guid.Parse(message.Data["guid"]) : Guid.Empty,
-                    Type = message.Data.ContainsKey("type") ? (EventType)Enum.Parse(typeof(EventType), message.Data["type"]) : EventType.None,
-                    ObjectId = message.Data.ContainsKey("objectId") ? int.Parse(message.Data["objectId"]) : 0,
-                    FolderId = message.Data.ContainsKey("folderId") ? int.Parse(message.Data["folderId"]) : 0,
-                    ObjectType = message.Data.ContainsKey("objectType") ? (ObjectType)Enum.Parse(typeof(ObjectType), message.Data["objectType"]) : ObjectType.None,
-                    RemindOn = message.Data.ContainsKey("remindOn") ? message.Data["remindOn"] : null,
+                    Silent = m.Data.ContainsKey("silent") ? int.Parse(m.Data["silent"]) : 0,
+                    Guid = m.Data.ContainsKey("guid") ? Guid.Parse(m.Data["guid"]) : Guid.Empty,
+                    Type = m.Data.ContainsKey("type") ? (EventType)Enum.Parse(typeof(EventType), m.Data["type"]) : EventType.None,
+                    ObjectId = m.Data.ContainsKey("objectId") ? int.Parse(m.Data["objectId"]) : 0,
+                    FolderId = m.Data.ContainsKey("folderId") ? int.Parse(m.Data["folderId"]) : 0,
+                    ObjectType = m.Data.ContainsKey("objectType") ? (ObjectType)Enum.Parse(typeof(ObjectType), m.Data["objectType"]) : ObjectType.None,
+                    RemindOn = m.Data.ContainsKey("remindOn") ? m.Data["remindOn"] : null,
                 };
 
                 var notification = new PushNotificationNotification
                 {
-                    Title = message.Data.ContainsKey("title") ? message.Data["title"] : null,
-                    Body = message.Data.ContainsKey("body") ? message.Data["body"] : null,
-                    Icon = message.Data.ContainsKey("icon") ? message.Data["icon"] : null,
+                    Title = m.Data.ContainsKey("title") ? m.Data["title"] : null,
+                    Body = m.Data.ContainsKey("body") ? m.Data["body"] : null,
+                    Icon = m.Data.ContainsKey("icon") ? m.Data["icon"] : null,
                 };
 
                 return new PushNotification
@@ -50,35 +49,6 @@ namespace Mark5.Mobile.Droid.Utilities
                     Notification = notification,
                 };
             }
-        }
-
-        public static Notification ExtractNotification(Bundle extra)
-        {
-            var data = new PushNotificationData
-            {
-                Silent = extra.ContainsKey("silent") ? int.Parse(extra.GetString("silent")) : 0,
-                Guid = extra.ContainsKey("guid") ? Guid.Parse(extra.GetString("guid")) : Guid.Empty,
-                Type = extra.ContainsKey("type") ? (EventType)Enum.Parse(typeof(EventType), extra.GetString("type")) : EventType.None,
-                ObjectId = extra.ContainsKey("objectId") ? int.Parse(extra.GetString("objectId")) : 0,
-                FolderId = extra.ContainsKey("folderId") ? int.Parse(extra.GetString("folderId")) : 0,
-                ObjectType = extra.ContainsKey("objectType") ? (ObjectType)Enum.Parse(typeof(ObjectType), extra.GetString("objectType")) : ObjectType.None,
-                RemindOn = extra.ContainsKey("remindOn") ? extra.GetString("remindOn") : null,
-            };
-
-            var notification = new PushNotificationNotification
-            {
-                Title = extra.ContainsKey("title") ? extra.GetString("title") : null,
-                Body = extra.ContainsKey("body") ? extra.GetString("body") : null,
-                Icon = extra.ContainsKey("icon") ? extra.GetString("icon") : null,
-            };
-
-            var pn = new PushNotification
-            {
-                Data = data,
-                Notification = notification,
-            };
-
-            return pn.ConvertToNotification();
         }
 
         public static Notification ConvertToNotification(this PushNotification pn)
