@@ -170,10 +170,19 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                             StartActivity(MainActivity.CreateIntent(this));
                         else
                             ShowLoginButton();
+
+                        if (Intent?.Extras?.IsEmpty == false && Intent.Extras.ContainsKey("title"))
+                            ProcessNotification();
                     },
                     TaskScheduler.FromCurrentSynchronizationContext());
 
             CommonConfig.Logger.Info($"Started {nameof(SplashActivity)}");
+        }
+
+        void ProcessNotification()
+        {
+            var not = PushNotificationsConverter.ExtractNotification(Intent.Extras);
+            PushNotificationsManager.ProcessBackgroundNotificationClicked(this, not);
         }
 
         void ShowLoginButton()
