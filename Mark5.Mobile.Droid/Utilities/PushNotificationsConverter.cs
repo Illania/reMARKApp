@@ -14,7 +14,7 @@ namespace Mark5.Mobile.Droid.Utilities
             return m.ConvertToPushNotification().ConvertToNotification();
         }
 
-        public static PushNotification ConvertToPushNotification(this RemoteMessage message)  //TODO this method is not necessary actually
+        public static PushNotification ConvertToPushNotification(this RemoteMessage message)
         {
             if (message.Data.ContainsKey("data"))
             {
