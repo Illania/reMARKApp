@@ -61,7 +61,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             Firebase.Analytics.FirebaseAnalytics.GetInstance(this).SetAnalyticsCollectionEnabled(false);
 #endif
 
-            var openedFromNotification = Intent?.Extras?.IsEmpty == false && Intent.Extras.ContainsKey("title");
+            var openedFromNotification = Intent?.Extras?.ContainsKey("title") == true;
             if (openedFromNotification && !IsTaskRoot)
             {
                 ProcessNotification();
