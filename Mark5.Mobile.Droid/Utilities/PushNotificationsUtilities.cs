@@ -15,10 +15,13 @@ using System.Threading.Tasks;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
-    public static class PushNotificationsManager
+    public static class PushNotificationsUtilities
     {
         static readonly string GroupName = "mark5";
         static readonly int StackNotification = -1000;
+
+        public static readonly string DocumentChannelId = "email";
+        static readonly string documentChannelName = "Email";
 
         public static async Task ProcessMessageReceived(Context context, Common.Model.Notification notification)
         {
@@ -38,14 +41,13 @@ namespace Mark5.Mobile.Droid.Utilities
                 if (notification.ObjectType == ObjectType.Document)
                 {
                     NotificationManager notificationManager = (NotificationManager)context.GetSystemService(Context.NotificationService);
-                    CreateChannelIfNotExists(notificationManager);
 
                     await Managers.NotificationsManager.SaveNotification(notification);
 
                     Intent intent = DocumentActivity.CreateIntent(context, folderId: notification.FolderId, documentId: notification.ObjectId, notificationGuid: Serializer.Serialize(notification.Guid));
                     PendingIntent pendingIntent = PendingIntent.GetActivity(context, notification.ObjectId, intent, PendingIntentFlags.OneShot);
 
-                    NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, "main")
+                    NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, DocumentChannelId)
                                                    .SetSmallIcon(Resource.Mipmap.ic_notification)
                                                    .SetColor(ContextCompat.GetColor(context, Resource.Color.darkerblue))
                                                    .SetContentTitle(notification.Title)
@@ -103,14 +105,14 @@ namespace Mark5.Mobile.Droid.Utilities
                 return;
 
             NotificationManager notificationManager = (NotificationManager)context.GetSystemService(Context.NotificationService);
-            CreateChannelIfNotExists(notificationManager);
 
-            Android.Service.Notification.StatusBarNotification[] activeNotifications = notificationManager.GetActiveNotifications().Where(sbn => sbn.Id != StackNotification).ToArray();
+            Android.Service.Notification.StatusBarNotification[] activeNotifications = notificationManager.GetActiveNotifications()
+                .Where(sbn => sbn.Id != StackNotification).ToArray();
 
             if (activeNotifications.Count() < 2)
                 return;
 
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "main");
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(context, DocumentChannelId);
             builder.SetSmallIcon(Resource.Mipmap.ic_notification);
             builder.SetColor(ContextCompat.GetColor(context, Resource.Color.darkerblue));
 
@@ -138,17 +140,21 @@ namespace Mark5.Mobile.Droid.Utilities
             notificationManager.Notify(StackNotification, notification);
         }
 
-        public static void CreateChannelIfNotExists(NotificationManager notificationManager)
+        public static void CreateChannelIfNotExists(Context context)
         {
             if (Build.VERSION.SdkInt < BuildVersionCodes.O)
                 return;
 
-            NotificationChannel channel = notificationManager.GetNotificationChannel("main");
+            NotificationManager notificationManager = (NotificationManager)context.GetSystemService(Context.NotificationService);
+
+#pragma warning disable XA0001 // Find issues with Android API usage
+            NotificationChannel channel = notificationManager.GetNotificationChannel(DocumentChannelId);
             if (channel != null)
                 return;
 
-            channel = new NotificationChannel("main", "General", NotificationImportance.High);
+            channel = new NotificationChannel(DocumentChannelId, documentChannelName, NotificationImportance.High);
             notificationManager.CreateNotificationChannel(channel);
+#pragma warning restore XA0001 // Find issues with Android API usage
         }
     }
 }

@@ -15,7 +15,7 @@ namespace Mark5.Mobile.Droid.Utilities.Service
             try
             {
                 var notification = message.ConvertToNotification();
-                await PushNotificationsManager.ProcessMessageReceived(this, notification);
+                await PushNotificationsUtilities.ProcessMessageReceived(this, notification);
             }
             catch (Exception ex)
             {

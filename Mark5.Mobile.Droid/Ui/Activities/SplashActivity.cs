@@ -50,6 +50,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         {
             base.OnStart();
 
+            var openedFromNotification = Intent?.Extras?.ContainsKey("title") == true;
+            if (openedFromNotification && !IsTaskRoot)
+            {
+                ProcessNotification();
+                return;
+            }
+
             CommonConfig.Logger.Info($"Starting {nameof(SplashActivity)}...");
 
 #if !DEBUG
@@ -60,13 +67,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 #else
             Firebase.Analytics.FirebaseAnalytics.GetInstance(this).SetAnalyticsCollectionEnabled(false);
 #endif
-
-            var openedFromNotification = Intent?.Extras?.ContainsKey("title") == true;
-            if (openedFromNotification && !IsTaskRoot)
-            {
-                ProcessNotification();
-                return;
-            }
 
             Task.Run(async () =>
                 {
@@ -174,6 +174,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                        Services.DocumentPreviewsDownloadService?.Start();
                        Services.DocumentsDownloadService?.Start();
 
+                       PushNotificationsUtilities.CreateChannelIfNotExists(this);
+
                        if (t.Result)
                            StartActivity(MainActivity.CreateIntent(this));
                        else
@@ -191,7 +193,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         void ProcessNotification()
         {
             var not = PushNotificationsConverter.ExtractNotification(Intent.Extras);
-            PushNotificationsManager.ProcessBackgroundNotificationClicked(this, not);
+            PushNotificationsUtilities.ProcessBackgroundNotificationClicked(this, not);
         }
 
         void ShowLoginButton()
