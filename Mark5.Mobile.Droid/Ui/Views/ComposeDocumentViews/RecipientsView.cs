@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,7 +16,6 @@ using Android.Text.Style;
 using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.PortableCollections;
@@ -35,13 +34,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         public event EventHandler AddButtonClicked = delegate { };
 
         public bool Empty => (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
-        ? !Validator.ContainsValidEmail(fullEditorText) && !Validator.ContainsValidUsernames(fullEditorText, systemUsersDepartments) : !Validator.ContainsValidEmail(fullEditorText);
+        ? !Validator.ContainsValidEmail(emailEditor.Text) && !Validator.ContainsValidUsernames(emailEditor.Text, systemUsersDepartments) : !Validator.ContainsValidEmail(emailEditor.Text);
 
         public bool AllRecipientsValid
         {
             get
             {
-                return fullEditorText.Split(new[] { RecipientSeperator }, StringSplitOptions.RemoveEmptyEntries)
+                return emailEditor.Text.Split(new[] { RecipientSeperator }, StringSplitOptions.RemoveEmptyEntries)
                                   .All(a => ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable
                                        ? (Validator.ContainsValidEmails(a) || Validator.ContainsValidUsernames(a, systemUsersDepartments))
                                        : Validator.ContainsValidEmails(a));
@@ -61,8 +60,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
         }
 
-        string fullEditorText = string.Empty;
-
         readonly AppCompatMultiAutoCompleteTextView emailEditor;
         readonly DocumentAddressType AddressType;
 
@@ -70,7 +67,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         SuggestionsAdapter adapter;
 
         string savedRecipient;
-        bool compressed;
 
         string textBeforeChange;
         bool textHasChangedFlag;
@@ -276,7 +272,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                     foreach (var user in GetInternalUsers())
                     {
                         var systemUser = systemUsersDepartments.Users.FirstOrDefault(su => String.Equals(su.Username, user, StringComparison.OrdinalIgnoreCase));
-
+                      
                         if (systemUser != null)
                         {
                             DocumentPreview.Addresses.Add(new DocumentAddress
@@ -304,15 +300,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             if (internalUsers.Any())
             {
                 var newInternalUsers = new StringBuilder();
-                newInternalUsers.Append(fullEditorText);
-                if (!fullEditorText.EndsWith(RecipientSeperator, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(fullEditorText))
+                newInternalUsers.Append(emailEditor.Text);
+                if (!emailEditor.Text.EndsWith(RecipientSeperator, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(emailEditor.Text))
                     newInternalUsers.Append(RecipientSeperator);
                 newInternalUsers.Append(string.Join(RecipientSeperator, internalUsers));
                 newInternalUsers.Append(RecipientSeperator);
 
-                fullEditorText = newInternalUsers.ToString();
+                emailEditor.Text = newInternalUsers.ToString();
 
-                UpdateTextView();
+                CorrectMarkup();
 
                 SetCursorAtEnd();
 
@@ -329,31 +325,27 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             SetEmails(string.Join(RecipientSeperator, emails));
         }
 
-        public void AddEmails(IEnumerable<string> emails, bool compressView = false)
+        public void AddEmails(IEnumerable<string> emails)
         {
-            AddEmails(string.Join(RecipientSeperator, emails), compressView);
+            AddEmails(string.Join(RecipientSeperator, emails));
         }
 
-        public void AddEmails(string emails, bool compressView)
+        public void AddEmails(string emails)
         {
             if (Validator.ContainsValidEmails(emails, out MatchCollection matches))
             {
-                if (compressView)
-                    CompressView();
-
                 var newEmails = new StringBuilder();
-                newEmails.Append(fullEditorText);
-                if (!fullEditorText.EndsWith(RecipientSeperator, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(fullEditorText))
+                newEmails.Append(emailEditor.Text);
+                if (!emailEditor.Text.EndsWith(RecipientSeperator, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(emailEditor.Text))
                     newEmails.Append(RecipientSeperator);
                 newEmails.Append(string.Join(RecipientSeperator, matches.Cast<Match>().Select(m => m.Value)));
                 newEmails.Append(RecipientSeperator);
 
-                fullEditorText = newEmails.ToString();
+                emailEditor.Text = newEmails.ToString();
 
-                UpdateTextView();
+                CorrectMarkup();
 
-                if (!compressView)
-                    SetCursorAtEnd();
+                SetCursorAtEnd();
 
                 Edited(this, EventArgs.Empty);
             }
@@ -366,8 +358,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         public void AddRecipient(string name, string address)
         {
             var newEmails = new StringBuilder();
-            newEmails.Append(fullEditorText);
-            if (!fullEditorText.EndsWith(RecipientSeperator, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(fullEditorText))
+            newEmails.Append(emailEditor.Text);
+            if (!emailEditor.Text.EndsWith(RecipientSeperator, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(emailEditor.Text))
                 newEmails.Append(RecipientSeperator);
             if (string.IsNullOrWhiteSpace(name))
                 newEmails.Append(address);
@@ -375,9 +367,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 newEmails.Append(string.Format(RecipentFormat, name, address));
             newEmails.Append(RecipientSeperator);
 
-            fullEditorText = newEmails.ToString();
+            emailEditor.Text = newEmails.ToString();
 
-            UpdateTextView();
+            CorrectMarkup();
 
             SetCursorAtEnd();
 
@@ -429,9 +421,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
                 sb.Append(RecipientSeperator);
 
-                fullEditorText = sb.ToString();
-
-                UpdateTextView();
+                emailEditor.Text = sb.ToString();
             }
             else
             {
@@ -439,18 +429,16 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
         }
 
-        IEnumerable<string> GetEmails() => Validator.ContainsValidEmails(fullEditorText, out MatchCollection matches) ?
+        IEnumerable<string> GetEmails() => Validator.ContainsValidEmails(emailEditor.Text, out MatchCollection matches) ?
                                                     matches.Cast<Match>().Select(m => m.Value).Distinct().ToList() :
                                                     new List<string>();
 
         void SetRecipients(IEnumerable<string> recipients)
         {
-            fullEditorText = string.Join(RecipientSeperator, recipients);
-
-            UpdateTextView();
+            emailEditor.Text = string.Join(RecipientSeperator, recipients);
         }
 
-        IEnumerable<string> GetRecipients() => fullEditorText.Split(new[] { RecipientSeperator }, StringSplitOptions.RemoveEmptyEntries)
+        IEnumerable<string> GetRecipients() => emailEditor.Text.Split(new[] { RecipientSeperator }, StringSplitOptions.RemoveEmptyEntries)
                 .Where(Validator.ContainsValidEmail)
                 .Select(s => s.Trim());
 
@@ -464,9 +452,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
                 sb.Append(RecipientSeperator);
 
-                fullEditorText = sb.ToString();
-
-                UpdateTextView();
+                emailEditor.Text = sb.ToString();
             }
             else
             {
@@ -474,13 +460,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
         }
 
-        IEnumerable<string> GetInternalUsers() => Validator.ExtractUsernames(fullEditorText, systemUsersDepartments).Select(m => m.Value.Trim()).Distinct().ToList();
+        IEnumerable<string> GetInternalUsers() => Validator.ExtractUsernames(emailEditor.Text, systemUsersDepartments).Select(m => m.Value.Trim()).Distinct().ToList();
 
         void Clear()
         {
-            fullEditorText = string.Empty;
-
-            UpdateTextView();
+            emailEditor.Text = string.Empty;
         }
 
         IEnumerable<string> ConvertGuidsToUsernames(IEnumerable<string> systemUserGuids)
@@ -564,29 +548,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         #region Private methods
 
-        void UpdateTextView()
-        {
-            if (compressed)
-                emailEditor.Text = fullEditorText.SafeSubstring(0, 100);
-            else
-                emailEditor.Text = fullEditorText;
-        }
-
         void CompressView()
         {
             emailEditor.SetSingleLine(true);
-            compressed = true;
-
-            fullEditorText = emailEditor.Text;
-            UpdateTextView();
         }
 
         void ExpandView()
         {
             emailEditor.SetSingleLine(false);
-            compressed = false;
-
-            UpdateTextView();
         }
 
         void CorrectMarkup()
@@ -594,52 +563,42 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             if (string.IsNullOrEmpty(emailEditor.Text))
                 return;
 
-            try
+            var emailMatches = Validator.ExtractValidEmails(emailEditor.Text);
+
+            ResetStyle();
+
+            foreach (Match match in emailMatches)
+                SetEmailStyle(match.Index, match.Index + match.Length);
+
+            if (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
             {
-                var emailMatches = Validator.ExtractValidEmails(emailEditor.Text);
+                var internalUserMatches = Validator.ExtractUsernames(emailEditor.Text, systemUsersDepartments);
 
-                var cursorPosition = emailEditor.SelectionStart;
-                var editableText = emailEditor.EditableText;
-
-                ResetStyle(editableText);
-
-                foreach (Match match in emailMatches)
-                    SetEmailStyle(editableText, match.Index, match.Index + match.Length);
-
-                if (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
+                foreach (Match match in internalUserMatches)
                 {
-                    var internalUserMatches = Validator.ExtractUsernames(emailEditor.Text, systemUsersDepartments);
-
-                    foreach (Match match in internalUserMatches)
-                    {
-                        SetEmailStyle(editableText, match.Index, match.Index + match.Length);
-                    }
+                    SetEmailStyle(match.Index, match.Index + match.Length);
                 }
-
-                emailEditor.SetSelection(cursorPosition);
-
             }
-            catch (Exception ex)
-            {
-                CommonConfig.Logger.Error("Lovely", ex);
-            }
-
         }
 
-        void ResetStyle(IEditable editableText)
+        void ResetStyle()
         {
-            SetColor(editableText, 0, emailEditor.TextFormatted.Length() - 1, new Color(ContextCompat.GetColor(Context, Resource.Color.black)));
+            SetColor(0, emailEditor.TextFormatted.Length() - 1, Resource.Color.black);
         }
 
-        void SetEmailStyle(IEditable editableText, int start, int end)
+        void SetEmailStyle(int start, int end)
         {
-            SetColor(editableText, start, end, new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
+            SetColor(start, end, Resource.Color.darkblue);
         }
 
-        void SetColor(IEditable editableText, int start, int end, Color color)
+        void SetColor(int start, int end, int colorId)
         {
-            var realEnd = Math.Min(editableText.Length() - 1, end);
-            editableText.SetSpan(new ForegroundColorSpan(color), start, realEnd, SpanTypes.ExclusiveExclusive);
+            var cursorPosition = emailEditor.SelectionStart;
+
+            var editableText = emailEditor.EditableText;
+            var color = new Color(ContextCompat.GetColor(Context, colorId));
+            editableText.SetSpan(new ForegroundColorSpan(color), start, end, SpanTypes.ExclusiveExclusive);
+            emailEditor.SetSelection(cursorPosition);
         }
 
         void SetCursorAtEnd()
