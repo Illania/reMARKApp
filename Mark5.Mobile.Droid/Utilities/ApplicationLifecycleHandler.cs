@@ -27,15 +27,15 @@ namespace Mark5.Mobile.Droid.Utilities
 
             if (!authenticated &&
                  !ApplicationVisible &&
-                 activity is BaseAppCompatActivity &&
+                 activity is BaseAppCompatActivity bca &&
                  PlatformConfig.Preferences.AuthorizationEnabled &&
                  ShouldAuthenticate() &&
                  IsAuthenticationPossible(activity))
             {
-                if ((AuthenticationDialogFragment)activity.FragmentManager.FindFragmentByTag(AuthenticationFragmentTag) == null)
+                if ((AuthenticationDialogFragment)bca.SupportFragmentManager.FindFragmentByTag(AuthenticationFragmentTag) == null)
                 {
                     var authFragment = new AuthenticationDialogFragment();
-                    authFragment.Show(activity.FragmentManager, AuthenticationFragmentTag);
+                    authFragment.Show(bca.SupportFragmentManager, AuthenticationFragmentTag);
                 }
             }
             else
