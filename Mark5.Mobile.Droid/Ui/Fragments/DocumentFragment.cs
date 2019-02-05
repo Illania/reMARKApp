@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
 using Android.App;
 using Android.Content;
 using Android.OS;
@@ -209,12 +210,51 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             av.AttachmentClicked += AttachmentsView_AttachmentClicked;
             av.AttachmentLongClicked += AttachmentsView_AttachmentLongClicked;
             linearLayout.AddView(av);
-            linearLayout.AddView(new ContentView(Context));
+
+            var contentView = new ContentView(Context);
+            contentView.MailToLinkClicked += ContentView_MailToLinkClicked;
+            linearLayout.AddView(contentView);
 
             HasOptionsMenu = true;
 
             return rootView;
         }
+
+        void ContentView_MailToLinkClicked(object sender, string url)
+        {
+            var preconfiguredEmailAddresses = new Dictionary<DocumentAddressType, string[]>();
+            var parts = url.Split("?");
+
+            preconfiguredEmailAddresses.Add(DocumentAddressType.To, parts[0].Split(","));
+
+            if (parts.Length >= 1)
+            {
+                var parsed = HttpUtility.ParseQueryString(parts[1]);
+                var subject = parsed["subject"];
+                var body = parsed["body"];
+                var cc = parsed["cc"]?.Split(",");
+                var bcc = parsed["bcc"]?.Split(",");
+
+                if (cc != null && cc.Any())
+                    preconfiguredEmailAddresses.Add(DocumentAddressType.Cc, cc);
+
+                if (bcc != null && bcc.Any())
+                    preconfiguredEmailAddresses.Add(DocumentAddressType.Bcc, bcc);
+
+                StartActivity(ComposeDocumentActivity.CreateIntent(Context,
+                                                                       DocumentCreationModeFlag.New,
+                                                                       CopyToNewOption.None,
+                                                                       preconfiguredContent: body,
+                                                                       preconfiguredSubject: subject,
+                                                                       preconfiguredEmailAddresses: preconfiguredEmailAddresses));
+            }
+            else
+                StartActivity(ComposeDocumentActivity.CreateIntent(Context,
+                                                                   DocumentCreationModeFlag.New,
+                                                                   CopyToNewOption.None,
+                                                                   preconfiguredEmailAddresses: preconfiguredEmailAddresses));
+        }
+
 
         public override void OnViewCreated(View view, Bundle savedInstanceState)
         {

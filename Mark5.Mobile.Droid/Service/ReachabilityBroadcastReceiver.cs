@@ -2,8 +2,6 @@
 using Android.Content;
 using Android.Net;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Extensions;
-
 namespace Mark5.Mobile.Droid.Service
 {
     public class ReachabilityBroadcastReceiver : BroadcastReceiver

@@ -72,7 +72,7 @@ namespace FastScrollRecycler
                 var popupTextColor = typedArray.GetColor(Resource.Styleable.FastScrollRecyclerView_fastScrollPopupTextColor, colorffffffff);
                 var popupTextSize = typedArray.GetDimensionPixelSize(Resource.Styleable.FastScrollRecyclerView_fastScrollPopupTextSize, Utils.ToPixels(resources, 56f));
                 var popupBackgroundSize = typedArray.GetDimensionPixelSize(Resource.Styleable.FastScrollRecyclerView_fastScrollPopupBackgroundSize, Utils.ToPixels(resources, 88f));
-                var popupPosition = (FastScrollerPosition) typedArray.GetInteger(Resource.Styleable.FastScrollRecyclerView_fastScrollPopupPosition, (int) FastScrollerPosition.Adjacent);
+                var popupPosition = (FastScrollerPosition)typedArray.GetInteger(Resource.Styleable.FastScrollRecyclerView_fastScrollPopupPosition, (int)FastScrollerPosition.Adjacent);
 
                 track.Color = trackColor;
                 thumb.Color = thumbColor;
@@ -124,7 +124,7 @@ namespace FastScrollRecycler
             var config = ViewConfiguration.Get(recyclerView.Context);
 
             var action = ev.Action;
-            var y = (int) ev.GetY();
+            var y = (int)ev.GetY();
 
             switch (action)
             {
@@ -145,11 +145,11 @@ namespace FastScrollRecycler
                     {
                         var top = 0;
                         var bottom = recyclerView.Height - thumbHeight;
-                        var boundedY = (float) Math.Max(top, Math.Min(bottom, y - touchOffset));
+                        var boundedY = (float)Math.Max(top, Math.Min(bottom, y - touchOffset));
                         var sectionName = recyclerView.ScrollToPositionAtProgress((boundedY - top) / (bottom - top));
                         popup.SetSectionName(sectionName);
                         popup.AnimateVisibility(!string.IsNullOrEmpty(sectionName));
-                        recyclerView.Invalidate(popup.UpdateFastScrollerBounds(recyclerView, thumbPosition.Y));
+                        recyclerView.Invalidate();
                     }
                     break;
                 case MotionEventActions.Up:
@@ -191,7 +191,7 @@ namespace FastScrollRecycler
             thumbPosition.Set(x, y);
             invalidateTmpRect.Set(thumbPosition.X + offset.X, offset.Y, thumbPosition.X + offset.X + width, recyclerView.Height + offset.Y);
             invalidateRect.Union(invalidateTmpRect);
-            recyclerView.Invalidate(invalidateRect);
+            recyclerView.Invalidate();
         }
 
         public void SetOffset(int x, int y)
@@ -203,7 +203,7 @@ namespace FastScrollRecycler
             offset.Set(x, y);
             invalidateTmpRect.Set(thumbPosition.X + offset.X, offset.Y, thumbPosition.X + offset.X + width, recyclerView.Height + offset.Y);
             invalidateRect.Union(invalidateTmpRect);
-            recyclerView.Invalidate(invalidateRect);
+            recyclerView.Invalidate();
         }
 
         [Export("setOffsetX")]
@@ -254,13 +254,13 @@ namespace FastScrollRecycler
         public void SetThumbColor(Color color)
         {
             thumb.Color = color;
-            recyclerView?.Invalidate(invalidateRect);
+            recyclerView?.Invalidate();
         }
 
         public void SetTrackColor(Color color)
         {
             track.Color = color;
-            recyclerView?.Invalidate(invalidateRect);
+            recyclerView?.Invalidate();
         }
 
         public void SetPopupBackgroundColor(Color color)
