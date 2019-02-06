@@ -13,6 +13,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
     {
         CustomWebView webView;
 
+        public event EventHandler<string> MailToLinkClicked = delegate { };
+
         public ContentView(Context context)
             : base(context)
         {
@@ -23,8 +25,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
         {
             SetPadding(DistanceNone, DistanceNormal, DistanceNone, DistanceNormal);
 
+            var customWebViewClient = new CustomWebViewClient();
+            customWebViewClient.MailToLinkClicked += (sender, e) => MailToLinkClicked(sender, e);
+
             webView = new CustomWebView(Context);
-            webView.SetWebViewClient(new CustomWebViewClient());
+            webView.SetWebViewClient(customWebViewClient);
             webView.Settings.SetSupportZoom(true);
             webView.Settings.BuiltInZoomControls = true;
             webView.Settings.DisplayZoomControls = false;
@@ -81,10 +86,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
         class CustomWebViewClient : WebViewClient
         {
+            public event EventHandler<string> MailToLinkClicked = delegate { };
+
             [Obsolete]
             public override bool ShouldOverrideUrlLoading(WebView view, string url)
             {
-                view.Context.StartActivity(new Intent(Intent.ActionView, Android.Net.Uri.Parse(url)));
+                if (url.StartsWith("mailto", StringComparison.InvariantCultureIgnoreCase))
+                    MailToLinkClicked(this, url);
+                else
+                    view.Context.StartActivity(new Intent(Intent.ActionView, Android.Net.Uri.Parse(url)));
                 return true;
             }
         }

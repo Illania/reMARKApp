@@ -7,7 +7,6 @@ using Android.Support.V7.App;
 using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 
 namespace Mark5.Mobile.Droid.Ui.Common

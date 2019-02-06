@@ -37,7 +37,7 @@ namespace Mark5.Mobile.Droid.Utilities
             sendIntent.PutExtra(Intent.ExtraText, report);
             sendIntent.SetType("text/plain");
             return Intent.CreateChooser(sendIntent, context.GetText(Resource.String.share));
-        } 
+        }
 
         public static Intent CreateShareFeedbackIntent(string report)
         {
@@ -120,31 +120,26 @@ namespace Mark5.Mobile.Droid.Utilities
 
             sb.AppendLine("===== Network information =====");
             var cm = Application.Context.GetSystemService(Context.ConnectivityService) as ConnectivityManager;
-            NetworkInfo[] networkInfos = null;
-            if (Build.VERSION.SdkInt >= BuildVersionCodes.Lollipop)
+            var activeNetwork = cm.ActiveNetwork;
+
+            if (activeNetwork != null)
             {
-#pragma warning disable XA0001 // Find issues with Android API usage
-                networkInfos = cm.GetAllNetworks().Select(n => cm.GetNetworkInfo(n)).ToArray();
-#pragma warning restore XA0001 // Find issues with Android API usage
+                var networkInfo = cm.GetNetworkInfo(activeNetwork);
+                var networkCapabilities = cm.GetNetworkCapabilities(activeNetwork);
+                sb.AppendLine($"Network {activeNetwork}:");
+                sb.AppendLine("  IsReachable: " + CommonConfig.Reachability?.IsReachable);
+                sb.AppendLine("  IsCellular: " + networkCapabilities.HasTransport(TransportType.Cellular));
+                sb.AppendLine("  IsVpn: " + networkCapabilities.HasTransport(TransportType.Vpn));
+                sb.AppendLine("  IsWifi: " + networkCapabilities.HasTransport(TransportType.Wifi));
+                sb.AppendLine("  IsWifiAware: " + networkCapabilities.HasTransport(TransportType.WifiAware));
+                sb.AppendLine("  NotRoaming:" + networkCapabilities.HasCapability(NetCapability.NotRoaming));
+                sb.AppendLine("  Subtype: " + networkInfo.Subtype);
+                sb.AppendLine("  Connected:" + networkInfo.IsConnected);
+                sb.AppendLine("  Extra info:" + networkInfo.ExtraInfo);
             }
             else
             {
-#pragma warning disable CS0618 // Type or member is obsolete
-                networkInfos = cm.GetAllNetworkInfo();
-#pragma warning restore CS0618 // Type or member is obsolete
-            }
-            for (var i = 0; i < networkInfos.Length; i++)
-            {
-                var networkInfo = networkInfos[i];
-                sb.AppendLine($"Network {i}:");
-                sb.AppendLine("  Type: " + networkInfo.Type);
-                sb.AppendLine("  Subtype: " + networkInfo.Subtype);
-                sb.AppendLine("  State: " + networkInfo.GetState());
-                sb.AppendLine("  Available:" + networkInfo.IsAvailable);
-                sb.AppendLine("  Connected:" + networkInfo.IsConnected);
-                sb.AppendLine("  Roaming:" + networkInfo.IsRoaming);
-                sb.AppendLine("  Failover:" + networkInfo.IsFailover);
-                sb.AppendLine("  Extra info:" + networkInfo.ExtraInfo);
+                sb.AppendLine("Active network is null");
             }
 
             sb.AppendLine();
@@ -212,7 +207,7 @@ namespace Mark5.Mobile.Droid.Utilities
             sb.AppendLine("===== Exception =====");
             sb.AppendLine("Exception Type: " + ex.GetType());
             sb.AppendLine();
-            sb.AppendLine("Stack trace: " +ex.StackTrace);
+            sb.AppendLine("Stack trace: " + ex.StackTrace);
 
             return sb.ToString();
         }
