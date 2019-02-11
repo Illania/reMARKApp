@@ -792,7 +792,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             CommonConfig.Logger.Info($"Setting favourite status of {selectedFolders.Count} folders to {favourite}");
 
-
             try
             {
                 foreach (var folder in selectedFolders)
@@ -810,11 +809,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 return;
             }
+            actionMode.Finish();
 
             if (AvailableSections.Contains(Section.Favourites))
                 await RefreshFavorites();
-
-            actionMode.Finish();
         }
 
         async void MakeFolderOnline()
