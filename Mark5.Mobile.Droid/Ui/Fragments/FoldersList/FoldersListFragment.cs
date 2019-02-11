@@ -727,22 +727,26 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var module = selectedFolders.First().Module;
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, enabled ? Resource.String.enabling_notifications : Resource.String.disabling_notifications_folders, Resource.String.please_wait);
 
-            var t = Managers.NotificationsManager.SetFoldersNotificationsAsync(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken, module, selectedFolders, enabled);
-            await t;
 
-            if (t.IsFaulted)
+            try
+            {
+                await Managers.NotificationsManager.SetFoldersNotificationsAsync(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken, module, selectedFolders, enabled);
+            }
+            catch (Exception ex)
             {
                 dismissAction();
 
-                CommonConfig.Logger.Error($"{(enabled ? "Subscription" : "Unsubscription")}  failed", t.Exception.InnerException);
-                Dialogs.ShowErrorDialog(Activity, t.Exception.InnerException);
+                CommonConfig.Logger.Error($"{(enabled ? "Subscription" : "Unsubscription")}  failed", ex);
+                Dialogs.ShowErrorDialog(Activity, ex);
+
+                actionMode.Finish();
+
+                return;
             }
-            else
-            {
-                dismissAction();
-                Adapter.RefreshFolders(selectedFolders, enabled);
-                SearchAdapter.RefreshFolders(selectedFolders, enabled);
-            }
+
+            dismissAction();
+            Adapter.RefreshFolders(selectedFolders, enabled);
+            SearchAdapter.RefreshFolders(selectedFolders, enabled);
 
             actionMode.Finish();
         }
