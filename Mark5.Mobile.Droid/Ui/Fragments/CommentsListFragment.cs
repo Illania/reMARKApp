@@ -269,6 +269,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 dismissAction();
                 return;
             }
+
             dismissAction();
             adapter.EditItem(newComment);
         }

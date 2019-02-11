@@ -734,7 +734,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             catch (Exception ex)
             {
                 dismissAction();
-
                 CommonConfig.Logger.Error($"{(enabled ? "Subscription" : "Unsubscription")}  failed", ex);
                 Dialogs.ShowErrorDialog(Activity, ex);
 
@@ -744,7 +743,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             dismissAction();
             Adapter.RefreshFolders(selectedFolders, enabled);
             SearchAdapter.RefreshFolders(selectedFolders, enabled);
-
             actionMode.Finish();
         }
 
@@ -778,7 +776,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             Adapter.RefreshFolders(selectedFolders);
             SearchAdapter.RefreshFolders(selectedFolders);
-
             actionMode.Finish();
         }
 
