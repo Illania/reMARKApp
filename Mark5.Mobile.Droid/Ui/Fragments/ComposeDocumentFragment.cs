@@ -768,7 +768,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
                 catch(Exception ex)
                 {
-                    CommonConfig.Logger.Error($"Failed to queue document for upload [saveDraft={saveDraft}, restoreWorkingCopy={restoreWorkingCopy}, documentCreationModeFlag={documentCreationModeFlag}, copyToNewOption={copyToNewOption}, previousDocumentFolderId={previousDocumentFolderId}, previousDocumentId={previousDocumentId}]", t.Exception.InnerException);
+                    CommonConfig.Logger.Error($"Failed to queue document for upload [saveDraft={saveDraft}, restoreWorkingCopy={restoreWorkingCopy}, documentCreationModeFlag={documentCreationModeFlag}, copyToNewOption={copyToNewOption}, previousDocumentFolderId={previousDocumentFolderId}, previousDocumentId={previousDocumentId}]", ex.InnerException);
                     await Dialogs.ShowErrorDialogAsync(Activity, ex.InnerException);
                     fab.Enabled = true;
 

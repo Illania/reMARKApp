@@ -214,13 +214,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     case ObjectType.Document:
                         var document = entity as Document;
-                        t = Managers.DocumentsManager.DeleteComment(document, comment);
-                        await t;
+                        await Managers.DocumentsManager.DeleteComment(document, comment);
                         break;
                     case ObjectType.Contact:
                         var contact = entity as Contact;
-                        t = Managers.ContactsManager.DeleteComment(contact, comment);
-                        await t;
+                        await Managers.ContactsManager.DeleteComment(contact, comment);
                         break;
                         
                     default:
@@ -252,13 +250,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     case ObjectType.Document:
                         var document = entity as Document;
-                        t = Managers.DocumentsManager.EditComment(document, newComment);
-                        await t;
+                        await Managers.DocumentsManager.EditComment(document, newComment);
                         break;
                     case ObjectType.Contact:
                         var contact = entity as Contact;
-                        t = Managers.ContactsManager.EditComment(contact, newComment);
-                        await t;
+                        await Managers.ContactsManager.EditComment(contact, newComment);
                         break;
                         
                     default:
