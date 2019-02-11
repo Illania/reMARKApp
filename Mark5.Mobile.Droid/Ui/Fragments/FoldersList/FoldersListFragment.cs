@@ -727,7 +727,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var module = selectedFolders.First().Module;
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, enabled ? Resource.String.enabling_notifications : Resource.String.disabling_notifications_folders, Resource.String.please_wait);
 
-
             try
             {
                 await Managers.NotificationsManager.SetFoldersNotificationsAsync(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken, module, selectedFolders, enabled);
@@ -738,8 +737,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 CommonConfig.Logger.Error($"{(enabled ? "Subscription" : "Unsubscription")}  failed", ex);
                 Dialogs.ShowErrorDialog(Activity, ex);
-
-                actionMode.Finish();
 
                 return;
             }
@@ -761,27 +758,26 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             CommonConfig.Logger.Info($"Setting offline status of {selectedFolders.Count} folders to {offline}");
 
-            Task t = null;
+            try
+            {
+                foreach (var folder in selectedFolders)
+                {
+                    if (offline)
+                        await Managers.FoldersManager.AddSavedFolderInfo(folder);
+                    else
+                        await Managers.FoldersManager.RemoveSavedFolderInfo(folder);
+                }
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Error while changing offline status for folders", ex.InnerException);
+                Dialogs.ShowErrorDialog(Activity, ex.InnerException);
 
-            foreach (var folder in selectedFolders)
-            {
-                if (offline)
-                    t = Managers.FoldersManager.AddSavedFolderInfo(folder);
-                else
-                    t = Managers.FoldersManager.RemoveSavedFolderInfo(folder);
-                await t;
+                return;
             }
 
-            if (t.IsFaulted)
-            {
-                CommonConfig.Logger.Error($"Error while changing offline status for folders", t.Exception.InnerException);
-                Dialogs.ShowErrorDialog(Activity, t.Exception.InnerException);
-            }
-            else
-            {
-                Adapter.RefreshFolders(selectedFolders);
-                SearchAdapter.RefreshFolders(selectedFolders);
-            }
+            Adapter.RefreshFolders(selectedFolders);
+            SearchAdapter.RefreshFolders(selectedFolders);
 
             actionMode.Finish();
         }
@@ -796,51 +792,50 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             CommonConfig.Logger.Info($"Setting favourite status of {selectedFolders.Count} folders to {favourite}");
 
-            Task t = null;
-            foreach (var folder in selectedFolders)
+
+            try
             {
-                if (favourite)
-                    t = Managers.FoldersManager.AddFavoriteFolderAsync(folder.Module, folder);
-                else
-                    t = Managers.FoldersManager.RemoveFavoriteFolderAsync(folder.Module, folder);
-                await t;
+                foreach (var folder in selectedFolders)
+                {
+                    if (favourite)
+                        await Managers.FoldersManager.AddFavoriteFolderAsync(folder.Module, folder);
+                    else
+                        await Managers.FoldersManager.RemoveFavoriteFolderAsync(folder.Module, folder);
+                }
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Error while changing favourite status for folders", ex.InnerException);
+                Dialogs.ShowErrorDialog(Activity, ex.InnerException);
+
+                return;
             }
 
-            if (t.IsFaulted)
-            {
-                CommonConfig.Logger.Error($"Error while changing favourite status for folders", t.Exception.InnerException);
-                Dialogs.ShowErrorDialog(Activity, t.Exception.InnerException);
-            }
-            else
-            {
-                actionMode.Finish();
+            if (AvailableSections.Contains(Section.Favourites))
+                await RefreshFavorites();
 
-                if (AvailableSections.Contains(Section.Favourites))
-                    await RefreshFavorites();
-            }
+            actionMode.Finish();
         }
 
-        void MakeFolderOnline()
+        async void MakeFolderOnline()
         {
             var selectedFolder = CurrentAdapter.GetSelectedItems().FirstOrDefault();
             if (selectedFolder == null)
                 return;
 
-            Task.Run(async () =>
+            try
             {
                 await Managers.FoldersManager.RemoveSavedFolderInfo(selectedFolder);
-            }).ContinueWith((t) =>
+            } 
+            catch (Exception ex)
             {
-                if (t.IsFaulted)
-                {
-                    CommonConfig.Logger.Error($"Error while making folder online.", t.Exception.InnerException);
-                    Dialogs.ShowErrorDialog(Activity, t.Exception.InnerException);
-                }
-                else
-                {
-                    actionMode.Finish();
-                }
-            }, TaskScheduler.FromCurrentSynchronizationContext());
+                CommonConfig.Logger.Error($"Error while making folder online.", ex.InnerException);
+                Dialogs.ShowErrorDialog(Activity, ex.InnerException);
+
+                return;
+            }
+
+            actionMode.Finish();
         }
 
         void SaveFolderOffline()
