@@ -74,13 +74,13 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         public void Initialize(ObjectAction action)
         {
-            usernameLabel.Text = action.Username ?? action.UserId.ToString();
+            usernameLabel.Text = action.Description;
             dateLabel.Text = action.ActionTimeTimestamp
                 .ConvertTimestampMillisecondsToDateTime()
                 .ConvertUtcToUserTime()
                 .ConvertDateTimeToTimestampMilliseconds()
                 .FormatUserTimestampAsCompactShortDateTimeString();
-            descriptionTextView.Text = action.Description;
+            descriptionTextView.Text = action.ActionType;
         }
     }
 }

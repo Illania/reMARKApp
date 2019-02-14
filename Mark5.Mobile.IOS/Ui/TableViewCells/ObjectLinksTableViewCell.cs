@@ -1,5 +1,4 @@
-﻿using System;
-using Foundation;
+﻿using Foundation;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
@@ -58,7 +57,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         public void Initialize(ObjectLink link)
         {
             descriptionLabel.Text = link.Description;
-            typeDescription.Text = link.IsReverse ? link.TypeInfo.DescriptionComplexReverse : link.TypeInfo.DescriptionComplex;
+            typeDescription.Text = link.TypeInfo.DescriptionSimple;
 
             var clickable = false;
             if (link.IsReverse)

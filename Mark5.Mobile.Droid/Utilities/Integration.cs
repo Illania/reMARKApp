@@ -9,7 +9,6 @@ using Android.Preferences;
 using Android.Support.V4.Net;
 using Android.Widget;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Droid.Ui.Activities;
 
 namespace Mark5.Mobile.Droid.Utilities
 {

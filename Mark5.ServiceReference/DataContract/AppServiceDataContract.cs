@@ -2586,6 +2586,9 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "TypeInfo", Order = 0)]
         public ObjectLinkTypeInfo TypeInfo { get; set; } = new ObjectLinkTypeInfo();
+
+        [DataMember(Name = "LinkTime", Order = 1)]
+        public DateTime LinkTime { get; set; }
     }
 
     [DataContract(Name = "ObjectLinkTypeInfo", Namespace = "com.nordic-it.appservice.v3")]
