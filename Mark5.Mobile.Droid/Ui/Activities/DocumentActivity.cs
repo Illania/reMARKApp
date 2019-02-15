@@ -34,14 +34,19 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             if (folderId != null)
                 intent.PutExtra(FolderIdIntentKey, folderId.Value);
 
+            if (notificationGuid != null)
+                intent.PutExtra(NotificationGuidIntentKey, notificationGuid);
+
             if (documentId != null)
                 intent.PutExtra(DocumentIdIntentKey, documentId.Value);
 
             if (documentPreview != null)
-                intent.PutExtra(DocumentPreviewIntentKey, Serializer.Serialize(documentPreview));
-
-            if (notificationGuid != null)
-                intent.PutExtra(NotificationGuidIntentKey, notificationGuid);
+            {
+                if (IsDocumentPreviewTooBig(documentPreview))
+                    intent.PutExtra(DocumentIdIntentKey, documentPreview.Id);
+                else
+                    intent.PutExtra(DocumentPreviewIntentKey, Serializer.Serialize(documentPreview));
+            }
 
             return intent;
         }
@@ -106,6 +111,22 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 CommonConfig.Logger.Info($"Restored {nameof(DocumentActivity)}");
             }
         }
+
+        static bool IsDocumentPreviewTooBig(DocumentPreview documentPreview)
+        {
+            //Ballpark calculation to avoid TransactionTooLargeException
+            //https://developer.android.com/reference/android/os/TransactionTooLargeException
+
+            var len1 = documentPreview.AddressesString.Length;
+            var len2 = documentPreview.Subject.Length;
+            var len3 = documentPreview.CategoriesString.Length;
+            var len4 = documentPreview.Preview.Length;
+
+            var sizeInKiB = (len1 + len2 + len3 + len4) * 2 / 1024;
+
+            return sizeInKiB > 400;
+        }
+
 
         public override void Finish()
         {
