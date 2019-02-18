@@ -222,7 +222,6 @@
     <Compile Include="Model\Exceptions\MailViewerException.cs" />
     <Compile Include="Service\PushNotificationInstanceIdService.cs" />
     <Compile Include="Service\PushNotificationMessagingService.cs" />
-    <Compile Include="Service\ReachabilityBroadcastReceiver.cs" />
     <Compile Include="Service\Reachability.cs" />
     <Compile Include="Utilities\Conversion.cs" />
     <Compile Include="Utilities\DateTimeFormatter.cs" />
