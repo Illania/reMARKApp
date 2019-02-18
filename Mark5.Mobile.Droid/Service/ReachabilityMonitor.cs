@@ -1,7 +1,10 @@
 ﻿using System.Threading.Tasks;
+using Android.App;
 using Android.Content;
 using Android.Net;
+using Android.OS;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Droid.Utilities;
 using static Android.Net.ConnectivityManager;
 
 namespace Mark5.Mobile.Droid.Service
@@ -44,9 +47,7 @@ namespace Mark5.Mobile.Droid.Service
             base.OnAvailable(network);
 
             CommonConfig.Logger.Info("Connectivity changed");
-
-            //Task.Run(() => CommonConfig.Reachability.Refresh());
-            CommonConfig.Reachability.Refresh();
+            new Handler(Looper.MainLooper).Post(() => CommonConfig.Reachability.Refresh());
         }
     }
 }
