@@ -127,7 +127,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             return sizeInKiB > 400;
         }
 
-
         public override void Finish()
         {
             base.Finish();
