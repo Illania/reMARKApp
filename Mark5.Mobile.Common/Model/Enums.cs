@@ -263,7 +263,7 @@ namespace Mark5.Mobile.Common.Model
         Declined = 2,
         Tentative = 3,
         Inviting = 4,
-        Invired = 5
+        Invited = 5
     }
 
     #endregion
@@ -379,7 +379,7 @@ namespace Mark5.Mobile.Common.Model
 
     #region ICalendar
 
-    public enum ICalendarInfoMethodType
+    public enum MethodType
     {
         Request = 0,
         Reply = 1,

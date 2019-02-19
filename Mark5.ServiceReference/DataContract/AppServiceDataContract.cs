@@ -1426,11 +1426,12 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "ParticipantStatus", Namespace = "com.nordic-it.appservice.v3")]
     public enum ParticipantStatus
     {
-        [EnumMember(Value = "None")] None = 0,
-        [EnumMember(Value = "NeedAction")] NeedAction = 1,
-        [EnumMember(Value = "Accepted")] Accepted = 2,
-        [EnumMember(Value = "Declined")] Declined = 3,
-        [EnumMember(Value = "Tentative")] Tentative = 4,
+        [EnumMember(Value = "NeedAction")] NeedAction = 0,
+        [EnumMember(Value = "Accepted")] Accepted = 1,
+        [EnumMember(Value = "Declined")] Declined = 2,
+        [EnumMember(Value = "Tentative")] Tentative = 3,
+        [EnumMember(Value = "Inviting")] Inviting = 4,
+        [EnumMember(Value = "Invited")] Invited = 5
     }
 
     [DataContract(Name = "SendCalendarAppointmentInvitationsResult", Namespace = "com.nordic-it.appservice.v3")]
@@ -1478,11 +1479,11 @@ namespace Mark5.ServiceReference.DataContract
         [DataMember(Name = "Events", Order = 0)]
         public List<IEventInfo> Events = new List<IEventInfo>();
 
-        [DataMember(Name = "Method", Order = 0)]
-        public MethodType Method = MethodType.Request;
+        [DataMember(Name = "MethodType", Order = 0)]
+        public MethodType MethodType { get; set; }
 
         [DataMember(Name = "Reply", Order = 0)]
-        public IReplyInfo Reply = null;
+        public IReplyInfo Reply { get; set; }
     }
 
     [DataContract(Name = "MethodType", Namespace = "com.nordic-it.appservice.v3")]
@@ -1501,26 +1502,26 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "IEventInfo", Namespace = "com.nordic-it.appservice.v3")]
     public sealed class IEventInfo
     {
+        [DataMember(Name = "Id", Order = 0)]
+        public string Id { get; set; }
+
         [DataMember(Name = "Attendees", Order = 0)]
         public List<IAttendeeInfo> Attendees = new List<IAttendeeInfo>();
 
         [DataMember(Name = "Description", Order = 0)]
-        public string Description = string.Empty;
+        public string Description { get; set; }
 
         [DataMember(Name = "End", Order = 0)]
-        public DateTime End = DateTime.MinValue;
-
-        [DataMember(Name = "Id", Order = 0)]
-        public string Id = string.Empty;
+        public DateTime End { get; set; }
 
         [DataMember(Name = "Location", Order = 0)]
-        public string Location = string.Empty;
+        public string Location { get; set; }
 
         [DataMember(Name = "Start", Order = 0)]
-        public DateTime Start = DateTime.MinValue;
+        public DateTime Start { get; set; }
 
         [DataMember(Name = "Summary", Order = 0)]
-        public string Summary = string.Empty;
+        public string Summary { get; set; }
     }
 
     [DataContract(Name = "IAttendeeInfo", Namespace = "com.nordic-it.appservice.v3")]
@@ -1528,35 +1529,35 @@ namespace Mark5.ServiceReference.DataContract
     {
         /// <summary> common name </summary>
         [DataMember(Name = "CN", Order = 0)]
-        public string CN = string.Empty;
+        public string CN { get; set; }
 
         [DataMember(Name = "RSVP", Order = 0)]
-        public bool RSVP = true;
+        public bool RSVP { get; set; }
 
         [DataMember(Name = "Status", Order = 0)]
-        public ParticipantStatus Status = ParticipantStatus.NeedAction;
+        public ParticipantStatus Status { get; set; }
 
         [DataMember(Name = "Type", Order = 0)]
-        public ParticipantType Type = ParticipantType.ComAddress;
+        public ParticipantType Type { get; set; }
 
         [DataMember(Name = "Url", Order = 0)]
-        public string Url = string.Empty;
+        public string Url { get; set; }
 
         [DataMember(Name = "IsOrganizer", Order = 0)]
-        public bool IsOrganizer = false;
+        public bool IsOrganizer { get; set; }
     }
 
     [DataContract(Name = "IReplyInfo", Namespace = "com.nordic-it.appservice.v3")]
     public sealed class IReplyInfo
     {
         [DataMember(Name = "AppId", Order = 0)]
-        public string AppId = string.Empty;
+        public string AppId { get; set; }
 
         [DataMember(Name = "FromAddress", Order = 0)]
-        public string FromAddress = string.Empty;
+        public string FromAddress { get; set; }
 
         [DataMember(Name = "Status", Order = 0)]
-        public ParticipantStatus Status = ParticipantStatus.Accepted;
+        public ParticipantStatus Status { get; set; }
     }
     #endregion
 

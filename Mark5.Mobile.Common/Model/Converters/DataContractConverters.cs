@@ -676,7 +676,7 @@ namespace Mark5.Mobile.Common.Model.Converters
             {
                 Events = calendarInfo.Events.WhereNotNull().Select(Convert).ToList(),
                 Reply = calendarInfo.Reply?.Convert(),
-                Method = calendarInfo.Method.ConvertEnum<ICalendarInfoMethodType>()
+                MethodType = calendarInfo.MethodType.ConvertEnum<MethodType>()
             };
         }
 
