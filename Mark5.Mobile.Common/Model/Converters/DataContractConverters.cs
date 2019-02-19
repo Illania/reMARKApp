@@ -454,7 +454,8 @@ namespace Mark5.Mobile.Common.Model.Converters
                 ToObjectType = ol.ToObjectType.ConvertEnum<ObjectType>(),
                 Description = ol.Description,
                 IsReverse = ol.IsReverse,
-                TypeInfo = ol.TypeInfo?.Convert()
+                TypeInfo = ol.TypeInfo?.Convert(),
+                LinkTimeStamp = ol.LinkTime.ConvertDateTimeToTimestampMilliseconds(),
             };
         }
 
