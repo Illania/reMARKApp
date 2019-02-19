@@ -673,7 +673,6 @@ namespace Mark5.Mobile.Common.Manager
                     SendOn = sendOnTimestamp.ConvertTimestampMillisecondsToDateTime(),
                     ConfirmRead = confirmRead,
                     ConfirmDelivery = confirmDelivery,
-                    IEventReplyParameters = eventReply.Convert(),
                     TemporaryAttachmentGuids = temporaryAttachmentGuids ?? new List<Guid>()
                 });
 
