@@ -246,6 +246,8 @@ namespace Mark5.Mobile.Common.Model.Converters
                 result.Comments.AddRange(d.Comments.WhereNotNull().Select(Convert));
             if (d.ExtraFields != null)
                 result.ExtraFields = d.ExtraFields.Where(kv => kv.Key != null).ToDictionary(kv => kv.Key.Convert(), kv => kv.Value);
+            if (d.ICalendars != null)
+                result.ICalendars.AddRange(d.ICalendars.WhereNotNull().Select(Convert));
             return result;
         }
 
@@ -667,6 +669,56 @@ namespace Mark5.Mobile.Common.Model.Converters
             };
         }
 
+        #region ICalendar
+        public static ICalendarInfo Convert(this DataContract.ICalendarInfo calendarInfo)
+        {
+            return new ICalendarInfo
+            {
+                Events = calendarInfo.Events.WhereNotNull().Select(Convert).ToList(),
+                Reply = calendarInfo.Reply?.Convert(),
+                Method = calendarInfo.Method.ConvertEnum<ICalendarInfoMethodType>()
+            };
+        }
+
+        public static IEventInfo Convert(this DataContract.IEventInfo eventInfo)
+        {
+            return new IEventInfo
+            {
+                Id = eventInfo.Id,
+                Description = eventInfo.Description,
+                Summary = eventInfo.Summary,
+                End = eventInfo.End,
+                Start = eventInfo.Start,
+                Location = eventInfo.Location,
+                Attendees = eventInfo.Attendees.WhereNotNull().Select(Convert).ToList(),
+            };
+        }
+
+        public static IReplyInfo Convert(this DataContract.IReplyInfo replyInfo)
+        {
+            return new IReplyInfo
+            {
+                AppId = replyInfo.AppId,
+                Status = replyInfo.Status.ConvertEnum<ParticipantStatus>(),
+                FromAddress = replyInfo.FromAddress
+            };
+        }
+
+        public static IAttendeeInfo Convert(this DataContract.IAttendeeInfo attendeeInfo)
+        {
+            return new IAttendeeInfo
+            {
+                Status = attendeeInfo.Status.ConvertEnum<ParticipantStatus>(),
+                RSVP = attendeeInfo.RSVP,
+                CN = attendeeInfo.CN,
+                IsOrganizer = attendeeInfo.IsOrganizer,
+                Type = attendeeInfo.Type.ConvertEnum<ParticipantType>(),
+                Url = attendeeInfo.Url
+            };
+        }
+
+        #endregion
+
         #endregion
 
         #region Model to DataContract
@@ -982,6 +1034,18 @@ namespace Mark5.Mobile.Common.Model.Converters
                 AddressCount = sp.AddressCount,
             };
         }
+
+        #region ICalendar
+        public static DataContract.IEventReplyParameters Convert(this IEventReply eventReply)
+        {
+            return new DataContract.IEventReplyParameters
+            {
+                IEventId = eventReply.EventId,
+                ParticipantStatus = (DataContract.ParticipantStatus)eventReply.ParticipantStatus.ConvertEnum<ParticipantStatus>(),
+                Silent = eventReply.Silent
+            };
+        }
+        #endregion
 
         #endregion
     }

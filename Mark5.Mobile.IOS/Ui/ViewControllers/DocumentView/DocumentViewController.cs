@@ -262,6 +262,57 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 editDocumentButtonItem.Clicked += EditDocumentButtonItem_Clicked;
         }
 
+        /*
+         *  Working silent ICalendar reply Document/DocumentPreview mock object
+         *
+        async Task HeaderView_ICalendarResponseTappedAsync(object sender, ICalendarResponseTapped e)
+        {
+            try
+            {
+                Document mockDocument = new Document
+                {
+                    Lines = new List<Line> { ServerConfig.SystemSettings.DocumentsModuleInfo.DefaultOutgoingLine },
+                    HtmlBody = ""
+                };
+
+                List<DocumentAddress> addresses = new List<DocumentAddress>();
+
+                addresses = documentPreview.Addresses.Where(x => x.AddressType == DocumentAddressType.From).ToList();
+
+                addresses.ForEach(x =>
+                {
+                    x.Type = CommunicationAddressType.Email;
+                    x.AddressType = DocumentAddressType.To;
+                });
+
+                DocumentPreview mockDocumentPreview = new DocumentPreview
+                {
+                    Direction = DocumentDirection.Outgoing,
+                    Addresses = addresses,
+                    Subject = ""
+                };
+
+                await Managers.DocumentsManager.SaveDocumentWorkingCopyAsync(new DocumentWorkingCopy
+                {
+                    DocumentCreationModeFlag = DocumentCreationModeFlag.Reply,
+                    CopyToNewOption = CopyToNewOption.None,
+                    PreviousDocumentFolderId = folderId ?? folder?.Id,
+                    PreviousDocumentId = documentPreview.Id,
+                    PreviousDocumentDirection = documentPreview.Direction,
+                    DocumentPreview = mockDocumentPreview,
+                    Document = mockDocument,
+                    IEventReply = new IEventReply(document, ParticipantStatus.Accepted, true)
+                });
+
+                await Managers.DocumentsManager.QueueWorkingCopyToUpload();
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Exception thrown in HeaderView_ICalendarResponseTappedAsync", ex);
+            }
+        }
+        */
+
         void DeinitializeHandlers()
         {
             if (headerView != null)

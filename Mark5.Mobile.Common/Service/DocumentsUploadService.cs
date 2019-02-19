@@ -119,6 +119,7 @@ namespace Mark5.Mobile.Common.Service
                                                                     info.ConfirmRead,
                                                                     info.ConfirmDelivery,
                                                                     uploadedAttachmentsGuids,
+                                                                    info.IEventReply,
                                                                     SourceType.Remote);
 
                             CommonConfig.Logger.Info($"Document sent [documentToUploadGuid={documentToUploadGuid}]");

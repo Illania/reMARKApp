@@ -653,7 +653,7 @@ namespace Mark5.Mobile.Common.Manager
 
         #region DocumentsUploadService specific
 
-        internal async Task SendDocumentAsync(Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId, long sendOnTimestamp, bool confirmRead, bool confirmDelivery, List<Guid> temporaryAttachmentGuids, SourceType sourceType = SourceType.Auto)
+        internal async Task SendDocumentAsync(Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId, long sendOnTimestamp, bool confirmRead, bool confirmDelivery, List<Guid> temporaryAttachmentGuids, IEventReply eventReply, SourceType sourceType = SourceType.Auto)
         {
             CommonConfig.UsageAnalytics.LogEvent(new DocumentSentEvent(flag));
 
@@ -673,6 +673,7 @@ namespace Mark5.Mobile.Common.Manager
                     SendOn = sendOnTimestamp.ConvertTimestampMillisecondsToDateTime(),
                     ConfirmRead = confirmRead,
                     ConfirmDelivery = confirmDelivery,
+                    IEventReplyParameters = eventReply.Convert(),
                     TemporaryAttachmentGuids = temporaryAttachmentGuids ?? new List<Guid>()
                 });
 
