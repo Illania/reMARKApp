@@ -736,6 +736,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 dismissAction();
                 CommonConfig.Logger.Error($"{(enabled ? "Subscription" : "Unsubscription")}  failed", ex);
                 Dialogs.ShowErrorDialog(Activity, ex);
+                actionMode.Finish();
 
                 return;
             }
@@ -770,6 +771,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 CommonConfig.Logger.Error($"Error while changing offline status for folders", ex.InnerException);
                 Dialogs.ShowErrorDialog(Activity, ex.InnerException);
+                actionMode.Finish();
 
                 return;
             }
@@ -803,6 +805,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 CommonConfig.Logger.Error($"Error while changing favourite status for folders", ex.InnerException);
                 Dialogs.ShowErrorDialog(Activity, ex.InnerException);
+                actionMode.Finish();
 
                 return;
             }
@@ -826,6 +829,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 CommonConfig.Logger.Error($"Error while making folder online.", ex.InnerException);
                 Dialogs.ShowErrorDialog(Activity, ex.InnerException);
+                actionMode.Finish();
 
                 return;
             }
