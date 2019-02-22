@@ -227,10 +227,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             catch (Exception ex)
             {
+                dismissAction();
+
                 CommonConfig.Logger.Error($"Failed to delete comment from entity [objectType={entity?.ObjectType}, entity.Id={entity?.Id}, comment.Id={comment.Id}, comment.Content={comment.Content}] ", ex.InnerException);
                 await Dialogs.ShowErrorDialogAsync(Activity, ex.InnerException);
 
-                dismissAction();
                 return;
             }
 
@@ -263,10 +264,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             catch (Exception ex)
             {
+                dismissAction();
+
                 CommonConfig.Logger.Error($"Failed to edit comment for entity [objectType={entity?.ObjectType}, entity.Id={entity?.Id}, comment.Id={comment.Id}, comment.Content={comment.Content}] ", ex.InnerException);
                 await Dialogs.ShowErrorDialogAsync(Activity, ex.InnerException);
 
-                dismissAction();
                 return;
             }
 
@@ -308,9 +310,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Failed to add comment attachment [entity.Id={entity?.Id}, commentContent={newCommentContent}] ", ex);
-
                 dismissAction();
+
+                CommonConfig.Logger.Error($"Failed to add comment attachment [entity.Id={entity?.Id}, commentContent={newCommentContent}] ", ex);
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
             }
             finally
