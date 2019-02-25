@@ -9,7 +9,6 @@ namespace Mark5.Mobile.Droid.Service
     public class ReachabilityMonitor : NetworkCallback
     {
         readonly NetworkRequest networkRequest;
-
         bool registered;
 
         public ReachabilityMonitor()
@@ -30,7 +29,7 @@ namespace Mark5.Mobile.Droid.Service
 
         public void Unregister(Context context)
         {
-            if (!registered)
+           if (!registered)
                 return;
 
             registered = false;
@@ -44,7 +43,20 @@ namespace Mark5.Mobile.Droid.Service
             base.OnAvailable(network);
 
             CommonConfig.Logger.Info("Connectivity changed");
-            new Handler(Looper.MainLooper).PostAtFrontOfQueue(() => CommonConfig.Reachability.Refresh());
+            new Handler(Looper.MainLooper).Post(() => CommonConfig.Reachability.Refresh());
+        }
+
+        public override void OnCapabilitiesChanged(Network network, NetworkCapabilities networkCapabilities)
+        {
+            base.OnCapabilitiesChanged(network, networkCapabilities);
+        }
+
+        public override void OnLost(Network network)
+        {
+            base.OnLost(network);
+
+            CommonConfig.Logger.Info("Connectivity changed");
+            new Handler(Looper.MainLooper).Post(() => CommonConfig.Reachability.Refresh());
         }
     }
 }
