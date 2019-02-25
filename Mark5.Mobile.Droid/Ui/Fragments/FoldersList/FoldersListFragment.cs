@@ -626,33 +626,30 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (foldersFavoriteState.Any(v => !v))
                 menu.Add(Menu.None, MenuItemActions.AddToFavourites, MenuItemActions.AddToFavourites, Resource.String.add_favorites).SetShowAsAction(ShowAsAction.Never);
 
-            if (section != Section.Favourites)
+            var foldersAvailableOfflineState = selectedFolders.Select(f => AsyncHelpers.RunSync(() => Managers.FoldersManager.IsSavedFolderOfflineInfo(f)));
+
+            if (RemoteFolder.Module == ModuleType.Documents)
             {
-                var foldersAvailableOfflineState = selectedFolders.Select(f => AsyncHelpers.RunSync(() => Managers.FoldersManager.IsSavedFolderOfflineInfo(f)));
+                if (foldersAvailableOfflineState.Any(v => v))
+                    menu.Add(Menu.None, MenuItemActions.DisableOffline, MenuItemActions.DisableOffline, Resource.String.remove_offline).SetShowAsAction(ShowAsAction.Never);
+                if (foldersAvailableOfflineState.Any(v => !v))
+                    menu.Add(Menu.None, MenuItemActions.EnableOffline, MenuItemActions.EnableOffline, Resource.String.add_offline).SetShowAsAction(ShowAsAction.Never);
+            }
 
-                if (RemoteFolder.Module == ModuleType.Documents)
-                {
-                    if (foldersAvailableOfflineState.Any(v => v))
-                        menu.Add(Menu.None, MenuItemActions.DisableOffline, MenuItemActions.DisableOffline, Resource.String.remove_offline).SetShowAsAction(ShowAsAction.Never);
-                    if (foldersAvailableOfflineState.Any(v => !v))
-                        menu.Add(Menu.None, MenuItemActions.EnableOffline, MenuItemActions.EnableOffline, Resource.String.add_offline).SetShowAsAction(ShowAsAction.Never);
-                }
+            if ((RemoteFolder.Module == ModuleType.Contacts || RemoteFolder.Module == ModuleType.Shortcodes) && selectedFolders.Count == 1 && AsyncHelpers.RunSync(() => Managers.FoldersManager.IsSavedFolderOfflineInfo(selectedFolders[0])))
+                menu.Add(Menu.None, MenuItemActions.MakeOnline, MenuItemActions.MakeOnline, Resource.String.make_online).SetShowAsAction(ShowAsAction.Never);
 
-                if ((RemoteFolder.Module == ModuleType.Contacts || RemoteFolder.Module == ModuleType.Shortcodes) && selectedFolders.Count == 1 && AsyncHelpers.RunSync(() => Managers.FoldersManager.IsSavedFolderOfflineInfo(selectedFolders[0])))
-                    menu.Add(Menu.None, MenuItemActions.MakeOnline, MenuItemActions.MakeOnline, Resource.String.make_online).SetShowAsAction(ShowAsAction.Never);
+            if ((RemoteFolder.Module == ModuleType.Contacts || RemoteFolder.Module == ModuleType.Shortcodes) && selectedFolders.Count == 1)
+                menu.Add(Menu.None, MenuItemActions.SaveOffline, MenuItemActions.SaveOffline, Resource.String.save_offline).SetShowAsAction(ShowAsAction.Never);
 
-                if ((RemoteFolder.Module == ModuleType.Contacts || RemoteFolder.Module == ModuleType.Shortcodes) && selectedFolders.Count == 1)
-                    menu.Add(Menu.None, MenuItemActions.SaveOffline, MenuItemActions.SaveOffline, Resource.String.save_offline).SetShowAsAction(ShowAsAction.Never);
+            if (RemoteFolder.Module == ModuleType.Documents && !string.IsNullOrEmpty(PlatformConfig.Preferences.PushNotificationToken))
+            {
+                var foldersSubscribedState = selectedFolders.Select(f => f.Subscribed);
 
-                if (RemoteFolder.Module == ModuleType.Documents && !string.IsNullOrEmpty(PlatformConfig.Preferences.PushNotificationToken))
-                {
-                    var foldersSubscribedState = selectedFolders.Select(f => f.Subscribed);
-
-                    if (foldersSubscribedState.Any(v => v))
-                        menu.Add(Menu.None, MenuItemActions.Unsubscribe, MenuItemActions.Unsubscribe, Resource.String.disable_notifications_folder).SetShowAsAction(ShowAsAction.Never);
-                    if (foldersSubscribedState.Any(v => !v))
-                        menu.Add(Menu.None, MenuItemActions.Subscribe, MenuItemActions.Subscribe, Resource.String.enable_notifications_folder).SetShowAsAction(ShowAsAction.Never);
-                }
+                if (foldersSubscribedState.Any(v => v))
+                    menu.Add(Menu.None, MenuItemActions.Unsubscribe, MenuItemActions.Unsubscribe, Resource.String.disable_notifications_folder).SetShowAsAction(ShowAsAction.Never);
+                if (foldersSubscribedState.Any(v => !v))
+                    menu.Add(Menu.None, MenuItemActions.Subscribe, MenuItemActions.Subscribe, Resource.String.enable_notifications_folder).SetShowAsAction(ShowAsAction.Never);
             }
 
             return true;
