@@ -247,7 +247,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                     dpvh.Subject = string.IsNullOrWhiteSpace(dp.Subject) ? context.GetString(Resource.String.no_subject) : dp.Subject;
                     var d = dp.DateReceivedTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds();
-                    dpvh.Date = d.FormatUserTimestampAsCompactShortDateTimeString(context);
+                    dpvh.Date = PlatformConfig.Preferences.ShowTimeOlderEmails ? d.FormatUserTimestampAsCompactMediumDateTimeString(context) : d.FormatUserTimestampAsCompactShortDateTimeString(context);
                     dpvh.BubbleDate = d.FormatUserTimestampAsCompactLongDateTimeString(context);
                     dpvh.Preview = string.IsNullOrWhiteSpace(dp.Preview) ? context.GetString(Resource.String.no_content) : Regex.Replace(dp.Preview, @"^\s+$[\r\n]*", "", RegexOptions.Multiline);
                     dpvh.Categories = dp.Categories;
