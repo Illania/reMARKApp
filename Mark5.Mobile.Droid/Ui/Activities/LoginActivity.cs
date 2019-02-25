@@ -342,7 +342,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     StartActivity(MainActivity.CreateIntent(this));
                     Finish();
                 }
-                            }
+            }
             catch (Exception ex)
             {
                 if (token.IsCancellationRequested)

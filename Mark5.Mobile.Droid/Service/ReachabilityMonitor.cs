@@ -42,20 +42,15 @@ namespace Mark5.Mobile.Droid.Service
         {
             base.OnAvailable(network);
 
-            CommonConfig.Logger.Info("Connectivity changed");
+            CommonConfig.Logger.Info("New network available");
             new Handler(Looper.MainLooper).Post(() => CommonConfig.Reachability.Refresh());
-        }
-
-        public override void OnCapabilitiesChanged(Network network, NetworkCapabilities networkCapabilities)
-        {
-            base.OnCapabilitiesChanged(network, networkCapabilities);
         }
 
         public override void OnLost(Network network)
         {
             base.OnLost(network);
 
-            CommonConfig.Logger.Info("Connectivity changed");
+            CommonConfig.Logger.Info("Network lost");
             new Handler(Looper.MainLooper).Post(() => CommonConfig.Reachability.Refresh());
         }
     }
