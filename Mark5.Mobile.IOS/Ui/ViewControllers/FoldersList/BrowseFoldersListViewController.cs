@@ -31,14 +31,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
-
             ReachabilityBar.Attach(this);
         }
 
         public override void ViewDidDisappear(bool animated)
         {
             base.ViewDidDisappear(animated);
-
             ReachabilityBar.Detach(this);
         }
 

@@ -128,6 +128,24 @@ namespace Mark5.Mobile.IOS.Ui.Common
             return tcs.Task;
         }
 
+        public static Task<int> ShowListActionSheetWithTitleAsync(UIViewController vc, string[] listStrings, UIView view, string title = "", string description = "")
+        {
+            UIPopoverPresentationControllerDelegate d = new PopoverPresentationControllerDelegate(view);
+
+            var tcs = new TaskCompletionSource<int>();
+            var actionSheet = UIAlertController.Create(title, description, UIAlertControllerStyle.ActionSheet);
+            for (var i = 0; i < listStrings.Length; i++)
+            {
+                var ii = i;
+                actionSheet.AddAction(UIAlertAction.Create(listStrings[ii], UIAlertActionStyle.Default, a => tcs.SetResult(ii)));
+            }
+            actionSheet.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => tcs.SetResult(-1)));
+            if (d != null && actionSheet.PopoverPresentationController != null) //If the PopoverController property is even just read, it will try to present the action sheet as a popover
+                actionSheet.PopoverPresentationController.Delegate = d;
+            vc.PresentViewController(actionSheet, true, null);
+            return tcs.Task;
+        }
+
         public static Task<T[]> ShowMultiSelectViewControllerAsync<T>(UIViewController vc, string title, T[] data, T[] preselected, Func<T, string> description, IEqualityComparer<T> equalityComparer, bool requireSelection)
         {
             var msvc = new MultiSelectViewController<T>(title, data, preselected, description, equalityComparer, requireSelection);

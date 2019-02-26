@@ -156,5 +156,13 @@ namespace Mark5.ServiceReference.AppService
         Task<TestResult> TestAsync(TestParameters parameters, CancellationToken ct = default(CancellationToken));
 
         #endregion
+
+        #region Folder favorites
+
+        Task<GetFavoriteFoldersResult> GetFavoriteFolders(GetFavoriteFoldersParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<UpdateFavoriteFoldersResult> UpdateFavoriteFolders(UpdateFavoriteFoldersParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        #endregion
     }
 }

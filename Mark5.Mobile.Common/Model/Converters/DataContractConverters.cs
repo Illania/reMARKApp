@@ -395,7 +395,8 @@ namespace Mark5.Mobile.Common.Model.Converters
                 OptionalParameters = f.OptionalParameters?.Convert(),
                 Subscribed = f.Subscribed,
                 Position = f.Position,
-                Type = f.Type.ConvertEnum<FolderType>()
+                Type = f.Type.ConvertEnum<FolderType>(),
+                Path = f.Path,
             };
             if (f.SubFolders != null)
                 result.SubFolders.AddRange(f.SubFolders.WhereNotNull().Select(Convert));
@@ -680,6 +681,30 @@ namespace Mark5.Mobile.Common.Model.Converters
                 User = ui.User?.Convert()
             };
         }
+
+        public static ModuleFavoriteFoldersCollection Convert(this DataContract.GetFavoriteFoldersResult moduleFavoritesResult)
+        {
+            ModuleFavoriteFoldersCollection moduleFavorites = new ModuleFavoriteFoldersCollection
+            {
+                UpdatedAt = moduleFavoritesResult.UpdatedAt
+            };
+
+            if (moduleFavoritesResult.ModuleFavoriteFoldersList != null)
+            {
+                moduleFavorites.ModuleFavoriteFolders = new List<ModuleFavoriteFolders>();
+
+                foreach (var fav in moduleFavoritesResult.ModuleFavoriteFoldersList)
+                {
+                    var newFav = new ModuleFavoriteFolders { ModuleType = (ModuleType)fav.ModuleType };
+                    newFav.Folders.AddRange(fav.Folders.Select(Convert));
+
+                    moduleFavorites.ModuleFavoriteFolders.Add(newFav);
+                }
+            }
+
+            return moduleFavorites;
+        }
+
 
         #endregion
 
@@ -1008,6 +1033,40 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Description = sp.Description,
                 AddressCount = sp.AddressCount,
             };
+        }
+
+        public static DataContract.Folder Convert(this Folder folder)
+        {
+            return new DataContract.Folder
+            {
+                Guid = folder.Guid,
+                HasSubFolders = folder.HasSubFolders,
+                Id = folder.Id,
+                ParentFolderId = folder.ParentFolderId,
+                Name = folder.Name,
+                Subscribed = folder.Subscribed,
+                Position = folder.Position,
+                Path = folder.Path,
+            };
+        }
+
+        public static List<DataContract.ModuleFavoriteFolders> Convert(this Dictionary<ModuleType, List<Folder>> favoriteDictionary)
+        {
+            List<DataContract.ModuleFavoriteFolders> favorites = new List<DataContract.ModuleFavoriteFolders>();
+
+            foreach (KeyValuePair<ModuleType, List<Folder>> entry in favoriteDictionary)
+            {
+                var favorite = new DataContract.ModuleFavoriteFolders { ModuleType = (DataContract.ModuleType)entry.Key };
+
+                foreach (var folder in entry.Value)
+                {
+                    favorite.Folders.Add(folder.Convert());
+                }
+
+                favorites.Add(favorite);
+            }
+
+            return favorites;
         }
 
         #endregion
