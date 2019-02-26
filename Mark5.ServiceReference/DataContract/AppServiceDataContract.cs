@@ -1177,9 +1177,6 @@ namespace Mark5.ServiceReference.DataContract
         [DataMember(Name = "ReminderAlertTime", Order = 0)]
         public DateTime ReminderAlertTime { get; set; }
 
-        [DataMember(Name = "ReminderTimeBefore", Order = 0)]
-        public long ReminderTimeBefore { get; set; } = -1;
-
         [DataMember(Name = "Participants", Order = 0)]
         public List<Participant> Participants { get; set; } = new List<Participant>();
 

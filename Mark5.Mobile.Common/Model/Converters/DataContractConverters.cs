@@ -46,7 +46,6 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Priority = ca.Priority.ConvertEnum<Priority>(),
                 Type = ca.Type.ConvertEnum<CalendarOccurenceType>(),
                 ReminderAlertTime = ca.ReminderAlertTime.ConvertDateTimeToTimestampMilliseconds(),
-                ReminderTimeBefore = ca.ReminderTimeBefore,
                 Description = ca.Description,
                 RecurrenceInfo = ca.RecurrenceInfo?.Convert()
             };
@@ -784,7 +783,6 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Priority = ca.Priority.ConvertEnum<DataContract.Priority>(),
                 Type = ca.Type.ConvertEnum<DataContract.CalendarOccurenceType>(),
                 ReminderAlertTime = ca.ReminderAlertTime.ConvertTimestampMillisecondsToDateTime(),
-                ReminderTimeBefore = ca.ReminderTimeBefore,
                 CalendarId = ca.CalendarId,
                 Participants = ca.Participants.Select(p => p.Convert()).ToList(),
                 Description = ca.Description,
