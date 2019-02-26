@@ -1,4 +1,3 @@
-using System.IO;
 using System.Linq;
 using Foundation;
 using Mark5.Mobile.Common.Extensions;
@@ -30,6 +29,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         readonly NSLayoutConstraint offlineIndicatorWidthConstraint;
         readonly NSLayoutConstraint offlineIndicatorLeadingConstraint;
+
+        public UILabel documentCount;
+        public UIView failedDocumentIndicator;
 
         public FoldersTableViewCell()
             : base(UITableViewCellStyle.Default, DefaultId)
@@ -66,6 +68,19 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             };
             ContentView.Add(nameLabel);
 
+            documentCount = new UILabel
+            {
+                TextAlignment = UITextAlignment.Right,
+                Font = Theme.DefaultFont,
+                TextColor = Theme.Black,
+                Lines = 1,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            documentCount.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            documentCount.SetContentHuggingPriority((float)UILayoutPriority.DefaultHigh, UILayoutConstraintAxis.Horizontal);
+
+            ContentView.Add(documentCount);
+
             expandButton = new LargeHitAreaButton
             {
                 ImageEdgeInsets = new UIEdgeInsets(-10f, -10f, -10f, -10f),
@@ -75,6 +90,16 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
             expandButton.SetImage(UIImage.FromBundle("Expand").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
             ContentView.Add(expandButton);
+
+            failedDocumentIndicator = new UIView()
+            {
+                BackgroundColor = UIColor.Red,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+
+            failedDocumentIndicator.Layer.CornerRadius = 5;
+
+            ContentView.Add(failedDocumentIndicator);
 
             ContentView.AddConstraints(new[]
             {
@@ -97,8 +122,20 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 nameLabel.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
                 nameLabel.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor, 4f),
                 nameLabel.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor, -4f),
+                nameLabel.TrailingAnchor.ConstraintEqualTo(documentCount.LeadingAnchor, 4f),
 
-                expandButton.LeadingAnchor.ConstraintEqualTo(nameLabel.TrailingAnchor, 8f),
+                documentCount.LeadingAnchor.ConstraintEqualTo(nameLabel.TrailingAnchor, 8f),
+                documentCount.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
+                documentCount.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor, 4f),
+                documentCount.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor, -4f),
+                documentCount.TrailingAnchor.ConstraintEqualTo(failedDocumentIndicator.LeadingAnchor, -4f),
+
+                failedDocumentIndicator.HeightAnchor.ConstraintEqualTo(10f),
+                failedDocumentIndicator.WidthAnchor.ConstraintEqualTo(10f),
+                failedDocumentIndicator.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
+                failedDocumentIndicator.TrailingAnchor.ConstraintEqualTo(expandButton.LeadingAnchor, 4f),
+
+                expandButton.LeadingAnchor.ConstraintEqualTo(documentCount.TrailingAnchor, 8f),
                 expandButton.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
                 expandButton.HeightAnchor.ConstraintEqualTo(40f),
                 expandButton.WidthAnchor.ConstraintEqualTo(40f),
@@ -121,6 +158,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             offlineIndicatorWidthConstraint.Constant = folderIsOffline ? 15f : 0f;
             nameLabel.Text = folder.Name;
             expandButton.Hidden = !folder.HasSubFolders;
+
+            documentCount.Text = folder.PendingDocumentCount <= 0 ? "" : $"{folder.PendingDocumentCount}";
+            failedDocumentIndicator.Hidden = !folder.HasFailedDocuments;
         }
 
         public void Disable()

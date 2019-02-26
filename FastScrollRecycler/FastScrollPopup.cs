@@ -56,32 +56,32 @@ namespace FastScrollRecycler
         {
             backgroundColor = color;
             backgroundPaint.Color = color;
-            recyclerView.Invalidate(backgroundBounds);
+            recyclerView.Invalidate();
         }
 
         public void SetTextColor(Color color)
         {
             textPaint.Color = color;
-            recyclerView.Invalidate(backgroundBounds);
+            recyclerView.Invalidate();
         }
 
         public void SetTextSize(int size)
         {
             textPaint.TextSize = size;
-            recyclerView.Invalidate(backgroundBounds);
+            recyclerView.Invalidate();
         }
 
         public void SetBackgroundSize(int size)
         {
             backgroundSize = size;
             cornerRadius = backgroundSize / 2;
-            recyclerView.Invalidate(backgroundBounds);
+            recyclerView.Invalidate();
         }
 
         public void SetTypeFace(Typeface typeface)
         {
             textPaint.SetTypeface(typeface);
-            recyclerView.Invalidate(backgroundBounds);
+            recyclerView.Invalidate();
         }
 
         public void AnimateVisibility(bool visible)
@@ -102,7 +102,7 @@ namespace FastScrollRecycler
         public void SetAlpha(float alpha)
         {
             this.alpha = alpha;
-            recyclerView.Invalidate(backgroundBounds);
+            recyclerView.Invalidate();
         }
 
         [Export("getAlpha")]
@@ -178,8 +178,8 @@ namespace FastScrollRecycler
 
                 backgroundPath.AddRoundRect(backgroundRect, radii, Path.Direction.Cw);
 
-                backgroundPaint.Alpha = (int) (Color.GetAlphaComponent(backgroundColor) * alpha);
-                textPaint.Alpha = (int) (alpha * 255);
+                backgroundPaint.Alpha = (int)(Color.GetAlphaComponent(backgroundColor) * alpha);
+                textPaint.Alpha = (int)(alpha * 255);
                 canvas.DrawPath(backgroundPath, backgroundPaint);
                 canvas.DrawText(sectionName, (backgroundBounds.Width() - textBounds.Width()) / 2, backgroundBounds.Height() - (backgroundBounds.Height() - textBounds.Height()) / 2, textPaint);
                 canvas.RestoreToCount(restoreCount);
@@ -192,7 +192,7 @@ namespace FastScrollRecycler
             {
                 this.sectionName = sectionName;
                 textPaint.GetTextBounds(sectionName, 0, sectionName.Length, textBounds);
-                textBounds.Right = (int) (textBounds.Left + textPaint.MeasureText(sectionName));
+                textBounds.Right = (int)(textBounds.Left + textPaint.MeasureText(sectionName));
             }
         }
 

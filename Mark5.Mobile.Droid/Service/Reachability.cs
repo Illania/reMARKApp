@@ -4,13 +4,13 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Android.App;
-using Android.Content;
 using Android.Net;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Testers;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Common.Extensions;
 
 namespace Mark5.Mobile.Droid.Service
 {
@@ -63,7 +63,7 @@ namespace Mark5.Mobile.Droid.Service
                 result &= await CheckWithServiceConnection();
             if (result && mode.HasFlag(ReachabilityMode.Service))
                 result &= await CheckWithService();
-              
+
             IsCheckingReachability = false;
 
             if (!testOnly)
@@ -84,15 +84,16 @@ namespace Mark5.Mobile.Droid.Service
                 if (!result)
                 {
                     cancellationTokenSource = new CancellationTokenSource();
-                    CheckServiceAvailabilityContinuously(cancellationTokenSource.Token);
+                    CheckServiceAvailabilityContinuously(cancellationTokenSource.Token).FireAndForget();
                 }
             }
 
             return result;
         }
 
-        public void OnPause() {
-            if(cancellationTokenSource != null)  
+        public void OnPause()
+        {
+            if (cancellationTokenSource != null)
             {
                 cancellationTokenSource.Cancel();
                 cancellationTokenSource = null;
@@ -101,7 +102,7 @@ namespace Mark5.Mobile.Droid.Service
 
         public bool CheckNetworkAvailability()
         {
-            var cm = (ConnectivityManager) Application.Context.GetSystemService(Android.Content.Context.ConnectivityService);
+            var cm = (ConnectivityManager)Application.Context.GetSystemService(Android.Content.Context.ConnectivityService);
             var result = cm.ActiveNetworkInfo?.IsConnected ?? false;
 
             CommonConfig.Logger.Info($"Network availability: {result}");

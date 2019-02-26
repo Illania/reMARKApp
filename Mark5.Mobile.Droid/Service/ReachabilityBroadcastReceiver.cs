@@ -2,8 +2,6 @@
 using Android.Content;
 using Android.Net;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Extensions;
-
 namespace Mark5.Mobile.Droid.Service
 {
     public class ReachabilityBroadcastReceiver : BroadcastReceiver
@@ -40,7 +38,7 @@ namespace Mark5.Mobile.Droid.Service
             CommonConfig.Logger.Info("Connectivity changed");
 
             GoAsync();
-            CommonConfig.Reachability.Refresh().FireAndForget();
+            CommonConfig.Reachability.Refresh();
         }
     }
 }

@@ -211,6 +211,8 @@
     <string name="invalid_recipients_and_subject_content">Not all recipients you entered are valid and the subject line is empty. Do you still want to send the email?</string>
     <string name="invalid_line_draft_title">Invalid mailbox</string>
     <string name="invalid_line_draft_content">You need to select a mailbox to save this draft</string>
+    <string name="invalid_token">Invalid session</string>
+    <string name="invalid_token_message">Session token is invalid. Please re-authenticate.</string>
     <string name="large_attachment">This attachment is larger than 20MB. Do you want to download it?</string>
     <string name="last_downloaded_on">Last downloaded on:</string>
     <string name="ledger">Ledger</string>
@@ -421,6 +423,12 @@
     <string name="subject">Subject</string>
     <string name="subscribe_folder">Subscribe</string>
     <string name="subscribing_folders">Subscribing to folders...</string>
+    <string name="sync_fav_folders_action_title">Choose which settings to use</string>
+    <string name="sync_fav_folders_action_description">Server favorites last time updated at</string>
+    <string name="sync_fav_folders_use_server"> Use from server</string>
+    <string name="sync_fav_folders_use_device">Use from current device</string>
+    <string name="sync_error_network">Internet connection required when favorite synchronization is enabled in settings</string>
+    <string name="sync_error_general">Something went wrong while synchronizing favorites</string>
     <string name="templates">Templates</string>
     <string name="template_attachment_title">Attachment from template</string>
     <string name="template_attachment_content">It is not possible to open attachments from templates</string>

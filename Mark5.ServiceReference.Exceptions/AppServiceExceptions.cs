@@ -100,6 +100,7 @@ namespace Mark5.ServiceReference.Exceptions
 
         [EnumMember(Value = "AuthenticationError")] AuthenticationError = 1000,
         [EnumMember(Value = "AuthorisationError")] AuthorisationError = 1001,
+        [EnumMember(Value = "InvalidToken")] InvalidToken = 1002,
 
         [EnumMember(Value = "GetFoldersError")] GetFoldersError = 1100,
 
@@ -156,6 +157,9 @@ namespace Mark5.ServiceReference.Exceptions
 
         [EnumMember(Value = "GetSystemSettingsError")] GetSystemSettingsError = 1900,
         [EnumMember(Value = "GetSystemUsersError")] GetSystemUsersError = 1901,
+
+        [EnumMember(Value = "GetFavoriteFoldersError")] GetFavoriteFoldersError = 3001,
+        [EnumMember(Value = "UpdateFavoriteFoldersError")] UpdateFavoriteFoldersError = 3002,
     }
 
     #endregion

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Android.Content;
 using Android.Graphics;
@@ -142,10 +143,73 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     fragmentTransaction.Commit();
                 };
             }
+
+
+            var checkBox = (CheckBoxPreference)FindPreference(GetString(Resource.String.pref_key_sync_favorites_enabled));
+            if (checkBox != null)
+            {
+                checkBox.PreferenceClick += async (object sender, Preference.PreferenceClickEventArgs e) =>
+                {
+                    if (checkBox.Checked)
+                        await HandleSync();
+                };
+            }
+
+            var serviceVersion = ServerConfig.SystemSettings?.SystemInfo?.ServiceVersion;
+            if (serviceVersion == null || serviceVersion.CompareTo(new Version(3, 2, 0)) < 0)
+            {
+                var screen = (PreferenceScreen)FindPreference(GetString(Resource.String.pref_sync_favorites));
+                if (screen != null)
+                    PreferenceScreen.RemovePreference(screen);
+            }
+        }
+
+        async Task HandleSync()
+        {
+            if (!PlatformConfig.Preferences.SyncFavoritesEnabled)
+                return;
+
+            try
+            {
+                var response = await Managers.FoldersManager.GetServiceFavoriteFoldersAsync(retain: false);
+                if (response.ModuleFavoriteFolders == null)
+                    await Managers.FoldersManager.UpdateServiceFavoriteFoldersAsync();
+                else
+                {
+                    var selectedOption = await Dialogs.ShowListDialog(Activity, Resource.String.sync_fav_folders_action_title, $"{GetString(Resource.String.sync_fav_folders_action_description)} { response.UpdatedAt.ToShortDateString() }", new string[] { GetString(Resource.String.sync_fav_folders_use_server), GetString(Resource.String.sync_fav_folders_use_device) }, true);
+
+                    if (selectedOption == 0)
+                    {
+                        foreach (var favorite in response.ModuleFavoriteFolders)
+                            await Managers.FoldersManager.SetFavoriteFoldersAsync(favorite.ModuleType, favorite.Folders);
+
+                        var availableModules = new List<ModuleType> { ModuleType.Shortcodes, ModuleType.Contacts, ModuleType.Documents };
+                        await Managers.FoldersManager.ClearFavoritesAsync(availableModules.Except(response.ModuleFavoriteFolders.Select(mff => mff.ModuleType)).ToList());
+                    }
+                    else if (selectedOption == 1)
+                        await Managers.FoldersManager.UpdateServiceFavoriteFoldersAsync();
+                    else
+                    {
+                        PlatformConfig.Preferences.SyncFavoritesEnabled = false;
+                        return;
+                    }
+                }
+
+                PlatformConfig.Preferences.SyncFavoritesEnabled = true;
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Error while shynchonizing favorite folders", ex);
+                PlatformConfig.Preferences.SyncFavoritesEnabled = false;
+                Dialogs.ShowErrorDialog(Activity, ex);
+            }
         }
 
         public override bool OnPreferenceTreeClick(Preference preference)
         {
+            if (preference.Key == GetString(Resource.String.pref_key_sync_favorites_enabled))
+                return false;
+
             if (preference.Key == GetString(Resource.String.pref_key_documents_use_server_timezone))
                 Dialogs.ShowConfirmDialog(Context, Resource.String.dialog_restart_required_title, Resource.String.dialog_restart_required_content);
 
@@ -180,7 +244,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                     }
 
-                },TaskScheduler.FromCurrentSynchronizationContext());
+                }, TaskScheduler.FromCurrentSynchronizationContext());
                 return true;
             }
 

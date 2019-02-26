@@ -29,7 +29,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AndroidLinkMode>None</AndroidLinkMode>
-    <AndroidSupportedAbis>armeabi-v7a;x86;x86_64;arm64-v8a;armeabi</AndroidSupportedAbis>
+    <AndroidSupportedAbis>armeabi-v7a;x86;x86_64;arm64-v8a</AndroidSupportedAbis>
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <MandroidI18n>cjk;mideast;west</MandroidI18n>
     <AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidClientHandler</AndroidHttpClientHandlerType>
@@ -456,6 +456,7 @@
     <Compile Include="Ui\Fragments\CategoriesListFragment.cs" />
     <Compile Include="Ui\Activities\PickerInternalContactsListActivity.cs" />
     <Compile Include="Ui\Fragments\PickerInternalContactsListFragment.cs" />
+    <Compile Include="Utilities\PushNotificationsUtilities.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -727,13 +728,13 @@
     <AndroidResource Include="Resources\menu\menu_drawer.axml" />
     <AndroidResource Include="Resources\menu\menu_main.axml" />
     <AndroidResource Include="Resources\mipmap-hdpi\ic_icon.png" />
-    <AndroidResource Include="Resources\mipmap-hdpi\ic_icon_lollipop.png" />
+    <AndroidResource Include="Resources\mipmap-hdpi\ic_notification.png" />
     <AndroidResource Include="Resources\mipmap-xhdpi\ic_icon.png" />
-    <AndroidResource Include="Resources\mipmap-xhdpi\ic_icon_lollipop.png" />
+    <AndroidResource Include="Resources\mipmap-xhdpi\ic_notification.png" />
     <AndroidResource Include="Resources\mipmap-xxhdpi\ic_icon.png" />
-    <AndroidResource Include="Resources\mipmap-xxhdpi\ic_icon_lollipop.png" />
+    <AndroidResource Include="Resources\mipmap-xxhdpi\ic_notification.png" />
     <AndroidResource Include="Resources\mipmap-xxxhdpi\ic_icon.png" />
-    <AndroidResource Include="Resources\mipmap-xxxhdpi\ic_icon_lollipop.png" />
+    <AndroidResource Include="Resources\mipmap-xxxhdpi\ic_notification.png" />
     <AndroidResource Include="Resources\values\color.axml" />
     <AndroidResource Include="Resources\values\dimens.axml" />
     <AndroidResource Include="Resources\values\plurals.xml" />
@@ -813,6 +814,7 @@
     <AndroidResource Include="Resources\drawable\onboarding_1.xml" />
     <AndroidResource Include="Resources\drawable\onboarding_2.xml" />
     <AndroidResource Include="Resources\drawable\onboarding_3.xml" />
+    <AndroidResource Include="Resources\drawable\circle_red.xml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FastScrollRecycler\FastScrollRecycler.csproj">
