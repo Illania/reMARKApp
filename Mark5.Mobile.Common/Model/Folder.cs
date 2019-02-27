@@ -263,6 +263,12 @@ namespace Mark5.Mobile.Common.Model
 
         public bool IsOutgoing => Id == DocumentsOutgoingFolder.Id;
 
+        [Ignore]
+        public int PendingDocumentCount { get; set; } = 0;
+
+        [Ignore]
+        public bool HasFailedDocuments { get; set; } = false;
+
         #endregion
 
         public override string ToString()
@@ -272,8 +278,8 @@ namespace Mark5.Mobile.Common.Model
 
     }
 
-    public class FolderComparer : IEqualityComparer<Folder> {
-
+    public class FolderComparer : IEqualityComparer<Folder>
+    {
         public bool Equals(Folder x, Folder y)
         {
             return x != null && y != null && x.Id.Equals(y.Id);

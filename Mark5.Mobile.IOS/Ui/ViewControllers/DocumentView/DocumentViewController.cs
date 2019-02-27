@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
@@ -697,18 +698,29 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void HeaderView_RecipientTapped(object sender, RecipientTappedEventArgs e)
         {
-            PresentComposeViewWithPreconfiguredAddresses(new string[] { e.Recipent });
+            PresentComposeViewWithPreconfiguredFields(preconfiguredToAddresses: new string[] { e.Recipent });
         }
 
-        void PresentComposeViewWithPreconfiguredAddresses(string[] preconfiguredEmailAddresses)
+        void PresentComposeViewWithPreconfiguredFields(string subject = null, string body = null,
+            string[] preconfiguredToAddresses = null, string[] preconfiguredCcAddresses = null, string[] preconfiguredBccAddresses = null)
         {
+            var preconfiguredAddresses = new Dictionary<DocumentAddressType, string[]>
+                {
+                    { DocumentAddressType.To, preconfiguredToAddresses }
+                };
+
+            if (preconfiguredCcAddresses != null)
+                preconfiguredAddresses.Add(DocumentAddressType.Cc, preconfiguredCcAddresses);
+
+            if (preconfiguredBccAddresses != null)
+                preconfiguredAddresses.Add(DocumentAddressType.Bcc, preconfiguredBccAddresses);
+
             var vc = new ComposeDocumentViewController
             {
                 DocumentCreationModeFlag = DocumentCreationModeFlag.New,
-                PreconfiguredEmailAddresses = new Dictionary<DocumentAddressType, string[]>
-                {
-                    { DocumentAddressType.To, preconfiguredEmailAddresses }
-                }
+                PreconfiguredEmailAddresses = preconfiguredAddresses,
+                PreconfiguredContent = body,
+                PreconfiguredSubject = subject,
             };
 
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
@@ -1106,15 +1118,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 if (action.Request.Url.Scheme == "mailto")
                 {
-                    var address = action.Request.Url.ResourceSpecifier;
-                    PresentComposeViewWithPreconfiguredAddresses(new string[] { address });
+                    var parts = action.Request.Url.AbsoluteString.Split("?");
+                    var to = parts[0].Split(",");
+
+                    if (parts.Length >= 1)
+                    {
+                        var parsed = HttpUtility.ParseQueryString(parts[1]);
+                        var subject = parsed["subject"];
+                        var body = parsed["body"];
+                        var cc = parsed["cc"]?.Split(",");
+                        var bcc = parsed["bcc"]?.Split(",");
+
+                        PresentComposeViewWithPreconfiguredFields(subject, body, to, cc, bcc);
+                    }
+                    else
+                        PresentComposeViewWithPreconfiguredFields(preconfiguredToAddresses: to);
+
                 }
                 else
                     Integration.OpenLink(action.Request.Url,
                                          async () => await Dialogs.ShowConfirmAlertAsync(this,
                                                                                          Localization.GetString("unable_open_link_title"),
                                                                                          Localization.GetString("unable_open_link_content") + action.Request.Url.Scheme));
-
                 return false;
             }
 

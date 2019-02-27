@@ -144,12 +144,20 @@ namespace Mark5.Mobile.Common.Service
 
                             CommonConfig.MessengerHub.Publish(new DocumentUploadStatusChangedMessage(this, DocumentUploadStatusChangedMessage.Status.DocumentSentFailed, documentToUploadGuid));
                         }
+                        finally
+                        {
+                            await Managers.DocumentsManager.NotifyPendingAndFailedCountChanged();
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error("Unexpected error in upload task!", ex);
+            }
+            finally
+            {
+                await Managers.DocumentsManager.NotifyPendingAndFailedCountChanged();
             }
 
             CommonConfig.Logger.Info("Stopped upload task");

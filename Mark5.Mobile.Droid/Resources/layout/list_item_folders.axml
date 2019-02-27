@@ -51,6 +51,22 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/fontListSmallLight" />
         </android.support.v7.widget.LinearLayoutCompat>
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/failed_and_pending_document_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:text="2"
+            android:textAppearance="@style/fontListPrimary"
+            android:layout_marginBottom="2dp" />
+       <ImageView
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
+            android:id="@+id/failed_document_indicator"
+            android:layout_width="10dp"
+            android:gravity="center_vertical"
+            android:layout_height="10dp"   
+            android:src="@drawable/circle_red" />  
         <android.support.v7.widget.AppCompatImageButton
             android:id="@+id/list_item_folder_expand"
             android:layout_gravity="center_vertical"

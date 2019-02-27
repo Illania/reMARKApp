@@ -17,6 +17,7 @@ using Mark5.Mobile.Common.Service;
 using Mark5.Mobile.Common.Storage;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Service;
+using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 #if !DEBUG
 using HockeyApp.Android;
@@ -48,6 +49,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         protected override void OnStart()
         {
             base.OnStart();
+
+            var openedFromNotification = Intent?.Extras?.ContainsKey("title") == true;
+            if (openedFromNotification && !IsTaskRoot)
+            {
+                ProcessNotification();
+                return;
+            }
 
             CommonConfig.Logger.Info($"Starting {nameof(SplashActivity)}...");
 
@@ -161,19 +169,31 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     return true;
                 })
                 .ContinueWith(t =>
-                    {
-                        Services.DocumentsUploadService?.Start();
-                        Services.DocumentPreviewsDownloadService?.Start();
-                        Services.DocumentsDownloadService?.Start();
+                   {
+                       Services.DocumentsUploadService?.Start();
+                       Services.DocumentPreviewsDownloadService?.Start();
+                       Services.DocumentsDownloadService?.Start();
 
-                        if (t.Result)
-                            StartActivity(MainActivity.CreateIntent(this));
-                        else
-                            ShowLoginButton();
-                    },
+                       PushNotificationsUtilities.CreateChannelIfNotExists(this);
+
+                       if (t.Result)
+                           StartActivity(MainActivity.CreateIntent(this));
+                       else
+                           ShowLoginButton();
+
+                       if (openedFromNotification && IsTaskRoot)
+                           ProcessNotification();
+
+                   },
                     TaskScheduler.FromCurrentSynchronizationContext());
 
             CommonConfig.Logger.Info($"Started {nameof(SplashActivity)}");
+        }
+
+        void ProcessNotification()
+        {
+            var not = PushNotificationsConverter.ExtractNotification(Intent.Extras);
+            PushNotificationsUtilities.ProcessBackgroundNotificationClicked(this, not);
         }
 
         void ShowLoginButton()

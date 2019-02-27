@@ -761,6 +761,21 @@ namespace Mark5.Mobile.Common.Manager
 
         internal async Task<int[]> GetNonCachedDocumentIdsAsync(int[] folderIds, int limit = -1) => await documentsDataAccess.GetNonCachedDocumentIdsAsync(folderIds, limit);
 
+        public async Task NotifyPendingAndFailedCountChanged()
+        {
+            try
+            {
+                var pendingGuids = await FileSystemStorage.GetDocumentsToUploadGuids();
+                var failedGuids = await FileSystemStorage.GetFailedDocumentsToUploadGuids();
+
+                CommonConfig.MessengerHub.Publish(new OugoingDocumentCountMessage(this, pendingGuids.Count(), failedGuids.Any()));
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Error while counting pending and failed outgoing documents", ex);
+            }
+        }
+
         #endregion
 
     }

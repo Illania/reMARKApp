@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using Mark5.Mobile.Common.Extensions;
 using DataContract = Mark5.ServiceReference.DataContract;
@@ -46,6 +46,7 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Priority = ca.Priority.ConvertEnum<Priority>(),
                 Type = ca.Type.ConvertEnum<CalendarOccurenceType>(),
                 ReminderAlertTime = ca.ReminderAlertTime.ConvertDateTimeToTimestampMilliseconds(),
+                ReminderTimeBefore = ca.ReminderTimeBefore,
                 Description = ca.Description,
                 RecurrenceInfo = ca.RecurrenceInfo?.Convert()
             };
@@ -365,8 +366,7 @@ namespace Mark5.Mobile.Common.Model.Converters
                 OptionalParameters = f.OptionalParameters?.Convert(),
                 Subscribed = f.Subscribed,
                 Position = f.Position,
-                Type = f.Type.ConvertEnum<FolderType>(),
-                Path = f.Path,
+                Type = f.Type.ConvertEnum<FolderType>()
             };
             if (f.SubFolders != null)
                 result.SubFolders.AddRange(f.SubFolders.WhereNotNull().Select(Convert));
@@ -425,8 +425,7 @@ namespace Mark5.Mobile.Common.Model.Converters
                 ToObjectType = ol.ToObjectType.ConvertEnum<ObjectType>(),
                 Description = ol.Description,
                 IsReverse = ol.IsReverse,
-                TypeInfo = ol.TypeInfo?.Convert(),
-                LinkTimeStamp = ol.LinkTime.ConvertDateTimeToTimestampMilliseconds(),
+                TypeInfo = ol.TypeInfo?.Convert()
             };
         }
 
@@ -670,30 +669,6 @@ namespace Mark5.Mobile.Common.Model.Converters
             };
         }
 
-        public static ModuleFavoriteFoldersCollection Convert(this DataContract.GetFavoriteFoldersResult moduleFavoritesResult)
-        {
-            ModuleFavoriteFoldersCollection moduleFavorites = new ModuleFavoriteFoldersCollection
-            {
-                UpdatedAt = moduleFavoritesResult.UpdatedAt
-            };
-
-            if (moduleFavoritesResult.ModuleFavoriteFoldersList != null)
-            {
-                moduleFavorites.ModuleFavoriteFolders = new List<ModuleFavoriteFolders>();
-
-                foreach (var fav in moduleFavoritesResult.ModuleFavoriteFoldersList)
-                {
-                    var newFav = new ModuleFavoriteFolders { ModuleType = (ModuleType)fav.ModuleType };
-                    newFav.Folders.AddRange(fav.Folders.Select(Convert));
-
-                    moduleFavorites.ModuleFavoriteFolders.Add(newFav);
-                }
-            }
-
-            return moduleFavorites;
-        }
-
-
         #region ICalendar
         public static ICalendarInfo Convert(this DataContract.ICalendarInfo calendarInfo)
         {
@@ -861,6 +836,7 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Priority = ca.Priority.ConvertEnum<DataContract.Priority>(),
                 Type = ca.Type.ConvertEnum<DataContract.CalendarOccurenceType>(),
                 ReminderAlertTime = ca.ReminderAlertTime.ConvertTimestampMillisecondsToDateTime(),
+                ReminderTimeBefore = ca.ReminderTimeBefore,
                 CalendarId = ca.CalendarId,
                 Participants = ca.Participants.Select(p => p.Convert()).ToList(),
                 Description = ca.Description,
@@ -1059,39 +1035,17 @@ namespace Mark5.Mobile.Common.Model.Converters
             };
         }
 
-        public static DataContract.Folder Convert(this Folder folder)
+        #region ICalendar
+        public static DataContract.IEventReplyParameters Convert(this IEventReply eventReply)
         {
-            return new DataContract.Folder
+            return new DataContract.IEventReplyParameters
             {
-                Guid = folder.Guid,
-                HasSubFolders = folder.HasSubFolders,
-                Id = folder.Id,
-                ParentFolderId = folder.ParentFolderId,
-                Name = folder.Name,
-                Subscribed = folder.Subscribed,
-                Position = folder.Position,
-                Path = folder.Path,
+                IEventId = eventReply.EventId,
+                ParticipantStatus = (DataContract.ParticipantStatus)eventReply.ParticipantStatus.ConvertEnum<ParticipantStatus>(),
+                Silent = eventReply.Silent
             };
         }
-
-        public static List<DataContract.ModuleFavoriteFolders> Convert(this Dictionary<ModuleType, List<Folder>> favoriteDictionary)
-        {
-            List<DataContract.ModuleFavoriteFolders> favorites = new List<DataContract.ModuleFavoriteFolders>();
-
-            foreach (KeyValuePair<ModuleType, List<Folder>> entry in favoriteDictionary)
-            {
-                var favorite = new DataContract.ModuleFavoriteFolders { ModuleType = (DataContract.ModuleType)entry.Key };
-
-                foreach (var folder in entry.Value)
-                {
-                    favorite.Folders.Add(folder.Convert());
-                }
-
-                favorites.Add(favorite);
-            }
-
-            return favorites;
-        }
+        #endregion
 
         #endregion
     }

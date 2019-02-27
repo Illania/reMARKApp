@@ -81,7 +81,7 @@ namespace Mark5.Mobile.Droid.Ui.Views
                 var titleView = new AppCompatTextView(Context)
                 {
                     LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                    Text = ol.IsReverse ? ol.TypeInfo.DescriptionComplexReverse : ol.TypeInfo.DescriptionComplex
+                    Text = ol.TypeInfo.DescriptionSimple
                 };
                 titleView.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
                 AddView(titleView);

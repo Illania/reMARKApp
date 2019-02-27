@@ -166,7 +166,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 CalendarId = selectedCalendar.Id,
                 Location = "TestLocation",
-                Subject = "TestAppointmentAlarm",
+                Subject = "ALARM",
                 Description = "TestDescription",
                 Creator = ServerConfig.SystemSettings.UserInfo.User.Username,
                 CreatorId = ServerConfig.SystemSettings.UserInfo.User.Id,
@@ -183,8 +183,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             };
 
             testAppointmentAlarm.Occurrences.Add(occurrence);
-            testAppointmentAlarm.ReminderAlertTime = occurrence.StartDateTimestamp;
-            testAppointmentAlarm.ReminderTimeBefore = TimeSpan.FromMinutes(15).Ticks;
+            testAppointmentAlarm.ReminderAlertTime = (GetFromDateTime().ConvertUserTimeToUtc() - TimeSpan.FromMinutes(15)).ConvertDateTimeToTimestampMilliseconds();
 
             testAppointmentToEdit = new CalendarAppointment
             {
@@ -208,9 +207,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             testAppointmentToEdit.Occurrences.Add(occurrence);
             testAppointmentToEdit.ReminderAlertTime = occurrence.StartDateTimestamp;
-            testAppointmentToEdit.ReminderTimeBefore = TimeSpan.FromMinutes(15).Ticks;
 
-            selectedAppointment = testAppointmentSimple;
+            selectedAppointment = testAppointmentAlarm;
         }
 
         public override void ViewWillAppear(bool animated)
@@ -488,20 +486,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
-                if (string.IsNullOrWhiteSpace(getIdView.Text))
-                {
-                    var list = await Managers.CalendarManager.GetCalendarAppointmentsAsync(new List<int> { selectedCalendar.Id }, selectedFromDateTime, selectedToDateTime, sourceType);
-                    AddAppointments(list);
-                }
-                else
-                {
-                    var id = int.Parse(getIdView.Text);
-                    var appointment = await Managers.CalendarManager.GetCalendarAppointmentAsync(selectedCalendar.Id, id);
-                    AddAppointments(new List<CalendarAppointment> { appointment });
-                }
+                //if (string.IsNullOrWhiteSpace(getIdView.Text))
+                //{
+                //    var list = await Managers.CalendarManager.GetCalendarAppointmentsAsync(new List<int> { selectedCalendar.Id }, selectedFromDateTime, selectedToDateTime, sourceType);
+                //    AddAppointments(list);
+                //}
+                //else
+                //{
+                //    var id = int.Parse(getIdView.Text);
+                //    var appointment = await Managers.CalendarManager.GetCalendarAppointmentAsync(selectedCalendar.Id, id);
+                //    AddAppointments(new List<CalendarAppointment> { appointment });
+                //}
 
-                //var alarms = await Managers.CalendarManager.GetCalendarAlarmsAsync(new List<int> { selectedCalendar.Id }, selectedFromDateTime, selectedToDateTime, sourceType);
-                //AddAlarms(alarms); //TODO TO TEST ALARMs
+                var alarms = await Managers.CalendarManager.GetCalendarAlarmsAsync(new List<int> { selectedCalendar.Id }, selectedFromDateTime, selectedToDateTime, sourceType);
+                AddAlarms(alarms); //TODO TO TEST ALARMs
             }
             catch (Exception ex)
             {
@@ -592,7 +590,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         .ConvertDateTimeToTimestampMilliseconds()
                         .FormatUserTimestampAsTimeAndDateString();
 
-                        text += $"\n{occurrence.RecurrenceIndex}: {fromDate} - {toDate}";
+
+                        var alarmTime = occurrence.StartDateTimestamp.ConvertTimestampMillisecondsToDateTime()
+                        .ConvertUtcToUserTime() - appointment.ReminderAlertTime.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime();
+
+                        text += $"\n{occurrence.RecurrenceIndex}: {fromDate} - {toDate} - {alarmTime.Minutes}";
                     }
 
                     textView.Font = UIFont.SystemFontOfSize(textSize);

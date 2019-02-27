@@ -10,7 +10,6 @@ using Android.Support.V4.Graphics.Drawable;
 using Android.Support.V7.Widget;
 using Android.Telephony;
 using Android.Views;
-using Mark5.Mobile.Common;
 using Mark5.Mobile.Droid.Ui.Common;
 using PhoneNumbers;
 using static Android.Views.View;

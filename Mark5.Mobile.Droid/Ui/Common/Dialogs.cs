@@ -16,6 +16,9 @@ using Mark5.Mobile.Droid.Utilities;
 using Mark5.ServiceReference.Exceptions;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Manager;
+using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Authenticator;
 
 namespace Mark5.Mobile.Droid.Ui.Common
 {
@@ -259,6 +262,24 @@ namespace Mark5.Mobile.Droid.Ui.Common
             return tcs.Task;
         }
 
+        public static Task<int> ShowListDialog(Context context, int titleId, string description, string[] items, bool includeCancel)
+        {
+            var tcs = new TaskCompletionSource<int>();
+            var builder = new MaterialDialog.Builder(context);
+            builder.Title(titleId);
+            builder.Content(description);
+            builder.Items(items);
+            builder.ItemsCallback(new ListCallback(i => tcs.SetResult(i)));
+            if (includeCancel)
+            {
+                builder.NegativeText(Resource.String.cancel);
+                builder.OnNegative(new SingleButtonCallback(() => tcs.SetResult(-1)));
+            }
+            builder.Cancelable(false);
+            builder.Show();
+            return tcs.Task;
+        }
+
         public static Task<long> ShowDatePicker(Context context, long initialTimestamp = -1, long minTimestamp = -1, long maxTimestamp = -1, bool addRemoveDateChoice = false)
         {
             var tcs = new TaskCompletionSource<long>();
@@ -402,6 +423,19 @@ namespace Mark5.Mobile.Droid.Ui.Common
             var builder = new MaterialDialog.Builder(context);
             builder.Title(GetErrorTitle(context, ex));
             builder.Content(GetErrorMessage(context, ex));
+
+            //if token is invalid -> navigate user to login
+            if (ex is HttpAppServiceException hape && (hape?.Detail?.Code == AppServiceFaultCode.InvalidToken))
+            {
+                ShowYesNoDialog(context, Resource.String.invalid_token, Resource.String.invalid_token_message,
+                    async () =>
+                    {
+                        await AuthenticatorFactory.Create().RetainConnectionInfoAsync();
+                        context.StartActivity(LoginActivity.CreateIntent(context, true));
+                    });
+                return tcs.Task;
+            }
+
             builder.PositiveText(Resource.String.ok);
             builder.OnPositive(new SingleButtonCallback(() => tcs.SetResult(true)));
             if (ShouldShowCreateReport(ex))
@@ -413,20 +447,20 @@ namespace Mark5.Mobile.Droid.Ui.Common
                     Task.Run(() => { return SystemReportCollector.CreateFullReport(); })
                         .ContinueWith(async t =>
                         {
-                        dismissAction();
+                            dismissAction();
 
-                        if (!t.IsFaulted)
-                        {
-                            var sendWithMark5 = await ShowYesNoDialogAsync(context, Resource.String.send_with_mark5_title, Resource.String.send_report_with_mark5_content);
+                            if (!t.IsFaulted)
+                            {
+                                var sendWithMark5 = await ShowYesNoDialogAsync(context, Resource.String.send_with_mark5_title, Resource.String.send_report_with_mark5_content);
 
-                            if (sendWithMark5)
-                                context.StartActivity(SystemReportCollector.CreateShareReportComposeDocumentActivityIntent(context, t.Result));
-                            else
-                                context.StartActivity(SystemReportCollector.CreateShareReportIntent(context, t.Result));
-                        }
+                                if (sendWithMark5)
+                                    context.StartActivity(SystemReportCollector.CreateShareReportComposeDocumentActivityIntent(context, t.Result));
+                                else
+                                    context.StartActivity(SystemReportCollector.CreateShareReportIntent(context, t.Result));
+                            }
 
-                        tcs.SetResult(true);
-                    }, TaskScheduler.FromCurrentSynchronizationContext());
+                            tcs.SetResult(true);
+                        }, TaskScheduler.FromCurrentSynchronizationContext());
                 }));
             }
             builder.Cancelable(false);

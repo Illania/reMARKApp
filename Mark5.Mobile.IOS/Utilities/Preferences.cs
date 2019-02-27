@@ -53,6 +53,8 @@ namespace Mark5.Mobile.IOS.Utilities
             public const string EmailLeadingSwipeActions = "EmailLeadingSwipeActions";
 
             public const string CallerIdentificationEnabledKey = "CallerIdentificationEnabled";
+
+            public const string SyncFavoriteFoldersKey = "SyncFavoriteFolders";
         }
 
         readonly NSUserDefaults ud;
@@ -141,7 +143,11 @@ namespace Mark5.Mobile.IOS.Utilities
                 },
                 {
                     new NSString(Keys.EmailTrailingSwipeActions), NSArray.FromStrings (EmailSwipeAction.SwipeAction.More.ToString(), EmailSwipeAction.SwipeAction.CopyToWorkTray.ToString(), EmailSwipeAction.SwipeAction.MarkAsRead.ToString())
-                }
+                },
+                {
+                    new NSString(Keys.SyncFavoriteFoldersKey), NSNumber.FromBoolean(false)
+                },
+
             };
 
             ud.RegisterDefaults(defaultsDictionary);
@@ -318,6 +324,19 @@ namespace Mark5.Mobile.IOS.Utilities
             EmailLeadingSwipeActions = new List<EmailSwipeAction> { new EmailSwipeAction(EmailSwipeAction.SwipeAction.Categories) };
             EmailTrailingSwipeActions = new List<EmailSwipeAction> { new EmailSwipeAction(EmailSwipeAction.SwipeAction.More), new EmailSwipeAction(EmailSwipeAction.SwipeAction.CopyToWorkTray), new EmailSwipeAction(EmailSwipeAction.SwipeAction.MarkAsRead) };
         }
+
+        #region Favorites sync
+        public bool SyncFavoriteFoldersEnabled
+        {
+            get => ud.BoolForKey(Keys.SyncFavoriteFoldersKey);
+            set
+            {
+                ud.SetBool(value, Keys.SyncFavoriteFoldersKey);
+                ud.Synchronize();
+            }
+        }
+
+        #endregion
 
         #endregion
 

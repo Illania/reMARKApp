@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using Mark5.Mobile.Common.Extensions;
 using DataContract = Mark5.ServiceReference.DataContract;
@@ -245,8 +245,6 @@ namespace Mark5.Mobile.Common.Model.Converters
                 result.Comments.AddRange(d.Comments.WhereNotNull().Select(Convert));
             if (d.ExtraFields != null)
                 result.ExtraFields = d.ExtraFields.Where(kv => kv.Key != null).ToDictionary(kv => kv.Key.Convert(), kv => kv.Value);
-            if (d.ICalendars != null)
-                result.ICalendars.AddRange(d.ICalendars.WhereNotNull().Select(Convert));
             return result;
         }
 
@@ -693,56 +691,6 @@ namespace Mark5.Mobile.Common.Model.Converters
             return moduleFavorites;
         }
 
-
-        #region ICalendar
-        public static ICalendarInfo Convert(this DataContract.ICalendarInfo calendarInfo)
-        {
-            return new ICalendarInfo
-            {
-                Events = calendarInfo.Events.WhereNotNull().Select(Convert).ToList(),
-                Reply = calendarInfo.Reply?.Convert(),
-                MethodType = calendarInfo.MethodType.ConvertEnum<MethodType>()
-            };
-        }
-
-        public static IEventInfo Convert(this DataContract.IEventInfo eventInfo)
-        {
-            return new IEventInfo
-            {
-                Id = eventInfo.Id,
-                Description = eventInfo.Description,
-                Summary = eventInfo.Summary,
-                End = eventInfo.End,
-                Start = eventInfo.Start,
-                Location = eventInfo.Location,
-                Attendees = eventInfo.Attendees.WhereNotNull().Select(Convert).ToList(),
-            };
-        }
-
-        public static IReplyInfo Convert(this DataContract.IReplyInfo replyInfo)
-        {
-            return new IReplyInfo
-            {
-                AppId = replyInfo.AppId,
-                Status = replyInfo.Status.ConvertEnum<ParticipantStatus>(),
-                FromAddress = replyInfo.FromAddress
-            };
-        }
-
-        public static IAttendeeInfo Convert(this DataContract.IAttendeeInfo attendeeInfo)
-        {
-            return new IAttendeeInfo
-            {
-                Status = attendeeInfo.Status.ConvertEnum<ParticipantStatus>(),
-                RSVP = attendeeInfo.RSVP,
-                CN = attendeeInfo.CN,
-                IsOrganizer = attendeeInfo.IsOrganizer,
-                Type = attendeeInfo.Type.ConvertEnum<ParticipantType>(),
-                Url = attendeeInfo.Url
-            };
-        }
-
-        #endregion
 
         #endregion
 

@@ -1,11 +1,11 @@
-﻿using Android.App;
-using Android.Content;
+﻿using Android.Content;
 using Android.OS;
-using Android.Runtime;
 using Android.Support.V4.Hardware.Fingerprint;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Droid.Utilities.Fingerprint;
+using Android.App;
+using DialogFragment = Android.Support.V4.App.DialogFragment;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -29,7 +29,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             base.OnCreate(savedInstanceState);
 
             RetainInstance = true;
-            SetStyle(DialogFragmentStyle.Normal, Android.Resource.Style.ThemeMaterialLightDialog);
+            SetStyle(StyleNormal, Android.Resource.Style.ThemeMaterialLightDialog);
 
             fingerprintManager = FingerprintManagerCompat.From(Context);
             keyguardManager = (KeyguardManager)Context.GetSystemService(Context.KeyguardService);
@@ -82,9 +82,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 fingerprintUiHelper.StopListening();
         }
 
-        public override void OnActivityResult(int requestCode, [GeneratedEnum] Result resultCode, Intent data)
+        public override void OnActivityResult(int requestCode, int resultCode, Intent data)
         {
-            if (requestCode == RequestCodes.ConfirmCredentialRequest && resultCode == Result.Ok)
+            if (requestCode == RequestCodes.ConfirmCredentialRequest && resultCode == (int)Result.Ok)
                 OnAuthenticatedWithDeviceCredential();
         }
 

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using Mark5.Mobile.Common.Extensions;
 using DataContract = Mark5.ServiceReference.DataContract;
@@ -670,30 +670,7 @@ namespace Mark5.Mobile.Common.Model.Converters
             };
         }
 
-        public static ModuleFavoriteFoldersCollection Convert(this DataContract.GetFavoriteFoldersResult moduleFavoritesResult)
-        {
-            ModuleFavoriteFoldersCollection moduleFavorites = new ModuleFavoriteFoldersCollection
-            {
-                UpdatedAt = moduleFavoritesResult.UpdatedAt
-            };
-
-            if (moduleFavoritesResult.ModuleFavoriteFoldersList != null)
-            {
-                moduleFavorites.ModuleFavoriteFolders = new List<ModuleFavoriteFolders>();
-
-                foreach (var fav in moduleFavoritesResult.ModuleFavoriteFoldersList)
-                {
-                    var newFav = new ModuleFavoriteFolders { ModuleType = (ModuleType)fav.ModuleType };
-                    newFav.Folders.AddRange(fav.Folders.Select(Convert));
-
-                    moduleFavorites.ModuleFavoriteFolders.Add(newFav);
-                }
-            }
-
-            return moduleFavorites;
-        }
-
-
+<<<<<<< HEAD
         #region ICalendar
         public static ICalendarInfo Convert(this DataContract.ICalendarInfo calendarInfo)
         {
@@ -743,6 +720,31 @@ namespace Mark5.Mobile.Common.Model.Converters
         }
 
         #endregion
+=======
+        public static ModuleFavoriteFoldersCollection Convert(this DataContract.GetFavoriteFoldersResult moduleFavoritesResult)
+        {
+            ModuleFavoriteFoldersCollection moduleFavorites = new ModuleFavoriteFoldersCollection
+            {
+                UpdatedAt = moduleFavoritesResult.UpdatedAt
+            };
+
+            if (moduleFavoritesResult.ModuleFavoriteFoldersList != null)
+            {
+                moduleFavorites.ModuleFavoriteFolders = new List<ModuleFavoriteFolders>();
+
+                foreach (var fav in moduleFavoritesResult.ModuleFavoriteFoldersList)
+                {
+                    var newFav = new ModuleFavoriteFolders { ModuleType = (ModuleType)fav.ModuleType };
+                    newFav.Folders.AddRange(fav.Folders.Select(Convert));
+
+                    moduleFavorites.ModuleFavoriteFolders.Add(newFav);
+                }
+            }
+
+            return moduleFavorites;
+        }
+
+>>>>>>> feature/M5APP-657-prepare-the-app-for-calendar-methods
 
         #endregion
 
@@ -1059,6 +1061,19 @@ namespace Mark5.Mobile.Common.Model.Converters
             };
         }
 
+<<<<<<< HEAD
+        #region ICalendar
+        public static DataContract.IEventReplyParameters Convert(this IEventReply eventReply)
+        {
+            return new DataContract.IEventReplyParameters
+            {
+                IEventId = eventReply.EventId,
+                ParticipantStatus = (DataContract.ParticipantStatus)eventReply.ParticipantStatus.ConvertEnum<ParticipantStatus>(),
+                Silent = eventReply.Silent
+            };
+        }
+        #endregion
+=======
         public static DataContract.Folder Convert(this Folder folder)
         {
             return new DataContract.Folder
@@ -1092,6 +1107,7 @@ namespace Mark5.Mobile.Common.Model.Converters
 
             return favorites;
         }
+>>>>>>> feature/M5APP-657-prepare-the-app-for-calendar-methods
 
         #endregion
     }
