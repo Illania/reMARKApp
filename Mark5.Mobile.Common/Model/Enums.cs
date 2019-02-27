@@ -258,11 +258,12 @@ namespace Mark5.Mobile.Common.Model
 
     public enum ParticipantStatus
     {
-        None = 0,
-        NeedAction = 1,
-        Accepted = 2,
-        Declined = 3,
-        Tentative = 4,
+        NeedAction = 0,
+        Accepted = 1,
+        Declined = 2,
+        Tentative = 3,
+        Inviting = 4,
+        Invited = 5
     }
 
     #endregion
@@ -372,6 +373,18 @@ namespace Mark5.Mobile.Common.Model
         On,
         AllowSelfSigned,
         Off
+    }
+
+    #endregion
+
+    #region ICalendar
+
+    public enum MethodType
+    {
+        Request = 0,
+        Reply = 1,
+        Cancelled = 2,
+        Publish = 3
     }
 
     #endregion

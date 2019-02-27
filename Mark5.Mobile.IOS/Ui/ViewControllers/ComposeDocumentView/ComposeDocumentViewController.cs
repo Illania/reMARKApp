@@ -812,6 +812,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     DocumentPreview = documentPreview,
                     Document = document
                 });
+
                 await Managers.DocumentsManager.QueueWorkingCopyToUpload();
 
                 dismissAction();

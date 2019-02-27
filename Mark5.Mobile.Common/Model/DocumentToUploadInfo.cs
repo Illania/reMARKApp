@@ -8,5 +8,6 @@
         public long SendOnTimestamp { get; set; } = -1;
         public bool ConfirmRead { get; set; }
         public bool ConfirmDelivery { get; set; }
+        public IEventReply IEventReply { get; set; }
     }
 }
