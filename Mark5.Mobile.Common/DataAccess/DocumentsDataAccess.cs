@@ -156,11 +156,7 @@ namespace Mark5.Mobile.Common.DataAccess
                 await documentsDatabase.RunInConnectionAsync(c =>
                 {
                     var result = c.Find<Document>(documentId);
-
-                    if (result == null)
-                        throw new DataNotFoundException("Document could not be found.");
-
-                    document = result;
+                    document = result ?? throw new DataNotFoundException("Document could not be found.");
                 });
 
                 return document;

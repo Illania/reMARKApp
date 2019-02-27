@@ -790,7 +790,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             actionMode.Finish();
         }
 
-        async void SetFolderFavouriteStatusForSelection(bool isFolderFavorite)
+        async void SetFolderFavouriteStatusForSelection(bool favourite)
         {
             var selectedFolders = CurrentAdapter.GetSelectedItems().ToList();
             if (!selectedFolders.Any())
@@ -853,7 +853,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             try
             {
                 await Managers.FoldersManager.RemoveSavedFolderInfo(selectedFolder);
-            } 
+            }
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error($"Error while making folder online.", ex.InnerException);

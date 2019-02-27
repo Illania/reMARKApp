@@ -106,6 +106,21 @@ namespace Mark5.Mobile.Common.Model
             set => extraFields = value;
         }
 
+        List<ICalendarInfo> iCalendars;
+
+        [JsonIgnore]
+        [Ignore]
+        public List<ICalendarInfo> ICalendars
+        {
+            get
+            {
+                if (iCalendars == null)
+                    iCalendars = new List<ICalendarInfo>();
+                return iCalendars;
+            }
+            set => iCalendars = value;
+        }
+
         [Column("IsEncrypted")]
         public bool IsEncrypted { get; set; }
 
@@ -131,6 +146,13 @@ namespace Mark5.Mobile.Common.Model
         {
             get => Serializer.Serialize(ExtraFields.ToList());
             set => ExtraFields = (Serializer.Deserialize<List<KeyValuePair<DocumentExtraFieldInfo, string>>>(value)).ToDictionary(x => x.Key, x => x.Value);
+        }
+
+        [Column("ICalendars")]
+        public string ICalendarsString
+        {
+            get => Serializer.Serialize(ICalendars.ToList());
+            set => ICalendars = Serializer.Deserialize<List<ICalendarInfo>>(value);
         }
 
         #endregion

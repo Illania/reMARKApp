@@ -2,7 +2,7 @@
 
 namespace Mark5.Mobile.Common.Model
 {
-    public class CalendarResource
+    public class Calendar
     {
         public int Id { get; set; } = -1;
 

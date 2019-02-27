@@ -23,79 +23,35 @@ namespace Mark5.Mobile.Common.Manager
             this.calendarDataAccess = calendarDataAccess;
         }
 
-        public async Task<List<CalendarAppointment>> GetCalendarAppointmentsAsync(Folder folder, long startDateTimestamp, long endDateTimestamp, SourceType sourceType = SourceType.Auto)
+        public async Task<List<CalendarAppointment>> GetCalendarAppointmentsAsync(List<int> calendarIds, long startDateTimestamp, long endDateTimestamp, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
 
             if (sourceType == SourceType.Remote)
             {
-                var result = await AppServiceProxy.GetCalendarEventsAsync(new DataContract.GetCalendarEventsParameters
+                var result = await AppServiceProxy.GetCalendarAppointmentsAsync(new DataContract.GetCalendarAppointmentsParameters
                 {
                     Token = Token,
-                    FolderId = folder.Id,
-                    GetAppointments = true,
-                    GetTasks = false,
+                    CalendarIds = calendarIds,
                     StartDate = startDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
                     EndDate = endDateTimestamp.ConvertTimestampMillisecondsToDateTime()
                 });
 
                 var appointments = result.CalendarAppointments.WhereNotNull().Select(a => a.Convert()).ToList();
 
-                await calendarDataAccess.SaveCalendarAppointmentsAsync(folder, appointments);
+                await calendarDataAccess.SaveCalendarAppointmentsAsync(calendarIds, appointments, startDateTimestamp, endDateTimestamp);
 
                 return appointments;
             }
 
             if (sourceType == SourceType.Local)
-            {
-                List<CalendarAppointment> appointments = null;
-
-                appointments = await calendarDataAccess.GetCalendarAppointmentsAsync(folder, startDateTimestamp, endDateTimestamp);
-
-                return appointments;
-            }
+                return await calendarDataAccess.GetCalendarAppointmentsAsync(calendarIds, startDateTimestamp, endDateTimestamp);
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task<List<CalendarTask>> GetCalendarTasksAsync(Folder folder, long startDateTimestamp, long endDateTimestamp, SourceType sourceType = SourceType.Auto)
-        {
-            if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
-
-            if (sourceType == SourceType.Remote)
-            {
-                var result = await AppServiceProxy.GetCalendarEventsAsync(new DataContract.GetCalendarEventsParameters
-                {
-                    Token = Token,
-                    FolderId = folder.Id,
-                    GetAppointments = false,
-                    GetTasks = true,
-                    StartDate = startDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
-                    EndDate = endDateTimestamp.ConvertTimestampMillisecondsToDateTime()
-                });
-
-                var tasks = result.CalendarTasks.WhereNotNull().Select(t => t.Convert()).ToList();
-
-                await calendarDataAccess.SaveCalendarTasksAsync(folder, tasks);
-
-                return tasks;
-            }
-
-            if (sourceType == SourceType.Local)
-            {
-                List<CalendarTask> tasks = null;
-
-                tasks = await calendarDataAccess.GetCalendarTasksAsync(folder, startDateTimestamp, endDateTimestamp);
-
-                return tasks;
-            }
-
-            throw new ArgumentException("Invalid sourceType provided.");
-        }
-
-        public async Task<CalendarAppointment> GetCalendarAppointmentAsync(Folder folder, int calendarAppointmentId, SourceType sourceType = SourceType.Auto)
+        public async Task<CalendarAppointment> GetCalendarAppointmentAsync(int calendarId, int calendarAppointmentId, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
@@ -105,7 +61,7 @@ namespace Mark5.Mobile.Common.Manager
                 var result = await AppServiceProxy.GetCalendarAppointmentAsync(new DataContract.GetCalendarAppointmentParameters
                 {
                     Token = Token,
-                    FolderId = folder?.Id ?? -1,
+                    CalendarId = calendarId,
                     CalendarAppointmentId = calendarAppointmentId
                 });
 
@@ -122,34 +78,7 @@ namespace Mark5.Mobile.Common.Manager
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task<CalendarTask> GetCalendarTaskAsync(Folder folder, int calendarTaskId, SourceType sourceType = SourceType.Auto)
-        {
-            if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
-
-            if (sourceType == SourceType.Remote)
-            {
-                var result = await AppServiceProxy.GetCalendarTaskAsync(new DataContract.GetCalendarTaskParameters
-                {
-                    Token = Token,
-                    FolderId = folder?.Id ?? -1,
-                    CalendarTaskId = calendarTaskId
-                });
-
-                var task = result.CalendarTask.Convert();
-
-                await calendarDataAccess.SaveCalendarTaskAsync(task);
-
-                return task;
-            }
-
-            if (sourceType == SourceType.Local)
-                return await calendarDataAccess.GetCalendarTaskAsync(calendarTaskId);
-
-            throw new ArgumentException("Invalid sourceType provided.");
-        }
-
-        public async Task<bool> CreateOrUpdateCalendarAppointmentAsync(Folder folder, CalendarAppointment calendarAppointment, SourceType sourceType = SourceType.Auto)
+        public async Task<bool> CreateOrUpdateCalendarAppointmentAsync(int calendarId, CalendarAppointment calendarAppointment, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
@@ -159,12 +88,14 @@ namespace Mark5.Mobile.Common.Manager
                 var result = await AppServiceProxy.CreateOrUpdateCalendarAppointmentAsync(new DataContract.CreateOrUpdateCalendarAppointmentParameters
                 {
                     Token = Token,
-                    FolderId = folder.Id,
+                    CalendarId = calendarId,
                     CalendarAppointment = calendarAppointment.Convert()
                 });
 
                 calendarAppointment.Id = result.Id;
                 calendarAppointment.Guid = result.Guid;
+
+                await calendarDataAccess.SaveCalendarAppointmentAsync(calendarAppointment);
 
                 return result.Updated;
             }
@@ -175,28 +106,42 @@ namespace Mark5.Mobile.Common.Manager
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task<bool> CreateOrUpdateCalendarTaskAsync(Folder folder, CalendarTask calendarTask, SourceType sourceType = SourceType.Auto)
+        public async Task<bool> SendCalendarAppointmentInvitationsAsync(int appointmentId, Guid lineGuid)
+        {
+            var result = await AppServiceProxy.SendCalendarAppointmentInvitationsAsync(new DataContract.SendCalendarAppointmentInvitationsParameters
+            {
+                Token = Token,
+                LineGuid = lineGuid,
+                CalendarAppointmentId = appointmentId
+            });
+
+            return true;
+        }
+
+        public async Task<List<CalendarAlarm>> GetCalendarAlarmsAsync(List<int> calendarIds, long startDateTimestamp, long endDateTimestamp, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
 
             if (sourceType == SourceType.Remote)
             {
-                var result = await AppServiceProxy.CreateOrUpdateCalendarTaskAsync(new DataContract.CreateOrUpdateCalendarTaskParameters
+                var result = await AppServiceProxy.GetCalendarAlarms(new DataContract.GetCalendarAlarmsParameters
                 {
                     Token = Token,
-                    FolderId = folder.Id,
-                    CalendarTask = calendarTask.Convert()
+                    CalendarIds = calendarIds,
+                    StartDate = startDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
+                    EndDate = endDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
                 });
 
-                calendarTask.Id = result.Id;
-                calendarTask.Guid = result.Guid;
+                var alarms = result.Alarms.WhereNotNull().Select(a => a.Convert()).ToList();
 
-                return result.Updated;
+                await calendarDataAccess.SaveCalendarAlarmsAsync(calendarIds, alarms, startDateTimestamp, endDateTimestamp);
+
+                return alarms;
             }
 
             if (sourceType == SourceType.Local)
-                throw new InvalidSourceTypeException("This action can only be performed when online.");
+                return await calendarDataAccess.GetCalendarAlarmsAsync(calendarIds, startDateTimestamp, endDateTimestamp);
 
             throw new ArgumentException("Invalid sourceType provided.");
         }

@@ -11,4 +11,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="AppService\AppServiceClient.AppServiceClientChannel.cs" />
+  </ItemGroup>
 </Project>
