@@ -166,10 +166,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 cell.TextLabel.Text = specifier.Title;
                 try
                 {
-                    //if (CallIdExtensionUtilities.IsCallIdExtensionEnabled().Result)
-                    //    cell.DetailTextLabel.Text = "Enabled";
-                    //else
-                    cell.DetailTextLabel.Text = "Disabled";
+                    if (CallIdExtensionUtilities.IsCallIdExtensionEnabled().Result)
+                        cell.DetailTextLabel.Text = "Enabled";
+                    else
+                        cell.DetailTextLabel.Text = "Disabled";
 
                     cell.DetailTextLabel.TextColor = Theme.DarkGray;
                 }
