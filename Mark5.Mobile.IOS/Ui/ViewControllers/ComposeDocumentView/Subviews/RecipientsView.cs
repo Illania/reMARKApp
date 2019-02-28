@@ -269,7 +269,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         public override Task UpdateDocument()
         {
-            DocumentPreview.Addresses.RemoveAll(a => a.AddressType == AddressType);
+            DocumentPreview?.Addresses?.RemoveAll(a => a?.AddressType == AddressType);
             InvokeOnMainThread(() =>
             {
                 foreach (var email in GetEmails())
