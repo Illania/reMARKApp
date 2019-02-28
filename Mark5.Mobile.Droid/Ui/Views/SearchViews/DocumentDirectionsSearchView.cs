@@ -109,16 +109,17 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
         {
             var selectedDirections = new List<DocumentDirection>();
 
-            if (draftButton.Selected)
+            if (draftButton?.Selected ?? false)
                 selectedDirections.Add(DocumentDirection.Draft);
 
-            if (inboxButton.Selected)
+            if (inboxButton?.Selected ?? false)
                 selectedDirections.Add(DocumentDirection.Incoming);
 
-            if (outboxButton.Selected)
+            if (outboxButton?.Selected ?? false)
                 selectedDirections.Add(DocumentDirection.Outgoing);
 
-            Criteria.Directions = selectedDirections;
+            if (Criteria != null)
+                Criteria.Directions = selectedDirections;
         }
     }
 }
