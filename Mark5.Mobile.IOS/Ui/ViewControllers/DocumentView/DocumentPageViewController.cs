@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.HubMessages;
@@ -17,6 +16,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
         UIBarButtonItem previousDocumentButtonItem;
         UIBarButtonItem nextDocumentButtonItem;
         UIBarButtonItem editDocumentButtonItem;
+
+        // Buttons for iPad only
+        UIBarButtonItem flagButton;
+        UIBarButtonItem fileToButton;
+        UIButton commentsButton;
+        BadgeBarButtonItem commentsBadgeButton;
+        UIBarButtonItem replyActionsButton;
+        UIBarButtonItem userActionsButton;
 
         const int CacheCapacity = 5; // Going below 5 might cause issues with internal caching of
                                      // UIPageViewController
@@ -59,7 +66,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
                 {
                     NavigationController.NavigationBar.Translucent = false;
                 }
-                NavigationController.ToolbarHidden = false;
+
+                if (Integration.IsIPad())
+                {
+                    NavigationController.ToolbarHidden = true;
+                }
+                else
+                {
+                    NavigationController.ToolbarHidden = false;
+                }
+
             }
             InitializeHandlers();
         }
@@ -202,6 +218,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
 
             SetToolbarItems(null, true);
             NavigationItem.SetRightBarButtonItems(new UIBarButtonItem[0], false);
+            NavigationItem.SetLeftBarButtonItems(new UIBarButtonItem[0], false);
         }
 
         public bool IsShowingDocumentWithId(int id)
@@ -272,8 +289,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
 
         void UpdateToolBar(DocumentViewController vc)
         {
-            var ti = vc?.ToolbarItems;
-            SetToolbarItems(ti, true);
+            if (Integration.IsIPad())
+            {
+                vc?.RefreshToolbar();
+            }
+            else
+            {
+                var ti = vc?.ToolbarItems;
+                SetToolbarItems(ti, true);
+            }
         }
 
         void UpdateNavigationBar(DocumentPreview documentPreview, bool isSearchActive = false)
@@ -404,10 +428,103 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
 
         #endregion
 
+        #region iPad related
+        public void UpdateIPadNavigationButtons(bool enabled, string commentBadgeValue)
+        {
+            flagButton = new UIBarButtonItem
+            {
+                Image = UIImage.FromBundle("Flag"),
+                Enabled = enabled
+            };
+
+            flagButton.Clicked += FlagButton_Clicked;
+
+            replyActionsButton = new UIBarButtonItem
+            {
+                Image = UIImage.FromBundle("Reply"),
+                Enabled = enabled
+            };
+
+            replyActionsButton.Clicked += ReplyButton_Clicked;
+
+            fileToButton = new UIBarButtonItem
+            {
+                Image = UIImage.FromBundle("Worktray"),
+                Enabled = enabled
+            };
+
+            fileToButton.Clicked += FileToButton_Clicked;
+
+            commentsButton = new UIButton
+            {
+                Frame = new CoreGraphics.CGRect(0f, 0f, 25f, 25f),
+                Enabled = enabled,
+            };
+
+            commentsButton.SetImage(UIImage.FromBundle("Comments").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+
+            commentsButton.TouchUpInside += CommentsButton_TouchUpInside;
+
+            commentsBadgeButton = new BadgeBarButtonItem(commentsButton)
+            {
+                Enabled = enabled
+            };
+
+            userActionsButton = new UIBarButtonItem
+            {
+                Image = UIImage.FromBundle("Actions"),
+                Enabled = enabled
+            };
+
+            userActionsButton.Clicked += UserActionsButton_Clicked;
+
+            var leftButtons = new[]
+            {
+                flagButton,
+                replyActionsButton,
+                fileToButton,
+                commentsBadgeButton,
+                userActionsButton
+            };
+
+            NavigationItem.SetLeftBarButtonItems(leftButtons, false);
+        }
+
+        void UserActionsButton_Clicked(object sender, EventArgs e)
+        {
+            var vc = (DocumentViewController)ViewControllers.FirstOrDefault();
+            vc.UserActionsClicke(sender, e);
+        }
+
+        void CommentsButton_TouchUpInside(object sender, EventArgs e)
+        {
+            var vc = (DocumentViewController)ViewControllers.FirstOrDefault();
+            vc.CommentsClicked(sender, e);
+        }
+
+        void FlagButton_Clicked(object sender, EventArgs e)
+        {
+            var vc = (DocumentViewController)ViewControllers.FirstOrDefault();
+            vc.FlagClicked(sender, e);
+        }
+
+        void ReplyButton_Clicked(object sender, EventArgs e)
+        {
+            var vc = (DocumentViewController)ViewControllers.FirstOrDefault();
+            vc.ReplyClicked(sender, e);
+        }
+
+        void FileToButton_Clicked(object sender, EventArgs e)
+        {
+            var vc = (DocumentViewController)ViewControllers.FirstOrDefault();
+            vc.FileToClicked(sender, e);
+        }
+        #endregion
     }
 
     public interface IDocumentPageViewControllerDelegate
     {
         void AddViewControllerToCache(DocumentViewController documentViewController);
+        void UpdateIPadNavigationButtons(bool enabled, string commentBadgeValue);
     }
 }

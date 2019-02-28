@@ -71,6 +71,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         TinyMessageSubscriptionToken draftSentToken;
         TinyMessageSubscriptionToken commentsCountChangedToken;
 
+        // EventHandlers for IPad
+        public EventHandler FlagClicked => FlagButton_Clicked;
+        public EventHandler ReplyClicked => ReplyActionsButton_Clicked;
+        public EventHandler FileToClicked => FileToButton_Clicked;
+        public EventHandler CommentsClicked => CommentsButton_Clicked;
+        public EventHandler UserActionsClicke => UserActionsButton_Clicked;
+
         public DocumentViewController()
         {
             HidesBottomBarWhenPushed = true;
@@ -84,7 +91,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             InitNavigationBar();
             InitHeaderView();
-            InitToolbar();
+
+            if (!Integration.IsIPad())
+                InitToolbar();
 
             if (Integration.IsRunningAtLeast(11))
                 NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Never;
@@ -102,6 +111,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (NavigationController != null && !(ParentViewController is DocumentPageViewController))
                 NavigationController.ToolbarHidden = false;
+
+            if (Integration.IsIPad())
+                NavigationController.ToolbarHidden = true;
         }
 
         public override void ViewDidAppear(bool animated)
@@ -473,6 +485,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (userActionsButton != null)
                 userActionsButton.Enabled = false;
 
+            if (Integration.IsIPad())
+                DocumentPageViewControllerDelegate?.UpdateIPadNavigationButtons(false, "0");
+
             Clear();
         }
 
@@ -618,13 +633,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var enableBottomActions = failedDocumentToUploadGuid == Guid.Empty;
             if (enableBottomActions)
             {
-                flagButton.Enabled = document != null;
-                fileToButton.Enabled = document != null;
-                replyActionsButton.Enabled = document != null;
-                commentsBadgeButton.BadgeValue = document?.Comments?.Count.ToString();
-                commentsBadgeButton.Enabled = document != null;
-                commentsButton.Enabled = document != null;
-                userActionsButton.Enabled = document != null;
+                if (Integration.IsIPad())
+                {
+                    DocumentPageViewControllerDelegate?.UpdateIPadNavigationButtons(document != null, document?.Comments?.Count.ToString());
+                }
+                else
+                {
+                    flagButton.Enabled = document != null;
+                    fileToButton.Enabled = document != null;
+                    replyActionsButton.Enabled = document != null;
+                    commentsBadgeButton.BadgeValue = document?.Comments?.Count.ToString();
+                    commentsBadgeButton.Enabled = document != null;
+                    commentsButton.Enabled = document != null;
+                    userActionsButton.Enabled = document != null;
+                }
             }
         }
 
@@ -736,7 +758,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Toolbar event handlers
 
-        async void FlagButton_Clicked(object sender, EventArgs e)
+        public async void FlagButton_Clicked(object sender, EventArgs e)
         {
             var isRead = documentPreview.IsReadByCurrent;
             var flagListStrings = new string[]
@@ -745,7 +767,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Localization.GetString("categories")
             };
 
-            var result = await Dialogs.ShowListActionSheetAsync(this, flagListStrings, flagButton);
+            var result = await Dialogs.ShowListActionSheetAsync(this, flagListStrings, (UIBarButtonItem)sender);
 
             if (result < 0)
                 return;
@@ -770,7 +792,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Localization.GetString("forward"),
                 Localization.GetString("copy_to_new")};
 
-            var result = await Dialogs.ShowListActionSheetAsync(this, replyListStrings, replyActionsButton);
+            var result = await Dialogs.ShowListActionSheetAsync(this, replyListStrings, (UIBarButtonItem)sender);
 
             if (result < 0)
                 return;
@@ -957,7 +979,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Localization.GetString("links")
             };
 
-            var result = await Dialogs.ShowListActionSheetAsync(this, actionLinksListString, userActionsButton);
+            var result = await Dialogs.ShowListActionSheetAsync(this, actionLinksListString, (UIBarButtonItem)sender);
 
             if (result < 0)
                 return;
@@ -1171,7 +1193,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void CommentsCountChangedHandler(EntityPreviewCommentCountChangedMessage m)
         {
-            BeginInvokeOnMainThread(() => commentsBadgeButton.SetBadgeValue(document.Comments.Count().ToString(), false));
+            if (Integration.IsIPad())
+            {
+                BeginInvokeOnMainThread(() => DocumentPageViewControllerDelegate?.UpdateIPadNavigationButtons(true, document.Comments.Count().ToString()));
+            }
+            else
+            {
+                BeginInvokeOnMainThread(() => commentsBadgeButton.SetBadgeValue(document.Comments.Count().ToString(), false));
+            }
         }
 
         #endregion
