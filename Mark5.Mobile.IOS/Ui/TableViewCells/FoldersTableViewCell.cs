@@ -63,8 +63,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             {
                 Font = Theme.DefaultFont,
                 TextColor = Theme.Black,
-                Lines = 1,
-                TranslatesAutoresizingMaskIntoConstraints = false
+                Lines = 2,
+                TranslatesAutoresizingMaskIntoConstraints = false,
             };
             ContentView.Add(nameLabel);
 
