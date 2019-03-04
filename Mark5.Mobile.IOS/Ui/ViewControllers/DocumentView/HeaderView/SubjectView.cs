@@ -6,28 +6,32 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 {
     public class SubjectView : DocumentSubView
     {
-        UILabel subjectLabel;
+        UITextView subjectTextView;
 
         public SubjectView()
         {
-            subjectLabel = new UILabel
+            subjectTextView = new UITextView
             {
                 BackgroundColor = Theme.Clear,
                 TextColor = Theme.DarkerBlue,
                 Font = Theme.DefaultLightBoldFont.WithRelativeSize(4f),
                 Opaque = false,
                 ClipsToBounds = false,
-                TranslatesAutoresizingMaskIntoConstraints = false
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                TextContainerInset = UIEdgeInsets.Zero,
+                ScrollEnabled = false,
+                Editable = false
             };
-            subjectLabel.Lines = 0;
-            subjectLabel.LineBreakMode = UILineBreakMode.WordWrap;
-            ContainerView.AddSubview(subjectLabel);
+            subjectTextView.TextContainer.LineFragmentPadding = 0f;
+            subjectTextView.TextContainer.LineBreakMode = UILineBreakMode.WordWrap;
+
+            ContainerView.AddSubview(subjectTextView);
             ContainerView.AddConstraints(new[]
             {
-                subjectLabel.TopAnchor.ConstraintEqualTo(ContainerView.TopAnchor, VerticalMargin),
-                subjectLabel.LeftAnchor.ConstraintEqualTo(ContainerView.LeftAnchor, HorizontalMargin),
-                subjectLabel.RightAnchor.ConstraintEqualTo(ContainerView.RightAnchor, -HorizontalMargin),
-                subjectLabel.BottomAnchor.ConstraintEqualTo(ContainerView.BottomAnchor, -5f)
+                subjectTextView.TopAnchor.ConstraintEqualTo(ContainerView.TopAnchor, VerticalMargin),
+                subjectTextView.LeftAnchor.ConstraintEqualTo(ContainerView.LeftAnchor, HorizontalMargin),
+                subjectTextView.RightAnchor.ConstraintEqualTo(ContainerView.RightAnchor, -HorizontalMargin),
+                subjectTextView.BottomAnchor.ConstraintEqualTo(ContainerView.BottomAnchor, -5f)
             });
         }
 
@@ -35,15 +39,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         {
             if (newsuper == null)
             {
-                subjectLabel?.RemoveFromSuperview();
-                subjectLabel = null;
+                subjectTextView?.RemoveFromSuperview();
+                subjectTextView = null;
             }
         }
 
         public override void RefreshView()
         {
             if (DocumentPreview != null)
-                subjectLabel.Text = DocumentPreview.Subject;
+                subjectTextView.Text = DocumentPreview.Subject;
         }
 
         public override void UpdateVisibility()
