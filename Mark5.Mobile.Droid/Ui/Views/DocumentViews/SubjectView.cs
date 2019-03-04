@@ -26,7 +26,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
             };
             subjectTextView.SetTextAppearanceCompat(Context, Resource.Style.fontTitle);
-            subjectTextView.SetTextIsSelectable(true);
 
             AddView(subjectTextView);
         }
