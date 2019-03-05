@@ -69,6 +69,7 @@ namespace Mark5.Mobile.IOS
                 Window.ApplyTheme();
 
                 UIViewController vc;
+
                 if (!isLoggedIn)
                     vc = new LoginViewController();
                 else if (Integration.IsIPad())
@@ -160,10 +161,7 @@ namespace Mark5.Mobile.IOS
         {
             var lastComponent = restorationIdentifierComponents.LastOrDefault();
 
-            if (lastComponent == nameof(SimpleMainViewController))
-                return Window.RootViewController;
-
-            if (lastComponent == nameof(SplitMainViewController))
+            if (lastComponent == nameof(AbstractMainViewController))
                 return Window.RootViewController;
 
             if (lastComponent == "NavigationController_" + nameof(SearchCriteriaViewController))
@@ -539,7 +537,7 @@ namespace Mark5.Mobile.IOS
                         OnAuthorizationRequested);
                 });
 
-                CommonConfig.Logger.Info($"Initialized - will present {nameof(SplitMainViewController)}");
+                CommonConfig.Logger.Info($"Initialized - will present {nameof(AbstractMainViewController)}");
 
                 return true;
             }).Result;

@@ -14,64 +14,34 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         NavigationController documentsNavigationController;
         NavigationController contactsNavigationController;
         NavigationController shortcodesNavigationController;
-        NavigationController settingsNavigationController;
 
         public override void LoadView()
         {
             base.LoadView();
 
-            documentsNavigationController = new NavigationController(new FoldersNotificationsListViewController(ModuleType.Documents));
-            documentsNavigationController.TabBarItem.Title = Localization.GetString("documents");
-            documentsNavigationController.TabBarItem.Image = UIImage.FromBundle("Documents");
-            documentsNavigationController.TabBarItem.SelectedImage = UIImage.FromBundle("Documents-Filled");
-            documentsNavigationController.Tag = DocumentsTag;
-            documentsNavigationController.RestorationIdentifier = "NavigationController_" + nameof(FoldersNotificationsListViewController) + "_" + nameof(ModuleType.Documents);
+            contactsNavigationController = new NavigationController(new BrowseFoldersListViewController(ModuleType.Contacts))
+            {
+                RestorationIdentifier = "NavigationController_" + nameof(BrowseFoldersListViewController) + "_" + nameof(ModuleType.Contacts)
+            };
 
-            contactsNavigationController = new NavigationController(new BrowseFoldersListViewController(ModuleType.Contacts));
-            contactsNavigationController.TabBarItem.Title = Localization.GetString("contacts");
-            contactsNavigationController.TabBarItem.Image = UIImage.FromBundle("Contacts");
-            contactsNavigationController.TabBarItem.SelectedImage = UIImage.FromBundle("Contacts-Filled");
-            contactsNavigationController.Tag = ContactsTag;
-            contactsNavigationController.RestorationIdentifier = "NavigationController_" + nameof(BrowseFoldersListViewController) + "_" + nameof(ModuleType.Contacts);
+            shortcodesNavigationController = new NavigationController(new BrowseFoldersListViewController(ModuleType.Shortcodes))
+            {
+                RestorationIdentifier = "NavigationController_" + nameof(BrowseFoldersListViewController) + "_" + nameof(ModuleType.Shortcodes)
+            };
 
-            shortcodesNavigationController = new NavigationController(new BrowseFoldersListViewController(ModuleType.Shortcodes));
-            shortcodesNavigationController.TabBarItem.Title = Localization.GetString("shortcodes");
-            shortcodesNavigationController.TabBarItem.Image = UIImage.FromBundle("Shortcodes");
-            shortcodesNavigationController.TabBarItem.SelectedImage = UIImage.FromBundle("Shortcodes-Filled");
-            shortcodesNavigationController.Tag = ShortcodesTag;
-            shortcodesNavigationController.RestorationIdentifier = "NavigationController_" + nameof(BrowseFoldersListViewController) + "_" + nameof(ModuleType.Shortcodes);
-
-            settingsNavigationController = new NavigationController(new SettingsViewController());
-            settingsNavigationController.TabBarItem.Title = Localization.GetString("settings");
-            settingsNavigationController.TabBarItem.Image = UIImage.FromBundle("Settings");
-            settingsNavigationController.TabBarItem.SelectedImage = UIImage.FromBundle("Settings-Filled");
-            settingsNavigationController.Tag = SettingsTag;
-            settingsNavigationController.RestorationIdentifier = "NavigationController_" + nameof(SettingsViewController);
+            documentsNavigationController = new NavigationController(new FoldersNotificationsListViewController(ModuleType.Documents))
+            {
+                RestorationIdentifier = "NavigationController_" + nameof(FoldersNotificationsListViewController) + "_" + nameof(ModuleType.Documents)
+            };
 
             ViewControllers = new UIViewController[]
             {
+                SearchNavigationController,
                 documentsNavigationController,
                 contactsNavigationController,
-                Dummy,
                 shortcodesNavigationController,
-                settingsNavigationController
+                SettingsNavigationController
             };
-
-            SelectedIndex = 0;
-        }
-
-        public override void ViewWillAppear(bool animated)
-        {
-            base.ViewWillAppear(animated);
-
-            ViewControllerSelected += ViewControllerSelected1;
-        }
-
-        public override void ViewWillDisappear(bool animated)
-        {
-            base.ViewWillDisappear(animated);
-
-            ViewControllerSelected -= ViewControllerSelected1;
         }
 
         public override void ViewDidLoad()
@@ -79,20 +49,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.ViewDidLoad();
 
             RestorationIdentifier = nameof(SimpleMainViewController);
-        }
-
-        void ViewControllerSelected1(object sender, UITabBarSelectionEventArgs e)
-        {
-            ModuleType module = ModuleType.None;
-            if (e.ViewController == documentsNavigationController)
-                module = ModuleType.Documents;
-            if (e.ViewController == contactsNavigationController)
-                module = ModuleType.Contacts;
-            if (e.ViewController == shortcodesNavigationController)
-                module = ModuleType.Shortcodes;
-
-            if (module != ModuleType.None)
-                CommonConfig.UsageAnalytics.LogEvent(new OpenModuleEvent(module));
         }
     }
 }

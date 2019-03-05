@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
@@ -9,6 +9,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
     public class SplitMainViewController : AbstractMainViewController
     {
+
         DocumentsSplitViewController documentSplitViewController;
         ContactsSplitViewController contactSplitViewController;
         ShortcodesSplitViewController shortcodeSplitViewController;
@@ -18,58 +19,29 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.LoadView();
 
-            documentSplitViewController = new DocumentsSplitViewController();
-            documentSplitViewController.TabBarItem.Title = Localization.GetString("documents");
-            documentSplitViewController.TabBarItem.Image = UIImage.FromBundle("Documents");
-            documentSplitViewController.TabBarItem.SelectedImage = UIImage.FromBundle("Documents-Filled");
-            documentSplitViewController.Tag = DocumentsTag;
-            documentSplitViewController.RestorationIdentifier = nameof(DocumentsSplitViewController);
+            documentSplitViewController = new DocumentsSplitViewController
+            {
+                RestorationIdentifier = nameof(DocumentsSplitViewController)
+            };
 
-            contactSplitViewController = new ContactsSplitViewController();
-            contactSplitViewController.TabBarItem.Title = Localization.GetString("contacts");
-            contactSplitViewController.TabBarItem.Image = UIImage.FromBundle("Contacts");
-            contactSplitViewController.TabBarItem.SelectedImage = UIImage.FromBundle("Contacts-Filled");
-            contactSplitViewController.Tag = ContactsTag;
-            contactSplitViewController.RestorationIdentifier = nameof(ContactsSplitViewController);
+            contactSplitViewController = new ContactsSplitViewController
+            {
+                RestorationIdentifier = nameof(ContactsSplitViewController)
+            };
 
-            shortcodeSplitViewController = new ShortcodesSplitViewController();
-            shortcodeSplitViewController.TabBarItem.Title = Localization.GetString("shortcodes");
-            shortcodeSplitViewController.TabBarItem.Image = UIImage.FromBundle("Shortcodes");
-            shortcodeSplitViewController.TabBarItem.SelectedImage = UIImage.FromBundle("Shortcodes-Filled");
-            shortcodeSplitViewController.Tag = ShortcodesTag;
-            shortcodeSplitViewController.RestorationIdentifier = nameof(ShortcodesSplitViewController);
-
-            settingsNavigationController = new NavigationController(new SettingsViewController());
-            settingsNavigationController.TabBarItem.Title = Localization.GetString("settings");
-            settingsNavigationController.TabBarItem.Image = UIImage.FromBundle("Settings");
-            settingsNavigationController.TabBarItem.SelectedImage = UIImage.FromBundle("Settings-Filled");
-            settingsNavigationController.Tag = SettingsTag;
-            settingsNavigationController.RestorationIdentifier = "NavigationController_" + nameof(SettingsViewController);
+            shortcodeSplitViewController = new ShortcodesSplitViewController
+            {
+                RestorationIdentifier = nameof(ShortcodesSplitViewController)
+            };
 
             ViewControllers = new UIViewController[]
             {
+                SearchNavigationController,
                 documentSplitViewController,
                 contactSplitViewController,
-                Dummy,
                 shortcodeSplitViewController,
-                settingsNavigationController
+                SettingsNavigationController
             };
-
-            SelectedIndex = 0;
-        }
-
-        public override void ViewWillAppear(bool animated)
-        {
-            base.ViewWillAppear(animated);
-
-            ViewControllerSelected += ViewControllerSelected1;
-        }
-
-        public override void ViewWillDisappear(bool animated)
-        {
-            base.ViewWillDisappear(animated);
-
-            ViewControllerSelected -= ViewControllerSelected1;
         }
 
         public override void ViewDidLoad()
@@ -79,18 +51,5 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             RestorationIdentifier = nameof(SplitViewController);
         }
 
-        void ViewControllerSelected1(object sender, UITabBarSelectionEventArgs e)
-        {
-            ModuleType module = ModuleType.None;
-            if (e.ViewController == documentSplitViewController)
-                module = ModuleType.Documents;
-            if (e.ViewController == contactSplitViewController)
-                module = ModuleType.Contacts;
-            if (e.ViewController == shortcodeSplitViewController)
-                module = ModuleType.Shortcodes;
-
-            if (module != ModuleType.None)
-                CommonConfig.UsageAnalytics.LogEvent(new OpenModuleEvent(module));
-        }
     }
 }
