@@ -183,12 +183,13 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             var vc = new ModuleNavigationController(CurrentNavigationModule);
 
-            //vc.View.Superview.Frame = new CGRect(0, 0, 500, 500);
+            if (Integration.IsIPad())
+            {
+                IPadModalPresentationController customPresentationController = new IPadModalPresentationController(vc, this);
+                vc.TransitioningDelegate = customPresentationController;
+                vc.ModalPresentationStyle = UIModalPresentationStyle.Custom;
+            }
 
-            IPadModalPresentationController customPresentationController = new IPadModalPresentationController(vc, this);
-
-            vc.TransitioningDelegate = customPresentationController;
-            vc.ModalPresentationStyle = UIModalPresentationStyle.Custom;
             PresentViewController(vc, true, null);
         }
 
