@@ -34,7 +34,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             UILabel title = new UILabel
             {
-                Font = Theme.DefaultBoldFont,
+                Font = Theme.DefaultFont,
+                TextColor = Theme.DarkerBlue,
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Text = "Choose",
                 TextAlignment = UITextAlignment.Center

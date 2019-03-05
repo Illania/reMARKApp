@@ -42,16 +42,15 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 RestorationIdentifier = "NavigationController_" + nameof(SettingsViewController)
             };
 
-            SearchNavigationController = new NavigationController(new UIViewController());
+            SettingsNavigationController.TabBarItem.Title = "";
 
-            SearchNavigationController.TabBarItem.Title = "Search";
-            SearchNavigationController.TabBarItem.Image = UIImage.FromBundle("Documents");
-            SearchNavigationController.TabBarItem.SelectedImage = UIImage.FromBundle("Documents-Filled");
+            SearchNavigationController = new NavigationController(new UIViewController());
+            SearchNavigationController.TabBarItem.Image = UIImage.FromBundle("Nav-search");
             SearchNavigationController.Tag = SearchTag;
             SearchNavigationController.RestorationIdentifier = "NavigationController_Search";
 
             TabBar.TintColor = Theme.DarkBlue;
-
+            TabBar.UnselectedItemTintColor = Theme.DarkBlue;
             CurrentNavigationModule = NavigationModule.NavigationModuleType.Mail;
 
             SelectedIndex = 1;
@@ -103,6 +102,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 modalNavigationButton.CenterXAnchor.ConstraintEqualTo(searchButtonContainer.CenterXAnchor),
                 modalNavigationButton.BottomAnchor.ConstraintEqualTo(searchButtonContainer.BottomAnchor, -10f),
             });
+
+            CommonConfig.MessengerHub.Publish(new NavigationModuleChangedMessage(this, new NavigationModule(CurrentNavigationModule)));
         }
 
         public override void ViewWillAppear(bool animated)
@@ -207,6 +208,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 };
                 PresentViewController(nc, true, null);
             }
+
         }
 
         private bool Handle_ShouldSelectViewController(UITabBarController tabBarController, UIViewController viewController)
@@ -225,7 +227,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 return false;
             }
 
-            return true;
+            return false;
         }
 
         void HandleNavigationChangeAction(NavigationModuleChangedMessage obj)
@@ -262,7 +264,6 @@ namespace Mark5.Mobile.IOS.Ui.Common
                     SelectedIndex = 1;
                     break;
                 case NavigationModule.NavigationModuleType.Search:
-                    modalNavigationButton.SetImage(UIImage.FromBundle("Nav-search").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
                     var nc = new DarkNavigationController(new SearchCriteriaViewController(), UIModalPresentationStyle.FullScreen)
                     {
                         ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve,
@@ -314,7 +315,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             get
             {
-                return new CGRect(new CGPoint(50, this.ContainerView.Frame.Height / 2), new CGSize(this.ContainerView.Frame.Width - 100, this.ContainerView.Frame.Height / 2));
+                return new CGRect(new CGPoint(50, this.ContainerView.Frame.Height / 2 - 200), new CGSize(this.ContainerView.Frame.Width - 100, this.ContainerView.Frame.Height / 2 + 200));
             }
         }
 
