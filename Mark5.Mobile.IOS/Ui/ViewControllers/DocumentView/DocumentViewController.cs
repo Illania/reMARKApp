@@ -753,7 +753,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             switch (result)
             {
                 case 0:
-                    await DoChangeReadStatus();
+                    await DoChangeReadStatus(isRead);
                     break;
                 case 1:
                     DoAssignCategory();
@@ -917,10 +917,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        async Task DoChangeReadStatus()
+        async Task DoChangeReadStatus(bool isReadByCurrent)
         {
-            var isReadByCurrent = documentPreview.IsReadByCurrent;
-
             CommonConfig.Logger.Info($"Attempting to mark as {(isReadByCurrent ? "unread" : "read")} [documentPreview={documentPreview}]...");
 
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString(isReadByCurrent ? "marking_document_as_unread___" : "marking_document_as_read___"));
