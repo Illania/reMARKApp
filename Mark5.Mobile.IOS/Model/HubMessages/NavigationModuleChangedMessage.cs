@@ -1,6 +1,6 @@
 ﻿using TinyMessenger;
 
-namespace Mark5.Mobile.Common.Model.HubMessages
+namespace Mark5.Mobile.IOS.Model.HubMessages
 {
     public class NavigationModuleChangedMessage : TinyMessageBase
     {

@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Model.HubMessages;
+using Mark5.Mobile.IOS.Model;
+using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
@@ -121,19 +121,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
             View.BackgroundColor = Theme.White;
         }
 
-        public override void ViewDidAppear(bool animated)
-        {
-            base.ViewDidAppear(animated);
-        }
-
-        public override void ViewWillDisappear(bool animated)
-        {
-            base.ViewWillDisappear(animated);
-        }
-
         void BuildStacks(List<NavigationModule> modules, bool bottom = false)
         {
-
             List<UIStackView> stackViews = BuildStackViews(modules, bottom);
 
             var dummyCount = (int)Math.Ceiling((double)modules.Count / 3) * 3 - modules.Count;
@@ -144,9 +133,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             for (var i = 0; i < modules.Count; i++)
             {
                 if (i > 0 && i % 3 == 0)
-                {
                     row++;
-                }
 
                 bool isCurrent = modules[i].Type == currentModule;
 

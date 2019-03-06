@@ -4,11 +4,11 @@ using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.IOS.Model;
+using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.ViewControllers;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
-using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Utilities;
 using TinyMessenger;
 using UIKit;
@@ -23,7 +23,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         protected const string SettingsTag = "settings";
         protected const string SearchTag = "search";
 
-        protected NavigationModule.NavigationModuleType CurrentNavigationModule;
+        protected NavigationModule.NavigationModuleType CurrentNavigationModuleType;
 
         protected NavigationController SearchNavigationController;
         protected NavigationController SettingsNavigationController;
@@ -51,7 +51,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             TabBar.TintColor = Theme.DarkBlue;
             TabBar.UnselectedItemTintColor = Theme.DarkBlue;
-            CurrentNavigationModule = NavigationModule.NavigationModuleType.Mail;
+            CurrentNavigationModuleType = NavigationModule.NavigationModuleType.Mail;
 
             SelectedIndex = 1;
         }
@@ -103,7 +103,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 modalNavigationButton.BottomAnchor.ConstraintEqualTo(searchButtonContainer.BottomAnchor, -10f),
             });
 
-            CommonConfig.MessengerHub.Publish(new NavigationModuleChangedMessage(this, new NavigationModule(CurrentNavigationModule)));
+            CommonConfig.MessengerHub.Publish(new NavigationModuleChangedMessage(this, new NavigationModule(CurrentNavigationModuleType)));
         }
 
         public override void ViewWillAppear(bool animated)
@@ -179,9 +179,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             var del = UIApplication.SharedApplication?.Delegate as AppDelegate;
             var root = del?.Window?.RootViewController as AbstractMainViewController;
-            var selected = root?.SelectedViewController;
 
-            var vc = new ModuleNavigationController(CurrentNavigationModule);
+            var vc = new ModuleNavigationController(CurrentNavigationModuleType);
 
             if (Integration.IsIPad())
             {
@@ -209,7 +208,6 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 };
                 PresentViewController(nc, true, null);
             }
-
         }
 
         private bool Handle_ShouldSelectViewController(UITabBarController tabBarController, UIViewController viewController)
@@ -233,36 +231,37 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         void HandleNavigationChangeAction(NavigationModuleChangedMessage obj)
         {
-            var nextModule = obj.Module.Type;
+            var nextModule = obj.Module;
+            var nextModuleType = obj.Module.Type;
 
-            if (nextModule != NavigationModule.NavigationModuleType.Search)
-                CurrentNavigationModule = nextModule;
+            if (nextModuleType != NavigationModule.NavigationModuleType.Search)
+                CurrentNavigationModuleType = nextModuleType;
 
             ModuleType module = ModuleType.None;
 
-            switch (nextModule)
+            switch (nextModuleType)
             {
+                case NavigationModule.NavigationModuleType.Mail:
+                    modalNavigationButton.SetImage(UIImage.FromBundle(nextModule.Image).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+                    SelectedIndex = 1;
+                    break;
                 case NavigationModule.NavigationModuleType.Contacts:
                     module = ModuleType.Contacts;
-                    modalNavigationButton.SetImage(UIImage.FromBundle("Nav-contacts").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+                    modalNavigationButton.SetImage(UIImage.FromBundle(nextModule.Image).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
                     SelectedIndex = 2;
-                    break;
-                case NavigationModule.NavigationModuleType.Calendar:
-                    module = ModuleType.Calendar;
-                    modalNavigationButton.SetImage(UIImage.FromBundle("Nav-calendar").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
-                    break;
-                case NavigationModule.NavigationModuleType.Settings:
-                    modalNavigationButton.SetImage(UIImage.FromBundle("Nav-settings").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
-                    SelectedIndex = 4;
                     break;
                 case NavigationModule.NavigationModuleType.Shortcodes:
                     module = ModuleType.Shortcodes;
-                    modalNavigationButton.SetImage(UIImage.FromBundle("Nav-shortcodes").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+                    modalNavigationButton.SetImage(UIImage.FromBundle(nextModule.Image).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
                     SelectedIndex = 3;
                     break;
-                case NavigationModule.NavigationModuleType.Mail:
-                    modalNavigationButton.SetImage(UIImage.FromBundle("Nav-mail").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
-                    SelectedIndex = 1;
+                case NavigationModule.NavigationModuleType.Calendar:
+                    module = ModuleType.Calendar;
+                    modalNavigationButton.SetImage(UIImage.FromBundle(nextModule.Image).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+                    break;
+                case NavigationModule.NavigationModuleType.Settings:
+                    modalNavigationButton.SetImage(UIImage.FromBundle(nextModule.Image).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+                    SelectedIndex = 4;
                     break;
                 case NavigationModule.NavigationModuleType.Search:
                     var nc = new DarkNavigationController(new SearchCriteriaViewController(), UIModalPresentationStyle.FullScreen)

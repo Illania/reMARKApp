@@ -1194,13 +1194,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void CommentsCountChangedHandler(EntityPreviewCommentCountChangedMessage m)
         {
             if (Integration.IsIPad())
-            {
                 BeginInvokeOnMainThread(() => DocumentPageViewControllerDelegate?.UpdateIPadNavigationButtons(true, document.Comments.Count().ToString()));
-            }
             else
-            {
                 BeginInvokeOnMainThread(() => commentsBadgeButton.SetBadgeValue(document.Comments.Count().ToString(), false));
-            }
         }
 
         #endregion

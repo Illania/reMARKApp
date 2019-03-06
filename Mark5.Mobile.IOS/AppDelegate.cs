@@ -161,7 +161,10 @@ namespace Mark5.Mobile.IOS
         {
             var lastComponent = restorationIdentifierComponents.LastOrDefault();
 
-            if (lastComponent == nameof(AbstractMainViewController))
+            if (lastComponent == nameof(SimpleMainViewController))
+                return Window.RootViewController;
+
+            if (lastComponent == nameof(SplitMainViewController))
                 return Window.RootViewController;
 
             if (lastComponent == "NavigationController_" + nameof(SearchCriteriaViewController))

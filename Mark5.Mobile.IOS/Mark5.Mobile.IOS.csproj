@@ -266,6 +266,8 @@
 		<Compile Include="Ui\Common\ModuleNavigationController.cs" />
 		<Compile Include="Ui\ViewControllers\SimpleMainViewController.cs" />
 		<Compile Include="Ui\ViewControllers\SplitMainViewController.cs" />
+		<Compile Include="Model\HubMessages\NavigationModuleChangedMessage.cs" />
+		<Compile Include="Model\NavigationModule.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
