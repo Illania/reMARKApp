@@ -87,7 +87,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 BackgroundColor = Theme.DarkBlue,
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 ClipsToBounds = true,
-                ContentEdgeInsets = new UIEdgeInsets(14f, 14f, 14f, 14f)
+                ContentEdgeInsets = new UIEdgeInsets(5f, 5f, 5f, 5f)
             };
 
             modalNavigationButton.SetImage(UIImage.FromBundle("Documents-Filled").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
