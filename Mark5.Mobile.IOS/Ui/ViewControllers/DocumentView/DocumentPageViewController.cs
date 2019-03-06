@@ -467,8 +467,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
 
             commentsBadgeButton = new BadgeBarButtonItem(commentsButton)
             {
-                Enabled = enabled
+                Enabled = enabled,
             };
+
+            commentsBadgeButton.SetBadgeValue(commentBadgeValue);
 
             userActionsButton = new UIBarButtonItem
             {

@@ -91,7 +91,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             };
 
             modalNavigationButton.SetImage(UIImage.FromBundle("Documents-Filled").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
-            modalNavigationButton.Layer.BorderColor = Theme.DarkGray.CGColor;
+            modalNavigationButton.Layer.BorderColor = Theme.DarkBlue.CGColor;
             modalNavigationButton.Layer.BorderWidth = .7f;
             modalNavigationButton.Layer.CornerRadius = 27.5f;
             searchButtonContainer.AddSubview(modalNavigationButton);

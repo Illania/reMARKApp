@@ -64,11 +64,11 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 BackgroundColor = Theme.DarkBlue,
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 ClipsToBounds = true,
-                ContentEdgeInsets = new UIEdgeInsets(14f, 14f, 14f, 14f)
+                ContentEdgeInsets = new UIEdgeInsets(10f, 10f, 10f, 10f)
             };
 
             closeButton.SetImage(UIImage.FromBundle("Failed").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
-            closeButton.Layer.BorderColor = Theme.DarkGray.CGColor;
+            closeButton.Layer.BorderColor = Theme.DarkBlue.CGColor;
             closeButton.Layer.BorderWidth = .7f;
             closeButton.Layer.CornerRadius = 27.5f;
             searchButtonContainer.AddSubview(closeButton);
@@ -246,7 +246,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 BackgroundColor = Theme.White,
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 ClipsToBounds = true,
-                ContentEdgeInsets = new UIEdgeInsets(14f, 14f, 14f, 14f)
+                ContentEdgeInsets = new UIEdgeInsets(10f, 10f, 10f, 10f)
             };
 
             readonly UILabel Title = new UILabel
@@ -269,7 +269,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 });
 
                 Button.SetImage(UIImage.FromBundle(module.Image).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
-                Button.Layer.BorderColor = Theme.DarkGray.CGColor;
+                Button.Layer.BorderColor = Theme.DarkBlue.CGColor;
                 Button.Layer.BorderWidth = .7f;
                 Button.Layer.CornerRadius = 32.5f;
 
