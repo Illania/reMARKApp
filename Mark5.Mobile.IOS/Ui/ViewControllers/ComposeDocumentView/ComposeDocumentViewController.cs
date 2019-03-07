@@ -20,7 +20,6 @@ using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView;
 using Mark5.Mobile.IOS.Utilities;
-using Mark5.ServiceReference.Exceptions;
 using MobileCoreServices;
 using Photos;
 using UIKit;
@@ -1001,8 +1000,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         {
             ProcessTemplate(template, previousDocumentPreview);
 
-            var type = String.Empty;
-            var content = String.Empty;
+            var type = string.Empty;
+            var content = string.Empty;
 
             if (template.ContentType == ContentType.PlainText)
             {
