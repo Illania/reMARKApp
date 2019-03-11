@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using CoreGraphics;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.IOS.Model;
 using Mark5.Mobile.IOS.Model.HubMessages;
@@ -11,52 +11,37 @@ namespace Mark5.Mobile.IOS.Ui.Common
 {
     public class ModuleNavigationController : UIViewController
     {
+        const string mailBtnConstraintIdentifier = "mailBtnConstraintIdentifier";
+        const string contactsBtnConstraintIdentifier = "contactsBtnConstraintIdentifier";
+        const string searchBtnConstraintIdentifier = "searchBtnHorizontalConstraint";
+        const string settingsBtnConstraintIdentifier = "searchBtnConstraintIdentifier";
+
+        nint seperatorTag = 1;
+        nint mailBtnTag = 2;
+        nint shortCodesBtnTag = 3;
+        nint settingsBtnTag = 4;
+        nint contactsBtnTag = 5;
+        nint searcBtnTag = 6;
+        nint titleTag = 7;
+
         UIButton closeButton;
         UIView searchButtonContainer;
+        UIView seperatorView;
+        UILabel titleLabel;
+
+        ReMarkNavigationButton searchBtn;
+        ReMarkNavigationButton contactsBtn;
+        ReMarkNavigationButton settingsBtn;
+        ReMarkNavigationButton mailBtn;
+        ReMarkNavigationButton shortCodesBtn;
+
         NavigationModule.NavigationModuleType currentModule;
+
+        readonly List<string> constraintIdentifiers = new List<string> { mailBtnConstraintIdentifier, contactsBtnConstraintIdentifier, searchBtnConstraintIdentifier, settingsBtnConstraintIdentifier };
 
         public ModuleNavigationController(NavigationModule.NavigationModuleType currentModule)
         {
             this.currentModule = currentModule;
-        }
-
-        public override void ViewDidLoad()
-        {
-            base.ViewDidLoad();
-
-            searchButtonContainer = new TouchTransparentView
-            {
-                TranslatesAutoresizingMaskIntoConstraints = false
-            };
-
-            var del = UIApplication.SharedApplication?.Delegate as AppDelegate;
-            var root = del?.Window?.RootViewController;
-
-            UILabel title = new UILabel
-            {
-                Font = Theme.DefaultFont,
-                TextColor = Theme.DarkerBlue,
-                TranslatesAutoresizingMaskIntoConstraints = false,
-                Text = "Choose",
-                TextAlignment = UITextAlignment.Center
-            };
-
-            View.AddSubview(title);
-            View.AddConstraints(new[]
-            {
-                title.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
-                title.TopAnchor.ConstraintEqualTo(View.TopAnchor, 40f)
-            });
-
-            View.AddSubview(searchButtonContainer);
-            View.AddConstraints(new[]
-            {
-                View.WidthAnchor.ConstraintLessThanOrEqualTo(300),
-                searchButtonContainer.HeightAnchor.ConstraintEqualTo(65f),
-                searchButtonContainer.WidthAnchor.ConstraintEqualTo(65f),
-                searchButtonContainer.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
-                searchButtonContainer.BottomAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.BottomAnchor : BottomLayoutGuide.GetTopAnchor(), 2),
-            });
 
             closeButton = new UIButton
             {
@@ -67,10 +52,71 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 ContentEdgeInsets = new UIEdgeInsets(10f, 10f, 10f, 10f)
             };
 
+            closeButton.Layer.ZPosition.Equals(999f);
             closeButton.SetImage(UIImage.FromBundle("Failed").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
             closeButton.Layer.BorderColor = Theme.DarkBlue.CGColor;
             closeButton.Layer.BorderWidth = .7f;
             closeButton.Layer.CornerRadius = 27.5f;
+
+            closeButton.TouchUpInside += (object sender, EventArgs e) => { DismissViewController(true, null); };
+
+            mailBtn = new ReMarkNavigationButton(new NavigationModule(NavigationModule.NavigationModuleType.Mail), BtnClicked, mailBtnTag, currentModule == NavigationModule.NavigationModuleType.Mail);
+            shortCodesBtn = new ReMarkNavigationButton(new NavigationModule(NavigationModule.NavigationModuleType.Shortcodes), BtnClicked, shortCodesBtnTag, currentModule == NavigationModule.NavigationModuleType.Shortcodes);
+            contactsBtn = new ReMarkNavigationButton(new NavigationModule(NavigationModule.NavigationModuleType.Contacts), BtnClicked, contactsBtnTag, currentModule == NavigationModule.NavigationModuleType.Contacts);
+            settingsBtn = new ReMarkNavigationButton(new NavigationModule(NavigationModule.NavigationModuleType.Settings), BtnClicked, settingsBtnTag, currentModule == NavigationModule.NavigationModuleType.Settings);
+            searchBtn = new ReMarkNavigationButton(new NavigationModule(NavigationModule.NavigationModuleType.Search), BtnClicked, settingsBtnTag, currentModule == NavigationModule.NavigationModuleType.Search);
+
+            seperatorView = new UIView
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                BackgroundColor = Theme.DarkBlue,
+                Tag = seperatorTag
+            };
+
+            seperatorView.Layer.CornerRadius = 1.5f;
+
+            titleLabel = new UILabel
+            {
+                Font = Theme.DefaultFont,
+                TextColor = Theme.DarkerBlue,
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                Text = "Choose",
+                TextAlignment = UITextAlignment.Center,
+                Tag = titleTag
+            };
+
+            searchButtonContainer = new TouchTransparentView
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+        }
+
+        public override void ViewDidLoad()
+        {
+            base.ViewDidLoad();
+
+            float verticalSpacingFirstBtns = 60f;
+            float verticalSpacing2ndRow = 115f;
+
+            View.AddSubviews(new UIView[] {
+                searchButtonContainer,
+                seperatorView,
+                shortCodesBtn,
+                mailBtn,
+                contactsBtn,
+                searchBtn,
+                settingsBtn
+            });
+
+            View.AddConstraints(new[]
+            {
+                View.WidthAnchor.ConstraintLessThanOrEqualTo(300),
+                searchButtonContainer.HeightAnchor.ConstraintEqualTo(65f),
+                searchButtonContainer.WidthAnchor.ConstraintEqualTo(65f),
+                searchButtonContainer.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
+                searchButtonContainer.BottomAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.BottomAnchor : BottomLayoutGuide.GetTopAnchor(), 2),
+            });
+
             searchButtonContainer.AddSubview(closeButton);
             searchButtonContainer.AddConstraints(new[]
             {
@@ -80,39 +126,36 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 closeButton.BottomAnchor.ConstraintEqualTo(searchButtonContainer.BottomAnchor, -10f),
             });
 
-            closeButton.TouchUpInside += (object sender, EventArgs e) => { DismissViewController(true, null); };
-
-            var seperator = new UIView()
-            {
-                TranslatesAutoresizingMaskIntoConstraints = false,
-                BackgroundColor = Theme.DarkBlue,
-            };
-
-            seperator.Layer.CornerRadius = 1.5f;
-
-            View.AddSubview(seperator);
             View.AddConstraints(new[]
             {
-                seperator.HeightAnchor.ConstraintEqualTo(3f),
-                seperator.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
-                seperator.CenterYAnchor.ConstraintEqualTo(View.CenterYAnchor),
-                seperator.LeftAnchor.ConstraintEqualTo(View.LeftAnchor, 20f),
-                seperator.RightAnchor.ConstraintEqualTo(View.RightAnchor, -20f)
+                seperatorView.HeightAnchor.ConstraintEqualTo(3f),
+                seperatorView.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
+                seperatorView.CenterYAnchor.ConstraintEqualTo(View.CenterYAnchor, 60),
+                seperatorView.LeftAnchor.ConstraintEqualTo(View.LeftAnchor, 20f),
+                seperatorView.RightAnchor.ConstraintEqualTo(View.RightAnchor, -20f)
             });
 
-            List<NavigationModule> topModules = new List<NavigationModule>{
-                new NavigationModule(NavigationModule.NavigationModuleType.Mail),
-                new NavigationModule(NavigationModule.NavigationModuleType.Shortcodes),
-                new NavigationModule(NavigationModule.NavigationModuleType.Contacts),
-                new NavigationModule(NavigationModule.NavigationModuleType.Search)
-            };
+            if (!UIDevice.CurrentDevice.Orientation.IsLandscape())
+            {
+                View.AddSubview(titleLabel);
+                View.AddConstraints(new[]
+                {
+                    titleLabel.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
+                    titleLabel.TopAnchor.ConstraintEqualTo(View.TopAnchor, 40f)
+                });
+            }
 
-            List<NavigationModule> bottomModules = new List<NavigationModule>{
-                new NavigationModule(NavigationModule.NavigationModuleType.Settings),
-            };
+            View.AddConstraints(new[]
+            {
+                shortCodesBtn.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
+                shortCodesBtn.BottomAnchor.ConstraintEqualTo(seperatorView.CenterYAnchor, -verticalSpacing2ndRow),
+                mailBtn.CenterYAnchor.ConstraintEqualTo(shortCodesBtn.CenterYAnchor),
+                contactsBtn.CenterYAnchor.ConstraintEqualTo(shortCodesBtn.CenterYAnchor),
+                searchBtn.CenterYAnchor.ConstraintEqualTo(seperatorView.CenterYAnchor, -verticalSpacingFirstBtns),
+                settingsBtn.CenterYAnchor.ConstraintEqualTo(seperatorView.CenterYAnchor, verticalSpacingFirstBtns),
+            });
 
-            BuildStacks(topModules);
-            BuildStacks(bottomModules, true);
+            SetButtonGridHorizontalConstraints();
         }
 
         public override void ViewWillAppear(bool animated)
@@ -121,32 +164,62 @@ namespace Mark5.Mobile.IOS.Ui.Common
             View.BackgroundColor = Theme.White;
         }
 
-        void BuildStacks(List<NavigationModule> modules, bool bottom = false)
+        public override void ViewWillTransitionToSize(CGSize toSize, IUIViewControllerTransitionCoordinator coordinator)
         {
-            List<UIStackView> stackViews = BuildStackViews(modules, bottom);
+            base.ViewWillTransitionToSize(toSize, coordinator);
 
-            var dummyCount = (int)Math.Ceiling((double)modules.Count / 3) * 3 - modules.Count;
-            modules.AddRange(Enumerable.Repeat(0, dummyCount).Select(i => new NavigationModule(NavigationModule.NavigationModuleType.Dummy)).ToList());
+            UpdateLayoutOnRotation();
+        }
 
-            var row = 0;
+        void UpdateLayoutOnRotation()
+        {
+            foreach (var constraint in View.Constraints)
+                if (constraintIdentifiers.Contains(constraint.GetIdentifier()))
+                    View.RemoveConstraint(constraint);
 
-            for (var i = 0; i < modules.Count; i++)
+            foreach (var view in View.Subviews)
+                if (view.Tag == titleTag)
+                    view.RemoveFromSuperview();
+
+            if (!UIDevice.CurrentDevice.Orientation.IsLandscape())
             {
-                if (i > 0 && i % 3 == 0)
-                    row++;
-
-                bool isCurrent = modules[i].Type == currentModule;
-
-                var btn = new ReMarkNavigationButton(modules[i])
+                View.AddSubview(titleLabel);
+                View.AddConstraints(new[]
                 {
-                    Selected = isCurrent,
-                    OnClicked = BtnClicked
-                };
-
-                stackViews[row].AddArrangedSubview(btn);
+                    titleLabel.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
+                    titleLabel.TopAnchor.ConstraintEqualTo(View.TopAnchor, 40f)
+                });
             }
 
-            View.AddSubviews(stackViews.ToArray());
+            SetButtonGridHorizontalConstraints();
+        }
+
+        void SetButtonGridHorizontalConstraints()
+        {
+            float horizontalSpacing = 85f;
+
+            if (UIDevice.CurrentDevice.Orientation.IsLandscape())
+                horizontalSpacing = 180f;
+
+            NSLayoutConstraint mailBtnHorizontalConstraint = mailBtn.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor, -horizontalSpacing);
+            mailBtnHorizontalConstraint.SetIdentifier(mailBtnConstraintIdentifier);
+
+            NSLayoutConstraint contactsBtnHorizontalConstraint = contactsBtn.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor, +horizontalSpacing);
+            contactsBtnHorizontalConstraint.SetIdentifier(contactsBtnConstraintIdentifier);
+
+            NSLayoutConstraint searchBtnHorizontalConstraint = searchBtn.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor, -horizontalSpacing);
+            searchBtnHorizontalConstraint.SetIdentifier(searchBtnConstraintIdentifier);
+
+            NSLayoutConstraint settingsBtnConstraint = settingsBtn.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor, -horizontalSpacing);
+            settingsBtnConstraint.SetIdentifier(settingsBtnConstraintIdentifier);
+
+            View.AddConstraints(new[]
+            {
+                mailBtnHorizontalConstraint,
+                contactsBtnHorizontalConstraint,
+                searchBtnHorizontalConstraint,
+                settingsBtnConstraint
+            });
         }
 
         void BtnClicked()
@@ -154,62 +227,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
             DismissViewController(false, null);
         }
 
-        List<UIStackView> BuildStackViews(List<NavigationModule> modules, bool bottomNavigation = false)
-        {
-            var stackviewCount = Math.Ceiling((double)modules.Count / 3);
-            List<UIStackView> stackViews = new List<UIStackView>();
-
-            for (var i = 0; i < stackviewCount; i++)
-            {
-                stackViews.Add(new UIStackView
-                {
-                    TranslatesAutoresizingMaskIntoConstraints = false,
-                    BackgroundColor = Theme.LightBlue,
-                    Axis = UILayoutConstraintAxis.Horizontal,
-                    Alignment = UIStackViewAlignment.Center,
-                    Distribution = UIStackViewDistribution.FillEqually
-                });
-            }
-
-            View.AddSubviews(stackViews.ToArray());
-
-            List<NSLayoutConstraint> stackViewsConstraints = new List<NSLayoutConstraint>();
-
-            for (var i = 0; i < stackViews.Count; i++)
-            {
-                stackViewsConstraints.Add(stackViews[i].CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor));
-                stackViewsConstraints.Add(stackViews[i].LeftAnchor.ConstraintEqualTo(View.LeftAnchor, 20f));
-                stackViewsConstraints.Add(stackViews[i].RightAnchor.ConstraintEqualTo(View.RightAnchor, -20f));
-
-                //Attach last stackview to center Y of view
-                if (i == stackViews.Count - 1)
-                {
-                    if (bottomNavigation)
-                    {
-                        stackViewsConstraints.Add(stackViews[i].TopAnchor.ConstraintEqualTo(View.CenterYAnchor, 20f));
-                    }
-                    else
-                    {
-                        stackViewsConstraints.Add(stackViews[i].BottomAnchor.ConstraintEqualTo(View.CenterYAnchor, -10f));
-                    }
-                }
-
-                //Attach bottom to next stackviews top
-                if (i != stackViews.Count - 1 && stackViews.Count > 1 && stackViews[i + 1] != null)
-                {
-                    stackViewsConstraints.Add(stackViews[i].BottomAnchor.ConstraintEqualTo(stackViews[i + 1].TopAnchor, -10f));
-                }
-            }
-
-            View.AddConstraints(stackViewsConstraints.ToArray());
-
-            return stackViews;
-        }
-
         class ReMarkNavigationButton : UIView
         {
-            public Action OnClicked;
-
             public bool Selected
             {
                 set
@@ -241,18 +260,22 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 TextColor = Theme.DarkBlue,
                 TextAlignment = UITextAlignment.Center,
-                Font = Theme.DefaultLightFont
+                Font = Theme.DefaultLightFont,
+                MinimumScaleFactor = 0.6f
             };
 
-            public ReMarkNavigationButton(NavigationModule module)
+            public ReMarkNavigationButton(NavigationModule module, Action clicked, nint tag, bool isSelected)
             {
+                Tag = tag;
+
+                Selected = isSelected;
 
                 TranslatesAutoresizingMaskIntoConstraints = false;
 
                 AddConstraints(new[]
                 {
                     HeightAnchor.ConstraintEqualTo(95f),
-                    WidthAnchor.ConstraintEqualTo(55f)
+                    WidthAnchor.ConstraintEqualTo(85f)
                 });
 
                 Button.SetImage(UIImage.FromBundle(module.Image).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
@@ -287,7 +310,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
                 Button.TouchUpInside += (object sender, EventArgs e) =>
                 {
-                    OnClicked?.Invoke();
+                    clicked.Invoke();
                     CommonConfig.MessengerHub.Publish(new NavigationModuleChangedMessage(this, module));
                 };
             }
