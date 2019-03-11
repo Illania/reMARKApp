@@ -14,7 +14,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         const string mailBtnConstraintIdentifier = "mailBtnConstraintIdentifier";
         const string contactsBtnConstraintIdentifier = "contactsBtnConstraintIdentifier";
         const string searchBtnConstraintIdentifier = "searchBtnHorizontalConstraint";
-        const string settingsBtnConstraintIdentifier = "searchBtnConstraintIdentifier";
+        const string settingsBtnConstraintIdentifier = "settingsBtnConstraintIdentifier";
 
         nint seperatorTag = 1;
         nint mailBtnTag = 2;
