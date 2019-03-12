@@ -12,7 +12,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
     public class ModuleNavigationController : UIViewController
     {
         const string mailBtnConstraintIdentifier = "mailBtnConstraintIdentifier";
-        const string contactsBtnConstraintIdentifier = "contactsBtnConstraintIdentifier";
+        const string shortcodeBtnConstraintIdentifier = "shortcodeBtnConstraintIdentifier";
         const string searchBtnConstraintIdentifier = "searchBtnHorizontalConstraint";
         const string settingsBtnConstraintIdentifier = "settingsBtnConstraintIdentifier";
 
@@ -25,7 +25,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         nint titleTag = 7;
 
         UIButton closeButton;
-        UIView searchButtonContainer;
+        UIView closeButtonContainer;
         UIView seperatorView;
         UILabel titleLabel;
 
@@ -35,9 +35,9 @@ namespace Mark5.Mobile.IOS.Ui.Common
         ReMarkNavigationButton mailBtn;
         ReMarkNavigationButton shortCodesBtn;
 
-        NavigationModule.NavigationModuleType currentModule;
+        readonly NavigationModule.NavigationModuleType currentModule;
 
-        readonly List<string> constraintIdentifiers = new List<string> { mailBtnConstraintIdentifier, contactsBtnConstraintIdentifier, searchBtnConstraintIdentifier, settingsBtnConstraintIdentifier };
+        readonly List<string> constraintIdentifiers = new List<string> { mailBtnConstraintIdentifier, shortcodeBtnConstraintIdentifier, searchBtnConstraintIdentifier, settingsBtnConstraintIdentifier };
 
         public ModuleNavigationController(NavigationModule.NavigationModuleType currentModule)
         {
@@ -52,7 +52,6 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 ContentEdgeInsets = new UIEdgeInsets(10f, 10f, 10f, 10f)
             };
 
-            closeButton.Layer.ZPosition.Equals(999f);
             closeButton.SetImage(UIImage.FromBundle("Failed").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
             closeButton.Layer.BorderColor = Theme.DarkBlue.CGColor;
             closeButton.Layer.BorderWidth = .7f;
@@ -85,7 +84,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 Tag = titleTag
             };
 
-            searchButtonContainer = new TouchTransparentView
+            closeButtonContainer = new TouchTransparentView
             {
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
@@ -99,7 +98,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             float verticalSpacing2ndRow = 115f;
 
             View.AddSubviews(new UIView[] {
-                searchButtonContainer,
+                closeButtonContainer,
                 seperatorView,
                 shortCodesBtn,
                 mailBtn,
@@ -110,20 +109,22 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             View.AddConstraints(new[]
             {
-                View.WidthAnchor.ConstraintLessThanOrEqualTo(300),
-                searchButtonContainer.HeightAnchor.ConstraintEqualTo(65f),
-                searchButtonContainer.WidthAnchor.ConstraintEqualTo(65f),
-                searchButtonContainer.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
-                searchButtonContainer.BottomAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.BottomAnchor : BottomLayoutGuide.GetTopAnchor(), 2),
+                closeButtonContainer.HeightAnchor.ConstraintEqualTo(65f),
+                closeButtonContainer.WidthAnchor.ConstraintEqualTo(65f),
+                closeButtonContainer.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
+                closeButtonContainer.BottomAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.BottomAnchor : BottomLayoutGuide.GetTopAnchor(), 2),
             });
 
-            searchButtonContainer.AddSubview(closeButton);
-            searchButtonContainer.AddConstraints(new[]
+            if (Integration.IsIPad())
+                View.AddConstraint(View.WidthAnchor.ConstraintLessThanOrEqualTo(300));
+
+            closeButtonContainer.AddSubview(closeButton);
+            closeButtonContainer.AddConstraints(new[]
             {
                 closeButton.HeightAnchor.ConstraintEqualTo(55f),
                 closeButton.WidthAnchor.ConstraintEqualTo(55f),
-                closeButton.CenterXAnchor.ConstraintEqualTo(searchButtonContainer.CenterXAnchor),
-                closeButton.BottomAnchor.ConstraintEqualTo(searchButtonContainer.BottomAnchor, -10f),
+                closeButton.CenterXAnchor.ConstraintEqualTo(closeButtonContainer.CenterXAnchor),
+                closeButton.BottomAnchor.ConstraintEqualTo(closeButtonContainer.BottomAnchor, -10f),
             });
 
             View.AddConstraints(new[]
@@ -131,26 +132,16 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 seperatorView.HeightAnchor.ConstraintEqualTo(3f),
                 seperatorView.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
                 seperatorView.CenterYAnchor.ConstraintEqualTo(View.CenterYAnchor, 60),
-                seperatorView.LeftAnchor.ConstraintEqualTo(View.LeftAnchor, 20f),
-                seperatorView.RightAnchor.ConstraintEqualTo(View.RightAnchor, -20f)
+                seperatorView.LeftAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.LeftAnchor : View.LeftAnchor, 20f),
+                seperatorView.RightAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.RightAnchor : View.RightAnchor, -20f)
             });
-
-            if (!UIDevice.CurrentDevice.Orientation.IsLandscape())
-            {
-                View.AddSubview(titleLabel);
-                View.AddConstraints(new[]
-                {
-                    titleLabel.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
-                    titleLabel.TopAnchor.ConstraintEqualTo(View.TopAnchor, 40f)
-                });
-            }
 
             View.AddConstraints(new[]
             {
-                shortCodesBtn.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
-                shortCodesBtn.BottomAnchor.ConstraintEqualTo(seperatorView.CenterYAnchor, -verticalSpacing2ndRow),
-                mailBtn.CenterYAnchor.ConstraintEqualTo(shortCodesBtn.CenterYAnchor),
-                contactsBtn.CenterYAnchor.ConstraintEqualTo(shortCodesBtn.CenterYAnchor),
+                contactsBtn.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
+                contactsBtn.BottomAnchor.ConstraintEqualTo(seperatorView.CenterYAnchor, -verticalSpacing2ndRow),
+                mailBtn.CenterYAnchor.ConstraintEqualTo(contactsBtn.CenterYAnchor),
+                shortCodesBtn.CenterYAnchor.ConstraintEqualTo(contactsBtn.CenterYAnchor),
                 searchBtn.CenterYAnchor.ConstraintEqualTo(seperatorView.CenterYAnchor, -verticalSpacingFirstBtns),
                 settingsBtn.CenterYAnchor.ConstraintEqualTo(seperatorView.CenterYAnchor, verticalSpacingFirstBtns),
             });
@@ -181,31 +172,18 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 if (view.Tag == titleTag)
                     view.RemoveFromSuperview();
 
-            if (!UIDevice.CurrentDevice.Orientation.IsLandscape())
-            {
-                View.AddSubview(titleLabel);
-                View.AddConstraints(new[]
-                {
-                    titleLabel.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
-                    titleLabel.TopAnchor.ConstraintEqualTo(View.TopAnchor, 40f)
-                });
-            }
-
             SetButtonGridHorizontalConstraints();
         }
 
         void SetButtonGridHorizontalConstraints()
         {
-            float horizontalSpacing = 85f;
-
-            if (UIDevice.CurrentDevice.Orientation.IsLandscape())
-                horizontalSpacing = 180f;
+            float horizontalSpacing = UIDevice.CurrentDevice.Orientation.IsLandscape() ? 180f : 85f;
 
             NSLayoutConstraint mailBtnHorizontalConstraint = mailBtn.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor, -horizontalSpacing);
             mailBtnHorizontalConstraint.SetIdentifier(mailBtnConstraintIdentifier);
 
-            NSLayoutConstraint contactsBtnHorizontalConstraint = contactsBtn.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor, +horizontalSpacing);
-            contactsBtnHorizontalConstraint.SetIdentifier(contactsBtnConstraintIdentifier);
+            NSLayoutConstraint shortcodesBthHorizontalConstraint = shortCodesBtn.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor, +horizontalSpacing);
+            shortcodesBthHorizontalConstraint.SetIdentifier(shortcodeBtnConstraintIdentifier);
 
             NSLayoutConstraint searchBtnHorizontalConstraint = searchBtn.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor, -horizontalSpacing);
             searchBtnHorizontalConstraint.SetIdentifier(searchBtnConstraintIdentifier);
@@ -216,10 +194,20 @@ namespace Mark5.Mobile.IOS.Ui.Common
             View.AddConstraints(new[]
             {
                 mailBtnHorizontalConstraint,
-                contactsBtnHorizontalConstraint,
+                shortcodesBthHorizontalConstraint,
                 searchBtnHorizontalConstraint,
                 settingsBtnConstraint
             });
+
+            if (!UIDevice.CurrentDevice.Orientation.IsLandscape())
+            {
+                View.AddSubview(titleLabel);
+                View.AddConstraints(new[]
+                {
+                    titleLabel.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
+                    titleLabel.BottomAnchor.ConstraintEqualTo(shortCodesBtn.TopAnchor, -60f)
+                });
+            }
         }
 
         void BtnClicked()
