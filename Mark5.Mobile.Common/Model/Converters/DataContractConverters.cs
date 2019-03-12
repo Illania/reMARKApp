@@ -367,7 +367,6 @@ namespace Mark5.Mobile.Common.Model.Converters
                 InternalType = f.InternalType.ConvertEnum<FolderInternalType>(),
                 Module = f.Module.ConvertEnum<ModuleType>(),
                 Name = f.Name,
-                OptionalParameters = f.OptionalParameters?.Convert(),
                 Subscribed = f.Subscribed,
                 Position = f.Position,
                 Type = f.Type.ConvertEnum<FolderType>(),
@@ -449,18 +448,6 @@ namespace Mark5.Mobile.Common.Model.Converters
                 FromType = olti.FromType.ConvertEnum<ObjectType>(),
                 ToType = olti.ToType.ConvertEnum<ObjectType>()
             };
-        }
-
-        public static OptionalParameters Convert(this DataContract.OptionalParameters p)
-        {
-            if (p is DataContract.CalendarEventOptionalParameters ceop)
-                return new CalendarEventOptionalParameters
-                {
-                    CanContainAppointments = ceop.CanContainAppointments,
-                    CanContainTasks = ceop.CanContainTasks
-                };
-
-            return null;
         }
 
         public static Participant Convert(this DataContract.Participant p)

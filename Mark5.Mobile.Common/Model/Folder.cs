@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Mark5.Mobile.Common.Utilities;
 using SQLite;
 
 namespace Mark5.Mobile.Common.Model
@@ -61,16 +60,6 @@ namespace Mark5.Mobile.Common.Model
         [Column("Position")]
         public int Position { get; set; }
 
-        [Ignore]
-        public OptionalParameters OptionalParameters { get; set; }
-
-        #region Serialization
-
-        [Column("OptionalParametersString")]
-        public string OptionalParametersString { get => Serializer.Serialize(OptionalParameters); set => OptionalParameters = Serializer.Deserialize<OptionalParameters>(value); }
-
-        #endregion
-
         #region ICopiable
 
         public Folder ShallowCopy()
@@ -88,7 +77,6 @@ namespace Mark5.Mobile.Common.Model
                 Subscribed = Subscribed,
                 Position = Position,
                 Path = Path,
-                OptionalParameters = OptionalParameters?.ShallowCopy()
             };
         }
 
