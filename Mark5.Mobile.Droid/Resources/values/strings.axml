@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="account">Account</string>
-    <string name="actions">Actions</string>
     <string name="add_attachment">Add attachment</string>
     <string name="add_comment_hint">Insert new comment</string>
     <string name="add_favorites">Add to favourites</string>
@@ -199,6 +198,7 @@
     <string name="hide_details">Hide details</string>
     <string name="hide_previous_message">Hide previous message</string>
     <string name="high_priority_document">This email has high priority</string>
+    <string name="history">History</string>
     <string name="hostname">Hostname</string>
     <string name="hostname_invalid">Hostname is not valid</string>
     <string name="internet_access">Internet access:</string>
@@ -218,7 +218,6 @@
     <string name="ledger">Ledger</string>
     <string name="line">Mailbox</string>
     <string name="lines">Mailboxes</string>
-    <string name="links">Links</string>
     <string name="loading_contact">Loading contact</string>
     <string name="loading_document">Loading email</string>
     <string name="loading_mail">Loading email</string>
@@ -280,6 +279,7 @@
     <string name="open_drawer">Open navigation drawer</string>
     <string name="opening_attachment">Opening attachment</string>
     <string name="outgoing">Outgoing</string>
+    <string name="overview">Overview</string>
     <string name="password">Password</string>
     <string name="password_invalid">Password is not valid</string>
     <string name="permissions_snackbar_action">Ok</string>

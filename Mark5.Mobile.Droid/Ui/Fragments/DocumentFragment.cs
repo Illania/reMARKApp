@@ -347,8 +347,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (Document != null)
                 menu.Add(Menu.None, MenuItemActions.Comments, MenuItemActions.Comments, Resource.String.comments);
 
-            menu.Add(Menu.None, MenuItemActions.Actions, MenuItemActions.Actions, Resource.String.actions);
-            menu.Add(Menu.None, MenuItemActions.Links, MenuItemActions.Links, Resource.String.links);
+            menu.Add(Menu.None, MenuItemActions.Actions, MenuItemActions.Actions, Resource.String.history);
+            menu.Add(Menu.None, MenuItemActions.Links, MenuItemActions.Links, Resource.String.overview);
 
             if (Folder?.InternalType == FolderInternalType.FilterView || Folder?.InternalType == FolderInternalType.Static || Folder?.InternalType == FolderInternalType.Worktray)
                 menu.Add(Menu.None, MenuItemActions.DeleteFromFolder, MenuItemActions.DeleteFromFolder, Resource.String.delete_from_folder);
