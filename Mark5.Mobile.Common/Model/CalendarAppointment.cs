@@ -45,6 +45,9 @@ namespace Mark5.Mobile.Common.Model
         [Column("ReminderAlertTime")]
         public long ReminderAlertTime { get; set; } = -1;
 
+        [Column("ReminderTimeBeforeStart")]
+        public long ReminderTimeBeforeStart { get; set; } = -1;
+
         [Ignore]
         public RecurrenceInfo RecurrenceInfo { get; set; }
 

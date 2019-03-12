@@ -45,10 +45,15 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Creator = ca.Creator,
                 Priority = ca.Priority.ConvertEnum<Priority>(),
                 Type = ca.Type.ConvertEnum<CalendarOccurenceType>(),
-                ReminderAlertTime = ca.ReminderAlertTime.ConvertDateTimeToTimestampMilliseconds(),
                 Description = ca.Description,
                 RecurrenceInfo = ca.RecurrenceInfo?.Convert()
             };
+
+            if (ca.ReminderAlertTime != null)
+            {
+                result.ReminderAlertTime = ca.ReminderAlertTime.Value.ConvertDateTimeToTimestampMilliseconds();
+                result.ReminderTimeBeforeStart = ca.ReminderTimeBeforeStart;
+            }
 
             if (ca.Participants != null)
                 result.Participants.AddRange(ca.Participants.WhereNotNull().Select(Convert));
@@ -860,12 +865,17 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Creator = ca.Creator,
                 Priority = ca.Priority.ConvertEnum<DataContract.Priority>(),
                 Type = ca.Type.ConvertEnum<DataContract.CalendarOccurenceType>(),
-                ReminderAlertTime = ca.ReminderAlertTime.ConvertTimestampMillisecondsToDateTime(),
                 CalendarId = ca.CalendarId,
                 Participants = ca.Participants.Select(p => p.Convert()).ToList(),
                 Description = ca.Description,
                 RecurrenceInfo = ca.RecurrenceInfo?.Convert(),
             };
+
+            if (ca.ReminderAlertTime > 0)
+            {
+                result.ReminderAlertTime = ca.ReminderAlertTime.ConvertTimestampMillisecondsToDateTime();
+                result.ReminderTimeBeforeStart = ca.ReminderTimeBeforeStart;
+            }
 
             if (ca.Occurrences != null)
             {

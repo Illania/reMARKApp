@@ -126,6 +126,7 @@ namespace Mark5.ServiceReference.Exceptions
         [EnumMember(Value = "GetCalendarAppointmentError")] GetCalendarAppointmentError = 1501,
         [EnumMember(Value = "CreateOrUpdateCalendarAppointmentError")] CreateOrUpdateCalendarAppointmentError = 1503,
         [EnumMember(Value = "GetCalendarAlarmsError")] GetCalendarAlarmsError = 1505,
+        [EnumMember(Value = "SendCalendarAppointmentInvitationsError")] SendCalendarAppointmentInvitationsError = 1510,
 
         [EnumMember(Value = "GetSavedSearchesError")] GetSavedSearchesError = 1600,
         [EnumMember(Value = "SearchDocumentsError")] SearchDocumentsError = 1601,
@@ -160,6 +161,8 @@ namespace Mark5.ServiceReference.Exceptions
 
         [EnumMember(Value = "GetFavoriteFoldersError")] GetFavoriteFoldersError = 3001,
         [EnumMember(Value = "UpdateFavoriteFoldersError")] UpdateFavoriteFoldersError = 3002,
+        [EnumMember(Value = "AddFavoriteFoldersError")] AddFavoriteFoldersError = 3003,
+        [EnumMember(Value = "RemoveFavoriteFoldersError")] RemoveFavoriteFoldersError = 3004,
     }
 
     #endregion
