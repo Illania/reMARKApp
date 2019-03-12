@@ -29,7 +29,7 @@ namespace Mark5.Mobile.Droid.Utilities
 
                     var title = Application.Context.Resources.GetString(Resource.String.failed_send_document_notification_title);
                     var content = Application.Context.Resources.GetString(Resource.String.failed_send_document_notification_content);
-                    var nb = new NotificationCompat.Builder(Application.Context).SetSmallIcon(Build.VERSION.SdkInt >= BuildVersionCodes.Lollipop ? Resource.Mipmap.ic_icon_lollipop : Resource.Mipmap.ic_icon).SetColor(ContextCompat.GetColor(Application.Context, Resource.Color.darkerblue)).SetContentIntent(pi).SetContentTitle(title).SetContentText(content).SetAutoCancel(true).SetPriority((int)NotificationPriority.High).SetStyle(new NotificationCompat.BigTextStyle().BigText(content));
+                    var nb = new NotificationCompat.Builder(Application.Context).SetSmallIcon(Resource.Mipmap.ic_icon).SetColor(ContextCompat.GetColor(Application.Context, Resource.Color.darkerblue)).SetContentIntent(pi).SetContentTitle(title).SetContentText(content).SetAutoCancel(true).SetPriority((int)NotificationPriority.High).SetStyle(new NotificationCompat.BigTextStyle().BigText(content));
 
                     if (!string.IsNullOrWhiteSpace(PlatformConfig.Preferences.NotificationsRingtone))
                         nb.SetSound(Android.Net.Uri.Parse(PlatformConfig.Preferences.NotificationsRingtone));

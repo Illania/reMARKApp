@@ -727,13 +727,9 @@
     <AndroidResource Include="Resources\menu\menu_drawer.axml" />
     <AndroidResource Include="Resources\menu\menu_main.axml" />
     <AndroidResource Include="Resources\mipmap-hdpi\ic_icon.png" />
-    <AndroidResource Include="Resources\mipmap-hdpi\ic_icon_lollipop.png" />
     <AndroidResource Include="Resources\mipmap-xhdpi\ic_icon.png" />
-    <AndroidResource Include="Resources\mipmap-xhdpi\ic_icon_lollipop.png" />
     <AndroidResource Include="Resources\mipmap-xxhdpi\ic_icon.png" />
-    <AndroidResource Include="Resources\mipmap-xxhdpi\ic_icon_lollipop.png" />
     <AndroidResource Include="Resources\mipmap-xxxhdpi\ic_icon.png" />
-    <AndroidResource Include="Resources\mipmap-xxxhdpi\ic_icon_lollipop.png" />
     <AndroidResource Include="Resources\values\color.axml" />
     <AndroidResource Include="Resources\values\dimens.axml" />
     <AndroidResource Include="Resources\values\plurals.xml" />
