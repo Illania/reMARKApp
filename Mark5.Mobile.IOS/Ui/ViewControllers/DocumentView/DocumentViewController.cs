@@ -902,8 +902,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var actionLinksListString = new string[]
             {
-                Localization.GetString("actions"),
-                Localization.GetString("links")
+                Localization.GetString("history"),
+                Localization.GetString("overview")
             };
 
             var result = await Dialogs.ShowListActionSheetAsync(this, actionLinksListString, userActionsButton);

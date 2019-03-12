@@ -1,5 +1,4 @@
 "account" = "Account";
-"actions" = "Actions";
 "attention" = "Attention";
 "area" = "Area";
 "add" = "Add";
@@ -170,6 +169,7 @@
 "forward" = "Forward";
 "from" = "From";
 "hostname" = "Hostname";
+"history" = "History";
 "im" = "IM";
 "incorrect_recipients_added" = "There are recipients that seem to be incorrect. Do you want to send this email anyway?";
 "insert_template" = "Insert template";
@@ -179,7 +179,6 @@
 "last_downloaded_on" = "Last downloaded on: ";
 "ledger" = "Ledger";
 "line" = "Mailbox";
-"links" = "Links";
 "loading_shortcode___" = "Loading mailing list...";
 "loading_contact___" = "Loading contact...";
 "loading_document___" = "Loading email...";
@@ -258,6 +257,7 @@
 "opening_attachment___" = "Opening attachment...";
 "originator" = "Originator";
 "own_worktray" = "My To-do list";
+"overview" = "Overview";
 "parent_contact_selector_invalid_person_title" = "Cannot select person";
 "parent_contact_selector_invalid_department_title" = "Cannot select department";
 "parent_contact_selector_invalid_person_content" = "Only department or company can be selected";
