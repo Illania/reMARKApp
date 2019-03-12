@@ -86,7 +86,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             SubscribeToMessages();
 
             if (NavigationController != null)
-                NavigationController.ToolbarHidden = false;
+                NavigationController.ToolbarHidden = Integration.IsIPad();
         }
 
         public override void ViewDidAppear(bool animated)
@@ -205,7 +205,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             TableView.TableHeaderView = headerView;
 
-            ToolbarItems = new[]
+            var buttonItems = new[]
             {
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
                 fileToButton = new UIBarButtonItem
@@ -215,6 +215,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 },
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace)
             };
+
+            if (!Integration.IsIPad())
+            {
+                ToolbarItems = buttonItems;
+            }
+            else
+            {
+                NavigationController.ToolbarHidden = true;
+                NavigationItem.SetLeftBarButtonItems(buttonItems, false);
+            }
         }
 
         void InitializeNavigationBar()

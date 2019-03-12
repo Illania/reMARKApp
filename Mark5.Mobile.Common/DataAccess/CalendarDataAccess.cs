@@ -150,6 +150,8 @@ namespace Mark5.Mobile.Common.DataAccess
 
         public async Task RemoveOrphans()
         {
+            return;
+            /*
             try  //TODO to test
             {
                 await calendarDatabase.RunInConnectionAsync(c =>
@@ -188,6 +190,7 @@ namespace Mark5.Mobile.Common.DataAccess
             {
                 throw new DataAccessException("Error removing orphan appointments and appointment occcurences.", ex);
             }
+            */
         }
 
         public async Task<List<CalendarAlarm>> GetCalendarAlarmsAsync(List<int> calendarIds, long startDateTimestamp, long endDateTimestamp)

@@ -77,6 +77,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 TableView.InsetsContentViewsToSafeArea = true;
             }
 
+            // Remove TabBarItem title
+            Title = "";
+            NavigationItem.Title = "Settings";
+
             RefreshHiddenSettings();
         }
 
