@@ -400,37 +400,6 @@
 		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json">
 			<InProject>false</InProject>
 		</ImageAsset>
-		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-167.png">
-			<InProject>false</InProject>
-		</ImageAsset>
-		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-60%402x.png">
-			<InProject>false</InProject>
-		</ImageAsset>
-		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-60%403x.png">
-			<InProject>false</InProject>
-		</ImageAsset>
-		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-76.png">
-			<InProject>false</InProject>
-		</ImageAsset>
-		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-76%402x.png">
-			<InProject>false</InProject>
-		</ImageAsset>
-		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-Small-40.png">
-			<InProject>false</InProject>
-		</ImageAsset>
-		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-Small-40%402x.png">
-			<InProject>false</InProject>
-		</ImageAsset>
-		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-Small.png">
-			<InProject>false</InProject>
-		</ImageAsset>
-		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-Small%402x.png">
-			<InProject>false</InProject>
-		</ImageAsset>
-		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-Small%403x.png">
-			<InProject>false</InProject>
-		</ImageAsset>
-		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appstore1024.png" />
 		<ImageAsset Include="Assets_icons.xcassets\Contents.json" />
 		<ImageAsset Include="Assets_icons.xcassets\Actions.imageset\Contents.json" />
 		<ImageAsset Include="Assets_icons.xcassets\Actions.imageset\actions%402x.png" />
@@ -606,6 +575,19 @@
 		<ImageAsset Include="Assets_onboarding.xcassets\2.8_5.imageset\Contents.json" />
 		<ImageAsset Include="Assets_onboarding.xcassets\2.8_5.imageset\Slide 5.pdf" />
 		<ImageAsset Include="Assets_onboarding.xcassets\2.8_4.imageset\Slide 4.pdf" />
+		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon40.png" />
+		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon60.png" />
+		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon58.png" />
+		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon87.png" />
+		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon80.png" />
+		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon120.png" />
+		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon180.png" />
+		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon20.png" />
+		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon29.png" />
+		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon76.png" />
+		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon152.png" />
+		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon167.png" />
+		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon1024.png" />
 	</ItemGroup>
 	<ItemGroup>
 		<BundleResource Include="Resources\Base.lproj\Localizable.strings" />
