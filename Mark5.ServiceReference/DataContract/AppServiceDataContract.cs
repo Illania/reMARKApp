@@ -121,25 +121,6 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "Path", Order = 1)]
         public string Path { get; set; }
-
-        [DataMember(Name = "OptionalParameters", Order = 0)]
-        public OptionalParameters OptionalParameters { get; set; }
-    }
-
-    [DataContract(Name = "OptionalParameters", Namespace = "com.nordic-it.appservice.v3")]
-    [KnownType(typeof(CalendarEventOptionalParameters))]
-    public abstract class OptionalParameters
-    {
-    }
-
-    [DataContract(Name = "CalendarEventOptionalParameters", Namespace = "com.nordic-it.appservice.v3")]
-    public class CalendarEventOptionalParameters : OptionalParameters
-    {
-        [DataMember(Name = "CanContainAppointments", Order = 0)]
-        public bool CanContainAppointments { get; set; }
-
-        [DataMember(Name = "CanContainTasks", Order = 0)]
-        public bool CanContainTasks { get; set; }
     }
 
     [DataContract(Name = "ModuleType", Namespace = "com.nordic-it.appservice.v3")]
