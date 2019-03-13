@@ -628,6 +628,9 @@
 		<ImageAsset Include="Assets_icons.xcassets\Nav-settings.imageset\Nav-settings%402x.png" />
 		<ImageAsset Include="Assets_icons.xcassets\Nav-settings.imageset\Nav-settings%403x.png" />
 		<ImageAsset Include="Assets_icons.xcassets\Nav-mail.imageset\Nav-mail%403x.png" />
+		<ImageAsset Include="Assets_icons.xcassets\Search-Filled.imageset\Contents.json" />
+		<ImageAsset Include="Assets_icons.xcassets\Search-Filled.imageset\Search-Filled%402x.png" />
+		<ImageAsset Include="Assets_icons.xcassets\Search-Filled.imageset\Search-Filled%403x.png" />
 	</ItemGroup>
 	<ItemGroup>
 		<BundleResource Include="Resources\Base.lproj\Localizable.strings" />
@@ -733,6 +736,7 @@
 	  <Folder Include="Assets_icons.xcassets\Nav-calendar.imageset\" />
 	  <Folder Include="Assets_icons.xcassets\Nav-shortcodes.imageset\" />
 	  <Folder Include="Assets_icons.xcassets\Nav-settings.imageset\" />
+	  <Folder Include="Assets_icons.xcassets\Search-Filled.imageset\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 	<Import Project="..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets" Condition="Exists('..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets')" />

@@ -28,8 +28,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
         protected NavigationController SearchNavigationController;
         protected NavigationController SettingsNavigationController;
 
-        UIView searchButtonContainer;
-        UIButton modalNavigationButton;
+        UIView navigationButtonContainer;
+        UIButton moduleNavigationButton;
 
         TinyMessageSubscriptionToken reMarkNav;
 
@@ -45,7 +45,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             SettingsNavigationController.TabBarItem.Title = "";
 
             SearchNavigationController = new NavigationController(new UIViewController());
-            SearchNavigationController.TabBarItem.Image = UIImage.FromBundle("Nav-search");
+            SearchNavigationController.TabBarItem.Image = UIImage.FromBundle("Search-Filled");
             SearchNavigationController.Tag = SearchTag;
             SearchNavigationController.RestorationIdentifier = "NavigationController_Search";
 
@@ -67,40 +67,40 @@ namespace Mark5.Mobile.IOS.Ui.Common
             RestorationIdentifier = nameof(AbstractMainViewController);
 
             SubscribeToMessages();
-            searchButtonContainer = new TouchTransparentView
+            navigationButtonContainer = new TouchTransparentView
             {
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
 
-            View.AddSubview(searchButtonContainer);
+            View.AddSubview(navigationButtonContainer);
             View.AddConstraints(new[]
             {
-                searchButtonContainer.HeightAnchor.ConstraintEqualTo(65f),
-                searchButtonContainer.WidthAnchor.ConstraintEqualTo(55f),
-                searchButtonContainer.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
-                searchButtonContainer.BottomAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.BottomAnchor : BottomLayoutGuide.GetTopAnchor(), 2),
+                navigationButtonContainer.HeightAnchor.ConstraintEqualTo(65f),
+                navigationButtonContainer.WidthAnchor.ConstraintEqualTo(55f),
+                navigationButtonContainer.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
+                navigationButtonContainer.BottomAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.BottomAnchor : BottomLayoutGuide.GetTopAnchor(), 2),
             });
 
-            modalNavigationButton = new UIButton
+            moduleNavigationButton = new UIButton
             {
                 TintColor = Theme.White,
                 BackgroundColor = Theme.DarkBlue,
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 ClipsToBounds = true,
-                ContentEdgeInsets = new UIEdgeInsets(5f, 5f, 5f, 5f)
+                ImageEdgeInsets = new UIEdgeInsets(15f, 15f, 15f, 15f)
             };
 
-            modalNavigationButton.SetImage(UIImage.FromBundle("Documents-Filled").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
-            modalNavigationButton.Layer.BorderColor = Theme.DarkBlue.CGColor;
-            modalNavigationButton.Layer.BorderWidth = .7f;
-            modalNavigationButton.Layer.CornerRadius = 27.5f;
-            searchButtonContainer.AddSubview(modalNavigationButton);
-            searchButtonContainer.AddConstraints(new[]
+            moduleNavigationButton.SetImage(UIImage.FromBundle("Documents-Filled").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+            moduleNavigationButton.Layer.BorderColor = Theme.DarkBlue.CGColor;
+            moduleNavigationButton.Layer.BorderWidth = .7f;
+            moduleNavigationButton.Layer.CornerRadius = 27.5f;
+            navigationButtonContainer.AddSubview(moduleNavigationButton);
+            navigationButtonContainer.AddConstraints(new[]
             {
-                modalNavigationButton.HeightAnchor.ConstraintEqualTo(55f),
-                modalNavigationButton.WidthAnchor.ConstraintEqualTo(55f),
-                modalNavigationButton.CenterXAnchor.ConstraintEqualTo(searchButtonContainer.CenterXAnchor),
-                modalNavigationButton.BottomAnchor.ConstraintEqualTo(searchButtonContainer.BottomAnchor, -10f),
+                moduleNavigationButton.HeightAnchor.ConstraintEqualTo(55f),
+                moduleNavigationButton.WidthAnchor.ConstraintEqualTo(55f),
+                moduleNavigationButton.CenterXAnchor.ConstraintEqualTo(navigationButtonContainer.CenterXAnchor),
+                moduleNavigationButton.BottomAnchor.ConstraintEqualTo(navigationButtonContainer.BottomAnchor, -10f),
             });
 
             CommonConfig.MessengerHub.Publish(new NavigationModuleChangedMessage(this, new NavigationModule(CurrentNavigationModuleType)));
@@ -112,7 +112,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             TabBar.Items[2].Enabled = false;
 
-            modalNavigationButton.TouchUpInside += ModalNavigationButton_TouchUpInside;
+            moduleNavigationButton.TouchUpInside += ModuleNavigationButton_TouchUpInside;
         }
 
         public override void ViewDidAppear(bool animated)
@@ -128,23 +128,23 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             base.ViewWillDisappear(animated);
 
-            modalNavigationButton.TouchUpInside -= ModalNavigationButton_TouchUpInside;
+            moduleNavigationButton.TouchUpInside -= ModuleNavigationButton_TouchUpInside;
         }
 
         public void SetSearchButtonHidden(bool hidden)
         {
-            searchButtonContainer.Hidden = hidden;
+            navigationButtonContainer.Hidden = hidden;
         }
 
         public void SetSearchButtonAlpha(float val)
         {
-            modalNavigationButton.Alpha = val;
+            moduleNavigationButton.Alpha = val;
         }
 
         public override void ViewDidLayoutSubviews()
         {
             base.ViewDidLayoutSubviews();
-            View.BringSubviewToFront(searchButtonContainer);
+            View.BringSubviewToFront(navigationButtonContainer);
         }
 
         async void CheckAutoSavedDocument()
@@ -174,8 +174,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
             }
         }
 
-        #region Modal Navigation related
-        void ModalNavigationButton_TouchUpInside(object sender, EventArgs e)
+        #region Module Navigation related
+        void ModuleNavigationButton_TouchUpInside(object sender, EventArgs e)
         {
             var del = UIApplication.SharedApplication?.Delegate as AppDelegate;
             var root = del?.Window?.RootViewController as AbstractMainViewController;
@@ -242,25 +242,25 @@ namespace Mark5.Mobile.IOS.Ui.Common
             switch (nextModuleType)
             {
                 case NavigationModule.NavigationModuleType.Mail:
-                    modalNavigationButton.SetImage(UIImage.FromBundle(nextModule.Image).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+                    moduleNavigationButton.SetImage(UIImage.FromBundle(nextModule.Image).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
                     SelectedIndex = 1;
                     break;
                 case NavigationModule.NavigationModuleType.Contacts:
                     module = ModuleType.Contacts;
-                    modalNavigationButton.SetImage(UIImage.FromBundle(nextModule.Image).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+                    moduleNavigationButton.SetImage(UIImage.FromBundle(nextModule.Image).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
                     SelectedIndex = 2;
                     break;
                 case NavigationModule.NavigationModuleType.Shortcodes:
                     module = ModuleType.Shortcodes;
-                    modalNavigationButton.SetImage(UIImage.FromBundle(nextModule.Image).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+                    moduleNavigationButton.SetImage(UIImage.FromBundle(nextModule.Image).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
                     SelectedIndex = 3;
                     break;
                 case NavigationModule.NavigationModuleType.Calendar:
                     module = ModuleType.Calendar;
-                    modalNavigationButton.SetImage(UIImage.FromBundle(nextModule.Image).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+                    moduleNavigationButton.SetImage(UIImage.FromBundle(nextModule.Image).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
                     break;
                 case NavigationModule.NavigationModuleType.Settings:
-                    modalNavigationButton.SetImage(UIImage.FromBundle(nextModule.Image).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+                    moduleNavigationButton.SetImage(UIImage.FromBundle(nextModule.Image).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
                     SelectedIndex = 4;
                     break;
                 case NavigationModule.NavigationModuleType.Search:

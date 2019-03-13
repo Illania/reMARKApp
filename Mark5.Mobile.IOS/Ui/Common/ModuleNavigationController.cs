@@ -132,8 +132,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 seperatorView.HeightAnchor.ConstraintEqualTo(3f),
                 seperatorView.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
                 seperatorView.CenterYAnchor.ConstraintEqualTo(View.CenterYAnchor, 60),
-                seperatorView.LeftAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.LeftAnchor : View.LeftAnchor, 20f),
-                seperatorView.RightAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.RightAnchor : View.RightAnchor, -20f)
+                seperatorView.LeftAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.LeftAnchor : View.LeftAnchor, 35f),
+                seperatorView.RightAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.RightAnchor : View.RightAnchor, -35f)
             });
 
             View.AddConstraints(new[]
@@ -177,7 +177,10 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         void SetButtonGridHorizontalConstraints()
         {
-            float horizontalSpacing = UIDevice.CurrentDevice.Orientation.IsLandscape() ? 180f : 85f;
+            float horizontalSpacing = UIDevice.CurrentDevice.Orientation.IsLandscape() ? 200f : 105f;
+
+            if (Integration.IsIPad())
+                horizontalSpacing += 15f;
 
             NSLayoutConstraint mailBtnHorizontalConstraint = mailBtn.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor, -horizontalSpacing);
             mailBtnHorizontalConstraint.SetIdentifier(mailBtnConstraintIdentifier);
@@ -240,7 +243,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 BackgroundColor = Theme.White,
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 ClipsToBounds = true,
-                ContentEdgeInsets = new UIEdgeInsets(10f, 10f, 10f, 10f)
+                ImageEdgeInsets = new UIEdgeInsets(15f, 15f, 15f, 15f)
             };
 
             readonly UILabel Title = new UILabel
