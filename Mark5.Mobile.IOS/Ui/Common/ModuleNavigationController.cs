@@ -96,6 +96,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             float verticalSpacingFirstBtns = 60f;
             float verticalSpacing2ndRow = 115f;
+            var separatorPadding = Integration.IsIPad() ? 70f : 35f;
 
             View.AddSubviews(new UIView[] {
                 closeButtonContainer,
@@ -132,8 +133,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 seperatorView.HeightAnchor.ConstraintEqualTo(3f),
                 seperatorView.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
                 seperatorView.CenterYAnchor.ConstraintEqualTo(View.CenterYAnchor, 60),
-                seperatorView.LeftAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.LeftAnchor : View.LeftAnchor, 35f),
-                seperatorView.RightAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.RightAnchor : View.RightAnchor, -35f)
+                seperatorView.LeftAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.LeftAnchor : View.LeftAnchor, separatorPadding),
+                seperatorView.RightAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.RightAnchor : View.RightAnchor, -separatorPadding)
             });
 
             View.AddConstraints(new[]
@@ -143,7 +144,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 mailBtn.CenterYAnchor.ConstraintEqualTo(contactsBtn.CenterYAnchor),
                 shortCodesBtn.CenterYAnchor.ConstraintEqualTo(contactsBtn.CenterYAnchor),
                 searchBtn.CenterYAnchor.ConstraintEqualTo(seperatorView.CenterYAnchor, -verticalSpacingFirstBtns),
-                settingsBtn.CenterYAnchor.ConstraintEqualTo(seperatorView.CenterYAnchor, verticalSpacingFirstBtns),
+                settingsBtn.CenterYAnchor.ConstraintEqualTo(seperatorView.CenterYAnchor, verticalSpacingFirstBtns + 30),
             });
 
             SetButtonGridHorizontalConstraints();
