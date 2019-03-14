@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using CoreGraphics;
@@ -387,7 +388,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
         protected Task<(NSObject, NSError)> InsertTemplate(string type, int id, string content)
         {
             var tcs = new TaskCompletionSource<(NSObject, NSError)>();
-            var sanitizedContent = content.Replace("\"", "'");
+            var sanitizedStyleTag = Regex.Replace(content, "style(.*)=(.*)\"(.*)font-family:([^>]*?)[\">]", m => m.Value.Replace("'", ""));
+            var sanitizedContent = sanitizedStyleTag.Replace("\"", "'");
             var js = $"InsertContent(\'{type}\',{id},\"{sanitizedContent}\")";
             webView.EvaluateJavaScript("javascript: " + js, (result, error) => tcs.SetResult((result, error)));
             webView.BecomeFirstResponder();
