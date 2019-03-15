@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using CoreGraphics;
@@ -11,6 +10,7 @@ using Foundation;
 using HtmlAgilityPack;
 using MailBee.Html;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 using WebKit;
@@ -385,12 +385,35 @@ namespace Mark5.Mobile.IOS.Ui.Common
             return tcs.Task;
         }
 
-        protected Task<(NSObject, NSError)> InsertTemplate(string type, int id, string content)
+        protected Task<(NSObject, NSError)> InsertTemplate(ContentType contentType, int id, string content)
         {
             var tcs = new TaskCompletionSource<(NSObject, NSError)>();
-            var sanitizedStyleTag = Regex.Replace(content, "style(.*)=(.*)\"(.*)font-family:([^>]*?)[\">]", m => m.Value.Replace("'", ""));
-            var sanitizedContent = sanitizedStyleTag.Replace("\"", "'");
-            var js = $"InsertContent(\'{type}\',{id},\"{sanitizedContent}\")";
+            string sanitizedContent = string.Empty;
+            string typeString = string.Empty;
+
+            if (contentType == ContentType.Html)
+            {
+                typeString = "html";
+
+                var htmlTemplate = new HtmlDocument();
+                htmlTemplate.LoadHtml(content);
+                var elementsWithStyleAttribute = htmlTemplate.DocumentNode.SelectNodes("//*[@style]");
+
+                foreach (var element in elementsWithStyleAttribute)
+                {
+                    var currStyle = element.GetAttributeValue("style", "");
+                    element.SetAttributeValue("style", currStyle.Replace("'", string.Empty).Replace("\"", "'"));
+                }
+
+                sanitizedContent = htmlTemplate.DocumentNode.OuterHtml.Replace("\"", "'");
+            }
+            else
+            {
+                typeString = "text";
+                sanitizedContent = content.Replace("\"", "'");
+            }
+
+            var js = $"InsertContent(\'{typeString}\',{id},\"{sanitizedContent}\")";
             webView.EvaluateJavaScript("javascript: " + js, (result, error) => tcs.SetResult((result, error)));
             webView.BecomeFirstResponder();
             webView.EndEditing(true);
