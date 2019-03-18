@@ -4,7 +4,7 @@
     {
         protected V view;
 
-        public void Init(V view)
+        public void AttachView(V view)
         {
             this.view = view;
         }
@@ -15,7 +15,7 @@
 
     public interface IPresenter<V> where V : IView
     {
-        void Init(V view);
+        void AttachView(V view);
         void Start();
         void Stop();
     }

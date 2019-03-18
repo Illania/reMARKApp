@@ -23,8 +23,11 @@ namespace Mark5.Mobile.Common.Manager
             this.calendarDataAccess = calendarDataAccess;
         }
 
-        public async Task<List<CalendarAppointment>> GetCalendarAppointmentsAsync(List<int> calendarIds, long startDateTimestamp, long endDateTimestamp, SourceType sourceType = SourceType.Auto)
+        public async Task<List<CalendarAppointment>> GetCalendarAppointmentsAsync(List<int> calendarIds, DateTime startDate, DateTime endDate, SourceType sourceType = SourceType.Auto)
         {
+            var startDateUTC = startDate.ConvertUserTimeToUtc();
+            var endDateUTC = endDate.ConvertUserTimeToUtc();
+
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
 
@@ -34,19 +37,21 @@ namespace Mark5.Mobile.Common.Manager
                 {
                     Token = Token,
                     CalendarIds = calendarIds,
-                    StartDate = startDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
-                    EndDate = endDateTimestamp.ConvertTimestampMillisecondsToDateTime()
+                    StartDate = startDateUTC,
+                    EndDate = endDateUTC,
                 });
 
                 var appointments = result.CalendarAppointments.WhereNotNull().Select(a => a.Convert()).ToList();
 
-                await calendarDataAccess.SaveCalendarAppointmentsAsync(calendarIds, appointments, startDateTimestamp, endDateTimestamp);
+                await calendarDataAccess.SaveCalendarAppointmentsAsync(calendarIds, appointments,
+                    startDateUTC.ConvertDateTimeToTimestampMilliseconds(), endDateUTC.ConvertDateTimeToTimestampMilliseconds()); //TODO this also should be changed to datetime...
 
                 return appointments;
             }
 
             if (sourceType == SourceType.Local)
-                return await calendarDataAccess.GetCalendarAppointmentsAsync(calendarIds, startDateTimestamp, endDateTimestamp);
+                return await calendarDataAccess.GetCalendarAppointmentsAsync(calendarIds,
+                    startDateUTC.ConvertDateTimeToTimestampMilliseconds(), endDateUTC.ConvertDateTimeToTimestampMilliseconds()); //TODO same as up
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
