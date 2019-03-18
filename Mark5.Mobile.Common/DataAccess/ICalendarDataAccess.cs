@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
 
@@ -8,17 +9,17 @@ namespace Mark5.Mobile.Common.DataAccess
     {
         Task<CalendarAppointment> GetCalendarAppointmentAsync(int calendarAppointmentId);
 
-        Task<List<CalendarAppointment>> GetCalendarAppointmentsAsync(List<int> calendarIds, long startDateTimestamp, long endDateTimestamp);
+        Task<List<CalendarAppointment>> GetCalendarAppointmentsAsync(List<int> calendarIds, DateTime startDate, DateTime endDate);
 
         Task SaveCalendarAppointmentAsync(CalendarAppointment calendarAppointment);
 
-        Task SaveCalendarAppointmentsAsync(List<int> calendarIds, List<CalendarAppointment> calendarAppointments, long startDateTimestamp, long endDateTimestamp);
+        Task SaveCalendarAppointmentsAsync(List<int> calendarIds, List<CalendarAppointment> calendarAppointments, DateTime startDate, DateTime endDate);
 
         Task DeleteAsync(List<CalendarAppointment> appointments);
 
-        Task<List<CalendarAlarm>> GetCalendarAlarmsAsync(List<int> calendarIds, long startDateTimestamp, long endDateTimestamp);
+        Task<List<CalendarAlarm>> GetCalendarAlarmsAsync(List<int> calendarIds, DateTime startDate, DateTime endDate);
 
-        Task SaveCalendarAlarmsAsync(List<int> calendarIds, List<CalendarAlarm> alarms, long startDateTimestamp, long endDateTimestamp);
+        Task SaveCalendarAlarmsAsync(List<int> calendarIds, List<CalendarAlarm> alarms, DateTime startDate, DateTime endDate);
 
         Task RemoveOrphans();
     }

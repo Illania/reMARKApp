@@ -43,15 +43,13 @@ namespace Mark5.Mobile.Common.Manager
 
                 var appointments = result.CalendarAppointments.WhereNotNull().Select(a => a.Convert()).ToList();
 
-                await calendarDataAccess.SaveCalendarAppointmentsAsync(calendarIds, appointments,
-                    startDateUTC.ConvertDateTimeToTimestampMilliseconds(), endDateUTC.ConvertDateTimeToTimestampMilliseconds()); //TODO this also should be changed to datetime...
+                await calendarDataAccess.SaveCalendarAppointmentsAsync(calendarIds, appointments, startDateUTC, endDateUTC);
 
                 return appointments;
             }
 
             if (sourceType == SourceType.Local)
-                return await calendarDataAccess.GetCalendarAppointmentsAsync(calendarIds,
-                    startDateUTC.ConvertDateTimeToTimestampMilliseconds(), endDateUTC.ConvertDateTimeToTimestampMilliseconds()); //TODO same as up
+                return await calendarDataAccess.GetCalendarAppointmentsAsync(calendarIds, startDateUTC, endDateUTC);
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
@@ -123,8 +121,11 @@ namespace Mark5.Mobile.Common.Manager
             return true;
         }
 
-        public async Task<List<CalendarAlarm>> GetCalendarAlarmsAsync(List<int> calendarIds, long startDateTimestamp, long endDateTimestamp, SourceType sourceType = SourceType.Auto)
+        public async Task<List<CalendarAlarm>> GetCalendarAlarmsAsync(List<int> calendarIds, DateTime startDate, DateTime endDate, SourceType sourceType = SourceType.Auto)
         {
+            var startDateUTC = startDate.ConvertUserTimeToUtc();
+            var endDateUTC = endDate.ConvertUserTimeToUtc();
+
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
 
@@ -134,19 +135,19 @@ namespace Mark5.Mobile.Common.Manager
                 {
                     Token = Token,
                     CalendarIds = calendarIds,
-                    StartDate = startDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
-                    EndDate = endDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
+                    StartDate = startDateUTC,
+                    EndDate = endDateUTC,
                 });
 
                 var alarms = result.Alarms.WhereNotNull().Select(a => a.Convert()).ToList();
 
-                await calendarDataAccess.SaveCalendarAlarmsAsync(calendarIds, alarms, startDateTimestamp, endDateTimestamp);
+                await calendarDataAccess.SaveCalendarAlarmsAsync(calendarIds, alarms, startDateUTC, endDateUTC);
 
                 return alarms;
             }
 
             if (sourceType == SourceType.Local)
-                return await calendarDataAccess.GetCalendarAlarmsAsync(calendarIds, startDateTimestamp, endDateTimestamp);
+                return await calendarDataAccess.GetCalendarAlarmsAsync(calendarIds, startDateUTC, endDateUTC);
 
             throw new ArgumentException("Invalid sourceType provided.");
         }

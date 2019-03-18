@@ -498,7 +498,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 //    AddAppointments(new List<CalendarAppointment> { appointment });
                 //}
 
-                var alarms = await Managers.CalendarManager.GetCalendarAlarmsAsync(new List<int> { selectedCalendar.Id }, selectedFromDateTime, selectedToDateTime, sourceType);
+                var alarms = await Managers.CalendarManager.GetCalendarAlarmsAsync(new List<int> { selectedCalendar.Id }, GetFromDateTime(), GetToDateTime(), sourceType);
                 AddAlarms(alarms); //TODO TO TEST ALARMs
             }
             catch (Exception ex)
