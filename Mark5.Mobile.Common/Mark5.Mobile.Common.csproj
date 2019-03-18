@@ -22,5 +22,7 @@
   <ItemGroup>
     <Folder Include="Model\HubMessages\" />
     <Folder Include="Utilities\Extensions\" />
+    <Folder Include="Presenters\" />
+    <Folder Include="Presenters\CalendarModule\" />
   </ItemGroup>
 </Project>
