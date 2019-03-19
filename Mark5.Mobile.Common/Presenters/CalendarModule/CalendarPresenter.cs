@@ -50,9 +50,28 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             }
         }
 
+        //TODO How do we implement our download/refresh policy....?
+        /* Some ideas
+         * 1) Get always appointments from all calendars, so we'll always have appointments for all calendars related to the same period      
+         * 2) Get 1 year before and 1 year after the current date, so we do the donwnload once
+         * 3) Get the current month, and then make several calls to get more months
+         * 4) Preemptive download, so as soon as the user is less than 3-4 months away from the "edge" of what we have downloaded, we ask for more stuff
+         * 
+         * 
+         */
+
         public void CalendarSelectionChanged(int calendarId, bool isSelected)
         {
             calendarsSelectedState[calendarId] = isSelected;
+
+            if (isSelected)
+            {
+                //Need to get those new appointments and add them to the view
+            }
+            else
+            {
+                //Need to remove from the showed ones
+            }
         }
 
 
