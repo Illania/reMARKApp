@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Mark5.Mobile.Common.Utilities;
 using SQLite;
 
@@ -78,6 +79,11 @@ namespace Mark5.Mobile.Common.Model
         public override string ToString()
         {
             return $"[CalendarAppointment: Subject={Subject}, Location={Location}]";
+        }
+
+        public static implicit operator CalendarAppointment(void v)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -34,7 +34,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             try
             {
                 var appointments = await Managers.CalendarManager.GetCalendarAppointmentsAsync(selectedCalendars.ToList(), start, end);
-                var appointmentsViewModels = appointments.Select(ConvertToViewModel);
+                var appointmentsViewModels = appointments.Select(SimpleCalendarAppointmentViewModel.ConvertToViewModel);
 
                 view.UpdateAppointments(appointmentsViewModels);
 
@@ -46,7 +46,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                     $"in calendars {string.Join(", ", selectedCalendars)} from {start} to {end} ", ex);
 
                 view.StopLoading();
-                view.ShowError();
+                await view.ShowError();
             }
         }
 
@@ -55,15 +55,15 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             calendarsSelectedState[calendarId] = isSelected;
         }
 
-        CalendarAppointmentViewModel ConvertToViewModel(CalendarAppointment ca)
-        {
-            return new CalendarAppointmentViewModel();
-        }
+
     }
 
-    public class CalendarAppointmentViewModel
+    public class SimpleCalendarAppointmentViewModel
     {
-
+        public static SimpleCalendarAppointmentViewModel ConvertToViewModel(CalendarAppointment ca)
+        {
+            return new SimpleCalendarAppointmentViewModel();
+        }
     }
 
     public class CalendarViewModel
@@ -81,9 +81,10 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
     public interface ICalendarView : IView
     {
         void SetCalendars(List<CalendarViewModel> calendars);
+        void UpdateAppointments(IEnumerable<SimpleCalendarAppointmentViewModel> caViewModels);
+
         void ShowLoading();
         void StopLoading();
-        void ShowError();
-        void UpdateAppointments(IEnumerable<CalendarAppointmentViewModel> caViewModels);
+        Task ShowError();
     }
 }
