@@ -349,6 +349,9 @@
 		<Reference Include="Firebase.CloudMessaging">
 		  <HintPath>..\packages\Xamarin.Firebase.iOS.CloudMessaging.3.0.3\lib\Xamarin.iOS10\Firebase.CloudMessaging.dll</HintPath>
 		</Reference>
+		<Reference Include="Lottie.iOS">
+		  <HintPath>..\packages\Com.Airbnb.iOS.Lottie.2.5.7\lib\xamarinios10\Lottie.iOS.dll</HintPath>
+		</Reference>
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Mark5.Mobile.Common\Mark5.Mobile.Common.csproj">
@@ -588,6 +591,11 @@
 		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon152.png" />
 		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon167.png" />
 		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon1024.png" />
+		<ImageAsset Include="Assets_onboarding.xcassets\5.0_1.imageset\Contents.json" />
+		<ImageAsset Include="Assets_onboarding.xcassets\5.0_2.imageset\Contents.json" />
+		<ImageAsset Include="Assets_onboarding.xcassets\5.0_3.imageset\Contents.json" />
+		<ImageAsset Include="Assets_onboarding.xcassets\5.0_4.imageset\Contents.json" />
+		<ImageAsset Include="Assets_onboarding.xcassets\5.0_5.imageset\Contents.json" />
 	</ItemGroup>
 	<ItemGroup>
 		<BundleResource Include="Resources\Base.lproj\Localizable.strings" />
@@ -617,6 +625,8 @@
 		<BundleResource Include="Resources\startscreens\start-screen-bg-retinahd55-landscape.png" />
 		<BundleResource Include="Resources\startscreens\start-screen-bg-retinahd55.png" />
 		<BundleResource Include="Resources\html\replyEditor.html" />
+		<BundleResource Include="Resources\splash.json" />
+		<BundleResource Include="Resources\data.json" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="Ui\ViewControllers\ContactsList\" />
@@ -687,6 +697,11 @@
 	  <Folder Include="Assets_onboarding.xcassets\2.8_3.imageset\" />
 	  <Folder Include="Assets_onboarding.xcassets\2.8_4.imageset\" />
 	  <Folder Include="Assets_onboarding.xcassets\2.8_5.imageset\" />
+	  <Folder Include="Assets_onboarding.xcassets\5.0_1.imageset\" />
+	  <Folder Include="Assets_onboarding.xcassets\5.0_2.imageset\" />
+	  <Folder Include="Assets_onboarding.xcassets\5.0_3.imageset\" />
+	  <Folder Include="Assets_onboarding.xcassets\5.0_4.imageset\" />
+	  <Folder Include="Assets_onboarding.xcassets\5.0_5.imageset\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 	<Import Project="..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets" Condition="Exists('..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets')" />
