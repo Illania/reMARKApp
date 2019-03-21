@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Airbnb.Lottie;
 using CoreAnimation;
 using CoreGraphics;
 using Foundation;
@@ -231,7 +232,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             logoImageView = new UIImageView
             {
-                Image = UIImage.FromBundle(logoFileName),
+                //Image = UIImage.FromBundle(logoFileName),
                 ContentMode = UIViewContentMode.ScaleAspectFit,
                 Opaque = false,
                 TranslatesAutoresizingMaskIntoConstraints = false
@@ -249,22 +250,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 logoImageView.HeightAnchor.ConstraintEqualTo(logoContainer.HeightAnchor)
             });
 
-            var backgroundImageView = new UIImageView
-            {
-                Image = UIImage.FromBundle(backgroundFileName),
-                ContentMode = UIViewContentMode.ScaleAspectFill,
-                Opaque = false,
-                TranslatesAutoresizingMaskIntoConstraints = false
-            };
-            View.AddSubview(backgroundImageView);
-            View.AddConstraints(new[]
-            {
-                backgroundImageView.TopAnchor.ConstraintEqualTo(View.TopAnchor),
-                backgroundImageView.LeftAnchor.ConstraintEqualTo(View.LeftAnchor),
-                backgroundImageView.WidthAnchor.ConstraintEqualTo(View.WidthAnchor),
-                backgroundImageView.HeightAnchor.ConstraintEqualTo(View.HeightAnchor)
-            });
-            View.SendSubviewToBack(backgroundImageView);
+            //var backgroundImageView = new UIImageView
+            //{
+            //    Image = UIImage.FromBundle(backgroundFileName),
+            //    ContentMode = UIViewContentMode.ScaleAspectFill,
+            //    Opaque = false,
+            //    TranslatesAutoresizingMaskIntoConstraints = false
+            //};
+            //View.AddSubview(backgroundImageView);
+            //View.AddConstraints(new[]
+            //{
+            //    backgroundImageView.TopAnchor.ConstraintEqualTo(View.TopAnchor),
+            //    backgroundImageView.LeftAnchor.ConstraintEqualTo(View.LeftAnchor),
+            //    backgroundImageView.WidthAnchor.ConstraintEqualTo(View.WidthAnchor),
+            //    backgroundImageView.HeightAnchor.ConstraintEqualTo(View.HeightAnchor)
+            //});
+            //View.SendSubviewToBack(backgroundImageView);
 
             settingsButton = new UIButton();
             settingsButton.TitleLabel.Font = Theme.DefaultBoldFont;
@@ -288,7 +289,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     settingsButton.RightAnchor.ConstraintEqualTo(View.RightAnchor, -5f)
                 });
             }
+
+
+            animation = LOTAnimationView.AnimationNamed("splash");
+            animation.ContentMode = UIViewContentMode.ScaleAspectFill;
+            animation.TranslatesAutoresizingMaskIntoConstraints = false;
+            View.AddSubview(animation);
+
+            View.AddConstraints(new NSLayoutConstraint[]
+            {
+                animation.BottomAnchor.ConstraintEqualTo(View.BottomAnchor),
+                animation.TopAnchor.ConstraintEqualTo(View.TopAnchor),
+                animation.LeftAnchor.ConstraintEqualTo(View.LeftAnchor),
+                animation.RightAnchor.ConstraintEqualTo(View.RightAnchor),
+
+            });
+            View.SendSubviewToBack(animation);
+
         }
+
+        LOTAnimationView animation;
 
         void InitializeSubViews()
         {
@@ -408,6 +428,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void StartLogoScaleAnimation()
         {
+            animation.Play();
+
             if (startLogoScaleAnimationDone)
                 return;
 
