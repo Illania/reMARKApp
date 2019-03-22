@@ -18,7 +18,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         public override void Start()
         {
             calendarsList = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars;
-            calendarsList.ForEach(c => calendarsSelectedState.Add(c.Id, true)); //To be cached
+            calendarsList.ForEach(c => calendarsSelectedState.Add(c.Id, true));
 
             cache = new AppointmentsCache(calendarsList);
             cache.Start();
@@ -47,7 +47,6 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 var appointmentsViewModels = appointments?.Select(SimpleCalendarAppointmentViewModel.ConvertToViewModel);
 
                 view.UpdateAppointments(appointmentsViewModels);
-
                 view.StopLoading();
             }
             catch (Exception ex)
@@ -74,49 +73,13 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             }
         }
 
-        class MonthDate
-        {
-            public int Month { get; }
-            public int Year { get; }
-
-            public MonthDate(int month, int year)
-            {
-                if (month <= 0 || month > 12)
-                    throw new ArgumentException("Invalid month");
-
-                if (year <= 1900 || year > 3000)
-                    throw new ArgumentException("Invalid year");
-
-                Month = month;
-                Year = year;
-            }
-
-            public static MonthDate FromDateTime(DateTime dateTime)
-            {
-                return new MonthDate(dateTime.Month, dateTime.Year);
-            }
-
-            public override bool Equals(object obj)
-            {
-                var other = obj as MonthDate;
-                return Year == other?.Year && Month == other.Month;
-            }
-
-            public override int GetHashCode()
-            {
-                var hashCode = -834659671;
-                hashCode = hashCode * -1521134295 + Month.GetHashCode();
-                hashCode = hashCode * -1521134295 + Year.GetHashCode();
-                return hashCode;
-            }
-        }
-
         class AppointmentsCache
         {
             readonly int cachingNeighbours = 4;
+
             BlockingCollection<MonthDate> queue;
             CancellationTokenSource tokenSource;
-            SortedSet<MonthDate> cachedMonths = new SortedSet<MonthDate>(); //TODO need to add IComparer
+            HashSet<MonthDate> cachedMonths;
             private List<Calendar> calendarsList;
 
             public AppointmentsCache(List<Calendar> calendarsList)
@@ -128,11 +91,12 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             {
                 queue = new BlockingCollection<MonthDate>();
                 tokenSource = new CancellationTokenSource();
+                cachedMonths = new HashSet<MonthDate>();
 
                 Task.Run(async () => await Work(tokenSource.Token));
             }
 
-            public void Append(MonthDate monthDate)
+            void Append(MonthDate monthDate)
             {
                 queue.Add(monthDate);
             }
@@ -144,7 +108,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 return await Managers.CalendarManager.GetCalendarAppointmentsAsync(selectedCalendars, start, end, SourceType.Local);
             }
 
-            public async Task Work(CancellationToken token)
+            async Task Work(CancellationToken token)
             {
                 while (!queue.IsCompleted && token.IsCancellationRequested)
                 {
@@ -152,8 +116,8 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                     {
                         try
                         {
-                            var startDate = new DateTime(monthDate.Year, monthDate.Month, 1, 0, 0, 0, DateTimeKind.Local);
-                            var endDate = new DateTime(monthDate.Year, monthDate.Month, 1, 23, 59, 59, DateTimeKind.Local).AddMonths(1).AddDays(-1);
+                            DateTime startDate, endDate;
+                            (startDate, endDate) = GetTimePeriod(monthDate);
 
                             await Managers.CalendarManager.GetCalendarAppointmentsAsync(calendarsList.Select(c => c.Id).ToList(), startDate, endDate, SourceType.Auto);
 
@@ -173,13 +137,20 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                     cachedMonths.Contains(MonthDate.FromDateTime(end));
             }
 
+            (DateTime a, DateTime b) GetTimePeriod(MonthDate monthDate)
+            {
+                var startDate = new DateTime(monthDate.Year, monthDate.Month, 1, 0, 0, 0, DateTimeKind.Local);
+                var endDate = new DateTime(monthDate.Year, monthDate.Month, 1, 23, 59, 59, DateTimeKind.Local).AddMonths(1).AddDays(-1);
+
+                return (startDate, endDate);
+            }
+
             async Task CacheCalendarContent(DateTime start, DateTime end)
             {
                 if (!RangeCached(start, end))
                 {
                     var startDate = new DateTime(start.Year, start.Month, 1, 0, 0, 0, DateTimeKind.Local);
                     var endDate = new DateTime(end.Year, end.Month, 1, 23, 59, 59, DateTimeKind.Local).AddMonths(1).AddDays(-1);
-                    //retrieve various months  
 
                     await Managers.CalendarManager.GetCalendarAppointmentsAsync(calendarsList.Select(c => c.Id).ToList(), startDate, endDate, SourceType.Auto);
 
@@ -209,6 +180,43 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 tokenSource = null;
             }
 
+
+            class MonthDate
+            {
+                public int Month { get; }
+                public int Year { get; }
+
+                public MonthDate(int month, int year)
+                {
+                    if (month <= 0 || month > 12)
+                        throw new ArgumentException("Invalid month");
+
+                    if (year <= 1900 || year > 3000)
+                        throw new ArgumentException("Invalid year");
+
+                    Month = month;
+                    Year = year;
+                }
+
+                public static MonthDate FromDateTime(DateTime dateTime)
+                {
+                    return new MonthDate(dateTime.Month, dateTime.Year);
+                }
+
+                public override bool Equals(object obj)
+                {
+                    var other = obj as MonthDate;
+                    return Year == other?.Year && Month == other.Month;
+                }
+
+                public override int GetHashCode()
+                {
+                    var hashCode = -834659671;
+                    hashCode = hashCode * -1521134295 + Month.GetHashCode();
+                    hashCode = hashCode * -1521134295 + Year.GetHashCode();
+                    return hashCode;
+                }
+            }
         }
     }
 
