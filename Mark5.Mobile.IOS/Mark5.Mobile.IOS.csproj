@@ -567,17 +567,6 @@
 		<ImageAsset Include="Assets_icons.xcassets\Arrow-Expand.imageset\arrow_expand%402x.png" />
 		<ImageAsset Include="Assets_icons.xcassets\Arrow-Expand.imageset\arrow_expand%403x.png" />
 		<ImageAsset Include="Assets_onboarding.xcassets\Contents.json" />
-		<ImageAsset Include="Assets_onboarding.xcassets\2.8_1.imageset\Contents.json" />
-		<ImageAsset Include="Assets_onboarding.xcassets\2.8_1.imageset\Slide 1.pdf" />
-		<ImageAsset Include="Assets_onboarding.xcassets\2.8_2.imageset\Contents.json" />
-		<ImageAsset Include="Assets_onboarding.xcassets\2.8_2.imageset\Slide 2.pdf" />
-		<ImageAsset Include="Assets_onboarding.xcassets\2.8_3.imageset\Contents.json" />
-		<ImageAsset Include="Assets_onboarding.xcassets\2.8_3.imageset\Slide 3.pdf" />
-		<ImageAsset Include="Assets_onboarding.xcassets\2.8_4.imageset\Contents.json" />
-		<ImageAsset Include="Assets_onboarding.xcassets\2.8_4.imageset\Slide 3.pdf" />
-		<ImageAsset Include="Assets_onboarding.xcassets\2.8_5.imageset\Contents.json" />
-		<ImageAsset Include="Assets_onboarding.xcassets\2.8_5.imageset\Slide 5.pdf" />
-		<ImageAsset Include="Assets_onboarding.xcassets\2.8_4.imageset\Slide 4.pdf" />
 		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon40.png" />
 		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon60.png" />
 		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon58.png" />
@@ -591,11 +580,18 @@
 		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon152.png" />
 		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon167.png" />
 		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon1024.png" />
-		<ImageAsset Include="Assets_onboarding.xcassets\5.0_1.imageset\Contents.json" />
-		<ImageAsset Include="Assets_onboarding.xcassets\5.0_2.imageset\Contents.json" />
-		<ImageAsset Include="Assets_onboarding.xcassets\5.0_3.imageset\Contents.json" />
-		<ImageAsset Include="Assets_onboarding.xcassets\5.0_4.imageset\Contents.json" />
-		<ImageAsset Include="Assets_onboarding.xcassets\5.0_5.imageset\Contents.json" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_1.imageset\Contents.json" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_1.imageset\Page01.pdf" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_2.imageset\Contents.json" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_2.imageset\Page02.pdf" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_3.imageset\Contents.json" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_3.imageset\Page03.pdf" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_4.imageset\Contents.json" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_4.imageset\Page04.pdf" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_5.imageset\Contents.json" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_5.imageset\Page05.pdf" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_6.imageset\Contents.json" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_6.imageset\Page06.pdf" />
 	</ItemGroup>
 	<ItemGroup>
 		<BundleResource Include="Resources\Base.lproj\Localizable.strings" />
@@ -627,6 +623,7 @@
 		<BundleResource Include="Resources\html\replyEditor.html" />
 		<BundleResource Include="Resources\splash.json" />
 		<BundleResource Include="Resources\data.json" />
+		<BundleResource Include="Resources\Base.lproj\Onboarding.strings" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="Ui\ViewControllers\ContactsList\" />
@@ -697,11 +694,12 @@
 	  <Folder Include="Assets_onboarding.xcassets\2.8_3.imageset\" />
 	  <Folder Include="Assets_onboarding.xcassets\2.8_4.imageset\" />
 	  <Folder Include="Assets_onboarding.xcassets\2.8_5.imageset\" />
-	  <Folder Include="Assets_onboarding.xcassets\5.0_1.imageset\" />
-	  <Folder Include="Assets_onboarding.xcassets\5.0_2.imageset\" />
-	  <Folder Include="Assets_onboarding.xcassets\5.0_3.imageset\" />
-	  <Folder Include="Assets_onboarding.xcassets\5.0_4.imageset\" />
-	  <Folder Include="Assets_onboarding.xcassets\5.0_5.imageset\" />
+	  <Folder Include="Assets_onboarding.xcassets\onboarding_1.imageset\" />
+	  <Folder Include="Assets_onboarding.xcassets\onboarding_2.imageset\" />
+	  <Folder Include="Assets_onboarding.xcassets\onboarding_3.imageset\" />
+	  <Folder Include="Assets_onboarding.xcassets\onboarding_4.imageset\" />
+	  <Folder Include="Assets_onboarding.xcassets\onboarding_5.imageset\" />
+	  <Folder Include="Assets_onboarding.xcassets\onboarding_6.imageset\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 	<Import Project="..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets" Condition="Exists('..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets')" />
