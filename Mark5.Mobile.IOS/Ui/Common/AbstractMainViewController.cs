@@ -56,6 +56,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             SelectedIndex = 1;
         }
 
+
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
@@ -103,6 +104,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 moduleNavigationButton.BottomAnchor.ConstraintEqualTo(navigationButtonContainer.BottomAnchor, -10f),
             });
 
+            CustomizableViewControllers = null;
+
             CommonConfig.MessengerHub.Publish(new NavigationModuleChangedMessage(this, new NavigationModule(CurrentNavigationModuleType)));
         }
 
@@ -113,6 +116,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
             TabBar.Items[2].Enabled = false;
 
             moduleNavigationButton.TouchUpInside += ModuleNavigationButton_TouchUpInside;
+
+            CustomizableViewControllers = null;
         }
 
         public override void ViewDidAppear(bool animated)
@@ -258,6 +263,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 case NavigationModule.NavigationModuleType.Calendar:
                     module = ModuleType.Calendar;
                     moduleNavigationButton.SetImage(UIImage.FromBundle(nextModule.Image).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+                    SelectedIndex = 5;
                     break;
                 case NavigationModule.NavigationModuleType.Settings:
                     moduleNavigationButton.SetImage(UIImage.FromBundle(nextModule.Image).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);

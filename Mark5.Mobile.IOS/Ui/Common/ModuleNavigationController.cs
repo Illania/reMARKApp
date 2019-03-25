@@ -34,6 +34,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         ReMarkNavigationButton settingsBtn;
         ReMarkNavigationButton mailBtn;
         ReMarkNavigationButton shortCodesBtn;
+        ReMarkNavigationButton calendarBtn;
 
         readonly NavigationModule.NavigationModuleType currentModule;
 
@@ -64,6 +65,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             contactsBtn = new ReMarkNavigationButton(new NavigationModule(NavigationModule.NavigationModuleType.Contacts), BtnClicked, contactsBtnTag, currentModule == NavigationModule.NavigationModuleType.Contacts);
             settingsBtn = new ReMarkNavigationButton(new NavigationModule(NavigationModule.NavigationModuleType.Settings), BtnClicked, settingsBtnTag, currentModule == NavigationModule.NavigationModuleType.Settings);
             searchBtn = new ReMarkNavigationButton(new NavigationModule(NavigationModule.NavigationModuleType.Search), BtnClicked, settingsBtnTag, currentModule == NavigationModule.NavigationModuleType.Search);
+            calendarBtn = new ReMarkNavigationButton(new NavigationModule(NavigationModule.NavigationModuleType.Calendar), BtnClicked, settingsBtnTag, currentModule == NavigationModule.NavigationModuleType.Calendar);
 
             seperatorView = new UIView
             {
@@ -105,7 +107,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 mailBtn,
                 contactsBtn,
                 searchBtn,
-                settingsBtn
+                settingsBtn,
+                calendarBtn
             });
 
             View.AddConstraints(new[]
@@ -145,6 +148,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 shortCodesBtn.CenterYAnchor.ConstraintEqualTo(contactsBtn.CenterYAnchor),
                 searchBtn.CenterYAnchor.ConstraintEqualTo(seperatorView.CenterYAnchor, -verticalSpacingFirstBtns),
                 settingsBtn.CenterYAnchor.ConstraintEqualTo(seperatorView.CenterYAnchor, verticalSpacingFirstBtns + 30),
+                calendarBtn.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
+                calendarBtn.CenterYAnchor.ConstraintEqualTo(seperatorView.CenterYAnchor, -verticalSpacingFirstBtns)
             });
 
             SetButtonGridHorizontalConstraints();

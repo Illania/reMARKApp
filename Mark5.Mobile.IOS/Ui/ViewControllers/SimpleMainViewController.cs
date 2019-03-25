@@ -6,6 +6,7 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using UIKit;
+using Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
@@ -14,6 +15,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         NavigationController documentsNavigationController;
         NavigationController contactsNavigationController;
         NavigationController shortcodesNavigationController;
+        NavigationController calendarNavigationController;
 
         public override void LoadView()
         {
@@ -34,13 +36,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 RestorationIdentifier = "NavigationController_" + nameof(FoldersNotificationsListViewController) + "_" + nameof(ModuleType.Documents)
             };
 
+            calendarNavigationController = new NavigationController(new MonthViewController(ModuleType.Calendar))
+            {
+                RestorationIdentifier = "NavigationController_" + nameof(MonthViewController) + "_" + nameof(ModuleType.Calendar)
+            };
+
             ViewControllers = new UIViewController[]
             {
                 SearchNavigationController,
                 documentsNavigationController,
                 contactsNavigationController,
                 shortcodesNavigationController,
-                SettingsNavigationController
+                SettingsNavigationController,
+                calendarNavigationController,
             };
         }
 
