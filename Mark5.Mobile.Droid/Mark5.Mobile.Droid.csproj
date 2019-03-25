@@ -810,6 +810,9 @@
     <AndroidResource Include="Resources\drawable\onboarding_2.xml" />
     <AndroidResource Include="Resources\drawable\onboarding_3.xml" />
     <AndroidResource Include="Resources\drawable\circle_red.xml" />
+    <AndroidResource Include="Resources\drawable\onboarding_4.xml" />
+    <AndroidResource Include="Resources\drawable\onboarding_5.xml" />
+    <AndroidResource Include="Resources\drawable\onboarding_6.xml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FastScrollRecycler\FastScrollRecycler.csproj">

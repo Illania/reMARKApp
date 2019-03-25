@@ -15,7 +15,7 @@ namespace Mark5.Mobile.IOS.Utilities
         {
             try
             {
-                if (true) //TODO for testing!
+                if (ApplicationHasBeenUpdated())
                 {
                     SaveAppVersionCode();
 
