@@ -1,9 +1,7 @@
 ﻿using System;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Airbnb.Lottie;
-using CoreAnimation;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
@@ -36,7 +34,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         const float LoginButtonToTextFieldInitialDistance = 50f;
 
         const float LogoImageViewToViewDistance = -140f;
-        const float TextFieldToLogoImageViewDistance = -140f;
+        const float TextFieldToLogoImageViewDistance = 0;
         const float TextFieldToTextFieldDistance = 10f;
         const float LoginButtonToTextFieldDistance = 20f;
 
@@ -53,8 +51,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         CancellationTokenSource cts;
         Action dismissAction;
 
-        UIView logoContainer;
-        UIImageView logoImageView;
+        LOTAnimationView animationView;
 
         UIButton settingsButton;
 
@@ -64,7 +61,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UITextField portTextField;
         UIButton loginButton;
 
-        NSLayoutConstraint logoContainerCenterYConstraint;
         NSLayoutConstraint usernameTextFieldTopConstraint;
         NSLayoutConstraint passwordTextFieldTopConstraint;
         NSLayoutConstraint hostnameTextFieldTopConstraint;
@@ -79,7 +75,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         NSObject didChangeFrameNotificationObserver;
         ConnectionInfo retainedConnectionInfo;
-        private bool reLogin;
+        private readonly bool reLogin;
 
         public LoginViewController(bool reLogin = false)
         {
@@ -142,8 +138,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.Recycle();
 
-            logoContainer = null;
-            logoImageView = null;
+            animationView = null;
 
             settingsButton = null;
 
@@ -153,7 +148,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             portTextField = null;
             loginButton = null;
 
-            logoContainerCenterYConstraint = null;
             usernameTextFieldTopConstraint = null;
             passwordTextFieldTopConstraint = null;
             hostnameTextFieldTopConstraint = null;
@@ -175,97 +169,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeView()
         {
-            string logoFileName;
-            string backgroundFileName;
+            View.BackgroundColor = Theme.LightGray;
 
-            var screenSize = Integration.GetScreenSizeInPixels();
-            if (screenSize == Integration.IPhoneRetina55Resolution || screenSize == Integration.IPhoneRetina55ZoomResolution)
-            {
-                logoFileName = Path.Combine("startscreens", "start-screen-logo-retinahd55.png");
-                backgroundFileName = Path.Combine("startscreens", "start-screen-bg-retinahd55.png");
-            }
-            else if (screenSize == Integration.IPhoneRetina47Resolution || screenSize == Integration.IPhoneRetina47ZoomResolution)
-            {
-                logoFileName = Path.Combine("startscreens", "start-screen-logo-retinahd47.png");
-                backgroundFileName = Path.Combine("startscreens", "start-screen-bg-retinahd47.png");
-            }
-            else if (screenSize == Integration.IPhoneRetina40Resolution)
-            {
-                logoFileName = Path.Combine("startscreens", "start-screen-logo-retina4.png");
-                backgroundFileName = Path.Combine("startscreens", "start-screen-bg-retina4.png");
-            }
-            else if (screenSize == Integration.IPadProRetina105ProScreenSize || screenSize == Integration.IPadProRetina129ProScreenSize)
-            {
-                logoFileName = Path.Combine("startscreens", "start-screen-logo-ipadretina-portrait.png");
-                backgroundFileName = Path.Combine("startscreens", "start-screen-bg-ipadretina-portrait.png");
-            }
-            else if (screenSize == Integration.IPadRetina79ScreenSize || screenSize == Integration.IPadRetina97ScreenSize)
-            {
-                logoFileName = Path.Combine("startscreens", "start-screen-logo-ipadretina-portrait.png");
-                backgroundFileName = Path.Combine("startscreens", "start-screen-bg-ipadretina-portrait.png");
-            }
-            else
-            {
-                CommonConfig.Logger.Error($"Unknown device detected. [screenSize={screenSize}]");
+            animationView = LOTAnimationView.AnimationNamed("splash");
+            animationView.ContentMode = UIViewContentMode.ScaleAspectFit;
+            animationView.TranslatesAutoresizingMaskIntoConstraints = false;
+            View.AddSubview(animationView);
 
-                logoFileName = Path.Combine("startscreens", "start-screen-logo-retinahd47.png");
-                backgroundFileName = Path.Combine("startscreens", "start-screen-bg-retinahd47.png");
-            }
-
-            logoContainer = new UIView
+            View.AddConstraints(new NSLayoutConstraint[]
             {
-                Opaque = false,
-                TranslatesAutoresizingMaskIntoConstraints = false
-            };
-            logoContainer.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
-            logoContainer.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
-            logoContainer.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
-            logoContainer.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
-            View.AddSubview(logoContainer);
-            View.AddConstraints(new[]
-            {
-                logoContainerCenterYConstraint = logoContainer.CenterYAnchor.ConstraintEqualTo(View.CenterYAnchor, LogoImageViewToViewInitialDistance),
-                logoContainer.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
-                logoContainer.WidthAnchor.ConstraintEqualTo(View.WidthAnchor),
-                logoContainer.HeightAnchor.ConstraintEqualTo(View.HeightAnchor)
+                animationView.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
+                animationView.CenterYAnchor.ConstraintEqualTo(View.CenterYAnchor),
+                animationView.WidthAnchor.ConstraintEqualTo(View.WidthAnchor, 0.8f),
+                animationView.HeightAnchor.ConstraintEqualTo(animationView.WidthAnchor),
             });
-
-            logoImageView = new UIImageView
-            {
-                //Image = UIImage.FromBundle(logoFileName),
-                ContentMode = UIViewContentMode.ScaleAspectFit,
-                Opaque = false,
-                TranslatesAutoresizingMaskIntoConstraints = false
-            };
-            logoImageView.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
-            logoImageView.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
-            logoImageView.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
-            logoImageView.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
-            logoContainer.AddSubview(logoImageView);
-            logoContainer.AddConstraints(new[]
-            {
-                logoImageView.TopAnchor.ConstraintEqualTo(logoContainer.TopAnchor),
-                logoImageView.LeftAnchor.ConstraintEqualTo(logoContainer.LeftAnchor),
-                logoImageView.WidthAnchor.ConstraintEqualTo(logoContainer.WidthAnchor),
-                logoImageView.HeightAnchor.ConstraintEqualTo(logoContainer.HeightAnchor)
-            });
-
-            //var backgroundImageView = new UIImageView
-            //{
-            //    Image = UIImage.FromBundle(backgroundFileName),
-            //    ContentMode = UIViewContentMode.ScaleAspectFill,
-            //    Opaque = false,
-            //    TranslatesAutoresizingMaskIntoConstraints = false
-            //};
-            //View.AddSubview(backgroundImageView);
-            //View.AddConstraints(new[]
-            //{
-            //    backgroundImageView.TopAnchor.ConstraintEqualTo(View.TopAnchor),
-            //    backgroundImageView.LeftAnchor.ConstraintEqualTo(View.LeftAnchor),
-            //    backgroundImageView.WidthAnchor.ConstraintEqualTo(View.WidthAnchor),
-            //    backgroundImageView.HeightAnchor.ConstraintEqualTo(View.HeightAnchor)
-            //});
-            //View.SendSubviewToBack(backgroundImageView);
+            View.SendSubviewToBack(animationView);
 
             settingsButton = new UIButton();
             settingsButton.TitleLabel.Font = Theme.DefaultBoldFont;
@@ -290,25 +208,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 });
             }
 
-
-            animation = LOTAnimationView.AnimationNamed("splash");
-            animation.ContentMode = UIViewContentMode.ScaleAspectFill;
-            animation.TranslatesAutoresizingMaskIntoConstraints = false;
-            View.AddSubview(animation);
-
-            View.AddConstraints(new NSLayoutConstraint[]
-            {
-                animation.BottomAnchor.ConstraintEqualTo(View.BottomAnchor),
-                animation.TopAnchor.ConstraintEqualTo(View.TopAnchor),
-                animation.LeftAnchor.ConstraintEqualTo(View.LeftAnchor),
-                animation.RightAnchor.ConstraintEqualTo(View.RightAnchor),
-
-            });
-            View.SendSubviewToBack(animation);
-
         }
-
-        LOTAnimationView animation;
 
         void InitializeSubViews()
         {
@@ -316,16 +216,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 BorderStyle = UITextBorderStyle.RoundedRect,
                 Font = Theme.DefaultFont,
+                TextColor = Theme.White,
                 AutocorrectionType = UITextAutocorrectionType.No,
                 ClearButtonMode = UITextFieldViewMode.WhileEditing,
                 ReturnKeyType = UIReturnKeyType.Next,
-                AttributedPlaceholder = new NSAttributedString(Localization.GetString("username")),
-                TranslatesAutoresizingMaskIntoConstraints = false
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                BackgroundColor = Theme.DarkBlue,
             };
+
+            var attrstr = new NSMutableAttributedString(Localization.GetString("username"), new NSDictionary());
+            var attr = new UIStringAttributes();
+            attr.BackgroundColor = Theme.Brown;
+            attrstr.SetAttributes(attr, new NSRange(0, 4));
+
+
             View.AddSubview(usernameTextField);
             View.AddConstraints(new[]
             {
-                usernameTextFieldTopConstraint = usernameTextField.TopAnchor.ConstraintEqualTo(logoImageView.BottomAnchor, TextFieldToLogoImageViewInitialDistance),
+                usernameTextFieldTopConstraint = usernameTextField.TopAnchor.ConstraintEqualTo(animationView.BottomAnchor, TextFieldToLogoImageViewInitialDistance),
                 usernameTextField.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
                 usernameTextField.WidthAnchor.ConstraintEqualTo(TextFieldWidth),
                 usernameTextField.HeightAnchor.ConstraintEqualTo(TextFieldHeight)
@@ -428,45 +336,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void StartLogoScaleAnimation()
         {
-            animation.Play();
-
             if (startLogoScaleAnimationDone)
                 return;
 
             startLogoScaleAnimationDone = true;
 
-            var bounceAnimation = CAKeyFrameAnimation.GetFromKeyPath("transform");
-            bounceAnimation.FillMode = CAFillMode.Both;
-            bounceAnimation.RemovedOnCompletion = false;
-            bounceAnimation.Duration = 0.4d;
-            bounceAnimation.Values = new[]
-            {
-                NSValue.FromCATransform3D(CATransform3D.MakeScale(1f, 1f, 1f)),
-                NSValue.FromCATransform3D(CATransform3D.MakeScale(1.2f, 1.2f, 1.2f)),
-                NSValue.FromCATransform3D(CATransform3D.MakeScale(1f, 1f, 1f)),
-                NSValue.FromCATransform3D(Integration.IsIPhone() ? CATransform3D.MakeScale(0.6f, 0.6f, 0.6f) : CATransform3D.MakeScale(0.8f, 0.8f, 0.8f))
-            };
-            bounceAnimation.KeyTimes = new[]
-            {
-                NSNumber.FromFloat(0f),
-                NSNumber.FromFloat(0.5f),
-                NSNumber.FromFloat(0.75f),
-                NSNumber.FromFloat(1f)
-            };
-            bounceAnimation.TimingFunctions = new[]
-            {
-                CAMediaTimingFunction.FromName(CAMediaTimingFunction.EaseInEaseOut),
-                CAMediaTimingFunction.FromName(CAMediaTimingFunction.EaseInEaseOut),
-                CAMediaTimingFunction.FromName(CAMediaTimingFunction.EaseInEaseOut),
-                CAMediaTimingFunction.FromName(CAMediaTimingFunction.EaseInEaseOut)
-            };
-            bounceAnimation.AnimationStopped += BounceAnimation_AnimationStopped;
-            logoContainer.Layer.AddAnimation(bounceAnimation, "bounceAnimation");
+            animationView.Play();
+            StartShowFieldsAnimation();
         }
 
         void StartShowFieldsAnimation()
         {
-            logoContainerCenterYConstraint.Constant = LogoImageViewToViewDistance;
             UIView.AnimateNotify(AnimationDuration, AnimationInitialDelay, Damping, SpringVelocity, UIViewAnimationOptions.CurveEaseInOut, View.LayoutIfNeeded, null);
 
             usernameTextFieldTopConstraint.Constant = TextFieldToLogoImageViewDistance;
@@ -550,15 +430,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             var loginSettingsViewController = (LoginSettingsViewController)sender;
             loginSettingsViewController.RestrictedSettingsValuesUpdated -= LoginSettingsViewController_RestrictedSettingsValuesUpdated;
-        }
-
-        void BounceAnimation_AnimationStopped(object sender, CAAnimationStateEventArgs e)
-        {
-            View.LayoutIfNeeded();
-            StartShowFieldsAnimation();
-
-            var bounceAnimation = (CAKeyFrameAnimation)sender;
-            bounceAnimation.AnimationStopped -= BounceAnimation_AnimationStopped;
         }
 
         #endregion
@@ -824,8 +695,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var distanceFromTopOfTheScreen = (remainingScreenHeight - formHeight) / 1.5f;
             var requiredMovement = usernameTextField.Frame.GetMinY() - distanceFromTopOfTheScreen;
 
-            logoContainerCenterYConstraint.Constant = up ? logoContainer.Frame.Top - requiredMovement : LogoImageViewToViewDistance;
-            UIView.AnimateNotify(AnimationDuration, AnimationInitialDelay, Damping, SpringVelocity, UIViewAnimationOptions.CurveEaseInOut, () => { logoContainer.Alpha = up ? 0f : 1f; }, (finished) => { View.LayoutIfNeeded(); });
+            //    logoContainerCenterYConstraint.Constant = up ? animationContainer.Frame.Top - requiredMovement : LogoImageViewToViewDistance;
+            //    UIView.AnimateNotify(AnimationDuration, AnimationInitialDelay, Damping, SpringVelocity, UIViewAnimationOptions.CurveEaseInOut, () => { animationContainer.Alpha = up ? 0f : 1f; }, (finished) => { View.LayoutIfNeeded(); });
         }
 
         void ValidateForm()

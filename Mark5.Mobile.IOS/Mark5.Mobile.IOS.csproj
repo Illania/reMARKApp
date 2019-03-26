@@ -598,12 +598,6 @@
 		<BundleResource Include="Resources\Settings.bundle\Root.Login.inApp.plist" />
 		<BundleResource Include="Resources\Settings.bundle\Root.inApp.plist" />
 		<BundleResource Include="Resources\Settings.bundle\en.lproj\Root.strings" />
-		<BundleResource Include="Resources\startscreens\start-screen-logo-ipadretina-landscape.png" />
-		<BundleResource Include="Resources\startscreens\start-screen-logo-ipadretina-portrait.png" />
-		<BundleResource Include="Resources\startscreens\start-screen-logo-retina4.png" />
-		<BundleResource Include="Resources\startscreens\start-screen-logo-retinahd47.png" />
-		<BundleResource Include="Resources\startscreens\start-screen-logo-retinahd55-landscape.png" />
-		<BundleResource Include="Resources\startscreens\start-screen-logo-retinahd55.png" />
 		<BundleResource Include="GoogleService-Info.plist" />
 		<BundleResource Include="Resources\html\editor.html" />
 		<BundleResource Include="Resources\html\empty.html" />
@@ -614,15 +608,8 @@
 		<BundleResource Include="Resources\html\headerPadding.js" />
 		<BundleResource Include="Resources\html\replyHeader.html" />
 		<BundleResource Include="Resources\html\blank.html" />
-		<BundleResource Include="Resources\startscreens\start-screen-bg-ipadretina-landscape.png" />
-		<BundleResource Include="Resources\startscreens\start-screen-bg-ipadretina-portrait.png" />
-		<BundleResource Include="Resources\startscreens\start-screen-bg-retina4.png" />
-		<BundleResource Include="Resources\startscreens\start-screen-bg-retinahd47.png" />
-		<BundleResource Include="Resources\startscreens\start-screen-bg-retinahd55-landscape.png" />
-		<BundleResource Include="Resources\startscreens\start-screen-bg-retinahd55.png" />
 		<BundleResource Include="Resources\html\replyEditor.html" />
 		<BundleResource Include="Resources\splash.json" />
-		<BundleResource Include="Resources\data.json" />
 		<BundleResource Include="Resources\Base.lproj\Onboarding.strings" />
 	</ItemGroup>
 	<ItemGroup>
