@@ -117,16 +117,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             var x = 10;
         }
 
-
         void YearCalendar_DrawMonthCell(object sender, DrawMonthCellEventArgs e)
         {
             if (e.MonthCell.IsCurrentMonth)
             {
-                /*
-                e.MonthCell.FontAttribute = Theme.DefaultBoldFont;
+                e.MonthCell.FontAttribute = Theme.DefaultLightFont;
                 e.MonthCell.BackgroundColor = Theme.DarkerBlue;
                 e.MonthCell.TextColor = UIColor.White;
-                */
             }
         }
     }
