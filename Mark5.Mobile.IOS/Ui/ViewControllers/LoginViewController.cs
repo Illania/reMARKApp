@@ -63,6 +63,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         NSLayoutConstraint hostnameTextFieldTopConstraint;
         NSLayoutConstraint portTextFieldTopConstraint;
         NSLayoutConstraint loginButtonTopConstraint;
+        NSLayoutConstraint containerCenter;
 
         bool startLogoScaleAnimationDone;
 
@@ -167,21 +168,39 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Initialize methods
 
-        NSLayoutConstraint animationCenter;
+        UIView containerView;
 
         void InitializeView()
         {
             View.BackgroundColor = Theme.LightGray;
 
+            containerView = new UIView
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                Opaque = false,
+            };
+            containerView.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            containerView.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            containerView.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            containerView.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            View.AddSubview(containerView);
+            View.AddConstraints(new NSLayoutConstraint[]
+            {
+                containerView.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
+                containerCenter = containerView.CenterYAnchor.ConstraintEqualTo(View.CenterYAnchor),
+            });
+
             animationView = LOTAnimationView.AnimationNamed("splash");
             animationView.ContentMode = UIViewContentMode.ScaleAspectFit;
             animationView.TranslatesAutoresizingMaskIntoConstraints = false;
-            View.AddSubview(animationView);
+            containerView.AddSubview(animationView);
 
             View.AddConstraints(new NSLayoutConstraint[]
             {
-                animationView.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
-                animationCenter = animationView.CenterYAnchor.ConstraintEqualTo(View.CenterYAnchor, AnimationToCenterDistance),
+                animationView.CenterXAnchor.ConstraintEqualTo(containerView.CenterXAnchor),
+                animationView.TopAnchor.ConstraintEqualTo(containerView.TopAnchor),
+                animationView.LeftAnchor.ConstraintEqualTo(containerView.LeftAnchor),
+                animationView.RightAnchor.ConstraintEqualTo(containerView.RightAnchor),
                 animationView.WidthAnchor.ConstraintLessThanOrEqualTo(View.WidthAnchor, 0.8f),
                 animationView.WidthAnchor.ConstraintLessThanOrEqualTo(450f),
                 animationView.HeightAnchor.ConstraintEqualTo(animationView.WidthAnchor),
@@ -233,15 +252,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 AttributedPlaceholder = new NSMutableAttributedString(Localization.GetString("username"), placeholderAttributes),
             };
 
-            var attrstr = new NSMutableAttributedString(Localization.GetString("username"), placeholderAttributes);
-
-            usernameTextField.AttributedPlaceholder = attrstr;
-
-            View.AddSubview(usernameTextField);
-            View.AddConstraints(new[]
+            containerView.AddSubview(usernameTextField);
+            containerView.AddConstraints(new[]
             {
                 usernameTextFieldTopConstraint = usernameTextField.TopAnchor.ConstraintEqualTo(animationView.BottomAnchor, TextFieldToAnimationDistance),
-                usernameTextField.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
+                usernameTextField.CenterXAnchor.ConstraintEqualTo(containerView.CenterXAnchor),
                 usernameTextField.WidthAnchor.ConstraintEqualTo(TextFieldWidth),
                 usernameTextField.HeightAnchor.ConstraintEqualTo(TextFieldHeight)
             });
@@ -261,11 +276,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 BackgroundColor = Theme.DarkBlue,
             };
-            View.AddSubview(passwordTextField);
-            View.AddConstraints(new[]
+            containerView.AddSubview(passwordTextField);
+            containerView.AddConstraints(new[]
             {
                 passwordTextFieldTopConstraint = passwordTextField.TopAnchor.ConstraintEqualTo(usernameTextField.BottomAnchor, 50f),
-                passwordTextField.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
+                passwordTextField.CenterXAnchor.ConstraintEqualTo(usernameTextField.CenterXAnchor),
                 passwordTextField.WidthAnchor.ConstraintEqualTo(TextFieldWidth),
                 passwordTextField.HeightAnchor.ConstraintEqualTo(TextFieldHeight)
             });
@@ -283,11 +298,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 BackgroundColor = Theme.DarkBlue,
             };
-            View.AddSubview(hostnameTextField);
-            View.AddConstraints(new[]
+            containerView.AddSubview(hostnameTextField);
+            containerView.AddConstraints(new[]
             {
                 hostnameTextFieldTopConstraint = hostnameTextField.TopAnchor.ConstraintEqualTo(passwordTextField.BottomAnchor, TextFieldToTextFieldInitialDistance),
-                hostnameTextField.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
+                hostnameTextField.CenterXAnchor.ConstraintEqualTo(usernameTextField.CenterXAnchor),
                 hostnameTextField.WidthAnchor.ConstraintEqualTo(TextFieldWidth),
                 hostnameTextField.HeightAnchor.ConstraintEqualTo(TextFieldHeight)
             });
@@ -306,11 +321,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 BackgroundColor = Theme.DarkBlue,
             };
-            View.AddSubview(portTextField);
-            View.AddConstraints(new[]
+            containerView.AddSubview(portTextField);
+            containerView.AddConstraints(new[]
             {
                 portTextFieldTopConstraint = portTextField.TopAnchor.ConstraintEqualTo(hostnameTextField.BottomAnchor, TextFieldToTextFieldInitialDistance),
-                portTextField.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
+                portTextField.CenterXAnchor.ConstraintEqualTo(usernameTextField.CenterXAnchor),
                 portTextField.WidthAnchor.ConstraintEqualTo(TextFieldWidth),
                 portTextField.HeightAnchor.ConstraintEqualTo(TextFieldHeight)
             });
@@ -321,13 +336,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             loginButton.TranslatesAutoresizingMaskIntoConstraints = false;
             loginButton.SetTitleColor(Theme.DarkBlue, UIControlState.Normal);
             loginButton.Enabled = false;
-            View.AddSubview(loginButton);
-            View.AddConstraints(new[]
+            loginButton.Alpha = 0.7f;
+            containerView.AddSubview(loginButton);
+            containerView.AddConstraints(new[]
             {
                 loginButtonTopConstraint = loginButton.TopAnchor.ConstraintEqualTo(portTextField.BottomAnchor, LoginButtonToTextFieldInitialDistance),
-                loginButton.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
+                loginButton.CenterXAnchor.ConstraintEqualTo(usernameTextField.CenterXAnchor),
                 loginButton.WidthAnchor.ConstraintEqualTo(LoginButtonWidth),
-                loginButton.HeightAnchor.ConstraintEqualTo(LoginButtonHeight)
+                loginButton.HeightAnchor.ConstraintEqualTo(LoginButtonHeight),
+                loginButton.BottomAnchor.ConstraintEqualTo(containerView.BottomAnchor),
             });
         }
 
@@ -688,23 +705,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void OnKeyboardWillChangeFrame(object sender, UIKeyboardEventArgs e)
         {
-            var keyboardHeight = e.FrameEnd.Height;
+            var loginButtonBottom = View.ConvertRectFromView(loginButton.Frame, containerView).GetMaxY();
+            var usernameTextFieldTop = View.ConvertRectFromView(usernameTextField.Frame, containerView).GetMinY();
 
             var remainingScreenHeight = View.Frame.Height - e.FrameEnd.Height;
-            var formHeight = loginButton.Frame.GetMaxY() - usernameTextField.Frame.GetMinY();
+            var formHeight = loginButtonBottom - usernameTextFieldTop;
             var distanceFromTopOfTheScreen = (remainingScreenHeight - formHeight) / 1.1f;
-            var requiredMovement = usernameTextField.Frame.GetMinY() - distanceFromTopOfTheScreen;
+            var requiredMovement = usernameTextFieldTop - distanceFromTopOfTheScreen;
 
             if (requiredMovement > 0)
             {
-            UIView.BeginAnimations(string.Empty);
-            UIView.SetAnimationDuration(e.AnimationDuration);
-            UIView.SetAnimationCurve(e.AnimationCurve);
+                UIView.BeginAnimations(string.Empty);
+                UIView.SetAnimationDuration(e.AnimationDuration);
+                UIView.SetAnimationCurve(e.AnimationCurve);
 
-            animationCenter.Constant = AnimationToCenterDistance - requiredMovement;
-            View.LayoutIfNeeded();
+                containerCenter.Constant = -requiredMovement;
+                View.LayoutIfNeeded();
 
-            UIView.CommitAnimations();
+                UIView.CommitAnimations();
             }
         }
 
@@ -714,7 +732,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             UIView.SetAnimationDuration(e.AnimationDuration);
             UIView.SetAnimationCurve(e.AnimationCurve);
 
-            animationCenter.Constant = AnimationToCenterDistance;
+            containerCenter.Constant = 0;
             View.LayoutIfNeeded();
 
             UIView.CommitAnimations();
