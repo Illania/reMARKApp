@@ -250,6 +250,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 BorderStyle = UITextBorderStyle.RoundedRect,
                 Font = Theme.DefaultFont,
+                TextColor = Theme.White,
                 AutocapitalizationType = UITextAutocapitalizationType.None,
                 AutocorrectionType = UITextAutocorrectionType.No,
                 ClearsOnBeginEditing = true,
@@ -273,6 +274,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 BorderStyle = UITextBorderStyle.RoundedRect,
                 Font = Theme.DefaultFont,
+                TextColor = Theme.White,
                 AutocapitalizationType = UITextAutocapitalizationType.None,
                 AutocorrectionType = UITextAutocorrectionType.No,
                 ClearButtonMode = UITextFieldViewMode.WhileEditing,
@@ -294,6 +296,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 BorderStyle = UITextBorderStyle.RoundedRect,
                 Font = Theme.DefaultFont,
+                TextColor = Theme.White,
                 AutocapitalizationType = UITextAutocapitalizationType.None,
                 AutocorrectionType = UITextAutocorrectionType.No,
                 ClearButtonMode = UITextFieldViewMode.WhileEditing,
@@ -338,6 +341,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 portTextField.Text = retainedConnectionInfo.Port.ToString();
                 sslMode = retainedConnectionInfo.SslMode;
             }
+        }
+
+        public override UIInterfaceOrientationMask GetSupportedInterfaceOrientations()
+        {
+            return Integration.IsIPad() ? base.GetSupportedInterfaceOrientations() : UIInterfaceOrientationMask.Portrait;
         }
 
         #endregion
@@ -687,6 +695,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var distanceFromTopOfTheScreen = (remainingScreenHeight - formHeight) / 1.1f;
             var requiredMovement = usernameTextField.Frame.GetMinY() - distanceFromTopOfTheScreen;
 
+            if (requiredMovement > 0)
+            {
             UIView.BeginAnimations(string.Empty);
             UIView.SetAnimationDuration(e.AnimationDuration);
             UIView.SetAnimationCurve(e.AnimationCurve);
@@ -695,7 +705,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             View.LayoutIfNeeded();
 
             UIView.CommitAnimations();
-
+            }
         }
 
         void OnKeyboardWillHide(object sender, UIKeyboardEventArgs e)
