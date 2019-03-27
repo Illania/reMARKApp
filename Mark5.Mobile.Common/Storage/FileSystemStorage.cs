@@ -367,7 +367,8 @@ namespace Mark5.Mobile.Common.Storage
                 PreviousDocumentId = documentWorkingCopy.PreviousDocumentId,
                 ConfirmDelivery = documentWorkingCopy.ConfirmDelivery,
                 ConfirmRead = documentWorkingCopy.ConfirmRead,
-                SendOnTimestamp = documentWorkingCopy.SendOnTimestamp
+                SendOnTimestamp = documentWorkingCopy.SendOnTimestamp,
+                IEventReply = documentWorkingCopy.IEventReply
             }));
             var documentPreviewFile = await folder.CreateFileAsync("documentPreview.json", CreationCollisionOption.FailIfExists);
             await documentPreviewFile.WriteAllTextAsync(Serializer.Serialize(documentWorkingCopy.DocumentPreview));

@@ -136,8 +136,6 @@
 		<Compile Include="Ui\ViewControllers\ShortcodeViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ShortcodesSearchResultsViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ShortcodesSplitViewController.cs" />
-		<Compile Include="Ui\ViewControllers\SimpleMainViewController.cs" />
-		<Compile Include="Ui\ViewControllers\SplitMainViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ComposeDocumentView\SuggestionsListView.cs" />
 		<Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\AttachmentsView.cs" />
 		<Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\BccView.cs" />
@@ -264,6 +262,12 @@
 		<Compile Include="Ui\ViewControllers\OnBoardingViewController.cs" />
 		<Compile Include="Ui\Common\BadgeBarButtonItem.cs" />
 		<Compile Include="Ui\ViewControllers\CategoriesListViewController.cs" />
+		<Compile Include="Ui\ViewControllers\CalendarTestViewController.cs" />
+		<Compile Include="Ui\Common\ModuleNavigationController.cs" />
+		<Compile Include="Ui\ViewControllers\SimpleMainViewController.cs" />
+		<Compile Include="Ui\ViewControllers\SplitMainViewController.cs" />
+		<Compile Include="Model\HubMessages\NavigationModuleChangedMessage.cs" />
+		<Compile Include="Model\NavigationModule.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
@@ -592,6 +596,27 @@
 		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_5.imageset\Page05.pdf" />
 		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_6.imageset\Contents.json" />
 		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_6.imageset\Page06.pdf" />
+		<ImageAsset Include="Assets_icons.xcassets\Nav-search.imageset\Contents.json" />
+		<ImageAsset Include="Assets_icons.xcassets\Nav-mail.imageset\Contents.json" />
+		<ImageAsset Include="Assets_icons.xcassets\Nav-mail.imageset\Nav-mail%402x.png" />
+		<ImageAsset Include="Assets_icons.xcassets\Nav-contacts.imageset\Contents.json" />
+		<ImageAsset Include="Assets_icons.xcassets\Nav-contacts.imageset\Nav-contacts%402x.png" />
+		<ImageAsset Include="Assets_icons.xcassets\Nav-contacts.imageset\Nav-contacts%403x.png" />
+		<ImageAsset Include="Assets_icons.xcassets\Nav-search.imageset\Nav-search%402x.png" />
+		<ImageAsset Include="Assets_icons.xcassets\Nav-search.imageset\Nav-search%403x.png" />
+		<ImageAsset Include="Assets_icons.xcassets\Nav-calendar.imageset\Contents.json" />
+		<ImageAsset Include="Assets_icons.xcassets\Nav-calendar.imageset\Nav-calendar%402x.png" />
+		<ImageAsset Include="Assets_icons.xcassets\Nav-calendar.imageset\Nav-calendar%403x.png" />
+		<ImageAsset Include="Assets_icons.xcassets\Nav-shortcodes.imageset\Contents.json" />
+		<ImageAsset Include="Assets_icons.xcassets\Nav-shortcodes.imageset\Nav-shortcodes%403x.png" />
+		<ImageAsset Include="Assets_icons.xcassets\Nav-shortcodes.imageset\Nav-shortcodes%402x.png" />
+		<ImageAsset Include="Assets_icons.xcassets\Nav-settings.imageset\Contents.json" />
+		<ImageAsset Include="Assets_icons.xcassets\Nav-settings.imageset\Nav-settings%402x.png" />
+		<ImageAsset Include="Assets_icons.xcassets\Nav-settings.imageset\Nav-settings%403x.png" />
+		<ImageAsset Include="Assets_icons.xcassets\Nav-mail.imageset\Nav-mail%403x.png" />
+		<ImageAsset Include="Assets_icons.xcassets\Search-Filled.imageset\Contents.json" />
+		<ImageAsset Include="Assets_icons.xcassets\Search-Filled.imageset\Search-Filled%402x.png" />
+		<ImageAsset Include="Assets_icons.xcassets\Search-Filled.imageset\Search-Filled%403x.png" />
 	</ItemGroup>
 	<ItemGroup>
 		<BundleResource Include="Resources\Base.lproj\Localizable.strings" />
@@ -687,6 +712,13 @@
 	  <Folder Include="Assets_onboarding.xcassets\onboarding_4.imageset\" />
 	  <Folder Include="Assets_onboarding.xcassets\onboarding_5.imageset\" />
 	  <Folder Include="Assets_onboarding.xcassets\onboarding_6.imageset\" />
+	  <Folder Include="Assets_icons.xcassets\Nav-search.imageset\" />
+	  <Folder Include="Assets_icons.xcassets\Nav-mail.imageset\" />
+	  <Folder Include="Assets_icons.xcassets\Nav-contacts.imageset\" />
+	  <Folder Include="Assets_icons.xcassets\Nav-calendar.imageset\" />
+	  <Folder Include="Assets_icons.xcassets\Nav-shortcodes.imageset\" />
+	  <Folder Include="Assets_icons.xcassets\Nav-settings.imageset\" />
+	  <Folder Include="Assets_icons.xcassets\Search-Filled.imageset\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 	<Import Project="..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets" Condition="Exists('..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets')" />

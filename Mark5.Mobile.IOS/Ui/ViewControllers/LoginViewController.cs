@@ -651,7 +651,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     CommonConfig.Logger.Info($"Registering {nameof(ReachabilityReceiver)}...");
                     PlatformConfig.ReachabilityReceiver.Register();
 
-                    CommonConfig.Logger.Info($"Logged in - will present {nameof(SplitMainViewController)}");
+                    CommonConfig.Logger.Info($"Logged in - will present {nameof(AbstractMainViewController)}");
 
                     dismissAction?.Invoke();
 

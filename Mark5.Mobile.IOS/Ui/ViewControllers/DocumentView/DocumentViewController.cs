@@ -71,6 +71,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         TinyMessageSubscriptionToken draftSentToken;
         TinyMessageSubscriptionToken commentsCountChangedToken;
 
+        // EventHandlers for IPad
+        public EventHandler FlagClicked => FlagButton_Clicked;
+        public EventHandler ReplyClicked => ReplyActionsButton_Clicked;
+        public EventHandler FileToClicked => FileToButton_Clicked;
+        public EventHandler CommentsClicked => CommentsButton_Clicked;
+        public EventHandler UserActionsClicke => UserActionsButton_Clicked;
+
         public DocumentViewController()
         {
             HidesBottomBarWhenPushed = true;
@@ -84,7 +91,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             InitNavigationBar();
             InitHeaderView();
-            InitToolbar();
+
+            if (!Integration.IsIPad())
+                InitToolbar();
 
             if (Integration.IsRunningAtLeast(11))
                 NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Never;
@@ -102,6 +111,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (NavigationController != null && !(ParentViewController is DocumentPageViewController))
                 NavigationController.ToolbarHidden = false;
+
+            if (Integration.IsIPad())
+                NavigationController.ToolbarHidden = true;
         }
 
         public override void ViewDidAppear(bool animated)
@@ -263,6 +275,57 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 editDocumentButtonItem.Clicked += EditDocumentButtonItem_Clicked;
         }
 
+        /*
+         *  Working silent ICalendar reply Document/DocumentPreview mock object
+         *
+        async Task HeaderView_ICalendarResponseTappedAsync(object sender, ICalendarResponseTapped e)
+        {
+            try
+            {
+                Document mockDocument = new Document
+                {
+                    Lines = new List<Line> { ServerConfig.SystemSettings.DocumentsModuleInfo.DefaultOutgoingLine },
+                    HtmlBody = ""
+                };
+
+                List<DocumentAddress> addresses = new List<DocumentAddress>();
+
+                addresses = documentPreview.Addresses.Where(x => x.AddressType == DocumentAddressType.From).ToList();
+
+                addresses.ForEach(x =>
+                {
+                    x.Type = CommunicationAddressType.Email;
+                    x.AddressType = DocumentAddressType.To;
+                });
+
+                DocumentPreview mockDocumentPreview = new DocumentPreview
+                {
+                    Direction = DocumentDirection.Outgoing,
+                    Addresses = addresses,
+                    Subject = ""
+                };
+
+                await Managers.DocumentsManager.SaveDocumentWorkingCopyAsync(new DocumentWorkingCopy
+                {
+                    DocumentCreationModeFlag = DocumentCreationModeFlag.Reply,
+                    CopyToNewOption = CopyToNewOption.None,
+                    PreviousDocumentFolderId = folderId ?? folder?.Id,
+                    PreviousDocumentId = documentPreview.Id,
+                    PreviousDocumentDirection = documentPreview.Direction,
+                    DocumentPreview = mockDocumentPreview,
+                    Document = mockDocument,
+                    IEventReply = new IEventReply(document, ParticipantStatus.Accepted, true)
+                });
+
+                await Managers.DocumentsManager.QueueWorkingCopyToUpload();
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Exception thrown in HeaderView_ICalendarResponseTappedAsync", ex);
+            }
+        }
+        */
+
         void DeinitializeHandlers()
         {
             if (headerView != null)
@@ -422,6 +485,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (userActionsButton != null)
                 userActionsButton.Enabled = false;
 
+            if (Integration.IsIPad())
+                DocumentPageViewControllerDelegate?.UpdateIPadNavigationButtons(false, "0");
+
             Clear();
         }
 
@@ -567,13 +633,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var enableBottomActions = failedDocumentToUploadGuid == Guid.Empty;
             if (enableBottomActions)
             {
-                flagButton.Enabled = document != null;
-                fileToButton.Enabled = document != null;
-                replyActionsButton.Enabled = document != null;
-                commentsBadgeButton.BadgeValue = document?.Comments?.Count.ToString();
-                commentsBadgeButton.Enabled = document != null;
-                commentsButton.Enabled = document != null;
-                userActionsButton.Enabled = document != null;
+                if (Integration.IsIPad())
+                {
+                    DocumentPageViewControllerDelegate?.UpdateIPadNavigationButtons(document != null, document?.Comments?.Count.ToString());
+                }
+                else
+                {
+                    flagButton.Enabled = document != null;
+                    fileToButton.Enabled = document != null;
+                    replyActionsButton.Enabled = document != null;
+                    commentsBadgeButton.BadgeValue = document?.Comments?.Count.ToString();
+                    commentsBadgeButton.Enabled = document != null;
+                    commentsButton.Enabled = document != null;
+                    userActionsButton.Enabled = document != null;
+                }
             }
         }
 
@@ -685,7 +758,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Toolbar event handlers
 
-        async void FlagButton_Clicked(object sender, EventArgs e)
+        public async void FlagButton_Clicked(object sender, EventArgs e)
         {
             var isRead = documentPreview.IsReadByCurrent;
             var flagListStrings = new string[]
@@ -694,7 +767,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Localization.GetString("categories")
             };
 
-            var result = await Dialogs.ShowListActionSheetAsync(this, flagListStrings, flagButton);
+            var result = await Dialogs.ShowListActionSheetAsync(this, flagListStrings, (UIBarButtonItem)sender);
 
             if (result < 0)
                 return;
@@ -702,7 +775,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             switch (result)
             {
                 case 0:
-                    await DoChangeReadStatus();
+                    await DoChangeReadStatus(isRead);
                     break;
                 case 1:
                     DoAssignCategory();
@@ -719,7 +792,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Localization.GetString("forward"),
                 Localization.GetString("copy_to_new")};
 
-            var result = await Dialogs.ShowListActionSheetAsync(this, replyListStrings, replyActionsButton);
+            var result = await Dialogs.ShowListActionSheetAsync(this, replyListStrings, (UIBarButtonItem)sender);
 
             if (result < 0)
                 return;
@@ -866,10 +939,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        async Task DoChangeReadStatus()
+        async Task DoChangeReadStatus(bool isReadByCurrent)
         {
-            var isReadByCurrent = documentPreview.IsReadByCurrent;
-
             CommonConfig.Logger.Info($"Attempting to mark as {(isReadByCurrent ? "unread" : "read")} [documentPreview={documentPreview}]...");
 
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString(isReadByCurrent ? "marking_document_as_unread___" : "marking_document_as_read___"));
@@ -906,7 +977,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Localization.GetString("overview")
             };
 
-            var result = await Dialogs.ShowListActionSheetAsync(this, actionLinksListString, userActionsButton);
+            var result = await Dialogs.ShowListActionSheetAsync(this, actionLinksListString, (UIBarButtonItem)sender);
 
             if (result < 0)
                 return;
@@ -1120,7 +1191,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void CommentsCountChangedHandler(EntityPreviewCommentCountChangedMessage m)
         {
-            BeginInvokeOnMainThread(() => commentsBadgeButton.SetBadgeValue(document.Comments.Count().ToString(), false));
+            if (Integration.IsIPad())
+                BeginInvokeOnMainThread(() => DocumentPageViewControllerDelegate?.UpdateIPadNavigationButtons(true, document.Comments.Count().ToString()));
+            else
+                BeginInvokeOnMainThread(() => commentsBadgeButton.SetBadgeValue(document.Comments.Count().ToString(), false));
         }
 
         #endregion

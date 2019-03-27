@@ -4,30 +4,17 @@ namespace Mark5.Mobile.Common.Model
 {
     public class CalendarModuleInfo
     {
-        List<CalendarCategory> calendarCategories;
+        List<Calendar> calendars;
 
-        public List<CalendarCategory> CalendarCategories
+        public List<Calendar> Calendars
         {
             get
             {
-                if (calendarCategories == null)
-                    calendarCategories = new List<CalendarCategory>();
-                return calendarCategories;
+                if (calendars == null)
+                    calendars = new List<Calendar>();
+                return calendars;
             }
-            set => calendarCategories = value;
-        }
-
-        List<CalendarResource> calendarResources;
-
-        public List<CalendarResource> CalendarResources
-        {
-            get
-            {
-                if (calendarResources == null)
-                    calendarResources = new List<CalendarResource>();
-                return calendarResources;
-            }
-            set => calendarResources = value;
+            set => calendars = value;
         }
 
         public Permissions Permissions { get; set; }

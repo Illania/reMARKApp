@@ -82,6 +82,11 @@ namespace Mark5.Mobile.Common.Manager
 
             favoriteFolders[module] = moduleFavoriteFolders;
 
+            foreach (var entry in favoriteFolders)
+            {
+                Folder.FavoritesRootForModule(entry.Key).SubFolders = entry.Value;
+            }
+
             await FileSystemStorage.SaveFavoriteFoldersAsync(favoriteFolders);
         }
 
@@ -195,6 +200,57 @@ namespace Mark5.Mobile.Common.Manager
             var folders = foldersResult.Folders.WhereNotNull().Select(f => f.Convert()).OrderBy(f => f.Position).ToList();
 
             return folders;
+        }
+
+        public async Task<ModuleFavoriteFoldersCollection> GetServiceFavoriteFoldersAsync(List<ModuleType> modules = null, bool retain = true)
+        {
+            modules = modules ?? new List<ModuleType> { ModuleType.Contacts, ModuleType.Documents, ModuleType.Shortcodes };
+
+            var result = await AppServiceProxy.GetFavoriteFolders(new DataContract.GetFavoriteFoldersParameters
+            {
+                Modules = modules.Select(module => module.ConvertEnum<DataContract.ModuleType>()).ToList(),
+                Token = ConnectionInfo.Token
+            });
+
+            ModuleFavoriteFoldersCollection moduleFavorites = result.Convert();
+
+            if (moduleFavorites.ModuleFavoriteFolders != null && retain)
+            {
+                foreach (var module in moduleFavorites.ModuleFavoriteFolders)
+                    await SetFavoriteFoldersAsync(module.ModuleType, module.Folders);
+            }
+
+            return moduleFavorites;
+        }
+
+        public async Task UpdateServiceFavoriteFoldersAsync()
+        {
+            Dictionary<ModuleType, List<Folder>> localFavorites = await FileSystemStorage.GetFavoriteFoldersAsync();
+
+            await AppServiceProxy.UpdateFavoriteFolders(new DataContract.UpdateFavoriteFoldersParameters
+            {
+                ModuleFavoriteFoldersList = localFavorites.Convert(),
+                Token = ConnectionInfo.Token
+            });
+        }
+
+        public async Task ClearFavoritesAsync(List<ModuleType> modules = null)
+        {
+            modules = modules ?? new List<ModuleType> { ModuleType.Contacts, ModuleType.Documents, ModuleType.Shortcodes };
+
+            var favorites = await FileSystemStorage.GetFavoriteFoldersAsync();
+
+            foreach (var module in modules)
+            {
+                if (favorites.ContainsKey(module))
+                    favorites[module] = new List<Folder>();
+                else
+                    favorites.Add(module, new List<Folder>());
+
+                Folder.FavoritesRootForModule(module).SubFolders = favorites[module];
+            }
+
+            await FileSystemStorage.SaveFavoriteFoldersAsync(favorites);
         }
 
         #region Helper methods

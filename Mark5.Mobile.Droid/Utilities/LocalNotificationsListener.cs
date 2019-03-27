@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Mark5.Mobile.Common.Manager;
 using Android.Support.V4.App;
 using Android.OS;
@@ -7,7 +7,6 @@ using Android.App;
 using Android.Content;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Droid.Ui.Activities;
-using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.HubMessages;
 

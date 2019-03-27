@@ -8,27 +8,17 @@ namespace Mark5.Mobile.Common.DataAccess
     {
         Task<CalendarAppointment> GetCalendarAppointmentAsync(int calendarAppointmentId);
 
-        Task<CalendarTask> GetCalendarTaskAsync(int calendarTaskId);
-
-        Task<List<CalendarAppointment>> GetCalendarAppointmentsAsync(Folder folder, long startDateTimestamp, long endDateTimestamp);
-
-        Task<List<CalendarTask>> GetCalendarTasksAsync(Folder folder, long startDateTimestamp, long endDateTimestamp);
+        Task<List<CalendarAppointment>> GetCalendarAppointmentsAsync(List<int> calendarIds, long startDateTimestamp, long endDateTimestamp);
 
         Task SaveCalendarAppointmentAsync(CalendarAppointment calendarAppointment);
 
-        Task SaveCalendarTaskAsync(CalendarTask calendarTask);
-
-        Task SaveCalendarAppointmentsAsync(Folder folder, IEnumerable<CalendarAppointment> calendarAppointments, bool clean = false);
-
-        Task SaveCalendarTasksAsync(Folder folder, IEnumerable<CalendarTask> calendarTasks, bool clean = false);
-
-        Task RemoveFromFolderAsync(List<CalendarAppointment> appointments, Folder folder);
-
-        Task RemoveFromFolderAsync(List<CalendarTask> tasks, Folder folder);
+        Task SaveCalendarAppointmentsAsync(List<int> calendarIds, List<CalendarAppointment> calendarAppointments, long startDateTimestamp, long endDateTimestamp);
 
         Task DeleteAsync(List<CalendarAppointment> appointments);
 
-        Task DeleteAsync(List<CalendarTask> tasks);
+        Task<List<CalendarAlarm>> GetCalendarAlarmsAsync(List<int> calendarIds, long startDateTimestamp, long endDateTimestamp);
+
+        Task SaveCalendarAlarmsAsync(List<int> calendarIds, List<CalendarAlarm> alarms, long startDateTimestamp, long endDateTimestamp);
 
         Task RemoveOrphans();
     }

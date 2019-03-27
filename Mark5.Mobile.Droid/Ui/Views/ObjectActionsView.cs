@@ -72,21 +72,21 @@ namespace Mark5.Mobile.Droid.Ui.Views
                 Orientation = Vertical;
                 SetPadding(distanceVeryLarge, distanceNormal, distanceVeryLarge, distanceNormal);
 
+                var processedActionTimeTimestamp = objectAction.ActionTimeTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds();
+
                 var titleView = new AppCompatTextView(Context)
                 {
                     LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                    Text = objectAction.Description
+                    Text = $"{objectAction.Description} {Context.GetString(Resource.String.on)} {processedActionTimeTimestamp.FormatUserTimestampAsTimeAndDateString(context)}"
                 };
                 titleView.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
 
                 AddView(titleView);
 
-                var processedActionTimeTimestamp = objectAction.ActionTimeTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds();
-
                 var subtitleView = new AppCompatTextView(Context)
                 {
                     LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                    Text = $"{Context.GetString(Resource.String.by)} {objectAction.Username} {Context.GetString(Resource.String.on)} {processedActionTimeTimestamp.FormatUserTimestampAsTimeAndDateString(context)}"
+                    Text = objectAction.ActionType
                 };
                 subtitleView.SetTextAppearanceCompat(Context, Resource.Style.fontSmallLight);
 

@@ -63,7 +63,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             {
                 Font = Theme.DefaultFont,
                 TextColor = Theme.Black,
-                Lines = 1,
+                Lines = 2,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
             ContentView.Add(nameLabel);
@@ -122,7 +122,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 nameLabel.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
                 nameLabel.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor, 4f),
                 nameLabel.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor, -4f),
-                nameLabel.TrailingAnchor.ConstraintEqualTo(documentCount.LeadingAnchor, 4f),
 
                 documentCount.LeadingAnchor.ConstraintEqualTo(nameLabel.TrailingAnchor, 8f),
                 documentCount.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
@@ -133,7 +132,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 failedDocumentIndicator.HeightAnchor.ConstraintEqualTo(10f),
                 failedDocumentIndicator.WidthAnchor.ConstraintEqualTo(10f),
                 failedDocumentIndicator.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
-                failedDocumentIndicator.TrailingAnchor.ConstraintEqualTo(expandButton.LeadingAnchor, 4f),
 
                 expandButton.LeadingAnchor.ConstraintEqualTo(documentCount.TrailingAnchor, 8f),
                 expandButton.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),

@@ -26,9 +26,5 @@ namespace Mark5.Mobile.Common.Manager
         Task<List<ContactPreview>> SearchContactsAsync(SearchContactsCriteria critera, SourceType sourceType = SourceType.Auto);
 
         Task<List<ShortcodePreview>> SearchShortcodesAsync(SearchShortcodesCriteria criteria, SourceType sourceType = SourceType.Auto);
-
-        Task<List<CalendarTask>> SearchCalendarTasksAsync(SearchCalendarEventsCriteria criteria, SourceType sourceType = SourceType.Auto);
-
-        Task<List<CalendarAppointment>> SearchCalendarAppointmentsAsync(SearchCalendarEventsCriteria criteria, SourceType sourceType = SourceType.Auto);
     }
 }

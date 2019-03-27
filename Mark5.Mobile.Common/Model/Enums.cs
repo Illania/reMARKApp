@@ -1,4 +1,6 @@
-﻿namespace Mark5.Mobile.Common.Model
+﻿using System;
+
+namespace Mark5.Mobile.Common.Model
 {
     #region Managers
 
@@ -186,15 +188,46 @@
         Vacation = 17,
     }
 
-    public enum AppointmentStatus
+    public enum WeekOfMonth
     {
-        None = 0,
-        Free = 1,
-        Tentative = 2,
-        Busy = 3,
-        OutOfOffice = 4,
-        WorkingElsewhere = 5,
-        Custom = 6,
+        First = 0,
+        Second = 1,
+        Third = 2,
+        Fourth = 3,
+        Last = 4,
+        None = 5
+    }
+
+    public enum RecurrenceType
+    {
+        Daily = 0,
+        Hourly = 1,
+        Minutely = 2,
+        Monthly = 3,
+        Weekly = 4,
+        Yearly = 5
+    }
+
+    public enum RecurrenceRange
+    {
+        EndByDate = 0,
+        NoEndDate = 1,
+        OccurrenceCount = 2
+    }
+
+    [Flags]
+    public enum WeekDays
+    {
+        Sunday = 1,
+        Monday = 2,
+        Tuesday = 4,
+        Wednesday = 8,
+        Thursday = 16,
+        Friday = 32,
+        Saturday = 64,
+        WeekendDays = Sunday | Saturday,
+        WorkDays = Monday | Tuesday | Wednesday | Thursday | Friday,
+        EveryDay = WeekendDays | WorkDays
     }
 
     public enum CalendarOccurenceType
@@ -225,30 +258,12 @@
 
     public enum ParticipantStatus
     {
-        None = 0,
-        NeedAction = 1,
-        Accepted = 2,
-        Declined = 3,
-        Tentative = 4,
-    }
-
-    public enum TaskStatus
-    {
-        None = 0,
-        NotStarted = 1,
-        Active = 2,
-        Completed = 3,
-        Waiting = 4,
-        Postponed = 5,
-    }
-
-    public enum DelegationStatus
-    {
-        None = 0,
-        NoDelegation = 1,
-        Unknown = 2,
-        Accepted = 3,
-        Declined = 4,
+        NeedAction = 0,
+        Accepted = 1,
+        Declined = 2,
+        Tentative = 3,
+        Inviting = 4,
+        Invited = 5
     }
 
     #endregion
@@ -358,6 +373,18 @@
         On,
         AllowSelfSigned,
         Off
+    }
+
+    #endregion
+
+    #region ICalendar
+
+    public enum MethodType
+    {
+        Request = 0,
+        Reply = 1,
+        Cancelled = 2,
+        Publish = 3
     }
 
     #endregion

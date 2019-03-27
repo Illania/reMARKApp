@@ -459,6 +459,7 @@
     <Compile Include="Ui\Fragments\CategoriesListFragment.cs" />
     <Compile Include="Ui\Activities\PickerInternalContactsListActivity.cs" />
     <Compile Include="Ui\Fragments\PickerInternalContactsListFragment.cs" />
+    <Compile Include="Utilities\PushNotificationsUtilities.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
   </ItemGroup>
   <ItemGroup>

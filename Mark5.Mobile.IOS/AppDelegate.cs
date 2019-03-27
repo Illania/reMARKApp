@@ -69,6 +69,7 @@ namespace Mark5.Mobile.IOS
                 Window.ApplyTheme();
 
                 UIViewController vc;
+
                 if (!isLoggedIn)
                     vc = new LoginViewController();
                 else if (Integration.IsIPad())
@@ -539,7 +540,7 @@ namespace Mark5.Mobile.IOS
                         OnAuthorizationRequested);
                 });
 
-                CommonConfig.Logger.Info($"Initialized - will present {nameof(SplitMainViewController)}");
+                CommonConfig.Logger.Info($"Initialized - will present {nameof(AbstractMainViewController)}");
 
                 return true;
             }).Result;

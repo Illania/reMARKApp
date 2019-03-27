@@ -39,12 +39,9 @@ namespace Mark5.Mobile.Common.Database
             });
             await DatabaseConnectionProvider.CalendarDatabase.RunInConnectionAsync(c =>
             {
-                c.CreateTable<Folder>();
-                c.CreateTable<FolderCalendarAppointmentLink>();
-                c.CreateTable<FolderCalendarTaskLink>();
-                c.CreateTable<CalendarTask>();
                 c.CreateTable<CalendarAppointment>();
-                c.CreateTable<Category>();
+                c.CreateTable<CalendarAppointmentOccurrence>();
+                c.CreateTable<CalendarAlarm>();
             });
             await DatabaseConnectionProvider.SystemDatabase.RunInConnectionAsync(c =>
             {
@@ -86,12 +83,9 @@ namespace Mark5.Mobile.Common.Database
             });
             await DatabaseConnectionProvider.CalendarDatabase.RunInConnectionAsync(c =>
             {
-                c.DeleteAll<Folder>();
-                c.DeleteAll<FolderCalendarAppointmentLink>();
-                c.DeleteAll<FolderCalendarTaskLink>();
-                c.DeleteAll<CalendarTask>();
                 c.DeleteAll<CalendarAppointment>();
-                c.DeleteAll<Category>();
+                c.DeleteAll<CalendarAppointmentOccurrence>();
+                c.DeleteAll<CalendarAlarm>();
             });
             await DatabaseConnectionProvider.SystemDatabase.RunInConnectionAsync(c =>
             {
