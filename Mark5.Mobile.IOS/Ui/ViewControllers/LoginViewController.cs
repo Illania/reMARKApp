@@ -182,10 +182,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 animationView.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
                 animationCenter = animationView.CenterYAnchor.ConstraintEqualTo(View.CenterYAnchor, AnimationToCenterDistance),
-                animationView.WidthAnchor.ConstraintEqualTo(View.WidthAnchor, 0.8f),
+                animationView.WidthAnchor.ConstraintLessThanOrEqualTo(View.WidthAnchor, 0.8f),
+                animationView.WidthAnchor.ConstraintLessThanOrEqualTo(450f),
                 animationView.HeightAnchor.ConstraintEqualTo(animationView.WidthAnchor),
             });
-            View.SendSubviewToBack(animationView);
 
             settingsButton = new UIButton();
             settingsButton.TitleLabel.Font = Theme.DefaultBoldFont;
