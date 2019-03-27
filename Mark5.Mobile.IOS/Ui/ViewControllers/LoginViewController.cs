@@ -28,17 +28,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         const float Damping = 0.9f;
         const float SpringVelocity = 1.2f;
 
-        const float LogoImageViewToViewInitialDistance = 0f;
-        const float TextFieldToLogoImageViewInitialDistance = 100f;
+        const float AnimationToCenterDistance = -100;
+        const float TextFieldToAnimationDistance = 150f;
         const float TextFieldToTextFieldInitialDistance = 50f;
         const float LoginButtonToTextFieldInitialDistance = 50f;
 
-        const float LogoImageViewToViewDistance = -140f;
-        const float TextFieldToLogoImageViewDistance = 0;
+        const float TextFieldToAnimationViewDistance = 50;
         const float TextFieldToTextFieldDistance = 10f;
         const float LoginButtonToTextFieldDistance = 20f;
-
-        const float LogoImageViewToViewDistanceWithKeyboard = -300f;
 
         const float TextFieldWidth = 180f;
         const float TextFieldHeight = 28f;
@@ -73,7 +70,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         SslMode sslMode = SslMode.On;
 
-        NSObject didChangeFrameNotificationObserver;
+        NSObject keyboardWillAppearObsever;
+        NSObject keyboardWillHideObserver;
+
         ConnectionInfo retainedConnectionInfo;
         private readonly bool reLogin;
 
@@ -102,7 +101,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             InitializeHandlers();
 
-            didChangeFrameNotificationObserver = UIKeyboard.Notifications.ObserveDidChangeFrame(OnKeyboardDidChangeFrameNotification);
+            keyboardWillAppearObsever = UIKeyboard.Notifications.ObserveWillChangeFrame(OnKeyboardWillChangeFrame);
+            keyboardWillHideObserver = UIKeyboard.Notifications.ObserveWillHide(OnKeyboardWillHide);
         }
 
         public override async void ViewDidAppear(bool animated)
@@ -131,7 +131,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             authenticator = null;
 
-            didChangeFrameNotificationObserver?.Dispose();
+            keyboardWillAppearObsever?.Dispose();
         }
 
         protected override void Recycle()
@@ -167,6 +167,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Initialize methods
 
+        NSLayoutConstraint animationCenter;
+
         void InitializeView()
         {
             View.BackgroundColor = Theme.LightGray;
@@ -179,7 +181,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             View.AddConstraints(new NSLayoutConstraint[]
             {
                 animationView.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
-                animationView.CenterYAnchor.ConstraintEqualTo(View.CenterYAnchor),
+                animationCenter = animationView.CenterYAnchor.ConstraintEqualTo(View.CenterYAnchor, AnimationToCenterDistance),
                 animationView.WidthAnchor.ConstraintEqualTo(View.WidthAnchor, 0.8f),
                 animationView.HeightAnchor.ConstraintEqualTo(animationView.WidthAnchor),
             });
@@ -188,6 +190,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             settingsButton = new UIButton();
             settingsButton.TitleLabel.Font = Theme.DefaultBoldFont;
             settingsButton.SetTitle(Localization.GetString("settings"), UIControlState.Normal);
+            settingsButton.SetTitleColor(Theme.DarkBlue, UIControlState.Normal);
             settingsButton.TranslatesAutoresizingMaskIntoConstraints = false;
             View.AddSubview(settingsButton);
 
@@ -212,6 +215,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeSubViews()
         {
+            var placeholderAttributes = new UIStringAttributes
+            {
+                ForegroundColor = Theme.LightGray
+            };
+
             usernameTextField = new UITextField
             {
                 BorderStyle = UITextBorderStyle.RoundedRect,
@@ -222,18 +230,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 ReturnKeyType = UIReturnKeyType.Next,
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 BackgroundColor = Theme.DarkBlue,
+                AttributedPlaceholder = new NSMutableAttributedString(Localization.GetString("username"), placeholderAttributes),
             };
 
-            var attrstr = new NSMutableAttributedString(Localization.GetString("username"), new NSDictionary());
-            var attr = new UIStringAttributes();
-            attr.BackgroundColor = Theme.Brown;
-            attrstr.SetAttributes(attr, new NSRange(0, 4));
+            var attrstr = new NSMutableAttributedString(Localization.GetString("username"), placeholderAttributes);
 
+            usernameTextField.AttributedPlaceholder = attrstr;
 
             View.AddSubview(usernameTextField);
             View.AddConstraints(new[]
             {
-                usernameTextFieldTopConstraint = usernameTextField.TopAnchor.ConstraintEqualTo(animationView.BottomAnchor, TextFieldToLogoImageViewInitialDistance),
+                usernameTextFieldTopConstraint = usernameTextField.TopAnchor.ConstraintEqualTo(animationView.BottomAnchor, TextFieldToAnimationDistance),
                 usernameTextField.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
                 usernameTextField.WidthAnchor.ConstraintEqualTo(TextFieldWidth),
                 usernameTextField.HeightAnchor.ConstraintEqualTo(TextFieldHeight)
@@ -249,8 +256,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 ClearButtonMode = UITextFieldViewMode.WhileEditing,
                 SecureTextEntry = true,
                 ReturnKeyType = UIReturnKeyType.Next,
-                AttributedPlaceholder = new NSAttributedString(Localization.GetString("password")),
-                TranslatesAutoresizingMaskIntoConstraints = false
+                AttributedPlaceholder = new NSMutableAttributedString(Localization.GetString("password"), placeholderAttributes),
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                BackgroundColor = Theme.DarkBlue,
             };
             View.AddSubview(passwordTextField);
             View.AddConstraints(new[]
@@ -269,8 +277,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 AutocorrectionType = UITextAutocorrectionType.No,
                 ClearButtonMode = UITextFieldViewMode.WhileEditing,
                 ReturnKeyType = UIReturnKeyType.Next,
-                AttributedPlaceholder = new NSAttributedString(Localization.GetString("hostname")),
-                TranslatesAutoresizingMaskIntoConstraints = false
+                AttributedPlaceholder = new NSMutableAttributedString(Localization.GetString("hostname"), placeholderAttributes),
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                BackgroundColor = Theme.DarkBlue,
             };
             View.AddSubview(hostnameTextField);
             View.AddConstraints(new[]
@@ -290,8 +299,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 ClearButtonMode = UITextFieldViewMode.WhileEditing,
                 KeyboardType = UIKeyboardType.NumberPad,
                 ReturnKeyType = UIReturnKeyType.Go,
-                AttributedPlaceholder = new NSAttributedString(Localization.GetString("port")),
-                TranslatesAutoresizingMaskIntoConstraints = false
+                AttributedPlaceholder = new NSMutableAttributedString(Localization.GetString("port"), placeholderAttributes),
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                BackgroundColor = Theme.DarkBlue,
             };
             View.AddSubview(portTextField);
             View.AddConstraints(new[]
@@ -306,8 +316,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             loginButton.SetTitle(Localization.GetString("login"), UIControlState.Normal);
             loginButton.TitleLabel.Font = Theme.DefaultBoldFont;
             loginButton.TranslatesAutoresizingMaskIntoConstraints = false;
+            loginButton.SetTitleColor(Theme.DarkBlue, UIControlState.Normal);
             loginButton.Enabled = false;
-            loginButton.Alpha = 0.7f;
             View.AddSubview(loginButton);
             View.AddConstraints(new[]
             {
@@ -349,7 +359,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             UIView.AnimateNotify(AnimationDuration, AnimationInitialDelay, Damping, SpringVelocity, UIViewAnimationOptions.CurveEaseInOut, View.LayoutIfNeeded, null);
 
-            usernameTextFieldTopConstraint.Constant = TextFieldToLogoImageViewDistance;
+            usernameTextFieldTopConstraint.Constant = TextFieldToAnimationViewDistance;
             UIView.AnimateNotify(AnimationDuration, AnimationInitialDelay + AnimationDelay, Damping, SpringVelocity, UIViewAnimationOptions.CurveEaseOut, View.LayoutIfNeeded, null);
 
             passwordTextFieldTopConstraint.Constant = TextFieldToTextFieldDistance;
@@ -668,10 +678,36 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Notification receivers
 
-        void OnKeyboardDidChangeFrameNotification(object sender, UIKeyboardEventArgs e)
+        void OnKeyboardWillChangeFrame(object sender, UIKeyboardEventArgs e)
         {
-            if (IsViewLoaded)
-                SlideViewOverKeyboard(e, true);
+            var keyboardHeight = e.FrameEnd.Height;
+
+            var remainingScreenHeight = View.Frame.Height - e.FrameEnd.Height;
+            var formHeight = loginButton.Frame.GetMaxY() - usernameTextField.Frame.GetMinY();
+            var distanceFromTopOfTheScreen = (remainingScreenHeight - formHeight) / 1.1f;
+            var requiredMovement = usernameTextField.Frame.GetMinY() - distanceFromTopOfTheScreen;
+
+            UIView.BeginAnimations(string.Empty);
+            UIView.SetAnimationDuration(e.AnimationDuration);
+            UIView.SetAnimationCurve(e.AnimationCurve);
+
+            animationCenter.Constant = AnimationToCenterDistance - requiredMovement;
+            View.LayoutIfNeeded();
+
+            UIView.CommitAnimations();
+
+        }
+
+        void OnKeyboardWillHide(object sender, UIKeyboardEventArgs e)
+        {
+            UIView.BeginAnimations(string.Empty);
+            UIView.SetAnimationDuration(e.AnimationDuration);
+            UIView.SetAnimationCurve(e.AnimationCurve);
+
+            animationCenter.Constant = AnimationToCenterDistance;
+            View.LayoutIfNeeded();
+
+            UIView.CommitAnimations();
         }
 
         void OnCancelLogin()
@@ -685,19 +721,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         #endregion
 
         #region Helper methods
-
-        void SlideViewOverKeyboard(UIKeyboardEventArgs e, bool up)
-        {
-            View.LayoutIfNeeded();
-
-            var remainingScreenHeight = View.Frame.Height - e.FrameEnd.Height;
-            var formHeight = loginButton.Frame.GetMaxY() - usernameTextField.Frame.GetMinY();
-            var distanceFromTopOfTheScreen = (remainingScreenHeight - formHeight) / 1.5f;
-            var requiredMovement = usernameTextField.Frame.GetMinY() - distanceFromTopOfTheScreen;
-
-            //    logoContainerCenterYConstraint.Constant = up ? animationContainer.Frame.Top - requiredMovement : LogoImageViewToViewDistance;
-            //    UIView.AnimateNotify(AnimationDuration, AnimationInitialDelay, Damping, SpringVelocity, UIViewAnimationOptions.CurveEaseInOut, () => { animationContainer.Alpha = up ? 0f : 1f; }, (finished) => { View.LayoutIfNeeded(); });
-        }
 
         void ValidateForm()
         {
