@@ -22,8 +22,7 @@ namespace Mark5.Mobile.IOS.Utilities
                 Generic = NSData.FromString("MARK5_Device_ID")
             };
 
-            SecStatusCode res;
-            var match = SecKeyChain.QueryAsRecord(rec, out res);
+            var match = SecKeyChain.QueryAsRecord(rec, out SecStatusCode res);
 
             if (res == SecStatusCode.Success)
                 return match.ValueData.ToString();
