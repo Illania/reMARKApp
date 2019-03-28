@@ -64,7 +64,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
             spaceHeightConstraint = spaceView.HeightAnchor.ConstraintEqualTo(1f);
-               
+
             AddSubview(spaceView);
             AddConstraints(new[]
             {
@@ -380,10 +380,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 if (printableSuggestion.Address.Contains('@'))
                 {
                     splittedRecipients.Add(printableSuggestion.ToString());
-                } else {
+                }
+                else
+                {
                     splittedRecipients.Add(printableSuggestion.Address);
                 }
-               
+
                 TextView.Text = string.Join(RecipientSeperator, splittedRecipients) + RecipientSeperator;
 
                 CorrectMarkup();
