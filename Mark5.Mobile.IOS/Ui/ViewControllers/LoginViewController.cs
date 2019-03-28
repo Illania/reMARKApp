@@ -160,11 +160,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 CommonConfig.Logger.Debug("Disposed");
         }
 
-        public override UIStatusBarStyle PreferredStatusBarStyle()
-        {
-            return UIStatusBarStyle.Default;
-        }
-
         #endregion
 
         #region Initialize methods
