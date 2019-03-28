@@ -268,9 +268,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                             if (!t.IsFaulted)
                             {
-                                var sendWithMark5 = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.send_with_mark5_title, Resource.String.send_report_with_mark5_content);
+                                var sendWithReMARK = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.send_with_mark5_title, Resource.String.send_report_with_mark5_content);
 
-                                if (sendWithMark5)
+                                if (sendWithReMARK)
                                     StartActivity(SystemReportCollector.CreateShareReportComposeDocumentActivityIntent(Context, t.Result));
                                 else
                                     StartActivity(SystemReportCollector.CreateShareReportIntent(Context, t.Result));
