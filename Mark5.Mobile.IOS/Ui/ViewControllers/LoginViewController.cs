@@ -96,8 +96,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillAppear(animated);
 
-            UIApplication.SharedApplication.StatusBarStyle = UIStatusBarStyle.LightContent;
-
             authenticator = AuthenticatorFactory.Create();
 
             InitializeHandlers();
@@ -120,8 +118,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public override void ViewWillDisappear(bool animated)
         {
             base.ViewWillDisappear(animated);
-
-            UIApplication.SharedApplication.StatusBarStyle = UIStatusBarStyle.Default;
 
             usernameTextField.ResignFirstResponder();
             passwordTextField.ResignFirstResponder();
@@ -162,6 +158,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (CommonConfig.Logger.IsDebugEnabled())
                 CommonConfig.Logger.Debug("Disposed");
+        }
+
+        public override UIStatusBarStyle PreferredStatusBarStyle()
+        {
+            return UIStatusBarStyle.Default;
         }
 
         #endregion
