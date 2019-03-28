@@ -98,7 +98,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeNavigationBar()
         {
-            NavigationItem.Title = Localization.GetString("actions");
+            NavigationItem.Title = Localization.GetString("history");
 
             doneItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
             NavigationItem.SetRightBarButtonItem(doneItem, false);

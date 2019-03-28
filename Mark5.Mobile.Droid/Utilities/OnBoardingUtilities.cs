@@ -73,16 +73,7 @@ namespace Mark5.Mobile.Droid.Utilities
                 LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.MatchParent)
             };
 
-            var content = new List<OnBoardingPageModel>
-            {
-                new OnBoardingPageModel("What's new", "We have made a few changes in the MARK5 app. Press next to see what has happened", Resource.Drawable.onboarding_1),
-                new OnBoardingPageModel("Category flow", "We have made it easier to assign categories. " +
-                                        "Tap the categories you wish to assign from “select categories” and they will appear in the top under “categories added”. " +
-                                        "To remove them from “categories added” just tap them again and they will reappear under “select categories”. " +
-                                        "Click save when you are done.", Resource.Drawable.onboarding_2),
-                new OnBoardingPageModel("Login details are saved", "From now on MARK5 saves your login details when you log out of the app. " +
-                                        "This means that you only need to type in your password when you want to login again.",Resource.Drawable.onboarding_3),
-            };
+            var content = GetPageModels();
 
             viewPager.Adapter = new OnBoardingPageAdapter(context, content);
 
@@ -92,6 +83,22 @@ namespace Mark5.Mobile.Droid.Utilities
             linearLayoout.AddView(viewPager);
 
             return linearLayoout;
+        }
+
+        static List<OnBoardingPageModel> GetPageModels()
+        {
+            return new List<OnBoardingPageModel>
+            {
+                new OnBoardingPageModel("Welcome to reMARK", "We have renamed the MARK5 app \"reMARK\". It has all the same functionality as before and is perfectly compatible with MARK5. We made some changes in order to accommodate the increasing functionality, click next to see.", Resource.Drawable.onboarding_1),
+                new OnBoardingPageModel("New navigation", "To navigate between emails, contacts, mailing lists, search and settings click the blue button.", Resource.Drawable.onboarding_2),
+                new OnBoardingPageModel("New navigation", "Now you will see a menu where you can select between emails, contacts, mailing lists, search and settings. Select where you want to go or click the exit button in the bottom." +
+                                        "This means that you only need to type in your password when you want to login again.",Resource.Drawable.onboarding_3),
+                new OnBoardingPageModel("Search", "You find search in the bottom bar or in the new navigation menu.", Resource.Drawable.onboarding_4),
+                new OnBoardingPageModel("History and overview", "Actions and links have been renamed. \"Actions\" is now called \"History\" and \"Links\" is now called \"Overview\". " +
+                    "You find history and overview in the same place as before and they have the same functionality.", Resource.Drawable.onboarding_5),
+                new OnBoardingPageModel("Outgoing emails", "Now you can see pending emails in \"Outgoing\" just by browsing your folder list." +
+                    " The number shows how many pending emails you have. If there is a red dot, it indicates that an email has been failed to send.",Resource.Drawable.onboarding_6),
+            };
         }
 
         static void GoToNextPage() => viewPager.SetCurrentItem(viewPager.CurrentItem + 1, true);

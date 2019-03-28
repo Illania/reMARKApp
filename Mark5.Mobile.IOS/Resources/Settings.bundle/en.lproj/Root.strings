@@ -1,7 +1,7 @@
 ﻿"1_week" = "1 week";
 "2_weeks" = "2 weeks";
 "3_days" = "3 days";
-"about" = "About MARK5";
+"about" = "About reMARK";
 "accept_selfsigned" = "Accept self-signed certificates";
 "advanced" = "Advanced";
 "advanced" = "Advanced";
@@ -11,7 +11,7 @@
 "anyone" = "Anyone";
 "cache" = "Cache";
 "caller_identification" = "Caller identification";
-"caller_identification_desc" = "To enable caller identification MARK5 must be allowed to identify calls in Settings, Call Blocking & Identification. Only contacts that are saved offline will be identified by MARK5.";
+"caller_identification_desc" = "To enable caller identification reMARK must be allowed to identify calls in Settings, Call Blocking & Identification. Only contacts that are saved offline will be identified by MARK5.";
 "clean_cache_interval_days" = "Compact cache every";
 "clear_all_cache" = "Clear all cache";
 "compact_documents_list" = "Compact emails list";
@@ -22,7 +22,7 @@
 "contacts_to_search" = "Contacts search results";
 "create_report" = "Create system report";
 "create_system_report" = "Create system report";
-"default_template" = "Default MARK5 template";
+"default_template" = "Default reMARK template";
 "default_template_short" = "Default";
 "document_body_request_type" = "Viewing format";
 "documents" = "Emails";
@@ -31,7 +31,7 @@
 "dont_use" = "Don't use";
 "dont_use_short" = "Don't use";
 "enable_reporting" = "Share diagnostic information";
-"enable_reporting_desc" = "Share anonymous usage statistics and diagnostic information with Nordic IT, to help improve MARK5.";
+"enable_reporting_desc" = "Share anonymous usage statistics and diagnostic information with Nordic IT, to help improve reMARK.";
 "auth_interval" = "Authentication interval";
 "auth_interval_desc" = "Require authentication when reopening the app after a certain amount of time.";
 "hide_read_notifications" = "Hide read notifications from list";
@@ -49,10 +49,10 @@
 "remove_line" = "Remove mailbox address";
 "search" = "Search";
 "security" = "Security";
-"security_footer" = "SSL should remain enabled to provide secure communication. Otherwise, communication between MARK5 on your iOS device and MARK5 server can be intercepted.";
+"security_footer" = "SSL should remain enabled to provide secure communication. Otherwise, communication between reMARK on your iOS device and reMARK server can be intercepted.";
 "send_feedback" = "Send feedback";
 "server" = "Server";
-"shortcodes_to_search" = "Shortcodes search results";
+"shortcodes_to_search" = "Mailing list search results";
 "show_creator_outgoing" = "Show creator for outgoing emails";
 "show_time_old_emails" = "Show time for older emails";
 "ssl" = "SSL";
@@ -60,7 +60,7 @@
 "sync_favorite_folders_footer" = "Synchronize favorite folders across devices and installations";
 "unread_indicator_me" = "Unread indicator";
 "update_config" = "Update system configuration";
-"use_server_timezone" = "Use time zone of MARK5 Server";
+"use_server_timezone" = "Use time zone of reMARK Server";
 "use_template" = "Use template";
 "use_template_short" = "Use template";
 "username" = "Username";

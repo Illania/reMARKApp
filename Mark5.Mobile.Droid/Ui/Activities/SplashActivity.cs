@@ -7,6 +7,7 @@ using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
+using Com.Airbnb.Lottie;
 using Firebase.Iid;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
@@ -26,7 +27,7 @@ using Mark5.Mobile.Droid.Utilities.Hockey;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-    [Activity(Label = "MARK5", MainLauncher = true, Icon = "@mipmap/ic_icon", Theme = "@style/mark5Splash", ScreenOrientation = ScreenOrientation.Portrait, NoHistory = true, ResizeableActivity = true)]
+    [Activity(MainLauncher = true, Icon = "@mipmap/ic_icon", Theme = "@style/mark5Splash", ScreenOrientation = ScreenOrientation.Portrait, NoHistory = true, ResizeableActivity = true)]
     public class SplashActivity : AppCompatActivity
     {
         protected override void OnCreate(Bundle savedInstanceState)
@@ -44,6 +45,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 CommonConfig.Logger.Info($"Created {nameof(SplashActivity)}");
 
             ((Mark5Application)ApplicationContext).StartedFromRoot = true;
+
         }
 
         protected override void OnStart()
@@ -68,6 +70,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             Firebase.Analytics.FirebaseAnalytics.GetInstance(this).SetAnalyticsCollectionEnabled(false);
 #endif
 
+            var animationView = FindViewById<LottieAnimationView>(Resource.Id.animation_view);
+
             Task.Run(async () =>
                 {
                     var authenticator = AuthenticatorFactory.Create();
@@ -79,8 +83,14 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                         CommonConfig.Logger.Info($"User was not authenticated - will present {nameof(LoginActivity)}");
 
+                        animationView.Alpha = 1f;
+                        animationView.PlayAnimation();
+
                         return false;
                     }
+
+                    animationView.Progress = 1;
+                    animationView.Animate().Alpha(1f).SetDuration(200);
 
                     CommonConfig.Logger.Info("Updating file system storage...");
 

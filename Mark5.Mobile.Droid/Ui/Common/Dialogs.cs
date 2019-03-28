@@ -15,9 +15,6 @@ using Mark5.Mobile.Droid.Model.Exceptions;
 using Mark5.Mobile.Droid.Utilities;
 using Mark5.ServiceReference.Exceptions;
 using Mark5.Mobile.Droid.Ui.Activities;
-using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Manager;
-using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 
 namespace Mark5.Mobile.Droid.Ui.Common
