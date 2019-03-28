@@ -11,7 +11,7 @@
 "anyone" = "Anyone";
 "cache" = "Cache";
 "caller_identification" = "Caller identification";
-"caller_identification_desc" = "To enable caller identification reMARK must be allowed to identify calls in Settings, Call Blocking & Identification. Only contacts that are saved offline will be identified by MARK5.";
+"caller_identification_desc" = "To enable caller identification reMARK must be allowed to identify calls in Settings, Call Blocking & Identification. Only contacts that are saved offline will be identified by reMARK.";
 "clean_cache_interval_days" = "Compact cache every";
 "clear_all_cache" = "Clear all cache";
 "compact_documents_list" = "Compact emails list";

@@ -35,7 +35,7 @@ namespace Mark5.Mobile.IOS.Utilities
                     UIActivityType.SaveToCameraRoll
                 }
             };
-            vc.SetValueForKey(NSObject.FromObject("MARK5 iOS System Report"), new NSString("subject"));
+            vc.SetValueForKey(NSObject.FromObject("reMARK iOS System Report"), new NSString("subject"));
 
             return vc;
         }
@@ -45,7 +45,7 @@ namespace Mark5.Mobile.IOS.Utilities
             return new ComposeDocumentViewController
             {
                 PreconfiguredEmailAddresses = new Dictionary<DocumentAddressType, string[]>() { { DocumentAddressType.To, new string[] { "appfeedback@nordic-it.com" } } },
-                PreconfiguredSubject = "MARK5 iOS System Report",
+                PreconfiguredSubject = "reMARK iOS System Report",
                 PreconfiguredContent = preconfiguredContent
             };
         }
@@ -55,7 +55,7 @@ namespace Mark5.Mobile.IOS.Utilities
             return new ComposeDocumentViewController
             {
                 PreconfiguredEmailAddresses = new Dictionary<DocumentAddressType, string[]>() { { DocumentAddressType.To, new string[] { "appfeedback@nordic-it.com" } } },
-                PreconfiguredSubject = "MARK5 iOS Feedback",
+                PreconfiguredSubject = "reMARK iOS Feedback",
                 PreconfiguredContent = preconfiguredContent
             };
         }
@@ -64,8 +64,8 @@ namespace Mark5.Mobile.IOS.Utilities
         {
             var mcvc = new MFMailComposeViewController();
             mcvc.SetToRecipients(new[] { "appfeedback@nordic-it.com" });
-            mcvc.SetSubject("MARK5 iOS Feedback");
-            mcvc.AddAttachmentData(NSData.FromString(report), "text/plain", "MARK5_iOS_System_Report.txt");
+            mcvc.SetSubject("reMARK iOS Feedback");
+            mcvc.AddAttachmentData(NSData.FromString(report), "text/plain", "reMARK_iOS_System_Report.txt");
             mcvc.Finished += Mcvc_Finished;
             mcvc.NavigationBar.TintColor = Theme.DarkBlue;
 

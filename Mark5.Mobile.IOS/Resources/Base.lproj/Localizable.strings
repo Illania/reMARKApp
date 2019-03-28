@@ -24,7 +24,7 @@
 "attachment_too_big" = "The attachment is bigger than the maximum allowed size on the server";
 "attachments" = "Attachments";
 "autosave_recover_title" = "Recover email";
-"autosave_recover_content" = "MARK5 recovered an autosaved email. Do you want to continue editing it?";
+"autosave_recover_content" = "reMARK recovered an autosaved email. Do you want to continue editing it?";
 "available" = "Available";
 "back" = "Back";
 "bcc" = "Bcc";
@@ -95,7 +95,7 @@
 "disable_notifications" = "Don't\nnotify";
 "disabled" = "Disabled";
 "disconnected" = "Disconnected";
-"dialog_different_user_content" = "You are trying to log in with a different user! If you want to proceede all personal settings will be deleted and you will have to start MARK5 again manually. Do you want to continue?";
+"dialog_different_user_content" = "You are trying to log in with a different user! If you want to proceede all personal settings will be deleted and you will have to start reMARK again manually. Do you want to continue?";
 "dialog_different_user_title" = "Warning";
 "documents" = "Emails";
 "done" = "Done";
@@ -131,7 +131,7 @@
 "empty_token_disable_content" = "It is not possible to disable notifications at the moment. Please try again later or restart the app.";
 "email" = "Email";
 "enable_callid_extension_title" = "Enable extension";
-"enable_callid_extension_message" = "To enable caller indentification you must save the folders \"All companies\" and/or \"All persons\". Afterwards go to Settings => Phone => Call Blocking &... and enable MARK5.";
+"enable_callid_extension_message" = "To enable caller indentification you must save the folders \"All companies\" and/or \"All persons\". Afterwards go to Settings => Phone => Call Blocking &... and enable reMARK.";
 "enable_notifications" = "Notify";
 "enable_sync" = "Enable\nsync";
 "enabled" = "Enabled";
@@ -190,10 +190,10 @@
 "logging_out___" = "Logging out...";
 "login" = "Login";
 "login_failed" = "Login failed";
-"login_failed_desc" = "Could not log in to MARK5. Please check your username, password and server address.\n\nYou may also want to verify SSL settings, by tapping Settings in top right corner of the screen.";
+"login_failed_desc" = "Could not log in to reMARK. Please check your username, password and server address.\n\nYou may also want to verify SSL settings, by tapping Settings in top right corner of the screen.";
 "low" = "Low";
-"mark5_server_reachability" = "MARK5 server: ";
-"mark5_ios_system_report" = "MARK5 iOS System Report";
+"mark5_server_reachability" = "reMARK server: ";
+"mark5_ios_system_report" = "reMARK iOS System Report";
 "mark_as_read" = "Mark as read";
 "mark_as_read_ml" = "Mark as\nread";
 "mark_as_unread" = "Mark as unread";
@@ -270,8 +270,8 @@
 "phonebook_contacts_empty" = "No Phonebook contacts";
 "phonebook_contacts_title" = "Phonebook";
 "phonebook_contacts_no_access_title" = "Phonebook access refused";
-"phonebook_contacts_no_access_content" = "You need to grant MARK5 access to the Phonebook in order to use this functionality";
-"please_restart" = "Please restart MARK5 app";
+"phonebook_contacts_no_access_content" = "You need to grant reMARK access to the Phonebook in order to use this functionality";
+"please_restart" = "Please restart reMARK app";
 "please_wait___" = "Please wait...";
 "port" = "Port";
 "position" = "Position";
@@ -295,7 +295,7 @@
 "resend" = "Resend";
 "reset" = "Reset";
 "responsible_users" = "Responsible users";
-"restart_required_content" = "You need to restart MARK5, for this setting to take effect.";
+"restart_required_content" = "You need to restart reMARK, for this setting to take effect.";
 "restart_required_title" = "Restart required";
 "recent_addresses_empty" = "No recent addresses";
 "recent_addresses_title" = "Recent addresses";
@@ -356,9 +356,9 @@
 "send" = "Send";
 "send_text" = "Send message";
 "sending_document___" = "Sending email...";
-"send_with_mark5_title" = "Send with MARK5?";
-"send_feedback_with_mark5_content" = "Do you want to send feedback with MARK5?";
-"send_report_with_mark5_content" = "Do you want to send the generated report with MARK5?";
+"send_with_mark5_title" = "Send with reMARK?";
+"send_feedback_with_mark5_content" = "Do you want to send feedback with reMARK?";
+"send_report_with_mark5_content" = "Do you want to send the generated report with reMARK?";
 "set_priority" = "Set priority";
 "setting_priority___" = "Setting priority...";
 "settings" = "Settings";
@@ -403,8 +403,8 @@
 "use_passcode" = "Use Passcode";
 "vat" = "VAT";
 "warning" = "Warning";
-"warning_selfsigned_on" = "Self signed certificates will be accepted. Please be aware that this lowers security of communication between MARK5 server and your device.";
-"warning_ssl_off" = "SSL is disabled. Please be aware that all the communication between your device and MARK5 server will not be secure.";
+"warning_selfsigned_on" = "Self signed certificates will be accepted. Please be aware that this lowers security of communication between reMARK server and your device.";
+"warning_ssl_off" = "SSL is disabled. Please be aware that all the communication between your device and reMARK server will not be secure.";
 "webpage" = "Webpage";
 "whats_new" = "What\'s new";
 "wrong_hostname_summary" = "You need to provide valid hostname.";

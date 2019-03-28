@@ -48,9 +48,9 @@ namespace Mark5.Mobile.IOS
                 App.Configure(); //Firebase Analytics
                 Messaging.SharedInstance.Delegate = this;
 
-                CommonConfig.Logger.Info("MARK5 initializing...");
+                CommonConfig.Logger.Info("reMARK initializing...");
                 var isLoggedIn = InitializePlatform(application);
-                CommonConfig.Logger.Info("MARK5 initialized");
+                CommonConfig.Logger.Info("reMARK initialized");
 
                 BITHockeyManager.SharedHockeyManager.Configure(Config.HockeyId);
 #if DEBUG

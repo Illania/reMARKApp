@@ -14,7 +14,7 @@ namespace Mark5.Mobile.Droid.Utilities
     class SystemSettingsJobService : JobService
     {
         static readonly long OneDayInterval = 1000 * 60 * 60 * 24;
-        static readonly int JobId = 1; //Must be unique for all jobservices scheduled by MARK5.
+        static readonly int JobId = 1; //Must be unique for all jobservices scheduled by reMARK.
 
         static readonly ComponentName serviceComponent = new ComponentName(Application.Context, Java.Lang.Class.FromType(typeof(SystemSettingsJobService)));
 
