@@ -8,6 +8,7 @@ using Foundation;
 using CoreGraphics;
 using System.Collections.ObjectModel;
 using Syncfusion.SfCalendar.iOS;
+using CoreAnimation;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 {
@@ -15,11 +16,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
     {
         ReMarkMonthView schedule;
 
+        public bool transitioning;
+
         readonly ModuleType moduleType;
 
         public MonthViewController(ModuleType moduleType)
         {
             this.moduleType = moduleType;
+        }
+
+        public override void ViewWillAppear(bool animated)
+        {
+            base.ViewWillAppear(animated);
+            NavigationController.NavigationBarHidden = false;
         }
 
         public override void ViewDidLoad()
@@ -44,6 +53,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 schedule.LeftAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.LeftAnchor)
             });
 
+            View.BackgroundColor = UIColor.White;
+
             InitializeNavigationBar();
         }
 
@@ -62,11 +73,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             NavigationController.PushViewController(new YearViewController(), true);
         }
 
-        public override void ViewWillAppear(bool animated)
-        {
-            base.ViewWillAppear(animated);
-        }
-
         void InitializeNavigationBar()
         {
             var backBtn = new UIBarButtonItem
@@ -76,8 +82,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             backBtn.Clicked += (sender, e) =>
             {
-                var yearSelection = new YearViewController();
-                NavigationController.PushViewController(yearSelection, true);
+                if (transitioning)
+                    return;
+
+                YearViewController yearSelection = new YearViewController();
+                CATransition transition = new CATransition();
+                transition.Duration = 0.35;
+                transition.TimingFunction = CAMediaTimingFunction.FromName(CAMediaTimingFunction.Linear);
+                transition.Type = CAAnimation.TransitionPush;
+                transition.Subtype = CAAnimation.TransitionFromLeft;
+                transition.Delegate = new AnimationDelegate(this);
+                transitioning = true;
+
+                NavigationController.View.Layer.AddAnimation(transition, null);
+                NavigationController.PushViewController(yearSelection, false);
             };
 
             NavigationItem.SetLeftBarButtonItem(backBtn, true);
@@ -90,11 +108,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             addBtn.Clicked += (sender, e) =>
             {
-                var yearSelection = new YearViewController();
-                NavigationController.PushViewController(yearSelection, true);
+                var newAppointmentVC = new CreateAppointmentViewController();
+                NavigationController.PushViewController(newAppointmentVC, true);
             };
 
             NavigationItem.SetRightBarButtonItem(addBtn, true);
+        }
+
+        class AnimationDelegate : CAAnimationDelegate
+        {
+            MonthViewController ctrl;
+
+            public AnimationDelegate(MonthViewController ctrl)
+            {
+                this.ctrl = ctrl;
+            }
+
+            public override void AnimationStopped(CAAnimation anim, bool finished)
+            {
+                ctrl.transitioning = false;
+            }
         }
     }
 
@@ -111,30 +144,39 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         {
             BackgroundColor = Theme.DarkerBlue,
             TextStyle = Theme.DefaultLightFont,
-            TextColor = UIColor.White,
-            TextPosition = UITextAlignment.Center
+            TextColor = UIColor.White
         };
 
-        readonly MonthViewSettings monthViewSettings = new MonthViewSettings
+        readonly MonthViewSettings monthViewSettings = new MonthViewSettings()
         {
             SelectionIndicatorColor = Theme.LightBlue,
             TodayBackgroundColor = Theme.LightBlue,
             SelectionTextColor = Theme.White,
             ShowAgendaView = true,
-            ShowAppointmentsInline = false
+            ShowAppointmentsInline = false,
+            AgendaViewStyle = new AgendaViewStyle
+            {
+                SubjectTextColor = Theme.DarkerBlue,
+                SubjectTextStyle = Theme.DefaultLightFont,
+                TimeTextStyle = Theme.CalendarTimeLightFont,
+                TimeTextColor = Theme.DarkGray,
+                DateTextColor = Theme.DarkGray,
+                DateTextStyle = Theme.DefaultLightFont,
+                HeaderHeight = 50f
+            }
         };
 
         public ReMarkMonthView()
         {
             ScheduleView = SFScheduleView.SFScheduleViewMonth;
 
-            AppointmentMapping = GetAppointmentMapping();
-            AddMeetings();
+            AppointmentMapping = CalendarUtils.GetAppointmentMapping();
+
+            ItemsSource = CalendarUtils.GetMeetings();
 
             MonthCellLoaded += ReMark_MonthCellLoaded;
+
             MonthViewSettings = monthViewSettings;
-
-
             SelectionStyle = new SFSelectionStyle
             {
                 BackgroundColor = Theme.DarkBlue,
@@ -169,77 +211,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             }
 
             e.CellStyle = style;
-        }
-
-        class Meeting
-        {
-            public NSString EventName { get; set; }
-            public NSDate From { get; set; }
-            public NSDate To { get; set; }
-            public UIColor Color { get; set; }
-        }
-
-        private AppointmentMapping GetAppointmentMapping()
-        {
-            AppointmentMapping mapping = new AppointmentMapping();
-            mapping.Subject = "EventName";
-            mapping.StartTime = "From";
-            mapping.EndTime = "To";
-            mapping.AppointmentBackground = "Color";
-            return mapping;
-        }
-
-        void AddMeetings()
-        {
-            NSCalendar calendar = new NSCalendar(NSCalendarType.Gregorian);
-            NSDate today = new NSDate();
-            NSDateComponents startDateComponents = calendar.Components(NSCalendarUnit.Year |
-                                                                       NSCalendarUnit.Month |
-                                                                       NSCalendarUnit.Day, today);
-            startDateComponents.Hour = 09;
-            startDateComponents.Minute = 0;
-            startDateComponents.Second = 0;
-            NSDateComponents endDateComponents = calendar.Components(NSCalendarUnit.Year |
-                                                                     NSCalendarUnit.Month |
-                                                                     NSCalendarUnit.Day, today);
-
-            endDateComponents.Hour = 10;
-            endDateComponents.Minute = 0;
-            endDateComponents.Second = 0;
-            NSDate startDate = calendar.DateFromComponents(startDateComponents);
-            NSDate endDate = calendar.DateFromComponents(endDateComponents);
-
-            // Creating instance for custom appointment class
-            Meeting meeting = new Meeting();
-            // Setting start time of an event
-            meeting.From = startDate;
-            // Setting end time of an event
-            meeting.To = endDate;
-            // Setting start time for an event
-            meeting.EventName = (NSString)"Anniversary";
-            // Setting color for an event
-            meeting.Color = UIColor.Green;
-            // Creating instance for collection of custom appointments
-            var Meetings = new ObservableCollection<Meeting>();
-            // Adding a custom appointment in CustomAppointmentCollection
-            Meetings.Add(meeting);
-
-            Meeting meeting2 = new Meeting();
-            // Setting start time of an event
-            meeting2.From = startDate.AddSeconds(3600);
-            // Setting end time of an event
-            meeting2.To = endDate.AddSeconds(3600);
-            // Setting start time for an event
-            meeting2.EventName = (NSString)"Meetings with Tester";
-            // Setting color for an event
-            meeting2.Color = UIColor.Red;
-            // Creating instance for collection of custom appointments
-
-            // Adding a custom appointment in CustomAppointmentCollection
-            Meetings.Add(meeting2);
-
-            // Adding custom appointments in DataSource of SfSchedule
-            ItemsSource = Meetings;
         }
     }
 }

@@ -5,16 +5,16 @@ using Mark5.Mobile.IOS.Ui.Common;
 using Foundation;
 using System.Collections.Generic;
 using CoreGraphics;
+using Syncfusion.SfCalendar.iOS;
+using Xamarin.Forms.Internals;
+using Mono;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 {
     public class DayViewController : UIViewController
     {
-
-
         public DayViewController()
         {
-
         }
 
         public override void ViewDidLoad()
@@ -30,30 +30,74 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             View.AddSubview(reMarkDayCalendar);
 
-
             View.AddConstraints(new NSLayoutConstraint[] {
                 reMarkDayCalendar.TopAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.TopAnchor),
                 reMarkDayCalendar.BottomAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.BottomAnchor),
-                reMarkDayCalendar.RightAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.RightAnchor, -10),
-                reMarkDayCalendar.LeftAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.LeftAnchor, 10)
+                reMarkDayCalendar.RightAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.RightAnchor),
+                reMarkDayCalendar.LeftAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.LeftAnchor)
             });
+
+
+            InitializeNavigationBar();
         }
 
+        void InitializeNavigationBar()
+        {
+            var addBtn = new UIBarButtonItem
+            {
+                Title = "",
+                Image = UIImage.FromBundle("Create")
+            };
 
+            addBtn.Clicked += (sender, e) =>
+            {
+                var newAppointmentVC = new CreateAppointmentViewController();
+                NavigationController.PushViewController(newAppointmentVC, true);
+            };
+
+            NavigationItem.SetRightBarButtonItem(addBtn, true);
+        }
     }
+
 
     class ReMarkDayView : SFSchedule
     {
+
+        readonly HeaderStyle headerStyle = new HeaderStyle
+        {
+            BackgroundColor = Theme.DarkerBlue,
+            TextColor = UIColor.White,
+            TextStyle = Theme.DefaultLightFont,
+            TextPosition = UITextAlignment.Center
+        };
+
+        readonly SFViewHeaderStyle viewHeaderStyle = new SFViewHeaderStyle
+        {
+            BackgroundColor = Theme.DarkerBlue,
+            DateTextStyle = Theme.DefaultLightFont,
+            DateTextColor = UIColor.White,
+            CurrentDateTextColor = UIColor.White,
+            CurrentDayTextColor = UIColor.White,
+            DayTextColor = UIColor.White,
+            DayTextStyle = Theme.DefaultLightFont
+        };
+
+        readonly DayViewSettings dayViewSettings = new DayViewSettings
+        {
+            LabelSettings = new DayLabelSettings
+            {
+                TimeLabelColor = Theme.DarkGray
+            }
+        };
+
         public ReMarkDayView()
         {
             ScheduleView = SFScheduleView.SFScheduleViewDay;
-            SFViewHeaderStyle viewHeaderStyle = new SFViewHeaderStyle();
-            BackgroundColor = UIColor.FromRGB(0, 150, 136);
-            viewHeaderStyle.DayTextColor = UIColor.FromRGB(255, 255, 255);
-            viewHeaderStyle.DateTextColor = UIColor.FromRGB(255, 255, 255);
-            viewHeaderStyle.DayTextStyle = UIFont.FromName("Arial", 15);
-            viewHeaderStyle.DateTextStyle = UIFont.FromName("Arial", 15);
+            HeaderStyle = headerStyle;
+            DayViewSettings = dayViewSettings;
             DayHeaderStyle = viewHeaderStyle;
+            AppointmentMapping = CalendarUtils.GetAppointmentMapping();
+            ItemsSource = CalendarUtils.GetMeetings();
         }
     }
 }
