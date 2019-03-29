@@ -76,8 +76,8 @@
                     android:id="@+id/hostname_edit_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:singleLine="true"
-                    android:inputType="textNoSuggestions" />
+                    android:singleLine="true" 
+                    android:inputType="textUri" />
             </android.support.design.widget.TextInputLayout>
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/port_text_input_layout"
