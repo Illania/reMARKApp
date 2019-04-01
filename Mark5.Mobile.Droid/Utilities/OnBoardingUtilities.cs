@@ -97,7 +97,7 @@ namespace Mark5.Mobile.Droid.Utilities
                 new OnBoardingPageModel("History and overview", "Actions and links have been renamed. \"Actions\" is now called \"History\" and \"Links\" is now called \"Overview\". " +
                     "You find history and overview in the same place as before and they have the same functionality.", Resource.Drawable.onboarding_5),
                 new OnBoardingPageModel("Outgoing emails", "Now you can see pending emails in \"Outgoing\" just by browsing your folder list." +
-                    " The number shows how many pending emails you have. If there is a red dot, it indicates that an email has been failed to send.",Resource.Drawable.onboarding_6),
+                    " The number shows how many pending emails you have. If there is a red dot, it indicates that an email has failed to send.",Resource.Drawable.onboarding_6),
             };
         }
 
