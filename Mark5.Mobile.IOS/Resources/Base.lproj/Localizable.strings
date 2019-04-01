@@ -31,6 +31,7 @@
 "big_attachment_warning" = "This attachment is {0} large. Do you still want to download this file?";
 "birthdate" = "Birthdate";
 "browse_files" = "Browse files...";
+"calendar" = "Calendar";
 "call" = "Call";
 "cancel" = "Cancel";
 "cannot_mail_report_content" = "There are no mail accounts configured on your device. You need to have an account configured before you can send feedback.";

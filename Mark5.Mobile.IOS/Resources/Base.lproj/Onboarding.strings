@@ -9,4 +9,4 @@
 "5_title" = "History and overview";
 "5_content" = "Actions and links have been renamed. \"Actions\" is now called \"History\" and \"Links\" is now called \"Overview\". You find history and overview in the same place as before and they have the same functionality.";
 "6_title" = "Outgoing emails";
-"6_content" = "Now you can see pending emails in \"Outgoing\" just by browsing your folder list. The number shows how many pending emails you have. If there is a red dot, it indicates that an email has been failed to send.";
+"6_content" = "Now you can see pending emails in \"Outgoing\" just by browsing your folder list. The number shows how many pending emails you have. If there is a red dot, it indicates that an email has failed to send.";
