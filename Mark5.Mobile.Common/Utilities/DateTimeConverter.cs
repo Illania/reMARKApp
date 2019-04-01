@@ -58,7 +58,7 @@ namespace Mark5.Mobile.Common.Utilities
             {
                 try
                 {
-                    offset = serverTimeZoneInfo.GetUtcOffset(dateTime).Hours;
+                    offset = serverTimeZoneInfo.GetUtcOffset(dateTime).TotalHours;
                 }
                 catch (Exception ex)
                 {
