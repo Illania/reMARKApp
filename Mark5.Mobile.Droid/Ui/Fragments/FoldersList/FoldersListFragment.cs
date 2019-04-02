@@ -31,14 +31,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     {
         protected const string RemoteFolderBundleKey = "RemoteFolder_551ec209-d787-4a8e-b4ba-99313741ddd1";
         protected const string HideSearchBundleKey = "HideSearch_694b0906-42a6-4c04-9892-238c920f7c74";
-        protected const string HideFabBundleKey = "HideFab_35efe47d-6c24-4374-afe4-74713393d00a";
         protected const string LoadRemoteFromCacheBundleKey = "LoadRemote_ae16f485-9e09-4f74-9f47-ad4d357eee12";
         protected const string RecoveredPositionsKey = "RecoveredItemPositions_e71c23ca-686c-4c63-a4ee-022c3855fdeb";
         protected const string SubFoldersDownloadedKey = "SubfoldersDownloaded_35f51cb3-b96c-4f26-be2d-af6760109bbc";
 
         protected Folder RemoteFolder;
+        protected int RemoteFolderId;
         protected bool HideSearch;
-        protected bool HideFab;
         protected bool LoadRemoteFromCache;
 
         protected FolderListAdapter Adapter;
@@ -95,9 +94,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (Arguments.ContainsKey(HideSearchBundleKey))
                 HideSearch = Arguments.GetBoolean(HideSearchBundleKey);
-
-            if (Arguments.ContainsKey(HideFabBundleKey))
-                HideFab = Arguments.GetBoolean(HideFabBundleKey);
 
             if (Arguments.ContainsKey(LoadRemoteFromCacheBundleKey))
                 LoadRemoteFromCache = Arguments.GetBoolean(LoadRemoteFromCacheBundleKey);
@@ -198,13 +194,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info($"Resuming {nameof(FoldersListFragment)} [folder.id={RemoteFolder?.Id}, folder.name={RemoteFolder?.Name}]...");
 
             fab = ((BaseAppCompatActivity)Activity).Fab;
-            if (HideFab)
-            {
-                fab.Visibility = ViewStates.Gone;
-                fab = null;
-            }
-            else
-            {
+
                 if (RemoteFolder?.Module == ModuleType.Documents)
                 {
                     fab.SetImageResource(Resource.Drawable.action_new);
@@ -225,7 +215,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     fab.SetOnClickListener(new ActionOnClickListener(CreateShortcode));
                     fab.Visibility = ViewStates.Visible;
                 }
-            }
 
             RefreshData();
 
