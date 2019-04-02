@@ -69,7 +69,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var args = new Bundle();
 
             if (remoteFolder != null)
-                args.PutString(RemoteFolderBundleKey, Serializer.Serialize(remoteFolder));
+                args.PutString(RemoteFolderBundleKey, Serializer.Serialize(remoteFolder.ShallowCopy()));
 
             if (hideSearch != null)
                 args.PutBoolean(HideSearchBundleKey, hideSearch.Value);
