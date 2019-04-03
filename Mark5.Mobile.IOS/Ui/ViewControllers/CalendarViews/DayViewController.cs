@@ -1,18 +1,39 @@
-﻿using System;
-using UIKit;
+﻿using UIKit;
 using Syncfusion.SfSchedule.iOS;
 using Mark5.Mobile.IOS.Ui.Common;
-using Foundation;
-using System.Collections.Generic;
-using CoreGraphics;
-using Syncfusion.SfCalendar.iOS;
-using Xamarin.Forms.Internals;
-using Mono;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 {
     public class DayViewController : UIViewController
     {
+        readonly HeaderStyle workWeekHeaderStyle = new HeaderStyle()
+        {
+            BackgroundColor = Theme.DarkerBlue,
+            TextStyle = Theme.DefaultLightFont,
+            TextColor = Theme.White
+        };
+
+        readonly SFViewHeaderStyle workWeekDayHeader = new SFViewHeaderStyle()
+        {
+            DayTextColor = UIColor.White,
+            DayTextStyle = Theme.DefaultLightFont,
+            DateTextColor = UIColor.White,
+            DateTextStyle = Theme.DefaultLightFont,
+            BackgroundColor = Theme.DarkerBlue,
+            CurrentDayTextColor = UIColor.White
+        };
+
+        readonly WeekViewSettings workWeekSettings = new WeekViewSettings()
+        {
+            LabelSettings = new WeekLabelSettings()
+            {
+                TimeLabelColor = Theme.DarkGray
+            }
+        };
+
+        ReMarkDayView reMarkDayCalendar;
+        UIBarButtonItem scheduleSwitchBtn;
+
         public DayViewController()
         {
         }
@@ -21,7 +42,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         {
             base.ViewDidLoad();
 
-            ReMarkDayView reMarkDayCalendar = new ReMarkDayView()
+            reMarkDayCalendar = new ReMarkDayView()
             {
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
@@ -37,8 +58,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 reMarkDayCalendar.LeftAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.LeftAnchor)
             });
 
+            reMarkDayCalendar.CellLongPressed += ReMarkDayCalendar_CellTapped;
+            reMarkDayCalendar.CellDoubleTapped += ReMarkDayCalendar_CellTapped;
 
             InitializeNavigationBar();
+        }
+
+        void ReMarkDayCalendar_CellTapped(object sender, CellTappedEventArgs e)
+        {
+            if (e != null)
+            {
+                NavigationController.PushViewController(new AppointmentViewController(), true);
+            }
         }
 
         void InitializeNavigationBar()
@@ -55,14 +86,37 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 NavigationController.PushViewController(newAppointmentVC, true);
             };
 
-            NavigationItem.SetRightBarButtonItem(addBtn, true);
+            scheduleSwitchBtn = new UIBarButtonItem
+            {
+                Title = reMarkDayCalendar.ScheduleView == SFScheduleView.SFScheduleViewWeek ? "Day" : "Week"
+            };
+
+            scheduleSwitchBtn.Clicked += (sender, e) =>
+            {
+                reMarkDayCalendar.HeaderStyle = workWeekHeaderStyle;
+
+                reMarkDayCalendar.DayHeaderStyle = workWeekDayHeader;
+
+                reMarkDayCalendar.WeekViewSettings = workWeekSettings;
+
+                if (reMarkDayCalendar.ScheduleView == SFScheduleView.SFScheduleViewWorkWeek)
+                {
+                    scheduleSwitchBtn.Title = "Week";
+                    reMarkDayCalendar.ScheduleView = SFScheduleView.SFScheduleViewDay;
+                }
+                else
+                {
+                    scheduleSwitchBtn.Title = "Day";
+                    reMarkDayCalendar.ScheduleView = SFScheduleView.SFScheduleViewWorkWeek;
+                }
+            };
+
+            NavigationItem.SetRightBarButtonItems(new UIBarButtonItem[] { addBtn, scheduleSwitchBtn }, false);
         }
     }
 
-
     class ReMarkDayView : SFSchedule
     {
-
         readonly HeaderStyle headerStyle = new HeaderStyle
         {
             BackgroundColor = Theme.DarkerBlue,
@@ -98,6 +152,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             DayHeaderStyle = viewHeaderStyle;
             AppointmentMapping = CalendarUtils.GetAppointmentMapping();
             ItemsSource = CalendarUtils.GetMeetings();
+
+            AppointmentStyle = new SFAppointmentStyle()
+            {
+                TextStyle = UIFont.FromName("Avenir-Light", 14),
+                SelectionBorderColor = Theme.DarkerBlue
+            };
         }
     }
 }

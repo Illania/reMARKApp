@@ -1,20 +1,14 @@
-﻿using System;
-using Mark5.Mobile.Common.Model;
+﻿using Mark5.Mobile.Common.Model;
 using Syncfusion.SfSchedule.iOS;
 using UIKit;
 using Mark5.Mobile.IOS.Ui.Common;
-using System.Collections.Generic;
-using Foundation;
-using CoreGraphics;
-using System.Collections.ObjectModel;
-using Syncfusion.SfCalendar.iOS;
 using CoreAnimation;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 {
     public class MonthViewController : AbstractViewController
     {
-        ReMarkMonthView schedule;
+        ReMarkMonthView monthView;
 
         public bool transitioning;
 
@@ -35,27 +29,34 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         {
             base.ViewDidLoad();
 
-            schedule = new ReMarkMonthView()
+            monthView = new ReMarkMonthView()
             {
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
 
-            schedule.HeaderTapped += Handle_HeaderTapped;
-            schedule.EnableNavigation = true;
-            schedule.CellDoubleTapped += Schedule_CellDoubleTapped;
+            monthView.HeaderTapped += Handle_HeaderTapped;
+            monthView.EnableNavigation = true;
+            monthView.CellDoubleTapped += Schedule_CellDoubleTapped;
 
-            View.AddSubview(schedule);
+            monthView.MonthInlineAppointmentTapped += Schedule_MonthInlineAppointmentTapped;
+
+            View.AddSubview(monthView);
 
             View.AddConstraints(new NSLayoutConstraint[] {
-                schedule.TopAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.TopAnchor),
-                schedule.BottomAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.BottomAnchor),
-                schedule.RightAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.RightAnchor),
-                schedule.LeftAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.LeftAnchor)
+                monthView.TopAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.TopAnchor),
+                monthView.BottomAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.BottomAnchor),
+                monthView.RightAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.RightAnchor),
+                monthView.LeftAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.LeftAnchor)
             });
 
             View.BackgroundColor = UIColor.White;
 
             InitializeNavigationBar();
+        }
+
+        void Schedule_MonthInlineAppointmentTapped(object sender, MonthInlineAppointmentTappedEventArgs e)
+        {
+            NavigationController.PushViewController(new AppointmentViewController(), true);
         }
 
         void Schedule_CellDoubleTapped(object sender, CellTappedEventArgs e)
@@ -108,8 +109,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             addBtn.Clicked += (sender, e) =>
             {
-                var newAppointmentVC = new CreateAppointmentViewController();
-                NavigationController.PushViewController(newAppointmentVC, true);
+                var createAppointmentVC = new CreateAppointmentViewController();
+                NavigationController.PushViewController(createAppointmentVC, true);
             };
 
             NavigationItem.SetRightBarButtonItem(addBtn, true);

@@ -274,6 +274,8 @@
     <Compile Include="Ui\ViewControllers\CalendarViews\YearViewController.cs" />
     <Compile Include="Ui\ViewControllers\CalendarViews\CalendarUtils.cs" />
     <Compile Include="Ui\ViewControllers\CalendarViews\CreateAppointmentViewController.cs" />
+    <Compile Include="Ui\ViewControllers\CalendarViews\WeekViewViewController.cs" />
+    <Compile Include="Ui\ViewControllers\CalendarViews\AppointmentViewController.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -370,12 +372,6 @@
     </Reference>
     <Reference Include="Xamarin.Forms.Xaml">
       <HintPath>..\packages\Xamarin.Forms.3.4.0.1008975\lib\Xamarin.iOS10\Xamarin.Forms.Xaml.dll</HintPath>
-    </Reference>
-    <Reference Include="Telerik.Xamarin.iOS">
-      <HintPath>..\packages\Telerik.UI.for.Xamarin.Common.Trial.2019.1.220.1\lib\xamarinios10\Telerik.Xamarin.iOS.dll</HintPath>
-    </Reference>
-    <Reference Include="Telerik.XamarinForms.Common">
-      <HintPath>..\packages\Telerik.UI.for.Xamarin.Common.Trial.2019.1.220.1\lib\xamarinios10\Telerik.XamarinForms.Common.dll</HintPath>
     </Reference>
     <Reference Include="Syncfusion.Licensing">
       <HintPath>..\packages\Syncfusion.Licensing.16.4.0.54\lib\Xamarin.iOS10\Syncfusion.Licensing.dll</HintPath>

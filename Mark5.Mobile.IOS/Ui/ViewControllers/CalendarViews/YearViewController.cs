@@ -2,7 +2,6 @@
 using Syncfusion.SfCalendar.iOS;
 using UIKit;
 using Mark5.Mobile.IOS.Ui.Common;
-using TelerikUI;
 using Syncfusion.SfSchedule.iOS;
 using CoreAnimation;
 
@@ -17,6 +16,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
+            View.BackgroundColor = Theme.DarkerBlue;
 
             reMarkYearCalendar = new ReMarkYearCalendar()
             {
@@ -29,8 +29,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             reMarkYearCalendar.ViewModeChanged += ReMarkYearCalendar_ViewModeChanged;
 
-            View.BackgroundColor = Theme.DarkerBlue;
-
             View.AddSubview(reMarkYearCalendar);
 
             View.AddConstraints(new NSLayoutConstraint[] {
@@ -39,6 +37,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 reMarkYearCalendar.RightAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.RightAnchor),
                 reMarkYearCalendar.LeftAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.LeftAnchor)
             });
+
+
 
             NavigationController.NavigationBarHidden = true;
         }
