@@ -34,7 +34,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 CommonConfig.Logger.Error($"Error while getting appointment with ID = {appointmentId}", ex);
 
                 view.StopLoading();
-                await view.ShowError();
+                await view.ShowLoadError();
 
                 view.CloseView();
             }
@@ -58,7 +58,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 CommonConfig.Logger.Error($"Error while deleting appointment with ID = {appointment.Id}", ex);
 
                 view.StopLoading();
-                await view.ShowError();
+                await view.ShowDeleteError();
             }
         }
 
@@ -84,7 +84,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 CommonConfig.Logger.Error($"Error while sending invitations for appointment with ID = {appointment.Id} with line with GUID = {lineGuid}", ex);
 
                 view.StopLoading();
-                await view.ShowError();
+                await view.ShowSendInvitationError();
             }
         }
     }
@@ -119,7 +119,11 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         void SetLines(IEnumerable<LineViewModel> lines);
         void ShowLoading();
         void StopLoading();
-        Task ShowError();
         void CloseView();
+
+        Task ShowLoadError();
+        Task ShowDeleteError();
+        Task ShowSendInvitationError();
+
     }
 }

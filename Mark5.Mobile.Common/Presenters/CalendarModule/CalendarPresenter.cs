@@ -116,8 +116,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                     {
                         try
                         {
-                            DateTime startDate, endDate;
-                            (startDate, endDate) = GetTimePeriod(monthDate);
+                            (var startDate, var endDate) = GetTimePeriod(monthDate);
 
                             await Managers.CalendarManager.GetCalendarAppointmentsAsync(calendarsList.Select(c => c.Id).ToList(), startDate, endDate, SourceType.Auto);
 
@@ -131,7 +130,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 }
             }
 
-            bool RangeCached(DateTime start, DateTime end) //TODO we supposing that they're max 1 month apart
+            bool RangeCached(DateTime start, DateTime end) //We are supposing that they're max 1 month apart
             {
                 return cachedMonths.Contains(MonthDate.FromDateTime(start)) &&
                     cachedMonths.Contains(MonthDate.FromDateTime(end));
