@@ -70,8 +70,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             Firebase.Analytics.FirebaseAnalytics.GetInstance(this).SetAnalyticsCollectionEnabled(false);
 #endif
 
-            var animationView = FindViewById<LottieAnimationView>(Resource.Id.animation_view);
-
             Task.Run(async () =>
                 {
                     var authenticator = AuthenticatorFactory.Create();
@@ -83,11 +81,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                         CommonConfig.Logger.Info($"User was not authenticated - will present {nameof(LoginActivity)}");
 
-                        animationView.Alpha = 1f;
-                        animationView.PlayAnimation();
-
                         return false;
                     }
+
+                    var animationView = FindViewById<LottieAnimationView>(Resource.Id.animation_view);
 
                     animationView.Progress = 1;
                     animationView.Animate().Alpha(1f).SetDuration(200);
@@ -208,6 +205,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         void ShowLoginButton()
         {
+            var animationView = FindViewById<LottieAnimationView>(Resource.Id.animation_view);
             var progressBar = FindViewById<ProgressBar>(Resource.Id.progress_bar);
             var loginButton = FindViewById<AppCompatButton>(Resource.Id.login_button);
 
@@ -215,6 +213,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             progressBar.Visibility = ViewStates.Gone;
             loginButton.Visibility = ViewStates.Visible;
+
+            animationView.Alpha = 1f;
+            animationView.PlayAnimation();
         }
     }
 }
