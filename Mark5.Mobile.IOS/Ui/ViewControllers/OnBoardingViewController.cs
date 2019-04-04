@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Airbnb.Lottie;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
@@ -12,10 +13,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidLoad();
 
-            View.BackgroundColor = Theme.LightBlue;
+            View.BackgroundColor = Theme.LightGray;
 
             var pc = UIPageControl.Appearance;
-            pc.BackgroundColor = Theme.LightBlue;
+            pc.BackgroundColor = Theme.LightGray;
             pc.CurrentPageIndicatorTintColor = Theme.DarkBlue;
             pc.PageIndicatorTintColor = Theme.White;
 
@@ -142,9 +143,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UILabel titleLabel;
         UITextView descriptionTextView;
         UIImageView headlineImage;
+        LOTAnimationView animationView = null;
 
         UIButton nextDoneButton;
-        UIButton skipButton;
 
         readonly OnBoardingPageModel pageModel;
         readonly bool isLast;
@@ -169,19 +170,40 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InitializeView();
         }
 
+        public override async void ViewWillAppear(bool animated)
+        {
+            base.ViewWillAppear(animated);
+
+            if (animationView != null)
+                await animationView.PlayAsync();
+        }
+
         void InitializeView()
         {
-            View.BackgroundColor = Theme.LightBlue;
+            View.BackgroundColor = Theme.LightGray;
 
+            UIView topView = null;
 
-            headlineImage = new UIImageView
+            if (Index == 0)
             {
-                TranslatesAutoresizingMaskIntoConstraints = false
-            };
+                animationView = LOTAnimationView.AnimationNamed("splash");
+                animationView.ContentMode = UIViewContentMode.ScaleAspectFit;
+                animationView.TranslatesAutoresizingMaskIntoConstraints = false;
+                topView = animationView;
+            }
+            else
+            {
+                headlineImage = new UIImageView
+                {
+                    TranslatesAutoresizingMaskIntoConstraints = false
+                };
 
-            headlineImage.Image = pageModel.Image;
-            headlineImage.AutoresizingMask = UIViewAutoresizing.FlexibleHeight;
-            headlineImage.ContentMode = UIViewContentMode.ScaleAspectFit;
+                headlineImage.Image = pageModel.Image;
+                headlineImage.ContentMode = UIViewContentMode.ScaleAspectFit;
+
+                topView = headlineImage;
+            }
+
             titleLabel = new UILabel
             {
                 TranslatesAutoresizingMaskIntoConstraints = false
@@ -217,25 +239,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             nextDoneButton.BackgroundColor = Theme.DarkBlue;
             nextDoneButton.TouchUpInside += NextDoneButton_TouchUpInside;
 
-            View.AddSubview(headlineImage);
+            View.AddSubview(topView);
             View.AddSubview(titleLabel);
             View.AddSubview(descriptionTextView);
             View.AddSubview(nextDoneButton);
 
             if (Integration.IsRunningAtLeast(11))
             {
-                View.AddConstraint(headlineImage.TopAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.TopAnchor, Integration.IsIPad() ? 30 : 20));
+                View.AddConstraint(topView.TopAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.TopAnchor, Integration.IsIPad() ? 30 : 20));
             }
             else
             {
-                View.AddConstraint(headlineImage.TopAnchor.ConstraintEqualTo(View.TopAnchor, Integration.IsIPad() ? 30 : 20));
+                View.AddConstraint(topView.TopAnchor.ConstraintEqualTo(View.TopAnchor, Integration.IsIPad() ? 30 : 20));
             }
 
             View.AddConstraints(new NSLayoutConstraint[]
             {
-                headlineImage.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
+                topView.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
+                topView.BottomAnchor.ConstraintEqualTo(View.CenterYAnchor),
 
-                titleLabel.TopAnchor.ConstraintEqualTo(headlineImage.BottomAnchor, 20),
+                titleLabel.TopAnchor.ConstraintEqualTo(topView.BottomAnchor, 20),
                 titleLabel.LeftAnchor.ConstraintEqualTo(View.LeftAnchor, 20),
                 titleLabel.RightAnchor.ConstraintEqualTo(View.RightAnchor, -20),
 
@@ -248,33 +271,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 nextDoneButton.BottomAnchor.ConstraintEqualTo(View.BottomAnchor),
             });
 
-            if (!Integration.IsIPad())
-                View.AddConstraints(new NSLayoutConstraint[] {
-                headlineImage.BottomAnchor.ConstraintEqualTo(View.CenterYAnchor)
-            });
-
-            if (!isLast)
-            {
-                skipButton = new UIButton(UIButtonType.System)
-                {
-                    TranslatesAutoresizingMaskIntoConstraints = false,
-                    ContentEdgeInsets = new UIEdgeInsets(5, 10f, 5f, 10f)
-                };
-                skipButton.SetTitle("Close", UIControlState.Normal);
-                skipButton.TitleLabel.Font = Theme.DefaultFont.WithSize(18);
-                skipButton.TitleLabel.TextAlignment = UITextAlignment.Center;
-                skipButton.TouchUpInside += SkipButton_TouchUpInside;
-
-                View.AddSubview(skipButton);
-
-                View.AddConstraints(new NSLayoutConstraint[]
-                {
-                    skipButton.TopAnchor.ConstraintEqualTo(nextDoneButton.TopAnchor),
-                    skipButton.LeftAnchor.ConstraintEqualTo(descriptionTextView.LeftAnchor),
-                    skipButton.BottomAnchor.ConstraintEqualTo(nextDoneButton.BottomAnchor),
-
-                });
-            }
         }
 
         void NextDoneButton_TouchUpInside(object sender, EventArgs e)
