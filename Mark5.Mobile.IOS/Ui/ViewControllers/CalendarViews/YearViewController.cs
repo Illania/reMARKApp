@@ -1,8 +1,6 @@
-﻿using System;
-using Syncfusion.SfCalendar.iOS;
+﻿using Syncfusion.SfCalendar.iOS;
 using UIKit;
 using Mark5.Mobile.IOS.Ui.Common;
-using Syncfusion.SfSchedule.iOS;
 using CoreAnimation;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
@@ -16,6 +14,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
+
             View.BackgroundColor = Theme.DarkerBlue;
 
             reMarkYearCalendar = new ReMarkYearCalendar()
@@ -37,8 +36,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 reMarkYearCalendar.RightAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.RightAnchor),
                 reMarkYearCalendar.LeftAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.LeftAnchor)
             });
-
-
 
             NavigationController.NavigationBarHidden = true;
         }
@@ -65,16 +62,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         class AnimationDelegate : CAAnimationDelegate
         {
-            YearViewController ctrl;
+            YearViewController yearViewController;
 
-            public AnimationDelegate(YearViewController ctrl)
+            public AnimationDelegate(YearViewController yearViewController)
             {
-                this.ctrl = ctrl;
+                this.yearViewController = yearViewController;
             }
 
             public override void AnimationStopped(CAAnimation anim, bool finished)
             {
-                ctrl.transitioning = false;
+                yearViewController.transitioning = false;
             }
         }
     }
