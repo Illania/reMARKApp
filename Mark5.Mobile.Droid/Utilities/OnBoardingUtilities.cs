@@ -90,7 +90,8 @@ namespace Mark5.Mobile.Droid.Utilities
         {
             return new List<OnBoardingPageModel>
             {
-                new OnBoardingPageModel("Welcome to reMARK", "We have renamed the MARK5 app \"reMARK\". It has all the same functionality as before and is perfectly compatible with MARK5. We made some changes in order to accommodate the increasing functionality, click next to see.", Resource.Drawable.onboarding_1),
+                new OnBoardingPageModel("Welcome to reMARK", "We have renamed the MARK5 app \"reMARK\". It has all the same functionality as before and is perfectly compatible with MARK5. " +
+                    "We have made a few changes in the reMARK app. Press next to see what has happened.", Resource.Drawable.onboarding_1),
                 new OnBoardingPageModel("History and overview", "Actions and links have been renamed. \"Actions\" is now called \"History\" and \"Links\" is now called \"Overview\". " +
                     "You find history and overview in the same place as before and they have the same functionality.", Resource.Drawable.onboarding_5),
                 new OnBoardingPageModel("Outgoing emails", "Now you can see pending emails in \"Outgoing\" just by browsing your folder list." +
