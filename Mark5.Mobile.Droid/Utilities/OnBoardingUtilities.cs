@@ -91,10 +91,6 @@ namespace Mark5.Mobile.Droid.Utilities
             return new List<OnBoardingPageModel>
             {
                 new OnBoardingPageModel("Welcome to reMARK", "We have renamed the MARK5 app \"reMARK\". It has all the same functionality as before and is perfectly compatible with MARK5. We made some changes in order to accommodate the increasing functionality, click next to see.", Resource.Drawable.onboarding_1),
-                new OnBoardingPageModel("New navigation", "To navigate between emails, contacts, mailing lists, search and settings click the blue button.", Resource.Drawable.onboarding_2),
-                new OnBoardingPageModel("New navigation", "Now you will see a menu where you can select between emails, contacts, mailing lists, search and settings. Select where you want to go or click the exit button in the bottom." +
-                                        "This means that you only need to type in your password when you want to login again.",Resource.Drawable.onboarding_3),
-                new OnBoardingPageModel("Search", "You find search in the bottom bar or in the new navigation menu.", Resource.Drawable.onboarding_4),
                 new OnBoardingPageModel("History and overview", "Actions and links have been renamed. \"Actions\" is now called \"History\" and \"Links\" is now called \"Overview\". " +
                     "You find history and overview in the same place as before and they have the same functionality.", Resource.Drawable.onboarding_5),
                 new OnBoardingPageModel("Outgoing emails", "Now you can see pending emails in \"Outgoing\" just by browsing your folder list." +
@@ -154,6 +150,12 @@ namespace Mark5.Mobile.Droid.Utilities
 
                 var paddingValue = Conversion.ConvertDpToPixels(15);
 
+                var displayMetrics = new DisplayMetrics();
+                ((Activity)context).WindowManager.DefaultDisplay.GetMetrics(displayMetrics);
+                int maxHeight = context.Resources.Configuration.Orientation == Android.Content.Res.Orientation.Portrait
+                    ? (int)(displayMetrics.HeightPixels * 0.50)
+                    : (int)(displayMetrics.HeightPixels * 0.20);
+
                 if (position == 0)
                 {
                     var animationView = new LottieAnimationView(context);
@@ -166,6 +168,7 @@ namespace Mark5.Mobile.Droid.Utilities
                     animationView.LayoutParameters = ip;
                     animationView.SetAdjustViewBounds(true);
                     animationView.SetScaleType(ImageView.ScaleType.FitStart);
+                    animationView.SetMaxHeight(maxHeight);
                     animationView.PlayAnimation();
 
                     topView = animationView;
@@ -182,12 +185,7 @@ namespace Mark5.Mobile.Droid.Utilities
                     imageView.SetScaleType(ImageView.ScaleType.FitStart);
                     imageView.SetImageResource(pageModel.ImageResourceId);
 
-                    var displayMetrics = new DisplayMetrics();
-                    ((Activity)context).WindowManager.DefaultDisplay.GetMetrics(displayMetrics);
-                    int height = context.Resources.Configuration.Orientation == Android.Content.Res.Orientation.Portrait
-                        ? (int)(displayMetrics.HeightPixels * 0.50)
-                        : (int)(displayMetrics.HeightPixels * 0.20);
-                    imageView.SetMaxHeight(height);
+                    imageView.SetMaxHeight(maxHeight);
 
                     topView = imageView;
                 }
