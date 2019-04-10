@@ -10,6 +10,7 @@ using Android.Support.V7.Widget;
 using Android.Util;
 using Android.Views;
 using Android.Widget;
+using Com.Airbnb.Lottie;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Droid.Ui.Common;
 
@@ -97,7 +98,7 @@ namespace Mark5.Mobile.Droid.Utilities
                 new OnBoardingPageModel("History and overview", "Actions and links have been renamed. \"Actions\" is now called \"History\" and \"Links\" is now called \"Overview\". " +
                     "You find history and overview in the same place as before and they have the same functionality.", Resource.Drawable.onboarding_5),
                 new OnBoardingPageModel("Outgoing emails", "Now you can see pending emails in \"Outgoing\" just by browsing your folder list." +
-                    " The number shows how many pending emails you have. If there is a red dot, it indicates that an email has been failed to send.",Resource.Drawable.onboarding_6),
+                    " The number shows how many pending emails you have. If there is a red dot, it indicates that an email has failed to send.",Resource.Drawable.onboarding_6),
             };
         }
 
@@ -147,28 +148,51 @@ namespace Mark5.Mobile.Droid.Utilities
                     Orientation = LinearLayoutCompat.Vertical,
                 };
 
-                linearLayout.SetBackgroundColor(new Color(ContextCompat.GetColor(context, Resource.Color.lightblue)));
+                linearLayout.SetBackgroundColor(new Color(ContextCompat.GetColor(context, Resource.Color.lightgray)));
+
+                View topView = null;
 
                 var paddingValue = Conversion.ConvertDpToPixels(15);
 
-                var imageView = new AppCompatImageView(context);
-                var ip = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
+                if (position == 0)
                 {
-                    Gravity = (int)GravityFlags.Center
-                };
-                imageView.LayoutParameters = ip;
-                imageView.SetAdjustViewBounds(true);
-                imageView.SetScaleType(ImageView.ScaleType.FitStart);
-                imageView.SetImageResource(pageModel.ImageResourceId);
+                    var animationView = new LottieAnimationView(context);
+                    animationView.SetAnimation("splash.json");
 
-                var displayMetrics = new DisplayMetrics();
-                ((Activity)context).WindowManager.DefaultDisplay.GetMetrics(displayMetrics);
-                int height = context.Resources.Configuration.Orientation == Android.Content.Res.Orientation.Portrait
-                    ? (int)(displayMetrics.HeightPixels * 0.50)
-                    : (int)(displayMetrics.HeightPixels * 0.20);
-                imageView.SetMaxHeight(height);
+                    var ip = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
+                    {
+                        Gravity = (int)GravityFlags.Center
+                    };
+                    animationView.LayoutParameters = ip;
+                    animationView.SetAdjustViewBounds(true);
+                    animationView.SetScaleType(ImageView.ScaleType.FitStart);
+                    animationView.PlayAnimation();
 
-                imageView.SetPadding(0, paddingValue * 3, 0, 0);
+                    topView = animationView;
+                }
+                else
+                {
+                    var imageView = new AppCompatImageView(context);
+                    var ip = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
+                    {
+                        Gravity = (int)GravityFlags.Center
+                    };
+                    imageView.LayoutParameters = ip;
+                    imageView.SetAdjustViewBounds(true);
+                    imageView.SetScaleType(ImageView.ScaleType.FitStart);
+                    imageView.SetImageResource(pageModel.ImageResourceId);
+
+                    var displayMetrics = new DisplayMetrics();
+                    ((Activity)context).WindowManager.DefaultDisplay.GetMetrics(displayMetrics);
+                    int height = context.Resources.Configuration.Orientation == Android.Content.Res.Orientation.Portrait
+                        ? (int)(displayMetrics.HeightPixels * 0.50)
+                        : (int)(displayMetrics.HeightPixels * 0.20);
+                    imageView.SetMaxHeight(height);
+
+                    topView = imageView;
+                }
+
+                topView.SetPadding(0, paddingValue * 3, 0, 0);
 
                 var titleTextView = new AppCompatTextView(context)
                 {
@@ -198,24 +222,6 @@ namespace Mark5.Mobile.Droid.Utilities
                 lp.SetMargins(0, 0, 0, paddingValue);
                 bottomRowLayout.LayoutParameters = lp;
 
-                if (position != Count - 1)
-                {
-                    var skipButton = new AppCompatButton(context)
-                    {
-                        Text = "Close",
-                        Id = View.GenerateViewId(),
-                    };
-                    skipButton.SetTextColor(new Color(ContextCompat.GetColor(context, Resource.Color.darkblue)));
-                    skipButton.SetBackgroundColor(Color.Transparent);
-                    var sp = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent);
-                    sp.AddRule(LayoutRules.CenterVertical);
-                    sp.AddRule(LayoutRules.AlignParentLeft);
-                    skipButton.LayoutParameters = sp;
-                    skipButton.Click += (object sender, EventArgs e) => Close();
-
-                    bottomRowLayout.AddView(skipButton);
-                }
-
                 var nextDoneButton = new AppCompatButton(context)
                 {
                     Text = (position != Count - 1) ? "NEXT" : "DONE",
@@ -236,7 +242,7 @@ namespace Mark5.Mobile.Droid.Utilities
 
                 bottomRowLayout.AddView(nextDoneButton);
 
-                linearLayout.AddView(imageView);
+                linearLayout.AddView(topView);
                 linearLayout.AddView(titleTextView);
                 linearLayout.AddView(contentTextView);
                 linearLayout.AddView(bottomRowLayout);
