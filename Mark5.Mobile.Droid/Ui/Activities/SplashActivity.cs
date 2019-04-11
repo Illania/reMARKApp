@@ -70,129 +70,145 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             Firebase.Analytics.FirebaseAnalytics.GetInstance(this).SetAnalyticsCollectionEnabled(false);
 #endif
 
+            AsyncHelpers.RunOnUiThreadAsync((Activity)this, () =>
+            {
+                CommonConfig.Logger.Info($"Starting lottie animation...");
+                var animationView = FindViewById<LottieAnimationView>(Resource.Id.animation_view);
+                animationView.Progress = 1;
+                animationView.EnableMergePathsForKitKatAndAbove(true);
+                animationView.Animate().Alpha(1f).SetDuration(200);
+            });
+
             Task.Run(async () =>
+            {
+                var authenticator = AuthenticatorFactory.Create();
+                if (!await authenticator.IsAuthenticatedAsync())
                 {
-                    var authenticator = AuthenticatorFactory.Create();
-                    if (!await authenticator.IsAuthenticatedAsync())
-                    {
-                        CommonConfig.Logger.Info($"Writing required file system storage version...");
+                    CommonConfig.Logger.Info($"Writing required file system storage version...");
 
-                        await FileSystemStorageUpdater.WriteRequiredStorageVersion();
+                    await FileSystemStorageUpdater.WriteRequiredStorageVersion();
 
-                        CommonConfig.Logger.Info($"User was not authenticated - will present {nameof(LoginActivity)}");
+                    CommonConfig.Logger.Info($"User was not authenticated - will present {nameof(LoginActivity)}");
 
-                        return false;
-                    }
+                    return false;
+                }
 
-                    var animationView = FindViewById<LottieAnimationView>(Resource.Id.animation_view);
+                var animationView = FindViewById<LottieAnimationView>(Resource.Id.animation_view);
 
-                    animationView.Progress = 1;
-                    animationView.Animate().Alpha(1f).SetDuration(200);
+                animationView.Progress = 1;
+                animationView.Animate().Alpha(1f).SetDuration(200);
 
-                    CommonConfig.Logger.Info("Updating file system storage...");
+                CommonConfig.Logger.Info("Updating file system storage...");
 
-                    var updated = await FileSystemStorageUpdater.UpdateStorage();
+                var updated = await FileSystemStorageUpdater.UpdateStorage();
 
-                    CommonConfig.Logger.Info(updated ? "File system storage updated" : "File system storage update not required");
+                CommonConfig.Logger.Info(updated ? "File system storage updated" : "File system storage update not required");
 
-                    CommonConfig.Logger.Info($"User is authenticated - initializing...");
+                CommonConfig.Logger.Info($"User is authenticated - initializing...");
 
-                    var ci = await authenticator.GetConnectionInfoAsync();
+                var ci = await authenticator.GetConnectionInfoAsync();
 
-                    CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Hostname, ci.Hostname);
-                    CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.SSL, ci.SslMode.ToString());
+                CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Hostname, ci.Hostname);
+                CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.SSL, ci.SslMode.ToString());
 
-                    CommonConfig.Logger.Info($"Current connection info: {ci}");
-                    CommonConfig.Logger.Info($"Push token: {PlatformConfig.Preferences.PushNotificationToken}");
+                CommonConfig.Logger.Info($"Current connection info: {ci}");
+                CommonConfig.Logger.Info($"Push token: {PlatformConfig.Preferences.PushNotificationToken}");
 
-                    switch (ci.SslMode)
-                    {
-                        case SslMode.AllowSelfSigned:
-                            PlatformConfig.SSLCertificateVerificationManager.EnableSelfSignedCertificates();
-                            break;
-                        default:
-                            PlatformConfig.SSLCertificateVerificationManager.DisableSelfSignedCertificates();
-                            break;
-                    }
+                switch (ci.SslMode)
+                {
+                    case SslMode.AllowSelfSigned:
+                        PlatformConfig.SSLCertificateVerificationManager.EnableSelfSignedCertificates();
+                        break;
+                    default:
+                        PlatformConfig.SSLCertificateVerificationManager.DisableSelfSignedCertificates();
+                        break;
+                }
 
-                    CommonConfig.Logger.Info($"Initializing {nameof(Managers)}...");
+                CommonConfig.Logger.Info($"Initializing {nameof(Managers)}...");
 
-                    Managers.Initialize(ci);
-                    Managers.DocumentsManager.MaxToFetch = PlatformConfig.Preferences.DocumentsToDownload;
-                    Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
-                    Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
-                    Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
+                Managers.Initialize(ci);
+                Managers.DocumentsManager.MaxToFetch = PlatformConfig.Preferences.DocumentsToDownload;
+                Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
+                Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
+                Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
 
-                    if (PlatformConfig.Preferences.ClearCache)
-                    {
-                        CommonConfig.UsageAnalytics.LogEvent(new SettingsCacheCleanUpEvent());
+                if (PlatformConfig.Preferences.ClearCache)
+                {
+                    CommonConfig.UsageAnalytics.LogEvent(new SettingsCacheCleanUpEvent());
 
-                        CommonConfig.Logger.Info("Clearing cache...");
+                    CommonConfig.Logger.Info("Clearing cache...");
 
-                        await DatabaseUtils.ResetDatabases();
-                        PlatformConfig.Preferences.ClearCache = false;
+                    await DatabaseUtils.ResetDatabases();
+                    PlatformConfig.Preferences.ClearCache = false;
 
-                        CommonConfig.Logger.Info("Cleared cache");
-                    }
+                    CommonConfig.Logger.Info("Cleared cache");
+                }
 
-                    if (await Managers.CleanUpManager.IsCleanUpNecessary(PlatformConfig.Preferences.CleanCacheIntervalDays))
-                    {
-                        CommonConfig.Logger.Info("Cleaning up cache....");
+                if (await Managers.CleanUpManager.IsCleanUpNecessary(PlatformConfig.Preferences.CleanCacheIntervalDays))
+                {
+                    CommonConfig.Logger.Info("Cleaning up cache....");
 
-                        await Managers.CleanUpManager.CleanUp();
+                    await Managers.CleanUpManager.CleanUp();
 
-                        CommonConfig.Logger.Info("Cleaned up cache");
-                    }
+                    CommonConfig.Logger.Info("Cleaned up cache");
+                }
 
-                    CommonConfig.Logger.Info($"Refreshing reachability status...");
-                    await CommonConfig.Reachability.Refresh();
+                CommonConfig.Logger.Info($"Refreshing reachability status...");
+                await CommonConfig.Reachability.Refresh();
 
-                    CommonConfig.Logger.Info($"Registering {nameof(ReachabilityBroadcastReceiver)}...");
-                    PlatformConfig.ReachabilityBroadcastReceiver.Register();
+                CommonConfig.Logger.Info($"Registering {nameof(ReachabilityBroadcastReceiver)}...");
+                PlatformConfig.ReachabilityBroadcastReceiver.Register();
 
-                    if (PlatformConfig.Preferences.CallerIdentificationEnabled)
-                    {
-                        CommonConfig.Logger.Info($"Registering {nameof(CallStateBroadcastReceiver)}...");
-                        PlatformConfig.CallStateBroadcastReceiver.Register();
-                    }
+                if (PlatformConfig.Preferences.CallerIdentificationEnabled)
+                {
+                    CommonConfig.Logger.Info($"Registering {nameof(CallStateBroadcastReceiver)}...");
+                    PlatformConfig.CallStateBroadcastReceiver.Register();
+                }
 
-                    CommonConfig.Logger.Info("Retrieving system settings...");
-                    ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
+                CommonConfig.Logger.Info("Retrieving system settings...");
+                ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
 
-                    if (!String.IsNullOrEmpty(ServerConfig.SystemSettings.SystemInfo.CustomerName))
-                        CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.CustomerName, ServerConfig.SystemSettings.SystemInfo.CustomerName);
+                if (!String.IsNullOrEmpty(ServerConfig.SystemSettings.SystemInfo.CustomerName))
+                    CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.CustomerName, ServerConfig.SystemSettings.SystemInfo.CustomerName);
 
-                    SystemSettingsJobService.ScheduleJob();
+                SystemSettingsJobService.ScheduleJob();
 
-                    LocalNotificationsListener.Initialize();
+                LocalNotificationsListener.Initialize();
 
-                    DateTimeConverter.UseServerTimezone = PlatformConfig.Preferences.UseServerTimeZone;
+                DateTimeConverter.UseServerTimezone = PlatformConfig.Preferences.UseServerTimeZone;
 
-                    if (!string.IsNullOrWhiteSpace(FirebaseInstanceId.Instance.Token))
-                        PlatformConfig.Preferences.PushNotificationToken = FirebaseInstanceId.Instance.Token;
+                if (!string.IsNullOrWhiteSpace(FirebaseInstanceId.Instance.Token))
+                    PlatformConfig.Preferences.PushNotificationToken = FirebaseInstanceId.Instance.Token;
 
-                    CommonConfig.Logger.Info($"Initialized - will present {nameof(MainActivity)}");
+                CommonConfig.Logger.Info($"Initialized - will present {nameof(MainActivity)}");
 
-                    return true;
-                })
-                .ContinueWith(t =>
-                   {
-                       Services.DocumentsUploadService?.Start();
-                       Services.DocumentPreviewsDownloadService?.Start();
-                       Services.DocumentsDownloadService?.Start();
+                return true;
+            }).ContinueWith(t =>
+            {
+                if (t.IsFaulted)
+                {
+                    Exception ex = t.Exception;
+                    CommonConfig.Logger.Error("Splash OnStart() Exception : ", ex);
+                    Dialogs.SendCriticalReport(this, ex);
+                    ShowLoginButton();
+                    return;
+                }
 
-                       PushNotificationsUtilities.CreateChannelIfNotExists(this);
+                Services.DocumentsUploadService?.Start();
+                Services.DocumentPreviewsDownloadService?.Start();
+                Services.DocumentsDownloadService?.Start();
 
-                       if (t.Result)
-                           StartActivity(MainActivity.CreateIntent(this));
-                       else
-                           ShowLoginButton();
+                PushNotificationsUtilities.CreateChannelIfNotExists(this);
 
-                       if (openedFromNotification && IsTaskRoot)
-                           ProcessNotification();
+                if (t.Result)
+                    StartActivity(MainActivity.CreateIntent(this));
+                else
+                    ShowLoginButton();
 
-                   },
-                    TaskScheduler.FromCurrentSynchronizationContext());
+                if (openedFromNotification && IsTaskRoot)
+                    ProcessNotification();
+
+            }, TaskScheduler.FromCurrentSynchronizationContext());
 
             CommonConfig.Logger.Info($"Started {nameof(SplashActivity)}");
         }

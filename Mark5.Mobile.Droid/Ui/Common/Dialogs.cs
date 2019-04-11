@@ -485,7 +485,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
                     Task.Run(() => { return SystemReportCollector.CreateFullReport(); })
                         .ContinueWith(async t =>
                     {
-                        dismissAction();
+                        dismissAction.Invoke();
 
                         if (!t.IsFaulted)
                         {
@@ -503,6 +503,39 @@ namespace Mark5.Mobile.Droid.Ui.Common
             }
             builder.Cancelable(false);
             builder.Show();
+        }
+
+        public static Task SendCriticalReport(Context context, Exception ex)
+        {
+            if (context == null)
+                return Task.CompletedTask;
+
+            var tcs = new TaskCompletionSource<bool>();
+            var builder = new MaterialDialog.Builder(context);
+
+            builder.Title(Resource.String.critical_exception_title);
+            builder.Content(Resource.String.critical_exception_message);
+
+            builder.PositiveText(Resource.String.report);
+            builder.OnPositive(new SingleButtonCallback(() => tcs.SetResult(true)));
+            builder.NeutralText(Resource.String.cancel);
+
+            builder.OnPositive(new SingleButtonCallback(() =>
+            {
+                var dismissAction = ShowInfiniteProgressDialog(context, Resource.String.dialog_creating_report, Resource.String.please_wait);
+                Task.Run(() => { return SystemReportCollector.CreateFullReport(); })
+                    .ContinueWith(t =>
+                    {
+                        context.StartActivity(SystemReportCollector.CreateShareReportIntent(context, t.Result));
+                        dismissAction.Invoke();
+                        tcs.SetResult(true);
+                    }, TaskScheduler.FromCurrentSynchronizationContext());
+            }));
+
+            builder.Cancelable(false);
+            builder.Show();
+
+            return tcs.Task;
         }
 
         static string GetErrorTitle(Context context, Exception ex)
