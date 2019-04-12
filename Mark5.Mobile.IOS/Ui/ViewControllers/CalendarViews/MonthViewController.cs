@@ -3,20 +3,37 @@ using Syncfusion.SfSchedule.iOS;
 using UIKit;
 using Mark5.Mobile.IOS.Ui.Common;
 using CoreAnimation;
+using Mark5.Mobile.IOS.Utilities;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 {
     public class MonthViewController : AbstractViewController
     {
-        ReMarkMonthView monthView;
-
-        public bool transitioning;
-
-        readonly ModuleType moduleType;
+        readonly ReMarkMonthSchedule monthSchedule;
+        private bool transitioning;
 
         public MonthViewController(ModuleType moduleType)
         {
-            this.moduleType = moduleType;
+            monthSchedule = new ReMarkMonthSchedule();
+            monthSchedule.HeaderTapped += Handle_HeaderTapped;
+            monthSchedule.CellDoubleTapped += Schedule_CellDoubleTapped;
+            monthSchedule.MonthInlineAppointmentTapped += Schedule_MonthInlineAppointmentTapped;
+        }
+
+        public override void ViewDidLoad()
+        {
+            base.ViewDidLoad();
+            View.AddSubview(monthSchedule);
+            View.AddConstraints(new NSLayoutConstraint[] {
+                monthSchedule.TopAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.TopAnchor : View.TopAnchor),
+                monthSchedule.BottomAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.BottomAnchor : View.BottomAnchor),
+                monthSchedule.RightAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.RightAnchor : View.RightAnchor),
+                monthSchedule.LeftAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.LeftAnchor : View.LeftAnchor)
+            });
+
+            View.BackgroundColor = UIColor.White;
+            InitializeNavigationBar();
+            MoveToDate(Foundation.NSDate.Now);
         }
 
         public override void ViewWillAppear(bool animated)
@@ -25,53 +42,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             NavigationController.NavigationBarHidden = false;
         }
 
-        public override void ViewDidLoad()
+        void MoveToDate(Foundation.NSDate date)
         {
-            base.ViewDidLoad();
-
-            monthView = new ReMarkMonthView()
+            if (monthSchedule != null)
             {
-                TranslatesAutoresizingMaskIntoConstraints = false
-            };
-
-            monthView.HeaderTapped += Handle_HeaderTapped;
-            monthView.EnableNavigation = true;
-            monthView.CellDoubleTapped += Schedule_CellDoubleTapped;
-
-            monthView.MonthInlineAppointmentTapped += Schedule_MonthInlineAppointmentTapped;
-
-            View.AddSubview(monthView);
-
-            View.AddConstraints(new NSLayoutConstraint[] {
-                monthView.TopAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.TopAnchor),
-                monthView.BottomAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.BottomAnchor),
-                monthView.RightAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.RightAnchor),
-                monthView.LeftAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.LeftAnchor)
-            });
-
-            View.BackgroundColor = UIColor.White;
-
-            InitializeNavigationBar();
-        }
-
-        void Schedule_MonthInlineAppointmentTapped(object sender, MonthInlineAppointmentTappedEventArgs e)
-        {
-            NavigationController.PushViewController(new AppointmentViewController(), true);
-        }
-
-        void Schedule_CellDoubleTapped(object sender, CellTappedEventArgs e)
-        {
-            NavigationController.PushViewController(new DayViewController(), true);
-        }
-
-        void Handle_HeaderTapped(object sender, HeaderTappedEventArgs e)
-        {
-            NavigationController.PushViewController(new YearViewController(), true);
-        }
-
-        void Schedule_ViewHeaderTapped(object sender, ViewHeaderTappedEventArgs e)
-        {
-            NavigationController.PushViewController(new YearViewController(), true);
+                monthSchedule.MoveToDate(date);
+                monthSchedule.SelectedDate = date;
+            }
         }
 
         void InitializeNavigationBar()
@@ -86,13 +63,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 if (transitioning)
                     return;
 
-                YearViewController yearSelection = new YearViewController();
-                CATransition transition = new CATransition();
-                transition.Duration = 0.35;
-                transition.TimingFunction = CAMediaTimingFunction.FromName(CAMediaTimingFunction.Linear);
-                transition.Type = CAAnimation.TransitionPush;
-                transition.Subtype = CAAnimation.TransitionFromLeft;
-                transition.Delegate = new AnimationDelegate(this);
+                YearViewController yearSelection = new YearViewController(MoveToDate);
+                CATransition transition = new CATransition
+                {
+                    Duration = 0.35,
+                    TimingFunction = CAMediaTimingFunction.FromName(CAMediaTimingFunction.Linear),
+                    Type = CAAnimation.TransitionPush,
+                    Subtype = CAAnimation.TransitionFromLeft,
+                    Delegate = new AnimationDelegate(this)
+                };
                 transitioning = true;
 
                 NavigationController.View.Layer.AddAnimation(transition, null);
@@ -101,24 +80,56 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             NavigationItem.SetLeftBarButtonItem(backBtn, true);
 
-            var addBtn = new UIBarButtonItem
+            var createAppointment = new UIBarButtonItem
             {
                 Title = "",
                 Image = UIImage.FromBundle("Create")
             };
 
-            addBtn.Clicked += (sender, e) =>
+            var selectCalendars = new UIBarButtonItem
+            {
+                Title = "Calendars"
+            };
+
+            createAppointment.Clicked += (sender, e) =>
             {
                 var createAppointmentVC = new CreateAppointmentViewController();
                 NavigationController.PushViewController(createAppointmentVC, true);
             };
 
-            NavigationItem.SetRightBarButtonItem(addBtn, true);
+            NavigationItem.SetRightBarButtonItems(new UIBarButtonItem[] { createAppointment, selectCalendars }, true);
+        }
+
+        void Schedule_MonthInlineAppointmentTapped(object sender, MonthInlineAppointmentTappedEventArgs e)
+        {
+            NavigationController.PushViewController(new AppointmentViewController(), true);
+        }
+
+        void Schedule_CellDoubleTapped(object sender, CellTappedEventArgs e)
+        {
+            Foundation.NSDateComponents components = new Foundation.NSDateComponents
+            {
+                Hour = 8
+            };
+
+            Foundation.NSDate date = Foundation.NSCalendar.CurrentCalendar.DateByAddingComponents(components, e.Date, Foundation.NSCalendarOptions.None);
+
+            NavigationController.PushViewController(new DayViewController(date), true);
+        }
+
+        void Handle_HeaderTapped(object sender, HeaderTappedEventArgs e)
+        {
+            NavigationController.PushViewController(new YearViewController(MoveToDate), true);
+        }
+
+        void Schedule_ViewHeaderTapped(object sender, ViewHeaderTappedEventArgs e)
+        {
+            NavigationController.PushViewController(new YearViewController(MoveToDate), true);
         }
 
         class AnimationDelegate : CAAnimationDelegate
         {
-            MonthViewController ctrl;
+            readonly MonthViewController ctrl;
 
             public AnimationDelegate(MonthViewController ctrl)
             {
@@ -132,7 +143,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         }
     }
 
-    public class ReMarkMonthView : SFSchedule
+    class ReMarkMonthSchedule : SFSchedule
     {
         readonly SFViewHeaderStyle dayHeaderStyle = new SFViewHeaderStyle
         {
@@ -167,30 +178,32 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             }
         };
 
-        public ReMarkMonthView()
+        readonly SFSelectionStyle selectionStyle = new SFSelectionStyle
         {
+            BackgroundColor = Theme.DarkBlue,
+            BorderColor = Theme.LightBlue
+        };
+
+        public ReMarkMonthSchedule()
+        {
+            TranslatesAutoresizingMaskIntoConstraints = false;
+
             ScheduleView = SFScheduleView.SFScheduleViewMonth;
-
-            AppointmentMapping = CalendarUtils.GetAppointmentMapping();
-
-            ItemsSource = CalendarUtils.GetMeetings();
+            EnableNavigation = true;
+            MonthViewSettings = monthViewSettings;
+            SelectionStyle = selectionStyle;
+            HeaderStyle = calendarHeaderStyle;
+            DayHeaderStyle = dayHeaderStyle;
 
             MonthCellLoaded += ReMark_MonthCellLoaded;
 
-            MonthViewSettings = monthViewSettings;
-            SelectionStyle = new SFSelectionStyle
-            {
-                BackgroundColor = Theme.DarkBlue,
-                BorderColor = Theme.LightBlue
-            };
-
-            HeaderStyle = calendarHeaderStyle;
-            DayHeaderStyle = dayHeaderStyle;
+            AppointmentMapping = CalendarUtils.GetAppointmentMapping();
+            ItemsSource = CalendarUtils.GetMeetings();
         }
 
         void ReMark_MonthCellLoaded(object sender, MonthCellLoadedEventArgs e)
         {
-            SFCellStyle style = new SFCellStyle();
+            SFCellStyle style;
 
             if (e.IsToday)
             {
