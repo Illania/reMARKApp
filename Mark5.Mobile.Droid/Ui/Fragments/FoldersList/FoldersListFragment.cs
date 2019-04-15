@@ -64,15 +64,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return (new FoldersListFragment());
         }
 
-        public static (FoldersListFragment fragment, string tag) NewInstance(Folder remoteFolder, bool? hideSearch = null)
+        public static (FoldersListFragment fragment, string tag) NewInstance(Folder remoteFolder, bool? hideSearch = null, bool? loadRemoteFromCache = null)
         {
             var args = new Bundle();
 
             if (remoteFolder != null)
-                args.PutString(RemoteFolderBundleKey, Serializer.Serialize(remoteFolder));
+                args.PutString(RemoteFolderBundleKey, Serializer.Serialize(remoteFolder.ShallowCopy()));
 
             if (hideSearch != null)
                 args.PutBoolean(HideSearchBundleKey, hideSearch.Value);
+
+            if (loadRemoteFromCache != null)
+                args.PutBoolean(LoadRemoteFromCacheBundleKey, loadRemoteFromCache.Value);
 
             var fragment = new FoldersListFragment
             {
@@ -379,7 +382,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected virtual (BaseFragment fragment, string tag) GetFolderFragment(Folder folder)
         {
-            return NewInstance(folder, HideSearch);
+            return NewInstance(folder, HideSearch, folder.SubFolders?.Any());
         }
 
         void HandleOutgoingDocumentCountChange(OugoingDocumentCountMessage outgoingMessageCount)
