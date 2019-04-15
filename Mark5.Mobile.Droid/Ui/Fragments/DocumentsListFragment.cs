@@ -1465,13 +1465,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 ResetViewHolder(viewHolder, direction);
                 if (direction == ItemTouchHelper.Left)
                 {
-                    SwipeActionSelected(PlatformConfig.Preferences.EmailTrailingSwipeAction, viewHolder);
-
+                    SwipeActionSelected(PlatformConfig.Preferences.EmailTrailingSwipeAction, viewHolder.AdapterPosition);
                 }
                 else if (direction == ItemTouchHelper.Right)
                 {
-                    SwipeActionSelected(PlatformConfig.Preferences.EmailLeadingSwipeAction, viewHolder);
-
+                    SwipeActionSelected(PlatformConfig.Preferences.EmailLeadingSwipeAction, viewHolder.AdapterPosition);
                 }
             }
 
@@ -1487,7 +1485,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 adapter.NotifyItemChanged(position);
             }
 
-            async void SwipeActionSelected(Preferences.EmailSwipeAction action, RecyclerView.ViewHolder viewHolder)
+            async void SwipeActionSelected(Preferences.EmailSwipeAction action, int adapterPosition)
             {
                 CommonConfig.UsageAnalytics.LogEvent(new SwipeActionUsedEvent());
 
@@ -1496,46 +1494,45 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     switch (action)
                     {
                         case Preferences.EmailSwipeAction.Delete:
-                            fragment.DeleteAction(new List<DocumentPreview>() { adapter.Items[viewHolder.AdapterPosition] });
+                            fragment.DeleteAction(new List<DocumentPreview>() { adapter.Items[adapterPosition] });
                             break;
                         case Preferences.EmailSwipeAction.CopyToFolder:
                             fragment.StartActivity(CopyMoveToFolderListActivity.CreateIntent(context, CopyMoveToFolderListActivity.ModeType.Copy, ModuleType.Documents,
-                                                                                             new List<DocumentPreview> { adapter.Items[viewHolder.AdapterPosition] }.Cast<IBusinessEntity>().ToList(), folder));
+                                                                                             new List<DocumentPreview> { adapter.Items[adapterPosition] }.Cast<IBusinessEntity>().ToList(), folder));
                             break;
                         case Preferences.EmailSwipeAction.More:
                             var index = await Dialogs.ShowListDialog(context, Resource.String.pref_email_swipe_dialog_title, Resource.Array.pref_email_swipe_actions_entries_without_more, true);
                             if (index >= 0)
                             {
-                                SwipeActionSelected(PlatformConfig.Preferences.GetAllAvailableActions()[index], viewHolder);
+                                SwipeActionSelected(PlatformConfig.Preferences.GetAllAvailableActions()[index], adapterPosition);
                             }
                             break;
                         case Preferences.EmailSwipeAction.CopyToWorkTray:
-                            fragment.CopyToWorktrayAction(new List<DocumentPreview>() { adapter.Items[viewHolder.AdapterPosition] });
+                            fragment.CopyToWorktrayAction(new List<DocumentPreview>() { adapter.Items[adapterPosition] });
                             break;
                         case Preferences.EmailSwipeAction.Categories:
-                            fragment.ShowCategories(adapter.Items[viewHolder.AdapterPosition]);
+                            fragment.ShowCategories(adapter.Items[adapterPosition]);
                             break;
                         case Preferences.EmailSwipeAction.MarkAsReadUnread:
-                            if (!adapter.Items[viewHolder.AdapterPosition].IsReadByCurrent)
+                            if (!adapter.Items[adapterPosition].IsReadByCurrent)
                             {
-                                fragment.MarkAsRead(new List<DocumentPreview>() { adapter.Items[viewHolder.AdapterPosition] });
+                                fragment.MarkAsRead(new List<DocumentPreview>() { adapter.Items[adapterPosition] });
                             }
-                            if (adapter.Items[viewHolder.AdapterPosition].IsReadByCurrent)
+                            if (adapter.Items[adapterPosition].IsReadByCurrent)
                             {
-                                fragment.MarkAsUnread(new List<DocumentPreview>() { adapter.Items[viewHolder.AdapterPosition] });
+                                fragment.MarkAsUnread(new List<DocumentPreview>() { adapter.Items[adapterPosition] });
                             }
                             break;
                         case Preferences.EmailSwipeAction.RemoveFromFolder:
-                            fragment.DeleteFromFolderAction(new List<DocumentPreview>() { adapter.Items[viewHolder.AdapterPosition] });
+                            fragment.DeleteFromFolderAction(new List<DocumentPreview>() { adapter.Items[adapterPosition] });
                             break;
                         case Preferences.EmailSwipeAction.Priorities:
-                            fragment.SetPriority(new List<DocumentPreview>() { adapter.Items[viewHolder.AdapterPosition] });
+                            fragment.SetPriority(new List<DocumentPreview>() { adapter.Items[adapterPosition] });
                             break;
                         case Preferences.EmailSwipeAction.MoveToFolder:
                             fragment.StartActivity(CopyMoveToFolderListActivity.CreateIntent(context, CopyMoveToFolderListActivity.ModeType.Move, ModuleType.Documents,
-                                                                                             new List<DocumentPreview> { adapter.Items[viewHolder.AdapterPosition] }.Cast<IBusinessEntity>().ToList(), folder));
+                                                                                             new List<DocumentPreview> { adapter.Items[adapterPosition] }.Cast<IBusinessEntity>().ToList(), folder));
                             break;
-
                     }
                 }
 
