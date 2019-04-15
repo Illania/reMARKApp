@@ -23,7 +23,7 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-    [Android.App.Activity()]
+    [Android.App.Activity]
     public class MainActivity : BaseAppCompatActivity, NavigationView.IOnNavigationItemSelectedListener, FragmentManager.IOnBackStackChangedListener
     {
         const string StateKey = "State_d7a09340-3478-43d7-93c3-8974b687a5ec";

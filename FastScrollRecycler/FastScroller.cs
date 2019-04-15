@@ -15,8 +15,7 @@ namespace FastScrollRecycler
 
         readonly FastScrollRecyclerView recyclerView;
         readonly FastScrollPopup popup;
-
-        int thumbHeight;
+        readonly int thumbHeight;
         int width;
 
         Paint thumb;
@@ -26,7 +25,7 @@ namespace FastScrollRecycler
         Rect invalidateRect = new Rect();
         Rect invalidateTmpRect = new Rect();
 
-        int touchInset;
+        readonly int touchInset;
         int touchOffset;
 
         Point thumbPosition = new Point(-1, -1);
