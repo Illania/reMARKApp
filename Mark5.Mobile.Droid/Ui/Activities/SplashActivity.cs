@@ -84,10 +84,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     return false;
                 }
 
-                var animationView = FindViewById<LottieAnimationView>(Resource.Id.animation_view);
+                RunOnUiThread(() =>
+                {
+                    var animationView = FindViewById<LottieAnimationView>(Resource.Id.animation_view);
 
-                animationView.Progress = 1;
-                animationView.Animate().Alpha(1f).SetDuration(200);
+                    animationView.Progress = 1;
+                    animationView.Animate().Alpha(1f).SetDuration(200);
+                });
 
                 CommonConfig.Logger.Info("Updating file system storage...");
 
@@ -181,7 +184,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     Exception ex = t.Exception;
                     CommonConfig.Logger.Error("Splash OnStart() Exception : ", ex);
                     Dialogs.SendCriticalReport(this, ex);
-                    ShowLoginButton();
                     return;
                 }
 
