@@ -61,6 +61,8 @@
     <string name="create_report">Create report</string>
     <string name="create_system_report">Create system report</string>
     <string name="creator">Creator:</string>
+    <string name="critical_exception_title">Critical exception has occured</string>
+    <string name="critical_exception_message">Please send report to our developer team for further investigation</string>
     <string name="person">Person</string>
     <string name="company">Company</string>
     <string name="department">Department</string>
