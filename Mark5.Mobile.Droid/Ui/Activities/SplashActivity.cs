@@ -70,15 +70,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             Firebase.Analytics.FirebaseAnalytics.GetInstance(this).SetAnalyticsCollectionEnabled(false);
 #endif
 
-            AsyncHelpers.RunOnUiThreadAsync((Activity)this, () =>
-            {
-                CommonConfig.Logger.Info($"Starting lottie animation...");
-                var animationView = FindViewById<LottieAnimationView>(Resource.Id.animation_view);
-                animationView.Progress = 1;
-                animationView.EnableMergePathsForKitKatAndAbove(true);
-                animationView.Animate().Alpha(1f).SetDuration(200);
-            });
-
             Task.Run(async () =>
             {
                 var authenticator = AuthenticatorFactory.Create();
