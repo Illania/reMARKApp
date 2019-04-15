@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
@@ -160,8 +161,20 @@ namespace Mark5.Mobile.Droid.Utilities
                 if (html == null)
                     return null;
 
-                var inlineResult = PreMailer.Net.PreMailer.MoveCssInline(html, true, null, null, true, true);
-                return inlineResult.Html;
+                string result;
+
+                try
+                {
+                    var inlineResult = PreMailer.Net.PreMailer.MoveCssInline(html, true, null, null, true, true);
+                    result = inlineResult.Html;
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error("Error while inlining css...", ex);
+                    result = html;
+                }
+
+                return result;
             });
         }
 

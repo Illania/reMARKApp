@@ -444,12 +444,12 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             if (config.InlineCss)
             {
-                html = await InlineCss(html);
+                    html = await InlineCss(html);
 
-                if (CommonConfig.Logger.IsDebugEnabled())
-                    CommonConfig.Logger.Debug($"InlineCss {sw.ElapsedMilliseconds}ms");
-                sw.Restart();
-            }
+                    if (CommonConfig.Logger.IsDebugEnabled())
+                        CommonConfig.Logger.Debug($"InlineCss {sw.ElapsedMilliseconds}ms");
+                    sw.Restart();
+                }
 
             var htmlDocument = new HtmlDocument();
             htmlDocument.LoadHtml(html);
@@ -577,8 +577,19 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 if (html == null)
                     return null;
 
-                var inlineResult = PreMailer.Net.PreMailer.MoveCssInline(html, true, null, null, true, true);
-                return inlineResult.Html;
+                string result;
+                try
+                {
+                    var inlineResult = PreMailer.Net.PreMailer.MoveCssInline(html, true, null, null, true, true);
+                    result = inlineResult.Html;
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error("Error while inlining css...", ex);
+                    result = html;
+                }
+
+                return result;
             });
         }
 
