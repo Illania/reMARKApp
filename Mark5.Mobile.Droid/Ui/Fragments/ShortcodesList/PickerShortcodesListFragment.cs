@@ -39,7 +39,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 dismissAction();
 
                 var data = new Intent();
-                data.PutExtra(PickerShortcodesListActivity.ShortcodeResultKey, Serializer.Serialize(shortcode));
+                data.PutExtra(PickerShortcodesListActivity.ShortcodeIdResultKey, shortcodePreview.Id);
+                data.PutExtra(PickerShortcodesListActivity.FolderIdResultKey, Folder.Id);
                 Activity.SetResult(Android.App.Result.Ok, data);
                 Activity?.Finish();
             }

@@ -227,7 +227,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             preconfiguredEmailAddresses.Add(DocumentAddressType.To, parts[0].Split(","));
 
-            if (parts.Length >= 1)
+            if (parts.Length > 1)
             {
                 var parsed = HttpUtility.ParseQueryString(parts[1]);
                 var subject = parsed["subject"];

@@ -14,7 +14,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class PickerShortcodesListActivity : BaseAppCompatActivity
     {
-        public const string ShortcodeResultKey = "ShortcodeResult_6c50b825-28f6-4143-93b5-9d209d365b25";
+        public const string ShortcodeIdResultKey = "ShortcodeResult_6c50b825-28f6-4143-93b5-9d209d365b25";
+        public const string FolderIdResultKey = "FolderIdResult_82f424ce-aa16-4e91-804f-4daabbf4d9a4";
+
         public const string FolderIntentKey = "FolderIntent_be2e7cbe-4825-4df1-a6da-54c4bc7b1ab8";
 
         Toolbar toolbar;
@@ -47,7 +49,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 var ft = SupportFragmentManager.BeginTransaction();
 
-                var (pcflf,tag) = PickerShortcodesListFragment.NewInstance(folder);
+                var (pcflf, tag) = PickerShortcodesListFragment.NewInstance(folder);
                 ft.Replace(Resource.Id.fragment_container, pcflf, tag);
                 ft.Commit();
 
