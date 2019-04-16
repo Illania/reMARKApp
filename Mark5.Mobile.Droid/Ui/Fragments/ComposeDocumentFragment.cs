@@ -304,8 +304,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             if (requestCode == RequestCodes.ShortcodesRequestCode && resultCode == (int)Result.Ok)
             {
-                var shortcode = Serializer.Deserialize<Shortcode>(data.GetStringExtra(PickerShortcodesFolderListActivity.ShortcodesResultKey));
-                AddAddressesFromShortcode(shortcode);
+                var shortcodeId = data.GetIntExtra(PickerShortcodesFolderListActivity.ShortcodeIdResultKey, -1);
+                var folderId = data.GetIntExtra(PickerShortcodesFolderListActivity.FolderIdResultKey, -1);
+                await RetrieveAndAddShortcode(shortcodeId, folderId);
                 UpdateSendButtonState();
             }
             if (requestCode == RequestCodes.TemplatePreviewRequestCode && resultCode == (int)Result.Ok)
@@ -317,6 +318,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var template = Serializer.Deserialize<TemplatePreview>(data.GetStringExtra(TemplatesListActivity.TemplatePreviewResultKey));
                 await GetTemplate(template, true);
+            }
+        }
+
+        async Task RetrieveAndAddShortcode(int shortcodeId, int folderId)
+        {
+            try
+            {
+                var shortcode = await Managers.ShortcodesManager.GetShortcodeAsync(folderId, shortcodeId, SourceType.Local);
+
+                AddAddressesFromShortcode(shortcode);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Error while retrieving shortcode from db [FolderId = {folderId}, ShortcodeId = {shortcodeId}]");
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
             }
         }
 
@@ -766,7 +782,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     await Managers.DocumentsManager.QueueWorkingCopyToUpload();
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     dismissAction();
 
@@ -829,18 +845,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 file = await Managers.DocumentsManager.SaveDocumentWorkingCopyAttachmentAsync(filename, stream);
                 var size = new Java.IO.File(file.Path).Length();
-                
+
                 if (size > ServerConfig.SystemSettings.DocumentsModuleInfo.MaximumAttachmentSizeBytes)
                 {
                     attachmentTooBig = true;
                     await Managers.DocumentsManager.DeleteDocumentWorkingCopyAttachmentAsync(filename);
                     throw new Exception();
                 }
-                
+
                 stream?.Dispose();
-            } 
+            }
             catch (Exception ex)
-            { 
+            {
                 CommonConfig.Logger.Error($"Failed to save attachment", ex.InnerException);
                 var resourceStringId = attachmentTooBig ? Resource.String.attachment_too_big : Resource.String.error_saving_local_attachment;
                 await Dialogs.ShowErrorDialogAsync(Activity, new Exception(Resources.GetString(resourceStringId)));
