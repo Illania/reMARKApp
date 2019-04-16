@@ -1,4 +1,5 @@
 ﻿using System;
+using Mark5.Mobile.IOS.Ui.Common;
 
 namespace Mark5.Mobile.IOS.Model
 {
@@ -20,27 +21,27 @@ namespace Mark5.Mobile.IOS.Model
             switch (Type)
             {
                 case NavigationModuleType.Calendar:
-                    Title = "Calendar";
+                    Title = Localization.GetString("calendar");
                     Image = "Nav-calendar";
                     break;
                 case NavigationModuleType.Contacts:
-                    Title = "Contacts";
+                    Title = Localization.GetString("contacts");
                     Image = "Nav-contacts";
                     break;
                 case NavigationModuleType.Shortcodes:
-                    Title = "Shortcodes";
+                    Title = Localization.GetString("shortcodes");
                     Image = "Nav-shortcodes";
                     break;
                 case NavigationModuleType.Mail:
-                    Title = "Mail";
+                    Title = Localization.GetString("email");
                     Image = "Nav-mail";
                     break;
                 case NavigationModuleType.Search:
-                    Title = "Search";
+                    Title = Localization.GetString("search");
                     Image = "Nav-search";
                     break;
                 case NavigationModuleType.Settings:
-                    Title = "Settings";
+                    Title = Localization.GetString("settings");
                     Image = "Nav-settings";
                     break;
                 case NavigationModuleType.Dummy:

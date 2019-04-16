@@ -162,7 +162,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         {
             if (RestoreWorkingCopy)
             {
-                SetEmails(DocumentPreview.Addresses.Where(a => a.AddressType == AddressType && a.Type == CommunicationAddressType.Email).Select(a => a.Address));
+                SetEmails(DocumentPreview.Addresses.Where(a => a.AddressType == AddressType).Select(a => a.Address));
 
                 if (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
                     AddInternalUsersFromGuids(DocumentPreview.Addresses.Where(a => a.AddressType == AddressType && a.Type == CommunicationAddressType.Internal).Select(a => a.Address));
@@ -171,10 +171,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             }
 
             if (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption.HasFlag(CopyToNewOption.Addresses))
-                SetEmails(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == AddressType && a.Type == CommunicationAddressType.Email).Select(a => a.Address));
+                SetEmails(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == AddressType).Select(a => a.Address));
 
             if (DocumentCreationModeFlag == DocumentCreationModeFlag.Edit)
-                SetEmails(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == AddressType && a.Type == CommunicationAddressType.Email).Select(a => a.Address));
+                SetEmails(PreviousDocumentPreview.Addresses.Where(a => a.AddressType == AddressType).Select(a => a.Address));
 
             if (DocumentCreationModeFlag == DocumentCreationModeFlag.Reply)
             {
@@ -183,35 +183,35 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
                 if (PreviousDocumentPreview.Direction == DocumentDirection.Incoming)
                 {
-                    var replyToAddresses = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.ReplyTo && da.Type == CommunicationAddressType.Email).Select(da => da.Address);
+                    var replyToAddresses = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.ReplyTo).Select(da => da.Address);
 
                     if (replyToAddresses == null || !replyToAddresses.Any())
-                        SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.From && da.Type == CommunicationAddressType.Email).Select(da => da.Address));
+                        SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.From).Select(da => da.Address));
                     else
                         SetEmails(replyToAddresses);
                 }
                 else if (PreviousDocumentPreview.Direction == DocumentDirection.Outgoing)
-                    SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.To && da.Type == CommunicationAddressType.Email).Select(da => da.Address));
+                    SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.To).Select(da => da.Address));
             }
 
             if (DocumentCreationModeFlag == DocumentCreationModeFlag.ReplyAll)
             {
                 if (PreviousDocumentPreview.Direction == DocumentDirection.Incoming)
                 {
-                    var replyToAddresses = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.ReplyTo && da.Type == CommunicationAddressType.Email).Select(da => da.Address);
+                    var replyToAddresses = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.ReplyTo).Select(da => da.Address);
 
                     if (AddressType == DocumentAddressType.To)
                     {
                         if (replyToAddresses == null || !replyToAddresses.Any())
-                            SetEmails(PreviousDocumentPreview.Addresses.Where(da => (da.AddressType == DocumentAddressType.From || da.AddressType == DocumentAddressType.To) && da.Type == CommunicationAddressType.Email).Select(da => da.Address).Distinct());
+                            SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.From || da.AddressType == DocumentAddressType.To).Select(da => da.Address).Distinct());
                         else
-                            SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.To && da.Type == CommunicationAddressType.Email).Select(da => da.Address).Union(replyToAddresses));
+                            SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.To).Select(da => da.Address).Union(replyToAddresses));
                     }
                     else if (AddressType == DocumentAddressType.Cc)
-                        SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.Cc && da.Type == CommunicationAddressType.Email).Select(da => da.Address));
+                        SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.Cc).Select(da => da.Address));
                 }
                 if (PreviousDocumentPreview.Direction == DocumentDirection.Outgoing)
-                    SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == AddressType && da.Type == CommunicationAddressType.Email).Select(da => da.Address));
+                    SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == AddressType).Select(da => da.Address));
             }
 
             if (PreconfiguredEmailAddresses != null && PreconfiguredEmailAddresses.ContainsKey(AddressType))
@@ -244,7 +244,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 {
                     if (PreviousDocumentPreview.Direction == DocumentDirection.Incoming)
                     {
-                        var replyToAddresses = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.ReplyTo && da.Type == CommunicationAddressType.Email).Select(da => da.Address);
+                        var replyToAddresses = PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.ReplyTo).Select(da => da.Address);
 
                         if (AddressType == DocumentAddressType.To)
                         {

@@ -207,6 +207,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             settingsButton.SetTitle(Localization.GetString("settings"), UIControlState.Normal);
             settingsButton.SetTitleColor(Theme.DarkBlue, UIControlState.Normal);
             settingsButton.TranslatesAutoresizingMaskIntoConstraints = false;
+            settingsButton.Alpha = 0;
             View.AddSubview(settingsButton);
 
             if (Integration.IsRunningAtLeast(11))
@@ -246,6 +247,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 BackgroundColor = Theme.DarkBlue,
                 AttributedPlaceholder = new NSMutableAttributedString(Localization.GetString("username"), placeholderAttributes),
+                Alpha = 0,
             };
 
             containerView.AddSubview(usernameTextField);
@@ -271,6 +273,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 AttributedPlaceholder = new NSMutableAttributedString(Localization.GetString("password"), placeholderAttributes),
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 BackgroundColor = Theme.DarkBlue,
+                Alpha = 0,
             };
             containerView.AddSubview(passwordTextField);
             containerView.AddConstraints(new[]
@@ -293,6 +296,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 AttributedPlaceholder = new NSMutableAttributedString(Localization.GetString("hostname"), placeholderAttributes),
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 BackgroundColor = Theme.DarkBlue,
+                Alpha = 0,
             };
             containerView.AddSubview(hostnameTextField);
             containerView.AddConstraints(new[]
@@ -316,6 +320,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 AttributedPlaceholder = new NSMutableAttributedString(Localization.GetString("port"), placeholderAttributes),
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 BackgroundColor = Theme.DarkBlue,
+                Alpha = 0,
             };
             containerView.AddSubview(portTextField);
             containerView.AddConstraints(new[]
@@ -332,7 +337,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             loginButton.TranslatesAutoresizingMaskIntoConstraints = false;
             loginButton.SetTitleColor(Theme.DarkBlue, UIControlState.Normal);
             loginButton.Enabled = false;
-            loginButton.Alpha = 0.7f;
+            loginButton.Alpha = 0;
             containerView.AddSubview(loginButton);
             containerView.AddConstraints(new[]
             {
@@ -372,7 +377,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             startLogoScaleAnimationDone = true;
 
-            animationView.Play();
+            animationView.PlayToProgress(0.5f, (animationFinished) =>
+             {
+                 animationView.Play();
+                 UIView.Animate(0.25, () =>
+                 {
+                     settingsButton.Alpha = 1;
+                     usernameTextField.Alpha = 1;
+                     hostnameTextField.Alpha = 1;
+                     passwordTextField.Alpha = 1;
+                     portTextField.Alpha = 1;
+                     loginButton.Alpha = 0.7f;
+                 });
+             });
             StartShowFieldsAnimation();
         }
 
