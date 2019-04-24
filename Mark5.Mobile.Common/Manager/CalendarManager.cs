@@ -10,12 +10,16 @@ using Mark5.ServiceReference.AppService;
 using DataContract = Mark5.ServiceReference.DataContract;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Model.Exceptions;
+using System.Collections.Concurrent;
+using System.Threading;
 
 namespace Mark5.Mobile.Common.Manager
 {
     class CalendarManager : AbstractManager, ICalendarManager
     {
         readonly ICalendarDataAccess calendarDataAccess;
+
+        public IAppointmentsCache AppointmentsCache => throw new NotImplementedException();
 
         public CalendarManager(ConnectionInfo connectionInfo, IAppServiceProxy appServiceProxy, ICalendarDataAccess calendarDataAccess)
             : base(connectionInfo, appServiceProxy)
@@ -150,6 +154,151 @@ namespace Mark5.Mobile.Common.Manager
                 return await calendarDataAccess.GetCalendarAlarmsAsync(calendarIds, startDateUTC, endDateUTC);
 
             throw new ArgumentException("Invalid sourceType provided.");
+        }
+    }
+
+    class AppointmentsCache : IAppointmentsCache
+    {
+        readonly int cachingNeighbours = 4;
+
+        BlockingCollection<MonthDate> queue;
+        CancellationTokenSource tokenSource;
+        HashSet<MonthDate> cachedMonths;
+        private List<Calendar> calendarsList;
+
+        public AppointmentsCache(List<Calendar> calendarsList)
+        {
+            this.calendarsList = calendarsList;
+        }
+
+        public void Start()
+        {
+            queue = new BlockingCollection<MonthDate>();
+            tokenSource = new CancellationTokenSource();
+            cachedMonths = new HashSet<MonthDate>();
+
+            Task.Run(async () => await Work(tokenSource.Token));
+        }
+
+        void Append(MonthDate monthDate)
+        {
+            queue.Add(monthDate);
+        }
+
+
+        public async Task<List<CalendarAppointment>> GetAppointments(List<int> calendarIds, DateTime startDate, DateTime endDate)
+        {
+            await CacheCalendarContent(startDate, endDate);
+
+            return await Managers.CalendarManager.GetCalendarAppointmentsAsync(calendarIds, startDate, endDate, SourceType.Local);
+        }
+
+        async Task Work(CancellationToken token)
+        {
+            while (!queue.IsCompleted && token.IsCancellationRequested)
+            {
+                if (queue.TryTake(out var monthDate))
+                {
+                    try
+                    {
+                        (var startDate, var endDate) = GetTimePeriod(monthDate);
+
+                        await Managers.CalendarManager.GetCalendarAppointmentsAsync(calendarsList.Select(c => c.Id).ToList(), startDate, endDate, SourceType.Auto);
+
+                        cachedMonths.Add(monthDate);
+                    }
+                    catch (Exception ex)
+                    {
+                        CommonConfig.Logger.Error($"Error while retrieving calendar appointments for {monthDate}", ex);
+                    }
+                }
+            }
+        }
+
+        bool RangeCached(DateTime start, DateTime end) //We are supposing that they're max 1 month apart
+        {
+            return cachedMonths.Contains(MonthDate.FromDateTime(start)) &&
+                cachedMonths.Contains(MonthDate.FromDateTime(end));
+        }
+
+        (DateTime a, DateTime b) GetTimePeriod(MonthDate monthDate)
+        {
+            var startDate = new DateTime(monthDate.Year, monthDate.Month, 1, 0, 0, 0, DateTimeKind.Local);
+            var endDate = new DateTime(monthDate.Year, monthDate.Month, 1, 23, 59, 59, DateTimeKind.Local).AddMonths(1).AddDays(-1);
+
+            return (startDate, endDate);
+        }
+
+        async Task CacheCalendarContent(DateTime start, DateTime end)
+        {
+            if (!RangeCached(start, end))
+            {
+                var startDate = new DateTime(start.Year, start.Month, 1, 0, 0, 0, DateTimeKind.Local);
+                var endDate = new DateTime(end.Year, end.Month, 1, 23, 59, 59, DateTimeKind.Local).AddMonths(1).AddDays(-1);
+
+                await Managers.CalendarManager.GetCalendarAppointmentsAsync(calendarsList.Select(c => c.Id).ToList(), startDate, endDate, SourceType.Auto);
+
+                cachedMonths.Add(MonthDate.FromDateTime(startDate));
+                cachedMonths.Add(MonthDate.FromDateTime(endDate));
+            }
+
+            for (int i = 0; i < cachingNeighbours; i++)
+            {
+                var futureMonth = MonthDate.FromDateTime(end.AddMonths(i));
+                var pastMonth = MonthDate.FromDateTime(start.AddMonths(-i));
+
+                if (!cachedMonths.Contains(futureMonth))
+                    Append(futureMonth);
+
+                if (!cachedMonths.Contains(pastMonth))
+                    Append(pastMonth);
+            }
+        }
+
+        public void Stop()
+        {
+            tokenSource.Cancel();
+            queue.CompleteAdding();
+
+            queue = null;
+            tokenSource = null;
+        }
+
+        class MonthDate
+        {
+            public int Month { get; }
+            public int Year { get; }
+
+            public MonthDate(int month, int year)
+            {
+                if (month <= 0 || month > 12)
+                    throw new ArgumentException("Invalid month");
+
+                if (year <= 1900 || year > 3000)
+                    throw new ArgumentException("Invalid year");
+
+                Month = month;
+                Year = year;
+            }
+
+            public static MonthDate FromDateTime(DateTime dateTime)
+            {
+                return new MonthDate(dateTime.Month, dateTime.Year);
+            }
+
+            public override bool Equals(object obj)
+            {
+                var other = obj as MonthDate;
+                return Year == other?.Year && Month == other.Month;
+            }
+
+            public override int GetHashCode()
+            {
+                var hashCode = -834659671;
+                hashCode = hashCode * -1521134295 + Month.GetHashCode();
+                hashCode = hashCode * -1521134295 + Year.GetHashCode();
+                return hashCode;
+            }
         }
     }
 }

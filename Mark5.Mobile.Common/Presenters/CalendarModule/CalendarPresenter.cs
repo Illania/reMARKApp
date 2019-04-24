@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -13,20 +11,19 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
     {
         List<Calendar> calendarsList;
         Dictionary<int, bool> calendarsSelectedState = new Dictionary<int, bool>();
-        AppointmentsCache cache;
+        IAppointmentsCache Cache => Managers.CalendarManager.AppointmentsCache;
 
         public override void Start()
         {
             calendarsList = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars;
             calendarsList.ForEach(c => calendarsSelectedState.Add(c.Id, true));
 
-            cache = new AppointmentsCache(calendarsList);
-            cache.Start();
+            Cache.Start();
         }
 
         public override void Stop()
         {
-            cache.Stop();
+            Cache.Stop();
         }
 
         public void AppointmentClicked(int appointmentId)
@@ -42,7 +39,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
             try
             {
-                var appointments = await cache?.GetAppointments(start, end, selectedCalendars);
+                var appointments = await Cache?.GetAppointments(selectedCalendars, start, end);
 
                 var appointmentsViewModels = appointments?.Select(SimpleCalendarAppointmentViewModel.ConvertToViewModel);
 
@@ -70,151 +67,6 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             else
             {
                 //Need to remove from the showed ones
-            }
-        }
-
-        class AppointmentsCache
-        {
-            readonly int cachingNeighbours = 4;
-
-            BlockingCollection<MonthDate> queue;
-            CancellationTokenSource tokenSource;
-            HashSet<MonthDate> cachedMonths;
-            private List<Calendar> calendarsList;
-
-            public AppointmentsCache(List<Calendar> calendarsList)
-            {
-                this.calendarsList = calendarsList;
-            }
-
-            public void Start()
-            {
-                queue = new BlockingCollection<MonthDate>();
-                tokenSource = new CancellationTokenSource();
-                cachedMonths = new HashSet<MonthDate>();
-
-                Task.Run(async () => await Work(tokenSource.Token));
-            }
-
-            void Append(MonthDate monthDate)
-            {
-                queue.Add(monthDate);
-            }
-
-            public async Task<List<CalendarAppointment>> GetAppointments(DateTime start, DateTime end, List<int> selectedCalendars)
-            {
-                await CacheCalendarContent(start, end);
-
-                return await Managers.CalendarManager.GetCalendarAppointmentsAsync(selectedCalendars, start, end, SourceType.Local);
-            }
-
-            async Task Work(CancellationToken token)
-            {
-                while (!queue.IsCompleted && token.IsCancellationRequested)
-                {
-                    if (queue.TryTake(out var monthDate))
-                    {
-                        try
-                        {
-                            (var startDate, var endDate) = GetTimePeriod(monthDate);
-
-                            await Managers.CalendarManager.GetCalendarAppointmentsAsync(calendarsList.Select(c => c.Id).ToList(), startDate, endDate, SourceType.Auto);
-
-                            cachedMonths.Add(monthDate);
-                        }
-                        catch (Exception ex)
-                        {
-                            CommonConfig.Logger.Error($"Error while retrieving calendar appointments for {monthDate}", ex);
-                        }
-                    }
-                }
-            }
-
-            bool RangeCached(DateTime start, DateTime end) //We are supposing that they're max 1 month apart
-            {
-                return cachedMonths.Contains(MonthDate.FromDateTime(start)) &&
-                    cachedMonths.Contains(MonthDate.FromDateTime(end));
-            }
-
-            (DateTime a, DateTime b) GetTimePeriod(MonthDate monthDate)
-            {
-                var startDate = new DateTime(monthDate.Year, monthDate.Month, 1, 0, 0, 0, DateTimeKind.Local);
-                var endDate = new DateTime(monthDate.Year, monthDate.Month, 1, 23, 59, 59, DateTimeKind.Local).AddMonths(1).AddDays(-1);
-
-                return (startDate, endDate);
-            }
-
-            async Task CacheCalendarContent(DateTime start, DateTime end)
-            {
-                if (!RangeCached(start, end))
-                {
-                    var startDate = new DateTime(start.Year, start.Month, 1, 0, 0, 0, DateTimeKind.Local);
-                    var endDate = new DateTime(end.Year, end.Month, 1, 23, 59, 59, DateTimeKind.Local).AddMonths(1).AddDays(-1);
-
-                    await Managers.CalendarManager.GetCalendarAppointmentsAsync(calendarsList.Select(c => c.Id).ToList(), startDate, endDate, SourceType.Auto);
-
-                    cachedMonths.Add(MonthDate.FromDateTime(startDate));
-                    cachedMonths.Add(MonthDate.FromDateTime(endDate));
-                }
-
-                for (int i = 0; i < cachingNeighbours; i++)
-                {
-                    var futureMonth = MonthDate.FromDateTime(end.AddMonths(i));
-                    var pastMonth = MonthDate.FromDateTime(start.AddMonths(-i));
-
-                    if (!cachedMonths.Contains(futureMonth))
-                        Append(futureMonth);
-
-                    if (!cachedMonths.Contains(pastMonth))
-                        Append(pastMonth);
-                }
-            }
-
-            public void Stop()
-            {
-                tokenSource.Cancel();
-                queue.CompleteAdding();
-
-                queue = null;
-                tokenSource = null;
-            }
-
-
-            class MonthDate
-            {
-                public int Month { get; }
-                public int Year { get; }
-
-                public MonthDate(int month, int year)
-                {
-                    if (month <= 0 || month > 12)
-                        throw new ArgumentException("Invalid month");
-
-                    if (year <= 1900 || year > 3000)
-                        throw new ArgumentException("Invalid year");
-
-                    Month = month;
-                    Year = year;
-                }
-
-                public static MonthDate FromDateTime(DateTime dateTime)
-                {
-                    return new MonthDate(dateTime.Month, dateTime.Year);
-                }
-
-                public override bool Equals(object obj)
-                {
-                    var other = obj as MonthDate;
-                    return Year == other?.Year && Month == other.Month;
-                }
-
-                public override int GetHashCode()
-                {
-                    var hashCode = -834659671;
-                    hashCode = hashCode * -1521134295 + Month.GetHashCode();
-                    hashCode = hashCode * -1521134295 + Year.GetHashCode();
-                    return hashCode;
-                }
             }
         }
     }

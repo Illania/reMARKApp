@@ -16,5 +16,17 @@ namespace Mark5.Mobile.Common.Manager
         Task<bool> SendCalendarAppointmentInvitationsAsync(int apointmentId, Guid lineGuid);
 
         Task<List<CalendarAlarm>> GetCalendarAlarmsAsync(List<int> calendarIds, DateTime startDate, DateTime endDate, SourceType sourceType = SourceType.Auto);
+
+        IAppointmentsCache AppointmentsCache { get; }
+    }
+
+    public interface IAppointmentsCache
+    {
+        Task<List<CalendarAppointment>> GetAppointments(List<int> calendarIds, DateTime startDate, DateTime endDate);
+
+        void Start();
+
+        void Stop();
+
     }
 }
