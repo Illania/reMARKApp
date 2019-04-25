@@ -234,7 +234,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.Edit)
             {
-                StartActivityForResult(AddEditShortcodeActivity.CreateIntent(Context, ShortcodeCreationModeFlag.Edit, shortcode, shortcodePreview), RequestCodes.EditRequest);
+                StartActivityForResult(AddEditShortcodeActivity.CreateIntent(Context, ShortcodeCreationModeFlag.Edit, shortcodePreview), RequestCodes.EditRequest);
                 return true;
             }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.OS;
@@ -23,7 +24,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class AddEditShortcodeFragment : BaseFragment
     {
-        const string ShortcodeBundleKey = "Shortcode_abf63445-9b80-4ddf-8af6-f1d0d8ea2044";
         const string ShortcodePreviewBundleKey = "ShortcodePreview_880203fa-26a5-4111-a85a-d907fa3fdbd1";
         const string ShortcodeCreationModeFlagBundleKey = "ShortcodeCreationModeFlag_0e4124b4-943c-4078-b88b-e4d15e9c0fde";
 
@@ -51,7 +51,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         List<AddEditShortcodeView> subviews = new List<AddEditShortcodeView>();
 
-        public static (AddEditShortcodeFragment fragment, string tag) NewInstance(ShortcodeCreationModeFlag? flag, Shortcode shortcode, ShortcodePreview shortcodePreview)
+        public static (AddEditShortcodeFragment fragment, string tag) NewInstance(ShortcodeCreationModeFlag? flag, ShortcodePreview shortcodePreview)
         {
             if (flag == ShortcodeCreationModeFlag.Edit)
                 CommonConfig.UsageAnalytics.LogEvent(new OpenEditShortcodeEvent());
@@ -59,9 +59,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 CommonConfig.UsageAnalytics.LogEvent(new OpenAddShortcodeEvent());
 
             Bundle args = new Bundle();
-
-            if (shortcode != null)
-                args.PutString(ShortcodeBundleKey, Serializer.Serialize(shortcode));
 
             if (shortcodePreview != null)
                 args.PutString(ShortcodePreviewBundleKey, Serializer.Serialize(shortcodePreview));
@@ -83,11 +80,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (Arguments.ContainsKey(ShortcodeCreationModeFlagBundleKey))
                 creationModeFlag = (ShortcodeCreationModeFlag)Arguments.GetInt(ShortcodeCreationModeFlagBundleKey);
-
-            if (savedInstanceState?.ContainsKey(ShortcodeBundleKey) == true)
-                shortcode = Serializer.Deserialize<Shortcode>(savedInstanceState.GetString(ShortcodeBundleKey));
-            else if (Arguments.ContainsKey(ShortcodeBundleKey))
-                shortcode = Serializer.Deserialize<Shortcode>(Arguments.GetString(ShortcodeBundleKey));
 
             if (savedInstanceState?.ContainsKey(ShortcodePreviewBundleKey) == true)
                 shortcodePreview = Serializer.Deserialize<ShortcodePreview>(savedInstanceState.GetString(ShortcodePreviewBundleKey));
@@ -133,9 +125,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnSaveInstanceState(outState);
 
-            if (shortcode != null)
-                outState.PutString(ShortcodeBundleKey, Serializer.Serialize(shortcode));
-
             if (shortcodePreview != null)
                 outState.PutString(ShortcodePreviewBundleKey, Serializer.Serialize(shortcodePreview));
         }
@@ -180,14 +169,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                                      $" mode={creationModeFlag}]...");
         }
 
-        public override void OnResume()
+        public override async void OnResume()
         {
             base.OnResume();
 
             fab.Enabled = true;
             fab.Visibility = ViewStates.Visible;
 
-            RefreshData();
+            await RefreshData();
         }
 
         public override void OnStop()
@@ -198,12 +187,29 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Refreh methods
 
-        void RefreshData()
+        async Task RefreshData()
         {
-            if (creationModeFlag == ShortcodeCreationModeFlag.New && shortcode == null && shortcodePreview == null)
+            if (creationModeFlag == ShortcodeCreationModeFlag.New && shortcodePreview == null)
             {
                 shortcode = new Shortcode();
                 shortcodePreview = new ShortcodePreview();
+            }
+            else
+            {
+                try
+                {
+                    shortcode = await Managers.ShortcodesManager.GetShortcodeAsync(-1, shortcodePreview.Id, SourceType.Local);
+
+                    RefreshView();
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error($"Retrieving shortcode failed [shortcodeId={shortcodePreview?.Id}]", ex);
+
+                    await Dialogs.ShowErrorDialogAsync(Activity, ex);
+
+                    Activity?.OnBackPressed();
+                }
             }
 
             RefreshView();
