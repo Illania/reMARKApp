@@ -50,24 +50,29 @@ namespace Mark5.Mobile.Droid.Ui.Common
             if (connectionBar != null)
             {
                 connectionBar.Clickable = true;
-                connectionBar.Click += ConnectionBar_Click;
                 connectionBar.LongClickable = true;
+                connectionBar.Click += ConnectionBar_Click;
                 connectionBar.LongClick += ConnectionBar_LongClick;
                 connectionBar.Visibility = CommonConfig.Reachability.IsReachable ? ViewStates.Gone : ViewStates.Visible;
                 CommonConfig.Reachability.ReachabilityRefreshed += ReachabilityService_ReachabilityRefreshed;
                 CommonConfig.Reachability.Refresh();
             }
 
-            if (Fab != null)
+            UpdateFab(CommonConfig.Reachability.IsReachable);
+        }
+
+        void UpdateFab(bool isReachable)
+        {
+            RunOnUiThread(() =>
             {
-                if (Fab.LayoutParameters is CoordinatorLayout.LayoutParams lp)
+                if (Fab?.LayoutParameters is CoordinatorLayout.LayoutParams lp)
                 {
                     lp.BottomMargin = (int)Resources.GetDimension(Resource.Dimension.fab_margin);
-                    if (!CommonConfig.Reachability.IsReachable)
+                    if (!isReachable)
                         lp.BottomMargin += (int)Resources.GetDimension(Resource.Dimension.connection_bar_height);
                     Fab.RequestLayout();
                 }
-            }
+            });
         }
 
         protected override void OnPause()
@@ -100,13 +105,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             var connectionBar = FindViewById(Resource.Id.connection_bar);
             connectionBar.Visibility = e.IsReachable ? ViewStates.Gone : ViewStates.Visible;
 
-            if (Fab?.LayoutParameters is CoordinatorLayout.LayoutParams lp)
-            {
-                lp.BottomMargin = (int)Resources.GetDimension(Resource.Dimension.fab_margin);
-                if (!e.IsReachable)
-                    lp.BottomMargin += (int)Resources.GetDimension(Resource.Dimension.connection_bar_height);
-                Fab.RequestLayout();
-            }
+            UpdateFab(e.IsReachable);
         }
 
         async void ConnectionBar_Click(object sender, EventArgs e)

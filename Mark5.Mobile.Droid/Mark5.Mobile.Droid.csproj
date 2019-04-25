@@ -58,7 +58,7 @@
     <AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidClientHandler</AndroidHttpClientHandlerType>
     <JavaMaximumHeapSize>1G</JavaMaximumHeapSize>
     <AndroidTlsProvider>btls</AndroidTlsProvider>
-    <AndroidSupportedAbis>armeabi;armeabi-v7a;arm64-v8a</AndroidSupportedAbis>
+    <AndroidSupportedAbis>armeabi-v7a;arm64-v8a</AndroidSupportedAbis>
     <AndroidKeyStore>True</AndroidKeyStore>
     <AndroidSigningKeyStore>../../extra/App Development Certificates/Android/default.keystore</AndroidSigningKeyStore>
     <AndroidSigningStorePass>Xs4Droid2015!</AndroidSigningStorePass>
@@ -212,9 +212,12 @@
       <HintPath>..\packages\libphonenumber-csharp.8.9.16\lib\netstandard2.0\PhoneNumbers.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Lottie.Android">
+      <HintPath>..\packages\Com.Airbnb.Android.Lottie.2.7.1\lib\monoandroid90\Lottie.Android.dll</HintPath>
+    </Reference>
+    <Reference Include="Java.Interop" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Mark5Application.cs" />
     <Compile Include="PlatformConfig.cs" />
@@ -457,6 +460,7 @@
     <Compile Include="Ui\Activities\PickerInternalContactsListActivity.cs" />
     <Compile Include="Ui\Fragments\PickerInternalContactsListFragment.cs" />
     <Compile Include="Utilities\PushNotificationsUtilities.cs" />
+    <Compile Include="Resources\Resource.designer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -728,13 +732,9 @@
     <AndroidResource Include="Resources\menu\menu_drawer.axml" />
     <AndroidResource Include="Resources\menu\menu_main.axml" />
     <AndroidResource Include="Resources\mipmap-hdpi\ic_icon.png" />
-    <AndroidResource Include="Resources\mipmap-hdpi\ic_notification.png" />
     <AndroidResource Include="Resources\mipmap-xhdpi\ic_icon.png" />
-    <AndroidResource Include="Resources\mipmap-xhdpi\ic_notification.png" />
     <AndroidResource Include="Resources\mipmap-xxhdpi\ic_icon.png" />
-    <AndroidResource Include="Resources\mipmap-xxhdpi\ic_notification.png" />
     <AndroidResource Include="Resources\mipmap-xxxhdpi\ic_icon.png" />
-    <AndroidResource Include="Resources\mipmap-xxxhdpi\ic_notification.png" />
     <AndroidResource Include="Resources\values\color.axml" />
     <AndroidResource Include="Resources\values\dimens.axml" />
     <AndroidResource Include="Resources\values\plurals.xml" />
@@ -742,7 +742,6 @@
     <AndroidResource Include="Resources\values\strings-errordialogs.axml" />
     <AndroidResource Include="Resources\values\strings-preferences.axml" />
     <AndroidResource Include="Resources\values\strings.axml" />
-    <AndroidResource Include="Resources\values\style.axml" />
     <AndroidResource Include="Resources\values\values-googleservices.axml" />
     <AndroidResource Include="Resources\values\values-preferences.axml" />
     <AndroidResource Include="Resources\xml\filepaths.xml" />
@@ -812,9 +811,10 @@
     <AndroidResource Include="Resources\drawable-xxhdpi\check_mark.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\check_mark.png" />
     <AndroidResource Include="Resources\drawable\onboarding_1.xml" />
-    <AndroidResource Include="Resources\drawable\onboarding_2.xml" />
-    <AndroidResource Include="Resources\drawable\onboarding_3.xml" />
     <AndroidResource Include="Resources\drawable\circle_red.xml" />
+    <AndroidResource Include="Resources\drawable\onboarding_5.xml" />
+    <AndroidResource Include="Resources\drawable\onboarding_6.xml" />
+    <AndroidResource Include="Resources\values\style.axml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FastScrollRecycler\FastScrollRecycler.csproj">
@@ -848,6 +848,7 @@
     <AndroidAsset Include="Assets\replyHeader.html" />
     <AndroidAsset Include="Assets\editorScript.js" />
     <AndroidAsset Include="Assets\initTemplate.js" />
+    <AndroidAsset Include="Assets\splash.json" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Import Project="..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets')" />

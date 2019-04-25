@@ -20,12 +20,12 @@ namespace Mark5.Mobile.Droid.Utilities
     {
         public static Intent CreateShareReportComposeDocumentActivityIntent(Context context, string preconfiguredContent)
         {
-            return ComposeDocumentActivity.CreateShareReportIntent(context, "MARK5 Android System Report", preconfiguredContent);
+            return ComposeDocumentActivity.CreateShareReportIntent(context, "reMARK Android System Report", preconfiguredContent);
         }
 
         public static Intent CreateShareFeedbackComposeDocumentActivityIntent(Context context, string preconfiguredContent)
         {
-            return ComposeDocumentActivity.CreateShareReportIntent(context, "MARK5 Android Feedback", preconfiguredContent);
+            return ComposeDocumentActivity.CreateShareReportIntent(context, "reMARK Android Feedback", preconfiguredContent);
         }
 
         public static Intent CreateShareReportIntent(Context context, string report)
@@ -33,7 +33,7 @@ namespace Mark5.Mobile.Droid.Utilities
             var sendIntent = new Intent();
             sendIntent.SetAction(Intent.ActionSend);
             sendIntent.PutExtra(Intent.ExtraEmail, new[] { "appfeedback@nordic-it.com" });
-            sendIntent.PutExtra(Intent.ExtraSubject, "MARK5 Android System Report");
+            sendIntent.PutExtra(Intent.ExtraSubject, "reMARK Android System Report");
             sendIntent.PutExtra(Intent.ExtraText, report);
             sendIntent.SetType("text/plain");
             return Intent.CreateChooser(sendIntent, context.GetText(Resource.String.share));
@@ -43,7 +43,7 @@ namespace Mark5.Mobile.Droid.Utilities
         {
             var sendIntent = new Intent();
             sendIntent.SetAction(Intent.ActionSendto);
-            sendIntent.SetData(Android.Net.Uri.Parse("mailto:appfeedback@nordic-it.com?subject=MARK5%20Android%20Feedback&body=" + report));
+            sendIntent.SetData(Android.Net.Uri.Parse("mailto:appfeedback@nordic-it.com?subject=reMARK%20Android%20Feedback&body=" + report));
             return sendIntent;
         }
 

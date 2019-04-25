@@ -157,7 +157,7 @@ namespace Mark5.Mobile.Common.DataAccess
 
         public async Task RemoveOrphans()
         {
-            return;
+            await Task.CompletedTask;
             /*
             try  //TODO to test
             {

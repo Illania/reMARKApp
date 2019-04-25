@@ -46,11 +46,11 @@ namespace Mark5.Mobile.Common.Utilities
             return dt.AddHours(-GetServerUtcOffset(dateTime));
         }
 
-        static int GetLocalUtcOffset(DateTime dateTime) => TimeZoneInfo.Local.GetUtcOffset(dateTime).Hours;
+        static double GetLocalUtcOffset(DateTime dateTime) => TimeZoneInfo.Local.GetUtcOffset(dateTime).TotalHours;
 
-        static int GetServerUtcOffset(DateTime dateTime)
+        static double GetServerUtcOffset(DateTime dateTime)
         {
-            int offset;
+            double offset;
 
             var serverTimeZoneInfo = ServerConfig.SystemSettings.SystemInfo.ServerTimeZoneInfo.Value;
 
@@ -58,16 +58,16 @@ namespace Mark5.Mobile.Common.Utilities
             {
                 try
                 {
-                    offset = serverTimeZoneInfo.GetUtcOffset(dateTime).Hours;
+                    offset = serverTimeZoneInfo.GetUtcOffset(dateTime).TotalHours;
                 }
                 catch (Exception ex)
                 {
                     CommonConfig.Logger.Error("Error while trying to get server UTC offset", ex);
-                    offset = ServerConfig.SystemSettings.SystemInfo.ServerUtcOffset.Hours;
+                    offset = ServerConfig.SystemSettings.SystemInfo.ServerUtcOffset.TotalHours;
                 }
             }
             else
-                offset = ServerConfig.SystemSettings.SystemInfo.ServerUtcOffset.Hours;
+                offset = ServerConfig.SystemSettings.SystemInfo.ServerUtcOffset.TotalHours;
 
             return offset;
         }

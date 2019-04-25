@@ -21,7 +21,7 @@ namespace Mark5.Mobile.Droid.Utilities
         {
             try
             {
-                if (analyticsEvent.EventName.Length > 40)
+                if (analyticsEvent.EventName.Length > 35)
                     CommonConfig.Logger.Error($"Event name is too long! [{analyticsEvent.EventName}]");
 
                 Bundle bundle = null;
@@ -41,7 +41,7 @@ namespace Mark5.Mobile.Droid.Utilities
                     }
                 }
 
-                firebaseAnalytics.LogEvent(analyticsEvent.EventName.SafeSubstring(0, 40), bundle);
+                firebaseAnalytics.LogEvent(analyticsEvent.EventName.SafeSubstring(0, 35), bundle);
             }
             catch (Exception ex)
             {

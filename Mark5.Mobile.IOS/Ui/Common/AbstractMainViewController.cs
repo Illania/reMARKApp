@@ -61,9 +61,9 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             base.ViewDidLoad();
 
-            this.ViewControllerSelected += Handle_ViewControllerSelected;
+            ViewControllerSelected += Handle_ViewControllerSelected;
 
-            this.ShouldSelectViewController += Handle_ShouldSelectViewController;
+            ShouldSelectViewController += Handle_ShouldSelectViewController;
 
             RestorationIdentifier = nameof(AbstractMainViewController);
 

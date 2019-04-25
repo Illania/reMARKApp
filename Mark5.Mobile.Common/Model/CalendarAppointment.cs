@@ -80,11 +80,6 @@ namespace Mark5.Mobile.Common.Model
         {
             return $"[CalendarAppointment: Subject={Subject}, Location={Location}]";
         }
-
-        public static implicit operator CalendarAppointment(void v)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
 

@@ -209,9 +209,9 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
                             if (!t.IsFaulted)
                             {
-                                var sendWithMark5 = await ShowYesNoAlertAsync(vc, Localization.GetString("send_with_mark5_title"), Localization.GetString("send_report_with_mark5_content"));
+                                var sendWithReMARK = await ShowYesNoAlertAsync(vc, Localization.GetString("send_with_mark5_title"), Localization.GetString("send_report_with_mark5_content"));
 
-                                if (sendWithMark5)
+                                if (sendWithReMARK)
                                 {
                                     var cvc = SystemReportCollector.CreateShareReportComposeDocumentViewController(t.Result);
                                     vc.PresentViewController(new NavigationController(cvc, UIModalPresentationStyle.PageSheet), true, null);

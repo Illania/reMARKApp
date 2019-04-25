@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Mark5.Mobile.Common.Manager;
 using Android.Support.V4.App;
 using Android.OS;
@@ -28,8 +28,8 @@ namespace Mark5.Mobile.Droid.Utilities
 
                     var title = Application.Context.Resources.GetString(Resource.String.failed_send_document_notification_title);
                     var content = Application.Context.Resources.GetString(Resource.String.failed_send_document_notification_content);
-                    var nb = new NotificationCompat.Builder(Application.Context, PushNotificationsUtilities.DocumentChannelId)
-                        .SetSmallIcon(Resource.Mipmap.ic_notification)
+                    var nb = new NotificationCompat.Builder(Application.Context)
+                        .SetSmallIcon(Resource.Mipmap.ic_icon)
                         .SetColor(ContextCompat.GetColor(Application.Context, Resource.Color.darkerblue))
                         .SetContentIntent(pi).SetContentTitle(title).SetContentText(content)
                         .SetAutoCancel(true)

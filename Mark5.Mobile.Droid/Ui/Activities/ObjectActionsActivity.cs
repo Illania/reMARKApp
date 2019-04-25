@@ -21,7 +21,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         public static Intent CreateIntent(Context context, IBusinessEntity businessEntity)
         {
             var intent = new Intent(context, typeof(ObjectActionsActivity));
-            intent.PutExtra(BusinessEntityIntentKey,Serializer.Serialize(businessEntity));
+            intent.PutExtra(BusinessEntityIntentKey, Serializer.Serialize(businessEntity));
 
             return intent;
         }
@@ -34,7 +34,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             OverridePendingTransition(Resource.Animation.slide_up, Resource.Animation.no_change);
 
-            SetTitle(Resource.String.actions);
+            SetTitle(Resource.String.history);
             SetContentView(Resource.Layout.base_layout);
 
             toolbar = FindViewById<Toolbar>(Resource.Id.toolbar);

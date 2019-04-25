@@ -1,39 +1,39 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string-array name="call_or_text">
-		<item>Call</item>
-		<item>Text</item>
-	</string-array>
-	<string-array name="copy_to_worktray_options">
-		<item>Own</item>
-		<item>Other users\'</item>
-	</string-array>
-	<string-array name="search_document_from_to">
-		<item>From</item>
-		<item>To</item>
-		<item>From and To</item>
-	</string-array>
-	<string-array name="search_document_subject_message">
-		<item>Subject or Message</item>
-		<item>Subject</item>
-		<item>Message</item>
-	</string-array>
-	<string-array name="ssl_modes">
-		<item>SSL Enabled</item>
-		<item>SSL Enabled (allow self-signed)</item>
-		<item>SSL Disabled</item>
-	</string-array>
-	<string-array name="picker_choice_with_internal_contacts">
-		<item>Recent addresses</item>
-		<item>Contacts</item>
-        <item>Shortcodes</item>
+    <string-array name="call_or_text">
+        <item>Call</item>
+        <item>Text</item>
+    </string-array>
+    <string-array name="copy_to_worktray_options">
+        <item>Own</item>
+        <item>Other users\'</item>
+    </string-array>
+    <string-array name="search_document_from_to">
+        <item>From</item>
+        <item>To</item>
+        <item>From and To</item>
+    </string-array>
+    <string-array name="search_document_subject_message">
+        <item>Subject or Message</item>
+        <item>Subject</item>
+        <item>Message</item>
+    </string-array>
+    <string-array name="ssl_modes">
+        <item>SSL Enabled</item>
+        <item>SSL Enabled (allow self-signed)</item>
+        <item>SSL Disabled</item>
+    </string-array>
+    <string-array name="picker_choice_with_internal_contacts">
+        <item>Recent addresses</item>
+        <item>Contacts</item>
+        <item>Mailing lists</item>
         <item>Phonebook</item>
         <item>Internal contacts</item>
-	</string-array>
+    </string-array>
     <string-array name="picker_choice">
         <item>Recent addresses</item>
         <item>Contacts</item>
-        <item>Shortcodes</item>
+        <item>Mailing lists</item>
         <item>Phonebook</item>
     </string-array>
 </resources>

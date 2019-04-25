@@ -105,7 +105,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeNavigationBar()
         {
-            NavigationItem.Title = Localization.GetString("links");
+            NavigationItem.Title = Localization.GetString("overview");
 
             doneItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
             NavigationItem.SetRightBarButtonItem(doneItem, false);

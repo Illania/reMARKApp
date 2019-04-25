@@ -15,7 +15,7 @@ namespace Mark5.Mobile.IOS.Utilities
         {
             try
             {
-                if (analyticsEvent.EventName.Length > 40)
+                if (analyticsEvent.EventName.Length > 35)
                     CommonConfig.Logger.Error($"Event name is too long! [{analyticsEvent.EventName}]");
 
                 NSDictionary<NSString, NSObject> parameters = null;
@@ -36,7 +36,7 @@ namespace Mark5.Mobile.IOS.Utilities
                     parameters = new NSDictionary<NSString, NSObject>(parametersDic.Keys.ToArray(), parametersDic.Values.ToArray());
                 }
 
-                Analytics.LogEvent(new NSString(analyticsEvent.EventName.SafeSubstring(0, 40)), parameters);
+                Analytics.LogEvent(new NSString(analyticsEvent.EventName.SafeSubstring(0, 35)), parameters);
             }
             catch (Exception ex)
             {

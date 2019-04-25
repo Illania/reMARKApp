@@ -179,8 +179,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (folder?.InternalType == FolderInternalType.FilterView || folder?.InternalType == FolderInternalType.Static || folder?.InternalType == FolderInternalType.Worktray)
                 menu.Add(Menu.None, MenuItemActions.MoveToFolder, MenuItemActions.MoveToFolder, Resource.String.move_to_folder);
 
-            menu.Add(Menu.None, MenuItemActions.Actions, MenuItemActions.Actions, Resource.String.actions);
-            menu.Add(Menu.None, MenuItemActions.Links, MenuItemActions.Links, Resource.String.links);
+            menu.Add(Menu.None, MenuItemActions.Actions, MenuItemActions.Actions, Resource.String.history);
+            menu.Add(Menu.None, MenuItemActions.Links, MenuItemActions.Links, Resource.String.overview);
 
             if (folder?.InternalType == FolderInternalType.FilterView || folder?.InternalType == FolderInternalType.Static || folder?.InternalType == FolderInternalType.Worktray)
                 menu.Add(Menu.None, MenuItemActions.DeleteFromFolder, MenuItemActions.DeleteFromFolder, Resource.String.delete_from_folder);
@@ -234,7 +234,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.Edit)
             {
-                StartActivityForResult(AddEditShortcodeActivity.CreateIntent(Context, ShortcodeCreationModeFlag.Edit, shortcode, shortcodePreview), RequestCodes.EditRequest);
+                StartActivityForResult(AddEditShortcodeActivity.CreateIntent(Context, ShortcodeCreationModeFlag.Edit, shortcodePreview), RequestCodes.EditRequest);
                 return true;
             }
 

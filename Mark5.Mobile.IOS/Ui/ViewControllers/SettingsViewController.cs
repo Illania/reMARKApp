@@ -284,9 +284,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     dismissAction();
 
-                    var sendWithMark5 = await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("send_with_mark5_title"), Localization.GetString("send_feedback_with_mark5_content"));
+                    var sendWithReMARK = await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("send_with_mark5_title"), Localization.GetString("send_feedback_with_mark5_content"));
 
-                    if (sendWithMark5)
+                    if (sendWithReMARK)
                     {
                         var cvc = SystemReportCollector.CreateShareFeedbackComposeDocumentViewController(report);
                         PresentViewController(new NavigationController(cvc, UIModalPresentationStyle.PageSheet), true, null);
@@ -321,9 +321,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     dismissAction();
 
-                    var sendWithMark5 = await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("send_with_mark5_title"), Localization.GetString("send_report_with_mark5_content"));
+                    var sendWithReMARK = await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("send_with_mark5_title"), Localization.GetString("send_report_with_mark5_content"));
 
-                    if (sendWithMark5)
+                    if (sendWithReMARK)
                     {
                         var cvc = SystemReportCollector.CreateShareReportComposeDocumentViewController(report);
                         PresentViewController(new NavigationController(cvc, UIModalPresentationStyle.PageSheet), true, null);

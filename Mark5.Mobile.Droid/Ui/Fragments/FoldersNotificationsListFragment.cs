@@ -9,6 +9,7 @@ using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
+using System.Linq;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -40,7 +41,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var args = new Bundle();
 
             if (remoteFolder != null)
-                args.PutString(RemoteFolderBundleKey, Serializer.Serialize(remoteFolder));
+                args.PutString(RemoteFolderBundleKey, Serializer.Serialize(remoteFolder.ShallowCopy()));
 
             var fragment = new FoldersNotificationsListFragment();
             fragment.Arguments = args;
@@ -158,7 +159,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     case 0:
                         //Item1 is the fragment
-                        return FoldersListFragment.NewInstance(folder).fragment;
+                        return FoldersListFragment.NewInstance(folder, loadRemoteFromCache: folder.SubFolders?.Any()).fragment;
                     case 1:
                         return NotificationsListFragment.NewInstance(folder.Module.ObjectTypes()).fragment;
                     default:

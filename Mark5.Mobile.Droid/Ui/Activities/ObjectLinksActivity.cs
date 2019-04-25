@@ -34,7 +34,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             OverridePendingTransition(Resource.Animation.slide_up, Resource.Animation.no_change);
 
-            SetTitle(Resource.String.links);
+            SetTitle(Resource.String.overview);
             SetContentView(Resource.Layout.base_layout);
 
             toolbar = FindViewById<Toolbar>(Resource.Id.toolbar);

@@ -48,9 +48,9 @@ namespace Mark5.Mobile.IOS
                 App.Configure(); //Firebase Analytics
                 Messaging.SharedInstance.Delegate = this;
 
-                CommonConfig.Logger.Info("MARK5 initializing...");
+                CommonConfig.Logger.Info("reMARK initializing...");
                 var isLoggedIn = InitializePlatform(application);
-                CommonConfig.Logger.Info("MARK5 initialized");
+                CommonConfig.Logger.Info("reMARK initialized");
 
                 BITHockeyManager.SharedHockeyManager.Configure(Config.HockeyId);
 #if DEBUG
@@ -360,12 +360,13 @@ namespace Mark5.Mobile.IOS
             }
         }
 
-        [Export("application:didReceiveRemoteNotification:fetchCompletionHandler:")]
-        public override void DidReceiveRemoteNotification(UIApplication application, NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler)
-        {
-            //This needs to be implemented to support silent notifications. 
-            //Let's not forget the silent notifications limitations (2-3 notifications per hour max, and other limitations per day)
-        }
+        //This needs to be implemented to support silent notifications. 
+        //Let's not forget the silent notifications limitations (2-3 notifications per hour max, and other limitations per day)
+        //[Export("application:didReceiveRemoteNotification:fetchCompletionHandler:")]
+        //public override void DidReceiveRemoteNotification(UIApplication application, NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler)
+        //{
+
+        //}
 
         #endregion
 
