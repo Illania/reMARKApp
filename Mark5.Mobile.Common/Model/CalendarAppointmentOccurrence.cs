@@ -1,4 +1,6 @@
-﻿using SQLite;
+﻿using System;
+using Mark5.Mobile.Common.Utilities;
+using SQLite;
 
 namespace Mark5.Mobile.Common.Model
 {
@@ -19,5 +21,9 @@ namespace Mark5.Mobile.Common.Model
 
         [Column("CalendarId")]
         public int CalendarId { get; set; }
+
+        public DateTime StartDate => StartDateTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime();
+        public DateTime EndDate => EndDateTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime();
+
     }
 }

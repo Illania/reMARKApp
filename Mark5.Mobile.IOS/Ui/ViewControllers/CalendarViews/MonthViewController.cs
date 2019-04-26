@@ -1,20 +1,33 @@
-﻿using Mark5.Mobile.Common.Model;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Threading.Tasks;
+using CoreAnimation;
+using Foundation;
+using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Presenters.CalendarModule;
+using Mark5.Mobile.IOS.Ui.Common;
+using Mark5.Mobile.IOS.Utilities;
 using Syncfusion.SfSchedule.iOS;
 using UIKit;
-using Mark5.Mobile.IOS.Ui.Common;
-using CoreAnimation;
-using Mark5.Mobile.IOS.Utilities;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 {
-    public class MonthViewController : AbstractViewController
+    public class MonthViewController : AbstractViewController, ICalendarView
     {
         readonly ReMarkMonthSchedule monthSchedule;
         private bool transitioning;
+        CalendarPresenter presenter;
+
+        ObservableCollection<Meeting> Items = new ObservableCollection<Meeting>();
 
         public MonthViewController(ModuleType moduleType)
         {
-            monthSchedule = new ReMarkMonthSchedule();
+            monthSchedule = new ReMarkMonthSchedule
+            {
+                AppointmentMapping = GetAppointmentMapping(),
+                ItemsSource = Items
+            };
             monthSchedule.HeaderTapped += Handle_HeaderTapped;
             monthSchedule.CellDoubleTapped += Schedule_CellDoubleTapped;
             monthSchedule.MonthInlineAppointmentTapped += Schedule_MonthInlineAppointmentTapped;
@@ -33,16 +46,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             View.BackgroundColor = UIColor.White;
             InitializeNavigationBar();
-            MoveToDate(Foundation.NSDate.Now);
+            MoveToDate(NSDate.Now);
+
+            presenter = new CalendarPresenter();
+            presenter.AttachView(this);
+            presenter.Start();
         }
 
-        public override void ViewWillAppear(bool animated)
+        public override async void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
             NavigationController.NavigationBarHidden = false;
+
+            var start = new DateTime(2019, 4, 1, 0, 0, 0, DateTimeKind.Local);
+            var end = start.AddMonths(1).AddDays(-1);
+            await presenter.LoadAppointments(start, end);
         }
 
-        void MoveToDate(Foundation.NSDate date)
+        void MoveToDate(NSDate date)
         {
             if (monthSchedule != null)
             {
@@ -100,33 +121,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             NavigationItem.SetRightBarButtonItems(new UIBarButtonItem[] { createAppointment, selectCalendars }, true);
         }
 
-        void Schedule_MonthInlineAppointmentTapped(object sender, MonthInlineAppointmentTappedEventArgs e)
-        {
-            NavigationController.PushViewController(new AppointmentViewController(), true);
-        }
-
-        void Schedule_CellDoubleTapped(object sender, CellTappedEventArgs e)
-        {
-            Foundation.NSDateComponents components = new Foundation.NSDateComponents
-            {
-                Hour = 8
-            };
-
-            Foundation.NSDate date = Foundation.NSCalendar.CurrentCalendar.DateByAddingComponents(components, e.Date, Foundation.NSCalendarOptions.None);
-
-            NavigationController.PushViewController(new DayViewController(date), true);
-        }
-
-        void Handle_HeaderTapped(object sender, HeaderTappedEventArgs e)
-        {
-            NavigationController.PushViewController(new YearViewController(MoveToDate), true);
-        }
-
-        void Schedule_ViewHeaderTapped(object sender, ViewHeaderTappedEventArgs e)
-        {
-            NavigationController.PushViewController(new YearViewController(MoveToDate), true);
-        }
-
         class AnimationDelegate : CAAnimationDelegate
         {
             readonly MonthViewController ctrl;
@@ -141,64 +135,152 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 ctrl.transitioning = false;
             }
         }
+
+        #region ICalendar implementation
+
+        void ICalendarView.SetCalendars(List<CalendarViewModel> calendars)
+        {
+            //TODO
+        }
+
+        void ICalendarView.UpdateAppointments(IEnumerable<SimpleCalendarAppointmentViewModel> caViewModels)
+        {
+            foreach (var caViewModel in caViewModels)
+            {
+                Items.Add(Convert(caViewModel));
+            }
+        }
+
+        Meeting Convert(SimpleCalendarAppointmentViewModel cavm)
+        {
+            return new Meeting
+            {
+                Subject = new NSString(cavm.Subject),
+                Start = (NSDate)cavm.Start,
+                End = (NSDate)cavm.End,
+                Color = UI.UIColorFromHexString(cavm.HexColor),
+            };
+        }
+
+        void ICalendarView.ShowLoading()
+        {
+            //TODO
+        }
+
+        void ICalendarView.StopLoading()
+        {
+            //TODO
+        }
+
+        Task ICalendarView.ShowError()
+        {
+            return Task.CompletedTask;
+            //TODO
+        }
+
+        #endregion
+
+        #region Event handlers
+
+        void Schedule_MonthInlineAppointmentTapped(object sender, MonthInlineAppointmentTappedEventArgs e)
+        {
+            NavigationController.PushViewController(new AppointmentViewController(), true);
+        }
+
+        void Schedule_CellDoubleTapped(object sender, CellTappedEventArgs e)
+        {
+            NSDateComponents components = new NSDateComponents
+            {
+                Hour = 8
+            };
+
+            NSDate date = NSCalendar.CurrentCalendar.DateByAddingComponents(components, e.Date, NSCalendarOptions.None);
+
+            NavigationController.PushViewController(new DayViewController(date), true);
+        }
+
+        void Handle_HeaderTapped(object sender, HeaderTappedEventArgs e)
+        {
+            NavigationController.PushViewController(new YearViewController(MoveToDate), true);
+        }
+
+        void Schedule_ViewHeaderTapped(object sender, ViewHeaderTappedEventArgs e)
+        {
+            NavigationController.PushViewController(new YearViewController(MoveToDate), true);
+        }
+
+        #endregion
+
+        public class Meeting
+        {
+            public NSString Subject { get; set; }
+            public NSDate Start { get; set; }
+            public NSDate End { get; set; }
+            public UIColor Color { get; set; }
+        }
+
+        public static AppointmentMapping GetAppointmentMapping()
+        {
+            AppointmentMapping mapping = new AppointmentMapping
+            {
+                Subject = "Subject",
+                StartTime = "Start",
+                EndTime = "End",
+                AppointmentBackground = "Color"
+            };
+            return mapping;
+        }
     }
 
     class ReMarkMonthSchedule : SFSchedule
     {
-        readonly SFViewHeaderStyle dayHeaderStyle = new SFViewHeaderStyle
-        {
-            BackgroundColor = Theme.DarkerBlue,
-            DayTextColor = UIColor.White,
-            DayTextStyle = Theme.DefaultLightFont
-        };
-
-        readonly HeaderStyle calendarHeaderStyle = new HeaderStyle
-        {
-            BackgroundColor = Theme.DarkerBlue,
-            TextStyle = Theme.DefaultLightFont,
-            TextColor = UIColor.White
-        };
-
-        readonly MonthViewSettings monthViewSettings = new MonthViewSettings()
-        {
-            SelectionIndicatorColor = Theme.LightBlue,
-            TodayBackgroundColor = Theme.LightBlue,
-            SelectionTextColor = Theme.White,
-            ShowAgendaView = true,
-            ShowAppointmentsInline = false,
-            AgendaViewStyle = new AgendaViewStyle
-            {
-                SubjectTextColor = Theme.DarkerBlue,
-                SubjectTextStyle = Theme.DefaultLightFont,
-                TimeTextStyle = Theme.CalendarTimeLightFont,
-                TimeTextColor = Theme.DarkGray,
-                DateTextColor = Theme.DarkGray,
-                DateTextStyle = Theme.DefaultLightFont,
-                HeaderHeight = 50f
-            }
-        };
-
-        readonly SFSelectionStyle selectionStyle = new SFSelectionStyle
-        {
-            BackgroundColor = Theme.DarkBlue,
-            BorderColor = Theme.LightBlue
-        };
-
         public ReMarkMonthSchedule()
         {
             TranslatesAutoresizingMaskIntoConstraints = false;
 
             ScheduleView = SFScheduleView.SFScheduleViewMonth;
             EnableNavigation = true;
-            MonthViewSettings = monthViewSettings;
-            SelectionStyle = selectionStyle;
-            HeaderStyle = calendarHeaderStyle;
-            DayHeaderStyle = dayHeaderStyle;
+
+            MonthViewSettings = new MonthViewSettings()
+            {
+                SelectionIndicatorColor = Theme.LightBlue,
+                TodayBackgroundColor = Theme.LightBlue,
+                SelectionTextColor = Theme.White,
+                ShowAgendaView = true,
+                ShowAppointmentsInline = false,
+                AgendaViewStyle = new AgendaViewStyle
+                {
+                    SubjectTextColor = Theme.DarkerBlue,
+                    SubjectTextStyle = Theme.DefaultLightFont,
+                    TimeTextStyle = Theme.CalendarTimeLightFont,
+                    TimeTextColor = Theme.DarkGray,
+                    DateTextColor = Theme.DarkGray,
+                    DateTextStyle = Theme.DefaultLightFont,
+                    HeaderHeight = 50f
+                }
+            };
+
+            SelectionStyle = new SFSelectionStyle
+            {
+                BackgroundColor = Theme.DarkBlue,
+                BorderColor = Theme.LightBlue
+            };
+
+            HeaderStyle = new HeaderStyle
+            {
+                BackgroundColor = Theme.DarkerBlue,
+                TextStyle = Theme.DefaultLightFont,
+                TextColor = UIColor.White
+            };
+
+            DayHeaderStyle = new SFViewHeaderStyle
+            {
+                BackgroundColor = Theme.DarkerBlue,
+                DayTextColor = UIColor.White,
+                DayTextStyle = Theme.DefaultLightFont
+            };
 
             MonthCellLoaded += ReMark_MonthCellLoaded;
-
-            AppointmentMapping = CalendarUtils.GetAppointmentMapping();
-            ItemsSource = CalendarUtils.GetMeetings();
         }
 
         void ReMark_MonthCellLoaded(object sender, MonthCellLoadedEventArgs e)

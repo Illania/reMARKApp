@@ -19,7 +19,9 @@ namespace Mark5.Mobile.Common.Manager
     {
         readonly ICalendarDataAccess calendarDataAccess;
 
-        public IAppointmentsCache AppointmentsCache => throw new NotImplementedException();
+        AppointmentsCache appCache = new AppointmentsCache();
+
+        public IAppointmentsCache AppointmentsCache => appCache;
 
         public CalendarManager(ConnectionInfo connectionInfo, IAppServiceProxy appServiceProxy, ICalendarDataAccess calendarDataAccess)
             : base(connectionInfo, appServiceProxy)
@@ -164,12 +166,6 @@ namespace Mark5.Mobile.Common.Manager
         BlockingCollection<MonthDate> queue;
         CancellationTokenSource tokenSource;
         HashSet<MonthDate> cachedMonths;
-        private List<Calendar> calendarsList;
-
-        public AppointmentsCache(List<Calendar> calendarsList)
-        {
-            this.calendarsList = calendarsList;
-        }
 
         public void Start()
         {
@@ -195,6 +191,8 @@ namespace Mark5.Mobile.Common.Manager
 
         async Task Work(CancellationToken token)
         {
+            var calendarsList = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars;  //TODO improve
+
             while (!queue.IsCompleted && token.IsCancellationRequested)
             {
                 if (queue.TryTake(out var monthDate))
@@ -231,6 +229,8 @@ namespace Mark5.Mobile.Common.Manager
 
         async Task CacheCalendarContent(DateTime start, DateTime end)
         {
+            var calendarsList = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars;  //TODO improve
+
             if (!RangeCached(start, end))
             {
                 var startDate = new DateTime(start.Year, start.Month, 1, 0, 0, 0, DateTimeKind.Local);

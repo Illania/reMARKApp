@@ -93,6 +93,8 @@ namespace Mark5.Mobile.IOS
 
         public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
         {
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("OTQ4NTJAMzEzNzJlMzEyZTMwWTh6RmRibklqNHU3citRNzViZVRJUkVkYmFSZTc1dFBEQi9td2dZSVZHWT0=");
+
             var OneDayInterval = 60 * 24;
             UIApplication.SharedApplication.SetMinimumBackgroundFetchInterval(OneDayInterval);
 

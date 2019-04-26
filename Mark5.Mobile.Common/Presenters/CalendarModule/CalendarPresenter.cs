@@ -9,7 +9,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 {
     public class CalendarPresenter : BasePresenter<ICalendarView>, ICalendarPresenter
     {
-        List<Calendar> calendarsList;
+        protected List<Calendar> calendarsList;
         Dictionary<int, bool> calendarsSelectedState = new Dictionary<int, bool>();
         IAppointmentsCache Cache => Managers.CalendarManager.AppointmentsCache;
 
@@ -35,7 +35,8 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         {
             view.ShowLoading();
 
-            var selectedCalendars = calendarsSelectedState?.Where(c => calendarsSelectedState[c.Key]).Select(c => c.Key).ToList();
+            //var selectedCalendars = calendarsSelectedState?.Where(c => calendarsSelectedState[c.Key]).Select(c => c.Key).ToList();  //TODO testing!!
+            var selectedCalendars = calendarsSelectedState?.Select(c => c.Key).ToList();
 
             try
             {
@@ -73,9 +74,23 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
     public class SimpleCalendarAppointmentViewModel
     {
+        public DateTime Start { get; set; }
+        public DateTime End { get; set; }
+
+        public string Subject { get; set; }
+        public bool AllDay { get; set; }
+        public string HexColor { get; set; }
+
         public static SimpleCalendarAppointmentViewModel ConvertToViewModel(CalendarAppointment ca)
         {
-            return new SimpleCalendarAppointmentViewModel();
+            return new SimpleCalendarAppointmentViewModel()
+            {
+                Subject = ca.Subject,
+                AllDay = ca.AllDay,
+                Start = ca.Occurrences[0].StartDate,
+                End = ca.Occurrences[0].EndDate,
+                HexColor = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars.First(c => c.Id == ca.CalendarId).ColorHex, //TODO should be improved
+            };
         }
     }
 

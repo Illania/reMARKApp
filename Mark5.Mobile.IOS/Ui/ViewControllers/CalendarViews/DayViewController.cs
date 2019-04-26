@@ -152,8 +152,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             DayHeaderStyle = viewHeaderStyle;
             AppointmentStyle = appointmentStyle;
 
-            AppointmentMapping = CalendarUtils.GetAppointmentMapping();
-            ItemsSource = CalendarUtils.GetMeetings();
+            //AppointmentMapping = CalendarUtils.GetAppointmentMapping(); //TODO
+            //ItemsSource = CalendarUtils.GetMeetings();
         }
     }
 }
