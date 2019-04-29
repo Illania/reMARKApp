@@ -26,7 +26,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             monthSchedule = new ReMarkMonthSchedule
             {
                 AppointmentMapping = GetAppointmentMapping(),
-                ItemsSource = Items
+                ItemsSource = Items  //If we're lucky, we can use the same items, in all the views, so we don't need to do strange stuff
             };
             monthSchedule.HeaderTapped += Handle_HeaderTapped;
             monthSchedule.CellDoubleTapped += Schedule_CellDoubleTapped;
@@ -59,7 +59,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             NavigationController.NavigationBarHidden = false;
 
             var start = new DateTime(2019, 4, 1, 0, 0, 0, DateTimeKind.Local);
-            var end = start.AddMonths(1).AddDays(-1);
+            var endDay = start.AddMonths(1).AddDays(-1);
+            var end = new DateTime(endDay.Year, endDay.Month, endDay.Day, 23, 59, 59);
+
             await presenter.LoadAppointments(start, end);
         }
 
@@ -156,8 +158,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             return new Meeting
             {
                 Subject = new NSString(cavm.Subject),
-                Start = (NSDate)cavm.Start,
-                End = (NSDate)cavm.End,
+                Start = (NSDate)DateTime.SpecifyKind(cavm.Start, DateTimeKind.Local),
+                End = (NSDate)DateTime.SpecifyKind(cavm.End, DateTimeKind.Local),
                 Color = UI.UIColorFromHexString(cavm.HexColor),
             };
         }
