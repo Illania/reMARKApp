@@ -28,7 +28,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         public void AppointmentClicked(int appointmentId)
         {
-            throw new System.NotImplementedException();
+            //TODO to complete...
         }
 
         public async Task LoadAppointments(DateTime start, DateTime end)
@@ -53,7 +53,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                     $"in calendars {string.Join(", ", selectedCalendars)} from {start} to {end} ", ex);
 
                 view.StopLoading();
-                await view.ShowError();
+                await view.ShowError(ex);
             }
         }
 
@@ -113,6 +113,6 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         void ShowLoading();
         void StopLoading();
-        Task ShowError();
+        Task ShowError(Exception ex);
     }
 }
