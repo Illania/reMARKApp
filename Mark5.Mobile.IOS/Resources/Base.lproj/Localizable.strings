@@ -32,6 +32,7 @@
 "birthdate" = "Birthdate";
 "browse_files" = "Browse files...";
 "calendar" = "Calendar";
+"calendars" = "Calendars";
 "call" = "Call";
 "cancel" = "Cancel";
 "cannot_mail_report_content" = "There are no mail accounts configured on your device. You need to have an account configured before you can send feedback.";
@@ -180,6 +181,8 @@
 "last_downloaded_on" = "Last downloaded on: ";
 "ledger" = "Ledger";
 "line" = "Mailbox";
+"loading_appointment___" = "Loading appointment...";
+"loading_appointments___" = "Loading appointments...";
 "loading_shortcode___" = "Loading mailing list...";
 "loading_contact___" = "Loading contact...";
 "loading_document___" = "Loading email...";
@@ -416,6 +419,7 @@
 "wrong_port_title" = "Wrong port";
 "wrong_username_summary" = "You need to provide valid username.";
 "wrong_username_title" = "Wrong username";
+"year" = "Year";
 "yes" = "Yes";
 "yesterday" = "Yesterday";
 "zip" = "Zip";
