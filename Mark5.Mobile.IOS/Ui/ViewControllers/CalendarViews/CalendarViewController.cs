@@ -11,7 +11,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 {
     public abstract class CalendarViewController : AbstractViewController
     {
-        protected ObservableCollection<Meeting> Items = new ObservableCollection<Meeting>();
+        protected SFSchedule schedule;
+        protected ObservableCollection<Meeting> items = new ObservableCollection<Meeting>();
+
+        public override void ViewDidLoad()
+        {
+            base.ViewDidLoad();
+
+            schedule.AppointmentMapping = GetAppointmentMapping();
+            schedule.ItemsSource = items;
+        }
+
+        protected void MoveToDate(NSDate date)
+        {
+            if (schedule != null)
+            {
+                schedule.MoveToDate(date);
+                schedule.SelectedDate = date;
+            }
+        }
 
         public class Meeting
         {

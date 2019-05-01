@@ -13,7 +13,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 {
     public class MonthViewController : CalendarViewController, ICalendarView
     {
-        ReMarkMonthSchedule monthSchedule;
         UIBarButtonItem backButtonItem;
         UIBarButtonItem calendarsButtonItem;
         UIBarButtonItem createAppointmentButtonItem;
@@ -22,23 +21,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         CalendarPresenter presenter;
         Action loadingDialogDismissal;
 
-        public override void ViewDidLoad()
+        public override void LoadView()
         {
-            base.ViewDidLoad();
+            base.LoadView();
 
-            monthSchedule = new ReMarkMonthSchedule
-            {
-                AppointmentMapping = GetAppointmentMapping(),
-                ItemsSource = Items  //TODO If we're lucky, we can use the same items, in all the views, so we don't need to do strange stuff
-            };
-
+            schedule = new MonthSchedule();
             View.BackgroundColor = UIColor.White;
-            View.AddSubview(monthSchedule);
+            View.AddSubview(schedule);
             View.AddConstraints(new NSLayoutConstraint[] {
-                monthSchedule.TopAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.TopAnchor : View.TopAnchor),
-                monthSchedule.BottomAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.BottomAnchor : View.BottomAnchor),
-                monthSchedule.RightAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.RightAnchor : View.RightAnchor),
-                monthSchedule.LeftAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.LeftAnchor : View.LeftAnchor)
+                schedule.TopAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.TopAnchor : View.TopAnchor),
+                schedule.BottomAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.BottomAnchor : View.BottomAnchor),
+                schedule.RightAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.RightAnchor : View.RightAnchor),
+                schedule.LeftAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.LeftAnchor : View.LeftAnchor)
             });
 
             InitializeNavigationBar();
@@ -67,12 +61,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         void InitializeHandlers()
         {
-            if (monthSchedule != null)
+            if (schedule != null)
             {
-                monthSchedule.HeaderTapped += Handle_HeaderTapped;
-                monthSchedule.CellDoubleTapped += Schedule_CellDoubleTapped;
-                monthSchedule.MonthInlineAppointmentTapped += Schedule_MonthInlineAppointmentTapped;
-                monthSchedule.VisibleDatesChanged += MonthSchedule_VisibleDatesChanged;
+                schedule.HeaderTapped += Handle_HeaderTapped;
+                schedule.CellDoubleTapped += Schedule_CellDoubleTapped;
+                schedule.MonthInlineAppointmentTapped += Schedule_MonthInlineAppointmentTapped;
+                schedule.VisibleDatesChanged += MonthSchedule_VisibleDatesChanged;
             }
 
             if (backButtonItem != null)
@@ -83,17 +77,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             if (calendarsButtonItem != null)
                 calendarsButtonItem.Clicked += CalendarsButtonItem_Clicked;
-
         }
 
         void DeInitializeHandlers()
         {
-            if (monthSchedule != null)
+            if (schedule != null)
             {
-                monthSchedule.HeaderTapped -= Handle_HeaderTapped;
-                monthSchedule.CellDoubleTapped -= Schedule_CellDoubleTapped;
-                monthSchedule.MonthInlineAppointmentTapped -= Schedule_MonthInlineAppointmentTapped;
-                monthSchedule.VisibleDatesChanged -= MonthSchedule_VisibleDatesChanged;
+                schedule.HeaderTapped -= Handle_HeaderTapped;
+                schedule.CellDoubleTapped -= Schedule_CellDoubleTapped;
+                schedule.MonthInlineAppointmentTapped -= Schedule_MonthInlineAppointmentTapped;
+                schedule.VisibleDatesChanged -= MonthSchedule_VisibleDatesChanged;
             }
 
             if (backButtonItem != null)
@@ -104,7 +97,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             if (calendarsButtonItem != null)
                 calendarsButtonItem.Clicked -= CalendarsButtonItem_Clicked;
-
         }
 
         void InitializeNavigationBar()
@@ -130,15 +122,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             NavigationItem.SetRightBarButtonItems(new UIBarButtonItem[] { createAppointmentButtonItem, calendarsButtonItem }, true);
         }
 
-        void MoveToDate(NSDate date)
-        {
-            if (monthSchedule != null)
-            {
-                monthSchedule.MoveToDate(date);
-                monthSchedule.SelectedDate = date;
-            }
-        }
-
         class AnimationDelegate : CAAnimationDelegate
         {
             readonly MonthViewController ctrl;
@@ -156,10 +139,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         #region ICalendar implementation
 
-        //void ICalendarView.OpenAppointment() //TODO
-        //{
-        //    NavigationController.PushViewController(new AppointmentViewController(), true);
-        //}
+        void ICalendarView.ShowAppointment(int appointmentId) //TODO maybe I'll need to do some modification for recurring appointments
+        {
+            NavigationController.PushViewController(new AppointmentViewController(appointmentId), true);
+        }
 
         void ICalendarView.SetCalendars(List<CalendarViewModel> calendars)
         {
@@ -170,7 +153,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         {
             foreach (var caViewModel in caViewModels)
             {
-                Items.Add(Convert(caViewModel));
+                items.Add(Convert(caViewModel));
             }
         }
 
@@ -200,8 +183,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         async void MonthSchedule_VisibleDatesChanged(object sender, VisibleDatesChangedEventArgs e)
         {
-            var startDate = monthSchedule.VisibleDates.GetItem<NSDate>(0);
-            var endDate = monthSchedule.VisibleDates.GetItem<NSDate>(monthSchedule.VisibleDates.Count - 1);
+            var startDate = schedule.VisibleDates.GetItem<NSDate>(0);
+            var endDate = schedule.VisibleDates.GetItem<NSDate>(schedule.VisibleDates.Count - 1);
 
             var start = ((DateTime)startDate).ToLocalTime();
             var end = ((DateTime)endDate).ToLocalTime();
@@ -218,7 +201,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             NSDate date = NSCalendar.CurrentCalendar.DateByAddingComponents(components, e.Date, NSCalendarOptions.None);
 
-            NavigationController.PushViewController(new DayViewController(date, Items, GetAppointmentMapping()), true);
+            NavigationController.PushViewController(new DayWeekViewController(date, items), true);
         }
 
         void Handle_HeaderTapped(object sender, HeaderTappedEventArgs e)
@@ -264,9 +247,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         #endregion
     }
 
-    class ReMarkMonthSchedule : SFSchedule
+    class MonthSchedule : SFSchedule
     {
-        public ReMarkMonthSchedule()
+        public MonthSchedule()
         {
             TranslatesAutoresizingMaskIntoConstraints = false;
 

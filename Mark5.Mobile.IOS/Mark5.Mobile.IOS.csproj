@@ -270,7 +270,7 @@
 		<Compile Include="Model\HubMessages\NavigationModuleChangedMessage.cs" />
 		<Compile Include="Model\NavigationModule.cs" />
 		    <Compile Include="Ui\ViewControllers\CalendarViews\MonthViewController.cs" />
-    <Compile Include="Ui\ViewControllers\CalendarViews\DayViewController.cs" />
+    <Compile Include="Ui\ViewControllers\CalendarViews\DayWeekViewController.cs" />
     <Compile Include="Ui\ViewControllers\CalendarViews\YearViewController.cs" />
     <Compile Include="Ui\ViewControllers\CalendarViews\CreateAppointmentViewController.cs" />
     <Compile Include="Ui\ViewControllers\CalendarViews\AppointmentViewController.cs" />

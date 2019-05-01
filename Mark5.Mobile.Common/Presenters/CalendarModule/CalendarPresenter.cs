@@ -28,7 +28,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         public void AppointmentClicked(int appointmentId)
         {
-            //TODO to complete...
+            view.ShowAppointment(appointmentId);
         }
 
         public async Task LoadAppointments(DateTime start, DateTime end)
@@ -116,5 +116,6 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         void ShowLoading();
         void StopLoading();
         Task ShowError(Exception ex);
+        void ShowAppointment(int appointmentId);
     }
 }
