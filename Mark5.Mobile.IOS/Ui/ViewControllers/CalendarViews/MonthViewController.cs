@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using CoreAnimation;
 using Foundation;
@@ -12,17 +11,16 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 {
-    public class MonthViewController : AbstractViewController, ICalendarView
+    public class MonthViewController : CalendarViewController, ICalendarView
     {
         ReMarkMonthSchedule monthSchedule;
         UIBarButtonItem backButtonItem;
         UIBarButtonItem calendarsButtonItem;
         UIBarButtonItem createAppointmentButtonItem;
 
-        private bool transitioning;
+        bool transitioning;
         CalendarPresenter presenter;
-
-        ObservableCollection<Meeting> Items = new ObservableCollection<Meeting>();
+        Action loadingDialogDismissal;
 
         public override void ViewDidLoad()
         {
@@ -176,19 +174,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             }
         }
 
-        Meeting Convert(SimpleCalendarAppointmentViewModel cavm)
-        {
-            return new Meeting
-            {
-                Subject = new NSString(cavm.Subject),
-                Start = (NSDate)DateTime.SpecifyKind(cavm.Start, DateTimeKind.Local),
-                End = (NSDate)DateTime.SpecifyKind(cavm.End, DateTimeKind.Local),
-                Color = UI.UIColorFromHexString(cavm.HexColor),
-            };
-        }
-
-        Action loadingDialogDismissal;
-
         void ICalendarView.ShowLoading()
         {
             loadingDialogDismissal = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("loading_appointments___"));
@@ -218,11 +203,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             var startDate = monthSchedule.VisibleDates.GetItem<NSDate>(0);
             var endDate = monthSchedule.VisibleDates.GetItem<NSDate>(monthSchedule.VisibleDates.Count - 1);
 
-            var selectedDateComponents = NSCalendar.CurrentCalendar.Components(NSCalendarUnit.Day | NSCalendarUnit.Month | NSCalendarUnit.Year, startDate);
-            var start = new DateTime((int)selectedDateComponents.Year, (int)selectedDateComponents.Month, (int)selectedDateComponents.Day, 0, 0, 0, DateTimeKind.Local);
-
-            selectedDateComponents = NSCalendar.CurrentCalendar.Components(NSCalendarUnit.Day | NSCalendarUnit.Month | NSCalendarUnit.Year, endDate);
-            var end = new DateTime((int)selectedDateComponents.Year, (int)selectedDateComponents.Month, (int)selectedDateComponents.Day, 23, 59, 59, DateTimeKind.Local).AddDays(1);
+            var start = ((DateTime)startDate).ToLocalTime();
+            var end = ((DateTime)endDate).ToLocalTime();
 
             await presenter.LoadAppointments(start, end);
         }
@@ -236,7 +218,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             NSDate date = NSCalendar.CurrentCalendar.DateByAddingComponents(components, e.Date, NSCalendarOptions.None);
 
-            NavigationController.PushViewController(new DayViewController(date), true);
+            NavigationController.PushViewController(new DayViewController(date, Items, GetAppointmentMapping()), true);
         }
 
         void Handle_HeaderTapped(object sender, HeaderTappedEventArgs e)
@@ -280,27 +262,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         }
 
         #endregion
-
-        public class Meeting
-        {
-            public int Id { get; set; }
-            public NSString Subject { get; set; }
-            public NSDate Start { get; set; }
-            public NSDate End { get; set; }
-            public UIColor Color { get; set; }
-        }
-
-        public static AppointmentMapping GetAppointmentMapping()
-        {
-            AppointmentMapping mapping = new AppointmentMapping
-            {
-                Subject = "Subject",
-                StartTime = "Start",
-                EndTime = "End",
-                AppointmentBackground = "Color",
-            };
-            return mapping;
-        }
     }
 
     class ReMarkMonthSchedule : SFSchedule

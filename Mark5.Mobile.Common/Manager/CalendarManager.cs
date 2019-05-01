@@ -213,7 +213,7 @@ namespace Mark5.Mobile.Common.Manager
             }
         }
 
-        bool RangeCached(DateTime start, DateTime end) //We are supposing that they're max 1 month apart
+        bool RangeCached(DateTime start, DateTime end)
         {
             return GetMonthDatePeriod(start, end).All(cachedMonths.Contains);
         }
@@ -251,7 +251,7 @@ namespace Mark5.Mobile.Common.Manager
         {
             var calendarsList = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars;  //TODO improve?
 
-            if (!RangeCached(start, end))
+            if (!RangeCached(start, end)) //This doesn't consider the case for which we already have cached already part of the period, but it's a good approximation
             {
                 var startDate = new DateTime(start.Year, start.Month, 1, 0, 0, 0, DateTimeKind.Local);
                 var endDate = new DateTime(end.Year, end.Month, 1, 23, 59, 59, DateTimeKind.Local).AddMonths(1).AddDays(-1);

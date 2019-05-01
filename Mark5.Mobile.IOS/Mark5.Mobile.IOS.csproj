@@ -274,6 +274,7 @@
     <Compile Include="Ui\ViewControllers\CalendarViews\YearViewController.cs" />
     <Compile Include="Ui\ViewControllers\CalendarViews\CreateAppointmentViewController.cs" />
     <Compile Include="Ui\ViewControllers\CalendarViews\AppointmentViewController.cs" />
+    <Compile Include="Ui\ViewControllers\CalendarViews\CalendarViewController.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

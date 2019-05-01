@@ -1,0 +1,50 @@
+﻿using System;
+using System.Collections.ObjectModel;
+using Foundation;
+using Mark5.Mobile.Common.Presenters.CalendarModule;
+using Mark5.Mobile.IOS.Ui.Common;
+using Mark5.Mobile.IOS.Utilities;
+using Syncfusion.SfSchedule.iOS;
+using UIKit;
+
+namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
+{
+    public abstract class CalendarViewController : AbstractViewController
+    {
+        protected ObservableCollection<Meeting> Items = new ObservableCollection<Meeting>();
+
+        public class Meeting
+        {
+            public NSString Id { get; set; }
+            public NSString Subject { get; set; }
+            public NSDate Start { get; set; }
+            public NSDate End { get; set; }
+            public UIColor Color { get; set; }
+        }
+
+        protected Meeting Convert(SimpleCalendarAppointmentViewModel cavm)
+        {
+            return new Meeting
+            {
+                Subject = new NSString(cavm.Subject),
+                Start = (NSDate)DateTime.SpecifyKind(cavm.Start, DateTimeKind.Local),
+                End = (NSDate)DateTime.SpecifyKind(cavm.End, DateTimeKind.Local),
+                Color = UI.UIColorFromHexString(cavm.HexColor),
+                Id = new NSString(cavm.Id.ToString())
+            };
+        }
+
+        public static AppointmentMapping GetAppointmentMapping()
+        {
+            AppointmentMapping mapping = new AppointmentMapping
+            {
+                Subject = "Subject",
+                StartTime = "Start",
+                EndTime = "End",
+                AppointmentBackground = "Color",
+                Notes = "Id",
+            };
+            return mapping;
+        }
+    }
+}

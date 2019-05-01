@@ -74,6 +74,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
     public class SimpleCalendarAppointmentViewModel
     {
+        public int Id { get; set; }
         public DateTime Start { get; set; }
         public DateTime End { get; set; }
 
@@ -85,6 +86,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         {
             return new SimpleCalendarAppointmentViewModel()
             {
+                Id = ca.Id,
                 Subject = ca.Subject,
                 AllDay = ca.AllDay,
                 Start = ca.Occurrences[0].StartDate,

@@ -2,18 +2,22 @@
 using Syncfusion.SfSchedule.iOS;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
+using System.Collections.ObjectModel;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 {
-    public class DayViewController : UIViewController
+    public class DayViewController : CalendarViewController
     {
         private readonly ReMarkSchedule reMarkSchedule;
         private UIBarButtonItem scheduleSwitchBtn;
 
-        public DayViewController(Foundation.NSDate date)
+        public DayViewController(Foundation.NSDate date, ObservableCollection<Meeting> itemsSource, AppointmentMapping appointmentMapping)
         {
             reMarkSchedule = new ReMarkSchedule();
             MoveToDate(date);
+
+            reMarkSchedule.AppointmentMapping = appointmentMapping;  //TODO testing
+            Items = itemsSource;
         }
 
         public override void ViewDidLoad()
@@ -32,6 +36,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             reMarkSchedule.CellDoubleTapped += ReMarkDayCalendar_CellTapped;
 
             InitializeNavigationBar();
+        }
+
+        public override void ViewWillAppear(bool animated)
+        {
+            base.ViewWillAppear(animated);
+
+            reMarkSchedule.ItemsSource = Items;
         }
 
         public void MoveToDate(Foundation.NSDate date)
@@ -151,9 +162,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             DayViewSettings = dayViewSettings;
             DayHeaderStyle = viewHeaderStyle;
             AppointmentStyle = appointmentStyle;
-
-            //AppointmentMapping = CalendarUtils.GetAppointmentMapping(); //TODO
-            //ItemsSource = CalendarUtils.GetMeetings();
         }
     }
 }
