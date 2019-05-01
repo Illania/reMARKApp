@@ -182,7 +182,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             var sizeInKiB = (len1 + len2 + len3 + len4) * 2 / 1024;
 
-            return sizeInKiB > 400;
+            return sizeInKiB > 200;
         }
 
         void ViewPager.IOnPageChangeListener.OnPageScrollStateChanged(int state)
