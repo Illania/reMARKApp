@@ -215,8 +215,28 @@ namespace Mark5.Mobile.Common.Manager
 
         bool RangeCached(DateTime start, DateTime end) //We are supposing that they're max 1 month apart
         {
-            return cachedMonths.Contains(MonthDate.FromDateTime(start)) &&
-                cachedMonths.Contains(MonthDate.FromDateTime(end));
+            return GetMonthDatePeriod(start, end).All(cachedMonths.Contains);
+        }
+
+        List<MonthDate> GetMonthDatePeriod(DateTime start, DateTime end)
+        {
+            var startMonthDate = MonthDate.FromDateTime(start);
+            var endMonthDate = MonthDate.FromDateTime(end);
+
+            var result = new List<MonthDate> { startMonthDate };
+
+            if (!startMonthDate.Equals(endMonthDate))
+            {
+                MonthDate newMonthDate = startMonthDate;
+                do
+                {
+                    newMonthDate = newMonthDate.AddMonths(1);
+                    result.Add(newMonthDate);
+
+                } while (!newMonthDate.Equals(endMonthDate));
+            }
+
+            return result;
         }
 
         (DateTime a, DateTime b) GetTimePeriod(MonthDate monthDate)
@@ -229,7 +249,7 @@ namespace Mark5.Mobile.Common.Manager
 
         async Task CacheCalendarContent(DateTime start, DateTime end)
         {
-            var calendarsList = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars;  //TODO improve
+            var calendarsList = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars;  //TODO improve?
 
             if (!RangeCached(start, end))
             {
@@ -274,7 +294,7 @@ namespace Mark5.Mobile.Common.Manager
                 if (month <= 0 || month > 12)
                     throw new ArgumentException("Invalid month");
 
-                if (year <= 1900 || year > 3000)
+                if (year <= 1900 || year > 5000)
                     throw new ArgumentException("Invalid year");
 
                 Month = month;
@@ -286,10 +306,24 @@ namespace Mark5.Mobile.Common.Manager
                 return new MonthDate(dateTime.Month, dateTime.Year);
             }
 
+            public MonthDate AddMonths(int months)
+            {
+                var newMonth = Month + months;
+                var newYear = Year;
+
+                if (newMonth > 12)
+                {
+                    newYear = newYear + (int)Math.Floor(newMonth / 12.0);
+                    newMonth = newMonth % 12;
+                }
+
+                return new MonthDate(newMonth, newYear);
+            }
+
             public override bool Equals(object obj)
             {
                 var other = obj as MonthDate;
-                return Year == other?.Year && Month == other.Month;
+                return Year == other?.Year && Month == other?.Month;
             }
 
             public override int GetHashCode()
@@ -298,6 +332,11 @@ namespace Mark5.Mobile.Common.Manager
                 hashCode = hashCode * -1521134295 + Month.GetHashCode();
                 hashCode = hashCode * -1521134295 + Year.GetHashCode();
                 return hashCode;
+            }
+
+            public override string ToString()
+            {
+                return $"{Month}/{Year}";
             }
         }
     }

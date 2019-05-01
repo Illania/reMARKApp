@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using CoreAnimation;
 using Foundation;
-using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Presenters.CalendarModule;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
@@ -15,27 +14,27 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 {
     public class MonthViewController : AbstractViewController, ICalendarView
     {
-        readonly ReMarkMonthSchedule monthSchedule;
+        ReMarkMonthSchedule monthSchedule;
+        UIBarButtonItem backButtonItem;
+        UIBarButtonItem calendarsButtonItem;
+        UIBarButtonItem createAppointmentButtonItem;
+
         private bool transitioning;
         CalendarPresenter presenter;
 
         ObservableCollection<Meeting> Items = new ObservableCollection<Meeting>();
 
-        public MonthViewController(ModuleType moduleType)
-        {
-            monthSchedule = new ReMarkMonthSchedule
-            {
-                AppointmentMapping = GetAppointmentMapping(),
-                ItemsSource = Items  //If we're lucky, we can use the same items, in all the views, so we don't need to do strange stuff
-            };
-            monthSchedule.HeaderTapped += Handle_HeaderTapped;
-            monthSchedule.CellDoubleTapped += Schedule_CellDoubleTapped;
-            monthSchedule.MonthInlineAppointmentTapped += Schedule_MonthInlineAppointmentTapped;
-        }
-
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
+
+            monthSchedule = new ReMarkMonthSchedule
+            {
+                AppointmentMapping = GetAppointmentMapping(),
+                ItemsSource = Items  //TODO If we're lucky, we can use the same items, in all the views, so we don't need to do strange stuff
+            };
+
+            View.BackgroundColor = UIColor.White;
             View.AddSubview(monthSchedule);
             View.AddConstraints(new NSLayoutConstraint[] {
                 monthSchedule.TopAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.TopAnchor : View.TopAnchor),
@@ -44,8 +43,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 monthSchedule.LeftAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.LeftAnchor : View.LeftAnchor)
             });
 
-            View.BackgroundColor = UIColor.White;
             InitializeNavigationBar();
+
             MoveToDate(NSDate.Now);
 
             presenter = new CalendarPresenter();
@@ -53,16 +52,84 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             presenter.Start();
         }
 
-        public override async void ViewWillAppear(bool animated)
+        public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
             NavigationController.NavigationBarHidden = false;
 
-            var start = new DateTime(2019, 4, 1, 0, 0, 0, DateTimeKind.Local);
-            var endDay = start.AddMonths(1).AddDays(-1);
-            var end = new DateTime(endDay.Year, endDay.Month, endDay.Day, 23, 59, 59);
+            InitializeHandlers();
+        }
 
-            await presenter.LoadAppointments(start, end);
+        public override void ViewWillDisappear(bool animated)
+        {
+            base.ViewWillDisappear(animated);
+
+            DeInitializeHandlers();
+        }
+
+        void InitializeHandlers()
+        {
+            if (monthSchedule != null)
+            {
+                monthSchedule.HeaderTapped += Handle_HeaderTapped;
+                monthSchedule.CellDoubleTapped += Schedule_CellDoubleTapped;
+                monthSchedule.MonthInlineAppointmentTapped += Schedule_MonthInlineAppointmentTapped;
+                monthSchedule.VisibleDatesChanged += MonthSchedule_VisibleDatesChanged;
+            }
+
+            if (backButtonItem != null)
+                backButtonItem.Clicked += BackButtonItem_Clicked;
+
+            if (createAppointmentButtonItem != null)
+                createAppointmentButtonItem.Clicked += CreateAppointmentButtonItem_Clicked;
+
+            if (calendarsButtonItem != null)
+                calendarsButtonItem.Clicked += CalendarsButtonItem_Clicked;
+
+        }
+
+        void DeInitializeHandlers()
+        {
+            if (monthSchedule != null)
+            {
+                monthSchedule.HeaderTapped -= Handle_HeaderTapped;
+                monthSchedule.CellDoubleTapped -= Schedule_CellDoubleTapped;
+                monthSchedule.MonthInlineAppointmentTapped -= Schedule_MonthInlineAppointmentTapped;
+                monthSchedule.VisibleDatesChanged -= MonthSchedule_VisibleDatesChanged;
+            }
+
+            if (backButtonItem != null)
+                backButtonItem.Clicked -= BackButtonItem_Clicked;
+
+            if (createAppointmentButtonItem != null)
+                createAppointmentButtonItem.Clicked -= CreateAppointmentButtonItem_Clicked;
+
+            if (calendarsButtonItem != null)
+                calendarsButtonItem.Clicked -= CalendarsButtonItem_Clicked;
+
+        }
+
+        void InitializeNavigationBar()
+        {
+            backButtonItem = new UIBarButtonItem
+            {
+                Title = Localization.GetString("year"),
+            };
+
+            NavigationItem.SetLeftBarButtonItem(backButtonItem, true);
+
+            createAppointmentButtonItem = new UIBarButtonItem
+            {
+                Title = Localization.GetString("create"),
+                Image = UIImage.FromBundle("Create")
+            };
+
+            calendarsButtonItem = new UIBarButtonItem
+            {
+                Title = Localization.GetString("calendars"),
+            };
+
+            NavigationItem.SetRightBarButtonItems(new UIBarButtonItem[] { createAppointmentButtonItem, calendarsButtonItem }, true);
         }
 
         void MoveToDate(NSDate date)
@@ -72,55 +139,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 monthSchedule.MoveToDate(date);
                 monthSchedule.SelectedDate = date;
             }
-        }
-
-        void InitializeNavigationBar()
-        {
-            var backBtn = new UIBarButtonItem
-            {
-                Title = "Year"
-            };
-
-            backBtn.Clicked += (sender, e) =>
-            {
-                if (transitioning)
-                    return;
-
-                YearViewController yearSelection = new YearViewController(MoveToDate);
-                CATransition transition = new CATransition
-                {
-                    Duration = 0.35,
-                    TimingFunction = CAMediaTimingFunction.FromName(CAMediaTimingFunction.Linear),
-                    Type = CAAnimation.TransitionPush,
-                    Subtype = CAAnimation.TransitionFromLeft,
-                    Delegate = new AnimationDelegate(this)
-                };
-                transitioning = true;
-
-                NavigationController.View.Layer.AddAnimation(transition, null);
-                NavigationController.PushViewController(yearSelection, false);
-            };
-
-            NavigationItem.SetLeftBarButtonItem(backBtn, true);
-
-            var createAppointment = new UIBarButtonItem
-            {
-                Title = "",
-                Image = UIImage.FromBundle("Create")
-            };
-
-            var selectCalendars = new UIBarButtonItem
-            {
-                Title = "Calendars"
-            };
-
-            createAppointment.Clicked += (sender, e) =>
-            {
-                var createAppointmentVC = new CreateAppointmentViewController();
-                NavigationController.PushViewController(createAppointmentVC, true);
-            };
-
-            NavigationItem.SetRightBarButtonItems(new UIBarButtonItem[] { createAppointment, selectCalendars }, true);
         }
 
         class AnimationDelegate : CAAnimationDelegate
@@ -139,6 +157,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         }
 
         #region ICalendar implementation
+
+        //void ICalendarView.OpenAppointment() //TODO
+        //{
+        //    NavigationController.PushViewController(new AppointmentViewController(), true);
+        //}
 
         void ICalendarView.SetCalendars(List<CalendarViewModel> calendars)
         {
@@ -164,20 +187,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             };
         }
 
+        Action loadingDialogDismissal;
+
         void ICalendarView.ShowLoading()
         {
-            //TODO
+            loadingDialogDismissal = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("loading_appointments___"));
         }
 
         void ICalendarView.StopLoading()
         {
-            //TODO
+            loadingDialogDismissal?.Invoke();
         }
 
-        Task ICalendarView.ShowError()
+        async Task ICalendarView.ShowError(Exception ex)
         {
-            return Task.CompletedTask;
-            //TODO
+            await Dialogs.ShowErrorAlertAsync(this, ex);
         }
 
         #endregion
@@ -186,7 +210,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         void Schedule_MonthInlineAppointmentTapped(object sender, MonthInlineAppointmentTappedEventArgs e)
         {
-            NavigationController.PushViewController(new AppointmentViewController(), true);
+            //presenter.AppointmentClicked(); //TODO
+        }
+
+        async void MonthSchedule_VisibleDatesChanged(object sender, VisibleDatesChangedEventArgs e)
+        {
+            var startDate = monthSchedule.VisibleDates.GetItem<NSDate>(0);
+            var endDate = monthSchedule.VisibleDates.GetItem<NSDate>(monthSchedule.VisibleDates.Count - 1);
+
+            var selectedDateComponents = NSCalendar.CurrentCalendar.Components(NSCalendarUnit.Day | NSCalendarUnit.Month | NSCalendarUnit.Year, startDate);
+            var start = new DateTime((int)selectedDateComponents.Year, (int)selectedDateComponents.Month, (int)selectedDateComponents.Day, 0, 0, 0, DateTimeKind.Local);
+
+            selectedDateComponents = NSCalendar.CurrentCalendar.Components(NSCalendarUnit.Day | NSCalendarUnit.Month | NSCalendarUnit.Year, endDate);
+            var end = new DateTime((int)selectedDateComponents.Year, (int)selectedDateComponents.Month, (int)selectedDateComponents.Day, 23, 59, 59, DateTimeKind.Local).AddDays(1);
+
+            await presenter.LoadAppointments(start, end);
         }
 
         void Schedule_CellDoubleTapped(object sender, CellTappedEventArgs e)
@@ -211,10 +249,41 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             NavigationController.PushViewController(new YearViewController(MoveToDate), true);
         }
 
+        void BackButtonItem_Clicked(object sender, EventArgs e)
+        {
+            if (transitioning)
+                return;
+
+            YearViewController yearSelection = new YearViewController(MoveToDate);
+            CATransition transition = new CATransition
+            {
+                Duration = 0.35,
+                TimingFunction = CAMediaTimingFunction.FromName(CAMediaTimingFunction.Linear),
+                Type = CAAnimation.TransitionPush,
+                Subtype = CAAnimation.TransitionFromLeft,
+                Delegate = new AnimationDelegate(this)
+            };
+            transitioning = true;
+
+            NavigationController.View.Layer.AddAnimation(transition, null);
+            NavigationController.PushViewController(yearSelection, false);
+        }
+
+        void CreateAppointmentButtonItem_Clicked(object sender, EventArgs e)
+        {
+            NavigationController.PushViewController(new CreateAppointmentViewController(), true);
+        }
+
+        void CalendarsButtonItem_Clicked(object sender, EventArgs e)
+        {
+            //TODO to complete
+        }
+
         #endregion
 
         public class Meeting
         {
+            public int Id { get; set; }
             public NSString Subject { get; set; }
             public NSDate Start { get; set; }
             public NSDate End { get; set; }
@@ -228,7 +297,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 Subject = "Subject",
                 StartTime = "Start",
                 EndTime = "End",
-                AppointmentBackground = "Color"
+                AppointmentBackground = "Color",
             };
             return mapping;
         }
