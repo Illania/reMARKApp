@@ -44,7 +44,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
                 var appointmentsViewModels = appointments?.Select(SimpleCalendarAppointmentViewModel.ConvertToViewModel);
 
-                view.UpdateAppointments(appointmentsViewModels);
+                view.UpdateAppointments(appointmentsViewModels, start, end);
                 view.StopLoading();
             }
             catch (Exception ex)
@@ -111,7 +111,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
     public interface ICalendarView : IView
     {
         void SetCalendars(List<CalendarViewModel> calendars);
-        void UpdateAppointments(IEnumerable<SimpleCalendarAppointmentViewModel> caViewModels);
+        void UpdateAppointments(IEnumerable<SimpleCalendarAppointmentViewModel> caViewModels, DateTime start, DateTime end);
 
         void ShowLoading();
         void StopLoading();

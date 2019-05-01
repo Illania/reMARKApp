@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common.Presenters.CalendarModule;
 using Mark5.Mobile.IOS.Ui.Common;
@@ -9,7 +11,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 {
-    public abstract class CalendarViewController : AbstractViewController
+    public abstract class CalendarViewController : AbstractViewController, ICalendarView
     {
         protected SFSchedule schedule;
         protected ObservableCollection<Meeting> items = new ObservableCollection<Meeting>();
@@ -64,5 +66,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             };
             return mapping;
         }
+
+        protected abstract void SetCalendars(List<CalendarViewModel> calendars);
+        protected abstract void UpdateAppointments(IEnumerable<SimpleCalendarAppointmentViewModel> caViewModels, DateTime start, DateTime end);
+        protected abstract void ShowLoading();
+        protected abstract void StopLoading();
+        protected abstract Task ShowError(Exception ex);
+        protected abstract void ShowAppointment(int appointmentId);
     }
 }

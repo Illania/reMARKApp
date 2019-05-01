@@ -11,7 +11,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 {
-    public class MonthViewController : CalendarViewController, ICalendarView
+    public class MonthViewController : CalendarViewController
     {
         UIBarButtonItem backButtonItem;
         UIBarButtonItem calendarsButtonItem;
@@ -139,17 +139,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         #region ICalendar implementation
 
-        void ICalendarView.ShowAppointment(int appointmentId) //TODO maybe I'll need to do some modification for recurring appointments
+        protected override void ShowAppointment(int appointmentId) //TODO maybe I'll need to do some modification for recurring appointments
         {
             NavigationController.PushViewController(new AppointmentViewController(appointmentId), true);
         }
 
-        void ICalendarView.SetCalendars(List<CalendarViewModel> calendars)
+        protected override void SetCalendars(List<CalendarViewModel> calendars)
         {
             //TODO
         }
 
-        void ICalendarView.UpdateAppointments(IEnumerable<SimpleCalendarAppointmentViewModel> caViewModels)
+        protected override void UpdateAppointments(IEnumerable<SimpleCalendarAppointmentViewModel> caViewModels, DateTime start, DateTime end)
         {
             foreach (var caViewModel in caViewModels)
             {
@@ -157,17 +157,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             }
         }
 
-        void ICalendarView.ShowLoading()
+        protected override void ShowLoading()
         {
             loadingDialogDismissal = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("loading_appointments___"));
         }
 
-        void ICalendarView.StopLoading()
+        protected override void StopLoading()
         {
             loadingDialogDismissal?.Invoke();
         }
 
-        async Task ICalendarView.ShowError(Exception ex)
+        protected override async Task ShowError(Exception ex)
         {
             await Dialogs.ShowErrorAlertAsync(this, ex);
         }

@@ -4,6 +4,10 @@ using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
 using System.Collections.ObjectModel;
 using Foundation;
+using Mark5.Mobile.Common.Presenters.CalendarModule;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 {
@@ -58,6 +62,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             {
                 schedule.CellLongPressed += ReMarkDayCalendar_CellTapped;
                 schedule.CellDoubleTapped += ReMarkDayCalendar_CellTapped;
+                schedule.VisibleDatesChanged += Schedule_VisibleDatesChanged;
             }
 
             if (addButtonItem != null)
@@ -73,6 +78,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             {
                 schedule.CellLongPressed -= ReMarkDayCalendar_CellTapped;
                 schedule.CellDoubleTapped -= ReMarkDayCalendar_CellTapped;
+                schedule.VisibleDatesChanged -= Schedule_VisibleDatesChanged;
             }
 
             if (addButtonItem != null)
@@ -104,10 +110,50 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             UpdateSwitchButtonTitle();
         }
 
+        #region CalendarView implementation
+
+        protected override void SetCalendars(List<CalendarViewModel> calendars)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void UpdateAppointments(IEnumerable<SimpleCalendarAppointmentViewModel> caViewModels, DateTime start, DateTime end)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void ShowLoading()
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void StopLoading()
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override Task ShowError(Exception ex)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void ShowAppointment(int appointmentId)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+
+        #region Event handlers
+
         void UpdateSwitchButtonTitle()
         {
             switchButtonItem.Title = schedule.ScheduleView == SFScheduleView.SFScheduleViewWeek ?
                     Localization.GetString("day") : Localization.GetString("week");  //TODO localization
+        }
+
+        void Schedule_VisibleDatesChanged(object sender, VisibleDatesChangedEventArgs e)
+        {
         }
 
 
@@ -126,6 +172,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             UpdateSwitchButtonTitle();
         }
+
+        #endregion
     }
 
     class DayWeekSchedule : SFSchedule
