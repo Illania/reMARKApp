@@ -20,6 +20,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         {
             base.ViewDidLoad();
 
+        }
+
+        public override void ViewDidAppear(bool animated)
+        {
+            base.ViewDidAppear(animated);
+
             schedule.AppointmentMapping = GetAppointmentMapping();
             schedule.ItemsSource = items;
         }

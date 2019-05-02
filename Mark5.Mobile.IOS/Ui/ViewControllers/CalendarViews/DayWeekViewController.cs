@@ -1,13 +1,13 @@
-﻿using UIKit;
-using Syncfusion.SfSchedule.iOS;
-using Mark5.Mobile.IOS.Ui.Common;
-using Mark5.Mobile.IOS.Utilities;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common.Presenters.CalendarModule;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using Mark5.Mobile.IOS.Ui.Common;
+using Mark5.Mobile.IOS.Utilities;
+using Syncfusion.SfSchedule.iOS;
+using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 {
@@ -157,13 +157,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         }
 
 
-        void AddButtonItem_Clicked(object sender, System.EventArgs e)
+        void AddButtonItem_Clicked(object sender, EventArgs e)
         {
             var newAppointmentVC = new CreateAppointmentViewController();
             NavigationController.PushViewController(newAppointmentVC, true);
         }
 
-        void ScheduleSwitchBtn_Clicked(object sender, System.EventArgs e)
+        void ScheduleSwitchBtn_Clicked(object sender, EventArgs e)
         {
             if (schedule.ScheduleView == SFScheduleView.SFScheduleViewWorkWeek)
                 schedule.ScheduleView = SFScheduleView.SFScheduleViewDay;

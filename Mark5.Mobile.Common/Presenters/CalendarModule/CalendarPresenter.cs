@@ -19,6 +19,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             calendarsList.ForEach(c => calendarsSelectedState.Add(c.Id, true));
 
             Cache.Start();
+            Cache.AppointmentRetrieved += Cache_AppointmentRetrieved;  //TODO we need to have an event also for errors
         }
 
         public override void Stop()
@@ -40,12 +41,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
             try
             {
-                var appointments = await Cache?.GetAppointments(selectedCalendars, start, end);
-
-                var appointmentsViewModels = appointments?.Select(SimpleCalendarAppointmentViewModel.ConvertToViewModel);
-
-                view.UpdateAppointments(appointmentsViewModels, start, end);
-                view.StopLoading();
+                Cache?.GetAppointments(selectedCalendars, start, end);
             }
             catch (Exception ex)
             {
@@ -55,6 +51,13 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 view.StopLoading();
                 await view.ShowError(ex);
             }
+        }
+
+        void Cache_AppointmentRetrieved(object sender, AppointmentsRetrievedEventArgs e)
+        {
+            var appointmentsViewModels = e.Appointments?.Select(SimpleCalendarAppointmentViewModel.ConvertToViewModel);
+            view.UpdateAppointments(appointmentsViewModels, e.Start, e.End);
+            view.StopLoading();
         }
 
         public void CalendarSelectionChanged(int calendarId, bool isSelected)

@@ -161,11 +161,13 @@ namespace Mark5.Mobile.Common.Manager
 
     class AppointmentsCache : IAppointmentsCache
     {
-        readonly int cachingNeighbours = 4;
+        readonly int cachingNeighbours = 0; //Testing
 
         BlockingCollection<MonthDate> queue;
         CancellationTokenSource tokenSource;
         HashSet<MonthDate> cachedMonths;
+
+        public event EventHandler<AppointmentsRetrievedEventArgs> AppointmentRetrieved = delegate { };
 
         public void Start()
         {
@@ -181,19 +183,16 @@ namespace Mark5.Mobile.Common.Manager
             queue.Add(monthDate);
         }
 
-
-        public async Task<List<CalendarAppointment>> GetAppointments(List<int> calendarIds, DateTime startDate, DateTime endDate)
+        public void GetAppointments(List<int> calendarIds, DateTime startDate, DateTime endDate)
         {
-            await CacheCalendarContent(startDate, endDate);
-
-            return await Managers.CalendarManager.GetCalendarAppointmentsAsync(calendarIds, startDate, endDate, SourceType.Local);
+            CacheCalendarContent(startDate, endDate);
         }
 
         async Task Work(CancellationToken token)
         {
-            var calendarsList = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars;  //TODO improve
+            var calendarsList = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars;
 
-            while (!queue.IsCompleted && token.IsCancellationRequested)
+            while (!queue.IsCompleted && !token.IsCancellationRequested)
             {
                 if (queue.TryTake(out var monthDate))
                 {
@@ -201,7 +200,9 @@ namespace Mark5.Mobile.Common.Manager
                     {
                         (var startDate, var endDate) = GetTimePeriod(monthDate);
 
-                        await Managers.CalendarManager.GetCalendarAppointmentsAsync(calendarsList.Select(c => c.Id).ToList(), startDate, endDate, SourceType.Auto);
+                        var app = await Managers.CalendarManager.GetCalendarAppointmentsAsync(calendarsList.Select(c => c.Id).ToList(), startDate, endDate, SourceType.Auto);
+
+                        AppointmentRetrieved(this, new AppointmentsRetrievedEventArgs(app, startDate, endDate));
 
                         cachedMonths.Add(monthDate);
                     }
@@ -213,9 +214,9 @@ namespace Mark5.Mobile.Common.Manager
             }
         }
 
-        bool RangeCached(DateTime start, DateTime end)
+        IEnumerable<MonthDate> GetUncached(DateTime start, DateTime end)
         {
-            return GetMonthDatePeriod(start, end).All(cachedMonths.Contains);
+            return GetMonthDatePeriod(start, end).Where(md => !cachedMonths.Contains(md));
         }
 
         List<MonthDate> GetMonthDatePeriod(DateTime start, DateTime end)
@@ -247,20 +248,13 @@ namespace Mark5.Mobile.Common.Manager
             return (startDate, endDate);
         }
 
-        async Task CacheCalendarContent(DateTime start, DateTime end)
+        void CacheCalendarContent(DateTime start, DateTime end)
         {
             var calendarsList = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars;  //TODO improve?
 
-            if (!RangeCached(start, end)) //This doesn't consider the case for which we already have cached already part of the period, but it's a good approximation
-            {
-                var startDate = new DateTime(start.Year, start.Month, 1, 0, 0, 0, DateTimeKind.Local);
-                var endDate = new DateTime(end.Year, end.Month, 1, 23, 59, 59, DateTimeKind.Local).AddMonths(1).AddDays(-1);
+            var uncached = GetMonthDatePeriod(start, end).Where(md => !cachedMonths.Contains(md));
 
-                await Managers.CalendarManager.GetCalendarAppointmentsAsync(calendarsList.Select(c => c.Id).ToList(), startDate, endDate, SourceType.Auto);
-
-                cachedMonths.Add(MonthDate.FromDateTime(startDate));
-                cachedMonths.Add(MonthDate.FromDateTime(endDate));
-            }
+            uncached.ForEach(Append);
 
             for (int i = 0; i < cachingNeighbours; i++)
             {

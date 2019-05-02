@@ -151,10 +151,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         public override void UpdateAppointments(IEnumerable<SimpleCalendarAppointmentViewModel> caViewModels, DateTime start, DateTime end)
         {
-            foreach (var caViewModel in caViewModels)
+            InvokeOnMainThread(() =>
             {
-                items.Add(Convert(caViewModel));
-            }
+                foreach (var caViewModel in caViewModels)
+                {
+                    items.Add(Convert(caViewModel));
+                }
+            });
         }
 
         public override void ShowLoading()

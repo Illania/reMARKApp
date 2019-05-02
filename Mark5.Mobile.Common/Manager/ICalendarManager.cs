@@ -22,11 +22,28 @@ namespace Mark5.Mobile.Common.Manager
 
     public interface IAppointmentsCache
     {
-        Task<List<CalendarAppointment>> GetAppointments(List<int> calendarIds, DateTime startDate, DateTime endDate);
+        event EventHandler<AppointmentsRetrievedEventArgs> AppointmentRetrieved;
+
+        void GetAppointments(List<int> calendarIds, DateTime startDate, DateTime endDate);
 
         void Start();
 
         void Stop();
 
     }
+
+    public class AppointmentsRetrievedEventArgs : EventArgs
+    {
+        public IEnumerable<CalendarAppointment> Appointments { get; }
+        public DateTime Start { get; }
+        public DateTime End { get; }
+
+        public AppointmentsRetrievedEventArgs(IEnumerable<CalendarAppointment> appointments, DateTime startPeriod, DateTime endPeriod)
+        {
+            Appointments = appointments;
+            Start = startPeriod;
+            End = endPeriod;
+        }
+    }
+
 }
