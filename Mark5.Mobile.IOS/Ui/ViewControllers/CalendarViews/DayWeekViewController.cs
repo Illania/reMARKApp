@@ -112,32 +112,32 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         #region CalendarView implementation
 
-        protected override void SetCalendars(List<CalendarViewModel> calendars)
+        public override void SetCalendars(List<CalendarViewModel> calendars)
         {
             throw new NotImplementedException();
         }
 
-        protected override void UpdateAppointments(IEnumerable<SimpleCalendarAppointmentViewModel> caViewModels, DateTime start, DateTime end)
+        public override void UpdateAppointments(IEnumerable<SimpleCalendarAppointmentViewModel> caViewModels, DateTime start, DateTime end)
         {
             throw new NotImplementedException();
         }
 
-        protected override void ShowLoading()
+        public override void ShowLoading()
         {
             throw new NotImplementedException();
         }
 
-        protected override void StopLoading()
+        public override void StopLoading()
         {
             throw new NotImplementedException();
         }
 
-        protected override Task ShowError(Exception ex)
+        public override Task ShowError(Exception ex)
         {
             throw new NotImplementedException();
         }
 
-        protected override void ShowAppointment(int appointmentId)
+        public override void ShowAppointment(int appointmentId)
         {
             throw new NotImplementedException();
         }

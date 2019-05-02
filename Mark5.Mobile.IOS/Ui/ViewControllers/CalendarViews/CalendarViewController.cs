@@ -67,11 +67,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             return mapping;
         }
 
-        protected abstract void SetCalendars(List<CalendarViewModel> calendars);
-        protected abstract void UpdateAppointments(IEnumerable<SimpleCalendarAppointmentViewModel> caViewModels, DateTime start, DateTime end);
-        protected abstract void ShowLoading();
-        protected abstract void StopLoading();
-        protected abstract Task ShowError(Exception ex);
-        protected abstract void ShowAppointment(int appointmentId);
+        public abstract void SetCalendars(List<CalendarViewModel> calendars);
+        public abstract void UpdateAppointments(IEnumerable<SimpleCalendarAppointmentViewModel> caViewModels, DateTime start, DateTime end);
+        public abstract void ShowLoading();
+        public abstract void StopLoading();
+        public abstract Task ShowError(Exception ex);
+        public abstract void ShowAppointment(int appointmentId);
     }
 }

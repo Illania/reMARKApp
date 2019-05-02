@@ -139,17 +139,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         #region ICalendar implementation
 
-        protected override void ShowAppointment(int appointmentId) //TODO maybe I'll need to do some modification for recurring appointments
+        public override void ShowAppointment(int appointmentId) //TODO maybe I'll need to do some modification for recurring appointments
         {
             NavigationController.PushViewController(new AppointmentViewController(appointmentId), true);
         }
 
-        protected override void SetCalendars(List<CalendarViewModel> calendars)
+        public override void SetCalendars(List<CalendarViewModel> calendars)
         {
             //TODO
         }
 
-        protected override void UpdateAppointments(IEnumerable<SimpleCalendarAppointmentViewModel> caViewModels, DateTime start, DateTime end)
+        public override void UpdateAppointments(IEnumerable<SimpleCalendarAppointmentViewModel> caViewModels, DateTime start, DateTime end)
         {
             foreach (var caViewModel in caViewModels)
             {
@@ -157,17 +157,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             }
         }
 
-        protected override void ShowLoading()
+        public override void ShowLoading()
         {
             loadingDialogDismissal = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("loading_appointments___"));
         }
 
-        protected override void StopLoading()
+        public override void StopLoading()
         {
             loadingDialogDismissal?.Invoke();
         }
 
-        protected override async Task ShowError(Exception ex)
+        public override async Task ShowError(Exception ex)
         {
             await Dialogs.ShowErrorAlertAsync(this, ex);
         }
