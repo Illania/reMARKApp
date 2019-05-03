@@ -150,18 +150,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             //TODO
         }
 
-        public override void UpdateAppointments(IEnumerable<SimpleCalendarAppointmentViewModel> caViewModels, DateTime start, DateTime end)
-        {
-            InvokeOnMainThread(() =>
-            {
-                items.Where(i => AppointmentIsInPeriod(i, start, end)).ToList().ForEach((obj) => items.Remove(obj));  //TODO need to test
-                foreach (var caViewModel in caViewModels)
-                {
-                    items.Add(Convert(caViewModel));
-                }
-            });
-        }
-
         public override void ShowLoading()
         {
             loadingDialogDismissal = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("loading_appointments___"));
@@ -206,7 +194,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             NSDate date = NSCalendar.CurrentCalendar.DateByAddingComponents(components, e.Date, NSCalendarOptions.None);
 
-            NavigationController.PushViewController(new DayWeekViewController(date, items), true);
+            NavigationController.PushViewController(new DayWeekViewController(date), true);
         }
 
         void Handle_HeaderTapped(object sender, HeaderTappedEventArgs e)
@@ -251,17 +239,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         #endregion
 
-        #region Utilities
-
-        bool AppointmentIsInPeriod(Appointment appointment, DateTime start, DateTime end) //TODO move
-        {
-            var appStart = (DateTime)appointment.Start;
-            var appEnd = (DateTime)appointment.End;
-
-            return appEnd > start && appStart < end;
-        }
-
-        #endregion
     }
 
     class MonthSchedule : SFSchedule

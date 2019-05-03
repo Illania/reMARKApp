@@ -34,28 +34,28 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         public async Task LoadAppointments(DateTime start, DateTime end)
         {
-            view.ShowLoading();
+            //view.ShowLoading();
 
             //var selectedCalendars = calendarsSelectedState?.Where(c => calendarsSelectedState[c.Key]).Select(c => c.Key).ToList();  //TODO testing!!
             var selectedCalendars = calendarsSelectedState?.Select(c => c.Key).ToList();
 
-            try
-            {
-                Cache?.GetAppointments(selectedCalendars, start, end);
-            }
-            catch (Exception ex)
-            {
-                CommonConfig.Logger.Error($"Error while getting appointments " +
-                    $"in calendars {string.Join(", ", selectedCalendars)} from {start} to {end} ", ex);
+            //try
+            //{
+            Cache?.GetAppointments(selectedCalendars, start, end);
+            //}
+            //catch (Exception ex)
+            //{
+            //    CommonConfig.Logger.Error($"Error while getting appointments " +
+            //        $"in calendars {string.Join(", ", selectedCalendars)} from {start} to {end} ", ex);
 
-                view.StopLoading();
-                await view.ShowError(ex);
-            }
+            //    view.StopLoading();
+            //    await view.ShowError(ex);
+            //}
         }
 
         void Cache_AppointmentRetrieved(object sender, AppointmentsRetrievedEventArgs e)
         {
-            var appointmentsViewModels = e.Appointments?.Select(SimpleCalendarAppointmentViewModel.ConvertToViewModel);
+            var appointmentsViewModels = e.Appointments?.Select(AppointmentPreviewViewModel.ConvertToViewModel);
             view.UpdateAppointments(appointmentsViewModels, e.Start, e.End);
             view.StopLoading();
         }
@@ -75,9 +75,10 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         }
     }
 
-    public class SimpleCalendarAppointmentViewModel
+    public class AppointmentPreviewViewModel
     {
         public int Id { get; set; }
+        public int CalendarId { get; set; }
         public DateTime Start { get; set; }
         public DateTime End { get; set; }
 
@@ -85,11 +86,12 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         public bool AllDay { get; set; }
         public string HexColor { get; set; }
 
-        public static SimpleCalendarAppointmentViewModel ConvertToViewModel(CalendarAppointment ca)
+        public static AppointmentPreviewViewModel ConvertToViewModel(CalendarAppointment ca)
         {
-            return new SimpleCalendarAppointmentViewModel()
+            return new AppointmentPreviewViewModel
             {
                 Id = ca.Id,
+                CalendarId = ca.Id,
                 Subject = ca.Subject,
                 AllDay = ca.AllDay,
                 Start = ca.Occurrences[0].StartDate,
@@ -114,7 +116,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
     public interface ICalendarView : IView
     {
         void SetCalendars(List<CalendarViewModel> calendars);
-        void UpdateAppointments(IEnumerable<SimpleCalendarAppointmentViewModel> caViewModels, DateTime start, DateTime end);
+        void UpdateAppointments(IEnumerable<AppointmentPreviewViewModel> caViewModels, DateTime start, DateTime end);
 
         void ShowLoading();
         void StopLoading();

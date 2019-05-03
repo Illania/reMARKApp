@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common.Presenters.CalendarModule;
@@ -18,10 +17,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         readonly NSDate date;
 
-        public DayWeekViewController(NSDate date, ObservableCollection<Appointment> itemsSource)
+        public DayWeekViewController(NSDate date)
         {
             this.date = date;
-            items = itemsSource;
         }
 
         public override void LoadView()
@@ -114,11 +112,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         #region CalendarView implementation
 
         public override void SetCalendars(List<CalendarViewModel> calendars)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void UpdateAppointments(IEnumerable<SimpleCalendarAppointmentViewModel> caViewModels, DateTime start, DateTime end)
         {
             throw new NotImplementedException();
         }
