@@ -14,17 +14,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
     public abstract class CalendarViewController : AbstractViewController, ICalendarView
     {
         protected SFSchedule schedule;
-        protected ObservableCollection<Meeting> items = new ObservableCollection<Meeting>();
+        protected ObservableCollection<Appointment> items = new ObservableCollection<Appointment>();
 
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
-
-        }
-
-        public override void ViewDidAppear(bool animated)
-        {
-            base.ViewDidAppear(animated);
 
             schedule.AppointmentMapping = GetAppointmentMapping();
             schedule.ItemsSource = items;
@@ -39,7 +33,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             }
         }
 
-        public class Meeting
+        public class Appointment
         {
             public NSString Id { get; set; }
             public NSString Subject { get; set; }
@@ -48,9 +42,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             public UIColor Color { get; set; }
         }
 
-        protected Meeting Convert(SimpleCalendarAppointmentViewModel cavm)
+        protected Appointment Convert(SimpleCalendarAppointmentViewModel cavm)
         {
-            return new Meeting
+            return new Appointment
             {
                 Subject = new NSString(cavm.Subject),
                 Start = (NSDate)DateTime.SpecifyKind(cavm.Start, DateTimeKind.Local),

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using CoreAnimation;
 using Foundation;
@@ -153,6 +154,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         {
             InvokeOnMainThread(() =>
             {
+                items.Where(i => AppointmentIsInPeriod(i, start, end)).ToList().ForEach((obj) => items.Remove(obj));  //TODO need to test
                 foreach (var caViewModel in caViewModels)
                 {
                     items.Add(Convert(caViewModel));
@@ -245,6 +247,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         void CalendarsButtonItem_Clicked(object sender, EventArgs e)
         {
             //TODO to complete
+        }
+
+        #endregion
+
+        #region Utilities
+
+        bool AppointmentIsInPeriod(Appointment appointment, DateTime start, DateTime end) //TODO move
+        {
+            var appStart = (DateTime)appointment.Start;
+            var appEnd = (DateTime)appointment.End;
+
+            return appEnd > start && appStart < end;
         }
 
         #endregion

@@ -18,9 +18,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         readonly NSDate date;
 
-        public DayWeekViewController(NSDate date, ObservableCollection<Meeting> itemsSource)
+        public DayWeekViewController(NSDate date, ObservableCollection<Appointment> itemsSource)
         {
             this.date = date;
+            items = itemsSource;
         }
 
         public override void LoadView()
