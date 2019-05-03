@@ -32,7 +32,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             view.ShowAppointment(appointmentId);
         }
 
-        public async Task LoadAppointments(DateTime start, DateTime end)
+        public void LoadAppointments(DateTime start, DateTime end)
         {
             //view.ShowLoading();
 
@@ -73,6 +73,11 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 //Need to remove from the showed ones
             }
         }
+
+        public void ViewReady()
+        {
+            view.SetCalendars(calendarsList.Where(c => calendarsSelectedState[c.Id]).Select(CalendarViewModel.ConvertToViewModel).ToList());
+        }
     }
 
     public class AppointmentPreviewViewModel
@@ -91,7 +96,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             return new AppointmentPreviewViewModel
             {
                 Id = ca.Id,
-                CalendarId = ca.Id,
+                CalendarId = ca.CalendarId,
                 Subject = ca.Subject,
                 AllDay = ca.AllDay,
                 Start = ca.Occurrences[0].StartDate,
@@ -103,12 +108,27 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
     public class CalendarViewModel
     {
+        public int Id { get; set; }
+        public string Name { get; set; }
+
+        public string HexColor { get; set; }
+
+        public static CalendarViewModel ConvertToViewModel(Calendar ca)
+        {
+            return new CalendarViewModel
+            {
+                Id = ca.Id,
+                Name = ca.Name,
+                HexColor = ca.ColorHex,
+            };
+        }
 
     }
 
     public interface ICalendarPresenter : IPresenter<ICalendarView>
     {
-        Task LoadAppointments(DateTime start, DateTime end);
+        void ViewReady();
+        void LoadAppointments(DateTime start, DateTime end);
         void AppointmentClicked(int appointmentId);
         void CalendarSelectionChanged(int calendarId, bool isSelected);
     }

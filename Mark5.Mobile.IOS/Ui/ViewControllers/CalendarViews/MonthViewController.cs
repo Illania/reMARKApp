@@ -45,6 +45,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             presenter.Start();
         }
 
+        public override void ViewDidLoad()
+        {
+            base.ViewDidLoad();
+
+            presenter.ViewReady();
+        }
+
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
@@ -145,11 +152,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             NavigationController.PushViewController(new AppointmentViewController(appointmentId), true);
         }
 
-        public override void SetCalendars(List<CalendarViewModel> calendars)
-        {
-            //TODO
-        }
-
         public override void ShowLoading()
         {
             loadingDialogDismissal = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("loading_appointments___"));
@@ -174,7 +176,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             //presenter.AppointmentClicked(); //TODO
         }
 
-        async void MonthSchedule_VisibleDatesChanged(object sender, VisibleDatesChangedEventArgs e)
+        void MonthSchedule_VisibleDatesChanged(object sender, VisibleDatesChangedEventArgs e)
         {
             var startDate = schedule.VisibleDates.GetItem<NSDate>(0);
             var endDate = schedule.VisibleDates.GetItem<NSDate>(schedule.VisibleDates.Count - 1);
@@ -182,7 +184,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             var start = ((DateTime)startDate).ToLocalTime();
             var end = ((DateTime)endDate).ToLocalTime();
 
-            await presenter.LoadAppointments(start, end);
+            presenter.LoadAppointments(start, end);
         }
 
         void Schedule_CellDoubleTapped(object sender, CellTappedEventArgs e)

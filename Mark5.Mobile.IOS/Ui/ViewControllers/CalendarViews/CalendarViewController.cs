@@ -35,6 +35,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         public class Appointment
         {
+            public int CalendarId { get; set; }
             public NSString Id { get; set; }
             public NSString Subject { get; set; }
             public NSDate Start { get; set; }
@@ -60,7 +61,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             UICache.Instance.CacheAppointments(caViewModels, start, end);
         }
 
-        public abstract void SetCalendars(List<CalendarViewModel> calendars);
+        public void SetCalendars(List<CalendarViewModel> calendars)
+        {
+            UICache.Instance.SetCalendars(calendars);
+        }
+
         public abstract void ShowLoading();
         public abstract void StopLoading();
         public abstract Task ShowError(Exception ex);
@@ -72,7 +77,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             public ObservableCollection<Appointment> Items { get; } = new ObservableCollection<Appointment>();
 
-            List<AppointmentPreviewViewModel> ViewModels { get; } = new List<AppointmentPreviewViewModel>();
+            List<AppointmentPreviewViewModel> AppointmentViewModels { get; } = new List<AppointmentPreviewViewModel>();
+            List<CalendarViewModel> CalendarViewModels { get; } = new List<CalendarViewModel>();
 
             private UICache()
             {
@@ -84,22 +90,45 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             public void CacheAppointments(IEnumerable<AppointmentPreviewViewModel> appointmentViewModels, DateTime start, DateTime end)
             {
-                ViewModels.Where(i => AppointmentIsInPeriod(i, start, end)).ToList().ForEach((obj) => ViewModels.Remove(obj));  //TODO need to test
-                ViewModels.AddRange(appointmentViewModels);
+                AppointmentViewModels.Where(i => AppointmentIsInPeriod(i, start, end)).ToList().ForEach((obj) => AppointmentViewModels.Remove(obj));  //TODO need to test
+                AppointmentViewModels.AddRange(appointmentViewModels);
 
                 new NSString().BeginInvokeOnMainThread(() =>  //TODO this is so bad, but we need to run it on the UI thread
-               {
-                   //TODO in this part here we'd need to take care also of the calendar that have been selected right now
-                   Items.Where(i => AppointmentIsInPeriod(i, start, end)).ToList().ForEach((obj) => Items.Remove(obj));  //TODO this can probably be done in a more clever way...
-                   foreach (var caViewModel in appointmentViewModels)
-                   {
-                       Items.Add(Convert(caViewModel));
-                   }
-               });
+                {
+                    //TODO in this part here we'd need to take care also of the calendar that have been selected right now
+                    Items.Where(i => AppointmentIsInPeriod(i, start, end)).ToList().ForEach((obj) => Items.Remove(obj));  //TODO this can probably be done in a more clever way...
+                    foreach (var caViewModel in AppointmentsInSelectedCalendars(appointmentViewModels))
+                    {
+                        Items.Add(Convert(caViewModel));
+                    }
+                });
+            }
 
+            public void UpdateCalendar()  //TODO need to connect it
+            {
+                new NSString().BeginInvokeOnMainThread(() =>  //TODO this is so bad, but we need to run it on the UI thread
+                {
+                    Items.Clear();
+                    foreach (var item in AppointmentsInSelectedCalendars(AppointmentViewModels))
+                    {
+                        Items.Add(Convert(item));
+                    }
+                });
+            }
+
+            public void SetCalendars(List<CalendarViewModel> calendars)
+            {
+                CalendarViewModels.Clear();
+                CalendarViewModels.AddRange(calendars);
             }
 
             #region Utilities
+
+            IEnumerable<AppointmentPreviewViewModel> AppointmentsInSelectedCalendars(IEnumerable<AppointmentPreviewViewModel> appointmentViewModels)
+            {
+                var calendarIds = new HashSet<int>(CalendarViewModels.Select(c => c.Id));
+                return appointmentViewModels.Where(apvm => calendarIds.Contains(apvm.CalendarId));
+            }
 
             bool AppointmentIsInPeriod(AppointmentPreviewViewModel appointment, DateTime start, DateTime end)
             {

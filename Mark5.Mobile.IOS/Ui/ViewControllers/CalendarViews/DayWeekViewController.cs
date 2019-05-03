@@ -111,11 +111,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         #region CalendarView implementation
 
-        public override void SetCalendars(List<CalendarViewModel> calendars)
-        {
-            throw new NotImplementedException();
-        }
-
         public override void ShowLoading()
         {
             throw new NotImplementedException();
