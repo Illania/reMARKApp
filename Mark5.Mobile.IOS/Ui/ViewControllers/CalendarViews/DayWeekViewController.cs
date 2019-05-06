@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Foundation;
-using Mark5.Mobile.Common.Presenters.CalendarModule;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
 using Syncfusion.SfSchedule.iOS;
@@ -17,7 +14,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         readonly NSDate date;
 
-        public DayWeekViewController(NSDate date)
+        public DayWeekViewController(ICalendarCoordinator coordinator, NSDate date) : base(coordinator)
         {
             this.date = date;
         }
@@ -108,30 +105,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             NavigationItem.SetRightBarButtonItems(new UIBarButtonItem[] { addButtonItem, switchButtonItem }, false);
             UpdateSwitchButtonTitle();
         }
-
-        #region CalendarView implementation
-
-        public override void ShowLoading()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void StopLoading()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override Task ShowError(Exception ex)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void ShowAppointment(int appointmentId)
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
 
         #region Event handlers
 

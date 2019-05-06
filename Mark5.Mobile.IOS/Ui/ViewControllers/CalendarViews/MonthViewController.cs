@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using CoreAnimation;
 using Foundation;
-using Mark5.Mobile.Common.Presenters.CalendarModule;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
 using Syncfusion.SfSchedule.iOS;
@@ -19,8 +15,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         UIBarButtonItem createAppointmentButtonItem;
 
         bool transitioning;
-        CalendarPresenter presenter;
-        Action loadingDialogDismissal;
+        Action loadingDialogDismissal;  //TODO
+
+        public MonthViewController(ICalendarCoordinator coordinator) : base(coordinator) { }
 
         public override void LoadView()
         {
@@ -39,17 +36,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             InitializeNavigationBar();
 
             MoveToDate(NSDate.Now);
-
-            presenter = new CalendarPresenter();
-            presenter.AttachView(this);
-            presenter.Start();
-        }
-
-        public override void ViewDidLoad()
-        {
-            base.ViewDidLoad();
-
-            presenter.ViewReady();
         }
 
         public override void ViewWillAppear(bool animated)
@@ -147,25 +133,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         #region ICalendar implementation
 
-        public override void ShowAppointment(int appointmentId) //TODO maybe I'll need to do some modification for recurring appointments
-        {
-            NavigationController.PushViewController(new AppointmentViewController(appointmentId), true);
-        }
+        //public override void ShowAppointment(int appointmentId) //TODO maybe I'll need to do some modification for recurring appointments
+        //{
+        //    NavigationController.PushViewController(new AppointmentViewController(appointmentId), true);
+        //}
 
-        public override void ShowLoading()
-        {
-            loadingDialogDismissal = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("loading_appointments___"));
-        }
+        //public override void ShowLoading()
+        //{
+        //    loadingDialogDismissal = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("loading_appointments___"));
+        //}
 
-        public override void StopLoading()
-        {
-            loadingDialogDismissal?.Invoke();
-        }
+        //public override void StopLoading()
+        //{
+        //    loadingDialogDismissal?.Invoke();
+        //}
 
-        public override async Task ShowError(Exception ex)
-        {
-            await Dialogs.ShowErrorAlertAsync(this, ex);
-        }
+        //public override async Task ShowError(Exception ex)
+        //{
+        //    await Dialogs.ShowErrorAlertAsync(this, ex);
+        //}
 
         #endregion
 
@@ -181,57 +167,47 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             var startDate = schedule.VisibleDates.GetItem<NSDate>(0);
             var endDate = schedule.VisibleDates.GetItem<NSDate>(schedule.VisibleDates.Count - 1);
 
-            var start = ((DateTime)startDate).ToLocalTime();
-            var end = ((DateTime)endDate).ToLocalTime();
-
-            presenter.LoadAppointments(start, end);
+            Coordinator.VisibleDatesChanged(startDate, endDate);
         }
 
         void Schedule_CellDoubleTapped(object sender, CellTappedEventArgs e)
         {
-            NSDateComponents components = new NSDateComponents
-            {
-                Hour = 8
-            };
-
-            NSDate date = NSCalendar.CurrentCalendar.DateByAddingComponents(components, e.Date, NSCalendarOptions.None);
-
-            NavigationController.PushViewController(new DayWeekViewController(date), true);
+            Coordinator.DateDoubleTapped(e.Date);
         }
 
         void Handle_HeaderTapped(object sender, HeaderTappedEventArgs e)
         {
-            NavigationController.PushViewController(new YearViewController(MoveToDate), true);
+            Coordinator.HeaderTapped();
         }
 
         void Schedule_ViewHeaderTapped(object sender, ViewHeaderTappedEventArgs e)
         {
-            NavigationController.PushViewController(new YearViewController(MoveToDate), true);
+            Coordinator.HeaderTapped();
         }
 
         void BackButtonItem_Clicked(object sender, EventArgs e)
         {
-            if (transitioning)
-                return;
+            //if (transitioning)  //TODO to iimplement
+            //    return;
 
-            YearViewController yearSelection = new YearViewController(MoveToDate);
-            CATransition transition = new CATransition
-            {
-                Duration = 0.35,
-                TimingFunction = CAMediaTimingFunction.FromName(CAMediaTimingFunction.Linear),
-                Type = CAAnimation.TransitionPush,
-                Subtype = CAAnimation.TransitionFromLeft,
-                Delegate = new AnimationDelegate(this)
-            };
-            transitioning = true;
+            //YearViewController yearSelection = new YearViewController(MoveToDate);
+            //CATransition transition = new CATransition
+            //{
+            //    Duration = 0.35,
+            //    TimingFunction = CAMediaTimingFunction.FromName(CAMediaTimingFunction.Linear),
+            //    Type = CAAnimation.TransitionPush,
+            //    Subtype = CAAnimation.TransitionFromLeft,
+            //    Delegate = new AnimationDelegate(this)
+            //};
+            //transitioning = true;
 
-            NavigationController.View.Layer.AddAnimation(transition, null);
-            NavigationController.PushViewController(yearSelection, false);
+            //NavigationController.View.Layer.AddAnimation(transition, null);
+            //NavigationController.PushViewController(yearSelection, false);
         }
 
         void CreateAppointmentButtonItem_Clicked(object sender, EventArgs e)
         {
-            NavigationController.PushViewController(new CreateAppointmentViewController(), true);
+            Coordinator.CreateAppointmentClicked();
         }
 
         void CalendarsButtonItem_Clicked(object sender, EventArgs e)

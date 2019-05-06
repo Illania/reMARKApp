@@ -275,6 +275,7 @@
     <Compile Include="Ui\ViewControllers\CalendarViews\CreateAppointmentViewController.cs" />
     <Compile Include="Ui\ViewControllers\CalendarViews\AppointmentViewController.cs" />
     <Compile Include="Ui\ViewControllers\CalendarViews\CalendarViewController.cs" />
+    <Compile Include="Ui\ViewControllers\CalendarViews\CalendarCoordinator.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

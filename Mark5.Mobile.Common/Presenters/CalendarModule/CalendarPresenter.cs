@@ -20,6 +20,8 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
             Cache.Start();
             Cache.AppointmentRetrieved += Cache_AppointmentRetrieved;  //TODO we need to have an event also for errors
+
+            view.SetCalendars(calendarsList.Where(c => calendarsSelectedState[c.Id]).Select(CalendarViewModel.ConvertToViewModel).ToList());
         }
 
         public override void Stop()
@@ -38,19 +40,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
             //var selectedCalendars = calendarsSelectedState?.Where(c => calendarsSelectedState[c.Key]).Select(c => c.Key).ToList();  //TODO testing!!
             var selectedCalendars = calendarsSelectedState?.Select(c => c.Key).ToList();
-
-            //try
-            //{
             Cache?.GetAppointments(selectedCalendars, start, end);
-            //}
-            //catch (Exception ex)
-            //{
-            //    CommonConfig.Logger.Error($"Error while getting appointments " +
-            //        $"in calendars {string.Join(", ", selectedCalendars)} from {start} to {end} ", ex);
-
-            //    view.StopLoading();
-            //    await view.ShowError(ex);
-            //}
         }
 
         void Cache_AppointmentRetrieved(object sender, AppointmentsRetrievedEventArgs e)
@@ -76,7 +66,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         public void ViewReady()
         {
-            view.SetCalendars(calendarsList.Where(c => calendarsSelectedState[c.Id]).Select(CalendarViewModel.ConvertToViewModel).ToList());
+            //TODO do I need this?
         }
     }
 

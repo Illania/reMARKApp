@@ -1,9 +1,7 @@
-﻿using Syncfusion.SfCalendar.iOS;
-using UIKit;
-using Mark5.Mobile.IOS.Ui.Common;
-using CoreAnimation;
-using System;
+﻿using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
+using Syncfusion.SfCalendar.iOS;
+using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 {
@@ -12,11 +10,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         ReMarkYearCalendar reMarkYearCalendar;
         public bool transitioning;
 
-        Action<Foundation.NSDate> MoveToDate;
+        ICalendarCoordinator coordinator;
 
-        public YearViewController(Action<Foundation.NSDate> moveToDateAction)
+        public YearViewController(ICalendarCoordinator coordinator)
         {
-            this.MoveToDate = moveToDateAction;
+            this.coordinator = coordinator;
         }
 
         public override void ViewDidLoad()
@@ -50,39 +48,27 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         {
             if (reMarkYearCalendar.ViewMode == SFCalendarViewMode.SFCalendarViewModeMonth)
             {
-                if (transitioning)
-                    return;
+                //if (transitioning)
+                //return;
 
-                CATransition transition = new CATransition
-                {
-                    Duration = 0.30,
-                    TimingFunction = CAMediaTimingFunction.FromName(CAMediaTimingFunction.Default),
-                    Type = CAAnimation.TransitionPush,
-                    Subtype = CAAnimation.TransitionFromRight,
-                    Delegate = new AnimationDelegate(this)
-                };
-
-                transitioning = true;
-                NavigationController.View.Layer.AddAnimation(transition, null);
-                MoveToDate.Invoke(e.Date);
-                NavigationController.PopViewController(false);
+                coordinator.MonthTapped(e.Date);
             }
         }
 
-        class AnimationDelegate : CAAnimationDelegate
-        {
-            readonly YearViewController yearViewController;
+        //class AnimationDelegate : CAAnimationDelegate  //TODO let's try it without...
+        //{
+        //    readonly YearViewController yearViewController;
 
-            public AnimationDelegate(YearViewController yearViewController)
-            {
-                this.yearViewController = yearViewController;
-            }
+        //    public AnimationDelegate(YearViewController yearViewController)
+        //    {
+        //        this.yearViewController = yearViewController;
+        //    }
 
-            public override void AnimationStopped(CAAnimation anim, bool finished)
-            {
-                yearViewController.transitioning = false;
-            }
-        }
+        //    public override void AnimationStopped(CAAnimation anim, bool finished)
+        //    {
+        //        yearViewController.transitioning = false;
+        //    }
+        //}
     }
 
     public class ReMarkYearCalendar : SFCalendar
