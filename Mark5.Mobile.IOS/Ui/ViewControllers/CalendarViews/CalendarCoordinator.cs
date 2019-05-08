@@ -27,9 +27,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         {
             presenter = new CalendarPresenter();
             presenter.AttachView(this);
-            presenter.Start();  //TODO shouldn't be done here
+            presenter.Start();  //TODO shouldn't be done here (it gets initialized too early...)
 
-            NavigationController = new NavigationController(new MonthViewController(this)) //TODO this could be done in a better way 
+            monthViewController = new MonthViewController(this);
+            NavigationController = new NavigationController(monthViewController) //TODO this could be done in a better way 
             {
                 RestorationIdentifier = "NavigationController_" + nameof(MonthViewController) + "_" + nameof(ModuleType.Calendar)
             };
@@ -81,8 +82,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             //};
 
             //NSDate date = NSCalendar.CurrentCalendar.DateByAddingComponents(components, e.Date, NSCalendarOptions.None);
-
-            NavigationController.PushViewController(new DayWeekViewController(this, date), true);
+            monthViewController.NavigationController.PushViewController(new DayWeekViewController(this, date), true);  //TODO need to understand why the view controller isn't the same
         }
 
         public void CreateAppointmentClicked()
