@@ -36,16 +36,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 RestorationIdentifier = "NavigationController_" + nameof(FoldersNotificationsListViewController) + "_" + nameof(ModuleType.Documents)
             };
 
-            calendarNavigationController = calendarCoordinator.NavigationController;
+            calendarNavigationController = calendarCoordinator.RootController;
 
             ViewControllers = new UIViewController[]
             {
                 SearchNavigationController,
                 documentsNavigationController,
                 contactsNavigationController,
+                calendarNavigationController,
                 shortcodesNavigationController,
                 SettingsNavigationController,
-                calendarNavigationController,
             };
         }
 

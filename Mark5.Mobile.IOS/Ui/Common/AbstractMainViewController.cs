@@ -56,7 +56,6 @@ namespace Mark5.Mobile.IOS.Ui.Common
             SelectedIndex = 1;
         }
 
-
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
@@ -217,10 +216,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         private bool Handle_ShouldSelectViewController(UITabBarController tabBarController, UIViewController viewController)
         {
-
             if (viewController == tabBarController.ViewControllers[0])
             {
-
                 var nc = new DarkNavigationController(new SearchCriteriaViewController(), UIModalPresentationStyle.FullScreen)
                 {
                     ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve,
@@ -258,16 +255,16 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 case NavigationModule.NavigationModuleType.Shortcodes:
                     module = ModuleType.Shortcodes;
                     moduleNavigationButton.SetImage(UIImage.FromBundle(nextModule.Image).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
-                    SelectedIndex = 3;
+                    SelectedIndex = 4;
                     break;
                 case NavigationModule.NavigationModuleType.Calendar:
                     module = ModuleType.Calendar;
                     moduleNavigationButton.SetImage(UIImage.FromBundle(nextModule.Image).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
-                    SelectedIndex = 5;
+                    SelectedIndex = 3;  //TODO this is actually somewhat important otherwise the navigation controller gets substituted
                     break;
                 case NavigationModule.NavigationModuleType.Settings:
                     moduleNavigationButton.SetImage(UIImage.FromBundle(nextModule.Image).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
-                    SelectedIndex = 4;
+                    SelectedIndex = 5;
                     break;
                 case NavigationModule.NavigationModuleType.Search:
                     var nc = new DarkNavigationController(new SearchCriteriaViewController(), UIModalPresentationStyle.FullScreen)

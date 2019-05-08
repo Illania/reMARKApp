@@ -10,11 +10,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 {
     public class MonthViewController : CalendarViewController
     {
-        UIBarButtonItem backButtonItem;
+        UIBarButtonItem yearButtonItem;
         UIBarButtonItem calendarsButtonItem;
         UIBarButtonItem createAppointmentButtonItem;
 
-        bool transitioning;
         Action loadingDialogDismissal;  //TODO
 
         public MonthViewController(ICalendarCoordinator coordinator) : base(coordinator) { }
@@ -22,6 +21,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         public override void LoadView()
         {
             base.LoadView();
+
+            Coordinator.MonthViewLoaded();
 
             schedule = new MonthSchedule();
             View.BackgroundColor = UIColor.White;
@@ -63,8 +64,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 schedule.VisibleDatesChanged += MonthSchedule_VisibleDatesChanged;
             }
 
-            if (backButtonItem != null)
-                backButtonItem.Clicked += BackButtonItem_Clicked;
+            if (yearButtonItem != null)
+                yearButtonItem.Clicked += YearButtonItem_Clicked;
 
             if (createAppointmentButtonItem != null)
                 createAppointmentButtonItem.Clicked += CreateAppointmentButtonItem_Clicked;
@@ -83,8 +84,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 schedule.VisibleDatesChanged -= MonthSchedule_VisibleDatesChanged;
             }
 
-            if (backButtonItem != null)
-                backButtonItem.Clicked -= BackButtonItem_Clicked;
+            if (yearButtonItem != null)
+                yearButtonItem.Clicked -= YearButtonItem_Clicked;
 
             if (createAppointmentButtonItem != null)
                 createAppointmentButtonItem.Clicked -= CreateAppointmentButtonItem_Clicked;
@@ -95,12 +96,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         void InitializeNavigationBar()
         {
-            backButtonItem = new UIBarButtonItem
+            yearButtonItem = new UIBarButtonItem
             {
                 Title = Localization.GetString("year"),
             };
 
-            NavigationItem.SetLeftBarButtonItem(backButtonItem, true);
+            NavigationItem.SetLeftBarButtonItem(yearButtonItem, true);
 
             createAppointmentButtonItem = new UIBarButtonItem
             {
@@ -115,45 +116,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             NavigationItem.SetRightBarButtonItems(new UIBarButtonItem[] { createAppointmentButtonItem, calendarsButtonItem }, true);
         }
-
-        class AnimationDelegate : CAAnimationDelegate
-        {
-            readonly MonthViewController ctrl;
-
-            public AnimationDelegate(MonthViewController ctrl)
-            {
-                this.ctrl = ctrl;
-            }
-
-            public override void AnimationStopped(CAAnimation anim, bool finished)
-            {
-                ctrl.transitioning = false;
-            }
-        }
-
-        #region ICalendar implementation
-
-        //public override void ShowAppointment(int appointmentId) //TODO maybe I'll need to do some modification for recurring appointments
-        //{
-        //    NavigationController.PushViewController(new AppointmentViewController(appointmentId), true);
-        //}
-
-        //public override void ShowLoading()
-        //{
-        //    loadingDialogDismissal = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("loading_appointments___"));
-        //}
-
-        //public override void StopLoading()
-        //{
-        //    loadingDialogDismissal?.Invoke();
-        //}
-
-        //public override async Task ShowError(Exception ex)
-        //{
-        //    await Dialogs.ShowErrorAlertAsync(this, ex);
-        //}
-
-        #endregion
 
         #region Event handlers
 
@@ -182,27 +144,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         void Schedule_ViewHeaderTapped(object sender, ViewHeaderTappedEventArgs e)
         {
-            Coordinator.HeaderTapped();
+            Coordinator.YearTapped(schedule.VisibleDates.GetItem<NSDate>(0));
         }
 
-        void BackButtonItem_Clicked(object sender, EventArgs e)
+        void YearButtonItem_Clicked(object sender, EventArgs e)
         {
-            //if (transitioning)  //TODO to iimplement
-            //    return;
-
-            //YearViewController yearSelection = new YearViewController(MoveToDate);
-            //CATransition transition = new CATransition
-            //{
-            //    Duration = 0.35,
-            //    TimingFunction = CAMediaTimingFunction.FromName(CAMediaTimingFunction.Linear),
-            //    Type = CAAnimation.TransitionPush,
-            //    Subtype = CAAnimation.TransitionFromLeft,
-            //    Delegate = new AnimationDelegate(this)
-            //};
-            //transitioning = true;
-
-            //NavigationController.View.Layer.AddAnimation(transition, null);
-            //NavigationController.PushViewController(yearSelection, false);
+            Coordinator.YearTapped(schedule.VisibleDates.GetItem<NSDate>(0));
         }
 
         void CreateAppointmentButtonItem_Clicked(object sender, EventArgs e)
@@ -216,7 +163,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         }
 
         #endregion
-
     }
 
     class MonthSchedule : SFSchedule

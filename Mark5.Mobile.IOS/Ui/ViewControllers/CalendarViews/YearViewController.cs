@@ -1,4 +1,5 @@
-﻿using Mark5.Mobile.IOS.Ui.Common;
+﻿using Foundation;
+using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
 using Syncfusion.SfCalendar.iOS;
 using UIKit;
@@ -8,13 +9,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
     public class YearViewController : UIViewController
     {
         ReMarkYearCalendar reMarkYearCalendar;
-        public bool transitioning;
-
         ICalendarCoordinator coordinator;
+        private NSDate initialDate;
 
-        public YearViewController(ICalendarCoordinator coordinator)
+        public YearViewController(CalendarCoordinator calendarCoordinator, NSDate date)
         {
-            this.coordinator = coordinator;
+            coordinator = calendarCoordinator;
+            initialDate = date;
         }
 
         public override void ViewDidLoad()
@@ -42,33 +43,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             });
 
             NavigationController.NavigationBarHidden = true;
+
+            reMarkYearCalendar.MoveToDate(initialDate);
         }
 
         void ReMarkYearCalendar_ViewModeChanged(object sender, ViewModeChangedEventArgs e)
         {
             if (reMarkYearCalendar.ViewMode == SFCalendarViewMode.SFCalendarViewModeMonth)
-            {
-                //if (transitioning)
-                //return;
-
                 coordinator.MonthTapped(e.Date);
-            }
         }
-
-        //class AnimationDelegate : CAAnimationDelegate  //TODO let's try it without...
-        //{
-        //    readonly YearViewController yearViewController;
-
-        //    public AnimationDelegate(YearViewController yearViewController)
-        //    {
-        //        this.yearViewController = yearViewController;
-        //    }
-
-        //    public override void AnimationStopped(CAAnimation anim, bool finished)
-        //    {
-        //        yearViewController.transitioning = false;
-        //    }
-        //}
     }
 
     public class ReMarkYearCalendar : SFCalendar

@@ -17,33 +17,32 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
     {
         CalendarPresenter presenter;
         MonthViewController monthViewController;
-        DayWeekViewController dayWeekViewController;
+        UICache uiCache;
 
-        public NavigationController NavigationController { get; }
-
-        public ObservableCollection<Appointment> Items => UICache.Instance.Items;
+        public NavigationController RootController { get; }
+        public ObservableCollection<Appointment> Items => uiCache.Items;
 
         public CalendarCoordinator()
         {
-            presenter = new CalendarPresenter();
-            presenter.AttachView(this);
-            presenter.Start();  //TODO shouldn't be done here (it gets initialized too early...)
-
+            uiCache = new UICache(this);
             monthViewController = new MonthViewController(this);
-            NavigationController = new NavigationController(monthViewController) //TODO this could be done in a better way 
+
+            RootController = new NavigationController(monthViewController) //TODO this could be done in a better way 
             {
                 RestorationIdentifier = "NavigationController_" + nameof(MonthViewController) + "_" + nameof(ModuleType.Calendar)
             };
         }
 
+        #region ICalendarView
+
         public void UpdateAppointments(IEnumerable<AppointmentPreviewViewModel> caViewModels, DateTime start, DateTime end)
         {
-            UICache.Instance.CacheAppointments(caViewModels, start, end);
+            uiCache.CacheAppointments(caViewModels, start, end);
         }
 
         public void SetCalendars(List<CalendarViewModel> calendars)
         {
-            UICache.Instance.SetCalendars(calendars);
+            uiCache.SetCalendars(calendars);
         }
 
         public void ShowLoading()
@@ -66,7 +65,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         }
 
-        void ICalendarCoordinator.VisibleDatesChanged(NSDate startDate, NSDate endDate)
+        #endregion
+
+        #region ICalendarCoordinator
+
+        public void VisibleDatesChanged(NSDate startDate, NSDate endDate)
         {
             var start = ((DateTime)startDate).ToLocalTime();
             var end = ((DateTime)endDate).ToLocalTime();
@@ -76,23 +79,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         public void DateDoubleTapped(NSDate date)
         {
-            //NSDateComponents components = new NSDateComponents
-            //{
-            //    Hour = 8
-            //};
-
-            //NSDate date = NSCalendar.CurrentCalendar.DateByAddingComponents(components, e.Date, NSCalendarOptions.None);
-            monthViewController.NavigationController.PushViewController(new DayWeekViewController(this, date), true);  //TODO need to understand why the view controller isn't the same
+            RootController.PushViewController(new DayWeekViewController(this, date), true);
         }
 
         public void CreateAppointmentClicked()
         {
-            NavigationController.PushViewController(new CreateAppointmentViewController(), true);
-        }
-
-        public void HeaderTapped()
-        {
-            NavigationController.PushViewController(new YearViewController(this), true);
+            RootController.PushViewController(new CreateAppointmentViewController(), true);
         }
 
         public void MonthTapped(NSDate date)
@@ -103,31 +95,58 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 TimingFunction = CAMediaTimingFunction.FromName(CAMediaTimingFunction.Default),
                 Type = CAAnimation.TransitionPush,
                 Subtype = CAAnimation.TransitionFromRight,
-                //Delegate = new AnimationDelegate(this) //TODO let's try it without...
             };
 
-            NavigationController.View.Layer.AddAnimation(transition, null);
-            NavigationController.PopViewController(false);
+            RootController.View.Layer.AddAnimation(transition, null);
+            RootController.PopViewController(false);
+
+            monthViewController.MoveToDate(date);
         }
 
-        class UICache  //TODO this doesn't need to be a singleton
+        public void MonthViewLoaded()
         {
-            public static UICache Instance { get; } = new UICache();
+            presenter = new CalendarPresenter();
+            presenter.AttachView(this);
+            presenter.Start();
+        }
 
+        public void YearTapped(NSDate date)
+        {
+            YearViewController yearSelection = new YearViewController(this, date);
+            CATransition transition = new CATransition
+            {
+                Duration = 0.35,
+                TimingFunction = CAMediaTimingFunction.FromName(CAMediaTimingFunction.Linear),
+                Type = CAAnimation.TransitionPush,
+                Subtype = CAAnimation.TransitionFromLeft,
+            };
+
+            RootController.View.Layer.AddAnimation(transition, null);
+            RootController.PushViewController(yearSelection, false);
+        }
+
+        #endregion
+
+        class UICache
+        {
             public ObservableCollection<Appointment> Items { get; } = new ObservableCollection<Appointment>();
+
+            CalendarCoordinator coordinator;
 
             List<AppointmentPreviewViewModel> AppointmentViewModels { get; } = new List<AppointmentPreviewViewModel>();
             List<CalendarViewModel> CalendarViewModels { get; } = new List<CalendarViewModel>();
 
-            private UICache() { }
-            static UICache() { }
+            public UICache(CalendarCoordinator coordinator)
+            {
+                this.coordinator = coordinator;
+            }
 
             public void CacheAppointments(IEnumerable<AppointmentPreviewViewModel> appointmentViewModels, DateTime start, DateTime end)
             {
                 AppointmentViewModels.Where(i => AppointmentIsInPeriod(i, start, end)).ToList().ForEach((obj) => AppointmentViewModels.Remove(obj));  //TODO need to test
                 AppointmentViewModels.AddRange(appointmentViewModels);
 
-                new NSString().BeginInvokeOnMainThread(() =>  //TODO this is so bad, but we need to run it on the UI thread
+                coordinator.RootController.BeginInvokeOnMainThread(() =>  //TODO seems stupid to get the rootController just for this
                 {
                     Items.Where(i => AppointmentIsInPeriod(i, start, end)).ToList().ForEach((obj) => Items.Remove(obj));  //TODO this can probably be done in a more clever way...
                     foreach (var caViewModel in AppointmentsInSelectedCalendars(appointmentViewModels))
@@ -139,7 +158,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             public void UpdateCalendar()  //TODO need to connect it
             {
-                new NSString().BeginInvokeOnMainThread(() =>  //TODO this is so bad, but we need to run it on the UI thread
+                coordinator.RootController.BeginInvokeOnMainThread(() =>   //TODO seems stupid to get the rootController just for this
                 {
                     Items.Clear();
                     foreach (var item in AppointmentsInSelectedCalendars(AppointmentViewModels))
@@ -192,7 +211,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             }
 
             #endregion
-
         }
     }
 
@@ -206,15 +224,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         public UIColor Color { get; set; }
     }
 
-    public interface ICalendarCoordinator
+    public interface ICalendarCoordinator  //TODO naming could be better
     {
-        void VisibleDatesChanged(NSDate startDate, NSDate endDate);
-
         ObservableCollection<Appointment> Items { get; }
 
+        void VisibleDatesChanged(NSDate startDate, NSDate endDate);
         void DateDoubleTapped(NSDate date);
         void MonthTapped(NSDate date);
         void CreateAppointmentClicked();
-        void HeaderTapped();
+        void MonthViewLoaded();
+        void YearTapped(NSDate nSDate);
     }
 }

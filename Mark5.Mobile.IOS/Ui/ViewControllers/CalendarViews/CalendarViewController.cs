@@ -22,7 +22,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             schedule.ItemsSource = Coordinator.Items;
         }
 
-        protected void MoveToDate(NSDate date)
+        public void MoveToDate(NSDate date)
         {
             if (schedule != null)
             {

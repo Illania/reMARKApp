@@ -12,11 +12,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         UIBarButtonItem addButtonItem;
         UIBarButtonItem switchButtonItem;
 
-        readonly NSDate date;
+        readonly NSDate initialDate;
 
         public DayWeekViewController(ICalendarCoordinator coordinator, NSDate date) : base(coordinator)
         {
-            this.date = date;
+            initialDate = date;
         }
 
         public override void LoadView()
@@ -24,7 +24,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             base.LoadView();
 
             schedule = new DayWeekSchedule();
-            MoveToDate(date);
+            MoveToDate(initialDate.AddSeconds(8 * 3600)); //8 AM
 
             View.BackgroundColor = Theme.White;
             View.AddSubview(schedule);
@@ -111,18 +111,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         void UpdateSwitchButtonTitle()
         {
             switchButtonItem.Title = schedule.ScheduleView == SFScheduleView.SFScheduleViewWeek ?
-                    Localization.GetString("day") : Localization.GetString("week");  //TODO localization
+                    Localization.GetString("day") : Localization.GetString("week");
         }
 
         void Schedule_VisibleDatesChanged(object sender, VisibleDatesChangedEventArgs e)
         {
-        }
+            var startDate = schedule.VisibleDates.GetItem<NSDate>(0);
+            var endDate = schedule.VisibleDates.GetItem<NSDate>(schedule.VisibleDates.Count - 1);
 
+            Coordinator.VisibleDatesChanged(startDate, endDate);  //TODO code duplicated in the monthView...
+        }
 
         void AddButtonItem_Clicked(object sender, EventArgs e)
         {
-            var newAppointmentVC = new CreateAppointmentViewController();
-            NavigationController.PushViewController(newAppointmentVC, true);
+            Coordinator.CreateAppointmentClicked();
         }
 
         void ScheduleSwitchBtn_Clicked(object sender, EventArgs e)
@@ -161,6 +163,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         readonly DayViewSettings dayViewSettings = new DayViewSettings
         {
+            WorkStartHour = 8,
+            WorkEndHour = 16,
             LabelSettings = new DayLabelSettings
             {
                 TimeLabelColor = Theme.DarkGray
@@ -179,7 +183,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         readonly WeekViewSettings workWeekSettings = new WeekViewSettings()
         {
-            LabelSettings = new WeekLabelSettings()
+            LabelSettings = new WeekLabelSettings
             {
                 TimeLabelColor = Theme.DarkGray
             }
@@ -201,6 +205,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             DayViewSettings = dayViewSettings;
             DayHeaderStyle = viewHeaderStyle;
             AppointmentStyle = appointmentStyle;
+
         }
     }
 }
