@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Foundation;
 using Mark5.Mobile.Common.Presenters.CalendarModule;
 using Mark5.Mobile.Common.Utilities.Extensions;
@@ -13,7 +12,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 {
     public class CalendarsListViewController : AbstractTableViewController
     {
-        UIBarButtonItem okButton;
+        UIBarButtonItem doneButton;
         UIBarButtonItem cancelButton;
         ICalendarCoordinator coordinator;
         Dictionary<CalendarViewModel, bool> selectedCalendars;
@@ -60,24 +59,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         void InitializeNavigationBar()
         {
-            okButton = new UIBarButtonItem(UIBarButtonSystemItem.Save);
-            okButton.Clicked += OkButton_Clicked;
+            doneButton = new UIBarButtonItem(UIBarButtonSystemItem.Done);
+            doneButton.Clicked += DoneButton_Clicked;
 
             cancelButton = new UIBarButtonItem(UIBarButtonSystemItem.Cancel);
             cancelButton.Clicked += CancelButton_Clicked;
 
             NavigationItem.LeftBarButtonItem = cancelButton;
-            NavigationItem.RightBarButtonItem = okButton;
+            NavigationItem.RightBarButtonItem = doneButton;
+            NavigationItem.Title = Localization.GetString("calendars");
         }
 
-        void RefreshData()  //TODO need to use the presenter...
+        void RefreshData()
         {
             calendarDataSource.UpdateCalendars(selectedCalendars);
         }
 
-        void OkButton_Clicked(object sender, EventArgs e)
+        void DoneButton_Clicked(object sender, EventArgs e)
         {
-            coordinator.OkButtonClicked();
+            coordinator.DoneButtonClicked(calendarDataSource.SelectedCalendars);
         }
 
         void CancelButton_Clicked(object sender, EventArgs e)
@@ -89,7 +89,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         {
             readonly WeakReference<UITableView> tableViewWeakReference;
 
-            Dictionary<CalendarViewModel, bool> selectedCalendars = new Dictionary<CalendarViewModel, bool>();
+            public Dictionary<CalendarViewModel, bool> SelectedCalendars { get; } = new Dictionary<CalendarViewModel, bool>();
+
             List<CalendarViewModel> privateCalendars = new List<CalendarViewModel>();
             List<CalendarViewModel> sharedCalendars = new List<CalendarViewModel>();
 
@@ -105,7 +106,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 var cell = tableView.DequeueReusableCell(CalendarTableViewCell.DefaultId) as CalendarTableViewCell ?? new CalendarTableViewCell();
 
                 cell.Initialize(cavm);
-                if (selectedCalendars[cavm])
+                if (SelectedCalendars[cavm])
                 {
                     cell.Accessory = UITableViewCellAccessory.Checkmark;
                     tableView.SelectRow(indexPath, false, UITableViewScrollPosition.None);
@@ -134,16 +135,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             public override string TitleForHeader(UITableView tableView, nint section)
             {
                 if (section == 0)
-                    return "Private";
-                return "Shared"; //TODO localization
+                    return Localization.GetString("cal_private");
+                return Localization.GetString("cal_shared");
             }
+
+            //public override UIView GetViewForHeader(UITableView tableView, nint section) //TODO need to complete this part to look more like the UI
+            //{
+            //    var label = new UILabel
+            //    {
+            //        Font = Theme.DefaultBoldFont,
+            //        Lines = 1,
+            //        TranslatesAutoresizingMaskIntoConstraints = false
+            //    };
+
+            //    label.Text = TitleForHeader(tableView, section);
+
+            //    return label;
+            //}
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
                 var cavm = GetViewModelForIndexPath(indexPath);
 
                 tableView.CellAt(indexPath).Accessory = UITableViewCellAccessory.Checkmark;
-                selectedCalendars[cavm] = true;
+                SelectedCalendars[cavm] = true;
             }
 
             public override void RowDeselected(UITableView tableView, NSIndexPath indexPath)
@@ -151,7 +166,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 var cavm = GetViewModelForIndexPath(indexPath);
 
                 tableView.CellAt(indexPath).Accessory = UITableViewCellAccessory.None;
-                selectedCalendars[cavm] = false;
+                SelectedCalendars[cavm] = false;
             }
 
             CalendarViewModel GetViewModelForIndexPath(NSIndexPath indexPath)
@@ -174,7 +189,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                     else
                         privateCalendars.Add(cal.Key);
 
-                    this.selectedCalendars.Add(cal.Key, cal.Value);
+                    this.SelectedCalendars.Add(cal.Key, cal.Value);
                 }
 
                 tableViewWeakReference.Unwrap()?.ReloadData();

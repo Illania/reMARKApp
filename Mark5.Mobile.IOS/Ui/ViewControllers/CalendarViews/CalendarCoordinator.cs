@@ -137,9 +137,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             RootController.PushViewController(calList, true);
         }
 
-        public void OkButtonClicked()
+        public void DoneButtonClicked(Dictionary<CalendarViewModel, bool> selectedCalendars) //TODO need to unify the naming
         {
-            throw new NotImplementedException();
+            this.selectedCalViewModel = selectedCalendars;
         }
 
         public void CancelButtonClicked()
@@ -259,7 +259,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         void CalendarsClicked();
 
         //Calendar List //TODO I think we should create multiple interfaces, and define them explicitly
-        void OkButtonClicked();
+        void DoneButtonClicked(Dictionary<CalendarViewModel, bool> selectedCalendars);
         void CancelButtonClicked();
     }
 }

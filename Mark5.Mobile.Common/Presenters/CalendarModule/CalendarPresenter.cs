@@ -59,7 +59,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             view.StopLoading();
         }
 
-        public void CalendarSelectionChanged(int calendarId, bool isSelected)
+        public void CalendarSelectionChanged(Dictionary<int, bool> selectedCalendars)
         {
             calendarsSelectedState[calendarId] = isSelected;
 

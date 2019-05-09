@@ -38,7 +38,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
             ContentView.AddConstraints(new[]
             {
-                colorView.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+                colorView.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor, 20),
                 colorView.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
                 colorView.WidthAnchor.ConstraintEqualTo(10f),
                 colorView.HeightAnchor.ConstraintEqualTo(10f),
