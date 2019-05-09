@@ -21,7 +21,16 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             Cache.Start();
             Cache.AppointmentRetrieved += Cache_AppointmentRetrieved;  //TODO we need to have an event also for errors
 
-            view.SetCalendars(calendarsList.Where(c => calendarsSelectedState[c.Id]).Select(CalendarViewModel.ConvertToViewModel).ToList());
+            view.CalendarsSelected(calendarsList.Where(c => calendarsSelectedState[c.Id]).Select(CalendarViewModel.ConvertToViewModel).ToList());
+
+            var sel = new Dictionary<CalendarViewModel, bool>();
+
+            foreach (var cal in calendarsList)
+            {
+                sel.Add(CalendarViewModel.ConvertToViewModel(cal), true); // calendarsSelectedState[cal.Id]); //TODO
+            }
+
+            view.SetCalendars(sel);
         }
 
         public override void Stop()
@@ -63,11 +72,6 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 //Need to remove from the showed ones
             }
         }
-
-        public void ViewReady()
-        {
-            //TODO do I need this?
-        }
     }
 
     public class AppointmentPreviewViewModel
@@ -100,8 +104,8 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
     {
         public int Id { get; set; }
         public string Name { get; set; }
-
         public string HexColor { get; set; }
+        public bool Shared { get; set; }
 
         public static CalendarViewModel ConvertToViewModel(Calendar ca)
         {
@@ -110,14 +114,13 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 Id = ca.Id,
                 Name = ca.Name,
                 HexColor = ca.ColorHex,
+                Shared = ca.Shared,
             };
         }
-
     }
 
     public interface ICalendarPresenter : IPresenter<ICalendarView>
     {
-        void ViewReady();
         void LoadAppointments(DateTime start, DateTime end);
         void AppointmentClicked(int appointmentId);
         void CalendarSelectionChanged(int calendarId, bool isSelected);
@@ -125,7 +128,9 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
     public interface ICalendarView : IView
     {
-        void SetCalendars(List<CalendarViewModel> calendars);
+        void CalendarsSelected(List<CalendarViewModel> calendars);
+        void SetCalendars(Dictionary<CalendarViewModel, bool> calendars);
+
         void UpdateAppointments(IEnumerable<AppointmentPreviewViewModel> caViewModels, DateTime start, DateTime end);
 
         void ShowLoading();

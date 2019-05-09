@@ -14,7 +14,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         UIBarButtonItem calendarsButtonItem;
         UIBarButtonItem createAppointmentButtonItem;
 
-        Action loadingDialogDismissal;  //TODO
+        //TODO loading error???
 
         public MonthViewController(ICalendarCoordinator coordinator) : base(coordinator) { }
 
@@ -139,7 +139,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         void Handle_HeaderTapped(object sender, HeaderTappedEventArgs e)
         {
-            Coordinator.HeaderTapped();
+            Coordinator.YearTapped(schedule.VisibleDates.GetItem<NSDate>(0));
         }
 
         void Schedule_ViewHeaderTapped(object sender, ViewHeaderTappedEventArgs e)
@@ -159,7 +159,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         void CalendarsButtonItem_Clicked(object sender, EventArgs e)
         {
-            //TODO to complete
+            Coordinator.CalendarsClicked();
         }
 
         #endregion

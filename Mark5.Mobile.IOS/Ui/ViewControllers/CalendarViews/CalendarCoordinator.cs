@@ -18,6 +18,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         CalendarPresenter presenter;
         MonthViewController monthViewController;
         UICache uiCache;
+        Dictionary<CalendarViewModel, bool> selectedCalViewModel;
 
         public NavigationController RootController { get; }
         public ObservableCollection<Appointment> Items => uiCache.Items;
@@ -40,7 +41,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             uiCache.CacheAppointments(caViewModels, start, end);
         }
 
-        public void SetCalendars(List<CalendarViewModel> calendars)
+        public void CalendarsSelected(List<CalendarViewModel> calendars)
         {
             uiCache.SetCalendars(calendars);
         }
@@ -63,6 +64,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         public void ShowAppointment(int appointmentId)
         {
 
+        }
+
+        public void SetCalendars(Dictionary<CalendarViewModel, bool> calendars)
+        {
+            selectedCalViewModel = calendars;
         }
 
         #endregion
@@ -123,6 +129,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             RootController.View.Layer.AddAnimation(transition, null);
             RootController.PushViewController(yearSelection, false);
+        }
+
+        public void CalendarsClicked()
+        {
+            var calList = new CalendarsListViewController(this, selectedCalViewModel);
+            RootController.PushViewController(calList, true);
+        }
+
+        public void OkButtonClicked()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void CancelButtonClicked()
+        {
+            RootController.PopViewController(true);
         }
 
         #endregion
@@ -234,5 +256,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         void CreateAppointmentClicked();
         void MonthViewLoaded();
         void YearTapped(NSDate nSDate);
+        void CalendarsClicked();
+
+        //Calendar List //TODO I think we should create multiple interfaces, and define them explicitly
+        void OkButtonClicked();
+        void CancelButtonClicked();
     }
 }
