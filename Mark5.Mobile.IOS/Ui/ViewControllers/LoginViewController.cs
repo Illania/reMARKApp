@@ -687,13 +687,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var distanceFromTopOfTheScreen = (remainingScreenHeight - formHeight) / 1.1f;
             var requiredMovement = usernameTextFieldTop - distanceFromTopOfTheScreen;
 
-            if (requiredMovement > 0)
+            if (requiredMovement > 1)
             {
                 UIView.BeginAnimations(string.Empty);
                 UIView.SetAnimationDuration(e.AnimationDuration);
                 UIView.SetAnimationCurve(e.AnimationCurve);
 
-                containerCenter.Constant = -requiredMovement;
+                containerCenter.Constant += -requiredMovement;
                 View.LayoutIfNeeded();
 
                 UIView.CommitAnimations();
