@@ -18,7 +18,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         CalendarPresenter presenter;
         MonthViewController monthViewController;
         UICache uiCache;
-        Dictionary<CalendarViewModel, bool> selectedCalViewModel;
 
         public NavigationController RootController { get; }
         public ObservableCollection<Appointment> Items => uiCache.Items;
@@ -66,9 +65,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         }
 
-        public void SetCalendars(Dictionary<CalendarViewModel, bool> calendars)
+        public void ShowCalendarsList(Dictionary<CalendarViewModel, bool> calendars)
         {
-            selectedCalViewModel = calendars;
+            var calList = new CalendarsListViewController(this, calendars);
+            RootController.PushViewController(calList, true);
         }
 
         #endregion
@@ -133,13 +133,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         public void CalendarsClicked()
         {
-            var calList = new CalendarsListViewController(this, selectedCalViewModel);
-            RootController.PushViewController(calList, true);
+            presenter.ShowCalendarsListClicked();
         }
 
         public void DoneButtonClicked(Dictionary<CalendarViewModel, bool> selectedCalendars) //TODO need to unify the naming
         {
-            this.selectedCalViewModel = selectedCalendars;
+            var newSelectedState = selectedCalendars.ToDictionary(pair => pair.Key.Id, pair => pair.Value);
+            presenter.CalendarSelectionChanged(newSelectedState);
+            RootController.PopViewController(true);
         }
 
         public void CancelButtonClicked()
@@ -178,8 +179,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 });
             }
 
-            public void UpdateCalendar()  //TODO need to connect it
+            public void UpdateSchedule()
             {
+                if (!AppointmentViewModels.Any())
+                    return;
+
                 coordinator.RootController.BeginInvokeOnMainThread(() =>   //TODO seems stupid to get the rootController just for this
                 {
                     Items.Clear();
@@ -194,6 +198,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             {
                 CalendarViewModels.Clear();
                 CalendarViewModels.AddRange(calendars);
+
+                UpdateSchedule();
             }
 
             #region Utilities
@@ -225,6 +231,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 return new Appointment
                 {
                     Subject = new NSString(cavm.Subject),
+                    AllDay = cavm.AllDay,
                     Start = (NSDate)DateTime.SpecifyKind(cavm.Start, DateTimeKind.Local),
                     End = (NSDate)DateTime.SpecifyKind(cavm.End, DateTimeKind.Local),
                     Color = UI.UIColorFromHexString(cavm.HexColor),
@@ -239,6 +246,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
     public class Appointment
     {
         public int CalendarId { get; set; }
+        public bool AllDay { get; set; }
         public NSString Id { get; set; }
         public NSString Subject { get; set; }
         public NSDate Start { get; set; }

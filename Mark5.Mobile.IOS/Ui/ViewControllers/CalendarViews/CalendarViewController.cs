@@ -40,6 +40,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 EndTime = "End",
                 AppointmentBackground = "Color",
                 Notes = "Id",
+                IsAllDay = "AllDay"
             };
             return mapping;
         }

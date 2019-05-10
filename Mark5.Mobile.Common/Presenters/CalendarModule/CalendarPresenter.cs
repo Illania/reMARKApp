@@ -13,6 +13,8 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         Dictionary<int, bool> calendarsSelectedState = new Dictionary<int, bool>();
         IAppointmentsCache Cache => Managers.CalendarManager.AppointmentsCache;
 
+        #region ICalendarPresenter
+
         public override void Start()
         {
             calendarsList = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars;
@@ -21,16 +23,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             Cache.Start();
             Cache.AppointmentRetrieved += Cache_AppointmentRetrieved;  //TODO we need to have an event also for errors
 
-            view.CalendarsSelected(calendarsList.Where(c => calendarsSelectedState[c.Id]).Select(CalendarViewModel.ConvertToViewModel).ToList());
-
-            var sel = new Dictionary<CalendarViewModel, bool>();
-
-            foreach (var cal in calendarsList)
-            {
-                sel.Add(CalendarViewModel.ConvertToViewModel(cal), true); // calendarsSelectedState[cal.Id]); //TODO
-            }
-
-            view.SetCalendars(sel);
+            UpdateCalendarsInView();
         }
 
         public override void Stop()
@@ -45,12 +38,36 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         public void LoadAppointments(DateTime start, DateTime end)
         {
-            //view.ShowLoading();
+            //view.ShowLoading(); //TODO ??
 
-            //var selectedCalendars = calendarsSelectedState?.Where(c => calendarsSelectedState[c.Key]).Select(c => c.Key).ToList();  //TODO testing!!
-            var selectedCalendars = calendarsSelectedState?.Select(c => c.Key).ToList();
+            var selectedCalendars = calendarsList?.Select(c => c.Id).ToList();
             Cache?.GetAppointments(selectedCalendars, start, end);
         }
+
+        public void CalendarSelectionChanged(Dictionary<int, bool> calendarsSelectedState)
+        {
+            this.calendarsSelectedState.Clear();
+            foreach (var k in calendarsSelectedState)
+                this.calendarsSelectedState.Add(k.Key, k.Value);
+
+            UpdateCalendarsInView();
+        }
+
+        public void ShowCalendarsListClicked()
+        {
+            var sel = new Dictionary<CalendarViewModel, bool>();
+
+            foreach (var cal in calendarsList)
+            {
+                sel.Add(CalendarViewModel.ConvertToViewModel(cal), calendarsSelectedState[cal.Id]); //TODO
+            }
+
+            view.ShowCalendarsList(sel);
+        }
+
+        #endregion
+
+        #region Cache event handlers
 
         void Cache_AppointmentRetrieved(object sender, AppointmentsRetrievedEventArgs e)
         {
@@ -59,10 +76,16 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             view.StopLoading();
         }
 
-        public void CalendarSelectionChanged(Dictionary<int, bool> selectedCalendars)
-        {
+        #endregion
 
+        #region Utilities
+
+        void UpdateCalendarsInView()
+        {
+            view.CalendarsSelected(calendarsList.Where(c => calendarsSelectedState[c.Id]).Select(CalendarViewModel.ConvertToViewModel).ToList());
         }
+
+        #endregion
     }
 
     public class AppointmentPreviewViewModel
@@ -114,13 +137,14 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
     {
         void LoadAppointments(DateTime start, DateTime end);
         void AppointmentClicked(int appointmentId);
-        void CalendarSelectionChanged(int calendarId, bool isSelected);
+        void CalendarSelectionChanged(Dictionary<int, bool> calendarsSelectedState);
+        void ShowCalendarsListClicked();
     }
 
     public interface ICalendarView : IView
     {
         void CalendarsSelected(List<CalendarViewModel> calendars);
-        void SetCalendars(Dictionary<CalendarViewModel, bool> calendars);
+        void ShowCalendarsList(Dictionary<CalendarViewModel, bool> calendars);
 
         void UpdateAppointments(IEnumerable<AppointmentPreviewViewModel> caViewModels, DateTime start, DateTime end);
 
