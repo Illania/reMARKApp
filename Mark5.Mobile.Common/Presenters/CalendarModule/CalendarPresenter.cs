@@ -61,16 +61,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         public void CalendarSelectionChanged(Dictionary<int, bool> selectedCalendars)
         {
-            calendarsSelectedState[calendarId] = isSelected;
 
-            if (isSelected)
-            {
-                //Need to get those new appointments and add them to the view
-            }
-            else
-            {
-                //Need to remove from the showed ones
-            }
         }
     }
 
