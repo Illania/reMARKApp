@@ -1,5 +1,4 @@
 ﻿using System;
-using CoreAnimation;
 using Foundation;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
@@ -121,7 +120,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         void Schedule_MonthInlineAppointmentTapped(object sender, MonthInlineAppointmentTappedEventArgs e)
         {
-            //presenter.AppointmentClicked(); //TODO
+            Coordinator.AppointmentTapped(e.Appointment);
         }
 
         void MonthSchedule_VisibleDatesChanged(object sender, VisibleDatesChangedEventArgs e)

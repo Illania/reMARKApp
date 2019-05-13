@@ -86,10 +86,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         void ReMarkDayCalendar_CellTapped(object sender, CellTappedEventArgs e)
         {
-            if (e != null)
-            {
-                //NavigationController.PushViewController(new AppointmentViewController(), true);
-            }
+            Coordinator.AppointmentTapped(e.ScheduleAppointment);
         }
 
         void InitializeNavigationBar()

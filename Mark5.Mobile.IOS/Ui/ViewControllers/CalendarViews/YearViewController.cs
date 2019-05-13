@@ -12,7 +12,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         ICalendarCoordinator coordinator;
         private NSDate initialDate;
 
-        public YearViewController(CalendarCoordinator calendarCoordinator, NSDate date)
+        public YearViewController(CalendarModuleCoordinator calendarCoordinator, NSDate date)
         {
             coordinator = calendarCoordinator;
             initialDate = date;

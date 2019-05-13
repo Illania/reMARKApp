@@ -13,13 +13,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         NavigationController shortcodesNavigationController;
         NavigationController calendarNavigationController;
 
-        CalendarCoordinator calendarCoordinator;
+        CalendarModuleCoordinator calendarCoordinator;
 
         public override void LoadView()
         {
             base.LoadView();
-
-            calendarCoordinator = new CalendarCoordinator();
 
             contactsNavigationController = new NavigationController(new BrowseFoldersListViewController(ModuleType.Contacts))
             {
@@ -36,7 +34,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 RestorationIdentifier = "NavigationController_" + nameof(FoldersNotificationsListViewController) + "_" + nameof(ModuleType.Documents)
             };
 
+            calendarCoordinator = new CalendarModuleCoordinator();
             calendarNavigationController = calendarCoordinator.RootController;
+            calendarNavigationController.RestorationIdentifier = nameof(calendarCoordinator.RootController) + "_" + nameof(ModuleType.Calendar);
 
             ViewControllers = new UIViewController[]
             {

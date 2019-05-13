@@ -5,15 +5,15 @@ using System.Linq;
 using System.Threading.Tasks;
 using CoreAnimation;
 using Foundation;
-using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Presenters.CalendarModule;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
+using Syncfusion.SfSchedule.iOS;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 {
-    public class CalendarCoordinator : ICalendarView, ICalendarCoordinator
+    public class CalendarModuleCoordinator : ICalendarView, ICalendarCoordinator, ICalendarListCoordinator
     {
         CalendarPresenter presenter;
         MonthViewController monthViewController;
@@ -22,15 +22,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         public NavigationController RootController { get; }
         public ObservableCollection<Appointment> Items => uiCache.Items;
 
-        public CalendarCoordinator()
+        public CalendarModuleCoordinator()
         {
             uiCache = new UICache(this);
             monthViewController = new MonthViewController(this);
 
-            RootController = new NavigationController(monthViewController) //TODO this could be done in a better way 
-            {
-                RestorationIdentifier = "NavigationController_" + nameof(MonthViewController) + "_" + nameof(ModuleType.Calendar)
-            };
+            RootController = new NavigationController(monthViewController);
         }
 
         #region ICalendarView
@@ -69,6 +66,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         {
             var calList = new CalendarsListViewController(this, calendars);
             RootController.PushViewController(calList, true);
+        }
+
+        public void AppointmentTapped(ScheduleAppointment appointment)
+        {
+            var appointmentId = int.Parse(appointment.Notes.ToString());
+            presenter.AppointmentClicked(appointmentId);
         }
 
         #endregion
@@ -136,7 +139,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             presenter.ShowCalendarsListClicked();
         }
 
-        public void DoneButtonClicked(Dictionary<CalendarViewModel, bool> selectedCalendars) //TODO need to unify the naming
+        #endregion
+
+        #region ICalendarListCoordinator implementation
+
+        public void DoneButtonClicked(Dictionary<CalendarViewModel, bool> selectedCalendars)
         {
             var newSelectedState = selectedCalendars.ToDictionary(pair => pair.Key.Id, pair => pair.Value);
             presenter.CalendarSelectionChanged(newSelectedState);
@@ -154,12 +161,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         {
             public ObservableCollection<Appointment> Items { get; } = new ObservableCollection<Appointment>();
 
-            CalendarCoordinator coordinator;
+            CalendarModuleCoordinator coordinator;
 
             List<AppointmentPreviewViewModel> AppointmentViewModels { get; } = new List<AppointmentPreviewViewModel>();
             List<CalendarViewModel> CalendarViewModels { get; } = new List<CalendarViewModel>();
 
-            public UICache(CalendarCoordinator coordinator)
+            public UICache(CalendarModuleCoordinator coordinator)
             {
                 this.coordinator = coordinator;
             }
@@ -169,7 +176,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 AppointmentViewModels.Where(i => AppointmentIsInPeriod(i, start, end)).ToList().ForEach((obj) => AppointmentViewModels.Remove(obj));  //TODO need to test
                 AppointmentViewModels.AddRange(appointmentViewModels);
 
-                coordinator.RootController.BeginInvokeOnMainThread(() =>  //TODO seems stupid to get the rootController just for this
+                coordinator.RootController.BeginInvokeOnMainThread(() =>
                 {
                     Items.Where(i => AppointmentIsInPeriod(i, start, end)).ToList().ForEach((obj) => Items.Remove(obj));  //TODO this can probably be done in a more clever way...
                     foreach (var caViewModel in AppointmentsInSelectedCalendars(appointmentViewModels))
@@ -184,7 +191,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 if (!AppointmentViewModels.Any())
                     return;
 
-                coordinator.RootController.BeginInvokeOnMainThread(() =>   //TODO seems stupid to get the rootController just for this
+                coordinator.RootController.BeginInvokeOnMainThread(() =>
                 {
                     Items.Clear();
                     foreach (var item in AppointmentsInSelectedCalendars(AppointmentViewModels))
@@ -202,6 +209,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 UpdateSchedule();
             }
 
+            public void Clear()
+            {
+                CalendarViewModels.Clear();
+                AppointmentViewModels.Clear();
+                Items.Clear();
+            }
+
             #region Utilities
 
             IEnumerable<AppointmentPreviewViewModel> AppointmentsInSelectedCalendars(IEnumerable<AppointmentPreviewViewModel> appointmentViewModels)
@@ -215,7 +229,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 var appStart = appointment.Start;
                 var appEnd = appointment.End;
 
-                return appEnd > start && appStart < end;
+                return DateTimeInPeriod(appStart, appEnd, start, end);
+
             }
 
             bool AppointmentIsInPeriod(Appointment appointment, DateTime start, DateTime end)  //TODO almost duplication
@@ -223,7 +238,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 var appStart = (DateTime)appointment.Start;
                 var appEnd = (DateTime)appointment.End;
 
-                return appEnd > start && appStart < end;
+                return DateTimeInPeriod(appStart, appEnd, start, end);
+            }
+
+            bool DateTimeInPeriod(DateTime appStart, DateTime appEnd, DateTime periodStart, DateTime periodEnd)
+            {
+                return appEnd > periodStart && appStart < periodEnd;
             }
 
             protected Appointment Convert(AppointmentPreviewViewModel cavm)
@@ -254,7 +274,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         public UIColor Color { get; set; }
     }
 
-    public interface ICalendarCoordinator  //TODO naming could be better
+    public interface ICalendarCoordinator
     {
         ObservableCollection<Appointment> Items { get; }
 
@@ -265,8 +285,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         void MonthViewLoaded();
         void YearTapped(NSDate nSDate);
         void CalendarsClicked();
+        void AppointmentTapped(ScheduleAppointment appointment);
+    }
 
-        //Calendar List //TODO I think we should create multiple interfaces, and define them explicitly
+    public interface ICalendarListCoordinator
+    {
         void DoneButtonClicked(Dictionary<CalendarViewModel, bool> selectedCalendars);
         void CancelButtonClicked();
     }

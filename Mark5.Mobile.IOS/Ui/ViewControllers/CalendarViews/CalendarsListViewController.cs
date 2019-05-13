@@ -14,12 +14,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
     {
         UIBarButtonItem doneButton;
         UIBarButtonItem cancelButton;
-        ICalendarCoordinator coordinator;
-        Dictionary<CalendarViewModel, bool> selectedCalendars;
+        ICalendarListCoordinator coordinator;
+        readonly Dictionary<CalendarViewModel, bool> selectedCalendars;
 
         CalendarDataSource calendarDataSource;
 
-        public CalendarsListViewController(ICalendarCoordinator coordinator, Dictionary<CalendarViewModel, bool> selectedCalendars)
+        public CalendarsListViewController(ICalendarListCoordinator coordinator, Dictionary<CalendarViewModel, bool> selectedCalendars)
         {
             this.coordinator = coordinator;
             this.selectedCalendars = selectedCalendars;
