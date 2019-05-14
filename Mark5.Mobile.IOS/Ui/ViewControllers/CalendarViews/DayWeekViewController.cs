@@ -86,7 +86,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         void ReMarkDayCalendar_CellTapped(object sender, CellTappedEventArgs e)
         {
-            Coordinator.AppointmentTapped(e.ScheduleAppointment);
+            if (e.ScheduleAppointment != null)
+                Coordinator.AppointmentTapped(e.ScheduleAppointment);
+            else
+                Coordinator.HourTapped(e.Date);
         }
 
         void InitializeNavigationBar()

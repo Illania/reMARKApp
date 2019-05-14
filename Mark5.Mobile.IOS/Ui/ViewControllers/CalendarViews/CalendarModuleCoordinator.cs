@@ -134,6 +134,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             RootController.PushViewController(yearSelection, false);
         }
 
+        public void HourTapped(NSDate date)
+        {
+            //Create appointment view with start date set;
+        }
+
         public void CalendarsClicked()
         {
             presenter.ShowCalendarsListClicked();
@@ -230,10 +235,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 var appEnd = appointment.End;
 
                 return DateTimeInPeriod(appStart, appEnd, start, end);
-
             }
 
-            bool AppointmentIsInPeriod(Appointment appointment, DateTime start, DateTime end)  //TODO almost duplication
+            bool AppointmentIsInPeriod(Appointment appointment, DateTime start, DateTime end)
             {
                 var appStart = (DateTime)appointment.Start;
                 var appEnd = (DateTime)appointment.End;
@@ -286,6 +290,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         void YearTapped(NSDate nSDate);
         void CalendarsClicked();
         void AppointmentTapped(ScheduleAppointment appointment);
+        void HourTapped(NSDate date);
     }
 
     public interface ICalendarListCoordinator

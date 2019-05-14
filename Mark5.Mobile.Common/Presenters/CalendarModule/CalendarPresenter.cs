@@ -71,7 +71,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         void Cache_AppointmentRetrieved(object sender, AppointmentsRetrievedEventArgs e)
         {
-            var appointmentsViewModels = e.Appointments?.Select(AppointmentPreviewViewModel.ConvertToViewModel);
+            var appointmentsViewModels = e.Appointments?.Select(AppointmentPreviewViewModel.ConvertToViewModels).SelectMany(x => x);
             view.UpdateAppointments(appointmentsViewModels, e.Start, e.End);
             view.StopLoading();
         }
@@ -99,7 +99,25 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         public bool AllDay { get; set; }
         public string HexColor { get; set; }
 
-        public static AppointmentPreviewViewModel ConvertToViewModel(CalendarAppointment ca)
+        public static List<AppointmentPreviewViewModel> ConvertToViewModels(CalendarAppointment ca)
+        {
+            var appViewModels = new List<AppointmentPreviewViewModel>();
+            if (ca.RecurrenceInfo == null)
+            {
+                appViewModels.Add(ConvertToViewModel(ca, ca.Occurrences[0]));
+            }
+            else
+            {
+                foreach (var occ in ca.Occurrences)
+                {
+                    if (occ.RecurrenceIndex != -1)
+                        appViewModels.Add(ConvertToViewModel(ca, occ));
+                }
+            }
+            return appViewModels;
+        }
+
+        static AppointmentPreviewViewModel ConvertToViewModel(CalendarAppointment ca, CalendarAppointmentOccurrence cao)
         {
             return new AppointmentPreviewViewModel
             {
@@ -107,10 +125,15 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 CalendarId = ca.CalendarId,
                 Subject = ca.Subject,
                 AllDay = ca.AllDay,
-                Start = ca.Occurrences[0].StartDate,
-                End = ca.Occurrences[0].EndDate,
+                Start = cao.StartDate,
+                End = cao.EndDate,
                 HexColor = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars.First(c => c.Id == ca.CalendarId).ColorHex, //TODO should be improved
             };
+        }
+
+        public override string ToString()
+        {
+            return string.Format("[AppViewModel: Id={0}, CalendarId={1}, Start={2}, End={3}, Subject={4}, AllDay={5}]", Id, CalendarId, Start, End, Subject, AllDay);
         }
     }
 
