@@ -35,6 +35,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 schedule.LeftAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.LeftAnchor : View.LeftAnchor)
             });
 
+            NavigationController.Title = string.Empty;
+
             InitializeNavigationBar();
         }
 

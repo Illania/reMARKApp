@@ -33,6 +33,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 schedule.LeftAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.LeftAnchor : View.LeftAnchor)
             });
 
+            NavigationController.Title = string.Empty;
+
             InitializeNavigationBar();
 
             MoveToDate(NSDate.Now);
@@ -41,7 +43,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
-            NavigationController.NavigationBarHidden = false;
 
             InitializeHandlers();
         }
