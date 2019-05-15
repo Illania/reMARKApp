@@ -26,10 +26,7 @@ namespace Mark5.Mobile.Common.Manager
 
         void GetAppointments(List<int> calendarIds, DateTime startDate, DateTime endDate);
 
-        void Start();
-
-        void Stop();
-
+        void Clean();
     }
 
     public class AppointmentsRetrievedEventArgs : EventArgs

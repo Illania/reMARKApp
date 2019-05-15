@@ -9,9 +9,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 {
     public class MonthViewController : CalendarViewController
     {
-        UIBarButtonItem yearButtonItem;
-        UIBarButtonItem calendarsButtonItem;
-        UIBarButtonItem createAppointmentButtonItem;
+        UIBarButtonItem yearButton;
+        UIBarButtonItem calendarsButton;
+        UIBarButtonItem createAppointmentsButton;
+        UIBarButtonItem refreshButton;
 
         //TODO loading error???
 
@@ -33,8 +34,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 schedule.LeftAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.LeftAnchor : View.LeftAnchor)
             });
 
-            NavigationController.Title = string.Empty;
-
             InitializeNavigationBar();
 
             MoveToDate(NSDate.Now);
@@ -43,6 +42,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
+
+            NavigationController.Title = string.Empty;
 
             InitializeHandlers();
         }
@@ -64,14 +65,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 schedule.VisibleDatesChanged += MonthSchedule_VisibleDatesChanged;
             }
 
-            if (yearButtonItem != null)
-                yearButtonItem.Clicked += YearButtonItem_Clicked;
+            if (yearButton != null)
+                yearButton.Clicked += YearButtonItem_Clicked;
 
-            if (createAppointmentButtonItem != null)
-                createAppointmentButtonItem.Clicked += CreateAppointmentButtonItem_Clicked;
+            if (createAppointmentsButton != null)
+                createAppointmentsButton.Clicked += CreateAppointmentButtonItem_Clicked;
 
-            if (calendarsButtonItem != null)
-                calendarsButtonItem.Clicked += CalendarsButtonItem_Clicked;
+            if (calendarsButton != null)
+                calendarsButton.Clicked += CalendarsButtonItem_Clicked;
+
+            if (refreshButton != null)
+                refreshButton.Clicked += RefreshButton_Clicked;
         }
 
         void DeInitializeHandlers()
@@ -84,37 +88,45 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 schedule.VisibleDatesChanged -= MonthSchedule_VisibleDatesChanged;
             }
 
-            if (yearButtonItem != null)
-                yearButtonItem.Clicked -= YearButtonItem_Clicked;
+            if (yearButton != null)
+                yearButton.Clicked -= YearButtonItem_Clicked;
 
-            if (createAppointmentButtonItem != null)
-                createAppointmentButtonItem.Clicked -= CreateAppointmentButtonItem_Clicked;
+            if (createAppointmentsButton != null)
+                createAppointmentsButton.Clicked -= CreateAppointmentButtonItem_Clicked;
 
-            if (calendarsButtonItem != null)
-                calendarsButtonItem.Clicked -= CalendarsButtonItem_Clicked;
+            if (calendarsButton != null)
+                calendarsButton.Clicked -= CalendarsButtonItem_Clicked;
+
+            if (refreshButton != null)
+                refreshButton.Clicked -= RefreshButton_Clicked;
         }
 
         void InitializeNavigationBar()
         {
-            yearButtonItem = new UIBarButtonItem
+            yearButton = new UIBarButtonItem
             {
                 Title = Localization.GetString("year"),
             };
 
-            NavigationItem.SetLeftBarButtonItem(yearButtonItem, true);
+            NavigationItem.SetLeftBarButtonItem(yearButton, true);
 
-            createAppointmentButtonItem = new UIBarButtonItem
+            createAppointmentsButton = new UIBarButtonItem
             {
                 Title = Localization.GetString("create"),
                 Image = UIImage.FromBundle("Create")
             };
 
-            calendarsButtonItem = new UIBarButtonItem
+            calendarsButton = new UIBarButtonItem
             {
                 Title = Localization.GetString("calendars"),
             };
 
-            NavigationItem.SetRightBarButtonItems(new UIBarButtonItem[] { createAppointmentButtonItem, calendarsButtonItem }, true);
+            refreshButton = new UIBarButtonItem(UIBarButtonSystemItem.Refresh)
+            {
+                Title = Localization.GetString("refresh") //TODO add
+            };
+
+            NavigationItem.SetRightBarButtonItems(new UIBarButtonItem[] { createAppointmentsButton, calendarsButton, refreshButton }, true);
         }
 
         #region Event handlers
@@ -162,6 +174,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             Coordinator.CalendarsClicked();
         }
 
+        void RefreshButton_Clicked(object sender, EventArgs e)
+        {
+            var startDate = schedule.VisibleDates.GetItem<NSDate>(0);
+            var endDate = schedule.VisibleDates.GetItem<NSDate>(schedule.VisibleDates.Count - 1);
+
+            Coordinator.RefreshClicked(startDate, endDate);
+        }
+
         #endregion
     }
 
@@ -171,6 +191,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         {
             TranslatesAutoresizingMaskIntoConstraints = false;
 
+            FirstDayOfWeek = 2;
             ScheduleView = SFScheduleView.SFScheduleViewMonth;
             EnableNavigation = true;
 

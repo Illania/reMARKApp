@@ -20,7 +20,6 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             calendarsList = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars;
             calendarsList.ForEach(c => calendarsSelectedState.Add(c.Id, true));
 
-            Cache.Start();
             Cache.AppointmentRetrieved += Cache_AppointmentRetrieved;  //TODO we need to have an event also for errors
 
             UpdateCalendarsInView();
@@ -28,7 +27,6 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         public override void Stop()
         {
-            Cache.Stop();
         }
 
         public void AppointmentClicked(int appointmentId)
@@ -46,6 +44,10 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         public void CalendarSelectionChanged(Dictionary<int, bool> calendarsSelectedState)
         {
+            if (this.calendarsSelectedState.Count == calendarsSelectedState.Count
+                && calendarsSelectedState.All((arg) => this.calendarsSelectedState[arg.Key] == arg.Value))
+                return;
+
             this.calendarsSelectedState.Clear();
             foreach (var k in calendarsSelectedState)
                 this.calendarsSelectedState.Add(k.Key, k.Value);
@@ -63,6 +65,13 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             }
 
             view.ShowCalendarsList(sel);
+        }
+
+        public void RefreshClicked(DateTime start, DateTime end)
+        {
+            Cache.Clean();
+
+            LoadAppointments(start, end);
         }
 
         #endregion
@@ -162,6 +171,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         void AppointmentClicked(int appointmentId);
         void CalendarSelectionChanged(Dictionary<int, bool> calendarsSelectedState);
         void ShowCalendarsListClicked();
+        void RefreshClicked(DateTime start, DateTime end);
     }
 
     public interface ICalendarView : IView

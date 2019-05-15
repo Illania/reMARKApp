@@ -167,15 +167,21 @@ namespace Mark5.Mobile.Common.Manager
         CancellationTokenSource tokenSource;
         HashSet<MonthDate> cachedMonths;
 
+        Task workTask;
+
+        bool started;
+
         public event EventHandler<AppointmentsRetrievedEventArgs> AppointmentRetrieved = delegate { };
 
-        public void Start()
+        void Start()
         {
             queue = new BlockingCollection<MonthDate>();
             tokenSource = new CancellationTokenSource();
             cachedMonths = new HashSet<MonthDate>();
 
-            Task.Run(async () => await Work(tokenSource.Token));
+            workTask = Task.Run(async () => await Work(tokenSource.Token));
+
+            started = true;
         }
 
         void Append(MonthDate monthDate)
@@ -185,6 +191,9 @@ namespace Mark5.Mobile.Common.Manager
 
         public void GetAppointments(List<int> calendarIds, DateTime startDate, DateTime endDate)
         {
+            if (!started)
+                Start();
+
             CacheCalendarContent(startDate, endDate);
         }
 
@@ -202,9 +211,12 @@ namespace Mark5.Mobile.Common.Manager
 
                         var app = await Managers.CalendarManager.GetCalendarAppointmentsAsync(calendarsList.Select(c => c.Id).ToList(), startDate, endDate, SourceType.Auto);
 
-                        AppointmentRetrieved(this, new AppointmentsRetrievedEventArgs(app, startDate, endDate));
+                        if (!token.IsCancellationRequested)
+                        {
+                            AppointmentRetrieved(this, new AppointmentsRetrievedEventArgs(app, startDate, endDate));
 
-                        cachedMonths.Add(monthDate);
+                            cachedMonths.Add(monthDate);
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -269,13 +281,16 @@ namespace Mark5.Mobile.Common.Manager
             }
         }
 
-        public void Stop()
+        public void Clean()
         {
+            if (!started)
+                return;
+
             tokenSource.Cancel();
             queue.CompleteAdding();
+            cachedMonths.Clear();
 
-            queue = null;
-            tokenSource = null;
+            started = false;
         }
 
         class MonthDate

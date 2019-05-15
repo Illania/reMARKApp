@@ -144,6 +144,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             presenter.ShowCalendarsListClicked();
         }
 
+        public void RefreshClicked(NSDate visibleStartDate, NSDate visibleEndDate)
+        {
+            uiCache.Clear();
+
+            var start = ((DateTime)visibleStartDate).ToLocalTime();
+            var end = ((DateTime)visibleEndDate).ToLocalTime();
+
+            presenter.RefreshClicked(start, end);
+        }
+
         #endregion
 
         #region ICalendarListCoordinator implementation
@@ -216,7 +226,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             public void Clear()
             {
-                CalendarViewModels.Clear();
                 AppointmentViewModels.Clear();
                 Items.Clear();
             }
@@ -291,6 +300,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         void CalendarsClicked();
         void AppointmentTapped(ScheduleAppointment appointment);
         void HourTapped(NSDate date);
+        void RefreshClicked(NSDate visibleStartDate, NSDate visibleEndDate);
     }
 
     public interface ICalendarListCoordinator
