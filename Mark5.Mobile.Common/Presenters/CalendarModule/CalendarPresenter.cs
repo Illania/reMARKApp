@@ -9,9 +9,11 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 {
     public class CalendarPresenter : BasePresenter<ICalendarView>, ICalendarPresenter
     {
-        protected List<Calendar> calendarsList;
+        List<Calendar> calendarsList;
         Dictionary<int, bool> calendarsSelectedState = new Dictionary<int, bool>();
         IAppointmentsCache Cache => Managers.CalendarManager.AppointmentsCache;
+
+        bool firstLoad = true;
 
         #region ICalendarPresenter
 
@@ -36,7 +38,8 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         public void LoadAppointments(DateTime start, DateTime end)
         {
-            //view.ShowLoading(); //TODO ??
+            if (firstLoad)
+                view.ShowLoading();
 
             var selectedCalendars = calendarsList?.Select(c => c.Id).ToList();
             Cache?.GetAppointments(selectedCalendars, start, end);
@@ -71,6 +74,8 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         {
             Cache.Clean();
 
+            firstLoad = true;
+
             LoadAppointments(start, end);
         }
 
@@ -80,6 +85,11 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         void Cache_AppointmentRetrieved(object sender, AppointmentsRetrievedEventArgs e)
         {
+            if (firstLoad)
+                view.StopLoading();
+
+            firstLoad = false;
+
             var appointmentsViewModels = e.Appointments?.Select(AppointmentPreviewViewModel.ConvertToViewModels).SelectMany(x => x);
             view.UpdateAppointments(appointmentsViewModels, e.Start, e.End);
             view.StopLoading();

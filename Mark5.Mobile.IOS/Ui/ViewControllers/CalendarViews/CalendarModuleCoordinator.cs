@@ -42,14 +42,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             uiCache.SetCalendars(calendars);
         }
 
-        public void ShowLoading()
-        {
-
-        }
+        Action loadingDialogDismissal;
 
         public void StopLoading()
         {
+            loadingDialogDismissal?.Invoke();
+        }
 
+        public void ShowLoading()
+        {
+            loadingDialogDismissal = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("loading_appointments___"));
         }
 
         public Task ShowError(Exception ex)
@@ -188,12 +190,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             public void CacheAppointments(IEnumerable<AppointmentPreviewViewModel> appointmentViewModels, DateTime start, DateTime end)
             {
-                AppointmentViewModels.Where(i => AppointmentIsInPeriod(i, start, end)).ToList().ForEach((obj) => AppointmentViewModels.Remove(obj));  //TODO need to test
+                AppointmentViewModels.Where(i => AppointmentIsInPeriod(i, start, end)).ToList().ForEach((obj) => AppointmentViewModels.Remove(obj));
                 AppointmentViewModels.AddRange(appointmentViewModels);
 
                 coordinator.RootController.BeginInvokeOnMainThread(() =>
                 {
-                    Items.Where(i => AppointmentIsInPeriod(i, start, end)).ToList().ForEach((obj) => Items.Remove(obj));  //TODO this can probably be done in a more clever way...
+                    Items.Where(i => AppointmentIsInPeriod(i, start, end)).ToList().ForEach((obj) => Items.Remove(obj));
                     foreach (var caViewModel in AppointmentsInSelectedCalendars(appointmentViewModels))
                     {
                         Items.Add(Convert(caViewModel));

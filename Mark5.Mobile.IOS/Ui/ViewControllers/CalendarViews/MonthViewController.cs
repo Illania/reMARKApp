@@ -14,8 +14,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         UIBarButtonItem createAppointmentsButton;
         UIBarButtonItem refreshButton;
 
-        //TODO loading error???
-
         public MonthViewController(ICalendarCoordinator coordinator) : base(coordinator) { }
 
         public override void LoadView()
