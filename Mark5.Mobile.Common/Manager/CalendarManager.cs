@@ -161,11 +161,12 @@ namespace Mark5.Mobile.Common.Manager
 
     class AppointmentsCache : IAppointmentsCache
     {
-        readonly int cachingNeighbours = 0; //Testing
+        readonly int cachingNeighbours = 0; // TODO Testing
 
         BlockingCollection<MonthDate> queue;
         CancellationTokenSource tokenSource;
         HashSet<MonthDate> cachedMonths;
+        readonly List<Calendar> calendarsList = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars;
 
         Task workTask;
 
@@ -262,8 +263,6 @@ namespace Mark5.Mobile.Common.Manager
 
         void CacheCalendarContent(DateTime start, DateTime end)
         {
-            var calendarsList = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars;  //TODO improve?
-
             var uncached = GetMonthDatePeriod(start, end).Where(md => !cachedMonths.Contains(md));
 
             uncached.ForEach(Append);

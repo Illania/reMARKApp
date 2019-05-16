@@ -121,7 +121,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             refreshButton = new UIBarButtonItem(UIBarButtonSystemItem.Refresh)
             {
-                Title = Localization.GetString("refresh") //TODO add
+                Title = Localization.GetString("refresh")
             };
 
             NavigationItem.SetRightBarButtonItems(new UIBarButtonItem[] { createAppointmentsButton, calendarsButton, refreshButton }, true);

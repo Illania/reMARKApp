@@ -10,16 +10,25 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
     public class CalendarPresenter : BasePresenter<ICalendarView>, ICalendarPresenter
     {
         List<Calendar> calendarsList;
-        Dictionary<int, bool> calendarsSelectedState = new Dictionary<int, bool>();
+        Dictionary<int, bool> calendarsSelectedState;
+        Dictionary<int, string> calendarsColor;
         IAppointmentsCache Cache => Managers.CalendarManager.AppointmentsCache;
 
         bool firstLoad = true;
 
         #region ICalendarPresenter
 
-        public override void Start()
+        public CalendarPresenter()
         {
             calendarsList = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars;
+            calendarsSelectedState = new Dictionary<int, bool>();
+            calendarsColor = new Dictionary<int, string>();
+
+            calendarsList.ForEach(c => calendarsColor.Add(c.Id, c.ColorHex));
+        }
+
+        public override void Start()
+        {
             calendarsList.ForEach(c => calendarsSelectedState.Add(c.Id, true));
 
             Cache.AppointmentRetrieved += Cache_AppointmentRetrieved;  //TODO we need to have an event also for errors
@@ -63,9 +72,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             var sel = new Dictionary<CalendarViewModel, bool>();
 
             foreach (var cal in calendarsList)
-            {
-                sel.Add(CalendarViewModel.ConvertToViewModel(cal), calendarsSelectedState[cal.Id]); //TODO
-            }
+                sel.Add(CalendarViewModel.ConvertToViewModel(cal), calendarsSelectedState[cal.Id]);
 
             view.ShowCalendarsList(sel);
         }
@@ -90,9 +97,14 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
             firstLoad = false;
 
-            var appointmentsViewModels = e.Appointments?.Select(AppointmentPreviewViewModel.ConvertToViewModels).SelectMany(x => x);
+            var appointmentsViewModels = e.Appointments?.Select(ConvertToViewModels).SelectMany(x => x);
             view.UpdateAppointments(appointmentsViewModels, e.Start, e.End);
             view.StopLoading();
+        }
+
+        List<AppointmentPreviewViewModel> ConvertToViewModels(CalendarAppointment ca)
+        {
+            return AppointmentPreviewViewModel.ConvertToViewModels(ca, calendarsColor);
         }
 
         #endregion
@@ -118,25 +130,25 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         public bool AllDay { get; set; }
         public string HexColor { get; set; }
 
-        public static List<AppointmentPreviewViewModel> ConvertToViewModels(CalendarAppointment ca)
+        public static List<AppointmentPreviewViewModel> ConvertToViewModels(CalendarAppointment ca, Dictionary<int, string> calendarColors)
         {
             var appViewModels = new List<AppointmentPreviewViewModel>();
             if (ca.RecurrenceInfo == null)
             {
-                appViewModels.Add(ConvertToViewModel(ca, ca.Occurrences[0]));
+                appViewModels.Add(ConvertToViewModel(ca, ca.Occurrences[0], calendarColors));
             }
             else
             {
                 foreach (var occ in ca.Occurrences)
                 {
                     if (occ.RecurrenceIndex != -1)
-                        appViewModels.Add(ConvertToViewModel(ca, occ));
+                        appViewModels.Add(ConvertToViewModel(ca, occ, calendarColors));
                 }
             }
             return appViewModels;
         }
 
-        static AppointmentPreviewViewModel ConvertToViewModel(CalendarAppointment ca, CalendarAppointmentOccurrence cao)
+        static AppointmentPreviewViewModel ConvertToViewModel(CalendarAppointment ca, CalendarAppointmentOccurrence cao, Dictionary<int, string> calendarColors)
         {
             return new AppointmentPreviewViewModel
             {
@@ -146,7 +158,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 AllDay = ca.AllDay,
                 Start = cao.StartDate,
                 End = cao.EndDate,
-                HexColor = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars.First(c => c.Id == ca.CalendarId).ColorHex, //TODO should be improved
+                HexColor = calendarColors[ca.CalendarId],
             };
         }
 

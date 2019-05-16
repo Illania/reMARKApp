@@ -123,7 +123,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             var startDate = schedule.VisibleDates.GetItem<NSDate>(0);
             var endDate = schedule.VisibleDates.GetItem<NSDate>(schedule.VisibleDates.Count - 1);
 
-            Coordinator.VisibleDatesChanged(startDate, endDate);  //TODO code duplicated in the monthView...
+            Coordinator.VisibleDatesChanged(startDate, endDate);
         }
 
         void AddButtonItem_Clicked(object sender, EventArgs e)
