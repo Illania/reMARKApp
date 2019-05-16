@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
+using Xamarin.Essentials;
 
 namespace Mark5.Mobile.Common.Presenters.CalendarModule
 {
@@ -13,6 +15,8 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         Dictionary<int, bool> calendarsSelectedState;
         Dictionary<int, string> calendarsColor;
         IAppointmentsCache Cache => Managers.CalendarManager.AppointmentsCache;
+
+        const string SelectedCalendarsPreferencesKey = "SelectedCalendarsPreferencesKey";
 
         bool firstLoad = true;
 
@@ -29,9 +33,9 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         public override void Start()
         {
-            calendarsList.ForEach(c => calendarsSelectedState.Add(c.Id, true));
-
             Cache.AppointmentRetrieved += Cache_AppointmentRetrieved;  //TODO we need to have an event also for errors
+
+            LoadPreferences();
 
             UpdateCalendarsInView();
         }
@@ -65,6 +69,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 this.calendarsSelectedState.Add(k.Key, k.Value);
 
             UpdateCalendarsInView();
+            UpdatePreferences();
         }
 
         public void ShowCalendarsListClicked()
@@ -114,6 +119,26 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         void UpdateCalendarsInView()
         {
             view.CalendarsSelected(calendarsList.Where(c => calendarsSelectedState[c.Id]).Select(CalendarViewModel.ConvertToViewModel).ToList());
+        }
+
+        void LoadPreferences()
+        {
+            if (Preferences.ContainsKey(SelectedCalendarsPreferencesKey))
+            {
+                var selectedCalendarsId = Serializer.Deserialize<List<int>>(Preferences.Get(SelectedCalendarsPreferencesKey, string.Empty));
+                calendarsList.ForEach(c => calendarsSelectedState.Add(c.Id, selectedCalendarsId.Contains(c.Id)));
+            }
+            else
+            {
+                calendarsList.ForEach(c => calendarsSelectedState.Add(c.Id, true));
+            }
+        }
+
+        void UpdatePreferences()
+        {
+            var selectedCalendarsId = calendarsSelectedState.Where(ca => ca.Value).Select(ca => ca.Key).ToList();
+
+            Preferences.Set(SelectedCalendarsPreferencesKey, Serializer.Serialize(selectedCalendarsId));
         }
 
         #endregion

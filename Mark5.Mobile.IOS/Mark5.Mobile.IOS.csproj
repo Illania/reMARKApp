@@ -386,6 +386,10 @@
 		<Reference Include="Syncfusion.SfCalendar.iOS">
 		  <HintPath>..\packages\Syncfusion.Xamarin.SfCalendar.IOS.17.1.0.38\lib\Xamarin.iOS10\Syncfusion.SfCalendar.iOS.dll</HintPath>
 		</Reference>
+		<Reference Include="Xamarin.Essentials">
+		  <HintPath>..\packages\Xamarin.Essentials.1.1.0\lib\xamarinios10\Xamarin.Essentials.dll</HintPath>
+		</Reference>
+		<Reference Include="OpenTK-1.0" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Mark5.Mobile.Common\Mark5.Mobile.Common.csproj">
