@@ -123,7 +123,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         public void YearTapped(NSDate date)
         {
-            YearViewController yearSelection = new YearViewController(this, date);
+            var yearSelection = new YearViewController(this, date);
             CATransition transition = new CATransition
             {
                 Duration = 0.35,

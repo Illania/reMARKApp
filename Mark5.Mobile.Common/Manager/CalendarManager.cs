@@ -18,8 +18,7 @@ namespace Mark5.Mobile.Common.Manager
     class CalendarManager : AbstractManager, ICalendarManager
     {
         readonly ICalendarDataAccess calendarDataAccess;
-
-        AppointmentsCache appCache = new AppointmentsCache();
+        readonly AppointmentsCache appCache = new AppointmentsCache();
 
         public IAppointmentsCache AppointmentsCache => appCache;
 
@@ -166,8 +165,6 @@ namespace Mark5.Mobile.Common.Manager
         BlockingCollection<MonthDate> queue;
         CancellationTokenSource tokenSource;
         HashSet<MonthDate> cachedMonths;
-        readonly List<Calendar> calendarsList = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars;
-
         Task workTask;
 
         bool started;

@@ -41,6 +41,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         {
             base.ViewWillAppear(animated);
 
+            NavigationController.NavigationBarHidden = false;
             NavigationController.Title = string.Empty;
 
             InitializeHandlers();
