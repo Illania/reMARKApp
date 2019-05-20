@@ -33,7 +33,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         public override void Start()
         {
-            Cache.AppointmentRetrieved += Cache_AppointmentRetrieved;  //TODO we need to have an event also for errors
+            Cache.AppointmentRetrieved += Cache_AppointmentRetrieved;
 
             LoadPreferences();
 

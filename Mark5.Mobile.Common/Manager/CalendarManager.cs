@@ -170,6 +170,7 @@ namespace Mark5.Mobile.Common.Manager
         bool started;
 
         public event EventHandler<AppointmentsRetrievedEventArgs> AppointmentRetrieved = delegate { };
+        public event EventHandler<Exception> RetrievalError = delegate { };
 
         void Start()
         {
@@ -219,6 +220,7 @@ namespace Mark5.Mobile.Common.Manager
                     catch (Exception ex)
                     {
                         CommonConfig.Logger.Error($"Error while retrieving calendar appointments for {monthDate}", ex);
+                        RetrievalError(this, ex);
                     }
                 }
             }
