@@ -59,7 +59,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             return Task.CompletedTask;
         }
 
-        public void ShowAppointment(int appointmentId)
+        public void ShowAppointment(int appointmentId, int recurrenceIndex)
         {
 
         }
@@ -70,15 +70,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             RootController.PushViewController(calList, true);
         }
 
-        public void AppointmentTapped(ScheduleAppointment appointment)
-        {
-            var appointmentId = int.Parse(appointment.Notes.ToString());
-            presenter.AppointmentClicked(appointmentId);
-        }
-
         #endregion
 
         #region ICalendarCoordinator
+
+        public void AppointmentTapped(ScheduleAppointment appointment)
+        {
+            var splitted = appointment.Notes.ToString().Split(" ");
+            var appointmentId = int.Parse(splitted[0]);
+            var recurrenceIndex = int.Parse(splitted[1]);
+            presenter.AppointmentClicked(appointmentId, recurrenceIndex);
+        }
 
         public void VisibleDatesChanged(NSDate startDate, NSDate endDate)
         {
@@ -270,7 +272,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                     Start = (NSDate)DateTime.SpecifyKind(cavm.Start, DateTimeKind.Local),
                     End = (NSDate)DateTime.SpecifyKind(cavm.End, DateTimeKind.Local),
                     Color = UI.UIColorFromHexString(cavm.HexColor),
-                    Id = new NSString(cavm.Id.ToString())
+                    Id = new NSString($"{cavm.Id} {cavm.RecurrenceIndex}")
                 };
             }
 

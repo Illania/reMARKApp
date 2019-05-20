@@ -44,9 +44,9 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         {
         }
 
-        public void AppointmentClicked(int appointmentId)
+        public void AppointmentClicked(int appointmentId, int recurrenceIndex)
         {
-            view.ShowAppointment(appointmentId);
+            view.ShowAppointment(appointmentId, recurrenceIndex);
         }
 
         public void LoadAppointments(DateTime start, DateTime end)
@@ -147,6 +147,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
     public class AppointmentPreviewViewModel
     {
         public int Id { get; set; }
+        public int RecurrenceIndex { get; set; }
         public int CalendarId { get; set; }
         public DateTime Start { get; set; }
         public DateTime End { get; set; }
@@ -178,6 +179,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             return new AppointmentPreviewViewModel
             {
                 Id = ca.Id,
+                RecurrenceIndex = cao.RecurrenceIndex,
                 CalendarId = ca.CalendarId,
                 Subject = ca.Subject,
                 AllDay = ca.AllDay,
@@ -215,7 +217,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
     public interface ICalendarPresenter : IPresenter<ICalendarView>
     {
         void LoadAppointments(DateTime start, DateTime end);
-        void AppointmentClicked(int appointmentId);
+        void AppointmentClicked(int appointmentId, int recurrenceIndex);
         void CalendarSelectionChanged(Dictionary<int, bool> calendarsSelectedState);
         void ShowCalendarsListClicked();
         void RefreshClicked(DateTime start, DateTime end);
@@ -231,6 +233,6 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         void ShowLoading();
         void StopLoading();
         Task ShowError(Exception ex);
-        void ShowAppointment(int appointmentId);
+        void ShowAppointment(int appointmentId, int recurrenceIndex);
     }
 }
