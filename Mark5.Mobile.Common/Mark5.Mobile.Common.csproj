@@ -25,5 +25,7 @@
     <Folder Include="Utilities\Extensions\" />
     <Folder Include="Presenters\" />
     <Folder Include="Presenters\CalendarModule\" />
+    <Folder Include="Manager\Interfaces\" />
+    <Folder Include="DataAccess\Interfaces\" />
   </ItemGroup>
 </Project>

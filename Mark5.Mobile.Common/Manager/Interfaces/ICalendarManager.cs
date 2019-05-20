@@ -23,6 +23,7 @@ namespace Mark5.Mobile.Common.Manager
     public interface IAppointmentsCache
     {
         event EventHandler<AppointmentsRetrievedEventArgs> AppointmentRetrieved;
+        event EventHandler<AppointmentsRetrievedEventArgs> RetrievalError;
 
         void GetAppointments(List<int> calendarIds, DateTime startDate, DateTime endDate);
 
