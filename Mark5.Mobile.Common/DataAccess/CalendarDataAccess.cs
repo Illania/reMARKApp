@@ -157,9 +157,7 @@ namespace Mark5.Mobile.Common.DataAccess
 
         public async Task RemoveOrphans()
         {
-            await Task.CompletedTask;
-            /*
-            try  //TODO to test
+            try
             {
                 await calendarDatabase.RunInConnectionAsync(c =>
                 {
@@ -167,7 +165,7 @@ namespace Mark5.Mobile.Common.DataAccess
 
                     // 1) Remove all the appointment in calendars for which we do not have access
 
-                    var deleteQuery1 = $"delete from {nameof(CalendarAppointment)}  " +
+                    var deleteQuery1 = $"delete from {nameof(CalendarAppointment)}" +
                         $" where {nameof(CalendarAppointment.CalendarId)} not in ({string.Join(", ", accessibleCalendarIds)}) ";
 
                     var c1 = c.Execute(deleteQuery1);
@@ -176,17 +174,17 @@ namespace Mark5.Mobile.Common.DataAccess
 
                     var innerQuery2 = $"select {nameof(CalendarAppointment.Id)} from {nameof(CalendarAppointment)}";
 
-                    var deleteQuery2 = $"delete from {nameof(CalendarAppointmentOccurrence)}  " +
+                    var deleteQuery2 = $"delete from {nameof(CalendarAppointmentOccurrence)}" +
                         $" where {nameof(CalendarAppointmentOccurrence.AppointmentId)} not in ({innerQuery2}) ";
 
                     var c2 = c.Execute(deleteQuery2);
 
                     // 3) Remove all appointments for which we do not have occurrences
 
-                    var innerQuery3 = $"select 1 from {nameof(CalendarAppointmentOccurrence)}" +
-                        $"where {nameof(CalendarAppointmentOccurrence.AppointmentId)} = ca.{nameof(CalendarAppointment.Id)} ";
+                    var innerQuery3 = $"select 1 from {nameof(CalendarAppointmentOccurrence)} " +
+                        $"where {nameof(CalendarAppointmentOccurrence.AppointmentId)} = {nameof(CalendarAppointment.Id)} ";
 
-                    var deleteQuery3 = $"delete from {nameof(CalendarAppointment)} ca  " +
+                    var deleteQuery3 = $"delete from {nameof(CalendarAppointment)}" +
                         $" where not exists ({innerQuery3}) ";
 
                     var c3 = c.Execute(deleteQuery3);
@@ -197,7 +195,7 @@ namespace Mark5.Mobile.Common.DataAccess
             {
                 throw new DataAccessException("Error removing orphan appointments and appointment occcurences.", ex);
             }
-            */
+
         }
 
         public async Task<List<CalendarAlarm>> GetCalendarAlarmsAsync(List<int> calendarIds, DateTime startDate, DateTime endDate)
