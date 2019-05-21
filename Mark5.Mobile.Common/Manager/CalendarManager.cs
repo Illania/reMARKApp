@@ -160,13 +160,11 @@ namespace Mark5.Mobile.Common.Manager
 
     class AppointmentsCache : IAppointmentsCache
     {
-        readonly int cachingNeighbours = 0; // TODO Testing
+        readonly int cachingNeighbours = 2;
 
         BlockingCollection<MonthDate> queue;
         CancellationTokenSource tokenSource;
         HashSet<MonthDate> cachedMonths;
-        Task workTask;
-
         bool started;
 
         public event EventHandler<AppointmentsRetrievedEventArgs> AppointmentRetrieved = delegate { };
@@ -178,7 +176,7 @@ namespace Mark5.Mobile.Common.Manager
             tokenSource = new CancellationTokenSource();
             cachedMonths = new HashSet<MonthDate>();
 
-            workTask = Task.Run(async () => await Work(tokenSource.Token));
+            Task.Run(async () => await Work(tokenSource.Token));
 
             started = true;
         }
@@ -266,7 +264,7 @@ namespace Mark5.Mobile.Common.Manager
 
             uncached.ForEach(Append);
 
-            for (int i = 0; i < cachingNeighbours; i++)
+            for (int i = 1; i <= cachingNeighbours; i++)
             {
                 var futureMonth = MonthDate.FromDateTime(end.AddMonths(i));
                 var pastMonth = MonthDate.FromDateTime(start.AddMonths(-i));

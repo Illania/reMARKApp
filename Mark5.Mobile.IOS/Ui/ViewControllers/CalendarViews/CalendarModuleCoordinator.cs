@@ -16,8 +16,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
     public class CalendarModuleCoordinator : ICalendarView, ICalendarCoordinator, ICalendarListCoordinator
     {
         CalendarPresenter presenter;
-        MonthViewController monthViewController;
-        UICache uiCache;
+        readonly MonthViewController monthViewController;
+        readonly UICache uiCache;
 
         public NavigationController RootController { get; }
         public ObservableCollection<Appointment> Items => uiCache.Items;
