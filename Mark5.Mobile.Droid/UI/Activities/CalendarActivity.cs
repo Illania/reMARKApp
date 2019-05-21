@@ -76,6 +76,26 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             SupportActionBar.Show();
         }
 
+        public void ShowCalendarSelection()
+        {
+            var (fragment, tag) = CalendarListFragment.NewInstance();
+            SupportFragmentManager.BeginTransaction()
+                .Replace(Resource.Id.fragment_container, fragment, tag)
+                .AddToBackStack(tag)
+                .Commit();
+            SupportActionBar.Hide();
+        }
+
+        public void ShowCreateAppointment()
+        {
+            var (fragment, tag) = CreateAppointmentFragment.NewInstance();
+            SupportFragmentManager.BeginTransaction()
+                .Replace(Resource.Id.fragment_container, fragment, tag)
+                .AddToBackStack(tag)
+                .Commit();
+            SupportActionBar.Hide();
+        }
+
         private void SetupLeftToolbarButton()
         {
             TextView yearTextView = new TextView(this)
@@ -106,5 +126,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         bool CellDoubleTapped();
 
         void ShowToolBar();
+
+        void ShowCalendarSelection();
+
+        void ShowCreateAppointment();
     }
 }

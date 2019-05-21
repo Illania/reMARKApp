@@ -12,7 +12,7 @@ using Mark5.Mobile.Droid.Ui.Activities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 {
-    public class MonthCalendarFragment : BaseFragment
+    public class MonthCalendarFragment : BaseFragment, IMenuItemOnMenuItemClickListener
     {
         ICalendarActivity iCalendarActivity;
 
@@ -58,16 +58,37 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         static class MenuItemActions
         {
-            public const int CreateAppointment = 10;
+            public const int CreateAppointment = 11;
+            public const int CalendarSelection = 10;
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
             menu.Clear();
 
+            var calendarSelection = menu.Add(Menu.None, MenuItemActions.CalendarSelection, MenuItemActions.CalendarSelection, "Calendars");
+            calendarSelection.SetTitle("Calendars");
+            calendarSelection.SetShowAsAction(ShowAsAction.Always);
+            calendarSelection.SetOnMenuItemClickListener(this);
+
             var insertTemplateItem = menu.Add(Menu.None, MenuItemActions.CreateAppointment, MenuItemActions.CreateAppointment, Resource.String.insert_template);
             insertTemplateItem.SetIcon(Resource.Drawable.action_add);
             insertTemplateItem.SetShowAsAction(ShowAsAction.Always);
+            insertTemplateItem.SetOnMenuItemClickListener(this);
+        }
+
+        public bool OnMenuItemClick(IMenuItem item)
+        {
+            if (item.ItemId == MenuItemActions.CalendarSelection)
+            {
+                iCalendarActivity.ShowCalendarSelection();
+            }
+
+            if (item.ItemId == MenuItemActions.CreateAppointment)
+            {
+                iCalendarActivity.ShowCreateAppointment();
+            }
+            return true;
         }
     }
 

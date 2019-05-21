@@ -8,6 +8,7 @@ using Android.Support.V4.Content;
 using Com.Syncfusion.Schedule;
 using Com.Syncfusion.Schedule.Enums;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Ui.Activities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 {
@@ -15,6 +16,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
     {
         private bool viewModeDay;
         private WeekCalendarConfiguration calendarConfiguration;
+        private ICalendarActivity iCalendarActivity;
 
         public static (WeekCalendarFragment fragment, string tag) NewInstance()
         {
@@ -42,16 +44,28 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             return calendarConfiguration.GetContent(Context);
         }
 
+        public override void OnAttach(Context context)
+        {
+            base.OnAttach(context);
+            iCalendarActivity = (CalendarActivity)context;
+        }
+
         #region Toolbar setup
         static class MenuItemActions
         {
             public const int CreateAppoitnment = 11;
             public const int SwitchViewMode = 10;
+            public const int SelectCalendars = 9;
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
             menu.Clear();
+
+            var calendarSelectionItem = menu.Add(Menu.None, MenuItemActions.SelectCalendars, MenuItemActions.SelectCalendars, Resource.String.calendar);
+            calendarSelectionItem.SetTitle("Calendars");
+            calendarSelectionItem.SetShowAsAction(ShowAsAction.Always);
+            calendarSelectionItem.SetOnMenuItemClickListener(this);
 
             var createAppointmentItem = menu.Add(Menu.None, MenuItemActions.CreateAppoitnment, MenuItemActions.CreateAppoitnment, Resource.String.insert_template);
             createAppointmentItem.SetIcon(Resource.Drawable.action_add);
@@ -74,6 +88,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                     viewModeDay = !viewModeDay;
                 }
                 Activity.InvalidateOptionsMenu();
+            }
+
+            if (item.ItemId == MenuItemActions.SelectCalendars)
+            {
+                iCalendarActivity.ShowCalendarSelection();
+            }
+
+            if (item.ItemId == MenuItemActions.CreateAppoitnment)
+            {
+                iCalendarActivity.ShowCreateAppointment();
             }
 
             return true;

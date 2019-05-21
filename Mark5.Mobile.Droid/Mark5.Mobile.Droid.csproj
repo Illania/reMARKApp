@@ -539,6 +539,8 @@
     <Compile Include="Ui\Fragments\Calendar\MonthCalendarFragment.cs" />
     <Compile Include="Ui\Fragments\Calendar\YearCalendarFragment.cs" />
     <Compile Include="Ui\Fragments\Calendar\WeekCalendarFragment.cs" />
+    <Compile Include="Ui\Fragments\Calendar\CalendarListFragment.cs" />
+    <Compile Include="Ui\Fragments\Calendar\CreateAppointmentFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
