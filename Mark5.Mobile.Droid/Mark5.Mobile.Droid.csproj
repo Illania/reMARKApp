@@ -202,9 +202,6 @@
     <Reference Include="Xamarin.Firebase.Messaging">
       <HintPath>..\packages\Xamarin.Firebase.Messaging.60.1142.1\lib\MonoAndroid80\Xamarin.Firebase.Messaging.dll</HintPath>
     </Reference>
-    <Reference Include="Polly">
-      <HintPath>..\packages\Polly.6.1.0\lib\netstandard2.0\Polly.dll</HintPath>
-    </Reference>
     <Reference Include="PhoneNumbers">
       <HintPath>..\packages\libphonenumber-csharp.8.10.12\lib\netstandard2.0\PhoneNumbers.dll</HintPath>
       <Private>False</Private>
@@ -278,6 +275,9 @@
     </Reference>
     <Reference Include="System.Numerics" />
     <Reference Include="System.Numerics.Vectors" />
+    <Reference Include="Polly">
+      <HintPath>..\packages\Polly.7.1.0\lib\netstandard2.0\Polly.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
