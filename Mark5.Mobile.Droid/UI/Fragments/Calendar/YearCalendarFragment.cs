@@ -16,16 +16,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
     public class YearCalendarFragment : BaseFragment
     {
         ICalendarActivity iCalendarActivity;
+        YearCalendar yearCalendar;
 
         public static (YearCalendarFragment fragment, string tag) NewInstance()
         {
-            var args = new Bundle();
-
-            var fragment = new YearCalendarFragment
-            {
-                Arguments = args
-            };
-
+            var fragment = new YearCalendarFragment();
             var tag = $"{nameof(YearCalendarFragment)}";
 
             return (fragment, tag);
@@ -45,9 +40,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             HasOptionsMenu = true;
-            var configurator = new YearCalendarConfiguration();
-            configurator.MonthSelected += Configurator_MonthSelected;
-            return configurator.GetContent(Context);
+
+            yearCalendar = new YearCalendar(Context);
+            yearCalendar.MonthChanged += Calendar_MonthChanged;  //TODO need to move it 
+
+            return yearCalendar;
         }
 
         void Configurator_MonthSelected()
@@ -55,19 +52,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             iCalendarActivity.ShowToolBar();
             Activity.SupportFragmentManager.PopBackStack();
         }
+
+        void Calendar_MonthChanged(object sender, MonthChangedEventArgs e)
+        {
+            Animation animation = AnimationUtils.LoadAnimation(Context, Resource.Animation.fade_out);
+            yearCalendar.StartAnimation(animation);
+
+            iCalendarActivity.ShowToolBar();
+            Activity.SupportFragmentManager.PopBackStack();
+        }
     }
 
-    public class YearCalendarConfiguration : IDisposable
+    class YearCalendar : SfCalendar
     {
-        private FrameLayout mainView;
-        private SfCalendar calendar;
-        private Context context;
-        public Action MonthSelected;
-
-        public View GetContent(Context con)
+        public YearCalendar(Context context) : base(context)
         {
-            context = con;
-
             MonthViewLabelSetting labelSettings = new MonthViewLabelSetting
             {
                 DateLabelSize = 12
@@ -104,41 +103,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 DateTextColor = new Color(ContextCompat.GetColor(context, Resource.Color.white)),
             };
 
-            calendar = new SfCalendar(con)
-            {
-                ShowEventsInline = false,
-                HeaderHeight = 100,
-                ViewMode = ViewMode.YearView,
-                MonthViewSettings = monthViewSettings,
-                YearViewSettings = yearViewSettings
-            };
+            ShowEventsInline = false;
+            HeaderHeight = 100;
+            ViewMode = ViewMode.YearView;
+            MonthViewSettings = monthViewSettings;
+            YearViewSettings = yearViewSettings;
 
-            calendar.MonthChanged += Calendar_MonthChanged;
-
-            mainView = new FrameLayout(con);
-
-            mainView.SetPadding(15, 15, 15, 15);
-            mainView.SetBackgroundColor(new Color(ContextCompat.GetColor(context, Resource.Color.darkerblue)));
-            mainView.AddView(calendar);
-
-            return mainView;
-        }
-
-        void Calendar_MonthChanged(object sender, MonthChangedEventArgs e)
-        {
-            mainView.RemoveAllViews();
-            Animation animation = AnimationUtils.LoadAnimation(context, Resource.Animation.fade_out);
-            mainView.StartAnimation(animation);
-
-            if (MonthSelected != null)
-            {
-                MonthSelected.Invoke();
-            }
-        }
-
-        public void Dispose()
-        {
-            //TODO : implement
+            SetPadding(15, 15, 15, 15);
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using Android.OS;
+﻿using Android.OS;
 using Android.Views;
 using Mark5.Mobile.Droid.Ui.Common;
 

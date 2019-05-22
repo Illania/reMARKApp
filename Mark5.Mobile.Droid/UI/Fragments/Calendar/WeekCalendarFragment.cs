@@ -1,7 +1,5 @@
-﻿using System;
-using Android.OS;
+﻿using Android.OS;
 using Android.Views;
-using Android.Widget;
 using Android.Content;
 using Android.Graphics;
 using Android.Support.V4.Content;
@@ -14,19 +12,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 {
     public class WeekCalendarFragment : BaseFragment, IMenuItemOnMenuItemClickListener
     {
-        private bool viewModeDay;
-        private WeekCalendarConfiguration calendarConfiguration;
-        private ICalendarActivity iCalendarActivity;
+        bool viewModeDay;
+        ICalendarActivity iCalendarActivity;
+        WeekSchedule schedule;
 
         public static (WeekCalendarFragment fragment, string tag) NewInstance()
         {
-            var args = new Bundle();
-
-            var fragment = new WeekCalendarFragment
-            {
-                Arguments = args
-            };
-
+            var fragment = new WeekCalendarFragment();
             var tag = $"{nameof(WeekCalendarFragment)}";
 
             return (fragment, tag);
@@ -40,8 +32,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             HasOptionsMenu = true;
-            calendarConfiguration = new WeekCalendarConfiguration();
-            return calendarConfiguration.GetContent(Context);
+
+            schedule = new WeekSchedule(Context);
+
+            return schedule;
         }
 
         public override void OnAttach(Context context)
@@ -82,11 +76,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         {
             if (item.ItemId == MenuItemActions.SwitchViewMode)
             {
-                if (calendarConfiguration != null)
-                {
-                    calendarConfiguration.ChangeViewMode();
-                    viewModeDay = !viewModeDay;
-                }
+                ChangeViewMode();
+                viewModeDay = !viewModeDay;
                 Activity.InvalidateOptionsMenu();
             }
 
@@ -104,18 +95,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         }
 
         #endregion
+
+        public void ChangeViewMode()
+        {
+            schedule.ScheduleView = schedule.ScheduleView == ScheduleView.WorkWeekView ? ScheduleView.DayView : ScheduleView.WorkWeekView;
+        }
+
     }
 
-    public class WeekCalendarConfiguration : IDisposable
+    class WeekSchedule : SfSchedule
     {
-        private FrameLayout mainView;
-        private Context context;
-        private SfSchedule schedule;
-
-        public View GetContent(Context con)
+        public WeekSchedule(Context context) : base(context)
         {
-            context = con;
-
             ViewHeaderStyle dayHeaderStyle = new ViewHeaderStyle
             {
                 BackgroundColor = ContextCompat.GetColor(context, Resource.Color.darkerblue),
@@ -131,34 +122,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 TextColor = ContextCompat.GetColor(context, Resource.Color.white)
             };
 
-            schedule = new SfSchedule(context)
+            ScheduleView = ScheduleView.WorkWeekView;
+            MonthViewSettings = new MonthViewSettings
             {
-                ScheduleView = ScheduleView.WorkWeekView,
-                MonthViewSettings = new MonthViewSettings()
-                {
-                    ShowAgendaView = true,
-                    TodayBackgroundColor = new Color(ContextCompat.GetColor(context, Resource.Color.lightblue)),
-                    SelectionTextColor = new Color(ContextCompat.GetColor(context, Resource.Color.white))
-                }
+                ShowAgendaView = true,
+                TodayBackgroundColor = new Color(ContextCompat.GetColor(context, Resource.Color.lightblue)),
+                SelectionTextColor = new Color(ContextCompat.GetColor(context, Resource.Color.white))
             };
 
-            schedule.HeaderStyle = headerStyle;
-            schedule.ViewHeaderStyle = dayHeaderStyle;
-
-            mainView = new FrameLayout(con);
-            mainView.AddView(schedule);
-
-            return mainView;
-        }
-
-        public void ChangeViewMode()
-        {
-            schedule.ScheduleView = schedule.ScheduleView == ScheduleView.WorkWeekView ? ScheduleView.DayView : ScheduleView.WorkWeekView;
-        }
-
-        public void Dispose()
-        {
-            //TODO : implement
+            HeaderStyle = headerStyle;
+            ViewHeaderStyle = dayHeaderStyle;
         }
     }
+
 }

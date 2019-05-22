@@ -15,15 +15,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
     public class MonthCalendarFragment : BaseFragment, IMenuItemOnMenuItemClickListener
     {
         ICalendarActivity iCalendarActivity;
+        MonthSchedule schedule;
 
         public static (MonthCalendarFragment fragment, string tag) NewInstance()
         {
-            var args = new Bundle();
-
-            var fragment = new MonthCalendarFragment
-            {
-                Arguments = args
-            };
+            var fragment = new MonthCalendarFragment();
 
             var tag = $"{nameof(MonthCalendarFragment)}";
 
@@ -45,21 +41,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         {
             HasOptionsMenu = true;
 
-            var configurator = new MonthCalendarConfiguration();
-            configurator.DateSelected += Configurator_DateSelected; ;
-            return configurator.GetContent(Context);
-        }
+            schedule = new MonthSchedule(Context);
+            schedule.CellDoubleTapped += Schedule_CellDoubleTapped;  //TODO refactor
 
-        void Configurator_DateSelected()
-        {
-            if (iCalendarActivity != null)
-                iCalendarActivity.CellDoubleTapped();
-        }
-
-        static class MenuItemActions
-        {
-            public const int CreateAppointment = 11;
-            public const int CalendarSelection = 10;
+            return schedule;
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
@@ -80,69 +65,67 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         public bool OnMenuItemClick(IMenuItem item)
         {
             if (item.ItemId == MenuItemActions.CalendarSelection)
-            {
                 iCalendarActivity.ShowCalendarSelection();
-            }
 
             if (item.ItemId == MenuItemActions.CreateAppointment)
-            {
                 iCalendarActivity.ShowCreateAppointment();
-            }
+
             return true;
         }
+
+        static class MenuItemActions
+        {
+            public const int CreateAppointment = 11;
+            public const int CalendarSelection = 10;
+        }
+
+
+        void Schedule_CellDoubleTapped(object sender, CellTappedEventArgs e)
+        {
+            iCalendarActivity.CellDoubleTapped(); //TODO need to refactor...
+        }
+
     }
 
-    public class MonthCalendarConfiguration : IDisposable
+    public class MonthSchedule : SfSchedule
     {
-        private Context context;
-        private FrameLayout mainView;
-        public Action DateSelected;
+        readonly int darkerBlueColor;
+        readonly int whiteColor;
+        readonly int lightBlueColor;
 
-        public View GetContent(Context con)
+        public MonthSchedule(Context context) : base(context)
         {
-            context = con;
-            mainView = new FrameLayout(con);
+            darkerBlueColor = ContextCompat.GetColor(context, Resource.Color.darkerblue);
+            whiteColor = ContextCompat.GetColor(context, Resource.Color.white);
+            lightBlueColor = ContextCompat.GetColor(context, Resource.Color.lightblue);
 
             ViewHeaderStyle dayHeaderStyle = new ViewHeaderStyle
             {
-                BackgroundColor = ContextCompat.GetColor(context, Resource.Color.darkerblue),
-                DayTextColor = ContextCompat.GetColor(context, Resource.Color.white)
+                BackgroundColor = darkerBlueColor,
+                DayTextColor = whiteColor,
             };
 
             HeaderStyle headerStyle = new HeaderStyle
             {
-                BackgroundColor = ContextCompat.GetColor(context, Resource.Color.darkerblue),
-                TextColor = ContextCompat.GetColor(context, Resource.Color.white)
+                BackgroundColor = darkerBlueColor,
+                TextColor = whiteColor,
             };
 
-            var schedule = new SfSchedule(context)
+            ScheduleView = ScheduleView.MonthView;
+            HeaderStyle = headerStyle;
+            ViewHeaderStyle = dayHeaderStyle;
+            MonthViewSettings = new MonthViewSettings
             {
-                ScheduleView = ScheduleView.MonthView,
-                MonthViewSettings = new MonthViewSettings()
-                {
-                    ShowAgendaView = true,
-                    TodayBackgroundColor = new Color(ContextCompat.GetColor(context, Resource.Color.lightblue)),
-                    SelectionTextColor = new Color(ContextCompat.GetColor(context, Resource.Color.white))
-                }
+                ShowAgendaView = true,
+                TodayBackgroundColor = new Color(lightBlueColor),
+                SelectionTextColor = new Color(whiteColor)
             };
 
-            schedule.MonthCellLoaded += Schedule_MonthCellLoaded;
-            schedule.CellDoubleTapped += Schedule_CellDoubleTapped;
-            schedule.HeaderStyle = headerStyle;
-            schedule.ViewHeaderStyle = dayHeaderStyle;
-
-            mainView.AddView(schedule);
-
-            return mainView;
+            MonthCellLoaded += MonthSchedule_MonthCellLoaded;
         }
 
-        void Schedule_CellDoubleTapped(object sender, CellTappedEventArgs e)
-        {
-            if (DateSelected != null)
-                DateSelected.Invoke();
-        }
 
-        void Schedule_MonthCellLoaded(object sender, MonthCellLoadedEventArgs e)
+        void MonthSchedule_MonthCellLoaded(object sender, MonthCellLoadedEventArgs e)
         {
             CellStyle cellStyle;
 
@@ -150,26 +133,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             {
                 cellStyle = new CellStyle
                 {
-                    BackgroundColor = ContextCompat.GetColor(context, Resource.Color.darkerblue),
-                    TextColor = ContextCompat.GetColor(context, Resource.Color.darkerblue)
+                    BackgroundColor = darkerBlueColor,
+                    TextColor = darkerBlueColor,
                 };
             }
             else
             {
                 cellStyle = new CellStyle
                 {
-                    BackgroundColor = ContextCompat.GetColor(context, Resource.Color.darkerblue),
-                    TextColor = ContextCompat.GetColor(context, Resource.Color.white)
+                    BackgroundColor = darkerBlueColor,
+                    TextColor = whiteColor,
                 };
             }
 
             e.CellStyle = cellStyle;
         }
 
-        public void Dispose()
-        {
-            //TODO : implement
-        }
     }
 }
 
