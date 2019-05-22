@@ -81,7 +81,7 @@ namespace Mark5.Mobile.Droid
             var emptyView = rootView.FindViewById<AppCompatTextView>(Resource.Id.empty_view);
             emptyView.Visibility = ViewStates.Gone;
             RefreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipe_refresh_layout);
-            RefreshLayout.SetEnabled(false);
+            RefreshLayout.Enabled = false;
 
             RecyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recycler_view);
             RecyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
@@ -172,7 +172,7 @@ namespace Mark5.Mobile.Droid
             RefreshLayout.Post(() =>
             {
                 RefreshLayout.Refreshing = false;
-                RefreshLayout.SetEnabled(false);
+                RefreshLayout.Enabled = false;
             });
         }
 
