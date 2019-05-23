@@ -195,7 +195,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 AppointmentViewModels.Where(i => AppointmentIsInPeriod(i, start, end)).ToList().ForEach((obj) => AppointmentViewModels.Remove(obj));
                 AppointmentViewModels.AddRange(appointmentViewModels);
 
-                coordinator.RootController.BeginInvokeOnMainThread(() =>
+                coordinator.RootController.BeginInvokeOnMainThread(() =>  //TODO should use Xamarin Essentials for this...
                 {
                     Items.Where(i => AppointmentIsInPeriod(i, start, end)).ToList().ForEach((obj) => Items.Remove(obj));
                     foreach (var caViewModel in AppointmentsInSelectedCalendars(appointmentViewModels))

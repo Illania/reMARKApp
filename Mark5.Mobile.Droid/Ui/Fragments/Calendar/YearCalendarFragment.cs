@@ -10,12 +10,13 @@ using Com.Syncfusion.Calendar;
 using Com.Syncfusion.Calendar.Enums;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Ui.Coordinators;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 {
     public class YearCalendarFragment : BaseFragment
     {
-        ICalendarActivity iCalendarActivity;
+        ICalendarCoordinator coordinator;
         YearCalendar yearCalendar;
 
         public static (YearCalendarFragment fragment, string tag) NewInstance()
@@ -29,7 +30,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         public override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-            iCalendarActivity = ((MainActivity)Activity).CalendarCoordinator;
+            coordinator = ((MainActivity)Activity).CalendarCoordinator;
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -44,17 +45,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         void Configurator_MonthSelected()
         {
-            iCalendarActivity.ShowToolBar();
-            Activity.SupportFragmentManager.PopBackStack();
+            //coordinator.ShowToolBar();
+            //Activity.SupportFragmentManager.PopBackStack();  //TODO
         }
 
         void Calendar_MonthChanged(object sender, MonthChangedEventArgs e)
         {
-            Animation animation = AnimationUtils.LoadAnimation(Context, Resource.Animation.fade_out);
-            yearCalendar.StartAnimation(animation);
+            //Animation animation = AnimationUtils.LoadAnimation(Context, Resource.Animation.fade_out);
+            //yearCalendar.StartAnimation(animation);
 
-            iCalendarActivity.ShowToolBar();
-            Activity.SupportFragmentManager.PopBackStack();
+            //coordinator.ShowToolBar();
+            //Activity.SupportFragmentManager.PopBackStack(); //TODO
         }
     }
 

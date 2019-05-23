@@ -5,16 +5,12 @@ using Android.Graphics;
 using Android.Support.V4.Content;
 using Com.Syncfusion.Schedule;
 using Com.Syncfusion.Schedule.Enums;
-using Mark5.Mobile.Droid.Ui.Common;
-using Mark5.Mobile.Droid.Ui.Activities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 {
-    public class WeekCalendarFragment : BaseFragment, IMenuItemOnMenuItemClickListener
+    public class WeekCalendarFragment : BaseCalendarFragment, IMenuItemOnMenuItemClickListener
     {
         bool viewModeDay;
-        ICalendarActivity iCalendarActivity;
-        WeekSchedule schedule;
 
         public static (WeekCalendarFragment fragment, string tag) NewInstance()
         {
@@ -22,13 +18,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             var tag = $"{nameof(WeekCalendarFragment)}";
 
             return (fragment, tag);
-        }
-
-        public override void OnCreate(Bundle savedInstanceState)
-        {
-            base.OnCreate(savedInstanceState);
-            iCalendarActivity = ((MainActivity)Activity).CalendarCoordinator;
-
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)

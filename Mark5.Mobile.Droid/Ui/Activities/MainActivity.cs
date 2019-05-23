@@ -38,7 +38,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         IMenuItem lastSelectedItem;
         CoordinatorLayout coordinatorLayout;
 
-        public CalendarCoordinator CalendarCoordinator;
+        public CalendarModuleCoordinator CalendarCoordinator;
 
         bool firstSelection = true;
         bool permissionsAsked;
@@ -89,7 +89,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             navHeaderTitleTextView = header.FindViewById<AppCompatTextView>(Resource.Id.nav_header_title);
 
-            CalendarCoordinator = new CalendarCoordinator(SupportFragmentManager);
+            CalendarCoordinator = new CalendarModuleCoordinator(this);
 
             if (savedInstanceState == null)
             {
@@ -335,11 +335,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             protected readonly List<Bundle> Arguments = new List<Bundle>();
             protected readonly List<string> SavedTags = new List<string>();
 
-            CalendarCoordinator coordinator;
+            CalendarModuleCoordinator coordinator;
 
             public ModuleType ModuleType { get; }
 
-            public MenuItemContent(ModuleType moduleType, CalendarCoordinator cal = null) //TODO this is so shitty
+            public MenuItemContent(ModuleType moduleType, CalendarModuleCoordinator cal = null) //TODO this is so shitty
             {
                 ModuleType = moduleType;
                 coordinator = cal;

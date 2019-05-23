@@ -1,22 +1,18 @@
 ﻿using System;
 using Android.OS;
 using Android.Views;
-using Android.Widget;
 using Android.Content;
 using Android.Graphics;
 using Android.Support.V4.Content;
 using Com.Syncfusion.Schedule;
 using Com.Syncfusion.Schedule.Enums;
-using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Activities;
+using Android.Support.V7.App;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 {
-    public class MonthCalendarFragment : BaseFragment, IMenuItemOnMenuItemClickListener
+    public class MonthCalendarFragment : BaseCalendarFragment, IMenuItemOnMenuItemClickListener
     {
-        ICalendarActivity iCalendarActivity;
-        MonthSchedule schedule;
-
         public static (MonthCalendarFragment fragment, string tag) NewInstance()
         {
             var fragment = new MonthCalendarFragment();
@@ -26,19 +22,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             return (fragment, tag);
         }
 
-        public override void OnCreate(Bundle savedInstanceState)
-        {
-            base.OnCreate(savedInstanceState);
-
-            iCalendarActivity = ((MainActivity)Activity).CalendarCoordinator;
-        }
-
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             HasOptionsMenu = true;
 
             schedule = new MonthSchedule(Context);
             schedule.CellDoubleTapped += Schedule_CellDoubleTapped;  //TODO refactor
+
+            ((AppCompatActivity)Activity).SupportActionBar.SetTitle(Resource.String.calendar);
 
             return schedule;
         }
@@ -52,10 +43,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             calendarSelection.SetShowAsAction(ShowAsAction.Always);
             calendarSelection.SetOnMenuItemClickListener(this);
 
-            var insertTemplateItem = menu.Add(Menu.None, MenuItemActions.CreateAppointment, MenuItemActions.CreateAppointment, Resource.String.insert_template);
-            insertTemplateItem.SetIcon(Resource.Drawable.action_add);
-            insertTemplateItem.SetShowAsAction(ShowAsAction.Always);
-            insertTemplateItem.SetOnMenuItemClickListener(this);
+            var addAppointment = menu.Add(Menu.None, MenuItemActions.CreateAppointment, MenuItemActions.CreateAppointment, Resource.String.insert_template);  //TODO change
+            addAppointment.SetIcon(Resource.Drawable.action_add);
+            addAppointment.SetShowAsAction(ShowAsAction.Always);
+            addAppointment.SetOnMenuItemClickListener(this);
         }
 
         public bool OnMenuItemClick(IMenuItem item)
@@ -78,7 +69,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         void Schedule_CellDoubleTapped(object sender, CellTappedEventArgs e)
         {
-            iCalendarActivity.CellDoubleTapped(); //TODO need to refactor...
+            iCalendarActivity.CellDoubleTapped(e.Calendar); //TODO need to refactor...
         }
 
     }
