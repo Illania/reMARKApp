@@ -63,12 +63,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         public void OnClick(View v)
         {
-            //var (fragment, tag) = YearCalendarFragment.NewInstance();
-            //SupportFragmentManager.BeginTransaction()
-            //    .Replace(Resource.Id.fragment_container, fragment, tag)
-            //    .AddToBackStack(tag)
-            //    .Commit();
-            //SupportActionBar.Hide();
+            var (fragment, tag) = YearCalendarFragment.NewInstance();
+            SupportFragmentManager.BeginTransaction()
+                .Replace(Resource.Id.fragment_container, fragment, tag)
+                .AddToBackStack(tag)
+                .Commit();
+            SupportActionBar.Hide();
         }
 
         public void ShowToolBar()
@@ -78,22 +78,22 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         public void ShowCalendarSelection()
         {
-            //var (fragment, tag) = CalendarListFragment.NewInstance();
-            //SupportFragmentManager.BeginTransaction()
-            //    .Replace(Resource.Id.fragment_container, fragment, tag)
-            //    .AddToBackStack(tag)
-            //    .Commit();
-            //SupportActionBar.Hide();
+            var (fragment, tag) = CalendarListFragment.NewInstance();
+            SupportFragmentManager.BeginTransaction()
+                .Replace(Resource.Id.fragment_container, fragment, tag)
+                .AddToBackStack(tag)
+                .Commit();
+            SupportActionBar.Hide();
         }
 
         public void ShowCreateAppointment()
         {
-            //var (fragment, tag) = CreateAppointmentFragment.NewInstance();
-            //SupportFragmentManager.BeginTransaction()
-            //    .Replace(Resource.Id.fragment_container, fragment, tag)
-            //    .AddToBackStack(tag)
-            //    .Commit();
-            //SupportActionBar.Hide();
+            var (fragment, tag) = CreateAppointmentFragment.NewInstance();
+            SupportFragmentManager.BeginTransaction()
+                .Replace(Resource.Id.fragment_container, fragment, tag)
+                .AddToBackStack(tag)
+                .Commit();
+            SupportActionBar.Hide();
         }
 
         private void SetupLeftToolbarButton()

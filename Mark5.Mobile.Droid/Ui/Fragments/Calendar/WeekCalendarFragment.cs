@@ -41,7 +41,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         public override void OnAttach(Context context)
         {
             base.OnAttach(context);
-            iCalendarActivity = (CalendarActivity)context;
+            iCalendarActivity = (ICalendarActivity)context;
         }
 
         #region Toolbar setup

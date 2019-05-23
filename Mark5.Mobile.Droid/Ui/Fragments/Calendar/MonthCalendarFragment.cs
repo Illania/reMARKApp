@@ -14,7 +14,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 {
     public class MonthCalendarFragment : BaseFragment, IMenuItemOnMenuItemClickListener
     {
-        //ICalendarActivity iCalendarActivity;
+        ICalendarActivity iCalendarActivity;
         MonthSchedule schedule;
 
         public static (MonthCalendarFragment fragment, string tag) NewInstance()
@@ -34,7 +34,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         public override void OnAttach(Context context)
         {
             base.OnAttach(context);
-            //iCalendarActivity = (CalendarActivity)context;
+            iCalendarActivity = (ICalendarActivity)context;
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -64,11 +64,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         public bool OnMenuItemClick(IMenuItem item)
         {
-            //if (item.ItemId == MenuItemActions.CalendarSelection)
-            //    iCalendarActivity.ShowCalendarSelection();
+            if (item.ItemId == MenuItemActions.CalendarSelection)
+                iCalendarActivity.ShowCalendarSelection();
 
-            //if (item.ItemId == MenuItemActions.CreateAppointment)
-            //    iCalendarActivity.ShowCreateAppointment();
+            if (item.ItemId == MenuItemActions.CreateAppointment)
+                iCalendarActivity.ShowCreateAppointment();
 
             return true;
         }
@@ -82,7 +82,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         void Schedule_CellDoubleTapped(object sender, CellTappedEventArgs e)
         {
-            //iCalendarActivity.CellDoubleTapped(); //TODO need to refactor...
+            iCalendarActivity.CellDoubleTapped(); //TODO need to refactor...
         }
 
     }
