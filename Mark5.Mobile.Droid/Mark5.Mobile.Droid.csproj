@@ -538,6 +538,10 @@
     <Compile Include="Ui\Fragments\PickerInternalContactsListFragment.cs" />
     <Compile Include="Utilities\PushNotificationsUtilities.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
+    <Compile Include="Ui\Fragments\Calendar\MonthCalendarFragment.cs" />
+    <Compile Include="Ui\Fragments\Calendar\WeekCalendarFragment.cs" />
+    <Compile Include="Ui\Activities\CalendarActivity.cs" />
+    <Compile Include="Ui\Fragments\Calendar\CalendarListFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -560,6 +564,7 @@
     <Folder Include="Ui\Views\AddEditViews\AddEditShortcodeViews\" />
     <Folder Include="Utilities\Fingerprint\" />
     <Folder Include="Utilities\CallerId\" />
+    <Folder Include="Ui\Fragments\Calendar\" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\anim\enter_from_left.xml" />
