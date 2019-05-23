@@ -27,6 +27,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         public override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
+            iCalendarActivity = ((MainActivity)Activity).CalendarCoordinator;
+
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -36,12 +38,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             schedule = new WeekSchedule(Context);
 
             return schedule;
-        }
-
-        public override void OnAttach(Context context)
-        {
-            base.OnAttach(context);
-            iCalendarActivity = (ICalendarActivity)context;
         }
 
         #region Toolbar setup

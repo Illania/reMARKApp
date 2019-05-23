@@ -544,6 +544,7 @@
     <Compile Include="Ui\Fragments\Calendar\CalendarListFragment.cs" />
     <Compile Include="Ui\Fragments\Calendar\CreateAppointmentFragment.cs" />
     <Compile Include="Ui\Fragments\Calendar\YearCalendarFragment.cs" />
+    <Compile Include="Ui\Coordinators\CalendarCoordinator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -567,6 +568,7 @@
     <Folder Include="Utilities\Fingerprint\" />
     <Folder Include="Utilities\CallerId\" />
     <Folder Include="Ui\Fragments\Calendar\" />
+    <Folder Include="Ui\Coordinators\" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\anim\enter_from_left.xml" />

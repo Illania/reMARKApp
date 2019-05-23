@@ -29,12 +29,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         public override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-        }
-
-        public override void OnAttach(Context context)
-        {
-            base.OnAttach(context);
-            iCalendarActivity = (CalendarActivity)context;
+            iCalendarActivity = ((MainActivity)Activity).CalendarCoordinator;
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)

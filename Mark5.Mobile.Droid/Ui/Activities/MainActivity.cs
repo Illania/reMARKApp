@@ -18,6 +18,7 @@ using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Ui.Coordinators;
 using Mark5.Mobile.Droid.Ui.Fragments;
 using Mark5.Mobile.Droid.Utilities;
 
@@ -36,6 +37,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         AppCompatTextView navHeaderTitleTextView;
         IMenuItem lastSelectedItem;
         CoordinatorLayout coordinatorLayout;
+
+        public CalendarCoordinator CalendarCoordinator;
 
         bool firstSelection = true;
         bool permissionsAsked;
@@ -86,6 +89,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             navHeaderTitleTextView = header.FindViewById<AppCompatTextView>(Resource.Id.nav_header_title);
 
+            CalendarCoordinator = new CalendarCoordinator(SupportFragmentManager);
+
             if (savedInstanceState == null)
             {
                 state = new MainActivityState
@@ -95,7 +100,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                         [Resource.Id.nav_documents] = new MenuItemContent(ModuleType.Documents),
                         [Resource.Id.nav_contacts] = new MenuItemContent(ModuleType.Contacts),
                         [Resource.Id.nav_shortcodes] = new MenuItemContent(ModuleType.Shortcodes),
-                        [Resource.Id.nav_calendar] = new MenuItemContent(ModuleType.Calendar)
+                        [Resource.Id.nav_calendar] = new MenuItemContent(ModuleType.Calendar, CalendarCoordinator),
                     }
                 };
 
@@ -240,12 +245,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 {
                     if (lastSelectedItem != menuItem)
                     {
-                        if (menuItem.ItemId == Resource.Id.nav_calendar)
-                        {
-                            Intent intent = new Intent(this, typeof(CalendarActivity));
-                            StartActivity(intent);
-                        }
-
                         if (lastSelectedItem != null)
                             state.MenuItemContents[lastSelectedItem.ItemId].Save(SupportFragmentManager);
 
@@ -336,11 +335,14 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             protected readonly List<Bundle> Arguments = new List<Bundle>();
             protected readonly List<string> SavedTags = new List<string>();
 
+            CalendarCoordinator coordinator;
+
             public ModuleType ModuleType { get; }
 
-            public MenuItemContent(ModuleType moduleType)
+            public MenuItemContent(ModuleType moduleType, CalendarCoordinator cal = null) //TODO this is so shitty
             {
                 ModuleType = moduleType;
+                coordinator = cal;
             }
 
             public void Save(FragmentManager fm)
@@ -371,10 +373,14 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             void Create(FragmentManager fm)
             {
-                BaseFragment f = null;
+                BaseFragment f;
                 string tag;
 
-                if (ModuleType == ModuleType.Documents)
+                if (ModuleType == ModuleType.Calendar)
+                {
+                    (f, tag) = coordinator.GetMainFragment();
+                }
+                else if (ModuleType == ModuleType.Documents)
                     (f, tag) = FoldersNotificationsListFragment.NewInstance(Folder.RootForModule(ModuleType));
                 else //(ModuleType == ModuleType.Contacts || ModuleType == ModuleType.Shortcodes || ModuleType == ModuleType.Calendar)
                     (f, tag) = FoldersListFragment.NewInstance(Folder.RootForModule(ModuleType));
@@ -396,6 +402,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                     BaseFragment f = null;
 
+                    //TODO need to add part for the calendar
                     if (tag.StartsWith(nameof(FoldersNotificationsListFragment), StringComparison.Ordinal))
                         f = FoldersNotificationsListFragment.NewInstance();
                     else if (tag.StartsWith(nameof(FoldersListFragment), StringComparison.Ordinal))
