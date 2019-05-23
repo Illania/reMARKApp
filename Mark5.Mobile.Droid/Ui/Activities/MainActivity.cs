@@ -54,6 +54,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             CommonConfig.Logger.Info($"Starting {nameof(MainActivity)}...");
 
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("OTQ4NDdAMzEzNzJlMzEyZTMwWTh6RmRibklqNHU3citRNzViZVRJUkVkYmFSZTc1dFBEQi9td2dZSVZHWT0=");
+
             OverridePendingTransition(Resource.Animation.fade_in, Resource.Animation.fade_out);
 
             SetContentView(Resource.Layout.base_layout_nav);
@@ -92,7 +94,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     {
                         [Resource.Id.nav_documents] = new MenuItemContent(ModuleType.Documents),
                         [Resource.Id.nav_contacts] = new MenuItemContent(ModuleType.Contacts),
-                        [Resource.Id.nav_shortcodes] = new MenuItemContent(ModuleType.Shortcodes)
+                        [Resource.Id.nav_shortcodes] = new MenuItemContent(ModuleType.Shortcodes),
+                        [Resource.Id.nav_calendar] = new MenuItemContent(ModuleType.Calendar)
                     }
                 };
 
@@ -237,6 +240,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 {
                     if (lastSelectedItem != menuItem)
                     {
+                        if (menuItem.ItemId == Resource.Id.nav_calendar)
+                        {
+                            Intent intent = new Intent(this, typeof(CalendarActivity));
+                            StartActivity(intent);
+                        }
+
                         if (lastSelectedItem != null)
                             state.MenuItemContents[lastSelectedItem.ItemId].Save(SupportFragmentManager);
 
