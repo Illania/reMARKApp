@@ -20,6 +20,7 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
         BaseAppCompatActivity activity;
         FragmentManager fragmentManager;
         MonthCalendarFragment monthFragment;
+        Action dismissAction;
 
         CalendarPresenter presenter;
 
@@ -61,12 +62,12 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
 
         public void ShowLoading()
         {
-            //TODO
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(activity, Resource.String.loading_appointments, Resource.String.please_wait);
         }
 
         public void StopLoading()
         {
-            //TODO
+            dismissAction?.Invoke();
         }
 
         public Task ShowError(Exception ex)
@@ -82,9 +83,9 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
 
         #endregion
 
-        #region ICalendar implementation
+        #region ICalendarCoordinator implementation
 
-        public bool CellDoubleTapped(Calendar calendar)
+        public bool DateDoubleTapped(Calendar calendar)
         {
             var (fragment, tag) = WeekCalendarFragment.NewInstance();
 
@@ -104,15 +105,9 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
                 .Replace(Resource.Id.fragment_container, fragment, tag)
                 .AddToBackStack(tag)
                 .Commit();
-            //SupportActionBar.Hide();
         }
 
-        public void ShowToolBar()
-        {
-            //SupportActionBar.Show();
-        }
-
-        public void ShowCalendarSelection()
+        public void CalendarsClicked()
         {
             var (fragment, tag) = CalendarListFragment.NewInstance();
             fragmentManager.BeginTransaction()
@@ -122,7 +117,7 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
             //SupportActionBar.Hide();
         }
 
-        public void ShowCreateAppointment()
+        public void CreateAppointmentClicked()
         {
             var (fragment, tag) = CreateAppointmentFragment.NewInstance();
             fragmentManager.BeginTransaction()
@@ -255,16 +250,14 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
         }
     }
 
-
-
     public class Appointment
     {
         public int CalendarId { get; set; }
         public bool AllDay { get; set; }
         public string Id { get; set; }
         public string Subject { get; set; }
-        public Java.Util.Calendar Start { get; set; }
-        public Java.Util.Calendar End { get; set; }
+        public Calendar Start { get; set; }
+        public Calendar End { get; set; }
         public int Color { get; set; }
     }
 
@@ -273,11 +266,10 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
         ObservableCollection<Appointment> Items { get; }
 
         void MonthViewLoaded();
-        bool CellDoubleTapped(Calendar calendar);
 
-        void ShowCalendarSelection();
-
-        void ShowCreateAppointment();
+        bool DateDoubleTapped(Calendar calendar);
+        void CalendarsClicked();
+        void CreateAppointmentClicked();
         void VisibleDatesChanged(Calendar startDate, Calendar endDate);
     }
 

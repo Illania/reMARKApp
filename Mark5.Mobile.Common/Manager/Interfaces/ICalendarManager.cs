@@ -24,6 +24,7 @@ namespace Mark5.Mobile.Common.Manager
     {
         event EventHandler<AppointmentsRetrievedEventArgs> AppointmentRetrieved;
         event EventHandler<Exception> RetrievalError;
+        event EventHandler NoAppointmentToRetrieve;
 
         void GetAppointments(List<int> calendarIds, DateTime startDate, DateTime endDate);
 

@@ -34,14 +34,19 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         public override void Start()
         {
             Cache.AppointmentRetrieved += Cache_AppointmentRetrieved;
+            Cache.RetrievalError += Cache_RetrievalError;
+            Cache.NoAppointmentToRetrieve += Cache_NoAppointmentToRetrieve;
 
             LoadPreferences();
 
             UpdateCalendarsInView();
         }
 
-        public override void Stop()
+        public override void Stop() //TODO when to use this...?
         {
+            Cache.AppointmentRetrieved -= Cache_AppointmentRetrieved;
+            Cache.RetrievalError -= Cache_RetrievalError;
+            Cache.NoAppointmentToRetrieve -= Cache_NoAppointmentToRetrieve;
         }
 
         public void AppointmentClicked(int appointmentId, int recurrenceIndex)
@@ -105,6 +110,16 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             var appointmentsViewModels = e.Appointments?.Select(ConvertToViewModels).SelectMany(x => x);
             view.UpdateAppointments(appointmentsViewModels, e.Start, e.End);
             view.StopLoading();
+        }
+
+        private void Cache_NoAppointmentToRetrieve(object sender, EventArgs e)
+        {
+            view.StopLoading();
+        }
+
+        private void Cache_RetrievalError(object sender, Exception e)
+        {
+            //TODO do something here?
         }
 
         List<AppointmentPreviewViewModel> ConvertToViewModels(CalendarAppointment ca)

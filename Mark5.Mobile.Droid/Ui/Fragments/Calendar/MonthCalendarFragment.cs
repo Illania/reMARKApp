@@ -1,13 +1,12 @@
 ﻿using System;
-using Android.OS;
-using Android.Views;
 using Android.Content;
 using Android.Graphics;
+using Android.OS;
 using Android.Support.V4.Content;
+using Android.Support.V7.App;
+using Android.Views;
 using Com.Syncfusion.Schedule;
 using Com.Syncfusion.Schedule.Enums;
-using Mark5.Mobile.Droid.Ui.Activities;
-using Android.Support.V7.App;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 {
@@ -60,10 +59,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         public bool OnMenuItemClick(IMenuItem item)
         {
             if (item.ItemId == MenuItemActions.CalendarSelection)
-                coordinator.ShowCalendarSelection();
+                coordinator.CalendarsClicked();
 
             if (item.ItemId == MenuItemActions.CreateAppointment)
-                coordinator.ShowCreateAppointment();
+                coordinator.CreateAppointmentClicked();
 
             return true;
         }
@@ -77,7 +76,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         void Schedule_CellDoubleTapped(object sender, CellTappedEventArgs e)
         {
-            coordinator.CellDoubleTapped(e.Calendar); //TODO need to refactor...
+            coordinator.DateDoubleTapped(e.Calendar); //TODO need to refactor...
         }
 
     }

@@ -68,12 +68,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
             if (item.ItemId == MenuItemActions.SelectCalendars)
             {
-                coordinator.ShowCalendarSelection();
+                coordinator.CalendarsClicked();
             }
 
             if (item.ItemId == MenuItemActions.CreateAppoitnment)
             {
-                coordinator.ShowCreateAppointment();
+                coordinator.CreateAppointmentClicked();
             }
 
             return true;

@@ -169,6 +169,7 @@ namespace Mark5.Mobile.Common.Manager
 
         public event EventHandler<AppointmentsRetrievedEventArgs> AppointmentRetrieved = delegate { };
         public event EventHandler<Exception> RetrievalError = delegate { };
+        public event EventHandler NoAppointmentToRetrieve = delegate { };
 
         void Start()
         {
@@ -263,6 +264,9 @@ namespace Mark5.Mobile.Common.Manager
             var uncached = GetMonthDatePeriod(start, end).Where(md => !cachedMonths.Contains(md));
 
             uncached.ForEach(Append);
+
+            if (!uncached.Any())
+                NoAppointmentToRetrieve(this, EventArgs.Empty);
 
             for (int i = 1; i <= cachingNeighbours; i++)
             {

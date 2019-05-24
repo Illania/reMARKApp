@@ -221,6 +221,7 @@
     <string name="ledger">Ledger</string>
     <string name="line">Mailbox</string>
     <string name="lines">Mailboxes</string>
+    <string name="loading_appointments">Loading appointments</string>
     <string name="loading_contact">Loading contact</string>
     <string name="loading_document">Loading email</string>
     <string name="loading_mail">Loading email</string>
