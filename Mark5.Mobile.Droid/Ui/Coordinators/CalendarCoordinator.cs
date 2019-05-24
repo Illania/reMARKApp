@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 using Android.Support.V4.App;
 using Android.Views;
 using Java.Util;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Presenters.CalendarModule;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments.Calendar;
+using Mark5.Mobile.Droid.Utilities;
 using Xamarin.Essentials;
 
 namespace Mark5.Mobile.Droid.Ui.Coordinators
@@ -18,19 +20,19 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
         BaseAppCompatActivity activity;
         FragmentManager fragmentManager;
         MonthCalendarFragment monthFragment;
-        YearCalendarFragment yearFragment;
-        WeekCalendarFragment weekFragment;
-        CalendarListFragment calendarListFragment;
-        CreateAppointmentFragment createAppointmentFragment;
 
         CalendarPresenter presenter;
+
+        readonly UICache uiCache;
+
+        public ObservableCollection<Appointment> Items => uiCache.Items;
 
         public CalendarModuleCoordinator(BaseAppCompatActivity a)
         {
             activity = a;
             fragmentManager = a.SupportFragmentManager;
 
-            presenter = new CalendarPresenter();
+            uiCache = new UICache(this);
         }
 
         public (BaseFragment, string) GetMainFragment()
@@ -44,37 +46,38 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
 
         public void CalendarsSelected(List<CalendarViewModel> calendars)
         {
-            throw new NotImplementedException();
+            uiCache.SetCalendars(calendars);
         }
 
         public void ShowCalendarsList(Dictionary<CalendarViewModel, bool> calendars)
         {
-            throw new NotImplementedException();
+            //TODO
         }
 
         public void UpdateAppointments(IEnumerable<AppointmentPreviewViewModel> caViewModels, DateTime start, DateTime end)
         {
-            throw new NotImplementedException();
+            uiCache.CacheAppointments(caViewModels, start, end);
         }
 
         public void ShowLoading()
         {
-            throw new NotImplementedException();
+            //TODO
         }
 
         public void StopLoading()
         {
-            throw new NotImplementedException();
+            //TODO
         }
 
         public Task ShowError(Exception ex)
         {
-            throw new NotImplementedException();
+            return Task.CompletedTask;
+            //TODO
         }
 
         public void ShowAppointment(int appointmentId, int recurrenceIndex)
         {
-            throw new NotImplementedException();
+            //TODO
         }
 
         #endregion
@@ -129,9 +132,12 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
             //SupportActionBar.Hide();
         }
 
-        public void VisibleDatesChanged(ObservableCollection<Calendar> visibleDates)
+        public void VisibleDatesChanged(Calendar startDate, Calendar endDate)
         {
-            throw new System.NotImplementedException();
+            var start = startDate.ConvertToDateTime().ToLocalTime();
+            var end = endDate.ConvertToDateTime().ToLocalTime();
+
+            presenter.LoadAppointments(start, end);
         }
 
         public void MonthViewLoaded()
@@ -160,6 +166,7 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
 
             public void CacheAppointments(IEnumerable<AppointmentPreviewViewModel> appointmentViewModels, DateTime start, DateTime end)
             {
+                CommonConfig.Logger.Debug($"PERIOD : {start} - {end}");
                 AppointmentViewModels.Where(i => AppointmentIsInPeriod(i, start, end)).ToList().ForEach((obj) => AppointmentViewModels.Remove(obj));
                 AppointmentViewModels.AddRange(appointmentViewModels);
 
@@ -220,8 +227,8 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
 
             bool AppointmentIsInPeriod(Appointment appointment, DateTime start, DateTime end)
             {
-                var appStart = ConvertToDateTime(appointment.Start);
-                var appEnd = ConvertToDateTime(appointment.End);
+                var appStart = appointment.Start.ConvertToDateTime();
+                var appEnd = appointment.End.ConvertToDateTime();
 
                 return DateTimeInPeriod(appStart, appEnd, start, end);
             }
@@ -237,36 +244,18 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
                 {
                     Subject = cavm.Subject,
                     AllDay = cavm.AllDay,
-                    Start = ConvertToCalendar(cavm.Start),
-                    End = ConvertToCalendar(cavm.End),
+                    Start = cavm.Start.ConvertToCalendar(),
+                    End = cavm.End.ConvertToCalendar(),
                     Color = Android.Graphics.Color.ParseColor(cavm.HexColor),
                     Id = $"{cavm.Id} {cavm.RecurrenceIndex}",
                 };
             }
 
-            public static Calendar ConvertToCalendar(DateTime date)
-            {
-                Calendar calendar = Calendar.Instance;
-                calendar.Set(date.Year, date.Month - 1, date.Day, date.Hour, date.Minute, date.Second);
-                return calendar;
-            }
-
-            public static DateTime ConvertToDateTime(Calendar date)
-            {
-                var year = date.Get(CalendarField.Year);
-                var month = date.Get(CalendarField.Month);
-                var day = date.Get(CalendarField.Date);
-                var hour = date.Get(CalendarField.HourOfDay);
-                var minute = date.Get(CalendarField.Minute);
-                var second = date.Get(CalendarField.Second); //TODO need  to check if the conversion is correct
-                var dateTime = new DateTime(year, month, day, hour, minute, second, DateTimeKind.Utc);
-
-                return dateTime;
-            }
-
             #endregion
         }
     }
+
+
 
     public class Appointment
     {
@@ -281,13 +270,15 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
 
     public interface ICalendarCoordinator
     {
+        ObservableCollection<Appointment> Items { get; }
+
         void MonthViewLoaded();
         bool CellDoubleTapped(Calendar calendar);
 
         void ShowCalendarSelection();
 
         void ShowCreateAppointment();
-        void VisibleDatesChanged(ObservableCollection<Calendar> visibleDates);
+        void VisibleDatesChanged(Calendar startDate, Calendar endDate);
     }
 
 }

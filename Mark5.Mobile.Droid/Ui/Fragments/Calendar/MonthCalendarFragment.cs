@@ -34,6 +34,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             return schedule;
         }
 
+
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
             menu.Clear();
@@ -49,13 +50,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             addAppointment.SetOnMenuItemClickListener(this);
         }
 
+        public override void OnViewCreated(View view, Bundle savedInstanceState)
+        {
+            base.OnViewCreated(view, savedInstanceState);
+
+            coordinator.MonthViewLoaded();
+        }
+
         public bool OnMenuItemClick(IMenuItem item)
         {
             if (item.ItemId == MenuItemActions.CalendarSelection)
-                iCalendarActivity.ShowCalendarSelection();
+                coordinator.ShowCalendarSelection();
 
             if (item.ItemId == MenuItemActions.CreateAppointment)
-                iCalendarActivity.ShowCreateAppointment();
+                coordinator.ShowCreateAppointment();
 
             return true;
         }
@@ -69,7 +77,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         void Schedule_CellDoubleTapped(object sender, CellTappedEventArgs e)
         {
-            iCalendarActivity.CellDoubleTapped(e.Calendar); //TODO need to refactor...
+            coordinator.CellDoubleTapped(e.Calendar); //TODO need to refactor...
         }
 
     }
