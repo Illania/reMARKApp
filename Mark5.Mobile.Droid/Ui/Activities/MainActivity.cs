@@ -377,9 +377,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 string tag;
 
                 if (ModuleType == ModuleType.Calendar)
-                {
                     (f, tag) = coordinator.GetMainFragment();
-                }
                 else if (ModuleType == ModuleType.Documents)
                     (f, tag) = FoldersNotificationsListFragment.NewInstance(Folder.RootForModule(ModuleType));
                 else //(ModuleType == ModuleType.Contacts || ModuleType == ModuleType.Shortcodes || ModuleType == ModuleType.Calendar)
@@ -402,8 +400,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                     BaseFragment f = null;
 
-                    //TODO need to add part for the calendar
-                    if (tag.StartsWith(nameof(FoldersNotificationsListFragment), StringComparison.Ordinal))
+                    if (ModuleType == ModuleType.Calendar)
+                        (f, tag) = coordinator.GetMainFragment();
+                    else if (tag.StartsWith(nameof(FoldersNotificationsListFragment), StringComparison.Ordinal))
                         f = FoldersNotificationsListFragment.NewInstance();
                     else if (tag.StartsWith(nameof(FoldersListFragment), StringComparison.Ordinal))
                         f = FoldersListFragment.NewInstance();
