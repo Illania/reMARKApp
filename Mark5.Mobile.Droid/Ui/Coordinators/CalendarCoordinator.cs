@@ -147,7 +147,8 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
 
         public void SelectedCalendarsChanged(Dictionary<CalendarViewModel, bool> selectedCalendars)
         {
-            throw new NotImplementedException();
+            var selectedCalendarsState = selectedCalendars.ToDictionary(k => k.Key.Id, k => k.Value);
+            presenter.CalendarSelectionChanged(selectedCalendarsState);
         }
 
         #endregion
@@ -156,7 +157,7 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
         {
             public ObservableCollection<Appointment> Items { get; } = new ObservableCollection<Appointment>();
 
-            CalendarModuleCoordinator coordinator;
+            readonly CalendarModuleCoordinator coordinator;
 
             List<AppointmentPreviewViewModel> AppointmentViewModels { get; } = new List<AppointmentPreviewViewModel>();
             List<CalendarViewModel> CalendarViewModels { get; } = new List<CalendarViewModel>();

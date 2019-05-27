@@ -901,6 +901,7 @@
     <AndroidResource Include="Resources\drawable\onboarding_5.xml" />
     <AndroidResource Include="Resources\drawable\onboarding_6.xml" />
     <AndroidResource Include="Resources\values\style.axml" />
+    <AndroidResource Include="Resources\layout\list_item_calendars.axml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FastScrollRecycler\FastScrollRecycler.csproj">

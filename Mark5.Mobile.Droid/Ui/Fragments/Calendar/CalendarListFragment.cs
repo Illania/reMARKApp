@@ -74,14 +74,6 @@ namespace Mark5.Mobile.Droid
             RecyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
 
             ListAdapter = new CalendarListAdapter(Context);
-            //ListAdapter.RegisterAdapterDataObserver(new LambdaEmptyAdapterObserver(() =>
-            //{
-            //    if (RecyclerView.GetAdapter() != ListAdapter)
-            //        return;
-
-            //    RecyclerView.Visibility = ListAdapter.ItemCount > 0 ? ViewStates.Visible : ViewStates.Gone;
-            //    menu?.FindItem(Resource.Id.action_filter)?.SetEnabled(ListAdapter.ItemCount > 0);
-            //}));
 
             RecyclerView.SetAdapter(ListAdapter);
 
@@ -120,9 +112,10 @@ namespace Mark5.Mobile.Droid
             ListAdapter.SetData(selectedCalendars);
         }
 
-        void SaveAndFinish()
+        void SaveCalendarChanges()
         {
             coordinator.SelectedCalendarsChanged(selectedCalendars);
+            Activity.OnBackPressed();
         }
 
         #region ActionBar related
@@ -139,7 +132,7 @@ namespace Mark5.Mobile.Droid
         public bool OnMenuItemClick(IMenuItem item)
         {
             if (item.ItemId == saveBtnId)
-                SaveAndFinish();
+                SaveCalendarChanges();
 
             return false;
         }
@@ -268,7 +261,7 @@ namespace Mark5.Mobile.Droid
             {
                 if (viewType == ViewType.CalendarView)
                 {
-                    var itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.list_item_categories, parent, false);
+                    var itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.list_item_calendars, parent, false);
                     return new CalendarViewHolder(itemView);
                 }
                 else
@@ -324,21 +317,6 @@ namespace Mark5.Mobile.Droid
         {
             public string Name { set => nameTextView.Text = value; }
             public event EventHandler<View> ItemClicked = delegate { };
-            public string Description
-            {
-                set
-                {
-                    if (string.IsNullOrWhiteSpace(value))
-                    {
-                        descriptionTextView.Visibility = ViewStates.Gone;
-                    }
-                    else
-                    {
-                        descriptionTextView.Visibility = ViewStates.Visible;
-                        descriptionTextView.Text = value;
-                    }
-                }
-            }
 
             public string HexColor
             {
@@ -353,22 +331,16 @@ namespace Mark5.Mobile.Droid
                 }
             }
 
-            public bool Selected { set => selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
-
             readonly View colorImageView;
             readonly AppCompatTextView nameTextView;
-            readonly AppCompatTextView descriptionTextView;
-            readonly View selectedOverlay;
 
             public AppCompatImageView CheckMark;
 
             public CalendarViewHolder(View itemView)
                 : base(itemView)
             {
-                nameTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_category_name);
-                descriptionTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_categoty_description);
-                colorImageView = itemView.FindViewById<View>(Resource.Id.list_item_category_color);
-                selectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
+                nameTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_calendar_name);
+                colorImageView = itemView.FindViewById<View>(Resource.Id.list_item_calendar_color);
                 CheckMark = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_check_mark);
             }
         }
