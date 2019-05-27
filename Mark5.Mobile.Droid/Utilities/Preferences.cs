@@ -5,7 +5,6 @@ using Mark5.Mobile.Common.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Xamarin.Android;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
@@ -254,14 +253,14 @@ namespace Mark5.Mobile.Droid.Utilities
 
         #region Folders favorites
 
-        public bool SyncFavoritesEnabled 
+        public bool SyncFavoritesEnabled
         {
-            get 
+            get
             {
                 return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_sync_favorites_enabled), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_key_sync_favorites_value));
             }
 
-            set 
+            set
             {
                 var e = sp.Edit();
                 e.PutBoolean(Application.Context.GetString(Resource.String.pref_key_sync_favorites_enabled), value);

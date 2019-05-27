@@ -17,9 +17,9 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
 {
     public class CalendarModuleCoordinator : ICalendarCoordinator, ICalendarView
     {
-        BaseAppCompatActivity activity;
-        FragmentManager fragmentManager;
-        MonthCalendarFragment monthFragment;
+        readonly BaseAppCompatActivity activity;
+        readonly FragmentManager fragmentManager;
+
         Action dismissAction;
 
         CalendarPresenter presenter;
@@ -36,12 +36,7 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
             uiCache = new UICache(this);
         }
 
-        public (BaseFragment, string) GetMainFragment()
-        {
-            string tag;
-            (monthFragment, tag) = MonthCalendarFragment.NewInstance();
-            return (monthFragment, tag);
-        }
+        public (BaseFragment, string) GetMainFragment() => MonthCalendarFragment.NewInstance();
 
         #region ICalendarView implementation
 
@@ -52,7 +47,12 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
 
         public void ShowCalendarsList(Dictionary<CalendarViewModel, bool> calendars)
         {
-            //TODO
+            var (fragment, tag) = CalendarListFragment.NewInstance(calendars);
+            fragmentManager.BeginTransaction()
+                .Replace(Resource.Id.fragment_container, fragment, tag)
+                .AddToBackStack(tag)
+                .Commit();
+            //SupportActionBar.Hide();
         }
 
         public void UpdateAppointments(IEnumerable<AppointmentPreviewViewModel> caViewModels, DateTime start, DateTime end)
@@ -109,12 +109,7 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
 
         public void CalendarsClicked()
         {
-            var (fragment, tag) = CalendarListFragment.NewInstance();
-            fragmentManager.BeginTransaction()
-                .Replace(Resource.Id.fragment_container, fragment, tag)
-                .AddToBackStack(tag)
-                .Commit();
-            //SupportActionBar.Hide();
+            presenter.ShowCalendarsListClicked();
         }
 
         public void CreateAppointmentClicked()
@@ -140,10 +135,22 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
             presenter = new CalendarPresenter();
             presenter.AttachView(this);
             presenter.Start();
+
+            var fab = activity.Fab;
+            fab.Visibility = ViewStates.Gone;
+
         }
 
         #endregion
 
+        #region ICalendarListCoordinator implementation
+
+        public void SelectedCalendarsChanged(Dictionary<CalendarViewModel, bool> selectedCalendars)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
 
         class UICache
         {
@@ -271,6 +278,9 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
         void CalendarsClicked();
         void CreateAppointmentClicked();
         void VisibleDatesChanged(Calendar startDate, Calendar endDate);
+
+        void SelectedCalendarsChanged(Dictionary<CalendarViewModel, bool> selectedCalendars);
+
     }
 
 }
