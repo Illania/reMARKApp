@@ -20,6 +20,8 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
         readonly BaseAppCompatActivity activity;
         readonly FragmentManager fragmentManager;
 
+        MonthCalendarFragment monthCalendarFragment;
+
         Action dismissAction;
 
         CalendarPresenter presenter;
@@ -36,7 +38,7 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
             uiCache = new UICache(this);
         }
 
-        public (BaseFragment, string) GetMainFragment() => MonthCalendarFragment.NewInstance();
+        public (BaseFragment, string) GetMainFragment() => (monthCalendarFragment, _) = MonthCalendarFragment.NewInstance();
 
         #region ICalendarView implementation
 
@@ -52,7 +54,6 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
                 .Replace(Resource.Id.fragment_container, fragment, tag)
                 .AddToBackStack(tag)
                 .Commit();
-            //SupportActionBar.Hide();
         }
 
         public void UpdateAppointments(IEnumerable<AppointmentPreviewViewModel> caViewModels, DateTime start, DateTime end)
@@ -87,7 +88,7 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
 
         public bool DateDoubleTapped(Calendar calendar)
         {
-            var (fragment, tag) = WeekCalendarFragment.NewInstance();
+            var (fragment, tag) = WeekCalendarFragment.NewInstance(calendar);
 
             fragmentManager.BeginTransaction()
                .SetCustomAnimations(Resource.Animation.fade_in, Resource.Animation.fade_out)
@@ -98,13 +99,22 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
             return true;
         }
 
-        public void OnClick(View v)
+        public void YearTapped(Calendar calendar)
         {
-            var (fragment, tag) = YearCalendarFragment.NewInstance();
+            var (fragment, tag) = YearCalendarFragment.NewInstance(calendar);
+
             fragmentManager.BeginTransaction()
                 .Replace(Resource.Id.fragment_container, fragment, tag)
                 .AddToBackStack(tag)
                 .Commit();
+        }
+
+        public void MonthTapped(Calendar calendar)
+        {
+            activity.OnBackPressed();
+
+            monthCalendarFragment.MoveToDate(calendar);
+
         }
 
         public void CalendarsClicked()
@@ -119,7 +129,6 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
                 .Replace(Resource.Id.fragment_container, fragment, tag)
                 .AddToBackStack(tag)
                 .Commit();
-            //SupportActionBar.Hide();
         }
 
         public void VisibleDatesChanged(Calendar startDate, Calendar endDate)
@@ -139,6 +148,7 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
             var fab = activity.Fab;
             fab.Visibility = ViewStates.Gone;
 
+            activity.SupportActionBar.SetTitle(Resource.String.calendar);
         }
 
         #endregion
@@ -149,6 +159,8 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
         {
             var selectedCalendarsState = selectedCalendars.ToDictionary(k => k.Key.Id, k => k.Value);
             presenter.CalendarSelectionChanged(selectedCalendarsState);
+
+            activity.OnBackPressed();
         }
 
         #endregion
@@ -281,7 +293,8 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
         void VisibleDatesChanged(Calendar startDate, Calendar endDate);
 
         void SelectedCalendarsChanged(Dictionary<CalendarViewModel, bool> selectedCalendars);
-
+        void YearTapped(Calendar calendar);
+        void MonthTapped(Calendar newValue);
     }
 
 }

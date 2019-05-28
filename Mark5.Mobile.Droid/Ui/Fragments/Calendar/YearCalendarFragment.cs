@@ -1,27 +1,41 @@
 ﻿using System;
 using Android.OS;
 using Android.Views;
-using Android.Widget;
 using Android.Content;
 using Android.Graphics;
-using Android.Views.Animations;
 using Android.Support.V4.Content;
 using Com.Syncfusion.Calendar;
 using Com.Syncfusion.Calendar.Enums;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Coordinators;
+using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Utilities;
+using Android.Widget;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 {
     public class YearCalendarFragment : BaseFragment
     {
+        const string InitialDateKey = "InitialDateKey";
+
         ICalendarCoordinator coordinator;
         YearCalendar yearCalendar;
 
-        public static (YearCalendarFragment fragment, string tag) NewInstance()
+        Java.Util.Calendar initialDate;
+
+        public static (YearCalendarFragment fragment, string tag) NewInstance(Java.Util.Calendar initialDate)
         {
-            var fragment = new YearCalendarFragment();
+            var args = new Bundle();
+
+            if (initialDate != null)
+                args.PutString(InitialDateKey, Serializer.Serialize(initialDate.ConvertToDateTime()));
+
+            var fragment = new YearCalendarFragment
+            {
+                Arguments = args
+            };
+
             var tag = $"{nameof(YearCalendarFragment)}";
 
             return (fragment, tag);
@@ -31,31 +45,31 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         {
             base.OnCreate(savedInstanceState);
             coordinator = ((MainActivity)Activity).CalendarCoordinator;
+
+            if (Arguments.ContainsKey(InitialDateKey))
+                initialDate = Serializer.Deserialize<DateTime>(Arguments.GetString(InitialDateKey)).ConvertToCalendar();
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             HasOptionsMenu = true;
 
+            int paddingValue = Conversion.ConvertDpToPixels(15);
+            var externalLayout = new FrameLayout(Context);
+            externalLayout.SetBackgroundResource(Resource.Color.darkerblue);
+            externalLayout.SetPadding(paddingValue, paddingValue, paddingValue, paddingValue);
+
             yearCalendar = new YearCalendar(Context);
-            yearCalendar.MonthChanged += Calendar_MonthChanged;  //TODO need to move it 
+            yearCalendar.MonthChanging += YearCalendar_MonthChanging;
+            yearCalendar.MoveToDate = initialDate;
+            externalLayout.AddView(yearCalendar);
 
-            return yearCalendar;
+            return externalLayout;
         }
 
-        void Configurator_MonthSelected()
+        void YearCalendar_MonthChanging(object sender, MonthChangingEventArgs e)
         {
-            //coordinator.ShowToolBar();
-            //Activity.SupportFragmentManager.PopBackStack();  //TODO
-        }
-
-        void Calendar_MonthChanged(object sender, MonthChangedEventArgs e)
-        {
-            //Animation animation = AnimationUtils.LoadAnimation(Context, Resource.Animation.fade_out);
-            //yearCalendar.StartAnimation(animation);
-
-            //coordinator.ShowToolBar();
-            //Activity.SupportFragmentManager.PopBackStack(); //TODO
+            coordinator.MonthTapped(e.NewValue);
         }
     }
 
@@ -104,8 +118,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             ViewMode = ViewMode.YearView;
             MonthViewSettings = monthViewSettings;
             YearViewSettings = yearViewSettings;
-
-            SetPadding(15, 15, 15, 15);
         }
     }
 }

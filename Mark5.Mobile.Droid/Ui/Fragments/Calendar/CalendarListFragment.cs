@@ -115,7 +115,6 @@ namespace Mark5.Mobile.Droid
         void SaveCalendarChanges()
         {
             coordinator.SelectedCalendarsChanged(selectedCalendars);
-            Activity.OnBackPressed();
         }
 
         #region ActionBar related

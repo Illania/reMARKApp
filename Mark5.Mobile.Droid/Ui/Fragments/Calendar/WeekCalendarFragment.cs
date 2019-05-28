@@ -5,28 +5,55 @@ using Android.Graphics;
 using Android.Support.V4.Content;
 using Com.Syncfusion.Schedule;
 using Com.Syncfusion.Schedule.Enums;
+using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Utilities;
+using System;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 {
     public class WeekCalendarFragment : BaseCalendarFragment, IMenuItemOnMenuItemClickListener
     {
+        const string InitialDateKey = "InitialDateKey";
+        Java.Util.Calendar initialDate;
+
         bool viewModeDay;
 
-        public static (WeekCalendarFragment fragment, string tag) NewInstance()
+        public static (WeekCalendarFragment fragment, string tag) NewInstance(Java.Util.Calendar initialDate)
         {
-            var fragment = new WeekCalendarFragment();
+            var args = new Bundle();
+
+            if (initialDate != null)
+                args.PutString(InitialDateKey, Serializer.Serialize(initialDate.ConvertToDateTime()));
+
+            var fragment = new WeekCalendarFragment
+            {
+                Arguments = args
+            };
+
             var tag = $"{nameof(WeekCalendarFragment)}";
 
             return (fragment, tag);
         }
 
+        public override void OnCreate(Bundle savedInstanceState)
+        {
+            base.OnCreate(savedInstanceState);
+            if (Arguments.ContainsKey(InitialDateKey))
+                initialDate = Serializer.Deserialize<DateTime>(Arguments.GetString(InitialDateKey)).ConvertToCalendar();
+        }
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             HasOptionsMenu = true;
-
             schedule = new WeekSchedule(Context);
 
             return schedule;
+        }
+
+        public override void OnViewCreated(View view, Bundle savedInstanceState)
+        {
+            base.OnViewCreated(view, savedInstanceState);
+            schedule.MoveToDate = initialDate;
         }
 
         #region Toolbar setup

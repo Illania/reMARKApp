@@ -26,13 +26,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             HasOptionsMenu = true;
 
             schedule = new MonthSchedule(Context);
-            schedule.CellDoubleTapped += Schedule_CellDoubleTapped;  //TODO refactor
-
-            ((AppCompatActivity)Activity).SupportActionBar.SetTitle(Resource.String.calendar);
+            schedule.CellDoubleTapped += Schedule_CellDoubleTapped;
+            schedule.HeaderTapped += Schedule_HeaderTapped;
 
             return schedule;
         }
-
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
@@ -67,18 +65,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             return true;
         }
 
+        void Schedule_CellDoubleTapped(object sender, CellTappedEventArgs e)
+        {
+            coordinator.DateDoubleTapped(e.Calendar);
+        }
+
+
+        private void Schedule_HeaderTapped(object sender, HeaderTappedEventArgs e)
+        {
+            coordinator.YearTapped(e.Calendar);
+        }
+
         static class MenuItemActions
         {
             public const int CreateAppointment = 11;
             public const int CalendarSelection = 10;
         }
-
-
-        void Schedule_CellDoubleTapped(object sender, CellTappedEventArgs e)
-        {
-            coordinator.DateDoubleTapped(e.Calendar); //TODO need to refactor...
-        }
-
     }
 
     public class MonthSchedule : SfSchedule

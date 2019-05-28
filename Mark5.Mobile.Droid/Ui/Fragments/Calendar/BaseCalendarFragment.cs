@@ -24,9 +24,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            schedule.ItemsSource = coordinator.Items;
             schedule.AppointmentMapping = GetAppointmentMapping();
             schedule.VisibleDatesChanged += Schedule_VisibleDatesChanged;
+        }
+
+        public override void OnResume()
+        {
+            base.OnResume();
+            schedule.ItemsSource = coordinator.Items;
         }
 
         public override void OnDestroyView()
