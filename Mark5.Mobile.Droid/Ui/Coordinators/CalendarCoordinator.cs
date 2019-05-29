@@ -35,7 +35,7 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
             activity = a;
             fragmentManager = a.SupportFragmentManager;
 
-            uiCache = new UICache(this);
+            uiCache = new UICache();
         }
 
         public (BaseFragment, string) GetMainFragment() => (monthCalendarFragment, _) = MonthCalendarFragment.NewInstance();
@@ -112,9 +112,7 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
         public void MonthTapped(Calendar calendar)
         {
             activity.OnBackPressed();
-
             monthCalendarFragment.MoveToDate(calendar);
-
         }
 
         public void CalendarsClicked()
@@ -169,15 +167,9 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
         {
             public ObservableCollection<Appointment> Items { get; } = new ObservableCollection<Appointment>();
 
-            readonly CalendarModuleCoordinator coordinator;
-
             List<AppointmentPreviewViewModel> AppointmentViewModels { get; } = new List<AppointmentPreviewViewModel>();
             List<CalendarViewModel> CalendarViewModels { get; } = new List<CalendarViewModel>();
 
-            public UICache(CalendarModuleCoordinator coordinator)
-            {
-                this.coordinator = coordinator;
-            }
 
             public void CacheAppointments(IEnumerable<AppointmentPreviewViewModel> appointmentViewModels, DateTime start, DateTime end)
             {

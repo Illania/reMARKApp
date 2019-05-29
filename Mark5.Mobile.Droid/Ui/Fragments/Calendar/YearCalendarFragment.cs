@@ -60,14 +60,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             externalLayout.SetPadding(paddingValue, paddingValue, paddingValue, paddingValue);
 
             yearCalendar = new YearCalendar(Context);
-            yearCalendar.MonthChanging += YearCalendar_MonthChanging;
+            yearCalendar.MonthChanged += YearCalendar_MonthChanged;
             yearCalendar.MoveToDate = initialDate;
             externalLayout.AddView(yearCalendar);
 
             return externalLayout;
         }
 
-        void YearCalendar_MonthChanging(object sender, MonthChangingEventArgs e)
+        void YearCalendar_MonthChanged(object sender, MonthChangedEventArgs e)
         {
             coordinator.MonthTapped(e.NewValue);
         }

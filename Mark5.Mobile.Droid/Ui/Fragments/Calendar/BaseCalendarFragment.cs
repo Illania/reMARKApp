@@ -60,7 +60,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         public static AppointmentMapping GetAppointmentMapping()
         {
-            AppointmentMapping mapping = new AppointmentMapping //TODO need to check if all is correct
+            AppointmentMapping mapping = new AppointmentMapping
             {
                 Subject = "Subject",
                 StartTime = "Start",

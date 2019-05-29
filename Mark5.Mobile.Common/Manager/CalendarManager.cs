@@ -12,6 +12,7 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Model.Exceptions;
 using System.Collections.Concurrent;
 using System.Threading;
+using Mark5.Mobile.Common.DataAccess.Exceptions;
 
 namespace Mark5.Mobile.Common.Manager
 {
@@ -215,6 +216,10 @@ namespace Mark5.Mobile.Common.Manager
 
                             cachedMonths.Add(monthDate);
                         }
+                    }
+                    catch (DataNotFoundException)
+                    {
+                        AppointmentRetrieved(this, new AppointmentsRetrievedEventArgs(null, default(DateTime), default(DateTime)));
                     }
                     catch (Exception ex)
                     {
