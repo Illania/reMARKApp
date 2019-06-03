@@ -96,12 +96,6 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\netstandard2.0\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="AngleSharp">
-      <HintPath>..\packages\AngleSharp.0.12.1\lib\netstandard2.0\AngleSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="PreMailer.Net">
-      <HintPath>..\packages\PreMailer.Net.2.0.1\lib\netstandard2.0\PreMailer.Net.dll</HintPath>
-    </Reference>
     <Reference Include="SQLitePCLRaw.core">
       <HintPath>..\packages\SQLitePCLRaw.core.1.1.13\lib\MonoAndroid\SQLitePCLRaw.core.dll</HintPath>
     </Reference>
@@ -292,6 +286,12 @@
     </Reference>
     <Reference Include="Syncfusion.SfCalendar.Android">
       <HintPath>..\packages\Syncfusion.Xamarin.SfCalendar.Android.17.1.0.48\lib\MonoAndroid10\Syncfusion.SfCalendar.Android.dll</HintPath>
+    </Reference>
+    <Reference Include="AngleSharp">
+      <HintPath>..\packages\AngleSharp.0.9.11\lib\portable-windows8+net45+windowsphone8+wpa+monoandroid+monotouch\AngleSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="PreMailer.Net">
+      <HintPath>..\packages\PreMailer.Net.2.0.1\lib\netstandard2.0\PreMailer.Net.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
