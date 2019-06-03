@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Mark5.Mobile.Common.Utilities;
 using SQLite;
 

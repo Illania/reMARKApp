@@ -15,7 +15,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         public override void Stop() { }
 
-        public async Task LoadAppointment(int appointmentId, int calendarId)
+        public async Task LoadAppointment(int appointmentId, int recurrenceIndex, int calendarId)
         {
             view.ShowLoading();
 
@@ -24,7 +24,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 CommonConfig.Logger.Info($"Retrieving appointment with ID = {appointmentId}");
 
                 appointment = await Managers.CalendarManager.GetCalendarAppointmentAsync(calendarId, appointmentId);
-                view.ShowAppointment(AppointmentViewModel.ConvertToViewModel(appointment));
+                view.ShowAppointment(AppointmentViewModel.ConvertToViewModel(appointment, recurrenceIndex));
                 view.SetLines(ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Select(LineViewModel.ConvertToViewModel));
 
                 view.StopLoading();
@@ -91,23 +91,77 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
     public class AppointmentViewModel
     {
-        public static AppointmentViewModel ConvertToViewModel(CalendarAppointment appointment)
+        public int Id { get; set; }
+        public string Subject { get; set; }
+        public string Description { get; set; }
+        public string Location { get; set; }
+        public bool AllDay { get; set; }
+        public string Creator { get; set; }
+        public RecurrenceInfoViewModel RecurrenceInfo { get; set; }
+        public long ReminderTimeBefore { get; set; }
+        public List<ParticipantsViewModel> Participants { get; set; }
+
+
+        public static AppointmentViewModel ConvertToViewModel(CalendarAppointment appointment, int recurrenceIndex = -1)
         {
-            return new AppointmentViewModel();
+            return new AppointmentViewModel
+            {
+                Id = appointment.Id,
+                Subject = appointment.Subject,
+                Description = appointment.Description,
+                Location = appointment.Location,
+                AllDay = appointment.AllDay,
+                Creator = appointment.Creator,
+                RecurrenceInfo = RecurrenceInfoViewModel.ConvertToViewModel(appointment.RecurrenceInfo),
+                ReminderTimeBefore = appointment.ReminderTimeBeforeStart,
+                Participants = appointment.Participants.Select(ParticipantsViewModel.ConvertToViewModel).ToList(),
+            };
+        }
+    }
+
+    public class RecurrenceInfoViewModel
+    {
+        public static RecurrenceInfoViewModel ConvertToViewModel(RecurrenceInfo ri)
+        {
+            return new RecurrenceInfoViewModel()  //TODO
+            {
+            };
+        }
+    }
+
+    public class ParticipantsViewModel
+    {
+        public string Name { get; set; }
+        public string Email { get; set; }
+        public ParticipantStatus Status { get; set; }
+
+        public static ParticipantsViewModel ConvertToViewModel(Participant participant)
+        {
+            return new ParticipantsViewModel
+            {
+                Name = participant.CN,
+                Email = participant.Email,
+                Status = participant.Status,
+            };
         }
     }
 
     public class LineViewModel
     {
-        public static LineViewModel ConvertToViewModel(Line appointment)
+        public string Name { get; set; }
+
+        public static LineViewModel ConvertToViewModel(Line line)
         {
-            return new LineViewModel();
+            return new LineViewModel
+            {
+                Name = line.Name
+            };
         }
     }
 
     public interface IAppointmentPresenter : IPresenter<IAppointmentView>
     {
-        Task LoadAppointment(int appointmentId, int calendarId);
+        Task LoadAppointment(int appointmentId, int recurrenceIndex, int calendarId);
         Task DeleteAppointmentClicked();
         Task EditAppointmentClicked();
         Task SendInvitationClicked(Guid lineGuid);
