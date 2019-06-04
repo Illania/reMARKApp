@@ -31,6 +31,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         const string RecipentRegex = @".*<.*@.*>";
         const string RecipentFormat = "{0} <{1}>";
 
+        readonly object compressExpandLock = new object();
+
         public event EventHandler Edited = delegate { };
         public event EventHandler AddButtonClicked = delegate { };
 
@@ -574,19 +576,31 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         void CompressView()
         {
-            emailEditor.SetSingleLine(true);
-            compressed = true;
+            lock (compressExpandLock)
+            {
+                if (compressed)
+                    return;
 
-            fullEditorText = emailEditor.Text;
-            UpdateTextView();
+                emailEditor.SetSingleLine(true);
+                compressed = true;
+
+                fullEditorText = emailEditor.Text;
+                UpdateTextView();
+            }
         }
 
         void ExpandView()
         {
-            emailEditor.SetSingleLine(false);
-            compressed = false;
+            lock (compressExpandLock)
+            {
+                if (!compressed)
+                    return;
 
-            UpdateTextView();
+                emailEditor.SetSingleLine(false);
+                compressed = false;
+
+                UpdateTextView();
+            }
         }
 
         void CorrectMarkup()
