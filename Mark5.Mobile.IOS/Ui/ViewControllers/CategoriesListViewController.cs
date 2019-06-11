@@ -143,9 +143,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public async Task RefreshDataAsync()
         {
-            allCategories = BusinessEntityPreview is DocumentPreview documentPreview
-                ? await Managers.DocumentsManager.GetAllCategoriesAsync()
-                : await Managers.ContactsManager.GetAllCategoriesAsync();
+            try
+            {
+                allCategories = BusinessEntityPreview is DocumentPreview documentPreview
+                    ? await Managers.DocumentsManager.GetAllCategoriesAsync()
+                    : await Managers.ContactsManager.GetAllCategoriesAsync();
+            }
+            catch (Exception ex)
+            {
+                await Dialogs.ShowErrorAlertAsync(this, ex);
+            }
 
             ReloadTable();
         }
