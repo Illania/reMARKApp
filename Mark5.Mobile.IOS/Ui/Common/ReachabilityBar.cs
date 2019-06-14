@@ -147,7 +147,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             UserInteractionEnabled = false;
 
             TextColor = Theme.White;
-            Text = Localization.GetString("disconnected");
+            Text = Localization.GetString("server_unreachable");
             BackgroundColor = Theme.Brown;
 
             var heightConstraint = Constraints.First(nslc => nslc.GetIdentifier() == "reachabilitybar.height");

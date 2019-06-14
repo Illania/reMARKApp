@@ -1,4 +1,4 @@
-"account" = "Account";
+﻿"account" = "Account";
 "attention" = "Attention";
 "area" = "Area";
 "add" = "Add";
@@ -149,6 +149,8 @@
 "error_invalidsourcetypeexception_title" = "Unavailable offline";
 "error_removing_local_attachment" = "Error while removing local attachment";
 "error_saving_local_attachment" = "Error while saving local attachment";
+"error_request_timeout" = "Please make sure you have a stable internet connection and access to the server from current network.";
+"error_request_timeout_title" = "Server Unreachable";
 "error_while_sending_document" = "Error while sending email";
 "error_argumentexception_title" = "Argument exception";
 "existing_photo" = "Add existing photo";
@@ -363,6 +365,7 @@
 "set_priority" = "Set priority";
 "setting_priority___" = "Setting priority...";
 "settings" = "Settings";
+"server_unreachable" = "Server Unreachable";
 "selected" = "Selected";
 "short_id" = "Short ID";
 "shortcodes" = "Mailing lists";
