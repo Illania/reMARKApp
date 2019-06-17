@@ -558,6 +558,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
 
             CorrectMarkup();
+
+            if (!compressed)
+                fullEditorText = emailEditor.Text;
+
             emailEditor.Invalidate();
             Edited(this, EventArgs.Empty);
         }
