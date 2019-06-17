@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Mark5.Mobile.Common.Extensions;
 using DataContract = Mark5.ServiceReference.DataContract;
@@ -39,76 +39,51 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Guid = ca.Guid,
                 Subject = ca.Subject,
                 Location = ca.Location,
-                StartDateTimestamp = ca.StartDate.ConvertDateTimeToTimestampMilliseconds(),
-                EndDateTimestamp = ca.EndDate.ConvertDateTimeToTimestampMilliseconds(),
+                CalendarId = ca.CalendarId,
                 AllDay = ca.AllDay,
-                Private = ca.Private,
-                Category = ca.Category?.Convert(),
-                Status = ca.Status.ConvertEnum<AppointmentStatus>(),
                 CreatorId = ca.CreatorId,
                 Creator = ca.Creator,
                 Priority = ca.Priority.ConvertEnum<Priority>(),
                 Type = ca.Type.ConvertEnum<CalendarOccurenceType>(),
-                ReminderDateTimestamp = ca.ReminderDate.ConvertDateTimeToTimestampMilliseconds(),
-                SnoozeDelay = ca.SnoozeDelay
+                Description = ca.Description,
+                RecurrenceInfo = ca.RecurrenceInfo?.Convert()
             };
 
-            if (ca.Resources != null)
-                result.Resources.AddRange(ca.Resources.WhereNotNull().Select(Convert));
+            if (ca.ReminderAlertTime != null)
+            {
+                result.ReminderAlertTime = ca.ReminderAlertTime.Value.ConvertDateTimeToTimestampMilliseconds();
+                result.ReminderTimeBeforeStart = ca.ReminderTimeBeforeStart;
+            }
+
             if (ca.Participants != null)
                 result.Participants.AddRange(ca.Participants.WhereNotNull().Select(Convert));
 
+            if (ca.Occurrences != null)
+            {
+                foreach (var occurrence in ca.Occurrences)
+                {
+                    result.Occurrences.Add(new CalendarAppointmentOccurrence
+                    {
+                        StartDateTimestamp = occurrence.StartDate.ConvertDateTimeToTimestampMilliseconds(),
+                        EndDateTimestamp = occurrence.EndDate.ConvertDateTimeToTimestampMilliseconds(),
+                        RecurrenceIndex = occurrence.RecurrenceIndex,
+                        AppointmentId = ca.Id,
+                        CalendarId = ca.CalendarId,
+                    });
+                }
+            }
+
             return result;
         }
 
-        public static CalendarTask Convert(this DataContract.CalendarTask ca)
+        public static CalendarAlarm Convert(this DataContract.CalendarAlarm ca)
         {
-            var result = new CalendarTask
+            return new CalendarAlarm
             {
                 Id = ca.Id,
-                Guid = ca.Guid,
-                Subject = ca.Subject,
-                StartDateTimestamp = ca.StartDate.ConvertDateTimeToTimestampMilliseconds(),
-                EndDateTimestamp = ca.EndDate.ConvertDateTimeToTimestampMilliseconds(),
-                Private = ca.Private,
-                Status = ca.Status.ConvertEnum<TaskStatus>(),
-                CreatorId = ca.CreatorId,
-                Creator = ca.Creator,
-                Priority = ca.Priority.ConvertEnum<Priority>(),
-                Type = ca.Type.ConvertEnum<CalendarOccurenceType>(),
-                ReminderDateTimestamp = ca.ReminderDate.ConvertDateTimeToTimestampMilliseconds(),
-                SnoozeDelay = ca.SnoozeDelay,
-                PercentComplete = ca.PercentComplete,
-                LinkedObjectId = ca.ObjectId,
-                LinkedObjectType = ca.ObjectType.ConvertEnum<ObjectType>(),
-                DelegatorId = ca.DelegatorId,
-                Delegator = ca.Delegator,
-                DelegationStatus = ca.DelegationStatus.ConvertEnum<DelegationStatus>()
-            };
-
-            if (ca.UserIds != null)
-                result.UserIds.AddRange(ca.UserIds);
-            if (ca.Users != null)
-                result.Users = new Dictionary<int, string>(result.Users);
-            if (ca.DepartmentIds != null)
-                result.DepartmentIds.AddRange(ca.DepartmentIds);
-            if (ca.Departments != null)
-                result.Departments = new Dictionary<int, string>(ca.Departments);
-
-            return result;
-        }
-
-        public static CalendarCategory Convert(this DataContract.CalendarCategory cc)
-        {
-            return new CalendarCategory
-            {
-                ColorHex = cc.ColorHex,
-                Description = cc.Description,
-                Guid = cc.Guid,
-                Id = cc.Id,
-                Name = cc.Name,
-                SubType = cc.SubType.ConvertEnum<CalendarCategorySubType>(),
-                Type = cc.Type.ConvertEnum<CalendarCategoryType>()
+                CalendarId = ca.CalendarId,
+                AppointmentId = ca.AppointmentId,
+                AlarmTimestamp = ca.AlarmDate.ConvertDateTimeToTimestampMilliseconds(),
             };
         }
 
@@ -118,16 +93,14 @@ namespace Mark5.Mobile.Common.Model.Converters
             {
                 Permissions = cmi.Permissions?.Convert()
             };
-            if (cmi.CalendarCategories != null)
-                result.CalendarCategories.AddRange(cmi.CalendarCategories.WhereNotNull().Select(Convert));
-            if (cmi.CalendarResources != null)
-                result.CalendarResources.AddRange(cmi.CalendarResources.WhereNotNull().Select(Convert));
+            if (cmi.Calendars != null)
+                result.Calendars.AddRange(cmi.Calendars.WhereNotNull().Select(Convert));
             return result;
         }
 
-        public static CalendarResource Convert(this DataContract.CalendarResource cr)
+        public static Calendar Convert(this DataContract.Calendar cr)
         {
-            return new CalendarResource
+            return new Calendar
             {
                 ColorHex = cr.ColorHex,
                 Guid = cr.Guid,
@@ -277,6 +250,8 @@ namespace Mark5.Mobile.Common.Model.Converters
                 result.Comments.AddRange(d.Comments.WhereNotNull().Select(Convert));
             if (d.ExtraFields != null)
                 result.ExtraFields = d.ExtraFields.Where(kv => kv.Key != null).ToDictionary(kv => kv.Key.Convert(), kv => kv.Value);
+            if (d.ICalendars != null)
+                result.ICalendars.AddRange(d.ICalendars.WhereNotNull().Select(Convert));
             return result;
         }
 
@@ -392,10 +367,10 @@ namespace Mark5.Mobile.Common.Model.Converters
                 InternalType = f.InternalType.ConvertEnum<FolderInternalType>(),
                 Module = f.Module.ConvertEnum<ModuleType>(),
                 Name = f.Name,
-                OptionalParameters = f.OptionalParameters?.Convert(),
                 Subscribed = f.Subscribed,
                 Position = f.Position,
-                Type = f.Type.ConvertEnum<FolderType>()
+                Type = f.Type.ConvertEnum<FolderType>(),
+                Path = f.Path,
             };
             if (f.SubFolders != null)
                 result.SubFolders.AddRange(f.SubFolders.WhereNotNull().Select(Convert));
@@ -454,7 +429,8 @@ namespace Mark5.Mobile.Common.Model.Converters
                 ToObjectType = ol.ToObjectType.ConvertEnum<ObjectType>(),
                 Description = ol.Description,
                 IsReverse = ol.IsReverse,
-                TypeInfo = ol.TypeInfo?.Convert()
+                TypeInfo = ol.TypeInfo?.Convert(),
+                LinkTimeStamp = ol.LinkTime.ConvertDateTimeToTimestampMilliseconds(),
             };
         }
 
@@ -474,19 +450,6 @@ namespace Mark5.Mobile.Common.Model.Converters
             };
         }
 
-        public static OptionalParameters Convert(this DataContract.OptionalParameters p)
-        {
-            var ceop = p as DataContract.CalendarEventOptionalParameters;
-            if (ceop != null)
-                return new CalendarEventOptionalParameters
-                {
-                    CanContainAppointments = ceop.CanContainAppointments,
-                    CanContainTasks = ceop.CanContainTasks
-                };
-
-            return null;
-        }
-
         public static Participant Convert(this DataContract.Participant p)
         {
             return new Participant
@@ -496,8 +459,7 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Type = p.Type.ConvertEnum<ParticipantType>(),
                 Status = p.Status.ConvertEnum<ParticipantStatus>(),
                 CN = p.CN,
-                Customer = p.Customer,
-                Note = p.Note
+                Email = p.Email,
             };
         }
 
@@ -550,6 +512,26 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Name = ra.Name,
                 AddressType = ra.AddressType.ConvertEnum<DocumentAddressType>(),
                 Address = ra.Address
+            };
+        }
+
+        public static RecurrenceInfo Convert(this DataContract.RecurrenceInfo ra)
+        {
+            return new RecurrenceInfo()
+            {
+                AllDay = ra.AllDay,
+                DayNumber = ra.DayNumber,
+                Duration = ra.Duration,
+                EndTimestamp = ra.End.ConvertDateTimeToTimestampMilliseconds(),
+                StartTimestamp = ra.Start.ConvertDateTimeToTimestampMilliseconds(),
+                FirstDayOfWeek = ra.FirstDayOfWeek,
+                Month = ra.Month,
+                OccurrenceCount = ra.OccurrenceCount,
+                Periodicity = ra.Periodicity,
+                Range = ra.Range.ConvertEnum<RecurrenceRange>(),
+                Type = ra.Type.ConvertEnum<RecurrenceType>(),
+                WeekDays = ra.WeekDays.ConvertEnum<WeekDays>(),
+                WeekOfMonth = ra.WeekOfMonth.ConvertEnum<WeekOfMonth>(),
             };
         }
 
@@ -680,6 +662,80 @@ namespace Mark5.Mobile.Common.Model.Converters
             };
         }
 
+        public static ModuleFavoriteFoldersCollection Convert(this DataContract.GetFavoriteFoldersResult moduleFavoritesResult)
+        {
+            ModuleFavoriteFoldersCollection moduleFavorites = new ModuleFavoriteFoldersCollection
+            {
+                UpdatedAt = moduleFavoritesResult.UpdatedAt
+            };
+
+            if (moduleFavoritesResult.ModuleFavoriteFoldersList != null)
+            {
+                moduleFavorites.ModuleFavoriteFolders = new List<ModuleFavoriteFolders>();
+
+                foreach (var fav in moduleFavoritesResult.ModuleFavoriteFoldersList)
+                {
+                    var newFav = new ModuleFavoriteFolders { ModuleType = (ModuleType)fav.ModuleType };
+                    newFav.Folders.AddRange(fav.Folders.Select(Convert));
+
+                    moduleFavorites.ModuleFavoriteFolders.Add(newFav);
+                }
+            }
+
+            return moduleFavorites;
+        }
+
+
+        #region ICalendar
+        public static ICalendarInfo Convert(this DataContract.ICalendarInfo calendarInfo)
+        {
+            return new ICalendarInfo
+            {
+                Events = calendarInfo.Events.WhereNotNull().Select(Convert).ToList(),
+                Reply = calendarInfo.Reply?.Convert(),
+                MethodType = calendarInfo.MethodType.ConvertEnum<MethodType>()
+            };
+        }
+
+        public static IEventInfo Convert(this DataContract.IEventInfo eventInfo)
+        {
+            return new IEventInfo
+            {
+                Id = eventInfo.Id,
+                Description = eventInfo.Description,
+                Summary = eventInfo.Summary,
+                End = eventInfo.End,
+                Start = eventInfo.Start,
+                Location = eventInfo.Location,
+                Attendees = eventInfo.Attendees.WhereNotNull().Select(Convert).ToList(),
+            };
+        }
+
+        public static IReplyInfo Convert(this DataContract.IReplyInfo replyInfo)
+        {
+            return new IReplyInfo
+            {
+                AppId = replyInfo.AppId,
+                Status = replyInfo.Status.ConvertEnum<ParticipantStatus>(),
+                FromAddress = replyInfo.FromAddress
+            };
+        }
+
+        public static IAttendeeInfo Convert(this DataContract.IAttendeeInfo attendeeInfo)
+        {
+            return new IAttendeeInfo
+            {
+                Status = attendeeInfo.Status.ConvertEnum<ParticipantStatus>(),
+                RSVP = attendeeInfo.RSVP,
+                CN = attendeeInfo.CN,
+                IsOrganizer = attendeeInfo.IsOrganizer,
+                Type = attendeeInfo.Type.ConvertEnum<ParticipantType>(),
+                Url = attendeeInfo.Url
+            };
+        }
+
+        #endregion
+
         #endregion
 
         #region Model to DataContract
@@ -785,62 +841,48 @@ namespace Mark5.Mobile.Common.Model.Converters
 
         public static DataContract.CalendarAppointment Convert(this CalendarAppointment ca)
         {
-            return new DataContract.CalendarAppointment
+            var result = new DataContract.CalendarAppointment
             {
                 Id = ca.Id,
                 Guid = ca.Guid,
                 Subject = ca.Subject,
                 Location = ca.Location,
-                StartDate = ca.StartDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
-                EndDate = ca.EndDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
                 AllDay = ca.AllDay,
-                Private = ca.Private,
-                Category = ca.Category?.Convert(),
-                Status = ca.Status.ConvertEnum<DataContract.AppointmentStatus>(),
                 CreatorId = ca.CreatorId,
                 Creator = ca.Creator,
                 Priority = ca.Priority.ConvertEnum<DataContract.Priority>(),
                 Type = ca.Type.ConvertEnum<DataContract.CalendarOccurenceType>(),
-                ReminderDate = ca.ReminderDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
-                SnoozeDelay = ca.SnoozeDelay,
-                Resources = ca.Resources.Select(r => r.Convert()).ToList(),
-                Participants = ca.Participants.Select(p => p.Convert()).ToList()
+                CalendarId = ca.CalendarId,
+                Participants = ca.Participants.Select(p => p.Convert()).ToList(),
+                Description = ca.Description,
+                RecurrenceInfo = ca.RecurrenceInfo?.Convert(),
             };
-        }
 
-        public static DataContract.CalendarTask Convert(this CalendarTask ca)
-        {
-            return new DataContract.CalendarTask
+            if (ca.ReminderAlertTime > 0)
             {
-                Id = ca.Id,
-                Guid = ca.Guid,
-                Subject = ca.Subject,
-                StartDate = ca.StartDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
-                EndDate = ca.EndDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
-                Private = ca.Private,
-                Status = ca.Status.ConvertEnum<DataContract.TaskStatus>(),
-                CreatorId = ca.CreatorId,
-                Creator = ca.Creator,
-                Priority = ca.Priority.ConvertEnum<DataContract.Priority>(),
-                Type = ca.Type.ConvertEnum<DataContract.CalendarOccurenceType>(),
-                ReminderDate = ca.ReminderDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
-                SnoozeDelay = ca.SnoozeDelay,
-                PercentComplete = ca.PercentComplete,
-                ObjectId = ca.LinkedObjectId,
-                ObjectType = ca.LinkedObjectType.ConvertEnum<DataContract.ObjectType>(),
-                DelegatorId = ca.DelegatorId,
-                Delegator = ca.Delegator,
-                DelegationStatus = ca.DelegationStatus.ConvertEnum<DataContract.DelegationStatus>(),
-                UserIds = ca.UserIds,
-                Users = ca.Users,
-                DepartmentIds = ca.DepartmentIds,
-                Departments = ca.Departments
-            };
+                result.ReminderAlertTime = ca.ReminderAlertTime.ConvertTimestampMillisecondsToDateTime();
+                result.ReminderTimeBeforeStart = ca.ReminderTimeBeforeStart;
+            }
+
+            if (ca.Occurrences != null)
+            {
+                foreach (var occurrence in ca.Occurrences)
+                {
+                    result.Occurrences.Add(new DataContract.CalendarAppointmentOccurrence
+                    {
+                        StartDate = occurrence.StartDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
+                        EndDate = occurrence.EndDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
+                        RecurrenceIndex = occurrence.RecurrenceIndex,
+                    });
+                }
+            }
+
+            return result;
         }
 
-        public static DataContract.CalendarResource Convert(this CalendarResource cr)
+        public static DataContract.Calendar Convert(this Calendar cr)
         {
-            return new DataContract.CalendarResource
+            return new DataContract.Calendar
             {
                 ColorHex = cr.ColorHex,
                 Guid = cr.Guid,
@@ -859,8 +901,7 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Type = p.Type.ConvertEnum<DataContract.ParticipantType>(),
                 Status = p.Status.ConvertEnum<DataContract.ParticipantStatus>(),
                 CN = p.CN,
-                Customer = p.Customer,
-                Note = p.Note
+                Email = p.Email,
             };
         }
 
@@ -895,6 +936,26 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Id = pat.Id,
                 Name = pat.Name,
                 Description = pat.Description
+            };
+        }
+
+        public static DataContract.RecurrenceInfo Convert(this RecurrenceInfo ra)
+        {
+            return new DataContract.RecurrenceInfo()
+            {
+                AllDay = ra.AllDay,
+                DayNumber = ra.DayNumber,
+                Duration = ra.Duration,
+                End = ra.EndTimestamp.ConvertTimestampMillisecondsToDateTime(),
+                Start = ra.StartTimestamp.ConvertTimestampMillisecondsToDateTime(),
+                FirstDayOfWeek = ra.FirstDayOfWeek,
+                Month = ra.Month,
+                OccurrenceCount = ra.OccurrenceCount,
+                Periodicity = ra.Periodicity,
+                Range = ra.Range.ConvertEnum<DataContract.RecurrenceRange>(),
+                Type = ra.Type.ConvertEnum<DataContract.RecurrenceType>(),
+                WeekDays = ra.WeekDays.ConvertEnum<DataContract.WeekDays>(),
+                WeekOfMonth = ra.WeekOfMonth.ConvertEnum<DataContract.WeekOfMonth>(),
             };
         }
 
@@ -947,20 +1008,6 @@ namespace Mark5.Mobile.Common.Model.Converters
             };
         }
 
-        public static DataContract.CalendarCategory Convert(this CalendarCategory cc)
-        {
-            return new DataContract.CalendarCategory
-            {
-                Id = cc.Id,
-                Guid = cc.Guid,
-                Name = cc.Name,
-                Description = cc.Description,
-                ColorHex = cc.ColorHex,
-                Type = cc.Type.ConvertEnum<DataContract.CalendarCategoryType>(),
-                SubType = cc.SubType.ConvertEnum<DataContract.CalendarCategorySubType>()
-            };
-        }
-
         public static DataContract.DocumentAddress Convert(this DocumentAddress da)
         {
             return new DataContract.DocumentAddress
@@ -1007,6 +1054,40 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Description = sp.Description,
                 AddressCount = sp.AddressCount,
             };
+        }
+
+        public static DataContract.Folder Convert(this Folder folder)
+        {
+            return new DataContract.Folder
+            {
+                Guid = folder.Guid,
+                HasSubFolders = folder.HasSubFolders,
+                Id = folder.Id,
+                ParentFolderId = folder.ParentFolderId,
+                Name = folder.Name,
+                Subscribed = folder.Subscribed,
+                Position = folder.Position,
+                Path = folder.Path,
+            };
+        }
+
+        public static List<DataContract.ModuleFavoriteFolders> Convert(this Dictionary<ModuleType, List<Folder>> favoriteDictionary)
+        {
+            List<DataContract.ModuleFavoriteFolders> favorites = new List<DataContract.ModuleFavoriteFolders>();
+
+            foreach (KeyValuePair<ModuleType, List<Folder>> entry in favoriteDictionary)
+            {
+                var favorite = new DataContract.ModuleFavoriteFolders { ModuleType = (DataContract.ModuleType)entry.Key };
+
+                foreach (var folder in entry.Value)
+                {
+                    favorite.Folders.Add(folder.Convert());
+                }
+
+                favorites.Add(favorite);
+            }
+
+            return favorites;
         }
 
         #endregion

@@ -619,9 +619,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                         progressIndicator.SetProgress(1 - (pi.LeftItemsCount / (float)pi.TotalItemsCount), true);
 
-                        progressLabel.Text = Localization.GetString("downloading_percentage___", (int)(progressIndicator.Progress * 100));
+                        progressLabel.Text = Localization.GetFormattedString("downloading_percentage___", (int)(progressIndicator.Progress * 100));
                         if (timeLeft > 0)
-                            progressLabel.Text += " " + Localization.GetString("time_remaining_minutes", (int)timeLeft);
+                            progressLabel.Text += " " + Localization.GetFormattedString("time_remaining_minutes", (int)timeLeft);
                         else if (timeLeft > -1)
                             progressLabel.Text += " " + Localization.GetString("time_remaining_less_than_minute");
                     }

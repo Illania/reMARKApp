@@ -12,11 +12,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
         public override void RefreshView()
         {
-            if (Document != null)
-            {
-                var readByUsernames = Document.ReadByUserNames.Values.SelectMany(s => s.Split('|')).OrderBy(s => s).Select(s => s.ToUpper());
+            var readByUsernames = Document?.ReadByUserNames?.Values.SelectMany(s => s.Split('|')).OrderBy(s => s).Select(s => s.ToUpper());
+            if (readByUsernames != null && readByUsernames.Any() && TextView != null)
                 TextView.Text = string.Join(", ", readByUsernames);
-            }
         }
 
         public override void UpdateVisibility()

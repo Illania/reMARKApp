@@ -304,8 +304,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             if (requestCode == RequestCodes.ShortcodesRequestCode && resultCode == (int)Result.Ok)
             {
-                var shortcode = Serializer.Deserialize<Shortcode>(data.GetStringExtra(PickerShortcodesFolderListActivity.ShortcodesResultKey));
-                AddAddressesFromShortcode(shortcode);
+                var shortcodeId = data.GetIntExtra(PickerShortcodesFolderListActivity.ShortcodeIdResultKey, -1);
+                var folderId = data.GetIntExtra(PickerShortcodesFolderListActivity.FolderIdResultKey, -1);
+                await RetrieveAndAddShortcode(shortcodeId, folderId);
                 UpdateSendButtonState();
             }
             if (requestCode == RequestCodes.TemplatePreviewRequestCode && resultCode == (int)Result.Ok)
@@ -320,15 +321,30 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
+        async Task RetrieveAndAddShortcode(int shortcodeId, int folderId)
+        {
+            try
+            {
+                var shortcode = await Managers.ShortcodesManager.GetShortcodeAsync(folderId, shortcodeId, SourceType.Local);
+
+                AddAddressesFromShortcode(shortcode);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Error while retrieving shortcode from db [FolderId = {folderId}, ShortcodeId = {shortcodeId}]");
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+            }
+        }
+
         void AddAddressesFromShortcode(Shortcode shortcode)
         {
             if (shortcode == null || shortcode.Addresses == null || !shortcode.Addresses.Any())
                 return;
 
             var addresses = shortcode.Addresses;
-            toView.AddEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.To).Select(da => da.Address));
-            ccView.AddEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Cc).Select(da => da.Address));
-            bccView.AddEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Bcc).Select(da => da.Address));
+            toView.AddEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.To).Select(da => da.Address), true);
+            ccView.AddEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Cc).Select(da => da.Address), true);
+            bccView.AddEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Bcc).Select(da => da.Address), true);
         }
 
         async Task LoadSystemUsersDepartments()
@@ -761,19 +777,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     DocumentPreview = documentPreview,
                     Document = document
                 });
-                var t = Managers.DocumentsManager.QueueWorkingCopyToUpload();
-                await t;
 
-                dismissAction();
-
-                if (t.IsFaulted)
+                try
                 {
-                    CommonConfig.Logger.Error($"Failed to queue document for upload [saveDraft={saveDraft}, restoreWorkingCopy={restoreWorkingCopy}, documentCreationModeFlag={documentCreationModeFlag}, copyToNewOption={copyToNewOption}, previousDocumentFolderId={previousDocumentFolderId}, previousDocumentId={previousDocumentId}]", t.Exception.InnerException);
-                    await Dialogs.ShowErrorDialogAsync(Activity, t.Exception.InnerException);
+                    await Managers.DocumentsManager.QueueWorkingCopyToUpload();
+                }
+                catch (Exception ex)
+                {
+                    dismissAction();
+
+                    CommonConfig.Logger.Error($"Failed to queue document for upload [saveDraft={saveDraft}, restoreWorkingCopy={restoreWorkingCopy}, documentCreationModeFlag={documentCreationModeFlag}, copyToNewOption={copyToNewOption}, previousDocumentFolderId={previousDocumentFolderId}, previousDocumentId={previousDocumentId}]", ex.InnerException);
+                    await Dialogs.ShowErrorDialogAsync(Activity, ex.InnerException);
                     fab.Enabled = true;
                 }
-                else
-                    Activity?.Finish();
+
+                dismissAction();
+                Activity?.Finish();
             }
 
             var allRecipientsValid = new RecipientsView[] { toView, ccView, bccView }.All(rv => rv.AllRecipientsValid);
@@ -808,7 +827,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var uri = data.Data;
             stream = Activity.ContentResolver.OpenInputStream(uri);
 
-            Task<IFile> t;
             string filename;
 
             if (uri.Scheme == "file")
@@ -823,29 +841,28 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
 
-            t = Managers.DocumentsManager.SaveDocumentWorkingCopyAttachmentAsync(filename, stream);
-            file = await t;
-            var size = new Java.IO.File(file.Path).Length();
-
-            if (size > ServerConfig.SystemSettings.DocumentsModuleInfo.MaximumAttachmentSizeBytes)
+            try
             {
-                attachmentTooBig = true;
-                await Managers.DocumentsManager.DeleteDocumentWorkingCopyAttachmentAsync(filename);
-                throw new Exception();
+                file = await Managers.DocumentsManager.SaveDocumentWorkingCopyAttachmentAsync(filename, stream);
+                var size = new Java.IO.File(file.Path).Length();
+
+                if (size > ServerConfig.SystemSettings.DocumentsModuleInfo.MaximumAttachmentSizeBytes)
+                {
+                    attachmentTooBig = true;
+                    await Managers.DocumentsManager.DeleteDocumentWorkingCopyAttachmentAsync(filename);
+                    throw new Exception();
+                }
+
+                stream?.Dispose();
             }
-
-            stream?.Dispose();
-
-            if (t.IsFaulted)
+            catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Failed to save attachment", t.Exception.InnerException);
+                CommonConfig.Logger.Error($"Failed to save attachment", ex.InnerException);
                 var resourceStringId = attachmentTooBig ? Resource.String.attachment_too_big : Resource.String.error_saving_local_attachment;
                 await Dialogs.ShowErrorDialogAsync(Activity, new Exception(Resources.GetString(resourceStringId)));
             }
-            else
-            {
-                attachmentsView.AddFileDescription(new FileDescription(file));
-            }
+
+            attachmentsView.AddFileDescription(new FileDescription(file));
         }
 
         async Task SaveWorkingCopy()
@@ -1068,10 +1085,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (!string.IsNullOrEmpty(template.Subject))
                 subjectView.SetSubject(template.Subject);
 
-            lineView.SetLine(template.LineGuid);
+            if (template.LineGuid != Guid.Empty)
+                lineView.SetLine(template.LineGuid);
 
             if (template.Attachments.Any())
-                template.Attachments.ForEach(a => attachmentsView.AddAttachment(a));
+                template.Attachments.ForEach(attachmentsView.AddAttachment);
         }
 
         static void ProcessTemplate(Template template, DocumentPreview documentPreview)

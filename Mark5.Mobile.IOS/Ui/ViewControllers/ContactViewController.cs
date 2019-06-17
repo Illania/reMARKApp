@@ -93,7 +93,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             SubscribeToMessages();
 
             if (NavigationController != null)
-                NavigationController.ToolbarHidden = false;
+                NavigationController.ToolbarHidden = Integration.IsIPad();
         }
 
         public override void ViewDidAppear(bool animated)
@@ -282,32 +282,42 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             TableView.TableHeaderView = headerView;
 
-            ToolbarItems = new[]
+            var buttons = new[]
+                {
+                    assignCategoryButton = new UIBarButtonItem
+                    {
+                        Image = UIImage.FromBundle("Flag"),
+                        Enabled = false
+                    },
+                    new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
+                    fileToButton = new UIBarButtonItem
+                    {
+                        Image = UIImage.FromBundle("Worktray"),
+                        Enabled = false
+                    },
+                    new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
+                    commentsButton = new UIBarButtonItem
+                    {
+                        Image = UIImage.FromBundle("Comments"),
+                        Enabled = false
+                    },
+                    new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
+                    actionsLinksButton = new UIBarButtonItem
+                    {
+                        Image = UIImage.FromBundle("Actions"),
+                        Enabled = false
+                    }
+                };
+
+            if (!Integration.IsIPad())
             {
-                assignCategoryButton = new UIBarButtonItem
-                {
-                    Image = UIImage.FromBundle("Flag"),
-                    Enabled = false
-                },
-                new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
-                fileToButton = new UIBarButtonItem
-                {
-                    Image = UIImage.FromBundle("Worktray"),
-                    Enabled = false
-                },
-                new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
-                commentsButton = new UIBarButtonItem
-                {
-                    Image = UIImage.FromBundle("Comments"),
-                    Enabled = false
-                },
-                new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
-                actionsLinksButton = new UIBarButtonItem
-                {
-                    Image = UIImage.FromBundle("Actions"),
-                    Enabled = false
-                }
-            };
+                ToolbarItems = buttons;
+            }
+            else
+            {
+                NavigationController.ToolbarHidden = true;
+                NavigationItem.SetLeftBarButtonItems(buttons, false);
+            }
         }
 
         void InitializeNavigationBar()
@@ -619,8 +629,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var actionLinksListString = new[]
             {
-                Localization.GetString("actions"),
-                Localization.GetString("links")
+                Localization.GetString("history"),
+                Localization.GetString("overview")
             };
 
             var result = await Dialogs.ShowListActionSheetAsync(this, actionLinksListString, actionsLinksButton);

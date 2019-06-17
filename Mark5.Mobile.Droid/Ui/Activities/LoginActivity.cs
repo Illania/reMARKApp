@@ -348,7 +348,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 if (token.IsCancellationRequested)
                     return;
 
-                dismissAction();
+                dismissAction?.Invoke();
 
                 CommonConfig.Logger.Error("Log in failed - main exception", ex);
 

@@ -20,7 +20,6 @@ using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView;
 using Mark5.Mobile.IOS.Utilities;
-using Mark5.ServiceReference.Exceptions;
 using MobileCoreServices;
 using Photos;
 using UIKit;
@@ -812,6 +811,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     DocumentPreview = documentPreview,
                     Document = document
                 });
+
                 await Managers.DocumentsManager.QueueWorkingCopyToUpload();
 
                 dismissAction();
@@ -939,7 +939,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 if (template == null)
                     return;
 
-                await InsertTemplate(template);
+                await ProcessAndInsertTemplate(template);
             }
             catch (Exception ex)
             {
@@ -971,7 +971,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 if (template == null)
                     return;
 
-                await InsertTemplate(template);
+                await ProcessAndInsertTemplate(template);
             }
             catch (Exception ex)
             {
@@ -993,28 +993,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             var localTemplateText = Regex.Replace(PlatformConfig.Preferences.LocalTemplate, @"\r\n?|\n", "\\n", RegexOptions.Multiline);
 
-            var result = await InsertTemplate("text", 0, localTemplateText);
+            var result = await InsertTemplate(ContentType.PlainText, 0, localTemplateText);
         }
 
-        async Task InsertTemplate(Template template)
+        async Task ProcessAndInsertTemplate(Template template)
         {
             ProcessTemplate(template, previousDocumentPreview);
 
-            var type = String.Empty;
-            var content = String.Empty;
+            var type = string.Empty;
+            var content = string.Empty;
 
             if (template.ContentType == ContentType.PlainText)
-            {
                 content = Regex.Replace(template.Content, @"\r\n?|\n", "\\n", RegexOptions.Multiline);
-                type = "text";
-            }
-            if (template.ContentType == ContentType.Html)
-            {
+            else if (template.ContentType == ContentType.Html)
                 content = Regex.Replace(template.Content, @"\r\n?|\n", " ", RegexOptions.Multiline);
-                type = "html";
-            }
 
-            var result = await InsertTemplate(type, template.Id, content);
+            var result = await InsertTemplate(template.ContentType, template.Id, content);
 
             if (template.Attachments.Any())
                 attachmentsView?.AddAttachmenstFromTemplate(template);

@@ -82,7 +82,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.links);
+            ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.overview);
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(ObjectLinksFragment)} [businessEntity.id={businessEntity?.Id}, businessEntity.objectType={businessEntity?.ObjectType}]...");
@@ -108,10 +108,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             try
             {
                 if (objectLinks == null)
-                {
                     objectLinks = await Managers.CommonActionsManager.GetObjectLinksAsync(businessEntity);
-                    ProcessObjectLinks(objectLinks);
-                }
 
                 RefreshView();
             }
@@ -130,7 +127,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             linearLayout.RemoveViews(0, linearLayout.ChildCount);
 
-            var grouppedObjectLinks = objectLinks.OrderBy(ol => ol.TypeInfo.DescriptionSimple).GroupBy(ol => ol.IsReverse ? ol.TypeInfo.DescriptionComplexReverse : ol.TypeInfo.DescriptionComplex);
+            var grouppedObjectLinks = objectLinks.OrderBy(ol => ol.TypeInfo.DescriptionSimple).GroupBy(ol => ol.TypeInfo.DescriptionSimple);
 
             foreach (var grouppedObjectLink in grouppedObjectLinks)
             {
@@ -141,29 +138,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             linearLayout.Invalidate();
             linearLayout.RequestLayout();
-        }
-
-        void ProcessObjectLinks(List<ObjectLink> ols)
-        {
-            foreach (var ol in ols)
-            {
-                ol.TypeInfo.DescriptionAction = ProcessString(ol.TypeInfo.DescriptionAction, ol.FromObjectType, ol.ToObjectType);
-                ol.TypeInfo.DescriptionActionReverse = ProcessString(ol.TypeInfo.DescriptionActionReverse, ol.FromObjectType, ol.ToObjectType);
-                ol.TypeInfo.DescriptionComplex = ProcessString(ol.TypeInfo.DescriptionComplex, ol.FromObjectType, ol.ToObjectType);
-                ol.TypeInfo.DescriptionComplexReverse = ProcessString(ol.TypeInfo.DescriptionComplexReverse, ol.FromObjectType, ol.ToObjectType);
-                ol.TypeInfo.DescriptionSimple = ProcessString(ol.TypeInfo.DescriptionSimple, ol.FromObjectType, ol.ToObjectType);
-            }
-        }
-
-        string ProcessString(string str, ObjectType from, ObjectType to)
-        {
-            if (str.Contains("%"))
-            {
-                str = str.Replace("%ObjFromName%", from.ToString());
-                str = str.Replace("%ObjToName%", to.ToString());
-            }
-
-            return str;
         }
 
         void ObjectLinksView(object sender, ObjectLink ol)

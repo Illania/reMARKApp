@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using CoreGraphics;
 using Foundation;
 using InAppSettingsKit;
@@ -17,6 +20,8 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
+    //Documentation : https://github.com/futuretap/InAppSettingsKit
+
     public class SettingsViewController : AbstractAppSettingsViewController, ISettingsDelegate
     {
         const string UseServerTimezoneKey = "UseServerTimezone";
@@ -37,7 +42,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         const string UsernameKey = "username";
         const string UseTemplateKey = "UseTemplate";
         const string VersionKey = "version";
-        const string EmailSwipeActions = "EmailSwipeActions";
+        const string EmailSwipeActionsKey = "EmailSwipeActions";
+        const string SyncFavoriteFoldersKey = "SyncFavoriteFolders";
+        const string SyncFavoriteFoldersGroupKey = "SyncFavoriteFoldersGroup";
 
         public SettingsViewController()
         {
@@ -69,6 +76,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 TableView.InsetsContentViewsToSafeArea = true;
             }
+
+            // Remove TabBarItem title
+            Title = "";
+            NavigationItem.Title = "Settings";
 
             RefreshHiddenSettings();
         }
@@ -229,7 +240,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return cell;
             }
 
-            if (specifier.Key == EmailSwipeActions)
+            if (specifier.Key == EmailSwipeActionsKey)
             {
                 var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
                 cell.TextLabel.Text = specifier.Title;
@@ -273,12 +284,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     dismissAction();
 
-                    var sendWithMark5 = await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("send_with_mark5_title"), Localization.GetString("send_feedback_with_mark5_content"));
+                    var sendWithReMARK = await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("send_with_mark5_title"), Localization.GetString("send_feedback_with_mark5_content"));
 
-                    if (sendWithMark5)
+                    if (sendWithReMARK)
                     {
                         var cvc = SystemReportCollector.CreateShareFeedbackComposeDocumentViewController(report);
-                        PresentViewController(new NavigationController(cvc, UIModalPresentationStyle.PageSheet), true, null); 
+                        PresentViewController(new NavigationController(cvc, UIModalPresentationStyle.PageSheet), true, null);
                     }
                     else
                     {
@@ -310,9 +321,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     dismissAction();
 
-                    var sendWithMark5 = await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("send_with_mark5_title"), Localization.GetString("send_report_with_mark5_content"));
+                    var sendWithReMARK = await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("send_with_mark5_title"), Localization.GetString("send_report_with_mark5_content"));
 
-                    if (sendWithMark5)
+                    if (sendWithReMARK)
                     {
                         var cvc = SystemReportCollector.CreateShareReportComposeDocumentViewController(report);
                         PresentViewController(new NavigationController(cvc, UIModalPresentationStyle.PageSheet), true, null);
@@ -419,15 +430,68 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return;
             }
 
+            if (key == SyncFavoriteFoldersKey)
+                await HandleFavoriteSync();
+
             if (key == UseTemplateKey)
                 RefreshHiddenSettings();
         }
 
+        async Task HandleFavoriteSync()
+        {
+            if (!PlatformConfig.Preferences.SyncFavoriteFoldersEnabled)
+                return;
+
+            try
+            {
+                var response = await Managers.FoldersManager.GetServiceFavoriteFoldersAsync(retain: false);
+                if (response.ModuleFavoriteFolders == null)
+                    await Managers.FoldersManager.UpdateServiceFavoriteFoldersAsync();
+                else
+                {
+                    var selectedOption = await Dialogs.ShowListActionSheetWithTitleAsync(this, new string[] { Localization.GetString("sync_fav_folders_use_server"), Localization.GetString("sync_fav_folders_use_device") }, View, Localization.GetString("sync_fav_folders_action_title"), $"{Localization.GetString("sync_fav_folders_action_description")} : {response.UpdatedAt.ToLongDateString()}");
+
+                    if (selectedOption == 0)
+                    {
+                        foreach (var mff in response.ModuleFavoriteFolders)
+                            await Managers.FoldersManager.SetFavoriteFoldersAsync(mff.ModuleType, mff.Folders);
+
+                        var availableModules = new List<ModuleType> { ModuleType.Shortcodes, ModuleType.Contacts, ModuleType.Documents };
+                        await Managers.FoldersManager.ClearFavoritesAsync(availableModules.Except(response.ModuleFavoriteFolders.Select(mf => mf.ModuleType)).ToList());
+                    }
+                    else if (selectedOption == 1)
+                        await Managers.FoldersManager.UpdateServiceFavoriteFoldersAsync();
+                    else
+                    {
+                        PlatformConfig.Preferences.SyncFavoriteFoldersEnabled = false;
+                        return;
+                    }
+                }
+
+                PlatformConfig.Preferences.SyncFavoriteFoldersEnabled = true;
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Error while shynchonizing favorite folders", ex);
+                PlatformConfig.Preferences.SyncFavoriteFoldersEnabled = false;
+                Dialogs.ShowErrorAlert(this, new Exception(Localization.GetString("sync_error_general")));
+            }
+        }
+
         void RefreshHiddenSettings()
         {
-            SetHiddenKeys(PlatformConfig.Preferences.UseTemplate == Preferences.TemplateUsageMode.Local || PlatformConfig.Preferences.UseTemplate == Preferences.TemplateUsageMode.AlwaysAsk
-                          ? null
-                          : new[] { LocalTemplateKey }, false);
+            List<string> hiddenKeys = new List<string>();
+
+            if (ServerConfig.SystemSettings?.SystemInfo?.SyncFavoritesAvailable != true)
+            {
+                hiddenKeys.Add(SyncFavoriteFoldersGroupKey);
+                hiddenKeys.Add(SyncFavoriteFoldersKey);
+            }
+
+            if (PlatformConfig.Preferences.UseTemplate == Preferences.TemplateUsageMode.Local || PlatformConfig.Preferences.UseTemplate == Preferences.TemplateUsageMode.AlwaysAsk)
+                hiddenKeys.Add(LocalTemplateKey);
+
+            SetHiddenKeys((string[])hiddenKeys.ToArray(), false);
         }
 
         class CustomSpecifierValuesViewController : SpecifierValuesViewController

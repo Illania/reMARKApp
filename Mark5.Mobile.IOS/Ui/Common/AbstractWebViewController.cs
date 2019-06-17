@@ -10,6 +10,7 @@ using Foundation;
 using HtmlAgilityPack;
 using MailBee.Html;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 using WebKit;
@@ -384,11 +385,35 @@ namespace Mark5.Mobile.IOS.Ui.Common
             return tcs.Task;
         }
 
-        protected Task<(NSObject, NSError)> InsertTemplate(string type, int id, string content)
+        protected Task<(NSObject, NSError)> InsertTemplate(ContentType contentType, int id, string content)
         {
             var tcs = new TaskCompletionSource<(NSObject, NSError)>();
-            var sanitizedContent = content.Replace("\"", "'");
-            var js = $"InsertContent(\'{type}\',{id},\"{sanitizedContent}\")";
+            string sanitizedContent = string.Empty;
+            string typeString = string.Empty;
+
+            if (contentType == ContentType.Html)
+            {
+                typeString = "html";
+
+                var htmlTemplate = new HtmlDocument();
+                htmlTemplate.LoadHtml(content);
+                var elementsWithStyleAttribute = htmlTemplate.DocumentNode.SelectNodes("//*[@style]");
+
+                foreach (var element in elementsWithStyleAttribute)
+                {
+                    var currStyle = element.GetAttributeValue("style", "");
+                    element.SetAttributeValue("style", currStyle.Replace("'", string.Empty).Replace("\"", "'"));
+                }
+
+                sanitizedContent = htmlTemplate.DocumentNode.OuterHtml.Replace("\"", "'");
+            }
+            else
+            {
+                typeString = "text";
+                sanitizedContent = content.Replace("\"", "'");
+            }
+
+            var js = $"InsertContent(\'{typeString}\',{id},\"{sanitizedContent}\")";
             webView.EvaluateJavaScript("javascript: " + js, (result, error) => tcs.SetResult((result, error)));
             webView.BecomeFirstResponder();
             webView.EndEditing(true);
@@ -419,12 +444,12 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             if (config.InlineCss)
             {
-                html = await InlineCss(html);
+                    html = await InlineCss(html);
 
-                if (CommonConfig.Logger.IsDebugEnabled())
-                    CommonConfig.Logger.Debug($"InlineCss {sw.ElapsedMilliseconds}ms");
-                sw.Restart();
-            }
+                    if (CommonConfig.Logger.IsDebugEnabled())
+                        CommonConfig.Logger.Debug($"InlineCss {sw.ElapsedMilliseconds}ms");
+                    sw.Restart();
+                }
 
             var htmlDocument = new HtmlDocument();
             htmlDocument.LoadHtml(html);
@@ -552,8 +577,19 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 if (html == null)
                     return null;
 
-                var inlineResult = PreMailer.Net.PreMailer.MoveCssInline(html, true, null, null, true, true);
-                return inlineResult.Html;
+                string result;
+                try
+                {
+                    var inlineResult = PreMailer.Net.PreMailer.MoveCssInline(html, true, null, null, true, true);
+                    result = inlineResult.Html;
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error("Error while inlining css...", ex);
+                    result = html;
+                }
+
+                return result;
             });
         }
 

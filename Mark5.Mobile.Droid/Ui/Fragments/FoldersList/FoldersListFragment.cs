@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -64,15 +64,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return (new FoldersListFragment());
         }
 
-        public static (FoldersListFragment fragment, string tag) NewInstance(Folder remoteFolder, bool? hideSearch = null)
+        public static (FoldersListFragment fragment, string tag) NewInstance(Folder remoteFolder, bool? hideSearch = null, bool? loadRemoteFromCache = null)
         {
             var args = new Bundle();
 
             if (remoteFolder != null)
-                args.PutString(RemoteFolderBundleKey, Serializer.Serialize(remoteFolder));
+                args.PutString(RemoteFolderBundleKey, Serializer.Serialize(remoteFolder.ShallowCopy()));
 
             if (hideSearch != null)
                 args.PutBoolean(HideSearchBundleKey, hideSearch.Value);
+
+            if (loadRemoteFromCache != null)
+                args.PutBoolean(LoadRemoteFromCacheBundleKey, loadRemoteFromCache.Value);
 
             var fragment = new FoldersListFragment
             {
@@ -379,7 +382,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected virtual (BaseFragment fragment, string tag) GetFolderFragment(Folder folder)
         {
-            return NewInstance(folder, HideSearch);
+            return NewInstance(folder, HideSearch, folder.SubFolders?.Any());
         }
 
         void HandleOutgoingDocumentCountChange(OugoingDocumentCountMessage outgoingMessageCount)
@@ -431,7 +434,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 await RefreshRemote(forceRefresh);
 
             if (AvailableSections.Contains(Section.Favourites))
-                await RefreshFavorites();
+                await RefreshFavorites(forceRefresh);
 
             if (AvailableSections.Contains(Section.Local))
                 RefreshLocal();
@@ -485,9 +488,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        async Task RefreshFavorites()
+        async Task RefreshFavorites(bool forceOnlineIfNecessary = false)
         {
             CommonConfig.Logger.Info($"Refreshing favourite folders...");
+
+            if (forceOnlineIfNecessary && PlatformConfig.Preferences.SyncFavoritesEnabled && CommonConfig.Reachability.IsReachable)
+            {
+                try
+                {
+                    await Managers.FoldersManager.GetServiceFavoriteFoldersAsync(new List<ModuleType>() { RemoteFolder.Module });
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error("Unable to get favorite folders from server...", ex);
+                }
+            }
 
             var favouriteFolders = await Managers.FoldersManager.GetFavoriteFoldersAsync(RemoteFolder.Module);
             Adapter.Refresh(favouriteFolders, Section.Favourites);
@@ -626,33 +641,30 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (foldersFavoriteState.Any(v => !v))
                 menu.Add(Menu.None, MenuItemActions.AddToFavourites, MenuItemActions.AddToFavourites, Resource.String.add_favorites).SetShowAsAction(ShowAsAction.Never);
 
-            if (section != Section.Favourites)
+            var foldersAvailableOfflineState = selectedFolders.Select(f => AsyncHelpers.RunSync(() => Managers.FoldersManager.IsSavedFolderOfflineInfo(f)));
+
+            if (RemoteFolder.Module == ModuleType.Documents)
             {
-                var foldersAvailableOfflineState = selectedFolders.Select(f => AsyncHelpers.RunSync(() => Managers.FoldersManager.IsSavedFolderOfflineInfo(f)));
+                if (foldersAvailableOfflineState.Any(v => v))
+                    menu.Add(Menu.None, MenuItemActions.DisableOffline, MenuItemActions.DisableOffline, Resource.String.remove_offline).SetShowAsAction(ShowAsAction.Never);
+                if (foldersAvailableOfflineState.Any(v => !v))
+                    menu.Add(Menu.None, MenuItemActions.EnableOffline, MenuItemActions.EnableOffline, Resource.String.add_offline).SetShowAsAction(ShowAsAction.Never);
+            }
 
-                if (RemoteFolder.Module == ModuleType.Documents)
-                {
-                    if (foldersAvailableOfflineState.Any(v => v))
-                        menu.Add(Menu.None, MenuItemActions.DisableOffline, MenuItemActions.DisableOffline, Resource.String.remove_offline).SetShowAsAction(ShowAsAction.Never);
-                    if (foldersAvailableOfflineState.Any(v => !v))
-                        menu.Add(Menu.None, MenuItemActions.EnableOffline, MenuItemActions.EnableOffline, Resource.String.add_offline).SetShowAsAction(ShowAsAction.Never);
-                }
+            if ((RemoteFolder.Module == ModuleType.Contacts || RemoteFolder.Module == ModuleType.Shortcodes) && selectedFolders.Count == 1 && AsyncHelpers.RunSync(() => Managers.FoldersManager.IsSavedFolderOfflineInfo(selectedFolders[0])))
+                menu.Add(Menu.None, MenuItemActions.MakeOnline, MenuItemActions.MakeOnline, Resource.String.make_online).SetShowAsAction(ShowAsAction.Never);
 
-                if ((RemoteFolder.Module == ModuleType.Contacts || RemoteFolder.Module == ModuleType.Shortcodes) && selectedFolders.Count == 1 && AsyncHelpers.RunSync(() => Managers.FoldersManager.IsSavedFolderOfflineInfo(selectedFolders[0])))
-                    menu.Add(Menu.None, MenuItemActions.MakeOnline, MenuItemActions.MakeOnline, Resource.String.make_online).SetShowAsAction(ShowAsAction.Never);
+            if ((RemoteFolder.Module == ModuleType.Contacts || RemoteFolder.Module == ModuleType.Shortcodes) && selectedFolders.Count == 1)
+                menu.Add(Menu.None, MenuItemActions.SaveOffline, MenuItemActions.SaveOffline, Resource.String.save_offline).SetShowAsAction(ShowAsAction.Never);
 
-                if ((RemoteFolder.Module == ModuleType.Contacts || RemoteFolder.Module == ModuleType.Shortcodes) && selectedFolders.Count == 1)
-                    menu.Add(Menu.None, MenuItemActions.SaveOffline, MenuItemActions.SaveOffline, Resource.String.save_offline).SetShowAsAction(ShowAsAction.Never);
+            if (RemoteFolder.Module == ModuleType.Documents && !string.IsNullOrEmpty(PlatformConfig.Preferences.PushNotificationToken))
+            {
+                var foldersSubscribedState = selectedFolders.Select(f => f.Subscribed);
 
-                if (RemoteFolder.Module == ModuleType.Documents && !string.IsNullOrEmpty(PlatformConfig.Preferences.PushNotificationToken))
-                {
-                    var foldersSubscribedState = selectedFolders.Select(f => f.Subscribed);
-
-                    if (foldersSubscribedState.Any(v => v))
-                        menu.Add(Menu.None, MenuItemActions.Unsubscribe, MenuItemActions.Unsubscribe, Resource.String.disable_notifications_folder).SetShowAsAction(ShowAsAction.Never);
-                    if (foldersSubscribedState.Any(v => !v))
-                        menu.Add(Menu.None, MenuItemActions.Subscribe, MenuItemActions.Subscribe, Resource.String.enable_notifications_folder).SetShowAsAction(ShowAsAction.Never);
-                }
+                if (foldersSubscribedState.Any(v => v))
+                    menu.Add(Menu.None, MenuItemActions.Unsubscribe, MenuItemActions.Unsubscribe, Resource.String.disable_notifications_folder).SetShowAsAction(ShowAsAction.Never);
+                if (foldersSubscribedState.Any(v => !v))
+                    menu.Add(Menu.None, MenuItemActions.Subscribe, MenuItemActions.Subscribe, Resource.String.enable_notifications_folder).SetShowAsAction(ShowAsAction.Never);
             }
 
             return true;
@@ -727,23 +739,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var module = selectedFolders.First().Module;
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, enabled ? Resource.String.enabling_notifications : Resource.String.disabling_notifications_folders, Resource.String.please_wait);
 
-            var t = Managers.NotificationsManager.SetFoldersNotificationsAsync(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken, module, selectedFolders, enabled);
-            await t;
-
-            if (t.IsFaulted)
+            try
+            {
+                await Managers.NotificationsManager.SetFoldersNotificationsAsync(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken, module, selectedFolders, enabled);
+            }
+            catch (Exception ex)
             {
                 dismissAction();
+                CommonConfig.Logger.Error($"{(enabled ? "Subscription" : "Unsubscription")}  failed", ex);
+                Dialogs.ShowErrorDialog(Activity, ex);
+                actionMode.Finish();
 
-                CommonConfig.Logger.Error($"{(enabled ? "Subscription" : "Unsubscription")}  failed", t.Exception.InnerException);
-                Dialogs.ShowErrorDialog(Activity, t.Exception.InnerException);
-            }
-            else
-            {
-                dismissAction();
-                Adapter.RefreshFolders(selectedFolders, enabled);
-                SearchAdapter.RefreshFolders(selectedFolders, enabled);
+                return;
             }
 
+            dismissAction();
+            Adapter.RefreshFolders(selectedFolders, enabled);
+            SearchAdapter.RefreshFolders(selectedFolders, enabled);
             actionMode.Finish();
         }
 
@@ -757,28 +769,27 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             CommonConfig.Logger.Info($"Setting offline status of {selectedFolders.Count} folders to {offline}");
 
-            Task t = null;
-
-            foreach (var folder in selectedFolders)
+            try
             {
-                if (offline)
-                    t = Managers.FoldersManager.AddSavedFolderInfo(folder);
-                else
-                    t = Managers.FoldersManager.RemoveSavedFolderInfo(folder);
-                await t;
+                foreach (var folder in selectedFolders)
+                {
+                    if (offline)
+                        await Managers.FoldersManager.AddSavedFolderInfo(folder);
+                    else
+                        await Managers.FoldersManager.RemoveSavedFolderInfo(folder);
+                }
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Error while changing offline status for folders", ex.InnerException);
+                Dialogs.ShowErrorDialog(Activity, ex.InnerException);
+                actionMode.Finish();
+
+                return;
             }
 
-            if (t.IsFaulted)
-            {
-                CommonConfig.Logger.Error($"Error while changing offline status for folders", t.Exception.InnerException);
-                Dialogs.ShowErrorDialog(Activity, t.Exception.InnerException);
-            }
-            else
-            {
-                Adapter.RefreshFolders(selectedFolders);
-                SearchAdapter.RefreshFolders(selectedFolders);
-            }
-
+            Adapter.RefreshFolders(selectedFolders);
+            SearchAdapter.RefreshFolders(selectedFolders);
             actionMode.Finish();
         }
 
@@ -792,51 +803,70 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             CommonConfig.Logger.Info($"Setting favourite status of {selectedFolders.Count} folders to {favourite}");
 
-            Task t = null;
-            foreach (var folder in selectedFolders)
+            try
             {
-                if (favourite)
-                    t = Managers.FoldersManager.AddFavoriteFolderAsync(folder.Module, folder);
-                else
-                    t = Managers.FoldersManager.RemoveFavoriteFolderAsync(folder.Module, folder);
-                await t;
+                foreach (var folder in selectedFolders)
+                {
+                    if (favourite)
+                        await Managers.FoldersManager.AddFavoriteFolderAsync(folder.Module, folder);
+                    else
+                        await Managers.FoldersManager.RemoveFavoriteFolderAsync(folder.Module, folder);
+                }
             }
-
-            if (t.IsFaulted)
+            catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Error while changing favourite status for folders", t.Exception.InnerException);
-                Dialogs.ShowErrorDialog(Activity, t.Exception.InnerException);
-            }
-            else
-            {
+                CommonConfig.Logger.Error($"Error while changing favourite status for folders", ex.InnerException);
+                Dialogs.ShowErrorDialog(Activity, ex.InnerException);
                 actionMode.Finish();
 
-                if (AvailableSections.Contains(Section.Favourites))
-                    await RefreshFavorites();
+                return;
             }
+
+            if (PlatformConfig.Preferences.SyncFavoritesEnabled && !CommonConfig.Reachability.IsReachable)
+            {
+                Dialogs.ShowErrorDialog(Activity, new Exception(GetString(Resource.String.sync_error_network)));
+                return;
+            }
+
+            if (PlatformConfig.Preferences.SyncFavoritesEnabled && CommonConfig.Reachability.IsReachable)
+            {
+                try
+                {
+                    await Managers.FoldersManager.UpdateServiceFavoriteFoldersAsync(); //TODO need to do the same on iOS (order of execution and remove (add and remove)
+                }
+                catch
+                {
+                    Dialogs.ShowErrorDialog(Activity, new Exception(GetString(Resource.String.sync_error_general)));
+                    return;
+                }
+            }
+
+            actionMode.Finish();
+
+            if (AvailableSections.Contains(Section.Favourites))
+                await RefreshFavorites();
         }
 
-        void MakeFolderOnline()
+        async void MakeFolderOnline()
         {
             var selectedFolder = CurrentAdapter.GetSelectedItems().FirstOrDefault();
             if (selectedFolder == null)
                 return;
 
-            Task.Run(async () =>
+            try
             {
                 await Managers.FoldersManager.RemoveSavedFolderInfo(selectedFolder);
-            }).ContinueWith((t) =>
+            }
+            catch (Exception ex)
             {
-                if (t.IsFaulted)
-                {
-                    CommonConfig.Logger.Error($"Error while making folder online.", t.Exception.InnerException);
-                    Dialogs.ShowErrorDialog(Activity, t.Exception.InnerException);
-                }
-                else
-                {
-                    actionMode.Finish();
-                }
-            }, TaskScheduler.FromCurrentSynchronizationContext());
+                CommonConfig.Logger.Error($"Error while making folder online.", ex.InnerException);
+                Dialogs.ShowErrorDialog(Activity, ex.InnerException);
+                actionMode.Finish();
+
+                return;
+            }
+
+            actionMode.Finish();
         }
 
         void SaveFolderOffline()

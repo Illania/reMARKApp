@@ -45,17 +45,18 @@ function InsertContent(type, id, content) {
     templateNode.setAttribute('id', 'template_' + id);
     var templateContent = content;
 
+    if (templateType == 'text') {
+        templateNode.innerText = templateContent;
+    }
+
+    if (templateType == 'html') {
+        templateNode.innerHTML = templateContent;
+    }
+
     var selection = window.getSelection();
     if(selection !== undefined && savedRange !== null) {
         var range = savedRange;
         range.deleteContents();
-
-        if (templateType == 'text') {
-            templateNode.innerText = templateContent;
-        }
-        if (templateType == 'html') {
-            templateNode.innerHTML = templateContent;
-        }
 
         var fragment = document.createDocumentFragment(), node, lastNode;
 
@@ -74,18 +75,16 @@ function InsertContent(type, id, content) {
         }
     }
     else {
+
         var editor = document.getElementById('editor');
 
-        if (templateType == 'text') {
-            templateNode.innerText = templateContent;
+        if (editor == null) {
+            var header = document.getElementById('headerpadding');
+            header.parentNode.insertBefore(templateNode, header.nextSibling);
         }
-
-        if (templateType == 'html') {
-            templateNode.innerHTML = templateContent;
+        else {
+            editor.prepend(templateNode);
         }
-
-        editor.prepend(templateNode);
     }
-
 };
 

@@ -55,7 +55,7 @@
 		<ConsolePause>false</ConsolePause>
 		<MtouchArch>ARM64</MtouchArch>
 		<CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
-		<CodesignKey>iPhone Developer</CodesignKey>
+		<CodesignKey>iPhone Developer: Lars Hansen (TUYUES9KMZ)</CodesignKey>
 		<MtouchDebug>true</MtouchDebug>
 		<RunCodeAnalysis>true</RunCodeAnalysis>
 		<MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
@@ -136,8 +136,6 @@
 		<Compile Include="Ui\ViewControllers\ShortcodeViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ShortcodesSearchResultsViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ShortcodesSplitViewController.cs" />
-		<Compile Include="Ui\ViewControllers\SimpleMainViewController.cs" />
-		<Compile Include="Ui\ViewControllers\SplitMainViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ComposeDocumentView\SuggestionsListView.cs" />
 		<Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\AttachmentsView.cs" />
 		<Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\BccView.cs" />
@@ -264,6 +262,12 @@
 		<Compile Include="Ui\ViewControllers\OnBoardingViewController.cs" />
 		<Compile Include="Ui\Common\BadgeBarButtonItem.cs" />
 		<Compile Include="Ui\ViewControllers\CategoriesListViewController.cs" />
+		<Compile Include="Ui\ViewControllers\CalendarTestViewController.cs" />
+		<Compile Include="Ui\Common\ModuleNavigationController.cs" />
+		<Compile Include="Ui\ViewControllers\SimpleMainViewController.cs" />
+		<Compile Include="Ui\ViewControllers\SplitMainViewController.cs" />
+		<Compile Include="Model\HubMessages\NavigationModuleChangedMessage.cs" />
+		<Compile Include="Model\NavigationModule.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
@@ -349,6 +353,9 @@
 		<Reference Include="Firebase.CloudMessaging">
 		  <HintPath>..\packages\Xamarin.Firebase.iOS.CloudMessaging.3.0.3\lib\Xamarin.iOS10\Firebase.CloudMessaging.dll</HintPath>
 		</Reference>
+		<Reference Include="Lottie.iOS">
+		  <HintPath>..\packages\Com.Airbnb.iOS.Lottie.2.5.7\lib\xamarinios10\Lottie.iOS.dll</HintPath>
+		</Reference>
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Mark5.Mobile.Common\Mark5.Mobile.Common.csproj">
@@ -400,37 +407,6 @@
 		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json">
 			<InProject>false</InProject>
 		</ImageAsset>
-		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-167.png">
-			<InProject>false</InProject>
-		</ImageAsset>
-		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-60%402x.png">
-			<InProject>false</InProject>
-		</ImageAsset>
-		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-60%403x.png">
-			<InProject>false</InProject>
-		</ImageAsset>
-		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-76.png">
-			<InProject>false</InProject>
-		</ImageAsset>
-		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-76%402x.png">
-			<InProject>false</InProject>
-		</ImageAsset>
-		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-Small-40.png">
-			<InProject>false</InProject>
-		</ImageAsset>
-		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-Small-40%402x.png">
-			<InProject>false</InProject>
-		</ImageAsset>
-		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-Small.png">
-			<InProject>false</InProject>
-		</ImageAsset>
-		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-Small%402x.png">
-			<InProject>false</InProject>
-		</ImageAsset>
-		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-Small%403x.png">
-			<InProject>false</InProject>
-		</ImageAsset>
-		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appstore1024.png" />
 		<ImageAsset Include="Assets_icons.xcassets\Contents.json" />
 		<ImageAsset Include="Assets_icons.xcassets\Actions.imageset\Contents.json" />
 		<ImageAsset Include="Assets_icons.xcassets\Actions.imageset\actions%402x.png" />
@@ -595,29 +571,58 @@
 		<ImageAsset Include="Assets_icons.xcassets\Arrow-Expand.imageset\arrow_expand%402x.png" />
 		<ImageAsset Include="Assets_icons.xcassets\Arrow-Expand.imageset\arrow_expand%403x.png" />
 		<ImageAsset Include="Assets_onboarding.xcassets\Contents.json" />
-		<ImageAsset Include="Assets_onboarding.xcassets\2.8_1.imageset\Contents.json" />
-		<ImageAsset Include="Assets_onboarding.xcassets\2.8_1.imageset\Slide 1.pdf" />
-		<ImageAsset Include="Assets_onboarding.xcassets\2.8_2.imageset\Contents.json" />
-		<ImageAsset Include="Assets_onboarding.xcassets\2.8_2.imageset\Slide 2.pdf" />
-		<ImageAsset Include="Assets_onboarding.xcassets\2.8_3.imageset\Contents.json" />
-		<ImageAsset Include="Assets_onboarding.xcassets\2.8_3.imageset\Slide 3.pdf" />
-		<ImageAsset Include="Assets_onboarding.xcassets\2.8_4.imageset\Contents.json" />
-		<ImageAsset Include="Assets_onboarding.xcassets\2.8_4.imageset\Slide 3.pdf" />
-		<ImageAsset Include="Assets_onboarding.xcassets\2.8_5.imageset\Contents.json" />
-		<ImageAsset Include="Assets_onboarding.xcassets\2.8_5.imageset\Slide 5.pdf" />
-		<ImageAsset Include="Assets_onboarding.xcassets\2.8_4.imageset\Slide 4.pdf" />
+		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon40.png" />
+		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon60.png" />
+		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon58.png" />
+		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon87.png" />
+		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon80.png" />
+		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon120.png" />
+		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon180.png" />
+		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon20.png" />
+		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon29.png" />
+		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon76.png" />
+		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon152.png" />
+		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon167.png" />
+		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon1024.png" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_1.imageset\Contents.json" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_1.imageset\Page01.pdf" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_2.imageset\Contents.json" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_2.imageset\Page02.pdf" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_3.imageset\Contents.json" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_3.imageset\Page03.pdf" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_4.imageset\Contents.json" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_4.imageset\Page04.pdf" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_5.imageset\Contents.json" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_5.imageset\Page05.pdf" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_6.imageset\Contents.json" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_6.imageset\Page06.pdf" />
+		<ImageAsset Include="Assets_icons.xcassets\Nav-search.imageset\Contents.json" />
+		<ImageAsset Include="Assets_icons.xcassets\Nav-mail.imageset\Contents.json" />
+		<ImageAsset Include="Assets_icons.xcassets\Nav-mail.imageset\Nav-mail%402x.png" />
+		<ImageAsset Include="Assets_icons.xcassets\Nav-contacts.imageset\Contents.json" />
+		<ImageAsset Include="Assets_icons.xcassets\Nav-contacts.imageset\Nav-contacts%402x.png" />
+		<ImageAsset Include="Assets_icons.xcassets\Nav-contacts.imageset\Nav-contacts%403x.png" />
+		<ImageAsset Include="Assets_icons.xcassets\Nav-search.imageset\Nav-search%402x.png" />
+		<ImageAsset Include="Assets_icons.xcassets\Nav-search.imageset\Nav-search%403x.png" />
+		<ImageAsset Include="Assets_icons.xcassets\Nav-calendar.imageset\Contents.json" />
+		<ImageAsset Include="Assets_icons.xcassets\Nav-calendar.imageset\Nav-calendar%402x.png" />
+		<ImageAsset Include="Assets_icons.xcassets\Nav-calendar.imageset\Nav-calendar%403x.png" />
+		<ImageAsset Include="Assets_icons.xcassets\Nav-shortcodes.imageset\Contents.json" />
+		<ImageAsset Include="Assets_icons.xcassets\Nav-shortcodes.imageset\Nav-shortcodes%403x.png" />
+		<ImageAsset Include="Assets_icons.xcassets\Nav-shortcodes.imageset\Nav-shortcodes%402x.png" />
+		<ImageAsset Include="Assets_icons.xcassets\Nav-settings.imageset\Contents.json" />
+		<ImageAsset Include="Assets_icons.xcassets\Nav-settings.imageset\Nav-settings%402x.png" />
+		<ImageAsset Include="Assets_icons.xcassets\Nav-settings.imageset\Nav-settings%403x.png" />
+		<ImageAsset Include="Assets_icons.xcassets\Nav-mail.imageset\Nav-mail%403x.png" />
+		<ImageAsset Include="Assets_icons.xcassets\Search-Filled.imageset\Contents.json" />
+		<ImageAsset Include="Assets_icons.xcassets\Search-Filled.imageset\Search-Filled%402x.png" />
+		<ImageAsset Include="Assets_icons.xcassets\Search-Filled.imageset\Search-Filled%403x.png" />
 	</ItemGroup>
 	<ItemGroup>
 		<BundleResource Include="Resources\Base.lproj\Localizable.strings" />
 		<BundleResource Include="Resources\Settings.bundle\Root.Login.inApp.plist" />
 		<BundleResource Include="Resources\Settings.bundle\Root.inApp.plist" />
 		<BundleResource Include="Resources\Settings.bundle\en.lproj\Root.strings" />
-		<BundleResource Include="Resources\startscreens\start-screen-logo-ipadretina-landscape.png" />
-		<BundleResource Include="Resources\startscreens\start-screen-logo-ipadretina-portrait.png" />
-		<BundleResource Include="Resources\startscreens\start-screen-logo-retina4.png" />
-		<BundleResource Include="Resources\startscreens\start-screen-logo-retinahd47.png" />
-		<BundleResource Include="Resources\startscreens\start-screen-logo-retinahd55-landscape.png" />
-		<BundleResource Include="Resources\startscreens\start-screen-logo-retinahd55.png" />
 		<BundleResource Include="GoogleService-Info.plist" />
 		<BundleResource Include="Resources\html\editor.html" />
 		<BundleResource Include="Resources\html\empty.html" />
@@ -628,13 +633,9 @@
 		<BundleResource Include="Resources\html\headerPadding.js" />
 		<BundleResource Include="Resources\html\replyHeader.html" />
 		<BundleResource Include="Resources\html\blank.html" />
-		<BundleResource Include="Resources\startscreens\start-screen-bg-ipadretina-landscape.png" />
-		<BundleResource Include="Resources\startscreens\start-screen-bg-ipadretina-portrait.png" />
-		<BundleResource Include="Resources\startscreens\start-screen-bg-retina4.png" />
-		<BundleResource Include="Resources\startscreens\start-screen-bg-retinahd47.png" />
-		<BundleResource Include="Resources\startscreens\start-screen-bg-retinahd55-landscape.png" />
-		<BundleResource Include="Resources\startscreens\start-screen-bg-retinahd55.png" />
 		<BundleResource Include="Resources\html\replyEditor.html" />
+		<BundleResource Include="Resources\splash.json" />
+		<BundleResource Include="Resources\Base.lproj\Onboarding.strings" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="Ui\ViewControllers\ContactsList\" />
@@ -705,6 +706,19 @@
 	  <Folder Include="Assets_onboarding.xcassets\2.8_3.imageset\" />
 	  <Folder Include="Assets_onboarding.xcassets\2.8_4.imageset\" />
 	  <Folder Include="Assets_onboarding.xcassets\2.8_5.imageset\" />
+	  <Folder Include="Assets_onboarding.xcassets\onboarding_1.imageset\" />
+	  <Folder Include="Assets_onboarding.xcassets\onboarding_2.imageset\" />
+	  <Folder Include="Assets_onboarding.xcassets\onboarding_3.imageset\" />
+	  <Folder Include="Assets_onboarding.xcassets\onboarding_4.imageset\" />
+	  <Folder Include="Assets_onboarding.xcassets\onboarding_5.imageset\" />
+	  <Folder Include="Assets_onboarding.xcassets\onboarding_6.imageset\" />
+	  <Folder Include="Assets_icons.xcassets\Nav-search.imageset\" />
+	  <Folder Include="Assets_icons.xcassets\Nav-mail.imageset\" />
+	  <Folder Include="Assets_icons.xcassets\Nav-contacts.imageset\" />
+	  <Folder Include="Assets_icons.xcassets\Nav-calendar.imageset\" />
+	  <Folder Include="Assets_icons.xcassets\Nav-shortcodes.imageset\" />
+	  <Folder Include="Assets_icons.xcassets\Nav-settings.imageset\" />
+	  <Folder Include="Assets_icons.xcassets\Search-Filled.imageset\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 	<Import Project="..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets" Condition="Exists('..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets')" />

@@ -13,7 +13,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
     public class PickerShortcodesFolderListActivity : BaseAppCompatActivity
     {
-        public const string ShortcodesResultKey = "ShortcodesResult_3e9d47b4-4d50-401e-ac1c-7ae03dedfb4f";
+        public const string ShortcodeIdResultKey = "ShortcodesIdResult_3e9d47b4-4d50-401e-ac1c-7ae03dedfb4f";
+        public const string FolderIdResultKey = "FolderIdResult_87bc6427-8a6c-44a8-be97-1e410e79129f";
         public const int ShortcodesRequestCode = 123;
 
         Toolbar toolbar;
@@ -40,7 +41,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             if (savedInstanceState == null)
             {
                 var ft = SupportFragmentManager.BeginTransaction();
-                var (pcflf,tag) = PickerShortcodesFolderListFragment.NewInstance(Folder.RootForModule(ModuleType.Shortcodes),true,true,true);
+                var (pcflf, tag) = PickerShortcodesFolderListFragment.NewInstance(Folder.RootForModule(ModuleType.Shortcodes), true, true, true);
                 ft.Replace(Resource.Id.fragment_container, pcflf, tag);
                 ft.Commit();
 
@@ -54,12 +55,15 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
         {
-            if (requestCode == ShortcodesRequestCode && resultCode == Result.Ok && data.HasExtra(PickerShortcodesListActivity.ShortcodeResultKey))
+            if (requestCode == ShortcodesRequestCode && resultCode == Result.Ok && data.HasExtra(PickerShortcodesListActivity.ShortcodeIdResultKey))
             {
-                var recipientString = data.GetStringExtra(PickerShortcodesListActivity.ShortcodeResultKey);
+                var shortcodeId = data.GetIntExtra(PickerShortcodesListActivity.ShortcodeIdResultKey, -1);
+                var folderId = data.GetIntExtra(PickerShortcodesListActivity.FolderIdResultKey, -1);
 
                 var resultIntent = new Intent();
-                resultIntent.PutExtra(ShortcodesResultKey, recipientString);
+                resultIntent.PutExtra(ShortcodeIdResultKey, shortcodeId);
+                resultIntent.PutExtra(FolderIdResultKey, folderId);
+
                 SetResult(Result.Ok, resultIntent);
                 Finish();
             }

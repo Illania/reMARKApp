@@ -38,7 +38,14 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         {
             var intent = new Intent(context, typeof(SwipeDocumentActivity));
             intent.PutExtra(FolderIntentKey, Serializer.Serialize(folder));
-            intent.PutExtra(DocumentPreviewIntentKey, Serializer.Serialize(documentPreview));
+
+            if (documentPreview != null)
+            {
+                if (IsDocumentPreviewTooBig(documentPreview))
+                    intent.PutExtra(DocumentIdIntentKey, documentPreview.Id);
+                else
+                    intent.PutExtra(DocumentPreviewIntentKey, Serializer.Serialize(documentPreview));
+            }
 
             return intent;
         }
@@ -90,10 +97,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 CommonConfig.Logger.Info($"Created {nameof(SwipeDocumentActivity)}");
 
-                if (activityState.Folder != null && mainFragmentState.DocumentPreview != null)
+                var initialDocumentId = mainFragmentState?.DocumentPreview?.Id ?? mainFragmentState.DocumentId;
+
+                if (activityState.Folder != null && initialDocumentId > 0)
                     try
                     {
-                        var previousIds = await Managers.DocumentsManager.GetNeighbourDocumentsIdAsync(activityState.Folder, mainFragmentState.DocumentPreview.Id, true, false, MaxNeighbours);
+                        var previousIds = await Managers.DocumentsManager.GetNeighbourDocumentsIdAsync(activityState.Folder, initialDocumentId.Value, true, false, MaxNeighbours);
                         previousIds.Reverse();
 
                         foreach (var previousId in previousIds)
@@ -106,7 +115,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                             activityState.Position++;
                         }
 
-                        var nextIds = await Managers.DocumentsManager.GetNeighbourDocumentsIdAsync(activityState.Folder, mainFragmentState.DocumentPreview.Id, false, true, MaxNeighbours);
+                        var nextIds = await Managers.DocumentsManager.GetNeighbourDocumentsIdAsync(activityState.Folder, initialDocumentId.Value, false, true, MaxNeighbours);
 
                         foreach (var nextId in nextIds)
                             activityState.FragmentStates.Add(new DocumentFragmentState
@@ -159,6 +168,21 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             base.Finish();
 
             OverridePendingTransition(Resource.Animation.enter_from_left_half, Resource.Animation.exit_to_right);
+        }
+
+        static bool IsDocumentPreviewTooBig(DocumentPreview documentPreview)
+        {
+            //Ballpark calculation to avoid TransactionTooLargeException
+            //https://developer.android.com/reference/android/os/TransactionTooLargeException
+
+            var len1 = documentPreview.AddressesString.Length;
+            var len2 = documentPreview.Subject.Length;
+            var len3 = documentPreview.CategoriesString.Length;
+            var len4 = documentPreview.Preview.Length;
+
+            var sizeInKiB = (len1 + len2 + len3 + len4) * 2 / 1024;
+
+            return sizeInKiB > 200;
         }
 
         void ViewPager.IOnPageChangeListener.OnPageScrollStateChanged(int state)

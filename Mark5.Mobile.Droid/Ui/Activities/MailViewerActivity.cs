@@ -27,7 +27,7 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-    [Activity(Label = "MARK5 Mail Viewer", ScreenOrientation = ScreenOrientation.Portrait, Exported = true)]
+    [Activity(Label = "reMARK Mail Viewer", ScreenOrientation = ScreenOrientation.Portrait, Exported = true)]
     [IntentFilter(new[] { Intent.ActionView, Intent.ActionSend },
                   Categories = new[] { Intent.CategoryDefault },
                   DataMimeTypes = new[] { "application/octet-stream", "message/rfc822" })]
@@ -144,7 +144,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 {
                     var auth = AuthenticatorFactory.Create();
                     if (!await auth.IsAuthenticatedAsync())
-                        throw new MailViewerException("You need to log in to MARK5 before you can use mail viewer.");
+                        throw new MailViewerException("You need to log in to reMARK before you can use mail viewer.");
 
                     if (uri == null)
                         throw new MailViewerException("File could not be loaded.");

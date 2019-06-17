@@ -3,9 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDisplayName</key>
-	<string>MARK5</string>
-	<key>CFBundleName</key>
-	<string>MARK5</string>
+	<string>reMARK</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleInfoDictionaryVersion</key>
@@ -24,8 +22,10 @@
 	<key>CFBundleIdentifier</key>
 	<string>com.nordic-it.mark5.mobile.ios.callid</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.8</string>
+	<string>5.0</string>
+	<key>CFBundleName</key>
+	<string>reMARK</string>
 	<key>CFBundleVersion</key>
-	<string>237</string>
+	<string>501</string>
 </dict>
 </plist>

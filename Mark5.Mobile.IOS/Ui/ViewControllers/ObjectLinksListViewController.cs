@@ -105,7 +105,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeNavigationBar()
         {
-            NavigationItem.Title = Localization.GetString("links");
+            NavigationItem.Title = Localization.GetString("overview");
 
             doneItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
             NavigationItem.SetRightBarButtonItem(doneItem, false);
@@ -194,10 +194,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var objectLinks = await Managers.CommonActionsManager.GetObjectLinksAsync(businessEntity);
 
-                ProcessObjectLinks(objectLinks);
-
                 var grouppedObjectLinks = objectLinks.OrderBy(ol => ol.TypeInfo.DescriptionSimple)
-                                                     .GroupBy(ol => ol.IsReverse ? ol.TypeInfo.DescriptionComplexReverse : ol.TypeInfo.DescriptionComplex)
+                                                     .GroupBy(ol => ol.TypeInfo.DescriptionSimple)
                                                      .ToDictionary(kv => kv.Key, kv => kv.ToArray());
                 ((DataSource)TableView.Source).SetItems(grouppedObjectLinks);
             }
@@ -209,29 +207,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 DismissViewController(true, null);
             }
-        }
-
-        void ProcessObjectLinks(List<ObjectLink> ols)
-        {
-            foreach (var ol in ols)
-            {
-                ol.TypeInfo.DescriptionAction = ProcessString(ol.TypeInfo.DescriptionAction, ol.FromObjectType, ol.ToObjectType);
-                ol.TypeInfo.DescriptionActionReverse = ProcessString(ol.TypeInfo.DescriptionActionReverse, ol.FromObjectType, ol.ToObjectType);
-                ol.TypeInfo.DescriptionComplex = ProcessString(ol.TypeInfo.DescriptionComplex, ol.FromObjectType, ol.ToObjectType);
-                ol.TypeInfo.DescriptionComplexReverse = ProcessString(ol.TypeInfo.DescriptionComplexReverse, ol.FromObjectType, ol.ToObjectType);
-                ol.TypeInfo.DescriptionSimple = ProcessString(ol.TypeInfo.DescriptionSimple, ol.FromObjectType, ol.ToObjectType);
-            }
-        }
-
-        string ProcessString(string str, ObjectType from, ObjectType to)
-        {
-            if (str.Contains("%"))
-            {
-                str = str.Replace("%ObjFromName%", from.ToString());
-                str = str.Replace("%ObjToName%", to.ToString());
-            }
-
-            return str;
         }
 
         class DataSource : UITableViewSource, IDisposable

@@ -140,12 +140,6 @@ namespace Mark5.Mobile.Common.Manager
                 var shortcodes = businessEntities.OfType<Shortcode>();
                 if (shortcodes.Any())
                     await shortcodesDataAccess.RemoveFromFolderAsync(shortcodes.ToList(), fromFolder);
-                var appointments = businessEntities.OfType<CalendarAppointment>();
-                if (appointments.Any())
-                    await calendarDataAccess.RemoveFromFolderAsync(appointments.ToList(), fromFolder);
-                var tasks = businessEntities.OfType<CalendarTask>();
-                if (tasks.Any())
-                    await calendarDataAccess.RemoveFromFolderAsync(tasks.ToList(), fromFolder);
 
                 CommonConfig.MessengerHub.Publish(new EntityMovedFromFolderMessage(this, businessEntities.First().ObjectType, fromFolder.Id, businessEntities.Select(b => b.Id).ToList()));
 
@@ -245,12 +239,6 @@ namespace Mark5.Mobile.Common.Manager
                 var shortcodes = businessEntities.OfType<Shortcode>();
                 if (shortcodes.Any())
                     await shortcodesDataAccess.RemoveFromFolderAsync(shortcodes.ToList(), folder);
-                var appointments = businessEntities.OfType<CalendarAppointment>();
-                if (appointments.Any())
-                    await calendarDataAccess.RemoveFromFolderAsync(appointments.ToList(), folder);
-                var tasks = businessEntities.OfType<CalendarTask>();
-                if (tasks.Any())
-                    await calendarDataAccess.RemoveFromFolderAsync(tasks.ToList(), folder);
 
                 CommonConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this, businessEntities.First().ObjectType, folder.Id,
                                                                                      businessEntities.Select(b => b.Id).ToList()));
@@ -301,9 +289,6 @@ namespace Mark5.Mobile.Common.Manager
                 var appointments = businessEntities.OfType<CalendarAppointment>();
                 if (appointments.Any())
                     await calendarDataAccess.DeleteAsync(appointments.ToList());
-                var tasks = businessEntities.OfType<CalendarTask>();
-                if (tasks.Any())
-                    await calendarDataAccess.DeleteAsync(tasks.ToList());
 
                 CommonConfig.MessengerHub.Publish(new EntityRemovedMessage(this,
                                                                            businessEntities.First().ObjectType, businessEntities.Select(b => b.Id).ToList()));

@@ -195,13 +195,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void ExitItem_Clicked(object sender, EventArgs e)
         {
-            tcs.SetResult(null);
+            tcs.TrySetResult(null);
             DismissViewController(true, null);
         }
 
         public void PhonebookAddressSelected(Recipient pb, UITableViewCell cell)
         {
-            tcs.SetResult(pb);
+            tcs.TrySetResult(pb);
             DismissViewController(true, null);
         }
 

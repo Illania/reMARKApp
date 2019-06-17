@@ -15,9 +15,6 @@ using Mark5.Mobile.Droid.Model.Exceptions;
 using Mark5.Mobile.Droid.Utilities;
 using Mark5.ServiceReference.Exceptions;
 using Mark5.Mobile.Droid.Ui.Activities;
-using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Manager;
-using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 
 namespace Mark5.Mobile.Droid.Ui.Common
@@ -262,6 +259,24 @@ namespace Mark5.Mobile.Droid.Ui.Common
             return tcs.Task;
         }
 
+        public static Task<int> ShowListDialog(Context context, int titleId, string description, string[] items, bool includeCancel)
+        {
+            var tcs = new TaskCompletionSource<int>();
+            var builder = new MaterialDialog.Builder(context);
+            builder.Title(titleId);
+            builder.Content(description);
+            builder.Items(items);
+            builder.ItemsCallback(new ListCallback(i => tcs.SetResult(i)));
+            if (includeCancel)
+            {
+                builder.NegativeText(Resource.String.cancel);
+                builder.OnNegative(new SingleButtonCallback(() => tcs.SetResult(-1)));
+            }
+            builder.Cancelable(false);
+            builder.Show();
+            return tcs.Task;
+        }
+
         public static Task<long> ShowDatePicker(Context context, long initialTimestamp = -1, long minTimestamp = -1, long maxTimestamp = -1, bool addRemoveDateChoice = false)
         {
             var tcs = new TaskCompletionSource<long>();
@@ -433,9 +448,9 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
                             if (!t.IsFaulted)
                             {
-                                var sendWithMark5 = await ShowYesNoDialogAsync(context, Resource.String.send_with_mark5_title, Resource.String.send_report_with_mark5_content);
+                                var sendWithReMARK = await ShowYesNoDialogAsync(context, Resource.String.send_with_mark5_title, Resource.String.send_report_with_mark5_content);
 
-                                if (sendWithMark5)
+                                if (sendWithReMARK)
                                     context.StartActivity(SystemReportCollector.CreateShareReportComposeDocumentActivityIntent(context, t.Result));
                                 else
                                     context.StartActivity(SystemReportCollector.CreateShareReportIntent(context, t.Result));
@@ -470,7 +485,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
                     Task.Run(() => { return SystemReportCollector.CreateFullReport(); })
                         .ContinueWith(async t =>
                     {
-                        dismissAction();
+                        dismissAction.Invoke();
 
                         if (!t.IsFaulted)
                         {
@@ -488,6 +503,39 @@ namespace Mark5.Mobile.Droid.Ui.Common
             }
             builder.Cancelable(false);
             builder.Show();
+        }
+
+        public static Task SendCriticalReport(Context context, Exception ex)
+        {
+            if (context == null)
+                return Task.CompletedTask;
+
+            var tcs = new TaskCompletionSource<bool>();
+            var builder = new MaterialDialog.Builder(context);
+
+            builder.Title(Resource.String.critical_exception_title);
+            builder.Content(Resource.String.critical_exception_message);
+
+            builder.PositiveText(Resource.String.report);
+            builder.OnPositive(new SingleButtonCallback(() => tcs.SetResult(true)));
+            builder.NeutralText(Resource.String.cancel);
+
+            builder.OnPositive(new SingleButtonCallback(() =>
+            {
+                var dismissAction = ShowInfiniteProgressDialog(context, Resource.String.dialog_creating_report, Resource.String.please_wait);
+                Task.Run(() => { return SystemReportCollector.CreateFullReport(); })
+                    .ContinueWith(t =>
+                    {
+                        context.StartActivity(SystemReportCollector.CreateShareReportIntent(context, t.Result));
+                        dismissAction.Invoke();
+                        tcs.SetResult(true);
+                    }, TaskScheduler.FromCurrentSynchronizationContext());
+            }));
+
+            builder.Cancelable(false);
+            builder.Show();
+
+            return tcs.Task;
         }
 
         static string GetErrorTitle(Context context, Exception ex)

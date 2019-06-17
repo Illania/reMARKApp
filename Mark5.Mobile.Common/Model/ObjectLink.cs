@@ -11,5 +11,7 @@
         public bool IsReverse { get; set; }
         public string Description { get; set; }
         public ObjectLinkTypeInfo TypeInfo { get; set; }
+        public long LinkTimeStamp { get; set; } = -1;
+
     }
 }

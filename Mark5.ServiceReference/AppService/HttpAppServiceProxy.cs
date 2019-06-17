@@ -276,9 +276,9 @@ namespace Mark5.ServiceReference.AppService
             return await InvokeAsync<CreateOrUpdateShortcodeResult, CreateOrUpdateShortcodeParameters>("CreateOrUpdateShortcode", parameters, ct);
         }
 
-        public async Task<GetCalendarEventsResult> GetCalendarEventsAsync(GetCalendarEventsParameters parameters, CancellationToken ct = default(CancellationToken))
+        public async Task<GetCalendarAppointmentsResult> GetCalendarAppointmentsAsync(GetCalendarAppointmentsParameters parameters, CancellationToken ct = default(CancellationToken))
         {
-            return await InvokeAsync<GetCalendarEventsResult, GetCalendarEventsParameters>("GetCalendarEvents", parameters, ct);
+            return await InvokeAsync<GetCalendarAppointmentsResult, GetCalendarAppointmentsParameters>("GetCalendarAppointments", parameters, ct);
         }
 
         public async Task<GetCalendarAppointmentResult> GetCalendarAppointmentAsync(GetCalendarAppointmentParameters parameters, CancellationToken ct = default(CancellationToken))
@@ -286,19 +286,19 @@ namespace Mark5.ServiceReference.AppService
             return await InvokeAsync<GetCalendarAppointmentResult, GetCalendarAppointmentParameters>("GetCalendarAppointment", parameters, ct);
         }
 
-        public async Task<GetCalendarTaskResult> GetCalendarTaskAsync(GetCalendarTaskParameters parameters, CancellationToken ct = default(CancellationToken))
-        {
-            return await InvokeAsync<GetCalendarTaskResult, GetCalendarTaskParameters>("GetCalendarTask", parameters, ct);
-        }
-
         public async Task<CreateOrUpdateCalendarAppointmentResult> CreateOrUpdateCalendarAppointmentAsync(CreateOrUpdateCalendarAppointmentParameters parameters, CancellationToken ct = default(CancellationToken))
         {
             return await InvokeAsync<CreateOrUpdateCalendarAppointmentResult, CreateOrUpdateCalendarAppointmentParameters>("CreateOrUpdateCalendarAppointment", parameters, ct);
         }
 
-        public async Task<CreateOrUpdateCalendarTaskResult> CreateOrUpdateCalendarTaskAsync(CreateOrUpdateCalendarTaskParameters parameters, CancellationToken ct = default(CancellationToken))
+        public async Task<SendCalendarAppointmentInvitationsResult> SendCalendarAppointmentInvitationsAsync(SendCalendarAppointmentInvitationsParameters parameters, CancellationToken ct = default(CancellationToken))
         {
-            return await InvokeAsync<CreateOrUpdateCalendarTaskResult, CreateOrUpdateCalendarTaskParameters>("CreateOrUpdateCalendarTask", parameters, ct);
+            return await InvokeAsync<SendCalendarAppointmentInvitationsResult, SendCalendarAppointmentInvitationsParameters>("SendCalendarAppointmentInvitations", parameters, ct);
+        }
+
+        public async Task<GetCalendarAlarmsResult> GetCalendarAlarms(GetCalendarAlarmsParameters parameters, CancellationToken ct = default(CancellationToken))
+        {
+            return await InvokeAsync<GetCalendarAlarmsResult, GetCalendarAlarmsParameters>("GetCalendarAlarms", parameters, ct);
         }
 
         public async Task<GetSavedSearchesResult> GetSavedSearchesAsync(GetSavedSearchesParameters parameters, CancellationToken ct = default(CancellationToken))
@@ -319,11 +319,6 @@ namespace Mark5.ServiceReference.AppService
         public async Task<SearchShortcodesResult> SearchShortcodesAsync(SearchShortcodesParameters parameters, CancellationToken ct = default(CancellationToken))
         {
             return await InvokeAsync<SearchShortcodesResult, SearchShortcodesParameters>("SearchShortcodes", parameters, ct);
-        }
-
-        public async Task<SearchCalendarEventsResult> SearchCalendarEventsAsync(SearchCalendarEventsParameters parameters, CancellationToken ct = default(CancellationToken))
-        {
-            return await InvokeAsync<SearchCalendarEventsResult, SearchCalendarEventsParameters>("SearchCalendarEvents", parameters, ct);
         }
 
         public async Task<GetNotificationsResult> GetNotificationsAsync(GetNotificationsParameters parameters, CancellationToken ct = default(CancellationToken))
@@ -444,6 +439,16 @@ namespace Mark5.ServiceReference.AppService
         public async Task<SearchFoldersResult> SearchFolders(SearchFoldersParameters parameters, CancellationToken ct = default(CancellationToken))
         {
             return await InvokeAsync<SearchFoldersResult, SearchFoldersParameters>("SearchFolders", parameters, ct, true);
+        }
+
+        public async Task<GetFavoriteFoldersResult> GetFavoriteFolders(GetFavoriteFoldersParameters parameters, CancellationToken ct = default(CancellationToken))
+        {
+            return await InvokeAsync<GetFavoriteFoldersResult, GetFavoriteFoldersParameters>("GetFavoriteFolders", parameters, ct);
+        }
+
+        public async Task<UpdateFavoriteFoldersResult> UpdateFavoriteFolders(UpdateFavoriteFoldersParameters parameters, CancellationToken ct = default(CancellationToken))
+        {
+            return await InvokeAsync<UpdateFavoriteFoldersResult, UpdateFavoriteFoldersParameters>("UpdateFavoriteFolders", parameters, ct);
         }
     }
 }

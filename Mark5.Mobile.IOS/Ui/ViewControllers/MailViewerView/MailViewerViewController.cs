@@ -149,7 +149,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             {
                 var auth = AuthenticatorFactory.Create();
                 if (!await auth.IsAuthenticatedAsync())
-                    throw new MailViewerException("You need to log in to MARK5 before you can use mail viewer.");
+                    throw new MailViewerException("You need to log in to reMARK before you can use mail viewer.");
 
                 if (url == null)
                     throw new MailViewerException("File could not be loaded.");
