@@ -225,7 +225,6 @@
     <Compile Include="Model\Exceptions\MailViewerException.cs" />
     <Compile Include="Service\PushNotificationInstanceIdService.cs" />
     <Compile Include="Service\PushNotificationMessagingService.cs" />
-    <Compile Include="Service\ReachabilityBroadcastReceiver.cs" />
     <Compile Include="Service\Reachability.cs" />
     <Compile Include="Utilities\Conversion.cs" />
     <Compile Include="Utilities\DateTimeFormatter.cs" />
@@ -459,6 +458,7 @@
     <Compile Include="Ui\Fragments\CategoriesListFragment.cs" />
     <Compile Include="Ui\Activities\PickerInternalContactsListActivity.cs" />
     <Compile Include="Ui\Fragments\PickerInternalContactsListFragment.cs" />
+    <Compile Include="Service\ReachabilityMonitor.cs" />
     <Compile Include="Utilities\PushNotificationsUtilities.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
   </ItemGroup>

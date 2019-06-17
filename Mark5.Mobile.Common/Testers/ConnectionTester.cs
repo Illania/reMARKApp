@@ -37,7 +37,7 @@ namespace Mark5.Mobile.Common.Testers
                 var policy = Policy.Handle<Exception>().WaitAndRetryAsync(attempts, attempt => TimeSpan.FromMilliseconds(200), (exception, calculatedWaitDuration) =>
                 {
                     retries++;
-                    CommonConfig.Logger.Info($"Failed to Ping server after {retries} retry");
+                    CommonConfig.Logger.Info($"Failed to Ping server after waiting {calculatedWaitDuration}. Retry number {retries}.");
                 });
                 await policy.ExecuteAsync(async () => 
                 { 
