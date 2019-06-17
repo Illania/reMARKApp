@@ -13,7 +13,10 @@ namespace Mark5.Mobile.Droid.Service
 
         public ReachabilityMonitor()
         {
-            networkRequest = new NetworkRequest.Builder().AddTransportType(TransportType.Cellular).AddTransportType(TransportType.Wifi).Build();
+            networkRequest = new NetworkRequest.Builder()
+                .AddTransportType(TransportType.Cellular)
+                .AddTransportType(TransportType.Wifi)
+                .AddTransportType(TransportType.Vpn).Build();
         }
 
         public void Register(Context context)
@@ -29,7 +32,7 @@ namespace Mark5.Mobile.Droid.Service
 
         public void Unregister(Context context)
         {
-           if (!registered)
+            if (!registered)
                 return;
 
             registered = false;
