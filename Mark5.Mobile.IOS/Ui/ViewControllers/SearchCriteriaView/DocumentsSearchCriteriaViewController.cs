@@ -36,6 +36,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             StackView.AddArrangedSubview(new AttachmentsUnreadSearchView());
             if (ServerConfig.SystemSettings.DocumentsModuleInfo.HandledFieldEnabled)
                 StackView.AddArrangedSubview(new HandledSearchView());
+
+            var transparentView = new UIView()
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                Alpha = 0,
+            };
+            transparentView.AddConstraint(transparentView.HeightAnchor.ConstraintEqualTo(50f));
+
+            StackView.AddArrangedSubview(transparentView);
+
         }
 
         public override void ViewDidLoad()

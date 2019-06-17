@@ -64,7 +64,8 @@ namespace Mark5.Mobile.Common.Manager
                     Token = ConnectionInfo.Token
                 });
 
-                if (linesResult.IncomingLines != null)
+                // lineResult below appservice.v3 is null
+                if (linesResult?.IncomingLines != null)
                     lines.AddRange(linesResult.IncomingLines.WhereNotNull().Select(DataContractConverters.Convert));
             }
             catch (Exception ex)
