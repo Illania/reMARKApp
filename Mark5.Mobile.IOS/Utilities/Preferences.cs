@@ -26,6 +26,7 @@ namespace Mark5.Mobile.IOS.Utilities
             public const string DocumentBodyRequestTypeKey = "DocumentBodyRequestType";
             public const string LargeAttachmentWarningKey = "LargeAttachmentWarning";
             public const string ShowTimeForOldEmails = "ShowTimeForOldEmails";
+            public const string ConfirmRemoveSwipe = "ConfirmRemoveSwipe";
             public const string HideReadNotificationsKey = "HideReadNotifications";
 
             public const string ComposePriorityEnabledKey = "ComposePriorityEnabled";
@@ -112,6 +113,9 @@ namespace Mark5.Mobile.IOS.Utilities
                     new NSString(Keys.AlwaysUseDefaultLineKey), NSNumber.FromBoolean(false)
                 },
                 {
+                    new NSString(Keys.ConfirmRemoveSwipe), NSNumber.FromBoolean(true)
+                },
+                {
                     new NSString(Keys.DocumentsToSearchKey), NSNumber.FromInt16(250)
                 },
                 {
@@ -177,6 +181,8 @@ namespace Mark5.Mobile.IOS.Utilities
         public bool ShowTimeForOldEmails => ud.BoolForKey(Keys.ShowTimeForOldEmails);
 
         public bool UnreadIndicatorMe => ud.BoolForKey(Keys.UnreadIndicatorMeKey);
+
+        public bool ConfirmRemoveSwipe => ud.BoolForKey(Keys.ConfirmRemoveSwipe);
 
         public bool CompactDocumentsList => ud.BoolForKey(Keys.CompactDocumentsListKey);
 
