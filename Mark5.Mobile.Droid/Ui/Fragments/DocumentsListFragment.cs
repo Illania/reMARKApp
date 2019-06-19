@@ -753,9 +753,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async void DeleteFromFolderAction(List<DocumentPreview> items)
         {
-            var yesNo = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete_from_folder, Resource.String.delete_from_folder_are_you_sure);
-            if (!yesNo)
-                return;
+            if (PlatformConfig.Preferences.ConfirmationRemoveSwipe)
+            {
+                var yesNo = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete_from_folder, Resource.String.delete_from_folder_are_you_sure);
+                if (!yesNo)
+                    return;
+            }
 
             CommonConfig.Logger.Info($"Attempting to delete from folder [businessEntities.Count={items.Count}]...");
 
@@ -1080,10 +1083,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             readonly Context context;
             readonly RecyclerView recyclerView;
             readonly Action<int> loadMoreAction;
-
-            bool unreadIndicatorMe = PlatformConfig.Preferences.UnreadIndicatorMe;
-            bool compactList = PlatformConfig.Preferences.CompactDocumentsList;
-            bool showCreatorOutgoing = PlatformConfig.Preferences.ShowCreatorOutgoing;
+            readonly bool unreadIndicatorMe = PlatformConfig.Preferences.UnreadIndicatorMe;
+            readonly bool compactList = PlatformConfig.Preferences.CompactDocumentsList;
+            readonly bool showCreatorOutgoing = PlatformConfig.Preferences.ShowCreatorOutgoing;
 
             int? swipedPosition;
             int swipedDirection;

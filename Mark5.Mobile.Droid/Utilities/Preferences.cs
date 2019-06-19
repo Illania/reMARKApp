@@ -5,7 +5,6 @@ using Mark5.Mobile.Common.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Xamarin.Android;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
@@ -39,6 +38,8 @@ namespace Mark5.Mobile.Droid.Utilities
         public bool LargeAttachmentWarning => sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_documents_large_attachment_warn), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_documents_large_attachment_warn_default));
 
         public DocumentBodyTypeRequest DocumentBodyRequestType => sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_documents_download_as_plaintext), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_documents_download_as_plaintext_default)) ? DocumentBodyTypeRequest.PlainTextOnly : DocumentBodyTypeRequest.HtmlOnly;
+
+        public bool ConfirmationRemoveSwipe => sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_documents_confirm_remove), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_documents_confirm_remove_default));
 
         #endregion
 
@@ -254,14 +255,14 @@ namespace Mark5.Mobile.Droid.Utilities
 
         #region Folders favorites
 
-        public bool SyncFavoritesEnabled 
+        public bool SyncFavoritesEnabled
         {
-            get 
+            get
             {
                 return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_sync_favorites_enabled), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_key_sync_favorites_value));
             }
 
-            set 
+            set
             {
                 var e = sp.Edit();
                 e.PutBoolean(Application.Context.GetString(Resource.String.pref_key_sync_favorites_enabled), value);
