@@ -751,9 +751,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             actionMode.Invalidate();
         }
 
-        async void DeleteFromFolderAction(List<DocumentPreview> items)
+        async void DeleteFromFolderAction(List<DocumentPreview> items, bool fromSwipe = false)
         {
-            if (PlatformConfig.Preferences.ConfirmationRemoveSwipe)
+            if (PlatformConfig.Preferences.ConfirmationRemoveSwipe && fromSwipe)
             {
                 var yesNo = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete_from_folder, Resource.String.delete_from_folder_are_you_sure);
                 if (!yesNo)
@@ -1526,7 +1526,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                             }
                             break;
                         case Preferences.EmailSwipeAction.RemoveFromFolder:
-                            fragment.DeleteFromFolderAction(new List<DocumentPreview>() { adapter.Items[adapterPosition] });
+                            fragment.DeleteFromFolderAction(new List<DocumentPreview>() { adapter.Items[adapterPosition] }, true);
                             break;
                         case Preferences.EmailSwipeAction.Priorities:
                             fragment.SetPriority(new List<DocumentPreview>() { adapter.Items[adapterPosition] });
