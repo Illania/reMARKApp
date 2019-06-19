@@ -4,7 +4,7 @@ namespace Mark5.Mobile.Droid
 {
     static class Config
     {
-        public const string HockeyId = "137e2a4fb6384cb3a51de617dd2f5999";
+        public const string AppCenterId = "1a15f961-a277-41d1-9d1e-e9111df90bc1";
         public const DecompressionMethods AcceptedResponseCompression = DecompressionMethods.GZip;
     }
 }
