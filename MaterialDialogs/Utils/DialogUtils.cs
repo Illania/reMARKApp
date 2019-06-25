@@ -90,7 +90,18 @@ namespace MaterialDialogs.Utils
         [ColorInt]
         public static int GetColor(Context context, [ColorRes] int colorId)
         {
-            return ContextCompat.GetColor(context, colorId);
+            int color = 0;
+
+            try
+            {
+                color = ContextCompat.GetColor(context, colorId);
+            }
+            catch (Exception ex)
+            {
+                Console.Write(ex.InnerException.ToString());
+            }
+
+            return color;
         }
 
         public static string ResolveString(Context context, [AttrRes] int attr)

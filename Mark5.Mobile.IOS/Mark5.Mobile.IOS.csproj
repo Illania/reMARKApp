@@ -1,730 +1,1150 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\packages\Xamarin.Build.Download.0.4.11\build\Xamarin.Build.Download.props" Condition="Exists('..\packages\Xamarin.Build.Download.0.4.11\build\Xamarin.Build.Download.props')" />
-	<PropertyGroup>
-		<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-		<Platform Condition=" '$(Platform)' == '' ">iPhoneSimulator</Platform>
-		<ProjectGuid>{3FB59A6F-9438-433D-A3BA-247D914A06AE}</ProjectGuid>
-		<ProjectTypeGuids>{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-		<OutputType>Exe</OutputType>
-		<RootNamespace>Mark5.Mobile.IOS</RootNamespace>
-		<IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
-		<AssemblyName>Mark5.Mobile.IOS</AssemblyName>
-		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
-		<DebugSymbols>true</DebugSymbols>
-		<DebugType>full</DebugType>
-		<Optimize>false</Optimize>
-		<OutputPath>bin\iPhoneSimulator\Debug</OutputPath>
-		<DefineConstants>DEBUG</DefineConstants>
-		<ErrorReport>prompt</ErrorReport>
-		<WarningLevel>4</WarningLevel>
-		<ConsolePause>false</ConsolePause>
-		<MtouchArch>x86_64</MtouchArch>
-		<MtouchLink>None</MtouchLink>
-		<MtouchDebug>true</MtouchDebug>
-		<RunCodeAnalysis>true</RunCodeAnalysis>
-		<CodesignKey>iPhone Developer</CodesignKey>
-		<MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
-		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
-		<DebugType>none</DebugType>
-		<Optimize>true</Optimize>
-		<OutputPath>bin\iPhoneSimulator\Release</OutputPath>
-		<ErrorReport>prompt</ErrorReport>
-		<WarningLevel>4</WarningLevel>
-		<MtouchLink>None</MtouchLink>
-		<MtouchArch>x86_64</MtouchArch>
-		<ConsolePause>false</ConsolePause>
-		<RunCodeAnalysis>true</RunCodeAnalysis>
-		<CodesignProvision>Mark5 Mobile Distribution</CodesignProvision>
-		<CodesignKey>iPhone Distribution: Nordic IT Europe ApS (5Q7TTRG4M4)</CodesignKey>
-		<MtouchUseLlvm>true</MtouchUseLlvm>
-		<MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
-		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
-		<DebugSymbols>true</DebugSymbols>
-		<DebugType>full</DebugType>
-		<Optimize>false</Optimize>
-		<OutputPath>bin\iPhone\Debug</OutputPath>
-		<DefineConstants>DEBUG</DefineConstants>
-		<ErrorReport>prompt</ErrorReport>
-		<WarningLevel>4</WarningLevel>
-		<ConsolePause>false</ConsolePause>
-		<MtouchArch>ARM64</MtouchArch>
-		<CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
-		<CodesignKey>iPhone Developer: Lars Hansen (TUYUES9KMZ)</CodesignKey>
-		<MtouchDebug>true</MtouchDebug>
-		<RunCodeAnalysis>true</RunCodeAnalysis>
-		<MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
-		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
-		<DebugType>none</DebugType>
-		<Optimize>true</Optimize>
-		<OutputPath>bin\iPhone\Release</OutputPath>
-		<ErrorReport>prompt</ErrorReport>
-		<WarningLevel>4</WarningLevel>
-		<CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
-		<MtouchArch>ARMv7, ARM64</MtouchArch>
-		<ConsolePause>false</ConsolePause>
-		<CodesignKey>iPhone Distribution: Nordic IT Europe ApS (5Q7TTRG4M4)</CodesignKey>
-		<RunCodeAnalysis>true</RunCodeAnalysis>
-		<CodesignProvision>Mark5 Mobile Distribution</CodesignProvision>
-		<MtouchUseLlvm>true</MtouchUseLlvm>
-		<MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
-		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
-	</PropertyGroup>
-	<ItemGroup>
-		<Compile Include="Properties\AssemblyInfo.cs" />
-		<Compile Include="AppDelegate.cs" />
-		<Compile Include="Main.cs" />
-		<Compile Include="PlatformConfig.cs" />
-		<Compile Include="Model\PushNotification.cs" />
-		<Compile Include="Model\Exceptions\MailViewerException.cs" />
-		<Compile Include="Service\ReachabilityProvider.cs" />
-		<Compile Include="Service\ReachabilityReceiver.cs" />
-		<Compile Include="Service\Reachability.cs" />
-		<Compile Include="Ui\Common\AbstractSplitViewController.cs" />
-		<Compile Include="Ui\Common\AbstractViewController.cs" />
-		<Compile Include="Ui\Common\Dialogs.cs" />
-		<Compile Include="Ui\Common\IPrimaryViewController.cs" />
-		<Compile Include="Ui\Common\ISecondaryViewController.cs" />
-		<Compile Include="Ui\Common\ITaggedViewController.cs" />
-		<Compile Include="Ui\Common\Localization.cs" />
-		<Compile Include="Ui\Common\MultiSelectViewController.cs" />
-		<Compile Include="Ui\Common\NavigationController.cs" />
-		<Compile Include="Ui\Common\PopoverPresentationControllerDelegate.cs" />
-		<Compile Include="Ui\Common\SeparatorSubView.cs" />
-		<Compile Include="Ui\Common\Theme.cs" />
-		<Compile Include="Ui\TableViewCells\CategoriesTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\CommentsTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\CommunicationAddressTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\ContactInfoTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\ContactsTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\DocumentsTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\EditTextViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\EmptyTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\FoldersSearchResultsTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\FoldersTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\NotificationsTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\ObjectActionsTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\ObjectLinksTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\PhysicalAddressTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\ShortcodesTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\WaitTableViewCell.cs" />
-		<Compile Include="Ui\ViewControllers\CommentsListViewController.cs" />
-		<Compile Include="Ui\ViewControllers\ContactViewController.cs" />
-		<Compile Include="Ui\ViewControllers\ContactsSearchResultsViewController.cs" />
-		<Compile Include="Ui\ViewControllers\ContactsSplitViewController.cs" />
-		<Compile Include="Ui\ViewControllers\CopyToWorktrayViewController.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentListViewController.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentsSearchResultsViewController.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentsSplitViewController.cs" />
-		<Compile Include="Ui\ViewControllers\FoldersNotificationsListViewController.cs" />
-		<Compile Include="Ui\ViewControllers\LoginSettingsViewController.cs" />
-		<Compile Include="Ui\ViewControllers\LoginViewController.cs" />
-		<Compile Include="Ui\ViewControllers\NotificationsListViewController.cs" />
-		<Compile Include="Ui\ViewControllers\ObjectActionsListViewController.cs" />
-		<Compile Include="Ui\ViewControllers\ObjectLinksListViewController.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentsToUploadListViewController.cs" />
-		<Compile Include="Ui\ViewControllers\SearchCriteriaViewController.cs" />
-		<Compile Include="Ui\ViewControllers\SelectCategoriesListViewController.cs" />
-		<Compile Include="Ui\ViewControllers\SettingsViewController.cs" />
-		<Compile Include="Ui\ViewControllers\ShortcodeViewController.cs" />
-		<Compile Include="Ui\ViewControllers\ShortcodesSearchResultsViewController.cs" />
-		<Compile Include="Ui\ViewControllers\ShortcodesSplitViewController.cs" />
-		<Compile Include="Ui\ViewControllers\ComposeDocumentView\SuggestionsListView.cs" />
-		<Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\AttachmentsView.cs" />
-		<Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\BccView.cs" />
-		<Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\CcView.cs" />
-		<Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\ComposeDocumentSubView.cs" />
-		<Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\LineView.cs" />
-		<Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\PriorityView.cs" />
-		<Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\RecipientsView.cs" />
-		<Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\SubjectView.cs" />
-		<Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\ToView.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentView\DocumentViewController.cs" />
-		<Compile Include="Ui\ViewControllers\FoldersList\AbstractFoldersListViewController.cs" />
-		<Compile Include="Ui\ViewControllers\FoldersList\BrowseFoldersListViewController.cs" />
-		<Compile Include="Ui\ViewControllers\FoldersList\CopyMoveToFolderListViewController.cs" />
-		<Compile Include="Ui\ViewControllers\MailViewerView\MailViewerViewController.cs" />
-		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\AttachmentsView.cs" />
-		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\DateView.cs" />
-		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\MailViewerSubview.cs" />
-		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\PriorityView.cs" />
-		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\SubjectView.cs" />
-		<Compile Include="Ui\ViewControllers\SearchCriteriaView\AbstractSearchCriteriaViewController.cs" />
-		<Compile Include="Ui\ViewControllers\SearchCriteriaView\ContactsSearchCriteriaViewController.cs" />
-		<Compile Include="Ui\ViewControllers\SearchCriteriaView\DocumentsSearchCriteriaViewController.cs" />
-		<Compile Include="Ui\ViewControllers\SearchCriteriaView\ShortcodesSearchCriteriaViewController.cs" />
-		<Compile Include="Utilities\ConsoleAndFileLogger.cs" />
-		<Compile Include="Utilities\DateTimeFormatter.cs" />
-		<Compile Include="Utilities\DeviceInfoProvider.cs" />
-		<Compile Include="Utilities\InsecureNativeMessageHandler.cs" />
-		<Compile Include="Utilities\Integration.cs" />
-		<Compile Include="Utilities\LocalNotificationsListener.cs" />
-		<Compile Include="Utilities\NotificationConverter.cs" />
-		<Compile Include="Utilities\Phonebook.cs" />
-		<Compile Include="Utilities\PortableConcurrentQueue.cs" />
-		<Compile Include="Utilities\Preferences.cs" />
-		<Compile Include="Utilities\PushNotificationsConverter.cs" />
-		<Compile Include="Utilities\SSLCertificateVerificationManager.cs" />
-		<Compile Include="Utilities\SystemReportCollector.cs" />
-		<Compile Include="Utilities\UI.cs" />
-		<Compile Include="Utilities\Extensions\NSObjectExtensions.cs" />
-		<Compile Include="Utilities\Extensions\ObjectExtensions.cs" />
-		<Compile Include="Utilities\Extensions\StringExtensions.cs" />
-		<Compile Include="Utilities\Extensions\UIFontExtensions.cs" />
-		<Compile Include="Utilities\Extensions\UITextViewExtensions.cs" />
-		<Compile Include="Utilities\Extensions\UIViewExtensions.cs" />
-		<Compile Include="Ui\ViewControllers\DownloadViewController.cs" />
-		<Compile Include="Utilities\ActivityIndicator.cs" />
-		<Compile Include="Ui\ViewControllers\RecentAddressesListViewController.cs" />
-		<Compile Include="Ui\ViewControllers\PhonebookContactsListViewController.cs" />
-		<Compile Include="Ui\ViewControllers\FoldersList\PickerContactsFoldersListViewController.cs" />
-		<Compile Include="Ui\ViewControllers\ContactsList\ContactsListViewController.cs" />
-		<Compile Include="Ui\ViewControllers\ContactsList\AbstractContactsListViewController.cs" />
-		<Compile Include="Ui\ViewControllers\ContactsList\PickerContactsListViewController.cs" />
-		<Compile Include="Ui\ViewControllers\FoldersList\PickerShortcodesFoldersListViewController.cs" />
-		<Compile Include="Ui\ViewControllers\ShortcodesList\AbstractShortcodesListViewController.cs" />
-		<Compile Include="Ui\ViewControllers\ShortcodesList\ShortcodesListViewController.cs" />
-		<Compile Include="Ui\ViewControllers\ShortcodesList\PickerShortcodesListViewController.cs" />
-		<Compile Include="Ui\ViewControllers\TemplatesListViewController.cs" />
-		<Compile Include="Model\FileDescription.cs" />
-		<Compile Include="Ui\Common\DocumentInteractionController.cs" />
-		<Compile Include="Ui\ViewControllers\UserSelectionViewController.cs" />
-		<Compile Include="Ui\ViewControllers\MultipleUserSelectionViewController.cs" />
-		<Compile Include="Ui\ViewControllers\FoldersList\PickerParentContactFoldersListView.cs" />
-		<Compile Include="Ui\ViewControllers\ContactsList\PickerParentContactListViewController.cs" />
-		<Compile Include="Ui\ViewControllers\AddEditContactViewController.cs" />
-		<Compile Include="Config.cs" />
-		<Compile Include="Ui\TableViewCells\AddEditTableViewCells\AddEditContactTableViewCell\BirthdateTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\AddEditTableViewCells\AddEditContactTableViewCell\EmailAddressTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\AddEditTableViewCells\AddEditContactTableViewCell\PhoneNumberTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\AddEditTableViewCells\AddEditContactTableViewCell\PhysicalAddressTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\AddEditTableViewCells\AddEditTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\AddEditTableViewCells\TextFieldTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\AddEditTableViewCells\TitledTextViewTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\AddEditTableViewCells\MultiRowHeaderTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\AddEditTableViewCells\MultiRowContentTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\AddEditTableViewCells\DisclosureIndicatorTableViewCell.cs" />
-		<Compile Include="Ui\ViewControllers\AddEditShortcodeViewController.cs" />
-		<Compile Include="Ui\TableViewCells\AddEditTableViewCells\AddEditShortcodeTableViewCell\AddressTableViewCell.cs" />
-		<Compile Include="Utilities\AsyncHelpers.cs" />
-		<Compile Include="Ui\Common\AbstractTableViewController.cs" />
-		<Compile Include="Ui\Common\KeyboardObserverInputAccessoryView.cs" />
-		<Compile Include="Ui\Common\DarkNavigationController.cs" />
-		<Compile Include="Utilities\Extensions\UIKeyboardEventArgsExtensions.cs" />
-		<Compile Include="Ui\Common\AbstractMultiViewController.cs" />
-		<Compile Include="Utilities\UITableViewCellUtilities.cs" />
-		<Compile Include="Ui\Common\TouchTransparentView.cs" />
-		<Compile Include="Ui\TableViewCells\ShortcodeInfoTableViewCell.cs" />
-		<Compile Include="Ui\TableViewCells\DocumentAddressTableViewCell.cs" />
-		<Compile Include="Model\HubMessages\DraftSentMessage.cs" />
-		<Compile Include="Utilities\UsageAnalytics.cs" />
-		<Compile Include="Ui\Common\ReachabilityBar.cs" />
-		<Compile Include="Ui\Common\AbstractWebViewController.cs" />
-		<Compile Include="Ui\ViewControllers\ComposeDocumentView\ComposeDocumentViewController.cs" />
-		<Compile Include="Ui\Common\AbstractAppSettingsViewController.cs" />
-		<Compile Include="Ui\ViewControllers\ComposeDocumentView\EditOriginalDocumentViewController.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentView\DocumentPageViewController.cs" />
-		<Compile Include="Ui\Common\AbstractPageViewController.cs" />
-		<Compile Include="Ui\Common\AbstractMainViewController.cs" />
-		<Compile Include="Utilities\LocalAuthenticationManager.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\HeaderView.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\DocumentSubView.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\TextSubView.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\ReadByView.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\ReferenceNumberView.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\OriginatorView.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\RecipientsView.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\CcView.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\BccView.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\DateView.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\ToView.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\FromView.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\SeparatorSubView.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\SubjectView.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\AttachmentsView.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\ExtraFieldsView.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\PriorityView.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\CreatorView.cs" />
-		<Compile Include="Ui\Common\LargeHitAreaButton.cs" />
-		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\HeaderView.cs" />
-		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\SeparatorSubview.cs" />
-		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\RecipientsView.cs" />
-		<Compile Include="Ui\ViewControllers\SwipeActionViewController.cs" />
-		<Compile Include="Utilities\EmailSwipeActions.cs" />
-		<Compile Include="Utilities\OnBoardingUtilities.cs" />
-		<Compile Include="Ui\ViewControllers\OnBoardingViewController.cs" />
-		<Compile Include="Ui\Common\BadgeBarButtonItem.cs" />
-		<Compile Include="Ui\ViewControllers\CategoriesListViewController.cs" />
-		<Compile Include="Ui\ViewControllers\CalendarTestViewController.cs" />
-		<Compile Include="Ui\Common\ModuleNavigationController.cs" />
-		<Compile Include="Ui\ViewControllers\SimpleMainViewController.cs" />
-		<Compile Include="Ui\ViewControllers\SplitMainViewController.cs" />
-		<Compile Include="Model\HubMessages\NavigationModuleChangedMessage.cs" />
-		<Compile Include="Model\NavigationModule.cs" />
-	</ItemGroup>
-	<ItemGroup>
-		<Reference Include="System" />
-		<Reference Include="System.Xml" />
-		<Reference Include="System.Core" />
-		<Reference Include="Xamarin.iOS" />
-		<Reference Include="Microsoft.CSharp" />
-		<Reference Include="System.IO.Compression" />
-		<Reference Include="System.Net.Http" />
-		<Reference Include="PCLStorage.Abstractions">
-			<HintPath>..\packages\PCLStorage.1.0.2\lib\portable-Xamarin.iOS+Xamarin.Mac\PCLStorage.Abstractions.dll</HintPath>
-		</Reference>
-		<Reference Include="InAppSettingsKit">
-			<HintPath>..\Components\InAppSettingsKit-2.6.0.0\lib\ios-unified\InAppSettingsKit.dll</HintPath>
-		</Reference>
-		<Reference Include="SQLite-net">
-		  <HintPath>..\packages\sqlite-net-pcl.1.4.118\lib\netstandard1.1\SQLite-net.dll</HintPath>
-		</Reference>
-		<Reference Include="MailBee.NET">
-		  <HintPath>..\packages\MailBee.NET.11.2.0\lib\netstandard2.0\MailBee.NET.dll</HintPath>
-		</Reference>
-		<Reference Include="System.Web.Services" />
-		<Reference Include="PCLStorage">
-		  <HintPath>..\packages\PCLStorage.1.0.2\lib\portable-Xamarin.iOS+Xamarin.Mac\PCLStorage.dll</HintPath>
-		</Reference>
-		<Reference Include="HockeySDK">
-		  <HintPath>..\packages\HockeySDK.Xamarin.5.1.2\lib\Xamarin.iOS10\HockeySDK.dll</HintPath>
-		</Reference>
-		<Reference Include="HockeySDK.iOSBindings">
-		  <HintPath>..\packages\HockeySDK.Xamarin.5.1.2\lib\Xamarin.iOS10\HockeySDK.iOSBindings.dll</HintPath>
-		</Reference>
-		<Reference Include="Newtonsoft.Json">
-		  <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\netstandard2.0\Newtonsoft.Json.dll</HintPath>
-		</Reference>
-		<Reference Include="ModernHttpClient">
-		  <HintPath>..\packages\modernhttpclient.2.4.2\lib\Xamarin.iOS10\ModernHttpClient.dll</HintPath>
-		</Reference>
-		<Reference Include="Polly">
-		  <HintPath>..\packages\Polly.6.1.0\lib\netstandard2.0\Polly.dll</HintPath>
-		</Reference>
-		<Reference Include="Firebase.Core">
-		  <HintPath>..\packages\Xamarin.Firebase.iOS.Core.5.0.5\lib\Xamarin.iOS10\Firebase.Core.dll</HintPath>
-		</Reference>
-		<Reference Include="Firebase.InstanceID">
-		  <HintPath>..\packages\Xamarin.Firebase.iOS.InstanceID.3.1.1\lib\Xamarin.iOS10\Firebase.InstanceID.dll</HintPath>
-		</Reference>
-		<Reference Include="Firebase.CloudMessaging">
-		  <HintPath>..\packages\Xamarin.Firebase.iOS.CloudMessaging.3.0.3\lib\Xamarin.iOS10\Firebase.CloudMessaging.dll</HintPath>
-		</Reference>
-		<Reference Include="Firebase.Analytics">
-		  <HintPath>..\packages\Xamarin.Firebase.iOS.Analytics.5.0.1\lib\Xamarin.iOS10\Firebase.Analytics.dll</HintPath>
-		</Reference>
-		<Reference Include="AngleSharp">
-		  <HintPath>..\packages\AngleSharp.0.9.10\lib\portable-windows8+net45+windowsphone8+wpa+monoandroid+monotouch\AngleSharp.dll</HintPath>
-		</Reference>
-		<Reference Include="PreMailer.Net">
-		  <HintPath>..\packages\PreMailer.Net.2.0.0\lib\netstandard2.0\PreMailer.Net.dll</HintPath>
-		</Reference>
-		<Reference Include="SQLitePCLRaw.core">
-		  <HintPath>..\packages\SQLitePCLRaw.core.1.1.11\lib\Xamarin.iOS10\SQLitePCLRaw.core.dll</HintPath>
-		</Reference>
-		<Reference Include="SQLitePCLRaw.provider.sqlite3">
-		  <HintPath>..\packages\SQLitePCLRaw.provider.sqlite3.ios_unified.1.1.11\lib\Xamarin.iOS10\SQLitePCLRaw.provider.sqlite3.dll</HintPath>
-		</Reference>
-		<Reference Include="SQLitePCLRaw.batteries_green">
-		  <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.11\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_green.dll</HintPath>
-		</Reference>
-		<Reference Include="SQLitePCLRaw.batteries_v2">
-		  <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.11\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_v2.dll</HintPath>
-		</Reference>
-		<Reference Include="HtmlAgilityPack">
-		  <HintPath>..\packages\HtmlAgilityPack.1.8.7\lib\netstandard2.0\HtmlAgilityPack.dll</HintPath>
-		</Reference>
-		<Reference Include="Polly">
-		  <HintPath>..\packages\Polly.6.1.0\lib\netstandard2.0\Polly.dll</HintPath>
-		</Reference>
-		<Reference Include="Firebase.Core">
-		  <HintPath>..\packages\Xamarin.Firebase.iOS.Core.5.0.5\lib\Xamarin.iOS10\Firebase.Core.dll</HintPath>
-		</Reference>
-		<Reference Include="Firebase.InstanceID">
-		  <HintPath>..\packages\Xamarin.Firebase.iOS.InstanceID.3.1.1\lib\Xamarin.iOS10\Firebase.InstanceID.dll</HintPath>
-		</Reference>
-		<Reference Include="Firebase.CloudMessaging">
-		  <HintPath>..\packages\Xamarin.Firebase.iOS.CloudMessaging.3.0.3\lib\Xamarin.iOS10\Firebase.CloudMessaging.dll</HintPath>
-		</Reference>
-		<Reference Include="Lottie.iOS">
-		  <HintPath>..\packages\Com.Airbnb.iOS.Lottie.2.5.7\lib\xamarinios10\Lottie.iOS.dll</HintPath>
-		</Reference>
-	</ItemGroup>
-	<ItemGroup>
-		<ProjectReference Include="..\Mark5.Mobile.Common\Mark5.Mobile.Common.csproj">
-			<Project>{a7f40f0e-def1-4ca5-bee9-e611df20fc3d}</Project>
-			<Name>Mark5.Mobile.Common</Name>
-		</ProjectReference>
-		<ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">
-			<Project>{06432085-f969-4fb0-860b-6ac0f7b0f69d}</Project>
-			<Name>Mark5.ServiceReference.Exceptions</Name>
-		</ProjectReference>
-		<ProjectReference Include="..\SVProgressHUD\SVProgressHUD.csproj">
-			<Project>{5ddb3bae-617a-417a-b6aa-68f82b48e3af}</Project>
-			<Name>SVProgressHUD</Name>
-			<IsAppExtension>false</IsAppExtension>
-			<IsWatchApp>false</IsWatchApp>
-		</ProjectReference>
-		<ProjectReference Include="..\TinyMessenger\TinyMessenger.csproj">
-			<Project>{a54356bd-9cc4-4de0-a8dc-9b2d9d6ed288}</Project>
-			<Name>TinyMessenger</Name>
-		</ProjectReference>
-		<ProjectReference Include="..\Mark5.Mobile.IOS.Extensions.CallId\Mark5.Mobile.IOS.Extensions.CallId.csproj">
-		  <IsAppExtension>true</IsAppExtension>
-		  <Project>{D8B702CE-A49B-4A21-88F3-9648E0051AB6}</Project>
-		  <Name>Mark5.Mobile.IOS.Extensions.CallId</Name>
-		</ProjectReference>
-		<ProjectReference Include="..\Mark5.Mobile.IOS.Common\Mark5.Mobile.IOS.Common.csproj">
-		  <Project>{9735C6AC-AAEE-4768-B8DB-E29A2FAFF4F9}</Project>
-		  <Name>Mark5.Mobile.IOS.Common</Name>
-		</ProjectReference>
-	</ItemGroup>
-	<ItemGroup>
-		<None Include="Info.plist" />
-		<None Include="Entitlements.plist" />
-		<None Include="packages.config" />
-		<None Include="Resources\html\fonts\calibri.ttf" />
-		<None Include="Resources\html\fonts\cambria.ttf" />
-		<None Include="Resources\html\fonts\couriernew.ttf" />
-		<None Include="Resources\html\fonts\opensans.ttf" />
-		<None Include="Resources\html\fonts\tahoma.ttf" />
-		<None Include="Resources\html\fonts\trebuchetms.ttf" />
-	</ItemGroup>
-	<ItemGroup>
-		<InterfaceDefinition Include="LaunchScreen.storyboard" />
-	</ItemGroup>
-	<ItemGroup>
-		<ImageAsset Include="Assets.xcassets\Contents.json">
-			<InProject>false</InProject>
-		</ImageAsset>
-		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json">
-			<InProject>false</InProject>
-		</ImageAsset>
-		<ImageAsset Include="Assets_icons.xcassets\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Actions.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Actions.imageset\actions%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Actions.imageset\actions%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Add.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Add.imageset\add%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Add.imageset\add%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Arrow-Down.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Arrow-Down.imageset\arrow-down%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Arrow-Down.imageset\arrow-down%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Arrow-Up.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Arrow-Up.imageset\arrow-up%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Arrow-Up.imageset\arrow-up%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Attachment-Small.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Attachment-Small.imageset\attachment-small%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Attachment-Small.imageset\attachment-small%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Attachment.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Attachment.imageset\attachment%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Attachment.imageset\attachment%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Checkmark.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Checkmark.imageset\checkmark%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Checkmark.imageset\checkmark%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Comments.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Comments.imageset\comments%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Comments.imageset\comments%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Contacts-Filled.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Contacts-Filled.imageset\contacts-filled%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Contacts-Filled.imageset\contacts-filled%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Contacts.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Contacts.imageset\contacts%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Contacts.imageset\contacts%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Create.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Create.imageset\create%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Create.imageset\create%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Documents-Filled.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Documents-Filled.imageset\documents-filled%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Documents-Filled.imageset\documents-filled%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Documents-Small.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Documents-Small.imageset\documents-small%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Documents-Small.imageset\documents-small%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Documents.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Documents.imageset\documents%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Documents.imageset\documents%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Done.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Done.imageset\done%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Done.imageset\done%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Edit-Small.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Edit-Small.imageset\edit_small%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Edit-Small.imageset\edit_small%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Edit.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Edit.imageset\edit%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Edit.imageset\edit%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Email-Large.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Email-Large.imageset\large_email%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Email-Large.imageset\large_email%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Email.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Email.imageset\email%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Email.imageset\email%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Expand.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Expand.imageset\expand%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Expand.imageset\expand%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Failed.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Failed.imageset\failed%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Failed.imageset\failed%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\File-To.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\File-To.imageset\fileto%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\File-To.imageset\fileto%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Flag.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Flag.imageset\flag%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Flag.imageset\flag%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Full-Dot.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Full-Dot.imageset\full-dot%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Full-Dot.imageset\full-dot%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Incoming.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Incoming.imageset\incoming%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Incoming.imageset\incoming%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Map-Large.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Map-Large.imageset\large_map%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Map-Large.imageset\large_map%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Map.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Map.imageset\map%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Map.imageset\map%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Mark-As-Read.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Mark-As-Read.imageset\markasread%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Mark-As-Read.imageset\markasread%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Message-Small.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Message-Small.imageset\message-small%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Message-Small.imageset\message-small%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Message.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Message.imageset\message%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Message.imageset\message%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Mobile-Large.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Mobile-Large.imageset\large_mobile%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Mobile-Large.imageset\large_mobile%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Offline.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Offline.imageset\offline%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Offline.imageset\offline%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Outgoing.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Outgoing.imageset\outgoing%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Outgoing.imageset\outgoing%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Pending.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Pending.imageset\pending%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Pending.imageset\pending%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Phone.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Phone.imageset\phone%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Phone.imageset\phone%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Remove.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Remove.imageset\remove%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Remove.imageset\remove%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Reply.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Reply.imageset\reply%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Reply.imageset\reply%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Search-Large.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Search-Large.imageset\search_large%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Search-Large.imageset\search_large%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Search-Small.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Search-Small.imageset\search_small%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Search-Small.imageset\search_small%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Sending.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Sending.imageset\sending%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Sending.imageset\sending%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Settings-Filled.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Settings-Filled.imageset\settings-filled%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Settings-Filled.imageset\settings-filled%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Settings.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Settings.imageset\settings%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Settings.imageset\settings%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Shortcodes-Filled.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Shortcodes-Filled.imageset\shortcodes-filled%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Shortcodes-Filled.imageset\shortcodes-filled%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Shortcodes.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Shortcodes.imageset\shortcodes%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Shortcodes.imageset\shortcodes%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Sms-Large.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Sms-Large.imageset\large_sms%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Sms-Large.imageset\large_sms%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Warning.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Warning.imageset\warning%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Warning.imageset\warning%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Worktray.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Worktray.imageset\worktray%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Worktray.imageset\worktray%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Folderslist-Draft.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Folderslist-Draft.imageset\draft%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Folderslist-Draft.imageset\draft%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Folderslist-Folder.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Folderslist-Folder.imageset\folder%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Folderslist-Folder.imageset\folder%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Folderslist-Worktray.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Folderslist-Worktray.imageset\worktray%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Folderslist-Worktray.imageset\worktray%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Download.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Download.imageset\download%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Download.imageset\download%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\SelectAll.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\SelectAll.imageset\selectAll%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\SelectAll.imageset\selectAll%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\DeselectAll.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\DeselectAll.imageset\deselectAll%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\DeselectAll.imageset\deselectAll%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Arrow-Expand.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Arrow-Expand.imageset\arrow_expand%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Arrow-Expand.imageset\arrow_expand%403x.png" />
-		<ImageAsset Include="Assets_onboarding.xcassets\Contents.json" />
-		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon40.png" />
-		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon60.png" />
-		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon58.png" />
-		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon87.png" />
-		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon80.png" />
-		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon120.png" />
-		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon180.png" />
-		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon20.png" />
-		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon29.png" />
-		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon76.png" />
-		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon152.png" />
-		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon167.png" />
-		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon1024.png" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_1.imageset\Contents.json" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_1.imageset\Page01.pdf" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_2.imageset\Contents.json" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_2.imageset\Page02.pdf" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_3.imageset\Contents.json" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_3.imageset\Page03.pdf" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_4.imageset\Contents.json" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_4.imageset\Page04.pdf" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_5.imageset\Contents.json" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_5.imageset\Page05.pdf" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_6.imageset\Contents.json" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_6.imageset\Page06.pdf" />
-		<ImageAsset Include="Assets_icons.xcassets\Nav-search.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Nav-mail.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Nav-mail.imageset\Nav-mail%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Nav-contacts.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Nav-contacts.imageset\Nav-contacts%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Nav-contacts.imageset\Nav-contacts%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Nav-search.imageset\Nav-search%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Nav-search.imageset\Nav-search%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Nav-calendar.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Nav-calendar.imageset\Nav-calendar%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Nav-calendar.imageset\Nav-calendar%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Nav-shortcodes.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Nav-shortcodes.imageset\Nav-shortcodes%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Nav-shortcodes.imageset\Nav-shortcodes%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Nav-settings.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Nav-settings.imageset\Nav-settings%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Nav-settings.imageset\Nav-settings%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Nav-mail.imageset\Nav-mail%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Search-Filled.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Search-Filled.imageset\Search-Filled%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Search-Filled.imageset\Search-Filled%403x.png" />
-	</ItemGroup>
-	<ItemGroup>
-		<BundleResource Include="Resources\Base.lproj\Localizable.strings" />
-		<BundleResource Include="Resources\Settings.bundle\Root.Login.inApp.plist" />
-		<BundleResource Include="Resources\Settings.bundle\Root.inApp.plist" />
-		<BundleResource Include="Resources\Settings.bundle\en.lproj\Root.strings" />
-		<BundleResource Include="GoogleService-Info.plist" />
-		<BundleResource Include="Resources\html\editor.html" />
-		<BundleResource Include="Resources\html\empty.html" />
-		<BundleResource Include="Resources\html\plain.html" />
-		<BundleResource Include="Resources\html\scriptsAtEnd.js" />
-		<BundleResource Include="Resources\html\scriptsAtStart.js" />
-		<BundleResource Include="Resources\html\fonts.css" />
-		<BundleResource Include="Resources\html\headerPadding.js" />
-		<BundleResource Include="Resources\html\replyHeader.html" />
-		<BundleResource Include="Resources\html\blank.html" />
-		<BundleResource Include="Resources\html\replyEditor.html" />
-		<BundleResource Include="Resources\splash.json" />
-		<BundleResource Include="Resources\Base.lproj\Onboarding.strings" />
-	</ItemGroup>
-	<ItemGroup>
-	  <Folder Include="Ui\ViewControllers\ContactsList\" />
-	  <Folder Include="Ui\ViewControllers\ShortcodesList\" />
-	  <Folder Include="Ui\TableViewCells\AddEditTableViewCells\" />
-	  <Folder Include="Ui\TableViewCells\AddEditTableViewCells\AddEditContactTableViewCell\" />
-	  <Folder Include="Ui\TableViewCells\AddEditTableViewCells\AddEditShortcodeTableViewCell\" />
-	  <Folder Include="Resources\html\fonts\" />
-	  <Folder Include="Assets.xcassets\Actions.imageset\" />
-	  <Folder Include="Assets.xcassets\Add.imageset\" />
-	  <Folder Include="Assets.xcassets\Arrow-Down.imageset\" />
-	  <Folder Include="Assets.xcassets\Arrow-Up.imageset\" />
-	  <Folder Include="Assets.xcassets\Attachment.imageset\" />
-	  <Folder Include="Assets.xcassets\Attachment-Small.imageset\" />
-	  <Folder Include="Assets.xcassets\Checkmark.imageset\" />
-	  <Folder Include="Assets.xcassets\Comments.imageset\" />
-	  <Folder Include="Assets.xcassets\Contacts.imageset\" />
-	  <Folder Include="Assets.xcassets\Contacts-Filled.imageset\" />
-	  <Folder Include="Assets.xcassets\Create.imageset\" />
-	  <Folder Include="Assets.xcassets\Documents.imageset\" />
-	  <Folder Include="Assets.xcassets\Documents-Filled.imageset\" />
-	  <Folder Include="Assets.xcassets\Documents-Small.imageset\" />
-	  <Folder Include="Assets.xcassets\Done.imageset\" />
-	  <Folder Include="Assets.xcassets\Downloads.imageset\" />
-	  <Folder Include="Assets.xcassets\Edit.imageset\" />
-	  <Folder Include="Assets.xcassets\Edit-Small.imageset\" />
-	  <Folder Include="Assets.xcassets\Email.imageset\" />
-	  <Folder Include="Assets.xcassets\Expand.imageset\" />
-	  <Folder Include="Assets.xcassets\Failed.imageset\" />
-	  <Folder Include="Assets.xcassets\File-To.imageset\" />
-	  <Folder Include="Assets.xcassets\Flag.imageset\" />
-	  <Folder Include="Assets.xcassets\Full-Dot.imageset\" />
-	  <Folder Include="Assets.xcassets\Incoming.imageset\" />
-	  <Folder Include="Assets.xcassets\Email-Large.imageset\" />
-	  <Folder Include="Assets.xcassets\Map-Large.imageset\" />
-	  <Folder Include="Assets.xcassets\Mobile-Large.imageset\" />
-	  <Folder Include="Assets.xcassets\Sms-Large.imageset\" />
-	  <Folder Include="Assets.xcassets\Map.imageset\" />
-	  <Folder Include="Assets.xcassets\Mark-As-Read.imageset\" />
-	  <Folder Include="Assets.xcassets\Message.imageset\" />
-	  <Folder Include="Assets.xcassets\Message-Small.imageset\" />
-	  <Folder Include="Assets.xcassets\Offline.imageset\" />
-	  <Folder Include="Assets.xcassets\Outgoing.imageset\" />
-	  <Folder Include="Assets.xcassets\Pending.imageset\" />
-	  <Folder Include="Assets.xcassets\Phone.imageset\" />
-	  <Folder Include="Assets.xcassets\Remove.imageset\" />
-	  <Folder Include="Assets.xcassets\Reply.imageset\" />
-	  <Folder Include="Assets.xcassets\Search-Large.imageset\" />
-	  <Folder Include="Assets.xcassets\Search-Small.imageset\" />
-	  <Folder Include="Assets.xcassets\Sending.imageset\" />
-	  <Folder Include="Assets.xcassets\Settings.imageset\" />
-	  <Folder Include="Assets.xcassets\Settings-Filled.imageset\" />
-	  <Folder Include="Assets.xcassets\Shortcodes.imageset\" />
-	  <Folder Include="Assets.xcassets\Shortcodes-Filled.imageset\" />
-	  <Folder Include="Assets.xcassets\Warning.imageset\" />
-	  <Folder Include="Assets.xcassets\Worktray.imageset\" />
-	  <Folder Include="Assets_icons.xcassets\Folderslist-Draft.imageset\" />
-	  <Folder Include="Assets_icons.xcassets\Folderslist-Folder.imageset\" />
-	  <Folder Include="Assets_icons.xcassets\Folderslist-Worktray.imageset\" />
-	  <Folder Include="Assets_icons.xcassets\Download.imageset\" />
-	  <Folder Include="Assets_icons.xcassets\SelectAll.imageset\" />
-	  <Folder Include="Assets_icons.xcassets\DeselectAll.imageset\" />
-	  <Folder Include="Ui\ViewControllers\DocumentView\HeaderView\" />
-	  <Folder Include="Assets_icons.xcassets\Arrow-Expand.imageset\" />
-	  <Folder Include="Assets.xcassets\OnBoardingOne.imageset\" />
-	  <Folder Include="Assets_onboarding.xcassets\2.8_1.imageset\" />
-	  <Folder Include="Assets_onboarding.xcassets\2.8_2.imageset\" />
-	  <Folder Include="Assets_onboarding.xcassets\2.8_3.imageset\" />
-	  <Folder Include="Assets_onboarding.xcassets\2.8_4.imageset\" />
-	  <Folder Include="Assets_onboarding.xcassets\2.8_5.imageset\" />
-	  <Folder Include="Assets_onboarding.xcassets\onboarding_1.imageset\" />
-	  <Folder Include="Assets_onboarding.xcassets\onboarding_2.imageset\" />
-	  <Folder Include="Assets_onboarding.xcassets\onboarding_3.imageset\" />
-	  <Folder Include="Assets_onboarding.xcassets\onboarding_4.imageset\" />
-	  <Folder Include="Assets_onboarding.xcassets\onboarding_5.imageset\" />
-	  <Folder Include="Assets_onboarding.xcassets\onboarding_6.imageset\" />
-	  <Folder Include="Assets_icons.xcassets\Nav-search.imageset\" />
-	  <Folder Include="Assets_icons.xcassets\Nav-mail.imageset\" />
-	  <Folder Include="Assets_icons.xcassets\Nav-contacts.imageset\" />
-	  <Folder Include="Assets_icons.xcassets\Nav-calendar.imageset\" />
-	  <Folder Include="Assets_icons.xcassets\Nav-shortcodes.imageset\" />
-	  <Folder Include="Assets_icons.xcassets\Nav-settings.imageset\" />
-	  <Folder Include="Assets_icons.xcassets\Search-Filled.imageset\" />
-	</ItemGroup>
-	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
-	<Import Project="..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets" Condition="Exists('..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets')" />
-	<Import Project="..\packages\Xamarin.Firebase.iOS.Analytics.4.0.5\build\Xamarin.Firebase.iOS.Analytics.targets" Condition="Exists('..\packages\Xamarin.Firebase.iOS.Analytics.4.0.5\build\Xamarin.Firebase.iOS.Analytics.targets')" />
-	<Import Project="..\packages\Xamarin.Build.Download.0.4.11\build\Xamarin.Build.Download.targets" Condition="Exists('..\packages\Xamarin.Build.Download.0.4.11\build\Xamarin.Build.Download.targets')" />
-	<Import Project="..\packages\Xamarin.Firebase.iOS.InstanceID.3.1.1\build\Xamarin.Firebase.iOS.InstanceID.targets" Condition="Exists('..\packages\Xamarin.Firebase.iOS.InstanceID.3.1.1\build\Xamarin.Firebase.iOS.InstanceID.targets')" />
-	<Import Project="..\packages\Xamarin.Firebase.iOS.Analytics.5.0.1\build\Xamarin.Firebase.iOS.Analytics.targets" Condition="Exists('..\packages\Xamarin.Firebase.iOS.Analytics.5.0.1\build\Xamarin.Firebase.iOS.Analytics.targets')" />
-	<Import Project="..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">iPhoneSimulator</Platform>
+    <ProjectGuid>{3FB59A6F-9438-433D-A3BA-247D914A06AE}</ProjectGuid>
+    <ProjectTypeGuids>{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Mark5.Mobile.IOS</RootNamespace>
+    <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
+    <AssemblyName>Mark5.Mobile.IOS</AssemblyName>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\iPhoneSimulator\Debug</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <MtouchArch>x86_64</MtouchArch>
+    <MtouchLink>None</MtouchLink>
+    <MtouchDebug>true</MtouchDebug>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <CodesignKey>iPhone Developer</CodesignKey>
+    <MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
+    <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\iPhoneSimulator\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <MtouchLink>None</MtouchLink>
+    <MtouchArch>x86_64</MtouchArch>
+    <ConsolePause>false</ConsolePause>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <CodesignProvision>Mark5 Mobile Distribution</CodesignProvision>
+    <CodesignKey>iPhone Distribution: Nordic IT Europe ApS (5Q7TTRG4M4)</CodesignKey>
+    <MtouchUseLlvm>true</MtouchUseLlvm>
+    <MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
+    <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\iPhone\Debug</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <MtouchArch>ARM64</MtouchArch>
+    <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
+    <CodesignKey>iPhone Developer: Lars Hansen (TUYUES9KMZ)</CodesignKey>
+    <MtouchDebug>true</MtouchDebug>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
+    <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\iPhone\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
+    <MtouchArch>ARMv7, ARM64</MtouchArch>
+    <ConsolePause>false</ConsolePause>
+    <CodesignKey>iPhone Distribution: Nordic IT Europe ApS (5Q7TTRG4M4)</CodesignKey>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <CodesignProvision>Mark5 Mobile Distribution</CodesignProvision>
+    <MtouchUseLlvm>true</MtouchUseLlvm>
+    <MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
+    <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="AppDelegate.cs" />
+    <Compile Include="Main.cs" />
+    <Compile Include="PlatformConfig.cs" />
+    <Compile Include="Model\PushNotification.cs" />
+    <Compile Include="Model\Exceptions\MailViewerException.cs" />
+    <Compile Include="Service\ReachabilityProvider.cs" />
+    <Compile Include="Service\ReachabilityReceiver.cs" />
+    <Compile Include="Service\Reachability.cs" />
+    <Compile Include="Ui\Common\AbstractSplitViewController.cs" />
+    <Compile Include="Ui\Common\AbstractViewController.cs" />
+    <Compile Include="Ui\Common\Dialogs.cs" />
+    <Compile Include="Ui\Common\IPrimaryViewController.cs" />
+    <Compile Include="Ui\Common\ISecondaryViewController.cs" />
+    <Compile Include="Ui\Common\ITaggedViewController.cs" />
+    <Compile Include="Ui\Common\Localization.cs" />
+    <Compile Include="Ui\Common\MultiSelectViewController.cs" />
+    <Compile Include="Ui\Common\NavigationController.cs" />
+    <Compile Include="Ui\Common\PopoverPresentationControllerDelegate.cs" />
+    <Compile Include="Ui\Common\SeparatorSubView.cs" />
+    <Compile Include="Ui\Common\Theme.cs" />
+    <Compile Include="Ui\TableViewCells\CategoriesTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\CommentsTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\CommunicationAddressTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\ContactInfoTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\ContactsTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\DocumentsTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\EditTextViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\EmptyTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\FoldersSearchResultsTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\FoldersTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\NotificationsTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\ObjectActionsTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\ObjectLinksTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\PhysicalAddressTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\ShortcodesTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\WaitTableViewCell.cs" />
+    <Compile Include="Ui\ViewControllers\CommentsListViewController.cs" />
+    <Compile Include="Ui\ViewControllers\ContactViewController.cs" />
+    <Compile Include="Ui\ViewControllers\ContactsSearchResultsViewController.cs" />
+    <Compile Include="Ui\ViewControllers\ContactsSplitViewController.cs" />
+    <Compile Include="Ui\ViewControllers\CopyToWorktrayViewController.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentListViewController.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentsSearchResultsViewController.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentsSplitViewController.cs" />
+    <Compile Include="Ui\ViewControllers\FoldersNotificationsListViewController.cs" />
+    <Compile Include="Ui\ViewControllers\LoginSettingsViewController.cs" />
+    <Compile Include="Ui\ViewControllers\LoginViewController.cs" />
+    <Compile Include="Ui\ViewControllers\NotificationsListViewController.cs" />
+    <Compile Include="Ui\ViewControllers\ObjectActionsListViewController.cs" />
+    <Compile Include="Ui\ViewControllers\ObjectLinksListViewController.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentsToUploadListViewController.cs" />
+    <Compile Include="Ui\ViewControllers\SearchCriteriaViewController.cs" />
+    <Compile Include="Ui\ViewControllers\SelectCategoriesListViewController.cs" />
+    <Compile Include="Ui\ViewControllers\SettingsViewController.cs" />
+    <Compile Include="Ui\ViewControllers\ShortcodeViewController.cs" />
+    <Compile Include="Ui\ViewControllers\ShortcodesSearchResultsViewController.cs" />
+    <Compile Include="Ui\ViewControllers\ShortcodesSplitViewController.cs" />
+    <Compile Include="Ui\ViewControllers\ComposeDocumentView\SuggestionsListView.cs" />
+    <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\AttachmentsView.cs" />
+    <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\BccView.cs" />
+    <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\CcView.cs" />
+    <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\ComposeDocumentSubView.cs" />
+    <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\LineView.cs" />
+    <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\PriorityView.cs" />
+    <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\RecipientsView.cs" />
+    <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\SubjectView.cs" />
+    <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\ToView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\DocumentViewController.cs" />
+    <Compile Include="Ui\ViewControllers\FoldersList\AbstractFoldersListViewController.cs" />
+    <Compile Include="Ui\ViewControllers\FoldersList\BrowseFoldersListViewController.cs" />
+    <Compile Include="Ui\ViewControllers\FoldersList\CopyMoveToFolderListViewController.cs" />
+    <Compile Include="Ui\ViewControllers\MailViewerView\MailViewerViewController.cs" />
+    <Compile Include="Ui\ViewControllers\MailViewerView\Subviews\AttachmentsView.cs" />
+    <Compile Include="Ui\ViewControllers\MailViewerView\Subviews\DateView.cs" />
+    <Compile Include="Ui\ViewControllers\MailViewerView\Subviews\MailViewerSubview.cs" />
+    <Compile Include="Ui\ViewControllers\MailViewerView\Subviews\PriorityView.cs" />
+    <Compile Include="Ui\ViewControllers\MailViewerView\Subviews\SubjectView.cs" />
+    <Compile Include="Ui\ViewControllers\SearchCriteriaView\AbstractSearchCriteriaViewController.cs" />
+    <Compile Include="Ui\ViewControllers\SearchCriteriaView\ContactsSearchCriteriaViewController.cs" />
+    <Compile Include="Ui\ViewControllers\SearchCriteriaView\DocumentsSearchCriteriaViewController.cs" />
+    <Compile Include="Ui\ViewControllers\SearchCriteriaView\ShortcodesSearchCriteriaViewController.cs" />
+    <Compile Include="Utilities\ConsoleAndFileLogger.cs" />
+    <Compile Include="Utilities\DateTimeFormatter.cs" />
+    <Compile Include="Utilities\DeviceInfoProvider.cs" />
+    <Compile Include="Utilities\InsecureNativeMessageHandler.cs" />
+    <Compile Include="Utilities\Integration.cs" />
+    <Compile Include="Utilities\LocalNotificationsListener.cs" />
+    <Compile Include="Utilities\NotificationConverter.cs" />
+    <Compile Include="Utilities\Phonebook.cs" />
+    <Compile Include="Utilities\PortableConcurrentQueue.cs" />
+    <Compile Include="Utilities\Preferences.cs" />
+    <Compile Include="Utilities\PushNotificationsConverter.cs" />
+    <Compile Include="Utilities\SSLCertificateVerificationManager.cs" />
+    <Compile Include="Utilities\SystemReportCollector.cs" />
+    <Compile Include="Utilities\UI.cs" />
+    <Compile Include="Utilities\Extensions\NSObjectExtensions.cs" />
+    <Compile Include="Utilities\Extensions\ObjectExtensions.cs" />
+    <Compile Include="Utilities\Extensions\StringExtensions.cs" />
+    <Compile Include="Utilities\Extensions\UIFontExtensions.cs" />
+    <Compile Include="Utilities\Extensions\UITextViewExtensions.cs" />
+    <Compile Include="Utilities\Extensions\UIViewExtensions.cs" />
+    <Compile Include="Ui\ViewControllers\DownloadViewController.cs" />
+    <Compile Include="Utilities\ActivityIndicator.cs" />
+    <Compile Include="Ui\ViewControllers\RecentAddressesListViewController.cs" />
+    <Compile Include="Ui\ViewControllers\PhonebookContactsListViewController.cs" />
+    <Compile Include="Ui\ViewControllers\FoldersList\PickerContactsFoldersListViewController.cs" />
+    <Compile Include="Ui\ViewControllers\ContactsList\ContactsListViewController.cs" />
+    <Compile Include="Ui\ViewControllers\ContactsList\AbstractContactsListViewController.cs" />
+    <Compile Include="Ui\ViewControllers\ContactsList\PickerContactsListViewController.cs" />
+    <Compile Include="Ui\ViewControllers\FoldersList\PickerShortcodesFoldersListViewController.cs" />
+    <Compile Include="Ui\ViewControllers\ShortcodesList\AbstractShortcodesListViewController.cs" />
+    <Compile Include="Ui\ViewControllers\ShortcodesList\ShortcodesListViewController.cs" />
+    <Compile Include="Ui\ViewControllers\ShortcodesList\PickerShortcodesListViewController.cs" />
+    <Compile Include="Ui\ViewControllers\TemplatesListViewController.cs" />
+    <Compile Include="Model\FileDescription.cs" />
+    <Compile Include="Ui\Common\DocumentInteractionController.cs" />
+    <Compile Include="Ui\ViewControllers\UserSelectionViewController.cs" />
+    <Compile Include="Ui\ViewControllers\MultipleUserSelectionViewController.cs" />
+    <Compile Include="Ui\ViewControllers\FoldersList\PickerParentContactFoldersListView.cs" />
+    <Compile Include="Ui\ViewControllers\ContactsList\PickerParentContactListViewController.cs" />
+    <Compile Include="Ui\ViewControllers\AddEditContactViewController.cs" />
+    <Compile Include="Config.cs" />
+    <Compile Include="Ui\TableViewCells\AddEditTableViewCells\AddEditContactTableViewCell\BirthdateTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\AddEditTableViewCells\AddEditContactTableViewCell\EmailAddressTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\AddEditTableViewCells\AddEditContactTableViewCell\PhoneNumberTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\AddEditTableViewCells\AddEditContactTableViewCell\PhysicalAddressTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\AddEditTableViewCells\AddEditTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\AddEditTableViewCells\TextFieldTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\AddEditTableViewCells\TitledTextViewTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\AddEditTableViewCells\MultiRowHeaderTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\AddEditTableViewCells\MultiRowContentTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\AddEditTableViewCells\DisclosureIndicatorTableViewCell.cs" />
+    <Compile Include="Ui\ViewControllers\AddEditShortcodeViewController.cs" />
+    <Compile Include="Ui\TableViewCells\AddEditTableViewCells\AddEditShortcodeTableViewCell\AddressTableViewCell.cs" />
+    <Compile Include="Utilities\AsyncHelpers.cs" />
+    <Compile Include="Ui\Common\AbstractTableViewController.cs" />
+    <Compile Include="Ui\Common\KeyboardObserverInputAccessoryView.cs" />
+    <Compile Include="Ui\Common\DarkNavigationController.cs" />
+    <Compile Include="Utilities\Extensions\UIKeyboardEventArgsExtensions.cs" />
+    <Compile Include="Ui\Common\AbstractMultiViewController.cs" />
+    <Compile Include="Utilities\UITableViewCellUtilities.cs" />
+    <Compile Include="Ui\Common\TouchTransparentView.cs" />
+    <Compile Include="Ui\TableViewCells\ShortcodeInfoTableViewCell.cs" />
+    <Compile Include="Ui\TableViewCells\DocumentAddressTableViewCell.cs" />
+    <Compile Include="Model\HubMessages\DraftSentMessage.cs" />
+    <Compile Include="Utilities\UsageAnalytics.cs" />
+    <Compile Include="Ui\Common\ReachabilityBar.cs" />
+    <Compile Include="Ui\Common\AbstractWebViewController.cs" />
+    <Compile Include="Ui\ViewControllers\ComposeDocumentView\ComposeDocumentViewController.cs" />
+    <Compile Include="Ui\Common\AbstractAppSettingsViewController.cs" />
+    <Compile Include="Ui\ViewControllers\ComposeDocumentView\EditOriginalDocumentViewController.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\DocumentPageViewController.cs" />
+    <Compile Include="Ui\Common\AbstractPageViewController.cs" />
+    <Compile Include="Ui\Common\AbstractMainViewController.cs" />
+    <Compile Include="Utilities\LocalAuthenticationManager.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\HeaderView\HeaderView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\HeaderView\DocumentSubView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\HeaderView\TextSubView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\HeaderView\ReadByView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\HeaderView\ReferenceNumberView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\HeaderView\OriginatorView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\HeaderView\RecipientsView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\HeaderView\CcView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\HeaderView\BccView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\HeaderView\DateView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\HeaderView\ToView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\HeaderView\FromView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\HeaderView\SeparatorSubView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\HeaderView\SubjectView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\HeaderView\AttachmentsView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\HeaderView\ExtraFieldsView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\HeaderView\PriorityView.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\HeaderView\CreatorView.cs" />
+    <Compile Include="Ui\Common\LargeHitAreaButton.cs" />
+    <Compile Include="Ui\ViewControllers\MailViewerView\Subviews\HeaderView.cs" />
+    <Compile Include="Ui\ViewControllers\MailViewerView\Subviews\SeparatorSubview.cs" />
+    <Compile Include="Ui\ViewControllers\MailViewerView\Subviews\RecipientsView.cs" />
+    <Compile Include="Ui\ViewControllers\SwipeActionViewController.cs" />
+    <Compile Include="Utilities\EmailSwipeActions.cs" />
+    <Compile Include="Utilities\OnBoardingUtilities.cs" />
+    <Compile Include="Ui\ViewControllers\OnBoardingViewController.cs" />
+    <Compile Include="Ui\Common\BadgeBarButtonItem.cs" />
+    <Compile Include="Ui\ViewControllers\CategoriesListViewController.cs" />
+    <Compile Include="Ui\ViewControllers\CalendarTestViewController.cs" />
+    <Compile Include="Ui\Common\ModuleNavigationController.cs" />
+    <Compile Include="Ui\ViewControllers\SimpleMainViewController.cs" />
+    <Compile Include="Ui\ViewControllers\SplitMainViewController.cs" />
+    <Compile Include="Model\HubMessages\NavigationModuleChangedMessage.cs" />
+    <Compile Include="Model\NavigationModule.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="Xamarin.iOS" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="PCLStorage.Abstractions">
+      <HintPath>..\packages\PCLStorage.1.0.2\lib\portable-Xamarin.iOS+Xamarin.Mac\PCLStorage.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="InAppSettingsKit">
+      <HintPath>..\Components\InAppSettingsKit-2.6.0.0\lib\ios-unified\InAppSettingsKit.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLite-net">
+      <HintPath>..\packages\sqlite-net-pcl.1.4.118\lib\netstandard1.1\SQLite-net.dll</HintPath>
+    </Reference>
+    <Reference Include="MailBee.NET">
+      <HintPath>..\packages\MailBee.NET.11.2.0\lib\netstandard2.0\MailBee.NET.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Services" />
+    <Reference Include="PCLStorage">
+      <HintPath>..\packages\PCLStorage.1.0.2\lib\portable-Xamarin.iOS+Xamarin.Mac\PCLStorage.dll</HintPath>
+    </Reference>
+    <Reference Include="HockeySDK">
+      <HintPath>..\packages\HockeySDK.Xamarin.5.1.2\lib\Xamarin.iOS10\HockeySDK.dll</HintPath>
+    </Reference>
+    <Reference Include="HockeySDK.iOSBindings">
+      <HintPath>..\packages\HockeySDK.Xamarin.5.1.2\lib\Xamarin.iOS10\HockeySDK.iOSBindings.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\netstandard2.0\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="ModernHttpClient">
+      <HintPath>..\packages\modernhttpclient.2.4.2\lib\Xamarin.iOS10\ModernHttpClient.dll</HintPath>
+    </Reference>
+    <Reference Include="Polly">
+      <HintPath>..\packages\Polly.6.1.0\lib\netstandard2.0\Polly.dll</HintPath>
+    </Reference>
+    <Reference Include="Firebase.Core">
+      <HintPath>..\packages\Xamarin.Firebase.iOS.Core.5.0.5\lib\Xamarin.iOS10\Firebase.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Firebase.InstanceID">
+      <HintPath>..\packages\Xamarin.Firebase.iOS.InstanceID.3.1.1\lib\Xamarin.iOS10\Firebase.InstanceID.dll</HintPath>
+    </Reference>
+    <Reference Include="Firebase.CloudMessaging">
+      <HintPath>..\packages\Xamarin.Firebase.iOS.CloudMessaging.3.0.3\lib\Xamarin.iOS10\Firebase.CloudMessaging.dll</HintPath>
+    </Reference>
+    <Reference Include="Firebase.Analytics">
+      <HintPath>..\packages\Xamarin.Firebase.iOS.Analytics.5.0.1\lib\Xamarin.iOS10\Firebase.Analytics.dll</HintPath>
+    </Reference>
+    <Reference Include="AngleSharp">
+      <HintPath>..\packages\AngleSharp.0.9.10\lib\portable-windows8+net45+windowsphone8+wpa+monoandroid+monotouch\AngleSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="PreMailer.Net">
+      <HintPath>..\packages\PreMailer.Net.2.0.0\lib\netstandard2.0\PreMailer.Net.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.core">
+      <HintPath>..\packages\SQLitePCLRaw.core.1.1.11\lib\Xamarin.iOS10\SQLitePCLRaw.core.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.provider.sqlite3">
+      <HintPath>..\packages\SQLitePCLRaw.provider.sqlite3.ios_unified.1.1.11\lib\Xamarin.iOS10\SQLitePCLRaw.provider.sqlite3.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.batteries_green">
+      <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.11\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_green.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.batteries_v2">
+      <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.11\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_v2.dll</HintPath>
+    </Reference>
+    <Reference Include="HtmlAgilityPack">
+      <HintPath>..\packages\HtmlAgilityPack.1.8.7\lib\netstandard2.0\HtmlAgilityPack.dll</HintPath>
+    </Reference>
+    <Reference Include="Polly">
+      <HintPath>..\packages\Polly.6.1.0\lib\netstandard2.0\Polly.dll</HintPath>
+    </Reference>
+    <Reference Include="Firebase.Core">
+      <HintPath>..\packages\Xamarin.Firebase.iOS.Core.5.0.5\lib\Xamarin.iOS10\Firebase.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Firebase.InstanceID">
+      <HintPath>..\packages\Xamarin.Firebase.iOS.InstanceID.3.1.1\lib\Xamarin.iOS10\Firebase.InstanceID.dll</HintPath>
+    </Reference>
+    <Reference Include="Firebase.CloudMessaging">
+      <HintPath>..\packages\Xamarin.Firebase.iOS.CloudMessaging.3.0.3\lib\Xamarin.iOS10\Firebase.CloudMessaging.dll</HintPath>
+    </Reference>
+    <Reference Include="Lottie.iOS">
+      <HintPath>..\packages\Com.Airbnb.iOS.Lottie.2.5.7\lib\xamarinios10\Lottie.iOS.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Mark5.Mobile.Common\Mark5.Mobile.Common.csproj">
+      <Project>{a7f40f0e-def1-4ca5-bee9-e611df20fc3d}</Project>
+      <Name>Mark5.Mobile.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj">
+      <Project>{06432085-f969-4fb0-860b-6ac0f7b0f69d}</Project>
+      <Name>Mark5.ServiceReference.Exceptions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SVProgressHUD\SVProgressHUD.csproj">
+      <Project>{5ddb3bae-617a-417a-b6aa-68f82b48e3af}</Project>
+      <Name>SVProgressHUD</Name>
+      <IsAppExtension>false</IsAppExtension>
+      <IsWatchApp>false</IsWatchApp>
+    </ProjectReference>
+    <ProjectReference Include="..\TinyMessenger\TinyMessenger.csproj">
+      <Project>{a54356bd-9cc4-4de0-a8dc-9b2d9d6ed288}</Project>
+      <Name>TinyMessenger</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Mark5.Mobile.IOS.Extensions.CallId\Mark5.Mobile.IOS.Extensions.CallId.csproj">
+      <IsAppExtension>true</IsAppExtension>
+      <Project>{D8B702CE-A49B-4A21-88F3-9648E0051AB6}</Project>
+      <Name>Mark5.Mobile.IOS.Extensions.CallId</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Mark5.Mobile.IOS.Common\Mark5.Mobile.IOS.Common.csproj">
+      <Project>{9735C6AC-AAEE-4768-B8DB-E29A2FAFF4F9}</Project>
+      <Name>Mark5.Mobile.IOS.Common</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Info.plist" />
+    <None Include="Entitlements.plist" />
+    <None Include="packages.config" />
+    <None Include="Resources\html\fonts\calibri.ttf" />
+    <None Include="Resources\html\fonts\cambria.ttf" />
+    <None Include="Resources\html\fonts\couriernew.ttf" />
+    <None Include="Resources\html\fonts\opensans.ttf" />
+    <None Include="Resources\html\fonts\tahoma.ttf" />
+    <None Include="Resources\html\fonts\trebuchetms.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <InterfaceDefinition Include="LaunchScreen.storyboard" />
+  </ItemGroup>
+  <ItemGroup>
+    <ImageAsset Include="Assets.xcassets\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Actions.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Actions.imageset\actions%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Actions.imageset\actions%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Add.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Add.imageset\add%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Add.imageset\add%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Arrow-Down.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Arrow-Down.imageset\arrow-down%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Arrow-Down.imageset\arrow-down%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Arrow-Up.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Arrow-Up.imageset\arrow-up%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Arrow-Up.imageset\arrow-up%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Attachment-Small.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Attachment-Small.imageset\attachment-small%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Attachment-Small.imageset\attachment-small%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Attachment.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Attachment.imageset\attachment%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Attachment.imageset\attachment%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Checkmark.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Checkmark.imageset\checkmark%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Checkmark.imageset\checkmark%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Comments.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Comments.imageset\comments%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Comments.imageset\comments%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Contacts-Filled.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Contacts-Filled.imageset\contacts-filled%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Contacts-Filled.imageset\contacts-filled%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Contacts.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Contacts.imageset\contacts%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Contacts.imageset\contacts%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Create.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Create.imageset\create%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Create.imageset\create%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Documents-Filled.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Documents-Filled.imageset\documents-filled%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Documents-Filled.imageset\documents-filled%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Documents-Small.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Documents-Small.imageset\documents-small%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Documents-Small.imageset\documents-small%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Documents.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Documents.imageset\documents%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Documents.imageset\documents%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Done.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Done.imageset\done%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Done.imageset\done%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Edit-Small.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Edit-Small.imageset\edit_small%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Edit-Small.imageset\edit_small%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Edit.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Edit.imageset\edit%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Edit.imageset\edit%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Email-Large.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Email-Large.imageset\large_email%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Email-Large.imageset\large_email%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Email.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Email.imageset\email%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Email.imageset\email%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Expand.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Expand.imageset\expand%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Expand.imageset\expand%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Failed.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Failed.imageset\failed%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Failed.imageset\failed%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\File-To.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\File-To.imageset\fileto%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\File-To.imageset\fileto%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Flag.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Flag.imageset\flag%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Flag.imageset\flag%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Full-Dot.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Full-Dot.imageset\full-dot%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Full-Dot.imageset\full-dot%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Incoming.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Incoming.imageset\incoming%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Incoming.imageset\incoming%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Map-Large.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Map-Large.imageset\large_map%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Map-Large.imageset\large_map%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Map.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Map.imageset\map%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Map.imageset\map%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Mark-As-Read.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Mark-As-Read.imageset\markasread%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Mark-As-Read.imageset\markasread%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Message-Small.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Message-Small.imageset\message-small%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Message-Small.imageset\message-small%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Message.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Message.imageset\message%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Message.imageset\message%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Mobile-Large.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Mobile-Large.imageset\large_mobile%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Mobile-Large.imageset\large_mobile%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Offline.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Offline.imageset\offline%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Offline.imageset\offline%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Outgoing.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Outgoing.imageset\outgoing%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Outgoing.imageset\outgoing%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Pending.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Pending.imageset\pending%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Pending.imageset\pending%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Phone.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Phone.imageset\phone%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Phone.imageset\phone%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Remove.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Remove.imageset\remove%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Remove.imageset\remove%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Reply.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Reply.imageset\reply%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Reply.imageset\reply%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Search-Large.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Search-Large.imageset\search_large%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Search-Large.imageset\search_large%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Search-Small.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Search-Small.imageset\search_small%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Search-Small.imageset\search_small%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Sending.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Sending.imageset\sending%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Sending.imageset\sending%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Settings-Filled.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Settings-Filled.imageset\settings-filled%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Settings-Filled.imageset\settings-filled%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Settings.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Settings.imageset\settings%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Settings.imageset\settings%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Shortcodes-Filled.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Shortcodes-Filled.imageset\shortcodes-filled%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Shortcodes-Filled.imageset\shortcodes-filled%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Shortcodes.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Shortcodes.imageset\shortcodes%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Shortcodes.imageset\shortcodes%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Sms-Large.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Sms-Large.imageset\large_sms%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Sms-Large.imageset\large_sms%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Warning.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Warning.imageset\warning%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Warning.imageset\warning%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Worktray.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Worktray.imageset\worktray%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Worktray.imageset\worktray%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Folderslist-Draft.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Folderslist-Draft.imageset\draft%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Folderslist-Draft.imageset\draft%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Folderslist-Folder.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Folderslist-Folder.imageset\folder%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Folderslist-Folder.imageset\folder%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Folderslist-Worktray.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Folderslist-Worktray.imageset\worktray%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Folderslist-Worktray.imageset\worktray%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Download.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Download.imageset\download%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Download.imageset\download%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\SelectAll.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\SelectAll.imageset\selectAll%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\SelectAll.imageset\selectAll%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\DeselectAll.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\DeselectAll.imageset\deselectAll%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\DeselectAll.imageset\deselectAll%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Arrow-Expand.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Arrow-Expand.imageset\arrow_expand%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Arrow-Expand.imageset\arrow_expand%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_onboarding.xcassets\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon40.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon60.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon58.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon87.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon80.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon120.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon180.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon20.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon29.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon76.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon152.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon167.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon1024.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_onboarding.xcassets\onboarding_1.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_onboarding.xcassets\onboarding_1.imageset\Page01.pdf">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_onboarding.xcassets\onboarding_2.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_onboarding.xcassets\onboarding_2.imageset\Page02.pdf">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_onboarding.xcassets\onboarding_3.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_onboarding.xcassets\onboarding_3.imageset\Page03.pdf">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_onboarding.xcassets\onboarding_4.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_onboarding.xcassets\onboarding_4.imageset\Page04.pdf">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_onboarding.xcassets\onboarding_5.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_onboarding.xcassets\onboarding_5.imageset\Page05.pdf">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_onboarding.xcassets\onboarding_6.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_onboarding.xcassets\onboarding_6.imageset\Page06.pdf">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Nav-search.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Nav-mail.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Nav-mail.imageset\Nav-mail%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Nav-contacts.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Nav-contacts.imageset\Nav-contacts%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Nav-contacts.imageset\Nav-contacts%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Nav-search.imageset\Nav-search%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Nav-search.imageset\Nav-search%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Nav-calendar.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Nav-calendar.imageset\Nav-calendar%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Nav-calendar.imageset\Nav-calendar%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Nav-shortcodes.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Nav-shortcodes.imageset\Nav-shortcodes%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Nav-shortcodes.imageset\Nav-shortcodes%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Nav-settings.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Nav-settings.imageset\Nav-settings%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Nav-settings.imageset\Nav-settings%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Nav-mail.imageset\Nav-mail%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Search-Filled.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Search-Filled.imageset\Search-Filled%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets_icons.xcassets\Search-Filled.imageset\Search-Filled%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\Base.lproj\Localizable.strings" />
+    <BundleResource Include="Resources\Settings.bundle\Root.Login.inApp.plist" />
+    <BundleResource Include="Resources\Settings.bundle\Root.inApp.plist" />
+    <BundleResource Include="Resources\Settings.bundle\en.lproj\Root.strings" />
+    <BundleResource Include="GoogleService-Info.plist" />
+    <BundleResource Include="Resources\html\editor.html" />
+    <BundleResource Include="Resources\html\empty.html" />
+    <BundleResource Include="Resources\html\plain.html" />
+    <BundleResource Include="Resources\html\scriptsAtEnd.js" />
+    <BundleResource Include="Resources\html\scriptsAtStart.js" />
+    <BundleResource Include="Resources\html\fonts.css" />
+    <BundleResource Include="Resources\html\headerPadding.js" />
+    <BundleResource Include="Resources\html\replyHeader.html" />
+    <BundleResource Include="Resources\html\blank.html" />
+    <BundleResource Include="Resources\html\replyEditor.html" />
+    <BundleResource Include="Resources\splash.json" />
+    <BundleResource Include="Resources\Base.lproj\Onboarding.strings" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Ui\ViewControllers\ContactsList\" />
+    <Folder Include="Ui\ViewControllers\ShortcodesList\" />
+    <Folder Include="Ui\TableViewCells\AddEditTableViewCells\" />
+    <Folder Include="Ui\TableViewCells\AddEditTableViewCells\AddEditContactTableViewCell\" />
+    <Folder Include="Ui\TableViewCells\AddEditTableViewCells\AddEditShortcodeTableViewCell\" />
+    <Folder Include="Resources\html\fonts\" />
+    <Folder Include="Assets.xcassets\Actions.imageset\" />
+    <Folder Include="Assets.xcassets\Add.imageset\" />
+    <Folder Include="Assets.xcassets\Arrow-Down.imageset\" />
+    <Folder Include="Assets.xcassets\Arrow-Up.imageset\" />
+    <Folder Include="Assets.xcassets\Attachment.imageset\" />
+    <Folder Include="Assets.xcassets\Attachment-Small.imageset\" />
+    <Folder Include="Assets.xcassets\Checkmark.imageset\" />
+    <Folder Include="Assets.xcassets\Comments.imageset\" />
+    <Folder Include="Assets.xcassets\Contacts.imageset\" />
+    <Folder Include="Assets.xcassets\Contacts-Filled.imageset\" />
+    <Folder Include="Assets.xcassets\Create.imageset\" />
+    <Folder Include="Assets.xcassets\Documents.imageset\" />
+    <Folder Include="Assets.xcassets\Documents-Filled.imageset\" />
+    <Folder Include="Assets.xcassets\Documents-Small.imageset\" />
+    <Folder Include="Assets.xcassets\Done.imageset\" />
+    <Folder Include="Assets.xcassets\Downloads.imageset\" />
+    <Folder Include="Assets.xcassets\Edit.imageset\" />
+    <Folder Include="Assets.xcassets\Edit-Small.imageset\" />
+    <Folder Include="Assets.xcassets\Email.imageset\" />
+    <Folder Include="Assets.xcassets\Expand.imageset\" />
+    <Folder Include="Assets.xcassets\Failed.imageset\" />
+    <Folder Include="Assets.xcassets\File-To.imageset\" />
+    <Folder Include="Assets.xcassets\Flag.imageset\" />
+    <Folder Include="Assets.xcassets\Full-Dot.imageset\" />
+    <Folder Include="Assets.xcassets\Incoming.imageset\" />
+    <Folder Include="Assets.xcassets\Email-Large.imageset\" />
+    <Folder Include="Assets.xcassets\Map-Large.imageset\" />
+    <Folder Include="Assets.xcassets\Mobile-Large.imageset\" />
+    <Folder Include="Assets.xcassets\Sms-Large.imageset\" />
+    <Folder Include="Assets.xcassets\Map.imageset\" />
+    <Folder Include="Assets.xcassets\Mark-As-Read.imageset\" />
+    <Folder Include="Assets.xcassets\Message.imageset\" />
+    <Folder Include="Assets.xcassets\Message-Small.imageset\" />
+    <Folder Include="Assets.xcassets\Offline.imageset\" />
+    <Folder Include="Assets.xcassets\Outgoing.imageset\" />
+    <Folder Include="Assets.xcassets\Pending.imageset\" />
+    <Folder Include="Assets.xcassets\Phone.imageset\" />
+    <Folder Include="Assets.xcassets\Remove.imageset\" />
+    <Folder Include="Assets.xcassets\Reply.imageset\" />
+    <Folder Include="Assets.xcassets\Search-Large.imageset\" />
+    <Folder Include="Assets.xcassets\Search-Small.imageset\" />
+    <Folder Include="Assets.xcassets\Sending.imageset\" />
+    <Folder Include="Assets.xcassets\Settings.imageset\" />
+    <Folder Include="Assets.xcassets\Settings-Filled.imageset\" />
+    <Folder Include="Assets.xcassets\Shortcodes.imageset\" />
+    <Folder Include="Assets.xcassets\Shortcodes-Filled.imageset\" />
+    <Folder Include="Assets.xcassets\Warning.imageset\" />
+    <Folder Include="Assets.xcassets\Worktray.imageset\" />
+    <Folder Include="Assets_icons.xcassets\Folderslist-Draft.imageset\" />
+    <Folder Include="Assets_icons.xcassets\Folderslist-Folder.imageset\" />
+    <Folder Include="Assets_icons.xcassets\Folderslist-Worktray.imageset\" />
+    <Folder Include="Assets_icons.xcassets\Download.imageset\" />
+    <Folder Include="Assets_icons.xcassets\SelectAll.imageset\" />
+    <Folder Include="Assets_icons.xcassets\DeselectAll.imageset\" />
+    <Folder Include="Ui\ViewControllers\DocumentView\HeaderView\" />
+    <Folder Include="Assets_icons.xcassets\Arrow-Expand.imageset\" />
+    <Folder Include="Assets.xcassets\OnBoardingOne.imageset\" />
+    <Folder Include="Assets_onboarding.xcassets\2.8_1.imageset\" />
+    <Folder Include="Assets_onboarding.xcassets\2.8_2.imageset\" />
+    <Folder Include="Assets_onboarding.xcassets\2.8_3.imageset\" />
+    <Folder Include="Assets_onboarding.xcassets\2.8_4.imageset\" />
+    <Folder Include="Assets_onboarding.xcassets\2.8_5.imageset\" />
+    <Folder Include="Assets_onboarding.xcassets\onboarding_1.imageset\" />
+    <Folder Include="Assets_onboarding.xcassets\onboarding_2.imageset\" />
+    <Folder Include="Assets_onboarding.xcassets\onboarding_3.imageset\" />
+    <Folder Include="Assets_onboarding.xcassets\onboarding_4.imageset\" />
+    <Folder Include="Assets_onboarding.xcassets\onboarding_5.imageset\" />
+    <Folder Include="Assets_onboarding.xcassets\onboarding_6.imageset\" />
+    <Folder Include="Assets_icons.xcassets\Nav-search.imageset\" />
+    <Folder Include="Assets_icons.xcassets\Nav-mail.imageset\" />
+    <Folder Include="Assets_icons.xcassets\Nav-contacts.imageset\" />
+    <Folder Include="Assets_icons.xcassets\Nav-calendar.imageset\" />
+    <Folder Include="Assets_icons.xcassets\Nav-shortcodes.imageset\" />
+    <Folder Include="Assets_icons.xcassets\Nav-settings.imageset\" />
+    <Folder Include="Assets_icons.xcassets\Search-Filled.imageset\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
+  <Import Project="..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets" Condition="Exists('..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets')" />
+  <Import Project="..\packages\Xamarin.Firebase.iOS.Analytics.4.0.5\build\Xamarin.Firebase.iOS.Analytics.targets" Condition="Exists('..\packages\Xamarin.Firebase.iOS.Analytics.4.0.5\build\Xamarin.Firebase.iOS.Analytics.targets')" />
+  <Import Project="..\packages\Xamarin.Build.Download.0.4.11\build\Xamarin.Build.Download.targets" Condition="Exists('..\packages\Xamarin.Build.Download.0.4.11\build\Xamarin.Build.Download.targets')" />
+  <Import Project="..\packages\Xamarin.Firebase.iOS.InstanceID.3.1.1\build\Xamarin.Firebase.iOS.InstanceID.targets" Condition="Exists('..\packages\Xamarin.Firebase.iOS.InstanceID.3.1.1\build\Xamarin.Firebase.iOS.InstanceID.targets')" />
+  <Import Project="..\packages\Xamarin.Firebase.iOS.Analytics.5.0.1\build\Xamarin.Firebase.iOS.Analytics.targets" Condition="Exists('..\packages\Xamarin.Firebase.iOS.Analytics.5.0.1\build\Xamarin.Firebase.iOS.Analytics.targets')" />
+  <Import Project="..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets')" />
 </Project>

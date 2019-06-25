@@ -11,6 +11,8 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Testers;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Extensions;
+using Android.Net.Wifi;
+using Android.Content;
 
 namespace Mark5.Mobile.Droid.Service
 {
@@ -189,6 +191,28 @@ namespace Mark5.Mobile.Droid.Service
             }
         }
 
+        public async Task<ConnectionDiagnosticModel> ConnectionDiagnostics()
+        {
+            try
+            {
+                var tester = ConnectionTesterFactory.Create();
+                if (!await tester.CanTest())
+                {
+                    CommonConfig.Logger.Info("Configuration file is missing connection info");
+                    return new ConnectionDiagnosticModel(ConnectionDiagnosticModel.ErrorCode.NoConfigurationInfo);
+                }
+
+                ConnectionDiagnosticModel result = await tester.ConnectionDiagnostics();
+                CommonConfig.Logger.Info($"Service availability: {result}");
+                return result;
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Info("Cannot check service availability", ex);
+                return new ConnectionDiagnosticModel(ConnectionDiagnosticModel.ErrorCode.UncaughtException);
+            }
+        }
+
         async Task CheckServiceAvailabilityContinuously(CancellationToken cancellationToken)
         {
             while (!cancellationToken.IsCancellationRequested)
@@ -203,6 +227,42 @@ namespace Mark5.Mobile.Droid.Service
 
                 await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
             }
+        }
+
+        private const string UNKNOWNSSID = "<unknown ssid>";
+        /// <summary>
+        /// Checks wifi is switched on AND that its connected (using NetworkId and SSID to 
+        /// identify connected).
+        /// </summary>
+        /// <returns>True if switched on and connected to a wifi network.  False if not switch on 
+        /// OR if switched on but not connected.</returns>
+        ///
+        public bool IsWifiConnected()
+        {
+            var wifiManager = Application.Context.GetSystemService(Context.WifiService) as WifiManager;
+
+            if (wifiManager != null)
+            {
+                // Check state is enabled.
+                return wifiManager.IsWifiEnabled &&
+                    // Check for network id equal to -1
+                    (wifiManager.ConnectionInfo.NetworkId != -1
+                    // Check for SSID having default value of "<unknown SSID>"
+                    && wifiManager.ConnectionInfo.SSID != UNKNOWNSSID);
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Detects if the device has MobileData turned on 
+        /// </summary>
+        /// <returns>True if switched on only. False if not switched on.</returns>
+        public bool IsMobileDataEnabled()
+        {
+            var connectivityManager = (ConnectivityManager)Application.Context.GetSystemService(Context.ConnectivityService);
+            var networkInfo = connectivityManager?.ActiveNetworkInfo;
+            return networkInfo?.Type == ConnectivityType.Mobile;
         }
     }
 }
