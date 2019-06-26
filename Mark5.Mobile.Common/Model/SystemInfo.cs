@@ -13,6 +13,7 @@ namespace Mark5.Mobile.Common.Model
         public Guid CustomerGuid { get; set; }
         public bool SyncFavoritesAvailable => ServiceVersionGreaterThanOrEqual(3, 2, 0);
         public bool InternalMailsAvailable => false;
+        public bool NotificationsInChina { get; set; }
 
         List<ModuleType> availableModules;
         public List<ModuleType> AvailableModules

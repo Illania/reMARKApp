@@ -217,9 +217,11 @@ namespace Mark5.Mobile.IOS
                 return;
             }
 
-            if (serviceVersion != null && serviceVersion.CompareTo(new Version(3, 2, 0)) >= 0)
+            bool notificationsInChinaEnabled = ServerConfig.SystemSettings?.SystemInfo?.NotificationsInChina != null ? (bool)ServerConfig.SystemSettings?.SystemInfo?.NotificationsInChina : false;
+
+            if ((serviceVersion != null && serviceVersion.CompareTo(new Version(3, 2, 0)) >= 0) && !notificationsInChinaEnabled)
             {
-                CommonConfig.Logger.Info($"Not sending the APNS token because the current service version is equal or higher than 3.2.0");
+                CommonConfig.Logger.Info($"Not sending the APNS token because the current service version is equal or higher than 3.2.0 and Notifications Not Enabled in China");
                 return;
             }
 
@@ -255,6 +257,12 @@ namespace Mark5.Mobile.IOS
             if (serviceVersion.CompareTo(new Version(3, 2, 0)) < 0)
             {
                 CommonConfig.Logger.Info($"Not sending the FCM token because the current service version is lesss than 3.2.0");
+                return;
+            }
+
+            if (ServerConfig.SystemSettings?.SystemInfo?.NotificationsInChina != null && (bool)ServerConfig.SystemSettings?.SystemInfo?.NotificationsInChina)
+            {
+                CommonConfig.Logger.Info($"Not sending the FCM token because the current service is using Chinese Notifications");
                 return;
             }
 
