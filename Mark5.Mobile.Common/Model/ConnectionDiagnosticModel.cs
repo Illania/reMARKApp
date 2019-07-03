@@ -17,6 +17,7 @@ namespace Mark5.Mobile.Common.Model
         public ConnectionDiagnosticModel(ErrorCode errorCode)
         {
             Error = errorCode;
+            Status = ConnectionStatus.Broken;
         }
 
         public ConnectionDiagnosticModel(int successResultCount, int failedRequestCount, long totalEllapsedTime, ErrorCode errorCode = ErrorCode.None)
@@ -25,40 +26,30 @@ namespace Mark5.Mobile.Common.Model
             FailedRequestCount = failedRequestCount;
             TotalEllapsedTime = totalEllapsedTime;
             Error = errorCode;
-            AverageEllapsedTime = TotalEllapsedTime / SuccessfullRequestCount;
-            AverageEllapsedTimeInSeconds = TimeSpan.FromMilliseconds(AverageEllapsedTime).TotalSeconds;
+            if (SuccessfullRequestCount > 0)
+            {
+                AverageEllapsedTime = TotalEllapsedTime / SuccessfullRequestCount;
+                AverageEllapsedTimeInSeconds = TimeSpan.FromMilliseconds(AverageEllapsedTime).TotalSeconds;
+            }
 
             if (SuccessfullRequestCount == SuccessfullRequestCount + FailedRequestCount)
                 Status = ConnectionStatus.Stable;
-            else if (SuccessfullRequestCount >= Math.Round((decimal)(SuccessfullRequestCount / 2)))
+            else if (SuccessfullRequestCount > 0 && SuccessfullRequestCount >= FailedRequestCount)
                 Status = ConnectionStatus.Unstable;
-            else if (SuccessfullRequestCount < Math.Round((decimal)(SuccessfullRequestCount / 2)))
+            else if (SuccessfullRequestCount > 0 && SuccessfullRequestCount < FailedRequestCount)
                 Status = ConnectionStatus.Bad;
             else
                 Status = ConnectionStatus.Broken;
         }
 
-        //"Failed to reach the server. Please make sure you have internet connection and current network has access to the server";
         public enum ErrorCode
         {
             None, NoConfigurationInfo, RequestsFailed, UncaughtException
         }
 
-        /*
-        string status;
-        if (successResultCount == 3)
-            status = "Connection to the server is Stable";
-        else if (successResultCount == 2)
-            status = "Connection to the server is Unstable";
-        else
-            status = "Connection to the server is Broken. Please contact your system administrator to resolve the issue.";
-        */
         public enum ConnectionStatus
         {
             Stable, Unstable, Bad, Broken
         }
-
-        //"Failed to reach the server. Please make sure you have internet connection and current network has access to the server";
-
     }
 }

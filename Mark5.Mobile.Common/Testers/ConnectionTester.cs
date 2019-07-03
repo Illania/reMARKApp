@@ -59,20 +59,10 @@ namespace Mark5.Mobile.Common.Testers
             }
         }
 
-        bool failRequest;
-
         async Task<long> MakeRequest(CancellationToken ct = default(CancellationToken))
         {
             try
             {
-
-                if (!failRequest)
-                {
-                    failRequest = !failRequest;
-                    return -1;
-                }
-
-
                 var ci = await FileSystemStorage.GetConnectionInfoAsync(ct);
 
                 var proxy = AppServiceProxyFactory.Create(ci.SslMode != SslMode.Off,
@@ -83,9 +73,7 @@ namespace Mark5.Mobile.Common.Testers
                                                           null);
 
                 var stopWatch = Stopwatch.StartNew();
-
                 var result = await proxy.TestAsync(new DataContract.TestParameters());
-
                 return stopWatch.ElapsedMilliseconds;
             }
             catch (Exception ex)
@@ -98,15 +86,13 @@ namespace Mark5.Mobile.Common.Testers
         public async Task<ConnectionDiagnosticModel> ConnectionDiagnostics(CancellationToken ct = default(CancellationToken))
         {
             ConnectionDiagnosticModel connectionDiagnosticModel = new ConnectionDiagnosticModel();
-
             // adding three tasks to the list of executables
             var taskList = new List<Task<long>> { MakeRequest(ct), MakeRequest(ct), MakeRequest(ct), MakeRequest(ct), MakeRequest(ct) };
             try
             {
                 // run tasks in parallel
-                var tasl = Task.WhenAll(taskList.ToArray());
-
-                await tasl.ContinueWith((elapsedTime) =>
+                var tasks = Task.WhenAll(taskList.ToArray());
+                await tasks.ContinueWith((elapsedTime) =>
                 {
                     List<long> ellapsedTimeList = elapsedTime.Result.OfType<long>().ToList();
                     List<long> successResultList = ellapsedTimeList.Where(d => d > -1).ToList();
