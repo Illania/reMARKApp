@@ -56,7 +56,7 @@
 		<ConsolePause>false</ConsolePause>
 		<MtouchArch>ARM64</MtouchArch>
 		<CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
-		<CodesignKey>iPhone Developer</CodesignKey>
+		<CodesignKey>iPhone Developer: Lars Hansen (TUYUES9KMZ)</CodesignKey>
 		<MtouchDebug>true</MtouchDebug>
 		<RunCodeAnalysis>true</RunCodeAnalysis>
 		<MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
@@ -302,12 +302,6 @@
 		<Reference Include="PCLStorage">
 		  <HintPath>..\packages\PCLStorage.1.0.2\lib\portable-Xamarin.iOS+Xamarin.Mac\PCLStorage.dll</HintPath>
 		</Reference>
-		<Reference Include="HockeySDK">
-		  <HintPath>..\packages\HockeySDK.Xamarin.5.1.2\lib\Xamarin.iOS10\HockeySDK.dll</HintPath>
-		</Reference>
-		<Reference Include="HockeySDK.iOSBindings">
-		  <HintPath>..\packages\HockeySDK.Xamarin.5.1.2\lib\Xamarin.iOS10\HockeySDK.iOSBindings.dll</HintPath>
-		</Reference>
 		<Reference Include="Newtonsoft.Json">
 		  <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\netstandard2.0\Newtonsoft.Json.dll</HintPath>
 		</Reference>
@@ -377,6 +371,18 @@
 		</Reference>
 		<Reference Include="Polly">
 		  <HintPath>..\packages\Polly.7.1.0\lib\netstandard2.0\Polly.dll</HintPath>
+		</Reference>
+		<Reference Include="Microsoft.AppCenter">
+		  <HintPath>..\packages\Microsoft.AppCenter.2.0.0\lib\Xamarin.iOS10\Microsoft.AppCenter.dll</HintPath>
+		</Reference>
+		<Reference Include="Microsoft.AppCenter.iOS.Bindings">
+		  <HintPath>..\packages\Microsoft.AppCenter.2.0.0\lib\Xamarin.iOS10\Microsoft.AppCenter.iOS.Bindings.dll</HintPath>
+		</Reference>
+		<Reference Include="Microsoft.AppCenter.Crashes">
+		  <HintPath>..\packages\Microsoft.AppCenter.Crashes.2.0.0\lib\Xamarin.iOS10\Microsoft.AppCenter.Crashes.dll</HintPath>
+		</Reference>
+		<Reference Include="Microsoft.AppCenter.Crashes.iOS.Bindings">
+		  <HintPath>..\packages\Microsoft.AppCenter.Crashes.2.0.0\lib\Xamarin.iOS10\Microsoft.AppCenter.Crashes.iOS.Bindings.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 	<ItemGroup>

@@ -90,10 +90,10 @@
 "description" = "Description";
 "delete" = "Delete";
 "delete_draft" = "Delete draft";
-"delete_from_folder" = "Delete from folder";
+"delete_from_folder" = "Remove from folder";
 "deleting___" = "Deleting...";
 "deleting_comment___" = "Deleting comment...";
-"deleting_from_folder___" = "Deleting from folder...";
+"deleting_from_folder___" = "Removing from folder...";
 "department" = "Department";
 "description" = "Description";
 "disable_sync" = "Disable\nsync";

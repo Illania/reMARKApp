@@ -601,7 +601,8 @@ namespace Mark5.Mobile.Common.Model.Converters
                 ServerUtcOffset = si.ServerUtcOffset,
                 CustomerName = si.CustomerName,
                 CustomerGuid = si.CustomerGuid,
-                ServerTimeZoneInfoSerialized = si.ServerTimeZoneInfoSerialized
+                ServerTimeZoneInfoSerialized = si.ServerTimeZoneInfoSerialized,
+                NotificationsInChina = si.NotificationsInChina
             };
             if (si.AvailableModules != null)
                 result.AvailableModules.AddRange(si.AvailableModules.Select(mt => mt.ConvertEnum<ModuleType>()));

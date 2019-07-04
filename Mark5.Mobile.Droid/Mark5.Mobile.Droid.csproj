@@ -31,7 +31,7 @@
     <AndroidLinkMode>None</AndroidLinkMode>
     <AndroidSupportedAbis>armeabi-v7a;x86;x86_64;arm64-v8a</AndroidSupportedAbis>
     <RunCodeAnalysis>true</RunCodeAnalysis>
-    <MandroidI18n>cjk;mideast;west</MandroidI18n>
+    <MandroidI18n>cjk;mideast;west;other;rare</MandroidI18n>
     <AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidClientHandler</AndroidHttpClientHandlerType>
     <JavaMaximumHeapSize>1G</JavaMaximumHeapSize>
     <AndroidTlsProvider>btls</AndroidTlsProvider>
@@ -87,12 +87,6 @@
       <HintPath>..\packages\MailBee.NET.11.2.0\lib\netstandard2.0\MailBee.NET.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.Services" />
-    <Reference Include="HockeySDK.AndroidBindings">
-      <HintPath>..\packages\HockeySDK.Xamarin.5.1.2\lib\MonoAndroid403\HockeySDK.AndroidBindings.dll</HintPath>
-    </Reference>
-    <Reference Include="HockeySDK">
-      <HintPath>..\packages\HockeySDK.Xamarin.5.1.2\lib\MonoAndroid403\HockeySDK.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\netstandard2.0\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -110,10 +104,6 @@
     </Reference>
     <Reference Include="SQLitePCLRaw.batteries_v2">
       <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.13\lib\MonoAndroid\SQLitePCLRaw.batteries_v2.dll</HintPath>
-    </Reference>
-    <Reference Include="HtmlAgilityPack">
-      <HintPath>..\packages\HtmlAgilityPack.1.11.4\lib\netstandard2.0\HtmlAgilityPack.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="Xamarin.Android.Support.Annotations">
       <HintPath>..\packages\Xamarin.Android.Support.Annotations.28.0.0.1\lib\monoandroid90\Xamarin.Android.Support.Annotations.dll</HintPath>
@@ -196,14 +186,22 @@
     <Reference Include="Xamarin.Firebase.Messaging">
       <HintPath>..\packages\Xamarin.Firebase.Messaging.60.1142.1\lib\MonoAndroid80\Xamarin.Firebase.Messaging.dll</HintPath>
     </Reference>
-    <Reference Include="PhoneNumbers">
-      <HintPath>..\packages\libphonenumber-csharp.8.10.12\lib\netstandard2.0\PhoneNumbers.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Lottie.Android">
       <HintPath>..\packages\Com.Airbnb.Android.Lottie.2.7.1\lib\monoandroid90\Lottie.Android.dll</HintPath>
     </Reference>
     <Reference Include="Java.Interop" />
+    <Reference Include="Microsoft.AppCenter.Android.Bindings">
+      <HintPath>..\packages\Microsoft.AppCenter.2.0.0\lib\MonoAndroid403\Microsoft.AppCenter.Android.Bindings.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AppCenter">
+      <HintPath>..\packages\Microsoft.AppCenter.2.0.0\lib\MonoAndroid403\Microsoft.AppCenter.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AppCenter.Crashes.Android.Bindings">
+      <HintPath>..\packages\Microsoft.AppCenter.Crashes.2.0.0\lib\MonoAndroid403\Microsoft.AppCenter.Crashes.Android.Bindings.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AppCenter.Crashes">
+      <HintPath>..\packages\Microsoft.AppCenter.Crashes.2.0.0\lib\MonoAndroid403\Microsoft.AppCenter.Crashes.dll</HintPath>
+    </Reference>
     <Reference Include="Xamarin.Android.Arch.Core.Runtime">
       <HintPath>..\packages\Xamarin.Android.Arch.Core.Runtime.1.1.1.1\lib\monoandroid90\Xamarin.Android.Arch.Core.Runtime.dll</HintPath>
     </Reference>
@@ -293,6 +291,15 @@
     <Reference Include="PreMailer.Net">
       <HintPath>..\packages\PreMailer.Net.2.0.1\lib\netstandard2.0\PreMailer.Net.dll</HintPath>
     </Reference>
+    <Reference Include="HtmlAgilityPack">
+      <HintPath>..\packages\HtmlAgilityPack.1.11.8\lib\netstandard2.0\HtmlAgilityPack.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Collections.Immutable">
+      <HintPath>..\packages\System.Collections.Immutable.1.5.0\lib\netstandard2.0\System.Collections.Immutable.dll</HintPath>
+    </Reference>
+    <Reference Include="PhoneNumbers">
+      <HintPath>..\packages\libphonenumber-csharp.8.10.14\lib\netstandard2.0\PhoneNumbers.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -302,7 +309,6 @@
     <Compile Include="Model\Exceptions\MailViewerException.cs" />
     <Compile Include="Service\PushNotificationInstanceIdService.cs" />
     <Compile Include="Service\PushNotificationMessagingService.cs" />
-    <Compile Include="Service\ReachabilityBroadcastReceiver.cs" />
     <Compile Include="Service\Reachability.cs" />
     <Compile Include="Utilities\Conversion.cs" />
     <Compile Include="Utilities\DateTimeFormatter.cs" />
@@ -319,7 +325,6 @@
     <Compile Include="Utilities\SimpleLogger.cs" />
     <Compile Include="Utilities\SystemReportCollector.cs" />
     <Compile Include="Utilities\UI.cs" />
-    <Compile Include="Utilities\Hockey\CustomCrashManagerListener.cs" />
     <Compile Include="Ui\Activities\CategoriesListActivity.cs" />
     <Compile Include="Ui\Activities\CommentsListActivity.cs" />
     <Compile Include="Ui\Activities\ComposeDocumentActivity.cs" />
@@ -536,6 +541,7 @@
     <Compile Include="Ui\Fragments\CategoriesListFragment.cs" />
     <Compile Include="Ui\Activities\PickerInternalContactsListActivity.cs" />
     <Compile Include="Ui\Fragments\PickerInternalContactsListFragment.cs" />
+    <Compile Include="Service\ReachabilityMonitor.cs" />
     <Compile Include="Utilities\PushNotificationsUtilities.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Ui\Fragments\Calendar\MonthCalendarFragment.cs" />

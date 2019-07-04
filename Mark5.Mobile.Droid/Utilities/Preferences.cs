@@ -39,6 +39,8 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public DocumentBodyTypeRequest DocumentBodyRequestType => sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_documents_download_as_plaintext), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_documents_download_as_plaintext_default)) ? DocumentBodyTypeRequest.PlainTextOnly : DocumentBodyTypeRequest.HtmlOnly;
 
+        public bool ConfirmationRemoveSwipe => sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_documents_confirm_remove), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_documents_confirm_remove_default));
+
         #endregion
 
         #region Caller Identification

@@ -20,6 +20,7 @@
 "contacts" = "Contacts";
 "contact_section_visibility" = "Sections";
 "contacts_to_search" = "Contacts search results";
+"confirm_remove_swipe" = "Confirm remove swipe action";
 "create_report" = "Create system report";
 "create_system_report" = "Create system report";
 "default_template" = "Default reMARK template";

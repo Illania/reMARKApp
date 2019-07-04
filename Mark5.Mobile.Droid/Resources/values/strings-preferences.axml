@@ -200,4 +200,8 @@
     <string name="sync_favorite_folders_title">Sync favorite folders</string>
     <string name="pref_sync_title">Sync</string>
     <string name="sync_favorite_folders_summary">Synchronize favorite folders across devices and installations</string>
+    <string name="pref_documents_confirm_remove_summary_off">The email will be removed straight away when using swipe actions.</string>
+    <string name="pref_documents_confirm_remove_summary_on">You will be asked for confirmation when removing an email from folder with swipe actions.</string>
+    <string name="pref_documents_confirm_remove_title">Confirm remove from folder with swipe</string>
+    <string name="pref_key_documents_confirm_remove">pref_key_documents_confirm_remove</string>
 </resources>

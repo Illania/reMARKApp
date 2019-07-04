@@ -326,8 +326,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     CommonConfig.Logger.Info($"Refreshing reachability status...");
                     await CommonConfig.Reachability.Refresh();
 
-                    CommonConfig.Logger.Info($"Registering {nameof(ReachabilityBroadcastReceiver)}...");
-                    PlatformConfig.ReachabilityBroadcastReceiver.Register();
+                    CommonConfig.Logger.Info($"Registering {nameof(ReachabilityMonitor)}...");
+                    PlatformConfig.ReachabilityMonitor.Register(ApplicationContext);
 
                     CommonConfig.Logger.Info($"Logged in - will present {nameof(MainActivity)}");
 

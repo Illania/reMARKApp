@@ -616,10 +616,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             List<EmailSwipeAction> availableSwipeActions = PlatformConfig.Preferences.GetAvailableSwipeActions();
 
-            foreach (var swipeAction in availableSwipeActions) {
+            foreach (var swipeAction in availableSwipeActions)
+            {
                 var title = SwipeActionTitle(swipeAction.Action, selectedDocument);
                 var actionAllowed = SwipeActionAllowed(swipeAction.Action, selectedDocument, folder);
-                if(actionAllowed && swipeAction.Action != EmailSwipeAction.SwipeAction.More) {
+                if (actionAllowed && swipeAction.Action != EmailSwipeAction.SwipeAction.More)
+                {
                     UIAlertActionStyle actionStyle = swipeAction.Action == EmailSwipeAction.SwipeAction.More ? UIAlertActionStyle.Destructive : UIAlertActionStyle.Default;
                     alertController.AddAction(UIAlertAction.Create(title, actionStyle, a => OnSwipeActionClick(swipeAction, indexPath, selectedDocument, folder, TableView)));
                 }
@@ -729,17 +731,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         }
 
         void RemoveFromFolder(DocumentPreview selectedDocument, UIPopoverPresentationControllerDelegate d) =>
-            RemoveFromFolder(new List<DocumentPreview> { selectedDocument }, d);
+            RemoveFromFolder(new List<DocumentPreview> { selectedDocument }, d, true);
 
-        async void RemoveFromFolder(List<DocumentPreview> selectedDocuments, UIPopoverPresentationControllerDelegate d)
+        async void RemoveFromFolder(List<DocumentPreview> selectedDocuments, UIPopoverPresentationControllerDelegate d, bool fromSwipe = false)
         {
-            var result = await Dialogs.ShowDestructiveActionSheetAsync(this, Localization.GetString("delete_from_folder"), d);
-            if (!result)
+            if (fromSwipe && PlatformConfig.Preferences.ConfirmRemoveSwipe)
             {
-                EndEditing();
-                return;
+                var result = await Dialogs.ShowDestructiveActionSheetAsync(this, Localization.GetString("delete_from_folder"), d);
+                if (!result)
+                {
+                    EndEditing();
+                    return;
+                }
             }
-
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("deleting_from_folder___"));
 
             try
@@ -1118,8 +1122,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             CommonConfig.UsageAnalytics.LogEvent(new SwipeActionUsedEvent());
 
             var popoverDelegate = new PopoverPresentationControllerDelegate(tableView, tableView.CellAt(indexPath));
-          
-            if (SwipeActionAllowed(swipeAction.Action, documentPreview, folder)) {
+
+            if (SwipeActionAllowed(swipeAction.Action, documentPreview, folder))
+            {
                 switch (swipeAction.Action)
                 {
                     case EmailSwipeAction.SwipeAction.MarkAsRead:

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Firebase.CloudMessaging;
 using Firebase.Core;
 using Foundation;
-using HockeyApp.iOS;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Database;
@@ -23,6 +22,8 @@ using Mark5.Mobile.IOS.Service;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers;
 using Mark5.Mobile.IOS.Utilities;
+using Microsoft.AppCenter;
+using Microsoft.AppCenter.Crashes;
 using ModernHttpClient;
 using PCLStorage;
 using TinyMessenger;
@@ -52,18 +53,11 @@ namespace Mark5.Mobile.IOS
                 var isLoggedIn = InitializePlatform(application);
                 CommonConfig.Logger.Info("reMARK initialized");
 
-                BITHockeyManager.SharedHockeyManager.Configure(Config.HockeyId);
 #if DEBUG
-                BITHockeyManager.SharedHockeyManager.CrashManager.CrashManagerStatus = BITCrashManagerStatus.Disabled;
                 AnalyticsConfiguration.SharedInstance.SetAnalyticsCollectionEnabled(false);
 #else
-                BITHockeyManager.SharedHockeyManager.CrashManager.CrashManagerStatus = PlatformConfig.Preferences.EnableReporting
-                    ? BITCrashManagerStatus.AutoSend
-                    : BITCrashManagerStatus.Disabled;
                 AnalyticsConfiguration.SharedInstance.SetAnalyticsCollectionEnabled(PlatformConfig.Preferences.EnableReporting);
 #endif
-                BITHockeyManager.SharedHockeyManager.StartManager();
-                BITHockeyManager.SharedHockeyManager.Authenticator.AuthenticateInstallation();
 
                 Window = new UIWindow(UIScreen.MainScreen.Bounds);
                 Window.ApplyTheme();
@@ -94,6 +88,16 @@ namespace Mark5.Mobile.IOS
         public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
         {
             Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("OTQ4NTJAMzEzNzJlMzEyZTMwWTh6RmRibklqNHU3citRNzViZVRJUkVkYmFSZTc1dFBEQi9td2dZSVZHWT0=");
+
+            Crashes.GetErrorAttachments =
+    report => { return new[] { ErrorAttachmentLog.AttachmentWithText(SystemReportCollector.CreateLogReport(), "deviceLogs.txt") }; };
+            AppCenter.Start("8aec5b28-2ac5-4956-997c-4867ef65d957", typeof(Crashes));
+
+#if DEBUG
+            Crashes.SetEnabledAsync(false);
+#else
+            Crashes.SetEnabledAsync(PlatformConfig.Preferences.EnableReporting);
+#endif
 
             var OneDayInterval = 60 * 24;
             UIApplication.SharedApplication.SetMinimumBackgroundFetchInterval(OneDayInterval);
@@ -219,9 +223,11 @@ namespace Mark5.Mobile.IOS
                 return;
             }
 
-            if (serviceVersion != null && serviceVersion.CompareTo(new Version(3, 2, 0)) >= 0)
+            bool notificationsInChinaEnabled = ServerConfig.SystemSettings?.SystemInfo?.NotificationsInChina == true;
+
+            if (serviceVersion.CompareTo(new Version(3, 2, 0)) >= 0 && !notificationsInChinaEnabled)
             {
-                CommonConfig.Logger.Info($"Not sending the APNS token because the current service version is equal or higher than 3.2.0");
+                CommonConfig.Logger.Info($"Not sending the APNS token because the current service version is equal or higher than 3.2.0 and Notifications Not Enabled in China");
                 return;
             }
 
@@ -257,6 +263,12 @@ namespace Mark5.Mobile.IOS
             if (serviceVersion.CompareTo(new Version(3, 2, 0)) < 0)
             {
                 CommonConfig.Logger.Info($"Not sending the FCM token because the current service version is lesss than 3.2.0");
+                return;
+            }
+
+            if (ServerConfig.SystemSettings?.SystemInfo?.NotificationsInChina == true)
+            {
+                CommonConfig.Logger.Info($"Not sending the FCM token because the current service is using Chinese Notifications");
                 return;
             }
 
