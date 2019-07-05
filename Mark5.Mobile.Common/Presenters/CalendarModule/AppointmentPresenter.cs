@@ -10,7 +10,8 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 {
     public class AppointmentPresenter : BasePresenter<IAppointmentView>, IAppointmentPresenter
     {
-        private CalendarAppointment appointment;
+        CalendarAppointment appointment;
+        int recurrenceIndex;
 
         public override void Start() { }
 
@@ -25,6 +26,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 CommonConfig.Logger.Info($"Retrieving appointment: AppointmentId = {appointmentId}, RecurrenceIndex = {recurrenceIndex}, CalendarId = {calendarId} ");
 
                 appointment = await Managers.CalendarManager.GetCalendarAppointmentAsync(calendarId, appointmentId, SourceType.Local);
+                this.recurrenceIndex = recurrenceIndex;
                 view.ShowAppointment(AppointmentViewModel.ConvertToViewModel(appointment, recurrenceIndex));
                 view.SetLines(ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Select(LineViewModel.ConvertToViewModel));
 
@@ -139,49 +141,50 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             string pattern = string.Empty;
             string range = string.Empty;
 
-            if (ri.Type == RecurrenceType.Daily)
+            switch (ri.Type)
             {
-                pattern = "Daily, every ";
+                case RecurrenceType.Daily:
+                    pattern = "Daily, every ";
 
-                if (ri.WeekDays == WeekDays.EveryDay)
-                    pattern += $"{ri.Periodicity} day(s)";
-                else //ri.WeekDays == WeekDays.WorkDays
-                    pattern += $"weekday";
-            }
-            else if (ri.Type == RecurrenceType.Weekly)
-            {
-                pattern = $"Weekly, every {ri.Periodicity} week(s) on";
+                    if (ri.WeekDays == WeekDays.EveryDay)
+                        pattern += $"{ri.Periodicity} day(s)";
+                    else //ri.WeekDays == WeekDays.WorkDays
+                        pattern += $"weekday";
+                    break;
+                case RecurrenceType.Weekly:
+                    {
+                        pattern = $"Weekly, every {ri.Periodicity} week(s) on";
 
-                var days = new[] { WeekDays.Monday, WeekDays.Tuesday, WeekDays.Wednesday,
+                        var days = new[] { WeekDays.Monday, WeekDays.Tuesday, WeekDays.Wednesday,
                     WeekDays.Thursday, WeekDays.Friday, WeekDays.Saturday, WeekDays.Sunday};
 
-                var stringDays = new List<string>();
+                        var stringDays = new List<string>();
 
-                foreach (var day in days)
-                {
-                    if (ri.WeekDays.HasFlag(day))
-                        stringDays.Add(GetDayName(day));
-                }
+                        foreach (var day in days)
+                        {
+                            if (ri.WeekDays.HasFlag(day))
+                                stringDays.Add(GetDayName(day));
+                        }
 
-                pattern += string.Join(", ", stringDays);
+                        pattern += string.Join(", ", stringDays);
+                        break;
+                    }
 
-            }
-            else if (ri.Type == RecurrenceType.Monthly)
-            {
-                pattern = $"Monthly, ";
-                if (ri.WeekOfMonth == WeekOfMonth.None)
-                    pattern += $"on day {ri.DayNumber} of every {ri.Periodicity} months";
-                else
-                    pattern += $"the {GetWeekString(ri.WeekOfMonth)} {GetDayName(ri.WeekDays)} of every {ri.Periodicity} month(s) ";
-            }
-            else if (ri.Type == RecurrenceType.Yearly)
-            {
-                pattern += $"Yearly, ";
+                case RecurrenceType.Monthly:
+                    pattern = $"Monthly, ";
+                    if (ri.WeekOfMonth == WeekOfMonth.None)
+                        pattern += $"on day {ri.DayNumber} of every {ri.Periodicity} months";
+                    else
+                        pattern += $"the {GetWeekString(ri.WeekOfMonth)} {GetDayName(ri.WeekDays)} of every {ri.Periodicity} month(s) ";
+                    break;
+                case RecurrenceType.Yearly:
+                    pattern += $"Yearly, ";
 
-                if (ri.WeekOfMonth == WeekOfMonth.None)
-                    pattern += $"every {GetMonthString(ri.Month)}, {ri.DayNumber}";
-                else
-                    pattern += $"the {GetWeekString(ri.WeekOfMonth)} {GetDayName(ri.WeekDays)} of {GetMonthString(ri.Month)} ";
+                    if (ri.WeekOfMonth == WeekOfMonth.None)
+                        pattern += $"every {GetMonthString(ri.Month)}, {ri.DayNumber}";
+                    else
+                        pattern += $"the {GetWeekString(ri.WeekOfMonth)} {GetDayName(ri.WeekDays)} of {GetMonthString(ri.Month)} ";
+                    break;
             }
 
             switch (ri.Range)
