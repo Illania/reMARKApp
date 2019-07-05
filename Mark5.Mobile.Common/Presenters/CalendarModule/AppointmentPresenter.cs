@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Manager;
@@ -21,9 +22,9 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
             try
             {
-                CommonConfig.Logger.Info($"Retrieving appointment with ID = {appointmentId}");
+                CommonConfig.Logger.Info($"Retrieving appointment: AppointmentId = {appointmentId}, RecurrenceIndex = {recurrenceIndex}, CalendarId = {calendarId} ");
 
-                appointment = await Managers.CalendarManager.GetCalendarAppointmentAsync(calendarId, appointmentId);
+                appointment = await Managers.CalendarManager.GetCalendarAppointmentAsync(calendarId, appointmentId, SourceType.Local);
                 view.ShowAppointment(AppointmentViewModel.ConvertToViewModel(appointment, recurrenceIndex));
                 view.SetLines(ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Select(LineViewModel.ConvertToViewModel));
 
@@ -95,16 +96,18 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         public string Subject { get; set; }
         public string Description { get; set; }
         public string Location { get; set; }
+        public DateTime Start { get; set; }
+        public DateTime End { get; set; }
         public bool AllDay { get; set; }
         public string Creator { get; set; }
-        public RecurrenceInfoViewModel RecurrenceInfo { get; set; }
+        public string RecurrenceInfo { get; set; }
         public long ReminderTimeBefore { get; set; }
         public List<ParticipantsViewModel> Participants { get; set; }
 
 
         public static AppointmentViewModel ConvertToViewModel(CalendarAppointment appointment, int recurrenceIndex = -1)
         {
-            return new AppointmentViewModel
+            var appModel = new AppointmentViewModel
             {
                 Id = appointment.Id,
                 Subject = appointment.Subject,
@@ -112,20 +115,100 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 Location = appointment.Location,
                 AllDay = appointment.AllDay,
                 Creator = appointment.Creator,
-                RecurrenceInfo = RecurrenceInfoViewModel.ConvertToViewModel(appointment.RecurrenceInfo),
+                RecurrenceInfo = GetRecurrenceString(appointment.RecurrenceInfo),
                 ReminderTimeBefore = appointment.ReminderTimeBeforeStart,
                 Participants = appointment.Participants.Select(ParticipantsViewModel.ConvertToViewModel).ToList(),
             };
-        }
-    }
 
-    public class RecurrenceInfoViewModel
-    {
-        public static RecurrenceInfoViewModel ConvertToViewModel(RecurrenceInfo ri)
+            var recurrence = appointment.Occurrences.FirstOrDefault(r => r.RecurrenceIndex == recurrenceIndex);
+
+            if (recurrence == null)
+                throw new ArgumentException("Can't find occurrence with the given recurrence index");
+
+            appModel.Start = recurrence.StartDate;
+            appModel.End = recurrence.EndDate;
+
+            return appModel;
+        }
+
+        public static string GetRecurrenceString(RecurrenceInfo ri)
         {
-            return new RecurrenceInfoViewModel()  //TODO
+            if (ri == null)
+                return null;
+
+            string pattern = string.Empty;
+            string range = string.Empty;
+
+            if (ri.Type == RecurrenceType.Daily)
             {
-            };
+                pattern = "Daily, every ";
+
+                if (ri.WeekDays == WeekDays.EveryDay)
+                    pattern += $"{ri.Periodicity} day(s)";
+                else //ri.WeekDays == WeekDays.WorkDays
+                    pattern += $"weekday";
+            }
+            else if (ri.Type == RecurrenceType.Weekly)
+            {
+                pattern = $"Weekly, every {ri.Periodicity} week(s) on";
+
+                var days = new[] { WeekDays.Monday, WeekDays.Tuesday, WeekDays.Wednesday,
+                    WeekDays.Thursday, WeekDays.Friday, WeekDays.Saturday, WeekDays.Sunday};
+
+                var stringDays = new List<String>();
+
+                foreach (var day in days)
+                {
+                    if (ri.WeekDays.HasFlag(day))
+                        stringDays.Add(GetDayName(day));
+                }
+
+                pattern += string.Join(", ", stringDays);
+
+            }
+            else if (ri.Type == RecurrenceType.Monthly)
+            {
+
+            }
+            else if (ri.Type == RecurrenceType.Yearly)
+            {
+
+            }
+
+            switch (ri.Range)
+            {
+                case RecurrenceRange.NoEndDate:
+                    range = string.Empty;
+                    break;
+                case RecurrenceRange.OccurrenceCount:
+                    range = $"ends after {ri.OccurrenceCount} occurrences";
+                    break;
+                case RecurrenceRange.EndByDate:
+                    range = $"ends by {ri.EndDate.ToString("d", CultureInfo.CurrentCulture)}";
+                    break;
+            }
+
+            if (!string.IsNullOrEmpty(range))
+                range += ", ";
+
+            range += $"starting from {ri.StartDate.ToString("d", CultureInfo.CurrentCulture)}";
+
+            return pattern + range;
+        }
+
+        public static string GetDayName(WeekDays val)
+        {
+            switch (val)
+            {
+                case WeekDays.Monday: return "Monday";
+                case WeekDays.Tuesday: return "Tuesday";
+                case WeekDays.Wednesday: return "Wednesday";
+                case WeekDays.Thursday: return "Thursday";
+                case WeekDays.Friday: return "Friday";
+                case WeekDays.Saturday: return "Saturday";
+                case WeekDays.Sunday: return "Sunday";
+                default: return string.Empty; //TODO always valid?
+            }
         }
     }
 
