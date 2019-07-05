@@ -42,7 +42,7 @@ namespace Mark5.ServiceReference.AppService
 
                 using (var c = new HttpClient(httpClientHandler())
                 {
-                    Timeout = TimeSpan.FromSeconds(5),
+                    Timeout = TimeSpan.FromSeconds(useShortTimeout ? Config.HttpClientShortTimeoutSeconds : Config.HttpClientTimeoutSeconds),
                 })
                 {
                     var req = CreateRequest(soapAction, parameters, checkXmlCharacters);
