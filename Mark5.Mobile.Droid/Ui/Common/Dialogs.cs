@@ -307,7 +307,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
         #region Non-awaitable dialogs
 
-        public static void ShowYesNoDialog(Context context, int titleId, int contentId, Action positiveAction, Action negativeAction = null, int positiveTextId = Resource.String.yes, int negativeTextId = Resource.String.no)
+        public static void ShowYesNoDialog(Context context, int titleId, int contentId, Action positiveAction, Action negativeAction = null, int positiveTextId = Resource.String.yes, int negativeTextId = Resource.String.no, bool cancelable = false)
         {
             var builder = new MaterialDialog.Builder(context);
             builder.Title(titleId);
@@ -317,7 +317,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             builder.OnPositive(new SingleButtonCallback(positiveAction));
             if (negativeAction != null)
                 builder.OnNegative(new SingleButtonCallback(negativeAction));
-            builder.Cancelable(false);
+            builder.Cancelable(cancelable);
             builder.Show();
         }
 
