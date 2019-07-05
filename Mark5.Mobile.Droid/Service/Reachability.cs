@@ -229,17 +229,17 @@ namespace Mark5.Mobile.Droid.Service
             }
         }
 
-        private const string UNKNOWNSSID = "<unknown ssid>";
         /// <summary>
-        /// Checks wifi is switched on AND that its connected (using NetworkId and SSID to 
+        /// Checks if wifi is switched on and it is connected (using NetworkId and SSID to 
         /// identify connected).
         /// </summary>
-        /// <returns>True if switched on and connected to a wifi network.  False if not switch on 
-        /// OR if switched on but not connected.</returns>
-        ///
+        /// <returns>True if switched on and connected to a wifi network. False if not switched on 
+        /// or if switched on but not connected.</returns>
         public bool IsWifiConnected()
         {
-            var wifiManager = Application.Context.GetSystemService(Context.WifiService) as WifiManager;
+            const string UNKNOWNSSID = "<unknown ssid>";
+
+            WifiManager wifiManager = Application.Context.GetSystemService(Context.WifiService) as WifiManager;
 
             if (wifiManager != null)
             {
@@ -257,7 +257,7 @@ namespace Mark5.Mobile.Droid.Service
         /// <summary>
         /// Detects if the device has MobileData turned on 
         /// </summary>
-        /// <returns>True if switched on only. False if not switched on.</returns>
+        /// <returns>True if is switched on only. False if not switched on.</returns>
         public bool IsMobileDataEnabled()
         {
             var connectivityManager = (ConnectivityManager)Application.Context.GetSystemService(Context.ConnectivityService);
