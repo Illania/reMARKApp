@@ -1138,22 +1138,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 if (action.Request.Url.Scheme == "mailto")
                 {
-                    var parts = action.Request.Url.AbsoluteString.Split("?");
-                    var to = parts[0].Split(",");
-
-                    if (parts.Length >= 1)
+                    try
                     {
-                        var parsed = HttpUtility.ParseQueryString(parts[1]);
-                        var subject = parsed["subject"];
-                        var body = parsed["body"];
-                        var cc = parsed["cc"]?.Split(",");
-                        var bcc = parsed["bcc"]?.Split(",");
+                        var parts = action.Request.Url.AbsoluteString.Split("?");
+                        var to = parts[0].Split(",");
 
-                        PresentComposeViewWithPreconfiguredFields(subject, body, to, cc, bcc);
+                        if (parts.Length > 1)
+                        {
+                            var parsed = HttpUtility.ParseQueryString(parts[1]);
+                            var subject = parsed["subject"];
+                            var body = parsed["body"];
+                            var cc = parsed["cc"]?.Split(",");
+                            var bcc = parsed["bcc"]?.Split(",");
+
+                            PresentComposeViewWithPreconfiguredFields(subject, body, to, cc, bcc);
+                        }
+                        else
+                            PresentComposeViewWithPreconfiguredFields(preconfiguredToAddresses: to);
                     }
-                    else
-                        PresentComposeViewWithPreconfiguredFields(preconfiguredToAddresses: to);
-
+                    catch (Exception ex)
+                    {
+                        CommonConfig.Logger.Info("Request.Url.AbsoluteString : " + action.Request.Url.AbsoluteString);
+                    }
                 }
                 else
                     Integration.OpenLink(action.Request.Url,

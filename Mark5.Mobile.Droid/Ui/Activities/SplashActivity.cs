@@ -20,6 +20,8 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Service;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
+using Microsoft.AppCenter;
+using Microsoft.AppCenter.Crashes;
 #if !DEBUG
 using HockeyApp.Android;
 using Mark5.Mobile.Droid.Utilities.Hockey;
@@ -61,9 +63,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             CommonConfig.Logger.Info($"Starting {nameof(SplashActivity)}...");
 
-#if !DEBUG
-            CrashManager.Register(this, Config.HockeyId, new CustomCrashManagerListener());
-            CrashManager.ResetAlwaysSend(new Java.Lang.Ref.WeakReference(this));
+#if !DEBUG  
+            Crashes.GetErrorAttachments =
+                report => { return new[] { ErrorAttachmentLog.AttachmentWithText(SystemReportCollector.CreateLogCatReport(), "deviceLogs.txt") }; };
+            AppCenter.Start(Config.AppCenterId, typeof(Crashes));
 
             Firebase.Analytics.FirebaseAnalytics.GetInstance(this).SetAnalyticsCollectionEnabled(PlatformConfig.Preferences.EnableReporting);
 #else
@@ -72,6 +75,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             Task.Run(async () =>
             {
+                await Crashes.SetEnabledAsync(PlatformConfig.Preferences.EnableReporting);
+
                 var authenticator = AuthenticatorFactory.Create();
                 if (!await authenticator.IsAuthenticatedAsync())
                 {
@@ -150,8 +155,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 CommonConfig.Logger.Info($"Refreshing reachability status...");
                 CommonConfig.Reachability.Refresh();
 
-                CommonConfig.Logger.Info($"Registering {nameof(ReachabilityBroadcastReceiver)}...");
-                PlatformConfig.ReachabilityBroadcastReceiver.Register();
+                CommonConfig.Logger.Info($"Registering {nameof(ReachabilityMonitor)}...");
+                PlatformConfig.ReachabilityMonitor.Register(ApplicationContext);
 
                 if (PlatformConfig.Preferences.CallerIdentificationEnabled)
                 {

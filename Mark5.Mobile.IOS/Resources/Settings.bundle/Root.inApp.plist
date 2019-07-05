@@ -108,6 +108,16 @@
 			<key>Title</key>
 			<string>email_swipe_actions</string>
 		</dict>
+				<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>confirm_remove_swipe</string>
+			<key>Key</key>
+			<string>ConfirmRemoveSwipe</string>
+			<key>DefaultValue</key>
+			<true/>
+		</dict>
 		<dict>
 			<key>Type</key>
 			<string>PSMultiValueSpecifier</string>

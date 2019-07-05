@@ -69,11 +69,11 @@
     <string name="date">Date:</string>
     <string name="delete">Delete</string>
     <string name="delete_are_you_sure">Are you sure you want to delete selected?</string>
-    <string name="delete_from_folder">Delete from folder</string>
-    <string name="delete_from_folder_are_you_sure">Are you sure you want to delete selected from folder?</string>
+    <string name="delete_from_folder">Remove from folder</string>
+    <string name="delete_from_folder_are_you_sure">Are you sure you want to remove selected from folder?</string>
     <string name="deleting">Deleting...</string>
     <string name="deleting_comment">Deleting comment</string>
-    <string name="deleting_from_folder">Deleting from folder...</string>
+    <string name="deleting_from_folder">Removing from folder...</string>
     <string name="description">Description</string>
     <string name="diagnostics_progress_text">Performing Diagnostics</string>
     <string name="diagnostics_stable">Stable</string>
@@ -426,7 +426,7 @@
     <string name="send">Send</string>
     <string name="sending_document">Sending email</string>
     <string name="send_with_mark5_title">Send with reMARK</string>
-    <string name="send_report_with_mark5_content">Do you want to send the generated report with reMARK?</string>
+    <string name="send_report_with_mark5_content">Do you want to send the generated report with reMARK?\n\nPlease note that these reports are not monitored 24/7 and will be available to developers only. If you need direct assistance, contact Nordic IT Support.</string>
     <string name="send_feedback_with_mark5_content">Do you want to send feedback with reMARK?</string>
     <string name="set_priority">Set priority</string>
     <string name="setting_priority">Setting priority...</string>

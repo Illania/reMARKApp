@@ -31,7 +31,7 @@
     <AndroidLinkMode>None</AndroidLinkMode>
     <AndroidSupportedAbis>armeabi-v7a;x86;x86_64;arm64-v8a</AndroidSupportedAbis>
     <RunCodeAnalysis>true</RunCodeAnalysis>
-    <MandroidI18n>cjk;mideast;west</MandroidI18n>
+    <MandroidI18n>cjk;mideast;west;other;rare</MandroidI18n>
     <AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidClientHandler</AndroidHttpClientHandlerType>
     <JavaMaximumHeapSize>1G</JavaMaximumHeapSize>
     <AndroidTlsProvider>btls</AndroidTlsProvider>
@@ -87,12 +87,6 @@
       <HintPath>..\packages\MailBee.NET.11.2.0\lib\netstandard2.0\MailBee.NET.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.Services" />
-    <Reference Include="HockeySDK.AndroidBindings">
-      <HintPath>..\packages\HockeySDK.Xamarin.5.2.0\lib\MonoAndroid403\HockeySDK.AndroidBindings.dll</HintPath>
-    </Reference>
-    <Reference Include="HockeySDK">
-      <HintPath>..\packages\HockeySDK.Xamarin.5.2.0\lib\MonoAndroid403\HockeySDK.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\netstandard2.0\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -267,6 +261,18 @@
     <Reference Include="Xamarin.Android.Support.ViewPager">
       <HintPath>..\packages\Xamarin.Android.Support.ViewPager.28.0.0.1\lib\monoandroid90\Xamarin.Android.Support.ViewPager.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.AppCenter.Android.Bindings">
+      <HintPath>..\packages\Microsoft.AppCenter.2.0.0\lib\MonoAndroid403\Microsoft.AppCenter.Android.Bindings.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AppCenter">
+      <HintPath>..\packages\Microsoft.AppCenter.2.0.0\lib\MonoAndroid403\Microsoft.AppCenter.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AppCenter.Crashes.Android.Bindings">
+      <HintPath>..\packages\Microsoft.AppCenter.Crashes.2.0.0\lib\MonoAndroid403\Microsoft.AppCenter.Crashes.Android.Bindings.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AppCenter.Crashes">
+      <HintPath>..\packages\Microsoft.AppCenter.Crashes.2.0.0\lib\MonoAndroid403\Microsoft.AppCenter.Crashes.dll</HintPath>
+    </Reference>
     <Reference Include="Polly">
       <HintPath>..\packages\Polly.7.1.0\lib\netstandard2.0\Polly.dll</HintPath>
     </Reference>
@@ -279,7 +285,6 @@
     <Compile Include="Model\Exceptions\MailViewerException.cs" />
     <Compile Include="Service\PushNotificationInstanceIdService.cs" />
     <Compile Include="Service\PushNotificationMessagingService.cs" />
-    <Compile Include="Service\ReachabilityBroadcastReceiver.cs" />
     <Compile Include="Service\Reachability.cs" />
     <Compile Include="Utilities\Conversion.cs" />
     <Compile Include="Utilities\DateTimeFormatter.cs" />
@@ -296,7 +301,6 @@
     <Compile Include="Utilities\SimpleLogger.cs" />
     <Compile Include="Utilities\SystemReportCollector.cs" />
     <Compile Include="Utilities\UI.cs" />
-    <Compile Include="Utilities\Hockey\CustomCrashManagerListener.cs" />
     <Compile Include="Ui\Activities\CategoriesListActivity.cs" />
     <Compile Include="Ui\Activities\CommentsListActivity.cs" />
     <Compile Include="Ui\Activities\ComposeDocumentActivity.cs" />
@@ -513,6 +517,7 @@
     <Compile Include="Ui\Fragments\CategoriesListFragment.cs" />
     <Compile Include="Ui\Activities\PickerInternalContactsListActivity.cs" />
     <Compile Include="Ui\Fragments\PickerInternalContactsListFragment.cs" />
+    <Compile Include="Service\ReachabilityMonitor.cs" />
     <Compile Include="Utilities\PushNotificationsUtilities.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Ui\Common\ConnectionDiagnosticsFragment.cs" />

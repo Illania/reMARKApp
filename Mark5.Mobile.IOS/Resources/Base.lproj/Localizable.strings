@@ -86,10 +86,10 @@
 "description" = "Description";
 "delete" = "Delete";
 "delete_draft" = "Delete draft";
-"delete_from_folder" = "Delete from folder";
+"delete_from_folder" = "Remove from folder";
 "deleting___" = "Deleting...";
 "deleting_comment___" = "Deleting comment...";
-"deleting_from_folder___" = "Deleting from folder...";
+"deleting_from_folder___" = "Removing from folder...";
 "department" = "Department";
 "description" = "Description"; 
 "disable_sync" = "Disable\nsync";
@@ -381,7 +381,9 @@
 "sending_document___" = "Sending email...";
 "send_with_mark5_title" = "Send with reMARK?";
 "send_feedback_with_mark5_content" = "Do you want to send feedback with reMARK?";
-"send_report_with_mark5_content" = "Do you want to send the generated report with reMARK?";
+"send_report_with_mark5_content" = "Do you want to send the generated report with reMARK? 
+
+Please note that these reports are not monitored 24/7 and will be available to developers only. If you need direct assistance, contact Nordic IT Support.";
 "set_priority" = "Set priority";
 "setting_priority___" = "Setting priority...";
 "settings" = "Settings";

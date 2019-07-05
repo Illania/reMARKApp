@@ -71,7 +71,7 @@ namespace Mark5.Mobile.Droid
                     await DatabaseUtils.InitializeDatabases();
 
                     PlatformConfig.SSLCertificateVerificationManager = new SSLCertificateVerificationManager();
-                    PlatformConfig.ReachabilityBroadcastReceiver = new ReachabilityBroadcastReceiver();
+                    PlatformConfig.ReachabilityMonitor = new ReachabilityMonitor();
                     PlatformConfig.CallStateBroadcastReceiver = new CallStateBroadcastReceiver();
                     PlatformConfig.Preferences = new Preferences();
                 })

@@ -751,11 +751,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             actionMode.Invalidate();
         }
 
-        async void DeleteFromFolderAction(List<DocumentPreview> items)
+        async void DeleteFromFolderAction(List<DocumentPreview> items, bool fromSwipe = false)
         {
-            var yesNo = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete_from_folder, Resource.String.delete_from_folder_are_you_sure);
-            if (!yesNo)
-                return;
+            if (PlatformConfig.Preferences.ConfirmationRemoveSwipe && fromSwipe)
+            {
+                var yesNo = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete_from_folder, Resource.String.delete_from_folder_are_you_sure);
+                if (!yesNo)
+                    return;
+            }
 
             CommonConfig.Logger.Info($"Attempting to delete from folder [businessEntities.Count={items.Count}]...");
 
@@ -1080,10 +1083,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             readonly Context context;
             readonly RecyclerView recyclerView;
             readonly Action<int> loadMoreAction;
-
-            bool unreadIndicatorMe = PlatformConfig.Preferences.UnreadIndicatorMe;
-            bool compactList = PlatformConfig.Preferences.CompactDocumentsList;
-            bool showCreatorOutgoing = PlatformConfig.Preferences.ShowCreatorOutgoing;
+            readonly bool unreadIndicatorMe = PlatformConfig.Preferences.UnreadIndicatorMe;
+            readonly bool compactList = PlatformConfig.Preferences.CompactDocumentsList;
+            readonly bool showCreatorOutgoing = PlatformConfig.Preferences.ShowCreatorOutgoing;
 
             int? swipedPosition;
             int swipedDirection;
@@ -1524,7 +1526,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                             }
                             break;
                         case Preferences.EmailSwipeAction.RemoveFromFolder:
-                            fragment.DeleteFromFolderAction(new List<DocumentPreview>() { adapter.Items[adapterPosition] });
+                            fragment.DeleteFromFolderAction(new List<DocumentPreview>() { adapter.Items[adapterPosition] }, true);
                             break;
                         case Preferences.EmailSwipeAction.Priorities:
                             fragment.SetPriority(new List<DocumentPreview>() { adapter.Items[adapterPosition] });
