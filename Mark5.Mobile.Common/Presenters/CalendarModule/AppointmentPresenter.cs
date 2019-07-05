@@ -155,7 +155,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 var days = new[] { WeekDays.Monday, WeekDays.Tuesday, WeekDays.Wednesday,
                     WeekDays.Thursday, WeekDays.Friday, WeekDays.Saturday, WeekDays.Sunday};
 
-                var stringDays = new List<String>();
+                var stringDays = new List<string>();
 
                 foreach (var day in days)
                 {
@@ -168,11 +168,20 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             }
             else if (ri.Type == RecurrenceType.Monthly)
             {
-
+                pattern = $"Monthly, ";
+                if (ri.WeekOfMonth == WeekOfMonth.None)
+                    pattern += $"on day {ri.DayNumber} of every {ri.Periodicity} months";
+                else
+                    pattern += $"the {GetWeekString(ri.WeekOfMonth)} {GetDayName(ri.WeekDays)} of every {ri.Periodicity} month(s) ";
             }
             else if (ri.Type == RecurrenceType.Yearly)
             {
+                pattern += $"Yearly, ";
 
+                if (ri.WeekOfMonth == WeekOfMonth.None)
+                    pattern += $"every {GetMonthString(ri.Month)}, {ri.DayNumber}";
+                else
+                    pattern += $"the {GetWeekString(ri.WeekOfMonth)} {GetDayName(ri.WeekDays)} of {GetMonthString(ri.Month)} ";
             }
 
             switch (ri.Range)
@@ -207,8 +216,29 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 case WeekDays.Friday: return "Friday";
                 case WeekDays.Saturday: return "Saturday";
                 case WeekDays.Sunday: return "Sunday";
+                case WeekDays.WeekendDays: return "Weekend day";
+                case WeekDays.EveryDay: return "Day";
+                case WeekDays.WorkDays: return "Weekday";
+                default: return string.Empty;
+            }
+        }
+
+        public static string GetWeekString(WeekOfMonth val)
+        {
+            switch (val)
+            {
+                case WeekOfMonth.First: return "first";
+                case WeekOfMonth.Second: return "second";
+                case WeekOfMonth.Third: return "third";
+                case WeekOfMonth.Fourth: return "fourth";
+                case WeekOfMonth.Last: return "last";
                 default: return string.Empty; //TODO always valid?
             }
+        }
+
+        public static string GetMonthString(int val)
+        {
+            return CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(val);  //We shouldn't get the current culture I think
         }
     }
 
