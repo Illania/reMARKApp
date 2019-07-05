@@ -45,6 +45,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         public static UIFont DefaultActionsFont => UIFont.FromName(DefaultFontName, 14f);
         public static UIFont DefaultLightBoldFont => UIFont.FromName(DefaultLightBoldFontName, DefaultFontSize);
 
+        public static UIFont CalendarTimeLightFont => UIFont.FromName(DefaultLightFontName, 12f);
 
         #endregion
 

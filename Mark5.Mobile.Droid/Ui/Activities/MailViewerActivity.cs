@@ -12,7 +12,6 @@ using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using HtmlAgilityPack;
 using MailBee;
-using MailBee.Html;
 using MailBee.Mime;
 using MailBee.Outlook;
 using Mark5.Mobile.Common;

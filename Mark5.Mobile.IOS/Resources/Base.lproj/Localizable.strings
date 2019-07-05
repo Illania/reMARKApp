@@ -32,6 +32,7 @@
 "birthdate" = "Birthdate";
 "browse_files" = "Browse files...";
 "calendar" = "Calendar";
+"calendars" = "Calendars";
 "call" = "Call";
 "cancel" = "Cancel";
 "cannot_mail_report_content" = "There are no mail accounts configured on your device. You need to have an account configured before you can send feedback.";
@@ -39,6 +40,8 @@
 "cannot_open_attachment_content" = "There is no app installed that can open this file.";
 "cannot_open_attachment_title" = "Cannot open attachment";
 "categories" = "Categories";
+"cal_private" = "Private";
+"cal_shared" = "Shared";
 "categories_added"="Categories Added";
 "cc" = "Cc";
 "chrome" = "Open in Google Chrome";
@@ -82,6 +85,7 @@
 "create_report" = "Create report";
 "creating_system_report___" = "Creating system report...";
 "creator" = "Creator";
+"day" = "Day";
 "date" = "Date";
 "description" = "Description";
 "delete" = "Delete";
@@ -180,6 +184,8 @@
 "last_downloaded_on" = "Last downloaded on: ";
 "ledger" = "Ledger";
 "line" = "Mailbox";
+"loading_appointment___" = "Loading appointment...";
+"loading_appointments___" = "Loading appointments...";
 "loading_shortcode___" = "Loading mailing list...";
 "loading_contact___" = "Loading contact...";
 "loading_document___" = "Loading email...";
@@ -292,6 +298,7 @@
 "reply" = "Reply";
 "reply_all" = "Reply all";
 "reply_to" = "Reply to";
+"refresh" = "Refresh";
 "report" = "Report";
 "resend" = "Resend";
 "reset" = "Reset";
@@ -365,6 +372,7 @@
 "settings" = "Settings";
 "selected" = "Selected";
 "short_id" = "Short ID";
+"shared" = "Shared";
 "shortcodes" = "Mailing lists";
 "show_more___" = "Show more...";
 "show_more" = "Show more";
@@ -407,6 +415,7 @@
 "warning_selfsigned_on" = "Self signed certificates will be accepted. Please be aware that this lowers security of communication between reMARK server and your device.";
 "warning_ssl_off" = "SSL is disabled. Please be aware that all the communication between your device and reMARK server will not be secure.";
 "webpage" = "Webpage";
+"week" = "Week";
 "whats_new" = "What\'s new";
 "wrong_hostname_summary" = "You need to provide valid hostname.";
 "wrong_hostname_title" = "Wrong hostname";
@@ -416,6 +425,7 @@
 "wrong_port_title" = "Wrong port";
 "wrong_username_summary" = "You need to provide valid username.";
 "wrong_username_title" = "Wrong username";
+"year" = "Year";
 "yes" = "Yes";
 "yesterday" = "Yesterday";
 "zip" = "Zip";

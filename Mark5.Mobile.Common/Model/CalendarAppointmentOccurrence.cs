@@ -1,4 +1,6 @@
-﻿using SQLite;
+﻿using System;
+using Mark5.Mobile.Common.Utilities;
+using SQLite;
 
 namespace Mark5.Mobile.Common.Model
 {
@@ -19,5 +21,14 @@ namespace Mark5.Mobile.Common.Model
 
         [Column("CalendarId")]
         public int CalendarId { get; set; }
+
+        public DateTime StartDate => StartDateTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime();
+        public DateTime EndDate => EndDateTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime();
+
+        public override string ToString()
+        {
+            return string.Format("[CalendarAppointmentOccurrence: RecurrenceIndex={0}, StartDate={1}, EndDate={2}]", RecurrenceIndex, StartDate, EndDate);
+        }
+
     }
 }

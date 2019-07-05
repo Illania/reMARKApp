@@ -148,7 +148,7 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public string PushNotificationToken
         {
-            get => sp.GetString(Application.Context.GetString(Resource.String.push_notification_token), string.Empty);
+            get => sp.GetString(Application.Context.GetString(Resource.String.push_notification_token), string.Empty);  //TODO the crash here is due to Xamarin Essentials (https://github.com/xamarin/Essentials/issues/783)
             set
             {
                 var e = sp.Edit();

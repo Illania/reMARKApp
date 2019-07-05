@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="account">Account</string>
     <string name="add_attachment">Add attachment</string>
@@ -24,6 +24,8 @@
     <string name="by">by</string>
     <string name="call">Call</string>
     <string name="cancel">Cancel</string>
+    <string name="calendar">Calendar</string>
+    <string name="calendars">Calendars</string>
     <string name="cannot_edit_comment_content">This comment cannot be edited anymore</string>
     <string name="cannot_edit_comment_title">Cannot edit comment</string>
     <string name="cannot_open_attachment_without_ext">Attachments without extensions cannot be opened</string>
@@ -220,6 +222,7 @@
     <string name="ledger">Ledger</string>
     <string name="line">Mailbox</string>
     <string name="lines">Mailboxes</string>
+    <string name="loading_appointments">Loading appointments</string>
     <string name="loading_contact">Loading contact</string>
     <string name="loading_document">Loading email</string>
     <string name="loading_mail">Loading email</string>
