@@ -94,6 +94,7 @@
     <string name="diagnostics_avg_request_time">Average request time</string>
     <string name="diagnostics_sec">sec.</string>
     <string name="diagnostics_connection_status">Connection status</string>
+    <string name="diagnostics_bad_broken_description">Connection to the service is broken or unstable. If the problem persists, please contact your IT support.</string>
     <string name="disable_notifications_folder">Disable notifications</string>
     <string name="disabling_notifications_folders">Disabling notifications...</string>
     <string name="document">Email</string>

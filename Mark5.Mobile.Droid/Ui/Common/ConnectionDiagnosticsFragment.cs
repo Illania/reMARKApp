@@ -130,6 +130,8 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
                 var connectionStatus = "";
 
+                diagnosticsModel.Status = ConnectionDiagnosticModel.ConnectionStatus.Broken;
+
                 switch (diagnosticsModel.Status)
                 {
                     case ConnectionDiagnosticModel.ConnectionStatus.Stable:
@@ -167,6 +169,9 @@ namespace Mark5.Mobile.Droid.Ui.Common
                     }
 
                     serviceStatustDetails.Text += $"\r\n{GetString(Resource.String.diagnostics_connection_status)} : " + connectionStatus;
+
+                    if (diagnosticsModel.Status == ConnectionDiagnosticModel.ConnectionStatus.Bad || diagnosticsModel.Status == ConnectionDiagnosticModel.ConnectionStatus.Broken)
+                        serviceStatustDetails.Text += $"\r\n\r\n{GetString(Resource.String.diagnostics_bad_broken_description)}";
 
                     dismissAction?.Invoke();
                 });

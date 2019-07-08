@@ -36,6 +36,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 BackgroundColor = UIColor.GroupTableViewBackgroundColor,
                 ShowsVerticalScrollIndicator = false,
                 ShowsHorizontalScrollIndicator = false,
+                ScrollEnabled = true
             };
 
             View.AddConstraints(new[]
@@ -201,6 +202,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var connectionStatus = "";
 
+                diagnosticsModel.Status = ConnectionDiagnosticModel.ConnectionStatus.Bad;
+
                 switch (diagnosticsModel.Status)
                 {
                     case ConnectionDiagnosticModel.ConnectionStatus.Stable:
@@ -237,6 +240,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     }
 
                     serviceStatusDescription.Text += $"\r\n{ Localization.GetString("diagnostics_connection_status") } : " + connectionStatus;
+
+                    if (diagnosticsModel.Status == ConnectionDiagnosticModel.ConnectionStatus.Bad || diagnosticsModel.Status == ConnectionDiagnosticModel.ConnectionStatus.Broken)
+                        serviceStatusDescription.Text += $"\r\n\r\n{ Localization.GetString("diagnostics_bad_broken_description") }";
 
                     dismissAction.Invoke();
                 });

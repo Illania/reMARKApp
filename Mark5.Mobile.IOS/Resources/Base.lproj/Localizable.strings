@@ -118,6 +118,7 @@
 "diagnostics_refresh" = "Refresh Diagnostics";
 "diagnostics_sec" = "sec.";
 "diagnostics_progress" = "Performing Diagnostics";
+"diagnostics_bad_broken_description" = "Connection to the service is broken or unstable. If the problem persists, please contact your IT support.";
 "documents" = "Emails";
 "done" = "Done";
 "dont_close_app" = "Please do not close the app before download is completed.\n\nClosing the app will interrupt download and all progress will be lost!";
