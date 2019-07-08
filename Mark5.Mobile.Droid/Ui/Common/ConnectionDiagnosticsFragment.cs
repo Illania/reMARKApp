@@ -130,8 +130,6 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
                 var connectionStatus = "";
 
-                diagnosticsModel.Status = ConnectionDiagnosticModel.ConnectionStatus.Broken;
-
                 switch (diagnosticsModel.Status)
                 {
                     case ConnectionDiagnosticModel.ConnectionStatus.Stable:

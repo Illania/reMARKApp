@@ -175,7 +175,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 refreshButton.CenterXAnchor.ConstraintEqualTo(scrollView.CenterXAnchor),
                 refreshButton.TrailingAnchor.ConstraintGreaterThanOrEqualTo(scrollView.ReadableContentGuide.TrailingAnchor, -2f),
-                refreshButton.TopAnchor.ConstraintEqualTo(serviceStatusDescription.BottomAnchor, 40f)
+                refreshButton.TopAnchor.ConstraintEqualTo(serviceStatusDescription.BottomAnchor, 40f),
+                refreshButton.BottomAnchor.ConstraintGreaterThanOrEqualTo(scrollView.BottomAnchor, -40f)
             });
 
             scrollView.AddSubview(refreshButton);
@@ -201,8 +202,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var url = $"{(ci.SslMode == SslMode.Off ? "http" : "https")}://{ci.Hostname}:{ci.Port}/app3";
 
                 var connectionStatus = "";
-
-                diagnosticsModel.Status = ConnectionDiagnosticModel.ConnectionStatus.Bad;
 
                 switch (diagnosticsModel.Status)
                 {
