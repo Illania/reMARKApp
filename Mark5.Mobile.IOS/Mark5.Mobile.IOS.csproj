@@ -308,12 +308,6 @@
 		<Reference Include="ModernHttpClient">
 		  <HintPath>..\packages\modernhttpclient.2.4.2\lib\Xamarin.iOS10\ModernHttpClient.dll</HintPath>
 		</Reference>
-		<Reference Include="AngleSharp">
-		  <HintPath>..\packages\AngleSharp.0.12.1\lib\netstandard2.0\AngleSharp.dll</HintPath>
-		</Reference>
-		<Reference Include="PreMailer.Net">
-		  <HintPath>..\packages\PreMailer.Net.2.0.1\lib\netstandard2.0\PreMailer.Net.dll</HintPath>
-		</Reference>
 		<Reference Include="SQLitePCLRaw.core">
 		  <HintPath>..\packages\SQLitePCLRaw.core.1.1.13\lib\Xamarin.iOS10\SQLitePCLRaw.core.dll</HintPath>
 		</Reference>
@@ -383,6 +377,12 @@
 		</Reference>
 		<Reference Include="HtmlAgilityPack">
 		  <HintPath>..\packages\HtmlAgilityPack.1.11.8\lib\netstandard2.0\HtmlAgilityPack.dll</HintPath>
+		</Reference>
+		<Reference Include="AngleSharp">
+		  <HintPath>..\packages\AngleSharp.0.9.11\lib\portable-windows8+net45+windowsphone8+wpa+monoandroid+monotouch\AngleSharp.dll</HintPath>
+		</Reference>
+		<Reference Include="PreMailer.Net">
+		  <HintPath>..\packages\PreMailer.Net.2.0.1\lib\netstandard2.0\PreMailer.Net.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 	<ItemGroup>

@@ -53,9 +53,9 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             Cache.NoAppointmentToRetrieve -= Cache_NoAppointmentToRetrieve;
         }
 
-        public void AppointmentClicked(int appointmentId, int recurrenceIndex)
+        public void AppointmentClicked(int calendarId, int appointmentId, int recurrenceIndex)
         {
-            view.ShowAppointment(appointmentId, recurrenceIndex);
+            view.ShowAppointment(calendarId, appointmentId, recurrenceIndex);
         }
 
         public void LoadAppointments(DateTime start, DateTime end)
@@ -258,7 +258,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
     public interface ICalendarPresenter : IPresenter<ICalendarView>
     {
         void LoadAppointments(DateTime start, DateTime end);
-        void AppointmentClicked(int appointmentId, int recurrenceIndex);
+        void AppointmentClicked(int calendarId, int appointmentId, int recurrenceIndex);
         void CalendarSelectionChanged(Dictionary<int, bool> calendarsSelectedState);
         void ShowCalendarsListClicked();
         void RefreshClicked(DateTime start, DateTime end);
@@ -275,7 +275,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         void ShowLoading();
         void StopLoading();
         Task ShowError(Exception ex);
-        void ShowAppointment(int appointmentId, int recurrenceIndex);
+        void ShowAppointment(int calendarId, int appointmentId, int recurrenceIndex);
     }
 }
 

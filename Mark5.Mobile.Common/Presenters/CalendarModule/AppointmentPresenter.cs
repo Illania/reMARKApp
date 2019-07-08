@@ -52,7 +52,6 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 CommonConfig.Logger.Info($"Deleting appointment with ID = {appointment.Id}");
 
                 await Managers.CommonActionsManager.Delete(new List<IBusinessEntity> { appointment });
-                //TODO this should send a message, that should remove it from the calendar view
 
                 view.StopLoading();
                 view.CloseView();
@@ -68,7 +67,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         public void EditAppointmentClicked()
         {
-            view.OpenEditAppointment();
+            view.OpenEditAppointment(appointment.CalendarId, appointment.Id);
         }
 
         public async Task SendInvitationClicked(Guid lineGuid)
@@ -81,8 +80,6 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
                 await Managers.CalendarManager.SendCalendarAppointmentInvitationsAsync(appointment.Id, lineGuid);
 
-                //TODO need to check what happens to the sent status...
-
                 view.StopLoading();
             }
             catch (Exception ex)
@@ -93,7 +90,6 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 await view.ShowSendInvitationError();
             }
         }
-
     }
 
     public class AppointmentViewModel
@@ -245,7 +241,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         public static string GetMonthString(int val)
         {
-            return CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(val);  //We shouldn't get the current culture I think
+            return CultureInfo.InvariantCulture.DateTimeFormat.GetMonthName(val);  //TODO check if correct
         }
     }
 
@@ -295,7 +291,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         void ShowLoading();
         void StopLoading();
         void CloseView();
-        void OpenEditAppointment();
+        void OpenEditAppointment(int calendarId, int appointmentId);
 
         Task ShowLoadError();
         Task ShowDeleteError();

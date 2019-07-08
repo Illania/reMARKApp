@@ -60,7 +60,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             return Task.CompletedTask;
         }
 
-        public void ShowAppointment(int appointmentId, int recurrenceIndex)
+        public void ShowAppointment(int calendarId, int appointmentId, int recurrenceIndex)
         {
 
         }
@@ -83,9 +83,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         public void AppointmentTapped(ScheduleAppointment appointment)
         {
             var splitted = appointment.Notes.ToString().Split(" ");
-            var appointmentId = int.Parse(splitted[0]);
-            var recurrenceIndex = int.Parse(splitted[1]);
-            presenter.AppointmentClicked(appointmentId, recurrenceIndex);
+            var calendarId = int.Parse(splitted[0]);
+            var appointmentId = int.Parse(splitted[1]);
+            var recurrenceIndex = int.Parse(splitted[2]);
+            presenter.AppointmentClicked(calendarId, appointmentId, recurrenceIndex);
         }
 
         public void VisibleDatesChanged(NSDate startDate, NSDate endDate)
@@ -233,7 +234,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
                 MainThread.BeginInvokeOnMainThread(() =>
                 {
-                    Items.Where(i => appointmentIds.Contains(GetAppointmentIdAndRecurrence(i).id)).ToList().ForEach((obj) => Items.Remove(obj));
+                    Items.Where(i => appointmentIds.Contains(GetAppointmentInfo(i).id)).ToList().ForEach((obj) => Items.Remove(obj));
                 });
             }
 
@@ -267,10 +268,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 return DateTimeInPeriod(appStart, appEnd, start, end);
             }
 
-            (int id, int recurrenceIndex) GetAppointmentIdAndRecurrence(Appointment appointment)
+            (int calendarId, int id, int recurrenceIndex) GetAppointmentInfo(Appointment appointment)
             {
                 var splitted = appointment.Id.ToString().Split(" ");
-                return (int.Parse(splitted[0]), int.Parse(splitted[1]));
+                return (int.Parse(splitted[0]), int.Parse(splitted[1]), int.Parse(splitted[2]));
             }
 
             bool DateTimeInPeriod(DateTime appStart, DateTime appEnd, DateTime periodStart, DateTime periodEnd)
