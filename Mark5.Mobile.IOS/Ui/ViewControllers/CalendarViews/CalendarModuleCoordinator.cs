@@ -10,12 +10,15 @@ using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
 using Syncfusion.SfSchedule.iOS;
 using UIKit;
+using Xamarin.Essentials;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 {
     public class CalendarModuleCoordinator : ICalendarView, ICalendarCoordinator, ICalendarListCoordinator
     {
         CalendarPresenter presenter;
+        Action loadingDialogDismissal;
+
         readonly MonthViewController monthViewController;
         readonly UICache uiCache;
 
@@ -24,7 +27,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         public CalendarModuleCoordinator()
         {
-            uiCache = new UICache(this);
+            uiCache = new UICache();
             monthViewController = new MonthViewController(this);
 
             RootController = new NavigationController(monthViewController);
@@ -41,8 +44,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         {
             uiCache.SetCalendars(calendars);
         }
-
-        Action loadingDialogDismissal;
 
         public void StopLoading()
         {
@@ -68,6 +69,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         {
             var calList = new CalendarsListViewController(this, calendars);
             RootController.PushViewController(calList, true);
+        }
+
+        public void DeleteAppointmentsWithIds(List<int> appointmentIds)
+        {
+            uiCache.DeleteAppointmentsWithIds(appointmentIds);
         }
 
         #endregion
@@ -180,22 +186,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         {
             public ObservableCollection<Appointment> Items { get; } = new ObservableCollection<Appointment>();
 
-            CalendarModuleCoordinator coordinator;
-
             List<AppointmentPreviewViewModel> AppointmentViewModels { get; } = new List<AppointmentPreviewViewModel>();
             List<CalendarViewModel> CalendarViewModels { get; } = new List<CalendarViewModel>();
-
-            public UICache(CalendarModuleCoordinator coordinator)
-            {
-                this.coordinator = coordinator;
-            }
 
             public void CacheAppointments(IEnumerable<AppointmentPreviewViewModel> appointmentViewModels, DateTime start, DateTime end)
             {
                 AppointmentViewModels.Where(i => AppointmentIsInPeriod(i, start, end)).ToList().ForEach((obj) => AppointmentViewModels.Remove(obj));
                 AppointmentViewModels.AddRange(appointmentViewModels);
 
-                coordinator.RootController.BeginInvokeOnMainThread(() =>  //TODO should use Xamarin Essentials for this...
+                MainThread.BeginInvokeOnMainThread(() =>
                 {
                     Items.Where(i => AppointmentIsInPeriod(i, start, end)).ToList().ForEach((obj) => Items.Remove(obj));
                     foreach (var caViewModel in AppointmentsInSelectedCalendars(appointmentViewModels))
@@ -210,7 +209,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 if (!AppointmentViewModels.Any())
                     return;
 
-                coordinator.RootController.BeginInvokeOnMainThread(() =>
+                MainThread.BeginInvokeOnMainThread(() =>
                 {
                     Items.Clear();
                     foreach (var item in AppointmentsInSelectedCalendars(AppointmentViewModels))
@@ -226,6 +225,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 CalendarViewModels.AddRange(calendars);
 
                 UpdateSchedule();
+            }
+
+            public void DeleteAppointmentsWithIds(List<int> appointmentIds)  //TODO needs to be tested
+            {
+                AppointmentViewModels.Where(i => appointmentIds.Contains(i.Id)).ToList().ForEach((obj) => AppointmentViewModels.Remove(obj));
+
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    Items.Where(i => appointmentIds.Contains(GetAppointmentIdAndRecurrence(i).id)).ToList().ForEach((obj) => Items.Remove(obj));
+                });
             }
 
             public void Clear()
@@ -256,6 +265,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 var appEnd = (DateTime)appointment.End;
 
                 return DateTimeInPeriod(appStart, appEnd, start, end);
+            }
+
+            (int id, int recurrenceIndex) GetAppointmentIdAndRecurrence(Appointment appointment)
+            {
+                var splitted = appointment.Id.ToString().Split(" ");
+                return (int.Parse(splitted[0]), int.Parse(splitted[1]));
             }
 
             bool DateTimeInPeriod(DateTime appStart, DateTime appEnd, DateTime periodStart, DateTime periodEnd)
