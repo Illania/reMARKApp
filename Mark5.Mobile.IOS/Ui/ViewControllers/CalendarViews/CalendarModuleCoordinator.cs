@@ -288,7 +288,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                     Start = (NSDate)DateTime.SpecifyKind(cavm.Start, DateTimeKind.Local),
                     End = (NSDate)DateTime.SpecifyKind(cavm.End, DateTimeKind.Local),
                     Color = UI.UIColorFromHexString(cavm.HexColor),
-                    Id = new NSString($"{cavm.Id} {cavm.RecurrenceIndex}")
+                    Id = new NSString($"{cavm.CalendarId} {cavm.Id} {cavm.RecurrenceIndex}")
                 };
             }
 
