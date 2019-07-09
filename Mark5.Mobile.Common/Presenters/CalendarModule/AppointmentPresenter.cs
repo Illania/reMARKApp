@@ -105,7 +105,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         public string RecurrenceInfo { get; set; }
         public long ReminderTimeBefore { get; set; }
         public List<ParticipantsViewModel> Participants { get; set; }
-
+        public CalendarViewModel Calendar { get; set; }
 
         public static AppointmentViewModel ConvertToViewModel(CalendarAppointment appointment, int recurrenceIndex = -1)
         {
@@ -121,6 +121,9 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 ReminderTimeBefore = appointment.ReminderTimeBeforeStart,
                 Participants = appointment.Participants.Select(ParticipantsViewModel.ConvertToViewModel).ToList(),
             };
+
+            var calendar = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars.First(ca => ca.Id == appointment.CalendarId);
+            appModel.Calendar = CalendarViewModel.ConvertToViewModel(calendar);
 
             var recurrence = appointment.Occurrences.FirstOrDefault(r => r.RecurrenceIndex == recurrenceIndex);
 
