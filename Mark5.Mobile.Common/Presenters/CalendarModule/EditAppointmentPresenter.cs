@@ -13,36 +13,52 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         public override void Stop() { }
 
-        public Task AddEditAppointment(EditAppointmentViewModel vm)
+        public async Task AddOrEditAppointment(EditAppointmentViewModel vm)
         {
-            var appointment = new CalendarAppointment()
+            var ca = vm.ConvertToModel();
+
+            view.ShowLoading();
+
+            try
             {
-                CalendarId = vm.c
+                CommonConfig.Logger.Info($"Adding or editing appointment: AppointmentId = {ca.Id}, CalendarId = {ca.CalendarId} ");
+
+                await Managers.CalendarManager.CreateOrUpdateCalendarAppointmentAsync(ca.CalendarId, ca);
+                //TODO this should send message and update the db eventually
+
+                view.StopLoading();
             }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Error while adding or editing appointment: AppointmentId = {ca.Id}, CalendarId = {ca.CalendarId} ", ex);
 
+                view.StopLoading();
 
+                await view.ShowAddingEditingError(ex);
 
-
-
-            return Task.CompletedTask;
+                view.CloseView();
+            }
         }
 
-        public Task InitEmptyAppointment()
+        public Task LoadEmptyAppointment()
         {
-            view.ShowAppointment(new EditAppointmentViewModel());
+            view.ShowAppointment(new EditAppointmentViewModel
+            {
+                CreatorId = ServerConfig.SystemSettings.UserInfo.User.Id,
+            });
             return Task.CompletedTask;
         }
 
-        public async Task LoadAppointment(int calendarId, int appointmentId, int recurrenceIndex)
+        public async Task LoadAppointment(int calendarId, int appointmentId)
         {
             view.ShowLoading();
 
             try
             {
-                CommonConfig.Logger.Info($"Retrieving appointment: AppointmentId = {appointmentId}, RecurrenceIndex = {recurrenceIndex}, CalendarId = {calendarId} ");
+                CommonConfig.Logger.Info($"Retrieving appointment: AppointmentId = {appointmentId}, CalendarId = {calendarId} ");
 
                 var appointment = await Managers.CalendarManager.GetCalendarAppointmentAsync(calendarId, appointmentId, SourceType.Local);
-                view.ShowAppointment(EditAppointmentViewModel.ConvertToViewModel(appointment, recurrenceIndex));
+                view.ShowAppointment(EditAppointmentViewModel.ConvertToViewModel(appointment));
 
                 view.StopLoading();
             }
@@ -57,6 +73,11 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             }
         }
 
+        public void LoadCalendarsList()
+        {
+            var calendars = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars.Select(CalendarViewModel.ConvertToViewModel);
+            view.UpdateCalendarsList(calendars.ToList());
+        }
     }
 
     public class EditAppointmentViewModel
@@ -67,17 +88,14 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         public string Location { get; set; }
         public DateTime Start { get; set; }
         public DateTime End { get; set; }
-        public DateTime RecurrenceStart { get; set; }
-        public DateTime RecurrenceEnd { get; set; }
         public bool AllDay { get; set; }
-        public string Creator { get; set; }
+        public int CreatorId { get; set; }
         public RecurrenceInfo RecurrenceInfo { get; set; } //TODO not so nice (use of domain class)
         public long ReminderTimeBefore { get; set; }
         public List<Participant> Participants { get; set; }  //TODO as before
-        public int RecurrenceIndex { get; set; }
         public CalendarViewModel Calendar { get; set; }
 
-        public static EditAppointmentViewModel ConvertToViewModel(CalendarAppointment appointment, int recurrenceIndex = -1)
+        public static EditAppointmentViewModel ConvertToViewModel(CalendarAppointment appointment)
         {
             var appModel = new EditAppointmentViewModel
             {
@@ -86,8 +104,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 Description = appointment.Description,
                 Location = appointment.Location,
                 AllDay = appointment.AllDay,
-                Creator = appointment.Creator,
-                RecurrenceIndex = recurrenceIndex,
+                CreatorId = appointment.CreatorId,
                 RecurrenceInfo = appointment.RecurrenceInfo,
                 ReminderTimeBefore = appointment.ReminderTimeBeforeStart,
                 Participants = appointment.Participants.ToList(),
@@ -104,32 +121,52 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             appModel.Start = recurrence.StartDate;
             appModel.End = recurrence.EndDate;
 
-            recurrence = appointment.Occurrences.FirstOrDefault(r => r.RecurrenceIndex == recurrenceIndex);
-
-            if (recurrence == null)
-                throw new ArgumentException("Can't find occurrence with the given recurrence index");
-
-            appModel.RecurrenceStart = recurrence.StartDate;
-            appModel.RecurrenceEnd = recurrence.EndDate;
-
             return appModel;
+        }
+
+        public CalendarAppointment ConvertToModel()
+        {
+            var ca = new CalendarAppointment
+            {
+                Id = this.Calendar.Id,
+                Subject = this.Subject,
+                Description = this.Description,
+                Location = this.Location,
+                AllDay = this.AllDay,
+                ReminderTimeBeforeStart = this.ReminderTimeBefore,
+                RecurrenceInfo = this.RecurrenceInfo,
+                Participants = this.Participants,
+                CreatorId = this.CreatorId,
+            };
+
+            ca.Occurrences.Add(new CalendarAppointmentOccurrence
+            {
+                RecurrenceIndex = -1,
+                StartDate = this.Start,
+                EndDate = this.End,
+            });
+
+            return ca;
         }
     }
 
     public interface IEditAppointmentPresenter : IPresenter<IEditAppointmentView>
     {
-        Task InitEmptyAppointment();
-        Task LoadAppointment(int calendarId, int appointmentId, int recurrenceIndex);
-        Task AddEditAppointment(EditAppointmentViewModel vm);
+        Task LoadEmptyAppointment();
+        Task LoadAppointment(int calendarId, int appointmentId);
+        void LoadCalendarsList();
+        Task AddOrEditAppointment(EditAppointmentViewModel vm);
     }
 
     public interface IEditAppointmentView : IView
     {
         void ShowAppointment(EditAppointmentViewModel vm);
+        void UpdateCalendarsList(List<CalendarViewModel> calendars);
 
         void CloseView();
-        Task ShowLoadError();
         void ShowLoading();
         void StopLoading();
+        Task ShowLoadError();
+        Task ShowAddingEditingError(Exception ex);
     }
 }
