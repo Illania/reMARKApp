@@ -237,21 +237,12 @@ namespace Mark5.Mobile.Droid.Service
         /// or if switched on but not connected.</returns>
         public bool IsWifiConnected()
         {
-            const string UNKNOWNSSID = "<unknown ssid>";
+            var cm = (ConnectivityManager)Application.Context.GetSystemService(Context.ConnectivityService);
 
-            WifiManager wifiManager = Application.Context.GetSystemService(Context.WifiService) as WifiManager;
+            if (cm.ActiveNetwork == null)
+                return false;
 
-            if (wifiManager != null)
-            {
-                // Check state is enabled.
-                return wifiManager.IsWifiEnabled &&
-                    // Check for network id equal to -1
-                    (wifiManager.ConnectionInfo.NetworkId != -1
-                    // Check for SSID having default value of "<unknown SSID>"
-                    && wifiManager.ConnectionInfo.SSID != UNKNOWNSSID);
-            }
-
-            return false;
+            return cm.GetNetworkCapabilities(cm.ActiveNetwork).HasTransport(Android.Net.TransportType.Wifi);
         }
 
         /// <summary>
@@ -260,9 +251,12 @@ namespace Mark5.Mobile.Droid.Service
         /// <returns>True if is switched on only. False if not switched on.</returns>
         public bool IsMobileDataEnabled()
         {
-            var connectivityManager = (ConnectivityManager)Application.Context.GetSystemService(Context.ConnectivityService);
-            var networkInfo = connectivityManager?.ActiveNetworkInfo;
-            return networkInfo?.Type == ConnectivityType.Mobile;
+            var cm = (ConnectivityManager)Application.Context.GetSystemService(Context.ConnectivityService);
+
+            if (cm.ActiveNetwork == null)
+                return false;
+
+            return cm.GetNetworkCapabilities(cm.ActiveNetwork).HasTransport(Android.Net.TransportType.Cellular);
         }
     }
 }

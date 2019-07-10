@@ -100,7 +100,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             StartDiagnostics();
         }
 
-        private void DiagnosticsBtn_Click(object sender, System.EventArgs e)
+        private void DiagnosticsBtn_Click(object sender, EventArgs e)
         {
             StartDiagnostics();
         }
@@ -116,10 +116,9 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
             Task.Run(async () =>
             {
-                ConnectionDiagnosticModel diagnosticsModel = await CommonConfig.Reachability.ConnectionDiagnostics();
+                var diagnosticsModel = await CommonConfig.Reachability.ConnectionDiagnostics();
 
                 var cm = (ConnectivityManager)Application.Context.GetSystemService(Android.Content.Context.ConnectivityService);
-                var networkInfo = cm.ActiveNetworkInfo;
                 var ci = Managers.ActiveConnectionInfo;
                 var url = $"{(ci.SslMode == SslMode.Off ? "http" : "https")}://{ci.Hostname}:{ci.Port}/app3";
 
@@ -143,6 +142,10 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
                 Activity.RunOnUiThread(() =>
                 {
+
+                    if (diagnosticsModel.Error == ConnectionDiagnosticModel.ErrorCode.UncaughtException)
+                        Dialogs.ShowConfirmDialog(Activity, Resource.String.error, Resource.String.error_diagnostic);
+
                     deviceStatustDetails.Text = "";
                     serviceStatustDetails.Text = "";
 
@@ -151,7 +154,6 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
                     deviceStatustDetails.Text += $"{GetString(Resource.String.diagnostics_mobile_data)} : " + mobileConnectionStatus;
                     deviceStatustDetails.Text += $"\r\n{GetString(Resource.String.diagnostics_wi_fi)} : " + wifiConnectionStatus;
-                    deviceStatustDetails.Text += $"\r\n{GetString(Resource.String.diagnostics_network_name)} : { networkInfo?.ExtraInfo }";
                     serviceStatustDetails.Text += $"{GetString(Resource.String.diagnostics_server_address)} : { url }";
 
                     if (diagnosticsModel.Error == ConnectionDiagnosticModel.ErrorCode.None)
