@@ -20,7 +20,6 @@ using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 
@@ -284,13 +283,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 ConnectionDiagnosticsFragment connectionDiagnosticsFragment;
                 string connectionDiagnosticsFragmentTag;
-                var fragmentTransaction = Activity.SupportFragmentManager.BeginTransaction();
                 (connectionDiagnosticsFragment, connectionDiagnosticsFragmentTag) = ConnectionDiagnosticsFragment.NewInstance();
+
+                var fragmentTransaction = Activity.SupportFragmentManager.BeginTransaction();
                 fragmentTransaction.Replace(Resource.Id.fragment_container, connectionDiagnosticsFragment, connectionDiagnosticsFragmentTag);
                 fragmentTransaction.AddToBackStack(null);
                 fragmentTransaction.Commit();
-
-
             }
             if (preference.Key == GetString(Resource.String.pref_key_advanced_update_config))
             {

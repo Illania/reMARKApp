@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Diagnostics.Contracts;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Testers;
 using Mark5.Mobile.Common.Utilities;
-using SystemConfiguration;
-using Network;
 
 namespace Mark5.Mobile.IOS.Service
 {
@@ -85,7 +81,7 @@ namespace Mark5.Mobile.IOS.Service
                 if (!result)
                 {
                     cancellationTokenSource = new CancellationTokenSource();
-                    CheckServiceAvailabilityContinuously(cancellationTokenSource.Token);
+                    _ = CheckServiceAvailabilityContinuously(cancellationTokenSource.Token);
                 }
             }
 

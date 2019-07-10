@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Android.App;
 using Android.Graphics;
 using Android.Net;
@@ -27,11 +28,6 @@ namespace Mark5.Mobile.Droid.Ui.Common
             var tag = $"{nameof(ConnectionDiagnosticsFragment)}";
 
             return (fragment, tag);
-        }
-
-        public override void OnCreate(Bundle savedInstanceState)
-        {
-            base.OnCreate(savedInstanceState);
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -111,7 +107,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
         private void StartDiagnostics()
         {
-            System.Action dismissAction = null;
+            Action dismissAction = null;
 
             Activity.RunOnUiThread(() =>
             {
@@ -120,7 +116,6 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
             Task.Run(async () =>
             {
-
                 ConnectionDiagnosticModel diagnosticsModel = await CommonConfig.Reachability.ConnectionDiagnostics();
 
                 var cm = (ConnectivityManager)Application.Context.GetSystemService(Android.Content.Context.ConnectivityService);
@@ -161,9 +156,9 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
                     if (diagnosticsModel.Error == ConnectionDiagnosticModel.ErrorCode.None)
                     {
-                        serviceStatustDetails.Text += $"\r\n{GetString(Resource.String.diagnostics_successfull_requests)} : { diagnosticsModel.SuccessfullRequestCount }";
+                        serviceStatustDetails.Text += $"\r\n{GetString(Resource.String.diagnostics_successfull_requests)} : { diagnosticsModel.SuccessfulRequestCount }";
                         serviceStatustDetails.Text += $"\r\n{GetString(Resource.String.diagnostics_failed_requests)} : { diagnosticsModel.FailedRequestCount }";
-                        serviceStatustDetails.Text += $"\r\n{GetString(Resource.String.diagnostics_avg_request_time)} : { diagnosticsModel.AverageEllapsedTimeInSeconds } {GetString(Resource.String.diagnostics_sec)}";
+                        serviceStatustDetails.Text += $"\r\n{GetString(Resource.String.diagnostics_avg_request_time)} : { diagnosticsModel.AverageElapsedTimeInSeconds } {GetString(Resource.String.diagnostics_sec)}";
                     }
 
                     serviceStatustDetails.Text += $"\r\n{GetString(Resource.String.diagnostics_connection_status)} : " + connectionStatus;

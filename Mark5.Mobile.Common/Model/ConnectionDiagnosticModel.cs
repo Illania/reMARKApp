@@ -12,8 +12,6 @@ namespace Mark5.Mobile.Common.Model
         public ErrorCode Error;
         public double AverageElapsedTimeInSeconds;
 
-        public ConnectionDiagnosticModel() { }
-
         public ConnectionDiagnosticModel(ErrorCode errorCode)
         {
             Error = errorCode;

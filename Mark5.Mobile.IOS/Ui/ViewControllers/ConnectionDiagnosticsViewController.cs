@@ -4,7 +4,6 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
-using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
@@ -14,26 +13,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         private UILabel deviceStatusDescription;
         private UILabel serviceStatusDescription;
 
-        public override void ViewWillAppear(bool animated)
-        {
-            base.ViewWillAppear(animated);
-        }
-
-        public override void ViewWillDisappear(bool animated)
-        {
-            base.ViewWillDisappear(animated);
-        }
-
         public override void LoadView()
         {
             base.LoadView();
 
             Title = Localization.GetString("diagnostics_title");
+            View.BackgroundColor = UIColor.GroupTableViewBackgroundColor;
 
             UIScrollView scrollView = new UIScrollView
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                BackgroundColor = UIColor.GroupTableViewBackgroundColor,
+                BackgroundColor = View.BackgroundColor,
                 ShowsVerticalScrollIndicator = false,
                 ShowsHorizontalScrollIndicator = false,
                 ScrollEnabled = true
@@ -49,7 +39,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             View.AddSubview(scrollView);
 
-            UILabel deviceStatusTitle = new UILabel()
+            UILabel deviceStatusTitle = new UILabel
             {
                 Font = Theme.DefaultLightBoldFont,
                 TextColor = Theme.DarkerBlue,
@@ -61,20 +51,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
 
-            if (Integration.IsIPad())
-                scrollView.AddConstraint(deviceStatusTitle.LeadingAnchor.ConstraintEqualTo(scrollView.ReadableContentGuide.LeadingAnchor));
-            else
-                scrollView.AddConstraint(NSLayoutConstraint.Create(deviceStatusTitle, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, scrollView.ReadableContentGuide, NSLayoutAttribute.Leading, 2f, 0f));
-
-            scrollView.AddConstraints(new[]
+            View.AddConstraints(new[]
             {
-                deviceStatusTitle.TrailingAnchor.ConstraintEqualTo(scrollView.ReadableContentGuide.TrailingAnchor),
+                deviceStatusTitle.LeadingAnchor.ConstraintEqualTo(View.ReadableContentGuide.LeadingAnchor),
+                deviceStatusTitle.TrailingAnchor.ConstraintEqualTo(View.ReadableContentGuide.TrailingAnchor),
                 deviceStatusTitle.TopAnchor.ConstraintEqualTo(scrollView.TopAnchor,20f)
             });
 
             scrollView.AddSubview(deviceStatusTitle);
 
-            deviceStatusDescription = new UILabel()
+            deviceStatusDescription = new UILabel
             {
                 Font = Theme.DefaultFont,
                 TextColor = Theme.DarkBlue,
@@ -86,16 +72,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
 
-            scrollView.AddConstraints(new[]
+            View.AddConstraints(new[]
             {
-                deviceStatusDescription.TrailingAnchor.ConstraintEqualTo(scrollView.ReadableContentGuide.TrailingAnchor,-2f),
+                deviceStatusDescription.LeadingAnchor.ConstraintEqualTo(deviceStatusTitle.LeadingAnchor),
+                deviceStatusDescription.TrailingAnchor.ConstraintEqualTo(deviceStatusTitle.TrailingAnchor),
                 deviceStatusDescription.TopAnchor.ConstraintEqualTo(deviceStatusTitle.BottomAnchor,20f)
             });
-
-            if (Integration.IsIPad())
-                scrollView.AddConstraint(deviceStatusDescription.LeadingAnchor.ConstraintEqualTo(scrollView.ReadableContentGuide.LeadingAnchor));
-            else
-                scrollView.AddConstraint(NSLayoutConstraint.Create(deviceStatusDescription, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, scrollView.ReadableContentGuide, NSLayoutAttribute.Leading, 2f, 0f));
 
             scrollView.AddSubview(deviceStatusDescription);
 
@@ -111,16 +93,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
 
-            scrollView.AddConstraints(new[]
+            View.AddConstraints(new[]
             {
-                serviceStatusTitle.TrailingAnchor.ConstraintEqualTo(scrollView.ReadableContentGuide.TrailingAnchor, -2f),
+                serviceStatusTitle.LeadingAnchor.ConstraintEqualTo(deviceStatusTitle.LeadingAnchor),
+                serviceStatusTitle.TrailingAnchor.ConstraintEqualTo(deviceStatusTitle.TrailingAnchor),
                 serviceStatusTitle.TopAnchor.ConstraintEqualTo(deviceStatusDescription.BottomAnchor,20f)
             });
-
-            if (Integration.IsIPad())
-                scrollView.AddConstraint(serviceStatusTitle.LeadingAnchor.ConstraintEqualTo(scrollView.ReadableContentGuide.LeadingAnchor));
-            else
-                scrollView.AddConstraint(NSLayoutConstraint.Create(serviceStatusTitle, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, scrollView.ReadableContentGuide, NSLayoutAttribute.Leading, 2f, 0f));
 
             scrollView.AddSubview(serviceStatusTitle);
 
@@ -137,14 +115,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             scrollView.AddConstraints(new[]
             {
-                serviceStatusDescription.TrailingAnchor.ConstraintEqualTo(scrollView.ReadableContentGuide.TrailingAnchor, -2f),
+                serviceStatusDescription.LeadingAnchor.ConstraintEqualTo(deviceStatusTitle.LeadingAnchor),
+                serviceStatusDescription.TrailingAnchor.ConstraintEqualTo(deviceStatusTitle.TrailingAnchor),
                 serviceStatusDescription.TopAnchor.ConstraintEqualTo(serviceStatusTitle.BottomAnchor,20f)
             });
-
-            if (Integration.IsIPad())
-                scrollView.AddConstraint(serviceStatusDescription.LeadingAnchor.ConstraintEqualTo(scrollView.ReadableContentGuide.LeadingAnchor));
-            else
-                scrollView.AddConstraint(NSLayoutConstraint.Create(serviceStatusDescription, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, scrollView.ReadableContentGuide, NSLayoutAttribute.Leading, 2f, 0f));
 
             scrollView.AddSubview(serviceStatusDescription);
 
@@ -166,15 +140,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             refreshButton.Layer.BorderWidth = 1f;
             refreshButton.Layer.BorderColor = Theme.DarkBlue.CGColor;
 
-            if (Integration.IsIPad())
-                scrollView.AddConstraint(refreshButton.LeadingAnchor.ConstraintGreaterThanOrEqualTo(scrollView.ReadableContentGuide.LeadingAnchor));
-            else
-                scrollView.AddConstraint(NSLayoutConstraint.Create(refreshButton, NSLayoutAttribute.Leading, NSLayoutRelation.GreaterThanOrEqual, scrollView.ReadableContentGuide, NSLayoutAttribute.Leading, 2f, 0f));
-
             scrollView.AddConstraints(new[]
             {
+                refreshButton.LeadingAnchor.ConstraintGreaterThanOrEqualTo(deviceStatusTitle.LeadingAnchor),
                 refreshButton.CenterXAnchor.ConstraintEqualTo(scrollView.CenterXAnchor),
-                refreshButton.TrailingAnchor.ConstraintGreaterThanOrEqualTo(scrollView.ReadableContentGuide.TrailingAnchor, -2f),
+                refreshButton.TrailingAnchor.ConstraintGreaterThanOrEqualTo(deviceStatusTitle.TrailingAnchor),
                 refreshButton.TopAnchor.ConstraintEqualTo(serviceStatusDescription.BottomAnchor, 40f),
                 refreshButton.BottomAnchor.ConstraintGreaterThanOrEqualTo(scrollView.BottomAnchor, -40f)
             });

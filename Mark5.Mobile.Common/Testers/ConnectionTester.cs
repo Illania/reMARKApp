@@ -92,7 +92,7 @@ namespace Mark5.Mobile.Common.Testers
             }
 
             const int requestsCount = 5;
-            ConnectionDiagnosticModel connectionDiagnosticModel = new ConnectionDiagnosticModel();
+            ConnectionDiagnosticModel connectionDiagnosticModel = null;
 
             var taskList = new List<Task<long>>();
 
