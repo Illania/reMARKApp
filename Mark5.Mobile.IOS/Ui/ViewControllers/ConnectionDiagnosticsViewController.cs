@@ -233,9 +233,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     if (diagnosticsModel.Error == ConnectionDiagnosticModel.ErrorCode.None)
                     {
-                        serviceStatusDescription.Text += $"\r\n{ Localization.GetString("diagnostics_successfull_requests") } : { diagnosticsModel.SuccessfullRequestCount }";
+                        serviceStatusDescription.Text += $"\r\n{ Localization.GetString("diagnostics_successfull_requests") } : { diagnosticsModel.SuccessfulRequestCount }";
                         serviceStatusDescription.Text += $"\r\n{ Localization.GetString("diagnostics_failed_requests") } :  { diagnosticsModel.FailedRequestCount }";
-                        serviceStatusDescription.Text += $"\r\n{ Localization.GetString("diagnostics_avg_time") } : { diagnosticsModel.AverageEllapsedTimeInSeconds } { Localization.GetString("diagnostics_sec") }";
+                        serviceStatusDescription.Text += $"\r\n{ Localization.GetString("diagnostics_avg_time") } : { diagnosticsModel.AverageElapsedTimeInSeconds } { Localization.GetString("diagnostics_sec") }";
                     }
 
                     serviceStatusDescription.Text += $"\r\n{ Localization.GetString("diagnostics_connection_status") } : " + connectionStatus;

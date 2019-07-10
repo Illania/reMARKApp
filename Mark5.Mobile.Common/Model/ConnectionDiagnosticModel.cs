@@ -6,11 +6,11 @@ namespace Mark5.Mobile.Common.Model
      */
     public class ConnectionDiagnosticModel
     {
-        public int SuccessfullRequestCount, FailedRequestCount;
-        public long TotalEllapsedTime, AverageEllapsedTime;
+        public int SuccessfulRequestCount, FailedRequestCount;
+        public long TotalElapsedTime, AverageElapsedTime;
         public ConnectionStatus Status;
         public ErrorCode Error;
-        public double AverageEllapsedTimeInSeconds;
+        public double AverageElapsedTimeInSeconds;
 
         public ConnectionDiagnosticModel() { }
 
@@ -20,23 +20,23 @@ namespace Mark5.Mobile.Common.Model
             Status = ConnectionStatus.Broken;
         }
 
-        public ConnectionDiagnosticModel(int successResultCount, int failedRequestCount, long totalEllapsedTime, ErrorCode errorCode = ErrorCode.None)
+        public ConnectionDiagnosticModel(int successResultCount, int failedRequestCount, long totalElapsedTime)
         {
-            SuccessfullRequestCount = successResultCount;
+            SuccessfulRequestCount = successResultCount;
             FailedRequestCount = failedRequestCount;
-            TotalEllapsedTime = totalEllapsedTime;
-            Error = errorCode;
-            if (SuccessfullRequestCount > 0)
+            TotalElapsedTime = totalElapsedTime;
+            Error = ErrorCode.None;
+            if (SuccessfulRequestCount > 0)
             {
-                AverageEllapsedTime = TotalEllapsedTime / SuccessfullRequestCount;
-                AverageEllapsedTimeInSeconds = TimeSpan.FromMilliseconds(AverageEllapsedTime).TotalSeconds;
+                AverageElapsedTime = TotalElapsedTime / SuccessfulRequestCount;
+                AverageElapsedTimeInSeconds = TimeSpan.FromMilliseconds(AverageElapsedTime).TotalSeconds;
             }
 
-            if (SuccessfullRequestCount == SuccessfullRequestCount + FailedRequestCount)
+            if (SuccessfulRequestCount == SuccessfulRequestCount + FailedRequestCount)
                 Status = ConnectionStatus.Stable;
-            else if (SuccessfullRequestCount > 0 && SuccessfullRequestCount >= FailedRequestCount)
+            else if (SuccessfulRequestCount > 0 && SuccessfulRequestCount >= FailedRequestCount)
                 Status = ConnectionStatus.Unstable;
-            else if (SuccessfullRequestCount > 0 && SuccessfullRequestCount < FailedRequestCount)
+            else if (SuccessfulRequestCount > 0 && SuccessfulRequestCount < FailedRequestCount)
                 Status = ConnectionStatus.Bad;
             else
                 Status = ConnectionStatus.Broken;
@@ -44,7 +44,7 @@ namespace Mark5.Mobile.Common.Model
 
         public enum ErrorCode
         {
-            None, NoConfigurationInfo, RequestsFailed, UncaughtException
+            None, NoConfigurationInfo, UncaughtException
         }
 
         public enum ConnectionStatus

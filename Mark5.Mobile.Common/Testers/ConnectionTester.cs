@@ -14,7 +14,7 @@ namespace Mark5.Mobile.Common.Testers
 {
     public class ConnectionTester : IConnectionTester
     {
-        private double timeOut = 200;
+        private readonly double timeOut = 200;
 
         public async Task<bool> CanTest(CancellationToken ct = default(CancellationToken))
         {
@@ -59,12 +59,10 @@ namespace Mark5.Mobile.Common.Testers
             }
         }
 
-        async Task<long> MakeRequest(CancellationToken ct = default(CancellationToken))
+        async Task<long> MakeRequest(ConnectionInfo ci, CancellationToken ct = default(CancellationToken))
         {
             try
             {
-                var ci = await FileSystemStorage.GetConnectionInfoAsync(ct);
-
                 var proxy = AppServiceProxyFactory.Create(ci.SslMode != SslMode.Off,
                                                           ci.Hostname,
                                                           ci.Port,
@@ -85,9 +83,24 @@ namespace Mark5.Mobile.Common.Testers
 
         public async Task<ConnectionDiagnosticModel> ConnectionDiagnostics(CancellationToken ct = default(CancellationToken))
         {
+            var ci = await FileSystemStorage.GetConnectionInfoAsync(ct);
+
+            if (ci == null)
+            {
+                CommonConfig.Logger.Error("No configuration file available to test connection");
+                return new ConnectionDiagnosticModel(ConnectionDiagnosticModel.ErrorCode.NoConfigurationInfo);
+            }
+
+            const int requestsCount = 5;
             ConnectionDiagnosticModel connectionDiagnosticModel = new ConnectionDiagnosticModel();
-            // adding three tasks to the list of executables
-            var taskList = new List<Task<long>> { MakeRequest(ct), MakeRequest(ct), MakeRequest(ct), MakeRequest(ct), MakeRequest(ct) };
+
+            var taskList = new List<Task<long>>();
+
+            for (int i = 0; i < requestsCount; i++)
+            {
+                taskList.Add(MakeRequest(ci, ct));
+            }
+
             try
             {
                 // run tasks in parallel
@@ -104,9 +117,8 @@ namespace Mark5.Mobile.Common.Testers
             }
             catch (Exception ex)
             {
-                var x = ex;
                 CommonConfig.Logger.Error("Exception occured while testing connection to server", ex);
-                connectionDiagnosticModel = new ConnectionDiagnosticModel(ConnectionDiagnosticModel.ErrorCode.RequestsFailed);
+                connectionDiagnosticModel = new ConnectionDiagnosticModel(ConnectionDiagnosticModel.ErrorCode.UncaughtException);
             }
 
             return connectionDiagnosticModel;
