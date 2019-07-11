@@ -21,11 +21,11 @@
 	</dict>
 	<key>CFBundleIdentifier</key>
 	<string>com.nordic-it.mark5.mobile.ios.callid</string>
-	<key>CFBundleShortVersionString</key>
-	<string>5.0.1</string>
 	<key>CFBundleName</key>
 	<string>reMARK</string>
+	<key>CFBundleShortVersionString</key>
+	<string>5.2</string>
 	<key>CFBundleVersion</key>
-	<string>505</string>
+	<string>506</string>
 </dict>
 </plist>
