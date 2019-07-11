@@ -1158,7 +1158,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     }
                     catch (Exception ex)
                     {
-                        CommonConfig.Logger.Info("Request.Url.AbsoluteString : " + action.Request.Url.AbsoluteString);
+                        CommonConfig.Logger.Error("Request.Url.AbsoluteString : " + action.Request.Url.AbsoluteString, ex);
                     }
                 }
                 else
