@@ -14,8 +14,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         int calendarId, appointmentId, recurrenceIndex;
         bool loaded;
 
-        UIBarButtonItem insertButtonItem;
-        UIBarButtonItem sendButtonItem;
+        UIBarButtonItem editButtinItem;
+        UIBarButtonItem deleteButtonItem;
 
         AppointmentSubjectView subjectView;
         AppointmentDateView dateView;
@@ -25,6 +25,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         AppointmentOrganizerView organizerView;
         AppointmentCalendarView calendarView;
         AppointmentParticipantsView participantsView;
+        SendInvitationsButton sendInvitationsButton;
 
         Action loadingDialogDismissal;
         AppointmentPresenter presenter;
@@ -51,17 +52,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             InitNavigationBar();
         }
 
-        //TODO Need to add "Send Invitation button"
-
         public override async void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
+
+            InitializeHandlers();
 
             if (!loaded)
             {
                 await presenter.LoadAppointment(appointmentId, recurrenceIndex, calendarId);
                 loaded = true;
             }
+        }
+
+        public override void ViewWillDisappear(bool animated)
+        {
+            base.ViewWillDisappear(animated);
+            DeinitializeHandlers();
+        }
+
+        protected override void Recycle()
+        {
+            base.Recycle();
+            deleteButtonItem = null;
+            editButtinItem = null;
         }
 
         public void CloseView()
@@ -71,12 +85,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         public void OpenEditAppointment(int calendarId, int appointmentId)
         {
-            throw new System.NotImplementedException();
+            // TODO
+            //presenter.EditAppointmentClicked();
         }
 
         public void SetLines(IEnumerable<LineViewModel> lines)
         {
-            // not sure what we do here..
+            //TODO
         }
 
         public void ShowAppointment(AppointmentViewModel appointment)
@@ -119,22 +134,63 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             loadingDialogDismissal?.Invoke();
         }
 
-        void InitNavigationBar()
+        private void InitializeHandlers()
         {
-            sendButtonItem = new UIBarButtonItem
+            if (deleteButtonItem != null)
+                deleteButtonItem.Clicked += DeleteButtonItem_Clicked;
+
+            if (editButtinItem != null)
+                editButtinItem.Clicked += EditButtinItem_Clicked;
+
+            if (sendInvitationsButton != null)
+                sendInvitationsButton.TouchUpInside += SendInvitationsButton_TouchUpInside;
+        }
+
+        private void DeinitializeHandlers()
+        {
+            if (deleteButtonItem != null)
+                deleteButtonItem.Clicked -= DeleteButtonItem_Clicked;
+
+            if (editButtinItem != null)
+                editButtinItem.Clicked -= EditButtinItem_Clicked;
+
+            if (sendInvitationsButton != null)
+                sendInvitationsButton.TouchUpInside -= SendInvitationsButton_TouchUpInside;
+        }
+
+        private void EditButtinItem_Clicked(object sender, EventArgs e)
+        {
+            presenter.EditAppointmentClicked();
+        }
+
+        private void DeleteButtonItem_Clicked(object sender, EventArgs e)
+        {
+            // TODO
+            //_ = presenter.DeleteAppointmentClicked();
+        }
+
+        async void SendInvitationsButton_TouchUpInside(object sender, EventArgs e)
+        {
+            //TODO : come back
+            //await presenter.SendInvitationClicked(new Guid());
+        }
+
+        private void InitNavigationBar()
+        {
+            deleteButtonItem = new UIBarButtonItem
             {
-                Image = UIImage.FromBundle("Attachment").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
+                Image = UIImage.FromBundle("Bin").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
             };
 
-            insertButtonItem = new UIBarButtonItem
+            editButtinItem = new UIBarButtonItem
             {
                 Image = UIImage.FromBundle("Edit").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
             };
 
-            NavigationItem.SetRightBarButtonItems(new[] { sendButtonItem, insertButtonItem }, false);
+            NavigationItem.SetRightBarButtonItems(new[] { editButtinItem, deleteButtonItem }, false);
         }
 
-        void InitView()
+        private void InitView()
         {
             UIScrollView scrollView = new UIScrollView
             {
@@ -212,14 +268,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             participantsView = new AppointmentParticipantsView();
             stackView.AddArrangedSubview(participantsView);
+
+            sendInvitationsButton = new SendInvitationsButton();
+            stackView.AddArrangedSubview(sendInvitationsButton);
         }
 
-        interface IAppointmentView
+        private interface IAppointmentView
         {
             void Refresh(AppointmentViewModel viewModel);
         }
 
-        class AppointmentOrganizerView : UIStackView, IAppointmentView
+        private class AppointmentOrganizerView : UIStackView, IAppointmentView
         {
             UILabel label;
 
@@ -269,200 +328,125 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             }
         }
 
-        class AppointmentSubjectView : UIView, IAppointmentView
+        private class AppointmentSubjectView : UILabel, IAppointmentView
         {
-            UILabel label;
-
             public AppointmentSubjectView()
             {
-                label = new UILabel()
-                {
-                    Font = Theme.AppointmentTitleFont,
-                    TextColor = Theme.DarkerBlue,
-                    LineBreakMode = UILineBreakMode.WordWrap,
-                    Lines = 0,
-                    BackgroundColor = Theme.Clear,
-                    TextAlignment = UITextAlignment.Left,
-                    TranslatesAutoresizingMaskIntoConstraints = false,
-                    Text = ""
-                };
-
-                AddSubview(label);
-
-                AddConstraints(new[]
-                {
-                    label.LeadingAnchor.ConstraintEqualTo(LeadingAnchor),
-                    label.TrailingAnchor.ConstraintEqualTo(TrailingAnchor),
-                    label.TopAnchor.ConstraintEqualTo(TopAnchor),
-                    label.BottomAnchor.ConstraintEqualTo(BottomAnchor)
-                });
+                Font = Theme.AppointmentTitleFont;
+                TextColor = Theme.DarkerBlue;
+                LineBreakMode = UILineBreakMode.WordWrap;
+                Lines = 0;
+                BackgroundColor = Theme.Clear;
+                TextAlignment = UITextAlignment.Left;
+                TranslatesAutoresizingMaskIntoConstraints = false;
+                Text = "";
             }
 
             public void Refresh(AppointmentViewModel viewModel)
             {
-                label.Text = viewModel.Subject;
+                Text = viewModel.Subject;
             }
         }
 
-        class AppointmentDateView : UIView, IAppointmentView
+        private class AppointmentDateView : UILabel, IAppointmentView
         {
-            UILabel label;
-
             public AppointmentDateView()
             {
-                label = new UILabel()
-                {
-                    Font = Theme.DefaultFont,
-                    TextColor = Theme.Black,
-                    LineBreakMode = UILineBreakMode.WordWrap,
-                    Lines = 0,
-                    BackgroundColor = Theme.Clear,
-                    TextAlignment = UITextAlignment.Left,
-                    TranslatesAutoresizingMaskIntoConstraints = false,
-                    Text = ""
-                };
-
-                AddSubview(label);
-
-                AddConstraints(new[]
-                {
-                    label.TrailingAnchor.ConstraintEqualTo(TrailingAnchor),
-                    label.LeadingAnchor.ConstraintEqualTo(LeadingAnchor),
-                    label.TopAnchor.ConstraintEqualTo(TopAnchor),
-                    label.BottomAnchor.ConstraintEqualTo(BottomAnchor)
-                });
+                Font = Theme.DefaultFont;
+                TextColor = Theme.Black;
+                LineBreakMode = UILineBreakMode.WordWrap;
+                Lines = 0;
+                BackgroundColor = Theme.Clear;
+                TextAlignment = UITextAlignment.Left;
+                TranslatesAutoresizingMaskIntoConstraints = false;
+                Text = "";
             }
 
             public void Refresh(AppointmentViewModel viewModel)
             {
                 if (viewModel.Start.Date.CompareTo(viewModel.End.Date) == 0)
                 {
-                    label.Text += viewModel.Start.ToString("dddd, d MMMM yyyy", CultureInfo.CurrentCulture);
+                    Text += viewModel.Start.ToString("dddd, d MMMM yyyy", CultureInfo.CurrentCulture);
                     if (viewModel.AllDay)
-                        label.Text += "\r\nAll Day";
+                        Text += "\r\nAll Day";
                     else
-                        label.Text += $"\r\nfrom { viewModel.Start.ToString("hh:mm", CultureInfo.CurrentCulture) } to { viewModel.End.ToString("hh:mm", CultureInfo.CurrentCulture) }";
+                        Text += $"\r\nfrom { viewModel.Start.ToString("hh:mm", CultureInfo.CurrentCulture) } to { viewModel.End.ToString("hh:mm", CultureInfo.CurrentCulture) }";
                 }
                 else
                 {
                     if (viewModel.AllDay)
                     {
-                        label.Text = $"All day from { viewModel.Start.ToString("ddd, d MMMM yyyy", CultureInfo.CurrentCulture) } ";
-                        label.Text += $"\r\nto { viewModel.End.ToString("ddd, d MMMM yyyy", CultureInfo.CurrentCulture) }";
+                        Text = $"All day from { viewModel.Start.ToString("ddd, d MMMM yyyy", CultureInfo.CurrentCulture) } ";
+                        Text += $"\r\nto { viewModel.End.ToString("ddd, d MMMM yyyy", CultureInfo.CurrentCulture) }";
                     }
                     else
                     {
-                        label.Text = $"from { viewModel.Start.ToString("hh:mm ddd, d MMMM yyyy", CultureInfo.CurrentCulture) } ";
-                        label.Text += $"\r\nto { viewModel.End.ToString("hh:mm ddd, d MMMM yyyy", CultureInfo.CurrentCulture) }";
+                        Text = $"from { viewModel.Start.ToString("hh:mm ddd, d MMMM yyyy", CultureInfo.CurrentCulture) } ";
+                        Text += $"\r\nto { viewModel.End.ToString("hh:mm ddd, d MMMM yyyy", CultureInfo.CurrentCulture) }";
                     }
                 }
             }
         }
 
-        class AppointmentReocurrenceView : UIView, IAppointmentView
+        private class AppointmentReocurrenceView : UILabel, IAppointmentView
         {
-            UILabel label;
-
             public AppointmentReocurrenceView()
             {
-                label = new UILabel()
-                {
-                    Font = Theme.DefaultLightFont,
-                    TextColor = Theme.DarkGray,
-                    LineBreakMode = UILineBreakMode.WordWrap,
-                    Lines = 0,
-                    Text = "",
-                    TextAlignment = UITextAlignment.Left,
-                    TranslatesAutoresizingMaskIntoConstraints = false
-                };
 
-                AddSubview(label);
-
-                AddConstraints(new[]
-                {
-                    label.TrailingAnchor.ConstraintEqualTo(TrailingAnchor),
-                    label.LeadingAnchor.ConstraintEqualTo(LeadingAnchor),
-                    label.TopAnchor.ConstraintEqualTo(TopAnchor),
-                    label.BottomAnchor.ConstraintEqualTo(BottomAnchor)
-                });
+                Font = Theme.DefaultLightFont;
+                TextColor = Theme.DarkGray;
+                LineBreakMode = UILineBreakMode.WordWrap;
+                Lines = 0;
+                Text = "";
+                TextAlignment = UITextAlignment.Left;
+                TranslatesAutoresizingMaskIntoConstraints = false;
             }
 
             public void Refresh(AppointmentViewModel viewModel)
             {
-                label.Text = viewModel.RecurrenceInfo;
+                Text = viewModel.RecurrenceInfo;
             }
         }
 
-        class AppointmentLocationView : UIView, IAppointmentView
+        private class AppointmentLocationView : UILabel, IAppointmentView
         {
-            UILabel label;
-
             public AppointmentLocationView()
             {
-                label = new UILabel()
-                {
-                    Font = Theme.DefaultFont,
-                    TextColor = Theme.DarkBlue,
-                    LineBreakMode = UILineBreakMode.WordWrap,
-                    Lines = 0,
-                    Text = "",
-                    TextAlignment = UITextAlignment.Left,
-                    TranslatesAutoresizingMaskIntoConstraints = false
-                };
-
-                AddSubview(label);
-
-                AddConstraints(new[]
-                {
-                    label.TrailingAnchor.ConstraintEqualTo(TrailingAnchor),
-                    label.LeadingAnchor.ConstraintEqualTo(LeadingAnchor),
-                    label.TopAnchor.ConstraintEqualTo(TopAnchor),
-                    label.BottomAnchor.ConstraintEqualTo(BottomAnchor)
-                });
+                Font = Theme.DefaultFont;
+                TextColor = Theme.DarkBlue;
+                LineBreakMode = UILineBreakMode.WordWrap;
+                Lines = 0;
+                Text = "";
+                TextAlignment = UITextAlignment.Left;
+                TranslatesAutoresizingMaskIntoConstraints = false;
             }
 
             public void Refresh(AppointmentViewModel viewModel)
             {
-                label.Text = viewModel.Location;
+                Text = viewModel.Location;
             }
         }
 
-        class AppointmentDescriptionView : UIView, IAppointmentView
+        private class AppointmentDescriptionView : UILabel, IAppointmentView
         {
-            UILabel label;
-
             public AppointmentDescriptionView()
             {
-                label = new UILabel()
-                {
-                    Font = Theme.DefaultFont,
-                    TextColor = Theme.Black,
-                    LineBreakMode = UILineBreakMode.WordWrap,
-                    Lines = 0,
-                    Text = "",
-                    TextAlignment = UITextAlignment.Left,
-                    TranslatesAutoresizingMaskIntoConstraints = false
-                };
 
-                AddSubview(label);
-
-                AddConstraints(new[]
-                {
-                    label.TrailingAnchor.ConstraintEqualTo(TrailingAnchor),
-                    label.LeadingAnchor.ConstraintEqualTo(LeadingAnchor),
-                    label.TopAnchor.ConstraintEqualTo(TopAnchor),
-                    label.BottomAnchor.ConstraintEqualTo(BottomAnchor)
-                });
+                Font = Theme.DefaultFont;
+                TextColor = Theme.Black;
+                LineBreakMode = UILineBreakMode.WordWrap;
+                Lines = 0;
+                Text = "";
+                TextAlignment = UITextAlignment.Left;
             }
 
             public void Refresh(AppointmentViewModel viewModel)
             {
-                if (label != null)
-                    label.Text = viewModel.Description;
+                Text = viewModel.Description;
             }
         }
 
-        class AppointmentCalendarView : UIView, IAppointmentView
+        private class AppointmentCalendarView : UIView, IAppointmentView
         {
             UIView colorView;
             UILabel lable;
@@ -534,7 +518,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             }
         }
 
-        class AppointmentParticipantsView : UIStackView, IAppointmentView
+        private class AppointmentParticipantsView : UIStackView, IAppointmentView
         {
             Header participantHeader;
 
@@ -695,7 +679,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             }
         }
 
-        class SeperatorView : UIView
+        private class SendInvitationsButton : UIButton
+        {
+            public SendInvitationsButton()
+            {
+                Font = Theme.DefaultLightFont;
+                SetTitle("Send Invitations", UIControlState.Normal);
+                SetTitleColor(Theme.DarkerBlue, UIControlState.Normal);
+                SetTitleColor(Theme.DarkGray, UIControlState.Highlighted);
+            }
+        }
+
+        private class SeperatorView : UIView
         {
             public SeperatorView()
             {
