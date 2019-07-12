@@ -83,6 +83,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             {
                 schedule.HeaderTapped -= Handle_HeaderTapped;
                 schedule.CellDoubleTapped -= Schedule_CellDoubleTapped;
+                schedule.CellLongPressed -= Schedule_CellDoubleTapped;
                 schedule.MonthInlineAppointmentTapped -= Schedule_MonthInlineAppointmentTapped;
                 schedule.VisibleDatesChanged -= MonthSchedule_VisibleDatesChanged;
             }
