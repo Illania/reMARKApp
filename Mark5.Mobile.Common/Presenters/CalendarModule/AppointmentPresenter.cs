@@ -26,7 +26,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 CommonConfig.Logger.Info($"Retrieving appointment: AppointmentId = {appointmentId}, RecurrenceIndex = {recurrenceIndex}, CalendarId = {calendarId} ");
 
                 appointment = await Managers.CalendarManager.GetCalendarAppointmentAsync(calendarId, appointmentId, SourceType.Local);
-                this.recurrenceIndex = recurrenceIndex;
+
                 view.ShowAppointment(AppointmentViewModel.ConvertToViewModel(appointment, recurrenceIndex));
                 view.SetLines(ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Select(LineViewModel.ConvertToViewModel));
 
@@ -105,7 +105,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         public string RecurrenceInfo { get; set; }
         public long ReminderTimeBefore { get; set; }
         public List<ParticipantsViewModel> Participants { get; set; }
-
+        public CalendarViewModel Calendar { get; set; }
 
         public static AppointmentViewModel ConvertToViewModel(CalendarAppointment appointment, int recurrenceIndex = -1)
         {
@@ -121,6 +121,9 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 ReminderTimeBefore = appointment.ReminderTimeBeforeStart,
                 Participants = appointment.Participants.Select(ParticipantsViewModel.ConvertToViewModel).ToList(),
             };
+
+            var calendar = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars.First(ca => ca.Id == appointment.CalendarId);
+            appModel.Calendar = CalendarViewModel.ConvertToViewModel(calendar);
 
             var recurrence = appointment.Occurrences.FirstOrDefault(r => r.RecurrenceIndex == recurrenceIndex);
 
@@ -138,13 +141,13 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             if (ri == null)
                 return null;
 
-            string pattern = string.Empty;
+            string pattern = "Reoccures ";
             string range = string.Empty;
 
             switch (ri.Type)
             {
                 case RecurrenceType.Daily:
-                    pattern = "Daily, every ";
+                    pattern += "daily, every ";
 
                     if (ri.WeekDays == WeekDays.EveryDay)
                         pattern += $"{ri.Periodicity} day(s)";
@@ -152,28 +155,28 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                         pattern += $"weekday";
                     break;
                 case RecurrenceType.Weekly:
-                    {
-                        pattern = $"Weekly, every {ri.Periodicity} week(s) on";
+                    pattern += $"weekly, every {ri.Periodicity} week(s) on";
 
-                        var days = new[] { WeekDays.Monday, WeekDays.Tuesday, WeekDays.Wednesday,
+                    var days = new[] { WeekDays.Monday, WeekDays.Tuesday, WeekDays.Wednesday,
                     WeekDays.Thursday, WeekDays.Friday, WeekDays.Saturday, WeekDays.Sunday};
 
-                        var stringDays = new List<string>();
+                    var stringDays = new List<string>();
 
-                        foreach (var day in days)
-                        {
-                            if (ri.WeekDays.HasFlag(day))
-                                stringDays.Add(GetDayName(day));
-                        }
-
-                        pattern += string.Join(", ", stringDays);
-                        break;
+                    foreach (var day in days)
+                    {
+                        if (ri.WeekDays.HasFlag(day))
+                            stringDays.Add(GetDayName(day));
                     }
 
+                    pattern += string.Join(", ", stringDays);
+                    break;
                 case RecurrenceType.Monthly:
-                    pattern = $"Monthly, ";
+                    pattern += $"monthly, ";
                     if (ri.WeekOfMonth == WeekOfMonth.None)
-                        pattern += $"on day {ri.DayNumber} of every {ri.Periodicity} months";
+                    {
+                        string monthPatter = ri.Periodicity == 1 ? "month" : $"{ ri.Periodicity} months";
+                        pattern += $"on day {ri.DayNumber} of every {monthPatter}";
+                    }
                     else
                         pattern += $"the {GetWeekString(ri.WeekOfMonth)} {GetDayName(ri.WeekDays)} of every {ri.Periodicity} month(s) ";
                     break;
@@ -193,17 +196,12 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                     range = string.Empty;
                     break;
                 case RecurrenceRange.OccurrenceCount:
-                    range = $"ends after {ri.OccurrenceCount} occurrences";
+                    range = $", ends after {ri.OccurrenceCount} occurrences";
                     break;
                 case RecurrenceRange.EndByDate:
-                    range = $"ends by {ri.EndDate.ToString("d", CultureInfo.CurrentCulture)}";
+                    range = $", ends by {ri.EndDate.ToString("d", CultureInfo.CurrentCulture)}";
                     break;
             }
-
-            if (!string.IsNullOrEmpty(range))
-                range += ", ";
-
-            range += $"starting from {ri.StartDate.ToString("d", CultureInfo.CurrentCulture)}";
 
             return pattern + range;
         }
