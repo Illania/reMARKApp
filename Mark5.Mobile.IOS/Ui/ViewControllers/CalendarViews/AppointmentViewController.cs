@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Presenters.CalendarModule;
 using Mark5.Mobile.IOS.Ui.Common;
@@ -15,6 +16,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         readonly AppointmentPresenter presenter;
 
         bool loaded;
+
+        List<LineViewModel> lineViewModels;
 
         UIBarButtonItem editButtinItem;
         UIBarButtonItem deleteButtonItem;
@@ -218,7 +221,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         public void SetLines(IEnumerable<LineViewModel> lines)
         {
-            //TODO
+            lineViewModels = lines.ToList();
         }
 
         public void ShowAppointment(AppointmentViewModel appointment)
@@ -267,16 +270,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             presenter.EditAppointmentClicked();
         }
 
-        private void DeleteButtonItem_Clicked(object sender, EventArgs e)
+        private async void DeleteButtonItem_Clicked(object sender, EventArgs e)
         {
-            // TODO
-            //_ = presenter.DeleteAppointmentClicked();
+            var d = new PopoverPresentationControllerDelegate(deleteButtonItem);
+
+            var result = await Dialogs.ShowDestructiveActionSheetAsync(this, Localization.GetString("delete"), d);
+            if (result)
+                await presenter.DeleteAppointmentClicked();
+
         }
 
         async void SendInvitationsButton_TouchUpInside(object sender, EventArgs e)
         {
-            //TODO : come back
-            //await presenter.SendInvitationClicked(new Guid());
+            var lineNames = lineViewModels.Select(l => l.Name).ToArray();
+
+            var result = await Dialogs.ShowListActionSheetWithTitleAsync(this, lineNames, sendInvitationsButton);
+
+            if (result >= 0)
+                await presenter.SendInvitationClicked(lineViewModels[result]);
         }
 
         #endregion

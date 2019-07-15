@@ -70,7 +70,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             view.OpenEditAppointment(appointment.CalendarId, appointment.Id);
         }
 
-        public async Task SendInvitationClicked(Guid lineGuid)
+        public async Task SendInvitationClicked(LineViewModel lvm)
         {
             view.ShowLoading();
 
@@ -78,13 +78,13 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             {
                 CommonConfig.Logger.Info($"Sending invitations for appointment with ID = {appointment.Id}");
 
-                await Managers.CalendarManager.SendCalendarAppointmentInvitationsAsync(appointment.Id, lineGuid);
+                await Managers.CalendarManager.SendCalendarAppointmentInvitationsAsync(appointment.Id, lvm.Guid);
 
                 view.StopLoading();
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Error while sending invitations for appointment with ID = {appointment.Id} with line with GUID = {lineGuid}", ex);
+                CommonConfig.Logger.Error($"Error while sending invitations for appointment with ID = {appointment.Id} with line with GUID = {lvm.Guid}", ex);
 
                 view.StopLoading();
                 await view.ShowSendInvitationError(ex);
@@ -279,7 +279,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
     {
         Task LoadAppointment(int appointmentId, int recurrenceIndex, int calendarId);
         Task DeleteAppointmentClicked();
-        Task SendInvitationClicked(Guid lineGuid);
+        Task SendInvitationClicked(LineViewModel lvm);
 
         void EditAppointmentClicked();
     }
@@ -288,11 +288,11 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
     {
         void ShowAppointment(AppointmentViewModel appointment);
         void SetLines(IEnumerable<LineViewModel> lines);
-        void ShowLoading();
-        void StopLoading();
         void CloseView();
         void OpenEditAppointment(int calendarId, int appointmentId);
 
+        void ShowLoading();
+        void StopLoading();
         Task ShowLoadError(Exception ex);
         Task ShowDeleteError(Exception ex);
         Task ShowSendInvitationError(Exception ex);
