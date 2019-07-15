@@ -11,7 +11,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 {
     public class AppointmentViewController : AbstractViewController, IAppointmentView
     {
-        int calendarId, appointmentId, recurrenceIndex;
+        readonly int calendarId, appointmentId, recurrenceIndex;
+        readonly AppointmentPresenter presenter;
+
         bool loaded;
 
         UIBarButtonItem editButtinItem;
@@ -28,7 +30,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         SendInvitationsButton sendInvitationsButton;
 
         Action loadingDialogDismissal;
-        AppointmentPresenter presenter;
 
         public AppointmentViewController(int calendarId, int appointmentId, int recurrenceIndex)
         {
@@ -42,12 +43,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         public override void LoadView()
         {
             base.LoadView();
+
             InitView();
         }
 
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
+
             View.BackgroundColor = UIColor.White;
             InitNavigationBar();
         }
@@ -78,62 +81,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             editButtinItem = null;
         }
 
-        public void CloseView()
-        {
-            NavigationController.PopViewController(true);
-        }
-
-        public void OpenEditAppointment(int calendarId, int appointmentId)
-        {
-            // TODO
-            //presenter.EditAppointmentClicked();
-        }
-
-        public void SetLines(IEnumerable<LineViewModel> lines)
-        {
-            //TODO
-        }
-
-        public void ShowAppointment(AppointmentViewModel appointment)
-        {
-            subjectView.Refresh(appointment);
-            dateView.Refresh(appointment);
-            reocurrenceView.Refresh(appointment);
-            locationView.Refresh(appointment);
-            descriptionView.Refresh(appointment);
-            organizerView.Refresh(appointment);
-            calendarView.Refresh(appointment);
-            participantsView.Refresh(appointment);
-        }
-
-        public async Task ShowDeleteError()
-        {
-            loadingDialogDismissal?.Invoke();
-            await Dialogs.ShowErrorAlertAsync(this, new Exception("ShowDeleteError"));
-        }
-
-        public async Task ShowLoadError()
-        {
-            loadingDialogDismissal?.Invoke();
-            await Dialogs.ShowErrorAlertAsync(this, new Exception("ShowLoadError"));
-        }
-
-        public async Task ShowSendInvitationError()
-        {
-            loadingDialogDismissal?.Invoke();
-            await Dialogs.ShowErrorAlertAsync(this, new Exception("ShowLoadError"));
-        }
-
-        public void ShowLoading()
-        {
-            loadingDialogDismissal = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("loading_appointments___"));
-        }
-
-        public void StopLoading()
-        {
-            loadingDialogDismissal?.Invoke();
-        }
-
         private void InitializeHandlers()
         {
             if (deleteButtonItem != null)
@@ -156,23 +103,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             if (sendInvitationsButton != null)
                 sendInvitationsButton.TouchUpInside -= SendInvitationsButton_TouchUpInside;
-        }
-
-        private void EditButtinItem_Clicked(object sender, EventArgs e)
-        {
-            presenter.EditAppointmentClicked();
-        }
-
-        private void DeleteButtonItem_Clicked(object sender, EventArgs e)
-        {
-            // TODO
-            //_ = presenter.DeleteAppointmentClicked();
-        }
-
-        async void SendInvitationsButton_TouchUpInside(object sender, EventArgs e)
-        {
-            //TODO : come back
-            //await presenter.SendInvitationClicked(new Guid());
         }
 
         private void InitNavigationBar()
@@ -272,6 +202,86 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             sendInvitationsButton = new SendInvitationsButton();
             stackView.AddArrangedSubview(sendInvitationsButton);
         }
+
+        #region IAppointmentView implementation
+
+        public void CloseView()
+        {
+            NavigationController.PopViewController(true);
+        }
+
+        public void OpenEditAppointment(int calendarId, int appointmentId)
+        {
+            // TODO
+            //presenter.EditAppointmentClicked();
+        }
+
+        public void SetLines(IEnumerable<LineViewModel> lines)
+        {
+            //TODO
+        }
+
+        public void ShowAppointment(AppointmentViewModel appointment)
+        {
+            subjectView.Refresh(appointment);
+            dateView.Refresh(appointment);
+            reocurrenceView.Refresh(appointment);
+            locationView.Refresh(appointment);
+            descriptionView.Refresh(appointment);
+            organizerView.Refresh(appointment);
+            calendarView.Refresh(appointment);
+            participantsView.Refresh(appointment);
+        }
+
+        public async Task ShowDeleteError(Exception ex)
+        {
+            await Dialogs.ShowErrorAlertAsync(this, ex);
+        }
+
+        public async Task ShowLoadError(Exception ex)
+        {
+            await Dialogs.ShowErrorAlertAsync(this, ex);
+        }
+
+        public async Task ShowSendInvitationError(Exception ex)
+        {
+            await Dialogs.ShowErrorAlertAsync(this, ex);
+        }
+
+        public void ShowLoading()
+        {
+            loadingDialogDismissal = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("loading_appointments___"));
+        }
+
+        public void StopLoading()
+        {
+            loadingDialogDismissal?.Invoke();
+        }
+
+        #endregion
+
+        #region Event handlers
+
+        private void EditButtinItem_Clicked(object sender, EventArgs e)
+        {
+            presenter.EditAppointmentClicked();
+        }
+
+        private void DeleteButtonItem_Clicked(object sender, EventArgs e)
+        {
+            // TODO
+            //_ = presenter.DeleteAppointmentClicked();
+        }
+
+        async void SendInvitationsButton_TouchUpInside(object sender, EventArgs e)
+        {
+            //TODO : come back
+            //await presenter.SendInvitationClicked(new Guid());
+        }
+
+        #endregion
+
+        #region Subviews
 
         private interface IAppointmentView
         {
@@ -622,7 +632,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             class ParticipantView : UIView
             {
-                UILabel labe;
+                UILabel label;
                 UIImageView statusImage;
 
                 public ParticipantView()
@@ -633,7 +643,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
                 public void Refresh(ParticipantsViewModel viewModel)
                 {
-                    labe.Text = viewModel.Name + " " + viewModel.Email;
+                    label.Text = viewModel.Name + " " + viewModel.Email;
                 }
 
                 void InitView()
@@ -651,7 +661,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
                     AddSubview(statusImage);
 
-                    labe = new UILabel()
+                    label = new UILabel()
                     {
                         Text = "",
                         TextAlignment = UITextAlignment.Left,
@@ -662,7 +672,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                         TextColor = Theme.DarkGray,
                     };
 
-                    AddSubview(labe);
+                    AddSubview(label);
 
                     AddConstraints(new[]
                     {
@@ -670,10 +680,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                         statusImage.TopAnchor.ConstraintEqualTo(TopAnchor, 2f),
                         statusImage.BottomAnchor.ConstraintEqualTo(BottomAnchor, -2f),
 
-                        labe.LeadingAnchor.ConstraintEqualTo(statusImage.TrailingAnchor, 8f),
-                        labe.TopAnchor.ConstraintEqualTo(TopAnchor, 2f),
-                        labe.BottomAnchor.ConstraintEqualTo(BottomAnchor, -2f),
-                        labe.HeightAnchor.ConstraintGreaterThanOrEqualTo(16f)
+                        label.LeadingAnchor.ConstraintEqualTo(statusImage.TrailingAnchor, 8f),
+                        label.TopAnchor.ConstraintEqualTo(TopAnchor, 2f),
+                        label.BottomAnchor.ConstraintEqualTo(BottomAnchor, -2f),
+                        label.HeightAnchor.ConstraintGreaterThanOrEqualTo(16f)
                     });
                 }
             }
@@ -700,5 +710,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 AutoresizingMask = UIViewAutoresizing.FlexibleHeight | UIViewAutoresizing.FlexibleWidth;
             }
         }
+
+        #endregion
+
     }
 }
