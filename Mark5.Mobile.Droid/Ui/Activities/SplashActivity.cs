@@ -22,10 +22,6 @@ using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 using Microsoft.AppCenter;
 using Microsoft.AppCenter.Crashes;
-#if !DEBUG
-using HockeyApp.Android;
-using Mark5.Mobile.Droid.Utilities.Hockey;
-#endif
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
