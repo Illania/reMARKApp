@@ -24,7 +24,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         AppointmentSubjectView subjectView;
         AppointmentDateView dateView;
-        AppointmentReocurrenceView reocurrenceView;
+        AppointmentRecurrenceView reocurrenceView;
         AppointmentLocationView locationView;
         AppointmentDescriptionView descriptionView;
         AppointmentOrganizerView organizerView;
@@ -184,7 +184,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             dateView = new AppointmentDateView();
             stackView.AddArrangedSubview(dateView);
 
-            reocurrenceView = new AppointmentReocurrenceView();
+            reocurrenceView = new AppointmentRecurrenceView();
             stackView.AddArrangedSubview(reocurrenceView);
 
             locationView = new AppointmentLocationView();
@@ -380,7 +380,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 BackgroundColor = Theme.Clear;
                 TextAlignment = UITextAlignment.Left;
                 TranslatesAutoresizingMaskIntoConstraints = false;
-                Text = "";
             }
 
             public void Refresh(AppointmentViewModel viewModel)
@@ -409,22 +408,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             }
         }
 
-        private class AppointmentReocurrenceView : UILabel, IAppointmentView
+        private class AppointmentRecurrenceView : UILabel, IAppointmentView
         {
-            public AppointmentReocurrenceView()
+            public AppointmentRecurrenceView()
             {
 
                 Font = Theme.DefaultLightFont;
                 TextColor = Theme.DarkGray;
                 LineBreakMode = UILineBreakMode.WordWrap;
                 Lines = 0;
-                Text = "";
                 TextAlignment = UITextAlignment.Left;
                 TranslatesAutoresizingMaskIntoConstraints = false;
+                BackgroundColor = UIColor.Blue;
             }
 
             public void Refresh(AppointmentViewModel viewModel)
             {
+                if (string.IsNullOrEmpty(viewModel.RecurrenceInfo))
+                {
+                    Hidden = true;
+                    return;
+                }
+
                 Text = viewModel.RecurrenceInfo;
             }
         }
@@ -437,13 +442,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 TextColor = Theme.DarkBlue;
                 LineBreakMode = UILineBreakMode.WordWrap;
                 Lines = 0;
-                Text = "";
                 TextAlignment = UITextAlignment.Left;
                 TranslatesAutoresizingMaskIntoConstraints = false;
             }
 
             public void Refresh(AppointmentViewModel viewModel)
             {
+                if (string.IsNullOrEmpty(viewModel.Location))
+                {
+                    Hidden = true;
+                    return;
+                }
+
                 Text = viewModel.Location;
             }
         }
@@ -452,17 +462,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         {
             public AppointmentDescriptionView()
             {
-
                 Font = Theme.DefaultFont;
                 TextColor = Theme.Black;
                 LineBreakMode = UILineBreakMode.WordWrap;
                 Lines = 0;
-                Text = "";
                 TextAlignment = UITextAlignment.Left;
             }
 
             public void Refresh(AppointmentViewModel viewModel)
             {
+                if (string.IsNullOrEmpty(viewModel.Description))
+                {
+                    Hidden = true;
+                    return;
+                }
+
                 Text = viewModel.Description;
             }
         }
@@ -711,9 +725,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             }
         }
 
-        private class SeperatorView : UIView
+        private class SeparatorView : UIView
         {
-            public SeperatorView()
+            public SeparatorView()
             {
                 TranslatesAutoresizingMaskIntoConstraints = false;
                 BackgroundColor = Theme.DarkGray;
