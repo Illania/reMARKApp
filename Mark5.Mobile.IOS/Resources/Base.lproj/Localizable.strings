@@ -1,4 +1,4 @@
-"account" = "Account";
+﻿"account" = "Account";
 "attention" = "Attention";
 "area" = "Area";
 "add" = "Add";
@@ -361,6 +361,7 @@
 "select_user" = "Select user";
 "select_users" = "Select users";
 "select_categories"="Select Categories";
+"select_line"="Select mailbox";
 "send" = "Send";
 "send_text" = "Send message";
 "sending_document___" = "Sending email...";

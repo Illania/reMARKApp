@@ -24,12 +24,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         AppointmentSubjectView subjectView;
         AppointmentDateView dateView;
-        AppointmentRecurrenceView reocurrenceView;
         AppointmentLocationView locationView;
         AppointmentDescriptionView descriptionView;
         AppointmentOrganizerView organizerView;
         AppointmentCalendarView calendarView;
         AppointmentParticipantsView participantsView;
+        AppointmentReminderView reminderView;
         SendInvitationsButton sendInvitationsButton;
 
         Action loadingDialogDismissal;
@@ -150,7 +150,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 Distribution = UIStackViewDistribution.EqualSpacing,
                 LayoutMargins = new UIEdgeInsets(10f, 10f, 10f, 10f),
                 LayoutMarginsRelativeArrangement = true,
-                Spacing = 15f,
+                Spacing = 5f,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
 
@@ -179,30 +179,36 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             }
 
             subjectView = new AppointmentSubjectView();
-            stackView.AddArrangedSubview(subjectView);
-
             dateView = new AppointmentDateView();
+            locationView = new AppointmentLocationView();
+            descriptionView = new AppointmentDescriptionView();
+            organizerView = new AppointmentOrganizerView();
+            calendarView = new AppointmentCalendarView();
+            participantsView = new AppointmentParticipantsView();
+            sendInvitationsButton = new SendInvitationsButton();
+            reminderView = new AppointmentReminderView();
+
+            stackView.AddArrangedSubview(subjectView);
             stackView.AddArrangedSubview(dateView);
 
-            reocurrenceView = new AppointmentRecurrenceView();
-            stackView.AddArrangedSubview(reocurrenceView);
-
-            locationView = new AppointmentLocationView();
+            stackView.AddArrangedSubview(new SpacerView());
             stackView.AddArrangedSubview(locationView);
-
-            descriptionView = new AppointmentDescriptionView();
             stackView.AddArrangedSubview(descriptionView);
 
-            organizerView = new AppointmentOrganizerView();
+
+            stackView.AddArrangedSubview(new SpacerView());
+            stackView.AddArrangedSubview(new SeparatorView());
+
             stackView.AddArrangedSubview(organizerView);
+            stackView.AddArrangedSubview(new SeparatorView());
 
-            calendarView = new AppointmentCalendarView();
             stackView.AddArrangedSubview(calendarView);
+            stackView.AddArrangedSubview(new SeparatorView());
 
-            participantsView = new AppointmentParticipantsView();
+            stackView.AddArrangedSubview(reminderView);
+            stackView.AddArrangedSubview(new SeparatorView());
+
             stackView.AddArrangedSubview(participantsView);
-
-            sendInvitationsButton = new SendInvitationsButton();
             stackView.AddArrangedSubview(sendInvitationsButton);
         }
 
@@ -228,12 +234,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         {
             subjectView.Refresh(appointment);
             dateView.Refresh(appointment);
-            reocurrenceView.Refresh(appointment);
             locationView.Refresh(appointment);
             descriptionView.Refresh(appointment);
             organizerView.Refresh(appointment);
             calendarView.Refresh(appointment);
             participantsView.Refresh(appointment);
+            reminderView.Refresh(appointment); //TODO I think we should just add all those view to a collection to simplyify
+
+            if (appointment.Participants.Count == 0)
+                sendInvitationsButton.Hidden = true;
         }
 
         public async Task ShowDeleteError(Exception ex)
@@ -284,7 +293,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         {
             var lineNames = lineViewModels.Select(l => l.Name).ToArray();
 
-            var result = await Dialogs.ShowListActionSheetWithTitleAsync(this, lineNames, sendInvitationsButton);
+            var result = await Dialogs.ShowListActionSheetWithTitleAsync(this, lineNames, sendInvitationsButton, Localization.GetString("select_line"));
 
             if (result >= 0)
                 await presenter.SendInvitationClicked(lineViewModels[result]);
@@ -349,6 +358,67 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             }
         }
 
+        private class AppointmentReminderView : UIStackView, IAppointmentView
+        {
+            UILabel label;
+
+            public AppointmentReminderView()
+            {
+                InitView();
+            }
+
+            void InitView()
+            {
+                Opaque = false;
+                TranslatesAutoresizingMaskIntoConstraints = false;
+                Alignment = UIStackViewAlignment.Fill;
+                Distribution = UIStackViewDistribution.Fill;
+                Axis = UILayoutConstraintAxis.Horizontal;
+
+                UILabel title = new UILabel()
+                {
+                    Text = "Reminder",
+                    TranslatesAutoresizingMaskIntoConstraints = false,
+                    LineBreakMode = UILineBreakMode.WordWrap,
+                    Font = Theme.DefaultFont,
+                    TextColor = Theme.DarkGray,
+                };
+
+                AddArrangedSubview(title);
+
+                label = new UILabel()
+                {
+                    TextAlignment = UITextAlignment.Right,
+                    TranslatesAutoresizingMaskIntoConstraints = false,
+                    LineBreakMode = UILineBreakMode.WordWrap,
+                    Font = Theme.DefaultFont,
+                    TextColor = Theme.Black
+                };
+
+                AddArrangedSubview(label);
+            }
+
+            public void Refresh(AppointmentViewModel viewModel)
+            {
+                if (viewModel.ReminderTimeBefore < 0)
+                {
+                    Hidden = true;
+                    return;
+                }
+
+                if (viewModel.ReminderTimeBefore == 0)
+                {
+                    label.Text = "At time of event"; //TODO localization..?
+                }
+
+                var timespan = new TimeSpan(0, (int)viewModel.ReminderTimeBefore, 0);
+
+
+                label.Text = $"{timespan.TotalMinutes} minutes before"; //TODO this is not correct, ( we need also hours, days, weeks)
+            }
+        }
+
+
         private class AppointmentSubjectView : UILabel, IAppointmentView
         {
             public AppointmentSubjectView()
@@ -374,7 +444,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             public AppointmentDateView()
             {
                 Font = Theme.DefaultFont;
-                TextColor = Theme.Black;
+                TextColor = Theme.DarkGray;
                 LineBreakMode = UILineBreakMode.WordWrap;
                 Lines = 0;
                 BackgroundColor = Theme.Clear;
@@ -405,32 +475,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                         Text += $"\r\nto { viewModel.End.ToString("hh:mm ddd, d MMMM yyyy", CultureInfo.CurrentCulture) }";
                     }
                 }
-            }
-        }
 
-        private class AppointmentRecurrenceView : UILabel, IAppointmentView
-        {
-            public AppointmentRecurrenceView()
-            {
-
-                Font = Theme.DefaultLightFont;
-                TextColor = Theme.DarkGray;
-                LineBreakMode = UILineBreakMode.WordWrap;
-                Lines = 0;
-                TextAlignment = UITextAlignment.Left;
-                TranslatesAutoresizingMaskIntoConstraints = false;
-                BackgroundColor = UIColor.Blue;
-            }
-
-            public void Refresh(AppointmentViewModel viewModel)
-            {
-                if (string.IsNullOrEmpty(viewModel.RecurrenceInfo))
+                if (viewModel.RecurrenceInfo != null)
                 {
-                    Hidden = true;
-                    return;
+                    Text += $"\n{viewModel.RecurrenceInfo}";
                 }
-
-                Text = viewModel.RecurrenceInfo;
             }
         }
 
@@ -457,6 +506,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 Text = viewModel.Location;
             }
         }
+
+        //TODO add reminder view
 
         private class AppointmentDescriptionView : UILabel, IAppointmentView
         {
@@ -597,6 +648,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 public void Refresh(AppointmentViewModel viewModel)
                 {
                     int count = viewModel.Participants.Count;
+
+                    if (count == 0)
+                    {
+                        Hidden = true;
+                        return;
+                    }
                     countLabel.Text = $"{count}";
                 }
 
@@ -718,7 +775,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         {
             public SendInvitationsButton()
             {
-                Font = Theme.DefaultLightFont;
                 SetTitle("Send Invitations", UIControlState.Normal);
                 SetTitleColor(Theme.DarkerBlue, UIControlState.Normal);
                 SetTitleColor(Theme.DarkGray, UIControlState.Highlighted);
@@ -731,8 +787,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             {
                 TranslatesAutoresizingMaskIntoConstraints = false;
                 BackgroundColor = Theme.DarkGray;
-                HeightAnchor.ConstraintEqualTo(2f);
-                AutoresizingMask = UIViewAutoresizing.FlexibleHeight | UIViewAutoresizing.FlexibleWidth;
+                HeightAnchor.ConstraintEqualTo(0.5f).Active = true;
+            }
+        }
+
+        private class SpacerView : UIView
+        {
+            public SpacerView()
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false;
+                BackgroundColor = Theme.Clear;
+                HeightAnchor.ConstraintEqualTo(10f).Active = true;
             }
         }
 
