@@ -117,7 +117,7 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task<bool> SendCalendarAppointmentInvitationsAsync(int appointmentId, Guid lineGuid)
         {
-            var result = await AppServiceProxy.SendCalendarAppointmentInvitationsAsync(new DataContract.SendCalendarAppointmentInvitationsParameters
+            _ = await AppServiceProxy.SendCalendarAppointmentInvitationsAsync(new DataContract.SendCalendarAppointmentInvitationsParameters
             {
                 Token = Token,
                 LineGuid = lineGuid,

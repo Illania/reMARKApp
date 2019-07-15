@@ -77,9 +77,14 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
             //TODO
         }
 
-        public void ShowAppointment(int appointmentId, int recurrenceIndex)
+        public void ShowAppointment(int calendarId, int appointmentId, int recurrenceIndex)
         {
             //TODO
+        }
+
+        public void DeleteAppointmentsWithIds(List<int> appointmentIds)
+        {
+            uiCache.DeleteAppointmentsWithIds(appointmentIds);
         }
 
         #endregion
@@ -210,6 +215,16 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
                 UpdateSchedule();
             }
 
+            public void DeleteAppointmentsWithIds(List<int> appointmentIds)
+            {
+                AppointmentViewModels.Where(i => appointmentIds.Contains(i.Id)).ToList().ForEach((obj) => AppointmentViewModels.Remove(obj));
+
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    Items.Where(i => appointmentIds.Contains(GetAppointmentInfo(i).id)).ToList().ForEach((obj) => Items.Remove(obj));
+                });
+            }
+
             public void Clear()
             {
                 AppointmentViewModels.Clear();
@@ -240,6 +255,12 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
                 return DateTimeInPeriod(appStart, appEnd, start, end);
             }
 
+            (int calendarId, int id, int recurrenceIndex) GetAppointmentInfo(Appointment appointment)
+            {
+                var splitted = appointment.Id.Split(" ");
+                return (int.Parse(splitted[0]), int.Parse(splitted[1]), int.Parse(splitted[2]));
+            }
+
             bool DateTimeInPeriod(DateTime appStart, DateTime appEnd, DateTime periodStart, DateTime periodEnd)
             {
                 return appEnd > periodStart && appStart < periodEnd;
@@ -254,7 +275,7 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
                     Start = cavm.Start.ConvertToCalendar(),
                     End = cavm.End.ConvertToCalendar(),
                     Color = Android.Graphics.Color.ParseColor(cavm.HexColor),
-                    Id = $"{cavm.Id} {cavm.RecurrenceIndex}",
+                    Id = $"{cavm.CalendarId} {cavm.Id} {cavm.RecurrenceIndex}",
                 };
             }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Manager;
@@ -9,7 +10,8 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 {
     public class AppointmentPresenter : BasePresenter<IAppointmentView>, IAppointmentPresenter
     {
-        private CalendarAppointment appointment;
+        CalendarAppointment appointment;
+        int recurrenceIndex;
 
         public override void Start() { }
 
@@ -21,9 +23,10 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
             try
             {
-                CommonConfig.Logger.Info($"Retrieving appointment with ID = {appointmentId}");
+                CommonConfig.Logger.Info($"Retrieving appointment: AppointmentId = {appointmentId}, RecurrenceIndex = {recurrenceIndex}, CalendarId = {calendarId} ");
 
-                appointment = await Managers.CalendarManager.GetCalendarAppointmentAsync(calendarId, appointmentId);
+                appointment = await Managers.CalendarManager.GetCalendarAppointmentAsync(calendarId, appointmentId, SourceType.Local);
+
                 view.ShowAppointment(AppointmentViewModel.ConvertToViewModel(appointment, recurrenceIndex));
                 view.SetLines(ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Select(LineViewModel.ConvertToViewModel));
 
@@ -62,9 +65,9 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             }
         }
 
-        public Task EditAppointmentClicked()
+        public void EditAppointmentClicked()
         {
-            throw new NotImplementedException();
+            view.OpenEditAppointment(appointment.CalendarId, appointment.Id);
         }
 
         public async Task SendInvitationClicked(Guid lineGuid)
@@ -95,16 +98,18 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         public string Subject { get; set; }
         public string Description { get; set; }
         public string Location { get; set; }
+        public DateTime Start { get; set; }
+        public DateTime End { get; set; }
         public bool AllDay { get; set; }
         public string Creator { get; set; }
-        public RecurrenceInfoViewModel RecurrenceInfo { get; set; }
+        public string RecurrenceInfo { get; set; }
         public long ReminderTimeBefore { get; set; }
         public List<ParticipantsViewModel> Participants { get; set; }
-
+        public CalendarViewModel Calendar { get; set; }
 
         public static AppointmentViewModel ConvertToViewModel(CalendarAppointment appointment, int recurrenceIndex = -1)
         {
-            return new AppointmentViewModel
+            var appModel = new AppointmentViewModel
             {
                 Id = appointment.Id,
                 Subject = appointment.Subject,
@@ -112,20 +117,129 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 Location = appointment.Location,
                 AllDay = appointment.AllDay,
                 Creator = appointment.Creator,
-                RecurrenceInfo = RecurrenceInfoViewModel.ConvertToViewModel(appointment.RecurrenceInfo),
+                RecurrenceInfo = GetRecurrenceString(appointment.RecurrenceInfo),
                 ReminderTimeBefore = appointment.ReminderTimeBeforeStart,
                 Participants = appointment.Participants.Select(ParticipantsViewModel.ConvertToViewModel).ToList(),
             };
-        }
-    }
 
-    public class RecurrenceInfoViewModel
-    {
-        public static RecurrenceInfoViewModel ConvertToViewModel(RecurrenceInfo ri)
+            var calendar = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars.First(ca => ca.Id == appointment.CalendarId);
+            appModel.Calendar = CalendarViewModel.ConvertToViewModel(calendar);
+
+            var recurrence = appointment.Occurrences.FirstOrDefault(r => r.RecurrenceIndex == recurrenceIndex);
+
+            if (recurrence == null)
+                throw new ArgumentException("Can't find occurrence with the given recurrence index");
+
+            appModel.Start = recurrence.StartDate;
+            appModel.End = recurrence.EndDate;
+
+            return appModel;
+        }
+
+        public static string GetRecurrenceString(RecurrenceInfo ri)
         {
-            return new RecurrenceInfoViewModel()  //TODO
+            if (ri == null)
+                return null;
+
+            string pattern = "Reoccures ";
+            string range = string.Empty;
+
+            switch (ri.Type)
             {
-            };
+                case RecurrenceType.Daily:
+                    pattern += "daily, every ";
+
+                    if (ri.WeekDays == WeekDays.EveryDay)
+                        pattern += $"{ri.Periodicity} day(s)";
+                    else //ri.WeekDays == WeekDays.WorkDays
+                        pattern += $"weekday";
+                    break;
+                case RecurrenceType.Weekly:
+                    pattern += $"weekly, every {ri.Periodicity} week(s) on";
+
+                    var days = new[] { WeekDays.Monday, WeekDays.Tuesday, WeekDays.Wednesday,
+                    WeekDays.Thursday, WeekDays.Friday, WeekDays.Saturday, WeekDays.Sunday};
+
+                    var stringDays = new List<string>();
+
+                    foreach (var day in days)
+                    {
+                        if (ri.WeekDays.HasFlag(day))
+                            stringDays.Add(GetDayName(day));
+                    }
+
+                    pattern += string.Join(", ", stringDays);
+                    break;
+                case RecurrenceType.Monthly:
+                    pattern += $"monthly, ";
+                    if (ri.WeekOfMonth == WeekOfMonth.None)
+                    {
+                        string monthPatter = ri.Periodicity == 1 ? "month" : $"{ ri.Periodicity} months";
+                        pattern += $"on day {ri.DayNumber} of every {monthPatter}";
+                    }
+                    else
+                        pattern += $"the {GetWeekString(ri.WeekOfMonth)} {GetDayName(ri.WeekDays)} of every {ri.Periodicity} month(s) ";
+                    break;
+                case RecurrenceType.Yearly:
+                    pattern += $"Yearly, ";
+
+                    if (ri.WeekOfMonth == WeekOfMonth.None)
+                        pattern += $"every {GetMonthString(ri.Month)}, {ri.DayNumber}";
+                    else
+                        pattern += $"the {GetWeekString(ri.WeekOfMonth)} {GetDayName(ri.WeekDays)} of {GetMonthString(ri.Month)} ";
+                    break;
+            }
+
+            switch (ri.Range)
+            {
+                case RecurrenceRange.NoEndDate:
+                    range = string.Empty;
+                    break;
+                case RecurrenceRange.OccurrenceCount:
+                    range = $", ends after {ri.OccurrenceCount} occurrences";
+                    break;
+                case RecurrenceRange.EndByDate:
+                    range = $", ends by {ri.EndDate.ToString("d", CultureInfo.CurrentCulture)}";
+                    break;
+            }
+
+            return pattern + range;
+        }
+
+        public static string GetDayName(WeekDays val)
+        {
+            switch (val)
+            {
+                case WeekDays.Monday: return "Monday";
+                case WeekDays.Tuesday: return "Tuesday";
+                case WeekDays.Wednesday: return "Wednesday";
+                case WeekDays.Thursday: return "Thursday";
+                case WeekDays.Friday: return "Friday";
+                case WeekDays.Saturday: return "Saturday";
+                case WeekDays.Sunday: return "Sunday";
+                case WeekDays.WeekendDays: return "Weekend day";
+                case WeekDays.EveryDay: return "Day";
+                case WeekDays.WorkDays: return "Weekday";
+                default: return string.Empty;
+            }
+        }
+
+        public static string GetWeekString(WeekOfMonth val)
+        {
+            switch (val)
+            {
+                case WeekOfMonth.First: return "first";
+                case WeekOfMonth.Second: return "second";
+                case WeekOfMonth.Third: return "third";
+                case WeekOfMonth.Fourth: return "fourth";
+                case WeekOfMonth.Last: return "last";
+                default: return string.Empty;
+            }
+        }
+
+        public static string GetMonthString(int val)
+        {
+            return CultureInfo.InvariantCulture.DateTimeFormat.GetMonthName(val);  //TODO check if correct
         }
     }
 
@@ -163,8 +277,9 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
     {
         Task LoadAppointment(int appointmentId, int recurrenceIndex, int calendarId);
         Task DeleteAppointmentClicked();
-        Task EditAppointmentClicked();
         Task SendInvitationClicked(Guid lineGuid);
+
+        void EditAppointmentClicked();
     }
 
     public interface IAppointmentView : IView
@@ -174,10 +289,10 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         void ShowLoading();
         void StopLoading();
         void CloseView();
+        void OpenEditAppointment(int calendarId, int appointmentId);
 
         Task ShowLoadError();
         Task ShowDeleteError();
         Task ShowSendInvitationError();
-
     }
 }

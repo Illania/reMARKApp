@@ -1,7 +1,7 @@
 ﻿using System;
 namespace Mark5.Mobile.Common.Presenters.CalendarModule
 {
-    public class EditAppointmentPresenter : BasePresenter<IEditAppointmentView>, IEditAppointmentPresenter
+    public class AddEditAppointmentPresenter : BasePresenter<IEditAppointmentView>, IEditAppointmentPresenter
     {
         public override void Start()
         {

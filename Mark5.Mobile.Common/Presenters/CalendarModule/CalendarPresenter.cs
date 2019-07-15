@@ -4,21 +4,24 @@ using System.Linq;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
+using TinyMessenger;
 using Xamarin.Essentials;
 
 namespace Mark5.Mobile.Common.Presenters.CalendarModule
 {
     public class CalendarPresenter : BasePresenter<ICalendarView>, ICalendarPresenter
     {
-        List<Calendar> calendarsList;
-        Dictionary<int, bool> calendarsSelectedState;
-        Dictionary<int, string> calendarsColor;
+        readonly List<Calendar> calendarsList;
+        readonly Dictionary<int, bool> calendarsSelectedState;
+        readonly Dictionary<int, string> calendarsColor;
         IAppointmentsCache Cache => Managers.CalendarManager.AppointmentsCache;
 
         const string SelectedCalendarsPreferencesKey = "SelectedCalendarsPreferencesKey";
 
         bool firstLoad = true;
+        private TinyMessageSubscriptionToken deletedAppointmentToken;
 
         #region ICalendarPresenter
 
@@ -37,21 +40,22 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             Cache.RetrievalError += Cache_RetrievalError;
             Cache.NoAppointmentToRetrieve += Cache_NoAppointmentToRetrieve;
 
+            SubscribeToMessages();
             LoadPreferences();
-
             UpdateCalendarsInView();
         }
 
         public override void Stop() //TODO when to use this...?
         {
+            UnsubscribeFromMessages();
             Cache.AppointmentRetrieved -= Cache_AppointmentRetrieved;
             Cache.RetrievalError -= Cache_RetrievalError;
             Cache.NoAppointmentToRetrieve -= Cache_NoAppointmentToRetrieve;
         }
 
-        public void AppointmentClicked(int appointmentId, int recurrenceIndex)
+        public void AppointmentClicked(int calendarId, int appointmentId, int recurrenceIndex)
         {
-            view.ShowAppointment(appointmentId, recurrenceIndex);
+            view.ShowAppointment(calendarId, appointmentId, recurrenceIndex);
         }
 
         public void LoadAppointments(DateTime start, DateTime end)
@@ -95,6 +99,19 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
             LoadAppointments(start, end);
         }
+        #endregion
+
+        #region Messages handlers
+
+        void SubscribeToMessages()
+        {
+            deletedAppointmentToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedMessage>(HandleDeletedAppointment);
+        }
+
+        void UnsubscribeFromMessages()
+        {
+            deletedAppointmentToken?.Dispose();
+        }
 
         #endregion
 
@@ -134,6 +151,11 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         #endregion
 
         #region Utilities
+
+        private void HandleDeletedAppointment(EntityRemovedMessage erm)
+        {
+            view.DeleteAppointmentsWithIds(erm.EntitiesId);
+        }
 
         void UpdateCalendarsInView()
         {
@@ -236,7 +258,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
     public interface ICalendarPresenter : IPresenter<ICalendarView>
     {
         void LoadAppointments(DateTime start, DateTime end);
-        void AppointmentClicked(int appointmentId, int recurrenceIndex);
+        void AppointmentClicked(int calendarId, int appointmentId, int recurrenceIndex);
         void CalendarSelectionChanged(Dictionary<int, bool> calendarsSelectedState);
         void ShowCalendarsListClicked();
         void RefreshClicked(DateTime start, DateTime end);
@@ -247,11 +269,13 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         void CalendarsSelected(List<CalendarViewModel> calendars);
         void ShowCalendarsList(Dictionary<CalendarViewModel, bool> calendars);
 
+        void DeleteAppointmentsWithIds(List<int> appointmentIds);
         void UpdateAppointments(IEnumerable<AppointmentPreviewViewModel> caViewModels, DateTime start, DateTime end);
 
         void ShowLoading();
         void StopLoading();
         Task ShowError(Exception ex);
-        void ShowAppointment(int appointmentId, int recurrenceIndex);
+        void ShowAppointment(int calendarId, int appointmentId, int recurrenceIndex);
     }
 }
+

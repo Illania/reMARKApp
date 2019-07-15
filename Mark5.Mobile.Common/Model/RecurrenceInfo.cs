@@ -1,4 +1,6 @@
 ﻿using System;
+using Mark5.Mobile.Common.Utilities;
+
 namespace Mark5.Mobile.Common.Model
 {
     public class RecurrenceInfo
@@ -28,5 +30,8 @@ namespace Mark5.Mobile.Common.Model
         public WeekDays WeekDays { get; set; }
 
         public WeekOfMonth WeekOfMonth { get; set; }
+
+        public DateTime StartDate => StartTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime();
+        public DateTime EndDate => EndTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime();
     }
 }
