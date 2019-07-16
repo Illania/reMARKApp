@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.Contracts;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
@@ -35,7 +34,8 @@ namespace Mark5.Mobile.IOS.Service
 
         public static Reachability Instance
         {
-            get {
+            get
+            {
                 if (instance == null)
                     instance = new Reachability();
 
@@ -81,7 +81,7 @@ namespace Mark5.Mobile.IOS.Service
                 if (!result)
                 {
                     cancellationTokenSource = new CancellationTokenSource();
-                    CheckServiceAvailabilityContinuously(cancellationTokenSource.Token);
+                    _ = CheckServiceAvailabilityContinuously(cancellationTokenSource.Token);
                 }
             }
 
@@ -190,6 +190,40 @@ namespace Mark5.Mobile.IOS.Service
 
         public void OnPause()
         {
+        }
+
+        public async Task<ConnectionDiagnosticModel> ConnectionDiagnostics()
+        {
+            try
+            {
+                var tester = ConnectionTesterFactory.Create();
+                if (!await tester.CanTest())
+                {
+                    CommonConfig.Logger.Info("Configuration file is missing connection info");
+                    return new ConnectionDiagnosticModel(ConnectionDiagnosticModel.ErrorCode.NoConfigurationInfo);
+                }
+
+                ConnectionDiagnosticModel result = await tester.ConnectionDiagnostics();
+                CommonConfig.Logger.Info($"Service availability: {result}");
+                return result;
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Info("Cannot check service availability", ex);
+                return new ConnectionDiagnosticModel(ConnectionDiagnosticModel.ErrorCode.UncaughtException);
+            }
+        }
+
+        public bool IsWifiConnected()
+        {
+            NetworkStatus networkStatus = ReachabilityProvider.InternetConnectionStatus();
+            return networkStatus == NetworkStatus.ReachableViaWiFiNetwork;
+        }
+
+        public bool IsMobileDataEnabled()
+        {
+            NetworkStatus networkStatus = ReachabilityProvider.InternetConnectionStatus();
+            return networkStatus == NetworkStatus.ReachableViaCarrierDataNetwork;
         }
     }
 }

@@ -61,6 +61,7 @@
     <android.support.v7.preference.PreferenceScreen android:key="@string/pref_key_cat_advanced" android:title="@string/pref_cat_advanced">
         <android.support.v7.preference.CheckBoxPreference android:key="@string/pref_key_advanced_enable_reporting" android:title="@string/pref_advanced_enable_reporting_title" android:summaryOn="@string/pref_advanced_enable_reporting_summary_on" android:summaryOff="@string/pref_advanced_enable_reporting_summary_off" android:defaultValue="@bool/pref_advanced_enable_reporting_default" />
         <android.support.v7.preference.Preference android:key="@string/pref_key_advanced_create_system_report" android:title="@string/pref_advanced_create_system_report_title" android:summary="@string/pref_advanced_create_system_report_summary" />
+        <android.support.v7.preference.Preference android:key="@string/pref_key_advanced_connection_diagnostics" android:title="@string/pref_advanced_connection_diagnostics_title" android:summary="@string/pref_advanced_connection_diagnostics_summary" />
         <android.support.v7.preference.Preference android:key="@string/pref_key_advanced_update_config" android:title="@string/pref_advanced_update_config_title" android:summary="@string/pref_advanced_update_config_summary" />
     </android.support.v7.preference.PreferenceScreen>
     <android.support.v7.preference.PreferenceScreen android:key="@string/pref_key_cat_account" android:title="@string/pref_cat_account">

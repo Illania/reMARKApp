@@ -534,6 +534,14 @@
 		</dict>
 		<dict>
 			<key>Type</key>
+			<string>IASKButtonSpecifier</string>
+			<key>Title</key>
+			<string>connection_diagnostics</string>
+			<key>Key</key>
+			<string>ConnectionDiagnostics</string>
+		</dict>
+		<dict>
+			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 			<key>FooterText</key>
 			<string>enable_reporting_desc</string>
