@@ -786,7 +786,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             public SeparatorView()
             {
                 TranslatesAutoresizingMaskIntoConstraints = false;
-                BackgroundColor = Theme.DarkGray;
+                BackgroundColor = new UITableView().SeparatorColor;
                 HeightAnchor.ConstraintEqualTo(0.5f).Active = true;
             }
         }
