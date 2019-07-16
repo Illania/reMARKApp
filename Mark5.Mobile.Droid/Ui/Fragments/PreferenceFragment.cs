@@ -20,7 +20,6 @@ using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 
@@ -133,7 +132,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 swipeOptions.PreferenceClick += (object sender, Preference.PreferenceClickEventArgs e) =>
                 {
-
                     SwipeActionsFragment swipeActionsFragment;
                     string swipeActionsFragmentTag;
                     var fragmentTransaction = Activity.SupportFragmentManager.BeginTransaction();
@@ -143,7 +141,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     fragmentTransaction.Commit();
                 };
             }
-
 
             var checkBox = (CheckBoxPreference)FindPreference(GetString(Resource.String.pref_key_sync_favorites_enabled));
             if (checkBox != null)
@@ -282,6 +279,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return true;
             }
 
+            if (preference.Key == GetString(Resource.String.pref_key_advanced_connection_diagnostics))
+            {
+                ConnectionDiagnosticsFragment connectionDiagnosticsFragment;
+                string connectionDiagnosticsFragmentTag;
+                (connectionDiagnosticsFragment, connectionDiagnosticsFragmentTag) = ConnectionDiagnosticsFragment.NewInstance();
+
+                var fragmentTransaction = Activity.SupportFragmentManager.BeginTransaction();
+                fragmentTransaction.Replace(Resource.Id.fragment_container, connectionDiagnosticsFragment, connectionDiagnosticsFragmentTag);
+                fragmentTransaction.AddToBackStack(null);
+                fragmentTransaction.Commit();
+            }
             if (preference.Key == GetString(Resource.String.pref_key_advanced_update_config))
             {
                 CommonConfig.UsageAnalytics.LogEvent(new SettingsUpdateSystemConfigurationEvent());

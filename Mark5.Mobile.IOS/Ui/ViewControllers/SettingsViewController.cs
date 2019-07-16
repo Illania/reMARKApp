@@ -45,6 +45,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         const string EmailSwipeActionsKey = "EmailSwipeActions";
         const string SyncFavoriteFoldersKey = "SyncFavoriteFolders";
         const string SyncFavoriteFoldersGroupKey = "SyncFavoriteFoldersGroup";
+        const string ConnectionDiagnosticsKey = "ConnectionDiagnostics";
 
         public SettingsViewController()
         {
@@ -128,7 +129,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var specifier = SettingsReader.GetSpecifier(indexPath);
 
-            if (specifier.Key == "EmailSwipeActions")
+            if (specifier.Key == ConnectionDiagnosticsKey)
+            {
+                var diagnosticsVC = new ConnectionDiagnosticsViewController();
+                NavigationController.PushViewController(diagnosticsVC, true);
+                return;
+            }
+
+            if (specifier.Key == EmailSwipeActionsKey)
             {
                 var swipeActionVC = new SwipeActionViewController();
                 NavigationController.PushViewController(swipeActionVC, true);

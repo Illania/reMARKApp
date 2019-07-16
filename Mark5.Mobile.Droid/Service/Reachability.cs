@@ -11,6 +11,8 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Testers;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Extensions;
+using Android.Net.Wifi;
+using Android.Content;
 
 namespace Mark5.Mobile.Droid.Service
 {
@@ -189,6 +191,28 @@ namespace Mark5.Mobile.Droid.Service
             }
         }
 
+        public async Task<ConnectionDiagnosticModel> ConnectionDiagnostics()
+        {
+            try
+            {
+                var tester = ConnectionTesterFactory.Create();
+                if (!await tester.CanTest())
+                {
+                    CommonConfig.Logger.Info("Configuration file is missing connection info");
+                    return new ConnectionDiagnosticModel(ConnectionDiagnosticModel.ErrorCode.NoConfigurationInfo);
+                }
+
+                ConnectionDiagnosticModel result = await tester.ConnectionDiagnostics();
+                CommonConfig.Logger.Info($"Service availability: {result}");
+                return result;
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Info("Cannot check service availability", ex);
+                return new ConnectionDiagnosticModel(ConnectionDiagnosticModel.ErrorCode.UncaughtException);
+            }
+        }
+
         async Task CheckServiceAvailabilityContinuously(CancellationToken cancellationToken)
         {
             while (!cancellationToken.IsCancellationRequested)
@@ -203,6 +227,36 @@ namespace Mark5.Mobile.Droid.Service
 
                 await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
             }
+        }
+
+        /// <summary>
+        /// Checks if wifi is switched on and it is connected (using NetworkId and SSID to 
+        /// identify connected).
+        /// </summary>
+        /// <returns>True if switched on and connected to a wifi network. False if not switched on 
+        /// or if switched on but not connected.</returns>
+        public bool IsWifiConnected()
+        {
+            var cm = (ConnectivityManager)Application.Context.GetSystemService(Context.ConnectivityService);
+
+            if (cm.ActiveNetwork == null)
+                return false;
+
+            return cm.GetNetworkCapabilities(cm.ActiveNetwork).HasTransport(Android.Net.TransportType.Wifi);
+        }
+
+        /// <summary>
+        /// Detects if the device has MobileData turned on 
+        /// </summary>
+        /// <returns>True if is switched on only. False if not switched on.</returns>
+        public bool IsMobileDataEnabled()
+        {
+            var cm = (ConnectivityManager)Application.Context.GetSystemService(Context.ConnectivityService);
+
+            if (cm.ActiveNetwork == null)
+                return false;
+
+            return cm.GetNetworkCapabilities(cm.ActiveNetwork).HasTransport(Android.Net.TransportType.Cellular);
         }
     }
 }
