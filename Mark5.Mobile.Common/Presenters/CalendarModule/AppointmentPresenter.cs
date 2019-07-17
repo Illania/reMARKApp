@@ -141,7 +141,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             if (ri == null)
                 return null;
 
-            string pattern = "Reoccures ";
+            string pattern = "Reoccurs ";
             string range = string.Empty;
 
             switch (ri.Type)
@@ -155,7 +155,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                         pattern += $"weekday";
                     break;
                 case RecurrenceType.Weekly:
-                    pattern += $"weekly, every {ri.Periodicity} week(s) on";
+                    pattern += $"weekly, every {ri.Periodicity} week(s) on ";
 
                     var days = new[] { WeekDays.Monday, WeekDays.Tuesday, WeekDays.Wednesday,
                     WeekDays.Thursday, WeekDays.Friday, WeekDays.Saturday, WeekDays.Sunday};
