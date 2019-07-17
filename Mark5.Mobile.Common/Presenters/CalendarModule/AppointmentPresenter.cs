@@ -11,7 +11,6 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
     public class AppointmentPresenter : BasePresenter<IAppointmentView>, IAppointmentPresenter
     {
         CalendarAppointment appointment;
-        int recurrenceIndex;
 
         public override void Start() { }
 
@@ -19,7 +18,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         public async Task LoadAppointment(int appointmentId, int recurrenceIndex, int calendarId)
         {
-            view.ShowLoading();
+            view.ShowAppointmentLoadingDialog();
 
             try
             {
@@ -30,13 +29,13 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 view.ShowAppointment(AppointmentViewModel.ConvertToViewModel(appointment, recurrenceIndex));
                 view.SetLines(ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Select(LineViewModel.ConvertToViewModel));
 
-                view.StopLoading();
+                view.CloseDialog();
             }
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error($"Error while getting appointment with ID = {appointmentId}", ex);
 
-                view.StopLoading();
+                view.CloseDialog();
                 await view.ShowLoadError(ex);
 
                 view.CloseView();
@@ -45,7 +44,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         public async Task DeleteAppointmentClicked()
         {
-            view.ShowLoading();
+            view.ShowDeletingDialog();
 
             try
             {
@@ -53,14 +52,14 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
                 await Managers.CommonActionsManager.Delete(new List<IBusinessEntity> { appointment });
 
-                view.StopLoading();
+                view.CloseDialog();
                 view.CloseView();
             }
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error($"Error while deleting appointment with ID = {appointment.Id}", ex);
 
-                view.StopLoading();
+                view.CloseDialog();
                 await view.ShowDeleteError(ex);
             }
         }
@@ -70,9 +69,9 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             view.OpenEditAppointment(appointment.CalendarId, appointment.Id);
         }
 
-        public async Task SendInvitationClicked(LineViewModel lvm)
+        public async Task SendInvitationsClicked(LineViewModel lvm)
         {
-            view.ShowLoading();
+            view.ShowSendInvitationsDialog();
 
             try
             {
@@ -80,13 +79,13 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
                 await Managers.CalendarManager.SendCalendarAppointmentInvitationsAsync(appointment.Id, lvm.Guid);
 
-                view.StopLoading();
+                view.CloseDialog();
             }
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error($"Error while sending invitations for appointment with ID = {appointment.Id} with line with GUID = {lvm.Guid}", ex);
 
-                view.StopLoading();
+                view.CloseDialog();
                 await view.ShowSendInvitationError(ex);
             }
         }
@@ -279,7 +278,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
     {
         Task LoadAppointment(int appointmentId, int recurrenceIndex, int calendarId);
         Task DeleteAppointmentClicked();
-        Task SendInvitationClicked(LineViewModel lvm);
+        Task SendInvitationsClicked(LineViewModel lvm);
 
         void EditAppointmentClicked();
     }
@@ -291,10 +290,15 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         void CloseView();
         void OpenEditAppointment(int calendarId, int appointmentId);
 
-        void ShowLoading();
-        void StopLoading();
+        void ShowAppointmentLoadingDialog();
+        void ShowDeletingDialog();
+        void ShowSendInvitationsDialog();
+
         Task ShowLoadError(Exception ex);
         Task ShowDeleteError(Exception ex);
         Task ShowSendInvitationError(Exception ex);
+
+        void CloseDialog();
+
     }
 }

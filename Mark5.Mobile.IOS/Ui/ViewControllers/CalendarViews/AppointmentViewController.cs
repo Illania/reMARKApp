@@ -32,7 +32,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         AppointmentReminderView reminderView;
         SendInvitationsButton sendInvitationsButton;
 
-        Action loadingDialogDismissal;
+        Action progressDialogDismissal;
 
         public AppointmentViewController(int calendarId, int appointmentId, int recurrenceIndex)
         {
@@ -257,12 +257,27 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         public void ShowLoading()
         {
-            loadingDialogDismissal = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("loading_appointments___"));
+            progressDialogDismissal = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("loading_appointments___"));
         }
 
-        public void StopLoading()
+        public void CloseDialog()
         {
-            loadingDialogDismissal?.Invoke();
+            progressDialogDismissal?.Invoke();
+        }
+
+        public void ShowAppointmentLoadingDialog()
+        {
+            progressDialogDismissal = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("loading_appointments___"));
+        }
+
+        public void ShowDeletingDialog()
+        {
+            progressDialogDismissal = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("deleting__"));
+        }
+
+        public void ShowSendInvitationsDialog()
+        {
+            progressDialogDismissal = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("sending_inviations__"));
         }
 
         #endregion
@@ -291,7 +306,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             var result = await Dialogs.ShowListActionSheetWithTitleAsync(this, lineNames, sendInvitationsButton, Localization.GetString("select_line"));
 
             if (result >= 0)
-                await presenter.SendInvitationClicked(lineViewModels[result]);
+                await presenter.SendInvitationsClicked(lineViewModels[result]);
         }
 
         #endregion
@@ -742,7 +757,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                         arrowImage.TrailingAnchor.ConstraintEqualTo(TrailingAnchor),
                         arrowImage.CenterYAnchor.ConstraintEqualTo(CenterYAnchor),
                         arrowImage.BottomAnchor.ConstraintEqualTo(BottomAnchor),
-                        arrowImage.WidthAnchor.ConstraintEqualTo(10f),
+                        //arrowImage.WidthAnchor.ConstraintEqualTo(10f),
 
                         countLabel.TrailingAnchor.ConstraintEqualTo(arrowImage.LeadingAnchor, -10f),
                         countLabel.HeightAnchor.ConstraintGreaterThanOrEqualTo(Theme.MinimumLabelSize),
@@ -797,7 +812,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
                     AddConstraints(new[]
                     {
-                        statusImage.LeadingAnchor.ConstraintEqualTo(LeadingAnchor),
+                        statusImage.LeadingAnchor.ConstraintEqualTo(LeadingAnchor, 5f),
                         statusImage.TopAnchor.ConstraintEqualTo(TopAnchor, 2f),
                         statusImage.BottomAnchor.ConstraintEqualTo(BottomAnchor, -2f),
 
