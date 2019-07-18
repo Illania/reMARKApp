@@ -80,6 +80,20 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 await Managers.CalendarManager.SendCalendarAppointmentInvitationsAsync(appointment.Id, lvm.Guid);
 
                 view.CloseDialog();
+
+                try
+                {
+                    //TODO check if this can be done in a more clever way....
+                    var newApp = await Managers.CalendarManager.GetCalendarAppointmentAsync(appointment.CalendarId, appointment.Id, SourceType.Remote);
+                    var participants = newApp.Participants.Select(ParticipantsViewModel.ConvertToViewModel).ToList();
+
+                    view.UpdateParticipants(participants);
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error($"Error while updating participants for appointment with ID = {appointment.Id} with line with GUID = {lvm.Guid}", ex);
+
+                }
             }
             catch (Exception ex)
             {
@@ -87,20 +101,6 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
                 view.CloseDialog();
                 await view.ShowSendInvitationError(ex);
-            }
-
-            try
-            {
-                //TODO check if this can be done in a more clever way....
-                var newApp = await Managers.CalendarManager.GetCalendarAppointmentAsync(appointment.CalendarId, appointment.Id, SourceType.Remote);
-                var participants = newApp.Participants.Select(ParticipantsViewModel.ConvertToViewModel).ToList();
-
-                view.UpdateParticipants(participants);
-            }
-            catch (Exception ex)
-            {
-                CommonConfig.Logger.Error($"Error while updating participants for appointment with ID = {appointment.Id} with line with GUID = {lvm.Guid}", ex);
-
             }
 
         }

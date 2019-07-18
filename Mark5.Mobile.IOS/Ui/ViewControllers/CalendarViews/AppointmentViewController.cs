@@ -687,8 +687,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             public void Update(List<ParticipantsViewModel> participants)
             {
-                participants[1].Status = Mobile.Common.Model.ParticipantStatus.Accepted;
-                participants[2].Status = Mobile.Common.Model.ParticipantStatus.Declined;
+                foreach (var v in ArrangedSubviews.OfType<ParticipantView>())
+                    v.RemoveFromSuperview();
 
                 foreach (var participant in participants)
                 {
