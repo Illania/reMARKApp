@@ -88,6 +88,21 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 view.CloseDialog();
                 await view.ShowSendInvitationError(ex);
             }
+
+            try
+            {
+                //TODO check if this can be done in a more clever way....
+                var newApp = await Managers.CalendarManager.GetCalendarAppointmentAsync(appointment.CalendarId, appointment.Id, SourceType.Remote);
+                var participants = newApp.Participants.Select(ParticipantsViewModel.ConvertToViewModel).ToList();
+
+                view.UpdateParticipants(participants);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Error while updating participants for appointment with ID = {appointment.Id} with line with GUID = {lvm.Guid}", ex);
+
+            }
+
         }
     }
 
@@ -238,7 +253,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         public static string GetMonthString(int val)
         {
-            return CultureInfo.InvariantCulture.DateTimeFormat.GetMonthName(val);  //TODO check if correct
+            return CultureInfo.InvariantCulture.DateTimeFormat.GetMonthName(val);
         }
     }
 
@@ -299,6 +314,6 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         Task ShowSendInvitationError(Exception ex);
 
         void CloseDialog();
-
+        void UpdateParticipants(List<ParticipantsViewModel> participants);
     }
 }

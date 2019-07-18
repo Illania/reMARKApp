@@ -236,8 +236,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             participantsView.Refresh(appointment);
             reminderView.Refresh(appointment); //TODO I think we should just add all those view to a collection to simplyify
 
-            if (appointment.Participants.Count == 0)
+            if (appointment.Participants.Count == 0)  //TODO a little stupid
                 sendInvitationsButton.Hidden = true;
+        }
+
+        public void UpdateParticipants(List<ParticipantsViewModel> participants)
+        {
+            participantsView.Update(participants);
         }
 
         public async Task ShowDeleteError(Exception ex)
@@ -677,14 +682,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             public void Refresh(AppointmentViewModel viewModel)
             {
-                foreach (var participant in viewModel.Participants)
+                Update(viewModel.Participants);
+            }
+
+            public void Update(List<ParticipantsViewModel> participants)
+            {
+                participants[1].Status = Mobile.Common.Model.ParticipantStatus.Accepted;
+                participants[2].Status = Mobile.Common.Model.ParticipantStatus.Declined;
+
+                foreach (var participant in participants)
                 {
                     ParticipantView participantView = new ParticipantView();
                     participantView.Refresh(participant);
                     AddArrangedSubview(participantView);
                 }
 
-                participantHeader.Refresh(viewModel);
+                participantHeader.Update(participants);
             }
 
             class Header : UIView, IAppointmentView
@@ -701,7 +714,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
                 public void Refresh(AppointmentViewModel viewModel)
                 {
-                    int count = viewModel.Participants.Count;
+                    Update(viewModel.Participants);
+                }
+
+                public void Update(List<ParticipantsViewModel> participants)
+                {
+                    int count = participants.Count;
 
                     if (count == 0)
                     {
@@ -757,7 +775,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                         arrowImage.TrailingAnchor.ConstraintEqualTo(TrailingAnchor),
                         arrowImage.CenterYAnchor.ConstraintEqualTo(CenterYAnchor),
                         arrowImage.BottomAnchor.ConstraintEqualTo(BottomAnchor),
-                        //arrowImage.WidthAnchor.ConstraintEqualTo(10f),
 
                         countLabel.TrailingAnchor.ConstraintEqualTo(arrowImage.LeadingAnchor, -10f),
                         countLabel.HeightAnchor.ConstraintGreaterThanOrEqualTo(Theme.MinimumLabelSize),
@@ -779,7 +796,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
                 public void Refresh(ParticipantsViewModel viewModel)
                 {
-                    label.Text = viewModel.Name + " " + viewModel.Email;
+                    if (string.IsNullOrEmpty(viewModel.Name) || string.IsNullOrEmpty(viewModel.Email))
+                        label.Text = viewModel.Name + viewModel.Email;
+                    else
+                        label.Text = $"{viewModel.Name} <{viewModel.Email}>";
+
+                    if (viewModel.Status == Mobile.Common.Model.ParticipantStatus.Accepted)
+                        statusImage.Image = UIImage.FromBundle("Participant-Accepted").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+                    else if (viewModel.Status == Mobile.Common.Model.ParticipantStatus.Declined)
+                        statusImage.Image = UIImage.FromBundle("Participant-Declined").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+                    else
+                        statusImage.Image = UIImage.FromBundle("Participant-Unknown").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
                 }
 
                 void InitView()
@@ -789,10 +816,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
                     statusImage = new UIImageView
                     {
-                        Image = UIImage.FromBundle("Add").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
                         TintColor = Theme.DarkGray,
                         TranslatesAutoresizingMaskIntoConstraints = false,
-                        UserInteractionEnabled = false
+                        UserInteractionEnabled = false,
                     };
 
                     AddSubview(statusImage);
@@ -813,8 +839,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                     AddConstraints(new[]
                     {
                         statusImage.LeadingAnchor.ConstraintEqualTo(LeadingAnchor, 5f),
-                        statusImage.TopAnchor.ConstraintEqualTo(TopAnchor, 2f),
-                        statusImage.BottomAnchor.ConstraintEqualTo(BottomAnchor, -2f),
+                        statusImage.WidthAnchor.ConstraintEqualTo(18f),
+                        statusImage.HeightAnchor.ConstraintEqualTo(statusImage.WidthAnchor),
+                        statusImage.CenterYAnchor.ConstraintEqualTo(label.CenterYAnchor),
 
                         label.LeadingAnchor.ConstraintEqualTo(statusImage.TrailingAnchor, 8f),
                         label.TopAnchor.ConstraintEqualTo(TopAnchor, 2f),
