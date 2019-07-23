@@ -22,6 +22,8 @@
     <string name="pref_account_username_title">Username</string>
     <string name="pref_advanced_create_system_report_summary">Create report containing current device and user information as well as reMARK logs that you can share with Nordic IT in case of problems</string>
     <string name="pref_advanced_create_system_report_title">Create system report</string>
+    <string name="pref_advanced_connection_diagnostics_title">Connection Diagnostics</string>
+    <string name="pref_advanced_connection_diagnostics_summary">Perform connection diagnostics to see service availability and performance</string>
     <string name="pref_advanced_enable_reporting_summary_off">Don\'t share anonymous usage statistics and diagnostic information with Nordic IT</string>
     <string name="pref_advanced_enable_reporting_summary_on">Share anonymous usage statistics and diagnostic information with Nordic IT, to help improve reMARK</string>
     <string name="pref_advanced_enable_reporting_title">Share diagnostics and usage statistics</string>
@@ -109,6 +111,7 @@
     <string name="pref_key_advanced_create_system_report">pref_key_advanced_create_system_report</string>
     <string name="pref_key_advanced_enable_reporting">pref_key_advanced_enable_reporting</string>
     <string name="pref_key_advanced_update_config">pref_key_advanced_update_config</string>
+    <string name="pref_key_advanced_connection_diagnostics">pref_key_advanced_connection_diagnostics</string>
     <string name="pref_key_cache_auto_clean">pref_key_cache_auto_clean</string>
     <string name="pref_key_cache_clear">pref_key_cache_clear</string>
     <string name="pref_key_cat_about">pref_key_cat_about</string>

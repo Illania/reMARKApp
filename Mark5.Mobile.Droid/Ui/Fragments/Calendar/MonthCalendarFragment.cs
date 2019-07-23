@@ -17,6 +17,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
             var tag = $"{nameof(MonthCalendarFragment)}";
 
+            var args = new Bundle();
+            fragment.Arguments = args;
+
             return (fragment, tag);
         }
 

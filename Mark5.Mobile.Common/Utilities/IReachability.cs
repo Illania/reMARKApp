@@ -1,5 +1,6 @@
-﻿﻿using System;
+﻿using System;
 using System.Threading.Tasks;
+using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Common.Utilities
 {
@@ -14,6 +15,13 @@ namespace Mark5.Mobile.Common.Utilities
         void OnPause();
 
         Task<bool> Refresh(ReachabilityMode mode = ReachabilityMode.NetworkAvailability | ReachabilityMode.Service, bool testOnly = false);
+
+        Task<ConnectionDiagnosticModel> ConnectionDiagnostics();
+
+        bool IsWifiConnected();
+
+        bool IsMobileDataEnabled();
+
     }
 
     public class ReachabilityRefreshedEventArgs : EventArgs
