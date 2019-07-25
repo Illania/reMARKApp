@@ -15,15 +15,6 @@ namespace Mark5.Mobile.Common.Model
 
     #region Folders
 
-    public enum ModuleType
-    {
-        None = 0,
-        Documents = 1,
-        Contacts = 2,
-        Shortcodes = 3,
-        Calendar = 4,
-    }
-
     public enum FolderType
     {
         None = 0,
@@ -362,6 +353,15 @@ namespace Mark5.Mobile.Common.Model
         Shortcode = 3,
         CalendarAppointment = 4,
         CalendarTask = 5,
+    }
+
+    public enum ModuleType
+    {
+        None = 0,
+        Documents = 1,
+        Contacts = 2,
+        Shortcodes = 3,
+        Calendar = 4,
     }
 
     #endregion

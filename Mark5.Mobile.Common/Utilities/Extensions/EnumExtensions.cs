@@ -1,4 +1,5 @@
 ﻿using System;
+using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Common.Utilities.Extensions
 {
@@ -21,5 +22,24 @@ namespace Mark5.Mobile.Common.Utilities.Extensions
 
             return true;
         }
+
+        public static ModuleType ToModuleType(this ObjectType ot)
+        {
+            switch (ot)
+            {
+                case ObjectType.Document:
+                    return ModuleType.Documents;
+                case ObjectType.Contact:
+                    return ModuleType.Contacts;
+                case ObjectType.Shortcode:
+                    return ModuleType.Shortcodes;
+                case ObjectType.CalendarTask:
+                case ObjectType.CalendarAppointment:
+                    return ModuleType.Calendar;
+                default:
+                    return ModuleType.None;
+            }
+        }
+
     }
 }

@@ -12,11 +12,17 @@ namespace Mark5.Mobile.Common.Manager
 
         Task CopyToFolder(List<IBusinessEntity> businessEntities, Folder folder, SourceType sourceType = SourceType.Auto);
 
+        Task CopyToFolder(List<int> ids, ObjectType objectType, int folderId, SourceType sourceType = SourceType.Auto);
+
         Task MoveToFolder(List<IBusinessEntity> businessEntities, Folder fromFolder, Folder toFolder, SourceType sourceType = SourceType.Auto);
 
         Task CopyToWorktray(List<IBusinessEntity> businessEntities, SourceType sourceType = SourceType.Auto);
 
+        Task CopyToWorktray(List<int> ids, ObjectType objectType, SourceType sourceType = SourceType.Auto);
+
         Task CopyToUserWorktray(List<IBusinessEntity> businessEntities, List<SystemUser> systemUsers, string comment = null, SourceType sourceType = SourceType.Auto);
+
+        Task CopyToUserWorktray(List<int> ids, ObjectType objectType, List<SystemUser> systemUsers, string comment = null, SourceType sourceType = SourceType.Auto);
 
         Task RemoveFromFolder(List<IBusinessEntity> businessEntities, Folder folder, SourceType sourceType = SourceType.Auto);
 
