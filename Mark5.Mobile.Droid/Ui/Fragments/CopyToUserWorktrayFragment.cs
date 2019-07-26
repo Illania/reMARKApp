@@ -23,10 +23,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         readonly Handler searchHandler = new Handler();
 
-        const string BusinessEntitiesBundleKey = "BusinessEntity_dbfe7236-42e1-46f9-9e5e-fe0b390d044c";
+        const string IdsIntentKey = "IdsIntentKey";
+        const string ObjectTypeIntentKey = "ObjectTypeIntentKey";
         const string SelectedSystemUsersKey = "SelectedSystemUsers_f2f7fa81-a3c0-4b3d-9b24-c2ecd360ae92";
 
-        List<IBusinessEntity> businessEntities;
+        List<int> businessEntitiesIds;
+        ObjectType objectType;
 
         CopyToUserWorktrayAdapter CurrentAdapter => (CopyToUserWorktrayAdapter)recyclerView.GetAdapter();
 
@@ -37,12 +39,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         CopyToUserWorktrayAdapter searchAdapter;
         AppCompatButton copyButton;
 
-        public static (CopyToUserWorktrayFragment fragment, string tag) NewInstance(List<IBusinessEntity> be)
+        public static (CopyToUserWorktrayFragment fragment, string tag) NewInstance(List<int> ids, ObjectType ot)
         {
             var args = new Bundle();
 
-            if (be != null)
-                args.PutString(BusinessEntitiesBundleKey, Serializer.Serialize(be));
+            if (ids != null)
+                args.PutString(IdsIntentKey, Serializer.Serialize(ids));
+
+            args.PutInt(ObjectTypeIntentKey, (int)ot);
 
             var fragment = new CopyToUserWorktrayFragment();
             fragment.Arguments = args;
@@ -58,8 +62,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnCreate(savedInstanceState);
 
-            if (Arguments.ContainsKey(BusinessEntitiesBundleKey))
-                businessEntities = Serializer.Deserialize<List<IBusinessEntity>>(Arguments.GetString(BusinessEntitiesBundleKey));
+            if (Arguments.ContainsKey(IdsIntentKey))
+                businessEntitiesIds = Serializer.Deserialize<List<int>>(Arguments.GetString(IdsIntentKey));
+
+            objectType = (ObjectType)Arguments.GetInt(ObjectTypeIntentKey);
 
             if (savedInstanceState?.ContainsKey(SelectedSystemUsersKey) == true)
             {
@@ -73,7 +79,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(CopyToUserWorktrayFragment)} [businessEntities.Count={businessEntities?.Count}]...");
+            CommonConfig.Logger.Info($"Creating {nameof(CopyToUserWorktrayFragment)} [businessEntities.Count={businessEntitiesIds?.Count}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.list_with_button, container, false);
 
@@ -97,13 +103,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             copyButton.Enabled = false;
             copyButton.Click += async (sender, e) =>
             {
-                CommonConfig.Logger.Info($"Attempting copy to worktray [businessEntities.Count={businessEntities.Count}, selectedUsers.Count={selectedSystemUsers.Count}]...");
+                CommonConfig.Logger.Info($"Attempting copy to worktray [businessEntities.Count={businessEntitiesIds.Count}, selectedUsers.Count={selectedSystemUsers.Count}]...");
 
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.copying_to_worktray, Resource.String.please_wait);
 
                 try
                 {
-                    await Managers.CommonActionsManager.CopyToUserWorktray(businessEntities, selectedSystemUsers.Values.ToList());
+                    await Managers.CommonActionsManager.CopyToUserWorktray(businessEntitiesIds, objectType, selectedSystemUsers.Values.ToList());
 
                     Activity?.OnBackPressed();
                 }
@@ -111,7 +117,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     dismissAction();
 
-                    CommonConfig.Logger.Error($"Copying to worktray failed [businessEntities.Count={businessEntities.Count}, selectedUsers.Count={selectedSystemUsers.Count}]", ex);
+                    CommonConfig.Logger.Error($"Copying to worktray failed [businessEntities.Count={businessEntitiesIds.Count}, selectedUsers.Count={selectedSystemUsers.Count}]", ex);
 
                     await Dialogs.ShowErrorDialogAsync(Activity, ex);
                 }
@@ -129,14 +135,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.select_users);
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
-            CommonConfig.Logger.Info($"Created {nameof(CopyToUserWorktrayFragment)} [[businessEntities.Count={businessEntities?.Count}]");
+            CommonConfig.Logger.Info($"Created {nameof(CopyToUserWorktrayFragment)} [[businessEntities.Count={businessEntitiesIds?.Count}]");
         }
 
         public override async void OnResume()
         {
             base.OnResume();
 
-            CommonConfig.Logger.Info($"Resuming {nameof(CopyToUserWorktrayFragment)} [businessEntities.Count={businessEntities?.Count}]...");
+            CommonConfig.Logger.Info($"Resuming {nameof(CopyToUserWorktrayFragment)} [businessEntities.Count={businessEntitiesIds?.Count}]...");
 
             if (adapter.ItemCount < 1)
             {
