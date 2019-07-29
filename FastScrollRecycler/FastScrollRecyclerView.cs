@@ -33,6 +33,7 @@ namespace FastScrollRecycler
 
         public FastScrollRecyclerView(Context context, IAttributeSet attrs)
             : base(context, attrs)
+
         {
             scrollbar = new FastScroller(context, this, attrs);
         }
@@ -68,7 +69,7 @@ namespace FastScrollRecycler
 
                 disableRefreshLayoutListener = new ActionOnScrollListener((rv, dx, dy, objects) =>
                     {
-                        var rl = (SwipeRefreshLayout) objects[0];
+                        var rl = (SwipeRefreshLayout)objects[0];
 
                         if (scrollbar?.IsDragging() ?? false)
                         {
@@ -78,7 +79,7 @@ namespace FastScrollRecycler
 
                         if (rv.GetLayoutManager() is LinearLayoutManager llm)
                         {
-                            llm = (LinearLayoutManager) rv.GetLayoutManager();
+                            llm = (LinearLayoutManager)rv.GetLayoutManager();
                             rl.Enabled = llm.FindFirstCompletelyVisibleItemPosition() == 0;
                         }
                     },
@@ -109,7 +110,6 @@ namespace FastScrollRecycler
             return HandleTouchEvent(@event);
         }
 
-
         public void OnTouchEvent(RecyclerView recyclerView, MotionEvent @event)
         {
             HandleTouchEvent(@event);
@@ -118,8 +118,8 @@ namespace FastScrollRecycler
         bool HandleTouchEvent(MotionEvent ev)
         {
             var action = ev.Action;
-            var x = (int) ev.GetX();
-            var y = (int) ev.GetY();
+            var x = (int)ev.GetX();
+            var y = (int)ev.GetY();
             switch (action)
             {
                 case MotionEventActions.Down:
@@ -177,7 +177,7 @@ namespace FastScrollRecycler
             }
 
             var scrollY = PaddingTop + yOffset + sps.RowIndex * sps.RowHeight - sps.RowTopOffset;
-            var scrollBarY = (int) ((float) scrollY / availableScrollHeight * availableScrollBarHeight);
+            var scrollBarY = (int)((float)scrollY / availableScrollHeight * availableScrollBarHeight);
 
             int scrollBarX;
             if (Utils.IsRtl(Resources))
@@ -197,8 +197,8 @@ namespace FastScrollRecycler
             var rowCount = itemCount;
             if (GetLayoutManager() is GridLayoutManager)
             {
-                spanCount = ((GridLayoutManager) GetLayoutManager()).SpanCount;
-                rowCount = (int) Math.Ceiling((double) rowCount / spanCount);
+                spanCount = ((GridLayoutManager)GetLayoutManager()).SpanCount;
+                rowCount = (int)Math.Ceiling((double)rowCount / spanCount);
             }
 
             StopScroll();
@@ -209,19 +209,19 @@ namespace FastScrollRecycler
 
             var availableScrollHeight = GetAvailableScrollHeight(rowCount, scrollPositionState.RowHeight, 0);
 
-            var exactItemPos = (int) (availableScrollHeight * touchFraction);
+            var exactItemPos = (int)(availableScrollHeight * touchFraction);
 
-            var layoutManager = (LinearLayoutManager) GetLayoutManager();
+            var layoutManager = (LinearLayoutManager)GetLayoutManager();
             layoutManager.ScrollToPositionWithOffset(spanCount * exactItemPos / scrollPositionState.RowHeight, -(exactItemPos % scrollPositionState.RowHeight));
 
             if (!(GetAdapter() is ISectionedAdapter))
                 return "";
 
 #pragma warning disable RECS0018 // Comparison of floating point numbers with equality operator
-            var posInt = (int) (touchFraction == 1 ? itemPos - 1 : itemPos);
+            var posInt = (int)(touchFraction == 1 ? itemPos - 1 : itemPos);
 #pragma warning restore RECS0018 // Comparison of floating point numbers with equality operator
 
-            var sectionedAdapter = (ISectionedAdapter) GetAdapter();
+            var sectionedAdapter = (ISectionedAdapter)GetAdapter();
             return sectionedAdapter.GetSectionName(posInt);
         }
 
@@ -233,8 +233,8 @@ namespace FastScrollRecycler
             int rowCount = GetAdapter().ItemCount;
             if (GetLayoutManager() is GridLayoutManager)
             {
-                var spanCount = ((GridLayoutManager) GetLayoutManager()).SpanCount;
-                rowCount = (int) Math.Ceiling((double) rowCount / spanCount);
+                var spanCount = ((GridLayoutManager)GetLayoutManager()).SpanCount;
+                rowCount = (int)Math.Ceiling((double)rowCount / spanCount);
             }
             if (rowCount == 0)
             {
@@ -268,7 +268,7 @@ namespace FastScrollRecycler
 
             stateOut.RowIndex = GetChildAdapterPosition(child);
             if (GetLayoutManager() is GridLayoutManager)
-                stateOut.RowIndex = stateOut.RowIndex / ((GridLayoutManager) GetLayoutManager()).SpanCount;
+                stateOut.RowIndex = stateOut.RowIndex / ((GridLayoutManager)GetLayoutManager()).SpanCount;
 
             stateOut.RowTopOffset = GetLayoutManager().GetDecoratedTop(child);
             stateOut.RowHeight = child.Height + GetLayoutManager().GetTopDecorationHeight(child) + GetLayoutManager().GetBottomDecorationHeight(child);
