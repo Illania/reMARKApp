@@ -126,6 +126,7 @@ namespace Mark5.ServiceReference.Exceptions
         [EnumMember(Value = "GetCalendarAppointmentError")] GetCalendarAppointmentError = 1501,
         [EnumMember(Value = "CreateOrUpdateCalendarAppointmentError")] CreateOrUpdateCalendarAppointmentError = 1503,
         [EnumMember(Value = "GetCalendarAlarmsError")] GetCalendarAlarmsError = 1505,
+        [EnumMember(Value = "GetCalendarAppointmentOccurrencesError")] GetCalendarAppointmentOccurrencesError = 1506,
         [EnumMember(Value = "SendCalendarAppointmentInvitationsError")] SendCalendarAppointmentInvitationsError = 1510,
 
         [EnumMember(Value = "GetSavedSearchesError")] GetSavedSearchesError = 1600,

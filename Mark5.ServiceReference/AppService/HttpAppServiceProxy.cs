@@ -286,6 +286,11 @@ namespace Mark5.ServiceReference.AppService
             return await InvokeAsync<GetCalendarAppointmentResult, GetCalendarAppointmentParameters>("GetCalendarAppointment", parameters, ct);
         }
 
+        public async Task<GetCalendarAppointmentOccurrencesResult> GetCalendarAppointmentOccurrencesAsync(GetCalendarAppointmentOccurrencesParameters parameters, CancellationToken ct = default(CancellationToken))
+        {
+            return await InvokeAsync<GetCalendarAppointmentOccurrencesResult, GetCalendarAppointmentOccurrencesParameters>("GetCalendarAppointmentOccurrences", parameters, ct);
+        }
+
         public async Task<CreateOrUpdateCalendarAppointmentResult> CreateOrUpdateCalendarAppointmentAsync(CreateOrUpdateCalendarAppointmentParameters parameters, CancellationToken ct = default(CancellationToken))
         {
             return await InvokeAsync<CreateOrUpdateCalendarAppointmentResult, CreateOrUpdateCalendarAppointmentParameters>("CreateOrUpdateCalendarAppointment", parameters, ct);
