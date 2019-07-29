@@ -22,6 +22,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         UIBarButtonItem editButtinItem;
         UIBarButtonItem deleteButtonItem;
 
+        UIStackView stackView;
         AppointmentSubjectView subjectView;
         AppointmentDateView dateView;
         AppointmentLocationView locationView;
@@ -143,7 +144,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 scrollView.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor)
             });
 
-            UIStackView stackView = new UIStackView
+            stackView = new UIStackView
             {
                 Axis = UILayoutConstraintAxis.Vertical,
                 Alignment = UIStackViewAlignment.Fill,
@@ -151,7 +152,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 LayoutMargins = new UIEdgeInsets(10f, 15f, 15f, 15f),
                 LayoutMarginsRelativeArrangement = true,
                 Spacing = 10f,
-                TranslatesAutoresizingMaskIntoConstraints = false
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                Alpha = 0,
             };
 
             scrollView.AddSubview(stackView);
@@ -238,6 +240,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             if (appointment.Participants.Count == 0)  //TODO a little stupid
                 sendInvitationsButton.Hidden = true;
+
+            UIView.Animate(0.05, () => { stackView.Alpha = 1; });
         }
 
         public void UpdateParticipants(List<ParticipantsViewModel> participants)
