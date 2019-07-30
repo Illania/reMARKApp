@@ -158,27 +158,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             scrollView.AddSubview(stackView);
 
-            if (Integration.IsIPad())
+            scrollView.AddConstraints(new[]
             {
-                scrollView.AddConstraints(new[]
-                {
-                    stackView.TopAnchor.ConstraintEqualTo(scrollView.TopAnchor),
-                    stackView.BottomAnchor.ConstraintEqualTo(scrollView.BottomAnchor),
-                    stackView.CenterXAnchor.ConstraintEqualTo(scrollView.CenterXAnchor),
-                    stackView.WidthAnchor.ConstraintEqualTo(500f)
-                });
-            }
-            else
-            {
-                scrollView.AddConstraints(new[]
-                {
-                    stackView.LeftAnchor.ConstraintEqualTo(scrollView.LeftAnchor),
-                    stackView.TopAnchor.ConstraintEqualTo(scrollView.TopAnchor),
-                    stackView.RightAnchor.ConstraintEqualTo(scrollView.RightAnchor),
-                    stackView.BottomAnchor.ConstraintEqualTo(scrollView.BottomAnchor),
-                    stackView.WidthAnchor.ConstraintEqualTo(scrollView.WidthAnchor)
-               });
-            }
+                    stackView.LeftAnchor.ConstraintEqualTo(scrollView.ReadableContentGuide.LeftAnchor),
+                    stackView.TopAnchor.ConstraintEqualTo(scrollView.ReadableContentGuide.TopAnchor),
+                    stackView.RightAnchor.ConstraintEqualTo(scrollView.ReadableContentGuide.RightAnchor),
+                    stackView.BottomAnchor.ConstraintEqualTo(scrollView.ReadableContentGuide.BottomAnchor),
+                    stackView.WidthAnchor.ConstraintEqualTo(scrollView.ReadableContentGuide.WidthAnchor)
+            });
 
             subjectView = new AppointmentSubjectView();
             dateView = new AppointmentDateView();
