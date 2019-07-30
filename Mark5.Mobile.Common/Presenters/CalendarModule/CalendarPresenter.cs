@@ -21,6 +21,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         const string SelectedCalendarsPreferencesKey = "SelectedCalendarsPreferencesKey";
 
         bool firstLoad = true;
+        bool shownRetrievalError;
         private TinyMessageSubscriptionToken deletedAppointmentToken;
 
         #region ICalendarPresenter
@@ -96,6 +97,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             Cache.Clean();
 
             firstLoad = true;
+            shownRetrievalError = false;
 
             LoadAppointments(start, end);
         }
@@ -130,7 +132,6 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 view.UpdateAppointments(appointmentsViewModels, e.Start, e.End);
                 view.StopLoading();
             }
-
         }
 
         private void Cache_NoAppointmentToRetrieve(object sender, EventArgs e)
@@ -140,7 +141,11 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         private void Cache_RetrievalError(object sender, Exception e)
         {
-            //TODO do something here?
+            if (!shownRetrievalError)
+            {
+                shownRetrievalError = true;
+                view.ShowError(e);
+            }
         }
 
         List<AppointmentPreviewViewModel> ConvertToViewModels(CalendarAppointment ca)
