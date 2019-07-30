@@ -163,7 +163,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                     stackView.LeftAnchor.ConstraintEqualTo(scrollView.ReadableContentGuide.LeftAnchor),
                     stackView.TopAnchor.ConstraintEqualTo(scrollView.ReadableContentGuide.TopAnchor),
                     stackView.RightAnchor.ConstraintEqualTo(scrollView.ReadableContentGuide.RightAnchor),
-                    stackView.BottomAnchor.ConstraintEqualTo(scrollView.ReadableContentGuide.BottomAnchor),
                     stackView.WidthAnchor.ConstraintEqualTo(scrollView.ReadableContentGuide.WidthAnchor)
             });
 
