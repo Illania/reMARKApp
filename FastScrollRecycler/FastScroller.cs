@@ -148,6 +148,7 @@ namespace FastScrollRecycler
                         var sectionName = recyclerView.ScrollToPositionAtProgress((boundedY - top) / (bottom - top));
                         popup.SetSectionName(sectionName);
                         popup.AnimateVisibility(!string.IsNullOrEmpty(sectionName));
+                        popup.UpdateFastScrollerBounds(recyclerView, thumbPosition.Y);
                         recyclerView.Invalidate();
                     }
                     break;
