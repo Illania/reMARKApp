@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
+using Android.OS;
+using Android.Views;
 using Android.Content;
 using Android.Graphics;
-using Android.OS;
+using Android.Graphics.Drawables;
 using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
-using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Presenters.CalendarModule;
 using Mark5.Mobile.Droid.Ui.Common;
@@ -37,6 +38,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         const string CalendarBundleKey = "Calendar_Id";
         const string AppointmentBundleKey = "Appointment_Id";
         const string ReocurrenceBundleKey = "Reocurrence_Id";
+
+        Action dismissLoadingAction;
 
         public static (AppointmentFragment fragment, string tag) NewInstance(int calendarId, int appointmentId, int recurrenceIndex)
         {
@@ -144,12 +147,26 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         public void SetLines(IEnumerable<LineViewModel> lines)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
         public void ShowAppointment(AppointmentViewModel appointment)
         {
-            throw new NotImplementedException();
+            subjectView?.Refresh(appointment);
+
+            dateView?.Refresh(appointment);
+
+            reocurrenceView?.Refresh(appointment);
+
+            locationView?.Refresh(appointment);
+
+            descriptionView?.Refresh(appointment);
+
+            organizerView?.Refresh(appointment);
+
+            calendarView?.Refresh(appointment);
+
+            participantsView?.Refresh(appointment);
         }
 
         public Task ShowDeleteError()
@@ -159,13 +176,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         public Task ShowLoadError()
         {
-            throw new NotImplementedException();
-
+            dismissLoadingAction?.Invoke();
+            return Dialogs.ShowErrorDialogAsync(Context, new Exception("Boom"));
         }
 
         public void ShowLoading()
         {
-            throw new NotImplementedException();
+            dismissLoadingAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.loading_appointments, Resource.String.please_wait);
         }
 
         public Task ShowSendInvitationError()
@@ -175,7 +192,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         public void StopLoading()
         {
-            throw new NotImplementedException();
+            dismissLoadingAction?.Invoke();
         }
 
         #region Options menu related
@@ -303,7 +320,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             public AppointmentLocationView(Context context)
                 : base(context)
             {
-                Text = "Location";
+                Text = "";
                 SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.blue)));
             }
 
@@ -323,7 +340,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             public AppointmentDescriptionView(Context context)
                 : base(context)
             {
-                Text = "Description";
+                Text = "";
                 SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.black)));
             }
 
@@ -340,36 +357,36 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         class AppointmentOrganizerView : LinearLayoutCompat, IAppointmentView
         {
+            readonly AppCompatTextView label;
+
             public AppointmentOrganizerView(Context context)
                 : base(context)
             {
-                int largeSpacing = Conversion.ConvertDpToPixels(24f);
-                int normalSpacing = Conversion.ConvertDpToPixels(8f);
-
                 Orientation = Horizontal;
                 LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
 
-                AppCompatTextView title = new AppCompatTextView(Context);
+                AppCompatTextView title = new AppCompatTextView(Context)
+                {
+                    Text = "Organizer",
+                    Gravity = GravityFlags.Left,
+                    LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent, 1f)
+                };
                 title.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
-                title.Text = "Organizer";
-                title.Gravity = GravityFlags.Left;
-                title.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent, 1f);
                 AddView(title);
 
-                AppCompatTextView label = new AppCompatTextView(Context);
+                label = new AppCompatTextView(Context)
+                {
+                    Gravity = GravityFlags.Right,
+                    Text = "",
+                    LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent, 1f)
+                };
                 label.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.black)));
-                label.Gravity = GravityFlags.Right;
-                label.Text = "Label";
-
-                label.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent, 1f);
                 AddView(label);
-
-                SetPadding(largeSpacing, normalSpacing, largeSpacing, normalSpacing);
             }
 
             public void Refresh(AppointmentViewModel viewModel)
             {
-                //TODO:
+                label.Text = viewModel.Creator;
             }
 
             public void SetViewPadding(int left, int top, int right, int bottom)
@@ -380,34 +397,62 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         class AppointmentCalendarView : LinearLayoutCompat, IAppointmentView
         {
+            readonly AppCompatTextView label;
+            readonly View colorCircle;
+
             public AppointmentCalendarView(Context context)
                 : base(context)
             {
-                int largeSpacing = Conversion.ConvertDpToPixels(24f);
-                int normalSpacing = Conversion.ConvertDpToPixels(8f);
-
                 Orientation = Horizontal;
                 LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
 
-                AppCompatTextView title = new AppCompatTextView(Context);
+                AppCompatTextView title = new AppCompatTextView(Context)
+                {
+                    Text = "Calendar",
+                    Gravity = GravityFlags.Left,
+                    LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent, 0.8f)
+                };
                 title.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
-                title.Text = "Calendar";
-                title.Gravity = GravityFlags.Left;
-                title.LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent, 1f);
                 AddView(title);
 
-                AppCompatTextView label = new AppCompatTextView(Context);
-                label.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.black)));
-                label.Gravity = GravityFlags.Right;
-                label.Text = "Label";
+                colorCircle = new View(Context)
+                {
+                    LayoutParameters = new LayoutParams(Conversion.ConvertDpToPixels(10), Conversion.ConvertDpToPixels(10))
+                    {
+                        Gravity = (int)GravityFlags.CenterVertical,
+                        BottomMargin = 10,
+                        TopMargin = 10,
+                    }
+                };
+                AddView(colorCircle);
 
-                label.LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent, 1f);
+                label = new AppCompatTextView(Context)
+                {
+                    Gravity = GravityFlags.Right,
+                    LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent, 0.2f),
+                    Text = ""
+                };
+                label.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.black)));
                 AddView(label);
+            }
+
+            public string HexColor
+            {
+                set
+                {
+                    var gd = new GradientDrawable();
+                    gd.SetShape(ShapeType.Oval);
+                    gd.SetStroke(Conversion.ConvertDpToPixels(1), Color.Black);
+                    gd.SetColor(Color.ParseColor(value));
+                    colorCircle.Background = gd;
+                }
             }
 
             public void Refresh(AppointmentViewModel viewModel)
             {
-                //TODO:
+                CalendarViewModel calendarViewModel = viewModel.Calendar;
+                HexColor = calendarViewModel.HexColor;
+                label.Text = calendarViewModel.Name;
             }
 
             public void SetViewPadding(int left, int top, int right, int bottom)
@@ -418,15 +463,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         class AppointmentParticipantsView : LinearLayoutCompat, IAppointmentView
         {
-            HeaderView headerView;
+            readonly HeaderView headerView;
 
             public AppointmentParticipantsView(Context context)
                 : base(context)
             {
                 Orientation = Vertical;
                 LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-                headerView = new HeaderView(Context);
-                headerView.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.MatchParent);
+
+                headerView = new HeaderView(Context)
+                {
+                    LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.MatchParent)
+                };
                 AddView(headerView);
             }
 
@@ -434,8 +482,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             {
                 foreach (var participant in viewModel.Participants)
                 {
-                    ParticiapntView partView = new ParticiapntView(Context);
-                    partView.LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent);
+                    ParticiapntView partView = new ParticiapntView(Context)
+                    {
+                        LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent)
+                    };
+                    partView.Refresh(participant);
                     AddView(partView);
                 }
 
@@ -447,94 +498,114 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 SetPadding(left, top, right, bottom);
             }
 
-            private class HeaderView : LinearLayoutCompat, IAppointmentView
+            private class HeaderView : LinearLayoutCompat
             {
+                readonly AppCompatTextView label;
+
                 public HeaderView(Context context) : base(context)
                 {
                     Orientation = Horizontal;
                     LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
 
-                    AppCompatTextView title = new AppCompatTextView(Context);
-                    title.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
-                    title.Text = "Participants";
-                    title.Gravity = GravityFlags.Left;
-                    title.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent, 1f);
-                    AddView(title);
-
-                    AppCompatTextView label = new AppCompatTextView(Context);
-                    label.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
-                    label.Gravity = GravityFlags.Right;
-                    label.Text = "3";
-
-                    label.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent, 0.9f);
-                    AddView(label);
-
-                    AppCompatImageButton appCompatImageButton = new AppCompatImageButton(Context);
-
-                    appCompatImageButton.SetImageResource(Resource.Drawable.arrow_right);
-
-                    var layoutParams = new LayoutParams(Conversion.ConvertDpToPixels(10), Conversion.ConvertDpToPixels(16), 0.1f)
+                    AppCompatTextView title = new AppCompatTextView(Context)
                     {
-                        Gravity = (int)GravityFlags.CenterVertical | (int)GravityFlags.Right
+                        Gravity = GravityFlags.Left | GravityFlags.CenterVertical,
+                        LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent, 1f),
+                        Text = "Participants"
                     };
 
-                    appCompatImageButton.LayoutParameters = layoutParams;
-                    appCompatImageButton.Clickable = false;
+                    title.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
+                    AddView(title);
 
+                    label = new AppCompatTextView(Context)
+                    {
+                        Gravity = GravityFlags.Right | GravityFlags.CenterVertical,
+                        LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent, 0.9f),
+                        Text = ""
+                    };
+                    label.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
+                    AddView(label);
+
+                    AppCompatImageButton appCompatImageButton = new AppCompatImageButton(Context)
+                    {
+                        LayoutParameters = new LayoutParams(Conversion.ConvertDpToPixels(10), Conversion.ConvertDpToPixels(16), 0.1f)
+                        {
+                            Gravity = (int)GravityFlags.CenterVertical | (int)GravityFlags.Right,
+                            BottomMargin = 5,
+                            TopMargin = 5
+                        },
+                        Clickable = false
+                    };
+
+                    appCompatImageButton.SetImageResource(Resource.Drawable.arrow_right);
                     AddView(appCompatImageButton);
+
                     SetPadding(0, 0, 0, Conversion.ConvertDpToPixels(8f));
                 }
 
                 public void Refresh(AppointmentViewModel viewModel)
                 {
-                    //TODO:
-                }
-
-                public void SetViewPadding(int left, int top, int right, int bottom)
-                {
-                    // we dont need this..
+                    label.Text = $"{viewModel.Participants.Count}";
                 }
             }
 
-            private class ParticiapntView : LinearLayoutCompat, IAppointmentView
+            private class ParticiapntView : LinearLayoutCompat
             {
+                readonly AppCompatTextView label;
+                readonly AppCompatImageView appCompatImageButton;
+
                 public ParticiapntView(Context context) : base(context)
                 {
                     Orientation = Horizontal;
                     LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
 
-                    AppCompatImageButton appCompatImageButton = new AppCompatImageButton(Context);
-
-                    appCompatImageButton.SetImageResource(Resource.Drawable.arrow_right);
-
-                    var layoutParams = new LayoutParams(Conversion.ConvertDpToPixels(16), Conversion.ConvertDpToPixels(16), 0.2f)
+                    appCompatImageButton = new AppCompatImageView(Context)
                     {
-                        Gravity = (int)GravityFlags.CenterVertical | (int)GravityFlags.Left
+                        Clickable = false,
+                        LayoutParameters = new LayoutParams(Conversion.ConvertDpToPixels(16), Conversion.ConvertDpToPixels(16), 0.2f)
+                        {
+                            Gravity = (int)GravityFlags.CenterVertical | (int)GravityFlags.Left
+                        }
                     };
 
-                    appCompatImageButton.LayoutParameters = layoutParams;
-                    appCompatImageButton.Clickable = false;
+                    appCompatImageButton.SetImageResource(Resource.Drawable.arrow_right);
+                    appCompatImageButton.SetColorFilter(Color.Gray);
 
                     AddView(appCompatImageButton);
 
-                    AppCompatTextView title = new AppCompatTextView(Context);
-                    title.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
-                    title.Text = "Title";
-                    title.TextSize = 11f;
-                    title.Gravity = GravityFlags.Left;
-                    title.LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent, 0.8f);
-                    AddView(title);
+                    label = new AppCompatTextView(Context)
+                    {
+                        Text = "",
+                        TextSize = 11f,
+                        Gravity = GravityFlags.Left,
+                        LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent, 0.8f)
+                    };
+
+                    label.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
+                    AddView(label);
+
                     SetPadding(0, Conversion.ConvertDpToPixels(8f), 0, Conversion.ConvertDpToPixels(8f));
                 }
 
-                public void Refresh(AppointmentViewModel viewModel)
+                public void Refresh(ParticipantsViewModel participant)
                 {
-                    //TODO:
-                }
+                    label.Text = $"{participant.Name} {participant.Email}";
 
-                public void SetViewPadding(int left, int top, int right, int bottom)
-                {
-                    // we dont need this..
+                    switch (participant.Status)
+                    {
+                        case Mobile.Common.Model.ParticipantStatus.Accepted:
+                            appCompatImageButton.SetImageResource(Resource.Drawable.icon_check);
+                            break;
+
+                        case Mobile.Common.Model.ParticipantStatus.Invited:
+                        case Mobile.Common.Model.ParticipantStatus.NeedAction:
+                            appCompatImageButton.SetImageResource(Resource.Drawable.icon_question);
+                            break;
+                        case Mobile.Common.Model.ParticipantStatus.Tentative:
+                        case Mobile.Common.Model.ParticipantStatus.Declined:
+                            appCompatImageButton.SetImageResource(Resource.Drawable.icon_cross);
+                            break;
+                    }
                 }
             }
         }
