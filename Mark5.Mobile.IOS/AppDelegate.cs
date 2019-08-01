@@ -533,7 +533,7 @@ namespace Mark5.Mobile.IOS
                 }
 
                 CommonConfig.Logger.Info($"Refreshing reachability status...");
-                await CommonConfig.Reachability.Refresh();
+                _ = CommonConfig.Reachability.Refresh();
 
                 LocalNotificationsListener.Initialize();
 

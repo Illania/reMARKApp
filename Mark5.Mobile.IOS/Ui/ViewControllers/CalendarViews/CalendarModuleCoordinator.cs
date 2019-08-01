@@ -55,20 +55,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             loadingDialogDismissal = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("loading_appointments___"));
         }
 
-        public Task ShowError(Exception ex)
+        public async Task ShowError(Exception ex)
         {
-            return Task.CompletedTask;
+            await Dialogs.ShowErrorAlertAsync(RootController, ex);
         }
 
         public void ShowAppointment(int calendarId, int appointmentId, int recurrenceIndex)
         {
-
+            RootController.PushViewController(new AppointmentViewController(calendarId, appointmentId, recurrenceIndex), true);
         }
 
         public void ShowCalendarsList(Dictionary<CalendarViewModel, bool> calendars)
         {
-            var calList = new CalendarsListViewController(this, calendars);
-            RootController.PushViewController(calList, true);
+            RootController.PushViewController(new CalendarsListViewController(this, calendars), true);
         }
 
         public void DeleteAppointmentsWithIds(List<int> appointmentIds)

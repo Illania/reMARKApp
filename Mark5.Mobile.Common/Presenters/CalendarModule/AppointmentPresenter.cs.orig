@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -108,6 +108,20 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
     public class AppointmentViewModel
     {
+<<<<<<< HEAD
+        public int Id { get; set; }
+        public string Subject { get; set; }
+        public string Description { get; set; }
+        public string Location { get; set; }
+        public DateTime Start { get; set; }
+        public DateTime End { get; set; }
+        public bool AllDay { get; set; }
+        public string Creator { get; set; }
+        public string RecurrenceInfo { get; set; }
+        public long ReminderTimeBefore { get; set; }
+        public List<ParticipantsViewModel> Participants { get; set; }
+        public CalendarViewModel Calendar { get; set; }
+=======
         public int Id { get; private set; }
         public string Subject { get; private set; }
         public string Description { get; private set; }
@@ -120,6 +134,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         public long ReminderTimeBefore { get; private set; }
         public List<ParticipantsViewModel> Participants { get; private set; }
         public CalendarViewModel Calendar { get; private set; }
+>>>>>>> feature/M5APP-821-finalize-appointmentview-on-ios
 
         public static AppointmentViewModel ConvertToViewModel(CalendarAppointment appointment, int recurrenceIndex = -1)
         {

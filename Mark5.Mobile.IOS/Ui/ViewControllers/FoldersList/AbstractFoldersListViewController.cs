@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Foundation;
@@ -17,6 +18,7 @@ using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 using Mark5.Mobile.IOS.Utilities;
+using Mark5.ServiceReference.Exceptions;
 using TinyMessenger;
 using UIKit;
 
@@ -531,6 +533,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 if (!IsRootOfFoldersList)
                     NavigationController?.PopViewController(true);
+
+                if (ex is HttpAppServiceException && (ex.InnerException is TimeoutException || ((WebException)ex.InnerException)?.Status is WebExceptionStatus.Timeout))
+                {
+                    RefreshData(true);
+                }
             }
 
             RefreshControl.EndRefreshing();

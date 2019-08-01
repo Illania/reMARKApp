@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.DataAccess.Exceptions;
@@ -128,7 +129,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             return tcs.Task;
         }
 
-        public static Task<int> ShowListActionSheetWithTitleAsync(UIViewController vc, string[] listStrings, UIView view, string title = "", string description = "")
+        public static Task<int> ShowListActionSheetWithTitleAsync(UIViewController vc, string[] listStrings, UIView view, string title = null, string description = null)
         {
             UIPopoverPresentationControllerDelegate d = new PopoverPresentationControllerDelegate(view);
 
@@ -271,6 +272,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             if (ex is HttpAppServiceException && ((HttpAppServiceException)ex)?.Detail?.Code == AppServiceFaultCode.InvalidToken)
                 return Localization.GetString("error_invalid_token");
+            if (ex is HttpAppServiceException && (ex.InnerException is TimeoutException || ((WebException)ex.InnerException)?.Status is WebExceptionStatus.Timeout))
+                return Localization.GetString("error_request_timeout_title");
             if (ex is WcfAppServiceException)
                 return Localization.GetString("error_appserviceexception_title");
             if (ex is HttpAppServiceException)
@@ -293,6 +296,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             if (ex is HttpAppServiceException && ((HttpAppServiceException)ex)?.Detail?.Code == AppServiceFaultCode.InvalidToken)
                 return Localization.GetString("error_invalid_token_message");
+            if (ex is HttpAppServiceException && (ex.InnerException is TimeoutException || ((WebException)ex.InnerException)?.Status is WebExceptionStatus.Timeout))
+                return Localization.GetString("error_request_timeout");
             if (ex is WcfAppServiceException)
                 return ex.Message;
             if (ex is HttpAppServiceException)
