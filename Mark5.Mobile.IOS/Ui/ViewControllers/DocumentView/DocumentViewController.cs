@@ -864,6 +864,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
 
+            var button = (UIBarButtonItem)sender;
+
             if (ServerConfig.SystemSettings.DocumentsModuleInfo.WorktrayEnabled ?? true)
             {
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"),
@@ -901,10 +903,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             eas.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"), UIAlertActionStyle.Default, a => ShowPriorityActionSheet((UIBarButtonItem)sender)));
 
             if (folder?.InternalType == FolderInternalType.FilterView || folder?.InternalType == FolderInternalType.Static || folder?.InternalType == FolderInternalType.Worktray)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, RemoveFromFolder));
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, (a) => RemoveFromFolder(button)));
 
             if (ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, Delete));
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, (a) => Delete(button)));
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
 
@@ -1060,9 +1062,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        async void RemoveFromFolder(UIAlertAction a)
+        async void RemoveFromFolder(UIBarButtonItem button)
         {
-            var d = new PopoverPresentationControllerDelegate(fileToButton);
+            var d = new PopoverPresentationControllerDelegate(button);
             var result = await Dialogs.ShowDestructiveActionSheetAsync(this, Localization.GetString("delete_from_folder"), d);
             if (!result)
                 return;
@@ -1091,9 +1093,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        async void Delete(UIAlertAction a)
+        async void Delete(UIBarButtonItem button)
         {
-            var d = new PopoverPresentationControllerDelegate(fileToButton);
+            var d = new PopoverPresentationControllerDelegate(button);
             var result = await Dialogs.ShowDestructiveActionSheetAsync(this, Localization.GetString("delete"), d);
             if (!result)
                 return;
@@ -1158,7 +1160,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     }
                     catch (Exception ex)
                     {
-                        CommonConfig.Logger.Info("Request.Url.AbsoluteString : " + action.Request.Url.AbsoluteString);
+                        CommonConfig.Logger.Error("Request.Url.AbsoluteString : " + action.Request.Url.AbsoluteString, ex);
                     }
                 }
                 else
