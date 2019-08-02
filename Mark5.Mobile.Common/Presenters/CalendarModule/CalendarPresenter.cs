@@ -181,7 +181,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         }
 
         //This is not the pretties, but a good fast solution
-        //When we want to optimize, we can use the method to retrieve occurrences to make an improved version
+        //When we want to optimize, we can use the method to retrieve occurrences to make an improved versions
         private void HandleAddedAppointment(EntityAddedMessage erm)
         {
             Refresh();  //TODO need to test if it works
