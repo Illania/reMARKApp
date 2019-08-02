@@ -13,16 +13,23 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 {
     public class CalendarPresenter : BasePresenter<ICalendarView>, ICalendarPresenter
     {
+        const string SelectedCalendarsPreferencesKey = "SelectedCalendarsPreferencesKey";
+
         readonly List<Calendar> calendarsList;
         readonly Dictionary<int, bool> calendarsSelectedState;
         readonly Dictionary<int, string> calendarsColor;
-        IAppointmentsCache Cache => Managers.CalendarManager.AppointmentsCache;
-
-        const string SelectedCalendarsPreferencesKey = "SelectedCalendarsPreferencesKey";
 
         bool firstLoad = true;
         bool shownRetrievalError;
-        private TinyMessageSubscriptionToken deletedAppointmentToken;
+
+        TinyMessageSubscriptionToken deletedAppointmentToken;
+        TinyMessageSubscriptionToken addedAppointmentToken;
+        TinyMessageSubscriptionToken editedAppointmentToken;
+
+        DateTime lastVisibleStartDate;
+        DateTime lastVisibleEndDate;
+
+        IAppointmentsCache Cache => Managers.CalendarManager.AppointmentsCache;
 
         #region ICalendarPresenter
 
@@ -94,12 +101,9 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         public void RefreshClicked(DateTime start, DateTime end)
         {
-            Cache.Clean();
-
-            firstLoad = true;
-            shownRetrievalError = false;
-
-            LoadAppointments(start, end);
+            lastVisibleStartDate = start;
+            lastVisibleEndDate = end;
+            Refresh();
         }
         #endregion
 
@@ -107,12 +111,16 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         void SubscribeToMessages()
         {
-            deletedAppointmentToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedMessage>(HandleDeletedAppointment);
+            deletedAppointmentToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedMessage>(HandleDeletedAppointment, m => m.ObjectType == ObjectType.CalendarAppointment);
+            addedAppointmentToken = CommonConfig.MessengerHub.Subscribe<EntityAddedMessage>(HandleAddedAppointment, m => m.ObjectType == ObjectType.CalendarAppointment);
+            editedAppointmentToken = CommonConfig.MessengerHub.Subscribe<EntityChangedMessage>(HandleEditedAppointment, m => m.ObjectType == ObjectType.CalendarAppointment);
         }
 
         void UnsubscribeFromMessages()
         {
             deletedAppointmentToken?.Dispose();
+            addedAppointmentToken?.Dispose();
+            editedAppointmentToken?.Dispose();
         }
 
         #endregion
@@ -157,9 +165,31 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         #region Utilities
 
+        private void Refresh()
+        {
+            Cache.Clean();
+
+            firstLoad = true;
+            shownRetrievalError = false;
+
+            LoadAppointments(lastVisibleStartDate, lastVisibleEndDate);
+        }
+
         private void HandleDeletedAppointment(EntityRemovedMessage erm)
         {
             view.DeleteAppointmentsWithIds(erm.EntitiesId);
+        }
+
+        //This is not the pretties, but a good fast solution
+        //When we want to optimize, we can use the method to retrieve occurrences to make an improved version
+        private void HandleAddedAppointment(EntityAddedMessage erm)
+        {
+            Refresh();  //TODO need to test if it works
+        }
+
+        private void HandleEditedAppointment(EntityChangedMessage erm)
+        {
+            Refresh();
         }
 
         void UpdateCalendarsInView()

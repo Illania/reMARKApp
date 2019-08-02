@@ -93,16 +93,8 @@ namespace Mark5.Mobile.Common.DataAccess
                 {
                     c.InsertOrReplace(calendarAppointment);
 
-                    if (calendarAppointment.RecurrenceInfo == null)
-                    {
-                        c.Table<CalendarAppointmentOccurrence>().Delete(cao => cao.AppointmentId == calendarAppointment.Id);
-                        c.InsertAll(calendarAppointment.Occurrences);
-                    }
-                    else
-                    {
-                        //TODO .. What to do??
-                    }
-
+                    c.Table<CalendarAppointmentOccurrence>().Delete(cao => cao.AppointmentId == calendarAppointment.Id);
+                    c.InsertAll(calendarAppointment.Occurrences);
                 });
             }
             catch (Exception ex) when (!(ex is DataAccessException))

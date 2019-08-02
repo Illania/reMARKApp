@@ -13,6 +13,7 @@ using Mark5.Mobile.Common.Model.Exceptions;
 using System.Collections.Concurrent;
 using System.Threading;
 using Mark5.Mobile.Common.DataAccess.Exceptions;
+using Mark5.Mobile.Common.Model.HubMessages;
 
 namespace Mark5.Mobile.Common.Manager
 {
@@ -105,6 +106,11 @@ namespace Mark5.Mobile.Common.Manager
                 calendarAppointment.Guid = result.Guid;
 
                 await calendarDataAccess.SaveCalendarAppointmentAsync(calendarAppointment);
+
+                if (result.Updated)
+                    CommonConfig.MessengerHub.Publish(new EntityChangedMessage(this, ObjectType.CalendarAppointment, calendarAppointment.Id));
+                else
+                    CommonConfig.MessengerHub.Publish(new EntityAddedMessage(this, ObjectType.CalendarAppointment, calendarAppointment.Id));
 
                 return result.Updated;
             }
