@@ -88,9 +88,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             dateView.SetPadding(largeSpacing, normalSpacing, largeSpacing, normalSpacing);
             linearLayout.AddView(dateView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
 
+            /*
             reocurrenceView = new AppointmentReocurrenceView(Context);
             reocurrenceView.SetPadding(largeSpacing, normalSpacing, largeSpacing, normalSpacing);
             linearLayout.AddView(reocurrenceView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
+            */
 
             locationView = new AppointmentLocationView(Context);
             locationView.SetPadding(largeSpacing, normalSpacing, largeSpacing, normalSpacing);
@@ -254,12 +256,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         class AppointmentDateView : AppCompatTextView, IAppointmentView
         {
-
             public AppointmentDateView(Context context)
                 : base(context)
             {
                 Text = context.GetString(Resource.String.related_contacts);
-                SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.black)));
+                SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
             }
 
             public void Refresh(AppointmentViewModel viewModel)
@@ -285,6 +286,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                         Text += $"\r\nto { viewModel.End.ToString("hh:mm ddd, d MMMM yyyy", CultureInfo.CurrentCulture) }";
                     }
                 }
+
+                Text += $"\r\n{viewModel.RecurrenceInfo}";
             }
 
             public void SetViewPadding(int left, int top, int right, int bottom)
@@ -523,7 +526,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                         LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent, 0.9f),
                         Text = ""
                     };
-                    label.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
+                    label.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.black)));
                     AddView(label);
 
                     AppCompatImageButton appCompatImageButton = new AppCompatImageButton(Context)
@@ -570,6 +573,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
                     appCompatImageButton.SetImageResource(Resource.Drawable.arrow_right);
                     appCompatImageButton.SetColorFilter(Color.Gray);
+                    appCompatImageButton.SetPadding(0, 0, Conversion.ConvertDpToPixels(4f), 0);
 
                     AddView(appCompatImageButton);
 
@@ -589,6 +593,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
                 public void Refresh(ParticipantsViewModel participant)
                 {
+                    if (string.IsNullOrEmpty(participant.Name) || string.IsNullOrEmpty(participant.Email))
+                        label.Text = participant.Name + participant.Email;
+                    else
+                        label.Text = $"{participant.Name} <{participant.Email}>";
+
                     label.Text = $"{participant.Name} {participant.Email}";
 
                     switch (participant.Status)
@@ -596,7 +605,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                         case Mobile.Common.Model.ParticipantStatus.Accepted:
                             appCompatImageButton.SetImageResource(Resource.Drawable.icon_check);
                             break;
-
                         case Mobile.Common.Model.ParticipantStatus.Invited:
                         case Mobile.Common.Model.ParticipantStatus.NeedAction:
                             appCompatImageButton.SetImageResource(Resource.Drawable.icon_question);
