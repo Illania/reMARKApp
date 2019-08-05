@@ -3,8 +3,12 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Foundation;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Presenters.CalendarModule;
+using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
+using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
@@ -31,9 +35,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         AppointmentCalendarView calendarView;
         AppointmentParticipantsView participantsView;
         AppointmentReminderView reminderView;
-        SendInvitationsButton sendInvitationsButton;
 
         Action progressDialogDismissal;
+
+        AppointmentViewModel appointment;
 
         public AppointmentViewController(int calendarId, int appointmentId, int recurrenceIndex)
         {
@@ -93,8 +98,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             if (editButtinItem != null)
                 editButtinItem.Clicked += EditButtinItem_Clicked;
 
-            if (sendInvitationsButton != null)
-                sendInvitationsButton.TouchUpInside += SendInvitationsButton_TouchUpInside;
+            if (participantsView != null)
+            {
+                participantsView.SendInvitationClicked += SendInvitationsButton_TouchUpInside;
+                participantsView.ShowParticipantsClicked += ParticipantsView_ShowParticipantsClicked;
+            }
+
         }
 
         private void DeinitializeHandlers()
@@ -105,8 +114,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             if (editButtinItem != null)
                 editButtinItem.Clicked -= EditButtinItem_Clicked;
 
-            if (sendInvitationsButton != null)
-                sendInvitationsButton.TouchUpInside -= SendInvitationsButton_TouchUpInside;
+            if (participantsView != null)
+            {
+                participantsView.SendInvitationClicked += SendInvitationsButton_TouchUpInside;
+                participantsView.ShowParticipantsClicked += ParticipantsView_ShowParticipantsClicked;
+            }
         }
 
         private void InitNavigationBar()
@@ -173,7 +185,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             organizerView = new AppointmentOrganizerView();
             calendarView = new AppointmentCalendarView();
             participantsView = new AppointmentParticipantsView();
-            sendInvitationsButton = new SendInvitationsButton();
             reminderView = new AppointmentReminderView();
 
             stackView.AddArrangedSubview(subjectView);
@@ -187,13 +198,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             stackView.AddArrangedSubview(new SeparatorView());
 
             stackView.AddArrangedSubview(organizerView);
-
             stackView.AddArrangedSubview(calendarView);
-
             stackView.AddArrangedSubview(reminderView);
-
             stackView.AddArrangedSubview(participantsView);
-            stackView.AddArrangedSubview(sendInvitationsButton);
         }
 
         #region IAppointmentView implementation
@@ -222,12 +229,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             organizerView.Refresh(appointment);
             calendarView.Refresh(appointment);
             participantsView.Refresh(appointment);
-            reminderView.Refresh(appointment); //TODO I think we should just add all those view to a collection to simplyify
-
-            if (appointment.Participants.Count == 0)  //TODO a little stupid
-                sendInvitationsButton.Hidden = true;
+            reminderView.Refresh(appointment);
 
             UIView.Animate(0.05, () => { stackView.Alpha = 1; });
+
+            this.appointment = appointment;
         }
 
         public void UpdateParticipants(List<ParticipantsViewModel> participants)
@@ -298,10 +304,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         {
             var lineNames = lineViewModels.Select(l => l.Name).ToArray();
 
-            var result = await Dialogs.ShowListActionSheetWithTitleAsync(this, lineNames, sendInvitationsButton, Localization.GetString("select_line"));
+            var result = await Dialogs.ShowListActionSheetWithTitleAsync(this, lineNames, (UIView)sender, Localization.GetString("select_line"));
 
             if (result >= 0)
                 await presenter.SendInvitationsClicked(lineViewModels[result]);
+        }
+
+        private void ParticipantsView_ShowParticipantsClicked(object sender, EventArgs e)
+        {
+            PresentViewController(new NavigationController(new ParticipantsViewController(appointment.Participants), UIModalPresentationStyle.PageSheet), true, null);
         }
 
         #endregion
@@ -655,7 +666,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         private class AppointmentParticipantsView : UIStackView, IAppointmentView
         {
-            Header participantHeader;
+            readonly Header participantHeader;
+            readonly SendInvitationsButton sendInvitationsButton;
+
+            public EventHandler SendInvitationClicked { get; internal set; } = delegate { };
+            public EventHandler ShowParticipantsClicked { get; internal set; } = delegate { };
 
             public AppointmentParticipantsView()
             {
@@ -666,7 +681,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 Spacing = 10f;
                 TranslatesAutoresizingMaskIntoConstraints = false;
 
+                sendInvitationsButton = new SendInvitationsButton();
+                sendInvitationsButton.TouchUpInside += SendInvitationClicked;
+
                 participantHeader = new Header();
+                participantHeader.AddGestureRecognizer(new UITapGestureRecognizer(ShowParticipantsTapped));
                 AddArrangedSubview(participantHeader);
             }
 
@@ -680,7 +699,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 foreach (var v in ArrangedSubviews.OfType<ParticipantView>())
                     v.RemoveFromSuperview();
 
-                foreach (var participant in participants)
+                foreach (var participant in participants.Take(4))
                 {
                     ParticipantView participantView = new ParticipantView();
                     participantView.Refresh(participant);
@@ -688,6 +707,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 }
 
                 participantHeader.Update(participants);
+
+                if (participants.Any())
+                    AddArrangedSubview(sendInvitationsButton);
+            }
+
+            void ShowParticipantsTapped(UITapGestureRecognizer a)
+            {
+                ShowParticipantsClicked(this, EventArgs.Empty);
+            }
+
+            class SendInvitationsButton : UIButton
+            {
+                public SendInvitationsButton()
+                {
+                    SetTitle("Send Invitations", UIControlState.Normal);
+                    SetTitleColor(Theme.DarkerBlue, UIControlState.Normal);
+                    SetTitleColor(Theme.DarkGray, UIControlState.Highlighted);
+                }
             }
 
             class Header : UIView, IAppointmentView
@@ -842,16 +879,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             }
         }
 
-        private class SendInvitationsButton : UIButton
-        {
-            public SendInvitationsButton()
-            {
-                SetTitle("Send Invitations", UIControlState.Normal);
-                SetTitleColor(Theme.DarkerBlue, UIControlState.Normal);
-                SetTitleColor(Theme.DarkGray, UIControlState.Highlighted);
-            }
-        }
-
         private class SeparatorView : UIView
         {
             public SeparatorView()
@@ -874,5 +901,165 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         #endregion
 
+    }
+
+    public class ParticipantsViewController : AbstractTableViewController
+    {
+        readonly List<ParticipantsViewModel> participants;
+
+        UIBarButtonItem doneItem;
+
+        public ParticipantsViewController(List<ParticipantsViewModel> participants)
+        {
+            this.participants = participants;
+        }
+
+        public override void LoadView()
+        {
+            base.LoadView();
+
+            InitializeNavigationBar();
+            InitializeView();
+        }
+
+        public override void ViewWillAppear(bool animated)
+        {
+            base.ViewWillAppear(animated);
+
+            if (Integration.IsRunningAtLeast(11))
+            {
+                if (NavigationController != null)
+                    NavigationController.NavigationBar.PrefersLargeTitles = true;
+                NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            }
+
+            InitializeHandlers();
+        }
+
+        public override void ViewDidAppear(bool animated)
+        {
+            base.ViewDidAppear(animated);
+
+            CommonConfig.Logger.Info("Appeared");
+
+            RefreshData();
+        }
+
+        public override void ViewWillDisappear(bool animated)
+        {
+            base.ViewWillDisappear(animated);
+
+            DeinitializeHandlers();
+        }
+
+        public override void DidReceiveMemoryWarning()
+        {
+            CommonConfig.Logger.Warning("Received memory warning!");
+
+            ((DataSource)TableView.Source)?.Reset();
+
+            GC.Collect();
+            base.DidReceiveMemoryWarning();
+        }
+
+        protected override void Recycle()
+        {
+            base.Recycle();
+
+            doneItem = null;
+
+            ((DataSource)TableView.Source)?.Reset();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            if (CommonConfig.Logger.IsDebugEnabled())
+                CommonConfig.Logger.Debug("Disposed");
+        }
+
+        void InitializeNavigationBar()
+        {
+            Title = Localization.GetString("participants");
+
+            doneItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
+            NavigationItem.SetRightBarButtonItem(doneItem, false);
+        }
+
+        void InitializeView()
+        {
+            TableView.Source = new DataSource(TableView);
+            TableView.AllowsSelection = true;
+            TableView.AllowsMultipleSelection = true;
+            TableView.RowHeight = UITableView.AutomaticDimension;
+            TableView.EstimatedRowHeight = 40f;
+        }
+
+        void InitializeHandlers()
+        {
+            if (doneItem != null)
+                doneItem.Clicked += DoneItem_Clicked;
+        }
+
+        void DeinitializeHandlers()
+        {
+            if (doneItem != null)
+                doneItem.Clicked -= DoneItem_Clicked;
+        }
+
+        void DoneItem_Clicked(object sender, EventArgs e)
+        {
+            DismissViewController(true, null);
+        }
+
+        void RefreshData()
+        {
+            ((DataSource)TableView.Source).SetItems(participants);
+        }
+
+        class DataSource : UITableViewSource
+        {
+            List<ParticipantsViewModel> items = new List<ParticipantsViewModel>();
+            readonly WeakReference<UITableView> tableViewWeakReference;
+
+            bool Empty => (items == null || items.Count == 0);
+
+            public DataSource(UITableView tableView)
+            {
+                tableViewWeakReference = tableView.Wrap();
+            }
+
+            public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
+            {
+                var c = items[indexPath.Row];
+
+                var cell = tableView.DequeueReusableCell(ParticipantsTableViewCell.DefaultId) as ParticipantsTableViewCell ?? new ParticipantsTableViewCell();
+                cell.Initialize(c);
+
+                return cell;
+            }
+
+            public override nint RowsInSection(UITableView tableview, nint section)
+            {
+                if (Empty)
+                    return 0;
+
+                return items.Count;
+            }
+
+            public void SetItems(List<ParticipantsViewModel> participants)
+            {
+                items.Clear();
+                items.AddRange(participants.OrderBy(c => c.Name));
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+            }
+
+            public void Reset()
+            {
+                items.Clear();
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+            }
+        }
     }
 }
