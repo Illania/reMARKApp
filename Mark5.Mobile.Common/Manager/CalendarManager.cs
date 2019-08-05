@@ -127,6 +127,35 @@ namespace Mark5.Mobile.Common.Manager
             return true;
         }
 
+        public async Task<List<CalendarAppointmentOccurrence>> GetCalendarAppointmentOccurrencesAsync(int calendarId, int calendarAppointmentId, DateTime startDate, DateTime endDate, SourceType sourceType = SourceType.Auto)
+        {
+            var startDateUTC = startDate.ConvertUserTimeToUtc();
+            var endDateUTC = endDate.ConvertUserTimeToUtc();
+
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
+            {
+                var result = await AppServiceProxy.GetCalendarAppointmentOccurrencesAsync(new DataContract.GetCalendarAppointmentOccurrencesParameters
+                {
+                    Token = Token,
+                    CalendarId = calendarId,
+                    CalendarAppointmentId = calendarAppointmentId,
+                    StartDate = startDateUTC,
+                    EndDate = endDateUTC,
+                });
+
+                var occurrences = result.Occurrences.WhereNotNull().Select(a => a.Convert(calendarAppointmentId, calendarId)).ToList();
+                return occurrences;
+            }
+
+            if (sourceType == SourceType.Local)
+                throw new InvalidSourceTypeException("This action can only be performed when online.");
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
+
         public async Task<List<CalendarAlarm>> GetCalendarAlarmsAsync(List<int> calendarIds, DateTime startDate, DateTime endDate, SourceType sourceType = SourceType.Auto)
         {
             var startDateUTC = startDate.ConvertUserTimeToUtc();

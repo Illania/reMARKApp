@@ -73,6 +73,8 @@ namespace Mark5.ServiceReference.AppService
 
         Task<GetCalendarAppointmentResult> GetCalendarAppointmentAsync(GetCalendarAppointmentParameters parameters, CancellationToken ct = default(CancellationToken));
 
+        Task<GetCalendarAppointmentOccurrencesResult> GetCalendarAppointmentOccurrencesAsync(GetCalendarAppointmentOccurrencesParameters parameters, CancellationToken ct = default(CancellationToken));
+
         Task<CreateOrUpdateCalendarAppointmentResult> CreateOrUpdateCalendarAppointmentAsync(CreateOrUpdateCalendarAppointmentParameters parameters, CancellationToken ct = default(CancellationToken));
 
         Task<SendCalendarAppointmentInvitationsResult> SendCalendarAppointmentInvitationsAsync(SendCalendarAppointmentInvitationsParameters parameters, CancellationToken ct = default(CancellationToken));

@@ -55,9 +55,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             loadingDialogDismissal = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("loading_appointments___"));
         }
 
-        public Task ShowError(Exception ex)
+        public async Task ShowError(Exception ex)
         {
-            return Task.CompletedTask;
+            await Dialogs.ShowErrorAlertAsync(RootController, ex);
         }
 
         public void ShowAppointment(int calendarId, int appointmentId, int recurrenceIndex)
