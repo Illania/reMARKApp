@@ -28,4 +28,7 @@
     <Folder Include="Manager\Interfaces\" />
     <Folder Include="DataAccess\Interfaces\" />
   </ItemGroup>
+  <ItemGroup>
+    <None Remove="Presenters\CalendarModule\AppointmentPresenter.cs.orig" />
+  </ItemGroup>
 </Project>
