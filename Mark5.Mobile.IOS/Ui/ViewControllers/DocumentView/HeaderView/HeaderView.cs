@@ -159,6 +159,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             subViews.OfType<RecipientsView>().ForEach(rv =>
             {
                 rv.RecipientTapped += RecipientTapped;
+            });
+
+            subViews.OfType<IAnimating>().ForEach(rv =>
+            {
                 rv.BeginAnimating += RecipientView_BeginAnimating;
                 rv.Animating += RecipientView_Animating;
                 rv.EndAnimating += RecipientView_EndAnimating;
@@ -173,6 +177,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             subViews.OfType<RecipientsView>().ForEach(rv =>
             {
                 rv.RecipientTapped -= RecipientTapped;
+            });
+
+            subViews.OfType<IAnimating>().ForEach(rv =>
+            {
                 rv.BeginAnimating -= RecipientView_BeginAnimating;
                 rv.Animating -= RecipientView_Animating;
                 rv.EndAnimating -= RecipientView_EndAnimating;
@@ -291,7 +299,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 subHeaderView.RemoveConstraints(compressedConstraints);
                 subHeaderView.AddConstraints(expandedConstraints);
 
-                subViews.OfType<RecipientsView>().ForEach(r => r.ExpandCompressView());
+                subViews.OfType<IAnimating>().ForEach(r => r.ExpandCompressView());
             }
             else
             {
@@ -306,7 +314,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 subHeaderView.RemoveConstraints(expandedConstraints);
                 subHeaderView.AddConstraints(compressedConstraints);
 
-                subViews.OfType<RecipientsView>().ForEach(r => r.ExpandCompressView());
+                subViews.OfType<IAnimating>().ForEach(r => r.ExpandCompressView());
             }
 
             detailsShown = !detailsShown;
