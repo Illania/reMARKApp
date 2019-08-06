@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -11,7 +11,6 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
     public class AppointmentPresenter : BasePresenter<IAppointmentView>, IAppointmentPresenter
     {
         CalendarAppointment appointment;
-        int recurrenceIndex;
 
         public override void Start() { }
 
@@ -19,7 +18,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         public async Task LoadAppointment(int appointmentId, int recurrenceIndex, int calendarId)
         {
-            view.ShowLoading();
+            view.ShowAppointmentLoadingDialog();
 
             try
             {
@@ -30,14 +29,14 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 view.ShowAppointment(AppointmentViewModel.ConvertToViewModel(appointment, recurrenceIndex));
                 view.SetLines(ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Select(LineViewModel.ConvertToViewModel));
 
-                view.StopLoading();
+                view.CloseDialog();
             }
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error($"Error while getting appointment with ID = {appointmentId}", ex);
 
-                view.StopLoading();
-                await view.ShowLoadError();
+                view.CloseDialog();
+                await view.ShowLoadError(ex);
 
                 view.CloseView();
             }
@@ -45,7 +44,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         public async Task DeleteAppointmentClicked()
         {
-            view.ShowLoading();
+            view.ShowDeletingDialog();
 
             try
             {
@@ -53,15 +52,15 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
                 await Managers.CommonActionsManager.Delete(new List<IBusinessEntity> { appointment });
 
-                view.StopLoading();
+                view.CloseDialog();
                 view.CloseView();
             }
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error($"Error while deleting appointment with ID = {appointment.Id}", ex);
 
-                view.StopLoading();
-                await view.ShowDeleteError();
+                view.CloseDialog();
+                await view.ShowDeleteError(ex);
             }
         }
 
@@ -70,42 +69,57 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             view.OpenEditAppointment(appointment.CalendarId, appointment.Id);
         }
 
-        public async Task SendInvitationClicked(Guid lineGuid)
+        public async Task SendInvitationsClicked(LineViewModel lvm)
         {
-            view.ShowLoading();
+            view.ShowSendInvitationsDialog();
 
             try
             {
                 CommonConfig.Logger.Info($"Sending invitations for appointment with ID = {appointment.Id}");
 
-                await Managers.CalendarManager.SendCalendarAppointmentInvitationsAsync(appointment.Id, lineGuid);
+                await Managers.CalendarManager.SendCalendarAppointmentInvitationsAsync(appointment.Id, lvm.Guid);
 
-                view.StopLoading();
+                view.CloseDialog();
+
+                try
+                {
+                    //TODO check if this can be done in a more clever way....
+                    var newApp = await Managers.CalendarManager.GetCalendarAppointmentAsync(appointment.CalendarId, appointment.Id, SourceType.Remote);
+                    var participants = newApp.Participants.Select(ParticipantsViewModel.ConvertToViewModel).ToList();
+
+                    view.UpdateParticipants(participants);
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error($"Error while updating participants for appointment with ID = {appointment.Id} with line with GUID = {lvm.Guid}", ex);
+
+                }
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Error while sending invitations for appointment with ID = {appointment.Id} with line with GUID = {lineGuid}", ex);
+                CommonConfig.Logger.Error($"Error while sending invitations for appointment with ID = {appointment.Id} with line with GUID = {lvm.Guid}", ex);
 
-                view.StopLoading();
-                await view.ShowSendInvitationError();
+                view.CloseDialog();
+                await view.ShowSendInvitationError(ex);
             }
+
         }
     }
 
     public class AppointmentViewModel
     {
-        public int Id { get; set; }
-        public string Subject { get; set; }
-        public string Description { get; set; }
-        public string Location { get; set; }
-        public DateTime Start { get; set; }
-        public DateTime End { get; set; }
-        public bool AllDay { get; set; }
-        public string Creator { get; set; }
-        public string RecurrenceInfo { get; set; }
-        public long ReminderTimeBefore { get; set; }
-        public List<ParticipantsViewModel> Participants { get; set; }
-        public CalendarViewModel Calendar { get; set; }
+        public int Id { get; private set; }
+        public string Subject { get; private set; }
+        public string Description { get; private set; }
+        public string Location { get; private set; }
+        public DateTime Start { get; private set; }
+        public DateTime End { get; private set; }
+        public bool AllDay { get; private set; }
+        public string Creator { get; private set; }
+        public string RecurrenceInfo { get; private set; }
+        public long ReminderTimeBefore { get; private set; }
+        public List<ParticipantsViewModel> Participants { get; private set; }
+        public CalendarViewModel Calendar { get; private set; }
 
         public static AppointmentViewModel ConvertToViewModel(CalendarAppointment appointment, int recurrenceIndex = -1)
         {
@@ -141,7 +155,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             if (ri == null)
                 return null;
 
-            string pattern = "Reoccures ";
+            string pattern = "Reoccurs ";
             string range = string.Empty;
 
             switch (ri.Type)
@@ -155,7 +169,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                         pattern += $"weekday";
                     break;
                 case RecurrenceType.Weekly:
-                    pattern += $"weekly, every {ri.Periodicity} week(s) on";
+                    pattern += $"weekly, every {ri.Periodicity} week(s) on ";
 
                     var days = new[] { WeekDays.Monday, WeekDays.Tuesday, WeekDays.Wednesday,
                     WeekDays.Thursday, WeekDays.Friday, WeekDays.Saturday, WeekDays.Sunday};
@@ -239,14 +253,14 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         public static string GetMonthString(int val)
         {
-            return CultureInfo.InvariantCulture.DateTimeFormat.GetMonthName(val);  //TODO check if correct
+            return CultureInfo.InvariantCulture.DateTimeFormat.GetMonthName(val);
         }
     }
 
     public class ParticipantsViewModel
     {
-        public string Name { get; set; }
-        public string Email { get; set; }
+        public string Name { get; private set; }
+        public string Email { get; private set; }
         public ParticipantStatus Status { get; set; }
 
         public static ParticipantsViewModel ConvertToViewModel(Participant participant)
@@ -262,12 +276,14 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
     public class LineViewModel
     {
-        public string Name { get; set; }
+        public Guid Guid { get; private set; }
+        public string Name { get; private set; }
 
         public static LineViewModel ConvertToViewModel(Line line)
         {
             return new LineViewModel
             {
+                Guid = line.Guid,
                 Name = line.Name
             };
         }
@@ -277,7 +293,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
     {
         Task LoadAppointment(int appointmentId, int recurrenceIndex, int calendarId);
         Task DeleteAppointmentClicked();
-        Task SendInvitationClicked(Guid lineGuid);
+        Task SendInvitationsClicked(LineViewModel lvm);
 
         void EditAppointmentClicked();
     }
@@ -286,13 +302,18 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
     {
         void ShowAppointment(AppointmentViewModel appointment);
         void SetLines(IEnumerable<LineViewModel> lines);
-        void ShowLoading();
-        void StopLoading();
         void CloseView();
         void OpenEditAppointment(int calendarId, int appointmentId);
 
-        Task ShowLoadError();
-        Task ShowDeleteError();
-        Task ShowSendInvitationError();
+        void ShowAppointmentLoadingDialog();
+        void ShowDeletingDialog();
+        void ShowSendInvitationsDialog();
+
+        Task ShowLoadError(Exception ex);
+        Task ShowDeleteError(Exception ex);
+        Task ShowSendInvitationError(Exception ex);
+
+        void CloseDialog();
+        void UpdateParticipants(List<ParticipantsViewModel> participants);
     }
 }

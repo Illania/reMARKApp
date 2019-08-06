@@ -13,6 +13,7 @@ using Mark5.Mobile.Common.Model.Exceptions;
 using System.Collections.Concurrent;
 using System.Threading;
 using Mark5.Mobile.Common.DataAccess.Exceptions;
+using Mark5.Mobile.Common.Model.HubMessages;
 
 namespace Mark5.Mobile.Common.Manager
 {
@@ -106,6 +107,11 @@ namespace Mark5.Mobile.Common.Manager
 
                 await calendarDataAccess.SaveCalendarAppointmentAsync(calendarAppointment);
 
+                if (result.Updated)
+                    CommonConfig.MessengerHub.Publish(new EntityChangedMessage(this, ObjectType.CalendarAppointment, calendarAppointment.Id));
+                else
+                    CommonConfig.MessengerHub.Publish(new EntityAddedMessage(this, ObjectType.CalendarAppointment, calendarAppointment.Id));
+
                 return result.Updated;
             }
 
@@ -125,6 +131,35 @@ namespace Mark5.Mobile.Common.Manager
             });
 
             return true;
+        }
+
+        public async Task<List<CalendarAppointmentOccurrence>> GetCalendarAppointmentOccurrencesAsync(int calendarId, int calendarAppointmentId, DateTime startDate, DateTime endDate, SourceType sourceType = SourceType.Auto)
+        {
+            var startDateUTC = startDate.ConvertUserTimeToUtc();
+            var endDateUTC = endDate.ConvertUserTimeToUtc();
+
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
+            {
+                var result = await AppServiceProxy.GetCalendarAppointmentOccurrencesAsync(new DataContract.GetCalendarAppointmentOccurrencesParameters
+                {
+                    Token = Token,
+                    CalendarId = calendarId,
+                    CalendarAppointmentId = calendarAppointmentId,
+                    StartDate = startDateUTC,
+                    EndDate = endDateUTC,
+                });
+
+                var occurrences = result.Occurrences.WhereNotNull().Select(a => a.Convert(calendarAppointmentId, calendarId)).ToList();
+                return occurrences;
+            }
+
+            if (sourceType == SourceType.Local)
+                throw new InvalidSourceTypeException("This action can only be performed when online.");
+
+            throw new ArgumentException("Invalid sourceType provided.");
         }
 
         public async Task<List<CalendarAlarm>> GetCalendarAlarmsAsync(List<int> calendarIds, DateTime startDate, DateTime endDate, SourceType sourceType = SourceType.Auto)

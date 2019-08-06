@@ -62,18 +62,23 @@ namespace Mark5.Mobile.Common.Model.Converters
             {
                 foreach (var occurrence in ca.Occurrences)
                 {
-                    result.Occurrences.Add(new CalendarAppointmentOccurrence
-                    {
-                        StartDateTimestamp = occurrence.StartDate.ConvertDateTimeToTimestampMilliseconds(),
-                        EndDateTimestamp = occurrence.EndDate.ConvertDateTimeToTimestampMilliseconds(),
-                        RecurrenceIndex = occurrence.RecurrenceIndex,
-                        AppointmentId = ca.Id,
-                        CalendarId = ca.CalendarId,
-                    });
+                    result.Occurrences.Add(occurrence.Convert(ca.Id, ca.CalendarId));
                 }
             }
 
             return result;
+        }
+
+        public static CalendarAppointmentOccurrence Convert(this DataContract.CalendarAppointmentOccurrence ca, int appointmentId, int calendarId)
+        {
+            return new CalendarAppointmentOccurrence
+            {
+                StartDateTimestamp = ca.StartDate.ConvertDateTimeToTimestampMilliseconds(),
+                EndDateTimestamp = ca.EndDate.ConvertDateTimeToTimestampMilliseconds(),
+                RecurrenceIndex = ca.RecurrenceIndex,
+                AppointmentId = appointmentId,
+                CalendarId = calendarId,
+            };
         }
 
         public static CalendarAlarm Convert(this DataContract.CalendarAlarm ca)

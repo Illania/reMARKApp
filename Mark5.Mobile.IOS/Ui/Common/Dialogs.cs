@@ -129,7 +129,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             return tcs.Task;
         }
 
-        public static Task<int> ShowListActionSheetWithTitleAsync(UIViewController vc, string[] listStrings, UIView view, string title = "", string description = "")
+        public static Task<int> ShowListActionSheetWithTitleAsync(UIViewController vc, string[] listStrings, UIView view, string title = null, string description = null)
         {
             UIPopoverPresentationControllerDelegate d = new PopoverPresentationControllerDelegate(view);
 

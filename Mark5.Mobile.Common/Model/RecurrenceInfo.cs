@@ -9,7 +9,7 @@ namespace Mark5.Mobile.Common.Model
 
         public int DayNumber { get; set; } = -1;
 
-        public TimeSpan Duration { get; set; }
+        public TimeSpan Duration { get; set; } //When using EndByDate End = Start + Duration
 
         public long StartTimestamp { get; set; }
 

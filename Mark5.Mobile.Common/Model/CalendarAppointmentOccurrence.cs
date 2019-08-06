@@ -22,8 +22,17 @@ namespace Mark5.Mobile.Common.Model
         [Column("CalendarId")]
         public int CalendarId { get; set; }
 
-        public DateTime StartDate => StartDateTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime();
-        public DateTime EndDate => EndDateTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime();
+        public DateTime StartDate
+        {
+            get => StartDateTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime();
+            set { StartDateTimestamp = value.ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds(); }
+        }
+
+        public DateTime EndDate
+        {
+            get => EndDateTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime();
+            set { EndDateTimestamp = value.ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds(); }
+        }
 
         public override string ToString()
         {
