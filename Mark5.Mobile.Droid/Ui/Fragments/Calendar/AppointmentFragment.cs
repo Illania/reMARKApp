@@ -28,8 +28,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         AppointmentDescriptionView descriptionView;
         AppointmentOrganizerView organizerView;
         AppointmentCalendarView calendarView;
+        AppointmentReminderView reminderView;
         AppointmentPresenter appointmentPresenter;
         AppointmentParticipantsView participantsView;
+        InviteParticipantsButton inviteParticipantsButton;
 
         int calendarId;
         int appointmentId;
@@ -88,12 +90,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             dateView.SetPadding(largeSpacing, normalSpacing, largeSpacing, normalSpacing);
             linearLayout.AddView(dateView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
 
-            /*
-            reocurrenceView = new AppointmentReocurrenceView(Context);
-            reocurrenceView.SetPadding(largeSpacing, normalSpacing, largeSpacing, normalSpacing);
-            linearLayout.AddView(reocurrenceView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
-            */
-
             locationView = new AppointmentLocationView(Context);
             locationView.SetPadding(largeSpacing, normalSpacing, largeSpacing, normalSpacing);
             linearLayout.AddView(locationView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
@@ -110,9 +106,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             calendarView.SetPadding(largeSpacing, normalSpacing, largeSpacing, normalSpacing);
             linearLayout.AddView(calendarView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
 
+            reminderView = new AppointmentReminderView(Context);
+            reminderView.SetPadding(largeSpacing, normalSpacing, largeSpacing, normalSpacing);
+            linearLayout.AddView(reminderView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
+
             participantsView = new AppointmentParticipantsView(Context);
             participantsView.SetPadding(largeSpacing, normalSpacing, largeSpacing, normalSpacing);
             linearLayout.AddView(participantsView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
+
+            inviteParticipantsButton = new InviteParticipantsButton(Context);
+            inviteParticipantsButton.SetPadding(largeSpacing, normalSpacing, largeSpacing, normalSpacing);
+            linearLayout.AddView(inviteParticipantsButton, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
 
             HasOptionsMenu = true;
 
@@ -137,6 +141,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             }
         }
 
+        #region IAppointmentView implementation
         public void CloseView()
         {
             //TODO:
@@ -165,6 +170,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             descriptionView?.Refresh(appointment);
 
             organizerView?.Refresh(appointment);
+
+            reminderView?.Refresh(appointment);
 
             calendarView?.Refresh(appointment);
 
@@ -196,6 +203,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         {
             dismissLoadingAction?.Invoke();
         }
+        #endregion
 
         #region Options menu related
 
@@ -238,7 +246,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             public AppointmentSubjectView(Context context)
                 : base(context)
             {
-                Text = context.GetString(Resource.String.related_contacts);
+                Text = "";
                 SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
                 SetTextSize(Android.Util.ComplexUnitType.Sp, 22);
             }
@@ -259,7 +267,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             public AppointmentDateView(Context context)
                 : base(context)
             {
-                Text = context.GetString(Resource.String.related_contacts);
+                Text = "";
                 SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
             }
 
@@ -398,6 +406,74 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             }
         }
 
+        class AppointmentReminderView : LinearLayoutCompat, IAppointmentView
+        {
+            readonly AppCompatTextView label;
+
+            public AppointmentReminderView(Context context)
+                : base(context)
+            {
+                Orientation = Horizontal;
+                LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
+
+                AppCompatTextView title = new AppCompatTextView(Context)
+                {
+                    Text = "Reminder",
+                    Gravity = GravityFlags.Left,
+                    LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent, 1f)
+                };
+                title.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
+                AddView(title);
+
+                label = new AppCompatTextView(Context)
+                {
+                    Gravity = GravityFlags.Right,
+                    Text = "",
+                    LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent, 1f)
+                };
+                label.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.black)));
+                AddView(label);
+            }
+
+            public void Refresh(AppointmentViewModel viewModel)
+            {
+                if (viewModel.ReminderTimeBefore < 0)
+                {
+                    Visibility = ViewStates.Gone;
+                    return;
+                }
+
+                if (viewModel.ReminderTimeBefore == 0)
+                {
+                    label.Text = "At time of event"; //TODO localization..?
+                    return;
+                }
+
+                var timeSpan = TimeSpan.FromSeconds(viewModel.ReminderTimeBefore);
+
+                int weeks = (int)timeSpan.TotalDays / 7;
+                var days = timeSpan.TotalDays;
+                var hours = timeSpan.TotalHours;
+                var minutes = timeSpan.TotalMinutes;
+
+                if (weeks == 1)
+                    label.Text = "1 week";
+                else if (days >= 1)
+                    label.Text = $"{days} day(s)";
+                else if (hours >= 1)
+                    label.Text = $"{hours} hour(s)";
+                else if (minutes >= 1)
+                    label.Text = $"{minutes} minute(s)";
+
+                label.Text += " before";
+            }
+
+            public void SetViewPadding(int left, int top, int right, int bottom)
+            {
+                SetPadding(left, top, right, bottom);
+            }
+        }
+
         class AppointmentCalendarView : LinearLayoutCompat, IAppointmentView
         {
             readonly AppCompatTextView label;
@@ -454,8 +530,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             public void Refresh(AppointmentViewModel viewModel)
             {
                 CalendarViewModel calendarViewModel = viewModel.Calendar;
-                HexColor = calendarViewModel.HexColor;
-                label.Text = calendarViewModel.Name;
+                HexColor = calendarViewModel?.HexColor;
+                label.Text = calendarViewModel?.Name;
             }
 
             public void SetViewPadding(int left, int top, int right, int bottom)
@@ -617,6 +693,29 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 }
             }
         }
+
+        class InviteParticipantsButton : AppCompatButton
+        {
+            Action onClick;
+
+            public InviteParticipantsButton(Context context) : base(context)
+            {
+                Text = "Send Invitations";
+                SetTextColor(new Color(ContextCompat.GetColor(context, Resource.Color.darkerblue)));
+                Click += InviteParticipantsButton_Click;
+            }
+
+            private void InviteParticipantsButton_Click(object sender, EventArgs e)
+            {
+                onClick?.Invoke();
+            }
+
+            public void SetViewPadding(int left, int top, int right, int bottom)
+            {
+                SetPadding(left, top, right, bottom);
+            }
+        }
+
         #endregion
     }
 }
