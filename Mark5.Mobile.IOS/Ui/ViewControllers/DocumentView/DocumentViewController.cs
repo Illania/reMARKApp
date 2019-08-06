@@ -184,14 +184,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitNavigationBar()
         {
-            if (PresentingViewController == null)
+            editDocumentButtonItem = new UIBarButtonItem
             {
-                editDocumentButtonItem = new UIBarButtonItem
-                {
-                    Image = UIImage.FromBundle("Edit")
-                };
-            }
-            else if (!hideDoneButton)
+                Image = UIImage.FromBundle("Edit")
+            };
+
+            if (PresentingViewController != null && !hideDoneButton)
             {
                 doneButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
                 NavigationItem.SetRightBarButtonItem(doneButtonItem, false);
@@ -620,11 +618,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void RefreshNavigationBar()
         {
-            if (PresentingViewController == null && document != null && documentPreview.Direction == DocumentDirection.Draft)
+            if (document != null && documentPreview.Direction == DocumentDirection.Draft)
             {
-                var rightButtons = new UIBarButtonItem[1];
-                rightButtons[0] = editDocumentButtonItem;
-                NavigationItem.SetRightBarButtonItems(rightButtons, true);
+                NavigationItem.SetRightBarButtonItem(editDocumentButtonItem, true);
             }
         }
 
@@ -934,7 +930,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 DocumentCreationModeFlag = DocumentCreationModeFlag.Edit,
                 PreviousDocumentDirection = documentPreview.Direction,
-                PreviousDocumentFolderId = folder.Id,
+                PreviousDocumentFolderId = folder?.Id,
                 PreviousDocumentId = documentPreview.Id
             };
 
