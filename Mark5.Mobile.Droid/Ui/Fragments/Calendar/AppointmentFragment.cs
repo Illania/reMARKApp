@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
 using Android.OS;
+using Android.App;
 using Android.Views;
 using Android.Content;
 using Android.Graphics;
@@ -18,8 +20,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 {
     public class AppointmentFragment : BaseFragment, IAppointmentView
     {
+        const string CalendarBundleKey = "Calendar_Id";
+        const string AppointmentBundleKey = "Appointment_Id";
+        const string ReocurrenceBundleKey = "Reocurrence_Id";
+
         readonly int largeSpacing = Conversion.ConvertDpToPixels(24f);
         readonly int normalSpacing = Conversion.ConvertDpToPixels(8f);
+
+        int calendarId;
+        int appointmentId;
+        int recurrenceIndex;
+
+        bool loaded;
+        Action dismissLoadingAction;
+        List<LineViewModel> lineViewModels;
 
         AppointmentSubjectView subjectView;
         AppointmentDateView dateView;
@@ -29,19 +43,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         AppointmentOrganizerView organizerView;
         AppointmentCalendarView calendarView;
         AppointmentReminderView reminderView;
-        AppointmentPresenter appointmentPresenter;
+        AppointmentPresenter presenter;
         AppointmentParticipantsView participantsView;
-        InviteParticipantsButton inviteParticipantsButton;
-
-        int calendarId;
-        int appointmentId;
-        int recurrenceIndex;
-
-        const string CalendarBundleKey = "Calendar_Id";
-        const string AppointmentBundleKey = "Appointment_Id";
-        const string ReocurrenceBundleKey = "Reocurrence_Id";
-
-        Action dismissLoadingAction;
 
         public static (AppointmentFragment fragment, string tag) NewInstance(int calendarId, int appointmentId, int recurrenceIndex)
         {
@@ -71,8 +74,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             if (Arguments.ContainsKey(ReocurrenceBundleKey))
                 recurrenceIndex = Arguments.GetInt(ReocurrenceBundleKey);
 
-            appointmentPresenter = new AppointmentPresenter();
-            appointmentPresenter.AttachView(this);
+            presenter = new AppointmentPresenter();
+            presenter.AttachView(this);
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -111,19 +114,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             linearLayout.AddView(reminderView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
 
             participantsView = new AppointmentParticipantsView(Context);
+            participantsView.ShowParticipantsClicked += ParticipantsView_ShowParticipantsClicked;
+            participantsView.SendInvitationClicked += SendInvitationsButton_TouchUpInside;
             participantsView.SetPadding(largeSpacing, normalSpacing, largeSpacing, normalSpacing);
             linearLayout.AddView(participantsView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
-
-            inviteParticipantsButton = new InviteParticipantsButton(Context);
-            inviteParticipantsButton.SetPadding(largeSpacing, normalSpacing, largeSpacing, normalSpacing);
-            linearLayout.AddView(inviteParticipantsButton, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
 
             HasOptionsMenu = true;
 
             return rootView;
         }
-
-        bool loaded;
 
         public override void OnViewCreated(View view, Bundle savedInstanceState)
         {
@@ -136,25 +135,38 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
             if (!loaded)
             {
-                await appointmentPresenter.LoadAppointment(appointmentId, recurrenceIndex, calendarId);
+                await presenter.LoadAppointment(appointmentId, recurrenceIndex, calendarId);
                 loaded = true;
             }
+        }
+
+        private void ParticipantsView_ShowParticipantsClicked(object sender, EventArgs e)
+        {
+            //TODO: implement
+        }
+
+        private async void SendInvitationsButton_TouchUpInside(object sender, EventArgs e)
+        {
+            var lineNames = lineViewModels.Select(l => l.Name).ToArray();
+            var result = await Dialogs.ShowListDialog(Context, Resource.String.select_a_line, lineNames, true);
+            if (result >= 0)
+                await presenter.SendInvitationsClicked(lineViewModels[result]);
         }
 
         #region IAppointmentView implementation
         public void CloseView()
         {
-            //TODO:
+            FragmentManager?.PopBackStack();
         }
 
         public void OpenEditAppointment(int calendarId, int appointmentId)
         {
-            throw new NotImplementedException();
+            //TODO: implement
         }
 
         public void SetLines(IEnumerable<LineViewModel> lines)
         {
-            //throw new NotImplementedException();
+            lineViewModels = lines.ToList();
         }
 
         public void ShowAppointment(AppointmentViewModel appointment)
@@ -175,34 +187,49 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
             calendarView?.Refresh(appointment);
 
-            participantsView?.Refresh(appointment);
+            participantsView?.Refresh(appointment.Participants);
         }
 
-        public Task ShowDeleteError()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task ShowLoadError()
-        {
-            dismissLoadingAction?.Invoke();
-            return Dialogs.ShowErrorDialogAsync(Context, new Exception("Boom"));
-        }
-
-        public void ShowLoading()
+        public void ShowAppointmentLoadingDialog()
         {
             dismissLoadingAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.loading_appointments, Resource.String.please_wait);
         }
 
-        public Task ShowSendInvitationError()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void StopLoading()
+        public void CloseDialog()
         {
             dismissLoadingAction?.Invoke();
         }
+
+        public void UpdateParticipants(List<ParticipantsViewModel> participants)
+        {
+            participantsView?.Refresh(participants);
+        }
+
+        public void ShowSendInvitationsDialog()
+        {
+            dismissLoadingAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.sending_invitations, Resource.String.please_wait);
+        }
+
+        public void ShowDeletingDialog()
+        {
+            dismissLoadingAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.deleting, Resource.String.please_wait);
+        }
+
+        public async Task ShowLoadError(Exception ex)
+        {
+            await Dialogs.ShowErrorDialogAsync(Context, ex);
+        }
+
+        public async Task ShowDeleteError(Exception ex)
+        {
+            await Dialogs.ShowErrorDialogAsync(Context, ex);
+        }
+
+        public async Task ShowSendInvitationError(Exception ex)
+        {
+            await Dialogs.ShowErrorDialogAsync(Context, ex);
+        }
+
         #endregion
 
         #region Options menu related
@@ -222,6 +249,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
+            if (item.ItemId == MenuItemActions.DeleteAppointment)
+            {
+                AsyncHelpers.RunOnUiThreadAsync((Activity)Context, async () =>
+                {
+                    await Dialogs.ShowConfirmDialogAsync(Context, Resource.String.delete, Resource.String.delete_are_you_sure);
+                    await presenter.DeleteAppointmentClicked();
+                });
+            }
+            else
+            {
+                presenter.EditAppointmentClicked();
+            }
+
             return true;
         }
 
@@ -230,11 +270,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             public const int DeleteAppointment = 10;
             public const int EditAppointment = 20;
         }
-
         #endregion
 
-        #region Custome Appointment Views
-        interface IAppointmentView
+        #region Custom views
+        private interface IAppointmentView
         {
             void Refresh(AppointmentViewModel viewModel);
             void SetViewPadding(int left, int top, int right, int bottom);
@@ -310,7 +349,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             public AppointmentReocurrenceView(Context context)
                 : base(context)
             {
-                Text = context.GetString(Resource.String.related_contacts);
+                Text = "";
                 SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.black)));
             }
 
@@ -540,26 +579,34 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             }
         }
 
-        class AppointmentParticipantsView : LinearLayoutCompat, IAppointmentView
+        class AppointmentParticipantsView : LinearLayoutCompat
         {
-            readonly HeaderView headerView;
+            HeaderView headerView;
+            SendInvitationsButton sendInvitationsButton;
+
+            public EventHandler SendInvitationClicked = delegate { };
+            public EventHandler ShowParticipantsClicked = delegate { };
 
             public AppointmentParticipantsView(Context context)
                 : base(context)
             {
                 Orientation = Vertical;
                 LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
+            }
+
+            public void Refresh(List<ParticipantsViewModel> participants)
+            {
+                RemoveAllViews();
 
                 headerView = new HeaderView(Context)
                 {
                     LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.MatchParent)
                 };
                 AddView(headerView);
-            }
 
-            public void Refresh(AppointmentViewModel viewModel)
-            {
-                foreach (var participant in viewModel.Participants)
+                headerView.Refresh(participants.Count);
+
+                foreach (var participant in participants)
                 {
                     ParticiapntView partView = new ParticiapntView(Context)
                     {
@@ -569,12 +616,39 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                     AddView(partView);
                 }
 
-                headerView.Refresh(viewModel);
+                if (participants.Any())
+                {
+                    sendInvitationsButton = new SendInvitationsButton(Context);
+                    sendInvitationsButton.Click += (sender, e) =>
+                    {
+                        SendInvitationClicked(sender, e);
+                    };
+                    AddView(sendInvitationsButton);
+                }
             }
 
             public void SetViewPadding(int left, int top, int right, int bottom)
             {
                 SetPadding(left, top, right, bottom);
+            }
+
+            private void HeaderView_Touch(object sender, TouchEventArgs e)
+            {
+                ShowParticipantsClicked(sender, e);
+            }
+
+            private class SendInvitationsButton : AppCompatButton
+            {
+                public SendInvitationsButton(Context context) : base(context)
+                {
+                    Text = "Send Invitations";
+                    SetTextColor(new Color(ContextCompat.GetColor(context, Resource.Color.darkerblue)));
+                }
+
+                public void SetViewPadding(int left, int top, int right, int bottom)
+                {
+                    SetPadding(left, top, right, bottom);
+                }
             }
 
             private class HeaderView : LinearLayoutCompat
@@ -622,9 +696,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                     SetPadding(0, 0, 0, Conversion.ConvertDpToPixels(8f));
                 }
 
-                public void Refresh(AppointmentViewModel viewModel)
+                public void Refresh(int count)
                 {
-                    label.Text = $"{viewModel.Participants.Count}";
+                    label.Text = $"{count}";
                 }
             }
 
@@ -693,29 +767,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 }
             }
         }
-
-        class InviteParticipantsButton : AppCompatButton
-        {
-            Action onClick;
-
-            public InviteParticipantsButton(Context context) : base(context)
-            {
-                Text = "Send Invitations";
-                SetTextColor(new Color(ContextCompat.GetColor(context, Resource.Color.darkerblue)));
-                Click += InviteParticipantsButton_Click;
-            }
-
-            private void InviteParticipantsButton_Click(object sender, EventArgs e)
-            {
-                onClick?.Invoke();
-            }
-
-            public void SetViewPadding(int left, int top, int right, int bottom)
-            {
-                SetPadding(left, top, right, bottom);
-            }
-        }
-
         #endregion
     }
 }
