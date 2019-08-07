@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Android.Support.V4.App;
 using Android.Views;
+using Com.Syncfusion.Schedule;
 using Java.Util;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Presenters.CalendarModule;
@@ -79,7 +80,13 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
 
         public void ShowAppointment(int calendarId, int appointmentId, int recurrenceIndex)
         {
-            //TODO
+            var (fragment, tag) = AppointmentFragment.NewInstance(calendarId, appointmentId, recurrenceIndex);
+
+            fragmentManager.BeginTransaction()
+               .SetCustomAnimations(Resource.Animation.fade_in, Resource.Animation.fade_out)
+               .Replace(Resource.Id.fragment_container, fragment, tag)
+               .AddToBackStack(tag)
+               .Commit();
         }
 
         public void DeleteAppointmentsWithIds(List<int> appointmentIds)
@@ -164,6 +171,15 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
             presenter.CalendarSelectionChanged(selectedCalendarsState);
 
             activity.OnBackPressed();
+        }
+
+        public void AppointmentTapped(ScheduleAppointment appointment)
+        {
+            var splitted = appointment.Notes.ToString().Split(" ");
+            var calendarId = int.Parse(splitted[0]);
+            var appointmentId = int.Parse(splitted[1]);
+            var recurrenceIndex = int.Parse(splitted[2]);
+            presenter.AppointmentClicked(calendarId, appointmentId, recurrenceIndex);
         }
 
         #endregion
@@ -304,7 +320,7 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
         void CalendarsClicked();
         void CreateAppointmentClicked();
         void VisibleDatesChanged(Calendar startDate, Calendar endDate);
-
+        void AppointmentTapped(ScheduleAppointment appointment);
         void SelectedCalendarsChanged(Dictionary<CalendarViewModel, bool> selectedCalendars);
         void YearTapped(Calendar calendar);
         void MonthTapped(Calendar newValue);

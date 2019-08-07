@@ -297,7 +297,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             var result = await Dialogs.ShowDestructiveActionSheetAsync(this, Localization.GetString("delete"), d);
             if (result)
                 await presenter.DeleteAppointmentClicked();
-
         }
 
         async void SendInvitationsButton_TouchUpInside(object sender, EventArgs e)
@@ -669,8 +668,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             readonly Header participantHeader;
             readonly SendInvitationsButton sendInvitationsButton;
 
-            public EventHandler SendInvitationClicked { get; internal set; } = delegate { };
-            public EventHandler ShowParticipantsClicked { get; internal set; } = delegate { };
+            public EventHandler SendInvitationClicked = delegate { };
+            public EventHandler ShowParticipantsClicked = delegate { };
 
             public AppointmentParticipantsView()
             {
