@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,10 +8,11 @@ using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.IOS.Common.CallId;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
 using Mark5.Mobile.IOS.Utilities.Extensions;
-using Mark5.Mobile.IOS.Common.CallId;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
@@ -112,7 +112,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             var info = await Managers.FoldersManager.GetSavedFolderOfflineInfo(Folder);
             if (info != null)
-                lastDownloadedLabel.Text = Localization.GetString("last_downloaded_on") + info.LastDownloaded.FormatUserTimestampAsCompactLongDateTimeString();
+                lastDownloadedLabel.Text = Localization.GetString("last_downloaded_on") + info.LastDownloaded.ConvertTimestampMillisecondsToDateTime()
+        .ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds().FormatUserTimestampAsCompactLongDateTimeString();
             else
                 lastDownloadedLabel.Text = null;
 

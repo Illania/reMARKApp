@@ -35,6 +35,8 @@ namespace Mark5.Mobile.Common.DataAccess
 
         Task RemoveFromFolderAsync(List<Document> documents, Folder folder);
 
+        Task RemoveFromFolderAsync(List<int> docIds, int folderId);
+
         Task DeleteAsync(List<DocumentPreview> documentPreviews);
 
         Task DeleteAsync(List<Document> documents);
