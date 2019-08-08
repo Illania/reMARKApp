@@ -47,6 +47,7 @@ namespace Mark5.Mobile.Droid.Utilities
 
         static bool ApplicationHasBeenUpdated(Context context)
         {
+            return false; //TODO need to be enabled again after we decide what to do with onboarding
             var currentVersionCode = float.Parse(context.PackageManager.GetPackageInfo(context.PackageName, 0).VersionName);
             var storedVersionCode = PreferenceManager.GetDefaultSharedPreferences(context).GetFloat(appVersionKey, 0);
 

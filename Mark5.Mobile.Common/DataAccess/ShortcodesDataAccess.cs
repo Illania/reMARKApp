@@ -179,7 +179,7 @@ namespace Mark5.Mobile.Common.DataAccess
             await RemoveFromFolderAsync(ids, folder.Id);
         }
 
-        async Task RemoveFromFolderAsync(List<int> ids, int folderId)
+        public async Task RemoveFromFolderAsync(List<int> ids, int folderId)
         {
             try
             {

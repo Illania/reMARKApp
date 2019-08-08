@@ -134,7 +134,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             base.OnSaveInstanceState(outState);
 
             //if (adapter?.Items != null || savedResults != null)  // Cannot be used because the size of the results could be too big
-                //outState.PutString(DocumentPreivewsKey, Serializer.Serialize(adapter?.Items ?? savedResults));
+            //outState.PutString(DocumentPreivewsKey, Serializer.Serialize(adapter?.Items ?? savedResults));
         }
 
         #endregion
@@ -201,7 +201,24 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void Adapter_ItemClicked(object sender, DocumentPreview documentPreview)
         {
-            StartActivity(DocumentActivity.CreateIntent(Context, documentPreview: documentPreview));
+            if (documentPreview.Direction == DocumentDirection.Draft)
+            {
+                if (!ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Any())
+                {
+                    Dialogs.ShowConfirmDialog(Activity, Resource.String.no_lines_error_title, Resource.String.no_lines_error_content);
+                    return;
+                }
+
+                StartActivity(ComposeDocumentActivity.CreateIntent(Context,
+                                                                   DocumentCreationModeFlag.Edit,
+                                                                   CopyToNewOption.None,
+                                                                   previousDocumentDirection: documentPreview.Direction,
+                                                                   previousDocumentId: documentPreview.Id));
+            }
+            else
+            {
+                StartActivity(DocumentActivity.CreateIntent(Context, documentPreview: documentPreview));
+            }
         }
 
         #endregion

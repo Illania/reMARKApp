@@ -9,6 +9,7 @@ using Mark5.Mobile.Common.Model.Converters;
 using Mark5.Mobile.Common.Model.Exceptions;
 using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.ServiceReference.AppService;
 using DataContract = Mark5.ServiceReference.DataContract;
 
@@ -78,7 +79,12 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task CopyToFolder(List<IBusinessEntity> businessEntities, Folder folder, SourceType sourceType = SourceType.Auto)
         {
-            CommonConfig.UsageAnalytics.LogEvent(new CopyToFolderEvent(folder.Module, businessEntities.Count));
+            await CopyToFolder(businessEntities.Select(bi => bi.Id).ToList(), businessEntities.First().ObjectType, folder.Id, sourceType);
+        }
+
+        public async Task CopyToFolder(List<int> ids, ObjectType objectType, int folderId, SourceType sourceType = SourceType.Auto)
+        {
+            CommonConfig.UsageAnalytics.LogEvent(new CopyToFolderEvent(objectType.ToModuleType(), ids.Count));
 
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
@@ -88,9 +94,9 @@ namespace Mark5.Mobile.Common.Manager
                 await AppServiceProxy.FileToFolderAsync(new DataContract.FileToFolderParameters
                 {
                     Token = Token,
-                    ObjectIds = businessEntities.Select(be => be.Id).ToArray(),
-                    ObjectType = businessEntities.First().ObjectType.ConvertEnum<DataContract.ObjectType>(),
-                    ToFolderId = folder.Id,
+                    ObjectIds = ids.ToArray(),
+                    ObjectType = objectType.ConvertEnum<DataContract.ObjectType>(),
+                    ToFolderId = folderId,
                     Move = false
                 });
 
@@ -105,7 +111,12 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task MoveToFolder(List<IBusinessEntity> businessEntities, Folder fromFolder, Folder toFolder, SourceType sourceType = SourceType.Auto)
         {
-            CommonConfig.UsageAnalytics.LogEvent(new MoveToFolderEvent(fromFolder.Module, businessEntities.Count));
+            await MoveToFolder(businessEntities.Select(bi => bi.Id).ToList(), businessEntities.First().ObjectType, fromFolder, toFolder, sourceType);
+        }
+
+        public async Task MoveToFolder(List<int> beIds, ObjectType ot, Folder fromFolder, Folder toFolder, SourceType sourceType = SourceType.Auto)
+        {
+            CommonConfig.UsageAnalytics.LogEvent(new MoveToFolderEvent(fromFolder.Module, beIds.Count));
 
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
@@ -115,33 +126,27 @@ namespace Mark5.Mobile.Common.Manager
                 await AppServiceProxy.FileToFolderAsync(new DataContract.FileToFolderParameters
                 {
                     Token = Token,
-                    ObjectIds = businessEntities.Select(be => be.Id).ToArray(),
-                    ObjectType = businessEntities.First().ObjectType.ConvertEnum<DataContract.ObjectType>(),
+                    ObjectIds = beIds.ToArray(),
+                    ObjectType = ot.ConvertEnum<DataContract.ObjectType>(),
                     FromFolderId = fromFolder.Id,
                     ToFolderId = toFolder.Id,
                     Move = true
                 });
 
-                var documentPreviews = businessEntities.OfType<DocumentPreview>();
-                if (documentPreviews.Any())
-                    await documentsDataAccess.RemoveFromFolderAsync(documentPreviews.ToList(), fromFolder);
-                var documents = businessEntities.OfType<Document>();
-                if (documents.Any())
-                    await documentsDataAccess.RemoveFromFolderAsync(documents.ToList(), fromFolder);
-                var contactPreviews = businessEntities.OfType<ContactPreview>();
-                if (contactPreviews.Any())
-                    await contactsDataAccess.RemoveFromFolderAsync(contactPreviews.ToList(), fromFolder);
-                var contacts = businessEntities.OfType<Contact>();
-                if (contacts.Any())
-                    await contactsDataAccess.RemoveFromFolderAsync(contacts.ToList(), fromFolder);
-                var shortcodePreviews = businessEntities.OfType<ShortcodePreview>();
-                if (shortcodePreviews.Any())
-                    await shortcodesDataAccess.RemoveFromFolderAsync(shortcodePreviews.ToList(), fromFolder);
-                var shortcodes = businessEntities.OfType<Shortcode>();
-                if (shortcodes.Any())
-                    await shortcodesDataAccess.RemoveFromFolderAsync(shortcodes.ToList(), fromFolder);
+                switch (ot)
+                {
+                    case ObjectType.Document:
+                        await documentsDataAccess.RemoveFromFolderAsync(beIds, fromFolder.Id);
+                        break;
+                    case ObjectType.Contact:
+                        await contactsDataAccess.RemoveFromFolderAsync(beIds, fromFolder.Id);
+                        break;
+                    case ObjectType.Shortcode:
+                        await shortcodesDataAccess.RemoveFromFolderAsync(beIds, fromFolder.Id);
+                        break;
+                }
 
-                CommonConfig.MessengerHub.Publish(new EntityMovedFromFolderMessage(this, businessEntities.First().ObjectType, fromFolder.Id, businessEntities.Select(b => b.Id).ToList()));
+                CommonConfig.MessengerHub.Publish(new EntityMovedFromFolderMessage(this, ot, fromFolder.Id, beIds.ToList()));
 
                 return;
             }
@@ -154,7 +159,12 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task CopyToWorktray(List<IBusinessEntity> businessEntities, SourceType sourceType = SourceType.Auto)
         {
-            CommonConfig.UsageAnalytics.LogEvent(new CopyToWorktrayEvent(businessEntities.First().ModuleType, businessEntities.Count));
+            await CopyToWorktray(businessEntities.Select(bi => bi.Id).ToList(), businessEntities.First().ObjectType, sourceType);
+        }
+
+        public async Task CopyToWorktray(List<int> ids, ObjectType objectType, SourceType sourceType = SourceType.Auto)
+        {
+            CommonConfig.UsageAnalytics.LogEvent(new CopyToWorktrayEvent(objectType.ToModuleType(), ids.Count));
 
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
@@ -164,8 +174,8 @@ namespace Mark5.Mobile.Common.Manager
                 await AppServiceProxy.CopyToWorktrayAsync(new DataContract.CopyToWorktrayParameters
                 {
                     Token = Token,
-                    ObjectIds = businessEntities.Select(be => be.Id).ToArray(),
-                    ObjectType = businessEntities.First().ObjectType.ConvertEnum<DataContract.ObjectType>()
+                    ObjectIds = ids.ToArray(),
+                    ObjectType = objectType.ConvertEnum<DataContract.ObjectType>(),
                 });
 
                 return;
@@ -179,7 +189,12 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task CopyToUserWorktray(List<IBusinessEntity> businessEntities, List<SystemUser> systemUsers, string comment = null, SourceType sourceType = SourceType.Auto)
         {
-            CommonConfig.UsageAnalytics.LogEvent(new CopyToUserWorktrayEvent(businessEntities.First().ModuleType, businessEntities.Count));
+            await CopyToUserWorktray(businessEntities.Select(bi => bi.Id).ToList(), businessEntities.First().ObjectType, systemUsers, comment, sourceType);
+        }
+
+        public async Task CopyToUserWorktray(List<int> ids, ObjectType objectType, List<SystemUser> systemUsers, string comment = null, SourceType sourceType = SourceType.Auto)
+        {
+            CommonConfig.UsageAnalytics.LogEvent(new CopyToUserWorktrayEvent(objectType.ToModuleType(), ids.Count));
 
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
@@ -189,8 +204,8 @@ namespace Mark5.Mobile.Common.Manager
                 await AppServiceProxy.CopyToWorktrayAsync(new DataContract.CopyToWorktrayParameters
                 {
                     Token = Token,
-                    ObjectIds = businessEntities.Select(be => be.Id).ToArray(),
-                    ObjectType = businessEntities.First().ObjectType.ConvertEnum<DataContract.ObjectType>(),
+                    ObjectIds = ids.ToArray(),
+                    ObjectType = objectType.ConvertEnum<DataContract.ObjectType>(),
                     UserIds = systemUsers.Select(su => su.Id).ToArray(),
                     Comment = comment
                 });

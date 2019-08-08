@@ -688,6 +688,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (option == 1)
             {
                 StartActivity(CopyToUserWorktrayActivity.CreateIntent(Context, documentPreviews.Cast<IBusinessEntity>().ToList()));
+                actionMode?.Finish();
             }
         }
 
