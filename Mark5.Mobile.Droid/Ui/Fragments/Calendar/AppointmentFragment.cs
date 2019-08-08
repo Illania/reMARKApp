@@ -45,6 +45,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         AppointmentPresenter presenter;
         AppointmentParticipantsView participantsView;
 
+        LinearLayoutCompat containerLayout;
         List<View> subviews = new List<View>();
 
         public static (AppointmentFragment fragment, string tag) NewInstance(int calendarId, int appointmentId, int recurrenceIndex)
@@ -84,7 +85,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             CommonConfig.Logger.Info($"Creating {nameof(AppointmentFragment)}");
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_base, container, false);
 
-            LinearLayoutCompat linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
+            containerLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
 
             subjectView = new AppointmentSubjectView(Context);
             dateView = new AppointmentDateView(Context);
@@ -105,20 +106,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             subviews.Add(new SeparatorSubView(Context));
             subviews.Add(organizerView);
             subviews.Add(new SeparatorSubView(Context));
-
             subviews.Add(calendarView);
             subviews.Add(new SeparatorSubView(Context));
-
             subviews.Add(reminderView);
             subviews.Add(new SeparatorSubView(Context));
-
             subviews.Add(participantsView);
 
             foreach (var subview in subviews)
             {
                 if (subview is SeparatorSubView)
                 {
-                    subview.LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, Conversion.ConvertDpToPixels(5));
+                    subview.LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, Conversion.ConvertDpToPixels(1));
                 }
                 else
                 {
@@ -126,20 +124,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                     subview.LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
                 }
 
-                linearLayout.AddView(subview);
+                containerLayout.AddView(subview);
             }
+
+            containerLayout.Alpha = 0;
 
             HasOptionsMenu = true;
-
             return rootView;
-        }
-
-        class SeparatorSubView : View
-        {
-            public SeparatorSubView(Context c) : base(c)
-            {
-                SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightgray)));
-            }
         }
 
         public override void OnViewCreated(View view, Bundle savedInstanceState)
@@ -199,6 +190,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 if (current is SeparatorSubView && subviews[i + 1].Visibility == ViewStates.Gone)
                     current.Visibility = ViewStates.Gone;
             }
+
+            containerLayout.Animate().Alpha(1f).SetDuration(500);
         }
 
         public void ShowAppointmentLoadingDialog()
@@ -264,8 +257,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             {
                 AsyncHelpers.RunOnUiThreadAsync((Activity)Context, async () =>
                 {
-                    await Dialogs.ShowConfirmDialogAsync(Context, Resource.String.delete, Resource.String.delete_are_you_sure);
-                    await presenter.DeleteAppointmentClicked();
+                    var confirm = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete, Resource.String.delete_are_you_sure);
+                    if (confirm)
+                        await presenter.DeleteAppointmentClicked();
                 });
             }
             else
@@ -288,6 +282,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         private interface IAppointmentView
         {
             void Refresh(AppointmentViewModel viewModel);
+        }
+
+        class SeparatorSubView : View
+        {
+            public SeparatorSubView(Context c) : base(c)
+            {
+                SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightgray)));
+            }
         }
 
         class AppointmentSubjectView : AppCompatTextView, IAppointmentView
@@ -654,19 +656,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                     label.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.black)));
                     AddView(label);
 
-                    AppCompatImageButton appCompatImageButton = new AppCompatImageButton(Context)
-                    {
-                        LayoutParameters = new LayoutParams(Conversion.ConvertDpToPixels(10), Conversion.ConvertDpToPixels(16), 0.1f)
-                        {
-                            Gravity = (int)GravityFlags.CenterVertical | (int)GravityFlags.Right,
-                            BottomMargin = 5,
-                            TopMargin = 5
-                        },
-                        Clickable = false
-                    };
+                    //AppCompatImageButton appCompatImageButton = new AppCompatImageButton(Context)  //TODO for now we do not show it, as it is not clickable
+                    //{
+                    //    LayoutParameters = new LayoutParams(Conversion.ConvertDpToPixels(10), Conversion.ConvertDpToPixels(16), 0.1f)
+                    //    {
+                    //        Gravity = (int)GravityFlags.CenterVertical | (int)GravityFlags.Right,
+                    //        BottomMargin = 5,
+                    //        TopMargin = 5
+                    //    },
+                    //    Clickable = false
+                    //};
 
-                    appCompatImageButton.SetImageResource(Resource.Drawable.arrow_right);
-                    AddView(appCompatImageButton);
+                    //appCompatImageButton.SetImageResource(Resource.Drawable.arrow_right);
+                    //AddView(appCompatImageButton);
 
                     SetPadding(0, 0, 0, Conversion.ConvertDpToPixels(8f));
                 }

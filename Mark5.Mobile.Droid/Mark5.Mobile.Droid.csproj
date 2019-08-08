@@ -972,6 +972,9 @@
       <SubType></SubType>
       <Generator></Generator>
     </AndroidResource>
+    <AndroidResource Include="Resources\drawable\refresh.xml" />
+    <AndroidResource Include="Resources\drawable\add_appointment.xml" />
+    <AndroidResource Include="Resources\drawable\calendar.xml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FastScrollRecycler\FastScrollRecycler.csproj">
