@@ -221,10 +221,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.Subviews
                         Text = "days",
                     };
 
-                    var daysTextField = new PickerTextField();
+                    var daysTextField = new UITextField();
+                    daysTextField.TranslatesAutoresizingMaskIntoConstraints = false;
                     daysTextField.KeyboardType = UIKeyboardType.NumberPad;
+                    daysTextField.Text = "122";
 
-                    firstLine.AddGestureRecognizer(new UITapGestureRecognizer(radioButton1.SetEnabled));
+                    //firstLine.AddGestureRecognizer(new UITapGestureRecognizer(radioButton1.SetEnabled));
                     firstLine.BackgroundColor = UIColor.Orange;
                     firstLine.AddSubview(radioButton1);
                     firstLine.AddSubview(everyLabel);
@@ -335,6 +337,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.Subviews
             public override void Selected(UIPickerView pickerView, nint row, nint component)
             {
                 selectedDelegate?.Invoke((int)row);
+            }
+        }
+
+        public class SeparatorSubView : UIView
+        {
+            static readonly UIColor backgroundColor = Theme.Blue;
+
+            public SeparatorSubView()
+            {
+                BackgroundColor = backgroundColor;
+                HeightAnchor.ConstraintEqualTo(0.5f).Active = true;
+                TranslatesAutoresizingMaskIntoConstraints = false;
             }
         }
 
