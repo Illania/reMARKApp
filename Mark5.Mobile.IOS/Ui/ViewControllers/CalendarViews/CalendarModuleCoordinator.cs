@@ -62,7 +62,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         public void ShowAppointment(int calendarId, int appointmentId, int recurrenceIndex)
         {
-            RootController.PushViewController(new AppointmentViewController(calendarId, appointmentId, recurrenceIndex), true);
+            //RootController.PushViewController(new AppointmentViewController(calendarId, appointmentId, recurrenceIndex), true);
+            RootController.PushViewController(new Subviews.RecurrenceViewController(), true);
+
         }
 
         public void ShowCalendarsList(Dictionary<CalendarViewModel, bool> calendars)

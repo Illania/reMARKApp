@@ -9,6 +9,7 @@ using Mark5.Mobile.Common.Presenters.CalendarModule;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
+using Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.Subviews;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
@@ -116,8 +117,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             if (participantsView != null)
             {
-                participantsView.SendInvitationClicked += SendInvitationsButton_TouchUpInside;
-                participantsView.ShowParticipantsClicked += ParticipantsView_ShowParticipantsClicked;
+                participantsView.SendInvitationClicked -= SendInvitationsButton_TouchUpInside;
+                participantsView.ShowParticipantsClicked -= ParticipantsView_ShowParticipantsClicked;
             }
         }
 
@@ -311,7 +312,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         private void ParticipantsView_ShowParticipantsClicked(object sender, EventArgs e)
         {
-            PresentViewController(new NavigationController(new ParticipantsViewController(appointment.Participants), UIModalPresentationStyle.PageSheet), true, null);
+            NavigationController.PushViewController(new RecurrenceViewController(), true);
         }
 
         #endregion
