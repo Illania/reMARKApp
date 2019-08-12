@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using CoreGraphics;
+using Foundation;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Presenters.CalendarModule;
+using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
+using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.Subviews
@@ -14,7 +18,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.Subviews
         RangeView rangeView;
 
         EditAppointmentViewModel ap = new EditAppointmentViewModel();
-
 
         public override void LoadView()
         {
@@ -70,8 +73,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.Subviews
             {
                     patternView.LeftAnchor.ConstraintEqualTo(scrollView.ReadableContentGuide.LeftAnchor, paddingValue),
                     patternView.TopAnchor.ConstraintEqualTo(scrollView.ReadableContentGuide.TopAnchor, paddingValue),
-                    patternView.RightAnchor.ConstraintEqualTo(scrollView.ReadableContentGuide.RightAnchor, -paddingValue),
-                    patternView.WidthAnchor.ConstraintEqualTo(scrollView.ReadableContentGuide.WidthAnchor),
 
                     //rangeView.TopAnchor.ConstraintEqualTo(patternView.BottomAnchor, 10f),
                     //rangeView.LeftAnchor.ConstraintEqualTo(patternView.LeftAnchor),
@@ -80,12 +81,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.Subviews
             });
 
             var gestureRecognizer = new UITapGestureRecognizer(() => View.EndEditing(true));
-            View.AddGestureRecognizer(gestureRecognizer);
+            View.AddGestureRecognizer(gestureRecognizer);  //TODO testing
         }
 
         class PatternView : UIStackView, IEditable
         {
             PatternHeaderView patternHeaderView;
+            DailyView dailyView;
+            WeeklyView weeklyView;
+
+            const float radioButtonSpacing = 5f;
+            const float interViewSpacing = 5f;
+            const float topSpacing = 2f;
+            const float bottomSpacing = -2f;
 
             public PatternView()
             {
@@ -95,26 +103,33 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.Subviews
             public void Refresh()
             {
                 patternHeaderView.Refresh();
+                dailyView.Refresh();
+                weeklyView.Refresh();
+
             }
 
             public void SetViewModel(EditAppointmentViewModel ca)
             {
                 patternHeaderView.SetViewModel(ca);
+                dailyView.SetViewModel(ca);
+                weeklyView.SetViewModel(ca);
             }
 
             void InitializeView()
             {
                 Axis = UILayoutConstraintAxis.Vertical;
-                Alignment = UIStackViewAlignment.Leading;
+                Alignment = UIStackViewAlignment.Fill;
                 Distribution = UIStackViewDistribution.Fill;
                 Spacing = 10f;
                 TranslatesAutoresizingMaskIntoConstraints = false;
 
                 patternHeaderView = new PatternHeaderView();
+                dailyView = new DailyView();
+                weeklyView = new WeeklyView();
 
                 AddArrangedSubview(patternHeaderView);
                 AddArrangedSubview(new SeparatorSubView());
-                AddArrangedSubview(new DailyView());
+                AddArrangedSubview(weeklyView);
             }
 
             class PatternHeaderView : UIStackView, IEditable
@@ -123,14 +138,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.Subviews
                 PickerTextField typeField;
 
                 List<RecurrenceType> recurrenceTypes = new List<RecurrenceType> { RecurrenceType.Daily, RecurrenceType.Monthly, RecurrenceType.Weekly, RecurrenceType.Yearly };
-                List<string> recurrenceStrings = new List<string> { "Daily", "Monthly", "Weekly", "Yearly" }; //TODO can be improved 
+                List<string> recurrenceStrings = new List<string> { "Daily", "Monthly", "Weekly", "Yearly" };
 
                 public PatternHeaderView()
                 {
                     Axis = UILayoutConstraintAxis.Horizontal;
                     Alignment = UIStackViewAlignment.Fill;
                     Distribution = UIStackViewDistribution.Fill;
-                    Spacing = 20f;
+                    Spacing = 10f;
                     TranslatesAutoresizingMaskIntoConstraints = false;
 
                     var label = new UILabel
@@ -191,6 +206,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.Subviews
             {
                 EditAppointmentViewModel viewModel;
 
+                RadioButton radioButton1;
+                RadioButton radioButton2;
+                UITextField daysTextField;
+
                 public DailyView()
                 {
                     Axis = UILayoutConstraintAxis.Vertical;
@@ -212,7 +231,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.Subviews
                         Text = "Every",
                     };
 
-                    var radioButton1 = new RadioButton();
+                    radioButton1 = new RadioButton();
 
                     var daysLabel = new UILabel
                     {
@@ -221,13 +240,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.Subviews
                         Text = "days",
                     };
 
-                    var daysTextField = new UITextField();
-                    daysTextField.TranslatesAutoresizingMaskIntoConstraints = false;
-                    daysTextField.KeyboardType = UIKeyboardType.NumberPad;
-                    daysTextField.Text = "122";
+                    daysTextField = new PickerTextField(true)
+                    {
+                        Text = "1",
+                        KeyboardType = UIKeyboardType.NumberPad
+                    };
+                    daysTextField.EditingChanged += DaysTextField_EditingChanged;
+                    daysTextField.EditingDidBegin += DaysTextField_EditingDidBegin;
+                    daysTextField.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+                    daysTextField.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
 
-                    //firstLine.AddGestureRecognizer(new UITapGestureRecognizer(radioButton1.SetEnabled));
-                    firstLine.BackgroundColor = UIColor.Orange;
+                    firstLine.AddGestureRecognizer(new UITapGestureRecognizer(FirstLine_Tapped));
                     firstLine.AddSubview(radioButton1);
                     firstLine.AddSubview(everyLabel);
                     firstLine.AddSubview(daysLabel);
@@ -237,27 +260,105 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.Subviews
                     {
                         radioButton1.LeadingAnchor.ConstraintEqualTo(firstLine.LeadingAnchor),
                         radioButton1.CenterYAnchor.ConstraintEqualTo(firstLine.CenterYAnchor),
-                        radioButton1.TopAnchor.ConstraintEqualTo(firstLine.TopAnchor, 5f),
 
                         everyLabel.CenterYAnchor.ConstraintEqualTo(radioButton1.CenterYAnchor),
-                        everyLabel.LeadingAnchor.ConstraintEqualTo(radioButton1.TrailingAnchor, 10f),
+                        everyLabel.LeadingAnchor.ConstraintEqualTo(radioButton1.TrailingAnchor, radioButtonSpacing),
 
                         daysTextField.CenterYAnchor.ConstraintEqualTo(radioButton1.CenterYAnchor),
-                        daysTextField.LeadingAnchor.ConstraintEqualTo(everyLabel.TrailingAnchor, 5f),
+                        daysTextField.LeadingAnchor.ConstraintEqualTo(everyLabel.TrailingAnchor, interViewSpacing),
+                        daysTextField.BottomAnchor.ConstraintEqualTo(firstLine.BottomAnchor, bottomSpacing),
+                        daysTextField.TopAnchor.ConstraintEqualTo(firstLine.TopAnchor, topSpacing),
 
                         daysLabel.CenterYAnchor.ConstraintEqualTo(radioButton1.CenterYAnchor),
-                        daysLabel.LeadingAnchor.ConstraintEqualTo(daysTextField.TrailingAnchor, 5f),
+                        daysLabel.LeadingAnchor.ConstraintEqualTo(daysTextField.TrailingAnchor, interViewSpacing),
+                        daysLabel.TrailingAnchor.ConstraintEqualTo(firstLine.TrailingAnchor),
+                    });
+
+                    var secondLine = new UIView
+                    {
+                        TranslatesAutoresizingMaskIntoConstraints = false,
+                        UserInteractionEnabled = true,
+                    };
+                    secondLine.AddGestureRecognizer(new UITapGestureRecognizer(SecondLine_Tapped));
+
+                    radioButton2 = new RadioButton();
+
+                    var weekedaysLabel = new UILabel
+                    {
+                        TranslatesAutoresizingMaskIntoConstraints = false,
+                        Font = Theme.DefaultFont,
+                        Text = "Every weekday",
+                    };
+
+                    secondLine.AddSubview(radioButton2);
+                    secondLine.AddSubview(weekedaysLabel);
+
+                    secondLine.AddConstraints(new[]
+                    {
+                        radioButton2.LeadingAnchor.ConstraintEqualTo(secondLine.LeadingAnchor),
+                        radioButton2.CenterYAnchor.ConstraintEqualTo(secondLine.CenterYAnchor),
+                        radioButton2.TopAnchor.ConstraintEqualTo(secondLine.TopAnchor,topSpacing),
+
+                        weekedaysLabel.CenterYAnchor.ConstraintEqualTo(radioButton2.CenterYAnchor),
+                        weekedaysLabel.LeadingAnchor.ConstraintEqualTo(radioButton2.TrailingAnchor, radioButtonSpacing),
+                        weekedaysLabel.TrailingAnchor.ConstraintEqualTo(secondLine.TrailingAnchor),
+                        weekedaysLabel.BottomAnchor.ConstraintEqualTo(secondLine.BottomAnchor, bottomSpacing),
                     });
 
                     AddArrangedSubview(firstLine);
+                    AddArrangedSubview(secondLine);
                 }
 
-                public void UpdateModel(int i)
+                private void FirstLine_Tapped()
                 {
+                    radioButton1.Enabled = true;
+                    radioButton2.Enabled = false;
+                    UpdateModel();
+                }
+
+                private void SecondLine_Tapped()
+                {
+                    radioButton1.Enabled = false;
+                    radioButton2.Enabled = true;
+                    UpdateModel();
+                }
+
+                void UpdateModel()
+                {
+                    if (radioButton1.Enabled)
+                    {
+                        viewModel.RecurrenceInfo.WeekDays = WeekDays.EveryDay;
+                        viewModel.RecurrenceInfo.Periodicity = int.Parse(daysTextField.Text);
+                    }
+                    else if (radioButton2.Enabled)
+                    {
+                        viewModel.RecurrenceInfo.WeekDays = WeekDays.WorkDays;
+                    }
+                }
+
+                void DaysTextField_EditingChanged(object sender, EventArgs e)
+                {
+                    FirstLine_Tapped();
+                }
+
+                void DaysTextField_EditingDidBegin(object sender, EventArgs e)
+                {
+                    FirstLine_Tapped();
                 }
 
                 public void Refresh()
                 {
+                    if (viewModel.RecurrenceInfo.WeekDays == WeekDays.EveryDay)
+                    {
+                        radioButton1.Enabled = true;
+                        radioButton2.Enabled = false;
+                        daysTextField.Text = viewModel.RecurrenceInfo.Periodicity.ToString();
+                    }
+                    else if (viewModel.RecurrenceInfo.WeekDays == WeekDays.WorkDays)
+                    {
+                        radioButton1.Enabled = false;
+                        radioButton2.Enabled = true;
+                    }
                 }
 
                 public void SetViewModel(EditAppointmentViewModel ca)
@@ -265,6 +366,183 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.Subviews
                     viewModel = ca;
                 }
             }
+
+            class WeeklyView : UIView, IEditable
+            {
+                EditAppointmentViewModel viewModel;
+
+                UITextField weeksTextField;
+                UITableView weekdaysTableView;
+                List<WeekDays> weekDays = new List<WeekDays> { WeekDays.Monday, WeekDays.Tuesday, WeekDays.Wednesday,
+                    WeekDays.Thursday, WeekDays.Friday, WeekDays.Saturday, WeekDays.Sunday };
+
+                public WeeklyView()
+                {
+                    TranslatesAutoresizingMaskIntoConstraints = false;
+
+                    var firstLine = new UIView
+                    {
+                        TranslatesAutoresizingMaskIntoConstraints = false,
+                        UserInteractionEnabled = true,
+                    };
+
+                    var recurLabel = new UILabel
+                    {
+                        TranslatesAutoresizingMaskIntoConstraints = false,
+                        Font = Theme.DefaultFont,
+                        Text = "Recur every",
+                    };
+
+                    var weeksLabel = new UILabel
+                    {
+                        TranslatesAutoresizingMaskIntoConstraints = false,
+                        Font = Theme.DefaultFont,
+                        Text = "week(s) on:",
+                    };
+
+                    weeksTextField = new PickerTextField(true)
+                    {
+                        Text = "1",
+                        KeyboardType = UIKeyboardType.NumberPad
+                    };
+                    weeksTextField.EditingChanged += WeeksTextField_EditingChanged;
+                    weeksTextField.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+                    weeksTextField.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+
+                    firstLine.AddSubview(recurLabel);
+                    firstLine.AddSubview(weeksLabel);
+                    firstLine.AddSubview(weeksTextField);
+
+                    firstLine.AddConstraints(new[]
+                    {
+                        recurLabel.LeadingAnchor.ConstraintEqualTo(firstLine.LeadingAnchor),
+                        recurLabel.CenterYAnchor.ConstraintEqualTo(firstLine.CenterYAnchor),
+
+                        weeksTextField.LeadingAnchor.ConstraintEqualTo(recurLabel.TrailingAnchor, interViewSpacing),
+                        weeksTextField.BottomAnchor.ConstraintEqualTo(firstLine.BottomAnchor, bottomSpacing),
+                        weeksTextField.TopAnchor.ConstraintEqualTo(firstLine.TopAnchor, topSpacing),
+                        weeksTextField.CenterYAnchor.ConstraintEqualTo(recurLabel.CenterYAnchor),
+
+                        weeksLabel.CenterYAnchor.ConstraintEqualTo(recurLabel.CenterYAnchor),
+                        weeksLabel.LeadingAnchor.ConstraintEqualTo(weeksTextField.TrailingAnchor, interViewSpacing),
+                        weeksLabel.TrailingAnchor.ConstraintEqualTo(firstLine.TrailingAnchor),
+                    });
+
+                    weekdaysTableView = new UITableView
+                    {
+                        TranslatesAutoresizingMaskIntoConstraints = false,
+                        UserInteractionEnabled = true,
+                    };
+                    weekdaysTableView.AllowsSelection = true;
+                    weekdaysTableView.AllowsMultipleSelection = true;
+                    weekdaysTableView.Source = new WeekdaysSource(this);
+
+                    AddSubview(firstLine);
+                    AddSubview(weekdaysTableView);
+
+                    AddConstraints(new[]
+                    {
+                        firstLine.LeadingAnchor.ConstraintEqualTo(LeadingAnchor),
+                        firstLine.TopAnchor.ConstraintEqualTo(TopAnchor),
+
+                        weekdaysTableView.LeadingAnchor.ConstraintEqualTo(firstLine.LeadingAnchor),
+                        weekdaysTableView.TopAnchor.ConstraintEqualTo(firstLine.BottomAnchor,10f ),
+                        weekdaysTableView.BottomAnchor.ConstraintEqualTo(BottomAnchor),
+                        weekdaysTableView.TrailingAnchor.ConstraintEqualTo(TrailingAnchor),
+                    });
+                }
+
+                private void WeeksTextField_EditingChanged(object sender, EventArgs e)
+                {
+                    UpdateModel();
+                }
+
+                void UpdateModel()
+                {
+                    viewModel.RecurrenceInfo.Periodicity = int.TryParse(weeksTextField.Text, out var i) ? i : 1;
+                }
+
+                public void Refresh()
+                {
+                    weeksTextField.Text = viewModel.RecurrenceInfo.Periodicity.ToString();
+                    var selected = weekDays.Where(w => viewModel.RecurrenceInfo.WeekDays.HasFlag(w)).ToList();
+                    (weekdaysTableView.Source as WeekdaysSource).SetSelected(selected);
+                    weekdaysTableView.ReloadData();
+                }
+
+                public void SetViewModel(EditAppointmentViewModel ca)
+                {
+                    viewModel = ca;
+                }
+
+                public void ChangedSelection(WeekDays weekday, bool selected)
+                {
+                    if (selected)
+                        viewModel.RecurrenceInfo.WeekDays |= weekday;
+                    else
+                        viewModel.RecurrenceInfo.WeekDays &= ~weekday;
+
+                }
+
+                class WeekdaysSource : UITableViewSource
+                {
+                    WeeklyView parentView;
+                    List<WeekDays> data = new List<WeekDays> { WeekDays.Monday, WeekDays.Tuesday, WeekDays.Wednesday,
+                    WeekDays.Thursday, WeekDays.Friday, WeekDays.Saturday, WeekDays.Sunday };
+                    readonly HashSet<WeekDays> selectedItems;
+
+                    public WeekdaysSource(WeeklyView parentView)
+                    {
+                        this.parentView = parentView;
+                    }
+
+                    public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
+                    {
+                        var weekDay = data[indexPath.Row];
+                        var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateDefault("cell", UITableViewCellSelectionStyle.None);
+                        cell.TextLabel.Text = weekDay.GetDayName();
+                        cell.Accessory = selectedItems.Contains(weekDay) ? UITableViewCellAccessory.Checkmark : UITableViewCellAccessory.None;
+                        return cell;
+                    }
+
+                    public override nint RowsInSection(UITableView tableview, nint section) => data.Count;
+
+                    public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
+                    {
+                        var cell = tableView.CellAt(indexPath);
+                        if (cell == null)
+                            return;
+
+                        tableView.CellAt(indexPath).Accessory = UITableViewCellAccessory.Checkmark;
+                        selectedItems.Add(data[indexPath.Row]);
+
+                        parentView.ChangedSelection(data[indexPath.Row], true);
+                    }
+
+                    public override void RowDeselected(UITableView tableView, NSIndexPath indexPath)
+                    {
+                        var cell = tableView.CellAt(indexPath);
+                        if (cell == null)
+                            return;
+
+                        if (selectedItems.Count == 1)
+                            return;
+
+                        tableView.CellAt(indexPath).Accessory = UITableViewCellAccessory.None;
+                        selectedItems.Remove(data[indexPath.Row]);
+
+                        parentView.ChangedSelection(data[indexPath.Row], false);
+                    }
+
+                    public void SetSelected(IEnumerable<WeekDays> wdays)
+                    {
+                        foreach (var w in wdays)
+                            selectedItems.Add(w);
+                    }
+                }
+
+            }
+
 
         }
 
@@ -301,6 +579,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.Subviews
                 TextColor = Theme.Blue;
                 if (!editable)
                     TintColor = Theme.Clear;
+
+                AddConstraints(new[] {
+                    WidthAnchor.ConstraintGreaterThanOrEqualTo(35f),
+                    HeightAnchor.ConstraintGreaterThanOrEqualTo(30f),
+                });
             }
 
             public override CGRect TextRect(CGRect forBounds)
@@ -347,14 +630,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.Subviews
             public SeparatorSubView()
             {
                 BackgroundColor = backgroundColor;
-                HeightAnchor.ConstraintEqualTo(0.5f).Active = true;
+                HeightAnchor.ConstraintEqualTo(1.5f).Active = true;
                 TranslatesAutoresizingMaskIntoConstraints = false;
             }
         }
 
         class RadioButton : UIView
         {
-            UIView innerCircle;
+            readonly UIView innerDisk;
+
+            private bool enabled;
+
+            public bool Enabled
+            {
+                get => enabled;
+                set { enabled = value; UpdateState(); }
+            }
 
             public RadioButton()
             {
@@ -363,37 +654,32 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.Subviews
                 Layer.BorderColor = Theme.Blue.CGColor;
                 Layer.BorderWidth = 2f;
 
-                innerCircle = new UIView()
+                innerDisk = new UIView()
                 {
                     TranslatesAutoresizingMaskIntoConstraints = false,
                 };
 
-                innerCircle.Layer.CornerRadius = 3f;
-                innerCircle.BackgroundColor = Theme.Blue;
+                innerDisk.Layer.CornerRadius = 3f;
+                innerDisk.BackgroundColor = Theme.Blue;
 
-                AddSubview(innerCircle);
+                AddSubview(innerDisk);
 
                 AddConstraints(new[]
                     {
-                    innerCircle.CenterXAnchor.ConstraintEqualTo(CenterXAnchor),
-                    innerCircle.CenterYAnchor.ConstraintEqualTo(CenterYAnchor),
-                    innerCircle.WidthAnchor.ConstraintEqualTo(innerCircle.HeightAnchor),
-                    innerCircle.WidthAnchor.ConstraintEqualTo(6),
+                    innerDisk.CenterXAnchor.ConstraintEqualTo(CenterXAnchor),
+                    innerDisk.CenterYAnchor.ConstraintEqualTo(CenterYAnchor),
+                    innerDisk.WidthAnchor.ConstraintEqualTo(innerDisk.HeightAnchor),
+                    innerDisk.WidthAnchor.ConstraintEqualTo(6),
                     WidthAnchor.ConstraintEqualTo(HeightAnchor),
                     WidthAnchor.ConstraintEqualTo(15),
                     });
 
-                innerCircle.Alpha = 0;
+                innerDisk.Alpha = 0;
             }
 
-            public void SetEnabled()
+            void UpdateState()
             {
-                innerCircle.Alpha = 1;
-            }
-
-            public void SetDisabled()
-            {
-                innerCircle.Alpha = 0;
+                innerDisk.Alpha = enabled ? 1 : 0;
             }
         }
 
