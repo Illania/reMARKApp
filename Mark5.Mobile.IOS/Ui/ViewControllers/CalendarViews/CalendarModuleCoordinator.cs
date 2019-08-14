@@ -7,6 +7,7 @@ using CoreAnimation;
 using Foundation;
 using Mark5.Mobile.Common.Presenters.CalendarModule;
 using Mark5.Mobile.IOS.Ui.Common;
+using Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView;
 using Mark5.Mobile.IOS.Utilities;
 using Syncfusion.SfSchedule.iOS;
 using UIKit;
@@ -63,7 +64,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         public void ShowAppointment(int calendarId, int appointmentId, int recurrenceIndex)
         {
             //RootController.PushViewController(new AppointmentViewController(calendarId, appointmentId, recurrenceIndex), true);
-            RootController.PushViewController(new Subviews.RecurrenceViewController(), true);
+            RootController.PushViewController(new RecurrenceViewController(), true);
 
         }
 

@@ -280,7 +280,10 @@
     <Compile Include="Ui\ViewControllers\CalendarViews\CalendarsListViewController.cs" />
     <Compile Include="Ui\TableViewCells\CalendarTableViewCell.cs" />
     <Compile Include="Ui\TableViewCells\ParticipantsTableViewCell.cs" />
-    <Compile Include="Ui\ViewControllers\CalendarViews\Recurrence\ReoccurrenceViewController.cs" />
+    <Compile Include="Ui\ViewControllers\CalendarViews\RecurrenceView\ReoccurrenceViewController.cs" />
+    <Compile Include="Ui\ViewControllers\CalendarViews\RecurrenceView\Subviews\PatternView.cs" />
+    <Compile Include="Ui\ViewControllers\CalendarViews\RecurrenceView\Subviews\Common.cs" />
+    <Compile Include="Ui\ViewControllers\CalendarViews\RecurrenceView\Subviews\RangeView.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
@@ -766,7 +769,8 @@
 	      <Folder Include="Assets_icons.xcassets\Participant-Unknown.imageset\" />
 	      <Folder Include="Assets_icons.xcassets\Participant-Accepted.imageset\" />
 	      <Folder Include="Assets_icons.xcassets\Participant-Declined.imageset\" />
-	      <Folder Include="Ui\ViewControllers\CalendarViews\Recurrence\" />
+	      <Folder Include="Ui\ViewControllers\CalendarViews\RecurrenceView\" />
+	      <Folder Include="Ui\ViewControllers\CalendarViews\RecurrenceView\Subviews\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 	<Import Project="..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets" Condition="Exists('..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets')" />

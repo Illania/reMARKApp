@@ -9,7 +9,6 @@ using Mark5.Mobile.Common.Presenters.CalendarModule;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
-using Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.Subviews;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
@@ -312,7 +311,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         private void ParticipantsView_ShowParticipantsClicked(object sender, EventArgs e)
         {
-            NavigationController.PushViewController(new RecurrenceViewController(), true);
+            //TODO for testing
         }
 
         #endregion
