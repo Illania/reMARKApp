@@ -316,7 +316,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
         {
             TranslatesAutoresizingMaskIntoConstraints = false;
             Font = Theme.DefaultFont;
-            //HeightAnchor.ConstraintGreaterThanOrEqualTo(30f).Active = true;
+            HeightAnchor.ConstraintGreaterThanOrEqualTo(30f).Active = true;
         }
     }
 
