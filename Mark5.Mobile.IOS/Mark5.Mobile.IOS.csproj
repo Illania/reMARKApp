@@ -279,7 +279,7 @@
     <Compile Include="Ui\ViewControllers\CalendarViews\CalendarsListViewController.cs" />
     <Compile Include="Ui\TableViewCells\CalendarTableViewCell.cs" />
     <Compile Include="Ui\TableViewCells\ParticipantsTableViewCell.cs" />
-    <Compile Include="Ui\ViewControllers\CalendarViews\EditAppointmentViewController.cs" />
+    <Compile Include="Ui\ViewControllers\CalendarViews\AddEditAppointmentViewController.cs" />
     <Compile Include="Model\DateTimeChangeEvent.cs" />
     <Compile Include="Ui\TableViewCells\AddEditTableViewCells\AddEditAppointmentTableViewCell\AppointmentDisclosureTableViewCell.cs" />
     <Compile Include="Ui\TableViewCells\AddEditTableViewCells\AddEditAppointmentTableViewCell\CalendarDisclosureTableViewCell.cs" />

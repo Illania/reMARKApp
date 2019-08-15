@@ -80,14 +80,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             InitializeHandlers();
 
             if (CreationModeFlag == ContactCreationModeFlag.New)
-            {
                 await presenter.LoadEmptyAppointment();
-            }
 
             if (CreationModeFlag == ContactCreationModeFlag.Edit)
-            {
                 await presenter.LoadAppointment(calendarId, appointmentId);
-            }
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -446,7 +442,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                     };
                 }
 
-                public void DateChanged(object sender, DateTimeChangeEvent args)
+                public void DateChanged(DateTimeChangeEvent args)
                 {
                     switch (args.rowType)
                     {
@@ -717,10 +713,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             class AllDayToggleRow : AbstractRow
             {
-                EventHandler<DateTimeChangeEvent> dateChangedHandler = delegate { };
+                //EventHandler<DateTimeChangeEvent> dateChangedHandler = delegate { };
+                Action<DateTimeChangeEvent> dateChangedHandler;
                 public override string Key => "AllDayToggleRow";
 
-                public AllDayToggleRow(AbstractSection section, EventHandler<DateTimeChangeEvent> dateChangedHandler)
+                public AllDayToggleRow(AbstractSection section, Action<DateTimeChangeEvent> dateChangedHandler)
                     : base(section)
                 {
                     this.dateChangedHandler = dateChangedHandler;
@@ -743,7 +740,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             {
                 public override string Key => "StartDateRow";
 
-                public StartDateRow(AbstractSection section, EventHandler<DateTimeChangeEvent> dateChangedHandler)
+                public StartDateRow(AbstractSection section, Action<DateTimeChangeEvent> dateChangedHandler)
                     : base(section, dateChangedHandler, DateRowType.Starts)
                 {
                 }
@@ -759,7 +756,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             {
                 public override string Key => "EndDateRow";
 
-                public EndDateRow(AbstractSection section, EventHandler<DateTimeChangeEvent> dateChangedHandler)
+                public EndDateRow(AbstractSection section, Action<DateTimeChangeEvent> dateChangedHandler)
                     : base(section, dateChangedHandler, DateRowType.Ends)
                 {
                 }
@@ -774,12 +771,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             class DateSelectionRow : AbstractRow
             {
-                readonly EventHandler<DateTimeChangeEvent> dateChangedHandler = delegate { };
+                readonly Action<DateTimeChangeEvent> dateChangedHandler = delegate { };
                 readonly DateRowType rowType;
 
                 public override string Key => "DateSelectionRow";
 
-                public DateSelectionRow(AbstractSection section, EventHandler<DateTimeChangeEvent> dateChangedHandler, DateRowType rowType) : base(section)
+                public DateSelectionRow(AbstractSection section, Action<DateTimeChangeEvent> dateChangedHandler, DateRowType rowType) : base(section)
                 {
                     this.dateChangedHandler = dateChangedHandler;
                     this.rowType = rowType;

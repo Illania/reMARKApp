@@ -17,11 +17,11 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
 
         UIDatePicker datePicker;
 
-        public EventHandler<DateTimeChangeEvent> DateChanged = delegate { };
+        public Action<DateTimeChangeEvent> DateChanged = delegate { };
         public UITextField DateTextField;
         public UILabel Label;
 
-        public DateSelectioTableViewCell(EventHandler<DateTimeChangeEvent> dateChanged, DateRowType rowType) : base(UITableViewCellStyle.Default, Key)
+        public DateSelectioTableViewCell(Action<DateTimeChangeEvent> dateChanged, DateRowType rowType) : base(UITableViewCellStyle.Default, Key)
         {
             this.rowType = rowType;
             SelectionStyle = UITableViewCellSelectionStyle.Default;
@@ -194,7 +194,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
             var selectedDate = datePicker.Date;
             var selectedDateComponents = NSCalendar.CurrentCalendar.Components(NSCalendarUnit.Day | NSCalendarUnit.Month | NSCalendarUnit.Year | NSCalendarUnit.Hour | NSCalendarUnit.Minute, selectedDate);
             var dateTime = new DateTime((int)selectedDateComponents.Year, (int)selectedDateComponents.Month, (int)selectedDateComponents.Day, (int)selectedDateComponents.Hour, (int)selectedDateComponents.Minute, 0, DateTimeKind.Utc);
-            DateChanged?.Invoke(sender, new DateTimeChangeEvent(dateTime, rowType));
+            DateChanged?.Invoke(new DateTimeChangeEvent(dateTime, rowType));
         }
 
         [Export("cancelTapped:")]
