@@ -103,7 +103,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         public void CreateAppointmentClicked()
         {
-            RootController.PushViewController(new CreateAppointmentViewController(), true);
+            RootController.PushViewController((UIViewController)new AddAppointmentViewController(), true);
         }
 
         public void MonthTapped(NSDate date)
