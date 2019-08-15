@@ -16,8 +16,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
         public const float radioButtonSpacing = 5f;
         public const float interviewHorizontalSpacing = 5f;
         public const float interviewVerticalSpacing = 3f;
-        public const float topSpacing = 4f;
+        public const float topSpacing = 2f;
         public const float bottomSpacing = -2f;
+        public const float internalStackViewSpacing = 10f;
+        public const float stackViewSpacing = 15f;
+        public const float lineHeight = 40f;
 
         public static List<RecurrenceType> recurrenceTypes = new List<RecurrenceType> { RecurrenceType.Daily, RecurrenceType.Weekly, RecurrenceType.Monthly, RecurrenceType.Yearly };
 
@@ -43,16 +46,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
 
     abstract class BaseField : UITextField
     {
-        const float insetVal = 5f;
+        const float insetVal = 4f;
 
         public BaseField(bool editable = false)
         {
             Font = Theme.DefaultFont;
             TranslatesAutoresizingMaskIntoConstraints = false;
-            Layer.BorderColor = Theme.Blue.CGColor;
-            Layer.BorderWidth = 2f;
+            Layer.BorderColor = Theme.DarkerBlue.CGColor;
+            Layer.BorderWidth = 1f;
             Layer.CornerRadius = 8f;
-            TextColor = Theme.Blue;
+            TextColor = Theme.DarkerBlue;
             if (!editable)
                 TintColor = Theme.Clear;
 
@@ -370,17 +373,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
         public RadioButton()
         {
             TranslatesAutoresizingMaskIntoConstraints = false;
-            Layer.CornerRadius = 5f;
-            Layer.BorderColor = Theme.Blue.CGColor;
-            Layer.BorderWidth = 2f;
+            Layer.CornerRadius = 7.5f;
+            Layer.BorderColor = Theme.DarkerBlue.CGColor;
+            Layer.BorderWidth = 1f;
 
             innerDisk = new UIView()
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
             };
 
-            innerDisk.Layer.CornerRadius = 3f;
-            innerDisk.BackgroundColor = Theme.Blue;
+            innerDisk.Layer.CornerRadius = 4f;
+            innerDisk.BackgroundColor = Theme.DarkerBlue;
 
             AddSubview(innerDisk);
 
