@@ -311,7 +311,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         private void ParticipantsView_ShowParticipantsClicked(object sender, EventArgs e)
         {
-            //TODO for testing
+            PresentViewController(new NavigationController(new ParticipantsViewController(appointment.Participants), UIModalPresentationStyle.PageSheet), true, null);
         }
 
         #endregion

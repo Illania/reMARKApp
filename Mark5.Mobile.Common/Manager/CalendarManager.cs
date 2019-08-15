@@ -243,7 +243,7 @@ namespace Mark5.Mobile.Common.Manager
                     {
                         (var startDate, var endDate) = GetTimePeriod(monthDate);
 
-                        var app = await Managers.CalendarManager.GetCalendarAppointmentsAsync(calendarsList.Select(c => c.Id).ToList(), startDate, endDate, SourceType.Local);  //TODO for testing!
+                        var app = await Managers.CalendarManager.GetCalendarAppointmentsAsync(calendarsList.Select(c => c.Id).ToList(), startDate, endDate, SourceType.Auto);
 
                         if (!token.IsCancellationRequested)
                         {

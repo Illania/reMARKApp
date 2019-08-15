@@ -13,7 +13,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
         PatternView patternView;
         RangeView rangeView;
 
-        EditAppointmentViewModel ap = new EditAppointmentViewModel();
+        EditAppointmentViewModel vm;
+
+        public RecurrenceViewController(EditAppointmentViewModel vm)
+        {
+            this.vm = vm;
+        }
 
         public override void LoadView()
         {
@@ -26,19 +31,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
         {
             base.ViewWillAppear(animated);
 
-            patternView.SetViewModel(ap);
-            patternView.Refresh();
+            patternView.SetViewModel(vm);
+            rangeView.SetViewModel(vm);
 
-            rangeView.SetViewModel(ap);
+            patternView.Refresh();
             rangeView.Refresh();
         }
 
         void InitializeView()
         {
-            ap.RecurrenceInfo = new RecurrenceInfo();
-            ap.RecurrenceInfo.Type = RecurrenceType.Weekly;
-            ap.RecurrenceInfo.WeekDays = WeekDays.WorkDays;
-
             NavigationItem.Title = "Custom recurrence";
 
             UIScrollView scrollView = new UIScrollView
@@ -81,7 +82,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
 
             var gestureRecognizer = new UITapGestureRecognizer(() => View.EndEditing(true));
             gestureRecognizer.CancelsTouchesInView = false;
-            View.AddGestureRecognizer(gestureRecognizer);  //TODO testing
+            View.AddGestureRecognizer(gestureRecognizer);
         }
     }
 }
