@@ -80,6 +80,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
             });
 
             var gestureRecognizer = new UITapGestureRecognizer(() => View.EndEditing(true));
+            gestureRecognizer.CancelsTouchesInView = false;
             View.AddGestureRecognizer(gestureRecognizer);  //TODO testing
         }
     }
