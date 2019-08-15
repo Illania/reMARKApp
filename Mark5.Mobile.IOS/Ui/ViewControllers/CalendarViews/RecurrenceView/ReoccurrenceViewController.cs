@@ -78,11 +78,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
                     rangeView.TopAnchor.ConstraintEqualTo(patternView.BottomAnchor, 10f),
                     rangeView.LeftAnchor.ConstraintEqualTo(patternView.LeftAnchor),
                     rangeView.RightAnchor.ConstraintEqualTo(patternView.RightAnchor),
-                    //rangeView.BottomAnchor.ConstraintEqualTo(scrollView.ReadableContentGuide.BottomAnchor, -paddingValue),
             });
 
             var gestureRecognizer = new UITapGestureRecognizer(() => View.EndEditing(true));
-            //View.AddGestureRecognizer(gestureRecognizer);  //TODO testing
+            View.AddGestureRecognizer(gestureRecognizer);  //TODO testing
         }
     }
 }

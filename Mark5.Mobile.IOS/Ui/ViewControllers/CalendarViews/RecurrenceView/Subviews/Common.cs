@@ -16,10 +16,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
         public const float radioButtonSpacing = 5f;
         public const float interviewHorizontalSpacing = 5f;
         public const float interviewVerticalSpacing = 3f;
-        public const float topSpacing = 2f;
-        public const float bottomSpacing = -2f;
-        public const float internalStackViewSpacing = 10f;
-        public const float stackViewSpacing = 15f;
+        public const float topSpacing = 1f;
+        public const float bottomSpacing = -1f;
+        public const float internalStackViewSpacing = 5f;
+        public const float stackViewSpacing = 10f;
 
         public static List<RecurrenceType> recurrenceTypes = new List<RecurrenceType> { RecurrenceType.Daily, RecurrenceType.Weekly, RecurrenceType.Monthly, RecurrenceType.Yearly };
 
