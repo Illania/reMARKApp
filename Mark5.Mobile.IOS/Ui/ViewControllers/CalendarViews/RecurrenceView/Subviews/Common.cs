@@ -20,7 +20,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
         public const float bottomSpacing = -2f;
         public const float internalStackViewSpacing = 10f;
         public const float stackViewSpacing = 15f;
-        public const float lineHeight = 40f;
 
         public static List<RecurrenceType> recurrenceTypes = new List<RecurrenceType> { RecurrenceType.Daily, RecurrenceType.Weekly, RecurrenceType.Monthly, RecurrenceType.Yearly };
 
@@ -317,6 +316,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
         {
             TranslatesAutoresizingMaskIntoConstraints = false;
             Font = Theme.DefaultFont;
+            //HeightAnchor.ConstraintGreaterThanOrEqualTo(30f).Active = true;
         }
     }
 

@@ -29,7 +29,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
             Axis = UILayoutConstraintAxis.Vertical;
             Alignment = UIStackViewAlignment.Fill;
             Distribution = UIStackViewDistribution.Fill;
-            Spacing = 10f;
+            Spacing = Common.stackViewSpacing;
             TranslatesAutoresizingMaskIntoConstraints = false;
 
             patternHeaderView = new PatternHeaderView();
@@ -134,7 +134,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
                 Axis = UILayoutConstraintAxis.Vertical;
                 Alignment = UIStackViewAlignment.Fill;
                 Distribution = UIStackViewDistribution.Fill;
-                Spacing = 20f;
+                Spacing = Common.internalStackViewSpacing;
                 TranslatesAutoresizingMaskIntoConstraints = false;
 
                 var firstLine = new UIView
@@ -191,7 +191,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
                 {
                         radioButton2.LeadingAnchor.ConstraintEqualTo(secondLine.LeadingAnchor),
                         radioButton2.CenterYAnchor.ConstraintEqualTo(secondLine.CenterYAnchor),
-                        radioButton2.TopAnchor.ConstraintEqualTo(secondLine.TopAnchor,Common.topSpacing),
 
                         weekedaysLabel.CenterYAnchor.ConstraintEqualTo(radioButton2.CenterYAnchor),
                         weekedaysLabel.LeadingAnchor.ConstraintEqualTo(radioButton2.TrailingAnchor, Common.radioButtonSpacing),
@@ -469,7 +468,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
                 Axis = UILayoutConstraintAxis.Vertical;
                 Alignment = UIStackViewAlignment.Fill;
                 Distribution = UIStackViewDistribution.Fill;
-                Spacing = 20f;
+                Spacing = Common.internalStackViewSpacing;
                 TranslatesAutoresizingMaskIntoConstraints = false;
 
                 var firstLine = new UIView
@@ -716,7 +715,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
                 Axis = UILayoutConstraintAxis.Vertical;
                 Alignment = UIStackViewAlignment.Fill;
                 Distribution = UIStackViewDistribution.Fill;
-                Spacing = 20f;
+                Spacing = Common.internalStackViewSpacing;
                 TranslatesAutoresizingMaskIntoConstraints = false;
 
                 var firstLine = new UIView
