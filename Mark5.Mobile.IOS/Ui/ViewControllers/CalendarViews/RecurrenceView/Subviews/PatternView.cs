@@ -19,12 +19,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
         MonthlyView monthlyView;
         YearlyView yearlyView;
 
-        const float radioButtonSpacing = 5f;
-        const float interviewHorizontalSpacing = 5f;
-        const float interviewVerticalSpacing = 3f;
-        const float topSpacing = 4f;
-        const float bottomSpacing = -2f;
-
         public PatternView()
         {
             InitializeView();
@@ -103,7 +97,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
                         label.CenterYAnchor.ConstraintEqualTo(CenterYAnchor),
                         label.BottomAnchor.ConstraintEqualTo(BottomAnchor),
 
-                        typeField.LeadingAnchor.ConstraintEqualTo(label.TrailingAnchor, interviewHorizontalSpacing),
+                        typeField.LeadingAnchor.ConstraintEqualTo(label.TrailingAnchor, Common.interviewHorizontalSpacing),
                         typeField.TopAnchor.ConstraintEqualTo(TopAnchor),
                         typeField.CenterYAnchor.ConstraintEqualTo(CenterYAnchor),
                     });
@@ -150,7 +144,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
                 };
 
                 var everyLabel = new TextLabel { Text = "Every" };
-                var daysLabel = new TextLabel { Text = "days", };
+                var daysLabel = new TextLabel { Text = "day(s)", };
                 radioButton1 = new RadioButton();
 
                 daysTextField = new NumberField();
@@ -168,15 +162,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
                         radioButton1.CenterYAnchor.ConstraintEqualTo(firstLine.CenterYAnchor),
 
                         everyLabel.CenterYAnchor.ConstraintEqualTo(radioButton1.CenterYAnchor),
-                        everyLabel.LeadingAnchor.ConstraintEqualTo(radioButton1.TrailingAnchor, radioButtonSpacing),
+                        everyLabel.LeadingAnchor.ConstraintEqualTo(radioButton1.TrailingAnchor, Common.radioButtonSpacing),
 
                         daysTextField.CenterYAnchor.ConstraintEqualTo(radioButton1.CenterYAnchor),
-                        daysTextField.LeadingAnchor.ConstraintEqualTo(everyLabel.TrailingAnchor, interviewHorizontalSpacing),
-                        daysTextField.BottomAnchor.ConstraintEqualTo(firstLine.BottomAnchor, bottomSpacing),
-                        daysTextField.TopAnchor.ConstraintEqualTo(firstLine.TopAnchor, topSpacing),
+                        daysTextField.LeadingAnchor.ConstraintEqualTo(everyLabel.TrailingAnchor, Common.interviewHorizontalSpacing),
+                        daysTextField.BottomAnchor.ConstraintEqualTo(firstLine.BottomAnchor, Common.bottomSpacing),
+                        daysTextField.TopAnchor.ConstraintEqualTo(firstLine.TopAnchor, Common.topSpacing),
 
                         daysLabel.CenterYAnchor.ConstraintEqualTo(radioButton1.CenterYAnchor),
-                        daysLabel.LeadingAnchor.ConstraintEqualTo(daysTextField.TrailingAnchor, interviewHorizontalSpacing),
+                        daysLabel.LeadingAnchor.ConstraintEqualTo(daysTextField.TrailingAnchor, Common.interviewHorizontalSpacing),
                     });
 
                 var secondLine = new UIView
@@ -197,12 +191,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
                 {
                         radioButton2.LeadingAnchor.ConstraintEqualTo(secondLine.LeadingAnchor),
                         radioButton2.CenterYAnchor.ConstraintEqualTo(secondLine.CenterYAnchor),
-                        radioButton2.TopAnchor.ConstraintEqualTo(secondLine.TopAnchor,topSpacing),
+                        radioButton2.TopAnchor.ConstraintEqualTo(secondLine.TopAnchor,Common.topSpacing),
 
                         weekedaysLabel.CenterYAnchor.ConstraintEqualTo(radioButton2.CenterYAnchor),
-                        weekedaysLabel.LeadingAnchor.ConstraintEqualTo(radioButton2.TrailingAnchor, radioButtonSpacing),
+                        weekedaysLabel.LeadingAnchor.ConstraintEqualTo(radioButton2.TrailingAnchor, Common.radioButtonSpacing),
                         weekedaysLabel.TrailingAnchor.ConstraintEqualTo(secondLine.TrailingAnchor),
-                        weekedaysLabel.BottomAnchor.ConstraintEqualTo(secondLine.BottomAnchor, bottomSpacing),
+                        weekedaysLabel.BottomAnchor.ConstraintEqualTo(secondLine.BottomAnchor, Common.bottomSpacing),
                     });
 
                 AddArrangedSubview(firstLine);
@@ -313,13 +307,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
                         recurLabel.LeadingAnchor.ConstraintEqualTo(firstLine.LeadingAnchor),
                         recurLabel.CenterYAnchor.ConstraintEqualTo(firstLine.CenterYAnchor),
 
-                        weeksTextField.LeadingAnchor.ConstraintEqualTo(recurLabel.TrailingAnchor, interviewHorizontalSpacing),
-                        weeksTextField.BottomAnchor.ConstraintEqualTo(firstLine.BottomAnchor, bottomSpacing),
-                        weeksTextField.TopAnchor.ConstraintEqualTo(firstLine.TopAnchor, topSpacing),
+                        weeksTextField.LeadingAnchor.ConstraintEqualTo(recurLabel.TrailingAnchor, Common.interviewHorizontalSpacing),
+                        weeksTextField.BottomAnchor.ConstraintEqualTo(firstLine.BottomAnchor, Common.bottomSpacing),
+                        weeksTextField.TopAnchor.ConstraintEqualTo(firstLine.TopAnchor, Common.topSpacing),
                         weeksTextField.CenterYAnchor.ConstraintEqualTo(recurLabel.CenterYAnchor),
 
                         weeksLabel.CenterYAnchor.ConstraintEqualTo(recurLabel.CenterYAnchor),
-                        weeksLabel.LeadingAnchor.ConstraintEqualTo(weeksTextField.TrailingAnchor, interviewHorizontalSpacing),
+                        weeksLabel.LeadingAnchor.ConstraintEqualTo(weeksTextField.TrailingAnchor, Common.interviewHorizontalSpacing),
                     });
 
                 weekdaysTableView = new UITableView
@@ -332,6 +326,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
                     ScrollEnabled = false,
                     CellLayoutMarginsFollowReadableWidth = false,
                     SeparatorInset = UIEdgeInsets.Zero,
+                    SeparatorStyle = UITableViewCellSeparatorStyle.None
                 };
 
                 AddSubview(firstLine);
@@ -520,23 +515,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
                         radioButton1.CenterYAnchor.ConstraintEqualTo(firstLine.CenterYAnchor),
 
                         dayLabel.CenterYAnchor.ConstraintEqualTo(radioButton1.CenterYAnchor),
-                        dayLabel.LeadingAnchor.ConstraintEqualTo(radioButton1.TrailingAnchor, radioButtonSpacing),
+                        dayLabel.LeadingAnchor.ConstraintEqualTo(radioButton1.TrailingAnchor, Common.radioButtonSpacing),
 
                         dayTextField.CenterYAnchor.ConstraintEqualTo(radioButton1.CenterYAnchor),
-                        dayTextField.LeadingAnchor.ConstraintEqualTo(dayLabel.TrailingAnchor, interviewHorizontalSpacing),
-                        dayTextField.BottomAnchor.ConstraintEqualTo(firstLine.BottomAnchor, bottomSpacing),
-                        dayTextField.TopAnchor.ConstraintEqualTo(firstLine.TopAnchor, topSpacing),
+                        dayTextField.LeadingAnchor.ConstraintEqualTo(dayLabel.TrailingAnchor, Common.interviewHorizontalSpacing),
+                        dayTextField.BottomAnchor.ConstraintEqualTo(firstLine.BottomAnchor, Common.bottomSpacing),
+                        dayTextField.TopAnchor.ConstraintEqualTo(firstLine.TopAnchor, Common.topSpacing),
 
                         ofEveryLabel1.CenterYAnchor.ConstraintEqualTo(radioButton1.CenterYAnchor),
-                        ofEveryLabel1.LeadingAnchor.ConstraintEqualTo(dayTextField.TrailingAnchor, interviewHorizontalSpacing),
+                        ofEveryLabel1.LeadingAnchor.ConstraintEqualTo(dayTextField.TrailingAnchor, Common.interviewHorizontalSpacing),
 
                         monthsField1.CenterYAnchor.ConstraintEqualTo(radioButton1.CenterYAnchor),
-                        monthsField1.LeadingAnchor.ConstraintEqualTo(ofEveryLabel1.TrailingAnchor, interviewHorizontalSpacing),
-                        monthsField1.BottomAnchor.ConstraintEqualTo(firstLine.BottomAnchor, bottomSpacing),
-                        monthsField1.TopAnchor.ConstraintEqualTo(firstLine.TopAnchor, topSpacing),
+                        monthsField1.LeadingAnchor.ConstraintEqualTo(ofEveryLabel1.TrailingAnchor, Common.interviewHorizontalSpacing),
+                        monthsField1.BottomAnchor.ConstraintEqualTo(firstLine.BottomAnchor, Common.bottomSpacing),
+                        monthsField1.TopAnchor.ConstraintEqualTo(firstLine.TopAnchor, Common.topSpacing),
 
                         monthsLabel1.CenterYAnchor.ConstraintEqualTo(radioButton1.CenterYAnchor),
-                        monthsLabel1.LeadingAnchor.ConstraintEqualTo(monthsField1.TrailingAnchor, interviewHorizontalSpacing),
+                        monthsLabel1.LeadingAnchor.ConstraintEqualTo(monthsField1.TrailingAnchor, Common.interviewHorizontalSpacing),
                     });
 
                 var secondLine = new UIView
@@ -582,25 +577,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
                         radioButton2.LeadingAnchor.ConstraintEqualTo(secondLine.LeadingAnchor),
 
                         theLabel.CenterYAnchor.ConstraintEqualTo(radioButton2.CenterYAnchor),
-                        theLabel.LeadingAnchor.ConstraintEqualTo(radioButton2.TrailingAnchor, radioButtonSpacing),
+                        theLabel.LeadingAnchor.ConstraintEqualTo(radioButton2.TrailingAnchor, Common.radioButtonSpacing),
 
                         weekOfMonthField.CenterYAnchor.ConstraintEqualTo(radioButton2.CenterYAnchor),
-                        weekOfMonthField.LeadingAnchor.ConstraintEqualTo(theLabel.TrailingAnchor, interviewHorizontalSpacing),
-                        weekOfMonthField.TopAnchor.ConstraintEqualTo(secondLine.TopAnchor, topSpacing),
+                        weekOfMonthField.LeadingAnchor.ConstraintEqualTo(theLabel.TrailingAnchor, Common.interviewHorizontalSpacing),
+                        weekOfMonthField.TopAnchor.ConstraintEqualTo(secondLine.TopAnchor, Common.topSpacing),
 
                         weekDayField.CenterYAnchor.ConstraintEqualTo(radioButton2.CenterYAnchor),
-                        weekDayField.LeadingAnchor.ConstraintEqualTo(weekOfMonthField.TrailingAnchor, interviewHorizontalSpacing),
-                        weekDayField.TopAnchor.ConstraintEqualTo(secondLine.TopAnchor, topSpacing),
+                        weekDayField.LeadingAnchor.ConstraintEqualTo(weekOfMonthField.TrailingAnchor, Common.interviewHorizontalSpacing),
+                        weekDayField.TopAnchor.ConstraintEqualTo(secondLine.TopAnchor, Common.topSpacing),
 
                         ofEveryLabel2.LeadingAnchor.ConstraintEqualTo(theLabel.LeadingAnchor),
                         ofEveryLabel2.CenterYAnchor.ConstraintEqualTo(monthsField2.CenterYAnchor),
 
-                        monthsField2.LeadingAnchor.ConstraintEqualTo(ofEveryLabel2.TrailingAnchor, interviewHorizontalSpacing),
-                        monthsField2.BottomAnchor.ConstraintEqualTo(secondLine.BottomAnchor, - bottomSpacing),
-                        monthsField2.TopAnchor.ConstraintEqualTo(weekDayField.BottomAnchor, interviewVerticalSpacing),
+                        monthsField2.LeadingAnchor.ConstraintEqualTo(ofEveryLabel2.TrailingAnchor, Common.interviewHorizontalSpacing),
+                        monthsField2.BottomAnchor.ConstraintEqualTo(secondLine.BottomAnchor, - Common.bottomSpacing),
+                        monthsField2.TopAnchor.ConstraintEqualTo(weekDayField.BottomAnchor, Common.interviewVerticalSpacing),
 
                         monthsLabel2.CenterYAnchor.ConstraintEqualTo(monthsField2.CenterYAnchor),
-                        monthsLabel2.LeadingAnchor.ConstraintEqualTo(monthsField2.TrailingAnchor, interviewHorizontalSpacing),
+                        monthsLabel2.LeadingAnchor.ConstraintEqualTo(monthsField2.TrailingAnchor, Common.interviewHorizontalSpacing),
                     });
 
                 AddArrangedSubview(firstLine);
@@ -751,17 +746,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
                         radioButton1.CenterYAnchor.ConstraintEqualTo(firstLine.CenterYAnchor),
 
                         everyLabel.CenterYAnchor.ConstraintEqualTo(radioButton1.CenterYAnchor),
-                        everyLabel.LeadingAnchor.ConstraintEqualTo(radioButton1.TrailingAnchor, radioButtonSpacing),
+                        everyLabel.LeadingAnchor.ConstraintEqualTo(radioButton1.TrailingAnchor, Common.radioButtonSpacing),
 
                         monthField1.CenterYAnchor.ConstraintEqualTo(radioButton1.CenterYAnchor),
-                        monthField1.LeadingAnchor.ConstraintEqualTo(everyLabel.TrailingAnchor, interviewHorizontalSpacing),
-                        monthField1.BottomAnchor.ConstraintEqualTo(firstLine.BottomAnchor, bottomSpacing),
-                        monthField1.TopAnchor.ConstraintEqualTo(firstLine.TopAnchor, topSpacing),
+                        monthField1.LeadingAnchor.ConstraintEqualTo(everyLabel.TrailingAnchor, Common.interviewHorizontalSpacing),
+                        monthField1.BottomAnchor.ConstraintEqualTo(firstLine.BottomAnchor, Common.bottomSpacing),
+                        monthField1.TopAnchor.ConstraintEqualTo(firstLine.TopAnchor, Common.topSpacing),
 
                         dayTextField.CenterYAnchor.ConstraintEqualTo(radioButton1.CenterYAnchor),
-                        dayTextField.LeadingAnchor.ConstraintEqualTo(monthField1.TrailingAnchor, interviewHorizontalSpacing),
-                        dayTextField.BottomAnchor.ConstraintEqualTo(firstLine.BottomAnchor, bottomSpacing),
-                        dayTextField.TopAnchor.ConstraintEqualTo(firstLine.TopAnchor, topSpacing),
+                        dayTextField.LeadingAnchor.ConstraintEqualTo(monthField1.TrailingAnchor, Common.interviewHorizontalSpacing),
+                        dayTextField.BottomAnchor.ConstraintEqualTo(firstLine.BottomAnchor, Common.bottomSpacing),
+                        dayTextField.TopAnchor.ConstraintEqualTo(firstLine.TopAnchor, Common.topSpacing),
                     });
 
                 var secondLine = new UIView
@@ -792,22 +787,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
                         radioButton2.LeadingAnchor.ConstraintEqualTo(secondLine.LeadingAnchor),
 
                         theLabel.CenterYAnchor.ConstraintEqualTo(radioButton2.CenterYAnchor),
-                        theLabel.LeadingAnchor.ConstraintEqualTo(radioButton2.TrailingAnchor, radioButtonSpacing),
+                        theLabel.LeadingAnchor.ConstraintEqualTo(radioButton2.TrailingAnchor, Common.radioButtonSpacing),
 
                         weekOfMonthField.CenterYAnchor.ConstraintEqualTo(radioButton2.CenterYAnchor),
-                        weekOfMonthField.LeadingAnchor.ConstraintEqualTo(theLabel.TrailingAnchor, interviewHorizontalSpacing),
-                        weekOfMonthField.TopAnchor.ConstraintEqualTo(secondLine.TopAnchor, topSpacing),
+                        weekOfMonthField.LeadingAnchor.ConstraintEqualTo(theLabel.TrailingAnchor, Common.interviewHorizontalSpacing),
+                        weekOfMonthField.TopAnchor.ConstraintEqualTo(secondLine.TopAnchor, Common.topSpacing),
 
                         weekDayField.CenterYAnchor.ConstraintEqualTo(radioButton2.CenterYAnchor),
-                        weekDayField.LeadingAnchor.ConstraintEqualTo(weekOfMonthField.TrailingAnchor, interviewHorizontalSpacing),
-                        weekDayField.TopAnchor.ConstraintEqualTo(secondLine.TopAnchor, topSpacing),
+                        weekDayField.LeadingAnchor.ConstraintEqualTo(weekOfMonthField.TrailingAnchor, Common.interviewHorizontalSpacing),
+                        weekDayField.TopAnchor.ConstraintEqualTo(secondLine.TopAnchor, Common.topSpacing),
 
                         ofLabel.LeadingAnchor.ConstraintEqualTo(theLabel.LeadingAnchor),
                         ofLabel.CenterYAnchor.ConstraintEqualTo(monthField2.CenterYAnchor),
 
-                        monthField2.LeadingAnchor.ConstraintEqualTo(ofLabel.TrailingAnchor, interviewHorizontalSpacing),
-                        monthField2.BottomAnchor.ConstraintEqualTo(secondLine.BottomAnchor, - bottomSpacing),
-                        monthField2.TopAnchor.ConstraintEqualTo(weekDayField.BottomAnchor, interviewVerticalSpacing),
+                        monthField2.LeadingAnchor.ConstraintEqualTo(ofLabel.TrailingAnchor, Common.interviewHorizontalSpacing),
+                        monthField2.BottomAnchor.ConstraintEqualTo(secondLine.BottomAnchor, - Common.bottomSpacing),
+                        monthField2.TopAnchor.ConstraintEqualTo(weekDayField.BottomAnchor, Common.interviewVerticalSpacing),
                     });
 
                 AddArrangedSubview(firstLine);

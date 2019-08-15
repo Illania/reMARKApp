@@ -2660,7 +2660,8 @@ namespace Mark5.ServiceReference.DataContract
         [EnumMember(Value = "Document")] Document = 1,
         [EnumMember(Value = "Contact")] Contact = 2,
         [EnumMember(Value = "Shortcode")] Shortcode = 3,
-        [EnumMember(Value = "CalendarAppointment")] CalendarAppointment = 4,
+        [EnumMember(Value = "CalendarAppointment")]
+        CalendarAppointment = 4,
         [EnumMember(Value = "CalendarTask")] CalendarTask = 5,
     }
 

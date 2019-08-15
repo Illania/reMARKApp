@@ -7,6 +7,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
 {
     public class RecurrenceViewController : AbstractViewController
     {
+        //TODO after the merge, the addEditAppointmentPresenter, needs to give default values to all parameters of recurring info
+        //And need to find a way to remove the recurring part
+
         PatternView patternView;
         RangeView rangeView;
 
@@ -25,6 +28,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
 
             patternView.SetViewModel(ap);
             patternView.Refresh();
+
+            rangeView.SetViewModel(ap);
+            rangeView.Refresh();
         }
 
         void InitializeView()
@@ -59,7 +65,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
             rangeView = new RangeView();
 
             scrollView.AddSubview(patternView);
-            //scrollView.AddSubview(rangeView);
+            scrollView.AddSubview(rangeView);
 
             var paddingValue = 20f;
 
@@ -68,10 +74,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
                     patternView.LeadingAnchor.ConstraintEqualTo(scrollView.ReadableContentGuide.LeadingAnchor, paddingValue),
                     patternView.TopAnchor.ConstraintEqualTo(scrollView.ReadableContentGuide.TopAnchor, paddingValue),
                     patternView.RightAnchor.ConstraintEqualTo(scrollView.ReadableContentGuide.RightAnchor, -paddingValue),
-                    //rangeView.TopAnchor.ConstraintEqualTo(patternView.BottomAnchor, 10f),
-                    //rangeView.LeftAnchor.ConstraintEqualTo(patternView.LeftAnchor),
-                    //rangeView.RightAnchor.ConstraintEqualTo(patternView.RightAnchor),
-                    //rangeView.BottomAnchor.ConstraintEqualTo(scrollView.ReadableContentGuide.BottomAnchor),
+
+                    rangeView.TopAnchor.ConstraintEqualTo(patternView.BottomAnchor, 10f),
+                    rangeView.LeftAnchor.ConstraintEqualTo(patternView.LeftAnchor),
+                    rangeView.RightAnchor.ConstraintEqualTo(patternView.RightAnchor),
+                    //rangeView.BottomAnchor.ConstraintEqualTo(scrollView.ReadableContentGuide.BottomAnchor, -paddingValue),
             });
 
             var gestureRecognizer = new UITapGestureRecognizer(() => View.EndEditing(true));

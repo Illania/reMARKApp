@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using CoreGraphics;
+using Foundation;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Presenters.CalendarModule;
 using Mark5.Mobile.Common.Utilities.Extensions;
@@ -12,6 +13,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
 {
     public static class Common
     {
+        public const float radioButtonSpacing = 5f;
+        public const float interviewHorizontalSpacing = 5f;
+        public const float interviewVerticalSpacing = 3f;
+        public const float topSpacing = 4f;
+        public const float bottomSpacing = -2f;
+
         public static List<RecurrenceType> recurrenceTypes = new List<RecurrenceType> { RecurrenceType.Daily, RecurrenceType.Weekly, RecurrenceType.Monthly, RecurrenceType.Yearly };
 
         public static List<WeekDays> weekDaysExtended = new List<WeekDays>
@@ -227,7 +234,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
     class MonthPicker : PickerField<int>
     {
         public MonthPicker(Action<int> selectedAction)
-            : base(selectedAction, Common.weekOfMonth.Select(w => w.ToFriendlyString()).ToList())
+            : base(selectedAction, Common.months)
         {
         }
 
@@ -239,6 +246,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
 
         public override void SetSelected(int value)
         {
+            if (value < 0)
+                value = 0;
             SetText(value);
             (InputView as UIPickerView).Select(value, 0, false);
         }
@@ -246,6 +255,56 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
         protected override void SetText(int value)
         {
             Text = Common.months[value];
+        }
+    }
+
+    class DateField : BaseField
+    {
+        UIDatePicker datePicker;
+        Action<DateTime> selectedAction;
+
+        public DateField(Action<DateTime> selectedAction)
+            : base(false)
+        {
+            this.selectedAction = selectedAction;
+            datePicker = new UIDatePicker
+            {
+                Mode = UIDatePickerMode.Date
+            };
+            datePicker.ValueChanged += DatePicker_ValueChanged;
+
+            InputView = datePicker;
+        }
+
+        private void DatePicker_ValueChanged(object sender, EventArgs e)
+        {
+            var selectedDate = datePicker.Date;
+
+            SetText(selectedDate);
+
+            var selectedDateComponents = NSCalendar.CurrentCalendar.Components(NSCalendarUnit.Day | NSCalendarUnit.Month | NSCalendarUnit.Year, selectedDate);
+            var date = new DateTime((int)selectedDateComponents.Year, (int)selectedDateComponents.Month, (int)selectedDateComponents.Day, 0, 0, 0, DateTimeKind.Utc);
+
+            selectedAction?.Invoke(date);
+        }
+
+        public void SetSelected(DateTime datetime)
+        {
+            var dateComponents = new NSDateComponents
+            {
+                Day = datetime.Day,
+                Month = datetime.Month,
+                Year = datetime.Year,
+            };
+
+            var nsDate = NSCalendar.CurrentCalendar.DateFromComponents(dateComponents);
+            datePicker.SetDate(nsDate, false);
+            SetText(nsDate);
+        }
+
+        void SetText(NSDate date)
+        {
+            Text = Utilities.DateTimeFormatter.ShortDateFormatter.StringFor(date);
         }
     }
 
@@ -291,7 +350,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
         public SeparatorSubView()
         {
             BackgroundColor = backgroundColor;
-            HeightAnchor.ConstraintEqualTo(1.5f).Active = true;
+            HeightAnchor.ConstraintEqualTo(1f).Active = true;
             TranslatesAutoresizingMaskIntoConstraints = false;
         }
     }
