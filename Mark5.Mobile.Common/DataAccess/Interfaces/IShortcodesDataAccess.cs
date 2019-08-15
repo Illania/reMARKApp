@@ -25,6 +25,8 @@ namespace Mark5.Mobile.Common.DataAccess
 
         Task RemoveFromFolderAsync(List<Shortcode> shortocode, Folder folder);
 
+        Task RemoveFromFolderAsync(List<int> shIds, int folderId);
+
         Task DeleteAsync(List<ShortcodePreview> shortcodePreviews);
 
         Task DeleteAsync(List<Shortcode> shortocode);

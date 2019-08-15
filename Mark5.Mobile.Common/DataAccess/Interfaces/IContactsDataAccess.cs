@@ -25,6 +25,8 @@ namespace Mark5.Mobile.Common.DataAccess
 
         Task RemoveFromFolderAsync(List<Contact> contacts, Folder folder);
 
+        Task RemoveFromFolderAsync(List<int> conIds, int folderId);
+
         Task DeleteAsync(List<ContactPreview> contactPreviews);
 
         Task DeleteAsync(List<Contact> contacts);

@@ -268,8 +268,8 @@
 		<Compile Include="Ui\ViewControllers\SplitMainViewController.cs" />
 		<Compile Include="Model\HubMessages\NavigationModuleChangedMessage.cs" />
 		<Compile Include="Model\NavigationModule.cs" />
-		<Compile Include="Ui\ViewControllers\ConnectionDiagnosticsViewController.cs" />
-
+    <Compile Include="Ui\ViewControllers\ConnectionDiagnosticsViewController.cs" />
+    <Compile Include="Ui\ViewControllers\DocumentView\HeaderView\IAnimating.cs" />
 		<Compile Include="Ui\ViewControllers\CalendarViews\MonthViewController.cs" />
     <Compile Include="Ui\ViewControllers\CalendarViews\DayWeekViewController.cs" />
     <Compile Include="Ui\ViewControllers\CalendarViews\YearViewController.cs" />

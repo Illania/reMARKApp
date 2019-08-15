@@ -17,6 +17,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
             var tag = $"{nameof(MonthCalendarFragment)}";
 
+            var args = new Bundle();
+            fragment.Arguments = args;
+
             return (fragment, tag);
         }
 
@@ -27,7 +30,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             schedule = new MonthSchedule(Context);
             schedule.CellDoubleTapped += Schedule_CellDoubleTapped;
             schedule.HeaderTapped += Schedule_HeaderTapped;
-
+            schedule.MonthInlineAppointmentTapped += Schedule_MonthInlineAppointmentTapped;
             return schedule;
         }
 
@@ -64,11 +67,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             return true;
         }
 
+        void Schedule_MonthInlineAppointmentTapped(object sender, MonthInlineAppointmentTappedEventArgs e)
+        {
+            coordinator.AppointmentTapped(e.ScheduleAppointment);
+        }
+
         void Schedule_CellDoubleTapped(object sender, CellTappedEventArgs e)
         {
             coordinator.DateDoubleTapped(e.Calendar);
         }
-
 
         private void Schedule_HeaderTapped(object sender, HeaderTappedEventArgs e)
         {

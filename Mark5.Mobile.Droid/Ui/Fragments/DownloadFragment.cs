@@ -106,7 +106,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var info = await Managers.FoldersManager.GetSavedFolderOfflineInfo(folder);
             if (info != null)
-                lastDownloadedOn.Text = GetString(Resource.String.last_downloaded_on) + " " + info.LastDownloaded.FormatUserTimestampAsCompactLongDateTimeString(Context);
+                lastDownloadedOn.Text = GetString(Resource.String.last_downloaded_on) + " " + info.LastDownloaded.ConvertTimestampMillisecondsToDateTime()
+                    .ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds().FormatUserTimestampAsCompactLongDateTimeString(Context);
             else
                 lastDownloadedOn.Text = null;
         }

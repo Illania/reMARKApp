@@ -671,8 +671,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             readonly Header participantHeader;
             readonly SendInvitationsButton sendInvitationsButton;
 
-            public EventHandler SendInvitationClicked { get; internal set; } = delegate { };
-            public EventHandler ShowParticipantsClicked { get; internal set; } = delegate { };
+            public EventHandler SendInvitationClicked = delegate { };
+            public EventHandler ShowParticipantsClicked = delegate { };
 
             public AppointmentParticipantsView()
             {

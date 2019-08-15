@@ -431,6 +431,7 @@
     <string name="select_users">Select users</string>
     <string name="send">Send</string>
     <string name="sending_document">Sending email</string>
+    <string name="sending_invitations">Sending invitations...</string>
     <string name="send_with_mark5_title">Send with reMARK</string>
     <string name="send_report_with_mark5_content">Do you want to send the generated report with reMARK?\n\nPlease note that these reports are not monitored 24/7 and will be available to developers only. If you need direct assistance, contact Nordic IT Support.</string>
     <string name="send_feedback_with_mark5_content">Do you want to send feedback with reMARK?</string>
