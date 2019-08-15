@@ -317,6 +317,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
 
                 weekdaysTableView = new UITableView
                 {
+                    BackgroundColor = UIColor.Clear,
                     TranslatesAutoresizingMaskIntoConstraints = false,
                     AllowsSelection = true,
                     AllowsMultipleSelection = true,
@@ -405,6 +406,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
                     var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateDefault("cell", UITableViewCellSelectionStyle.None);
                     cell.TextLabel.Text = weekDay.ToFriendlyString();
                     cell.Accessory = selectedItems.Contains(weekDay) ? UITableViewCellAccessory.Checkmark : UITableViewCellAccessory.None;
+                    cell.BackgroundColor = UIColor.Clear;
                     return cell;
                 }
 

@@ -39,13 +39,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
             ap.RecurrenceInfo.Type = RecurrenceType.Weekly;
             ap.RecurrenceInfo.WeekDays = WeekDays.WorkDays;
 
-            NavigationItem.Title = "Custom recurrence"; //TODO remove support for iOS 10
-            View.BackgroundColor = UIColor.GroupTableViewBackgroundColor;
+            NavigationItem.Title = "Custom recurrence";
 
             UIScrollView scrollView = new UIScrollView
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                BackgroundColor = UIColor.White,
+                BackgroundColor = UIColor.GroupTableViewBackgroundColor,
                 ShowsVerticalScrollIndicator = false,
                 ShowsHorizontalScrollIndicator = false,
             };
