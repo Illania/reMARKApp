@@ -889,7 +889,7 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
 
             foreach (var possibleKeyboard in keyboardWindow.Subviews)
             {
-                if (possibleKeyboard.IsKindOfClass(new Class("UIPeripheralHostView")) || possibleKeyboard.IsKindOfClass(new Class("UIKeyboard")))
+                if (possibleKeyboard.IsKindOfClass(new Class("UIKeyboard")))
                     return (float)possibleKeyboard.Bounds.Height;
 
                 if (possibleKeyboard.IsKindOfClass(new Class("UIInputSetContainerView")))
