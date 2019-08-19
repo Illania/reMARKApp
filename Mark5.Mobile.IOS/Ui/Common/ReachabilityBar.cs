@@ -55,9 +55,6 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 TranslatesAutoresizingMaskIntoConstraints = false;
 
                 var c1 = BottomAnchor.ConstraintEqualTo(Superview.SafeAreaLayoutGuide.TopAnchor);
-
-                else
-                    c1 = TopAnchor.ConstraintEqualTo(Superview.TopAnchor);
                 c1.SetIdentifier("reachabilitybar.top");
                 var c2 = LeftAnchor.ConstraintEqualTo(Superview.LeftAnchor);
                 c2.SetIdentifier("reachabilitybar.left");
