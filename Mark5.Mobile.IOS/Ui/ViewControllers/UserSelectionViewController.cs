@@ -37,12 +37,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillAppear(animated);
 
-            if (Integration.IsRunningAtLeast(11))
-            {
-                if (NavigationController != null)
-                    NavigationController.NavigationBar.PrefersLargeTitles = true;
-                NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
-            }
+            if (NavigationController != null)
+                NavigationController.NavigationBar.PrefersLargeTitles = true;
+            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
 
             InitializeHandlers();
         }
@@ -152,7 +149,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (usersDepartments != null)
                 {
-                    if(IncludeCurrentUser ?? true)
+                    if (IncludeCurrentUser ?? true)
                         usersDepartments.Users.Add(ServerConfig.SystemSettings.UserInfo.User);
                     ((DataSource)TableView.Source).SetItems(usersDepartments.Users);
                 }

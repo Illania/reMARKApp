@@ -244,14 +244,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             View.AddSubview(descriptionTextView);
             View.AddSubview(nextDoneButton);
 
-            if (Integration.IsRunningAtLeast(11))
-            {
-                View.AddConstraint(topView.TopAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.TopAnchor, Integration.IsIPad() ? 30 : 20));
-            }
-            else
-            {
-                View.AddConstraint(topView.TopAnchor.ConstraintEqualTo(View.TopAnchor, Integration.IsIPad() ? 30 : 20));
-            }
+            View.AddConstraint(topView.TopAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.TopAnchor, Integration.IsIPad() ? 30 : 20));
 
             View.AddConstraints(new NSLayoutConstraint[]
             {

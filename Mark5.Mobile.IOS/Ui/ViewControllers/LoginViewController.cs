@@ -188,23 +188,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             settingsButton.Alpha = 0;
             View.AddSubview(settingsButton);
 
-            if (Integration.IsRunningAtLeast(11))
+            View.AddConstraints(new[]
             {
-                View.AddConstraints(new[]
-                {
                     settingsButton.TopAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.TopAnchor),
                     settingsButton.RightAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.RightAnchor, -10f)
                 });
-            }
-            else
-            {
-                View.AddConstraints(new[]
-                {
-                    settingsButton.TopAnchor.ConstraintEqualTo(View.TopAnchor, 20f),
-                    settingsButton.RightAnchor.ConstraintEqualTo(View.RightAnchor, -5f)
-                });
-            }
-
         }
 
         void InitializeSubViews()

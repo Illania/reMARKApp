@@ -54,9 +54,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
             {
                 TranslatesAutoresizingMaskIntoConstraints = false;
 
-                NSLayoutConstraint c1;
-                if (Integration.IsRunningAtLeast(11))
-                    c1 = BottomAnchor.ConstraintEqualTo(Superview.SafeAreaLayoutGuide.TopAnchor);
+                var c1 = BottomAnchor.ConstraintEqualTo(Superview.SafeAreaLayoutGuide.TopAnchor);
+
                 else
                     c1 = TopAnchor.ConstraintEqualTo(Superview.TopAnchor);
                 c1.SetIdentifier("reachabilitybar.top");
@@ -119,15 +118,12 @@ namespace Mark5.Mobile.IOS.Ui.Common
             {
                 Alpha = 1f;
 
-                if (Integration.IsRunningAtLeast(11))
+                var viewController = weakViewController.Unwrap();
+                if (viewController != null)
                 {
-                    var viewController = weakViewController.Unwrap();
-                    if (viewController != null)
-                    {
-                        var asai = viewController.AdditionalSafeAreaInsets;
-                        asai = new UIEdgeInsets(VisibleHeight, asai.Left, asai.Bottom, asai.Right);
-                        viewController.AdditionalSafeAreaInsets = asai;
-                    }
+                    var asai = viewController.AdditionalSafeAreaInsets;
+                    asai = new UIEdgeInsets(VisibleHeight, asai.Left, asai.Bottom, asai.Right);
+                    viewController.AdditionalSafeAreaInsets = asai;
                 }
             };
 
@@ -157,16 +153,12 @@ namespace Mark5.Mobile.IOS.Ui.Common
             Action action = () =>
             {
                 Alpha = 1f;
-
-                if (Integration.IsRunningAtLeast(11))
+                var viewController = weakViewController.Unwrap();
+                if (viewController != null)
                 {
-                    var viewController = weakViewController.Unwrap();
-                    if (viewController != null)
-                    {
-                        var asai = viewController.AdditionalSafeAreaInsets;
-                        asai = new UIEdgeInsets(VisibleHeight, asai.Left, asai.Bottom, asai.Right);
-                        viewController.AdditionalSafeAreaInsets = asai;
-                    }
+                    var asai = viewController.AdditionalSafeAreaInsets;
+                    asai = new UIEdgeInsets(VisibleHeight, asai.Left, asai.Bottom, asai.Right);
+                    viewController.AdditionalSafeAreaInsets = asai;
                 }
             };
 
@@ -189,15 +181,12 @@ namespace Mark5.Mobile.IOS.Ui.Common
             {
                 Alpha = 0f;
 
-                if (Integration.IsRunningAtLeast(11))
+                var viewController = weakViewController.Unwrap();
+                if (viewController != null)
                 {
-                    var viewController = weakViewController.Unwrap();
-                    if (viewController != null)
-                    {
-                        var asai = viewController.AdditionalSafeAreaInsets;
-                        asai = new UIEdgeInsets(HiddenHeight, asai.Left, asai.Bottom, asai.Right);
-                        viewController.AdditionalSafeAreaInsets = asai;
-                    }
+                    var asai = viewController.AdditionalSafeAreaInsets;
+                    asai = new UIEdgeInsets(HiddenHeight, asai.Left, asai.Bottom, asai.Right);
+                    viewController.AdditionalSafeAreaInsets = asai;
                 }
             };
 

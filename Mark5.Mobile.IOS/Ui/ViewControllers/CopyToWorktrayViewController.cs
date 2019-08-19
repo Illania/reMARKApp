@@ -45,12 +45,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillAppear(animated);
 
-            if (Integration.IsRunningAtLeast(11))
-            {
-                if (NavigationController != null)
-                    NavigationController.NavigationBar.PrefersLargeTitles = true;
-                NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
-            }
+            if (NavigationController != null)
+                NavigationController.NavigationBar.PrefersLargeTitles = true;
+            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
 
             InitializeHandlers();
         }
@@ -64,19 +61,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (((DataSource)TableView.Source).Empty)
                 await RefreshData();
 
-            if (Integration.IsRunningAtLeast(11))
+            NSOperationQueue.MainQueue.AddOperation(() =>
             {
-                NSOperationQueue.MainQueue.AddOperation(() =>
-                {
-                    var ni = NavigationItem;
+                var ni = NavigationItem;
 
-                    if (ParentViewController != null && ParentViewController is UIViewController && !(ParentViewController is UINavigationController))
-                        ni = ParentViewController?.NavigationItem;
+                if (ParentViewController != null && ParentViewController is UIViewController && !(ParentViewController is UINavigationController))
+                    ni = ParentViewController?.NavigationItem;
 
-                    if (ni.SearchController == null)
-                        ni.SearchController = searchController;
-                });
-            }
+                if (ni.SearchController == null)
+                    ni.SearchController = searchController;
+            });
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -163,11 +157,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 SearchResultsUpdater = this
             };
             searchController.SearchBar.Placeholder = Localization.GetString("filter");
-
-            if (!Integration.IsRunningAtLeast(11))
-            {
-                TableView.TableHeaderView = searchController.SearchBar;
-            }
         }
 
         void InitializeHandlers()
@@ -311,10 +300,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             if (su.FirstName?.ContainsCaseInsensitive(query) ?? false)
                 return true;
-            
+
             if (su.LastName?.ContainsCaseInsensitive(query) ?? false)
                 return true;
-            
+
             if (su.Username?.ContainsCaseInsensitive(query) ?? false)
                 return true;
 

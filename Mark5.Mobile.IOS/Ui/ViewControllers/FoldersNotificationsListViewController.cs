@@ -45,31 +45,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillAppear(animated);
 
-            if (Integration.IsRunningAtLeast(11))
-            {
-                if (NavigationController != null)
-                    NavigationController.NavigationBar.PrefersLargeTitles = true;
-                NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
-            }
+            if (NavigationController != null)
+                NavigationController.NavigationBar.PrefersLargeTitles = true;
+            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
         }
 
         public override void ViewDidAppear(bool animated)
         {
             base.ViewDidAppear(animated);
 
-            if (Integration.IsRunningAtLeast(11))
+            NSOperationQueue.MainQueue.AddOperation(() =>
             {
-                NSOperationQueue.MainQueue.AddOperation(() =>
-                {
-                    var ni = NavigationItem;
+                var ni = NavigationItem;
 
-                    if (ParentViewController != null && ParentViewController is UIViewController && !(ParentViewController is UINavigationController))
-                        ni = ParentViewController?.NavigationItem;
+                if (ParentViewController != null && ParentViewController is UIViewController && !(ParentViewController is UINavigationController))
+                    ni = ParentViewController?.NavigationItem;
 
-                    if (ni.SearchController == null)
-                        ni.SearchController = CurrentViewController?.NavigationItem?.SearchController;
-                });
-            }
+                if (ni.SearchController == null)
+                    ni.SearchController = CurrentViewController?.NavigationItem?.SearchController;
+            });
         }
 
         static string GetTitleForModule(ModuleType moduleType)

@@ -82,12 +82,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillAppear(animated);
 
-            if (Integration.IsRunningAtLeast(11))
-            {
-                if (NavigationController != null)
-                    NavigationController.NavigationBar.PrefersLargeTitles = true;
-                NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Never;
-            }
+            if (NavigationController != null)
+                NavigationController.NavigationBar.PrefersLargeTitles = true;
+            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Never;
 
             InitializeHandlers();
             SubscribeToMessages();
@@ -1074,14 +1071,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             void ScrollChanged(UIScrollView scrollView)
             {
-                if (Integration.IsRunningAtLeast(11))
-                {
-                    var offset = scrollView.ContentOffset.Y;
-                    var inset = -scrollView.SafeAreaInsets.Top;
-                    var show = offset > inset + 30;
+                var offset = scrollView.ContentOffset.Y;
+                var inset = -scrollView.SafeAreaInsets.Top;
+                var show = offset > inset + 30;
 
-                    viewControllerWeakReference.Unwrap()?.UpdateTitle(show);
-                }
+                viewControllerWeakReference.Unwrap()?.UpdateTitle(show);
             }
 
             public void StartRefresh()

@@ -79,8 +79,6 @@ namespace Mark5.Mobile.IOS.Ui.Common
             CurrentViewController.View.RemoveFromSuperview();
             vc.View.Frame = View.Bounds;
             View.AddSubview(vc.View);
-            if (!Integration.IsRunningAtLeast(11))
-                NavigationController.View.SetNeedsLayout();
             if (vc.NavigationItem.LeftBarButtonItems != null)
                 NavigationItem.SetLeftBarButtonItems(vc.NavigationItem.LeftBarButtonItems, false);
             else

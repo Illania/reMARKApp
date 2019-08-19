@@ -69,14 +69,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             CommonConfig.UsageAnalytics.LogEvent(new OpenSettingsEvent());
 
-            if (Integration.IsRunningAtLeast(11))
-            {
-                if (NavigationController != null)
-                    NavigationController.NavigationBar.PrefersLargeTitles = true;
-                NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            if (NavigationController != null)
+                NavigationController.NavigationBar.PrefersLargeTitles = true;
+            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
 
-                TableView.InsetsContentViewsToSafeArea = true;
-            }
+            TableView.InsetsContentViewsToSafeArea = true;
 
             // Remove TabBarItem title
             Title = "";

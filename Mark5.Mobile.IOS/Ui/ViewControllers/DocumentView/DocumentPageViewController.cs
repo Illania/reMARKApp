@@ -43,8 +43,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
         {
             base.ViewDidLoad();
 
-            if (Integration.IsRunningAtLeast(11))
-                NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Never;
+            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Never;
 
             InitNavigationBar();
 
