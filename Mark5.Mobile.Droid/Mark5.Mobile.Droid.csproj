@@ -567,6 +567,10 @@
     <Compile Include="Ui\Fragments\Calendar\BaseCalendarFragment.cs" />
     <Compile Include="Ui\Fragments\Calendar\AppointmentFragment.cs" />
     <Compile Include="Ui\Common\ConnectionDiagnosticsFragment.cs" />
+    <Compile Include="Ui\Fragments\Calendar\Reoccurrence\ReoccurrenceFragment.cs" />
+    <Compile Include="Ui\Fragments\Calendar\Reoccurrence\Subviews\PatternView.cs" />
+    <Compile Include="Ui\Fragments\Calendar\Reoccurrence\Subviews\RangeView.cs" />
+    <Compile Include="Ui\Fragments\Calendar\Reoccurrence\Subviews\Common.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -591,6 +595,8 @@
     <Folder Include="Utilities\CallerId\" />
     <Folder Include="Ui\Fragments\Calendar\" />
     <Folder Include="Ui\Coordinators\" />
+    <Folder Include="Ui\Fragments\Calendar\Reoccurrence\" />
+    <Folder Include="Ui\Fragments\Calendar\Reoccurrence\Subviews\" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\anim\enter_from_left.xml" />
