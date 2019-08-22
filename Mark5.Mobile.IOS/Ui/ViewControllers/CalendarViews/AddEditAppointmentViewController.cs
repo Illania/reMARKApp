@@ -79,11 +79,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             base.ViewWillAppear(animated);
             InitializeHandlers();
 
-            if (CreationModeFlag == ContactCreationModeFlag.New)
-                await presenter.LoadEmptyAppointment();
-
-            if (CreationModeFlag == ContactCreationModeFlag.Edit)
-                await presenter.LoadAppointment(calendarId, appointmentId);
+            ((DataSource)TableView.Source).Refresh(viewModel, CreationModeFlag, false);
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -108,10 +104,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             TableView.Alpha = 0;
         }
 
-        void RefreshData()
+        async void RefreshData()
         {
-            var ds = (DataSource)TableView.Source;
-            ds.Refresh(viewModel, CreationModeFlag, false);
+            if (CreationModeFlag == ContactCreationModeFlag.New)
+                await presenter.LoadEmptyAppointment();
+
+            if (CreationModeFlag == ContactCreationModeFlag.Edit)
+                await presenter.LoadAppointment(calendarId, appointmentId);
+
+            ((DataSource)TableView.Source).Refresh(viewModel, CreationModeFlag, false);
         }
 
         private void InitializeHandlers()
@@ -153,9 +154,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         public void ShowAppointment(AddEditAppointmentViewModel viewModel)
         {
-            this.viewModel = viewModel;
-            UIView.Animate(0.05, () => { TableView.Alpha = 1; });
-            RefreshData();
+            if (this.viewModel == null)
+            {
+                this.viewModel = viewModel;
+                UIView.Animate(0.05, () => { TableView.Alpha = 1; });
+                RefreshData();
+            }
         }
 
         public async Task ShowLoadError()
@@ -373,6 +377,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             abstract class AbstractSection
             {
                 public DataSource DataSource;
+                public UIViewController viewController { get => DataSource.viewControllerWeakReference.Unwrap(); }
                 public UITableView TableView { get => DataSource.tableViewWeakReference.Unwrap(); }
                 public AddEditAppointmentViewModel ViewModel;
                 public bool ParentPreselected;
@@ -512,6 +517,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
                 public DataSource DataSource { get => Section.DataSource; }
                 public UITableView TableView { get => Section.DataSource.tableViewWeakReference.Unwrap(); }
+                public UIViewController ViewController { get => Section.DataSource.viewControllerWeakReference.Unwrap(); }
                 public AddEditAppointmentViewModel ViewModel { get => Section.ViewModel; }
                 public ContactCreationModeFlag CreationMode { get => Section.CreationMode; }
                 public bool ParentPreselected { get => Section.ParentPreselected; }
@@ -865,7 +871,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             class ParticipantsRow : AbstractRow
             {
-                public override string Key => new NSString("ParticipantsRow");
+                public override string Key => "ParticipantsRow";
 
                 public ParticipantsRow(AbstractSection section) : base(section)
                 {
@@ -876,7 +882,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 public override void RefreshRow()
                 {
                     if (ViewModel != null && ViewModel.Participants != null)
-                        ((AppointmentDisclosureTableViewCell)Cell).SetLabel($"{ViewModel.Participants.Count}");
+                    {
+                        if (ViewModel.Participants.Count == 0)
+                            ((AppointmentDisclosureTableViewCell)Cell).SetLabel("None");
+                        else
+                            ((AppointmentDisclosureTableViewCell)Cell).SetLabel($"{ViewModel.Participants.Count}");
+                    }
                     else
                         ((AppointmentDisclosureTableViewCell)Cell).SetLabel("None");
                 }
@@ -884,6 +895,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 protected override void Initialize()
                 {
                     ((AppointmentDisclosureTableViewCell)Cell).SetTitle("Participants");
+                }
+
+                public async override void OnClicked(NSIndexPath indexPath)
+                {
+                    base.OnClicked(indexPath);
+                    var vc = new AddEditParticipantsViewController(ViewModel);
+                    ViewController?.NavigationController?.PushViewController(vc, true);
+
+                    var c = ViewModel.Participants;
+
+                    /*
+                    var result = await vc.Result;
+                    if (result != null)
+                    {
+                        ViewModel.Participants = result;
+                    }
+                    */
+
+                    RefreshRow();
                 }
             }
 

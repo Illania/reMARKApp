@@ -89,7 +89,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         public int CreatorId { get; set; }
         public RecurrenceInfo RecurrenceInfo { get; set; } //TODO not so nice (use of domain class)
         public long ReminderTimeBeforeStart { get; set; }
-        public List<Participant> Participants { get; set; }  //TODO as before
+        public List<ParticipantsViewModel> Participants { get; set; }
         public CalendarViewModel Calendar { get; set; }
 
         public AddEditAppointmentViewModel()
@@ -116,7 +116,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 CreatorId = appointment.CreatorId,
                 RecurrenceInfo = appointment.RecurrenceInfo,
                 ReminderTimeBeforeStart = appointment.ReminderTimeBeforeStart,
-                Participants = appointment.Participants.ToList(),
+                Participants = appointment.Participants.Select(ParticipantsViewModel.ConvertToViewModel).ToList(),
             };
 
             var calendar = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars.First(ca => ca.Id == appointment.CalendarId);
@@ -144,7 +144,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 AllDay = this.AllDay,
                 ReminderTimeBeforeStart = this.ReminderTimeBeforeStart,
                 RecurrenceInfo = this.RecurrenceInfo,
-                Participants = this.Participants,
+                Participants = this.Participants.Select(ParticipantsViewModel.ConvertToModel).ToList(),
                 CreatorId = this.CreatorId,
             };
 

@@ -259,8 +259,8 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
     public class ParticipantsViewModel
     {
-        public string Name { get; private set; }
-        public string Email { get; private set; }
+        public string Name { get; set; }
+        public string Email { get; set; }
         public ParticipantStatus Status { get; set; }
 
         public static ParticipantsViewModel ConvertToViewModel(Participant participant)
@@ -270,6 +270,15 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 Name = participant.CN,
                 Email = participant.Email,
                 Status = participant.Status,
+            };
+        }
+
+        public static Participant ConvertToModel(ParticipantsViewModel participant)
+        {
+            return new Participant
+            {
+                CN = participant.Name,
+                Email = participant.Email
             };
         }
     }
