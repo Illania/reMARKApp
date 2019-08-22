@@ -80,7 +80,8 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
 
         public void ShowAppointment(int calendarId, int appointmentId, int recurrenceIndex)
         {
-            var (fragment, tag) = AppointmentFragment.NewInstance(calendarId, appointmentId, recurrenceIndex);
+            //var (fragment, tag) = AppointmentFragment.NewInstance(calendarId, appointmentId, recurrenceIndex);
+            var (fragment, tag) = ReoccurrenceFragment.NewInstance(null);
 
             fragmentManager.BeginTransaction()
                .SetCustomAnimations(Resource.Animation.fade_in, Resource.Animation.fade_out)

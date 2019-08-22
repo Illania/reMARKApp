@@ -6,8 +6,9 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Ui.Views.RecurrenceViews;
 
-namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar.Reoccurrence
+namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 {
     public class ReoccurrenceFragment : BaseFragment
     {
@@ -24,7 +25,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar.Reoccurrence
             var tag = $"{nameof(ReoccurrenceFragment)}";
 
             var args = new Bundle();
-            args.PutString(RecurrenceKey, Serializer.Serialize(rec));
+            if (rec != null)
+                args.PutString(RecurrenceKey, Serializer.Serialize(rec));
 
             fragment.Arguments = args;
             return (fragment, tag);
@@ -36,6 +38,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar.Reoccurrence
 
             if (Arguments.ContainsKey(RecurrenceKey))
                 recInfo = Serializer.Deserialize<RecurrenceInfo>(Arguments.GetString(RecurrenceKey));
+            else  //TODO for testing
+            {
+                recInfo = new RecurrenceInfo();
+            }
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
