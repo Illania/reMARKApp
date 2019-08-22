@@ -31,7 +31,16 @@ namespace Mark5.Mobile.Common.Model
 
         public WeekOfMonth WeekOfMonth { get; set; }
 
-        public DateTime StartDate => StartTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime();
-        public DateTime EndDate => EndTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime();
+        public DateTime StartDate
+        {
+            get => StartTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime();
+            set => StartTimestamp = value.ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
+        }
+
+        public DateTime EndDate
+        {
+            get => EndTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime();
+            set => EndTimestamp = value.ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
+        }
     }
 }

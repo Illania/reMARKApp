@@ -8,6 +8,8 @@ using Android.Widget;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.Droid.Utilities;
+using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
 {
@@ -70,6 +72,49 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
         public void SetViewModel(RecurrenceInfo ri)
         {
             this.ri = ri;
+        }
+    }
+
+    public class DateField : TextView
+    {
+        Action<DateTime> selectedAction;
+        DateTime currentDate;
+
+        public DateField(Context context, Action<DateTime> selectedAction) : base(context)
+        {
+            this.selectedAction = selectedAction;
+            Click += DateField_Click;
+        }
+
+        async void DateField_Click(object sender, EventArgs e)
+        {
+            long userTimestamp = -1;
+
+            if (currentDate != default)
+                userTimestamp = currentDate.ConvertDateTimeToTimestampMilliseconds();
+
+            var newTimestamp = await Dialogs.ShowDatePicker(Context, userTimestamp, addRemoveDateChoice: false);
+
+            var newDate = newTimestamp.ConvertTimestampMillisecondsToDateTime();
+
+            currentDate = newDate;
+            UpdateText();
+            selectedAction?.Invoke(newDate);
+        }
+
+        public void SetDate(DateTime dt)
+        {
+            if (dt != default)
+                currentDate = dt;
+            else
+                currentDate = DateTime.Now;
+
+            UpdateText();
+        }
+
+        public void UpdateText()
+        {
+            Text = currentDate.ConvertDateTimeToTimestampMilliseconds().FormatUserTimestampAsLongDateString(Context);
         }
     }
 
@@ -146,6 +191,17 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
         }
     }
 
+    public class SpecialLabelTextView : AppCompatTextView
+    {
+        public SpecialLabelTextView(Context context) : base(context)
+        {
+            LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
+            {
+                RightMargin = Common.interviewHorizontalSpacing,
+            };
+        }
+    }
+
     public class NumberField : AppCompatEditText
     {
         public NumberField(Context context) : base(context)
@@ -183,12 +239,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
     public class CommonAdapter : ArrayAdapter
     {
         readonly List<string> data;
-        Context context;
 
         public CommonAdapter(Context context, List<string> data)
             : base(context, Android.Resource.Layout.SimpleSpinnerItem)
         {
-            this.context = context;
             this.data = data;
         }
 
