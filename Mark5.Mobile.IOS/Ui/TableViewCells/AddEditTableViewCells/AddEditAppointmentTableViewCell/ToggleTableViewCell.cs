@@ -29,7 +29,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
 
             toggleSwitch.SetContentHuggingPriority((float)UILayoutPriority.DefaultHigh, UILayoutConstraintAxis.Horizontal);
             ContentView.Add(toggleSwitch);
-            toggleSwitch.ValueChanged += ToggleSwitch_ValueChanged;
+            toggleSwitch.ValueChanged += Toggle_ValueChanged;
 
             ContentView.AddConstraints(new[]
             {
@@ -43,7 +43,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
             });
         }
 
-        public virtual void ToggleSwitch_ValueChanged(object sender, EventArgs e)
+        public virtual void Toggle_ValueChanged(object sender, EventArgs e)
         {
         }
 
