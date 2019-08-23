@@ -1,4 +1,5 @@
 ﻿using System;
+using Android.App;
 using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
@@ -34,10 +35,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
 
         private void PatternHeaderView_Updated(object sender, EventArgs e)
         {
-            dailyView.Refresh();
-            weeklyView.Refresh();
-            monthlyView.Refresh();
-            yearlyView.Refresh();
+            ((Activity)Context).RunOnUiThread(() =>
+           {
+               dailyView.Refresh();
+               weeklyView.Refresh();
+               monthlyView.Refresh();
+               yearlyView.Refresh();
+           });
         }
 
         public override void Refresh()
@@ -104,6 +108,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
                 {
                     Orientation = Horizontal,
                     LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+                    {
+                        BottomMargin = Common.verticalSpacing,
+                    },
                 };
                 firstLine.Click += (a, b) => FirstLine_Click();
 
@@ -205,6 +212,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
                 {
                     Orientation = Horizontal,
                     LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+                    {
+                        BottomMargin = Common.verticalSpacing,
+                    },
                 };
 
                 weeksTextField = new NumberField(context);
@@ -259,7 +269,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
                 var firstLine = new LinearLayoutCompat(Context)
                 {
                     Orientation = Horizontal,
-                    LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
+                    LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+                    {
+                        BottomMargin = Common.verticalSpacing,
+                    },
                     Gravity = (int)GravityFlags.CenterVertical,
                 };
                 firstLine.Click += (a, b) => FirstLine_Click();
@@ -442,7 +455,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
                 var firstLine = new LinearLayoutCompat(Context)
                 {
                     Orientation = Horizontal,
-                    LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
+                    LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+                    {
+                        BottomMargin = Common.verticalSpacing,
+                    },
                     Gravity = (int)GravityFlags.CenterVertical,
                 };
                 firstLine.Click += (a, b) => FirstLine_Click();
@@ -594,6 +610,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
                     weekOfMonthField.SetSelected(ri.WeekOfMonth);
                     monthField2.SetSelected(ri.Month);
                 }
+
+                Invalidate();
+                RequestLayout();
             }
         }
 

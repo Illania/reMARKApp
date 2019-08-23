@@ -20,10 +20,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
 
     public static class Common
     {
-        public static int interviewHorizontalSpacing = Conversion.ConvertDpToPixels(10f);
+        public static int interviewHorizontalSpacing = Conversion.ConvertDpToPixels(8f);
         public static int commonPadding = Conversion.ConvertDpToPixels(10f);
-        public static int pickerPadding = Conversion.ConvertDpToPixels(5f);
-        public static int verticalSpacing = Conversion.ConvertDpToPixels(5f);
+        public static int pickerPadding = Conversion.ConvertDpToPixels(6.5f);
+        public static int verticalSpacing = Conversion.ConvertDpToPixels(7f);
 
         public static List<RecurrenceType> recurrenceTypes = new List<RecurrenceType> { RecurrenceType.Daily, RecurrenceType.Weekly, RecurrenceType.Monthly, RecurrenceType.Yearly };
 
@@ -38,6 +38,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
 
         public static List<string> months = new List<string> { "January", "February", "March", "April", "May", "June", "July", "August", "September",
         "October", "November", "Dicember"};
+
+        public static Drawable GetBackground(Context context)
+        {
+            var shape = new GradientDrawable();
+            shape.SetCornerRadius(Conversion.ConvertDpToPixels(4f));
+            shape.SetColor(ContextCompat.GetColor(context, Resource.Color.lightgray));
+
+            return shape;
+        }
     }
 
     interface IEditable
@@ -92,6 +101,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
         public DateField(Context context, Action<DateTime> selectedAction) : base(context)
         {
             this.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
+
+            SetPadding(Common.pickerPadding, Common.pickerPadding, Common.pickerPadding, Common.pickerPadding);
+
+            Background = Common.GetBackground(context);
 
             this.selectedAction = selectedAction;
             Click += DateField_Click;
@@ -221,11 +234,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
         {
             this.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
 
+            Background = Common.GetBackground(context);
+
             LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
             {
                 RightMargin = Common.interviewHorizontalSpacing,
             };
+
             SetMinimumWidth(Conversion.ConvertDpToPixels(25f));
+            SetPadding(Common.pickerPadding, Common.pickerPadding, Common.pickerPadding, Common.pickerPadding);
 
             InputType = Android.Text.InputTypes.ClassNumber;
             KeyListener = DigitsKeyListener.GetInstance(null, false, false);
@@ -241,11 +258,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
         {
             this.selectedAction = selectedAction;
 
-            var shape = new GradientDrawable();
-            shape.SetCornerRadius(Conversion.ConvertDpToPixels(3f));
-            shape.SetColor(ContextCompat.GetColor(Context, Resource.Color.lightgray));
-
-            Background = shape;
+            Background = Common.GetBackground(context);
 
             LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
             {
@@ -258,7 +271,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
             spinner.Adapter = new CommonAdapter(context, data);
             spinner.ItemSelected += PickerField_ItemSelected;
             spinner.SetPadding(0, 0, 0, 0);
-            //spinner.Background = null;
+            spinner.Background = null;
 
             AddView(spinner);
         }
@@ -301,7 +314,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
 
         public override View GetDropDownView(int position, View convertView, ViewGroup parent)
         {
-            return GetView(position, convertView, parent);
+            var view = GetView(position, convertView, parent);
+            view.SetPadding(Common.pickerPadding, Common.pickerPadding, Common.pickerPadding, Common.pickerPadding);
+            return view;
         }
     }
 

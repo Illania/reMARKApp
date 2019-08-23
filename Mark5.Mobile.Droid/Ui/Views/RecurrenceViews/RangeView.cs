@@ -80,6 +80,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
                 {
                     Orientation = Horizontal,
                     LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+                    {
+                        BottomMargin = Common.verticalSpacing,
+                    },
                 };
                 firstLine.Click += (a, b) => FirstLine_Click();
 
@@ -93,6 +96,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
                 {
                     Orientation = Horizontal,
                     LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+                    {
+                        BottomMargin = Common.verticalSpacing,
+                    },
                 };
                 secondLine.Click += (a, b) => SecondLine_Click();
 
@@ -111,6 +117,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
                 {
                     Orientation = Horizontal,
                     LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+                    {
+                        BottomMargin = Common.verticalSpacing,
+                    },
                 };
                 thirdLine.Click += (a, b) => ThirdLine_Click();
 
@@ -172,27 +181,27 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
 
             public override void Refresh()  //TODO need to give default values
             {
-                if (ri.Range == RecurrenceRange.NoEndDate)
+                switch (ri.Range)
                 {
-                    radioButton1.Checked = true;
-                    radioButton2.Checked = false;
-                    radioButton3.Checked = false;
-                }
-                else if (ri.Range == RecurrenceRange.OccurrenceCount)
-                {
-                    radioButton1.Checked = false;
-                    radioButton2.Checked = true;
-                    radioButton3.Checked = false;
+                    case RecurrenceRange.NoEndDate:
+                        radioButton1.Checked = true;
+                        radioButton2.Checked = false;
+                        radioButton3.Checked = false;
+                        break;
+                    case RecurrenceRange.OccurrenceCount:
+                        radioButton1.Checked = false;
+                        radioButton2.Checked = true;
+                        radioButton3.Checked = false;
 
-                    occurrenceField.Text = ri.OccurrenceCount.ToString();
-                }
-                else if (ri.Range == RecurrenceRange.EndByDate)
-                {
-                    radioButton1.Checked = false;
-                    radioButton2.Checked = false;
-                    radioButton3.Checked = true;
+                        occurrenceField.Text = ri.OccurrenceCount.ToString();
+                        break;
+                    case RecurrenceRange.EndByDate:
+                        radioButton1.Checked = false;
+                        radioButton2.Checked = false;
+                        radioButton3.Checked = true;
 
-                    endDateField.SetDate(ri.EndDate);
+                        endDateField.SetDate(ri.EndDate);
+                        break;
                 }
             }
         }

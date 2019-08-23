@@ -40,7 +40,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             if (Arguments.ContainsKey(RecurrenceKey))
                 recInfo = Serializer.Deserialize<RecurrenceInfo>(Arguments.GetString(RecurrenceKey));
             else  //TODO for testing
-                recInfo = new RecurrenceInfo();
+                recInfo = new RecurrenceInfo { Type = RecurrenceType.Yearly };
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -49,6 +49,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_base, container, false);
 
             var linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
+            linearLayout.LayoutTransition = new Android.Animation.LayoutTransition();
 
             var padding = Conversion.ConvertDpToPixels(10f);
             linearLayout.SetPadding(padding, padding, padding, padding);
