@@ -681,6 +681,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 {
                     ((CalendarDisclosureTableViewCell)Cell).SetTitle(Localization.GetString("calendar"));
                 }
+
+                public async override void OnClicked(NSIndexPath indexPath)
+                {
+                    Task<CalendarViewModel> result = null;
+
+                    if (ViewModel.Calendar != null)
+                    {
+                        var vc = AddEditAppointmentCalendarListViewController.Factory(ViewModel.Calendar);
+                        ViewController?.NavigationController?.PushViewController(vc, true);
+                        result = vc.Result;
+                    }
+                    else
+                    {
+                        var vc = AddEditAppointmentCalendarListViewController.Factory();
+                        ViewController?.NavigationController?.PushViewController(vc, true);
+                        result = vc.Result;
+                    }
+
+                    CalendarViewModel selectedCalendar = await result;
+                    if (selectedCalendar != null)
+                        ViewModel.Calendar = selectedCalendar;
+                    else
+                        ViewModel.Calendar = null;
+                }
             }
 
             class NameRow : TextFieldRow
@@ -899,21 +923,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
                 public async override void OnClicked(NSIndexPath indexPath)
                 {
-                    base.OnClicked(indexPath);
-                    var vc = new AddEditParticipantsViewController(ViewModel);
-                    ViewController?.NavigationController?.PushViewController(vc, true);
-
-                    var c = ViewModel.Participants;
-
-                    /*
-                    var result = await vc.Result;
-                    if (result != null)
-                    {
-                        ViewModel.Participants = result;
-                    }
-                    */
-
-                    RefreshRow();
+                    ViewController?.NavigationController?.PushViewController(new AddEditParticipantsViewController(ViewModel), true);
                 }
             }
 
@@ -942,6 +952,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 protected override void Initialize()
                 {
                     ((AppointmentDisclosureTableViewCell)Cell).SetTitle(Localization.GetString("reminder"));
+                }
+
+                public override void OnClicked(NSIndexPath indexPath)
+                {
+                    base.OnClicked(indexPath);
                 }
             }
 

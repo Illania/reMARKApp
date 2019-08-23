@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Foundation;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Presenters.CalendarModule;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
@@ -18,6 +20,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         readonly Dictionary<CalendarViewModel, bool> selectedCalendars;
 
         CalendarDataSource calendarDataSource;
+
+        public CalendarsListViewController(Dictionary<CalendarViewModel, bool> selectedCalendars)
+        {
+            this.selectedCalendars = selectedCalendars;
+        }
 
         public CalendarsListViewController(ICalendarListCoordinator coordinator, Dictionary<CalendarViewModel, bool> selectedCalendars)
         {
@@ -47,17 +54,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             RefreshData();
         }
 
-        void InitializeView()
-        {
-            calendarDataSource = new CalendarDataSource(TableView);
-            TableView.Source = calendarDataSource;
-            TableView.RowHeight = UITableView.AutomaticDimension;
-            TableView.EstimatedRowHeight = 40f;
-            TableView.AllowsSelection = true;
-            TableView.AllowsMultipleSelection = true;
-        }
-
-        void InitializeNavigationBar()
+        public virtual void InitializeNavigationBar()
         {
             doneButton = new UIBarButtonItem(UIBarButtonSystemItem.Done);
             doneButton.Clicked += DoneButton_Clicked;
@@ -68,6 +65,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             NavigationItem.LeftBarButtonItem = cancelButton;
             NavigationItem.RightBarButtonItem = doneButton;
             NavigationItem.Title = Localization.GetString("calendars");
+        }
+
+        public virtual void CalendarSelected(CalendarViewModel calendar)
+        {
+        }
+
+        void InitializeView()
+        {
+            calendarDataSource = new CalendarDataSource(TableView, CalendarSelected);
+            TableView.Source = calendarDataSource;
+            TableView.RowHeight = UITableView.AutomaticDimension;
+            TableView.EstimatedRowHeight = 40f;
+            TableView.AllowsSelection = true;
+            TableView.AllowsMultipleSelection = true;
         }
 
         void RefreshData()
@@ -93,10 +104,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             List<CalendarViewModel> privateCalendars = new List<CalendarViewModel>();
             List<CalendarViewModel> sharedCalendars = new List<CalendarViewModel>();
+            Action<CalendarViewModel> calendarSelected;
 
-            public CalendarDataSource(UITableView tableView)  //We need to pass the state...
+            public CalendarDataSource(UITableView tableView, Action<CalendarViewModel> calendarSelected)  //We need to pass the state...
             {
                 tableViewWeakReference = tableView.Wrap();
+                this.calendarSelected = calendarSelected;
             }
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
@@ -139,34 +152,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 return Localization.GetString("cal_shared");
             }
 
-            //public override UIView GetViewForHeader(UITableView tableView, nint section) //TODO need to complete this part to look more like the UI
-            //{
-            //    var label = new UILabel
-            //    {
-            //        Font = Theme.DefaultBoldFont,
-            //        Lines = 1,
-            //        TranslatesAutoresizingMaskIntoConstraints = false
-            //    };
-
-            //    label.Text = TitleForHeader(tableView, section);
-
-            //    return label;
-            //}
-
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
                 var cavm = GetViewModelForIndexPath(indexPath);
-
-                tableView.CellAt(indexPath).Accessory = UITableViewCellAccessory.Checkmark;
-                SelectedCalendars[cavm] = true;
+                if (calendarSelected != null)
+                    calendarSelected?.Invoke(cavm);
+                else
+                {
+                    tableView.CellAt(indexPath).Accessory = UITableViewCellAccessory.Checkmark;
+                    SelectedCalendars[cavm] = true;
+                    calendarSelected?.Invoke(cavm);
+                }
             }
 
             public override void RowDeselected(UITableView tableView, NSIndexPath indexPath)
             {
-                var cavm = GetViewModelForIndexPath(indexPath);
-
-                tableView.CellAt(indexPath).Accessory = UITableViewCellAccessory.None;
-                SelectedCalendars[cavm] = false;
+                if (calendarSelected != null)
+                    calendarSelected?.Invoke(null);
+                else
+                {
+                    tableView.CellAt(indexPath).Accessory = UITableViewCellAccessory.None;
+                    SelectedCalendars[GetViewModelForIndexPath(indexPath)] = false;
+                }
             }
 
             CalendarViewModel GetViewModelForIndexPath(NSIndexPath indexPath)
@@ -195,6 +202,59 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 tableViewWeakReference.Unwrap()?.ReloadData();
             }
         }
+    }
 
+    public class AddEditAppointmentCalendarListViewController : CalendarsListViewController
+    {
+        UIBarButtonItem cancelButton;
+
+        readonly TaskCompletionSource<CalendarViewModel> tcs = new TaskCompletionSource<CalendarViewModel>();
+        public Task<CalendarViewModel> Result => tcs.Task;
+
+        private AddEditAppointmentCalendarListViewController(Dictionary<CalendarViewModel, bool> calendars) : base(calendars) { }
+
+        public static AddEditAppointmentCalendarListViewController Factory(CalendarViewModel calendar)
+        {
+            var calendarsList = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars;
+
+            var sel = new Dictionary<CalendarViewModel, bool>();
+
+            foreach (var cal in calendarsList)
+                sel.Add(CalendarViewModel.ConvertToViewModel(cal), cal.Id == calendar.Id);
+
+            return new AddEditAppointmentCalendarListViewController(sel);
+        }
+
+        public static AddEditAppointmentCalendarListViewController Factory()
+        {
+            var calendarsList = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars;
+
+            var sel = new Dictionary<CalendarViewModel, bool>();
+
+            foreach (var cal in calendarsList)
+                sel.Add(CalendarViewModel.ConvertToViewModel(cal), false);
+
+            return new AddEditAppointmentCalendarListViewController(sel);
+        }
+
+        public override void InitializeNavigationBar()
+        {
+            cancelButton = new UIBarButtonItem(UIBarButtonSystemItem.Cancel);
+            cancelButton.Clicked += CancelButton_Clicked;
+
+            NavigationItem.LeftBarButtonItem = cancelButton;
+            NavigationItem.Title = Localization.GetString("calendars");
+        }
+
+        void CancelButton_Clicked(object sender, EventArgs e)
+        {
+            NavigationController?.PopViewController(true);
+        }
+
+        public override void CalendarSelected(CalendarViewModel calendar)
+        {
+            tcs.SetResult(calendar);
+            NavigationController?.PopViewController(true);
+        }
     }
 }

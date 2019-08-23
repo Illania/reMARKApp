@@ -222,8 +222,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         async Task DoOpenInternalContacts()
         {
-            //CommonConfig.UsageAnalytics.LogEvent(new ComposeContactPickerEvent(ContactPickerChoice.Internal));
-
             var vc = new MultipleUserSelectionViewController();
             vc.IncludeCurrentUser = false;
             PresentViewController(new NavigationController(vc), true, null);
