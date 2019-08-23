@@ -18,6 +18,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
             headerView = new HeaderView(context);
             endView = new EndView(context);
 
+            AddView(new SeparatorView(context));
             AddView(headerView);
             AddView(endView);
         }

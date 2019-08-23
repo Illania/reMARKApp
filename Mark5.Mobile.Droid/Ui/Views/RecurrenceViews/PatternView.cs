@@ -8,11 +8,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
 {
     public class PatternView : RecurrenceParentView
     {
-        PatternHeaderView patternHeaderView;
-        DailyView dailyView;
-        WeeklyView weeklyView;
-        MonthlyView monthlyView;
-        YearlyView yearlyView;
+        readonly PatternHeaderView patternHeaderView;
+        readonly DailyView dailyView;
+        readonly WeeklyView weeklyView;
+        readonly MonthlyView monthlyView;
+        readonly YearlyView yearlyView;
 
         public PatternView(Context context) : base(context)
         {
@@ -25,6 +25,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
             yearlyView = new YearlyView(context);
 
             AddView(patternHeaderView);
+            AddView(new SeparatorView(context));
             AddView(dailyView);
             AddView(weeklyView);
             AddView(monthlyView);
@@ -65,11 +66,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
             public PatternHeaderView(Context context) : base(context)
             {
                 Orientation = Horizontal;
-                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent);
+                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
+                Gravity = (int)GravityFlags.CenterVertical;
 
-                var repeatsLabel = new LabelTextView(Context);
-
-                repeatsLabel.Text = "Repeats";
+                var repeatsLabel = new SpecialLabelTextView(Context) { Text = "Repeats" };
 
                 typePicker = new TypePicker(Context, TypeSelected);
 
@@ -179,14 +179,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
 
                 if (ri.WeekDays == WeekDays.EveryDay)
                 {
-                    radioButton1.Enabled = true;
-                    radioButton2.Enabled = false;
+                    radioButton1.Checked = true;
+                    radioButton2.Checked = false;
                     daysTextField.Text = ri.Periodicity.ToString();
                 }
                 else if (ri.WeekDays == WeekDays.WorkDays)
                 {
-                    radioButton1.Enabled = false;
-                    radioButton2.Enabled = true;
+                    radioButton1.Checked = false;
+                    radioButton2.Checked = true;
                 }
             }
         }
@@ -259,7 +259,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
                 var firstLine = new LinearLayoutCompat(Context)
                 {
                     Orientation = Horizontal,
-                    LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+                    LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
+                    Gravity = (int)GravityFlags.CenterVertical,
                 };
                 firstLine.Click += (a, b) => FirstLine_Click();
 
@@ -282,7 +283,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
                 var secondLine = new LinearLayoutCompat(Context)
                 {
                     Orientation = Horizontal,
-                    LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+                    LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
                 };
                 secondLine.Click += (a, b) => SecondLine_Click();
 
@@ -296,12 +297,17 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
                 {
                     Orientation = Horizontal,
                     LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
+                    {
+                        BottomMargin = Common.verticalSpacing,
+                    },
+                    Gravity = (int)GravityFlags.CenterVertical,
                 };
 
                 var bottomLine = new LinearLayoutCompat(Context)
                 {
                     Orientation = Horizontal,
-                    LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
+                    LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent),
+                    Gravity = (int)GravityFlags.CenterVertical,
                 };
 
                 radioButton2 = new AppCompatRadioButton(context);
@@ -323,8 +329,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
                 topLine.AddView(theLabel);
                 topLine.AddView(weekOfMonthField);
                 topLine.AddView(weekDayField);
-                topLine.AddView(everyLabel2);
 
+                bottomLine.AddView(everyLabel2);
                 bottomLine.AddView(monthsField2);
                 bottomLine.AddView(monthsLabel2);
 
@@ -436,7 +442,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
                 var firstLine = new LinearLayoutCompat(Context)
                 {
                     Orientation = Horizontal,
-                    LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+                    LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
+                    Gravity = (int)GravityFlags.CenterVertical,
                 };
                 firstLine.Click += (a, b) => FirstLine_Click();
 
@@ -454,7 +461,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
                 var secondLine = new LinearLayoutCompat(Context)
                 {
                     Orientation = Horizontal,
-                    LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+                    LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
                 };
                 secondLine.Click += (a, b) => SecondLine_Click();
 
@@ -468,12 +475,17 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
                 {
                     Orientation = Horizontal,
                     LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
+                    {
+                        BottomMargin = Common.verticalSpacing,
+                    },
+                    Gravity = (int)GravityFlags.CenterVertical,
                 };
 
                 var bottomLine = new LinearLayoutCompat(Context)
                 {
                     Orientation = Horizontal,
-                    LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
+                    LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent),
+                    Gravity = (int)GravityFlags.CenterVertical,
                 };
 
                 radioButton2 = new AppCompatRadioButton(context);
@@ -482,7 +494,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
                 monthField2 = new MonthPicker(context, UpdateMonth2);
                 weekDayField = new ExtendedWeekDayPicker(context, UpdateWeekDays);
                 weekOfMonthField = new WeekOfMonthPicker(context, UpdateWeekOfMonth);
-
 
                 secondLine.AddView(radioButton2);
                 secondLine.AddView(container);
@@ -569,15 +580,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
 
                 if (ri.WeekOfMonth == WeekOfMonth.None)
                 {
-                    radioButton1.Enabled = true;
-                    radioButton2.Enabled = false;
+                    radioButton1.Checked = true;
+                    radioButton2.Checked = false;
                     dayTextField.Text = ri.DayNumber.ToString();
                     monthField1.SetSelected(ri.Month);
                 }
                 else
                 {
-                    radioButton1.Enabled = false;
-                    radioButton2.Enabled = true;
+                    radioButton1.Checked = false;
+                    radioButton2.Checked = true;
 
                     weekDayField.SetSelected(ri.WeekDays);
                     weekOfMonthField.SetSelected(ri.WeekOfMonth);

@@ -7,6 +7,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.RecurrenceViews;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 {
@@ -39,9 +40,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             if (Arguments.ContainsKey(RecurrenceKey))
                 recInfo = Serializer.Deserialize<RecurrenceInfo>(Arguments.GetString(RecurrenceKey));
             else  //TODO for testing
-            {
                 recInfo = new RecurrenceInfo();
-            }
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -50,6 +49,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_base, container, false);
 
             var linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
+
+            var padding = Conversion.ConvertDpToPixels(10f);
+            linearLayout.SetPadding(padding, padding, padding, padding);
 
             patternView = new PatternView(Context);
             rangeView = new RangeView(Context);

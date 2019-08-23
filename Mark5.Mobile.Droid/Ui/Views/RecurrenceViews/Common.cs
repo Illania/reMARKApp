@@ -10,6 +10,10 @@ using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.Droid.Utilities;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
+using Android.Support.V4.Content;
+using Android.Graphics;
+using Android.Graphics.Drawables;
+using Android.Text.Method;
 
 namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
 {
@@ -17,11 +21,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
     public static class Common
     {
         public static int interviewHorizontalSpacing = Conversion.ConvertDpToPixels(10f);
-        public const float interviewVerticalSpacing = 3f;
-        public const float topSpacing = 1f;
-        public const float bottomSpacing = -1f;
-        public const float internalStackViewSpacing = 5f;
-        public const float stackViewSpacing = 10f;
+        public static int commonPadding = Conversion.ConvertDpToPixels(10f);
+        public static int pickerPadding = Conversion.ConvertDpToPixels(5f);
+        public static int verticalSpacing = Conversion.ConvertDpToPixels(5f);
 
         public static List<RecurrenceType> recurrenceTypes = new List<RecurrenceType> { RecurrenceType.Daily, RecurrenceType.Weekly, RecurrenceType.Monthly, RecurrenceType.Yearly };
 
@@ -49,10 +51,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
         protected RecurrenceInfo ri;
         public RecurrenceParentView(Context context) : base(context)
         {
-            LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
-            {
-                LeftMargin = Conversion.ConvertDpToPixels(10f),
-            };
+            LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
         }
 
         public abstract void Refresh();
@@ -65,6 +64,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
         protected RecurrenceInfo ri;
         public RecurrenceSubView(Context context) : base(context)
         {
+            SetPadding(Common.commonPadding, Common.commonPadding, Common.commonPadding, Common.commonPadding);
         }
 
         public abstract void Refresh();
@@ -75,6 +75,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
         }
     }
 
+    public class SeparatorView : LinearLayoutCompat
+    {
+        public SeparatorView(Context context) : base(context)
+        {
+            LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, Conversion.ConvertDpToPixels(1));
+            SetBackgroundColor(new Color(ContextCompat.GetColor(context, Resource.Color.lightgray)));
+        }
+    }
+
     public class DateField : TextView
     {
         Action<DateTime> selectedAction;
@@ -82,6 +91,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
 
         public DateField(Context context, Action<DateTime> selectedAction) : base(context)
         {
+            this.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
+
             this.selectedAction = selectedAction;
             Click += DateField_Click;
         }
@@ -184,6 +195,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
     {
         public LabelTextView(Context context) : base(context)
         {
+            this.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
             LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
             {
                 RightMargin = Common.interviewHorizontalSpacing,
@@ -195,6 +207,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
     {
         public SpecialLabelTextView(Context context) : base(context)
         {
+            this.SetTextAppearanceCompat(context, Resource.Style.fontPrimaryLight);
             LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
             {
                 RightMargin = Common.interviewHorizontalSpacing,
@@ -206,27 +219,56 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
     {
         public NumberField(Context context) : base(context)
         {
+            this.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
+
             LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
             {
                 RightMargin = Common.interviewHorizontalSpacing,
             };
+            SetMinimumWidth(Conversion.ConvertDpToPixels(25f));
+
+            InputType = Android.Text.InputTypes.ClassNumber;
+            KeyListener = DigitsKeyListener.GetInstance(null, false, false);
         }
     }
 
-    public abstract class PickerField<T> : AppCompatSpinner
+    public abstract class PickerField<T> : LinearLayoutCompat
     {
         protected Action<T> selectedAction;
+        AppCompatSpinner spinner;
 
         public PickerField(Context context, Action<T> selectedAction, List<string> data) : base(context)
         {
             this.selectedAction = selectedAction;
 
-            Adapter = new CommonAdapter(context, data);
+            var shape = new GradientDrawable();
+            shape.SetCornerRadius(Conversion.ConvertDpToPixels(3f));
+            shape.SetColor(ContextCompat.GetColor(Context, Resource.Color.lightgray));
 
-            ItemSelected += PickerField_ItemSelected;
+            Background = shape;
+
+            LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
+            {
+                RightMargin = Common.interviewHorizontalSpacing,
+            };
+            SetPadding(Common.pickerPadding, Common.pickerPadding, Common.pickerPadding, Common.pickerPadding);
+
+            spinner = new AppCompatSpinner(context);
+            spinner.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent);
+            spinner.Adapter = new CommonAdapter(context, data);
+            spinner.ItemSelected += PickerField_ItemSelected;
+            spinner.SetPadding(0, 0, 0, 0);
+            //spinner.Background = null;
+
+            AddView(spinner);
         }
 
-        private void PickerField_ItemSelected(object sender, ItemSelectedEventArgs e)
+        protected void SetSelection(int index)
+        {
+            spinner.SetSelection(index);
+        }
+
+        private void PickerField_ItemSelected(object sender, AdapterView.ItemSelectedEventArgs e)
         {
             Update(e.Position);
         }
@@ -250,9 +292,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
 
         public override View GetView(int position, View convertView, ViewGroup parent)
         {
-            var view = convertView ?? new AppCompatTextView(Context);
-
-            (view as AppCompatTextView).Text = data[position];
+            var view = (convertView ?? new AppCompatTextView(Context)) as AppCompatTextView;
+            view.LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
+            view.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
+            view.Text = data[position];
             return view;
         }
 
