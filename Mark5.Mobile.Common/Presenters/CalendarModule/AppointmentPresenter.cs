@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities.Extensions;
 
 namespace Mark5.Mobile.Common.Presenters.CalendarModule
 {
@@ -179,7 +180,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                     foreach (var day in days)
                     {
                         if (ri.WeekDays.HasFlag(day))
-                            stringDays.Add(GetDayName(day));
+                            stringDays.Add(day.ToFriendlyString());
                     }
 
                     pattern += string.Join(", ", stringDays);
@@ -192,7 +193,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                         pattern += $"on day {ri.DayNumber} of every {monthPatter}";
                     }
                     else
-                        pattern += $"the {GetWeekString(ri.WeekOfMonth)} {GetDayName(ri.WeekDays)} of every {ri.Periodicity} month(s) ";
+                        pattern += $"the {GetWeekString(ri.WeekOfMonth)} {ri.WeekDays.ToFriendlyString()} of every {ri.Periodicity} month(s) ";
                     break;
                 case RecurrenceType.Yearly:
                     pattern += $"Yearly, ";
@@ -200,7 +201,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                     if (ri.WeekOfMonth == WeekOfMonth.None)
                         pattern += $"every {GetMonthString(ri.Month)}, {ri.DayNumber}";
                     else
-                        pattern += $"the {GetWeekString(ri.WeekOfMonth)} {GetDayName(ri.WeekDays)} of {GetMonthString(ri.Month)} ";
+                        pattern += $"the {GetWeekString(ri.WeekOfMonth)} {ri.WeekDays.ToFriendlyString()} of {GetMonthString(ri.Month)} ";
                     break;
             }
 
@@ -218,24 +219,6 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             }
 
             return pattern + range;
-        }
-
-        public static string GetDayName(WeekDays val)
-        {
-            switch (val)
-            {
-                case WeekDays.Monday: return "Monday";
-                case WeekDays.Tuesday: return "Tuesday";
-                case WeekDays.Wednesday: return "Wednesday";
-                case WeekDays.Thursday: return "Thursday";
-                case WeekDays.Friday: return "Friday";
-                case WeekDays.Saturday: return "Saturday";
-                case WeekDays.Sunday: return "Sunday";
-                case WeekDays.WeekendDays: return "Weekend day";
-                case WeekDays.EveryDay: return "Day";
-                case WeekDays.WorkDays: return "Weekday";
-                default: return string.Empty;
-            }
         }
 
         public static string GetWeekString(WeekOfMonth val)

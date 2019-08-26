@@ -119,8 +119,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             if (participantsView != null)
             {
-                participantsView.SendInvitationClicked += SendInvitationsButton_TouchUpInside;
-                participantsView.ShowParticipantsClicked += ParticipantsView_ShowParticipantsClicked;
+                participantsView.SendInvitationClicked -= SendInvitationsButton_TouchUpInside;
+                participantsView.ShowParticipantsClicked -= ParticipantsView_ShowParticipantsClicked;
             }
         }
 
