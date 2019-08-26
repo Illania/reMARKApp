@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Android.OS;
+using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common;
@@ -14,6 +16,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
     public class ReoccurrenceFragment : BaseFragment
     {
         const string RecurrenceKey = "RecurrenceKey";
+
+        //Await on Task to get the updated value of recurrence info.
+        //If the result is null, the user pressed "Back", so we do not update recurrence info.
+        public Task<RecurrenceInfo> Task => tcs.Task;
+
+        readonly TaskCompletionSource<RecurrenceInfo> tcs = new TaskCompletionSource<RecurrenceInfo>();
 
         RecurrenceInfo recInfo;
 
@@ -39,8 +47,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
             if (Arguments.ContainsKey(RecurrenceKey))
                 recInfo = Serializer.Deserialize<RecurrenceInfo>(Arguments.GetString(RecurrenceKey));
-            else  //TODO for testing
-                recInfo = new RecurrenceInfo { Type = RecurrenceType.Yearly };
+
+            recInfo = recInfo ?? new RecurrenceInfo { Type = RecurrenceType.Daily };
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -60,6 +68,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             linearLayout.AddView(patternView);
             linearLayout.AddView(rangeView);
 
+            HasOptionsMenu = true;
+
             return rootView;
         }
 
@@ -74,6 +84,35 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             rangeView.Refresh();
         }
 
+        public override void OnStop()
+        {
+            base.OnStop();
 
+            tcs.TrySetResult(recInfo);
+        }
+
+        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
+        {
+            menu.Clear();
+            var item = menu.Add(Menu.None, 10, 10, Resource.String.done);
+            item.SetShowAsAction(ShowAsAction.Always);
+        }
+
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            if (item.ItemId == 10)
+            {
+                CloseFragment();
+                return true;
+            }
+
+            return base.OnOptionsItemSelected(item);
+        }
+
+        void CloseFragment()
+        {
+            tcs.SetResult(recInfo);
+            ((AppCompatActivity)Activity).OnBackPressed();
+        }
     }
 }
