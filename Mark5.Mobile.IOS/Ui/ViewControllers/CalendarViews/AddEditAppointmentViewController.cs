@@ -127,9 +127,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 saveButtonItem.Clicked -= SaveButtonItem_Clicked;
         }
 
-        private void SaveButtonItem_Clicked(object sender, EventArgs e)
+        private async void SaveButtonItem_Clicked(object sender, EventArgs e)
         {
-            //TODO: implement
+            //TODO: add model validation before:
+            //await presenter.AddOrEditAppointment(viewModel);
         }
 
         private void InitNavigationBar()
