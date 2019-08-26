@@ -97,14 +97,14 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 {
                     MenuItemContents = new Dictionary<int, MenuItemContent>
                     {
-                        [Resource.Id.nav_calendar] = new MenuItemContent(ModuleType.Calendar, CalendarCoordinator),
+                        [Resource.Id.nav_documents] = new MenuItemContent(ModuleType.Documents),
                         [Resource.Id.nav_contacts] = new MenuItemContent(ModuleType.Contacts),
                         [Resource.Id.nav_shortcodes] = new MenuItemContent(ModuleType.Shortcodes),
-                        [Resource.Id.nav_documents] = new MenuItemContent(ModuleType.Documents), //TEsting
+                        [Resource.Id.nav_calendar] = new MenuItemContent(ModuleType.Calendar, CalendarCoordinator),
                     }
                 };
 
-                var initialMenuItem = navigationView.Menu.FindItem(Resource.Id.nav_calendar);
+                var initialMenuItem = navigationView.Menu.FindItem(Resource.Id.nav_documents);
                 initialMenuItem.SetChecked(true);
                 OnNavigationItemSelected(initialMenuItem);
 
