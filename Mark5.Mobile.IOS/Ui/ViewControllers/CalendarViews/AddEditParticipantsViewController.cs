@@ -41,8 +41,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             base.ViewWillAppear(animated);
 
             if (NavigationController != null)
-                NavigationController.NavigationBar.PrefersLargeTitles = true;
-            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+                NavigationController.NavigationBar.PrefersLargeTitles = false;
+            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Never;
 
             InitializeHandlers();
         }

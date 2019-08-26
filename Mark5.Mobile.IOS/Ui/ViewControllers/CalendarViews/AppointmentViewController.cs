@@ -70,6 +70,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             InitializeHandlers();
 
+            if (NavigationController != null)
+                NavigationController.NavigationBar.PrefersLargeTitles = false;
+            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Never;
+
             if (!loaded)
             {
                 await presenter.LoadAppointment(appointmentId, recurrenceIndex, calendarId);
