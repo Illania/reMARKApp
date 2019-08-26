@@ -288,6 +288,7 @@
     <Compile Include="Ui\TableViewCells\AddEditTableViewCells\AddEditAppointmentTableViewCell\AllDayToggleTableViewCell.cs" />
     <Compile Include="Ui\ViewControllers\CalendarViews\AddEditParticipantsViewController.cs" />
     <Compile Include="Ui\ViewControllers\CalendarViews\AddEditAppointmentCalendarListViewController.cs" />
+    <Compile Include="Ui\TableViewCells\AddEditTableViewCells\AddEditAppointmentTableViewCell\ReminderDisclosuerTableViewCell.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

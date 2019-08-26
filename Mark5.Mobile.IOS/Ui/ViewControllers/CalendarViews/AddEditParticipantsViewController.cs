@@ -1,4 +1,5 @@
-﻿using System;
+﻿using UIKit;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,8 +10,6 @@ using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
-using Mark5.Mobile.IOS.Utilities;
-using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 {
@@ -271,7 +270,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             public void SetItems(List<ParticipantsViewModel> participants)
             {
                 items.Clear();
-                items.AddRange(participants.OrderBy(c => c.Name));
+                if (participants != null)
+                    items.AddRange(participants.OrderBy(c => c.Name));
+
                 tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
 

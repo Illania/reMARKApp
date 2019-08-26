@@ -1,11 +1,11 @@
-﻿using System;
+﻿using UIKit;
+using System;
 using System.Globalization;
-using CoreGraphics;
 using Foundation;
+using ObjCRuntime;
+using CoreGraphics;
 using Mark5.Mobile.IOS.Model;
 using Mark5.Mobile.IOS.Ui.Common;
-using UIKit;
-using ObjCRuntime;
 using static Mark5.Mobile.IOS.Model.DateTimeChangeEvent;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppointmentTableViewCell
@@ -178,14 +178,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
             var nsDate = NSCalendar.CurrentCalendar.DateFromComponents(fromComponents);
             datePicker.SetDate(nsDate, false);
         }
-
-        /*
-        [Export("tapped:")]
-        void Tapped(UITapGestureRecognizer recognizer)
-        {
-
-        }
-        */
 
         [Export("doneTapped:")]
         void DoneTapped(UIBarButtonItem sender)

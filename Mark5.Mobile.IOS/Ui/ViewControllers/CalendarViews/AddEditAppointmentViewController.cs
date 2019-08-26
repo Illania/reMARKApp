@@ -935,28 +935,38 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 {
                 }
 
-                public override AddEditTableViewCell CreateCell() => new AppointmentDisclosureTableViewCell();
+                public override AddEditTableViewCell CreateCell() => new ReminderDisclosureTableViewCell();
 
                 public override void RefreshRow()
                 {
                     if (ViewModel != null && ViewModel.ReminderTimeBeforeStart > -1)
                     {
-
+                        ReminderInfo reminder = ReminderInfo.ConvertFromSeconds((int)ViewModel.ReminderTimeBeforeStart);
+                        ((ReminderDisclosureTableViewCell)Cell).SetLabel(reminder.Title);
+                        ((ReminderDisclosureTableViewCell)Cell).SetPickerSelection(reminder);
                     }
                     else
                     {
-                        ((AppointmentDisclosureTableViewCell)Cell).SetLabel(Localization.GetString("none"));
+                        ((ReminderDisclosureTableViewCell)Cell).SetLabel(Localization.GetString("none"));
                     }
                 }
 
                 protected override void Initialize()
                 {
-                    ((AppointmentDisclosureTableViewCell)Cell).SetTitle(Localization.GetString("reminder"));
+                    ReminderDisclosureTableViewCell cell = (ReminderDisclosureTableViewCell)Cell;
+                    cell.ReminderSelected = ReminderSelected;
+                    cell.SetTitle(Localization.GetString("reminder"));
+                }
+
+                void ReminderSelected(ReminderInfo reminder)
+                {
+                    ViewModel.ReminderTimeBeforeStart = reminder.Seconds;
                 }
 
                 public override void OnClicked(NSIndexPath indexPath)
                 {
                     base.OnClicked(indexPath);
+                    ((ReminderDisclosureTableViewCell)Cell).Label.BecomeFirstResponder();
                 }
             }
 

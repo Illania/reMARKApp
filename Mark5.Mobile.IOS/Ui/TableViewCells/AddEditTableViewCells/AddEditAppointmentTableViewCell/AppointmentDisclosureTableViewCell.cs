@@ -1,7 +1,5 @@
-﻿using System;
-using Foundation;
+﻿using UIKit;
 using Mark5.Mobile.IOS.Ui.Common;
-using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppointmentTableViewCell
 {
@@ -10,7 +8,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
         public static readonly string Key = "AppointmentDisclosureTableViewCell";
         public UIButton ChevronButton;
         public UILabel Title;
-        public UILabel Label;
+        public UITextView Label;
 
         public AppointmentDisclosureTableViewCell() : base(UITableViewCellStyle.Default, Key)
         {
@@ -27,12 +25,18 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
             Title.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             ContentView.AddSubview(Title);
 
-            Label = new UILabel
+            Label = new UITextView
             {
+                AutocapitalizationType = UITextAutocapitalizationType.Sentences,
+                AutocorrectionType = UITextAutocorrectionType.Yes,
+                ScrollEnabled = false,
+                ClipsToBounds = true,
+                InputAccessoryView = new KeyboardObserverInputAccessoryView(),
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Font = Theme.DefaultFont,
                 TextColor = Theme.DarkGray,
-                Lines = 0,
+                Editable = false,
+                UserInteractionEnabled = false
             };
 
             ContentView.AddSubview(Label);

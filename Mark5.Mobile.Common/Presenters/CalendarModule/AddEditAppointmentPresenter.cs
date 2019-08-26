@@ -137,22 +137,22 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         {
             var ca = new CalendarAppointment
             {
-                Id = this.Calendar.Id,
-                Subject = this.Subject,
-                Description = this.Description,
-                Location = this.Location,
-                AllDay = this.AllDay,
-                ReminderTimeBeforeStart = this.ReminderTimeBeforeStart,
-                RecurrenceInfo = this.RecurrenceInfo,
-                Participants = this.Participants.Select(ParticipantsViewModel.ConvertToModel).ToList(),
-                CreatorId = this.CreatorId,
+                Id = Calendar.Id,
+                Subject = Subject,
+                Description = Description,
+                Location = Location,
+                AllDay = AllDay,
+                ReminderTimeBeforeStart = ReminderTimeBeforeStart,
+                RecurrenceInfo = RecurrenceInfo,
+                Participants = Participants.Select(ParticipantsViewModel.ConvertToModel).ToList(),
+                CreatorId = CreatorId,
             };
 
             ca.Occurrences.Add(new CalendarAppointmentOccurrence
             {
                 RecurrenceIndex = -1,
-                StartDate = this.Start,
-                EndDate = this.End,
+                StartDate = Start,
+                EndDate = End,
             });
 
             return ca;

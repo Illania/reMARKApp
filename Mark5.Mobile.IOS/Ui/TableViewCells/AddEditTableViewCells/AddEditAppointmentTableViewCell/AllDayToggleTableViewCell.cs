@@ -17,7 +17,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
             SetTitle(Localization.GetString("all_day"));
         }
 
-        public override void Togglee__ValueChanged(object sender, EventArgs e)
+        public override void Toggle_ValueChanged(object sender, EventArgs e)
         {
             UISwitch toggle = (UISwitch)sender;
             dateChangedHandler.Invoke(new DateTimeChangeEvent(DateRowType.AllDay, toggle.On));
