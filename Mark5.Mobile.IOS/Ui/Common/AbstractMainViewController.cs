@@ -78,7 +78,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 navigationButtonContainer.HeightAnchor.ConstraintEqualTo(65f),
                 navigationButtonContainer.WidthAnchor.ConstraintEqualTo(55f),
                 navigationButtonContainer.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
-                navigationButtonContainer.BottomAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.BottomAnchor, 2),
+                navigationButtonContainer.BottomAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.BottomAnchor : BottomLayoutGuide.GetTopAnchor(), 2),
             });
 
             moduleNavigationButton = new UIButton

@@ -143,8 +143,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                     ClipsToBounds = false,
                     TextContainerInset = UIEdgeInsets.Zero,
                     UserInteractionEnabled = false,
-                    TranslatesAutoresizingMaskIntoConstraints = false,
-                    BackgroundColor = UIColor.Clear,
+                    TranslatesAutoresizingMaskIntoConstraints = false
                 };
                 bottomLabel.TextContainer.MaximumNumberOfLines = 3;
                 bottomLabel.TextContainer.LineFragmentPadding = 0f;

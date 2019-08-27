@@ -91,13 +91,26 @@ namespace Mark5.Mobile.IOS.Ui.Common
             webView.AddObserver(this, new NSString("loading"), NSKeyValueObservingOptions.New, IntPtr.Zero);
             View.AddSubview(webView);
 
-            View.AddConstraints(new[]
+            if (Integration.IsRunningAtLeast(11))
             {
+                View.AddConstraints(new[]
+                {
                     webView.TopAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.TopAnchor),
                     webView.BottomAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.BottomAnchor),
                     webView.LeadingAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.LeadingAnchor),
                     webView.TrailingAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.TrailingAnchor)
                 });
+            }
+            else
+            {
+                View.AddConstraints(new[]
+                {
+                    webView.TopAnchor.ConstraintEqualTo(View.TopAnchor),
+                    webView.BottomAnchor.ConstraintEqualTo(View.BottomAnchor),
+                    webView.LeadingAnchor.ConstraintEqualTo(View.LeadingAnchor),
+                    webView.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor)
+                });
+            }
 
             headerContainerView = new UIView
             {
@@ -139,7 +152,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             View.AddSubview(webViewProgressView);
             View.AddConstraints(new[]
             {
-                webViewProgressView.TopAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.TopAnchor ),
+                webViewProgressView.TopAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.TopAnchor : View.TopAnchor),
                 webViewProgressView.LeadingAnchor.ConstraintEqualTo(View.LeadingAnchor),
                 webViewProgressView.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor)
             });
@@ -203,7 +216,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
         void HandleKeyboardDidShow(object sender, UIKeyboardEventArgs e)
         {
             keyboardHeight = e.FrameEnd.Height;
-            keyboardHeight -= View.SafeAreaInsets.Bottom;
+            if (Integration.IsRunningAtLeast(11))
+                keyboardHeight -= View.SafeAreaInsets.Bottom;
         }
 
         protected void HeaderView_BeginAnimating(object sender, EventArgs e) => headerAnimationRunning = true;
@@ -430,12 +444,12 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             if (config.InlineCss)
             {
-                html = await InlineCss(html);
+                    html = await InlineCss(html);
 
-                if (CommonConfig.Logger.IsDebugEnabled())
-                    CommonConfig.Logger.Debug($"InlineCss {sw.ElapsedMilliseconds}ms");
-                sw.Restart();
-            }
+                    if (CommonConfig.Logger.IsDebugEnabled())
+                        CommonConfig.Logger.Debug($"InlineCss {sw.ElapsedMilliseconds}ms");
+                    sw.Restart();
+                }
 
             var htmlDocument = new HtmlDocument();
             htmlDocument.LoadHtml(html);

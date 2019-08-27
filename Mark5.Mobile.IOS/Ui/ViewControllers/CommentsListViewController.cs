@@ -52,9 +52,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillAppear(animated);
 
-            if (NavigationController != null)
-                NavigationController.NavigationBar.PrefersLargeTitles = true;
-            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            if (Integration.IsRunningAtLeast(11))
+            {
+                if (NavigationController != null)
+                    NavigationController.NavigationBar.PrefersLargeTitles = true;
+                NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            }
 
             InitializeHandlers();
             UpdateCommentTextViewHeight();
@@ -136,7 +139,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             NSLayoutConstraint tableViewBottomConstraint = null;
 
-            tableViewBottomConstraint = tableView.BottomAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.BottomAnchor);
+            if (Integration.IsRunningAtLeast(11))
+                tableViewBottomConstraint = tableView.BottomAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.BottomAnchor);
+            else
+                tableViewBottomConstraint = tableView.BottomAnchor.ConstraintEqualTo(View.BottomAnchor);
 
             View.AddConstraints(new[]
             {
@@ -157,7 +163,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             };
             commentView.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
 
-            commentViewBottomConstraint = commentView.BottomAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.BottomAnchor);
+            if (Integration.IsRunningAtLeast(11))
+                commentViewBottomConstraint = commentView.BottomAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.BottomAnchor);
+            else
+                commentViewBottomConstraint = commentView.BottomAnchor.ConstraintEqualTo(View.BottomAnchor);
 
             View.AddSubview(commentView);
             View.AddConstraints(new[]
@@ -201,7 +210,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
 
-            commentTextScrollView.ContentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentBehavior.Never;
+            if (Integration.IsRunningAtLeast(11))
+                commentTextScrollView.ContentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentBehavior.Never;
             commentTextScrollView.Layer.BorderColor = Theme.DarkGray.CGColor;
             commentTextScrollView.Layer.BorderWidth = .7f;
             commentTextScrollView.Layer.CornerRadius = 5f;
@@ -214,7 +224,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 commentTextScrollView.BottomAnchor.ConstraintEqualTo(commentView.BottomAnchor,-7f),
                 commentTextScrollView.HeightAnchor.ConstraintGreaterThanOrEqualTo(0f),
                 commentTextScrollViewHeightConstraint = commentTextScrollView.HeightAnchor.ConstraintEqualTo(0f),
-
+                   
                 addCommentButton.RightAnchor.ConstraintEqualTo(commentView.RightAnchor,-7f),
                 addCommentButton.CenterYAnchor.ConstraintEqualTo(commentTextScrollView.CenterYAnchor)
             });
@@ -362,7 +372,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var height = KeyboardObserverInputAccessoryView.GetVisibleKeyboardHeight(View, frame);
 
-            commentViewBottomConstraint.Constant = height == 0 ? 0 : -height + (View.SafeAreaInsets.Bottom);
+            if (Integration.IsRunningAtLeast(11))
+                commentViewBottomConstraint.Constant = height == 0 ? 0 : -height + (View.SafeAreaInsets.Bottom);
+            else
+                commentViewBottomConstraint.Constant = -height;
 
             commentView.LayoutIfNeeded();
 

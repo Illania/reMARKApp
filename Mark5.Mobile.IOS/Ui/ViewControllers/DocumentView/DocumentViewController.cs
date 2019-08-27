@@ -95,7 +95,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (!Integration.IsIPad())
                 InitToolbar();
 
-            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Never;
+            if (Integration.IsRunningAtLeast(11))
+                NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Never;
 
             RestorationIdentifier = nameof(DocumentViewController);
             RestorationClass = Class;

@@ -58,9 +58,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillAppear(animated);
 
-            if (NavigationController != null)
-                NavigationController.NavigationBar.PrefersLargeTitles = true;
-            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            if (Integration.IsRunningAtLeast(11))
+            {
+                if (NavigationController != null)
+                    NavigationController.NavigationBar.PrefersLargeTitles = true;
+                NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            }
         }
 
         public override async void ViewDidAppear(bool animated)
@@ -70,7 +73,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (((DataSource)TableView.Source).Empty)
                 await RefreshDataAsync();
 
-            NavigationItem.SearchController = searchController;
+            if (Integration.IsRunningAtLeast(11))
+                NavigationItem.SearchController = searchController;
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -212,6 +216,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             };
 
             searchController.SearchBar.Placeholder = Localization.GetString("filter");
+
+            if (!Integration.IsRunningAtLeast(11))
+            {
+                TableView.TableHeaderView = searchController.SearchBar;
+            }
         }
 
         void IUISearchResultsUpdating.UpdateSearchResultsForSearchController(UISearchController searchController)

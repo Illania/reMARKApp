@@ -69,9 +69,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
         {
             base.ViewWillAppear(animated);
 
-            if (NavigationController != null)
-                NavigationController.NavigationBar.PrefersLargeTitles = true;
-            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Never;
+            if (Integration.IsRunningAtLeast(11))
+            {
+                if (NavigationController != null)
+                    NavigationController.NavigationBar.PrefersLargeTitles = true;
+                NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Never;
+            }
 
             closeItem.Clicked += CloseItem_Clicked;
             shareItem.Clicked += ShareItem_Clicked;

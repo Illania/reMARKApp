@@ -113,7 +113,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 closeButtonContainer.HeightAnchor.ConstraintEqualTo(65f),
                 closeButtonContainer.WidthAnchor.ConstraintEqualTo(65f),
                 closeButtonContainer.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
-                closeButtonContainer.BottomAnchor.ConstraintEqualTo( View.SafeAreaLayoutGuide.BottomAnchor, 2),
+                closeButtonContainer.BottomAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.BottomAnchor : BottomLayoutGuide.GetTopAnchor(), 2),
             });
 
             if (Integration.IsIPad())
@@ -133,8 +133,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 seperatorView.HeightAnchor.ConstraintEqualTo(3f),
                 seperatorView.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
                 seperatorView.CenterYAnchor.ConstraintEqualTo(View.CenterYAnchor, 60),
-                seperatorView.LeftAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.LeftAnchor),
-                seperatorView.RightAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.RightAnchor)
+                seperatorView.LeftAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.LeftAnchor : View.LeftAnchor, separatorPadding),
+                seperatorView.RightAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.RightAnchor : View.RightAnchor, -separatorPadding)
             });
 
             View.AddConstraints(new[]
