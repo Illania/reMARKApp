@@ -1,5 +1,5 @@
 ﻿using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Presenters.CalendarModule;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
 
@@ -13,11 +13,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
         PatternView patternView;
         RangeView rangeView;
 
-        RecurrenceInfo ri;
+        RecurrenceInfo recInfo;
 
-        public RecurrenceViewController(RecurrenceInfo vm)
+        private RecurrenceViewController(RecurrenceInfo ri)
         {
-            this.ri = vm;
+            recInfo = Serializer.Deserialize<RecurrenceInfo>(Serializer.Serialize(ri));
+        }
+
+        public static RecurrenceViewController Create(RecurrenceInfo ri)
+        {
+            return new RecurrenceViewController(ri);
         }
 
         public override void LoadView()
@@ -31,8 +36,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
         {
             base.ViewWillAppear(animated);
 
-            patternView.SetViewModel(ri);
-            rangeView.SetViewModel(ri);
+            patternView.SetViewModel(recInfo);
+            rangeView.SetViewModel(recInfo);
 
             patternView.Refresh();
             rangeView.Refresh();
