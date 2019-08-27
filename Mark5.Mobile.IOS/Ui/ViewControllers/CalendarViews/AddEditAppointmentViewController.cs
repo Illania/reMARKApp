@@ -74,7 +74,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             RefreshData();
         }
 
-        public override async void ViewWillAppear(bool animated)
+        public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
             InitializeHandlers();
@@ -127,7 +127,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 saveButtonItem.Clicked -= SaveButtonItem_Clicked;
         }
 
-        private async void SaveButtonItem_Clicked(object sender, EventArgs e)
+        private void SaveButtonItem_Clicked(object sender, EventArgs e)
         {
             //TODO: add model validation before:
             //await presenter.AddOrEditAppointment(viewModel);
@@ -922,7 +922,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                     ((AppointmentDisclosureTableViewCell)Cell).SetTitle("Participants");
                 }
 
-                public async override void OnClicked(NSIndexPath indexPath)
+                public override void OnClicked(NSIndexPath indexPath)
                 {
                     ViewController?.NavigationController?.PushViewController(new AddEditParticipantsViewController(ViewModel), true);
                 }

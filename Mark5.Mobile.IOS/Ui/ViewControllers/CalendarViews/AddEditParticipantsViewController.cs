@@ -22,8 +22,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         AddEditAppointmentViewModel viewModel;
 
-        Action<ParticipantsViewModel> participantSelectedAction;
-
         public AddEditParticipantsViewController(AddEditAppointmentViewModel viewModel)
         {
             this.viewModel = viewModel;
@@ -190,12 +188,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         {
             var vc = new RecentAddressesListViewController();
             PresentViewController(new NavigationController(vc), true, null);
-            var result = await vc.Result;
-            if (result != null)
-            {
-                participantSelectedAction(new ParticipantsViewModel());
-            }
-
             var pa = await vc.Result;
             if (pa != null)
                 viewModel.Participants.Add(new ParticipantsViewModel() { Name = pa.Name, Email = pa.Address });
@@ -205,12 +197,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         {
             var vc = new PickerContactsFoldersListViewController();
             PresentViewController(new NavigationController(vc), true, null);
-            var result = await vc.Result;
-            if (result != null)
-            {
-                participantSelectedAction(new ParticipantsViewModel());
-            }
-
             var pa = await vc.Result;
             if (pa != null)
                 viewModel.Participants.Add(new ParticipantsViewModel() { Name = pa.Name, Email = pa.Address });
@@ -221,11 +207,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             var vc = new MultipleUserSelectionViewController();
             vc.IncludeCurrentUser = false;
             PresentViewController(new NavigationController(vc), true, null);
-            var result = await vc.Result;
-            if (result != null)
-            {
-                participantSelectedAction(new ParticipantsViewModel());
-            }
             var pa = await vc.Result;
             if (pa != null)
                 foreach (var su in pa)
