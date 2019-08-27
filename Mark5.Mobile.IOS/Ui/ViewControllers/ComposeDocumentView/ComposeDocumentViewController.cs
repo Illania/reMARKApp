@@ -26,7 +26,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 {
-    public class ComposeDocumentViewController : AbstractWebViewController
+    public class ComposeDocumentViewController : AbstractWebViewController, IUIAdaptivePresentationControllerDelegate
     {
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
         const int AutoSaveWorkingCopyInterval = 5000; // 5 seconds
@@ -93,6 +93,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             InitNavigationBar();
             InitializeView();
+
+            NavigationController.PresentationController.Delegate = this;
         }
 
         public override void ViewWillAppear(bool animated)
@@ -499,6 +501,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         }
 
         #region Handlers
+
+        [Export("presentationControllerDidDismiss:")]
+        public async void DidDismiss(UIPresentationController presentationController)
+        {
+            autoSaveWorkingCopyWorker?.Stop();
+            await Managers.DocumentsManager.DeleteDocumentWorkingCopyAsync();
+        }
 
         async void CancelButtonItem_Clicked(object sender, EventArgs e)
         {
