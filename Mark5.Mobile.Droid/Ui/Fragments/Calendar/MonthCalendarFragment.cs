@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Android.Content;
 using Android.Graphics;
 using Android.OS;
@@ -38,13 +39,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         {
             menu.Clear();
 
-            var calendarSelection = menu.Add(Menu.None, MenuItemActions.CalendarSelection, MenuItemActions.CalendarSelection, "Calendars");
-            calendarSelection.SetTitle("Calendars");
+            var refresh = menu.Add(Menu.None, MenuItemActions.Refresh, MenuItemActions.Refresh, Resource.String.refresh);
+            refresh.SetIcon(Resource.Drawable.refresh);
+            refresh.SetShowAsAction(ShowAsAction.Always);
+            refresh.SetOnMenuItemClickListener(this);
+
+            var calendarSelection = menu.Add(Menu.None, MenuItemActions.CalendarSelection, MenuItemActions.CalendarSelection, Resource.String.calendars);
+            calendarSelection.SetIcon(Resource.Drawable.calendar);
             calendarSelection.SetShowAsAction(ShowAsAction.Always);
             calendarSelection.SetOnMenuItemClickListener(this);
 
-            var addAppointment = menu.Add(Menu.None, MenuItemActions.CreateAppointment, MenuItemActions.CreateAppointment, Resource.String.insert_template);  //TODO change
-            addAppointment.SetIcon(Resource.Drawable.action_add);
+            var addAppointment = menu.Add(Menu.None, MenuItemActions.CreateAppointment, MenuItemActions.CreateAppointment, Resource.String.add_appointment);
+            addAppointment.SetIcon(Resource.Drawable.add_appointment);
             addAppointment.SetShowAsAction(ShowAsAction.Always);
             addAppointment.SetOnMenuItemClickListener(this);
         }
@@ -58,6 +64,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         public bool OnMenuItemClick(IMenuItem item)
         {
+            if (item.ItemId == MenuItemActions.Refresh)
+                Refresh();
+
             if (item.ItemId == MenuItemActions.CalendarSelection)
                 coordinator.CalendarsClicked();
 
@@ -67,6 +76,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             return true;
         }
 
+        void Refresh()
+        {
+            var startDate = schedule.VisibleDates.First();
+            var endDate = schedule.VisibleDates.Last();
+
+            coordinator.RefreshClicked(startDate, endDate);
+        }
         void Schedule_MonthInlineAppointmentTapped(object sender, MonthInlineAppointmentTappedEventArgs e)
         {
             coordinator.AppointmentTapped(e.ScheduleAppointment);
@@ -84,8 +100,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         static class MenuItemActions
         {
-            public const int CreateAppointment = 11;
-            public const int CalendarSelection = 10;
+            public const int Refresh = 10;
+            public const int CalendarSelection = 20;
+            public const int CreateAppointment = 30;
         }
     }
 

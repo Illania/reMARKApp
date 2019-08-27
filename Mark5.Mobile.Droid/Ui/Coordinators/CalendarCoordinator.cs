@@ -149,6 +149,14 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
             presenter.LoadAppointments(start, end);
         }
 
+        public void RefreshClicked(Calendar startDate, Calendar endDate)
+        {
+            var start = startDate.ConvertToDateTime().ToLocalTime();
+            var end = endDate.ConvertToDateTime().ToLocalTime();
+
+            presenter.RefreshClicked(start, end);
+        }
+
         public void MonthViewLoaded()
         {
             presenter = new CalendarPresenter();
@@ -324,6 +332,7 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
         void SelectedCalendarsChanged(Dictionary<CalendarViewModel, bool> selectedCalendars);
         void YearTapped(Calendar calendar);
         void MonthTapped(Calendar newValue);
+        void RefreshClicked(Calendar startDate, Calendar endDate);
     }
 
 }

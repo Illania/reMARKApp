@@ -976,6 +976,9 @@
       <SubType></SubType>
       <Generator></Generator>
     </AndroidResource>
+    <AndroidResource Include="Resources\drawable\refresh.xml" />
+    <AndroidResource Include="Resources\drawable\add_appointment.xml" />
+    <AndroidResource Include="Resources\drawable\calendar.xml" />
     <AndroidResource Include="Resources\drawable\circle_white.xml">
       <SubType></SubType>
       <Generator></Generator>
