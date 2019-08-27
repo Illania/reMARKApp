@@ -87,7 +87,7 @@ namespace Mark5.Mobile.IOS
 
         public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
         {
-            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("OTQ4NTJAMzEzNzJlMzEyZTMwWTh6RmRibklqNHU3citRNzViZVRJUkVkYmFSZTc1dFBEQi9td2dZSVZHWT0=");
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("MTI5NjA0QDMxMzcyZTMyMmUzMEV5SitXQWp3Smx0eWUxK0psY0R6RVE1UWdBTUpURTRIbGdRU0pnRTdHODQ9=");
 
             Crashes.GetErrorAttachments =
     report => { return new[] { ErrorAttachmentLog.AttachmentWithText(SystemReportCollector.CreateLogReport(), "deviceLogs.txt") }; };

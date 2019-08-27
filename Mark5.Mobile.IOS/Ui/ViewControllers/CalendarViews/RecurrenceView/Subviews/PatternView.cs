@@ -52,7 +52,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
             Subviews.OfType<IEditable>().ToList().ForEach(a => a.Refresh());
         }
 
-        public void SetViewModel(EditAppointmentViewModel ca)
+        public void SetViewModel(AddEditAppointmentViewModel ca)
         {
             Subviews.OfType<IEditable>().ToList().ForEach(a => a.SetViewModel(ca));
         }
@@ -68,7 +68,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
 
         class PatternHeaderView : UIView, IEditable
         {
-            EditAppointmentViewModel viewModel;
+            AddEditAppointmentViewModel viewModel;
             TypePicker typeField;
 
             public event EventHandler Updated = delegate { };
@@ -115,7 +115,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
                 typeField.SetSelected(viewModel.RecurrenceInfo.Type);
             }
 
-            public void SetViewModel(EditAppointmentViewModel ca)
+            public void SetViewModel(AddEditAppointmentViewModel ca)
             {
                 viewModel = ca;
             }
@@ -123,7 +123,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
 
         class DailyView : UIStackView, IEditable
         {
-            EditAppointmentViewModel viewModel;
+            AddEditAppointmentViewModel viewModel;
 
             RadioButton radioButton1;
             RadioButton radioButton2;
@@ -259,7 +259,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
                 }
             }
 
-            public void SetViewModel(EditAppointmentViewModel ca)
+            public void SetViewModel(AddEditAppointmentViewModel ca)
             {
                 viewModel = ca;
             }
@@ -267,7 +267,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
 
         class WeeklyView : UIView, IEditable
         {
-            EditAppointmentViewModel viewModel;
+            AddEditAppointmentViewModel viewModel;
 
             const float cellheight = 44f;
 
@@ -374,7 +374,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
                 (weekdaysTableView.Source as WeekdaysSource).SetSelected(weekdaysTableView, selected);
             }
 
-            public void SetViewModel(EditAppointmentViewModel ca)
+            public void SetViewModel(AddEditAppointmentViewModel ca)
             {
                 viewModel = ca;
             }
@@ -455,7 +455,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
 
         class MonthlyView : UIStackView, IEditable
         {
-            EditAppointmentViewModel viewModel;
+            AddEditAppointmentViewModel viewModel;
 
             RadioButton radioButton1;
             RadioButton radioButton2;
@@ -693,7 +693,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
                 }
             }
 
-            public void SetViewModel(EditAppointmentViewModel ca)
+            public void SetViewModel(AddEditAppointmentViewModel ca)
             {
                 viewModel = ca;
             }
@@ -701,7 +701,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
 
         class YearlyView : UIStackView, IEditable
         {
-            EditAppointmentViewModel viewModel;
+            AddEditAppointmentViewModel viewModel;
 
             RadioButton radioButton1;
             RadioButton radioButton2;
@@ -900,7 +900,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
                 }
             }
 
-            public void SetViewModel(EditAppointmentViewModel ca)
+            public void SetViewModel(AddEditAppointmentViewModel ca)
             {
                 viewModel = ca;
             }

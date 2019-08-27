@@ -4,16 +4,17 @@ using System.Linq;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Extensions;
 
 namespace Mark5.Mobile.Common.Presenters.CalendarModule
 {
-    public class AddEditAppointmentPresenter : BasePresenter<IEditAppointmentView>, IEditAppointmentPresenter
+    public class AddEditAppointmentPresenter : BasePresenter<IAddEditAppointmentView>, IAddEditAppointmentPresenter
     {
         public override void Start() { }
 
         public override void Stop() { }
 
-        public async Task AddOrEditAppointment(EditAppointmentViewModel vm)
+        public async Task AddOrEditAppointment(AddEditAppointmentViewModel vm)
         {
             var ca = vm.ConvertToModel();
 
@@ -41,10 +42,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         public Task LoadEmptyAppointment()
         {
-            view.ShowAppointment(new EditAppointmentViewModel
-            {
-                CreatorId = ServerConfig.SystemSettings.UserInfo.User.Id,
-            });
+            view.ShowAppointment(new AddEditAppointmentViewModel(ServerConfig.SystemSettings.UserInfo.User.Id));
             return Task.CompletedTask;
         }
 
@@ -57,7 +55,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 CommonConfig.Logger.Info($"Retrieving appointment: AppointmentId = {appointmentId}, CalendarId = {calendarId} ");
 
                 var appointment = await Managers.CalendarManager.GetCalendarAppointmentAsync(calendarId, appointmentId, SourceType.Local);
-                view.ShowAppointment(EditAppointmentViewModel.ConvertToViewModel(appointment));
+                view.ShowAppointment(AddEditAppointmentViewModel.ConvertToViewModel(appointment));
 
                 view.StopLoading();
             }
@@ -79,7 +77,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         }
     }
 
-    public class EditAppointmentViewModel
+    public class AddEditAppointmentViewModel
     {
         public int Id { get; set; }
         public string Subject { get; set; }
@@ -90,13 +88,25 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         public bool AllDay { get; set; }
         public int CreatorId { get; set; }
         public RecurrenceInfo RecurrenceInfo { get; set; } //TODO not so nice (use of domain class)
-        public long ReminderTimeBefore { get; set; }
-        public List<Participant> Participants { get; set; }  //TODO as before
+        public long ReminderTimeBeforeStart { get; set; }
+        public List<ParticipantsViewModel> Participants { get; set; }
         public CalendarViewModel Calendar { get; set; }
 
-        public static EditAppointmentViewModel ConvertToViewModel(CalendarAppointment appointment)
+        public AddEditAppointmentViewModel()
+        { }
+
+        // When creating a new appointment default values are initialized here
+        public AddEditAppointmentViewModel(int creatorId)
         {
-            var appModel = new EditAppointmentViewModel
+            CreatorId = creatorId;
+            Start = DateTime.Now.RoundUp(TimeSpan.FromMinutes(15));
+            End = DateTime.Now.RoundUp(TimeSpan.FromMinutes(15)).AddHours(1);
+            ReminderTimeBeforeStart = -1;
+        }
+
+        public static AddEditAppointmentViewModel ConvertToViewModel(CalendarAppointment appointment)
+        {
+            var appModel = new AddEditAppointmentViewModel
             {
                 Id = appointment.Id,
                 Subject = appointment.Subject,
@@ -105,8 +115,8 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 AllDay = appointment.AllDay,
                 CreatorId = appointment.CreatorId,
                 RecurrenceInfo = appointment.RecurrenceInfo,
-                ReminderTimeBefore = appointment.ReminderTimeBeforeStart,
-                Participants = appointment.Participants.ToList(),
+                ReminderTimeBeforeStart = appointment.ReminderTimeBeforeStart,
+                Participants = appointment.Participants.Select(ParticipantsViewModel.ConvertToViewModel).ToList(),
             };
 
             var calendar = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars.First(ca => ca.Id == appointment.CalendarId);
@@ -127,39 +137,39 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         {
             var ca = new CalendarAppointment
             {
-                Id = this.Calendar.Id,
-                Subject = this.Subject,
-                Description = this.Description,
-                Location = this.Location,
-                AllDay = this.AllDay,
-                ReminderTimeBeforeStart = this.ReminderTimeBefore,
-                RecurrenceInfo = this.RecurrenceInfo,
-                Participants = this.Participants,
-                CreatorId = this.CreatorId,
+                Id = Calendar.Id,
+                Subject = Subject,
+                Description = Description,
+                Location = Location,
+                AllDay = AllDay,
+                ReminderTimeBeforeStart = ReminderTimeBeforeStart,
+                RecurrenceInfo = RecurrenceInfo,
+                Participants = Participants.Select(ParticipantsViewModel.ConvertToModel).ToList(),
+                CreatorId = CreatorId,
             };
 
             ca.Occurrences.Add(new CalendarAppointmentOccurrence
             {
                 RecurrenceIndex = -1,
-                StartDate = this.Start,
-                EndDate = this.End,
+                StartDate = Start,
+                EndDate = End,
             });
 
             return ca;
         }
     }
 
-    public interface IEditAppointmentPresenter : IPresenter<IEditAppointmentView>
+    public interface IAddEditAppointmentPresenter : IPresenter<IAddEditAppointmentView>
     {
         Task LoadEmptyAppointment();
         Task LoadAppointment(int calendarId, int appointmentId);
         void LoadCalendarsList();
-        Task AddOrEditAppointment(EditAppointmentViewModel vm);
+        Task AddOrEditAppointment(AddEditAppointmentViewModel vm);
     }
 
-    public interface IEditAppointmentView : IView
+    public interface IAddEditAppointmentView : IView
     {
-        void ShowAppointment(EditAppointmentViewModel vm);
+        void ShowAppointment(AddEditAppointmentViewModel vm);
         void UpdateCalendarsList(List<CalendarViewModel> calendars);
 
         void CloseView();

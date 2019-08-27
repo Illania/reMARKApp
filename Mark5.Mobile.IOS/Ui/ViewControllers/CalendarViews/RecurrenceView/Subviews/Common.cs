@@ -40,7 +40,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
     interface IEditable
     {
         void Refresh();
-        void SetViewModel(EditAppointmentViewModel vm);
+        void SetViewModel(AddEditAppointmentViewModel vm);
     }
 
     abstract class BaseField : UITextField

@@ -21,6 +21,7 @@
 "adding_comment___" = "Adding comment...";
 "adding_shortcode___" = "Adding mailing list...";
 "address" = "Address";
+"all_day" = "All-day";
 "attachment_too_big" = "The attachment is bigger than the maximum allowed size on the server";
 "attachments" = "Attachments";
 "autosave_recover_title" = "Recover email";
@@ -44,6 +45,7 @@
 "cal_shared" = "Shared";
 "categories_added"="Categories Added";
 "cc" = "Cc";
+"custom" = "Custom";
 "chrome" = "Open in Google Chrome";
 "changes_not_saved" = "Changes not saved!";
 "changes_not_saved_description" = "Current changes are not saved and will be discarded";
@@ -82,6 +84,7 @@
 "copying___" = "Copying...";
 "copying_to_own_worktray___" = "Copying to own To-do list...";
 "copying_to_worktray___" = "Copying to To-do list...";
+"create_appointment" = "Create Appointment";
 "create_report" = "Create report";
 "creating_system_report___" = "Creating system report...";
 "creator" = "Creator";
@@ -135,6 +138,7 @@
 "downloading_attachment___" = "Downloading attachment...";
 "downloading_percentage___" = "Downloading {0}%...";
 "edit" = "Edit";
+"edit_appointment" = "Edit Appointment";
 "edit_categories" = "Edit categories";
 "edit_contact" = "Edit contact";
 "edit_contact_create_person" = "New person";
@@ -161,6 +165,7 @@
 "enable_notifications" = "Notify";
 "enable_sync" = "Enable\nsync";
 "enabled" = "Enabled";
+"ends" = "Ends";
 "error" = "Error";
 "error_appserviceexception_title" = "Error";
 "error_dataaccessexception_title" = "Cache error occured";
@@ -216,6 +221,7 @@
 "loading_templates___" = "Loading templates...";
 "local_folders" = "Local folders";
 "localized_reason" = "Please authenticate to continue using the app";
+"location" = "Location";
 "logging_in___" = "Logging in...";
 "logging_out___" = "Logging out...";
 "login" = "Login";
@@ -239,9 +245,11 @@
 "move_to_folder" = "Move to folder";
 "moving___" = "Moving...";
 "name" = "Name";
+"never" = "Never";
 "network_interface" = "Network interface: ";
 "new_document" = "New email";
 "no" = "No";
+"none" = "None";
 "no_addresses" = "No addresses";
 "no_categories" = "No categories";
 "no_comments" = "No comments";
@@ -319,7 +327,9 @@
 "read_by" = "Read by";
 "reference_number" = "Reference number";
 "remove_from_favorites" = "Remove from\nfavorites";
+"reminder" = "Reminder";
 "reply" = "Reply";
+"repeats" = "Repeats";
 "reply_all" = "Reply all";
 "reply_to" = "Reply to";
 "refresh" = "Refresh";
@@ -407,6 +417,7 @@ Please note that these reports are not monitored 24/7 and will be available to d
 "show_less" = "Show less";
 "skype" = "Skype";
 "subject" = "Subject";
+"starts" = "Starts";
 "system" = "System";
 "sync_fav_folders_action_title" = "Choose which settings to use";
 "sync_fav_folders_action_description" = "Server favorites last time updated at";

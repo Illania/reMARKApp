@@ -38,7 +38,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
             endView.Refresh();
         }
 
-        public void SetViewModel(EditAppointmentViewModel ca)
+        public void SetViewModel(AddEditAppointmentViewModel ca)
         {
             headerView.SetViewModel(ca);
             endView.SetViewModel(ca);
@@ -46,7 +46,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
 
         class HeaderView : UIView, IEditable
         {
-            EditAppointmentViewModel viewModel;
+            AddEditAppointmentViewModel viewModel;
             DateField startDateField;
 
             public event EventHandler Updated = delegate { };
@@ -91,7 +91,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
                 startDateField.SetSelected(viewModel.RecurrenceInfo.StartDate);
             }
 
-            public void SetViewModel(EditAppointmentViewModel ca)
+            public void SetViewModel(AddEditAppointmentViewModel ca)
             {
                 viewModel = ca;
             }
@@ -99,7 +99,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
 
         class EndView : UIStackView, IEditable
         {
-            EditAppointmentViewModel viewModel;
+            AddEditAppointmentViewModel viewModel;
 
             RadioButton radioButton1;
             RadioButton radioButton2;
@@ -277,10 +277,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
 
                     endDateField.SetSelected(viewModel.RecurrenceInfo.EndDate);
                 }
-
             }
 
-            public void SetViewModel(EditAppointmentViewModel vm)
+            public void SetViewModel(AddEditAppointmentViewModel vm)
             {
                 viewModel = vm;
             }

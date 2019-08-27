@@ -13,9 +13,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
         PatternView patternView;
         RangeView rangeView;
 
-        EditAppointmentViewModel vm;
+        AddEditAppointmentViewModel vm;
 
-        public RecurrenceViewController(EditAppointmentViewModel vm)
+        public RecurrenceViewController(AddEditAppointmentViewModel vm)
         {
             this.vm = vm;
         }

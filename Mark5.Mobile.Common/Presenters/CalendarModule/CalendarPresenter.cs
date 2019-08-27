@@ -92,7 +92,6 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         public void ShowCalendarsListClicked()
         {
             var sel = new Dictionary<CalendarViewModel, bool>();
-
             foreach (var cal in calendarsList)
                 sel.Add(CalendarViewModel.ConvertToViewModel(cal), calendarsSelectedState[cal.Id]);
 
