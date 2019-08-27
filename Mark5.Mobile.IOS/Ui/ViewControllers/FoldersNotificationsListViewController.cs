@@ -26,6 +26,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             SegmentedControl.InsertSegment(Localization.GetString("folders"), 0, false);
             SegmentedControl.InsertSegment(Localization.GetString("notifications"), 1, false);
 
+            if (Integration.IsRunningAtLeast(13))
+            {
+                var attributesSelected = new UITextAttributes { TextColor = Theme.White };
+                var attributesNormal = new UITextAttributes { TextColor = Theme.DarkerBlue };
+
+                SegmentedControl.SetTitleTextAttributes(attributesSelected, UIControlState.Selected);
+                SegmentedControl.SetTitleTextAttributes(attributesNormal, UIControlState.Normal);
+            }
+
             ViewControllers = new UIViewController[]
             {
                  new BrowseFoldersListViewController(moduleType),
