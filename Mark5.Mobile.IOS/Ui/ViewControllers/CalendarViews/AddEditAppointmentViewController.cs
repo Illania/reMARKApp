@@ -13,6 +13,7 @@ using Mark5.Mobile.Common.Presenters.CalendarModule;
 using static Mark5.Mobile.IOS.Model.DateTimeChangeEvent;
 using Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells;
 using Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppointmentTableViewCell;
+using Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 {
@@ -443,7 +444,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                         new AllDayToggleRow(this, DateChanged),
                         startDateRow.Unwrap(),
                         endDateRow.Unwrap(),
-                        new ReocurrenceRow(this),
+                        new ReoccurrenceRow(this),
                         new ReminderRow(this)
                     };
                 }
@@ -870,11 +871,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 }
             }
 
-            class ReocurrenceRow : AbstractRow
+            class ReoccurrenceRow : AbstractRow
             {
-                public override string Key => "ReocurrenceRow";
+                public override string Key => "ReoccurrenceRow";
 
-                public ReocurrenceRow(AbstractSection section) : base(section)
+                public ReoccurrenceRow(AbstractSection section) : base(section)
                 {
                 }
 
@@ -891,6 +892,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 protected override void Initialize()
                 {
                     ((AppointmentDisclosureTableViewCell)Cell).SetTitle(Localization.GetString("repeats"));
+                }
+
+                public override void OnClicked(NSIndexPath indexPath)
+                {
+                    ViewController?.NavigationController?.PushViewController(new RecurrenceViewController(ViewModel), true);
                 }
             }
 
