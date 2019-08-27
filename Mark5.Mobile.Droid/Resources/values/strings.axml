@@ -59,6 +59,7 @@
     <string name="copy_to_new_addresses">Addresses</string>
     <string name="copy_to_new_content">Content</string>
     <string name="copy_to_new_attachments">Attachments</string>
+    <string name="create_appointment">Create Appointment</string>
     <string name="create_new_document">New email</string>
     <string name="create_report">Create report</string>
     <string name="create_system_report">Create system report</string>

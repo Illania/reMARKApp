@@ -561,7 +561,6 @@
     <Compile Include="Ui\Fragments\Calendar\MonthCalendarFragment.cs" />
     <Compile Include="Ui\Fragments\Calendar\WeekCalendarFragment.cs" />
     <Compile Include="Ui\Fragments\Calendar\CalendarListFragment.cs" />
-    <Compile Include="Ui\Fragments\Calendar\CreateAppointmentFragment.cs" />
     <Compile Include="Ui\Fragments\Calendar\YearCalendarFragment.cs" />
     <Compile Include="Ui\Coordinators\CalendarCoordinator.cs" />
     <Compile Include="Ui\Fragments\Calendar\BaseCalendarFragment.cs" />
@@ -571,6 +570,7 @@
     <Compile Include="Ui\Views\RecurrenceViews\Common.cs" />
     <Compile Include="Ui\Views\RecurrenceViews\PatternView.cs" />
     <Compile Include="Ui\Views\RecurrenceViews\RangeView.cs" />
+    <Compile Include="Ui\Fragments\Calendar\AddEditAppointmentFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
