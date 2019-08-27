@@ -9,7 +9,7 @@ using Mark5.Mobile.IOS.Ui.Common;
 using ObjCRuntime;
 using UIKit;
 
-namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
+namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
 {
     public class PhoneNumberTableViewCell : MultiRowContentTableViewCell
     {

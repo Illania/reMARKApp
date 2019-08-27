@@ -7,6 +7,7 @@ using CoreAnimation;
 using Foundation;
 using Mark5.Mobile.Common.Presenters.CalendarModule;
 using Mark5.Mobile.IOS.Ui.Common;
+using Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView;
 using Mark5.Mobile.IOS.Utilities;
 using Syncfusion.SfSchedule.iOS;
 using UIKit;
@@ -103,7 +104,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         public void CreateAppointmentClicked()
         {
-            RootController.PushViewController(new CreateAppointmentViewController(), true);
+            RootController.PushViewController(new AddAppointmentViewController(), true);
         }
 
         public void MonthTapped(NSDate date)

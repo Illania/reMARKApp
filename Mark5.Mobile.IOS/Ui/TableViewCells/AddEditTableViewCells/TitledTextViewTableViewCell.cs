@@ -5,7 +5,7 @@ using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities.Extensions;
 using UIKit;
 
-namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
+namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
 {
     public class TitledTextViewTableViewCell : AddEditTableViewCell, IUITextViewDelegate
     {
@@ -16,6 +16,10 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
 
         readonly UITextView textView;
         readonly UILabel titleLabel;
+
+        NSLayoutConstraint leadingLayoutConstraint;
+        bool hasPlaceholder;
+        string placeholderText;
 
         public TitledTextViewTableViewCell()
             : base(UITableViewCellStyle.Default, Key)
@@ -36,7 +40,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Font = Theme.DefaultFont,
                 Editable = true,
-                ScrollEnabled = false,
+                ScrollEnabled = false
             };
             textView.TextContainer.LineFragmentPadding = 0f;
             textView.TextContainerInset = UIEdgeInsets.Zero;
@@ -52,7 +56,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
                 titleLabel.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
 
                 textView.TopAnchor.ConstraintEqualTo(titleLabel.BottomAnchor, InnerVerticalMargin),
-                textView.LeadingAnchor.ConstraintEqualTo(titleLabel.LeadingAnchor),
+                leadingLayoutConstraint = textView.LeadingAnchor.ConstraintEqualTo(ContentView.LeadingAnchor),
                 textView.TrailingAnchor.ConstraintEqualTo(titleLabel.TrailingAnchor),
                 textView.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor, -VerticalMargin),
                 textView.HeightAnchor.ConstraintGreaterThanOrEqualTo(InnerRowHeight),
@@ -60,6 +64,14 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
         }
 
         CGRect previous = CGRect.Empty;
+
+        //Used to reduced the leading constraint for add/edit appointment
+        public void AdjustLeadingConstraint()
+        {
+            ContentView.RemoveConstraint(leadingLayoutConstraint);
+            leadingLayoutConstraint = textView.LeadingAnchor.ConstraintEqualTo(ContentView.LeadingAnchor);
+            ContentView.AddConstraint(leadingLayoutConstraint);
+        }
 
         [Export("textView:shouldChangeTextInRange:replacementText:")]
         public bool ShouldChangeText(UITextView textView, NSRange range, string text)
@@ -83,6 +95,34 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
             }
         }
 
+        [Export("textViewDidBeginEditing:")]
+        public void DidBeginEditing(UITextView textView)
+        {
+            if (hasPlaceholder)
+            {
+                if (textView.Text.Equals(placeholderText))
+                {
+                    textView.Text = string.Empty;
+                    textView.TextColor = Theme.Black;
+                }
+            }
+            textView.BecomeFirstResponder();
+        }
+
+        [Export("textViewDidEndEditing:")]
+        public void DidEndEditing(UITextView textView)
+        {
+            if (hasPlaceholder)
+            {
+                if (textView.Text.Equals(string.Empty))
+                {
+                    textView.Text = placeholderText;
+                    textView.TextColor = Theme.Gray;
+                }
+            }
+            textView.ResignFirstResponder();
+        }
+
         void HandlTitleTap()
         {
             textView.BecomeFirstResponder();
@@ -95,6 +135,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
 
         public void SetContent(string content)
         {
+            textView.TextColor = Theme.Black;
             textView.Text = content;
         }
 
@@ -112,6 +153,14 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
         public void SetAutocorrectionType(UITextAutocorrectionType type)
         {
             textView.AutocorrectionType = type;
+        }
+
+        public void SetPlaceholder(string placeholder)
+        {
+            hasPlaceholder = true;
+            placeholderText = placeholder;
+            textView.Text = placeholder;
+            textView.TextColor = Theme.DarkGray;
         }
 
         public override void Reset()

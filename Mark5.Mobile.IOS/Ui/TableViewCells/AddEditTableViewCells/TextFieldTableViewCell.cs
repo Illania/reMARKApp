@@ -3,7 +3,7 @@ using Foundation;
 using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
 
-namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
+namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
 {
     public class TextFieldTableViewCell : AddEditTableViewCell
     {
@@ -12,6 +12,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
         public Action<string> ContentEdited;
 
         readonly UITextField textField;
+
+        NSLayoutConstraint leadingLayoutConstraint;
 
         public TextFieldTableViewCell()
             : base(UITableViewCellStyle.Default, Key)
@@ -32,7 +34,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
             {
                 textField.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor, VerticalMargin),
                 textField.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor, -VerticalMargin),
-                textField.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+                leadingLayoutConstraint = textField.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
                 textField.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
             });
         }
@@ -60,6 +62,14 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
         public void SetAutocorrectionType(UITextAutocorrectionType type)
         {
             textField.AutocorrectionType = type;
+        }
+
+        //Used to reduced the leading constraint for add/edit appointment
+        public void AdjustLeadingConstraint()
+        {
+            ContentView.RemoveConstraint(leadingLayoutConstraint);
+            leadingLayoutConstraint = textField.LeadingAnchor.ConstraintEqualTo(ContentView.LeadingAnchor);
+            ContentView.AddConstraint(leadingLayoutConstraint);
         }
 
         public override void Reset()

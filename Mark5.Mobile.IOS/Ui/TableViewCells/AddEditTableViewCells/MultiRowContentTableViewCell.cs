@@ -1,7 +1,7 @@
 ﻿using System;
 using UIKit;
 
-namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
+namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
 {
     abstract public class MultiRowContentTableViewCell : AddEditTableViewCell
     {

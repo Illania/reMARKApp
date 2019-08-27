@@ -1,16 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using UIKit;
 using Foundation;
+using System;
+using System.Linq;
+using System.Globalization;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Presenters.CalendarModule;
 using Mark5.Mobile.Common.Utilities.Extensions;
+using Mark5.Mobile.Common.Presenters.CalendarModule;
 using Mark5.Mobile.IOS.Ui.Common;
-using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Utilities;
-using UIKit;
+using Mark5.Mobile.IOS.Ui.TableViewCells;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 {
@@ -23,7 +23,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         List<LineViewModel> lineViewModels;
 
-        UIBarButtonItem editButtinItem;
+        UIBarButtonItem editButtonItem;
         UIBarButtonItem deleteButtonItem;
 
         UIStackView stackView;
@@ -70,6 +70,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             InitializeHandlers();
 
+            if (NavigationController != null)
+                NavigationController.NavigationBar.PrefersLargeTitles = false;
+            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Never;
+
             if (!loaded)
             {
                 await presenter.LoadAppointment(appointmentId, recurrenceIndex, calendarId);
@@ -87,7 +91,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         {
             base.Recycle();
             deleteButtonItem = null;
-            editButtinItem = null;
+            editButtonItem = null;
         }
 
         private void InitializeHandlers()
@@ -95,15 +99,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             if (deleteButtonItem != null)
                 deleteButtonItem.Clicked += DeleteButtonItem_Clicked;
 
-            if (editButtinItem != null)
-                editButtinItem.Clicked += EditButtinItem_Clicked;
+            if (editButtonItem != null)
+                editButtonItem.Clicked += EditButtinItem_Clicked;
 
             if (participantsView != null)
             {
                 participantsView.SendInvitationClicked += SendInvitationsButton_TouchUpInside;
                 participantsView.ShowParticipantsClicked += ParticipantsView_ShowParticipantsClicked;
             }
-
         }
 
         private void DeinitializeHandlers()
@@ -111,13 +114,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             if (deleteButtonItem != null)
                 deleteButtonItem.Clicked -= DeleteButtonItem_Clicked;
 
-            if (editButtinItem != null)
-                editButtinItem.Clicked -= EditButtinItem_Clicked;
+            if (editButtonItem != null)
+                editButtonItem.Clicked -= EditButtinItem_Clicked;
 
             if (participantsView != null)
             {
-                participantsView.SendInvitationClicked += SendInvitationsButton_TouchUpInside;
-                participantsView.ShowParticipantsClicked += ParticipantsView_ShowParticipantsClicked;
+                participantsView.SendInvitationClicked -= SendInvitationsButton_TouchUpInside;
+                participantsView.ShowParticipantsClicked -= ParticipantsView_ShowParticipantsClicked;
             }
         }
 
@@ -128,12 +131,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 Image = UIImage.FromBundle("Bin").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
             };
 
-            editButtinItem = new UIBarButtonItem
+            editButtonItem = new UIBarButtonItem
             {
                 Image = UIImage.FromBundle("Edit").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
             };
 
-            NavigationItem.SetRightBarButtonItems(new[] { editButtinItem, deleteButtonItem }, false);
+            NavigationItem.SetRightBarButtonItems(new[] { editButtonItem, deleteButtonItem }, false);
         }
 
         private void InitView()
@@ -212,7 +215,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         public void OpenEditAppointment(int calendarId, int appointmentId)
         {
-            presenter.EditAppointmentClicked();
+            NavigationController.PushViewController(new EditAppointmentViewController(appointmentId, calendarId), true);
         }
 
         public void SetLines(IEnumerable<LineViewModel> lines)
@@ -290,13 +293,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             presenter.EditAppointmentClicked();
         }
 
-        private async void DeleteButtonItem_Clicked(object sender, EventArgs e)
+        private void DeleteButtonItem_Clicked(object sender, EventArgs e)
         {
+            /* TODO : DEBUG
             var d = new PopoverPresentationControllerDelegate(deleteButtonItem);
 
             var result = await Dialogs.ShowDestructiveActionSheetAsync(this, Localization.GetString("delete"), d);
             if (result)
                 await presenter.DeleteAppointmentClicked();
+            */
+
+            NavigationController.PushViewController(new AddAppointmentViewController(), true);
         }
 
         async void SendInvitationsButton_TouchUpInside(object sender, EventArgs e)
