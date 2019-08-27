@@ -21,6 +21,9 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 Frame = new CGRect(0f, 0f, 0f, 24f)
             };
             SegmentedControl.AddTarget(this, new Selector("segmentedControlHasChangedValue:"), UIControlEvent.ValueChanged);
+
+            if (Integration.IsRunningAtLeast(13))
+                SegmentedControl.SelectedSegmentTintColor = Theme.DarkBlue;
         }
 
         public override void ViewDidLoad()

@@ -609,7 +609,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 var viewportElement = htmlDocument.CreateElement("meta");
                 viewportElement.SetAttributeValue("id", "viewport");
                 viewportElement.SetAttributeValue("name", "viewport");
-                viewportElement.SetAttributeValue("content", "initial-scale=1, minimum-scale=0.75, maximum-scale=1.25, user-scalable=yes");
+                viewportElement.SetAttributeValue("content", "initial-scale=0.8, minimum-scale=0.75, maximum-scale=1.25, user-scalable=yes");
 
                 headNode.PrependChild(viewportElement);
             });
