@@ -567,6 +567,10 @@
     <Compile Include="Ui\Fragments\Calendar\BaseCalendarFragment.cs" />
     <Compile Include="Ui\Fragments\Calendar\AppointmentFragment.cs" />
     <Compile Include="Ui\Common\ConnectionDiagnosticsFragment.cs" />
+    <Compile Include="Ui\Fragments\Calendar\ReoccurrenceFragment.cs" />
+    <Compile Include="Ui\Views\RecurrenceViews\Common.cs" />
+    <Compile Include="Ui\Views\RecurrenceViews\PatternView.cs" />
+    <Compile Include="Ui\Views\RecurrenceViews\RangeView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -607,7 +611,7 @@
     <AndroidResource Include="Resources\color\drawer_item.xml" />
     <AndroidResource Include="Resources\color\drawer_item_background.xml" />
     <AndroidResource Include="Resources\color\drawer_item_icon.xml" />
-    <AndroidResource Include="Resources\drawable\circle.axml" />
+    <AndroidResource Include="Resources\drawable\circle_blue.xml" />
     <AndroidResource Include="Resources\drawable\circle_dark.xml" />
     <AndroidResource Include="Resources\drawable\line_divider.axml" />
     <AndroidResource Include="Resources\drawable\rounded_background.xml" />
@@ -969,6 +973,10 @@
       <Generator></Generator>
     </AndroidResource>
     <AndroidResource Include="Resources\drawable-xxxhdpi\nav_calendar.png">
+      <SubType></SubType>
+      <Generator></Generator>
+    </AndroidResource>
+    <AndroidResource Include="Resources\drawable\circle_white.xml">
       <SubType></SubType>
       <Generator></Generator>
     </AndroidResource>

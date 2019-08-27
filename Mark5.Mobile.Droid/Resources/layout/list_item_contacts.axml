@@ -27,7 +27,7 @@
             android:layout_marginRight="16dp"
             android:padding="8dp"
             android:tint="@color/darkgray"
-            android:background="@drawable/circle"
+            android:background="@drawable/circle_blue"
             android:gravity="center" />
         <android.support.v7.widget.AppCompatTextView
             android:id="@+id/list_item_contact_name"
