@@ -13,11 +13,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
         PatternView patternView;
         RangeView rangeView;
 
-        AddEditAppointmentViewModel vm;
+        RecurrenceInfo ri;
 
-        public RecurrenceViewController(AddEditAppointmentViewModel vm)
+        public RecurrenceViewController(RecurrenceInfo vm)
         {
-            this.vm = vm;
+            this.ri = vm;
         }
 
         public override void LoadView()
@@ -31,8 +31,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
         {
             base.ViewWillAppear(animated);
 
-            patternView.SetViewModel(vm);
-            rangeView.SetViewModel(vm);
+            patternView.SetViewModel(ri);
+            rangeView.SetViewModel(ri);
 
             patternView.Refresh();
             rangeView.Refresh();

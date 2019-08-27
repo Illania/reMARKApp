@@ -894,9 +894,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                     ((AppointmentDisclosureTableViewCell)Cell).SetTitle(Localization.GetString("repeats"));
                 }
 
-                public override void OnClicked(NSIndexPath indexPath)
+                public async override void OnClicked(NSIndexPath indexPath)
                 {
-                    ViewController?.NavigationController?.PushViewController(new RecurrenceViewController(ViewModel), true);
+                    var choices = new List<string> { "Never", "Custom" }.ToArray();
+                    var title = "Repeats";
+                    var result = await Dialogs.ShowListActionSheetWithTitleAsync(ViewController, choices, Cell, title);
+
+                    if (result < 0)
+                        return;
+                    if (result == 0)
+                        ViewModel.RecurrenceInfo = null;
+                    else if (result == 1)
+                        ViewController?.NavigationController?.PushViewController(new RecurrenceViewController(ViewModel), true);
                 }
             }
 
