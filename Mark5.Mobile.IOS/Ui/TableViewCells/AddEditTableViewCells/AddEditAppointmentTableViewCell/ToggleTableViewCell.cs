@@ -17,9 +17,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Font = Theme.DefaultFont,
-                Text = string.Empty
+                Text = string.Empty,
             };
-
             ContentView.Add(title);
 
             toggleSwitch = new UISwitch

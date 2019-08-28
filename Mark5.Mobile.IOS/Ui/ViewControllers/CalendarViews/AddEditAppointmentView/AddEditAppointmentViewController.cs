@@ -49,12 +49,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         public ContactCreationModeFlag CreationModeFlag;
 
         public AbstractAddEditAppointmentViewController()
+               : base(UITableViewStyle.Grouped)
         {
             presenter = new AddEditAppointmentPresenter();
             presenter.AttachView(this);
         }
 
         public AbstractAddEditAppointmentViewController(int appointmentId, int calendarId)
+            : base(UITableViewStyle.Grouped)
         {
             this.appointmentId = appointmentId;
             this.calendarId = calendarId;
@@ -186,7 +188,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         public RecurrenceInfo GetEmptyRecurrenceInfo()
         {
-            return presenter.GetEmptyRecurrenceInfo();
+            return presenter.GetEmptyRecurrenceInfo();  //TODO put it on the view model...
         }
 
         class DataSource : UITableViewSource, IDisposable, IUIGestureRecognizerDelegate
@@ -241,18 +243,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 }
                 row.BindCell(cell);
                 return cell;
-            }
-
-            public override UIView GetViewForHeader(UITableView tableView, nint section)
-            {
-                UIView headerView = new UIView
-                {
-                    BackgroundColor = UIColor.GroupTableViewBackgroundColor
-                };
-
-                headerView.AddConstraint(headerView.HeightAnchor.ConstraintEqualTo(20f));
-
-                return headerView;
             }
 
             public override void WillDisplay(UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
@@ -508,7 +498,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 {
                     Rows = new RowCollection
                     {
-                        new MessageRow(this),
+                        new DescriptionRow(this),
                     };
                 }
             }
@@ -616,11 +606,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 protected abstract void ContentEdited(string e);
             }
 
-            class MessageRow : AbstractRow
+            class DescriptionRow : AbstractRow
             {
                 public override string Key => "TitledTextView";
 
-                public MessageRow(AbstractSection section) : base(section)
+                public DescriptionRow(AbstractSection section) : base(section)
                 {
                 }
 
@@ -635,7 +625,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                     tfc.SetMultiline(true);
                     tfc.ContentEditedAction = ContentEdited;
                     tfc.NumbersOfLineChangedAction = NumberOfLinesChanged;
-                    tfc.SetPlaceholder(Localization.GetString("description"));
+                    tfc.SetTitle(Localization.GetString("description"));
                 }
 
                 void ContentEdited(string e)
@@ -655,8 +645,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 {
                     if (ViewModel != null && ViewModel.Description != null && !ViewModel.Description.Equals(string.Empty))
                         ((TitledTextViewTableViewCell)Cell).SetContent(ViewModel.Description);
-                    else
-                        ((TitledTextViewTableViewCell)Cell).SetPlaceholder(Localization.GetString("description"));
                 }
             }
 
@@ -748,7 +736,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             class AllDayToggleRow : AbstractRow
             {
-                //EventHandler<DateTimeChangeEvent> dateChangedHandler = delegate { };
                 Action<DateTimeChangeEvent> dateChangedHandler;
                 public override string Key => "AllDayToggleRow";
 
@@ -856,8 +843,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
                 public override void OnClicked(NSIndexPath indexPath)
                 {
-                    base.OnClicked(indexPath);
-
                     DateSelectioTableViewCell cell = (DateSelectioTableViewCell)Cell;
                     if (cell != null)
                         cell.DateTextField.BecomeFirstResponder();
@@ -988,8 +973,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
                 public override void OnClicked(NSIndexPath indexPath)
                 {
-                    base.OnClicked(indexPath);
-                    ((ReminderDisclosureTableViewCell)Cell).Label.BecomeFirstResponder();
+                    ((ReminderDisclosureTableViewCell)Cell).ShowPicker();
                 }
             }
 

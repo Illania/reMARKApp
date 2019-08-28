@@ -6,9 +6,10 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
     public class AppointmentDisclosureTableViewCell : AddEditTableViewCell
     {
         public static readonly string Key = "AppointmentDisclosureTableViewCell";
-        public UIButton ChevronButton;
-        public UILabel Title;
-        public UITextView Label;
+        protected UIButton ChevronButton;
+        protected UILabel Title;
+        protected UILabel Label;
+        protected UITextView HiddenTextView;
 
         public AppointmentDisclosureTableViewCell() : base(UITableViewCellStyle.Default, Key)
         {
@@ -23,28 +24,34 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
 
             Title.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             Title.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            Title.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+
             ContentView.AddSubview(Title);
 
-            Label = new UITextView
+            Label = new UILabel
             {
-                AutocapitalizationType = UITextAutocapitalizationType.Sentences,
-                AutocorrectionType = UITextAutocorrectionType.Yes,
-                ScrollEnabled = false,
                 ClipsToBounds = true,
-                InputAccessoryView = new KeyboardObserverInputAccessoryView(),
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Font = Theme.DefaultFont,
                 TextColor = Theme.DarkGray,
-                Editable = false,
                 UserInteractionEnabled = false,
+                TextAlignment = UITextAlignment.Center
             };
+            Label.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            Label.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            Label.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
 
             ContentView.AddSubview(Label);
 
             ChevronButton = GetChevron();
             ChevronButton.TranslatesAutoresizingMaskIntoConstraints = false;
             ChevronButton.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            ChevronButton.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             ContentView.AddSubview(ChevronButton);
+
+            HiddenTextView = new UITextView { TranslatesAutoresizingMaskIntoConstraints = false };
+            HiddenTextView.Hidden = true;
+            ContentView.Add(HiddenTextView);
 
             ContentView.AddConstraints(new[]
             {
@@ -52,13 +59,15 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
                 Title.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor),
                 Title.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
 
-                Label.HeightAnchor.ConstraintGreaterThanOrEqualTo(20f),
-                Label.TopAnchor.ConstraintEqualTo(Title.TopAnchor),
-                Label.BottomAnchor.ConstraintEqualTo(Title.BottomAnchor),
+                Label.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor),
+                Label.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor),
 
                 ChevronButton.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
                 ChevronButton.LeadingAnchor.ConstraintEqualTo(Label.TrailingAnchor, InnerHorizontalMargin),
                 ChevronButton.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
+
+                HiddenTextView.HeightAnchor.ConstraintEqualTo(0),
+                HiddenTextView.WidthAnchor.ConstraintEqualTo(0),
             });
         }
 
