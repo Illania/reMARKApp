@@ -16,6 +16,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
 
         RecurrenceInfo recInfo;
 
+        UIBarButtonItem cancelButton;
+        UIBarButtonItem doneButton;
+
         private RecurrenceViewController(RecurrenceInfo ri)
         {
             recInfo = Serializer.Deserialize<RecurrenceInfo>(Serializer.Serialize(ri));
@@ -31,6 +34,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
             base.LoadView();
 
             InitializeView();
+            InitializeNavigationBar();
         }
 
         public override void ViewWillAppear(bool animated)
@@ -42,6 +46,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
 
             patternView.Refresh();
             rangeView.Refresh();
+        }
+
+        void InitializeNavigationBar()
+        {
+            cancelButton = new UIBarButtonItem(UIBarButtonSystemItem.Cancel);
+            doneButton = new UIBarButtonItem(UIBarButtonSystemItem.Done);
+
+            cancelButton.Clicked += CancelButton_Clicked;
+            doneButton.Clicked += DoneButton_Clicked;
+
+            NavigationItem.LeftBarButtonItem = cancelButton;
+            NavigationItem.RightBarButtonItem = doneButton;
         }
 
         void InitializeView()
@@ -89,6 +105,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
             var gestureRecognizer = new UITapGestureRecognizer(() => View.EndEditing(true));
             gestureRecognizer.CancelsTouchesInView = false;
             View.AddGestureRecognizer(gestureRecognizer);
+        }
+
+        void DoneButton_Clicked(object sender, System.EventArgs e)
+        {
+            tcs.SetResult(recInfo);
+            NavigationController?.PopViewController(true);
+
+        }
+
+        void CancelButton_Clicked(object sender, System.EventArgs e)
+        {
+            tcs.SetResult(null);
+            NavigationController?.PopViewController(true);
         }
     }
 }

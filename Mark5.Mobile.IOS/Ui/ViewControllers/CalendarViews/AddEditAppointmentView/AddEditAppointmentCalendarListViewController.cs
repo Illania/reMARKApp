@@ -17,26 +17,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         private AddEditAppointmentCalendarListViewController(Dictionary<CalendarViewModel, bool> calendars) : base(calendars) { }
 
-        public static AddEditAppointmentCalendarListViewController Factory(CalendarViewModel calendar)
+        public static AddEditAppointmentCalendarListViewController Create(CalendarViewModel calendar)
         {
             var calendarsList = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars;
 
             var sel = new Dictionary<CalendarViewModel, bool>();
 
             foreach (var cal in calendarsList)
-                sel.Add(CalendarViewModel.ConvertToViewModel(cal), cal.Id == calendar.Id);
-
-            return new AddEditAppointmentCalendarListViewController(sel);
-        }
-
-        public static AddEditAppointmentCalendarListViewController Factory()
-        {
-            var calendarsList = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars;
-
-            var sel = new Dictionary<CalendarViewModel, bool>();
-
-            foreach (var cal in calendarsList)
-                sel.Add(CalendarViewModel.ConvertToViewModel(cal), false);
+                sel.Add(CalendarViewModel.ConvertToViewModel(cal), cal.Id == calendar?.Id);
 
             return new AddEditAppointmentCalendarListViewController(sel);
         }
@@ -52,7 +40,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         void CancelButton_Clicked(object sender, EventArgs e)
         {
-            //TODO result not set, what happens to the waiting task?
+            tcs.SetResult(null);
             NavigationController?.PopViewController(true);
         }
 

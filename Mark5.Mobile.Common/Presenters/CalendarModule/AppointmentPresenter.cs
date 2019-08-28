@@ -132,7 +132,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 Location = appointment.Location,
                 AllDay = appointment.AllDay,
                 Creator = appointment.Creator,
-                RecurrenceInfo = GetRecurrenceString(appointment.RecurrenceInfo),
+                RecurrenceInfo = appointment.RecurrenceInfo.ToFriendlyString(),
                 ReminderTimeBefore = appointment.ReminderTimeBeforeStart,
                 Participants = appointment.Participants.Select(ParticipantsViewModel.ConvertToViewModel).ToList(),
             };
@@ -149,94 +149,6 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             appModel.End = recurrence.EndDate;
 
             return appModel;
-        }
-
-        public static string GetRecurrenceString(RecurrenceInfo ri)
-        {
-            if (ri == null)
-                return null;
-
-            string pattern = "Reoccurs ";
-            string range = string.Empty;
-
-            switch (ri.Type)
-            {
-                case RecurrenceType.Daily:
-                    pattern += "daily, every ";
-
-                    if (ri.WeekDays == WeekDays.EveryDay)
-                        pattern += $"{ri.Periodicity} day(s)";
-                    else //ri.WeekDays == WeekDays.WorkDays
-                        pattern += $"weekday";
-                    break;
-                case RecurrenceType.Weekly:
-                    pattern += $"weekly, every {ri.Periodicity} week(s) on ";
-
-                    var days = new[] { WeekDays.Monday, WeekDays.Tuesday, WeekDays.Wednesday,
-                    WeekDays.Thursday, WeekDays.Friday, WeekDays.Saturday, WeekDays.Sunday};
-
-                    var stringDays = new List<string>();
-
-                    foreach (var day in days)
-                    {
-                        if (ri.WeekDays.HasFlag(day))
-                            stringDays.Add(day.ToFriendlyString());
-                    }
-
-                    pattern += string.Join(", ", stringDays);
-                    break;
-                case RecurrenceType.Monthly:
-                    pattern += $"monthly, ";
-                    if (ri.WeekOfMonth == WeekOfMonth.None)
-                    {
-                        string monthPatter = ri.Periodicity == 1 ? "month" : $"{ ri.Periodicity} months";
-                        pattern += $"on day {ri.DayNumber} of every {monthPatter}";
-                    }
-                    else
-                        pattern += $"the {GetWeekString(ri.WeekOfMonth)} {ri.WeekDays.ToFriendlyString()} of every {ri.Periodicity} month(s) ";
-                    break;
-                case RecurrenceType.Yearly:
-                    pattern += $"Yearly, ";
-
-                    if (ri.WeekOfMonth == WeekOfMonth.None)
-                        pattern += $"every {GetMonthString(ri.Month)}, {ri.DayNumber}";
-                    else
-                        pattern += $"the {GetWeekString(ri.WeekOfMonth)} {ri.WeekDays.ToFriendlyString()} of {GetMonthString(ri.Month)} ";
-                    break;
-            }
-
-            switch (ri.Range)
-            {
-                case RecurrenceRange.NoEndDate:
-                    range = string.Empty;
-                    break;
-                case RecurrenceRange.OccurrenceCount:
-                    range = $", ends after {ri.OccurrenceCount} occurrences";
-                    break;
-                case RecurrenceRange.EndByDate:
-                    range = $", ends by {ri.EndDate.ToString("d", CultureInfo.CurrentCulture)}";
-                    break;
-            }
-
-            return pattern + range;
-        }
-
-        public static string GetWeekString(WeekOfMonth val)
-        {
-            switch (val)
-            {
-                case WeekOfMonth.First: return "first";
-                case WeekOfMonth.Second: return "second";
-                case WeekOfMonth.Third: return "third";
-                case WeekOfMonth.Fourth: return "fourth";
-                case WeekOfMonth.Last: return "last";
-                default: return string.Empty;
-            }
-        }
-
-        public static string GetMonthString(int val)
-        {
-            return CultureInfo.InvariantCulture.DateTimeFormat.GetMonthName(val);
         }
     }
 

@@ -35,10 +35,11 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
                 Font = Theme.DefaultFont,
                 TextColor = Theme.DarkGray,
                 UserInteractionEnabled = false,
-                TextAlignment = UITextAlignment.Center
+                TextAlignment = UITextAlignment.Justified,
+                Lines = 0,
             };
             Label.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
-            Label.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            Label.SetContentCompressionResistancePriority((float)UILayoutPriority.DefaultHigh, UILayoutConstraintAxis.Horizontal);
             Label.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
 
             ContentView.AddSubview(Label);
@@ -47,6 +48,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
             ChevronButton.TranslatesAutoresizingMaskIntoConstraints = false;
             ChevronButton.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             ChevronButton.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            ChevronButton.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             ContentView.AddSubview(ChevronButton);
 
             HiddenTextView = new UITextView { TranslatesAutoresizingMaskIntoConstraints = false };
@@ -56,9 +58,10 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
             ContentView.AddConstraints(new[]
             {
                 Title.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor),
-                Title.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor),
                 Title.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
 
+                Label.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor),
+                Label.LeadingAnchor.ConstraintGreaterThanOrEqualTo(Title.TrailingAnchor, HorizontalMargin),
                 Label.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor),
                 Label.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor),
 

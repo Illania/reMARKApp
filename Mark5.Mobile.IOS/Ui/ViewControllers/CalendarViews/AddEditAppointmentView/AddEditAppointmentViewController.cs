@@ -186,11 +186,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             throw new NotImplementedException();
         }
 
-        public RecurrenceInfo GetEmptyRecurrenceInfo()
-        {
-            return presenter.GetEmptyRecurrenceInfo();  //TODO put it on the view model...
-        }
-
         class DataSource : UITableViewSource, IDisposable, IUIGestureRecognizerDelegate
         {
             public WeakReference<AbstractAddEditAppointmentViewController> viewControllerWeakReference;
@@ -677,26 +672,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
                 public async override void OnClicked(NSIndexPath indexPath)
                 {
-                    Task<CalendarViewModel> result = null;
+                    var vc = AddEditAppointmentCalendarListViewController.Create(ViewModel.Calendar);
+                    ViewController?.NavigationController?.PushViewController(vc, true);
 
-                    if (ViewModel.Calendar != null)
-                    {
-                        var vc = AddEditAppointmentCalendarListViewController.Factory(ViewModel.Calendar);
-                        ViewController?.NavigationController?.PushViewController(vc, true);
-                        result = vc.Result;
-                    }
-                    else
-                    {
-                        var vc = AddEditAppointmentCalendarListViewController.Factory();
-                        ViewController?.NavigationController?.PushViewController(vc, true);
-                        result = vc.Result;
-                    }
-
-                    CalendarViewModel selectedCalendar = await result;
+                    CalendarViewModel selectedCalendar = await vc.Result;
                     if (selectedCalendar != null)
                         ViewModel.Calendar = selectedCalendar;
-                    else
-                        ViewModel.Calendar = null;
                 }
             }
 
@@ -872,7 +853,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 public override void RefreshRow()
                 {
                     if (ViewModel != null && ViewModel.RecurrenceInfo != null)
-                        ((AppointmentDisclosureTableViewCell)Cell).SetLabel(Localization.GetString("custom"));
+                        ((AppointmentDisclosureTableViewCell)Cell).SetLabel(ViewModel.RecurrenceInfo.ToFriendlyString());
                     else
                         ((AppointmentDisclosureTableViewCell)Cell).SetLabel(Localization.GetString("never"));
                 }
@@ -894,10 +875,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                         ViewModel.RecurrenceInfo = null;
                     else if (result == 1)
                     {
-                        var recInfo = ViewModel.RecurrenceInfo ?? ViewController.GetEmptyRecurrenceInfo();
-                        var recViewController = RecurrenceViewController.Create(recInfo);
-                        ViewController?.NavigationController?.PushViewController(RecurrenceViewController.Create(recInfo), true);
+                        var recInfo = ViewModel.RecurrenceInfo ?? AddEditAppointmentViewModel.GetEmptyRecurrenceInfo();
+                        var vc = RecurrenceViewController.Create(recInfo);
+                        ViewController?.NavigationController?.PushViewController(vc, true);
+                        var newRecInfo = await vc.Result;
+
+                        if (newRecInfo != null)
+                            ViewModel.RecurrenceInfo = newRecInfo;
                     }
+
+                    RefreshRow();
                 }
             }
 

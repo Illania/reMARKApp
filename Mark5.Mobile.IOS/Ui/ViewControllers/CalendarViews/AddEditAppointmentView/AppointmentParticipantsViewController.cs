@@ -143,12 +143,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                     {
                         Localization.GetString("contact_picker_recent_addresses"),
                         Localization.GetString("contact_picker_contacts"),
-                        Localization.GetString("contact_picker_shortcodes"),  //TODO shortcodes???
                         Localization.GetString("contact_picker_phonebook"),
+                        Localization.GetString("contact_picker_internal_contacts"),
                     };
-
-            if (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
-                strings.Add(Localization.GetString("contact_picker_internal_contacts"));
 
             var choice = await Dialogs.ShowListActionSheetAsync(this, strings.ToArray(), (UIView)this.View);
 
@@ -161,12 +158,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                     await DoOpenContacts();
                     break;
                 case 2:
-                    //await DoOpenShortcodes();
-                    break;
-                case 3:
                     await DoOpenPhonebook();
                     break;
-                case 4:
+                case 3:
                     await DoOpenInternalContacts();
                     break;
                 default:
@@ -181,7 +175,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             var pa = await vc.Result;
             if (pa != null)
-                viewModel.Participants.Add(new ParticipantsViewModel() { Name = pa.Name, Email = pa.Address });
+                viewModel.Participants.Add(new ParticipantsViewModel { Name = pa.Name, Email = pa.Address });
         }
 
         async Task DoOpenRecents()
@@ -190,7 +184,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             PresentViewController(new NavigationController(vc), true, null);
             var pa = await vc.Result;
             if (pa != null)
-                viewModel.Participants.Add(new ParticipantsViewModel() { Name = pa.Name, Email = pa.Address });
+                viewModel.Participants.Add(new ParticipantsViewModel { Name = pa.Name, Email = pa.Address });
         }
 
         async Task DoOpenContacts()
@@ -199,7 +193,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             PresentViewController(new NavigationController(vc), true, null);
             var pa = await vc.Result;
             if (pa != null)
-                viewModel.Participants.Add(new ParticipantsViewModel() { Name = pa.Name, Email = pa.Address });
+                viewModel.Participants.Add(new ParticipantsViewModel { Name = pa.Name, Email = pa.Address });
         }
 
         async Task DoOpenInternalContacts()
@@ -210,7 +204,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             var pa = await vc.Result;
             if (pa != null)
                 foreach (var su in pa)
-                    viewModel.Participants.Add(new ParticipantsViewModel() { Name = string.Empty, Email = su.Username });
+                    viewModel.Participants.Add(new ParticipantsViewModel { Name = string.Empty, Email = su.Username });  //TODO need to check iif this is correct
         }
 
         void RefreshData()
