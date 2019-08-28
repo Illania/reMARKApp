@@ -36,7 +36,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         }
     }
 
-    public class AbstractAddEditAppointmentViewController : AbstractTableViewController, IAddEditAppointmentView
+    public abstract class AbstractAddEditAppointmentViewController : AbstractTableViewController, IAddEditAppointmentView
     {
         readonly int appointmentId;
         readonly int calendarId;
@@ -99,7 +99,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             TableView.Source = new DataSource(this, TableView);
             TableView.TableFooterView = new UIView();
             TableView.KeyboardDismissMode = UIScrollViewKeyboardDismissMode.OnDrag;
-            TableView.Editing = true;
+            TableView.Editing = false;
             TableView.AllowsSelectionDuringEditing = true;
             TableView.CellLayoutMarginsFollowReadableWidth = true;
             TableView.Alpha = 0;
@@ -182,6 +182,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         public void UpdateCalendarsList(List<CalendarViewModel> calendars)
         {
             throw new NotImplementedException();
+        }
+
+        public RecurrenceInfo GetEmptyRecurrenceInfo()
+        {
+            return presenter.GetEmptyRecurrenceInfo();
         }
 
         class DataSource : UITableViewSource, IDisposable, IUIGestureRecognizerDelegate
@@ -519,7 +524,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
                 public DataSource DataSource { get => Section.DataSource; }
                 public UITableView TableView { get => Section.DataSource.tableViewWeakReference.Unwrap(); }
-                public UIViewController ViewController { get => Section.DataSource.viewControllerWeakReference.Unwrap(); }
+                public AbstractAddEditAppointmentViewController ViewController { get => Section.DataSource.viewControllerWeakReference.Unwrap(); }
                 public AddEditAppointmentViewModel ViewModel { get => Section.ViewModel; }
                 public ContactCreationModeFlag CreationMode { get => Section.CreationMode; }
                 public bool ParentPreselected { get => Section.ParentPreselected; }
@@ -605,7 +610,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                     tfc.SetAutocorrectionType(autocorrectionType);
                     tfc.SetAutocapitalizationType(autocapitalizationType);
                     tfc.SetPlaceholder(placeholder);
-                    tfc.AdjustLeadingConstraint();
                     tfc.ContentEdited = ContentEdited;
                 }
 
@@ -631,7 +635,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                     tfc.SetMultiline(true);
                     tfc.ContentEditedAction = ContentEdited;
                     tfc.NumbersOfLineChangedAction = NumberOfLinesChanged;
-                    tfc.AdjustLeadingConstraint();
                     tfc.SetPlaceholder(Localization.GetString("description"));
                 }
 
@@ -905,7 +908,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                     if (result == 0)
                         ViewModel.RecurrenceInfo = null;
                     else if (result == 1)
-                        ViewController?.NavigationController?.PushViewController(new RecurrenceViewController(ViewModel), true);
+                    {
+                        var recInfo = ViewModel.RecurrenceInfo ?? ViewController.GetEmptyRecurrenceInfo();
+                        var recViewController = RecurrenceViewController.Create(recInfo);
+                        ViewController?.NavigationController?.PushViewController(RecurrenceViewController.Create(recInfo), true);
+                    }
                 }
             }
 
@@ -939,7 +946,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
                 public override void OnClicked(NSIndexPath indexPath)
                 {
-                    ViewController?.NavigationController?.PushViewController(new AddEditParticipantsViewController(ViewModel), true);
+                    ViewController?.NavigationController?.PushViewController(new AppointmentParticipantsViewController(ViewModel), true);
                 }
             }
 

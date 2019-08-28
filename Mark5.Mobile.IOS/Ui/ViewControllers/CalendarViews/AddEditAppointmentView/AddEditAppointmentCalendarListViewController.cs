@@ -52,6 +52,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         void CancelButton_Clicked(object sender, EventArgs e)
         {
+            //TODO result not set, what happens to the waiting task?
             NavigationController?.PopViewController(true);
         }
 

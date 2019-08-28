@@ -13,7 +13,7 @@ using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 {
-    public class AddEditParticipantsViewController : AbstractTableViewController, IUITableViewDelegate
+    public class AppointmentParticipantsViewController : AbstractTableViewController, IUITableViewDelegate
     {
         readonly TaskCompletionSource<List<ParticipantsViewModel>> tcs = new TaskCompletionSource<List<ParticipantsViewModel>>();
         public Task<List<ParticipantsViewModel>> Result => tcs.Task;
@@ -22,7 +22,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         AddEditAppointmentViewModel viewModel;
 
-        public AddEditParticipantsViewController(AddEditAppointmentViewModel viewModel)
+        public AppointmentParticipantsViewController(AddEditAppointmentViewModel viewModel)
         {
             this.viewModel = viewModel;
         }
@@ -143,7 +143,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                     {
                         Localization.GetString("contact_picker_recent_addresses"),
                         Localization.GetString("contact_picker_contacts"),
-                        Localization.GetString("contact_picker_shortcodes"),
+                        Localization.GetString("contact_picker_shortcodes"),  //TODO shortcodes???
                         Localization.GetString("contact_picker_phonebook"),
                     };
 

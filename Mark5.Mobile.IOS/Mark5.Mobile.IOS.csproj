@@ -290,9 +290,9 @@
 		<Compile Include="Ui\ViewControllers\CalendarViews\RecurrenceView\Subviews\PatternView.cs" />
 		<Compile Include="Ui\ViewControllers\CalendarViews\RecurrenceView\Subviews\Common.cs" />
 		<Compile Include="Ui\ViewControllers\CalendarViews\RecurrenceView\Subviews\RangeView.cs" />
-		<Compile Include="Ui\ViewControllers\CalendarViews\AddEditViews\AddEditAppointmentCalendarListViewController.cs" />
-		<Compile Include="Ui\ViewControllers\CalendarViews\AddEditViews\AddEditAppointmentViewController.cs" />
-		<Compile Include="Ui\ViewControllers\CalendarViews\AddEditViews\AddEditParticipantsViewController.cs" />
+		<Compile Include="Ui\ViewControllers\CalendarViews\AddEditAppointmentView\AddEditAppointmentCalendarListViewController.cs" />
+		<Compile Include="Ui\ViewControllers\CalendarViews\AddEditAppointmentView\AddEditAppointmentViewController.cs" />
+		<Compile Include="Ui\ViewControllers\CalendarViews\AddEditAppointmentView\AppointmentParticipantsViewController.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
@@ -781,7 +781,7 @@
 	  <Folder Include="Ui\TableViewCells\AddEditTableViewCells\AddEditAppointmentTableViewCell\" />
 	  <Folder Include="Ui\ViewControllers\CalendarViews\RecurrenceView\" />
 	  <Folder Include="Ui\ViewControllers\CalendarViews\RecurrenceView\Subviews\" />
-	  <Folder Include="Ui\ViewControllers\CalendarViews\AddEditViews\" />
+	  <Folder Include="Ui\ViewControllers\CalendarViews\AddEditAppointmentView\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 	<Import Project="..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets" Condition="Exists('..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets')" />

@@ -18,7 +18,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Font = Theme.DefaultFont,
-                TextColor = Theme.Black
+                TextColor = Theme.Black,
             };
 
             Title.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
@@ -36,7 +36,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
                 Font = Theme.DefaultFont,
                 TextColor = Theme.DarkGray,
                 Editable = false,
-                UserInteractionEnabled = false
+                UserInteractionEnabled = false,
             };
 
             ContentView.AddSubview(Label);
@@ -48,14 +48,13 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
 
             ContentView.AddConstraints(new[]
             {
-                Title.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor, VerticalMargin),
-                Title.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor, -VerticalMargin),
-                Title.LeadingAnchor.ConstraintEqualTo(ContentView.LeadingAnchor),
+                Title.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor),
+                Title.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor),
+                Title.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
 
                 Label.HeightAnchor.ConstraintGreaterThanOrEqualTo(20f),
                 Label.TopAnchor.ConstraintEqualTo(Title.TopAnchor),
                 Label.BottomAnchor.ConstraintEqualTo(Title.BottomAnchor),
-                Label.TrailingAnchor.ConstraintEqualTo(ChevronButton.LeadingAnchor, InnerHorizontalMargin),
 
                 ChevronButton.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
                 ChevronButton.LeadingAnchor.ConstraintEqualTo(Label.TrailingAnchor, InnerHorizontalMargin),

@@ -1,4 +1,5 @@
-﻿using Mark5.Mobile.Common.Model;
+﻿using System.Threading.Tasks;
+using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
@@ -7,8 +8,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
 {
     public class RecurrenceViewController : AbstractViewController
     {
-        //TODO after the merge, the addEditAppointmentPresenter, needs to give default values to all parameters of recurring info
-        //And need to find a way to remove the recurring part
+        readonly TaskCompletionSource<RecurrenceInfo> tcs = new TaskCompletionSource<RecurrenceInfo>();
+        public Task<RecurrenceInfo> Result => tcs.Task;
 
         PatternView patternView;
         RangeView rangeView;

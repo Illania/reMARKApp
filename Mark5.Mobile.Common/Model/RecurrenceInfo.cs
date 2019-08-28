@@ -5,7 +5,7 @@ namespace Mark5.Mobile.Common.Model
 {
     public class RecurrenceInfo
     {
-        public bool AllDay { get; set; }
+        public bool AllDay { get; set; }  //NOT USED
 
         public int DayNumber { get; set; } = -1;
 

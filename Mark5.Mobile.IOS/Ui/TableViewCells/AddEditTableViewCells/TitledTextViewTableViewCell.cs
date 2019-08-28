@@ -17,9 +17,10 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
         readonly UITextView textView;
         readonly UILabel titleLabel;
 
-        NSLayoutConstraint leadingLayoutConstraint;
         bool hasPlaceholder;
         string placeholderText;
+
+        CGRect previous = CGRect.Empty;
 
         public TitledTextViewTableViewCell()
             : base(UITableViewCellStyle.Default, Key)
@@ -56,21 +57,11 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
                 titleLabel.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
 
                 textView.TopAnchor.ConstraintEqualTo(titleLabel.BottomAnchor, InnerVerticalMargin),
-                leadingLayoutConstraint = textView.LeadingAnchor.ConstraintEqualTo(ContentView.LeadingAnchor),
+                textView.LeadingAnchor.ConstraintEqualTo(ContentView.LeadingAnchor),
                 textView.TrailingAnchor.ConstraintEqualTo(titleLabel.TrailingAnchor),
                 textView.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor, -VerticalMargin),
                 textView.HeightAnchor.ConstraintGreaterThanOrEqualTo(InnerRowHeight),
             });
-        }
-
-        CGRect previous = CGRect.Empty;
-
-        //Used to reduced the leading constraint for add/edit appointment
-        public void AdjustLeadingConstraint()
-        {
-            ContentView.RemoveConstraint(leadingLayoutConstraint);
-            leadingLayoutConstraint = textView.LeadingAnchor.ConstraintEqualTo(ContentView.LeadingAnchor);
-            ContentView.AddConstraint(leadingLayoutConstraint);
         }
 
         [Export("textView:shouldChangeTextInRange:replacementText:")]
