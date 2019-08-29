@@ -40,6 +40,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         readonly int appointmentId;
         readonly int calendarId;
         readonly AddEditAppointmentPresenter presenter;
+        readonly List<CalendarViewModel> calendars;
 
         UIBarButtonItem saveButtonItem;
         AddEditAppointmentViewModel viewModel;
@@ -47,20 +48,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         public ContactCreationModeFlag CreationModeFlag;
 
-        public AbstractAddEditAppointmentViewController()
-               : base(UITableViewStyle.Grouped)
-        {
-            presenter = new AddEditAppointmentPresenter();
-            presenter.AttachView(this);
-        }
-
-        public AbstractAddEditAppointmentViewController(int appointmentId, int calendarId)
+        public AbstractAddEditAppointmentViewController(int appointmentId = -1, int calendarId = -1)
             : base(UITableViewStyle.Grouped)
         {
             this.appointmentId = appointmentId;
             this.calendarId = calendarId;
             presenter = new AddEditAppointmentPresenter();
             presenter.AttachView(this);
+            calendars = new List<CalendarViewModel>();
         }
 
         public override void LoadView()
@@ -152,7 +147,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         void RefreshTable()
         {
-            ((DataSource)TableView.Source).Refresh(viewModel);
+            ((DataSource)TableView.Source).Refresh(viewModel, calendars);
         }
 
         #region IAddEditAppointmentView implementation
@@ -164,9 +159,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             UIView.Animate(0.1, () => { TableView.Alpha = 1; });
         }
 
-        public async Task ShowLoadError()
+        public async Task ShowLoadError(Exception ex)
         {
-            await Dialogs.ShowErrorAlertAsync(this, new Exception("Unresolved error occured while loading appointment"));
+            await Dialogs.ShowErrorAlertAsync(this, ex);
         }
 
         public void ShowLoading()
@@ -181,7 +176,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         public void UpdateCalendarsList(List<CalendarViewModel> calendars)
         {
-            throw new NotImplementedException();  //TODO!!!
+            this.calendars.AddRange(calendars);
         }
 
         public void CloseView()
@@ -189,9 +184,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             NavigationController.PopViewController(true);
         }
 
-        public async Task ShowAddingEditingError(Exception ex)
+        public async Task ShowEditingError(Exception ex)
         {
             await Dialogs.ShowErrorAlertAsync(this, ex);
+        }
+
+        public void ShowEditingLoading()
+        {
+            var dialogText = Localization.GetString(CreationModeFlag == ContactCreationModeFlag.New ? "creating_appointment___" : "editing_appointment___");
+            progressDialogDismissal = Dialogs.ShowInfiniteProgressDialog(dialogText);
+        }
+
+        public void StopEditingLoading()
+        {
+            progressDialogDismissal?.Invoke();
         }
 
         #endregion
@@ -308,11 +314,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 row.OnCommit(indexPath);
             }
 
-            public void Refresh(AddEditAppointmentViewModel viewModel)
+            public void Refresh(AddEditAppointmentViewModel viewModel, List<CalendarViewModel> calendars)
             {
                 foreach (var section in sections)
                 {
                     section.ViewModel = viewModel;
+                    section.Calendars = calendars;
                     section.InitializeRows();
                 }
 
@@ -377,6 +384,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 public DataSource DataSource;
                 public UIViewController viewController { get => DataSource.viewControllerWeakReference.Unwrap(); }
                 public UITableView TableView { get => DataSource.tableViewWeakReference.Unwrap(); }
+                public List<CalendarViewModel> Calendars;
                 public AddEditAppointmentViewModel ViewModel;
                 public RowCollection Rows = new RowCollection();
 
@@ -673,7 +681,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
                 public async override void OnClicked(NSIndexPath indexPath)
                 {
-                    var vc = AddEditAppointmentCalendarListViewController.Create(ViewModel.Calendar);
+                    var vc = AddEditAppointmentCalendarListViewController.Create(Section.Calendars, ViewModel.Calendar);
                     ViewController?.NavigationController?.PushViewController(vc, true);
 
                     CalendarViewModel selectedCalendar = await vc.Result;

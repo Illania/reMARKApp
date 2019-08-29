@@ -18,7 +18,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         {
             var ca = vm.ConvertToModel();
 
-            view.ShowLoading();
+            view.ShowEditingLoading();
 
             try
             {
@@ -26,7 +26,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
                 await Managers.CalendarManager.CreateOrUpdateCalendarAppointmentAsync(ca.CalendarId, ca);
 
-                view.StopLoading();
+                view.StopEditingLoading();
                 view.CloseView();
 
             }
@@ -34,9 +34,9 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             {
                 CommonConfig.Logger.Error($"Error while adding or editing appointment: AppointmentId = {ca.Id}, CalendarId = {ca.CalendarId} ", ex);
 
-                view.StopLoading();
+                view.StopEditingLoading();
 
-                await view.ShowAddingEditingError(ex);
+                await view.ShowEditingError(ex);
             }
         }
 
@@ -203,9 +203,13 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         void UpdateCalendarsList(List<CalendarViewModel> calendars);
 
         void CloseView();
+
         void ShowLoading();
         void StopLoading();
-        Task ShowLoadError();
-        Task ShowAddingEditingError(Exception ex);
+        Task ShowLoadError(Exception ex);
+
+        void ShowEditingLoading();
+        void StopEditingLoading();
+        Task ShowEditingError(Exception ex);
     }
 }

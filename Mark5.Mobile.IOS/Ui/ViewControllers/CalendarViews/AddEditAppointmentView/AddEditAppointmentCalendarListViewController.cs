@@ -17,13 +17,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         private AddEditAppointmentCalendarListViewController(Dictionary<CalendarViewModel, bool> calendars) : base(calendars) { }
 
-        public static AddEditAppointmentCalendarListViewController Create(CalendarViewModel calendar)
+        public static AddEditAppointmentCalendarListViewController Create(List<CalendarViewModel> calendarList, CalendarViewModel calendar)
         {
-            var calendarsList = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars;
-
             var sel = new Dictionary<CalendarViewModel, bool>();
 
-            foreach (var cal in calendarsList)
+            foreach (var cal in calendarList)
                 sel.Add(CalendarViewModel.ConvertToViewModel(cal), cal.Id == calendar?.Id);
 
             return new AddEditAppointmentCalendarListViewController(sel);
