@@ -74,15 +74,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         {
             base.ViewDidLoad();
             InitNavigationBar();
-            RefreshData();
         }
 
-        public override void ViewWillAppear(bool animated)
+        public override async void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
             InitializeHandlers();
-
-            ((DataSource)TableView.Source).Refresh(viewModel, CreationModeFlag, false);
+            await RefreshData();
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -107,15 +105,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             TableView.Alpha = 0;
         }
 
-        async void RefreshData()
+        async Task RefreshData()
         {
-            if (CreationModeFlag == ContactCreationModeFlag.New)
-                await presenter.LoadEmptyAppointment();
+            if (viewModel == null)
+            {
+                if (CreationModeFlag == ContactCreationModeFlag.New)
+                    await presenter.LoadEmptyAppointment();
 
-            if (CreationModeFlag == ContactCreationModeFlag.Edit)
-                await presenter.LoadAppointment(calendarId, appointmentId);
-
-            ((DataSource)TableView.Source).Refresh(viewModel, CreationModeFlag, false);
+                if (CreationModeFlag == ContactCreationModeFlag.Edit)
+                    await presenter.LoadAppointment(calendarId, appointmentId);  //TODO we need the recurrence index too, just in case
+            }
+            else
+                RefreshTable();
         }
 
         private void InitializeHandlers()
@@ -156,14 +157,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             throw new NotImplementedException();
         }
 
+        void RefreshTable()
+        {
+            ((DataSource)TableView.Source).Refresh(viewModel);
+        }
+
         public void ShowAppointment(AddEditAppointmentViewModel viewModel)
         {
-            if (this.viewModel == null)
-            {
-                this.viewModel = viewModel;
-                UIView.Animate(0.05, () => { TableView.Alpha = 1; });
-                RefreshData();
-            }
+            this.viewModel = viewModel;
+            RefreshTable();
+            UIView.Animate(0.05, () => { TableView.Alpha = 1; });
         }
 
         public async Task ShowLoadError()
@@ -300,13 +303,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 row.OnCommit(indexPath);
             }
 
-            public void Refresh(AddEditAppointmentViewModel viewModel, ContactCreationModeFlag creationMode, bool parentPreselected)
+            public void Refresh(AddEditAppointmentViewModel viewModel)
             {
                 foreach (var section in sections)
                 {
                     section.ViewModel = viewModel;
-                    section.CreationMode = creationMode;
-                    section.ParentPreselected = parentPreselected;
                     section.InitializeRows();
                 }
 
@@ -372,9 +373,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 public UIViewController viewController { get => DataSource.viewControllerWeakReference.Unwrap(); }
                 public UITableView TableView { get => DataSource.tableViewWeakReference.Unwrap(); }
                 public AddEditAppointmentViewModel ViewModel;
-                public bool ParentPreselected;
                 public RowCollection Rows = new RowCollection();
-                public ContactCreationModeFlag CreationMode;
 
                 abstract public void InitializeRows();
 
@@ -511,8 +510,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 public UITableView TableView { get => Section.DataSource.tableViewWeakReference.Unwrap(); }
                 public AbstractAddEditAppointmentViewController ViewController { get => Section.DataSource.viewControllerWeakReference.Unwrap(); }
                 public AddEditAppointmentViewModel ViewModel { get => Section.ViewModel; }
-                public ContactCreationModeFlag CreationMode { get => Section.CreationMode; }
-                public bool ParentPreselected { get => Section.ParentPreselected; }
 
                 public virtual UITableViewCellEditingStyle EditingStyle => UITableViewCellEditingStyle.None;
 
@@ -684,7 +681,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             class NameRow : TextFieldRow
             {
                 public NameRow(AbstractSection section)
-                    : base(section, Localization.GetString("name"), UITextAutocapitalizationType.Words, UITextAutocorrectionType.No)
+                    : base(section, Localization.GetString("name"), UITextAutocapitalizationType.None, UITextAutocorrectionType.No)
                 {
                 }
 
@@ -702,7 +699,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 public override string Key => "LocationRow";
 
                 public LocationRow(AbstractSection section)
-                    : base(section, Localization.GetString("location"), UITextAutocapitalizationType.Words, UITextAutocorrectionType.No)
+                    : base(section, Localization.GetString("location"), UITextAutocapitalizationType.None, UITextAutocorrectionType.No)
                 {
                 }
 
