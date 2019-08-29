@@ -40,9 +40,18 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             }
         }
 
-        public Task LoadEmptyAppointment()
+        public Task LoadEmptyAppointment()  //TODO it would be also convenient to put here "reasoonable dates"
         {
-            view.ShowAppointment(new AddEditAppointmentViewModel(ServerConfig.SystemSettings.UserInfo.User.Id));
+            var preselectedCalendar = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars.First(c => !c.Shared)
+                ?? ServerConfig.SystemSettings.CalendarModuleInfo.Calendars.First();
+
+            view.ShowAppointment(new AddEditAppointmentViewModel(ServerConfig.SystemSettings.UserInfo.User.Id)
+            {
+                Calendar = CalendarViewModel.ConvertToViewModel(preselectedCalendar),
+                Start = DateTime.Now,
+                End = DateTime.Now.AddMinutes(30)
+            });
+
             return Task.CompletedTask;
         }
 

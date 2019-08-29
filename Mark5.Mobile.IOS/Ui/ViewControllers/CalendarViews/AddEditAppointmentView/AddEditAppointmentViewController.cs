@@ -748,7 +748,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 protected override void Initialize()
                 {
                     SetLabel(Localization.GetString("starts"));
-                    InitializeDate(DateTime.Now);
                 }
             }
 
@@ -764,8 +763,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 protected override void Initialize()
                 {
                     SetLabel(Localization.GetString("ends"));
-                    if (ViewModel != null)
-                        InitializeDate(DateTime.Now.AddHours(1));
                 }
             }
 
