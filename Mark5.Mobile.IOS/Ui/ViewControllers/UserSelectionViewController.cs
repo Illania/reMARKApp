@@ -82,6 +82,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             doneItem = null;
 
             ((DataSource)TableView.Source)?.Reset();
+
+            tcs?.TrySetResult(null);
         }
 
         protected override void Dispose(bool disposing)
@@ -152,7 +154,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (usersDepartments != null)
                 {
-                    if(IncludeCurrentUser ?? true)
+                    if (IncludeCurrentUser ?? true)
                         usersDepartments.Users.Add(ServerConfig.SystemSettings.UserInfo.User);
                     ((DataSource)TableView.Source).SetItems(usersDepartments.Users);
                 }

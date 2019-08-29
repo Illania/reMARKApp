@@ -77,6 +77,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             exitEditItem = null;
 
             ((DataSource)TableView.Source)?.Reset();
+
+            tcs?.TrySetResult(null);
         }
 
         protected override void Dispose(bool disposing)

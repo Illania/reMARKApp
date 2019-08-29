@@ -147,7 +147,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                         Localization.GetString("contact_picker_internal_contacts"),
                     };
 
-            var choice = await Dialogs.ShowListActionSheetAsync(this, strings.ToArray(), (UIView)this.View);
+            var choice = await Dialogs.ShowListActionSheetAsync(this, strings.ToArray(), addParticipantsItem);
 
             switch (choice)
             {
@@ -175,7 +175,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             var pa = await vc.Result;
             if (pa != null)
+            {
                 viewModel.Participants.Add(new ParticipantsViewModel { Name = pa.Name, Email = pa.Address });
+                RefreshData();
+            }
         }
 
         async Task DoOpenRecents()
@@ -184,7 +187,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             PresentViewController(new NavigationController(vc), true, null);
             var pa = await vc.Result;
             if (pa != null)
+            {
                 viewModel.Participants.Add(new ParticipantsViewModel { Name = pa.Name, Email = pa.Address });
+                RefreshData();
+            }
         }
 
         async Task DoOpenContacts()
@@ -193,7 +199,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             PresentViewController(new NavigationController(vc), true, null);
             var pa = await vc.Result;
             if (pa != null)
+            {
                 viewModel.Participants.Add(new ParticipantsViewModel { Name = pa.Name, Email = pa.Address });
+                RefreshData();
+            }
         }
 
         async Task DoOpenInternalContacts()
@@ -203,8 +212,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             PresentViewController(new NavigationController(vc), true, null);
             var pa = await vc.Result;
             if (pa != null)
+            {
                 foreach (var su in pa)
                     viewModel.Participants.Add(new ParticipantsViewModel { Name = string.Empty, Email = su.Username });  //TODO need to check iif this is correct
+                RefreshData();
+            }
         }
 
         void RefreshData()
