@@ -140,7 +140,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
 
         private string FormatDateString(DateTime dateTime)
         {
-            return $"{ dateTime.Date.ToString("d MMM yyyy", CultureInfo.CurrentCulture) }"; ;
+            return $"{ dateTime.Date.ToString("d MMM yyyy", CultureInfo.CurrentCulture) }";
         }
 
         private void SetDateOnlyPicker(DateTime dateTime)

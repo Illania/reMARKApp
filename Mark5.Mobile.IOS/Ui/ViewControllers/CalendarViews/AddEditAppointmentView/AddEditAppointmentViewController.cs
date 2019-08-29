@@ -2,7 +2,6 @@
 using Foundation;
 using System;
 using System.Linq;
-using System.Globalization;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Mark5.Mobile.IOS.Model;
@@ -119,6 +118,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 RefreshTable();
         }
 
+        private void InitNavigationBar()
+        {
+            saveButtonItem = new UIBarButtonItem
+            {
+                Title = Localization.GetString("save")
+            };
+
+            NavigationItem.SetRightBarButtonItems(new[] { saveButtonItem }, false);
+        }
+
         private void InitializeHandlers()
         {
             if (saveButtonItem != null)
@@ -131,30 +140,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 saveButtonItem.Clicked -= SaveButtonItem_Clicked;
         }
 
-        private void SaveButtonItem_Clicked(object sender, EventArgs e)
+        private async void SaveButtonItem_Clicked(object sender, EventArgs e)
         {
-            //TODO: add model validation before:
-            //await presenter.AddOrEditAppointment(viewModel);
-        }
+            var isValid = ((DataSource)TableView.Source).IsFormCorrect();
 
-        private void InitNavigationBar()
-        {
-            saveButtonItem = new UIBarButtonItem
-            {
-                Title = Localization.GetString("save")
-            };
-
-            NavigationItem.SetRightBarButtonItems(new[] { saveButtonItem }, false);
-        }
-
-        public void CloseView()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task ShowAddingEditingError(Exception ex)
-        {
-            throw new NotImplementedException();
+            if (isValid)
+                await presenter.AddOrEditAppointment(viewModel);
+            else
+                await Dialogs.ShowConfirmAlertAsync(this, "Cannot Save Event", "The start date must be before the end date");
         }
 
         void RefreshTable()
@@ -162,11 +155,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             ((DataSource)TableView.Source).Refresh(viewModel);
         }
 
+        #region IAddEditAppointmentView implementation
+
         public void ShowAppointment(AddEditAppointmentViewModel viewModel)
         {
             this.viewModel = viewModel;
             RefreshTable();
-            UIView.Animate(0.05, () => { TableView.Alpha = 1; });
+            UIView.Animate(0.1, () => { TableView.Alpha = 1; });
         }
 
         public async Task ShowLoadError()
@@ -186,8 +181,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         public void UpdateCalendarsList(List<CalendarViewModel> calendars)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException();  //TODO!!!
         }
+
+        public void CloseView()
+        {
+            NavigationController.PopViewController(true);
+        }
+
+        public async Task ShowAddingEditingError(Exception ex)
+        {
+            await Dialogs.ShowErrorAlertAsync(this, ex);
+        }
+
+        #endregion
 
         class DataSource : UITableViewSource, IDisposable, IUIGestureRecognizerDelegate
         {
@@ -220,9 +227,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 };
 
                 foreach (var section in sectionsToInsert)
-                {
                     sections.Add(section);
-                }
             }
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
@@ -383,7 +388,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                     foreach (var row in Rows)
                     {
                         var isRowValid = row.IsRowValid();
-                        row.SetErrorState(!isRowValid);
 
                         valid &= isRowValid;
                     }
@@ -828,9 +832,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                     ((DateSelectioTableViewCell)Cell).Label.Text = title;
                 }
 
-                public void InitializeDate(DateTime dateTime)
+                public override bool IsRowValid()
                 {
-                    ((DateSelectioTableViewCell)Cell).DateTextField.Text = $"{ dateTime.Date.ToString("d MMM yyyy", CultureInfo.CurrentCulture) }   { dateTime.Date.ToString("t", CultureInfo.CurrentCulture) }";
+                    if (rowType == DateRowType.Ends && ViewModel.End < ViewModel.Start)
+                        return false;
+                    return true;
                 }
             }
 

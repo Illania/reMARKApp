@@ -132,9 +132,9 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 Location = appointment.Location,
                 AllDay = appointment.AllDay,
                 Creator = appointment.Creator,
-                RecurrenceInfo = appointment.RecurrenceInfo.ToFriendlyString(),
+                RecurrenceInfo = appointment.RecurrenceInfo?.ToFriendlyString(),
                 ReminderTimeBefore = appointment.ReminderTimeBeforeStart,
-                Participants = appointment.Participants.Select(ParticipantsViewModel.ConvertToViewModel).ToList(),
+                Participants = appointment.Participants?.Select(ParticipantsViewModel.ConvertToViewModel).ToList(),
             };
 
             var calendar = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars.First(ca => ca.Id == appointment.CalendarId);

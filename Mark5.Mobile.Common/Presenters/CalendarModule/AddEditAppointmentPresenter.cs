@@ -27,6 +27,8 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 await Managers.CalendarManager.CreateOrUpdateCalendarAppointmentAsync(ca.CalendarId, ca);
 
                 view.StopLoading();
+                view.CloseView();
+
             }
             catch (Exception ex)
             {
@@ -35,8 +37,6 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 view.StopLoading();
 
                 await view.ShowAddingEditingError(ex);
-
-                view.CloseView();
             }
         }
 
@@ -48,8 +48,6 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             view.ShowAppointment(new AddEditAppointmentViewModel(ServerConfig.SystemSettings.UserInfo.User.Id)
             {
                 Calendar = CalendarViewModel.ConvertToViewModel(preselectedCalendar),
-                Start = DateTime.Now,
-                End = DateTime.Now.AddMinutes(30)
             });
 
             return Task.CompletedTask;
@@ -111,6 +109,9 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             End = DateTime.Now.RoundUp(TimeSpan.FromMinutes(15)).AddHours(1);
             ReminderTimeBeforeStart = -1;
             Participants = new List<ParticipantsViewModel>();
+            Start = DateTime.Now;
+            End = DateTime.Now.AddMinutes(30);
+            Id = -1;
         }
 
         public static AddEditAppointmentViewModel ConvertToViewModel(CalendarAppointment appointment)
@@ -146,15 +147,17 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         {
             var ca = new CalendarAppointment
             {
-                Id = Calendar.Id,
-                Subject = Subject,
-                Description = Description,
-                Location = Location,
+                Id = Id,
+                CalendarId = Calendar.Id,
+                Subject = Subject ?? string.Empty,
+                Description = Description ?? string.Empty,
+                Location = Location ?? string.Empty,
                 AllDay = AllDay,
                 ReminderTimeBeforeStart = ReminderTimeBeforeStart,
                 RecurrenceInfo = RecurrenceInfo,
                 Participants = Participants.Select(ParticipantsViewModel.ConvertToModel).ToList(),
                 CreatorId = CreatorId,
+                Type = RecurrenceInfo == null ? CalendarOccurenceType.Normal : CalendarOccurenceType.Pattern,
             };
 
             ca.Occurrences.Add(new CalendarAppointmentOccurrence
