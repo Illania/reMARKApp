@@ -176,7 +176,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             var pa = await vc.Result;
             if (pa != null)
             {
-                viewModel.Participants.Add(new ParticipantsViewModel { Name = pa.Name, Email = pa.Address });
+                viewModel.Participants.Add(new ParticipantsViewModel
+                {
+                    Name = pa.Name,
+                    Email = pa.Address,
+                    Status = Mobile.Common.Model.ParticipantStatus.NeedAction,
+                    Type = Mobile.Common.Model.ParticipantType.ComAddress
+                });
                 RefreshData();
             }
         }
@@ -188,7 +194,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             var pa = await vc.Result;
             if (pa != null)
             {
-                viewModel.Participants.Add(new ParticipantsViewModel { Name = pa.Name, Email = pa.Address });
+                viewModel.Participants.Add(new ParticipantsViewModel
+                {
+                    Name = pa.Name,
+                    Email = pa.Address,
+                    Status = Mobile.Common.Model.ParticipantStatus.NeedAction,
+                    Type = Mobile.Common.Model.ParticipantType.ComAddress
+                });
                 RefreshData();
             }
         }
@@ -200,7 +212,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             var pa = await vc.Result;
             if (pa != null)
             {
-                viewModel.Participants.Add(new ParticipantsViewModel { Name = pa.Name, Email = pa.Address });
+                viewModel.Participants.Add(new ParticipantsViewModel
+                {
+                    Name = pa.Name,
+                    Email = pa.Address,
+                    Status = Mobile.Common.Model.ParticipantStatus.NeedAction,
+                    Type = Mobile.Common.Model.ParticipantType.Client  //TODO need to check what I need ...
+                });
                 RefreshData();
             }
         }
@@ -214,7 +232,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             if (pa != null)
             {
                 foreach (var su in pa)
-                    viewModel.Participants.Add(new ParticipantsViewModel { Name = string.Empty, Email = su.Username });  //TODO need to check iif this is correct
+                    viewModel.Participants.Add(new ParticipantsViewModel
+                    {
+                        Name = string.Empty,
+                        Email = su.Username,
+                        Status = Mobile.Common.Model.ParticipantStatus.NeedAction,
+                        Type = Mobile.Common.Model.ParticipantType.User
+                    });
                 RefreshData();
             }
         }

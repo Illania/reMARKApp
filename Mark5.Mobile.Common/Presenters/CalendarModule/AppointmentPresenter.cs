@@ -154,17 +154,21 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
     public class ParticipantsViewModel
     {
+        public int Id { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }
         public ParticipantStatus Status { get; set; }
+        public ParticipantType Type { get; set; }
 
         public static ParticipantsViewModel ConvertToViewModel(Participant participant)
         {
             return new ParticipantsViewModel
             {
+                Id = participant.Id,
                 Name = participant.CN,
                 Email = participant.Email,
                 Status = participant.Status,
+                Type = participant.Type,
             };
         }
 
@@ -172,8 +176,12 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         {
             return new Participant
             {
+                Id = participant.Id,
                 CN = participant.Name,
-                Email = participant.Email
+                Email = participant.Email,
+                Type = participant.Type,
+                Status = participant.Status,
+                Presence = ParticipantPresenence.Mandatory,
             };
         }
     }
