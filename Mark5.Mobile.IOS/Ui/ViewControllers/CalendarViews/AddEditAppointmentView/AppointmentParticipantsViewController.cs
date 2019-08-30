@@ -196,6 +196,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             {
                 viewModel.Participants.Add(new ParticipantsViewModel
                 {
+                    Id = pa.Id,
                     Name = pa.Name,
                     Email = pa.Address,
                     Status = Mobile.Common.Model.ParticipantStatus.NeedAction,
@@ -214,10 +215,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             {
                 viewModel.Participants.Add(new ParticipantsViewModel
                 {
+                    Id = pa.Id,
                     Name = pa.Name,
                     Email = pa.Address,
                     Status = Mobile.Common.Model.ParticipantStatus.NeedAction,
-                    Type = Mobile.Common.Model.ParticipantType.Client  //TODO need to check what I need ...
+                    Type = Mobile.Common.Model.ParticipantType.Client  //TODO for testing.
                 });
                 RefreshData();
             }
@@ -234,8 +236,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 foreach (var su in pa)
                     viewModel.Participants.Add(new ParticipantsViewModel
                     {
-                        Name = string.Empty,
-                        Email = su.Username,
+                        Id = su.Id,
+                        Name = su.Username,
+                        Email = string.Empty,
                         Status = Mobile.Common.Model.ParticipantStatus.NeedAction,
                         Type = Mobile.Common.Model.ParticipantType.User
                     });

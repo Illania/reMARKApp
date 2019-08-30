@@ -5,6 +5,7 @@ namespace Mark5.Mobile.Common.Model
 {
     public class Recipient
     {
+        public int Id { get; set; } //Valid for contacts and internal
         public string Name { get; set; }
         public string ContactDescription { get; set; }
         public string Address { get; set; }
@@ -13,7 +14,7 @@ namespace Mark5.Mobile.Common.Model
         public RecipientType Type { get; set; }
 
         public Recipient(RecentAddress ra)
-            : this(ra.Name, ra.Address, RecipientType.RecentAddress)
+            : this(ra.Name, ra.Address, RecipientType.RecentAddress, ra.Id)
         {
         }
 
@@ -21,24 +22,12 @@ namespace Mark5.Mobile.Common.Model
         {
         }
 
-        public Recipient(string name, string address, RecipientType type)
+        public Recipient(string name, string address, RecipientType type, int id = 0)
         {
             Name = name;
             Address = address;
             Type = type;
-        }
-
-        public static List<Recipient> GetPrintableSuggestionsFromContacts(List<Contact> contacts, RecipientType type)
-        {
-            var suggestions = new List<Recipient>();
-            foreach (var contact in contacts)
-                foreach (var address in contact.CommunicationAddresses)
-                {
-                    var fullName = contact.GetFullName();
-                    suggestions.Add(new Recipient(fullName, address.Address, type));
-                }
-
-            return suggestions;
+            Id = id;
         }
 
         #region Overrides
