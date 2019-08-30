@@ -2,7 +2,6 @@
 using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Presenters.CalendarModule;
 using Mark5.Mobile.IOS.Ui.Common;
 
@@ -22,7 +21,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             var sel = new Dictionary<CalendarViewModel, bool>();
 
             foreach (var cal in calendarList)
-                sel.Add(CalendarViewModel.ConvertToViewModel(cal), cal.Id == calendar?.Id);
+                sel.Add(cal, cal.Id == calendar?.Id);
 
             return new AddEditAppointmentCalendarListViewController(sel);
         }

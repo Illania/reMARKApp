@@ -71,7 +71,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 CommonConfig.Logger.Error($"Error while getting appointment with ID = {appointmentId}", ex);
 
                 view.StopLoading();
-                await view.ShowLoadError();
+                await view.ShowLoadError(ex);
 
                 view.CloseView();
             }
@@ -159,6 +159,9 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 CreatorId = CreatorId,
                 Type = RecurrenceInfo == null ? CalendarOccurenceType.Normal : CalendarOccurenceType.Pattern,
             };
+
+            if (ReminderTimeBeforeStart >= 0)
+                ca.ReminderAlertDate = Start.AddSeconds(-ReminderTimeBeforeStart);
 
             ca.Occurrences.Add(new CalendarAppointmentOccurrence
             {
