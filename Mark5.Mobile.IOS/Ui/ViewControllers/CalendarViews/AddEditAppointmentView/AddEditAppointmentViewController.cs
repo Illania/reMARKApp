@@ -631,7 +631,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                     tfc.SetMultiline(true);
                     tfc.ContentEditedAction = ContentEdited;
                     tfc.NumbersOfLineChangedAction = NumberOfLinesChanged;
-                    tfc.SetTitle(Localization.GetString("description"));
+                    tfc.SetTitle(Localization.GetString("message"));
                 }
 
                 void ContentEdited(string e)

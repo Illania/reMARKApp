@@ -251,32 +251,38 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
             void UpdateModel()
             {
                 recInfo.OccurrenceCount = int.TryParse(occurrenceField.Text, out var p) ? p : 1;
+
+                if (radioButton1.Enabled)
+                    recInfo.Range = RecurrenceRange.NoEndDate;
+                else if (radioButton2.Enabled)
+                    recInfo.Range = RecurrenceRange.OccurrenceCount;
+                else if (radioButton3.Enabled)
+                    recInfo.Range = RecurrenceRange.EndByDate;
             }
 
             public void Refresh()
             {
-                if (recInfo.Range == RecurrenceRange.NoEndDate)
+                switch (recInfo.Range)
                 {
-                    radioButton1.Enabled = true;
-                    radioButton2.Enabled = false;
-                    radioButton3.Enabled = false;
+                    case RecurrenceRange.NoEndDate:
+                        radioButton1.Enabled = true;
+                        radioButton2.Enabled = false;
+                        radioButton3.Enabled = false;
+                        break;
+                    case RecurrenceRange.OccurrenceCount:
+                        radioButton1.Enabled = false;
+                        radioButton2.Enabled = true;
+                        radioButton3.Enabled = false;
+                        break;
+                    case RecurrenceRange.EndByDate:
+                        radioButton1.Enabled = false;
+                        radioButton2.Enabled = false;
+                        radioButton3.Enabled = true;
+                        break;
                 }
-                else if (recInfo.Range == RecurrenceRange.OccurrenceCount)
-                {
-                    radioButton1.Enabled = false;
-                    radioButton2.Enabled = true;
-                    radioButton3.Enabled = false;
 
-                    occurrenceField.Text = recInfo.OccurrenceCount.ToString();
-                }
-                else if (recInfo.Range == RecurrenceRange.EndByDate)
-                {
-                    radioButton1.Enabled = false;
-                    radioButton2.Enabled = false;
-                    radioButton3.Enabled = true;
-
-                    endDateField.SetSelected(recInfo.EndDate);
-                }
+                occurrenceField.Text = recInfo.OccurrenceCount.ToString();
+                endDateField.SetSelected(recInfo.EndDate);
             }
 
             public void SetViewModel(RecurrenceInfo vm)

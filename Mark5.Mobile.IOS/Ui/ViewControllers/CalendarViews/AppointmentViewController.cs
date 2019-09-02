@@ -293,17 +293,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             presenter.EditAppointmentClicked();
         }
 
-        private void DeleteButtonItem_Clicked(object sender, EventArgs e)
+        private async void DeleteButtonItem_Clicked(object sender, EventArgs e)
         {
-            /* TODO : DEBUG
             var d = new PopoverPresentationControllerDelegate(deleteButtonItem);
 
             var result = await Dialogs.ShowDestructiveActionSheetAsync(this, Localization.GetString("delete"), d);
             if (result)
                 await presenter.DeleteAppointmentClicked();
-            */
-
-            NavigationController.PushViewController(new AddAppointmentViewController(), true);
         }
 
         async void SendInvitationsButton_TouchUpInside(object sender, EventArgs e)

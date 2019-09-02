@@ -180,13 +180,13 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 Type = RecurrenceType.Daily,
                 DayNumber = 1,
                 Month = 1,
-                WeekDays = WeekDays.Monday,
+                WeekDays = WeekDays.EveryDay,
                 Periodicity = 1,
                 WeekOfMonth = WeekOfMonth.First,
                 OccurrenceCount = 1,
                 FirstDayOfWeek = DayOfWeek.Monday,
                 StartDate = DateTime.Now,
-                EndDate = DateTime.Now,
+                EndDate = DateTime.Now.AddDays(10),
                 Range = RecurrenceRange.NoEndDate,
             };
         }
