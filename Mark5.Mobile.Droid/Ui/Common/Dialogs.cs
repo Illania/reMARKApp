@@ -303,6 +303,29 @@ namespace Mark5.Mobile.Droid.Ui.Common
             return tcs.Task;
         }
 
+        public static Task<TimeSpan> ShowTimePicker(Context context, int initialHour = -1, int initialMinute = -1)
+        {
+            var tcs = new TaskCompletionSource<TimeSpan>();
+            var timePicker = new TimePicker(context);
+            if (initialHour >= 0 && initialMinute >= 0)
+            {
+                timePicker.Hour = initialHour;
+                timePicker.Minute = initialMinute;
+            }
+
+            timePicker.SetIs24HourView((Java.Lang.Boolean)true);
+
+            var builder = new MaterialDialog.Builder(context);
+            builder.CustomView(timePicker, false);
+            builder.PositiveText(Resource.String.ok);
+            builder.OnPositive(new SingleButtonCallback(() => { tcs.SetResult(new TimeSpan(timePicker.Hour, timePicker.Minute, 0)); }));
+            builder.NegativeText(Resource.String.cancel);
+            builder.OnNegative(new SingleButtonCallback(() => tcs.SetResult(new TimeSpan())));
+            builder.Cancelable(false);
+            builder.Show();
+            return tcs.Task;
+        }
+
         #endregion
 
         #region Non-awaitable dialogs

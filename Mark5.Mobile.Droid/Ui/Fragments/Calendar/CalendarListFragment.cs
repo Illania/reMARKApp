@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Android.Content;
 using Android.Graphics;
 using Android.Graphics.Drawables;
@@ -31,7 +32,27 @@ namespace Mark5.Mobile.Droid
         CalendarListAdapter ListAdapter;
         List<Section> Sections { get; set; }
 
+        readonly TaskCompletionSource<CalendarViewModel> tcs = new TaskCompletionSource<CalendarViewModel>();
+        public Task<CalendarViewModel> Result => tcs.Task;
+
         public static (CalendarListFragment fragment, string tag) NewInstance(Dictionary<CalendarViewModel, bool> selectedCalendars)
+        {
+            var args = new Bundle();
+
+            if (selectedCalendars != null)
+                args.PutString(SelectedClendarsKey, Serializer.Serialize(selectedCalendars.ToList()));
+
+            var fragment = new CalendarListFragment
+            {
+                Arguments = args
+            };
+
+            var tag = $"{nameof(CalendarListFragment)}]";
+
+            return (fragment, tag);
+        }
+
+        public static (CalendarListFragment fragment, string tag) NewInstance(Dictionary<CalendarViewModel, bool> selectedCalendars, Action calendarSelected)
         {
             var args = new Bundle();
 
@@ -74,7 +95,7 @@ namespace Mark5.Mobile.Droid
             RecyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
 
             ListAdapter = new CalendarListAdapter(Context);
-
+            ListAdapter.calendarSelected += CalendarSelected;
             RecyclerView.SetAdapter(ListAdapter);
 
             HasOptionsMenu = true;
@@ -136,6 +157,11 @@ namespace Mark5.Mobile.Droid
             return false;
         }
 
+        void CalendarSelected(CalendarViewModel viewModel)
+        {
+            tcs.SetResult(viewModel);
+        }
+
         #endregion
 
         #region RecyclerView Adapters/ViewHolders
@@ -151,6 +177,8 @@ namespace Mark5.Mobile.Droid
             readonly Context context;
 
             readonly int sectionHeight = Conversion.ConvertDpToPixels(40);
+
+            public Action<CalendarViewModel> calendarSelected = delegate { };
 
             public CalendarListAdapter(Context context)
             {
@@ -212,6 +240,7 @@ namespace Mark5.Mobile.Droid
             {
                 selectedCalendars[cvm] = !selectedCalendars[cvm];
                 NotifyItemChanged(position);
+                calendarSelected?.Invoke(cvm);
             }
 
             public (CalendarViewModel Calendar, Section Section) GetItemAtPosition(int position)

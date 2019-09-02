@@ -43,6 +43,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         public Task LoadEmptyAppointment()
         {
             view.ShowAppointment(new AddEditAppointmentViewModel(ServerConfig.SystemSettings.UserInfo.User.Id));
+            view.StopLoading();
             return Task.CompletedTask;
         }
 
