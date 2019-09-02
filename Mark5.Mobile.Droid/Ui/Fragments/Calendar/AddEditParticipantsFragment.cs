@@ -22,9 +22,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         const string ParticipantsKey = "Participants_a0d328b3-7c18-4a18-b62e-f713cc528cc1";
 
         RecyclerView recyclerView;
-
         ParticipantsListAdapter adapter;
-
         List<ParticipantsViewModel> participants = new List<ParticipantsViewModel>();
 
         readonly TaskCompletionSource<List<ParticipantsViewModel>> tcs = new TaskCompletionSource<List<ParticipantsViewModel>>();
@@ -144,6 +142,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                     participants.Add(new ParticipantsViewModel { Email = user.Username, Name = $"{user.FirstName} {user.LastName}" });
                 }
             }
+
+            adapter.SetItems(participants);
         }
 
         async Task RefreshView()
@@ -161,7 +161,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             addItem.SetShowAsAction(ShowAsAction.Always);
             addItem.SetOnMenuItemClickListener(this);
 
-            var saveItem = menu.Add(Menu.None, MenuItemActions.AddParticipants, MenuItemActions.AddParticipants, Resource.String.save);
+            var saveItem = menu.Add(Menu.None, MenuItemActions.SaveParticipants, MenuItemActions.SaveParticipants, Resource.String.save);
             saveItem.SetShowAsAction(ShowAsAction.Always);
             saveItem.SetOnMenuItemClickListener(this);
         }
