@@ -8,7 +8,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
     public class ParticipantsTableViewCell : UITableViewCell
     {
-        public static readonly NSString DefaultId = new NSString(nameof(CategoriesTableViewCell));
+        public static readonly NSString DefaultId = new NSString(nameof(ParticipantsTableViewCell));
 
         public int CategoryId { get; private set; }
 

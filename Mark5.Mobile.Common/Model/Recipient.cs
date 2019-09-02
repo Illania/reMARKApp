@@ -14,7 +14,7 @@ namespace Mark5.Mobile.Common.Model
         public RecipientType Type { get; set; }
 
         public Recipient(RecentAddress ra)
-            : this(ra.Name, ra.Address, RecipientType.RecentAddress, ra.Id)
+            : this(ra.Name, ra.Address, RecipientType.RecentAddress)
         {
         }
 
@@ -22,7 +22,7 @@ namespace Mark5.Mobile.Common.Model
         {
         }
 
-        public Recipient(string name, string address, RecipientType type, int id = 0)
+        public Recipient(string name, string address, RecipientType type, int id = -1)
         {
             Name = name;
             Address = address;

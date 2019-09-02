@@ -10,6 +10,7 @@ using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
+using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 {
@@ -19,6 +20,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         public Task<List<ParticipantsViewModel>> Result => tcs.Task;
 
         UIBarButtonItem addParticipantsItem;
+
+        UITextField field;
+        UIButton addButton;
 
         AddEditAppointmentViewModel viewModel;
 
@@ -107,7 +111,81 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             TableView.AllowsMultipleSelection = true;
             TableView.RowHeight = UITableView.AutomaticDimension;
             TableView.EstimatedRowHeight = 40f;
+            TableView.TableHeaderView = GetHeader();
             TableView.Delegate = this;
+
+            EdgesForExtendedLayout = UIRectEdge.None;
+        }
+
+        UIView GetHeader()
+        {
+            var headerView = new UIView { TranslatesAutoresizingMaskIntoConstraints = false };
+
+            field = new UITextField
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                BorderStyle = UITextBorderStyle.RoundedRect,
+            };
+            field.EditingChanged += Field_EditingChanged;
+
+            addButton = new UIButton(UIButtonType.System)
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false,
+            };
+            addButton.Enabled = false;
+            addButton.SetTitle("ADD", UIControlState.Normal);
+            addButton.TouchUpInside += AddButton_TouchUpInside;
+
+            var separator = new UIView { TranslatesAutoresizingMaskIntoConstraints = false };
+            separator.BackgroundColor = TableView.SeparatorColor;
+
+            headerView.AddSubview(field);
+            headerView.AddSubview(addButton);
+            headerView.AddSubview(separator);
+
+            headerView.AddConstraints(new[]
+            {
+                    field.LeadingAnchor.ConstraintEqualTo(headerView.LeadingAnchor, TableView.SeparatorInset.Left),
+                    field.TopAnchor.ConstraintEqualTo(headerView.TopAnchor, 10f),
+
+                    addButton.LeadingAnchor.ConstraintEqualTo(field.TrailingAnchor, 25f),
+                    addButton.TrailingAnchor.ConstraintEqualTo(headerView.TrailingAnchor, -15f),
+                    addButton.CenterYAnchor.ConstraintEqualTo(field.CenterYAnchor),
+
+                    separator.WidthAnchor.ConstraintEqualTo(headerView.WidthAnchor),
+                    separator.HeightAnchor.ConstraintEqualTo(1f),
+                    separator.BottomAnchor.ConstraintEqualTo(headerView.BottomAnchor),
+                    separator.TopAnchor.ConstraintEqualTo(field.BottomAnchor, 10f),
+
+             });
+
+            TableView.AddConstraint(headerView.WidthAnchor.ConstraintEqualTo(TableView.WidthAnchor));
+            TableView.AddConstraint(headerView.HeightAnchor.ConstraintEqualTo(60f));
+
+            return headerView;
+        }
+
+        void AddButton_TouchUpInside(object sender, EventArgs e)
+        {
+            if (!Validator.IsEmailValid(field.Text))
+                return;
+
+            viewModel.Participants.Add(new ParticipantsViewModel
+            {
+                Email = field.Text,
+                Status = Mobile.Common.Model.ParticipantStatus.NeedAction,
+                Type = Mobile.Common.Model.ParticipantType.ComAddress
+            });
+
+            RefreshData();
+
+            field.Text = string.Empty;
+            addButton.Enabled = false;
+        }
+
+        void Field_EditingChanged(object sender, EventArgs e)
+        {
+            addButton.Enabled = Validator.IsEmailValid(field.Text);
         }
 
         public override UISwipeActionsConfiguration GetTrailingSwipeActionsConfiguration(UITableView tableView, NSIndexPath indexPath)
@@ -219,7 +297,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                     Name = pa.Name,
                     Email = pa.Address,
                     Status = Mobile.Common.Model.ParticipantStatus.NeedAction,
-                    Type = Mobile.Common.Model.ParticipantType.Client  //TODO for testing.
+                    Type = Mobile.Common.Model.ParticipantType.Client
                 });
                 RefreshData();
             }
