@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Mark5.Mobile.Common.DataAccess.Exceptions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.HubMessages;
@@ -141,10 +142,10 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             editedAppointmentToken?.Dispose();
         }
 
-        async void HandleEditedAppointment(EntityChangedMessage obj)
+        void HandleEditedAppointment(EntityChangedMessage obj)
         {
             if (obj.EntityId == appointment.Id)
-                await LoadAppointment(appointment.Id, recurrenceIndex, appointment.CalendarId);
+                view.CloseView();
         }
 
         #endregion

@@ -158,7 +158,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         {
             this.viewModel = viewModel;
             RefreshTable();
-            UIView.Animate(0.1, () => { TableView.Alpha = 1; });
+            UIView.Animate(0.3, () => { TableView.Alpha = 1; });
         }
 
         public async Task ShowLoadError(Exception ex)

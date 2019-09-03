@@ -47,6 +47,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             this.recurrenceIndex = recurrenceIndex;
             presenter = new AppointmentPresenter();
             presenter.AttachView(this);
+            presenter.Start();
         }
 
         public override void LoadView()
@@ -92,6 +93,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             base.Recycle();
             deleteButtonItem = null;
             editButtonItem = null;
+
+            presenter?.Stop();
         }
 
         private void InitializeHandlers()
