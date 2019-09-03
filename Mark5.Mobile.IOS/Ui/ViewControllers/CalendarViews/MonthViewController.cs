@@ -195,13 +195,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             ScheduleView = SFScheduleView.SFScheduleViewMonth;
             EnableNavigation = true;
 
-            MonthViewSettings = new MonthViewSettings()
+            MonthViewSettings = new MonthViewSettings
             {
-                SelectionIndicatorColor = Theme.LightBlue,
-                TodayBackgroundColor = Theme.LightBlue,
-                SelectionTextColor = Theme.White,
                 ShowAgendaView = true,
                 ShowAppointmentsInline = false,
+                TodayBackgroundColor = Theme.LightBlue,
+                SelectionIndicatorColor = Theme.DarkBlue,
+                SelectionTextColor = Theme.White,
                 AgendaViewStyle = new AgendaViewStyle
                 {
                     SubjectTextColor = Theme.DarkerBlue,
@@ -214,53 +214,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 }
             };
 
-            SelectionStyle = new SFSelectionStyle
-            {
-                BackgroundColor = Theme.DarkBlue,
-                BorderColor = Theme.LightBlue
-            };
-
             HeaderStyle = new HeaderStyle
             {
-                BackgroundColor = Theme.DarkerBlue,
-                TextStyle = Theme.DefaultLightFont,
-                TextColor = UIColor.White
+                TextColor = Theme.DarkerBlue,
             };
 
             DayHeaderStyle = new SFViewHeaderStyle
             {
-                BackgroundColor = Theme.DarkerBlue,
-                DayTextColor = UIColor.White,
+                DayTextColor = Theme.DarkerBlue,
                 DayTextStyle = Theme.DefaultLightFont
             };
-
-            MonthCellLoaded += ReMark_MonthCellLoaded;
-        }
-
-        void ReMark_MonthCellLoaded(object sender, MonthCellLoadedEventArgs e)
-        {
-            SFCellStyle style;
-
-            if (e.IsToday)
-            {
-                style = new SFCellStyle
-                {
-                    TextStyle = Theme.DefaultLightFont,
-                    BackgroundColor = Theme.DarkerBlue,
-                    TextColor = Theme.DarkerBlue
-                };
-            }
-            else
-            {
-                style = new SFCellStyle
-                {
-                    TextStyle = Theme.DefaultLightFont,
-                    BackgroundColor = Theme.DarkerBlue,
-                    TextColor = UIColor.White
-                };
-            }
-
-            e.CellStyle = style;
         }
     }
 }
