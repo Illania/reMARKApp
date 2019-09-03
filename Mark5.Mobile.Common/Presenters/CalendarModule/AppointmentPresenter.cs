@@ -1,21 +1,29 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Utilities.Extensions;
+using Mark5.Mobile.Common.Model.HubMessages;
+using TinyMessenger;
 
 namespace Mark5.Mobile.Common.Presenters.CalendarModule
 {
     public class AppointmentPresenter : BasePresenter<IAppointmentView>, IAppointmentPresenter
     {
         CalendarAppointment appointment;
+        int recurrenceIndex;
+        TinyMessageSubscriptionToken editedAppointmentToken;
 
-        public override void Start() { }
+        public override void Start()
+        {
+            SubscribeToMessages();
+        }
 
-        public override void Stop() { }
+        public override void Stop()
+        {
+            UnsubscribeFromMessages();
+        }
 
         public async Task LoadAppointment(int appointmentId, int recurrenceIndex, int calendarId)
         {
@@ -26,6 +34,21 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 CommonConfig.Logger.Info($"Retrieving appointment: AppointmentId = {appointmentId}, RecurrenceIndex = {recurrenceIndex}, CalendarId = {calendarId} ");
 
                 appointment = await Managers.CalendarManager.GetCalendarAppointmentAsync(calendarId, appointmentId, SourceType.Local);
+
+                try
+                {
+                    appointment = await Managers.CalendarManager.GetCalendarAppointmentAsync(calendarId, appointmentId, SourceType.Local);
+                }
+                catch (DataNotFoundException)
+                {
+                    CommonConfig.Logger.Debug($"Appointment can't be found in cache: AppointmentId = {appointmentId}, CalendarId = {calendarId} ");
+                }
+
+                if (appointment == null)
+                    appointment = await Managers.CalendarManager.GetCalendarAppointmentAsync(calendarId, appointmentId, SourceType.Remote);
+
+
+                this.recurrenceIndex = recurrenceIndex;
 
                 view.ShowAppointment(AppointmentViewModel.ConvertToViewModel(appointment, recurrenceIndex));
                 view.SetLines(ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Select(LineViewModel.ConvertToViewModel));
@@ -105,6 +128,26 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             }
 
         }
+
+        #region Messages handlers
+
+        void SubscribeToMessages()
+        {
+            editedAppointmentToken = CommonConfig.MessengerHub.Subscribe<EntityChangedMessage>(HandleEditedAppointment, m => m.ObjectType == ObjectType.CalendarAppointment);
+        }
+
+        void UnsubscribeFromMessages()
+        {
+            editedAppointmentToken?.Dispose();
+        }
+
+        async void HandleEditedAppointment(EntityChangedMessage obj)
+        {
+            if (obj.EntityId == appointment.Id)
+                await LoadAppointment(appointment.Id, recurrenceIndex, appointment.CalendarId);
+        }
+
+        #endregion
     }
 
     public class AppointmentViewModel

@@ -109,7 +109,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                     await presenter.LoadEmptyAppointment();
 
                 if (CreationModeFlag == ContactCreationModeFlag.Edit)
-                    await presenter.LoadAppointment(calendarId, appointmentId);  //TODO we need the recurrence index too, just in case
+                    await presenter.LoadAppointment(calendarId, appointmentId);
             }
             else
                 RefreshTable();
