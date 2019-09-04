@@ -108,7 +108,6 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
                 try
                 {
-                    //TODO check if this can be done in a more clever way....
                     var newApp = await Managers.CalendarManager.GetCalendarAppointmentAsync(appointment.CalendarId, appointment.Id, SourceType.Remote);
                     var participants = newApp.Participants.Select(ParticipantsViewModel.ConvertToViewModel).ToList();
 

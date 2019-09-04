@@ -451,7 +451,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
                 if (viewModel.ReminderTimeBefore == 0)
                 {
-                    label.Text = "At time of event"; //TODO localization..?
+                    label.Text = "At time of event";
                     return;
                 }
 

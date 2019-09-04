@@ -525,7 +525,7 @@ namespace Mark5.Mobile.IOS
 
                 ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
 
-                if (await Managers.CleanUpManager.IsCleanUpNecessary(PlatformConfig.Preferences.CleanCacheIntervalDays))  //TODO testing
+                if (await Managers.CleanUpManager.IsCleanUpNecessary(PlatformConfig.Preferences.CleanCacheIntervalDays))
                 {
                     CommonConfig.Logger.Info("Cleaning up cache....");
                     await Managers.CleanUpManager.CleanUp();
