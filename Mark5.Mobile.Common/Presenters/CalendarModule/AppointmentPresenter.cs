@@ -13,7 +13,6 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
     public class AppointmentPresenter : BasePresenter<IAppointmentView>, IAppointmentPresenter
     {
         CalendarAppointment appointment;
-        int recurrenceIndex;
         TinyMessageSubscriptionToken editedAppointmentToken;
 
         public override void Start()
@@ -28,13 +27,9 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         public async Task LoadAppointment(int appointmentId, int recurrenceIndex, int calendarId)
         {
-            view.ShowAppointmentLoadingDialog();
-
             try
             {
                 CommonConfig.Logger.Info($"Retrieving appointment: AppointmentId = {appointmentId}, RecurrenceIndex = {recurrenceIndex}, CalendarId = {calendarId} ");
-
-                appointment = await Managers.CalendarManager.GetCalendarAppointmentAsync(calendarId, appointmentId, SourceType.Local);
 
                 try
                 {
@@ -46,10 +41,10 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 }
 
                 if (appointment == null)
+                {
+                    view.ShowAppointmentLoadingDialog();
                     appointment = await Managers.CalendarManager.GetCalendarAppointmentAsync(calendarId, appointmentId, SourceType.Remote);
-
-
-                this.recurrenceIndex = recurrenceIndex;
+                }
 
                 view.ShowAppointment(AppointmentViewModel.ConvertToViewModel(appointment, recurrenceIndex));
                 view.SetLines(ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Select(LineViewModel.ConvertToViewModel));

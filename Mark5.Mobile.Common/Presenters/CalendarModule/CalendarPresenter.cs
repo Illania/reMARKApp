@@ -68,6 +68,9 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         public void LoadAppointments(DateTime start, DateTime end)
         {
+            lastVisibleStartDate = start;
+            lastVisibleEndDate = end;
+
             if (firstLoad)
                 view.ShowLoading();
 
