@@ -2,7 +2,6 @@
 using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Presenters.CalendarModule;
 using Mark5.Mobile.IOS.Ui.Common;
 
@@ -17,26 +16,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         private AddEditAppointmentCalendarListViewController(Dictionary<CalendarViewModel, bool> calendars) : base(calendars) { }
 
-        public static AddEditAppointmentCalendarListViewController Factory(CalendarViewModel calendar)
+        public static AddEditAppointmentCalendarListViewController Create(List<CalendarViewModel> calendarList, CalendarViewModel calendar)
         {
-            var calendarsList = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars;
-
             var sel = new Dictionary<CalendarViewModel, bool>();
 
-            foreach (var cal in calendarsList)
-                sel.Add(CalendarViewModel.ConvertToViewModel(cal), cal.Id == calendar.Id);
-
-            return new AddEditAppointmentCalendarListViewController(sel);
-        }
-
-        public static AddEditAppointmentCalendarListViewController Factory()
-        {
-            var calendarsList = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars;
-
-            var sel = new Dictionary<CalendarViewModel, bool>();
-
-            foreach (var cal in calendarsList)
-                sel.Add(CalendarViewModel.ConvertToViewModel(cal), false);
+            foreach (var cal in calendarList)
+                sel.Add(cal, cal.Id == calendar?.Id);
 
             return new AddEditAppointmentCalendarListViewController(sel);
         }
@@ -52,6 +37,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         void CancelButton_Clicked(object sender, EventArgs e)
         {
+            tcs.SetResult(null);
             NavigationController?.PopViewController(true);
         }
 

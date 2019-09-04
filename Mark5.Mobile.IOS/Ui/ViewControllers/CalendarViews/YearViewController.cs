@@ -22,7 +22,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         {
             base.ViewDidLoad();
 
-            reMarkYearCalendar = new ReMarkYearCalendar()
+            reMarkYearCalendar = new ReMarkYearCalendar
             {
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
@@ -82,7 +82,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         public ReMarkYearCalendar()
         {
             ViewMode = SFCalendarViewMode.SFCalendarViewModeYear;
-            BackgroundColor = Theme.DarkerBlue;
+            YearViewMode = YearViewMode.Date;
             ShowYearView = true;
             MonthViewSettings = monthViewSettings;
             YearViewSettings = yearViewSettings;

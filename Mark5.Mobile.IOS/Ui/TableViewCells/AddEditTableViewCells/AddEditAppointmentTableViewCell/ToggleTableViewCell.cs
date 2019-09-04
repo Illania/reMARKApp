@@ -17,9 +17,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Font = Theme.DefaultFont,
-                Text = string.Empty
+                Text = string.Empty,
             };
-
             ContentView.Add(title);
 
             toggleSwitch = new UISwitch
@@ -33,13 +32,12 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
 
             ContentView.AddConstraints(new[]
             {
-                title.LeadingAnchor.ConstraintEqualTo(ContentView.LeadingAnchor),
-                title.BottomAnchor.ConstraintEqualTo(ContentView.BottomAnchor, -VerticalMargin),
-                title.TopAnchor.ConstraintEqualTo(ContentView.TopAnchor, VerticalMargin),
+                title.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+                title.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor),
+                title.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor),
                 toggleSwitch.LeadingAnchor.ConstraintGreaterThanOrEqualTo(title.LeadingAnchor, HorizontalMargin),
                 toggleSwitch.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
-                toggleSwitch.BottomAnchor.ConstraintEqualTo(ContentView.BottomAnchor, -VerticalMargin),
-                toggleSwitch.TopAnchor.ConstraintEqualTo(ContentView.TopAnchor, VerticalMargin)
+                toggleSwitch.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
             });
         }
 

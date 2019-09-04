@@ -1,7 +1,5 @@
-﻿using Foundation;
-using Mark5.Mobile.IOS.Ui.Common;
+﻿using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
-using Mark5.Mobile.Common.Presenters.CalendarModule;
 using Mark5.Mobile.IOS.Utilities;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppointmentTableViewCell

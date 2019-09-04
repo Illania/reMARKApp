@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Mark5.Mobile.Common.Utilities;
 using SQLite;
 
@@ -74,6 +75,13 @@ namespace Mark5.Mobile.Common.Model
         public string RecurrenceInfoString { get => Serializer.Serialize(RecurrenceInfo); set => RecurrenceInfo = Serializer.Deserialize<RecurrenceInfo>(value); }
 
         #endregion
+
+        [Ignore]
+        public DateTime ReminderAlertDate
+        {
+            get => ReminderAlertTime.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime();
+            set { ReminderAlertTime = value.ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds(); }
+        }
 
         public override string ToString()
         {

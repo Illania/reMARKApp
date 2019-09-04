@@ -24,7 +24,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
                 Delegate = pickerDataSource
             };
 
-            Label.InputView = pickerView;
+            HiddenTextView.InputView = pickerView;
 
             UIToolbar toolbar = new UIToolbar(new CGRect(0f, 0f, 0f, 44f))
             {
@@ -42,7 +42,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
                 }
             };
 
-            Label.InputAccessoryView = toolbar;
+            HiddenTextView.InputAccessoryView = toolbar;
         }
 
         public void SetPickerSelection(ReminderInfo info)
@@ -57,13 +57,18 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
             ReminderInfo reminder = pickerDataSource.GetSelectedReminder(pickerView);
             Label.Text = reminder.Title;
             ReminderSelected?.Invoke(reminder);
-            Label.ResignFirstResponder();
+            HiddenTextView.ResignFirstResponder();
         }
 
         [Export("cancelTapped:")]
         void CancelTapped(UIBarButtonItem sender)
         {
-            Label.ResignFirstResponder();
+            HiddenTextView.ResignFirstResponder();
+        }
+
+        public void ShowPicker()
+        {
+            HiddenTextView.BecomeFirstResponder();
         }
 
         class Source : UIPickerViewDataSource, IUIPickerViewDelegate

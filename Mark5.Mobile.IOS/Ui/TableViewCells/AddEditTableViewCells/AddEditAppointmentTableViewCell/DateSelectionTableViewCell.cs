@@ -71,9 +71,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
 
             ContentView.AddConstraints(new[]
             {
-                Label.LeadingAnchor.ConstraintEqualTo(ContentView.LeadingAnchor),
-                Label.BottomAnchor.ConstraintEqualTo(ContentView.BottomAnchor, -VerticalMargin),
-                Label.TopAnchor.ConstraintEqualTo(ContentView.TopAnchor, VerticalMargin),
+                Label.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+                Label.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor),
+                Label.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor),
 
                 DateTextField.HeightAnchor.ConstraintGreaterThanOrEqualTo(20f),
                 DateTextField.TopAnchor.ConstraintEqualTo(Label.TopAnchor),
@@ -140,7 +140,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
 
         private string FormatDateString(DateTime dateTime)
         {
-            return $"{ dateTime.Date.ToString("d MMM yyyy", CultureInfo.CurrentCulture) }"; ;
+            return $"{ dateTime.Date.ToString("d MMM yyyy", CultureInfo.CurrentCulture) }";
         }
 
         private void SetDateOnlyPicker(DateTime dateTime)

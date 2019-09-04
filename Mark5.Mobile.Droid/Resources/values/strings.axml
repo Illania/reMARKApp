@@ -2,6 +2,7 @@
 <resources>
     <string name="account">Account</string>
     <string name="add_attachment">Add attachment</string>
+    <string name="add_appointment">Add appointment</string>
     <string name="add_comment_hint">Insert new comment</string>
     <string name="add_tite">Add title</string>
     <string name="add_location">Add location</string>
@@ -343,6 +344,7 @@
     <string name="redirect_to_draw_settings_title">You must allow reMARK to draw over other apps</string>
     <string name="redirect_to_draw_settings_content">You will be redirected to the settings where you must enable reMARK to draw over other apps. Only contacts that are saved offline will be identified by reMARK.</string>
     <string name="read_by_prefix">read by</string>
+    <string name="refresh">Refresh</string>
     <string name="reference">Ref.</string>
     <string name="reset">Reset</string>
     <string name="related_contacts">Related</string>

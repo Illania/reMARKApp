@@ -49,7 +49,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
                     var address = emailAddresses[index];
 
-                    tcs.SetResult(new Recipient(contactPreview.Name, address, RecipientType.Contact));
+                    tcs.SetResult(new Recipient(contactPreview.Name, address, RecipientType.Contact, contactPreview.Id));
                     DisableSearchController();
                     DismissViewController(true, null);
                 }

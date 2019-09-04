@@ -18,7 +18,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         {
             var ca = vm.ConvertToModel();
 
-            view.ShowLoading();
+            view.ShowEditingLoading();
 
             try
             {
@@ -26,24 +26,30 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
                 await Managers.CalendarManager.CreateOrUpdateCalendarAppointmentAsync(ca.CalendarId, ca);
 
-                view.StopLoading();
+                view.StopEditingLoading();
+                view.CloseView();
+
             }
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error($"Error while adding or editing appointment: AppointmentId = {ca.Id}, CalendarId = {ca.CalendarId} ", ex);
 
-                view.StopLoading();
+                view.StopEditingLoading();
 
-                await view.ShowAddingEditingError(ex);
-
-                view.CloseView();
+                await view.ShowEditingError(ex);
             }
         }
 
-        public Task LoadEmptyAppointment()
+        public Task LoadEmptyAppointment()  //TODO it would be also convenient to put here "reasoonable dates"
         {
-            view.ShowAppointment(new AddEditAppointmentViewModel(ServerConfig.SystemSettings.UserInfo.User.Id));
-            view.StopLoading();
+            var preselectedCalendar = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars.First(c => !c.Shared)
+                ?? ServerConfig.SystemSettings.CalendarModuleInfo.Calendars.First();
+
+            view.ShowAppointment(new AddEditAppointmentViewModel(ServerConfig.SystemSettings.UserInfo.User.Id)
+            {
+                Calendar = CalendarViewModel.ConvertToViewModel(preselectedCalendar),
+            });
+
             return Task.CompletedTask;
         }
 
@@ -65,7 +71,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 CommonConfig.Logger.Error($"Error while getting appointment with ID = {appointmentId}", ex);
 
                 view.StopLoading();
-                await view.ShowLoadError();
+                await view.ShowLoadError(ex);
 
                 view.CloseView();
             }
@@ -88,13 +94,12 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         public DateTime End { get; set; }
         public bool AllDay { get; set; }
         public int CreatorId { get; set; }
-        public RecurrenceInfo RecurrenceInfo { get; set; } //TODO not so nice (use of domain class)
+        public RecurrenceInfo RecurrenceInfo { get; set; }
         public long ReminderTimeBeforeStart { get; set; }
         public List<ParticipantsViewModel> Participants { get; set; }
         public CalendarViewModel Calendar { get; set; }
 
-        public AddEditAppointmentViewModel()
-        { }
+        public AddEditAppointmentViewModel() { }
 
         // When creating a new appointment default values are initialized here
         public AddEditAppointmentViewModel(int creatorId)
@@ -103,6 +108,10 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             Start = DateTime.Now.RoundUp(TimeSpan.FromMinutes(15));
             End = DateTime.Now.RoundUp(TimeSpan.FromMinutes(15)).AddHours(1);
             ReminderTimeBeforeStart = -1;
+            Participants = new List<ParticipantsViewModel>();
+            Start = DateTime.Now;
+            End = DateTime.Now.AddMinutes(30);
+            Id = -1;
         }
 
         public static AddEditAppointmentViewModel ConvertToViewModel(CalendarAppointment appointment)
@@ -138,16 +147,21 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         {
             var ca = new CalendarAppointment
             {
-                Id = Calendar.Id,
-                Subject = Subject,
-                Description = Description,
-                Location = Location,
+                Id = Id,
+                CalendarId = Calendar.Id,
+                Subject = Subject ?? string.Empty,
+                Description = Description ?? string.Empty,
+                Location = Location ?? string.Empty,
                 AllDay = AllDay,
                 ReminderTimeBeforeStart = ReminderTimeBeforeStart,
                 RecurrenceInfo = RecurrenceInfo,
                 Participants = Participants.Select(ParticipantsViewModel.ConvertToModel).ToList(),
                 CreatorId = CreatorId,
+                Type = RecurrenceInfo == null ? CalendarOccurenceType.Normal : CalendarOccurenceType.Pattern,
             };
+
+            if (ReminderTimeBeforeStart >= 0)
+                ca.ReminderAlertDate = Start.AddSeconds(-ReminderTimeBeforeStart);
 
             ca.Occurrences.Add(new CalendarAppointmentOccurrence
             {
@@ -157,6 +171,24 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             });
 
             return ca;
+        }
+
+        public static RecurrenceInfo GetEmptyRecurrenceInfo()
+        {
+            return new RecurrenceInfo
+            {
+                Type = RecurrenceType.Daily,
+                DayNumber = 1,
+                Month = 1,
+                WeekDays = WeekDays.EveryDay,
+                Periodicity = 1,
+                WeekOfMonth = WeekOfMonth.First,
+                OccurrenceCount = 1,
+                FirstDayOfWeek = DayOfWeek.Monday,
+                StartDate = DateTime.Now,
+                EndDate = DateTime.Now.AddDays(10),
+                Range = RecurrenceRange.NoEndDate,
+            };
         }
     }
 
@@ -174,9 +206,13 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         void UpdateCalendarsList(List<CalendarViewModel> calendars);
 
         void CloseView();
+
         void ShowLoading();
         void StopLoading();
-        Task ShowLoadError();
-        Task ShowAddingEditingError(Exception ex);
+        Task ShowLoadError(Exception ex);
+
+        void ShowEditingLoading();
+        void StopEditingLoading();
+        Task ShowEditingError(Exception ex);
     }
 }

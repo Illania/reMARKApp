@@ -279,20 +279,20 @@
 		<Compile Include="Ui\ViewControllers\CalendarViews\CalendarsListViewController.cs" />
 		<Compile Include="Ui\TableViewCells\CalendarTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\ParticipantsTableViewCell.cs" />
-		<Compile Include="Ui\ViewControllers\CalendarViews\AddEditAppointmentViewController.cs" />
 		<Compile Include="Model\DateTimeChangeEvent.cs" />
 		<Compile Include="Ui\TableViewCells\AddEditTableViewCells\AddEditAppointmentTableViewCell\AppointmentDisclosureTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\AddEditTableViewCells\AddEditAppointmentTableViewCell\CalendarDisclosureTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\AddEditTableViewCells\AddEditAppointmentTableViewCell\DateSelectionTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\AddEditTableViewCells\AddEditAppointmentTableViewCell\ToggleTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\AddEditTableViewCells\AddEditAppointmentTableViewCell\AllDayToggleTableViewCell.cs" />
-		<Compile Include="Ui\ViewControllers\CalendarViews\AddEditParticipantsViewController.cs" />
-		<Compile Include="Ui\ViewControllers\CalendarViews\AddEditAppointmentCalendarListViewController.cs" />
 		<Compile Include="Ui\TableViewCells\AddEditTableViewCells\AddEditAppointmentTableViewCell\ReminderDisclosuerTableViewCell.cs" />
-		<Compile Include="Ui\ViewControllers\CalendarViews\RecurrenceView\ReoccurrenceViewController.cs" />
-		<Compile Include="Ui\ViewControllers\CalendarViews\RecurrenceView\Subviews\PatternView.cs" />
-		<Compile Include="Ui\ViewControllers\CalendarViews\RecurrenceView\Subviews\Common.cs" />
-		<Compile Include="Ui\ViewControllers\CalendarViews\RecurrenceView\Subviews\RangeView.cs" />
+		<Compile Include="Ui\ViewControllers\CalendarViews\AddEditAppointmentView\AddEditAppointmentCalendarListViewController.cs" />
+		<Compile Include="Ui\ViewControllers\CalendarViews\AddEditAppointmentView\AddEditAppointmentViewController.cs" />
+		<Compile Include="Ui\ViewControllers\CalendarViews\AddEditAppointmentView\AppointmentParticipantsViewController.cs" />
+		<Compile Include="Ui\ViewControllers\CalendarViews\AddEditAppointmentView\RecurrenceView\ReoccurrenceViewController.cs" />
+		<Compile Include="Ui\ViewControllers\CalendarViews\AddEditAppointmentView\RecurrenceView\Subviews\Common.cs" />
+		<Compile Include="Ui\ViewControllers\CalendarViews\AddEditAppointmentView\RecurrenceView\Subviews\PatternView.cs" />
+		<Compile Include="Ui\ViewControllers\CalendarViews\AddEditAppointmentView\RecurrenceView\Subviews\RangeView.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
@@ -331,16 +331,16 @@
       <HintPath>..\packages\Xamarin.Forms.4.0.0.425677\lib\Xamarin.iOS10\Xamarin.Forms.Xaml.dll</HintPath>
     </Reference>
     <Reference Include="Syncfusion.Licensing">
-      <HintPath>..\packages\Syncfusion.Licensing.17.2.0.40\lib\Xamarin.iOS10\Syncfusion.Licensing.dll</HintPath>
+      <HintPath>..\packages\Syncfusion.Licensing.17.2.0.47\lib\Xamarin.iOS10\Syncfusion.Licensing.dll</HintPath>
     </Reference>
 		<Reference Include="Lottie.iOS">
 		  <HintPath>..\packages\Com.Airbnb.iOS.Lottie.2.5.7\lib\xamarinios10\Lottie.iOS.dll</HintPath>
 		</Reference>
 		<Reference Include="Syncfusion.SfSchedule.iOS">
-		  <HintPath>..\packages\Syncfusion.Xamarin.SfSchedule.IOS.17.2.0.40\lib\Xamarin.iOS10\Syncfusion.SfSchedule.iOS.dll</HintPath>
+		  <HintPath>..\packages\Syncfusion.Xamarin.SfSchedule.IOS.17.2.0.47\lib\Xamarin.iOS10\Syncfusion.SfSchedule.iOS.dll</HintPath>
 		</Reference>
 		<Reference Include="Syncfusion.SfCalendar.iOS">
-		  <HintPath>..\packages\Syncfusion.Xamarin.SfCalendar.IOS.17.2.0.40\lib\Xamarin.iOS10\Syncfusion.SfCalendar.iOS.dll</HintPath>
+		  <HintPath>..\packages\Syncfusion.Xamarin.SfCalendar.IOS.17.2.0.47\lib\Xamarin.iOS10\Syncfusion.SfCalendar.iOS.dll</HintPath>
 		</Reference>
 		<Reference Include="Xamarin.Essentials">
 		  <HintPath>..\packages\Xamarin.Essentials.1.1.0\lib\xamarinios10\Xamarin.Essentials.dll</HintPath>
@@ -779,8 +779,8 @@
 	  <Folder Include="Assets_icons.xcassets\Participant-Accepted.imageset\" />
 	  <Folder Include="Assets_icons.xcassets\Participant-Declined.imageset\" />
 	  <Folder Include="Ui\TableViewCells\AddEditTableViewCells\AddEditAppointmentTableViewCell\" />
-	  <Folder Include="Ui\ViewControllers\CalendarViews\RecurrenceView\" />
-	  <Folder Include="Ui\ViewControllers\CalendarViews\RecurrenceView\Subviews\" />
+	  <Folder Include="Ui\ViewControllers\CalendarViews\AddEditAppointmentView\" />
+	  <Folder Include="Ui\ViewControllers\CalendarViews\AddEditAppointmentView\RecurrenceView\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 	<Import Project="..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets" Condition="Exists('..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets')" />

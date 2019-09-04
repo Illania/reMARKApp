@@ -29,8 +29,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
             base.Recycle();
 
-            if (!tcs.Task.IsCompleted)
-                tcs.SetResult(null);
+            tcs?.TrySetResult(null);
         }
 
         protected override void InitializeNavigationBar()
@@ -71,7 +70,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             DismissViewController(true, null);
             if (!tcs.TrySetResult(null))
                 CommonConfig.Logger.Error("Result was already set!");
-
         }
 
         protected async override void FolderSelected(Folder folder, bool isFromFavorite)

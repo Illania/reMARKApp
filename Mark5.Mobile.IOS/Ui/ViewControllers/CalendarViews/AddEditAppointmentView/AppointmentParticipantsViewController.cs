@@ -10,21 +10,23 @@ using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
+using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 {
-    public class AddEditParticipantsViewController : AbstractTableViewController, IUITableViewDelegate
+    public class AppointmentParticipantsViewController : AbstractTableViewController, IUITableViewDelegate
     {
         readonly TaskCompletionSource<List<ParticipantsViewModel>> tcs = new TaskCompletionSource<List<ParticipantsViewModel>>();
         public Task<List<ParticipantsViewModel>> Result => tcs.Task;
 
         UIBarButtonItem addParticipantsItem;
 
+        UITextField field;
+        UIButton addButton;
+
         AddEditAppointmentViewModel viewModel;
 
-        Action<ParticipantsViewModel> participantSelectedAction;
-
-        public AddEditParticipantsViewController(AddEditAppointmentViewModel viewModel)
+        public AppointmentParticipantsViewController(AddEditAppointmentViewModel viewModel)
         {
             this.viewModel = viewModel;
         }
@@ -109,7 +111,81 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             TableView.AllowsMultipleSelection = true;
             TableView.RowHeight = UITableView.AutomaticDimension;
             TableView.EstimatedRowHeight = 40f;
+            TableView.TableHeaderView = GetHeader();
             TableView.Delegate = this;
+
+            EdgesForExtendedLayout = UIRectEdge.None;
+        }
+
+        UIView GetHeader()
+        {
+            var headerView = new UIView { TranslatesAutoresizingMaskIntoConstraints = false };
+
+            field = new UITextField
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                BorderStyle = UITextBorderStyle.RoundedRect,
+            };
+            field.EditingChanged += Field_EditingChanged;
+
+            addButton = new UIButton(UIButtonType.System)
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false,
+            };
+            addButton.Enabled = false;
+            addButton.SetTitle("ADD", UIControlState.Normal);
+            addButton.TouchUpInside += AddButton_TouchUpInside;
+
+            var separator = new UIView { TranslatesAutoresizingMaskIntoConstraints = false };
+            separator.BackgroundColor = TableView.SeparatorColor;
+
+            headerView.AddSubview(field);
+            headerView.AddSubview(addButton);
+            headerView.AddSubview(separator);
+
+            headerView.AddConstraints(new[]
+            {
+                    field.LeadingAnchor.ConstraintEqualTo(headerView.LeadingAnchor, TableView.SeparatorInset.Left),
+                    field.TopAnchor.ConstraintEqualTo(headerView.TopAnchor, 10f),
+
+                    addButton.LeadingAnchor.ConstraintEqualTo(field.TrailingAnchor, 25f),
+                    addButton.TrailingAnchor.ConstraintEqualTo(headerView.TrailingAnchor, -15f),
+                    addButton.CenterYAnchor.ConstraintEqualTo(field.CenterYAnchor),
+
+                    separator.WidthAnchor.ConstraintEqualTo(headerView.WidthAnchor),
+                    separator.HeightAnchor.ConstraintEqualTo(1f),
+                    separator.BottomAnchor.ConstraintEqualTo(headerView.BottomAnchor),
+                    separator.TopAnchor.ConstraintEqualTo(field.BottomAnchor, 10f),
+
+             });
+
+            TableView.AddConstraint(headerView.WidthAnchor.ConstraintEqualTo(TableView.WidthAnchor));
+            TableView.AddConstraint(headerView.HeightAnchor.ConstraintEqualTo(60f));
+
+            return headerView;
+        }
+
+        void AddButton_TouchUpInside(object sender, EventArgs e)
+        {
+            if (!Validator.IsEmailValid(field.Text))
+                return;
+
+            viewModel.Participants.Add(new ParticipantsViewModel
+            {
+                Email = field.Text,
+                Status = Mobile.Common.Model.ParticipantStatus.NeedAction,
+                Type = Mobile.Common.Model.ParticipantType.ComAddress
+            });
+
+            RefreshData();
+
+            field.Text = string.Empty;
+            addButton.Enabled = false;
+        }
+
+        void Field_EditingChanged(object sender, EventArgs e)
+        {
+            addButton.Enabled = Validator.IsEmailValid(field.Text);
         }
 
         public override UISwipeActionsConfiguration GetTrailingSwipeActionsConfiguration(UITableView tableView, NSIndexPath indexPath)
@@ -145,14 +221,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                     {
                         Localization.GetString("contact_picker_recent_addresses"),
                         Localization.GetString("contact_picker_contacts"),
-                        Localization.GetString("contact_picker_shortcodes"),
                         Localization.GetString("contact_picker_phonebook"),
+                        Localization.GetString("contact_picker_internal_contacts"),
                     };
 
-            if (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
-                strings.Add(Localization.GetString("contact_picker_internal_contacts"));
-
-            var choice = await Dialogs.ShowListActionSheetAsync(this, strings.ToArray(), (UIView)this.View);
+            var choice = await Dialogs.ShowListActionSheetAsync(this, strings.ToArray(), addParticipantsItem);
 
             switch (choice)
             {
@@ -163,12 +236,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                     await DoOpenContacts();
                     break;
                 case 2:
-                    //await DoOpenShortcodes();
-                    break;
-                case 3:
                     await DoOpenPhonebook();
                     break;
-                case 4:
+                case 3:
                     await DoOpenInternalContacts();
                     break;
                 default:
@@ -183,37 +253,54 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             var pa = await vc.Result;
             if (pa != null)
-                viewModel.Participants.Add(new ParticipantsViewModel() { Name = pa.Name, Email = pa.Address });
+            {
+                viewModel.Participants.Add(new ParticipantsViewModel
+                {
+                    Name = pa.Name,
+                    Email = pa.Address,
+                    Status = Mobile.Common.Model.ParticipantStatus.NeedAction,
+                    Type = Mobile.Common.Model.ParticipantType.ComAddress
+                });
+                RefreshData();
+            }
         }
 
         async Task DoOpenRecents()
         {
             var vc = new RecentAddressesListViewController();
             PresentViewController(new NavigationController(vc), true, null);
-            var result = await vc.Result;
-            if (result != null)
-            {
-                participantSelectedAction(new ParticipantsViewModel());
-            }
-
             var pa = await vc.Result;
             if (pa != null)
-                viewModel.Participants.Add(new ParticipantsViewModel() { Name = pa.Name, Email = pa.Address });
+            {
+                viewModel.Participants.Add(new ParticipantsViewModel
+                {
+                    Id = pa.Id,
+                    Name = pa.Name,
+                    Email = pa.Address,
+                    Status = Mobile.Common.Model.ParticipantStatus.NeedAction,
+                    Type = Mobile.Common.Model.ParticipantType.ComAddress
+                });
+                RefreshData();
+            }
         }
 
         async Task DoOpenContacts()
         {
             var vc = new PickerContactsFoldersListViewController();
             PresentViewController(new NavigationController(vc), true, null);
-            var result = await vc.Result;
-            if (result != null)
-            {
-                participantSelectedAction(new ParticipantsViewModel());
-            }
-
             var pa = await vc.Result;
             if (pa != null)
-                viewModel.Participants.Add(new ParticipantsViewModel() { Name = pa.Name, Email = pa.Address });
+            {
+                viewModel.Participants.Add(new ParticipantsViewModel
+                {
+                    Id = pa.Id,
+                    Name = pa.Name,
+                    Email = pa.Address,
+                    Status = Mobile.Common.Model.ParticipantStatus.NeedAction,
+                    Type = Mobile.Common.Model.ParticipantType.Client
+                });
+                RefreshData();
+            }
         }
 
         async Task DoOpenInternalContacts()
@@ -221,15 +308,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             var vc = new MultipleUserSelectionViewController();
             vc.IncludeCurrentUser = false;
             PresentViewController(new NavigationController(vc), true, null);
-            var result = await vc.Result;
-            if (result != null)
-            {
-                participantSelectedAction(new ParticipantsViewModel());
-            }
             var pa = await vc.Result;
             if (pa != null)
+            {
                 foreach (var su in pa)
-                    viewModel.Participants.Add(new ParticipantsViewModel() { Name = string.Empty, Email = su.Username });
+                    viewModel.Participants.Add(new ParticipantsViewModel
+                    {
+                        Id = su.Id,
+                        Name = su.Username,
+                        Email = string.Empty,
+                        Status = Mobile.Common.Model.ParticipantStatus.NeedAction,
+                        Type = Mobile.Common.Model.ParticipantType.User
+                    });
+                RefreshData();
+            }
         }
 
         void RefreshData()

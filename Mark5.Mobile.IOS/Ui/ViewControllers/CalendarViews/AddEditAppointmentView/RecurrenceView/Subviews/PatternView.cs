@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Foundation;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Presenters.CalendarModule;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
@@ -52,7 +51,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
             Subviews.OfType<IEditable>().ToList().ForEach(a => a.Refresh());
         }
 
-        public void SetViewModel(AddEditAppointmentViewModel ca)
+        public void SetViewModel(RecurrenceInfo ca)
         {
             Subviews.OfType<IEditable>().ToList().ForEach(a => a.SetViewModel(ca));
         }
@@ -63,12 +62,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
             weeklyView.Refresh();
             monthlyView.Refresh();
             yearlyView.Refresh();
-
         }
 
         class PatternHeaderView : UIView, IEditable
         {
-            AddEditAppointmentViewModel viewModel;
+            RecurrenceInfo recInfo;
             TypePicker typeField;
 
             public event EventHandler Updated = delegate { };
@@ -105,25 +103,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
 
             void UpdateModel(RecurrenceType rec)
             {
-                viewModel.RecurrenceInfo.Type = rec;
+                recInfo.Type = rec;
                 Updated(this, EventArgs.Empty);
                 Refresh();
             }
 
             public void Refresh()
             {
-                typeField.SetSelected(viewModel.RecurrenceInfo.Type);
+                typeField.SetSelected(recInfo.Type);
             }
 
-            public void SetViewModel(AddEditAppointmentViewModel ca)
+            public void SetViewModel(RecurrenceInfo ca)
             {
-                viewModel = ca;
+                recInfo = ca;
             }
         }
 
         class DailyView : UIStackView, IEditable
         {
-            AddEditAppointmentViewModel viewModel;
+            RecurrenceInfo recInfo;
 
             RadioButton radioButton1;
             RadioButton radioButton2;
@@ -220,12 +218,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
             {
                 if (radioButton1.Enabled)
                 {
-                    viewModel.RecurrenceInfo.WeekDays = WeekDays.EveryDay;
-                    viewModel.RecurrenceInfo.Periodicity = int.TryParse(daysTextField.Text, out var s) ? s : 1;
+                    recInfo.WeekDays = WeekDays.EveryDay;
+                    recInfo.Periodicity = int.TryParse(daysTextField.Text, out var s) ? s : 1;
                 }
                 else if (radioButton2.Enabled)
                 {
-                    viewModel.RecurrenceInfo.WeekDays = WeekDays.WorkDays;
+                    recInfo.WeekDays = WeekDays.WorkDays;
                 }
             }
 
@@ -236,7 +234,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
 
             public void Refresh()
             {
-                if (viewModel.RecurrenceInfo.Type != RecurrenceType.Daily)
+                if (recInfo.Type != RecurrenceType.Daily)
                 {
                     if (!Hidden)
                         Hidden = true;
@@ -246,28 +244,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
                 if (Hidden)
                     Hidden = false;
 
-                if (viewModel.RecurrenceInfo.WeekDays == WeekDays.EveryDay)
+                if (recInfo.WeekDays == WeekDays.EveryDay)
                 {
                     radioButton1.Enabled = true;
                     radioButton2.Enabled = false;
-                    daysTextField.Text = viewModel.RecurrenceInfo.Periodicity.ToString();
+                    daysTextField.Text = recInfo.Periodicity.ToString();
                 }
-                else if (viewModel.RecurrenceInfo.WeekDays == WeekDays.WorkDays)
+                else if (recInfo.WeekDays == WeekDays.WorkDays)
                 {
                     radioButton1.Enabled = false;
                     radioButton2.Enabled = true;
                 }
             }
 
-            public void SetViewModel(AddEditAppointmentViewModel ca)
+            public void SetViewModel(RecurrenceInfo ca)
             {
-                viewModel = ca;
+                recInfo = ca;
             }
         }
 
         class WeeklyView : UIView, IEditable
         {
-            AddEditAppointmentViewModel viewModel;
+            RecurrenceInfo recInfo;
 
             const float cellheight = 44f;
 
@@ -353,12 +351,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
 
             void UpdateModel()
             {
-                viewModel.RecurrenceInfo.Periodicity = int.TryParse(weeksTextField.Text, out var i) ? i : 1;
+                recInfo.Periodicity = int.TryParse(weeksTextField.Text, out var i) ? i : 1;
             }
 
             public void Refresh()
             {
-                if (viewModel.RecurrenceInfo.Type != RecurrenceType.Weekly)
+                if (recInfo.Type != RecurrenceType.Weekly)
                 {
                     if (!Hidden)
                         Hidden = true;
@@ -368,23 +366,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
                 if (Hidden)
                     Hidden = false;
 
-                weeksTextField.Text = viewModel.RecurrenceInfo.Periodicity.ToString();
-                var selected = Common.weekDays.Where(w => viewModel.RecurrenceInfo.WeekDays.HasFlag(w)).ToList();
+                weeksTextField.Text = recInfo.Periodicity.ToString();
+                var selected = Common.weekDays.Where(w => recInfo.WeekDays.HasFlag(w)).ToList();
                 weekdaysTableView.ReloadData();
                 (weekdaysTableView.Source as WeekdaysSource).SetSelected(weekdaysTableView, selected);
             }
 
-            public void SetViewModel(AddEditAppointmentViewModel ca)
+            public void SetViewModel(RecurrenceInfo ca)
             {
-                viewModel = ca;
+                recInfo = ca;
             }
 
             public void ChangedSelection(WeekDays weekday, bool selected)
             {
                 if (selected)
-                    viewModel.RecurrenceInfo.WeekDays |= weekday;
+                    recInfo.WeekDays |= weekday;
                 else
-                    viewModel.RecurrenceInfo.WeekDays &= ~weekday;
+                    recInfo.WeekDays &= ~weekday;
 
             }
 
@@ -447,15 +445,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
                         var index = data.FindIndex(s => s == w);
                         tableView.SelectRow(NSIndexPath.FromRowSection(index, 0), false, UITableViewScrollPosition.None);
                     }
-
                 }
             }
-
         }
 
         class MonthlyView : UIStackView, IEditable
         {
-            AddEditAppointmentViewModel viewModel;
+            RecurrenceInfo recInfo;
 
             RadioButton radioButton1;
             RadioButton radioButton2;
@@ -638,13 +634,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
 
             void UpdateWeekMonth(WeekOfMonth wm)
             {
-                viewModel.RecurrenceInfo.WeekOfMonth = wm;
+                recInfo.WeekOfMonth = wm;
                 SecondLine_Tapped();
             }
 
             void UpdateWeekDays(WeekDays wd)
             {
-                viewModel.RecurrenceInfo.WeekDays = wd;
+                recInfo.WeekDays = wd;
                 SecondLine_Tapped();
             }
 
@@ -652,19 +648,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
             {
                 if (radioButton1.Enabled)
                 {
-                    viewModel.RecurrenceInfo.WeekOfMonth = WeekOfMonth.None;
-                    viewModel.RecurrenceInfo.Periodicity = int.TryParse(monthsField1.Text, out var p) ? p : 1;
-                    viewModel.RecurrenceInfo.DayNumber = int.TryParse(dayTextField.Text, out var s) ? s : 1;
+                    recInfo.WeekOfMonth = WeekOfMonth.None;
+                    recInfo.Periodicity = int.TryParse(monthsField1.Text, out var p) ? p : 1;
+                    recInfo.DayNumber = int.TryParse(dayTextField.Text, out var s) ? s : 1;
                 }
                 else if (radioButton2.Enabled)
                 {
-                    viewModel.RecurrenceInfo.Periodicity = int.TryParse(monthsField2.Text, out var s) ? s : 1;
+                    recInfo.Periodicity = int.TryParse(monthsField2.Text, out var s) ? s : 1;
                 }
             }
 
             public void Refresh()
             {
-                if (viewModel.RecurrenceInfo.Type != RecurrenceType.Monthly)
+                if (recInfo.Type != RecurrenceType.Monthly)
                 {
                     if (!Hidden)
                         Hidden = true;
@@ -674,34 +670,34 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
                 if (Hidden)
                     Hidden = false;
 
-                if (viewModel.RecurrenceInfo.WeekOfMonth == WeekOfMonth.None)
+                if (recInfo.WeekOfMonth == WeekOfMonth.None)
                 {
                     radioButton1.Enabled = true;
                     radioButton2.Enabled = false;
-                    dayTextField.Text = viewModel.RecurrenceInfo.DayNumber.ToString();
-                    monthsField1.Text = viewModel.RecurrenceInfo.Periodicity.ToString();
+                    dayTextField.Text = recInfo.DayNumber.ToString();
+                    monthsField1.Text = recInfo.Periodicity.ToString();
                 }
                 else
                 {
                     radioButton1.Enabled = false;
                     radioButton2.Enabled = true;
 
-                    weekDayField.SetSelected(viewModel.RecurrenceInfo.WeekDays);
-                    weekOfMonthField.SetSelected(viewModel.RecurrenceInfo.WeekOfMonth);
+                    weekDayField.SetSelected(recInfo.WeekDays);
+                    weekOfMonthField.SetSelected(recInfo.WeekOfMonth);
 
-                    monthsField2.Text = viewModel.RecurrenceInfo.Periodicity.ToString();
+                    monthsField2.Text = recInfo.Periodicity.ToString();
                 }
             }
 
-            public void SetViewModel(AddEditAppointmentViewModel ca)
+            public void SetViewModel(RecurrenceInfo ca)
             {
-                viewModel = ca;
+                recInfo = ca;
             }
         }
 
         class YearlyView : UIStackView, IEditable
         {
-            AddEditAppointmentViewModel viewModel;
+            RecurrenceInfo recInfo;
 
             RadioButton radioButton1;
             RadioButton radioButton2;
@@ -845,19 +841,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
 
             private void UpdateWeekOfMonth(WeekOfMonth wm)
             {
-                viewModel.RecurrenceInfo.WeekOfMonth = wm;
+                recInfo.WeekOfMonth = wm;
                 SecondLine_Tapped();
             }
 
             void UpdateMonth(int i)
             {
-                viewModel.RecurrenceInfo.Month = i;
+                recInfo.Month = i;
                 SecondLine_Tapped();
             }
 
             void UpdateWeekDays(WeekDays wd)
             {
-                viewModel.RecurrenceInfo.WeekDays = wd;
+                recInfo.WeekDays = wd;
                 SecondLine_Tapped();
             }
 
@@ -865,14 +861,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
             {
                 if (radioButton1.Enabled)
                 {
-                    viewModel.RecurrenceInfo.WeekOfMonth = WeekOfMonth.None;
-                    viewModel.RecurrenceInfo.DayNumber = int.TryParse(dayTextField.Text, out var s) ? s : 1;
+                    recInfo.WeekOfMonth = WeekOfMonth.None;
+                    recInfo.DayNumber = int.TryParse(dayTextField.Text, out var s) ? s : 1;
                 }
             }
 
             public void Refresh()
             {
-                if (viewModel.RecurrenceInfo.Type != RecurrenceType.Yearly)
+                if (recInfo.Type != RecurrenceType.Yearly)
                 {
                     if (!Hidden)
                         Hidden = true;
@@ -882,27 +878,27 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
                 if (Hidden)
                     Hidden = false;
 
-                if (viewModel.RecurrenceInfo.WeekOfMonth == WeekOfMonth.None)
+                if (recInfo.WeekOfMonth == WeekOfMonth.None)
                 {
                     radioButton1.Enabled = true;
                     radioButton2.Enabled = false;
-                    dayTextField.Text = viewModel.RecurrenceInfo.DayNumber.ToString();
-                    monthField1.SetSelected(viewModel.RecurrenceInfo.Month);
+                    dayTextField.Text = recInfo.DayNumber.ToString();
+                    monthField1.SetSelected(recInfo.Month);
                 }
                 else
                 {
                     radioButton1.Enabled = false;
                     radioButton2.Enabled = true;
 
-                    weekDayField.SetSelected(viewModel.RecurrenceInfo.WeekDays);
-                    weekOfMonthField.SetSelected(viewModel.RecurrenceInfo.WeekOfMonth);
-                    monthField2.SetSelected(viewModel.RecurrenceInfo.Month);
+                    weekDayField.SetSelected(recInfo.WeekDays);
+                    weekOfMonthField.SetSelected(recInfo.WeekOfMonth);
+                    monthField2.SetSelected(recInfo.Month);
                 }
             }
 
-            public void SetViewModel(AddEditAppointmentViewModel ca)
+            public void SetViewModel(RecurrenceInfo ca)
             {
-                viewModel = ca;
+                recInfo = ca;
             }
         }
     }

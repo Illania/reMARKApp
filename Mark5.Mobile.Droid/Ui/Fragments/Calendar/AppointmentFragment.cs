@@ -38,7 +38,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         AppointmentSubjectView subjectView;
         AppointmentDateView dateView;
-        AppointmentReocurrenceView reocurrenceView;
         AppointmentLocationView locationView;
         AppointmentDescriptionView descriptionView;
         AppointmentOrganizerView organizerView;
@@ -46,6 +45,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         AppointmentReminderView reminderView;
         AppointmentPresenter presenter;
         AppointmentParticipantsView participantsView;
+
+        LinearLayoutCompat containerLayout;
+        List<View> subviews = new List<View>();
 
         public static (AppointmentFragment fragment, string tag) NewInstance(int calendarId, int appointmentId, int recurrenceIndex)
         {
@@ -84,44 +86,51 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             CommonConfig.Logger.Info($"Creating {nameof(AppointmentFragment)}");
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_base, container, false);
 
-            LinearLayoutCompat linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
+            containerLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
 
             subjectView = new AppointmentSubjectView(Context);
-            subjectView.SetPadding(largeSpacing, normalSpacing, largeSpacing, normalSpacing);
-            linearLayout.AddView(subjectView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
-
             dateView = new AppointmentDateView(Context);
-            dateView.SetPadding(largeSpacing, normalSpacing, largeSpacing, normalSpacing);
-            linearLayout.AddView(dateView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
-
             locationView = new AppointmentLocationView(Context);
-            locationView.SetPadding(largeSpacing, normalSpacing, largeSpacing, normalSpacing);
-            linearLayout.AddView(locationView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
-
             descriptionView = new AppointmentDescriptionView(Context);
-            descriptionView.SetPadding(largeSpacing, normalSpacing, largeSpacing, normalSpacing);
-            linearLayout.AddView(descriptionView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
-
             organizerView = new AppointmentOrganizerView(Context);
-            organizerView.SetPadding(largeSpacing, normalSpacing, largeSpacing, normalSpacing);
-            linearLayout.AddView(organizerView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
-
             calendarView = new AppointmentCalendarView(Context);
-            calendarView.SetPadding(largeSpacing, normalSpacing, largeSpacing, normalSpacing);
-            linearLayout.AddView(calendarView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
-
             reminderView = new AppointmentReminderView(Context);
-            reminderView.SetPadding(largeSpacing, normalSpacing, largeSpacing, normalSpacing);
-            linearLayout.AddView(reminderView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
-
             participantsView = new AppointmentParticipantsView(Context);
+
             participantsView.ShowParticipantsClicked += ParticipantsView_ShowParticipantsClicked;
             participantsView.SendInvitationClicked += SendInvitationsButton_TouchUpInside;
-            participantsView.SetPadding(largeSpacing, normalSpacing, largeSpacing, normalSpacing);
-            linearLayout.AddView(participantsView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
+
+            subviews.Add(subjectView);
+            subviews.Add(dateView);
+            subviews.Add(locationView);
+            subviews.Add(descriptionView);
+            subviews.Add(new SeparatorSubView(Context));
+            subviews.Add(organizerView);
+            subviews.Add(new SeparatorSubView(Context));
+            subviews.Add(calendarView);
+            subviews.Add(new SeparatorSubView(Context));
+            subviews.Add(reminderView);
+            subviews.Add(new SeparatorSubView(Context));
+            subviews.Add(participantsView);
+
+            foreach (var subview in subviews)
+            {
+                if (subview is SeparatorSubView)
+                {
+                    subview.LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, Conversion.ConvertDpToPixels(1));
+                }
+                else
+                {
+                    subview.SetPadding(largeSpacing, normalSpacing, largeSpacing, normalSpacing);
+                    subview.LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
+                }
+
+                containerLayout.AddView(subview);
+            }
+
+            containerLayout.Alpha = 0;
 
             HasOptionsMenu = true;
-
             return rootView;
         }
 
@@ -150,6 +159,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         }
 
         #region IAppointmentView implementation
+
         public void CloseView()
         {
             FragmentManager?.PopBackStack();
@@ -171,23 +181,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         public void ShowAppointment(AppointmentViewModel appointment)
         {
-            subjectView?.Refresh(appointment);
+            subviews.OfType<IAppointmentView>().ToList().ForEach(v => v.Refresh(appointment));
 
-            dateView?.Refresh(appointment);
+            //Fix separator
+            for (int i = 0; i < subviews.Count - 1; i++)
+            {
+                var current = subviews[i];
+                if (current is SeparatorSubView && subviews[i + 1].Visibility == ViewStates.Gone)
+                    current.Visibility = ViewStates.Gone;
+            }
 
-            reocurrenceView?.Refresh(appointment);
-
-            locationView?.Refresh(appointment);
-
-            descriptionView?.Refresh(appointment);
-
-            organizerView?.Refresh(appointment);
-
-            reminderView?.Refresh(appointment);
-
-            calendarView?.Refresh(appointment);
-
-            participantsView?.Refresh(appointment.Participants);
+            containerLayout.Animate().Alpha(1f).SetDuration(500);
         }
 
         public void ShowAppointmentLoadingDialog()
@@ -253,8 +257,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             {
                 AsyncHelpers.RunOnUiThreadAsync((Activity)Context, async () =>
                 {
-                    await Dialogs.ShowConfirmDialogAsync(Context, Resource.String.delete, Resource.String.delete_are_you_sure);
-                    await presenter.DeleteAppointmentClicked();
+                    var confirm = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete, Resource.String.delete_are_you_sure);
+                    if (confirm)
+                        await presenter.DeleteAppointmentClicked();
                 });
             }
             else
@@ -273,10 +278,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         #endregion
 
         #region Custom views
+
         private interface IAppointmentView
         {
             void Refresh(AppointmentViewModel viewModel);
-            void SetViewPadding(int left, int top, int right, int bottom);
+        }
+
+        class SeparatorSubView : View
+        {
+            public SeparatorSubView(Context c) : base(c)
+            {
+                SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightgray)));
+            }
         }
 
         class AppointmentSubjectView : AppCompatTextView, IAppointmentView
@@ -293,11 +306,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             public void Refresh(AppointmentViewModel viewModel)
             {
                 Text = viewModel.Subject;
-            }
-
-            public void SetViewPadding(int left, int top, int right, int bottom)
-            {
-                SetPadding(left, top, right, bottom);
             }
         }
 
@@ -336,11 +344,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
                 Text += $"\r\n{viewModel.RecurrenceInfo}";
             }
-
-            public void SetViewPadding(int left, int top, int right, int bottom)
-            {
-                SetPadding(left, top, right, bottom);
-            }
         }
 
         class AppointmentReocurrenceView : AppCompatTextView, IAppointmentView
@@ -357,11 +360,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             {
                 Text = viewModel.RecurrenceInfo;
             }
-
-            public void SetViewPadding(int left, int top, int right, int bottom)
-            {
-                SetPadding(left, top, right, bottom);
-            }
         }
 
         class AppointmentLocationView : AppCompatTextView, IAppointmentView
@@ -376,12 +374,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
             public void Refresh(AppointmentViewModel viewModel)
             {
+                if (string.IsNullOrEmpty(viewModel.Location))
+                    Visibility = ViewStates.Gone;
                 Text = viewModel.Location;
-            }
-
-            public void SetViewPadding(int left, int top, int right, int bottom)
-            {
-                SetPadding(left, top, right, bottom);
             }
         }
 
@@ -396,12 +391,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
             public void Refresh(AppointmentViewModel viewModel)
             {
+                if (string.IsNullOrEmpty(viewModel.Description))
+                    Visibility = ViewStates.Gone;
                 Text = viewModel.Description;
-            }
-
-            public void SetViewPadding(int left, int top, int right, int bottom)
-            {
-                SetPadding(left, top, right, bottom);
             }
         }
 
@@ -418,8 +410,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 AppCompatTextView title = new AppCompatTextView(Context)
                 {
                     Text = "Organizer",
-                    Gravity = GravityFlags.Left,
-                    LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent, 1f)
+                    LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent, 1)
                 };
                 title.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
                 AddView(title);
@@ -428,7 +419,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 {
                     Gravity = GravityFlags.Right,
                     Text = "",
-                    LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent, 1f)
+                    LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent)
                 };
                 label.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.black)));
                 AddView(label);
@@ -436,12 +427,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
             public void Refresh(AppointmentViewModel viewModel)
             {
+                if (string.IsNullOrEmpty(viewModel.Creator))
+                    Visibility = ViewStates.Gone;
                 label.Text = viewModel.Creator;
-            }
-
-            public void SetViewPadding(int left, int top, int right, int bottom)
-            {
-                SetPadding(left, top, right, bottom);
             }
         }
 
@@ -484,7 +472,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
                 if (viewModel.ReminderTimeBefore == 0)
                 {
-                    label.Text = "At time of event"; //TODO localization..?
+                    label.Text = "At time of event";
                     return;
                 }
 
@@ -506,11 +494,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
                 label.Text += " before";
             }
-
-            public void SetViewPadding(int left, int top, int right, int bottom)
-            {
-                SetPadding(left, top, right, bottom);
-            }
         }
 
         class AppointmentCalendarView : LinearLayoutCompat, IAppointmentView
@@ -527,19 +510,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 AppCompatTextView title = new AppCompatTextView(Context)
                 {
                     Text = "Calendar",
-                    Gravity = GravityFlags.Left,
-                    LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent, 0.8f)
+                    LayoutParameters = new LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1)
+                    {
+                        Gravity = (int)GravityFlags.Left,
+                    },
                 };
                 title.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
                 AddView(title);
 
                 colorCircle = new View(Context)
                 {
-                    LayoutParameters = new LayoutParams(Conversion.ConvertDpToPixels(10), Conversion.ConvertDpToPixels(10))
+                    LayoutParameters = new LayoutParams(Conversion.ConvertDpToPixels(12), Conversion.ConvertDpToPixels(12))
                     {
-                        Gravity = (int)GravityFlags.CenterVertical,
-                        BottomMargin = 10,
-                        TopMargin = 10,
+                        Gravity = (int)GravityFlags.Right | (int)GravityFlags.CenterVertical,
+                        RightMargin = Conversion.ConvertDpToPixels(5),
                     }
                 };
                 AddView(colorCircle);
@@ -547,7 +531,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 label = new AppCompatTextView(Context)
                 {
                     Gravity = GravityFlags.Right,
-                    LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent, 0.2f),
+                    LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
+                    {
+                        Gravity = (int)GravityFlags.Right,
+                    },
                     Text = ""
                 };
                 label.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.black)));
@@ -572,14 +559,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 HexColor = calendarViewModel?.HexColor;
                 label.Text = calendarViewModel?.Name;
             }
-
-            public void SetViewPadding(int left, int top, int right, int bottom)
-            {
-                SetPadding(left, top, right, bottom);
-            }
         }
 
-        class AppointmentParticipantsView : LinearLayoutCompat
+        class AppointmentParticipantsView : LinearLayoutCompat, IAppointmentView
         {
             HeaderView headerView;
             SendInvitationsButton sendInvitationsButton;
@@ -592,6 +574,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             {
                 Orientation = Vertical;
                 LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
+            }
+
+            public void Refresh(AppointmentViewModel viewModel)
+            {
+                Refresh(viewModel.Participants);
             }
 
             public void Refresh(List<ParticipantsViewModel> participants)
@@ -608,7 +595,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
                 foreach (var participant in participants)
                 {
-                    ParticiapntView partView = new ParticiapntView(Context)
+                    ParticipantView partView = new ParticipantView(Context)
                     {
                         LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent)
                     };
@@ -627,11 +614,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 }
             }
 
-            public void SetViewPadding(int left, int top, int right, int bottom)
-            {
-                SetPadding(left, top, right, bottom);
-            }
-
             private void HeaderView_Touch(object sender, TouchEventArgs e)
             {
                 ShowParticipantsClicked(sender, e);
@@ -643,11 +625,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 {
                     Text = "Send Invitations";
                     SetTextColor(new Color(ContextCompat.GetColor(context, Resource.Color.darkerblue)));
-                }
-
-                public void SetViewPadding(int left, int top, int right, int bottom)
-                {
-                    SetPadding(left, top, right, bottom);
                 }
             }
 
@@ -679,19 +656,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                     label.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.black)));
                     AddView(label);
 
-                    AppCompatImageButton appCompatImageButton = new AppCompatImageButton(Context)
-                    {
-                        LayoutParameters = new LayoutParams(Conversion.ConvertDpToPixels(10), Conversion.ConvertDpToPixels(16), 0.1f)
-                        {
-                            Gravity = (int)GravityFlags.CenterVertical | (int)GravityFlags.Right,
-                            BottomMargin = 5,
-                            TopMargin = 5
-                        },
-                        Clickable = false
-                    };
+                    //AppCompatImageButton appCompatImageButton = new AppCompatImageButton(Context)  //TODO for now we do not show it, as it is not clickable
+                    //{
+                    //    LayoutParameters = new LayoutParams(Conversion.ConvertDpToPixels(10), Conversion.ConvertDpToPixels(16), 0.1f)
+                    //    {
+                    //        Gravity = (int)GravityFlags.CenterVertical | (int)GravityFlags.Right,
+                    //        BottomMargin = 5,
+                    //        TopMargin = 5
+                    //    },
+                    //    Clickable = false
+                    //};
 
-                    appCompatImageButton.SetImageResource(Resource.Drawable.arrow_right);
-                    AddView(appCompatImageButton);
+                    //appCompatImageButton.SetImageResource(Resource.Drawable.arrow_right);
+                    //AddView(appCompatImageButton);
 
                     SetPadding(0, 0, 0, Conversion.ConvertDpToPixels(8f));
                 }
@@ -702,12 +679,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 }
             }
 
-            private class ParticiapntView : LinearLayoutCompat
+            private class ParticipantView : LinearLayoutCompat
             {
                 readonly AppCompatTextView label;
                 readonly AppCompatImageView appCompatImageButton;
 
-                public ParticiapntView(Context context) : base(context)
+                public ParticipantView(Context context) : base(context)
                 {
                     Orientation = Horizontal;
                     LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
