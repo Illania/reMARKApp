@@ -86,14 +86,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             return rootView;
         }
 
-        public override void OnViewCreated(View view, Bundle savedInstanceState)
+        public override async void OnViewCreated(View view, Bundle savedInstanceState)
         {
             base.OnViewCreated(view, savedInstanceState);
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.participants);
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
-            _ = RefreshView();
+            await RefreshView();
 
             CommonConfig.Logger.Info($"Created {nameof(AddEditParticipantsFragment)}");
         }

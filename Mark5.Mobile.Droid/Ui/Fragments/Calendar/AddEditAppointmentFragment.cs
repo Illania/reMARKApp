@@ -283,7 +283,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         public Task ShowAddingEditingError(Exception ex)
         {
-            throw new NotImplementedException();
+            return Dialogs.ShowErrorDialogAsync(Context, ex);
         }
 
         public void ShowAppointment(AddEditAppointmentViewModel viewModel)
@@ -320,7 +320,27 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         public void UpdateCalendarsList(List<CalendarViewModel> calendars)
         {
-            throw new NotImplementedException();
+            // TODO :
+        }
+
+        public Task ShowLoadError(Exception ex)
+        {
+            return Dialogs.ShowErrorDialogAsync(Context, ex);
+        }
+
+        public void ShowEditingLoading()
+        {
+            //TODO : throw new NotImplementedException();
+        }
+
+        public void StopEditingLoading()
+        {
+            //TODO : 
+        }
+
+        public Task ShowEditingError(Exception ex)
+        {
+            return Dialogs.ShowErrorDialogAsync(Context, ex);
         }
         #endregion
     }
