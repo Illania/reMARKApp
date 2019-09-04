@@ -159,7 +159,7 @@ namespace Mark5.Mobile.Droid
 
         void CalendarSelected(CalendarViewModel viewModel)
         {
-            tcs.SetResult(viewModel);
+            tcs.TrySetResult(viewModel);
         }
 
         #endregion

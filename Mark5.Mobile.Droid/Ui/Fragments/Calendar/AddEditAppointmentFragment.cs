@@ -116,6 +116,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             if (Arguments.ContainsKey(CreationModeFlagBundleKey))
                 creationModeFlag = (ContactCreationModeFlag)Arguments.GetInt(CreationModeFlagBundleKey);
 
+            if (Arguments.ContainsKey(AppointmentIdBundleKey))
+                appointmentId = Arguments.GetInt(AppointmentIdBundleKey);
+
+            if (Arguments.ContainsKey(CalendarIdBundleKey))
+                calendarId = Arguments.GetInt(CalendarIdBundleKey);
+
             presenter = new AddEditAppointmentPresenter();
             presenter.AttachView(this);
         }
@@ -164,7 +170,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                     await presenter.LoadEmptyAppointment();
                 else
                     await presenter.LoadAppointment(calendarId, appointmentId);
-
                 loaded = true;
             }
             else
@@ -173,11 +178,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 if (viewModel != null)
                     ShowAppointment(viewModel);
             }
-        }
-
-        public override async void OnActivityResult(int requestCode, int resultCode, Intent data)
-        {
-
         }
 
         #endregion
@@ -278,7 +278,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         #region IAddEditAppointmentView implementation
         public void CloseView()
         {
-            throw new NotImplementedException();
+            ((AppCompatActivity)Activity).SupportFragmentManager.PopBackStack();
         }
 
         public Task ShowAddingEditingError(Exception ex)
@@ -288,19 +288,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         public void ShowAppointment(AddEditAppointmentViewModel viewModel)
         {
-            this.viewModel = viewModel;
-
-            foreach (var subview in subviews)
+            if (viewModel != null)
             {
-                subview.ViewModel = viewModel;
-                subview.CreationMode = creationModeFlag;
-                subview.RefreshView();
+                this.viewModel = viewModel;
+
+                foreach (var subview in subviews)
+                {
+                    subview.ViewModel = viewModel;
+                    subview.CreationMode = creationModeFlag;
+                    subview.RefreshView();
+                }
             }
         }
 
-        public Task ShowLoadError()
+        public async Task ShowLoadError()
         {
-            throw new NotImplementedException();
+            await Dialogs.ShowErrorDialogAsync(Context, new Exception("Failed to load appointment data"));
         }
 
         public void ShowLoading()
