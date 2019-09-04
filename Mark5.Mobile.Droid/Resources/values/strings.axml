@@ -5,6 +5,7 @@
     <string name="add_comment_hint">Insert new comment</string>
     <string name="add_tite">Add title</string>
     <string name="add_location">Add location</string>
+    <string name="add_message">Add message</string>
     <string name="add_favorites">Add to favourites</string>
     <string name="add_offline">Enable sync</string>
     <string name="adding_comment">Adding comment</string>
@@ -442,6 +443,7 @@
     <string name="send_report_with_mark5_content">Do you want to send the generated report with reMARK?\n\nPlease note that these reports are not monitored 24/7 and will be available to developers only. If you need direct assistance, contact Nordic IT Support.</string>
     <string name="send_feedback_with_mark5_content">Do you want to send feedback with reMARK?</string>
     <string name="set_priority">Set priority</string>
+    <string name="set_reminder">Set reminder</string>
     <string name="setting_priority">Setting priority...</string>
     <string name="settings">Settings</string>
     <string name="share">Share</string>

@@ -2,18 +2,18 @@
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Android.OS;
+using Android.App;
 using Android.Views;
-using Android.Support.V4.Widget;
+using Android.Content;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
+using Android.Support.V4.Widget;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Ui.Common;
-using Mark5.Mobile.Common.Presenters.CalendarModule;
-using Mark5.Mobile.Droid.Ui.Activities;
-using Android.Content;
-using Android.App;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Common.Presenters.CalendarModule;
+using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Ui.Activities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 {
@@ -184,7 +184,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         private void OnSaveParticipantsClicked()
         {
-            tcs.SetResult(participants);
+            tcs.TrySetResult(participants);
+            ((AppCompatActivity)Activity).SupportFragmentManager.PopBackStack();
         }
 
         async void OnAddContactClicked()
