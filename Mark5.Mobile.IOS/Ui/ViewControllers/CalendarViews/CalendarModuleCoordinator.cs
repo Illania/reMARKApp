@@ -146,7 +146,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         public void HourTapped(NSDate date)
         {
-            //Create appointment view with start date set;
+            // Todo Create appointment view with start date set;
         }
 
         public void CalendarsClicked()
