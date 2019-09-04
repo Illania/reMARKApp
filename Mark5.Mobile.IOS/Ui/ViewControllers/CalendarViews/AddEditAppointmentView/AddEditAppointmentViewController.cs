@@ -928,7 +928,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
                 public override void OnClicked(NSIndexPath indexPath)
                 {
-                    ViewController?.NavigationController?.PushViewController(new AppointmentParticipantsViewController(ViewModel), true);
+                    ViewController?.NavigationController?.PushViewController(new AddEditAppointmentParticipantsViewController(ViewModel), true);
                 }
             }
 

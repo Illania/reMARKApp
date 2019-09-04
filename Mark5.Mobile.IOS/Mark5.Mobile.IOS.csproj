@@ -288,7 +288,7 @@
 		<Compile Include="Ui\TableViewCells\AddEditTableViewCells\AddEditAppointmentTableViewCell\ReminderDisclosuerTableViewCell.cs" />
 		<Compile Include="Ui\ViewControllers\CalendarViews\AddEditAppointmentView\AddEditAppointmentCalendarListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\CalendarViews\AddEditAppointmentView\AddEditAppointmentViewController.cs" />
-		<Compile Include="Ui\ViewControllers\CalendarViews\AddEditAppointmentView\AppointmentParticipantsViewController.cs" />
+		<Compile Include="Ui\ViewControllers\CalendarViews\AddEditAppointmentView\AddEditAppointmentParticipantsViewController.cs" />
 		<Compile Include="Ui\ViewControllers\CalendarViews\AddEditAppointmentView\RecurrenceView\ReoccurrenceViewController.cs" />
 		<Compile Include="Ui\ViewControllers\CalendarViews\AddEditAppointmentView\RecurrenceView\Subviews\Common.cs" />
 		<Compile Include="Ui\ViewControllers\CalendarViews\AddEditAppointmentView\RecurrenceView\Subviews\PatternView.cs" />
