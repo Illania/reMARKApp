@@ -100,6 +100,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             participantsView.ShowParticipantsClicked += ParticipantsView_ShowParticipantsClicked;
             participantsView.SendInvitationClicked += SendInvitationsButton_TouchUpInside;
 
+
+            foreach (var subview in subviews)
+            {
+                if (subview.Parent != null)
+                    ((ViewGroup)subview.Parent).RemoveView(subview);
+            }
+
+            subviews = new List<View>();
+
             subviews.Add(subjectView);
             subviews.Add(dateView);
             subviews.Add(locationView);
