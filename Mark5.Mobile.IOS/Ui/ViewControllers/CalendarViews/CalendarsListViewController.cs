@@ -154,25 +154,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
                 var cavm = GetViewModelForIndexPath(indexPath);
-                if (calendarSelected != null)
-                    calendarSelected?.Invoke(cavm);
-                else
-                {
-                    tableView.CellAt(indexPath).Accessory = UITableViewCellAccessory.Checkmark;
-                    SelectedCalendars[cavm] = true;
-                    calendarSelected?.Invoke(cavm);
-                }
+
+                tableView.CellAt(indexPath).Accessory = UITableViewCellAccessory.Checkmark;
+                SelectedCalendars[cavm] = true;
+                calendarSelected?.Invoke(cavm);
             }
 
             public override void RowDeselected(UITableView tableView, NSIndexPath indexPath)
             {
-                if (calendarSelected != null)
-                    calendarSelected?.Invoke(null);
-                else
-                {
-                    tableView.CellAt(indexPath).Accessory = UITableViewCellAccessory.None;
-                    SelectedCalendars[GetViewModelForIndexPath(indexPath)] = false;
-                }
+                tableView.CellAt(indexPath).Accessory = UITableViewCellAccessory.None;
+                SelectedCalendars[GetViewModelForIndexPath(indexPath)] = false;
             }
 
             CalendarViewModel GetViewModelForIndexPath(NSIndexPath indexPath)
