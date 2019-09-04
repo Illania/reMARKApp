@@ -1,5 +1,6 @@
-﻿using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Presenters.CalendarModule;
+﻿using System.Threading.Tasks;
+using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
 
@@ -7,17 +8,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
 {
     public class RecurrenceViewController : AbstractViewController
     {
-        //TODO after the merge, the addEditAppointmentPresenter, needs to give default values to all parameters of recurring info
-        //And need to find a way to remove the recurring part
+        readonly TaskCompletionSource<RecurrenceInfo> tcs = new TaskCompletionSource<RecurrenceInfo>();
+        public Task<RecurrenceInfo> Result => tcs.Task;
 
         PatternView patternView;
         RangeView rangeView;
 
-        AddEditAppointmentViewModel vm;
+        RecurrenceInfo recInfo;
 
-        public RecurrenceViewController(AddEditAppointmentViewModel vm)
+        UIBarButtonItem cancelButton;
+        UIBarButtonItem doneButton;
+
+        private RecurrenceViewController(RecurrenceInfo ri)
         {
-            this.vm = vm;
+            recInfo = Serializer.Deserialize<RecurrenceInfo>(Serializer.Serialize(ri));
+        }
+
+        public static RecurrenceViewController Create(RecurrenceInfo ri)
+        {
+            return new RecurrenceViewController(ri);
         }
 
         public override void LoadView()
@@ -25,17 +34,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
             base.LoadView();
 
             InitializeView();
+            InitializeNavigationBar();
         }
 
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
 
-            patternView.SetViewModel(vm);
-            rangeView.SetViewModel(vm);
+            patternView.SetViewModel(recInfo);
+            rangeView.SetViewModel(recInfo);
 
             patternView.Refresh();
             rangeView.Refresh();
+        }
+
+        void InitializeNavigationBar()
+        {
+            cancelButton = new UIBarButtonItem(UIBarButtonSystemItem.Cancel);
+            doneButton = new UIBarButtonItem(UIBarButtonSystemItem.Done);
+
+            cancelButton.Clicked += CancelButton_Clicked;
+            doneButton.Clicked += DoneButton_Clicked;
+
+            NavigationItem.LeftBarButtonItem = cancelButton;
+            NavigationItem.RightBarButtonItem = doneButton;
         }
 
         void InitializeView()
@@ -83,6 +105,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
             var gestureRecognizer = new UITapGestureRecognizer(() => View.EndEditing(true));
             gestureRecognizer.CancelsTouchesInView = false;
             View.AddGestureRecognizer(gestureRecognizer);
+        }
+
+        void DoneButton_Clicked(object sender, System.EventArgs e)
+        {
+            tcs.SetResult(recInfo);
+            NavigationController?.PopViewController(true);
+
+        }
+
+        void CancelButton_Clicked(object sender, System.EventArgs e)
+        {
+            tcs.SetResult(null);
+            NavigationController?.PopViewController(true);
         }
     }
 }

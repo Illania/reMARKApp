@@ -38,7 +38,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
             endView.Refresh();
         }
 
-        public void SetViewModel(AddEditAppointmentViewModel ca)
+        public void SetViewModel(RecurrenceInfo ca)
         {
             headerView.SetViewModel(ca);
             endView.SetViewModel(ca);
@@ -46,7 +46,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
 
         class HeaderView : UIView, IEditable
         {
-            AddEditAppointmentViewModel viewModel;
+            RecurrenceInfo recInfo;
             DateField startDateField;
 
             public event EventHandler Updated = delegate { };
@@ -83,23 +83,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
 
             private void UpdateStartDate(DateTime date)
             {
-                viewModel.RecurrenceInfo.StartDate = date;
+                recInfo.StartDate = date;
             }
 
             public void Refresh()
             {
-                startDateField.SetSelected(viewModel.RecurrenceInfo.StartDate);
+                startDateField.SetSelected(recInfo.StartDate);
             }
 
-            public void SetViewModel(AddEditAppointmentViewModel ca)
+            public void SetViewModel(RecurrenceInfo ca)
             {
-                viewModel = ca;
+                recInfo = ca;
             }
         }
 
         class EndView : UIStackView, IEditable
         {
-            AddEditAppointmentViewModel viewModel;
+            RecurrenceInfo recInfo;
 
             RadioButton radioButton1;
             RadioButton radioButton2;
@@ -240,7 +240,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
 
             private void UpdateEndDate(DateTime date)
             {
-                viewModel.RecurrenceInfo.EndDate = date;
+                recInfo.EndDate = date;
             }
 
             private void OccurrenceField_TextChanged(object sender, EventArgs e)
@@ -250,38 +250,44 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
 
             void UpdateModel()
             {
-                viewModel.RecurrenceInfo.OccurrenceCount = int.TryParse(occurrenceField.Text, out var p) ? p : 1;
+                recInfo.OccurrenceCount = int.TryParse(occurrenceField.Text, out var p) ? p : 1;
+
+                if (radioButton1.Enabled)
+                    recInfo.Range = RecurrenceRange.NoEndDate;
+                else if (radioButton2.Enabled)
+                    recInfo.Range = RecurrenceRange.OccurrenceCount;
+                else if (radioButton3.Enabled)
+                    recInfo.Range = RecurrenceRange.EndByDate;
             }
 
             public void Refresh()
             {
-                if (viewModel.RecurrenceInfo.Range == RecurrenceRange.NoEndDate)
+                switch (recInfo.Range)
                 {
-                    radioButton1.Enabled = true;
-                    radioButton2.Enabled = false;
-                    radioButton3.Enabled = false;
+                    case RecurrenceRange.NoEndDate:
+                        radioButton1.Enabled = true;
+                        radioButton2.Enabled = false;
+                        radioButton3.Enabled = false;
+                        break;
+                    case RecurrenceRange.OccurrenceCount:
+                        radioButton1.Enabled = false;
+                        radioButton2.Enabled = true;
+                        radioButton3.Enabled = false;
+                        break;
+                    case RecurrenceRange.EndByDate:
+                        radioButton1.Enabled = false;
+                        radioButton2.Enabled = false;
+                        radioButton3.Enabled = true;
+                        break;
                 }
-                else if (viewModel.RecurrenceInfo.Range == RecurrenceRange.OccurrenceCount)
-                {
-                    radioButton1.Enabled = false;
-                    radioButton2.Enabled = true;
-                    radioButton3.Enabled = false;
 
-                    occurrenceField.Text = viewModel.RecurrenceInfo.OccurrenceCount.ToString();
-                }
-                else if (viewModel.RecurrenceInfo.Range == RecurrenceRange.EndByDate)
-                {
-                    radioButton1.Enabled = false;
-                    radioButton2.Enabled = false;
-                    radioButton3.Enabled = true;
-
-                    endDateField.SetSelected(viewModel.RecurrenceInfo.EndDate);
-                }
+                occurrenceField.Text = recInfo.OccurrenceCount.ToString();
+                endDateField.SetSelected(recInfo.EndDate);
             }
 
-            public void SetViewModel(AddEditAppointmentViewModel vm)
+            public void SetViewModel(RecurrenceInfo vm)
             {
-                viewModel = vm;
+                recInfo = vm;
             }
         }
     }

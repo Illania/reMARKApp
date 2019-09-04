@@ -109,6 +109,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             searchController.SearchResultsUpdater = null;
             searchController = null;
+
+            tcs?.TrySetResult(null);
         }
 
         protected override void Dispose(bool disposing)

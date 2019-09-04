@@ -55,9 +55,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             DisableSearch = disableSearch;
         }
 
-        /// <summary>
-        ///     This constructor MUST NOT be public!
-        /// </summary>
         protected AbstractFoldersListViewController(Folder folder, bool disableRowActions, bool disableNavigationBarActions, bool disableSearch)
             : base(UITableViewStyle.Plain)
         {

@@ -84,7 +84,8 @@
 "copying___" = "Copying...";
 "copying_to_own_worktray___" = "Copying to own To-do list...";
 "copying_to_worktray___" = "Copying to To-do list...";
-"create_appointment" = "Create Appointment";
+"create_appointment" = "Create appointment";
+"creating_appointment___" = "Creating appointment...";
 "create_report" = "Create report";
 "creating_system_report___" = "Creating system report...";
 "creator" = "Creator";
@@ -139,6 +140,7 @@
 "downloading_percentage___" = "Downloading {0}%...";
 "edit" = "Edit";
 "edit_appointment" = "Edit Appointment";
+"editing_appointment___" = "Editing appointment...";
 "edit_categories" = "Edit categories";
 "edit_contact" = "Edit contact";
 "edit_contact_create_person" = "New person";
@@ -238,6 +240,7 @@
 "marking_document_as_read___" = "Marking email as read...";
 "marking_document_as_unread___" = "Marking email as unread...";
 "me" = "Me";
+"message" = "Message";
 "middle_name" = "Middle name";
 "mobile" = "Mobile";
 "more" = "More";

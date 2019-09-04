@@ -87,7 +87,7 @@ namespace Mark5.Mobile.IOS
 
         public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
         {
-            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("MTI5NjA0QDMxMzcyZTMyMmUzMEV5SitXQWp3Smx0eWUxK0psY0R6RVE1UWdBTUpURTRIbGdRU0pnRTdHODQ9=");
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("MTM2NTEwQDMxMzcyZTMyMmUzMFJ0SVQvVmIzbmQrejNkd1Z0cVF4eXBIdFViUUY4eDVvbXZrdDBrT2xkaTg9");
 
             Crashes.GetErrorAttachments =
     report => { return new[] { ErrorAttachmentLog.AttachmentWithText(SystemReportCollector.CreateLogReport(), "deviceLogs.txt") }; };
@@ -525,7 +525,7 @@ namespace Mark5.Mobile.IOS
 
                 ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
 
-                if (await Managers.CleanUpManager.IsCleanUpNecessary(PlatformConfig.Preferences.CleanCacheIntervalDays))  //TODO testing
+                if (await Managers.CleanUpManager.IsCleanUpNecessary(PlatformConfig.Preferences.CleanCacheIntervalDays))
                 {
                     CommonConfig.Logger.Info("Cleaning up cache....");
                     await Managers.CleanUpManager.CleanUp();
