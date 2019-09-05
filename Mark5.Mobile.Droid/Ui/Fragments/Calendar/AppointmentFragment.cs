@@ -32,7 +32,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         int appointmentId;
         int recurrenceIndex;
 
-        bool loaded;
         Action dismissLoadingAction;
         List<LineViewModel> lineViewModels;
 

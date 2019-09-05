@@ -20,6 +20,7 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Presenters.CalendarModule;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
+using System.Linq;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 {
@@ -28,13 +29,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         const string CreationModeFlagBundleKey = "CreationModeFlag_ab9071da-34f6-45fc-9a03-a0b348814dcd";
         const string AppointmentIdBundleKey = "AppointmentId_d09e0cb6-e224-4327-8d09-43ce921f53c6";
         const string CalendarIdBundleKey = "CalendarId_d09e0cb6-e224-4327-8d09-43ce921f53c6";
+        const string StartDateIdBundleKey = "StartDate_3b43a244-6a24-496f-9d33-1eeb1c277005";
 
         AddEditAppointmentPresenter presenter;
 
         ContactCreationModeFlag creationModeFlag;
         bool loaded;
-        static int calendarId;
-        static int appointmentId;
+        int calendarId;
+        int appointmentId;
+        DateTime startDate;
 
         LinearLayoutCompat linearLayout;
         NestedScrollView scrollView;
@@ -47,9 +50,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         AddEditAppointmentViewModel viewModel;
 
-        List<AddEditAppointmentView> subviews = new List<AddEditAppointmentView>();
+        List<View> subviews = new List<View>();
 
-        public static (AddEditAppointmentFragment fragment, string tag) NewInstance()
+        public static (AddEditAppointmentFragment fragment, string tag) NewInstance(DateTime startDate = default)
         {
             Bundle args = new Bundle();
 
@@ -59,6 +62,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             };
 
             args.PutInt(CreationModeFlagBundleKey, (int)ContactCreationModeFlag.New);
+            args.PutLong(StartDateIdBundleKey, startDate.Ticks);
 
             var tag = $"{nameof(AddEditAppointmentFragment)}";
 
@@ -82,31 +86,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
             return (fragment, tag);
         }
-        #region IMenu
-        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
-        {
-            menu.Clear();
-
-            var addAppointment = menu.Add(Menu.None, MenuItemActions.SaveAppointment, MenuItemActions.SaveAppointment, Resource.String.save);  //TODO change
-            addAppointment.SetIcon(Resource.Drawable.action_save);
-            addAppointment.SetShowAsAction(ShowAsAction.Always);
-            addAppointment.SetOnMenuItemClickListener(this);
-        }
-
-        public bool OnMenuItemClick(IMenuItem item)
-        {
-            if (item.ItemId == MenuItemActions.SaveAppointment)
-                return false;
-
-            return true;
-        }
-
-        static class MenuItemActions
-        {
-            public const int SaveAppointment = 10;
-        }
-
-        #endregion
 
         #region Fragment Lifecycle
         public override void OnCreate(Bundle savedInstanceState)
@@ -121,6 +100,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
             if (Arguments.ContainsKey(CalendarIdBundleKey))
                 calendarId = Arguments.GetInt(CalendarIdBundleKey);
+
+            if (Arguments.ContainsKey(StartDateIdBundleKey))
+                startDate = new DateTime(Arguments.GetLong(StartDateIdBundleKey));  //TODO check if the datetime kind is there
 
             presenter = new AddEditAppointmentPresenter();
             presenter.AttachView(this);
@@ -167,10 +149,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             if (!loaded)
             {
                 if (creationModeFlag == ContactCreationModeFlag.New)
-                    await presenter.LoadEmptyAppointment();
+                    await presenter.LoadEmptyAppointment(startDate);
                 else
                     await presenter.LoadAppointment(calendarId, appointmentId);
                 loaded = true;
+
+                StopLoading();
             }
             else
             {
@@ -182,21 +166,54 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         #endregion
 
+        #region IMenu
+
+        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
+        {
+            menu.Clear();
+
+            var addAppointment = menu.Add(Menu.None, MenuItemActions.SaveAppointment, MenuItemActions.SaveAppointment, Resource.String.save);  //TODO change
+            addAppointment.SetIcon(Resource.Drawable.action_save);
+            addAppointment.SetShowAsAction(ShowAsAction.Always);
+            addAppointment.SetOnMenuItemClickListener(this);
+        }
+
+        public bool OnMenuItemClick(IMenuItem item)
+        {
+            if (item.ItemId == MenuItemActions.SaveAppointment)
+                return false;
+
+            return true;
+        }
+
+        static class MenuItemActions
+        {
+            public const int SaveAppointment = 10;
+        }
+
+        #endregion
+
         #region Helpers
 
         void PrepareViews()
         {
             subviews.Add(new NameView(Context));
-            subviews.Add(new LocationView(Context));
+            subviews.Add(new SeparatorSubview(Context));
+            subviews.Add(calendarView = new CalendarView(Context, CalendarClicked));
+            subviews.Add(new SeparatorSubview(Context));
             subviews.Add(new AllDayToggleView(Context, AllDayToggleChanged));
             subviews.Add(startDateView = new StartDateView(Context));
             subviews.Add(endDateView = new EndDateView(Context));
-            subviews.Add(new ReminderView(Context));
             subviews.Add(new ReocurrenceView(Context, ReocurrenceClicked));
-            subviews.Add(calendarView = new CalendarView(Context, CalendarClicked));
+            subviews.Add(new SeparatorSubview(Context));
             subviews.Add(participantsView = new ParticipantsView(Context, ParticipantsClicked));
+            subviews.Add(new SeparatorSubview(Context));
+            subviews.Add(new LocationView(Context));
+            subviews.Add(new SeparatorSubview(Context));
+            subviews.Add(new ReminderView(Context));
+            subviews.Add(new SeparatorSubview(Context));
             subviews.Add(new MessageView(Context));
-
+            subviews.Add(new SeparatorSubview(Context));
             subviews.ForEach(linearLayout.AddView);
         }
 
@@ -228,8 +245,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                            .SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right)
                            .Replace(Resource.Id.fragment_container, aepf, tag)
                            .AddToBackStack(tag).Commit();
-
-
 
             var result = await aepf.TaskResult;
             if (result != null && viewModel != null)
@@ -276,6 +291,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         #endregion
 
         #region IAddEditAppointmentView implementation
+
         public void CloseView()
         {
             ((AppCompatActivity)Activity).SupportFragmentManager.PopBackStack();
@@ -292,10 +308,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             {
                 this.viewModel = viewModel;
 
-                foreach (var subview in subviews)
+                foreach (var subview in subviews.OfType<AddEditAppointmentView>())
                 {
                     subview.ViewModel = viewModel;
-                    subview.CreationMode = creationModeFlag;
                     subview.RefreshView();
                 }
             }
@@ -342,42 +357,71 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         {
             return Dialogs.ShowErrorDialogAsync(Context, ex);
         }
+
         #endregion
     }
 
-    abstract class AbstractAddEditAppointmentView : LinearLayoutCompat
+    class SeparatorSubview : View
+    {
+        public SeparatorSubview(Context c) : base(c)
+        {
+            SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightgray)));
+            LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, Conversion.ConvertDpToPixels(1.5f));
+        }
+    }
+
+    class BasicTextView : AppCompatTextView
+    {
+        public BasicTextView(Context context) : base(context)
+        {
+            SetPadding(0, 0, 0, 0);
+            SetBackgroundColor(Color.Transparent);
+            this.SetTextAppearanceCompat(context, Resource.Style.editAppointmentText);
+        }
+    }
+
+    class BasicTextField : AppCompatEditText
+    {
+        public BasicTextField(Context context) : base(context)
+        {
+            LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent);
+            SetPadding(0, 0, 0, 0);
+            SetBackgroundColor(Color.Transparent);
+            SetHintTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
+            this.SetTextAppearanceCompat(context, Resource.Style.editAppointmentField);
+        }
+    }
+
+    class TitleTextField : AppCompatEditText
+    {
+        public TitleTextField(Context context) : base(context)
+        {
+            LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent);
+            SetPadding(0, 0, 0, 0);
+            SetBackgroundColor(Color.Transparent);
+            SetHintTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
+            this.SetTextAppearanceCompat(context, Resource.Style.editAppointmentTitle);
+        }
+    }
+
+
+    abstract class AddEditAppointmentView : LinearLayoutCompat
     {
         protected static int DistanceLarge = Conversion.ConvertDpToPixels(16f);
         protected static int DistanceNormal = Conversion.ConvertDpToPixels(8f);
         protected static int DistanceSmall = Conversion.ConvertDpToPixels(4f);
         protected static int DistanceVerySmall = Conversion.ConvertDpToPixels(4f);
 
-        protected AbstractAddEditAppointmentView(Context context)
+        public AddEditAppointmentViewModel ViewModel;
+        readonly AppCompatImageView icon;
+
+        protected AddEditAppointmentView(Context context, int resourceId = -1)
             : base(context)
         {
             Orientation = Horizontal;
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-            SetPadding(DistanceLarge, DistanceNormal, DistanceLarge, DistanceNormal);
+            SetPadding(DistanceLarge, DistanceLarge, DistanceLarge, DistanceLarge);
 
-            LayoutTransition = new LayoutTransition();
-        }
-
-        abstract public void RefreshView();
-
-        public void LeadingIcon()
-        {
-        }
-    }
-
-    abstract class AddEditAppointmentView : AbstractAddEditAppointmentView
-    {
-        public AddEditAppointmentViewModel ViewModel;
-        public ContactCreationModeFlag CreationMode;
-        readonly AppCompatImageView icon;
-
-        protected AddEditAppointmentView(Context context)
-            : base(context)
-        {
             var iconSize = Conversion.ConvertDpToPixels(20f);
             icon = new AppCompatImageView(context)
             {
@@ -390,30 +434,26 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             };
 
             AddView(icon);
+
+            if (resourceId > 0)
+            {
+                icon.Visibility = ViewStates.Visible;
+                icon.SetImageResource(resourceId);
+            }
+
+            LayoutTransition = new LayoutTransition();
         }
 
-        public void SetIcon(int resourceId)
-        {
-            icon.Visibility = ViewStates.Visible;
-            icon.SetImageResource(resourceId);
-        }
+        abstract public void RefreshView();
     }
 
     class NameView : AddEditAppointmentView
     {
-        AppCompatEditText TextField;
+        TitleTextField TextField;
 
         public NameView(Context context) : base(context)
         {
-            TextField = LayoutInflater.From(context).Inflate(Resource.Layout.search_edit_text_layout, null).FindViewById<AppCompatEditText>(Resource.Id.search_edit_text);
-            TextField.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
-            {
-
-            };
-            TextField.SetPadding(0, 0, 0, 0);
-            TextField.SetBackgroundColor(Color.Transparent);
-            TextField.SetTextAppearanceCompat(context, Resource.Style.searchViewBottomLine);
-            TextField.SetHintTextColor(ViewUtilities.GetColorStateList(context, Resource.Drawable.search_edit_text_selector));
+            TextField = new TitleTextField(context);
             TextField.Hint = context.GetString(Resource.String.add_tite);
             TextField.EditorAction += (sender, e) =>
             {
@@ -424,8 +464,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             TextField.TextChanged += TextField_TextChanged;
 
             AddView(TextField);
-
-            SetIcon(Resource.Drawable.action_search_server);
         }
 
         private void TextField_TextChanged(object sender, Android.Text.TextChangedEventArgs e)
@@ -446,18 +484,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
     class LocationView : AddEditAppointmentView
     {
-        AppCompatEditText TextField;
-        public LocationView(Context context) : base(context)
-        {
-            TextField = LayoutInflater.From(context).Inflate(Resource.Layout.search_edit_text_layout, null).FindViewById<AppCompatEditText>(Resource.Id.search_edit_text);
-            TextField.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
-            {
+        BasicTextField TextField;
 
-            };
-            TextField.SetPadding(0, 0, 0, 0);
-            TextField.SetBackgroundColor(Color.Transparent);
-            TextField.SetTextAppearanceCompat(context, Resource.Style.searchViewBottomLine);
-            TextField.SetHintTextColor(ViewUtilities.GetColorStateList(context, Resource.Drawable.search_edit_text_selector));
+        public LocationView(Context context)
+            : base(context, Resource.Drawable.location)
+        {
+            TextField = new BasicTextField(context);
             TextField.Hint = context.GetString(Resource.String.add_location);
             TextField.EditorAction += (sender, e) =>
             {
@@ -468,8 +500,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             TextField.TextChanged += TextField_TextChanged;
 
             AddView(TextField);
-
-            SetIcon(Resource.Drawable.action_search_server);
         }
 
         private void TextField_TextChanged(object sender, Android.Text.TextChangedEventArgs e)
@@ -493,27 +523,26 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         SwitchCompat ToggleButton;
         Action toggleChanged = delegate { };
 
-        public AllDayToggleView(Context context, Action toggleChanged) : base(context)
+        public AllDayToggleView(Context context, Action toggleChanged)
+            : base(context, Resource.Drawable.time)
         {
-            AppCompatTextView TextField = new AppCompatTextView(context);
-
             this.toggleChanged = toggleChanged;
 
-            TextField.SetPadding(0, 0, 0, 0);
-            TextField.SetBackgroundColor(Color.Transparent);
-            TextField.SetTextAppearanceCompat(context, Resource.Style.searchViewBottomLine);
-            TextField.Text = "All day";
+            var allDayText = new BasicTextView(context);
+            allDayText.Text = "All day";
+            allDayText.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
+            {
+                Gravity = (int)GravityFlags.Left | (int)GravityFlags.CenterVertical,
+            };
 
-            AddView(TextField);
-
-            SetIcon(Resource.Drawable.action_search_server);
+            AddView(allDayText);
 
             ToggleButton = new SwitchCompat(context)
             {
                 Gravity = GravityFlags.Right,
-                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
                 {
-                    Gravity = (int)GravityFlags.End,
+                    Gravity = (int)GravityFlags.Right | (int)GravityFlags.CenterVertical,
                 }
             };
 
@@ -631,15 +660,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
     class DateView : AddEditAppointmentView
     {
-        public AppCompatTextView DateTextView;
-        public AppCompatTextView TimeTextView;
+        public BasicTextView DateTextView;
+        public BasicTextView TimeTextView;
 
         public DateView(Context context) : base(context)
         {
-            DateTextView = new AppCompatTextView(context);
-            DateTextView.SetPadding(0, 0, 0, 0);
-            DateTextView.SetBackgroundColor(Color.Transparent);
-            DateTextView.SetTextAppearanceCompat(context, Resource.Style.searchViewBottomLine);
+            DateTextView = new BasicTextView(context);
             DateTextView.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
             {
                 Weight = 1,
@@ -650,14 +676,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
             AddView(DateTextView);
 
-            TimeTextView = new AppCompatTextView(context)
+            TimeTextView = new BasicTextView(context)
             {
                 Gravity = GravityFlags.Right,
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent),
                 Text = ""
             };
-            TimeTextView.SetPadding(0, 0, 0, 0);
-            TimeTextView.SetTextAppearanceCompat(context, Resource.Style.searchViewBottomLine);
             TimeTextView.TextAlignment = TextAlignment.ViewEnd;
 
             TimeTextView.Click += TimeClicked;
@@ -674,25 +698,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
     class CalendarView : AddEditAppointmentView
     {
-        readonly AppCompatTextView label;
+        readonly BasicTextView label;
         readonly View colorCircle;
 
         Action viewClicked;
 
         public CalendarView(Context context, Action viewClicked)
-            : base(context)
+            : base(context, Resource.Drawable.calendar_black)
         {
             this.viewClicked = viewClicked;
-            AppCompatTextView title = new AppCompatTextView(context)
-            {
-                Text = "Calendar",
-                Gravity = GravityFlags.Left,
-                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent, 0.8f)
-            };
-
-            title.SetTextAppearanceCompat(context, Resource.Style.searchViewBottomLine);
-
-            AddView(title);
 
             colorCircle = new View(context)
             {
@@ -704,17 +718,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
             AddView(colorCircle);
 
-            label = new AppCompatTextView(context)
+            label = new BasicTextView(context)
             {
-                Gravity = GravityFlags.Right,
-                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent, 0.2f),
-                Text = ""
+                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent)
+                {
+                    LeftMargin = DistanceNormal
+                },
+                Text = "",
             };
 
             label.SetTextColor(new Color(ContextCompat.GetColor(context, Resource.Color.black)));
             AddView(label);
-
-            SetIcon(Resource.Drawable.action_search_server);
 
             Click += CalendarView_Click;
         }
@@ -738,50 +752,33 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         public override void RefreshView()
         {
-            if (ViewModel != null && ViewModel.Calendar != null)
+            if (ViewModel?.Calendar != null)
             {
-                CalendarViewModel calendarViewModel = ViewModel.Calendar;
-                HexColor = calendarViewModel?.HexColor;
-                label.Text = calendarViewModel?.Name;
+                HexColor = ViewModel.Calendar.HexColor;
+                label.Text = ViewModel.Calendar.Name;
             }
         }
     }
 
     class ParticipantsView : AddEditAppointmentView
     {
-        readonly AppCompatTextView label;
+        readonly BasicTextView title;
 
         Action viewClicked;
 
         public ParticipantsView(Context context, Action action)
-            : base(context)
+            : base(context, Resource.Drawable.participants)
         {
             Orientation = Horizontal;
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
             viewClicked = action;
-            AppCompatTextView title = new AppCompatTextView(context)
+            title = new BasicTextView(context)
             {
                 Text = "Participants",
-                Gravity = GravityFlags.Left,
-                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent, 0.8f)
+                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent)
             };
-
-            title.SetTextAppearanceCompat(context, Resource.Style.searchViewBottomLine);
 
             AddView(title);
-
-            label = new AppCompatTextView(context)
-            {
-                Gravity = GravityFlags.Right,
-                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent, 0.2f),
-                Text = ""
-            };
-
-            label.SetTextColor(new Color(ContextCompat.GetColor(context, Resource.Color.black)));
-            AddView(label);
-
-            SetIcon(Resource.Drawable.action_search_server);
-
             Click += ParticipantsView_Click;
         }
 
@@ -793,23 +790,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         public override void RefreshView()
         {
             if (ViewModel != null && ViewModel.Participants != null && ViewModel.Participants.Count > 0)
-                label.Text = $"{ViewModel.Participants.Count}";
+                title.Text = $"{ViewModel.Participants.Count}";
             else
-                label.Text = "None"; //TODO : string
+                title.Text = "None"; //TODO : string
         }
     }
 
     class MessageView : AddEditAppointmentView
     {
-        AppCompatEditText TextField;
-        public MessageView(Context context) : base(context)
+        BasicTextField TextField;
+        public MessageView(Context context)
+            : base(context, Resource.Drawable.description)
         {
-            TextField = LayoutInflater.From(context).Inflate(Resource.Layout.search_edit_text_layout, null).FindViewById<AppCompatEditText>(Resource.Id.search_edit_text);
-            TextField.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-            TextField.SetPadding(0, 0, 0, 0);
-            TextField.SetBackgroundColor(Color.Transparent);
-            TextField.SetTextAppearanceCompat(context, Resource.Style.searchViewBottomLine);
-            TextField.SetHintTextColor(ViewUtilities.GetColorStateList(context, Resource.Drawable.search_edit_text_selector));
+            TextField = new BasicTextField(context);
             TextField.Hint = context.GetString(Resource.String.add_message);
             TextField.EditorAction += (sender, e) =>
             {
@@ -820,8 +813,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             TextField.TextChanged += TextField_TextChanged;
 
             AddView(TextField);
-
-            SetIcon(Resource.Drawable.action_search_server);
         }
 
         private void TextField_TextChanged(object sender, Android.Text.TextChangedEventArgs e)
@@ -842,18 +833,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
     class ReocurrenceView : AddEditAppointmentView
     {
-        readonly AppCompatTextView title;
-        readonly AppCompatTextView label;
+        readonly BasicTextView title;
+
         Action ViewClicked = delegate { };
 
-        public ReocurrenceView(Context context, Action viewClicked) : base(context)
+        public ReocurrenceView(Context context, Action viewClicked)
+            : base(context, Resource.Drawable.refresh_black)
         {
             Click += RecurrencView_Click;
             ViewClicked = viewClicked;
 
-            SetIcon(Resource.Drawable.action_search_server);
-
-            title = new AppCompatTextView(context)
+            title = new BasicTextView(context)
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
                 {
@@ -862,22 +852,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 Text = "Repeats"
             };
 
-            title.SetPadding(0, 0, 0, 0);
-            title.SetTextAppearanceCompat(context, Resource.Style.searchViewBottomLine);
-
             AddView(title);
 
-            label = new AppCompatTextView(context)
-            {
-                Gravity = GravityFlags.Right,
-                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent),
-                Text = ""
-            };
-
-            label.SetPadding(0, 0, 0, 0);
-            label.SetTextAppearanceCompat(context, Resource.Style.searchViewBottomLine);
-
-            AddView(label);
         }
 
         private void RecurrencView_Click(object sender, EventArgs e)
@@ -887,51 +863,30 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         public override void RefreshView()
         {
-            if (ViewModel != null && ViewModel.RecurrenceInfo != null)
+            if (ViewModel?.RecurrenceInfo != null)
             {
                 //TODO : 
             }
             else
             {
-                label.Text = "None";
+                title.Text = "Does not repeat";
             }
         }
     }
 
     class ReminderView : AddEditAppointmentView
     {
-        readonly AppCompatTextView title;
-        readonly AppCompatTextView label;
+        readonly BasicTextView title;
 
-        public ReminderView(Context context) : base(context)
+        public ReminderView(Context context)
+            : base(context, Resource.Drawable.alarm)
         {
-            SetIcon(Resource.Drawable.action_search_server);
-
-            title = new AppCompatTextView(context)
+            title = new BasicTextView(context)
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
-                {
-                    Weight = 1
-                },
-                Text = "Reminder"
             };
-
-            title.SetPadding(0, 0, 0, 0);
-            title.SetTextAppearanceCompat(context, Resource.Style.searchViewBottomLine);
 
             AddView(title);
-
-            label = new AppCompatTextView(context)
-            {
-                Gravity = GravityFlags.Right,
-                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent),
-                Text = ""
-            };
-
-            label.SetPadding(0, 0, 0, 0);
-            label.SetTextAppearanceCompat(context, Resource.Style.searchViewBottomLine);
-
-            AddView(label);
 
             Click += ReminderView_Click;
         }
@@ -960,12 +915,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         {
             if (ViewModel != null && ViewModel.ReminderTimeBeforeStart > -1)
             {
-                ReminderInfo reminder = ReminderInfo.ConvertFromSeconds((int)ViewModel.ReminderTimeBeforeStart);
-                label.Text = reminder.Title;
+                ReminderInfo reminder = ReminderInfo.ConvertFromSeconds((int)ViewModel.ReminderTimeBeforeStart);  //TOODO this needs to be changed
+                title.Text = reminder.Title;
             }
             else
             {
-                label.Text = "None";
+                title.Text = "Add reminder";
             }
         }
     }

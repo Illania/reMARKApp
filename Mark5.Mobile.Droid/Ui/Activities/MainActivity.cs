@@ -57,7 +57,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             CommonConfig.Logger.Info($"Starting {nameof(MainActivity)}...");
 
-            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("OTQ4NDdAMzEzNzJlMzEyZTMwWTh6RmRibklqNHU3citRNzViZVRJUkVkYmFSZTc1dFBEQi9td2dZSVZHWT0=");
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("MTM2NTEwQDMxMzcyZTMyMmUzMFJ0SVQvVmIzbmQrejNkd1Z0cVF4eXBIdFViUUY4eDVvbXZrdDBrT2xkaTg9");
 
             OverridePendingTransition(Resource.Animation.fade_in, Resource.Animation.fade_out);
 
