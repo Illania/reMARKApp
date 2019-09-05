@@ -15,6 +15,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Presenters.CalendarModule;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
+using Android.Support.V7.App;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 {
@@ -99,6 +100,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             participantsView.ShowParticipantsClicked += ParticipantsView_ShowParticipantsClicked;
             participantsView.SendInvitationClicked += SendInvitationsButton_TouchUpInside;
 
+
+            foreach (var subview in subviews)
+            {
+                if (subview.Parent != null)
+                    ((ViewGroup)subview.Parent).RemoveView(subview);
+            }
+
+            subviews = new List<View>();
+
             subviews.Add(subjectView);
             subviews.Add(dateView);
             subviews.Add(locationView);
@@ -141,12 +151,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         public override async void OnResume()
         {
             base.OnResume();
-
-            if (!loaded)
-            {
-                await presenter.LoadAppointment(appointmentId, recurrenceIndex, calendarId);
-                loaded = true;
-            }
+            await presenter.LoadAppointment(appointmentId, recurrenceIndex, calendarId);
         }
 
         private void ParticipantsView_ShowParticipantsClicked(object sender, EventArgs e)
@@ -171,7 +176,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         public void OpenEditAppointment(int calendarId, int appointmentId)
         {
-            //TODO: implement
+            var (aeaf, tag) = AddEditAppointmentFragment.NewInstance(calendarId, appointmentId);
+            ((AppCompatActivity)Activity).SupportFragmentManager.BeginTransaction()
+                          .SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right)
+                          .Replace(Resource.Id.fragment_container, aeaf, tag)
+                          .AddToBackStack(tag).Commit();
         }
 
         public void SetLines(IEnumerable<LineViewModel> lines)

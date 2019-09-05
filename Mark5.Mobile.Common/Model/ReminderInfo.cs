@@ -57,6 +57,11 @@
             OneDay = 24 * 60
         };
 
+        public override string ToString()
+        {
+            return Title;
+        }
+
         public static ReminderInfo ConvertFromSeconds(int seconds)
         {
             var minutes = seconds / 60;

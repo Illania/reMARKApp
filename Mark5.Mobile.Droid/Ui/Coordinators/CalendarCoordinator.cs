@@ -134,7 +134,7 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
 
         public void CreateAppointmentClicked()
         {
-            var (fragment, tag) = CreateAppointmentFragment.NewInstance();
+            var (fragment, tag) = AddEditAppointmentFragment.NewInstance();
             fragmentManager.BeginTransaction()
                 .Replace(Resource.Id.fragment_container, fragment, tag)
                 .AddToBackStack(tag)

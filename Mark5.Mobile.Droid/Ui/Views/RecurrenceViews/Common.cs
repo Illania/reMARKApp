@@ -245,7 +245,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
             SetPadding(Common.pickerPadding, Common.pickerPadding, Common.pickerPadding, Common.pickerPadding);
 
             InputType = Android.Text.InputTypes.ClassNumber;
-            KeyListener = DigitsKeyListener.GetInstance(null, false, false);
+            //KeyListener = DigitsKeyListener.GetInstance(null, false, false);
         }
     }
 

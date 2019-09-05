@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Android.Content;
 using Android.Graphics;
 using Android.Graphics.Drawables;
@@ -30,6 +31,9 @@ namespace Mark5.Mobile.Droid
         Dictionary<CalendarViewModel, bool> selectedCalendars;
         CalendarListAdapter ListAdapter;
         List<Section> Sections { get; set; }
+
+        readonly TaskCompletionSource<CalendarViewModel> tcs = new TaskCompletionSource<CalendarViewModel>();
+        public Task<CalendarViewModel> Result => tcs.Task;
 
         public static (CalendarListFragment fragment, string tag) NewInstance(Dictionary<CalendarViewModel, bool> selectedCalendars)
         {
@@ -74,7 +78,7 @@ namespace Mark5.Mobile.Droid
             RecyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
 
             ListAdapter = new CalendarListAdapter(Context);
-
+            ListAdapter.calendarSelected += CalendarSelected;
             RecyclerView.SetAdapter(ListAdapter);
 
             HasOptionsMenu = true;
@@ -136,6 +140,11 @@ namespace Mark5.Mobile.Droid
             return false;
         }
 
+        void CalendarSelected(CalendarViewModel viewModel)
+        {
+            tcs.TrySetResult(viewModel);
+        }
+
         #endregion
 
         #region RecyclerView Adapters/ViewHolders
@@ -151,6 +160,8 @@ namespace Mark5.Mobile.Droid
             readonly Context context;
 
             readonly int sectionHeight = Conversion.ConvertDpToPixels(40);
+
+            public Action<CalendarViewModel> calendarSelected = delegate { };
 
             public CalendarListAdapter(Context context)
             {

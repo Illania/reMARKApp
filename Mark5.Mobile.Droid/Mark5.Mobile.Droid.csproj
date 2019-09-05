@@ -87,9 +87,6 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\netstandard2.0\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="AngleSharp">
-      <HintPath>..\packages\AngleSharp.0.12.1\lib\netstandard2.0\AngleSharp.dll</HintPath>
-    </Reference>
     <Reference Include="PreMailer.Net">
       <HintPath>..\packages\PreMailer.Net.2.0.1\lib\netstandard2.0\PreMailer.Net.dll</HintPath>
     </Reference>
@@ -273,13 +270,13 @@
       <HintPath>..\packages\Xamarin.Android.Support.v7.MediaRouter.28.0.0.1\lib\monoandroid90\Xamarin.Android.Support.v7.MediaRouter.dll</HintPath>
     </Reference>
     <Reference Include="Syncfusion.Licensing">
-      <HintPath>..\packages\Syncfusion.Licensing.17.1.0.48\lib\MonoAndroid10\Syncfusion.Licensing.dll</HintPath>
+      <HintPath>..\packages\Syncfusion.Licensing.17.2.0.47\lib\MonoAndroid10\Syncfusion.Licensing.dll</HintPath>
     </Reference>
     <Reference Include="Syncfusion.SfSchedule.Android">
-      <HintPath>..\packages\Syncfusion.Xamarin.SfSchedule.Android.17.1.0.48\lib\MonoAndroid10\Syncfusion.SfSchedule.Android.dll</HintPath>
+      <HintPath>..\packages\Syncfusion.Xamarin.SfSchedule.Android.17.2.0.47\lib\MonoAndroid10\Syncfusion.SfSchedule.Android.dll</HintPath>
     </Reference>
     <Reference Include="Syncfusion.SfCalendar.Android">
-      <HintPath>..\packages\Syncfusion.Xamarin.SfCalendar.Android.17.1.0.48\lib\MonoAndroid10\Syncfusion.SfCalendar.Android.dll</HintPath>
+      <HintPath>..\packages\Syncfusion.Xamarin.SfCalendar.Android.17.2.0.47\lib\MonoAndroid10\Syncfusion.SfCalendar.Android.dll</HintPath>
     </Reference>
     <Reference Include="AngleSharp">
       <HintPath>..\packages\AngleSharp.0.9.11\lib\portable-windows8+net45+windowsphone8+wpa+monoandroid+monotouch\AngleSharp.dll</HintPath>
@@ -561,7 +558,6 @@
     <Compile Include="Ui\Fragments\Calendar\MonthCalendarFragment.cs" />
     <Compile Include="Ui\Fragments\Calendar\WeekCalendarFragment.cs" />
     <Compile Include="Ui\Fragments\Calendar\CalendarListFragment.cs" />
-    <Compile Include="Ui\Fragments\Calendar\CreateAppointmentFragment.cs" />
     <Compile Include="Ui\Fragments\Calendar\YearCalendarFragment.cs" />
     <Compile Include="Ui\Coordinators\CalendarCoordinator.cs" />
     <Compile Include="Ui\Fragments\Calendar\BaseCalendarFragment.cs" />
@@ -571,6 +567,8 @@
     <Compile Include="Ui\Views\RecurrenceViews\Common.cs" />
     <Compile Include="Ui\Views\RecurrenceViews\PatternView.cs" />
     <Compile Include="Ui\Views\RecurrenceViews\RangeView.cs" />
+    <Compile Include="Ui\Fragments\Calendar\AddEditAppointmentFragment.cs" />
+    <Compile Include="Ui\Fragments\Calendar\AddEditParticipantsFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -1004,6 +1002,10 @@
     <ProjectReference Include="..\MaterialDialogs\MaterialDialogs.csproj">
       <Project>{03F5EB27-28E4-4309-962C-628C73475478}</Project>
       <Name>MaterialDialogs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Mark5.Mobile.IOS\Mark5.Mobile.IOS.csproj">
+      <Project>{3FB59A6F-9438-433D-A3BA-247D914A06AE}</Project>
+      <Name>Mark5.Mobile.IOS</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
