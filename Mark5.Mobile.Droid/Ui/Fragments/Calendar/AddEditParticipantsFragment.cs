@@ -98,11 +98,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             CommonConfig.Logger.Info($"Created {nameof(AddEditParticipantsFragment)}");
         }
 
-        public override async void OnResume()
-        {
-            base.OnResume();
-        }
-
         public override void OnDestroy()
         {
             base.OnDestroy();
@@ -190,12 +185,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         async void OnAddContactClicked()
         {
-            var choice = ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable
-                                           ? await Dialogs.ShowListDialog(Context, Resource.String.picker_title, Resource.Array.picker_choice_appointments_with_internal_contacts, true)
-                                           : await Dialogs.ShowListDialog(Context, Resource.String.picker_title, Resource.Array.picker_choice_appointments, true);
-
-            if (choice < 0)
-                return;
+            var choice = await Dialogs.ShowListDialog(Context, Resource.String.picker_title, Resource.Array.picker_choice_appointments, true);
 
             switch (choice)
             {

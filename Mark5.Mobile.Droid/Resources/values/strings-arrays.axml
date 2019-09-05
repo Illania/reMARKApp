@@ -40,11 +40,6 @@
         <item>Recent addresses</item>
         <item>Contacts</item>
         <item>Phonebook</item>
-    </string-array>
-    <string-array name="picker_choice_appointments_with_internal_contacts">
-        <item>Recent addresses</item>
-        <item>Contacts</item>
-        <item>Phonebook</item>
         <item>Internal contacts</item>
     </string-array>
 </resources>

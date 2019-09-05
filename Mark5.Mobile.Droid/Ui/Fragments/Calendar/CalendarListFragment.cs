@@ -52,23 +52,6 @@ namespace Mark5.Mobile.Droid
             return (fragment, tag);
         }
 
-        public static (CalendarListFragment fragment, string tag) NewInstance(Dictionary<CalendarViewModel, bool> selectedCalendars, Action calendarSelected)
-        {
-            var args = new Bundle();
-
-            if (selectedCalendars != null)
-                args.PutString(SelectedClendarsKey, Serializer.Serialize(selectedCalendars.ToList()));
-
-            var fragment = new CalendarListFragment
-            {
-                Arguments = args
-            };
-
-            var tag = $"{nameof(CalendarListFragment)}]";
-
-            return (fragment, tag);
-        }
-
         public override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -240,7 +223,6 @@ namespace Mark5.Mobile.Droid
             {
                 selectedCalendars[cvm] = !selectedCalendars[cvm];
                 NotifyItemChanged(position);
-                calendarSelected?.Invoke(cvm);
             }
 
             public (CalendarViewModel Calendar, Section Section) GetItemAtPosition(int position)
