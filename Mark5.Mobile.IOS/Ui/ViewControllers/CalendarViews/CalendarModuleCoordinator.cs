@@ -146,7 +146,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         public void HourTapped(NSDate date)
         {
-            // Todo Create appointment view with start date set;
+            var start = ((DateTime)date).ToLocalTime();
+            RootController.PushViewController(new AddAppointmentViewController(start), true);
         }
 
         public void CalendarsClicked()

@@ -40,12 +40,12 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             }
         }
 
-        public Task LoadEmptyAppointment()  //TODO it would be also convenient to put here "reasoonable dates"
+        public Task LoadEmptyAppointment(DateTime startDate)
         {
             var preselectedCalendar = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars.First(c => !c.Shared)
                 ?? ServerConfig.SystemSettings.CalendarModuleInfo.Calendars.First();
 
-            view.ShowAppointment(new AddEditAppointmentViewModel(ServerConfig.SystemSettings.UserInfo.User.Id)
+            view.ShowAppointment(new AddEditAppointmentViewModel(startDate, ServerConfig.SystemSettings.UserInfo.User.Id)
             {
                 Calendar = CalendarViewModel.ConvertToViewModel(preselectedCalendar),
             });
@@ -98,16 +98,19 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         public AddEditAppointmentViewModel() { }
 
         // When creating a new appointment default values are initialized here
-        public AddEditAppointmentViewModel(int creatorId)
+        public AddEditAppointmentViewModel(DateTime start, int creatorId)
         {
+            Id = -1;
             CreatorId = creatorId;
-            Start = DateTime.Now.RoundUp(TimeSpan.FromMinutes(15));
-            End = DateTime.Now.RoundUp(TimeSpan.FromMinutes(15)).AddHours(1);
             ReminderTimeBeforeStart = -1;
             Participants = new List<ParticipantsViewModel>();
-            Start = DateTime.Now;
-            End = DateTime.Now.AddMinutes(30);
-            Id = -1;
+
+            if (start != default)
+                Start = start;
+            else
+                Start = DateTime.Now.RoundUp(TimeSpan.FromMinutes(15));
+
+            End = Start.AddMinutes(30);
         }
 
         public static AddEditAppointmentViewModel ConvertToViewModel(CalendarAppointment appointment)
@@ -169,9 +172,9 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             return ca;
         }
 
-        public static RecurrenceInfo GetEmptyRecurrenceInfo()
+        public RecurrenceInfo GetEmptyRecurrenceInfo()
         {
-            return new RecurrenceInfo
+            var recInfo = new RecurrenceInfo
             {
                 Type = RecurrenceType.Daily,
                 DayNumber = 1,
@@ -181,16 +184,19 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 WeekOfMonth = WeekOfMonth.First,
                 OccurrenceCount = 1,
                 FirstDayOfWeek = DayOfWeek.Monday,
-                StartDate = DateTime.Now,
-                EndDate = DateTime.Now.AddDays(10),
+                StartDate = new DateTime(Start.Year, Start.Month, Start.Day, 0, 0, 1, DateTimeKind.Local),
                 Range = RecurrenceRange.NoEndDate,
             };
+
+            recInfo.EndDate = recInfo.StartDate.AddDays(10);
+
+            return recInfo;
         }
     }
 
     public interface IAddEditAppointmentPresenter : IPresenter<IAddEditAppointmentView>
     {
-        Task LoadEmptyAppointment();
+        Task LoadEmptyAppointment(DateTime startDate);
         Task LoadAppointment(int calendarId, int appointmentId);
         void LoadCalendarsList();
         Task AddOrEditAppointment(AddEditAppointmentViewModel vm);

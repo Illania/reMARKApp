@@ -28,10 +28,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
     public class AddAppointmentViewController : AbstractAddEditAppointmentViewController
     {
-        public AddAppointmentViewController()
+        public AddAppointmentViewController(DateTime startDate = default)
         {
             Title = Localization.GetString("create_appointment");
             CreationModeFlag = ContactCreationModeFlag.New;
+            StartDate = startDate;
         }
     }
 
@@ -46,7 +47,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         AddEditAppointmentViewModel viewModel;
         Action progressDialogDismissal;
 
-        public ContactCreationModeFlag CreationModeFlag;
+        protected ContactCreationModeFlag CreationModeFlag;
+        protected DateTime StartDate;
 
         public AbstractAddEditAppointmentViewController(int appointmentId = -1, int calendarId = -1)
             : base(UITableViewStyle.Grouped)
@@ -106,7 +108,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             if (viewModel == null)
             {
                 if (CreationModeFlag == ContactCreationModeFlag.New)
-                    await presenter.LoadEmptyAppointment();
+                    await presenter.LoadEmptyAppointment(StartDate);
 
                 if (CreationModeFlag == ContactCreationModeFlag.Edit)
                     await presenter.LoadAppointment(calendarId, appointmentId);
@@ -885,7 +887,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                         ViewModel.RecurrenceInfo = null;
                     else if (result == 1)
                     {
-                        var recInfo = ViewModel.RecurrenceInfo ?? AddEditAppointmentViewModel.GetEmptyRecurrenceInfo();
+                        var recInfo = ViewModel.RecurrenceInfo ?? ViewModel.GetEmptyRecurrenceInfo();
                         var vc = RecurrenceViewController.Create(recInfo);
                         ViewController?.NavigationController?.PushViewController(vc, true);
                         var newRecInfo = await vc.Result;
