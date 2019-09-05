@@ -729,7 +729,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
                 dayTextField = new NumberField();
                 dayTextField.EditingChanged += DaysTextField_EditingChanged;
 
-                monthField1 = new MonthPicker(UpdateMonth);
+                monthField1 = new MonthPicker(UpdateMonth1);
 
                 firstLine.AddGestureRecognizer(new UITapGestureRecognizer(FirstLine_Tapped));
                 firstLine.AddSubview(radioButton1);
@@ -770,7 +770,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
 
                 weekDayField = new ExtendedWeekDayPicker(UpdateWeekDays);
                 weekOfMonthField = new WeekOfMonthPicker(UpdateWeekOfMonth);
-                monthField2 = new MonthPicker(UpdateMonth);
+                monthField2 = new MonthPicker(UpdateMonth2);
 
                 secondLine.AddSubview(radioButton2);
                 secondLine.AddSubview(theLabel);
@@ -845,7 +845,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
                 SecondLine_Tapped();
             }
 
-            void UpdateMonth(int i)
+            void UpdateMonth1(int i)
+            {
+                recInfo.Month = i;
+                FirstLine_Tapped();
+            }
+
+            void UpdateMonth2(int i)
             {
                 recInfo.Month = i;
                 SecondLine_Tapped();
