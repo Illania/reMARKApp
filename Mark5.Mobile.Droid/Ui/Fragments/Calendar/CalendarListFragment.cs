@@ -22,7 +22,7 @@ namespace Mark5.Mobile.Droid
 {
     public class CalendarListFragment : BaseFragment, IMenuItemOnMenuItemClickListener
     {
-        const string SelectedClendarsKey = "SelectedCalendars";
+        protected const string SelectedClendarsKey = "SelectedCalendars";
         const int saveBtnId = 10;
         RecyclerView RecyclerView;
 
@@ -102,6 +102,13 @@ namespace Mark5.Mobile.Droid
             CommonConfig.Logger.Info($"Refreshing {nameof(CalendarListFragment)}");
             SetDefaultSections();
             SetData();
+        }
+
+        public override void OnDestroy()
+        {
+            tcs?.TrySetResult(null);
+
+            base.OnDestroy();
         }
 
         protected virtual void SetDefaultSections()
@@ -221,6 +228,7 @@ namespace Mark5.Mobile.Droid
 
             void ChangeSelectedState(CalendarViewModel cvm, int position)
             {
+                calendarSelected?.Invoke(cvm);
                 selectedCalendars[cvm] = !selectedCalendars[cvm];
                 NotifyItemChanged(position);
             }

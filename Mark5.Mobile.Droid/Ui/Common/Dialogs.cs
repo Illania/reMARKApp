@@ -320,7 +320,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             builder.PositiveText(Resource.String.ok);
             builder.OnPositive(new SingleButtonCallback(() => { tcs.SetResult(new TimeSpan(timePicker.Hour, timePicker.Minute, 0)); }));
             builder.NegativeText(Resource.String.cancel);
-            builder.OnNegative(new SingleButtonCallback(() => tcs.SetResult(new TimeSpan())));
+            builder.OnNegative(new SingleButtonCallback(() => tcs.SetResult(new TimeSpan(initialHour, initialMinute, 0))));
             builder.Cancelable(false);
             builder.Show();
             return tcs.Task;

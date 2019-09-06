@@ -49,6 +49,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         ParticipantsView participantsView;
 
         AddEditAppointmentViewModel viewModel;
+        List<CalendarViewModel> calendarList;
 
         List<View> subviews = new List<View>();
 
@@ -102,10 +103,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 calendarId = Arguments.GetInt(CalendarIdBundleKey);
 
             if (Arguments.ContainsKey(StartDateIdBundleKey))
-                startDate = new DateTime(Arguments.GetLong(StartDateIdBundleKey));  //TODO check if the datetime kind is there
+                startDate = new DateTime(Arguments.GetLong(StartDateIdBundleKey));
 
             presenter = new AddEditAppointmentPresenter();
             presenter.AttachView(this);
+            presenter.LoadCalendarsList();
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -223,11 +225,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             endDateView.RefreshView();
         }
 
-        void CalendarClicked()
-        {
-            _ = CalendarClickedAsync();
-        }
-
         void ReocurrenceClicked()
         {
             var (rf, tag) = ReoccurrenceFragment.NewInstance(viewModel.RecurrenceInfo);
@@ -254,19 +251,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             }
         }
 
-        async Task CalendarClickedAsync()
+        async void CalendarClicked()
         {
-            List<Mobile.Common.Model.Calendar> calendarsList = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars;
-            Dictionary<int, bool> calendarsSelectedState = new Dictionary<int, bool>();
-            Dictionary<int, string> calendarsColor = new Dictionary<int, string>();
-
-            calendarsList.ForEach(c => calendarsColor.Add(c.Id, c.ColorHex));
-
-            var calendarsWithSelection = new Dictionary<CalendarViewModel, bool>();
-            foreach (var cal in calendarsList)
-                calendarsWithSelection.Add(CalendarViewModel.ConvertToViewModel(cal), viewModel.Calendar != null && viewModel.Calendar.Id == cal.Id);
-
-            var (clf, tag) = CalendarListFragment.NewInstance(calendarsWithSelection);
+            var (clf, tag) = AddEditAppointmentCalendarListFragment.NewInstance(calendarList, viewModel.Calendar);
 
             ((AppCompatActivity)Activity).SupportFragmentManager.BeginTransaction()
                            .SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right)
@@ -281,11 +268,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 viewModel.Calendar = result;
                 calendarView.RefreshView();
             }
-        }
-
-        void CalendarSelected()
-        {
-
         }
 
         #endregion
@@ -335,7 +317,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         public void UpdateCalendarsList(List<CalendarViewModel> calendars)
         {
-            // TODO :
+            calendarList = calendars;
         }
 
         public Task ShowLoadError(Exception ex)
@@ -374,11 +356,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
     {
         public BasicTextView(Context context) : base(context)
         {
+            var verticalPadding = Conversion.ConvertDpToPixels(4);
+
             LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
             {
                 Gravity = (int)GravityFlags.CenterVertical
             };
-            SetPadding(0, 0, 0, 0);
+            SetPadding(0, verticalPadding, 0, verticalPadding);
             SetBackgroundColor(Color.Transparent);
             this.SetTextAppearanceCompat(context, Resource.Style.editAppointmentText);
         }
@@ -388,11 +372,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
     {
         public BasicTextField(Context context) : base(context)
         {
+            var verticalPadding = Conversion.ConvertDpToPixels(4);
             LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
             {
                 Gravity = (int)GravityFlags.CenterVertical
             };
-            SetPadding(0, 0, 0, 0);
+            SetPadding(0, verticalPadding, 0, verticalPadding);
             SetBackgroundColor(Color.Transparent);
             SetHintTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
             this.SetTextAppearanceCompat(context, Resource.Style.editAppointmentField);
@@ -403,11 +388,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
     {
         public TitleTextField(Context context) : base(context)
         {
+            var verticalPadding = Conversion.ConvertDpToPixels(4);
+
             LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
             {
                 Gravity = (int)GravityFlags.CenterVertical,
             };
-            SetPadding(0, 0, 0, 0);
+            SetPadding(0, verticalPadding, 0, verticalPadding);
             SetBackgroundColor(Color.Transparent);
             SetHintTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
             this.SetTextAppearanceCompat(context, Resource.Style.editAppointmentTitle);
@@ -416,7 +403,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
     abstract class AddEditAppointmentView : LinearLayoutCompat
     {
-        protected static int DistanceLarge = Conversion.ConvertDpToPixels(14f);
+        protected static int DistanceLarge = Conversion.ConvertDpToPixels(16f);
         protected static int DistanceNormal = Conversion.ConvertDpToPixels(8f);
         protected static int DistanceSmall = Conversion.ConvertDpToPixels(4f);
         protected static int DistanceVerySmall = Conversion.ConvertDpToPixels(4f);
@@ -444,6 +431,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 {
                     Gravity = (int)GravityFlags.Left | (int)GravityFlags.Top,
                     RightMargin = DistanceLarge,
+                    TopMargin = Conversion.ConvertDpToPixels(4), //To balance the padding around text fields
                 },
                 Visibility = ViewStates.Invisible
             };
@@ -464,72 +452,66 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
     class NameView : AddEditAppointmentView
     {
-        TitleTextField TextField;
+        TitleTextField textField;
 
         public NameView(Context context) : base(context)
         {
-            TextField = new TitleTextField(context);
-            TextField.Hint = context.GetString(Resource.String.add_tite);
-            TextField.EditorAction += (sender, e) =>
+            textField = new TitleTextField(context);
+            textField.Hint = context.GetString(Resource.String.add_tite);
+            textField.EditorAction += (sender, e) =>
             {
                 if (e.ActionId == ImeAction.Done)
-                    TextField.ClearFocus();
+                    textField.ClearFocus();
             };
 
-            TextField.TextChanged += TextField_TextChanged;
+            textField.TextChanged += TextField_TextChanged;
 
-            AddView(TextField);
+            AddView(textField);
         }
 
         private void TextField_TextChanged(object sender, Android.Text.TextChangedEventArgs e)
         {
-            var editText = (AppCompatEditText)sender;
             if (ViewModel != null)
-                ViewModel.Subject = editText.Text;
+                ViewModel.Subject = textField.Text;
         }
 
         public override void RefreshView()
         {
             if (!string.IsNullOrEmpty(ViewModel.Subject))
-            {
-                TextField.Text = ViewModel.Subject;
-            }
+                textField.Text = ViewModel.Subject;
         }
     }
 
     class LocationView : AddEditAppointmentView
     {
-        BasicTextField TextField;
+        BasicTextField textField;
 
         public LocationView(Context context)
             : base(context, Resource.Drawable.location)
         {
-            TextField = new BasicTextField(context);
-            TextField.Hint = context.GetString(Resource.String.add_location);
-            TextField.EditorAction += (sender, e) =>
+            textField = new BasicTextField(context);
+            textField.Hint = context.GetString(Resource.String.add_location);
+            textField.EditorAction += (sender, e) =>
             {
                 if (e.ActionId == ImeAction.Done)
-                    TextField.ClearFocus();
+                    textField.ClearFocus();
             };
 
-            TextField.TextChanged += TextField_TextChanged;
+            textField.TextChanged += TextField_TextChanged;
 
-            AddView(TextField);
+            AddView(textField);
         }
 
         private void TextField_TextChanged(object sender, Android.Text.TextChangedEventArgs e)
         {
-            var editText = (AppCompatEditText)sender;
             if (ViewModel != null)
-                ViewModel.Location = editText.Text;
+                ViewModel.Location = textField.Text;
         }
 
         public override void RefreshView()
         {
             if (!string.IsNullOrEmpty(ViewModel.Location))
-            {
-                TextField.Text = ViewModel.Location;
-            }
+                textField.Text = ViewModel.Location;
         }
     }
 
@@ -591,23 +573,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         protected override async void DateClicked(object sender, EventArgs e)
         {
-            long startTiemStamp = ViewModel.Start.ConvertDateTimeToTimestampMilliseconds();
-            var newTimestamp = await Dialogs.ShowDatePicker(Context, startTiemStamp, addRemoveDateChoice: true);
+            var start = ViewModel.Start;
+            var startDate = new DateTime(start.Year, start.Month, start.Day);
 
-            if (newTimestamp == 0)
-                return;
-
-            var newDate = newTimestamp.ConvertTimestampMillisecondsToDateTime();
-            ViewModel.Start = newDate + new TimeSpan(ViewModel.Start.Hour, ViewModel.Start.Minute, ViewModel.Start.Second);
+            var newTimestamp = await Dialogs.ShowDatePicker(Context, startDate.ConvertDateTimeToTimestampMilliseconds());
+            var newDate = DateTime.SpecifyKind(newTimestamp.ConvertTimestampMillisecondsToDateTime(), DateTimeKind.Local);
+            ViewModel.Start = newDate + new TimeSpan(start.Hour, start.Minute, start.Second);
 
             RefreshView();
-            return;
         }
 
         protected override async void TimeClicked(object sender, EventArgs e)
         {
-            TimeSpan result = await Dialogs.ShowTimePicker(Context, ViewModel.Start.Hour, ViewModel.Start.Minute);
-            var newDate = new DateTime(ViewModel.Start.Year, ViewModel.Start.Month, ViewModel.Start.Day, result.Hours, result.Minutes, 0);
+            var start = ViewModel.Start;
+
+            TimeSpan result = await Dialogs.ShowTimePicker(Context, start.Hour, start.Minute);
+            var newDate = new DateTime(start.Year, start.Month, start.Day, result.Hours, result.Minutes, 0, DateTimeKind.Local);
             ViewModel.Start = newDate;
             RefreshView();
         }
@@ -624,24 +605,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         protected override async void DateClicked(object sender, EventArgs e)
         {
-            long endTiemStamp = ViewModel.End.ConvertDateTimeToTimestampMilliseconds();
-            var newTimestamp = await Dialogs.ShowDatePicker(Context, endTiemStamp, addRemoveDateChoice: true);
+            var end = ViewModel.End;
+            var eddDate = new DateTime(end.Year, end.Month, end.Day);
 
-            if (newTimestamp == 0)
-                return;
-
-            DateTime newDate = newTimestamp.ConvertTimestampMillisecondsToDateTime();
-            ViewModel.End = newDate + new TimeSpan(ViewModel.End.Hour, ViewModel.End.Minute, ViewModel.End.Second);
+            var newTimestamp = await Dialogs.ShowDatePicker(Context, eddDate.ConvertDateTimeToTimestampMilliseconds());
+            var newDate = DateTime.SpecifyKind(newTimestamp.ConvertTimestampMillisecondsToDateTime(), DateTimeKind.Local);
+            ViewModel.End = newDate + new TimeSpan(end.Hour, end.Minute, end.Second);
 
             RefreshView();
-            return;
         }
 
         protected override async void TimeClicked(object sender, EventArgs e)
         {
-            TimeSpan result = await Dialogs.ShowTimePicker(Context, ViewModel.Start.Hour, ViewModel.Start.Minute);
-            var newDate = new DateTime(ViewModel.End.Year, ViewModel.End.Month, ViewModel.End.Day, result.Hours, result.Minutes, 0);
-            ViewModel.Start = newDate;
+            var end = ViewModel.End;
+
+            TimeSpan result = await Dialogs.ShowTimePicker(Context, end.Hour, end.Minute);
+            var newDate = new DateTime(end.Year, end.Month, end.Day, result.Hours, result.Minutes, 0, DateTimeKind.Local);
+            ViewModel.End = newDate;
             RefreshView();
         }
     }
@@ -654,10 +634,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         public DateView(Context context) : base(context)
         {
             DateTextView = new BasicTextView(context);
-            DateTextView.SetBackgroundColor(Color.AliceBlue); //TODO testing
-            DateTextView.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent)
+            DateTextView.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent, 1)
             {
-                Weight = 1,
                 Gravity = (int)GravityFlags.CenterVertical | (int)GravityFlags.Left
             };
 
@@ -668,11 +646,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             TimeTextView = new BasicTextView(context)
             {
                 Gravity = GravityFlags.Right,
-                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent),
-                Text = ""
+                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent)
+                {
+                    Gravity = (int)GravityFlags.CenterVertical | (int)GravityFlags.Right
+                },
             };
+
+            TimeTextView.SetPadding(2 * DistanceLarge, 0, 0, 0);
             TimeTextView.TextAlignment = TextAlignment.ViewEnd;
-            TimeTextView.SetBackgroundColor(Color.Green); //TODO testing
 
             TimeTextView.Click += TimeClicked;
 
@@ -692,7 +673,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 else
                 {
                     TimeTextView.Visibility = ViewStates.Visible;
-                    TimeTextView.Text = date.ToString("hh:mm", CultureInfo.CurrentCulture);
+                    TimeTextView.Text = date.ToString("HH:mm ", CultureInfo.CurrentCulture);
                 }
             }
         }
@@ -900,7 +881,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             var reminder = await Dialogs.ShowSingleSelectDialogAsync(Context, Resource.String.set_reminder, reminders, selectedReminder);
 
             if (reminder != null)
+            {
                 ViewModel.ReminderTimeBeforeStart = reminder.Seconds;
+                RefreshView();
+            }
         }
 
         public override void RefreshView()
