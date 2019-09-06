@@ -177,10 +177,9 @@
         <item name="android:textSize">16sp</item>
     </style>
     <style name="editAppointmentField" parent="TextAppearance.AppCompat.Body2">
-        <item name="android:textColor">@color/black</item>
+
     </style>
     <style name="editAppointmentTitle" parent="TextAppearance.AppCompat.Title">
-        <item name="android:textColor">@color/black</item>
     </style>
     <style name="editAppointmentText" parent="editAppointmentField">
     </style>
