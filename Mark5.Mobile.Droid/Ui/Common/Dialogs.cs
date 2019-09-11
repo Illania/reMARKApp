@@ -259,6 +259,25 @@ namespace Mark5.Mobile.Droid.Ui.Common
             return tcs.Task;
         }
 
+        public static Task<int> ShowListDialog(Context context, string title, string[] items, bool includeCancel)
+        {
+            var tcs = new TaskCompletionSource<int>();
+            var builder = new MaterialDialog.Builder(context);
+            if (!string.IsNullOrEmpty(title))
+                builder.Title(title);
+            builder.Items(items);
+            builder.ItemsCallback(new ListCallback(i => tcs.SetResult(i)));
+            if (includeCancel)
+            {
+                builder.NegativeText(Resource.String.cancel);
+                builder.OnNegative(new SingleButtonCallback(() => tcs.SetResult(-1)));
+            }
+            builder.Cancelable(false);
+            builder.Show();
+            return tcs.Task;
+        }
+
+
         public static Task<int> ShowListDialog(Context context, int titleId, string description, string[] items, bool includeCancel)
         {
             var tcs = new TaskCompletionSource<int>();

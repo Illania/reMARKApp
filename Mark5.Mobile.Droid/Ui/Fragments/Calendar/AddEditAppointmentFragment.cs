@@ -47,6 +47,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         EndDateView endDateView;
         CalendarView calendarView;
         ParticipantsView participantsView;
+        ReocurrenceView recurrenceView;
 
         AddEditAppointmentViewModel viewModel;
         List<CalendarViewModel> calendarList;
@@ -206,7 +207,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             subviews.Add(new AllDayToggleView(Context, AllDayToggleChanged));
             subviews.Add(startDateView = new StartDateView(Context));
             subviews.Add(endDateView = new EndDateView(Context));
-            subviews.Add(new ReocurrenceView(Context, ReocurrenceClicked));
+            subviews.Add(recurrenceView = new ReocurrenceView(Context, ReocurrenceClicked));
             subviews.Add(new SeparatorSubview(Context));
             subviews.Add(participantsView = new ParticipantsView(Context, ParticipantsClicked));
             subviews.Add(new SeparatorSubview(Context));
@@ -225,8 +226,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             endDateView.RefreshView();
         }
 
-        void ReocurrenceClicked()
+        async void ReocurrenceClicked()
         {
+            var strings = new string[] { "Does not repeat", "Custom" };
+            var result = await Dialogs.ShowListDialog(Context, string.Empty, strings, true);
+
+            if (result < 0)
+                return;
+
+            if (result == 0)
+            {
+                viewModel.RecurrenceInfo = null;
+                recurrenceView.RefreshView();
+                return;
+            }
+
             var (rf, tag) = ReoccurrenceFragment.NewInstance(viewModel.RecurrenceInfo);
             ((AppCompatActivity)Activity).SupportFragmentManager.BeginTransaction()
                           .SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right)
@@ -244,7 +258,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                            .AddToBackStack(tag).Commit();
 
             var result = await aepf.TaskResult;
-            if (result != null && viewModel != null)
+            if (result != null)
             {
                 viewModel.Participants = result;
                 participantsView?.RefreshView();
@@ -373,7 +387,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         public BasicTextField(Context context) : base(context)
         {
             var verticalPadding = Conversion.ConvertDpToPixels(4);
-            LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
+            LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent, 1)
             {
                 Gravity = (int)GravityFlags.CenterVertical
             };
@@ -390,7 +404,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         {
             var verticalPadding = Conversion.ConvertDpToPixels(4);
 
-            LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
+            LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent, 1)
             {
                 Gravity = (int)GravityFlags.CenterVertical,
             };

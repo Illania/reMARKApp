@@ -46,10 +46,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         public override void OnCreate(Bundle savedInstanceState)
         {
+            //TODO tested with recent contacts, they get added
+            //Need to check
+            // - that the the participants are added to the view
+            // - that the participants are correctly formatted as in iOS
             base.OnCreate(savedInstanceState);
 
-            if (savedInstanceState?.ContainsKey(ParticipantsKey) == true)
-                participants = Serializer.Deserialize<List<ParticipantsViewModel>>(savedInstanceState.GetString(ParticipantsKey));
+            if (Arguments.ContainsKey(ParticipantsKey) == true)
+                participants = Serializer.Deserialize<List<ParticipantsViewModel>>(Arguments.GetString(ParticipantsKey));
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -152,12 +156,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             menu.Clear();
 
             var addItem = menu.Add(Menu.None, MenuItemActions.AddParticipants, MenuItemActions.AddParticipants, Resource.String.participants);
-            addItem.SetIcon(Resource.Drawable.action_add);
+            addItem.SetIcon(Resource.Drawable.add_appointment);  //TODO need to rename to just add after refactoring
             addItem.SetShowAsAction(ShowAsAction.Always);
             addItem.SetOnMenuItemClickListener(this);
 
             var saveItem = menu.Add(Menu.None, MenuItemActions.SaveParticipants, MenuItemActions.SaveParticipants, Resource.String.save);
-            saveItem.SetShowAsAction(ShowAsAction.Always);
+            saveItem.SetShowAsAction(ShowAsAction.Always);  //Either we use an icon here too, or we change it in the previous view
             saveItem.SetOnMenuItemClickListener(this);
         }
 
@@ -269,6 +273,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             public void SetItems(List<ParticipantsViewModel> participants)
             {
                 var count = Items.Count;
+                Items.Clear();
                 Items.AddRange(participants);
                 NotifyItemRangeRemoved(0, count);
                 NotifyItemRangeInserted(count, participants.Count);
