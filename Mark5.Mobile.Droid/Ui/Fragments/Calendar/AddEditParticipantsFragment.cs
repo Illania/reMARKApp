@@ -25,6 +25,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         ParticipantsListAdapter adapter;
         List<ParticipantsViewModel> participants = new List<ParticipantsViewModel>();
 
+        AppCompatButton addButton;
+        AppCompatEditText participantTextView;
+
         readonly TaskCompletionSource<List<ParticipantsViewModel>> tcs = new TaskCompletionSource<List<ParticipantsViewModel>>();
         public Task<List<ParticipantsViewModel>> TaskResult => tcs.Task;
 
@@ -62,12 +65,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
             HasOptionsMenu = true;
 
-            var rootView = inflater.Inflate(Resource.Layout.list, container, false);
+            var rootView = inflater.Inflate(Resource.Layout.list_participants, container, false);
+
+            addButton = rootView.FindViewById<AppCompatButton>(Resource.Id.add_participant_btn);
+            participantTextView = rootView.FindViewById<AppCompatEditText>(Resource.Id.participant_text);
+
+            addButton.Click += AddButton_Click;
+            participantTextView.TextChanged += ParticipantTextView_TextChanged;
 
             var emptyView = rootView.FindViewById<AppCompatTextView>(Resource.Id.empty_view);
             emptyView.SetText(Resource.String.no_participants);
 
-            var refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipe_refresh_layout);
+            var refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipe_refresh_layout_participants);
             refreshLayout.Enabled = false;
 
             recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recycler_view);
@@ -181,6 +190,31 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             return true;
         }
 
+        private void AddButton_Click(object sender, EventArgs e)
+        {
+            if (!Validator.IsEmailValid(participantTextView.Text))
+                return;
+
+            adapter.SetItems(
+                new List<ParticipantsViewModel>
+                {
+                    new ParticipantsViewModel
+                    {
+                        Email = participantTextView.Text,
+                        Status = ParticipantStatus.NeedAction,
+                        Type = ParticipantType.ComAddress
+                    }
+                });
+
+            participantTextView.Text = string.Empty;
+            addButton.Enabled = false;
+        }
+
+        void ParticipantTextView_TextChanged(object sender, Android.Text.TextChangedEventArgs e)
+        {
+            addButton.Enabled = Validator.IsEmailValid(participantTextView.Text);
+        }
+
         private void OnSaveParticipantsClicked()
         {
             tcs.TrySetResult(participants);
@@ -262,12 +296,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 var participantViewModel = Items[position];
                 viewHolder.Address = participantViewModel.Name;
                 viewHolder.Name = participantViewModel.Email;
+                viewHolder.Status = participantViewModel.Status;
             }
 
             public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
             {
-                var itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.list_item_recipients, parent, false);
-                return new ParticipantViewHolder(itemView);
+                return new ParticipantViewHolder(LayoutInflater.From(parent.Context).Inflate(Resource.Layout.list_item_participant, parent, false));
             }
 
             public void SetItems(List<ParticipantsViewModel> participants)
@@ -281,8 +315,28 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
             class ParticipantViewHolder : RecyclerView.ViewHolder
             {
+                readonly AppCompatImageView iconView;
                 readonly AppCompatTextView addressTextView;
                 readonly AppCompatTextView nameTextView;
+
+                public ParticipantStatus Status
+                {
+                    set
+                    {
+                        switch (value)
+                        {
+                            case ParticipantStatus.Accepted:
+                                iconView.SetImageResource(Resource.Drawable.icon_check);
+                                break;
+                            case ParticipantStatus.Declined:
+                                iconView.SetImageResource(Resource.Drawable.icon_cross);
+                                break;
+                            default:
+                                iconView.SetImageResource(Resource.Drawable.icon_question);
+                                break;
+                        }
+                    }
+                }
 
                 public string Name
                 {
@@ -320,6 +374,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 {
                     addressTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_recipients_address);
                     nameTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_recipients_name);
+                    iconView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_participant_icon);
                 }
             }
         }
