@@ -17,8 +17,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
     {
         const string RecurrenceKey = "RecurrenceKey";
 
-        //Await on Task to get the updated value of recurrence info.
-        //If the result is null, the user pressed "Back", so we do not update recurrence info.
         public Task<RecurrenceInfo> Task => tcs.Task;
 
         readonly TaskCompletionSource<RecurrenceInfo> tcs = new TaskCompletionSource<RecurrenceInfo>();
@@ -88,7 +86,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         {
             base.OnStop();
 
-            tcs.TrySetResult(recInfo);
+            tcs.TrySetResult(null);
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)

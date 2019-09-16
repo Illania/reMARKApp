@@ -90,6 +90,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
             {
                 ri.Type = rt;
                 Updated(this, EventArgs.Empty);
+                Refresh();
             }
         }
 
@@ -115,6 +116,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
                 firstLine.Click += (a, b) => FirstLine_Click();
 
                 radioButton1 = new AppCompatRadioButton(context);
+                radioButton1.Click += (a, b) => FirstLine_Click();
                 daysTextField = new NumberField(context);
                 daysTextField.TextChanged += DaysTextField_TextChanged;
                 var everyLabel = new LabelTextView(context) { Text = "Every" };
@@ -133,6 +135,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
                 secondLine.Click += (a, b) => SecondLine_Click();
 
                 radioButton2 = new AppCompatRadioButton(context);
+                radioButton2.Click += (a, b) => SecondLine_Click();
+
                 var everyWeekdayLabel = new LabelTextView(context) { Text = "Every weekday" };
 
                 secondLine.AddView(radioButton2);
@@ -278,6 +282,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
                 firstLine.Click += (a, b) => FirstLine_Click();
 
                 radioButton1 = new AppCompatRadioButton(context);
+                radioButton1.Click += (a, b) => FirstLine_Click();
+
                 dayTextField = new NumberField(context);
                 dayTextField.TextChanged += DaysTextField_TextChanged;
                 var dayLabel = new LabelTextView(context) { Text = "Day" };
@@ -324,6 +330,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
                 };
 
                 radioButton2 = new AppCompatRadioButton(context);
+                radioButton2.Click += (a, b) => SecondLine_Click();
+
                 var theLabel = new LabelTextView(context) { Text = "The" };
                 var everyLabel2 = new LabelTextView(context) { Text = "of every" };
                 var monthsLabel2 = new LabelTextView(context) { Text = "month(s)" };
@@ -464,6 +472,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
                 firstLine.Click += (a, b) => FirstLine_Click();
 
                 radioButton1 = new AppCompatRadioButton(context);
+                radioButton1.Click += (a, b) => FirstLine_Click();
+
                 dayTextField = new NumberField(context);
                 dayTextField.TextChanged += DaysTextField_TextChanged;
                 var everyLabel = new LabelTextView(context) { Text = "Every" };
@@ -505,6 +515,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
                 };
 
                 radioButton2 = new AppCompatRadioButton(context);
+                radioButton2.Click += (a, b) => SecondLine_Click();
+
                 var theLabel = new LabelTextView(context) { Text = "The" };
                 var ofLabel = new LabelTextView(context) { Text = "of" };
                 monthField2 = new MonthPicker(context, UpdateMonth2);

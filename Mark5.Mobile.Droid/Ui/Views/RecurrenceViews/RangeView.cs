@@ -87,6 +87,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
                 firstLine.Click += (a, b) => FirstLine_Click();
 
                 radioButton1 = new AppCompatRadioButton(context);
+                radioButton1.Click += (a, b) => FirstLine_Click();
                 var noEndLabel = new LabelTextView(context) { Text = "No end date" };
 
                 firstLine.AddView(radioButton1);
@@ -103,6 +104,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
                 secondLine.Click += (a, b) => SecondLine_Click();
 
                 radioButton2 = new AppCompatRadioButton(context);
+                radioButton2.Click += (a, b) => SecondLine_Click();
                 var endAfterLabel = new LabelTextView(context) { Text = "End after" };
                 var occurrencesLabel = new LabelTextView(context) { Text = "occurrences" };
                 occurrenceField = new NumberField(context);
@@ -124,6 +126,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
                 thirdLine.Click += (a, b) => ThirdLine_Click();
 
                 radioButton3 = new AppCompatRadioButton(context);
+                radioButton3.Click += (a, b) => ThirdLine_Click();
                 var endByLabel = new LabelTextView(context) { Text = "End by" };
                 endDateField = new DateField(context, UpdateEndDate);
 
@@ -177,9 +180,16 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
             void UpdateModel()
             {
                 ri.OccurrenceCount = int.TryParse(occurrenceField.Text, out var p) ? p : 1;
+
+                if (radioButton1.Checked)
+                    ri.Range = RecurrenceRange.NoEndDate;
+                else if (radioButton2.Checked)
+                    ri.Range = RecurrenceRange.OccurrenceCount;
+                else if (radioButton3.Checked)
+                    ri.Range = RecurrenceRange.EndByDate;
             }
 
-            public override void Refresh()  //TODO need to give default values
+            public override void Refresh()
             {
                 switch (ri.Range)
                 {
@@ -192,17 +202,16 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
                         radioButton1.Checked = false;
                         radioButton2.Checked = true;
                         radioButton3.Checked = false;
-
-                        occurrenceField.Text = ri.OccurrenceCount.ToString();
                         break;
                     case RecurrenceRange.EndByDate:
                         radioButton1.Checked = false;
                         radioButton2.Checked = false;
                         radioButton3.Checked = true;
-
-                        endDateField.SetDate(ri.EndDate);
                         break;
                 }
+
+                occurrenceField.Text = ri.OccurrenceCount.ToString();
+                endDateField.SetDate(ri.EndDate);
             }
         }
     }

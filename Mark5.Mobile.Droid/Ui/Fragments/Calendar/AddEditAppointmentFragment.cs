@@ -241,11 +241,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 return;
             }
 
-            var (rf, tag) = ReoccurrenceFragment.NewInstance(viewModel.RecurrenceInfo);
+            var recInfo = viewModel.RecurrenceInfo ?? viewModel.GetEmptyRecurrenceInfo();
+
+            var (rf, tag) = ReoccurrenceFragment.NewInstance(recInfo);
             ((AppCompatActivity)Activity).SupportFragmentManager.BeginTransaction()
                           .SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right)
                           .Replace(Resource.Id.fragment_container, rf, tag)
                           .AddToBackStack(tag).Commit();
+
+            var rec = await rf.Task;
+            if (rec != null)
+            {
+                viewModel.RecurrenceInfo = rec;
+                recurrenceView?.RefreshView();
+            }
         }
 
         async void ParticipantsClicked()
