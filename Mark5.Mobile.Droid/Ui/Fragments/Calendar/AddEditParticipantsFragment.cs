@@ -14,6 +14,8 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Presenters.CalendarModule;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Activities;
+using Android.Graphics;
+using Android.Support.V4.Content;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 {
@@ -49,10 +51,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         public override void OnCreate(Bundle savedInstanceState)
         {
-            //TODO tested with recent contacts, they get added
-            //Need to check
-            // - that the the participants are added to the view
-            // - that the participants are correctly formatted as in iOS
             base.OnCreate(savedInstanceState);
 
             if (Arguments.ContainsKey(ParticipantsKey) == true)
@@ -71,6 +69,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             participantTextView = rootView.FindViewById<AppCompatEditText>(Resource.Id.participant_text);
 
             addButton.Click += AddButton_Click;
+            addButton.Enabled = false;
+            UpdateAddButton();
             participantTextView.TextChanged += ParticipantTextView_TextChanged;
 
             var emptyView = rootView.FindViewById<AppCompatTextView>(Resource.Id.empty_view);
@@ -99,14 +99,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             return rootView;
         }
 
-        public override async void OnViewCreated(View view, Bundle savedInstanceState)
+        public override void OnViewCreated(View view, Bundle savedInstanceState)
         {
             base.OnViewCreated(view, savedInstanceState);
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.participants);
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
-            await RefreshView();
+            RefreshView();
 
             CommonConfig.Logger.Info($"Created {nameof(AddEditParticipantsFragment)}");
         }
@@ -130,31 +130,58 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             if (requestCode == RequestCodes.RecentAddressesRequestCode && resultCode == (int)Result.Ok)
             {
                 var recipient = Serializer.Deserialize<Recipient>(data.GetStringExtra(RecentAddressesListActivity.RecipientResultKey));
-                participants.Add(new ParticipantsViewModel { Email = recipient.Address, Name = recipient.Name });
+                participants.Add(new ParticipantsViewModel
+                {
+                    Id = recipient.Id,
+                    Email = recipient.Address,
+                    Name = recipient.Name,
+                    Status = ParticipantStatus.NeedAction,
+                    Type = ParticipantType.ComAddress,
+                });
             }
-            if (requestCode == RequestCodes.PhonebookRequestCode && resultCode == (int)Result.Ok)
+            else if (requestCode == RequestCodes.PhonebookRequestCode && resultCode == (int)Result.Ok)
             {
                 var recipient = Serializer.Deserialize<Recipient>(data.GetStringExtra(PhonebookContactsListActivity.RecipientResultKey));
-                participants.Add(new ParticipantsViewModel { Email = recipient.Address, Name = recipient.Name });
+                participants.Add(new ParticipantsViewModel
+                {
+                    Name = recipient.Name,
+                    Email = recipient.Address,
+                    Status = ParticipantStatus.NeedAction,
+                    Type = ParticipantType.ComAddress
+                });
             }
-            if (requestCode == RequestCodes.ContactsRequestCode && resultCode == (int)Result.Ok)
+            else if (requestCode == RequestCodes.ContactsRequestCode && resultCode == (int)Result.Ok)
             {
                 var recipient = Serializer.Deserialize<Recipient>(data.GetStringExtra(PickerContactFolderListActivity.RecipientResultKey));
-                participants.Add(new ParticipantsViewModel { Email = recipient.Address, Name = recipient.Name });
+                participants.Add(new ParticipantsViewModel
+                {
+                    Id = recipient.Id,
+                    Name = recipient.Name,
+                    Email = recipient.Address,
+                    Status = ParticipantStatus.NeedAction,
+                    Type = ParticipantType.Client
+                });
             }
-            if (requestCode == RequestCodes.InternalContactsRequestCode && resultCode == (int)Result.Ok)
+            else if (requestCode == RequestCodes.InternalContactsRequestCode && resultCode == (int)Result.Ok)
             {
                 var users = Serializer.Deserialize<List<SystemUser>>(data.GetStringExtra(PickerInternalContactsListActivity.RecipientResultKey));
                 foreach (var user in users)
                 {
-                    participants.Add(new ParticipantsViewModel { Email = user.Username, Name = $"{user.FirstName} {user.LastName}" });
+                    participants.Add(new ParticipantsViewModel
+                    {
+                        Id = user.Id,
+                        Name = user.Username,
+                        Email = string.Empty,
+                        Status = ParticipantStatus.NeedAction,
+                        Type = ParticipantType.User
+                    });
                 }
             }
 
             adapter.SetItems(participants);
         }
 
-        async Task RefreshView()
+        void RefreshView()
         {
             adapter.SetItems(participants);
         }
@@ -195,24 +222,31 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             if (!Validator.IsEmailValid(participantTextView.Text))
                 return;
 
-            adapter.SetItems(
-                new List<ParticipantsViewModel>
-                {
+            participants.Add(
                     new ParticipantsViewModel
                     {
                         Email = participantTextView.Text,
                         Status = ParticipantStatus.NeedAction,
-                        Type = ParticipantType.ComAddress
-                    }
-                });
+                        Type = ParticipantType.ComAddress,
+                    });
+
+
+            adapter.SetItems(participants);
 
             participantTextView.Text = string.Empty;
             addButton.Enabled = false;
+            UpdateAddButton();
         }
 
         void ParticipantTextView_TextChanged(object sender, Android.Text.TextChangedEventArgs e)
         {
             addButton.Enabled = Validator.IsEmailValid(participantTextView.Text);
+            UpdateAddButton();
+        }
+
+        void UpdateAddButton()
+        {
+            addButton.SetTextColor(new Color(ContextCompat.GetColor(Context, addButton.Enabled ? Resource.Color.black : Resource.Color.lightgray)));
         }
 
         private void OnSaveParticipantsClicked()
