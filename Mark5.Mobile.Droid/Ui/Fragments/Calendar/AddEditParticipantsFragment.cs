@@ -5,17 +5,16 @@ using Android.OS;
 using Android.App;
 using Android.Views;
 using Android.Content;
+using Android.Graphics;
+using Android.Support.V4.Content;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
-using Android.Support.V4.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Presenters.CalendarModule;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Activities;
-using Android.Graphics;
-using Android.Support.V4.Content;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 {
@@ -36,25 +35,26 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         public static (AddEditParticipantsFragment fragment, string tag) NewInstance(List<ParticipantsViewModel> participants)
         {
             Bundle args = new Bundle();
+            if (participants != null)
+                args.PutString(ParticipantsKey, Serializer.Serialize(participants));
+
             var fragment = new AddEditParticipantsFragment
             {
                 Arguments = args
             };
 
-            var tag = $"{nameof(AddEditParticipantsFragment)}";
-
-            if (participants != null)
-                args.PutString(ParticipantsKey, Serializer.Serialize(participants));
-
-            return (fragment, tag);
+            return (fragment, $"{nameof(AddEditParticipantsFragment)}");
         }
 
         public override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
 
-            if (Arguments.ContainsKey(ParticipantsKey) == true)
+            if (Arguments?.ContainsKey(ParticipantsKey) == true)
                 participants = Serializer.Deserialize<List<ParticipantsViewModel>>(Arguments.GetString(ParticipantsKey));
+
+            if (savedInstanceState?.ContainsKey(ParticipantsKey) == true)
+                participants = Serializer.Deserialize<List<ParticipantsViewModel>>(savedInstanceState.GetString(ParticipantsKey));
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -66,24 +66,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             var rootView = inflater.Inflate(Resource.Layout.list_participants, container, false);
 
             addButton = rootView.FindViewById<AppCompatButton>(Resource.Id.add_participant_btn);
-            participantTextView = rootView.FindViewById<AppCompatEditText>(Resource.Id.participant_text);
-
             addButton.Click += AddButton_Click;
+
             addButton.Enabled = false;
             UpdateAddButton();
+
+            participantTextView = rootView.FindViewById<AppCompatEditText>(Resource.Id.participant_text);
+
             participantTextView.TextChanged += ParticipantTextView_TextChanged;
 
             var emptyView = rootView.FindViewById<AppCompatTextView>(Resource.Id.empty_view);
             emptyView.SetText(Resource.String.no_participants);
 
-            var refreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.swipe_refresh_layout_participants);
-            refreshLayout.Enabled = false;
-
             recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recycler_view);
             recyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
             recyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
 
-            adapter = new ParticipantsListAdapter();
+            adapter = new ParticipantsListAdapter(recyclerView);
 
             adapter.RegisterAdapterDataObserver(new LambdaEmptyAdapterObserver(() =>
             {
@@ -95,6 +94,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             }));
 
             recyclerView.SetAdapter(adapter);
+
+            adapter.RemoveIconClicked += Adapter_RemoveIconClicked;
 
             return rootView;
         }
@@ -127,63 +128,110 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         public override async void OnActivityResult(int requestCode, int resultCode, Intent data)
         {
+            ParticipantsViewModel newParticipant = null;
+
             if (requestCode == RequestCodes.RecentAddressesRequestCode && resultCode == (int)Result.Ok)
             {
                 var recipient = Serializer.Deserialize<Recipient>(data.GetStringExtra(RecentAddressesListActivity.RecipientResultKey));
-                participants.Add(new ParticipantsViewModel
+                newParticipant = new ParticipantsViewModel
                 {
                     Id = recipient.Id,
                     Email = recipient.Address,
                     Name = recipient.Name,
                     Status = ParticipantStatus.NeedAction,
-                    Type = ParticipantType.ComAddress,
-                });
+                    Type = ParticipantType.ComAddress
+                };
             }
             else if (requestCode == RequestCodes.PhonebookRequestCode && resultCode == (int)Result.Ok)
             {
                 var recipient = Serializer.Deserialize<Recipient>(data.GetStringExtra(PhonebookContactsListActivity.RecipientResultKey));
-                participants.Add(new ParticipantsViewModel
+                newParticipant = new ParticipantsViewModel
                 {
                     Name = recipient.Name,
                     Email = recipient.Address,
                     Status = ParticipantStatus.NeedAction,
                     Type = ParticipantType.ComAddress
-                });
+                };
             }
             else if (requestCode == RequestCodes.ContactsRequestCode && resultCode == (int)Result.Ok)
             {
                 var recipient = Serializer.Deserialize<Recipient>(data.GetStringExtra(PickerContactFolderListActivity.RecipientResultKey));
-                participants.Add(new ParticipantsViewModel
+                newParticipant = new ParticipantsViewModel
                 {
                     Id = recipient.Id,
                     Name = recipient.Name,
                     Email = recipient.Address,
                     Status = ParticipantStatus.NeedAction,
                     Type = ParticipantType.Client
-                });
+                };
             }
-            else if (requestCode == RequestCodes.InternalContactsRequestCode && resultCode == (int)Result.Ok)
+
+            if (newParticipant != null)
+            {
+                participants.Add(newParticipant);
+                adapter.AddItem(newParticipant);
+            }
+
+            if (requestCode == RequestCodes.InternalContactsRequestCode && resultCode == (int)Result.Ok)
             {
                 var users = Serializer.Deserialize<List<SystemUser>>(data.GetStringExtra(PickerInternalContactsListActivity.RecipientResultKey));
                 foreach (var user in users)
                 {
-                    participants.Add(new ParticipantsViewModel
+                    var participant = new ParticipantsViewModel
                     {
                         Id = user.Id,
                         Name = user.Username,
                         Email = string.Empty,
                         Status = ParticipantStatus.NeedAction,
                         Type = ParticipantType.User
-                    });
+                    };
+                    participants.Add(participant);
+                    adapter.AddItem(participant);
                 }
             }
-
-            adapter.SetItems(participants);
         }
 
         void RefreshView()
         {
             adapter.SetItems(participants);
+        }
+
+        void OnSaveParticipantsClicked()
+        {
+            tcs.TrySetResult(participants);
+            ((AppCompatActivity)Activity).SupportFragmentManager.PopBackStack();
+        }
+
+        void Adapter_RemoveIconClicked(object sender, int index)
+        {
+            participants.RemoveAt(index);
+            adapter.RemoveItem(index);
+        }
+
+        void AddButton_Click(object sender, EventArgs e)
+        {
+            if (!Validator.IsEmailValid(participantTextView.Text))
+                return;
+
+            var participant = new ParticipantsViewModel
+            {
+                Email = participantTextView.Text,
+                Status = ParticipantStatus.NeedAction,
+                Type = ParticipantType.ComAddress
+            };
+
+            participants.Add(participant);
+            adapter.AddItem(participant);
+
+            participantTextView.Text = string.Empty;
+            addButton.Enabled = false;
+            UpdateAddButton();
+        }
+
+        void ParticipantTextView_TextChanged(object sender, Android.Text.TextChangedEventArgs e)
+        {
+            addButton.Enabled = Validator.IsEmailValid(participantTextView.Text);
+            UpdateAddButton();
         }
 
         #region IMenu
@@ -217,49 +265,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             return true;
         }
 
-        private void AddButton_Click(object sender, EventArgs e)
-        {
-            if (!Validator.IsEmailValid(participantTextView.Text))
-                return;
-
-            participants.Add(
-                    new ParticipantsViewModel
-                    {
-                        Email = participantTextView.Text,
-                        Status = ParticipantStatus.NeedAction,
-                        Type = ParticipantType.ComAddress,
-                    });
-
-
-            adapter.SetItems(participants);
-
-            participantTextView.Text = string.Empty;
-            addButton.Enabled = false;
-            UpdateAddButton();
-        }
-
-        void ParticipantTextView_TextChanged(object sender, Android.Text.TextChangedEventArgs e)
-        {
-            addButton.Enabled = Validator.IsEmailValid(participantTextView.Text);
-            UpdateAddButton();
-        }
-
         void UpdateAddButton()
         {
             addButton.SetTextColor(new Color(ContextCompat.GetColor(Context, addButton.Enabled ? Resource.Color.black : Resource.Color.lightgray)));
         }
 
-        private void OnSaveParticipantsClicked()
-        {
-            tcs.TrySetResult(participants);
-            ((AppCompatActivity)Activity).SupportFragmentManager.PopBackStack();
-        }
-
         async void OnAddContactClicked()
         {
-            var choice = await Dialogs.ShowListDialog(Context, Resource.String.picker_title, Resource.Array.picker_choice_appointments, true);
+            var selected = await Dialogs.ShowListDialog(Context, Resource.String.picker_title, Resource.Array.picker_choice_appointments, true);
 
-            switch (choice)
+            switch (selected)
             {
                 case 0:
                     DoOpenRecentAddresses();
@@ -323,28 +338,66 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             public override int ItemCount => Items.Count;
 
             public event EventHandler<ParticipantsViewModel> ItemClicked = delegate { };
+            public event EventHandler<int> RemoveIconClicked = delegate { };
+
+            readonly RecyclerView parentView;
+
+            public ParticipantsListAdapter(RecyclerView parentRecyclerView)
+            {
+                parentView = parentRecyclerView;
+            }
 
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
                 var viewHolder = holder as ParticipantViewHolder;
-                var participantViewModel = Items[position];
-                viewHolder.Address = participantViewModel.Name;
-                viewHolder.Name = participantViewModel.Email;
-                viewHolder.Status = participantViewModel.Status;
+                var viewModel = Items[position];
+                viewHolder.Address = viewModel.Name;
+                viewHolder.Name = viewModel.Email;
+                viewHolder.Status = viewModel.Status;
             }
 
             public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
             {
-                return new ParticipantViewHolder(LayoutInflater.From(parent.Context).Inflate(Resource.Layout.list_item_participant, parent, false));
+                var viewHolder = new ParticipantViewHolder(LayoutInflater.From(parent.Context).Inflate(Resource.Layout.list_item_participant, parent, false));
+                viewHolder.RemoveClicked += (sender, view) =>
+                {
+                    RemoveIconClicked(sender, parentView.GetChildLayoutPosition(view));
+                };
+
+                return viewHolder;
+            }
+
+            public void RemoveItem(int index)
+            {
+                try
+                {
+                    Items.RemoveAt(index);
+                    NotifyItemRangeRemoved(index, 1);
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error($"Exception while removing participant", ex);
+                }
+            }
+
+            public void AddItem(ParticipantsViewModel participant)
+            {
+                Items.Add(participant);
+                NotifyItemRangeInserted(Items.Count, 1);
             }
 
             public void SetItems(List<ParticipantsViewModel> participants)
             {
-                var count = Items.Count;
-                Items.Clear();
+                Clear();
                 Items.AddRange(participants);
-                NotifyItemRangeRemoved(0, count);
-                NotifyItemRangeInserted(count, participants.Count);
+                NotifyItemRangeInserted(0, Items.Count);
+            }
+
+            void Clear()
+            {
+                var size = Items.Count;
+                Items.Clear();
+                NotifyItemRangeRemoved(0, size);
             }
 
             class ParticipantViewHolder : RecyclerView.ViewHolder
@@ -352,6 +405,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 readonly AppCompatImageView iconView;
                 readonly AppCompatTextView addressTextView;
                 readonly AppCompatTextView nameTextView;
+                public event EventHandler<View> RemoveClicked = delegate { };
 
                 public ParticipantStatus Status
                 {
@@ -409,6 +463,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                     addressTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_recipients_address);
                     nameTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_recipients_name);
                     iconView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_participant_icon);
+                    var removeview = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_participant_remove);
+                    removeview.SetImageResource(Resource.Drawable.failed);
+                    removeview.Click += (sender, e) => { RemoveClicked(this, itemView); };
                 }
             }
         }

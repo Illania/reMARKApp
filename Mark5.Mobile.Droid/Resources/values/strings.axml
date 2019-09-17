@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="account">Account</string>
     <string name="add_attachment">Add attachment</string>
@@ -142,8 +142,8 @@
     <string name="edit_contact_im">Im</string>
     <string name="edit_contact_skype">Skype</string>
     <string name="edit_contact_address">Address</string>
-    <string name="edit_contact_description">Description</string>
     <string name="edit_contact_country">Country</string>
+    <string name="edit_contact_description">Description</string>
     <string name="edit_contact_vat">VAT</string>
     <string name="edit_contact_ledger">Ledger</string>
     <string name="edit_contact_mark_as_preferable">Preferable</string>
