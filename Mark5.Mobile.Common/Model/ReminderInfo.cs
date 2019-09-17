@@ -42,7 +42,7 @@
 
         public ReminderInfo(ReminderType type)
         {
-            this.Type = type;
+            Type = type;
         }
 
         public enum ReminderType
@@ -64,8 +64,16 @@
 
         public static ReminderInfo ConvertFromSeconds(int seconds)
         {
+            if (seconds < 0)
+                return new ReminderInfo(ReminderType.None);
+
             var minutes = seconds / 60;
             return new ReminderInfo((ReminderType)minutes);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return ((ReminderInfo)obj)?.Type == Type;
         }
     }
 }

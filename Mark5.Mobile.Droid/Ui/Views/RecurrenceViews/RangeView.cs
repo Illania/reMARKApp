@@ -108,7 +108,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
                 var endAfterLabel = new LabelTextView(context) { Text = "End after" };
                 var occurrencesLabel = new LabelTextView(context) { Text = "occurrences" };
                 occurrenceField = new NumberField(context);
-                occurrenceField.TextChanged += OccurrenceField_TextChanged;
+                occurrenceField.TextModified += OccurrenceField_TextChanged;
 
                 secondLine.AddView(radioButton2);
                 secondLine.AddView(endAfterLabel);
@@ -172,7 +172,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
                 ThirdLine_Click();
             }
 
-            private void OccurrenceField_TextChanged(object sender, Android.Text.TextChangedEventArgs e)
+            private void OccurrenceField_TextChanged(object sender, string e)
             {
                 SecondLine_Click();
             }
@@ -191,6 +191,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
 
             public override void Refresh()
             {
+                occurrenceField.SetText(ri.OccurrenceCount.ToString());
+                endDateField.SetDate(ri.EndDate);
+
                 switch (ri.Range)
                 {
                     case RecurrenceRange.NoEndDate:
@@ -209,9 +212,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
                         radioButton3.Checked = true;
                         break;
                 }
-
-                occurrenceField.Text = ri.OccurrenceCount.ToString();
-                endDateField.SetDate(ri.EndDate);
             }
         }
     }

@@ -118,7 +118,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
                 radioButton1 = new AppCompatRadioButton(context);
                 radioButton1.Click += (a, b) => FirstLine_Click();
                 daysTextField = new NumberField(context);
-                daysTextField.TextChanged += DaysTextField_TextChanged;
+                daysTextField.TextModified += DaysTextField_TextChanged;
                 var everyLabel = new LabelTextView(context) { Text = "Every" };
                 var daysLabel = new LabelTextView(context) { Text = "day(s)" };
 
@@ -160,7 +160,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
                 UpdateModel();
             }
 
-            private void DaysTextField_TextChanged(object sender, Android.Text.TextChangedEventArgs e)
+            private void DaysTextField_TextChanged(object sender, string e)
             {
                 FirstLine_Click();
             }
@@ -187,12 +187,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
                 }
 
                 Visibility = ViewStates.Visible;
+                daysTextField.SetText(ri.Periodicity.ToString());
 
                 if (ri.WeekDays == WeekDays.EveryDay)
                 {
                     radioButton1.Checked = true;
                     radioButton2.Checked = false;
-                    daysTextField.Text = ri.Periodicity.ToString();
                 }
                 else if (ri.WeekDays == WeekDays.WorkDays)
                 {
@@ -222,7 +222,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
                 };
 
                 weeksTextField = new NumberField(context);
-                weeksTextField.TextChanged += WeeksTextField_TextChanged; ;
+                weeksTextField.TextModified += WeeksTextField_TextChanged;
                 var recurLabel = new LabelTextView(context) { Text = "Recur every" };
                 var weeksLabel = new LabelTextView(context) { Text = "week(s) on:" };
 
@@ -236,7 +236,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
                 AddView(weekDaysSelectionView);
             }
 
-            private void WeeksTextField_TextChanged(object sender, Android.Text.TextChangedEventArgs e)
+            private void WeeksTextField_TextChanged(object sender, string e)
             {
                 ri.Periodicity = int.TryParse(weeksTextField.Text, out var i) ? i : 1;
             }
@@ -250,7 +250,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
                 }
 
                 Visibility = ViewStates.Visible;
-                weeksTextField.Text = ri.Periodicity.ToString();
+                weeksTextField.SetText(ri.Periodicity.ToString());
                 weekDaysSelectionView.Refresh(ri.WeekDays);
             }
         }
@@ -285,12 +285,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
                 radioButton1.Click += (a, b) => FirstLine_Click();
 
                 dayTextField = new NumberField(context);
-                dayTextField.TextChanged += DaysTextField_TextChanged;
+                dayTextField.TextModified += DaysTextField_TextChanged;
                 var dayLabel = new LabelTextView(context) { Text = "Day" };
                 var everyLabel = new LabelTextView(context) { Text = "of every" };
                 var monthsLabel = new LabelTextView(context) { Text = "month(s)" };
                 monthsField1 = new NumberField(context);
-                monthsField1.TextChanged += MonthsField1_TextChanged;
+                monthsField1.TextModified += MonthsField1_TextChanged;
 
                 firstLine.AddView(radioButton1);
                 firstLine.AddView(dayLabel);
@@ -336,7 +336,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
                 var everyLabel2 = new LabelTextView(context) { Text = "of every" };
                 var monthsLabel2 = new LabelTextView(context) { Text = "month(s)" };
                 monthsField2 = new NumberField(context);
-                monthsField2.TextChanged += MonthsField2_TextChanged;
+                monthsField2.TextModified += MonthsField2_TextChanged;
                 weekDayField = new ExtendedWeekDayPicker(context, UpdateWeekDays);
                 weekOfMonthField = new WeekOfMonthPicker(context, UpdateWeekOfMonth);
 
@@ -373,17 +373,17 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
                 UpdateModel();
             }
 
-            private void DaysTextField_TextChanged(object sender, Android.Text.TextChangedEventArgs e)
+            private void DaysTextField_TextChanged(object sender, string e)
             {
                 FirstLine_Click();
             }
 
-            private void MonthsField1_TextChanged(object sender, Android.Text.TextChangedEventArgs e)
+            private void MonthsField1_TextChanged(object sender, string e)
             {
                 FirstLine_Click();
             }
 
-            private void MonthsField2_TextChanged(object sender, Android.Text.TextChangedEventArgs e)
+            private void MonthsField2_TextChanged(object sender, string e)
             {
                 SecondLine_Click();
             }
@@ -424,22 +424,22 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
 
                 Visibility = ViewStates.Visible;
 
+                dayTextField.SetText(ri.DayNumber.ToString());
+                monthsField1.SetText(ri.Periodicity.ToString());
+                monthsField2.SetText(ri.Periodicity.ToString());
+                weekDayField.SetSelected(ri.WeekDays);
+
                 if (ri.WeekOfMonth == WeekOfMonth.None)
                 {
                     radioButton1.Checked = true;
                     radioButton2.Checked = false;
-                    dayTextField.Text = ri.DayNumber.ToString();
-                    monthsField1.Text = ri.Periodicity.ToString();
                 }
                 else
                 {
                     radioButton1.Checked = false;
                     radioButton2.Checked = true;
 
-                    weekDayField.SetSelected(ri.WeekDays);
                     weekOfMonthField.SetSelected(ri.WeekOfMonth);
-
-                    monthsField2.Text = ri.Periodicity.ToString();
                 }
             }
         }
@@ -475,7 +475,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
                 radioButton1.Click += (a, b) => FirstLine_Click();
 
                 dayTextField = new NumberField(context);
-                dayTextField.TextChanged += DaysTextField_TextChanged;
+                dayTextField.TextModified += DaysTextField_TextChanged;
                 var everyLabel = new LabelTextView(context) { Text = "Every" };
                 monthField1 = new MonthPicker(context, UpdateMonth1);
 
@@ -554,11 +554,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
                 UpdateModel();
             }
 
-            private void DaysTextField_TextChanged(object sender, Android.Text.TextChangedEventArgs e)
+            private void DaysTextField_TextChanged(object sender, string e)
             {
                 var tryParse = int.TryParse(dayTextField.Text, out var par);
                 if (tryParse && par > 31)
-                    dayTextField.Text = "31";
+                    dayTextField.SetText("31");
 
                 FirstLine_Click();
             }
@@ -606,21 +606,23 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
 
                 Visibility = ViewStates.Visible;
 
+                dayTextField.SetText(ri.DayNumber.ToString());
+                monthField1.SetSelected(ri.Month);
+
+                monthField2.SetSelected(ri.Month);
+                weekDayField.SetSelected(ri.WeekDays);
+
                 if (ri.WeekOfMonth == WeekOfMonth.None)
                 {
                     radioButton1.Checked = true;
                     radioButton2.Checked = false;
-                    dayTextField.Text = ri.DayNumber.ToString();
-                    monthField1.SetSelected(ri.Month);
                 }
                 else
                 {
                     radioButton1.Checked = false;
                     radioButton2.Checked = true;
 
-                    weekDayField.SetSelected(ri.WeekDays);
                     weekOfMonthField.SetSelected(ri.WeekOfMonth);
-                    monthField2.SetSelected(ri.Month);
                 }
 
                 Invalidate();

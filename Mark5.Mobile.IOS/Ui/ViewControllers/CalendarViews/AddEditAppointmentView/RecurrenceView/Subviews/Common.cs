@@ -4,7 +4,6 @@ using System.Linq;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Presenters.CalendarModule;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;

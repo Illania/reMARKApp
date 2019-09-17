@@ -13,7 +13,6 @@ using Mark5.Mobile.Droid.Ui.Common;
 using Android.Support.V4.Content;
 using Android.Graphics;
 using Android.Graphics.Drawables;
-using Android.Text.Method;
 
 namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
 {
@@ -230,6 +229,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
 
     public class NumberField : AppCompatEditText
     {
+        public event EventHandler<string> TextModified = delegate { };
+
         public NumberField(Context context) : base(context)
         {
             this.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
@@ -245,7 +246,20 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
             SetPadding(Common.pickerPadding, Common.pickerPadding, Common.pickerPadding, Common.pickerPadding);
 
             InputType = Android.Text.InputTypes.ClassNumber;
-            //KeyListener = DigitsKeyListener.GetInstance(null, false, false);
+
+            TextChanged += NumberField_TextChanged;
+        }
+
+        private void NumberField_TextChanged(object sender, Android.Text.TextChangedEventArgs e)
+        {
+            TextModified(this, Text);
+        }
+
+        public void SetText(string text)
+        {
+            TextChanged -= NumberField_TextChanged;
+            Text = text;
+            TextChanged += NumberField_TextChanged;
         }
     }
 
@@ -405,12 +419,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
 
         public override void SetSelected(int value)
         {
-            SetSelection(value);
+            if (value <= 0)
+                value = 1;
+
+            SetSelection(value - 1);  //TODO the same needs to be done on iOS
         }
 
         public override void Update(int i)
         {
-            selectedAction?.Invoke(i);
+            selectedAction?.Invoke(i + 1);
         }
     }
 }
