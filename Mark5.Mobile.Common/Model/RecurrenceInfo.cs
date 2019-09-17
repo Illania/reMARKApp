@@ -90,7 +90,7 @@ namespace Mark5.Mobile.Common.Model
                         pattern += $"on day {DayNumber} of every {monthPatter}";
                     }
                     else
-                        pattern += $"the {WeekOfMonth.ToFriendlyString()} {WeekDays.ToFriendlyString()} of every {Periodicity} month(s) ";
+                        pattern += $"the {WeekOfMonth.ToFriendlyString()} {WeekDays.ToFriendlyString()} of every {Periodicity} month(s)";
                     break;
                 case RecurrenceType.Yearly:
                     pattern += $"Yearly, ";
@@ -98,7 +98,7 @@ namespace Mark5.Mobile.Common.Model
                     if (WeekOfMonth == WeekOfMonth.None)
                         pattern += $"every {GetMonthString(Month)}, {DayNumber}";
                     else
-                        pattern += $"the {WeekOfMonth.ToFriendlyString()} {WeekDays.ToFriendlyString()} of {GetMonthString(Month)} ";
+                        pattern += $"the {WeekOfMonth.ToFriendlyString()} {WeekDays.ToFriendlyString()} of {GetMonthString(Month)}";
                     break;
             }
 

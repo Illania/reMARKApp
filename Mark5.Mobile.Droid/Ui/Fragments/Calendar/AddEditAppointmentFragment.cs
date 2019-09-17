@@ -54,6 +54,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         List<View> subviews = new List<View>();
 
+        Action dismissAction;
+
         public static (AddEditAppointmentFragment fragment, string tag) NewInstance(DateTime startDate = default)
         {
             Bundle args = new Bundle();
@@ -175,8 +177,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         {
             menu.Clear();
 
-            var addAppointment = menu.Add(Menu.None, MenuItemActions.SaveAppointment, MenuItemActions.SaveAppointment, Resource.String.save);  //TODO change
-            addAppointment.SetIcon(Resource.Drawable.action_save);
+            var addAppointment = menu.Add(Menu.None, MenuItemActions.SaveAppointment, MenuItemActions.SaveAppointment, Resource.String.save);
             addAppointment.SetShowAsAction(ShowAsAction.Always);
             addAppointment.SetOnMenuItemClickListener(this);
         }
@@ -184,7 +185,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         public bool OnMenuItemClick(IMenuItem item)
         {
             if (item.ItemId == MenuItemActions.SaveAppointment)
-                return false;
+            {
+                AddOrEditAppointment();
+                return true;
+            }
 
             return true;
         }
@@ -224,6 +228,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         {
             startDateView.RefreshView();
             endDateView.RefreshView();
+        }
+
+        async void AddOrEditAppointment()
+        {
+            await presenter.AddOrEditAppointment(viewModel);
         }
 
         async void ReocurrenceClicked()
@@ -350,12 +359,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         public void ShowEditingLoading()
         {
-            //TODO : throw new NotImplementedException();
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity,
+                creationModeFlag == ContactCreationModeFlag.New ? Resource.String.adding_appointment : Resource.String.editing_appointment,
+                Resource.String.please_wait);
         }
 
         public void StopEditingLoading()
         {
-            //TODO : 
+            dismissAction?.Invoke();
         }
 
         public Task ShowEditingError(Exception ex)
