@@ -29,6 +29,8 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         DateTime lastVisibleStartDate;
         DateTime lastVisibleEndDate;
 
+        bool started;
+
         IAppointmentsCache Cache => Managers.CalendarManager.AppointmentsCache;
 
         #region ICalendarPresenter
@@ -44,6 +46,9 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         public override void Start()
         {
+            if (started)
+                return;
+
             Cache.AppointmentRetrieved += Cache_AppointmentRetrieved;
             Cache.RetrievalError += Cache_RetrievalError;
             Cache.NoAppointmentToRetrieve += Cache_NoAppointmentToRetrieve;
@@ -51,14 +56,21 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             SubscribeToMessages();
             LoadPreferences();
             UpdateCalendarsInView();
+
+            started = true;
         }
 
-        public override void Stop() //TODO when to use this...?
+        public override void Stop()
         {
+            if (!started)
+                return;
+
             UnsubscribeFromMessages();
             Cache.AppointmentRetrieved -= Cache_AppointmentRetrieved;
             Cache.RetrievalError -= Cache_RetrievalError;
             Cache.NoAppointmentToRetrieve -= Cache_NoAppointmentToRetrieve;
+
+            started = false;
         }
 
         public void AppointmentClicked(int calendarId, int appointmentId, int recurrenceIndex)

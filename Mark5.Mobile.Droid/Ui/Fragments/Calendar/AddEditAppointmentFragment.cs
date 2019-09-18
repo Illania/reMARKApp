@@ -120,6 +120,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             HasOptionsMenu = true;
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_with_progress, container, false);
+            rootView.SetBackgroundColor(Color.White);
 
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
             linearLayout.DescendantFocusability = DescendantFocusability.BeforeDescendants;
