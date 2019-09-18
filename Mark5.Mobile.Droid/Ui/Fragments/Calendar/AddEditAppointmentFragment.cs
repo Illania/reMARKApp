@@ -602,7 +602,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         public override void RefreshView()
         {
-            UpdateUI(ViewModel.Start);
+            if (ViewModel != null)
+                UpdateUI(ViewModel.Start);
         }
 
         protected override async void DateClicked(object sender, EventArgs e)
@@ -634,7 +635,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         public override void RefreshView()
         {
-            UpdateUI(ViewModel.End);
+            if (ViewModel != null)
+                UpdateUI(ViewModel.End);
         }
 
         protected override async void DateClicked(object sender, EventArgs e)
