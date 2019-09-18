@@ -1,6 +1,7 @@
 ﻿using System;
 using Android.OS;
 using Android.Views;
+using Android.Widget;
 using Android.Content;
 using Android.Graphics;
 using Android.Support.V4.Content;
@@ -11,7 +12,6 @@ using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Coordinators;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Utilities;
-using Android.Widget;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 {
@@ -56,7 +56,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
             int paddingValue = Conversion.ConvertDpToPixels(15);
             var externalLayout = new FrameLayout(Context);
-            externalLayout.SetBackgroundResource(Resource.Color.darkerblue);
+            externalLayout.SetBackgroundResource(Resource.Color.white);
             externalLayout.SetPadding(paddingValue, paddingValue, paddingValue, paddingValue);
 
             yearCalendar = new YearCalendar(Context);
@@ -75,47 +75,57 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
     class YearCalendar : SfCalendar
     {
+        readonly Color darkerBlueColor;
+        readonly Color whiteColor;
+        readonly Color lightBlueColor;
+
         public YearCalendar(Context context) : base(context)
         {
+            darkerBlueColor = new Color(ContextCompat.GetColor(context, Resource.Color.darkerblue));
+            whiteColor = new Color(ContextCompat.GetColor(context, Resource.Color.white));
+            lightBlueColor = new Color(ContextCompat.GetColor(context, Resource.Color.lightblue));
+
             MonthViewLabelSetting labelSettings = new MonthViewLabelSetting
             {
-                DateLabelSize = 12
+                DateLabelSize = 10,
             };
 
             MonthViewSettings monthViewSettings = new MonthViewSettings
             {
                 MonthViewLabelSetting = labelSettings,
-                PreviousMonthBackgroundColor = new Color(ContextCompat.GetColor(context, Resource.Color.darkerblue)),
-                WeekEndBackgroundColor = new Color(ContextCompat.GetColor(context, Resource.Color.darkerblue)),
-                WeekDayBackgroundColor = new Color(ContextCompat.GetColor(context, Resource.Color.darkerblue)),
+                PreviousMonthBackgroundColor = whiteColor,
+                WeekEndBackgroundColor = whiteColor,
+                WeekDayBackgroundColor = whiteColor,
                 DayHeight = 0,
-                CurrentMonthBackgroundColor = new Color(ContextCompat.GetColor(context, Resource.Color.darkerblue)),
-                TodayTextColor = new Color(ContextCompat.GetColor(context, Resource.Color.darkerblue)),
-                WeekEndTextColor = new Color(ContextCompat.GetColor(context, Resource.Color.darkerblue)),
-                InlineTextColor = new Color(ContextCompat.GetColor(context, Resource.Color.darkerblue)),
-                DisabledTextColor = new Color(ContextCompat.GetColor(context, Resource.Color.darkerblue)),
-                CurrentMonthTextColor = new Color(ContextCompat.GetColor(context, Resource.Color.darkerblue)),
-                WeekDayTextColor = new Color(ContextCompat.GetColor(context, Resource.Color.darkerblue)),
-                DateSelectionColor = new Color(ContextCompat.GetColor(context, Resource.Color.darkerblue)),
-                SelectedDayTextColor = new Color(ContextCompat.GetColor(context, Resource.Color.darkerblue)),
-                TodaySelectionTextColor = new Color(ContextCompat.GetColor(context, Resource.Color.darkerblue)),
-                TodaySelectionBackgroundColor = new Color(ContextCompat.GetColor(context, Resource.Color.darkerblue)),
-                PreviousMonthTextColor = new Color(ContextCompat.GetColor(context, Resource.Color.darkerblue))
+                CurrentMonthBackgroundColor = whiteColor,
+                TodayTextColor = darkerBlueColor,
+                WeekEndTextColor = whiteColor,
+                InlineTextColor = whiteColor,
+                DisabledTextColor = whiteColor,
+                CurrentMonthTextColor = darkerBlueColor,
+                WeekDayTextColor = whiteColor,
+                DateSelectionColor = whiteColor,
+                SelectedDayTextColor = whiteColor,
+                TodaySelectionTextColor = whiteColor,
+                TodaySelectionBackgroundColor = whiteColor,
+                PreviousMonthTextColor = whiteColor,
+                BorderColor = darkerBlueColor
             };
 
             YearViewSettings yearViewSettings = new YearViewSettings
             {
-                MonthHeaderBackground = new Color(ContextCompat.GetColor(context, Resource.Color.darkerblue)),
-                YearHeaderBackground = new Color(ContextCompat.GetColor(context, Resource.Color.darkerblue)),
-                YearLayoutBackground = new Color(ContextCompat.GetColor(context, Resource.Color.darkerblue)),
-                YearHeaderTextColor = new Color(ContextCompat.GetColor(context, Resource.Color.white)),
-                MonthHeaderTextColor = new Color(ContextCompat.GetColor(context, Resource.Color.white)),
-                DateTextColor = new Color(ContextCompat.GetColor(context, Resource.Color.white)),
+                MonthHeaderBackground = whiteColor,
+                YearHeaderBackground = whiteColor,
+                YearLayoutBackground = whiteColor,
+                YearHeaderTextColor = darkerBlueColor,
+                MonthHeaderTextColor = darkerBlueColor,
+                DateTextColor = darkerBlueColor,
             };
 
             ShowEventsInline = false;
             HeaderHeight = 100;
             ViewMode = ViewMode.YearView;
+            YearViewMode = YearViewMode.Date;
             MonthViewSettings = monthViewSettings;
             YearViewSettings = yearViewSettings;
         }

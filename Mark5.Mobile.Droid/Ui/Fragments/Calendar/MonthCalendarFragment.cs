@@ -120,14 +120,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
             ViewHeaderStyle dayHeaderStyle = new ViewHeaderStyle
             {
-                BackgroundColor = darkerBlueColor,
-                DayTextColor = whiteColor,
+                BackgroundColor = whiteColor,
+                DayTextColor = darkerBlueColor,
             };
 
             HeaderStyle headerStyle = new HeaderStyle
             {
-                BackgroundColor = darkerBlueColor,
-                TextColor = whiteColor,
+                BackgroundColor = whiteColor,
+                TextColor = darkerBlueColor,
             };
 
             ScheduleView = ScheduleView.MonthView;
@@ -137,7 +137,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             {
                 ShowAgendaView = true,
                 TodayBackgroundColor = new Color(lightBlueColor),
-                SelectionTextColor = new Color(whiteColor)
+                SelectionTextColor = new Color(darkerBlueColor)
             };
 
             MonthCellLoaded += MonthSchedule_MonthCellLoaded;
@@ -152,7 +152,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             {
                 cellStyle = new CellStyle
                 {
-                    BackgroundColor = darkerBlueColor,
+                    BackgroundColor = whiteColor,
                     TextColor = darkerBlueColor,
                 };
             }
@@ -160,8 +160,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             {
                 cellStyle = new CellStyle
                 {
-                    BackgroundColor = darkerBlueColor,
-                    TextColor = whiteColor,
+                    BackgroundColor = whiteColor,
+                    TextColor = darkerBlueColor,
                 };
             }
 

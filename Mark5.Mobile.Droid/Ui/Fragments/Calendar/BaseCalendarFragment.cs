@@ -16,7 +16,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         public override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-
             coordinator = ((MainActivity)Activity).CalendarCoordinator;
         }
 

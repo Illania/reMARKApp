@@ -10,12 +10,7 @@ namespace Mark5.Mobile.Droid.Utilities
 {
     public class Preferences
     {
-        readonly ISharedPreferences sp;
-
-        public Preferences()
-        {
-            sp = PreferenceManager.GetDefaultSharedPreferences(Application.Context);
-        }
+        ISharedPreferences sp = PreferenceManager.GetDefaultSharedPreferences(Application.Context);
 
         public IDictionary<string, object> All => sp.All;
 
