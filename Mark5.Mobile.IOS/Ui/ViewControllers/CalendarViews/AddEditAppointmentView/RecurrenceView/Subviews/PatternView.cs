@@ -884,21 +884,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
                 if (Hidden)
                     Hidden = false;
 
+                monthField1.SetSelected(recInfo.Month);
+                monthField2.SetSelected(recInfo.Month);
+                weekDayField.SetSelected(recInfo.WeekDays);
+                weekOfMonthField.SetSelected(recInfo.WeekOfMonth);
+                dayTextField.Text = recInfo.DayNumber.ToString();
+
                 if (recInfo.WeekOfMonth == WeekOfMonth.None)
                 {
                     radioButton1.Enabled = true;
                     radioButton2.Enabled = false;
-                    dayTextField.Text = recInfo.DayNumber.ToString();
-                    monthField1.SetSelected(recInfo.Month);
                 }
                 else
                 {
                     radioButton1.Enabled = false;
                     radioButton2.Enabled = true;
-
-                    weekDayField.SetSelected(recInfo.WeekDays);
-                    weekOfMonthField.SetSelected(recInfo.WeekOfMonth);
-                    monthField2.SetSelected(recInfo.Month);
                 }
             }
 

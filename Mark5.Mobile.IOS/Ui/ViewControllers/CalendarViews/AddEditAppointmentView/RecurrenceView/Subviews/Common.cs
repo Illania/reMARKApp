@@ -242,15 +242,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
         protected override void Update(int i)
         {
             SetText(i);
-            selectedAction?.Invoke(i);
+            selectedAction?.Invoke(i + 1);
         }
 
         public override void SetSelected(int value)
         {
-            if (value < 0)
-                value = 0;
-            SetText(value);
-            (InputView as UIPickerView).Select(value, 0, false);
+            if (value <= 0)
+                value = 1;
+            SetText(value - 1);
+            (InputView as UIPickerView).Select(value - 1, 0, false);
         }
 
         protected override void SetText(int value)
