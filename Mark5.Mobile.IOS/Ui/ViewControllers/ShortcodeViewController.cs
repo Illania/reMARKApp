@@ -36,6 +36,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         bool refreshDataOnAppear;
         bool hideDoneButton;
+        bool hideNavigationButtons;
 
         UIView headerView;
         UILabel nameLabel;
@@ -223,7 +224,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             else
             {
                 NavigationController.ToolbarHidden = true;
-                NavigationItem.SetLeftBarButtonItems(buttonItems, false);
+                if (!hideNavigationButtons)
+                    NavigationItem.SetLeftBarButtonItems(buttonItems, false);
             }
         }
 
@@ -437,7 +439,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             this.shortcodePreview = shortcodePreview;
         }
 
-        public void SetData(ShortcodePreview shortcodePreview, bool hideDoneButton)
+        public void SetData(ShortcodePreview shortcodePreview, bool hideDoneButton, bool hideNavigationButtons = false)
         {
             CommonConfig.UsageAnalytics.LogEvent(new OpenShortcodeEvent());
 
@@ -448,6 +450,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             this.hideDoneButton = hideDoneButton;
             this.shortcodePreview = shortcodePreview;
+            this.hideNavigationButtons = hideNavigationButtons;
         }
 
         public void SetData(int shortcodeId)
