@@ -134,14 +134,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             var yearSelection = new YearViewController(this, date);
             CATransition transition = new CATransition
             {
-                Duration = 0.35,
+                Duration = 0.30,
                 TimingFunction = CAMediaTimingFunction.FromName(CAMediaTimingFunction.Linear),
-                Type = CAAnimation.TransitionPush,
+                Type = CAAnimation.TransitionMoveIn,
                 Subtype = CAAnimation.TransitionFromLeft,
             };
 
+            RootController.View.Window.BackgroundColor = UIColor.White;
+            RootController.View.Layer.BackgroundColor = UIColor.White.CGColor;
+
+
             RootController.View.Layer.AddAnimation(transition, null);
-            RootController.PushViewController(yearSelection, false);
+            RootController.PushViewController(yearSelection, true);
         }
 
         public void HourTapped(NSDate date)
