@@ -139,7 +139,7 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
         {
             var (fragment, tag) = AddEditAppointmentFragment.NewInstance();
             fragmentManager.BeginTransaction()
-                .Add(Resource.Id.fragment_container, fragment, tag)  //TODO should put add almost everywhere
+                .Replace(Resource.Id.fragment_container, fragment, tag)
                 .AddToBackStack(tag)
                 .Commit();
         }

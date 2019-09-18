@@ -4,9 +4,11 @@ using Android.Content;
 using Android.Graphics;
 using Android.OS;
 using Android.Support.V4.Content;
+using Android.Support.V7.App;
 using Android.Views;
 using Com.Syncfusion.Schedule;
 using Com.Syncfusion.Schedule.Enums;
+using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 {
@@ -28,11 +30,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         {
             HasOptionsMenu = true;
 
+            (Activity as BaseAppCompatActivity).Fab.Visibility = ViewStates.Gone;
+
             schedule = new MonthSchedule(Context);
             schedule.CellDoubleTapped += Schedule_CellDoubleTapped;
             schedule.HeaderTapped += Schedule_HeaderTapped;
             schedule.MonthInlineAppointmentTapped += Schedule_MonthInlineAppointmentTapped;
+
             return schedule;
+        }
+
+        public override void OnResume()
+        {
+            base.OnResume();
+
+            (Activity as AppCompatActivity).SupportActionBar.SetTitle(Resource.String.calendar);
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
@@ -53,13 +65,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             addAppointment.SetIcon(Resource.Drawable.add_appointment);
             addAppointment.SetShowAsAction(ShowAsAction.Always);
             addAppointment.SetOnMenuItemClickListener(this);
-        }
-
-        public override void OnViewCreated(View view, Bundle savedInstanceState)
-        {
-            base.OnViewCreated(view, savedInstanceState);
-
-            coordinator.MonthViewLoaded();
         }
 
         public bool OnMenuItemClick(IMenuItem item)
