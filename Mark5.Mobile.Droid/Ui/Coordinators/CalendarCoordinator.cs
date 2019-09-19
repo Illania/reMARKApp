@@ -39,16 +39,6 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
             presenter = new CalendarPresenter();
             presenter.AttachView(this);
             presenter.Start();
-
-            fragmentManager.BackStackChanged += FragmentManager_BackStackChanged;
-        }
-
-        private void FragmentManager_BackStackChanged(object sender, EventArgs e)
-        {
-            var last = fragmentManager.Fragments.LastOrDefault();
-
-            if (last is ICalendarNamedFragment namedFragment)
-                activity.SupportActionBar.SetTitle(namedFragment.NameResource);
         }
 
         public (BaseFragment, string) GetMainFragment() => (monthCalendarFragment, _) = MonthCalendarFragment.NewInstance();
@@ -336,10 +326,4 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
         void MonthTapped(Calendar newValue);
         void RefreshClicked(Calendar startDate, Calendar endDate);
     }
-
-    public interface ICalendarNamedFragment
-    {
-        int NameResource { get; }
-    }
-
 }

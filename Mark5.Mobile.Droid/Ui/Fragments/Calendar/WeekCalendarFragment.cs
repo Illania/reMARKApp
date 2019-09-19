@@ -45,7 +45,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             HasOptionsMenu = true;
-            schedule = new WeekSchedule(Context);
+
+            schedule = schedule ?? new WeekSchedule(Context);
 
             return schedule;
         }

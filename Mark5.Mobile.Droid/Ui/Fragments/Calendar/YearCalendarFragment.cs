@@ -59,9 +59,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             externalLayout.SetBackgroundResource(Resource.Color.darkerblue);
             externalLayout.SetPadding(paddingValue, paddingValue, paddingValue, paddingValue);
 
-            yearCalendar = new YearCalendar(Context);
-            yearCalendar.MonthChanged += YearCalendar_MonthChanged;
-            yearCalendar.MoveToDate = initialDate;
+            if (yearCalendar == null)
+            {
+                yearCalendar = new YearCalendar(Context);
+                yearCalendar.MonthChanged += YearCalendar_MonthChanged;
+                yearCalendar.MoveToDate = initialDate;
+            }
+
             externalLayout.AddView(yearCalendar);
 
             return externalLayout;
