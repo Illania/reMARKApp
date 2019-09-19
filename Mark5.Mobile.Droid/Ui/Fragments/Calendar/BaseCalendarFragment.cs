@@ -28,15 +28,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             View.SetBackgroundColor(Color.White);
 
             schedule.AppointmentMapping = GetAppointmentMapping();
-
-            var visibleDate = (Java.Util.Calendar)savedInstanceState?.GetSerializable(VisibleDateKey);
-            var selectedDate = (Java.Util.Calendar)savedInstanceState?.GetSerializable(SelectedDateKey);
-
-            if (visibleDate != null)
-                schedule.MoveToDate = visibleDate;
-
-            if (selectedDate != null)
-                schedule.SelectedDate = selectedDate;
         }
 
         public override void OnResume()

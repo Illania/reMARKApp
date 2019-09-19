@@ -148,12 +148,9 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
             firstLoad = false;
 
-            if (e.Appointments?.Any() == true)
-            {
-                var appointmentsViewModels = e.Appointments?.Select(ConvertToViewModels).SelectMany(x => x);
-                view.UpdateAppointments(appointmentsViewModels, e.Start, e.End);
-                view.StopLoading();
-            }
+            var appointmentsViewModels = e.Appointments?.Select(ConvertToViewModels).SelectMany(x => x);
+            view.UpdateAppointments(appointmentsViewModels, e.Start, e.End);
+            view.StopLoading();
         }
 
         private void Cache_NoAppointmentToRetrieve(object sender, EventArgs e)

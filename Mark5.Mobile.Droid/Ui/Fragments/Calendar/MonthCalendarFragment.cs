@@ -3,6 +3,7 @@ using Android.Content;
 using Android.Graphics;
 using Android.OS;
 using Android.Support.V4.Content;
+using Android.Support.V7.App;
 using Android.Views;
 using Com.Syncfusion.Schedule;
 using Com.Syncfusion.Schedule.Enums;
@@ -73,6 +74,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 coordinator.CreateAppointmentClicked();
 
             return true;
+        }
+
+        public override void OnResume()
+        {
+            base.OnResume();
+
+            (Activity as AppCompatActivity).SupportActionBar.SetTitle(Resource.String.calendar);
         }
 
         void Refresh()
