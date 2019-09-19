@@ -26,6 +26,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 SegmentedControl.SetTitleTextAttributes(new UITextAttributes { TextColor = Theme.DarkerBlue }, UIControlState.Selected);
                 SegmentedControl.SetTitleTextAttributes(new UITextAttributes { TextColor = Theme.White }, UIControlState.Normal);
             }
+            else
+            {
+                SegmentedControl.SetTitleTextAttributes(new UITextAttributes { TextColor = Theme.White }, UIControlState.Selected);
+                SegmentedControl.SetTitleTextAttributes(new UITextAttributes { TextColor = Theme.White }, UIControlState.Normal);
+            }
         }
 
         public override void ViewDidLoad()
