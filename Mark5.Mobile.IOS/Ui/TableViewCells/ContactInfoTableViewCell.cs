@@ -32,7 +32,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 ScrollEnabled = false,
                 ClipsToBounds = false,
                 TextContainerInset = UIEdgeInsets.Zero,
-                TranslatesAutoresizingMaskIntoConstraints = false
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                BackgroundColor = UIColor.Clear
             };
             bottomTextView.ApplyTheme();
             bottomTextView.TextContainer.LineFragmentPadding = 0f;
