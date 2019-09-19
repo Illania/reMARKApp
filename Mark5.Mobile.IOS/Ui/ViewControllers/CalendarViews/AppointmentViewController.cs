@@ -279,7 +279,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         public void ShowDeletingDialog()
         {
-            progressDialogDismissal = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("deleting__"));
+            progressDialogDismissal = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("deleting___"));
         }
 
         public void ShowSendInvitationsDialog()

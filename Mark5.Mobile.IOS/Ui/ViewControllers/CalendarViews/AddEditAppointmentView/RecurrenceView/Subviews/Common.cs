@@ -4,7 +4,6 @@ using System.Linq;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Presenters.CalendarModule;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
@@ -243,15 +242,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
         protected override void Update(int i)
         {
             SetText(i);
-            selectedAction?.Invoke(i);
+            selectedAction?.Invoke(i + 1);
         }
 
         public override void SetSelected(int value)
         {
-            if (value < 0)
-                value = 0;
-            SetText(value);
-            (InputView as UIPickerView).Select(value, 0, false);
+            if (value <= 0)
+                value = 1;
+            SetText(value - 1);
+            (InputView as UIPickerView).Select(value - 1, 0, false);
         }
 
         protected override void SetText(int value)
@@ -285,7 +284,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
             SetText(selectedDate);
 
             var selectedDateComponents = NSCalendar.CurrentCalendar.Components(NSCalendarUnit.Day | NSCalendarUnit.Month | NSCalendarUnit.Year, selectedDate);
-            var date = new DateTime((int)selectedDateComponents.Year, (int)selectedDateComponents.Month, (int)selectedDateComponents.Day, 0, 0, 0, DateTimeKind.Utc);
+            var date = new DateTime((int)selectedDateComponents.Year, (int)selectedDateComponents.Month, (int)selectedDateComponents.Day, 0, 0, 0, DateTimeKind.Local);
 
             selectedAction?.Invoke(date);
         }
@@ -306,7 +305,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
 
         void SetText(NSDate date)
         {
-            Text = Utilities.DateTimeFormatter.ShortDateFormatter.StringFor(date);
+            var dateFormatter = new NSDateFormatter
+            {
+                DateStyle = NSDateFormatterStyle.Short,
+                TimeStyle = NSDateFormatterStyle.None,
+                TimeZone = NSTimeZone.LocalTimeZone,
+                Locale = NSLocale.CurrentLocale,
+            };
+
+            Text = dateFormatter.StringFor(date);
         }
     }
 

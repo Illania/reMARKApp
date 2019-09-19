@@ -35,7 +35,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
                 Font = Theme.DefaultFont,
                 TextColor = Theme.DarkGray,
                 UserInteractionEnabled = false,
-                TextAlignment = UITextAlignment.Justified,
+                TextAlignment = UITextAlignment.Natural,
                 Lines = 0,
             };
             Label.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
