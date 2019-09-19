@@ -11,6 +11,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 {
     public class BaseCalendarFragment : BaseFragment
     {
+        const string SelectedDateKey = "SelectedDateKey";
+        const string VisibleDateKey = "VisibleDateKey";
+
         protected ICalendarCoordinator coordinator;
         protected SfSchedule schedule;
 
@@ -28,6 +31,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             View.SetBackgroundColor(Color.White);
 
             schedule.AppointmentMapping = GetAppointmentMapping();
+
+            var visibleDate = (Java.Util.Calendar)savedInstanceState?.GetSerializable(VisibleDateKey);
+            var selectedDate = (Java.Util.Calendar)savedInstanceState?.GetSerializable(SelectedDateKey);
+
+            if (visibleDate != null)
+                schedule.MoveToDate = visibleDate;
+
+            if (selectedDate != null)
+                schedule.SelectedDate = selectedDate;
         }
 
         public override void OnResume()
@@ -59,6 +71,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 schedule.MoveToDate = date;
                 schedule.SelectedDate = date;
             }
+        }
+
+        public override void OnSaveInstanceState(Bundle outState)
+        {
+            base.OnSaveInstanceState(outState);
+
+            outState.PutSerializable(SelectedDateKey, schedule.SelectedDate);
+            outState.PutSerializable(VisibleDateKey, schedule.VisibleDates.First());
         }
 
         public static AppointmentMapping GetAppointmentMapping()

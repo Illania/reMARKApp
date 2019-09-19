@@ -78,12 +78,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
             presenter = new AppointmentPresenter();
             presenter.AttachView(this);
+            presenter.Start();
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             CommonConfig.Logger.Info($"Creating {nameof(AppointmentFragment)}");
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_base, container, false);
+            rootView.SetBackgroundColor(Color.White);
 
             containerLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
 
@@ -98,7 +100,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
             participantsView.ShowParticipantsClicked += ParticipantsView_ShowParticipantsClicked;
             participantsView.SendInvitationClicked += SendInvitationsButton_TouchUpInside;
-
 
             foreach (var subview in subviews)
             {
@@ -142,15 +143,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             return rootView;
         }
 
-        public override void OnViewCreated(View view, Bundle savedInstanceState)
-        {
-            base.OnViewCreated(view, savedInstanceState);
-        }
-
         public override async void OnResume()
         {
             base.OnResume();
             await presenter.LoadAppointment(appointmentId, recurrenceIndex, calendarId);
+        }
+
+        public override void OnDestroy()
+        {
+            presenter?.Stop();
+            base.OnDestroy();
         }
 
         private void ParticipantsView_ShowParticipantsClicked(object sender, EventArgs e)

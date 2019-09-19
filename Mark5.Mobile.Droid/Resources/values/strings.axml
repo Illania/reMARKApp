@@ -121,7 +121,7 @@
     <string name="edit_appointment">Edit Appointment</string>
     <string name="edit_comment_message">Edit comment message</string>
     <string name="editing_comment">Editing comment</string>
-    <string name="editing_appointment">Editing comment...</string>
+    <string name="editing_appointment">Editing appointment...</string>
     <string name="edit_contact_edit_loading">Editing contact...</string>
     <string name="edit_contact_add_loading">Creating contact...</string>
     <string name="edit_contact_dialog_title">New contact</string>

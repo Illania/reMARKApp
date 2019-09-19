@@ -123,6 +123,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             rootView.SetBackgroundColor(Color.White);
 
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
+            linearLayout.Alpha = 0;
             linearLayout.DescendantFocusability = DescendantFocusability.BeforeDescendants;
             linearLayout.FocusableInTouchMode = true;
 
@@ -168,6 +169,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 if (viewModel != null)
                     ShowAppointment(viewModel);
             }
+
+            linearLayout.Animate().Alpha(1f).SetDuration(500);
         }
 
         #endregion
