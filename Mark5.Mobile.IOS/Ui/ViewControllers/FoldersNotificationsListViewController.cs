@@ -28,11 +28,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (Integration.IsRunningAtLeast(13))
             {
-                var attributesSelected = new UITextAttributes { TextColor = Theme.White };
-                var attributesNormal = new UITextAttributes { TextColor = Theme.DarkerBlue };
-
-                SegmentedControl.SetTitleTextAttributes(attributesSelected, UIControlState.Selected);
-                SegmentedControl.SetTitleTextAttributes(attributesNormal, UIControlState.Normal);
+                SegmentedControl.SetTitleTextAttributes(new UITextAttributes { TextColor = Theme.DarkerBlue }, UIControlState.Selected);
+                SegmentedControl.SetTitleTextAttributes(new UITextAttributes { TextColor = Theme.DarkerBlue }, UIControlState.Normal);
             }
 
             ViewControllers = new UIViewController[]
