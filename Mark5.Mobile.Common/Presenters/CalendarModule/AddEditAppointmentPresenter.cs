@@ -60,13 +60,13 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 CommonConfig.Logger.Info($"Retrieving appointment: AppointmentId = {appointmentId}, CalendarId = {calendarId} ");
 
                 var appointment = await Managers.CalendarManager.GetCalendarAppointmentAsync(calendarId, appointmentId, SourceType.Local);
+
                 view.ShowAppointment(AddEditAppointmentViewModel.ConvertToViewModel(appointment));
             }
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error($"Error while getting appointment with ID = {appointmentId}", ex);
 
-                view.StopLoading();
                 await view.ShowLoadError(ex);
 
                 view.CloseView();

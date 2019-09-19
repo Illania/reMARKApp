@@ -60,9 +60,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         {
             if (schedule != null)
             {
+                schedule.CellTapped += Schedule_CellTapped;
                 schedule.CellLongPressed += ReMarkDayCalendar_CellTapped;
                 schedule.CellDoubleTapped += ReMarkDayCalendar_CellTapped;
                 schedule.VisibleDatesChanged += Schedule_VisibleDatesChanged;
+
             }
 
             if (addButtonItem != null)
@@ -76,6 +78,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         {
             if (schedule != null)
             {
+                schedule.CellTapped -= Schedule_CellTapped;
                 schedule.CellLongPressed -= ReMarkDayCalendar_CellTapped;
                 schedule.CellDoubleTapped -= ReMarkDayCalendar_CellTapped;
                 schedule.VisibleDatesChanged -= Schedule_VisibleDatesChanged;
@@ -86,6 +89,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             if (switchButtonItem != null)
                 switchButtonItem.Clicked -= ScheduleSwitchBtn_Clicked;
+        }
+
+        void Schedule_CellTapped(object sender, CellTappedEventArgs e)
+        {
+            if (e.ScheduleAppointment != null)
+                Coordinator.AppointmentTapped(e.ScheduleAppointment);
         }
 
         void ReMarkDayCalendar_CellTapped(object sender, CellTappedEventArgs e)
@@ -133,10 +142,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         void ScheduleSwitchBtn_Clicked(object sender, EventArgs e)
         {
-            if (schedule.ScheduleView == SFScheduleView.SFScheduleViewWorkWeek)
+            if (schedule.ScheduleView == SFScheduleView.SFScheduleViewWeek)
                 schedule.ScheduleView = SFScheduleView.SFScheduleViewDay;
             else
-                schedule.ScheduleView = SFScheduleView.SFScheduleViewWorkWeek;
+                schedule.ScheduleView = SFScheduleView.SFScheduleViewWeek;
 
             UpdateSwitchButtonTitle();
         }

@@ -14,7 +14,7 @@ using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 {
-    public class AppointmentParticipantsViewController : AbstractTableViewController, IUITableViewDelegate
+    public class AddEditAppointmentParticipantsViewController : AbstractTableViewController, IUITableViewDelegate
     {
         readonly TaskCompletionSource<List<ParticipantsViewModel>> tcs = new TaskCompletionSource<List<ParticipantsViewModel>>();
         public Task<List<ParticipantsViewModel>> Result => tcs.Task;
@@ -26,7 +26,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         AddEditAppointmentViewModel viewModel;
 
-        public AppointmentParticipantsViewController(AddEditAppointmentViewModel viewModel)
+        public AddEditAppointmentParticipantsViewController(AddEditAppointmentViewModel viewModel)
         {
             this.viewModel = viewModel;
         }
