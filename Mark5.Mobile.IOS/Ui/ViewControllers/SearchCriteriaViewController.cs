@@ -20,17 +20,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             SegmentedControl.InsertSegment(Localization.GetString("documents"), 0, false);
             SegmentedControl.InsertSegment(Localization.GetString("contacts"), 1, false);
             SegmentedControl.InsertSegment(Localization.GetString("shortcodes"), 2, false);
-
-            if (Integration.IsRunningAtLeast(13))
-            {
-                SegmentedControl.SetTitleTextAttributes(new UITextAttributes { TextColor = Theme.DarkerBlue }, UIControlState.Selected);
-                SegmentedControl.SetTitleTextAttributes(new UITextAttributes { TextColor = Theme.White }, UIControlState.Normal);
-            }
-            else
-            {
-                SegmentedControl.SetTitleTextAttributes(new UITextAttributes { TextColor = Theme.White }, UIControlState.Selected);
-                SegmentedControl.SetTitleTextAttributes(new UITextAttributes { TextColor = Theme.White }, UIControlState.Normal);
-            }
         }
 
         public override void ViewDidLoad()
