@@ -20,6 +20,5 @@
         app:headerLayout="@layout/drawer_header"
         app:menu="@menu/menu_drawer"
         app:itemTextColor="@color/drawer_item"
-        app:itemIconTint="@color/drawer_item_icon"
-        app:itemBackground="@color/drawer_item_background" />
+        app:itemIconTint="@color/drawer_item_icon" />
 </android.support.v4.widget.DrawerLayout>
