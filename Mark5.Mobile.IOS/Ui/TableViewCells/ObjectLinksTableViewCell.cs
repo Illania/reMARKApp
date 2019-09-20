@@ -28,6 +28,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             typeDescription = new UITextView
             {
                 Selectable = false,
+                BackgroundColor = UIColor.Clear,
                 Editable = false,
                 ScrollEnabled = false,
                 ClipsToBounds = false,

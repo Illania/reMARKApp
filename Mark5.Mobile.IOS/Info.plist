@@ -52,6 +52,8 @@
 		<string>googlechrome</string>
 		<string>comgooglemapsurl</string>
 	</array>
+	<key>UIUserInterfaceStyle</key>
+	<string>Light</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>We need access to your photos to be able to attach pictures to email.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
@@ -67,8 +69,8 @@
 	<key>CFBundleName</key>
 	<string>reMARK</string>
 	<key>CFBundleShortVersionString</key>
-	<string>5.2</string>
+	<string>5.2.1</string>
 	<key>CFBundleVersion</key>
-	<string>507</string>
+	<string>509</string>
 </dict>
 </plist>

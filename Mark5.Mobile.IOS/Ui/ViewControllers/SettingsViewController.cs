@@ -36,8 +36,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         const string SendFeedbackKey = "sendFeedback";
         const string ServerAddressKey = "serverAddress";
         const string SslEnabledKey = "sslEnabled";
-        const string SynchroniseContactsKey = "SynchroniseContacts";
-        const string SynchroniseShortcodesKey = "SynchroniseShortcodes";
         const string UpdateConfigKey = "updateConfig";
         const string UsernameKey = "username";
         const string UseTemplateKey = "UseTemplate";
@@ -74,7 +72,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (NavigationController != null)
                     NavigationController.NavigationBar.PrefersLargeTitles = true;
                 NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
-
+                TableView.CellLayoutMarginsFollowReadableWidth = true;
                 TableView.InsetsContentViewsToSafeArea = true;
             }
 
@@ -496,10 +494,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 hiddenKeys.Add(SyncFavoriteFoldersKey);
             }
 
-            if (PlatformConfig.Preferences.UseTemplate == Preferences.TemplateUsageMode.Local || PlatformConfig.Preferences.UseTemplate == Preferences.TemplateUsageMode.AlwaysAsk)
+            if (PlatformConfig.Preferences.UseTemplate != Preferences.TemplateUsageMode.Local && PlatformConfig.Preferences.UseTemplate != Preferences.TemplateUsageMode.AlwaysAsk)
                 hiddenKeys.Add(LocalTemplateKey);
 
-            SetHiddenKeys((string[])hiddenKeys.ToArray(), false);
+            SetHiddenKeys(hiddenKeys.ToArray(), false);
         }
 
         class CustomSpecifierValuesViewController : SpecifierValuesViewController

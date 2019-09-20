@@ -68,7 +68,7 @@
 		<ErrorReport>prompt</ErrorReport>
 		<WarningLevel>4</WarningLevel>
 		<CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
-		<MtouchArch>ARMv7, ARM64</MtouchArch>
+		<MtouchArch>ARM64</MtouchArch>
 		<ConsolePause>false</ConsolePause>
 		<CodesignKey>iPhone Distribution: Nordic IT Europe ApS (5Q7TTRG4M4)</CodesignKey>
 		<RunCodeAnalysis>true</RunCodeAnalysis>
