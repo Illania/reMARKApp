@@ -26,16 +26,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             SegmentedControl.InsertSegment(Localization.GetString("folders"), 0, false);
             SegmentedControl.InsertSegment(Localization.GetString("notifications"), 1, false);
 
-            if (Integration.IsRunningAtLeast(13))
-            {
-                SegmentedControl.SetTitleTextAttributes(new UITextAttributes { TextColor = Theme.White }, UIControlState.Selected);
-                SegmentedControl.SetTitleTextAttributes(new UITextAttributes { TextColor = Theme.DarkerBlue }, UIControlState.Normal);
-            }
-            else
-            {
-                SegmentedControl.SetTitleTextAttributes(new UITextAttributes { TextColor = Theme.White }, UIControlState.Selected);
-                SegmentedControl.SetTitleTextAttributes(new UITextAttributes { TextColor = Theme.White }, UIControlState.Normal);
-            }
+            SegmentedControl.SetTitleTextAttributes(new UITextAttributes { TextColor = Theme.White }, UIControlState.Selected);
+            SegmentedControl.SetTitleTextAttributes(new UITextAttributes { TextColor = Theme.DarkerBlue }, UIControlState.Normal);
 
             ViewControllers = new UIViewController[]
             {
