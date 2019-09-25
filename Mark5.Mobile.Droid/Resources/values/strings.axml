@@ -124,7 +124,6 @@
     <string name="edit_contact_short_id">Short ID</string>
     <string name="edit_contact_birthdate">Birthdate</string>
     <string name="edit_contact_position">Position</string>
-    <string name="edit_contact_description">Description</string>
     <string name="edit_contact_webpage">Webpage</string>
     <string name="edit_contact_responsible">Responsible users</string>
     <string name="edit_contact_email">Email</string>

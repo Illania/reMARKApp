@@ -557,7 +557,6 @@
     <AndroidResource Include="Resources\anim\slide_down.xml" />
     <AndroidResource Include="Resources\anim\slide_up.xml" />
     <AndroidResource Include="Resources\color\drawer_item.xml" />
-    <AndroidResource Include="Resources\color\drawer_item_background.xml" />
     <AndroidResource Include="Resources\color\drawer_item_icon.xml" />
     <AndroidResource Include="Resources\drawable\circle.axml" />
     <AndroidResource Include="Resources\drawable\circle_dark.xml" />
