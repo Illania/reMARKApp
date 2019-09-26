@@ -162,20 +162,8 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             if (ReminderTimeBeforeStart >= 0)
                 ca.ReminderAlertDate = Start.AddSeconds(-ReminderTimeBeforeStart);
 
-            //var recStart = RecurrenceInfo.StartDate;
-            //var recEnd = RecurrenceInfo.EndDate;
-
-            //if (ca.AllDay)
-            //{
-            //    ca.RecurrenceInfo.StartDate = new DateTime(recStart.Year, recStart.Month, recStart.Day, 0, 0, 0, recStart.Kind);
-            //    ca.RecurrenceInfo.EndDate = new DateTime(recEnd.Year, recEnd.Month, recEnd.Day, 0, 0, 0, recEnd.Kind);
-            //}
-            //else
-            //{
-            //    ca.RecurrenceInfo.StartDate = new DateTime(recStart.Year, recStart.Month, recStart.Day, Start.Hour, Start.Minute, Start.Second, recStart.Kind);
-            //    ca.RecurrenceInfo.EndDate = new DateTime(recEnd.Year, recEnd.Month, recEnd.Day, End.Hour, End.Minute, End.Second, recEnd.Kind);
-            //}
-
+            var recEnd = RecurrenceInfo.EndDate;
+            ca.RecurrenceInfo.EndDate = new DateTime(recEnd.Year, recEnd.Month, recEnd.Day, End.Hour, End.Minute, End.Second, DateTimeKind.Utc);
 
             ca.Occurrences.Add(new CalendarAppointmentOccurrence
             {
