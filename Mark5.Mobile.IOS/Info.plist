@@ -69,8 +69,8 @@
 	<key>CFBundleName</key>
 	<string>reMARK</string>
 	<key>CFBundleShortVersionString</key>
-	<string>5.2.3</string>
+	<string>5.2.4</string>
 	<key>CFBundleVersion</key>
-	<string>511</string>
+	<string>512</string>
 </dict>
 </plist>
