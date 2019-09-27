@@ -231,9 +231,18 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
                 firstLine.AddView(weeksLabel);
 
                 weekDaysSelectionView = new WeekDaysSelectionView(context);
+                weekDaysSelectionView.SelectionChanged += WeekDaysSelectionView_SelectionChanged;
 
                 AddView(firstLine);
                 AddView(weekDaysSelectionView);
+            }
+
+            private void WeekDaysSelectionView_SelectionChanged(object sender, (WeekDays wd, bool selected) e)
+            {
+                if (e.selected)
+                    ri.WeekDays |= e.wd;
+                else
+                    ri.WeekDays &= ~e.wd;
             }
 
             private void WeeksTextField_TextChanged(object sender, string e)

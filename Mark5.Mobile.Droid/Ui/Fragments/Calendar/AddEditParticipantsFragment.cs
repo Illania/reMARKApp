@@ -126,7 +126,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 outState.PutString(ParticipantsKey, Serializer.Serialize(participants));
         }
 
-        public override async void OnActivityResult(int requestCode, int resultCode, Intent data)
+        public override void OnActivityResult(int requestCode, int resultCode, Intent data)
         {
             ParticipantsViewModel newParticipant = null;
 
