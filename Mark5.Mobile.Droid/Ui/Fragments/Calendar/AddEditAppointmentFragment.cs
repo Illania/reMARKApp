@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Globalization;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -20,7 +21,6 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Presenters.CalendarModule;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
-using System.Linq;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 {
@@ -557,6 +557,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
     {
         SwitchCompat ToggleButton;
         Action toggleChanged = delegate { };
+        bool initialLoad = true;
 
         public AllDayToggleView(Context context, Action toggleChanged)
             : base(context, Resource.Drawable.time)
@@ -590,7 +591,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         private void ToggleButton_CheckedChange(object sender, CompoundButton.CheckedChangeEventArgs e)
         {
-            ViewModel.AllDay = !ViewModel.AllDay;
+            if (!initialLoad)
+                ViewModel.AllDay = !ViewModel.AllDay;
+
+            initialLoad = false;
             toggleChanged.Invoke();
         }
 
