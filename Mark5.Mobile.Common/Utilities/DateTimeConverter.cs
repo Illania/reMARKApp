@@ -34,6 +34,18 @@ namespace Mark5.Mobile.Common.Utilities
             return dt.AddHours(UseServerTimezone ? -GetServerUtcOffset(dateTime) : -GetLocalUtcOffset(dateTime));
         }
 
+        public static DateTime ConvertUtcToUserTimeCalendar(this DateTime dateTime)
+        {
+            var dt = DateTime.SpecifyKind(dateTime, DateTimeKind.Unspecified);
+            return dt.AddHours(+GetLocalUtcOffset(dateTime));
+        }
+
+        public static DateTime ConvertUserTimeToUtcCalendar(this DateTime dateTime)
+        {
+            var dt = DateTime.SpecifyKind(dateTime, DateTimeKind.Utc);
+            return dt.AddHours(-GetLocalUtcOffset(dateTime));
+        }
+
         public static DateTime ConvertUtcToServerTime(this DateTime dateTime)
         {
             var dt = DateTime.SpecifyKind(dateTime, DateTimeKind.Unspecified);

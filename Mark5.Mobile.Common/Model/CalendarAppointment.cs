@@ -79,8 +79,8 @@ namespace Mark5.Mobile.Common.Model
         [Ignore]
         public DateTime ReminderAlertDate
         {
-            get => ReminderAlertTime.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime();
-            set { ReminderAlertTime = value.ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds(); }
+            get => ReminderAlertTime.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTimeCalendar();
+            set { ReminderAlertTime = value.ConvertUserTimeToUtcCalendar().ConvertDateTimeToTimestampMilliseconds(); }
         }
 
         public override string ToString()

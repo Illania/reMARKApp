@@ -32,8 +32,8 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task<List<CalendarAppointment>> GetCalendarAppointmentsAsync(List<int> calendarIds, DateTime startDate, DateTime endDate, SourceType sourceType = SourceType.Auto)
         {
-            var startDateUTC = startDate.ConvertUserTimeToUtc();
-            var endDateUTC = endDate.ConvertUserTimeToUtc();
+            var startDateUTC = startDate.ConvertUserTimeToUtcCalendar();
+            var endDateUTC = endDate.ConvertUserTimeToUtcCalendar();
 
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
@@ -135,8 +135,8 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task<List<CalendarAppointmentOccurrence>> GetCalendarAppointmentOccurrencesAsync(int calendarId, int calendarAppointmentId, DateTime startDate, DateTime endDate, SourceType sourceType = SourceType.Auto)
         {
-            var startDateUTC = startDate.ConvertUserTimeToUtc();
-            var endDateUTC = endDate.ConvertUserTimeToUtc();
+            var startDateUTC = startDate.ConvertUserTimeToUtcCalendar();
+            var endDateUTC = endDate.ConvertUserTimeToUtcCalendar();
 
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
@@ -164,8 +164,8 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task<List<CalendarAlarm>> GetCalendarAlarmsAsync(List<int> calendarIds, DateTime startDate, DateTime endDate, SourceType sourceType = SourceType.Auto)
         {
-            var startDateUTC = startDate.ConvertUserTimeToUtc();
-            var endDateUTC = endDate.ConvertUserTimeToUtc();
+            var startDateUTC = startDate.ConvertUserTimeToUtcCalendar();
+            var endDateUTC = endDate.ConvertUserTimeToUtcCalendar();
 
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;

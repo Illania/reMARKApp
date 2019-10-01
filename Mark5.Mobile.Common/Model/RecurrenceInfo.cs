@@ -36,14 +36,14 @@ namespace Mark5.Mobile.Common.Model
 
         public DateTime StartDate
         {
-            get => StartTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime();
-            set => StartTimestamp = value.ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
+            get => StartTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTimeCalendar();
+            set => StartTimestamp = value.ConvertUserTimeToUtcCalendar().ConvertDateTimeToTimestampMilliseconds();
         }
 
         public DateTime EndDate
         {
-            get => EndTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime();
-            set => EndTimestamp = value.ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
+            get => EndTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTimeCalendar();
+            set => EndTimestamp = value.ConvertUserTimeToUtcCalendar().ConvertDateTimeToTimestampMilliseconds();
         }
 
         public string ToFriendlyString()
