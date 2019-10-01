@@ -69,7 +69,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             menu.Clear();
 
             var createAppointmentItem = menu.Add(Menu.None, MenuItemActions.CreateAppoitnment, MenuItemActions.CreateAppoitnment, Resource.String.insert_template);
-            createAppointmentItem.SetIcon(Resource.Drawable.action_add);
+            createAppointmentItem.SetIcon(Resource.Drawable.add_appointment);
             createAppointmentItem.SetShowAsAction(ShowAsAction.Always);
             createAppointmentItem.SetOnMenuItemClickListener(this);
 
