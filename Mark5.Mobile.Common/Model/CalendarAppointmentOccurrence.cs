@@ -34,6 +34,10 @@ namespace Mark5.Mobile.Common.Model
             set { EndDateTimestamp = value.ConvertUserTimeToUtcCalendar().ConvertDateTimeToTimestampMilliseconds(); }
         }
 
+        public DateTime AllDayStartDate => StartDateTimestamp.ConvertTimestampMillisecondsToDateTime();
+
+        public DateTime AllDayEndDate => EndDateTimestamp.ConvertTimestampMillisecondsToDateTime();
+
         public override string ToString()
         {
             return string.Format("[CalendarAppointmentOccurrence: RecurrenceIndex={0}, StartDate={1}, EndDate={2}]", RecurrenceIndex, StartDate, EndDate);

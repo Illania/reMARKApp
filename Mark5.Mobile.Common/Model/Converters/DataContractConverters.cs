@@ -46,7 +46,8 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Priority = ca.Priority.ConvertEnum<Priority>(),
                 Type = ca.Type.ConvertEnum<CalendarOccurenceType>(),
                 Description = ca.Description,
-                RecurrenceInfo = ca.RecurrenceInfo?.Convert()
+                RecurrenceInfo = ca.RecurrenceInfo?.Convert(),
+                SerializedTimeZoneInfo = ca.SerializedTimeZoneInfo,
             };
 
             if (ca.ReminderAlertTime != null)
@@ -862,6 +863,7 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Participants = ca.Participants.Select(p => p.Convert()).ToList(),
                 Description = ca.Description,
                 RecurrenceInfo = ca.RecurrenceInfo?.Convert(),
+                SerializedTimeZoneInfo = ca.SerializedTimeZoneInfo,
             };
 
             if (ca.ReminderAlertTime > 0)

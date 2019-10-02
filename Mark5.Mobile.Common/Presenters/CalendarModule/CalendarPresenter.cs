@@ -263,17 +263,29 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         static AppointmentPreviewViewModel ConvertToViewModel(CalendarAppointment ca, CalendarAppointmentOccurrence cao, Dictionary<int, string> calendarColors)
         {
-            return new AppointmentPreviewViewModel
+            var apv = new AppointmentPreviewViewModel
             {
                 Id = ca.Id,
                 RecurrenceIndex = cao.RecurrenceIndex,
                 CalendarId = ca.CalendarId,
                 Subject = ca.Subject,
                 AllDay = ca.AllDay,
-                Start = cao.StartDate,
-                End = cao.EndDate,
+
                 HexColor = calendarColors[ca.CalendarId],
             };
+
+            if (apv.AllDay)
+            {
+                apv.Start = cao.AllDayStartDate;
+                apv.End = cao.AllDayEndDate;
+            }
+            else
+            {
+                apv.Start = cao.StartDate;
+                apv.End = cao.EndDate;
+            }
+
+            return apv;
         }
 
         public override string ToString()

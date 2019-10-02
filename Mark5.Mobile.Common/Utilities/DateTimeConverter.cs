@@ -36,12 +36,18 @@ namespace Mark5.Mobile.Common.Utilities
 
         public static DateTime ConvertUtcToUserTimeCalendar(this DateTime dateTime)
         {
-            var dt = DateTime.SpecifyKind(dateTime, DateTimeKind.Unspecified);
+            if (dateTime.Kind == DateTimeKind.Local)
+                return dateTime;
+
+            var dt = DateTime.SpecifyKind(dateTime, DateTimeKind.Local);
             return dt.AddHours(+GetLocalUtcOffset(dateTime));
         }
 
         public static DateTime ConvertUserTimeToUtcCalendar(this DateTime dateTime)
         {
+            if (dateTime.Kind == DateTimeKind.Utc)
+                return dateTime;
+
             var dt = DateTime.SpecifyKind(dateTime, DateTimeKind.Utc);
             return dt.AddHours(-GetLocalUtcOffset(dateTime));
         }

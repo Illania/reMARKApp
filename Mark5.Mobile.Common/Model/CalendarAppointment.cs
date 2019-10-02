@@ -49,6 +49,8 @@ namespace Mark5.Mobile.Common.Model
         [Column("ReminderTimeBeforeStart")]
         public long ReminderTimeBeforeStart { get; set; } = -1;
 
+        [Column("SerializedTimeZoneInfo")]        public string SerializedTimeZoneInfo { get; set; }
+
         [Ignore]
         public RecurrenceInfo RecurrenceInfo { get; set; }
 
@@ -81,6 +83,12 @@ namespace Mark5.Mobile.Common.Model
         {
             get => ReminderAlertTime.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTimeCalendar();
             set { ReminderAlertTime = value.ConvertUserTimeToUtcCalendar().ConvertDateTimeToTimestampMilliseconds(); }
+        }
+
+        [Ignore]
+        public TimeZoneInfo TimeZoneInfo
+        {
+            get => String.IsNullOrEmpty(SerializedTimeZoneInfo) ? null : CommonConfig.TimeZoneInfoDeserializer(SerializedTimeZoneInfo);
         }
 
         public override string ToString()

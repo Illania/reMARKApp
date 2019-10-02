@@ -131,13 +131,22 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             var calendar = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars.First(ca => ca.Id == appointment.CalendarId);
             appModel.Calendar = CalendarViewModel.ConvertToViewModel(calendar);
 
-            var recurrence = appointment.Occurrences.FirstOrDefault(r => r.RecurrenceIndex == -1);
+            var occurrence = appointment.Occurrences.FirstOrDefault(r => r.RecurrenceIndex == -1);
 
-            if (recurrence == null)
+            if (occurrence == null)
                 throw new ArgumentException("Can't find occurrence of the main appointment");
 
-            appModel.Start = recurrence.StartDate;
-            appModel.End = recurrence.EndDate;
+            if (appModel.AllDay)
+            {
+                appModel.Start = occurrence.AllDayStartDate;
+                appModel.End = occurrence.StartDate.Date == occurrence.EndDate.Date ? occurrence.AllDayEndDate : occurrence.AllDayEndDate.AddDays(-1);
+                //Same not as for the appointment presenter
+            }
+            else
+            {
+                appModel.Start = occurrence.StartDate;
+                appModel.End = occurrence.EndDate;
+            }
 
             return appModel;
         }
@@ -169,16 +178,32 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             }
 
             if (Id < 0)
-            {
                 ca.Guid = Guid.NewGuid();
+
+            CalendarAppointmentOccurrence occurrence;
+
+            if (ca.AllDay)
+            {
+                var startAllDay = DateTime.SpecifyKind(Start.Date, DateTimeKind.Utc);
+                var endAllDay = DateTime.SpecifyKind(End.Date, DateTimeKind.Utc);
+                occurrence = new CalendarAppointmentOccurrence
+                {
+                    RecurrenceIndex = -1,
+                    StartDate = startAllDay,
+                    EndDate = Start.Date == End.Date ? endAllDay : endAllDay.AddDays(1),
+                };
+            }
+            else
+            {
+                occurrence = new CalendarAppointmentOccurrence
+                {
+                    RecurrenceIndex = -1,
+                    StartDate = Start,
+                    EndDate = End,
+                };
             }
 
-            ca.Occurrences.Add(new CalendarAppointmentOccurrence
-            {
-                RecurrenceIndex = -1,
-                StartDate = Start,
-                EndDate = End,
-            });
+            ca.Occurrences.Add(occurrence);
 
             return ca;
         }

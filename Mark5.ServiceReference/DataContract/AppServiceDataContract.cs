@@ -1188,6 +1188,8 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "RecurrenceInfo", Order = 0)]
         public RecurrenceInfo RecurrenceInfo { get; set; }
+
+        [DataMember(Name = "SerializedTimeZoneInfo", Order = 0)]        public string SerializedTimeZoneInfo { get; set; }
     }
 
     [DataContract(Name = "CalendarAppointmentOccurrence", Namespace = "com.nordic-it.appservice.v3")]
