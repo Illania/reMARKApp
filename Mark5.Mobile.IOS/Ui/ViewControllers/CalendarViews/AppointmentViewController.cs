@@ -687,11 +687,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 TranslatesAutoresizingMaskIntoConstraints = false;
 
                 sendInvitationsButton = new SendInvitationsButton();
-                sendInvitationsButton.TouchUpInside += SendInvitationClicked;
+                sendInvitationsButton.TouchUpInside += SendInvitationsButton_TouchUp;
 
                 participantHeader = new Header();
                 participantHeader.AddGestureRecognizer(new UITapGestureRecognizer(ShowParticipantsTapped));
                 AddArrangedSubview(participantHeader);
+            }
+
+            private void SendInvitationsButton_TouchUp(object sender, EventArgs e)
+            {
+                SendInvitationClicked.Invoke(sender, e);
             }
 
             public void Refresh(AppointmentViewModel viewModel)

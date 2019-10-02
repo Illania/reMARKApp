@@ -109,6 +109,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             TableView.Source = new DataSource(TableView);
             TableView.AllowsSelection = true;
             TableView.AllowsMultipleSelection = true;
+            TableView.KeyboardDismissMode = UIScrollViewKeyboardDismissMode.OnDrag;
             TableView.RowHeight = UITableView.AutomaticDimension;
             TableView.EstimatedRowHeight = 40f;
             TableView.TableHeaderView = GetHeader();
@@ -124,8 +125,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             field = new UITextField
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                BorderStyle = UITextBorderStyle.RoundedRect,
+                Font = Theme.DefaultFont,
+                BorderStyle = UITextBorderStyle.RoundedRect
             };
+
             field.EditingChanged += Field_EditingChanged;
 
             addButton = new UIButton(UIButtonType.System)
@@ -145,19 +148,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             headerView.AddConstraints(new[]
             {
-                    field.LeadingAnchor.ConstraintEqualTo(headerView.LeadingAnchor, TableView.SeparatorInset.Left),
-                    field.TopAnchor.ConstraintEqualTo(headerView.TopAnchor, 10f),
+                field.LeadingAnchor.ConstraintEqualTo(headerView.LeadingAnchor, TableView.SeparatorInset.Left),
+                field.TopAnchor.ConstraintEqualTo(headerView.TopAnchor, 10f),
 
-                    addButton.LeadingAnchor.ConstraintEqualTo(field.TrailingAnchor, 25f),
-                    addButton.TrailingAnchor.ConstraintEqualTo(headerView.TrailingAnchor, -15f),
-                    addButton.CenterYAnchor.ConstraintEqualTo(field.CenterYAnchor),
+                addButton.LeadingAnchor.ConstraintEqualTo(field.TrailingAnchor, 25f),
+                addButton.TrailingAnchor.ConstraintEqualTo(headerView.TrailingAnchor, -15f),
+                addButton.CenterYAnchor.ConstraintEqualTo(field.CenterYAnchor),
 
-                    separator.WidthAnchor.ConstraintEqualTo(headerView.WidthAnchor),
-                    separator.HeightAnchor.ConstraintEqualTo(1f),
-                    separator.BottomAnchor.ConstraintEqualTo(headerView.BottomAnchor),
-                    separator.TopAnchor.ConstraintEqualTo(field.BottomAnchor, 10f),
-
-             });
+                separator.WidthAnchor.ConstraintEqualTo(headerView.WidthAnchor),
+                separator.HeightAnchor.ConstraintEqualTo(1f),
+                separator.BottomAnchor.ConstraintEqualTo(headerView.BottomAnchor),
+                separator.TopAnchor.ConstraintEqualTo(field.BottomAnchor, 10f)
+            });
 
             TableView.AddConstraint(headerView.WidthAnchor.ConstraintEqualTo(TableView.WidthAnchor));
             TableView.AddConstraint(headerView.HeightAnchor.ConstraintEqualTo(60f));
