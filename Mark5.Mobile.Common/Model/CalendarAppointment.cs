@@ -49,7 +49,8 @@ namespace Mark5.Mobile.Common.Model
         [Column("ReminderTimeBeforeStart")]
         public long ReminderTimeBeforeStart { get; set; } = -1;
 
-        [Column("SerializedTimeZoneInfo")]        public string SerializedTimeZoneInfo { get; set; }
+        [Column("SerializedTimeZoneInfo")]
+        public string SerializedTimeZoneInfo { get; set; }
 
         [Ignore]
         public RecurrenceInfo RecurrenceInfo { get; set; }
