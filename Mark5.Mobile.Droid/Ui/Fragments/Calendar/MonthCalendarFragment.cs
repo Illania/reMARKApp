@@ -1,12 +1,13 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Android.Content;
 using Android.Graphics;
 using Android.OS;
 using Android.Support.V4.Content;
+using Android.Support.V7.App;
 using Android.Views;
 using Com.Syncfusion.Schedule;
 using Com.Syncfusion.Schedule.Enums;
+using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 {
@@ -28,10 +29,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         {
             HasOptionsMenu = true;
 
-            schedule = new MonthSchedule(Context);
-            schedule.CellDoubleTapped += Schedule_CellDoubleTapped;
-            schedule.HeaderTapped += Schedule_HeaderTapped;
-            schedule.MonthInlineAppointmentTapped += Schedule_MonthInlineAppointmentTapped;
+            (Activity as BaseAppCompatActivity).Fab.Visibility = ViewStates.Gone;
+
+            if (schedule == null)
+            {
+                schedule = new MonthSchedule(Context);
+                schedule.CellDoubleTapped += Schedule_CellDoubleTapped;
+                schedule.HeaderTapped += Schedule_HeaderTapped;
+                schedule.MonthInlineAppointmentTapped += Schedule_MonthInlineAppointmentTapped;
+            }
+
             return schedule;
         }
 
@@ -55,13 +62,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             addAppointment.SetOnMenuItemClickListener(this);
         }
 
-        public override void OnViewCreated(View view, Bundle savedInstanceState)
-        {
-            base.OnViewCreated(view, savedInstanceState);
-
-            coordinator.MonthViewLoaded();
-        }
-
         public bool OnMenuItemClick(IMenuItem item)
         {
             if (item.ItemId == MenuItemActions.Refresh)
@@ -74,6 +74,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 coordinator.CreateAppointmentClicked();
 
             return true;
+        }
+
+        public override void OnResume()
+        {
+            base.OnResume();
+
+            (Activity as AppCompatActivity).SupportActionBar.SetTitle(Resource.String.calendar);
         }
 
         void Refresh()
@@ -120,14 +127,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
             ViewHeaderStyle dayHeaderStyle = new ViewHeaderStyle
             {
-                BackgroundColor = darkerBlueColor,
-                DayTextColor = whiteColor,
+                BackgroundColor = whiteColor,
+                DayTextColor = darkerBlueColor,
             };
 
             HeaderStyle headerStyle = new HeaderStyle
             {
-                BackgroundColor = darkerBlueColor,
-                TextColor = whiteColor,
+                BackgroundColor = whiteColor,
+                TextColor = darkerBlueColor,
             };
 
             ScheduleView = ScheduleView.MonthView;
@@ -137,7 +144,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             {
                 ShowAgendaView = true,
                 TodayBackgroundColor = new Color(lightBlueColor),
-                SelectionTextColor = new Color(whiteColor)
+                SelectionTextColor = new Color(darkerBlueColor)
             };
 
             MonthCellLoaded += MonthSchedule_MonthCellLoaded;
@@ -152,7 +159,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             {
                 cellStyle = new CellStyle
                 {
-                    BackgroundColor = darkerBlueColor,
+                    BackgroundColor = whiteColor,
                     TextColor = darkerBlueColor,
                 };
             }
@@ -160,8 +167,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             {
                 cellStyle = new CellStyle
                 {
-                    BackgroundColor = darkerBlueColor,
-                    TextColor = whiteColor,
+                    BackgroundColor = whiteColor,
+                    TextColor = darkerBlueColor,
                 };
             }
 

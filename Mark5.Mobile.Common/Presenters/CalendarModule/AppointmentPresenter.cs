@@ -178,13 +178,22 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             var calendar = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars.First(ca => ca.Id == appointment.CalendarId);
             appModel.Calendar = CalendarViewModel.ConvertToViewModel(calendar);
 
-            var recurrence = appointment.Occurrences.FirstOrDefault(r => r.RecurrenceIndex == recurrenceIndex);
+            var occurrence = appointment.Occurrences.FirstOrDefault(r => r.RecurrenceIndex == recurrenceIndex);
 
-            if (recurrence == null)
+            if (occurrence == null)
                 throw new ArgumentException("Can't find occurrence with the given recurrence index");
 
-            appModel.Start = recurrence.StartDate;
-            appModel.End = recurrence.EndDate;
+            if (appModel.AllDay)
+            {
+                appModel.Start = occurrence.AllDayStartDate;
+                appModel.End = occurrence.StartDate.Date == occurrence.EndDate.Date ? occurrence.AllDayEndDate : occurrence.AllDayEndDate.AddDays(-1);
+                //https://documentation.devexpress.com/CoreLibraries/DevExpress.XtraScheduler.Appointment.AllDay.property
+            }
+            else
+            {
+                appModel.Start = occurrence.StartDate;
+                appModel.End = occurrence.EndDate;
+            }
 
             return appModel;
         }

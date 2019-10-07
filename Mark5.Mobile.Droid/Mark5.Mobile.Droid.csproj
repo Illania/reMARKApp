@@ -569,6 +569,7 @@
     <Compile Include="Ui\Views\RecurrenceViews\RangeView.cs" />
     <Compile Include="Ui\Fragments\Calendar\AddEditAppointmentFragment.cs" />
     <Compile Include="Ui\Fragments\Calendar\AddEditParticipantsFragment.cs" />
+    <Compile Include="Ui\Fragments\Calendar\AddEditAppointmentCalendarListFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -981,11 +982,41 @@
       <SubType></SubType>
       <Generator></Generator>
     </AndroidResource>
+    <AndroidResource Include="Resources\drawable\refresh_black.xml" />
+    <AndroidResource Include="Resources\drawable\calendar_black.xml" />
+    <AndroidResource Include="Resources\drawable\alarm.xml">
+      <SubType></SubType>
+      <Generator></Generator>
+    </AndroidResource>
+    <AndroidResource Include="Resources\drawable\time.xml">
+      <SubType></SubType>
+      <Generator></Generator>
+    </AndroidResource>
+    <AndroidResource Include="Resources\drawable\participants.xml">
+      <SubType></SubType>
+      <Generator></Generator>
+    </AndroidResource>
+    <AndroidResource Include="Resources\drawable\location.xml">
+      <SubType></SubType>
+      <Generator></Generator>
+    </AndroidResource>
+    <AndroidResource Include="Resources\drawable\description.xml">
+      <SubType></SubType>
+      <Generator></Generator>
+    </AndroidResource>
     <AndroidResource Include="Resources\layout\list_participants.axml">
       <SubType></SubType>
       <Generator></Generator>
     </AndroidResource>
     <AndroidResource Include="Resources\layout\list_item_participant.axml">
+      <SubType></SubType>
+      <Generator></Generator>
+    </AndroidResource>
+    <AndroidResource Include="Resources\drawable\create.xml">
+      <SubType></SubType>
+      <Generator></Generator>
+    </AndroidResource>
+    <AndroidResource Include="Resources\drawable\delete.xml">
       <SubType></SubType>
       <Generator></Generator>
     </AndroidResource>

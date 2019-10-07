@@ -5,6 +5,7 @@ using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Coordinators;
 using Com.Syncfusion.Schedule;
 using System.Linq;
+using Android.Graphics;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 {
@@ -16,7 +17,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         public override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-
             coordinator = ((MainActivity)Activity).CalendarCoordinator;
         }
 
@@ -24,20 +24,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         {
             base.OnViewCreated(view, savedInstanceState);
 
+            View.SetBackgroundColor(Color.White);
+
             schedule.AppointmentMapping = GetAppointmentMapping();
-            schedule.VisibleDatesChanged += Schedule_VisibleDatesChanged;
         }
 
         public override void OnResume()
         {
             base.OnResume();
+
+            schedule.VisibleDatesChanged += Schedule_VisibleDatesChanged;
             schedule.ItemsSource = coordinator.Items;
         }
 
-        public override void OnDestroyView()
+        public override void OnPause()
         {
-            base.OnDestroyView();
-
+            base.OnPause();
             schedule.VisibleDatesChanged -= Schedule_VisibleDatesChanged;
         }
 

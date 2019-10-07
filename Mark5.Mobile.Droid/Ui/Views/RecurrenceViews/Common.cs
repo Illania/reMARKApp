@@ -13,7 +13,6 @@ using Mark5.Mobile.Droid.Ui.Common;
 using Android.Support.V4.Content;
 using Android.Graphics;
 using Android.Graphics.Drawables;
-using Android.Text.Method;
 
 namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
 {
@@ -146,12 +145,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
     {
         List<DayView> dayViews = new List<DayView>();
 
+        public event EventHandler<(WeekDays, bool)> SelectionChanged = delegate { };
+
         public WeekDaysSelectionView(Context context) : base(context)
         {
             LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
             Orientation = Horizontal;
 
-            Common.weekDays.ForEach(wd => dayViews.Add(new DayView(context, wd)));
+            Common.weekDays.ForEach(wd => dayViews.Add(new DayView(context, wd, SelectedAction)));
             dayViews.ForEach(AddView);
         }
 
@@ -160,16 +161,24 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
             dayViews.ForEach(dv => dv.Refresh(wd));
         }
 
+        void SelectedAction(WeekDays wd, bool selected)
+        {
+            SelectionChanged(this, (wd, selected));
+        }
+
         class DayView : AppCompatTextView
         {
             readonly WeekDays weekDay;
-            public DayView(Context context, WeekDays wd) : base(context)
+            readonly Action<WeekDays, bool> selectedAction;
+
+            public DayView(Context context, WeekDays wd, Action<WeekDays, bool> selectedAction) : base(context)
             {
                 Text = wd.ToFriendlyString().ToUpper()[0].ToString();
                 TextAlignment = TextAlignment.Center;
                 Gravity = GravityFlags.Center;
 
                 weekDay = wd;
+                this.selectedAction = selectedAction;
 
                 var dimension = Conversion.ConvertDpToPixels(38f);
 
@@ -184,6 +193,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
             private void DayView_Click(object sender, EventArgs e)
             {
                 Selected = !Selected;
+                selectedAction?.Invoke(weekDay, Selected);
                 UpdateUI();
             }
 
@@ -230,6 +240,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
 
     public class NumberField : AppCompatEditText
     {
+        public event EventHandler<string> TextModified = delegate { };
+
         public NumberField(Context context) : base(context)
         {
             this.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
@@ -245,7 +257,20 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
             SetPadding(Common.pickerPadding, Common.pickerPadding, Common.pickerPadding, Common.pickerPadding);
 
             InputType = Android.Text.InputTypes.ClassNumber;
-            //KeyListener = DigitsKeyListener.GetInstance(null, false, false);
+
+            TextChanged += NumberField_TextChanged;
+        }
+
+        private void NumberField_TextChanged(object sender, Android.Text.TextChangedEventArgs e)
+        {
+            TextModified(this, Text);
+        }
+
+        public void SetText(string text)
+        {
+            TextChanged -= NumberField_TextChanged;
+            Text = text;
+            TextChanged += NumberField_TextChanged;
         }
     }
 
@@ -405,12 +430,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
 
         public override void SetSelected(int value)
         {
-            SetSelection(value);
+            if (value <= 0)
+                value = 1;
+
+            SetSelection(value - 1);  //TODO the same needs to be done on iOS
         }
 
         public override void Update(int i)
         {
-            selectedAction?.Invoke(i);
+            selectedAction?.Invoke(i + 1);
         }
     }
 }

@@ -383,7 +383,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
                     recInfo.WeekDays |= weekday;
                 else
                     recInfo.WeekDays &= ~weekday;
-
             }
 
             class WeekdaysSource : UITableViewSource

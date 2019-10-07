@@ -36,14 +36,14 @@ namespace Mark5.Mobile.Common.Model
 
         public DateTime StartDate
         {
-            get => StartTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime();
-            set => StartTimestamp = value.ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
+            get => StartTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTimeCalendar();
+            set => StartTimestamp = value.ConvertUserTimeToUtcCalendar().ConvertDateTimeToTimestampMilliseconds();
         }
 
         public DateTime EndDate
         {
-            get => EndTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime();
-            set => EndTimestamp = value.ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
+            get => EndTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTimeCalendar();
+            set => EndTimestamp = value.ConvertUserTimeToUtcCalendar().ConvertDateTimeToTimestampMilliseconds();
         }
 
         public string ToFriendlyString()
@@ -90,7 +90,7 @@ namespace Mark5.Mobile.Common.Model
                         pattern += $"on day {DayNumber} of every {monthPatter}";
                     }
                     else
-                        pattern += $"the {WeekOfMonth.ToFriendlyString()} {WeekDays.ToFriendlyString()} of every {Periodicity} month(s) ";
+                        pattern += $"the {WeekOfMonth.ToFriendlyString()} {WeekDays.ToFriendlyString()} of every {Periodicity} month(s)";
                     break;
                 case RecurrenceType.Yearly:
                     pattern += $"Yearly, ";
@@ -98,7 +98,7 @@ namespace Mark5.Mobile.Common.Model
                     if (WeekOfMonth == WeekOfMonth.None)
                         pattern += $"every {GetMonthString(Month)}, {DayNumber}";
                     else
-                        pattern += $"the {WeekOfMonth.ToFriendlyString()} {WeekDays.ToFriendlyString()} of {GetMonthString(Month)} ";
+                        pattern += $"the {WeekOfMonth.ToFriendlyString()} {WeekDays.ToFriendlyString()} of {GetMonthString(Month)}";
                     break;
             }
 

@@ -176,6 +176,13 @@
     <style name="contactViewHeaderSubtitle" parent="TextAppearance.AppCompat.Body2">
         <item name="android:textSize">16sp</item>
     </style>
+    <style name="editAppointmentField" parent="TextAppearance.AppCompat.Subhead">
+
+    </style>
+    <style name="editAppointmentTitle" parent="TextAppearance.AppCompat.Headline">
+    </style>
+    <style name="editAppointmentText" parent="editAppointmentField">
+    </style>
     <style name="searchViewButtonSelected" parent="TextAppearance.AppCompat.Body2">
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">@color/darkerblue</item>

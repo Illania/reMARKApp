@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <resources>
     <string name="dialog_creating_report">Creating system report</string>
     <string name="dialog_different_user_content">You are trying to log in with a different user! If you want to proceede all personal settings will be deleted and you will have to start reMARK again manually. Do you want to continue?</string>
@@ -194,11 +194,9 @@
     <string name="pref_key_swipe_options">pref_key_swipe_options</string>
     <string name="pref_swipe_options_summary">Customize swipe options to take quick action on emails in your inbox.</string>
     <string name="pref_swipe_options_title">Swipe options</string>
-    <string name="pref_key_sync_favorites">pref_key_sync_favorites</string>
     <string name="pref_key_sync_favorites_enabled">pref_key_sync_favorites_enabled</string>
     <string name="pref_sync_favorites_title">Favorites synchronisation</string>
     <bool name="pref_key_sync_favorites_value">false</bool>
-    <string name="pref_key_sync_favorites">pref_key_sync_favorites</string>
     <string name="pref_sync_favorites">pref_sync_favorites</string>
     <string name="sync_favorite_folders_title">Sync favorite folders</string>
     <string name="pref_sync_title">Sync</string>

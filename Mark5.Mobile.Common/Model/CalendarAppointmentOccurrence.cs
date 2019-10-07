@@ -24,15 +24,19 @@ namespace Mark5.Mobile.Common.Model
 
         public DateTime StartDate
         {
-            get => StartDateTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime();
-            set { StartDateTimestamp = value.ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds(); }
+            get => StartDateTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTimeCalendar();
+            set { StartDateTimestamp = value.ConvertUserTimeToUtcCalendar().ConvertDateTimeToTimestampMilliseconds(); }
         }
 
         public DateTime EndDate
         {
-            get => EndDateTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime();
-            set { EndDateTimestamp = value.ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds(); }
+            get => EndDateTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTimeCalendar();
+            set { EndDateTimestamp = value.ConvertUserTimeToUtcCalendar().ConvertDateTimeToTimestampMilliseconds(); }
         }
+
+        public DateTime AllDayStartDate => StartDateTimestamp.ConvertTimestampMillisecondsToDateTime();
+
+        public DateTime AllDayEndDate => EndDateTimestamp.ConvertTimestampMillisecondsToDateTime();
 
         public override string ToString()
         {

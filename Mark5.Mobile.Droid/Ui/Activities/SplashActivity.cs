@@ -20,7 +20,6 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Service;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
-using Microsoft.AppCenter;
 using Microsoft.AppCenter.Crashes;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
@@ -89,8 +88,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 {
                     var animationView = FindViewById<LottieAnimationView>(Resource.Id.animation_view);
 
-                    animationView.Progress = 1;
-                    animationView.Animate().Alpha(1f).SetDuration(200);
+                    if (animationView != null)
+                    {
+                        animationView.Progress = 1;
+                        animationView.Animate().Alpha(1f).SetDuration(200);
+                    }
+
                 });
 
                 CommonConfig.Logger.Info("Updating file system storage...");

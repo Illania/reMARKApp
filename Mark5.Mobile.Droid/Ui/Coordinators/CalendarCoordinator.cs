@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Android.Support.V4.App;
-using Android.Views;
 using Com.Syncfusion.Schedule;
 using Java.Util;
 using Mark5.Mobile.Common;
@@ -37,6 +36,9 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
             fragmentManager = a.SupportFragmentManager;
 
             uiCache = new UICache();
+            presenter = new CalendarPresenter();
+            presenter.AttachView(this);
+            presenter.Start();
         }
 
         public (BaseFragment, string) GetMainFragment() => (monthCalendarFragment, _) = MonthCalendarFragment.NewInstance();
@@ -70,6 +72,7 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
         public void StopLoading()
         {
             dismissAction?.Invoke();
+            dismissAction = null;
         }
 
         public Task ShowError(Exception ex)
@@ -104,7 +107,7 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
 
             fragmentManager.BeginTransaction()
                .SetCustomAnimations(Resource.Animation.fade_in, Resource.Animation.fade_out)
-               .Replace(Resource.Id.fragment_container, fragment, tag)
+               .Add(Resource.Id.fragment_container, fragment, tag)
                .AddToBackStack(tag)
                .Commit();
 
@@ -116,7 +119,7 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
             var (fragment, tag) = YearCalendarFragment.NewInstance(calendar);
 
             fragmentManager.BeginTransaction()
-                .Replace(Resource.Id.fragment_container, fragment, tag)
+                .Add(Resource.Id.fragment_container, fragment, tag)
                 .AddToBackStack(tag)
                 .Commit();
         }
@@ -143,6 +146,9 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
 
         public void VisibleDatesChanged(Calendar startDate, Calendar endDate)
         {
+            if (dismissAction != null)
+                return;
+
             var start = startDate.ConvertToDateTime().ToLocalTime();
             var end = endDate.ConvertToDateTime().ToLocalTime();
 
@@ -155,18 +161,6 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
             var end = endDate.ConvertToDateTime().ToLocalTime();
 
             presenter.RefreshClicked(start, end);
-        }
-
-        public void MonthViewLoaded()
-        {
-            presenter = new CalendarPresenter();
-            presenter.AttachView(this);
-            presenter.Start();
-
-            var fab = activity.Fab;
-            fab.Visibility = ViewStates.Gone;
-
-            activity.SupportActionBar.SetTitle(Resource.String.calendar);
         }
 
         #endregion
@@ -322,8 +316,6 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
     {
         ObservableCollection<Appointment> Items { get; }
 
-        void MonthViewLoaded();
-
         bool DateDoubleTapped(Calendar calendar);
         void CalendarsClicked();
         void CreateAppointmentClicked();
@@ -334,5 +326,4 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
         void MonthTapped(Calendar newValue);
         void RefreshClicked(Calendar startDate, Calendar endDate);
     }
-
 }

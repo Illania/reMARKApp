@@ -29,6 +29,8 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         DateTime lastVisibleStartDate;
         DateTime lastVisibleEndDate;
 
+        bool started;
+
         IAppointmentsCache Cache => Managers.CalendarManager.AppointmentsCache;
 
         #region ICalendarPresenter
@@ -44,6 +46,9 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         public override void Start()
         {
+            if (started)
+                return;
+
             Cache.AppointmentRetrieved += Cache_AppointmentRetrieved;
             Cache.RetrievalError += Cache_RetrievalError;
             Cache.NoAppointmentToRetrieve += Cache_NoAppointmentToRetrieve;
@@ -51,14 +56,21 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             SubscribeToMessages();
             LoadPreferences();
             UpdateCalendarsInView();
+
+            started = true;
         }
 
-        public override void Stop() //TODO when to use this...?
+        public override void Stop()
         {
+            if (!started)
+                return;
+
             UnsubscribeFromMessages();
             Cache.AppointmentRetrieved -= Cache_AppointmentRetrieved;
             Cache.RetrievalError -= Cache_RetrievalError;
             Cache.NoAppointmentToRetrieve -= Cache_NoAppointmentToRetrieve;
+
+            started = false;
         }
 
         public void AppointmentClicked(int calendarId, int appointmentId, int recurrenceIndex)
@@ -136,12 +148,9 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
             firstLoad = false;
 
-            if (e.Appointments?.Any() == true)
-            {
-                var appointmentsViewModels = e.Appointments?.Select(ConvertToViewModels).SelectMany(x => x);
-                view.UpdateAppointments(appointmentsViewModels, e.Start, e.End);
-                view.StopLoading();
-            }
+            var appointmentsViewModels = e.Appointments?.Select(ConvertToViewModels).SelectMany(x => x);
+            view.UpdateAppointments(appointmentsViewModels, e.Start, e.End);
+            view.StopLoading();
         }
 
         private void Cache_NoAppointmentToRetrieve(object sender, EventArgs e)
@@ -254,17 +263,29 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         static AppointmentPreviewViewModel ConvertToViewModel(CalendarAppointment ca, CalendarAppointmentOccurrence cao, Dictionary<int, string> calendarColors)
         {
-            return new AppointmentPreviewViewModel
+            var apv = new AppointmentPreviewViewModel
             {
                 Id = ca.Id,
                 RecurrenceIndex = cao.RecurrenceIndex,
                 CalendarId = ca.CalendarId,
                 Subject = ca.Subject,
                 AllDay = ca.AllDay,
-                Start = cao.StartDate,
-                End = cao.EndDate,
+
                 HexColor = calendarColors[ca.CalendarId],
             };
+
+            if (apv.AllDay)
+            {
+                apv.Start = cao.AllDayStartDate;
+                apv.End = cao.AllDayEndDate;
+            }
+            else
+            {
+                apv.Start = cao.StartDate;
+                apv.End = cao.EndDate;
+            }
+
+            return apv;
         }
 
         public override string ToString()

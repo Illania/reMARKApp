@@ -45,7 +45,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             HasOptionsMenu = true;
-            schedule = new WeekSchedule(Context);
+
+            schedule = schedule ?? new WeekSchedule(Context);
 
             return schedule;
         }
@@ -61,20 +62,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         {
             public const int CreateAppoitnment = 11;
             public const int SwitchViewMode = 10;
-            public const int SelectCalendars = 9;
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
             menu.Clear();
 
-            var calendarSelectionItem = menu.Add(Menu.None, MenuItemActions.SelectCalendars, MenuItemActions.SelectCalendars, Resource.String.calendar);
-            calendarSelectionItem.SetTitle("Calendars");
-            calendarSelectionItem.SetShowAsAction(ShowAsAction.Always);
-            calendarSelectionItem.SetOnMenuItemClickListener(this);
-
             var createAppointmentItem = menu.Add(Menu.None, MenuItemActions.CreateAppoitnment, MenuItemActions.CreateAppoitnment, Resource.String.insert_template);
-            createAppointmentItem.SetIcon(Resource.Drawable.action_add);
+            createAppointmentItem.SetIcon(Resource.Drawable.add_appointment);
             createAppointmentItem.SetShowAsAction(ShowAsAction.Always);
             createAppointmentItem.SetOnMenuItemClickListener(this);
 
@@ -91,11 +86,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 ChangeViewMode();
                 viewModeDay = !viewModeDay;
                 Activity.InvalidateOptionsMenu();
-            }
-
-            if (item.ItemId == MenuItemActions.SelectCalendars)
-            {
-                coordinator.CalendarsClicked();
             }
 
             if (item.ItemId == MenuItemActions.CreateAppoitnment)
