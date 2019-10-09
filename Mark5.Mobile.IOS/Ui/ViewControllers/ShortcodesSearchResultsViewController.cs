@@ -230,7 +230,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public void ShortcodeSelected(UITableView tableView, ShortcodePreview shortcodePreview)
         {
             var vc = new ShortcodeViewController();
-            vc.SetData(shortcodePreview, true);
+            vc.SetData(shortcodePreview, true, true);
             vc.SetRefreshDataOnAppear();
             NavigationController.PushViewController(vc, true);
         }

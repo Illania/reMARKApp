@@ -217,6 +217,12 @@ namespace Mark5.Mobile.IOS
 
             var serviceVersion = ServerConfig.SystemSettings?.SystemInfo?.ServiceVersion;
 
+            if (deviceToken == null)
+            {
+                CommonConfig.Logger.Error("deviceToken is null!");
+                return;
+            }
+
             if (serviceVersion == null)
             {
                 CommonConfig.Logger.Info($"It is not possible to update the APNS token because the server version is null");
@@ -231,7 +237,17 @@ namespace Mark5.Mobile.IOS
                 return;
             }
 
-            var newToken = new string(deviceToken.ToString().Where(char.IsLetterOrDigit).ToArray());
+            string newToken = string.Empty;
+
+            try
+            {
+                newToken = string.Join("", deviceToken.Select(b => b.ToString("x2")));
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Error while parsing deviceToken", ex);
+                return;
+            }
 
             UpdatePushNotificationToken(newToken);
         }

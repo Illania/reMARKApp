@@ -36,6 +36,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         bool refreshDataOnAppear;
         bool hideDoneButton;
+        bool hideNavigationButtons;
 
         UIView headerView;
         UILabel nameLabel;
@@ -316,7 +317,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             else
             {
                 NavigationController.ToolbarHidden = true;
-                NavigationItem.SetLeftBarButtonItems(buttons, false);
+                if (!hideNavigationButtons)
+                    NavigationItem.SetLeftBarButtonItems(buttons, false);
             }
         }
 
@@ -738,7 +740,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             this.contactPreview = contactPreview;
         }
 
-        public void SetData(ContactPreview contactPreview, bool hideDoneButton)
+        public void SetData(ContactPreview contactPreview, bool hideDoneButton, bool hideNavigationButtons = false)
         {
             CommonConfig.UsageAnalytics.LogEvent(new OpenContactEvent());
 
@@ -749,6 +751,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             this.hideDoneButton = hideDoneButton;
             this.contactPreview = contactPreview;
+            this.hideNavigationButtons = hideNavigationButtons;
         }
 
         public void SetData(int contactId)

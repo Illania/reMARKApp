@@ -22,10 +22,9 @@
         android:layout_alignParentLeft="true" />
     <android.support.v7.widget.AppCompatImageView
         android:id="@+id/nav_header_logo"
-        android:layout_width="@dimen/nav_header_logo_width"
-        android:layout_height="wrap_content"
-        android:paddingTop="@dimen/nav_header_vertical_spacing"
-        android:src="@drawable/logo"
+        android:layout_width="60dp"
+        android:layout_height="100dp"
+        android:src="@drawable/remark_symbol"
         android:layout_above="@id/nav_header_title"
         android:layout_alignParentLeft="true" />
     <android.support.v7.widget.AppCompatImageView
