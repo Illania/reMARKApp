@@ -54,7 +54,7 @@
     <AndroidManagedSymbols>true</AndroidManagedSymbols>
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <AndroidLinkSkip>System.Runtime;System.Collections;System.Runtime.Serialization</AndroidLinkSkip>
-    <MandroidI18n>cjk;mideast;west</MandroidI18n>
+    <MandroidI18n>cjk;mideast;west;other;rare</MandroidI18n>
     <AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidClientHandler</AndroidHttpClientHandlerType>
     <JavaMaximumHeapSize>1G</JavaMaximumHeapSize>
     <AndroidTlsProvider>btls</AndroidTlsProvider>
