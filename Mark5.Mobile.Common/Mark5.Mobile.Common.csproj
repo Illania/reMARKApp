@@ -15,12 +15,20 @@
   <ItemGroup>
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="Xamarin.Essentials" Version="1.1.0" />
     <PackageReference Include="Polly" Version="7.1.0" />
-    <PackageReference Include="sqlite-net-pcl" Version="1.5.231" />
     <PackageReference Include="PCLStorage" Version="1.0.2" />
+    <PackageReference Include="sqlite-net-pcl" Version="1.5.231" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Model\HubMessages\" />
     <Folder Include="Utilities\Extensions\" />
+    <Folder Include="Presenters\" />
+    <Folder Include="Presenters\CalendarModule\" />
+    <Folder Include="Manager\Interfaces\" />
+    <Folder Include="DataAccess\Interfaces\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Presenters\CalendarModule\AppointmentPresenter.cs.orig" />
   </ItemGroup>
 </Project>

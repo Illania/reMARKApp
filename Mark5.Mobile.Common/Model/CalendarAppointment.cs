@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Mark5.Mobile.Common.Utilities;
 using SQLite;
 
@@ -48,6 +49,9 @@ namespace Mark5.Mobile.Common.Model
         [Column("ReminderTimeBeforeStart")]
         public long ReminderTimeBeforeStart { get; set; } = -1;
 
+        [Column("SerializedTimeZoneInfo")]
+        public string SerializedTimeZoneInfo { get; set; }
+
         [Ignore]
         public RecurrenceInfo RecurrenceInfo { get; set; }
 
@@ -74,6 +78,19 @@ namespace Mark5.Mobile.Common.Model
         public string RecurrenceInfoString { get => Serializer.Serialize(RecurrenceInfo); set => RecurrenceInfo = Serializer.Deserialize<RecurrenceInfo>(value); }
 
         #endregion
+
+        [Ignore]
+        public DateTime ReminderAlertDate
+        {
+            get => ReminderAlertTime.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTimeCalendar();
+            set { ReminderAlertTime = value.ConvertUserTimeToUtcCalendar().ConvertDateTimeToTimestampMilliseconds(); }
+        }
+
+        [Ignore]
+        public TimeZoneInfo TimeZoneInfo
+        {
+            get => String.IsNullOrEmpty(SerializedTimeZoneInfo) ? null : CommonConfig.TimeZoneInfoDeserializer(SerializedTimeZoneInfo);
+        }
 
         public override string ToString()
         {

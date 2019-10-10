@@ -55,16 +55,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.Recycle();
             searchCancellationTokenSource?.Dispose();
             searchCancellationTokenSource = null;
-            searchCancellationTokenSourceList.ForEach(cts => cts?.Dispose());
-            searchCancellationTokenSourceList.Clear();
+            searchCancellationTokenSourceList?.ForEach(cts => cts?.Dispose());
+            searchCancellationTokenSourceList?.Clear();
 
             ((DataSource)TableView.Source)?.Reset();
 
             searchController.SearchResultsUpdater = null;
             searchController = null;
 
-            if (!tcs.Task.IsCompleted)
-                tcs.SetResult(null);
+            tcs?.TrySetResult(null);
         }
 
         void InitializeSearchBar()

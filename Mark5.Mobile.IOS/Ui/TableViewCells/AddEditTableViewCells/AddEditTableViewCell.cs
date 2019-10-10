@@ -1,8 +1,7 @@
-﻿using System;
+﻿using UIKit;
 using Mark5.Mobile.IOS.Ui.Common;
-using UIKit;
 
-namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
+namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
 {
     public abstract class AddEditTableViewCell : UITableViewCell
     {
@@ -17,6 +16,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
         protected AddEditTableViewCell(UITableViewCellStyle style, string reuseIdentifier)
             : base(style, reuseIdentifier)
         {
+            BackgroundColor = UIColor.White;
         }
 
         protected UIView GetVerticalSeparator()
@@ -70,13 +70,13 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
         public void SetErrorState(bool error, bool animate = true)
         {
             if (!animate || !error)
-                BackgroundColor = error ? Theme.LightBrown : Theme.Clear;
+                BackgroundColor = error ? Theme.LightBrown : Theme.White;
             else
             {
                 AnimateKeyframes(1.0f, 0, UIViewKeyframeAnimationOptions.CalculationModeLinear, () =>
                  {
                      AddKeyframeWithRelativeStartTime(0, 0.33, () => BackgroundColor = Theme.LightBrown);
-                     AddKeyframeWithRelativeStartTime(0.33, 0.33, () => BackgroundColor = Theme.Clear);
+                     AddKeyframeWithRelativeStartTime(0.33, 0.33, () => BackgroundColor = Theme.White);
                      AddKeyframeWithRelativeStartTime(0.66, 0.33, () => BackgroundColor = Theme.LightBrown);
                  }, (finished) => { });
             }

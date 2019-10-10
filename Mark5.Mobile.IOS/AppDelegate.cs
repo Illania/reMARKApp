@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -87,6 +87,8 @@ namespace Mark5.Mobile.IOS
 
         public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
         {
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("MTM2NTEwQDMxMzcyZTMyMmUzMFJ0SVQvVmIzbmQrejNkd1Z0cVF4eXBIdFViUUY4eDVvbXZrdDBrT2xkaTg9");
+
             Crashes.GetErrorAttachments =
     report => { return new[] { ErrorAttachmentLog.AttachmentWithText(SystemReportCollector.CreateLogReport(), "deviceLogs.txt") }; };
             AppCenter.Start("8aec5b28-2ac5-4956-997c-4867ef65d957", typeof(Crashes));
@@ -537,6 +539,8 @@ namespace Mark5.Mobile.IOS
                     CommonConfig.Logger.Info("Cleared cache");
                 }
 
+                ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
+
                 if (await Managers.CleanUpManager.IsCleanUpNecessary(PlatformConfig.Preferences.CleanCacheIntervalDays))
                 {
                     CommonConfig.Logger.Info("Cleaning up cache....");
@@ -553,8 +557,6 @@ namespace Mark5.Mobile.IOS
                 PlatformConfig.ReachabilityReceiver.Register();
 
                 CommonConfig.Logger.Info("Retrieving system settings...");
-
-                ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
 
                 if (!String.IsNullOrEmpty(ServerConfig.SystemSettings.SystemInfo.CustomerName))
                     CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.CustomerName, ServerConfig.SystemSettings.SystemInfo.CustomerName);

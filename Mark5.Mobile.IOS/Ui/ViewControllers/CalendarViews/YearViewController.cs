@@ -1,0 +1,95 @@
+﻿using Foundation;
+using Mark5.Mobile.IOS.Ui.Common;
+using Syncfusion.SfCalendar.iOS;
+using UIKit;
+
+namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
+{
+    public class YearViewController : UIViewController
+    {
+        ReMarkYearCalendar reMarkYearCalendar;
+        ICalendarCoordinator coordinator;
+        NSDate initialDate;
+
+        public YearViewController(CalendarModuleCoordinator calendarCoordinator, NSDate date)
+        {
+            coordinator = calendarCoordinator;
+            initialDate = date;
+        }
+
+        public override void ViewDidLoad()
+        {
+            base.ViewDidLoad();
+
+            reMarkYearCalendar = new ReMarkYearCalendar
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+
+            View.BackgroundColor = UIColor.White;
+
+            reMarkYearCalendar.NavigateToMonthOnInActiveDatesSelection = false;
+
+            reMarkYearCalendar.ViewModeChanged += ReMarkYearCalendar_ViewModeChanged;
+
+            View.AddSubview(reMarkYearCalendar);
+
+            View.AddConstraints(new NSLayoutConstraint[] {
+                reMarkYearCalendar.TopAnchor.ConstraintEqualTo( View.SafeAreaLayoutGuide.TopAnchor),
+                reMarkYearCalendar.BottomAnchor.ConstraintEqualTo( View.SafeAreaLayoutGuide.BottomAnchor),
+                reMarkYearCalendar.RightAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.RightAnchor, -10),
+                reMarkYearCalendar.LeftAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.LeftAnchor, 10)
+            });
+
+            NavigationController.NavigationBarHidden = true;
+
+            reMarkYearCalendar.MoveToDate(initialDate);
+        }
+
+        void ReMarkYearCalendar_ViewModeChanged(object sender, ViewModeChangedEventArgs e)
+        {
+            if (reMarkYearCalendar.ViewMode == SFCalendarViewMode.SFCalendarViewModeMonth)
+                coordinator.MonthTapped(e.Date);
+        }
+    }
+
+    public class ReMarkYearCalendar : SFCalendar
+    {
+        readonly SFYearViewSettings yearViewSettings = new SFYearViewSettings
+        {
+            HeaderLabelAlignment = NSTextAlignment.NSTextAlignmentCenter,
+            YearHeaderTextColor = Theme.DarkerBlue,
+            MonthHeaderTextColor = Theme.DarkerBlue,
+            DateTextColor = Theme.DarkerBlue,
+            MonthLayoutPadding = 15
+        };
+
+        readonly SFMonthViewSettings monthViewSettings = new SFMonthViewSettings()
+        {
+            DayHeight = 0,
+            TodaySelectionTextColor = Theme.DarkGray,
+            CurrentMonthTextColor = Theme.DarkGray,
+            CurrentMonthBackgroundColor = Theme.DarkGray
+        };
+
+        public ReMarkYearCalendar()
+        {
+            ViewMode = SFCalendarViewMode.SFCalendarViewModeYear;
+            YearViewMode = YearViewMode.Date;
+            ShowYearView = true;
+            MonthViewSettings = monthViewSettings;
+            YearViewSettings = yearViewSettings;
+            DrawYearCell += ReMarkYearCalendar_DrawYearCell;
+        }
+
+        void ReMarkYearCalendar_DrawYearCell(object sender, DrawYearCellEventArgs e)
+        {
+            e.YearCell = new SFYearCell
+            {
+                FontAttribute = Theme.DefaultLightFont,
+                MonthBackgroundColor = UIColor.White,
+                DateTextColor = UIColor.White
+            };
+        }
+    }
+}

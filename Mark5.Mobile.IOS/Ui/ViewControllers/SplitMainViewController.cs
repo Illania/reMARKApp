@@ -1,4 +1,5 @@
 ﻿using Mark5.Mobile.IOS.Ui.Common;
+using Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
@@ -9,6 +10,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         DocumentsSplitViewController documentSplitViewController;
         ContactsSplitViewController contactSplitViewController;
         ShortcodesSplitViewController shortcodeSplitViewController;
+
+        NavigationController calendarNavigationController;
+
+        CalendarModuleCoordinator calendarCoordinator;
 
         public override void LoadView()
         {
@@ -29,11 +34,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 RestorationIdentifier = nameof(ShortcodesSplitViewController)
             };
 
+            calendarCoordinator = new CalendarModuleCoordinator();
+            calendarNavigationController = calendarCoordinator.RootController;
+            calendarNavigationController.RestorationIdentifier = nameof(calendarCoordinator);
+
             ViewControllers = new UIViewController[]
             {
-                SearchNavigationController,
                 documentSplitViewController,
                 contactSplitViewController,
+                calendarNavigationController,
                 shortcodeSplitViewController,
                 SettingsNavigationController
             };

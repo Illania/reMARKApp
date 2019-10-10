@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
@@ -25,11 +26,13 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         protected NavigationModule.NavigationModuleType CurrentNavigationModuleType;
 
-        protected NavigationController SearchNavigationController;
         protected NavigationController SettingsNavigationController;
 
         UIView navigationButtonContainer;
         UIButton moduleNavigationButton;
+
+        UIView searchButtonContainer;
+        UIButton searchButton;
 
         TinyMessageSubscriptionToken reMarkNav;
 
@@ -43,11 +46,6 @@ namespace Mark5.Mobile.IOS.Ui.Common
             };
 
             SettingsNavigationController.TabBarItem.Title = "";
-
-            SearchNavigationController = new NavigationController(new UIViewController());
-            SearchNavigationController.TabBarItem.Image = UIImage.FromBundle("Search-Filled");
-            SearchNavigationController.Tag = SearchTag;
-            SearchNavigationController.RestorationIdentifier = "NavigationController_Search";
 
             TabBar.TintColor = Theme.DarkBlue;
             TabBar.UnselectedItemTintColor = Theme.DarkBlue;
@@ -103,6 +101,39 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 moduleNavigationButton.BottomAnchor.ConstraintEqualTo(navigationButtonContainer.BottomAnchor, -10f),
             });
 
+            searchButtonContainer = new TouchTransparentView
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+
+            View.AddSubview(searchButtonContainer);
+            View.AddConstraints(new[]
+            {
+                searchButtonContainer.HeightAnchor.ConstraintEqualTo(65f),
+                searchButtonContainer.WidthAnchor.ConstraintEqualTo(55f),
+                searchButtonContainer.LeftAnchor.ConstraintEqualTo(View.LeftAnchor, 10f),
+                searchButtonContainer.BottomAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.BottomAnchor : BottomLayoutGuide.GetTopAnchor(), 2),
+            });
+
+            searchButton = new UIButton
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                ClipsToBounds = true,
+                ImageEdgeInsets = new UIEdgeInsets(15f, 15f, 15f, 15f)
+            };
+
+            searchButton.SetImage(UIImage.FromBundle("Nav-search").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+            searchButtonContainer.AddSubview(searchButton);
+            searchButtonContainer.AddConstraints(new[]
+            {
+                searchButton.HeightAnchor.ConstraintEqualTo(55f),
+                searchButton.WidthAnchor.ConstraintEqualTo(55f),
+                searchButton.CenterXAnchor.ConstraintEqualTo(searchButtonContainer.CenterXAnchor),
+                searchButton.BottomAnchor.ConstraintEqualTo(searchButtonContainer.BottomAnchor),
+            });
+
+            CustomizableViewControllers = null;
+
             CommonConfig.MessengerHub.Publish(new NavigationModuleChangedMessage(this, new NavigationModule(CurrentNavigationModuleType)));
         }
 
@@ -113,13 +144,16 @@ namespace Mark5.Mobile.IOS.Ui.Common
             TabBar.Items[2].Enabled = false;
 
             moduleNavigationButton.TouchUpInside += ModuleNavigationButton_TouchUpInside;
+            searchButton.TouchUpInside += SearchButton_TouchUpInside;
+
+            CustomizableViewControllers = null;
         }
 
         public override void ViewDidAppear(bool animated)
         {
             base.ViewDidAppear(animated);
 
-            OnBoardingUtilities.ShowOnBoardingIfNecessary(this);
+            //OnBoardingUtilities.ShowOnBoardingIfNecessary(this); //Not using onboarding at the moment...
 
             CheckAutoSavedDocument();
         }
@@ -129,6 +163,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
             base.ViewWillDisappear(animated);
 
             moduleNavigationButton.TouchUpInside -= ModuleNavigationButton_TouchUpInside;
+            searchButton.TouchUpInside -= SearchButton_TouchUpInside;
+
         }
 
         public void SetSearchButtonHidden(bool hidden)
@@ -175,6 +211,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         }
 
         #region Module Navigation related
+
         void ModuleNavigationButton_TouchUpInside(object sender, EventArgs e)
         {
             var del = UIApplication.SharedApplication?.Delegate as AppDelegate;
@@ -190,6 +227,11 @@ namespace Mark5.Mobile.IOS.Ui.Common
             }
 
             PresentViewController(vc, true, null);
+        }
+
+        void SearchButton_TouchUpInside(object sender, EventArgs e)
+        {
+            OpenSearch();
         }
 
         void Handle_ViewControllerSelected(object sender, UITabBarSelectionEventArgs e)
@@ -210,12 +252,10 @@ namespace Mark5.Mobile.IOS.Ui.Common
             }
         }
 
-        private bool Handle_ShouldSelectViewController(UITabBarController tabBarController, UIViewController viewController)
+        bool Handle_ShouldSelectViewController(UITabBarController tabBarController, UIViewController viewController)
         {
-
             if (viewController == tabBarController.ViewControllers[0])
             {
-
                 var nc = new DarkNavigationController(new SearchCriteriaViewController(), UIModalPresentationStyle.FullScreen)
                 {
                     ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve,
@@ -243,12 +283,12 @@ namespace Mark5.Mobile.IOS.Ui.Common
             {
                 case NavigationModule.NavigationModuleType.Mail:
                     moduleNavigationButton.SetImage(UIImage.FromBundle(nextModule.Image).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
-                    SelectedIndex = 1;
+                    SelectedIndex = 0;
                     break;
                 case NavigationModule.NavigationModuleType.Contacts:
                     module = ModuleType.Contacts;
                     moduleNavigationButton.SetImage(UIImage.FromBundle(nextModule.Image).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
-                    SelectedIndex = 2;
+                    SelectedIndex = 1;
                     break;
                 case NavigationModule.NavigationModuleType.Shortcodes:
                     module = ModuleType.Shortcodes;
@@ -258,23 +298,29 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 case NavigationModule.NavigationModuleType.Calendar:
                     module = ModuleType.Calendar;
                     moduleNavigationButton.SetImage(UIImage.FromBundle(nextModule.Image).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+                    SelectedIndex = 2;  //TODO this is actually somewhat important otherwise the navigation controller gets substituted
                     break;
                 case NavigationModule.NavigationModuleType.Settings:
                     moduleNavigationButton.SetImage(UIImage.FromBundle(nextModule.Image).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
                     SelectedIndex = 4;
                     break;
                 case NavigationModule.NavigationModuleType.Search:
-                    var nc = new DarkNavigationController(new SearchCriteriaViewController(), UIModalPresentationStyle.FullScreen)
-                    {
-                        ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve,
-                        RestorationIdentifier = "NavigationController_" + nameof(SearchCriteriaViewController)
-                    };
-                    PresentViewController(nc, true, null);
+                    OpenSearch();
                     break;
             }
 
             if (module != ModuleType.None)
                 CommonConfig.UsageAnalytics.LogEvent(new OpenModuleEvent(module));
+        }
+
+        void OpenSearch()
+        {
+            var nc = new DarkNavigationController(new SearchCriteriaViewController(), UIModalPresentationStyle.FullScreen)
+            {
+                ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve,
+                RestorationIdentifier = "NavigationController_" + nameof(SearchCriteriaViewController)
+            };
+            PresentViewController(nc, true, null);
         }
         #endregion
 

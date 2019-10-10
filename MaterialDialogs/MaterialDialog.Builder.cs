@@ -122,7 +122,6 @@ namespace MaterialDialogs
             public Builder([NonNull] Context context)
             {
                 this.context = context;
-                var materialBlue = DialogUtils.GetColor(context, Resource.Color.md_material_blue_600);
 
                 //Get default accent colors for action buttons and progress bars.
                 widgetColor = DialogUtils.ResolveColor(context, Android.Resource.Attribute.ColorAccent, widgetColor);
@@ -152,9 +151,6 @@ namespace MaterialDialogs
                 btnStackedGravity = DialogUtils.ResolveGravityEnum(context, Resource.Attribute.md_btnstacked_gravity, btnStackedGravity);
                 itemsGravity = DialogUtils.ResolveGravityEnum(context, Resource.Attribute.md_items_gravity, itemsGravity);
                 buttonsGravity = DialogUtils.ResolveGravityEnum(context, Resource.Attribute.md_buttons_gravity, buttonsGravity);
-
-                var medFont = DialogUtils.ResolveString(context, Resource.Attribute.md_medium_font);
-                var regFont = DialogUtils.ResolveString(context, Resource.Attribute.md_regular_font);
 
                 try
                 {

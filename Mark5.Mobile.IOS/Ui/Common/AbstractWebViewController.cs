@@ -204,7 +204,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             headerContainerView?.RemoveFromSuperview();
             webView.Hidden = true;
             if (Integration.IsIPhone())
-                webView?.RemoveFromSuperview(); //TODO This has been commented out to avoid eventual crashes 
+                webView?.RemoveFromSuperview(); // This has been commented out to avoid eventual crashes 
                                                 // Github link: https://github.com/xamarin/xamarin-macios/issues/4130#issuecomment-399243880
             webViewProgressView = null;
             loadIndicatorView = null;
@@ -444,12 +444,12 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             if (config.InlineCss)
             {
-                    html = await InlineCss(html);
+                html = await InlineCss(html);
 
-                    if (CommonConfig.Logger.IsDebugEnabled())
-                        CommonConfig.Logger.Debug($"InlineCss {sw.ElapsedMilliseconds}ms");
-                    sw.Restart();
-                }
+                if (CommonConfig.Logger.IsDebugEnabled())
+                    CommonConfig.Logger.Debug($"InlineCss {sw.ElapsedMilliseconds}ms");
+                sw.Restart();
+            }
 
             var htmlDocument = new HtmlDocument();
             htmlDocument.LoadHtml(html);

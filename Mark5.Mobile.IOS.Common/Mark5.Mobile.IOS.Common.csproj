@@ -46,9 +46,6 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="Xamarin.iOS" />
-    <Reference Include="SQLite-net">
-      <HintPath>..\packages\sqlite-net-pcl.1.5.231\lib\netstandard1.1\SQLite-net.dll</HintPath>
-    </Reference>
     <Reference Include="PhoneNumbers">
       <HintPath>..\packages\libphonenumber-csharp.8.10.13\lib\netstandard2.0\PhoneNumbers.dll</HintPath>
     </Reference>
@@ -63,6 +60,9 @@
     </Reference>
     <Reference Include="SQLitePCLRaw.batteries_v2">
       <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.14\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_v2.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLite-net">
+      <HintPath>..\packages\sqlite-net-pcl.1.5.231\lib\netstandard1.1\SQLite-net.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

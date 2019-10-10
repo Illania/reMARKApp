@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Mark5.Mobile.Common.DataAccess.Exceptions;
 using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.Common.DataAccess
 {
@@ -46,11 +47,14 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-        public async Task<List<CalendarAppointment>> GetCalendarAppointmentsAsync(List<int> calendarIds, long startDateTimestamp = -1, long endDateTimestamp = -1)
+        public async Task<List<CalendarAppointment>> GetCalendarAppointmentsAsync(List<int> calendarIds, DateTime startDate, DateTime endDate)
         {
             try
             {
                 List<CalendarAppointment> appointments = null;
+
+                var startDateTimestamp = startDate.ConvertDateTimeToTimestampMilliseconds();
+                var endDateTimestamp = endDate.ConvertDateTimeToTimestampMilliseconds();
 
                 await calendarDatabase.RunInConnectionAsync(c =>
                 {
@@ -89,16 +93,8 @@ namespace Mark5.Mobile.Common.DataAccess
                 {
                     c.InsertOrReplace(calendarAppointment);
 
-                    if (calendarAppointment.RecurrenceInfo == null)
-                    {
-                        c.Table<CalendarAppointmentOccurrence>().Delete(cao => cao.AppointmentId == calendarAppointment.Id);
-                        c.InsertAll(calendarAppointment.Occurrences);
-                    }
-                    else
-                    {
-                        //TODO .. What to do??
-                    }
-
+                    c.Table<CalendarAppointmentOccurrence>().Delete(cao => cao.AppointmentId == calendarAppointment.Id);
+                    c.InsertAll(calendarAppointment.Occurrences);
                 });
             }
             catch (Exception ex) when (!(ex is DataAccessException))
@@ -107,10 +103,13 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-        public async Task SaveCalendarAppointmentsAsync(List<int> calendarIds, List<CalendarAppointment> calendarAppointments, long startDateTimestamp, long endDateTimestamp)
+        public async Task SaveCalendarAppointmentsAsync(List<int> calendarIds, List<CalendarAppointment> calendarAppointments, DateTime startDate, DateTime endDate)
         {
             try
             {
+                var startDateTimestamp = startDate.ConvertDateTimeToTimestampMilliseconds();
+                var endDateTimestamp = endDate.ConvertDateTimeToTimestampMilliseconds();
+
                 await calendarDatabase.RunInConnectionAsync(c =>
                 {
                     var deleteOccurrencesQuery = $"delete from {nameof(CalendarAppointmentOccurrence)} " +
@@ -150,9 +149,7 @@ namespace Mark5.Mobile.Common.DataAccess
 
         public async Task RemoveOrphans()
         {
-            await Task.CompletedTask;
-            /*
-            try  //TODO to test
+            try
             {
                 await calendarDatabase.RunInConnectionAsync(c =>
                 {
@@ -160,7 +157,7 @@ namespace Mark5.Mobile.Common.DataAccess
 
                     // 1) Remove all the appointment in calendars for which we do not have access
 
-                    var deleteQuery1 = $"delete from {nameof(CalendarAppointment)}  " +
+                    var deleteQuery1 = $"delete from {nameof(CalendarAppointment)}" +
                         $" where {nameof(CalendarAppointment.CalendarId)} not in ({string.Join(", ", accessibleCalendarIds)}) ";
 
                     var c1 = c.Execute(deleteQuery1);
@@ -169,17 +166,17 @@ namespace Mark5.Mobile.Common.DataAccess
 
                     var innerQuery2 = $"select {nameof(CalendarAppointment.Id)} from {nameof(CalendarAppointment)}";
 
-                    var deleteQuery2 = $"delete from {nameof(CalendarAppointmentOccurrence)}  " +
+                    var deleteQuery2 = $"delete from {nameof(CalendarAppointmentOccurrence)}" +
                         $" where {nameof(CalendarAppointmentOccurrence.AppointmentId)} not in ({innerQuery2}) ";
 
                     var c2 = c.Execute(deleteQuery2);
 
                     // 3) Remove all appointments for which we do not have occurrences
 
-                    var innerQuery3 = $"select 1 from {nameof(CalendarAppointmentOccurrence)}" +
-                        $"where {nameof(CalendarAppointmentOccurrence.AppointmentId)} = ca.{nameof(CalendarAppointment.Id)} ";
+                    var innerQuery3 = $"select 1 from {nameof(CalendarAppointmentOccurrence)} " +
+                        $"where {nameof(CalendarAppointmentOccurrence.AppointmentId)} = {nameof(CalendarAppointment.Id)} ";
 
-                    var deleteQuery3 = $"delete from {nameof(CalendarAppointment)} ca  " +
+                    var deleteQuery3 = $"delete from {nameof(CalendarAppointment)}" +
                         $" where not exists ({innerQuery3}) ";
 
                     var c3 = c.Execute(deleteQuery3);
@@ -190,14 +187,17 @@ namespace Mark5.Mobile.Common.DataAccess
             {
                 throw new DataAccessException("Error removing orphan appointments and appointment occcurences.", ex);
             }
-            */
+
         }
 
-        public async Task<List<CalendarAlarm>> GetCalendarAlarmsAsync(List<int> calendarIds, long startDateTimestamp, long endDateTimestamp)
+        public async Task<List<CalendarAlarm>> GetCalendarAlarmsAsync(List<int> calendarIds, DateTime startDate, DateTime endDate)
         {
             try
             {
                 List<CalendarAlarm> alarms = null;
+
+                var startDateTimestamp = startDate.ConvertDateTimeToTimestampMilliseconds();
+                var endDateTimestamp = endDate.ConvertDateTimeToTimestampMilliseconds();
 
                 await calendarDatabase.RunInConnectionAsync(c =>
                 {
@@ -219,10 +219,13 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-        public async Task SaveCalendarAlarmsAsync(List<int> calendarIds, List<CalendarAlarm> alarms, long startDateTimestamp, long endDateTimestamp)
+        public async Task SaveCalendarAlarmsAsync(List<int> calendarIds, List<CalendarAlarm> alarms, DateTime startDate, DateTime endDate)
         {
             try
             {
+                var startDateTimestamp = startDate.ConvertDateTimeToTimestampMilliseconds();
+                var endDateTimestamp = endDate.ConvertDateTimeToTimestampMilliseconds();
+
                 await calendarDatabase.RunInConnectionAsync(c =>
                 {
                     var deleteOccurrencesQuery = $"delete from {nameof(CalendarAlarm)} " +

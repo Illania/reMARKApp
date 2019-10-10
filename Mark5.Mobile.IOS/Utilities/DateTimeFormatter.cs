@@ -14,28 +14,28 @@ namespace Mark5.Mobile.IOS.Utilities
 
         static DateTimeFormatter()
         {
-            ShortTimeFormatter = new NSDateFormatter()
+            ShortTimeFormatter = new NSDateFormatter
             {
                 DateStyle = NSDateFormatterStyle.None,
                 TimeStyle = NSDateFormatterStyle.Short,
-                TimeZone = new NSTimeZone("GMT")
+                TimeZone = new NSTimeZone("GMT"),
             };
 
-            ShortDateFormatter = new NSDateFormatter()
+            ShortDateFormatter = new NSDateFormatter
             {
                 DateStyle = NSDateFormatterStyle.Short,
                 TimeStyle = NSDateFormatterStyle.None,
                 TimeZone = new NSTimeZone("GMT")
             };
 
-            ShortDateTimeFormatter = new NSDateFormatter()
+            ShortDateTimeFormatter = new NSDateFormatter
             {
                 DateStyle = NSDateFormatterStyle.Short,
                 TimeStyle = NSDateFormatterStyle.Short,
                 TimeZone = new NSTimeZone("GMT")
             };
 
-            LongDateFormatter = new NSDateFormatter()
+            LongDateFormatter = new NSDateFormatter
             {
                 DateStyle = NSDateFormatterStyle.Medium,
                 TimeStyle = NSDateFormatterStyle.None,

@@ -1188,6 +1188,9 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "RecurrenceInfo", Order = 0)]
         public RecurrenceInfo RecurrenceInfo { get; set; }
+
+        [DataMember(Name = "SerializedTimeZoneInfo", Order = 0)]
+        public string SerializedTimeZoneInfo { get; set; }
     }
 
     [DataContract(Name = "CalendarAppointmentOccurrence", Namespace = "com.nordic-it.appservice.v3")]
@@ -1451,6 +1454,29 @@ namespace Mark5.ServiceReference.DataContract
     {
         [DataMember(Name = "Alarms", Order = 0)]
         public List<CalendarAlarm> Alarms { get; set; }
+    }
+
+    [DataContract(Name = "GetCalendarAppointmentOccurrencesParameters", Namespace = "com.nordic-it.appservice.v3")]
+    public class GetCalendarAppointmentOccurrencesParameters : AbstractParameters
+    {
+        [DataMember(Name = "CalendarId", Order = 0)]
+        public int CalendarId { get; set; } = -1;
+
+        [DataMember(Name = "CalendarAppointmentId", Order = 0)]
+        public int CalendarAppointmentId { get; set; } = -1;
+
+        [DataMember(Name = "StartDate", Order = 0)]
+        public DateTime StartDate { get; set; }
+
+        [DataMember(Name = "EndDate", Order = 0)]
+        public DateTime EndDate { get; set; }
+    }
+
+    [DataContract(Name = "GetCalendarAppointmentOccurrencesResult", Namespace = "com.nordic-it.appservice.v3")]
+    public class GetCalendarAppointmentOccurrencesResult
+    {
+        [DataMember(Name = "Occurrences", Order = 0)]
+        public List<CalendarAppointmentOccurrence> Occurrences { get; set; }
     }
 
     #endregion

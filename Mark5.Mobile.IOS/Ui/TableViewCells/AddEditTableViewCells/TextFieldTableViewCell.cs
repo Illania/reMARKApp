@@ -3,7 +3,7 @@ using Foundation;
 using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
 
-namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCell
+namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
 {
     public class TextFieldTableViewCell : AddEditTableViewCell
     {

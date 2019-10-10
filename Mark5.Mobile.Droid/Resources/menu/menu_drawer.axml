@@ -1,12 +1,15 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-	<group android:id="@+id/nav_group_documents" android:checkableBehavior="single">
-		<item android:id="@+id/nav_documents" android:title="@string/documents" android:icon="@drawable/nav_documents" />
-	</group>
-	<group android:id="@+id/nav_group_contacts" android:checkableBehavior="single">
-		<item android:id="@+id/nav_contacts" android:title="@string/contacts" android:icon="@drawable/nav_contacts" />
-	</group>
-	<group android:id="@+id/nav_group_shortcodes" android:checkableBehavior="single">
-		<item android:id="@+id/nav_shortcodes" android:title="@string/shortcodes" android:icon="@drawable/nav_shortcodes" />
-	</group>
+    <group android:id="@+id/nav_group_documents" android:checkableBehavior="single">
+        <item android:id="@+id/nav_documents" android:title="@string/documents" android:icon="@drawable/nav_documents" />
+    </group>
+    <group android:id="@+id/nav_group_contacts" android:checkableBehavior="single">
+        <item android:id="@+id/nav_contacts" android:title="@string/contacts" android:icon="@drawable/nav_contacts" />
+    </group>
+    <group android:id="@+id/nav_group_shortcodes" android:checkableBehavior="single">
+        <item android:id="@+id/nav_shortcodes" android:title="@string/shortcodes" android:icon="@drawable/nav_shortcodes" />
+    </group>
+    <group android:id="@+id/nav_group_calendar" android:checkableBehavior="single">
+        <item android:id="@+id/nav_calendar" android:title="@string/calendar" android:icon="@drawable/nav_calendar" />
+    </group>
 </menu>

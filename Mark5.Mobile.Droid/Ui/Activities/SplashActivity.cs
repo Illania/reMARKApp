@@ -20,7 +20,6 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Service;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
-using Microsoft.AppCenter;
 using Microsoft.AppCenter.Crashes;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
@@ -89,8 +88,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 {
                     var animationView = FindViewById<LottieAnimationView>(Resource.Id.animation_view);
 
-                    animationView.Progress = 1;
-                    animationView.Animate().Alpha(1f).SetDuration(200);
+                    if (animationView != null)
+                    {
+                        animationView.Progress = 1;
+                        animationView.Animate().Alpha(1f).SetDuration(200);
+                    }
+
                 });
 
                 CommonConfig.Logger.Info("Updating file system storage...");
@@ -127,6 +130,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
                 Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
 
+                CommonConfig.Logger.Info("Retrieving system settings...");
+                ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
+
                 if (PlatformConfig.Preferences.ClearCache)
                 {
                     CommonConfig.UsageAnalytics.LogEvent(new SettingsCacheCleanUpEvent());
@@ -159,9 +165,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     CommonConfig.Logger.Info($"Registering {nameof(CallStateBroadcastReceiver)}...");
                     PlatformConfig.CallStateBroadcastReceiver.Register();
                 }
-
-                CommonConfig.Logger.Info("Retrieving system settings...");
-                ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
 
                 if (!String.IsNullOrEmpty(ServerConfig.SystemSettings.SystemInfo.CustomerName))
                     CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.CustomerName, ServerConfig.SystemSettings.SystemInfo.CustomerName);
