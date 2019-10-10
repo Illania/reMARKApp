@@ -90,6 +90,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             if (Document == null)
                 return;
 
+            if (Document.Attachments?.Count > 1)
+                titleLabel.Text = $"{ Document.Attachments.Count } " + Localization.GetString("attachments") + ":";
+            else
+                titleLabel.Text = Localization.GetString("attachments") + ":";
+
             stackView.ArrangedSubviews.ForEach(v => v.RemoveFromSuperview());
             foreach (var batch in Document.Attachments.Batch(columnSize))
                 stackView.AddArrangedSubview(PrepareColumnStack(batch));
@@ -164,7 +169,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             };
             attachmentButton.TitleLabel.Font = Theme.DefaultFont;
             attachmentButton.Layer.CornerRadius = 5f;
-            attachmentButton.SetTitle(Attachment.Name + " (" + UI.PrettyFileSize(Attachment.SizeInBytes) + ")", UIControlState.Normal);
+            attachmentButton.SetTitle(Truncate(Attachment.Name, 25) + " (" + UI.PrettyFileSize(Attachment.SizeInBytes) + ")", UIControlState.Normal);
             attachmentButton.SetContentHuggingPriority((float)UILayoutPriority.DefaultHigh, UILayoutConstraintAxis.Vertical);
             attachmentButton.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             attachmentButton.TouchUpInside += AttachmentButton_TouchUpInside;
@@ -189,6 +194,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 attachmentButton = null;
             }
         }
+
+
+        private string Truncate(string value, int maxLength)
+        {
+            if (string.IsNullOrEmpty(value) || value.Length <= maxLength) { return value; }
+
+            return value.Substring(0, Math.Min(value.Length, maxLength)) + "..";
+        }
+
     }
 
     public class AttachmentButtonTappedEventArgs : EventArgs
