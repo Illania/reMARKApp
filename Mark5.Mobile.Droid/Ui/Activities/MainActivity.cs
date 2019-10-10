@@ -81,6 +81,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             navigationView = FindViewById<NavigationView>(Resource.Id.navigation_view);
             navigationView.SetNavigationItemSelectedListener(this);
 
+            navigationView.Menu.Clear();
+
+            if (ServerConfig.SystemSettings?.SystemInfo.SystemVersion >= new Version(1, 35, 10))
+                navigationView.InflateMenu(Resource.Menu.menu_drawer_1_35_10);
+            else
+                navigationView.InflateMenu(Resource.Menu.menu_drawer);
+
             var header = navigationView.GetHeaderView(0);
 
             navHeaderSettingsButton = header.FindViewById<AppCompatImageView>(Resource.Id.nav_header_settings_button);

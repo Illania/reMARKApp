@@ -9,4 +9,7 @@
     <group android:id="@+id/nav_group_shortcodes" android:checkableBehavior="single">
         <item android:id="@+id/nav_shortcodes" android:title="@string/shortcodes" android:icon="@drawable/nav_shortcodes" />
     </group>
+    <group android:id="@+id/nav_group_calendar" android:checkableBehavior="single">
+        <item android:id="@+id/nav_calendar" android:title="@string/calendar" android:icon="@drawable/nav_calendar" />
+    </group>
 </menu>

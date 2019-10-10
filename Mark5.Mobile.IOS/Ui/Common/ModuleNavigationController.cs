@@ -152,6 +152,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 calendarBtn.CenterYAnchor.ConstraintEqualTo(seperatorView.CenterYAnchor, -verticalSpacingFirstBtns)
             });
 
+            calendarBtn.Hidden = !(ServerConfig.SystemSettings?.SystemInfo.SystemVersion >= new Version(1, 35, 10));
+
             SetButtonGridHorizontalConstraints();
         }
 
