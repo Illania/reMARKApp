@@ -91,7 +91,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 return;
 
             if (Document.Attachments?.Count > 1)
-                titleLabel.Text = $"{ Document.Attachments?.Count } " + Localization.GetString("attachments") + ":";
+                titleLabel.Text = $"{ Document.Attachments.Count } " + Localization.GetString("attachments") + ":";
             else
                 titleLabel.Text = Localization.GetString("attachments") + ":";
 
