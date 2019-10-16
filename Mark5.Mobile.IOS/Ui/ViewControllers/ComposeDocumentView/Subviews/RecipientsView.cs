@@ -277,6 +277,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                     {
                         Address = email,
                         AddressType = AddressType,
+                        Name = ExtractAddressNameForEmail(email),
                         Type = CommunicationAddressType.Email
                     });
 
@@ -456,6 +457,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         #endregion
 
         #region Helper methods
+        string ExtractAddressNameForEmail(string email)
+        {
+            var name = string.Empty;
+            var addresses = TextView?.Text;
+
+            if (addresses == null) return name;
+
+            var splitAddresses = addresses.Split(",").ToList();
+            var addressElement = splitAddresses.Where(x => x.Contains(email, StringComparison.InvariantCultureIgnoreCase)).First();
+            var splitAddressElement = addressElement.Split("<").ToList();
+            if (splitAddressElement.Count > 1)
+                name = splitAddressElement.First().Trim();
+
+            return name;
+        }
 
         protected void CorrectMarkup()
         {

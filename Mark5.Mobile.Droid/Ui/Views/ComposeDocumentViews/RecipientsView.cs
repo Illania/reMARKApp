@@ -268,6 +268,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                     DocumentPreview.Addresses.Add(new DocumentAddress
                     {
                         Address = email,
+                        Name = ExtractAddressNameForEmail(email),
                         AddressType = AddressType,
                         Type = CommunicationAddressType.Email
                     });
@@ -490,6 +491,17 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             return SystemUsersDepartments?.Users.Where(su => systemUserGuids.Any(g => g == su.Guid.ToString())).Select(su => su.Username);
         }
 
+        string ExtractAddressNameForEmail(string email)
+        {
+            var name = string.Empty;
+            var splitAddresses = fullEditorText.Split(",").ToList();
+            var addressElement = splitAddresses.Where(x => x.Contains(email, StringComparison.InvariantCultureIgnoreCase)).First();
+            var splitAddressElement = addressElement.Split("<").ToList();
+            if (splitAddressElement.Count > 1)
+                name = splitAddressElement.First().Trim();
+
+            return name;
+        }
         #endregion
 
         #region Control event handlers
