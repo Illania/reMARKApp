@@ -6,7 +6,7 @@ namespace Mark5.Mobile.Common.Utilities
 {
     public interface IReachability
     {
-        bool IsReachable { get; }
+        bool IsReachable { get; set; }
         bool IsCheckingReachability { get; }
         event EventHandler RefreshingReachability;
 
