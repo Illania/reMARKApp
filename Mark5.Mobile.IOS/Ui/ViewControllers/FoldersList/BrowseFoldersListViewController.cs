@@ -6,6 +6,7 @@ using Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList;
 using UIKit;
 using Mark5.Mobile.IOS.Ui.Common;
 
+
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 {
     public class BrowseFoldersListViewController : AbstractFoldersListViewController, IUIViewControllerRestoration
@@ -31,12 +32,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
+            OutgoingWarningBar.Attach(this);
             ReachabilityBar.Attach(this);
         }
 
         public override void ViewDidDisappear(bool animated)
         {
             base.ViewDidDisappear(animated);
+            OutgoingWarningBar.Detach(this);
             ReachabilityBar.Detach(this);
         }
 
