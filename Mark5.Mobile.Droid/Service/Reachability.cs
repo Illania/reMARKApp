@@ -20,7 +20,7 @@ namespace Mark5.Mobile.Droid.Service
     {
         const string GoogleRequestUrl = "http://clients3.google.com/generate_204";
 
-        public bool IsReachable { get; set; }
+        public bool IsReachable { get; private set; }
 
         public bool IsCheckingReachability { get; private set; }
 

@@ -15,7 +15,7 @@ namespace Mark5.Mobile.IOS.Service
     {
         const string GoogleRequestUrl = "http://clients3.google.com/generate_204";
 
-        public bool IsReachable { get; set; }
+        public bool IsReachable { get; private set; }
 
         public bool IsCheckingReachability { get; private set; }
 
@@ -67,7 +67,7 @@ namespace Mark5.Mobile.IOS.Service
             {
                 var lastResult = IsReachable;
                 IsReachable = result;
-                CommonConfig.Reachability.IsReachable = IsReachable;
+
                 CommonConfig.Logger.Info($"Reachability checked: {result}");
 
                 ReachabilityRefreshed(this, new ReachabilityRefreshedEventArgs(lastResult != result, result));
@@ -160,7 +160,6 @@ namespace Mark5.Mobile.IOS.Service
 
                 var result = await tester.Test();
                 CommonConfig.Logger.Info($"Service availability: {result}");
-                CommonConfig.Reachability.IsReachable = result;
                 return result;
             }
             catch (Exception)
@@ -180,7 +179,7 @@ namespace Mark5.Mobile.IOS.Service
                 if (response)
                 {
                     cancellationTokenSource.Cancel();
-                    CommonConfig.Reachability.IsReachable = response;
+                    IsReachable = response;
                     ReachabilityRefreshed(this, new ReachabilityRefreshedEventArgs(true, true));
                 }
 
