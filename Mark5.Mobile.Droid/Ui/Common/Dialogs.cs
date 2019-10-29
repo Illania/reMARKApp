@@ -453,26 +453,22 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
         #region Error dialogs
 
-        public static Task ShowErrorDialogAsync(Context context, Exception ex)
+        public static async Task ShowErrorDialogAsync(Context context, Exception ex)
         {
             if (context == null)
-                return Task.CompletedTask;
+                return;
 
             var tcs = new TaskCompletionSource<bool>();
             var builder = new MaterialDialog.Builder(context);
             builder.Title(GetErrorTitle(context, ex));
             builder.Content(GetErrorMessage(context, ex));
 
-            //if token is invalid -> navigate user to login
-            if (ex is HttpAppServiceException hape && (hape?.Detail?.Code == AppServiceFaultCode.InvalidToken))
+            if (IsAccessDisabled(ex))
             {
-                ShowYesNoDialog(context, Resource.String.invalid_token, Resource.String.invalid_token_message,
-                    async () =>
-                    {
-                        await AuthenticatorFactory.Create().RetainConnectionInfoAsync();
-                        context.StartActivity(LoginActivity.CreateIntent(context, true));
-                    });
-                return tcs.Task;
+                await AuthenticatorFactory.Create().RetainConnectionInfoAsync();
+                await Integration.ClearData(context);
+
+                ShowBlockingAlert(context, Resource.String.access_disabled);
             }
 
             builder.PositiveText(Resource.String.ok);
@@ -504,13 +500,29 @@ namespace Mark5.Mobile.Droid.Ui.Common
             }
             builder.Cancelable(false);
             builder.Show();
-            return tcs.Task;
+            return;
+        }
+
+        public static bool IsAccessDisabled(Exception ex)
+        {
+            if (ex is HttpAppServiceException httpEx)
+            {
+                var code = httpEx?.Detail?.Code;
+
+                return code == AppServiceFaultCode.InvalidToken
+                    || code == AppServiceFaultCode.MobileLicenseError
+                    || code == AppServiceFaultCode.AccessDisabled;
+            }
+
+            return false;
         }
 
         public static void ShowErrorDialog(Context context, Exception ex, Action action = null)
         {
             if (context == null)
                 return;
+
+            //TODO need to do the same thing we do in async
 
             var builder = new MaterialDialog.Builder(context);
             builder.Title(GetErrorTitle(context, ex));
