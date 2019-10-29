@@ -80,7 +80,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         void ShowMessage()
         {
             TextColor = Theme.White;
-            Text = "Error when sending emails";
+            Text = Localization.GetString("outgoing_warning");
             BackgroundColor = UIColor.Red;
 
             var heightConstraint = Constraints.First(nslc => nslc.GetIdentifier() == "toastbar.height");

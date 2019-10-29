@@ -304,6 +304,7 @@
 "parent_contact_selector_invalid_person_content" = "Only department or company can be selected";
 "parent_contact_selector_invalid_department_content" = "Only company can be selected";
 "outgoing" = "Outgoing";
+"outgoing_warning" = "Error while sending emails";
 "participants" = "Participants";
 "password" = "Password";
 "pending" = "Pending";
