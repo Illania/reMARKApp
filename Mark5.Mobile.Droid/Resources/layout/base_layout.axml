@@ -13,21 +13,32 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
         <android.support.v7.widget.AppCompatTextView
-            android:id="@+id/connection_bar"
+            android:id="@+id/outgoing_warning_bar"
             android:layout_width="match_parent"
             android:layout_height="@dimen/connection_bar_height"
+            android:text="@string/outgoing_warning"
+            android:textAppearance="@style/fontSmall"
+            android:textColor="@color/white"
+            android:background="@color/red"
+            android:gravity="center"
+            android:visibility="gone"
+            android:layout_above="@id/connection_bar" />
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/connection_bar"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
             android:layout_alignParentBottom="true"
             android:text="@string/no_connection"
             android:textAppearance="@style/fontSmall"
             android:textColor="@color/white"
             android:background="@color/brown"
             android:gravity="center"
-            android:visibility="gone" />
+            android:visibility="visible" />
         <FrameLayout
             android:id="@+id/fragment_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@id/connection_bar" />
+            android:layout_above="@id/outgoing_warning_bar" />
     </RelativeLayout>
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"

@@ -395,6 +395,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 outgoing.PendingDocumentCount = outgoingMessageCount.PendingCount;
                 outgoing.HasFailedDocuments = outgoingMessageCount.HasFailedDocuments;
                 Activity.RunOnUiThread(Adapter.RefreshOutgoing);
+
+                Activity.RunOnUiThread(() =>
+                {
+                    var view = ((AppCompatActivity)Activity).FindViewById(Resource.Id.outgoing_warning_bar);
+                    if (view != null)
+                        if (outgoingMessageCount.HasFailedDocuments)
+                            view.Visibility = ViewStates.Visible;
+                        else
+                            view.Visibility = ViewStates.Gone;
+                });
             }
         }
 
