@@ -14,8 +14,10 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Model.Exceptions;
 using Mark5.Mobile.Droid.Utilities;
 using Mark5.ServiceReference.Exceptions;
-using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Common.Authenticator;
+using Mark5.Mobile.Common.Manager;
+using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Common
 {
@@ -469,6 +471,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 await Integration.ClearData(context);
 
                 ShowBlockingAlert(context, Resource.String.access_disabled);
+                return;
             }
 
             builder.PositiveText(Resource.String.ok);
@@ -521,8 +524,6 @@ namespace Mark5.Mobile.Droid.Ui.Common
         {
             if (context == null)
                 return;
-
-            //TODO need to do the same thing we do in async
 
             var builder = new MaterialDialog.Builder(context);
             builder.Title(GetErrorTitle(context, ex));
