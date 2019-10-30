@@ -78,6 +78,7 @@ namespace Mark5.Mobile.Droid.Utilities
             sb.AppendLine("Brand: " + Build.Brand);
             sb.AppendLine("Model: " + Build.Model);
             sb.AppendLine("Device: " + Build.Device);
+            sb.AppendLine("Installation ID: " + CommonConfig.DeviceInfoProvider.GetDeviceId());
             sb.AppendLine("Display: " + Build.Display);
             sb.AppendLine("Version.BaseOs: " + Build.VERSION.BaseOs);
             sb.AppendLine("Version.Codename: " + Build.VERSION.Codename);

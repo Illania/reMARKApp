@@ -346,7 +346,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     CommonConfig.Logger.Error("Could not share system report", ex);
 
-                    Dialogs.ShowErrorAlert(this, ex);
+                    await Dialogs.ShowErrorAlertAsync(this, ex);
                 }
 
                 return;

@@ -11,6 +11,7 @@ using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 using MessageUI;
 using UIKit;
+using Xamarin.Essentials;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
@@ -105,11 +106,15 @@ namespace Mark5.Mobile.IOS.Utilities
             sb.AppendLine("Local Date: " + DateTime.Now);
             sb.AppendLine();
 
+            sb.AppendLine("Model: " + DeviceInfo.Model);
+            sb.AppendLine("Model number: " + DeviceInfo.Name);
+
             sb.AppendLine("===== Device information =====");
             sb.AppendLine("Name: " + UIDevice.CurrentDevice.Name);
             sb.AppendLine("UserInterfaceIdiom: " + UIDevice.CurrentDevice.UserInterfaceIdiom.ToString());
             sb.AppendLine("Model: " + UIDevice.CurrentDevice.Model);
             sb.AppendLine("Model number: " + Integration.GetModelNumber());
+            sb.AppendLine("Installation ID: " + CommonConfig.DeviceInfoProvider.GetDeviceId());
             sb.AppendLine("LocalizedModel: " + UIDevice.CurrentDevice.LocalizedModel);
             sb.AppendLine("SystemName: " + UIDevice.CurrentDevice.SystemName);
             sb.AppendLine("SystemVersion: " + UIDevice.CurrentDevice.SystemVersion);

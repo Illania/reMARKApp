@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Authenticator;
@@ -182,18 +183,11 @@ namespace Mark5.Mobile.IOS.Ui.Common
             var tcs = new TaskCompletionSource<bool>();
             UIAlertController alert;
 
-            if (ex is HttpAppServiceException && ((HttpAppServiceException)ex)?.Detail?.Code == AppServiceFaultCode.InvalidToken)
+            if (IsAccessDisabled(ex))
             {
-                alert = UIAlertController.Create(GetErrorTitle(ex), GetErrorContent(ex), UIAlertControllerStyle.Alert);
-
-                alert.AddAction(UIAlertAction.Create(Localization.GetString("Logout"), UIAlertActionStyle.Default, async a =>
-                 {
-                     await AuthenticatorFactory.Create().RetainConnectionInfoAsync();
-                     vc.PresentViewController(new LoginViewController(true), true, null);
-                     tcs.SetResult(true);
-                 }));
-
-                alert.AddAction(UIAlertAction.Create(Localization.GetString("Cancel"), UIAlertActionStyle.Cancel, a => { tcs.SetResult(true); }));
+                PlatformConfig.Preferences.ResetOnLaunch = true;
+                ShowBlockingAlert(vc, Localization.GetString("access_disabled"));
+                tcs.SetResult(true);
             }
             else
             {
@@ -225,11 +219,25 @@ namespace Mark5.Mobile.IOS.Ui.Common
                         }, TaskScheduler.FromCurrentSynchronizationContext());
                     }));
                 }
+
+                vc.PresentViewController(alert, true, () => hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Error));
             }
 
-            vc.PresentViewController(alert, true, () => hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Error));
-
             return tcs.Task;
+        }
+
+        public static bool IsAccessDisabled(Exception ex)
+        {
+            if (ex is HttpAppServiceException httpEx)
+            {
+                var code = httpEx?.Detail?.Code;
+
+                return code == AppServiceFaultCode.InvalidToken
+                    || code == AppServiceFaultCode.MobileLicenseError
+                    || code == AppServiceFaultCode.AccessDisabled;
+            }
+
+            return false;
         }
 
         public static void ShowErrorAlert(UIViewController vc, Exception ex)
