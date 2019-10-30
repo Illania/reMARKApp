@@ -21,7 +21,7 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public string GetDeviceName()
         {
-            return BluetoothAdapter.DefaultAdapter?.Name ?? Build.Manufacturer + " " + Build.Product + " (" + Build.Model + ")";
+            return $"{Build.Manufacturer} {Build.Model} - {BluetoothAdapter.DefaultAdapter?.Name}";
         }
 
         public string GetAppVersionString()
