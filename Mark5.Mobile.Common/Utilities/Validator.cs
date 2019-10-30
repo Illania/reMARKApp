@@ -65,15 +65,41 @@ namespace Mark5.Mobile.Common.Utilities
             return Regex.Matches(text ?? string.Empty, EmailAddressRegex, RegexOptions.IgnoreCase);
         }
 
-        public static bool ContainsValidEmails(string text)
+        public static List<DocumentAddress> ExtractValidaEmails(string text)
         {
-            return ContainsValidEmails(text, out MatchCollection mc);
+            List<DocumentAddress> addresses = new List<DocumentAddress>();
+
+            var entries = text.Split(',');
+
+            foreach (var entry in entries)
+            {
+                var validEmail = Regex.Matches(entry ?? string.Empty, EmailAddressRegex, RegexOptions.IgnoreCase);
+                if (validEmail.Count > 0)
+                {
+                    var email = validEmail[0].Value;
+                    var entrySplit = entry.Split('<');
+
+                    addresses.Add(new DocumentAddress
+                    {
+                        Address = email,
+                        Name = entrySplit.Count() > 1 ? entrySplit[0].Trim() : string.Empty,
+                        Type = CommunicationAddressType.Email
+                    });
+                }
+            }
+
+            return addresses;
         }
 
-        public static bool ContainsValidEmails(string text, out MatchCollection matches)
+        public static bool ContainsValidEmails(string text)
         {
-            matches = ExtractValidEmails(text);
-            return matches.Count > 0;
+            return ContainsValidEmails(text, out List<DocumentAddress> addresses);
+        }
+
+        public static bool ContainsValidEmails(string text, out List<DocumentAddress> addresses)
+        {
+            addresses = ExtractValidaEmails(text);
+            return addresses.Count > 0;
         }
 
         public static bool ContainsValidEmail(string text)

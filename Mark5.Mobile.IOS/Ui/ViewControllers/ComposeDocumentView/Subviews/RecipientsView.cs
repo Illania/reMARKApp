@@ -44,6 +44,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         public event EventHandler CommaOrEnterPressed = delegate { };
         public event EventHandler AddButtonTapped = delegate { };
 
+        List<DocumentAddress> addresses;
+
         public RecipientsView(DocumentAddressType type, bool hideAddButton = false)
         {
             AddressType = type;
@@ -139,6 +141,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             textViewTapGestureRecognizer = new UITapGestureRecognizer();
             textViewTapGestureRecognizer.AddTarget(HandleTextTapped);
             textViewTapGestureRecognizer.NumberOfTapsRequired = 1;
+
+            addresses = new List<DocumentAddress>();
         }
 
         protected string GetTitleFromAddressType()
@@ -272,14 +276,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             DocumentPreview.Addresses.RemoveAll(a => a?.AddressType == AddressType);
             InvokeOnMainThread(() =>
             {
-                foreach (var email in GetEmails())
-                    DocumentPreview.Addresses.Add(new DocumentAddress
-                    {
-                        Address = email,
-                        AddressType = AddressType,
-                        Name = ExtractAddressNameForEmail(email),
-                        Type = CommunicationAddressType.Email
-                    });
+                DocumentPreview.Addresses = GetEmails().Select(x =>
+                {
+                    x.AddressType = AddressType;
+                    return x;
+                }).ToList();
 
                 if (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
                 {
@@ -457,21 +458,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         #endregion
 
         #region Helper methods
-        string ExtractAddressNameForEmail(string email)
-        {
-            var name = string.Empty;
-            var addresses = TextView?.Text;
-
-            if (addresses == null) return name;
-
-            var splitAddresses = addresses.Split(",").ToList();
-            var addressElement = splitAddresses.Where(x => x.Contains(email, StringComparison.InvariantCultureIgnoreCase)).First();
-            var splitAddressElement = addressElement.Split("<").ToList();
-            if (splitAddressElement.Count > 1)
-                name = splitAddressElement.First().Trim();
-
-            return name;
-        }
 
         protected void CorrectMarkup()
         {
@@ -551,9 +537,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                                                                 ? (!Validator.ContainsValidEmails(a) && !Validator.ContainsValidUsernames(a, SystemUsersDepartments))
                                                                 : !Validator.ContainsValidEmails(a));
 
-        public IEnumerable<string> GetEmails() => Validator.ContainsValidEmails(TextView.Text, out MatchCollection matches)
-                                                           ? matches.Cast<Match>().Select(m => m.Value).Distinct().ToArray()
-                                                           : new string[0];
+        public List<DocumentAddress> GetEmails() => Validator.ContainsValidEmails(TextView.Text, out List<DocumentAddress> addresses)
+                                                           ? addresses
+                                                           : new List<DocumentAddress>();
 
         public IEnumerable<string> GetRecipents()
         {
@@ -570,10 +556,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         public void SetEmails(string emails)
         {
-            if (Validator.ContainsValidEmails(emails, out MatchCollection matches))
+            if (Validator.ContainsValidEmails(emails, out List<DocumentAddress> addresses))
             {
                 var sb = new StringBuilder();
-                sb.Append(string.Join(RecipientSeperator, matches.Cast<Match>().Select(m => m.Value)));
+                sb.Append(string.Join(RecipientSeperator, addresses.Select(m => m.Address)));
 
                 sb.Append(RecipientSeperator);
 
@@ -649,13 +635,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         public void AddEmails(string emails)
         {
-            if (Validator.ContainsValidEmails(emails, out MatchCollection matches))
+            if (Validator.ContainsValidEmails(emails, out List<DocumentAddress> addresses))
             {
                 var newEmails = new StringBuilder();
                 newEmails.Append(TextView.Text);
                 if (!TextView.Text.EndsWith(RecipientSeperator, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(TextView.Text))
                     newEmails.Append(RecipientSeperator);
-                newEmails.Append(string.Join(RecipientSeperator, matches.Cast<Match>().Select(m => m.Value)));
+                newEmails.Append(string.Join(RecipientSeperator, addresses.Select(m => m.Address)));
                 newEmails.Append(RecipientSeperator);
 
                 TextView.TextStorage.BeginEditing();
