@@ -159,9 +159,7 @@ namespace Mark5.Mobile.IOS.Service
                 }
 
                 var result = await tester.Test();
-
                 CommonConfig.Logger.Info($"Service availability: {result}");
-
                 return result;
             }
             catch (Exception)
@@ -181,6 +179,7 @@ namespace Mark5.Mobile.IOS.Service
                 if (response)
                 {
                     cancellationTokenSource.Cancel();
+                    IsReachable = response;
                     ReachabilityRefreshed(this, new ReachabilityRefreshedEventArgs(true, true));
                 }
 
