@@ -101,7 +101,8 @@ namespace Mark5.ServiceReference.Exceptions
         [EnumMember(Value = "AuthenticationError")] AuthenticationError = 1000,
         [EnumMember(Value = "AuthorisationError")] AuthorisationError = 1001,
         [EnumMember(Value = "InvalidToken")] InvalidToken = 1002,
-        [EnumMember(Value = "AccessDisabled")] AccessDisabled = 1003,        [EnumMember(Value = "MobileLicenseError")] MobileLicenseError = 1004,
+        [EnumMember(Value = "AccessDisabled")] AccessDisabled = 1003,
+        [EnumMember(Value = "MobileLicenseError")] MobileLicenseError = 1004,
 
         [EnumMember(Value = "GetFoldersError")] GetFoldersError = 1100,
 
