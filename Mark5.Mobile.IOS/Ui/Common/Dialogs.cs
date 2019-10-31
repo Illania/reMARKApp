@@ -1,12 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.DataAccess.Exceptions;
 using Mark5.Mobile.Common.Model.Exceptions;
-using Mark5.Mobile.IOS.Ui.ViewControllers;
 using Mark5.Mobile.IOS.Utilities;
 using Mark5.ServiceReference.Exceptions;
 using SVProgressHUD;

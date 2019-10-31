@@ -106,9 +106,6 @@ namespace Mark5.Mobile.IOS.Utilities
             sb.AppendLine("Local Date: " + DateTime.Now);
             sb.AppendLine();
 
-            sb.AppendLine("Model: " + DeviceInfo.Model);
-            sb.AppendLine("Model number: " + DeviceInfo.Name);
-
             sb.AppendLine("===== Device information =====");
             sb.AppendLine("Name: " + UIDevice.CurrentDevice.Name);
             sb.AppendLine("UserInterfaceIdiom: " + UIDevice.CurrentDevice.UserInterfaceIdiom.ToString());
