@@ -57,17 +57,17 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
                 if (fromVc.HidesBottomBarWhenPushed && (SplitViewController == null || SplitViewController.Collapsed))
                 {
-                    root?.SetSearchButtonHidden(false);
-                    root?.SetSearchButtonAlpha(1f);
+                    root?.SetBottomNavigationButtonsHidden(false);
+                    root?.SetBottomNavigationButtonsAlpha(1f);
                 }
                 if (toVc.HidesBottomBarWhenPushed && (SplitViewController == null || SplitViewController.Collapsed))
-                    root?.SetSearchButtonAlpha(0f);
+                    root?.SetBottomNavigationButtonsAlpha(0f);
 
             }, completionContext =>
             {
                 var toVc = completionContext.GetViewControllerForKey(UITransitionContext.ToViewControllerKey);
                 if (toVc.HidesBottomBarWhenPushed && (SplitViewController == null || SplitViewController.Collapsed))
-                    root?.SetSearchButtonHidden(true);
+                    root?.SetBottomNavigationButtonsHidden(true);
             });
         }
 
