@@ -747,7 +747,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 dismissAction();
                 CommonConfig.Logger.Error($"{(enabled ? "Subscription" : "Unsubscription")}  failed", ex);
-                Dialogs.ShowErrorDialog(Activity, ex);
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
                 actionMode.Finish();
 
                 return;
@@ -782,7 +782,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error($"Error while changing offline status for folders", ex.InnerException);
-                Dialogs.ShowErrorDialog(Activity, ex.InnerException);
+                await Dialogs.ShowErrorDialogAsync(Activity, ex.InnerException);
                 actionMode.Finish();
 
                 return;
@@ -816,7 +816,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error($"Error while changing favourite status for folders", ex.InnerException);
-                Dialogs.ShowErrorDialog(Activity, ex.InnerException);
+                await Dialogs.ShowErrorDialogAsync(Activity, ex.InnerException);
                 actionMode.Finish();
 
                 return;
@@ -824,7 +824,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (PlatformConfig.Preferences.SyncFavoritesEnabled && !CommonConfig.Reachability.IsReachable)
             {
-                Dialogs.ShowErrorDialog(Activity, new Exception(GetString(Resource.String.sync_error_network)));
+                await Dialogs.ShowErrorDialogAsync(Activity, new Exception(GetString(Resource.String.sync_error_network)));
                 return;
             }
 
@@ -832,11 +832,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 try
                 {
-                    await Managers.FoldersManager.UpdateServiceFavoriteFoldersAsync(); //TODO need to do the same on iOS (order of execution and remove (add and remove)
+                    await Managers.FoldersManager.UpdateServiceFavoriteFoldersAsync();
                 }
                 catch
                 {
-                    Dialogs.ShowErrorDialog(Activity, new Exception(GetString(Resource.String.sync_error_general)));
+                    await Dialogs.ShowErrorDialogAsync(Activity, new Exception(GetString(Resource.String.sync_error_general)));
                     return;
                 }
             }
@@ -860,7 +860,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error($"Error while making folder online.", ex.InnerException);
-                Dialogs.ShowErrorDialog(Activity, ex.InnerException);
+                await Dialogs.ShowErrorDialogAsync(Activity, ex.InnerException);
                 actionMode.Finish();
 
                 return;

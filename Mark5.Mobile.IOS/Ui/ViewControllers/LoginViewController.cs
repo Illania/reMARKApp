@@ -472,7 +472,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     {
                         CommonConfig.UsageAnalytics.LogEvent(new SettingsLogOutEvent());
 
-                        var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("logging_out___"));
+                        var dismAct = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("logging_out___"));
 
                         try
                         {
@@ -488,7 +488,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                         await AuthenticatorFactory.Create().DeleteRetainedConnectionInfoAsync();
 
-                        dismissAction();
+                        dismAct();
 
                         Dialogs.ShowBlockingAlert(this, Localization.GetString("please_restart"));
                     }
@@ -663,6 +663,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (ex.InnerException != null)
                     CommonConfig.Logger.Error("Log in failed - inner exception", ex.InnerException);
 
+                if (Dialogs.IsAccessDisabled(ex))
+                    await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("login_failed"), Localization.GetString("login_failed_access_disabled"));
+                else
                 await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("login_failed"), Localization.GetString("login_failed_desc"));
 
                 hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Error);

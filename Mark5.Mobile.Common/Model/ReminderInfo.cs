@@ -75,5 +75,10 @@
         {
             return ((ReminderInfo)obj)?.Type == Type;
         }
+
+        public override int GetHashCode()
+        {
+            return Type.GetHashCode();
+        }
     }
 }

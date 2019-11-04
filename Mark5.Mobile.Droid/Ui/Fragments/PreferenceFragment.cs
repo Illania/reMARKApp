@@ -198,7 +198,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 CommonConfig.Logger.Error("Error while shynchonizing favorite folders", ex);
                 PlatformConfig.Preferences.SyncFavoritesEnabled = false;
-                Dialogs.ShowErrorDialog(Activity, ex);
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
             }
         }
 

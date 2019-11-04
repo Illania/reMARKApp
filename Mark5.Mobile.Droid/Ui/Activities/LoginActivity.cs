@@ -355,6 +355,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 if (ex.InnerException != null)
                     CommonConfig.Logger.Error("Log in failed - inner exception", ex.InnerException);
 
+                if (Dialogs.IsAccessDisabled(ex))
+                    await Dialogs.ShowConfirmDialogAsync(this, Resource.String.log_in_failed_title, Resource.String.log_in_failed_message_access_disabled);
+                else
                 await Dialogs.ShowConfirmDialogAsync(this, Resource.String.log_in_failed_title, Resource.String.log_in_failed_message);
             }
             finally

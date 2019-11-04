@@ -47,7 +47,7 @@ namespace Mark5.Mobile.IOS.Utilities
 
         public string GetDeviceName()
         {
-            return UIDevice.CurrentDevice.Name;
+            return $"{Integration.GetModelNumber()} - {UIDevice.CurrentDevice.Name}";
         }
 
         public string GetAppVersionString()
