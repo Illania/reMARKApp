@@ -66,6 +66,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         bool refreshDataOnAppear;
         bool hideDoneButton;
+        bool showActionsBarOnIPad;
 
         TinyMessageSubscriptionToken readStatusChangedToken;
         TinyMessageSubscriptionToken draftSentToken;
@@ -78,9 +79,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public EventHandler CommentsClicked => CommentsButton_Clicked;
         public EventHandler UserActionsClicke => UserActionsButton_Clicked;
 
-        public DocumentViewController()
+        public DocumentViewController(bool showActionBarOnIPad = false)
         {
             HidesBottomBarWhenPushed = true;
+            showActionsBarOnIPad = showActionBarOnIPad;
         }
 
         #region UIViewController overrides
@@ -92,7 +94,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InitNavigationBar();
             InitHeaderView();
 
-            if (!Integration.IsIPad())
+            if (showActionsBarOnIPad || !Integration.IsIPad())
                 InitToolbar();
 
             if (Integration.IsRunningAtLeast(11))
@@ -112,7 +114,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (NavigationController != null && !(ParentViewController is DocumentPageViewController))
                 NavigationController.ToolbarHidden = false;
 
-            if (Integration.IsIPad())
+            if (!showActionsBarOnIPad && Integration.IsIPad())
                 NavigationController.ToolbarHidden = true;
         }
 
@@ -629,7 +631,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var enableBottomActions = failedDocumentToUploadGuid == Guid.Empty;
             if (enableBottomActions)
             {
-                if (Integration.IsIPad())
+                if (!showActionsBarOnIPad && Integration.IsIPad())
                 {
                     DocumentPageViewControllerDelegate?.UpdateIPadNavigationButtons(document != null, document?.Comments?.Count.ToString());
                 }
