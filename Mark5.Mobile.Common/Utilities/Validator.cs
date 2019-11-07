@@ -65,7 +65,7 @@ namespace Mark5.Mobile.Common.Utilities
             return Regex.Matches(text ?? string.Empty, EmailAddressRegex, RegexOptions.IgnoreCase);
         }
 
-        public static List<DocumentAddress> ExtractValidaEmails(string text)
+        public static List<DocumentAddress> ExtractValidDocumentAddresses(string text)
         {
             List<DocumentAddress> addresses = new List<DocumentAddress>();
 
@@ -98,7 +98,7 @@ namespace Mark5.Mobile.Common.Utilities
 
         public static bool ContainsValidEmails(string text, out List<DocumentAddress> addresses)
         {
-            addresses = ExtractValidaEmails(text);
+            addresses = ExtractValidDocumentAddresses(text);
             return addresses.Count > 0;
         }
 
