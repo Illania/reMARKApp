@@ -263,15 +263,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
             await AsyncHelpers.RunOnUiThreadAsync((Activity)Context, () =>
             {
-                foreach (var email in GetEmails())
+                DocumentPreview.Addresses = GetEmails().Select(x =>
                 {
-                    DocumentPreview.Addresses.Add(new DocumentAddress
-                    {
-                        Address = email,
-                        AddressType = AddressType,
-                        Type = CommunicationAddressType.Email
-                    });
-                }
+                    x.AddressType = AddressType;
+                    return x;
+                }).ToList();
 
                 if (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
                 {
@@ -338,7 +334,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public void AddEmails(string emails, bool compressView)
         {
-            if (Validator.ContainsValidEmails(emails, out MatchCollection matches))
+            if (Validator.ContainsValidEmails(emails, out List<DocumentAddress> addresses))
             {
                 if (compressView)
                     CompressView();
@@ -347,7 +343,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 newEmails.Append(fullEditorText);
                 if (!fullEditorText.EndsWith(RecipientSeperator, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(fullEditorText))
                     newEmails.Append(RecipientSeperator);
-                newEmails.Append(string.Join(RecipientSeperator, matches.Cast<Match>().Select(m => m.Value)));
+                newEmails.Append(string.Join(RecipientSeperator, addresses.Select(x => x.Address)));
                 newEmails.Append(RecipientSeperator);
 
                 fullEditorText = newEmails.ToString();
@@ -424,10 +420,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         void SetEmails(string emails)
         {
-            if (Validator.ContainsValidEmails(emails, out MatchCollection matches))
+            if (Validator.ContainsValidEmails(emails, out List<DocumentAddress> addresses))
             {
                 var sb = new StringBuilder();
-                sb.Append(string.Join(RecipientSeperator, matches.Cast<Match>().Select(m => m.Value)));
+                sb.Append(string.Join(RecipientSeperator, addresses.Select(m => m.Address)));
 
                 sb.Append(RecipientSeperator);
 
@@ -441,9 +437,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
         }
 
-        IEnumerable<string> GetEmails() => Validator.ContainsValidEmails(fullEditorText, out MatchCollection matches) ?
-                                                    matches.Cast<Match>().Select(m => m.Value).Distinct().ToList() :
-                                                    new List<string>();
+        List<DocumentAddress> GetEmails() => Validator.ContainsValidEmails(fullEditorText, out List<DocumentAddress> addresses) ?
+                                                    addresses :
+                                                    new List<DocumentAddress>();
 
         void SetRecipients(IEnumerable<string> recipients)
         {
