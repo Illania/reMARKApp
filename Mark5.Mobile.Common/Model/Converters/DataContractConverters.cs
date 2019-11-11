@@ -353,7 +353,8 @@ namespace Mark5.Mobile.Common.Model.Converters
                 AttachmentsCount = dp.AttachmentsCount,
                 DateReceivedTimestamp = dp.DateReceived.ConvertDateTimeToTimestampMilliseconds(),
                 CreatorId = dp.CreatorId,
-                Creator = dp.Creator
+                Creator = dp.Creator,
+                TransmitStatus = dp.TransmitStatus.ConvertEnum<TransmitStatus>(),
             };
             if (dp.Addresses != null)
                 result.Addresses.AddRange(dp.Addresses.WhereNotNull().Select(Convert));
