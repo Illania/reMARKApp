@@ -482,7 +482,8 @@ namespace Mark5.ServiceReference.DataContract
         [DataMember(Name = "Creator", Order = 0)]
         public string Creator { get; set; }
 
-        [DataMember(Name = "TransmitStatus", Order = 1)]        public TransmitStatus TransmitStatus { get; set; }
+        [DataMember(Name = "TransmitStatus", Order = 1)]
+        public TransmitStatus TransmitStatus { get; set; }
     }
 
     [DataContract(Name = "DocumentAddress", Namespace = "com.nordic-it.appservice.v3")]
@@ -683,7 +684,8 @@ namespace Mark5.ServiceReference.DataContract
         [EnumMember(Value = "HtmlAndPlainText")] HtmlAndPlainText = 3,
     }
 
-    [DataContract(Name = "TransmitStatus", Namespace = "com.nordic-it.appservice.v3")]    public enum TransmitStatus    {        [EnumMember(Value = "None")] None = 0,        [EnumMember(Value = "InTransmit")] InTransmit = 1,        [EnumMember(Value = "Fail")] Fail = 2,        [EnumMember(Value = "Sent")] Sent = 3,        [EnumMember(Value = "InCancel")] InCancel = 4,        [EnumMember(Value = "PartialSent")] PartialSent = 5,        [EnumMember(Value = "Delivered")] Delivered = 6,        [EnumMember(Value = "FailedBounced")] FailedBounced = 7,        [EnumMember(Value = "Delayed")] Delayed = 8,        [EnumMember(Value = "CheckedOut")] CheckedOut = 9,        [EnumMember(Value = "Locked")] Locked = 10    }
+    [DataContract(Name = "TransmitStatus", Namespace = "com.nordic-it.appservice.v3")]    public enum TransmitStatus    {        [EnumMember(Value = "None")] None = 0,
+        [EnumMember(Value = "InTransmit")] InTransmit = 1,        [EnumMember(Value = "Fail")] Fail = 2,        [EnumMember(Value = "Sent")] Sent = 3,        [EnumMember(Value = "InCancel")] InCancel = 4,        [EnumMember(Value = "PartialSent")] PartialSent = 5,        [EnumMember(Value = "Delivered")] Delivered = 6,        [EnumMember(Value = "FailedBounced")] FailedBounced = 7,        [EnumMember(Value = "Delayed")] Delayed = 8,        [EnumMember(Value = "CheckedOut")] CheckedOut = 9,        [EnumMember(Value = "Locked")] Locked = 10    }
 
     #endregion
 

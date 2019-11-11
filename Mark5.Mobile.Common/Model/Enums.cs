@@ -100,7 +100,8 @@ namespace Mark5.Mobile.Common.Model
         HtmlAndPlainText = 3,
     }
 
-    public enum TransmitStatus    {
+    public enum TransmitStatus
+    {
         None = 0,
         InTransmit = 1,
         Fail = 2,
@@ -111,7 +112,8 @@ namespace Mark5.Mobile.Common.Model
         FailedBounced = 7,
         Delayed = 8,
         CheckedOut = 9,
-        Locked = 10    }
+        Locked = 10
+    }
 
     #endregion
 
