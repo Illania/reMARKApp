@@ -1,4 +1,5 @@
 ﻿using System;
+using CoreFoundation;
 using Foundation;
 using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
@@ -60,6 +61,11 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
         public void SetAutocorrectionType(UITextAutocorrectionType type)
         {
             textField.AutocorrectionType = type;
+        }
+
+        public void Focus()
+        {
+            DispatchQueue.MainQueue.DispatchAsync(() => textField.BecomeFirstResponder());
         }
 
         public override void Reset()
