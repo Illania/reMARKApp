@@ -161,6 +161,17 @@ namespace Mark5.Mobile.Common.Model
         {
             return $"[Document: Id={Id}, IsEncrypted={IsEncrypted}]";
         }
+
+        public Document LightCopy()
+        {
+            return new Document
+            {
+                Id = Id,
+                Lines = Lines,
+                ReadByUserIds = ReadByUserIds,
+                Comments = Comments,
+            };
+        }
     }
 
 }
