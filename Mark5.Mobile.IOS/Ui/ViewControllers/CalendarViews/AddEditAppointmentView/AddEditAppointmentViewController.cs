@@ -161,11 +161,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             this.viewModel = viewModel;
             RefreshTable();
             UIView.Animate(0.1, () => { TableView.Alpha = 1; });
-            if (CreationModeFlag == ContactCreationModeFlag.New)
-            {
-                View.EndEditing(true);
-                ((DataSource)TableView.Source).FocusName();
-            }
         }
 
         public async Task ShowLoadError(Exception ex)
@@ -385,11 +380,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 tableViewWeakReference.Unwrap()?.ReloadData();
             }
 
-            public void FocusName()
-            {
-                (sections[0] as GeneralSection).FocusName();
-            }
-
             #region Custom section definitions
             class SectionCollection : List<AbstractSection> { }
 
@@ -436,11 +426,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                         new NameRow(this),
                         new LocationRow(this)
                     };
-                }
-
-                public void FocusName()
-                {
-                    (Rows[0] as NameRow).Focus();
                 }
             }
 
@@ -624,11 +609,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                     tfc.SetAutocapitalizationType(autocapitalizationType);
                     tfc.SetPlaceholder(placeholder);
                     tfc.ContentEdited = ContentEdited;
-                }
-
-                public void Focus()
-                {
-                    ((TextFieldTableViewCell)Cell)?.Focus();
                 }
 
                 protected abstract void ContentEdited(string e);

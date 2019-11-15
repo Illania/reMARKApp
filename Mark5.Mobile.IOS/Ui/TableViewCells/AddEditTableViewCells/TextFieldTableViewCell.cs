@@ -63,11 +63,6 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
             textField.AutocorrectionType = type;
         }
 
-        public void Focus()
-        {
-            DispatchQueue.MainQueue.DispatchAsync(() => textField.BecomeFirstResponder());
-        }
-
         public override void Reset()
         {
             ContentEdited = delegate { };
