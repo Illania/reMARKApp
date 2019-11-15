@@ -31,20 +31,8 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             {
                 CommonConfig.Logger.Info($"Retrieving appointment: AppointmentId = {appointmentId}, RecurrenceIndex = {recurrenceIndex}, CalendarId = {calendarId} ");
 
-                try
-                {
-                    appointment = await Managers.CalendarManager.GetCalendarAppointmentAsync(calendarId, appointmentId, SourceType.Local);
-                }
-                catch (DataNotFoundException)
-                {
-                    CommonConfig.Logger.Debug($"Appointment can't be found in cache: AppointmentId = {appointmentId}, CalendarId = {calendarId} ");
-                }
-
-                if (appointment == null)
-                {
-                    view.ShowAppointmentLoadingDialog();
-                    appointment = await Managers.CalendarManager.GetCalendarAppointmentAsync(calendarId, appointmentId, SourceType.Remote);
-                }
+                view.ShowAppointmentLoadingDialog();
+                appointment = await Managers.CalendarManager.GetCalendarAppointmentAsync(calendarId, appointmentId, recurrenceIndex, SourceType.Auto);
 
                 view.ShowAppointment(AppointmentViewModel.ConvertToViewModel(appointment, recurrenceIndex));
                 view.SetLines(ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Select(LineViewModel.ConvertToViewModel));
@@ -103,7 +91,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
                 try
                 {
-                    var newApp = await Managers.CalendarManager.GetCalendarAppointmentAsync(appointment.CalendarId, appointment.Id, SourceType.Remote);
+                    var newApp = await Managers.CalendarManager.GetCalendarAppointmentAsync(appointment.CalendarId, appointment.Id, -1, SourceType.Remote);
                     var participants = newApp.Participants.Select(ParticipantsViewModel.ConvertToViewModel).ToList();
 
                     view.UpdateParticipants(participants);

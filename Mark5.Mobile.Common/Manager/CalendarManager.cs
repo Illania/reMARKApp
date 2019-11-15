@@ -84,7 +84,7 @@ namespace Mark5.Mobile.Common.Manager
             }
 
             if (sourceType == SourceType.Local)
-                return await calendarDataAccess.GetCalendarAppointmentAsync(calendarAppointmentId);
+                return await calendarDataAccess.GetCalendarAppointmentAsync(calendarAppointmentId, recurrenceIndex);
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
