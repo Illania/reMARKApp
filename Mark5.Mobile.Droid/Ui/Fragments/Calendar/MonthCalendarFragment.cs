@@ -140,11 +140,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             ScheduleView = ScheduleView.MonthView;
             HeaderStyle = headerStyle;
             ViewHeaderStyle = dayHeaderStyle;
+            FirstDayOfWeek = 2;
             MonthViewSettings = new MonthViewSettings
             {
                 ShowAgendaView = true,
                 TodayBackgroundColor = new Color(lightBlueColor),
-                SelectionTextColor = new Color(darkerBlueColor)
+                SelectionTextColor = new Color(darkerBlueColor),
             };
 
             MonthCellLoaded += MonthSchedule_MonthCellLoaded;
