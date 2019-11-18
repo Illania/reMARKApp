@@ -77,6 +77,9 @@ namespace Mark5.Mobile.Common.Model
         [Column("Creator")]
         public string Creator { get; set; }
 
+        [Column("TransmitStatus")]
+        public TransmitStatus TransmitStatus { get; set; }
+
         #region Serialization
 
         [Column("AddressesString")]

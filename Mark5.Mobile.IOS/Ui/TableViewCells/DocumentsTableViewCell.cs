@@ -338,20 +338,36 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             if (directionIndicatorImageView == null)
                 return;
 
-            UIImage i = null;
-            switch (dp.Direction)
+            UIImage image = null;
+
+            if (dp.TransmitStatus == TransmitStatus.Fail || dp.TransmitStatus == TransmitStatus.FailedBounced)
             {
-                case DocumentDirection.Incoming:
-                    i = UIImage.FromBundle("Incoming").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
-                    break;
-                case DocumentDirection.Outgoing:
-                    i = UIImage.FromBundle("Outgoing").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
-                    break;
-                case DocumentDirection.Draft:
-                    i = UIImage.FromBundle("Edit-Small").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
-                    break;
+                directionIndicatorImageView.TintColor = UIColor.Red;
+                image = UIImage.FromBundle("Failed").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
             }
-            directionIndicatorImageView.Image = i;
+            else if (dp.TransmitStatus == TransmitStatus.PartialSent)
+            {
+                directionIndicatorImageView.TintColor = Theme.Gray;
+                image = UIImage.FromBundle("Partially-Sent").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+            }
+            else
+            {
+                directionIndicatorImageView.TintColor = Theme.TintColor;
+                switch (dp.Direction)
+                {
+                    case DocumentDirection.Incoming:
+                        image = UIImage.FromBundle("Incoming").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+                        break;
+                    case DocumentDirection.Outgoing:
+                        image = UIImage.FromBundle("Outgoing").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+                        break;
+                    case DocumentDirection.Draft:
+                        image = UIImage.FromBundle("Edit-Small").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+                        break;
+                }
+            }
+
+            directionIndicatorImageView.Image = image;
         }
 
         void InitializeUnreadIndicator(DocumentPreview dp)

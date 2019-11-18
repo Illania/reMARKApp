@@ -670,6 +670,8 @@
 		<ImageAsset Include="Assets_icons.xcassets\Participant-Declined.imageset\round-highlight_off-24px.pdf" />
 		<ImageAsset Include="Assets_icons.xcassets\Participant-Accepted.imageset\round-check_circle_outline-24px.pdf" />
 		<ImageAsset Include="Assets_icons.xcassets\Participant-Unknown.imageset\round-help_outline-24px.pdf" />
+		<ImageAsset Include="Assets_icons.xcassets\Partially-Sent.imageset\Contents.json" />
+		<ImageAsset Include="Assets_icons.xcassets\Partially-Sent.imageset\partially_sent-1.pdf" />
 	</ItemGroup>
 	<ItemGroup>
 		<BundleResource Include="Resources\Base.lproj\Localizable.strings" />
@@ -781,6 +783,7 @@
 	  <Folder Include="Ui\TableViewCells\AddEditTableViewCells\AddEditAppointmentTableViewCell\" />
 	  <Folder Include="Ui\ViewControllers\CalendarViews\AddEditAppointmentView\" />
 	  <Folder Include="Ui\ViewControllers\CalendarViews\AddEditAppointmentView\RecurrenceView\" />
+	  <Folder Include="Assets_icons.xcassets\Partially-Sent.imageset\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 	<Import Project="..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets" Condition="Exists('..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets')" />

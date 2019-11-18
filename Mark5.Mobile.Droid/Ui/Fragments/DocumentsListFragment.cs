@@ -1139,14 +1139,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         }
                     }
 
+                    var isFailed = dp.TransmitStatus == TransmitStatus.Fail || dp.TransmitStatus == TransmitStatus.FailedBounced;
+                    var isPartiallySent = dp.TransmitStatus == TransmitStatus.PartialSent;
+
                     dpvh.Subject = string.IsNullOrWhiteSpace(dp.Subject) ? context.GetString(Resource.String.no_subject) : dp.Subject;
                     var d = dp.DateReceivedTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds();
                     dpvh.Date = PlatformConfig.Preferences.ShowTimeOlderEmails ? d.FormatUserTimestampAsCompactMediumDateTimeString(context) : d.FormatUserTimestampAsCompactShortDateTimeString(context);
                     dpvh.BubbleDate = d.FormatUserTimestampAsCompactLongDateTimeString(context);
                     dpvh.Preview = string.IsNullOrWhiteSpace(dp.Preview) ? context.GetString(Resource.String.no_content) : Regex.Replace(dp.Preview, @"^\s+$[\r\n]*", "", RegexOptions.Multiline);
                     dpvh.Categories = dp.Categories;
-                    dpvh.IncomingIndicator = dp.Direction == DocumentDirection.Incoming;
-                    dpvh.OutgoingIndicator = dp.Direction == DocumentDirection.Outgoing;
+
+                    dpvh.FailIndicator = isFailed;
+                    dpvh.PartiallySentIndicator = isPartiallySent;
+                    dpvh.IncomingIndicator = dp.Direction == DocumentDirection.Incoming && (!isPartiallySent) && (!isFailed);
+                    dpvh.OutgoingIndicator = dp.Direction == DocumentDirection.Outgoing && (!isPartiallySent) && (!isFailed);
                     dpvh.DraftIndicator = dp.Direction == DocumentDirection.Draft;
                     dpvh.UnreadIndicator = unreadIndicatorMe ? !dp.IsReadByCurrent : !dp.IsReadByAnyone;
                     dpvh.AttachmentIndicator = dp.AttachmentsCount > 0;
@@ -1643,6 +1649,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public bool OutgoingIndicator { set => outgoingImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
+            public bool PartiallySentIndicator { set => partiallySentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
+
+            public bool FailIndicator { set => failImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
+
             public bool DraftIndicator { set => draftImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
             public bool UnreadIndicator { set => unreadImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
@@ -1693,6 +1703,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             readonly AppCompatImageView outgoingImageView;
             readonly AppCompatImageView draftImageView;
             readonly AppCompatImageView unreadImageView;
+            readonly AppCompatImageView partiallySentImageView;
+            readonly AppCompatImageView failImageView;
             readonly AppCompatImageView attachmentImageView;
             readonly AppCompatImageView commentImageView;
             readonly LinearLayoutCompat itemContent;
@@ -1709,6 +1721,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 categoriesLayout = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.list_item_document_categories);
                 incomingImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_direction_incoming);
                 outgoingImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_direction_outgoing);
+                failImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_failed);
+                partiallySentImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_partially_sent);
                 draftImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_direction_draft);
                 unreadImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_unread);
                 attachmentImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_attachment);
