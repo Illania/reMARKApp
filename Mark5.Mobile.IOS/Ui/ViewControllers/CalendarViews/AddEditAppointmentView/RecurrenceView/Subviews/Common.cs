@@ -32,9 +32,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
                     WeekDays.Thursday, WeekDays.Friday, WeekDays.Saturday, WeekDays.Sunday };
 
         public static List<string> months = new List<string> { "January", "February", "March", "April", "May", "June", "July", "August", "September",
-        "October", "November", "Dicember"};
+        "October", "November", "December"};
     }
-
 
     interface IEditable
     {

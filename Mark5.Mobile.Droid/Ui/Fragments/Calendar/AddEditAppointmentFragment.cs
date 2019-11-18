@@ -241,7 +241,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         async void ReocurrenceClicked()
         {
-            var strings = new string[] { "Does not repeat", "Custom" };
+            var strings = new string[] { "Never", "Custom" };
             var result = await Dialogs.ShowListDialog(Context, string.Empty, strings, true);
 
             if (result < 0)
