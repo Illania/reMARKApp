@@ -163,6 +163,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             if (!shownRetrievalError)
             {
                 shownRetrievalError = true;
+                view.StopLoading();
                 view.ShowError(e);
             }
         }

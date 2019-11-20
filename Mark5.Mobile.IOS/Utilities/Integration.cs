@@ -403,14 +403,28 @@ namespace Mark5.Mobile.IOS.Utilities
                 if (!string.IsNullOrEmpty(physicalAddress.Country?.Name))
                     qb.Append(physicalAddress.Country.Name);
 
-                var address = Uri.EscapeUriString(qb.ToString());
+                ShowOnMap(viewController, view, qb.ToString());
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error(ex);
 
-                var appleMapsUrl = new NSUrl($"http://maps.apple.com/maps?q={address}");
-                var googleMapsUrl = new NSUrl($"comgooglemapsurl://maps.google.com/?q={address}");
+                Dialogs.ShowErrorAlert(viewController, ex);
+            }
+        }
+
+        public static void ShowOnMap(UIViewController viewController, UIView view, string address)
+        {
+            try
+            {
+                var escapedAddress = Uri.EscapeUriString(address);
+
+                var appleMapsUrl = new NSUrl($"http://maps.apple.com/maps?q={escapedAddress}");
+                var googleMapsUrl = new NSUrl($"comgooglemapsurl://maps.google.com/?q={escapedAddress}");
 
                 if (UIApplication.SharedApplication.CanOpenUrl(googleMapsUrl))
                 {
-                    var browserChooser = UIAlertController.Create(null, qb.ToString(), UIAlertControllerStyle.ActionSheet);
+                    var browserChooser = UIAlertController.Create(null, address, UIAlertControllerStyle.ActionSheet);
                     browserChooser.AddAction(UIAlertAction.Create(Localization.GetString("open_in_apple_maps"), UIAlertActionStyle.Default, a => UIApplication.SharedApplication.OpenUrl(appleMapsUrl, new NSDictionary(), null)));
                     browserChooser.AddAction(UIAlertAction.Create(Localization.GetString("open_in_google_maps"), UIAlertActionStyle.Default, a => UIApplication.SharedApplication.OpenUrl(googleMapsUrl, new NSDictionary(), null)));
                     browserChooser.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
@@ -432,6 +446,7 @@ namespace Mark5.Mobile.IOS.Utilities
                 Dialogs.ShowErrorAlert(viewController, ex);
             }
         }
+
 
         public static void OpenUrl(UIViewController viewController, UITableView tableView, UITableViewCell cell, string url)
         {

@@ -9,7 +9,7 @@ namespace Mark5.Mobile.Common.Manager
     {
         Task<List<CalendarAppointment>> GetCalendarAppointmentsAsync(List<int> calendarIds, DateTime startDate, DateTime endDate, SourceType sourceType = SourceType.Auto);
 
-        Task<CalendarAppointment> GetCalendarAppointmentAsync(int calendarId, int calendarAppointmentId, SourceType sourceType = SourceType.Auto);
+        Task<CalendarAppointment> GetCalendarAppointmentAsync(int calendarId, int calendarAppointmentId, int recurrenceIndex = -1, SourceType sourceType = SourceType.Auto);
 
         Task<List<CalendarAppointmentOccurrence>> GetCalendarAppointmentOccurrencesAsync(int calendarId, int calendarAppointmentId, DateTime startDate, DateTime endDate, SourceType sourceType = SourceType.Auto);
 

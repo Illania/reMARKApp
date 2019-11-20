@@ -1,4 +1,5 @@
 ﻿using System;
+using CoreFoundation;
 using Foundation;
 using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;

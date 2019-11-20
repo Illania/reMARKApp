@@ -629,7 +629,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                     var tfc = (TitledTextViewTableViewCell)Cell;
                     tfc.Reset();
                     tfc.SetAutocorrectionType(UITextAutocorrectionType.Default);
-                    tfc.SetAutocapitalizationType(UITextAutocapitalizationType.None);
+                    tfc.SetAutocapitalizationType(UITextAutocapitalizationType.Sentences);
                     tfc.SetMultiline(true);
                     tfc.ContentEditedAction = ContentEdited;
                     tfc.NumbersOfLineChangedAction = NumberOfLinesChanged;
@@ -697,7 +697,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             class NameRow : TextFieldRow
             {
                 public NameRow(AbstractSection section)
-                    : base(section, Localization.GetString("name"), UITextAutocapitalizationType.None, UITextAutocorrectionType.No)
+                    : base(section, Localization.GetString("name"), UITextAutocapitalizationType.Sentences, UITextAutocorrectionType.No)
                 {
                 }
 
@@ -715,7 +715,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 public override string Key => "LocationRow";
 
                 public LocationRow(AbstractSection section)
-                    : base(section, Localization.GetString("location"), UITextAutocapitalizationType.None, UITextAutocorrectionType.No)
+                    : base(section, Localization.GetString("location"), UITextAutocapitalizationType.Sentences, UITextAutocorrectionType.No)
                 {
                 }
 

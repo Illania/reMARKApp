@@ -7,7 +7,7 @@ namespace Mark5.Mobile.Common.DataAccess
 {
     interface ICalendarDataAccess
     {
-        Task<CalendarAppointment> GetCalendarAppointmentAsync(int calendarAppointmentId);
+        Task<CalendarAppointment> GetCalendarAppointmentAsync(int calendarAppointmentId, int recurrenceIndex = -1);
 
         Task<List<CalendarAppointment>> GetCalendarAppointmentsAsync(List<int> calendarIds, DateTime startDate, DateTime endDate);
 
