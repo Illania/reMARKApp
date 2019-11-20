@@ -19,7 +19,17 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         CommentsListFragment cf;
 
-        public static Intent CreateIntent(Context context, IBusinessEntity be = null)
+        public static Intent CreateIntent(Context context, Document document = null)
+        {
+            return CreateIntent(context, (IBusinessEntity)document.LightCopy());
+        }
+
+        public static Intent CreateIntent(Context context, Contact contact = null)
+        {
+            return CreateIntent(context, (IBusinessEntity)contact);
+        }
+
+        static Intent CreateIntent(Context context, IBusinessEntity be = null)
         {
             var intent = new Intent(context, typeof(CommentsListActivity));
 
