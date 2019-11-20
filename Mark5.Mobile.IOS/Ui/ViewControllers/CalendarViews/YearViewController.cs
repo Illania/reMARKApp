@@ -49,7 +49,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         void ReMarkYearCalendar_ViewModeChanged(object sender, ViewModeChangedEventArgs e)
         {
             if (reMarkYearCalendar.ViewMode == SFCalendarViewMode.SFCalendarViewModeMonth)
-                coordinator.MonthTapped(e.Date);
+                coordinator.MonthTapped(e.Date.AddSeconds(12 * 60 * 60)); //Adding 12 hours to be sure we get into the first day of the month;
         }
     }
 

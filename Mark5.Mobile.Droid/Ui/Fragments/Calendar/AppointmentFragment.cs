@@ -332,7 +332,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             {
                 if (viewModel.Start.Date.CompareTo(viewModel.End.Date) == 0)
                 {
-                    Text += viewModel.Start.ToString("dddd, d MMMM yyyy", CultureInfo.CurrentCulture);
+                    Text = viewModel.Start.ToString("dddd, d MMMM yyyy", CultureInfo.CurrentCulture);
                     if (viewModel.AllDay)
                         Text += "\r\nAll Day";
                     else
@@ -379,7 +379,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 : base(context)
             {
                 Text = "";
+                Click += AppointmentLocationView_Click;
                 SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.blue)));
+            }
+
+            private void AppointmentLocationView_Click(object sender, EventArgs e)
+            {
+                if (!string.IsNullOrEmpty(Text))
+                    Integration.OpenMap(Context, Text);
             }
 
             public void Refresh(AppointmentViewModel viewModel)
@@ -396,6 +403,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 : base(context)
             {
                 Text = "";
+                LinksClickable = true;
+                AutoLinkMask = Android.Text.Util.MatchOptions.All;
                 SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.black)));
             }
 

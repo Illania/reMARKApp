@@ -418,6 +418,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             SetPadding(0, verticalPadding, 0, verticalPadding);
             SetBackgroundColor(Color.Transparent);
             SetHintTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
+            InputType = Android.Text.InputTypes.TextFlagCapCharacters;
             this.SetTextAppearanceCompat(context, Resource.Style.editAppointmentField);
         }
     }
@@ -435,6 +436,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             SetPadding(0, verticalPadding, 0, verticalPadding);
             SetBackgroundColor(Color.Transparent);
             SetHintTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
+            InputType = Android.Text.InputTypes.TextFlagCapCharacters;
             this.SetTextAppearanceCompat(context, Resource.Style.editAppointmentTitle);
         }
     }

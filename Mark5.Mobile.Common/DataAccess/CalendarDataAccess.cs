@@ -18,7 +18,7 @@ namespace Mark5.Mobile.Common.DataAccess
             this.calendarDatabase = calendarDatabase;
         }
 
-        public async Task<CalendarAppointment> GetCalendarAppointmentAsync(int calendarAppointmentId)
+        public async Task<CalendarAppointment> GetCalendarAppointmentAsync(int calendarAppointmentId, int recurrenceIndex = -1)
         {
             try
             {
@@ -30,7 +30,8 @@ namespace Mark5.Mobile.Common.DataAccess
                     appointment = result ?? throw new DataNotFoundException("Calendar appointment could not be found");
 
                     var occurrencesQuery = $"select * from {nameof(CalendarAppointmentOccurrence)} " +
-                        $"where {nameof(CalendarAppointmentOccurrence.AppointmentId)} = {calendarAppointmentId} ";
+                        $"where {nameof(CalendarAppointmentOccurrence.AppointmentId)} = {calendarAppointmentId} " +
+                        $"AND  {nameof(CalendarAppointmentOccurrence.RecurrenceIndex)} = {recurrenceIndex}";
 
                     var occurrencesResult = c.Query<CalendarAppointmentOccurrence>(occurrencesQuery);
                     if (occurrencesResult == null || occurrencesResult.Count < 1)

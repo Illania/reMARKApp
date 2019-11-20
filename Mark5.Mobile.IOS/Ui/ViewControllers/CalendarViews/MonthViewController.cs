@@ -151,17 +151,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         void Handle_HeaderTapped(object sender, HeaderTappedEventArgs e)
         {
-            Coordinator.YearTapped(schedule.VisibleDates.GetItem<NSDate>(0));
+            GoToYear();
         }
 
         void Schedule_ViewHeaderTapped(object sender, ViewHeaderTappedEventArgs e)
         {
-            Coordinator.YearTapped(schedule.VisibleDates.GetItem<NSDate>(0));
+            GoToYear();
         }
 
         void YearButtonItem_Clicked(object sender, EventArgs e)
         {
-            Coordinator.YearTapped(schedule.VisibleDates.GetItem<NSDate>(0));
+            GoToYear();
         }
 
         void CreateAppointmentButtonItem_Clicked(object sender, EventArgs e)
@@ -180,6 +180,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             var endDate = schedule.VisibleDates.GetItem<NSDate>(schedule.VisibleDates.Count - 1);
 
             Coordinator.RefreshClicked(startDate, endDate);
+        }
+
+        #endregion
+
+        #region Utilities
+
+        void GoToYear()
+        {
+            Coordinator.YearTapped(schedule.VisibleDates.GetItem<NSDate>(schedule.VisibleDates.Count / 2));
         }
 
         #endregion
