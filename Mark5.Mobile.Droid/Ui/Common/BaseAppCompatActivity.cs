@@ -53,7 +53,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 connectionBar.LongClickable = true;
                 connectionBar.Click += ConnectionBar_Click;
                 connectionBar.LongClick += ConnectionBar_LongClick;
-                connectionBar.LayoutParameters.Height = CommonConfig.Reachability.IsReachable ? 0 : (int)Resources.GetDimension(Resource.Dimension.connection_bar_height);
+                connectionBar.Visibility = CommonConfig.Reachability.IsReachable ? ViewStates.Gone : ViewStates.Visible;
                 CommonConfig.Reachability.ReachabilityRefreshed += ReachabilityService_ReachabilityRefreshed;
                 CommonConfig.Reachability.Refresh();
             }
@@ -103,7 +103,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
         void ReachabilityService_ReachabilityRefreshed(object sender, ReachabilityRefreshedEventArgs e)
         {
             var connectionBar = FindViewById(Resource.Id.connection_bar);
-            connectionBar.LayoutParameters.Height = CommonConfig.Reachability.IsReachable ? 0 : (int)Resources.GetDimension(Resource.Dimension.connection_bar_height);
+            connectionBar.Visibility = e.IsReachable ? ViewStates.Gone : ViewStates.Visible;
             UpdateFab(e.IsReachable);
         }
 
