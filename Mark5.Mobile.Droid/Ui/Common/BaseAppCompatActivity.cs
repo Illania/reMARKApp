@@ -104,7 +104,6 @@ namespace Mark5.Mobile.Droid.Ui.Common
         {
             var connectionBar = FindViewById(Resource.Id.connection_bar);
             connectionBar.Visibility = e.IsReachable ? ViewStates.Gone : ViewStates.Visible;
-
             UpdateFab(e.IsReachable);
         }
 

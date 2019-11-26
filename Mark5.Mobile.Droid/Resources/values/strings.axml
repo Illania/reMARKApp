@@ -316,6 +316,7 @@
     <string name="open_drawer">Open navigation drawer</string>
     <string name="opening_attachment">Opening attachment</string>
     <string name="outgoing">Outgoing</string>
+    <string name="outgoing_warning">Error while sending emails</string>
     <string name="overview">Overview</string>
     <string name="participants">Participants</string>
     <string name="password">Password</string>
