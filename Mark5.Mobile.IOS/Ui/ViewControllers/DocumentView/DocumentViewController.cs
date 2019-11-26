@@ -66,7 +66,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         bool refreshDataOnAppear;
         bool hideDoneButton;
-        bool showActionsBarOnIPad;
+        bool forceShowActionBar;
 
         TinyMessageSubscriptionToken readStatusChangedToken;
         TinyMessageSubscriptionToken draftSentToken;
@@ -79,10 +79,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public EventHandler CommentsClicked => CommentsButton_Clicked;
         public EventHandler UserActionsClicke => UserActionsButton_Clicked;
 
-        public DocumentViewController(bool showActionBarOnIPad = false)
+        public DocumentViewController(bool forceShowActionBar = false)
         {
             HidesBottomBarWhenPushed = true;
-            showActionsBarOnIPad = showActionBarOnIPad;
+            this.forceShowActionBar = forceShowActionBar;
         }
 
         #region UIViewController overrides
@@ -94,7 +94,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InitNavigationBar();
             InitHeaderView();
 
-            if (showActionsBarOnIPad || !Integration.IsIPad())
+            if (forceShowActionBar || !Integration.IsIPad())
                 InitToolbar();
 
             if (Integration.IsRunningAtLeast(11))
@@ -114,7 +114,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (NavigationController != null && !(ParentViewController is DocumentPageViewController))
                 NavigationController.ToolbarHidden = false;
 
-            if (!showActionsBarOnIPad && Integration.IsIPad())
+            if (!forceShowActionBar && Integration.IsIPad())
                 NavigationController.ToolbarHidden = true;
         }
 
@@ -631,7 +631,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var enableBottomActions = failedDocumentToUploadGuid == Guid.Empty;
             if (enableBottomActions)
             {
-                if (!showActionsBarOnIPad && Integration.IsIPad())
+                if (!forceShowActionBar && Integration.IsIPad())
                 {
                     DocumentPageViewControllerDelegate?.UpdateIPadNavigationButtons(document != null, document?.Comments?.Count.ToString());
                 }
