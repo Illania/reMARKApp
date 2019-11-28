@@ -118,7 +118,7 @@
 "diagnostics_mobile_connection" = "Mobile connection";
 "diagnostics_wifi_connection" = "Wi-Fi connection";
 "diagnostics_service_address" = "Service Address";
-"diagnostics_successfull_requests" = "Successfull requests";
+"diagnostics_successfull_requests" = "Successful requests";
 "diagnostics_failed_requests" = "Failed requests";
 "diagnostics_avg_time" = "Average request time";
 "diagnostics_connection_status" = "Connection status";

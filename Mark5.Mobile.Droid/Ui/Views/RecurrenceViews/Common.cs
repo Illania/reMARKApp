@@ -36,7 +36,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
                     WeekDays.Thursday, WeekDays.Friday, WeekDays.Saturday, WeekDays.Sunday };
 
         public static List<string> months = new List<string> { "January", "February", "March", "April", "May", "June", "July", "August", "September",
-        "October", "November", "Dicember"};
+        "October", "November", "December"};
 
         public static Drawable GetBackground(Context context)
         {
