@@ -61,7 +61,7 @@ namespace Mark5.Mobile.Common.Manager
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task<CalendarAppointment> GetCalendarAppointmentAsync(int calendarId, int calendarAppointmentId, SourceType sourceType = SourceType.Auto)
+        public async Task<CalendarAppointment> GetCalendarAppointmentAsync(int calendarId, int calendarAppointmentId, int recurrenceIndex = -1, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
@@ -72,7 +72,8 @@ namespace Mark5.Mobile.Common.Manager
                 {
                     Token = Token,
                     CalendarId = calendarId,
-                    CalendarAppointmentId = calendarAppointmentId
+                    CalendarAppointmentId = calendarAppointmentId,
+                    RecurrenceIndex = recurrenceIndex,
                 });
 
                 var appointment = result.CalendarAppointment.Convert();
@@ -83,7 +84,7 @@ namespace Mark5.Mobile.Common.Manager
             }
 
             if (sourceType == SourceType.Local)
-                return await calendarDataAccess.GetCalendarAppointmentAsync(calendarAppointmentId);
+                return await calendarDataAccess.GetCalendarAppointmentAsync(calendarAppointmentId, recurrenceIndex);
 
             throw new ArgumentException("Invalid sourceType provided.");
         }

@@ -167,20 +167,23 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         }
 
-        public void SetSearchButtonHidden(bool hidden)
+        public void SetBottomNavigationButtonsHidden(bool hidden)
         {
             navigationButtonContainer.Hidden = hidden;
+            searchButtonContainer.Hidden = hidden;
         }
 
-        public void SetSearchButtonAlpha(float val)
+        public void SetBottomNavigationButtonsAlpha(float val)
         {
             moduleNavigationButton.Alpha = val;
+            searchButton.Alpha = val;
         }
 
         public override void ViewDidLayoutSubviews()
         {
             base.ViewDidLayoutSubviews();
             View.BringSubviewToFront(navigationButtonContainer);
+            View.BringSubviewToFront(searchButtonContainer);
         }
 
         async void CheckAutoSavedDocument()

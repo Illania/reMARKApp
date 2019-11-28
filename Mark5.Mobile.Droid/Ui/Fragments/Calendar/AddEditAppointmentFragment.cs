@@ -241,7 +241,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         async void ReocurrenceClicked()
         {
-            var strings = new string[] { "Does not repeat", "Custom" };
+            var strings = new string[] { "Never", "Custom" };
             var result = await Dialogs.ShowListDialog(Context, string.Empty, strings, true);
 
             if (result < 0)
@@ -418,6 +418,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             SetPadding(0, verticalPadding, 0, verticalPadding);
             SetBackgroundColor(Color.Transparent);
             SetHintTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
+            InputType = Android.Text.InputTypes.TextFlagCapCharacters;
             this.SetTextAppearanceCompat(context, Resource.Style.editAppointmentField);
         }
     }
@@ -435,6 +436,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             SetPadding(0, verticalPadding, 0, verticalPadding);
             SetBackgroundColor(Color.Transparent);
             SetHintTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
+            InputType = Android.Text.InputTypes.TextFlagCapCharacters;
             this.SetTextAppearanceCompat(context, Resource.Style.editAppointmentTitle);
         }
     }

@@ -24,8 +24,8 @@
 	<key>CFBundleName</key>
 	<string>reMARK</string>
 	<key>CFBundleShortVersionString</key>
-	<string>5.2.4</string>
+	<string>5.3</string>
 	<key>CFBundleVersion</key>
-	<string>512</string>
+	<string>514</string>
 </dict>
 </plist>

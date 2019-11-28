@@ -169,7 +169,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 Distribution = UIStackViewDistribution.Fill,
                 LayoutMargins = new UIEdgeInsets(10f, 15f, 15f, 15f),
                 LayoutMarginsRelativeArrangement = true,
-                Spacing = 10f,
+                Spacing = 8f,
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Alpha = 0,
             };
@@ -192,6 +192,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             calendarView = new AppointmentCalendarView();
             participantsView = new AppointmentParticipantsView();
             reminderView = new AppointmentReminderView();
+
+            locationView.LocationClicked += LocationView_LocationClicked;
 
             stackView.AddArrangedSubview(subjectView);
             stackView.AddArrangedSubview(dateView);
@@ -318,6 +320,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         private void ParticipantsView_ShowParticipantsClicked(object sender, EventArgs e)
         {
             PresentViewController(new NavigationController(new ParticipantsViewController(appointment.Participants), UIModalPresentationStyle.PageSheet), true, null);
+        }
+
+        private void LocationView_LocationClicked(object sender, EventArgs e)
+        {
+            if (!string.IsNullOrEmpty(appointment.Location))
+                Integration.ShowOnMap(this, (UIView)sender, appointment.Location);
         }
 
         #endregion
@@ -540,13 +548,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         private class AppointmentLocationView : UILabel, IAppointmentView
         {
+            public event EventHandler LocationClicked = delegate { };
+
             public AppointmentLocationView()
             {
                 Font = Theme.AppointmentDefaultFont;
                 TextColor = Theme.DarkBlue;
                 LineBreakMode = UILineBreakMode.WordWrap;
                 TextAlignment = UITextAlignment.Left;
+                Lines = 0;
                 TranslatesAutoresizingMaskIntoConstraints = false;
+                UserInteractionEnabled = true;
+
+                AddGestureRecognizer(new UITapGestureRecognizer(OpenAddress));
+            }
+
+            public void OpenAddress()
+            {
+                LocationClicked(this, EventArgs.Empty);
             }
 
             public void Refresh(AppointmentViewModel viewModel)
@@ -561,15 +580,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             }
         }
 
-        private class AppointmentDescriptionView : UILabel, IAppointmentView
+        private class AppointmentDescriptionView : UITextView, IAppointmentView
         {
             public AppointmentDescriptionView()
             {
                 Font = Theme.AppointmentDefaultFont;
                 TextColor = Theme.Black;
-                LineBreakMode = UILineBreakMode.WordWrap;
-                Lines = 0;
+                DataDetectorTypes = UIDataDetectorType.Link | UIDataDetectorType.Address | UIDataDetectorType.PhoneNumber;
                 TextAlignment = UITextAlignment.Left;
+                ScrollEnabled = false;
+                Editable = false;
+                BackgroundColor = UIColor.Clear;
+                TextContainerInset = UIEdgeInsets.Zero;
+                TextContainer.LineFragmentPadding = 0;
+                TranslatesAutoresizingMaskIntoConstraints = false;
             }
 
             public void Refresh(AppointmentViewModel viewModel)
