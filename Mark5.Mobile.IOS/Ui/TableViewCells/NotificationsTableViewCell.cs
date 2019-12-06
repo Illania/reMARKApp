@@ -21,6 +21,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         readonly UILabel dateReceivedLabel;
         readonly UIImageView readImageView;
         readonly UIImageView iconImageView;
+        readonly UIImageView directionIndicatorImageView;
+
 
         public NotificationsTableViewCell(NSString reuseIdentifier)
             : base(UITableViewCellStyle.Default, reuseIdentifier)
@@ -63,6 +65,13 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 dateReceivedLabel.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
                 ContentView.Add(dateReceivedLabel);
 
+                directionIndicatorImageView = new UIImageView
+                {
+                    ContentMode = UIViewContentMode.ScaleToFill,
+                    TranslatesAutoresizingMaskIntoConstraints = false
+                };
+                ContentView.AddSubview(directionIndicatorImageView);
+
                 readImageView = new UIImageView
                 {
                     TranslatesAutoresizingMaskIntoConstraints = false
@@ -90,6 +99,11 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                     readImageView.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
                     readImageView.HeightAnchor.ConstraintEqualTo(15f),
                     readImageView.WidthAnchor.ConstraintEqualTo(15f),
+
+                    directionIndicatorImageView.TopAnchor.ConstraintEqualTo(readImageView.BottomAnchor, 4f),
+                    directionIndicatorImageView.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+                    directionIndicatorImageView.HeightAnchor.ConstraintEqualTo(15f),
+                    directionIndicatorImageView.WidthAnchor.ConstraintEqualTo(15f),
 
                     bottomLabel.LeadingAnchor.ConstraintEqualTo(titleLabel.LeadingAnchor),
                     bottomLabel.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor),
@@ -153,6 +167,18 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             }
 
             iconImageView.Image = icon;
+
+            if (notification.Type == EventType.TransmitFailed)
+            {
+                directionIndicatorImageView.Hidden = false;
+
+                directionIndicatorImageView.TintColor = UIColor.Red;
+                directionIndicatorImageView.Image = UIImage.FromBundle("Failed").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+            }
+            else
+            {
+                directionIndicatorImageView.Hidden = true;
+            }
 
             var splitMessage = notification.Message.Split('\n');
 

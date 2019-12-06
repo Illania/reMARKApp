@@ -210,17 +210,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 adapter.NotifyItemChanged(position);
 
             if (notification.ObjectType == ObjectType.Document)
-            {
                 StartActivity(DocumentActivity.CreateIntent(Context, folderId: notification.FolderId, documentId: notification.ObjectId));
-            }
-            if (notification.ObjectType == ObjectType.Contact)
-            {
-                StartActivity(ContactActivity.CreateIntent(Context, notification.FolderId, contactId: notification.ObjectId));
-            }
-            if (notification.ObjectType == ObjectType.Shortcode)
-            {
-                StartActivity(ShortcodeActivity.CreateIntent(Context, notification.FolderId, shortcodeId: notification.ObjectId));
-            }
         }
 
         #endregion
@@ -280,6 +270,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 cpvh.DateTime = n.DateTimeTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds().FormatUserTimestampAsCompactShortDateTimeString(context);
                 cpvh.UnreadIndicator = !n.IsRead;
+                cpvh.TransmitFailedIndicator = n.Type == EventType.TransmitFailed;
             }
 
             public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
@@ -379,7 +370,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public bool UnreadIndicator { set => unreadImageView.Visibility = value ? ViewStates.Visible : ViewStates.Invisible; }
 
+            public bool TransmitFailedIndicator { set => transmitFailedImageView.Visibility = value ? ViewStates.Visible : ViewStates.Invisible; }
+
             readonly AppCompatImageView unreadImageView;
+            readonly AppCompatImageView transmitFailedImageView;
             readonly AppCompatTextView titleTextView;
             readonly AppCompatTextView messageFirstLine;
             readonly AppCompatTextView messageSecondLine;
@@ -388,6 +382,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public NotificationViewHolder(View itemView)
                 : base(itemView)
             {
+                transmitFailedImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_transmit_failed);
                 unreadImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_notification_unread);
                 titleTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_notification_title);
                 messageFirstLine = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_notification_message_first_line);

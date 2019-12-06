@@ -339,6 +339,7 @@ namespace Mark5.Mobile.Common.Model
         CreateOrUpdateReminder = 4,
         DeleteReminderIfExists = 5,
         Invited = 6,
+        TransmitFailed = 7
     }
 
     public enum DeviceType
