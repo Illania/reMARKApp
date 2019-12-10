@@ -931,14 +931,6 @@
       <SubType></SubType>
       <Generator></Generator>
     </AndroidResource>
-        <AndroidResource Include="Resources\drawable\icon_foreground.xml">
-      <SubType></SubType>
-      <Generator></Generator>
-    </AndroidResource>
-    <AndroidResource Include="Resources\drawable\icon_background.xml">
-      <SubType></SubType>
-      <Generator></Generator>
-    </AndroidResource>
     <AndroidResource Include="Resources\mipmap-anydpi-v26\ic_icon.axml">
       <SubType></SubType>
       <Generator></Generator>
@@ -1038,6 +1030,14 @@
       <Generator></Generator>
     </AndroidResource>
     <AndroidResource Include="Resources\menu\menu_drawer_1_35_10.axml">
+      <SubType></SubType>
+      <Generator></Generator>
+    </AndroidResource>
+    <AndroidResource Include="Resources\drawable\ic_launcher_background.xml">
+      <SubType></SubType>
+      <Generator></Generator>
+    </AndroidResource>
+    <AndroidResource Include="Resources\drawable\ic_launcher_foreground.xml">
       <SubType></SubType>
       <Generator></Generator>
     </AndroidResource>
