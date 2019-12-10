@@ -537,6 +537,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected virtual void Adapter_ItemClicked(object sender, int position)
         {
+            if (position < 0)
+                return;
+
             if (actionMode == null)
             {
                 var (folder, section) = CurrentAdapter.GetItemAtPosition(position);
@@ -575,11 +578,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void Adapter_ExpandClicked(object sender, int position)
         {
+            if (position < 0)
+                return;
+
             NavigateToFolder(CurrentAdapter.GetItemAtPosition(position).Folder);
         }
 
         bool IsSelectionValid(int position)
         {
+            if (position < 0)
+                return false;
+
             var selectedIsLocal = CurrentAdapter.GetItemAtPosition(position).Folder.Local;
             var sectionForPrelectedItems = CurrentAdapter.GetSectionForSelectedItems();
             var selectedItemNotInPreselectedSection = sectionForPrelectedItems != CurrentAdapter.GetSectionForPosition(position);
@@ -1220,16 +1229,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     var section = sectionPositionToSection[sectionPosition];
                     return (foldersInSection[section][position - sectionPosition - 1], section);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    var exceptionText = $"FolderListAdapter.GetItemAtPosition(int position) : index ouf of range exception :: Position : { position }, foldersInSection.Count() : { foldersInSection.Count() } :: ";
+                    var exceptionText = $"FolderListAdapter.GetItemAtPosition(int position): {e.Message} \n:: Position : { position }, foldersInSection.Count() : { foldersInSection.Count() } :: ";
 
                     var foldersTxt = String.Empty;
 
                     foreach (var entry in foldersInSection)
-                    {
-                        foldersTxt += $" section : { entry.Key }, folders.Count() : { entry.Value.Count() },";
-                    }
+                        foldersTxt += $"\nsection : { entry.Key }, folders.Count() : { entry.Value.Count() },";
 
                     exceptionText += foldersTxt;
 
