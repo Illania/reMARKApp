@@ -272,7 +272,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             if (ex is HttpAppServiceException && ((HttpAppServiceException)ex)?.Detail?.Code == AppServiceFaultCode.InvalidToken)
                 return Localization.GetString("error_invalid_token");
-            if (ex is HttpAppServiceException && (ex.InnerException is TimeoutException || ((WebException)ex.InnerException)?.Status is WebExceptionStatus.Timeout))
+            if (ex is HttpAppServiceException && (ex.InnerException is TimeoutException || (ex.InnerException as WebException)?.Status is WebExceptionStatus.Timeout))
                 return Localization.GetString("error_request_timeout_title");
             if (ex is WcfAppServiceException)
                 return Localization.GetString("error_appserviceexception_title");
@@ -296,7 +296,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             if (ex is HttpAppServiceException && ((HttpAppServiceException)ex)?.Detail?.Code == AppServiceFaultCode.InvalidToken)
                 return Localization.GetString("error_invalid_token_message");
-            if (ex is HttpAppServiceException && (ex.InnerException is TimeoutException || ((WebException)ex.InnerException)?.Status is WebExceptionStatus.Timeout))
+            if (ex is HttpAppServiceException && (ex.InnerException is TimeoutException || (ex.InnerException as WebException)?.Status is WebExceptionStatus.Timeout))
                 return Localization.GetString("error_request_timeout");
             if (ex is WcfAppServiceException)
                 return ex.Message;

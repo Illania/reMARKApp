@@ -122,7 +122,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
         void TransitionToState(State state)
         {
-            if (currentState == state || Superview == null)
+            if (currentState == state || Superview == null
+                || textView == null || expandButton == null)
                 return;
 
             currentState = state;
@@ -165,7 +166,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 Superview?.Superview?.Superview?.Superview?.LayoutIfNeeded();
             }, (finished) =>
                 {
-                    displayLink.Invalidate();
+                    displayLink?.Invalidate();
                     displayLink = null;
                     EndAnimating(this, EventArgs.Empty);
                 });
