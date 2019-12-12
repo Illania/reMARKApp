@@ -27,7 +27,7 @@ namespace Mark5.Mobile.Droid.Utilities
             var hour = date.Get(CalendarField.HourOfDay);
             var minute = date.Get(CalendarField.Minute);
             var second = date.Get(CalendarField.Second);
-            var dateTime = new DateTime(year, month, day, hour, minute, second, DateTimeKind.Utc);
+            var dateTime = new DateTime(year, month, day, hour, minute, second, DateTimeKind.Local);
 
             return dateTime;
         }

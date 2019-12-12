@@ -207,7 +207,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             stackView.AddArrangedSubview(organizerView);
             stackView.AddArrangedSubview(calendarView);
-            stackView.AddArrangedSubview(reminderView);
+            //stackView.AddArrangedSubview(reminderView);
             stackView.AddArrangedSubview(participantsView);
         }
 

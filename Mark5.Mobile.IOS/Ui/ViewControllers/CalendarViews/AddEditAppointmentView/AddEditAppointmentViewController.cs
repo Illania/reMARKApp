@@ -9,10 +9,10 @@ using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.Common.Presenters.CalendarModule;
-using static Mark5.Mobile.IOS.Model.DateTimeChangeEvent;
 using Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells;
 using Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppointmentTableViewCell;
 using Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView;
+using static Mark5.Mobile.IOS.Model.DateTimeChangeEvent;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 {
@@ -450,7 +450,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                         startDateRow.Unwrap(),
                         endDateRow.Unwrap(),
                         new ReoccurrenceRow(this),
-                        new ReminderRow(this)
+                        //new ReminderRow(this)
                     };
                 }
 

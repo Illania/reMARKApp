@@ -135,9 +135,20 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
             presenter.ShowCalendarsListClicked();
         }
 
-        public void CreateAppointmentClicked()
+        public void CreateAppointmentClicked(Calendar calendar)
         {
-            var (fragment, tag) = AddEditAppointmentFragment.NewInstance();
+            var dateTime = calendar?.ConvertToDateTime();
+            var (fragment, tag) = AddEditAppointmentFragment.NewInstance(dateTime ?? DateTime.Now);
+            fragmentManager.BeginTransaction()
+                .Replace(Resource.Id.fragment_container, fragment, tag)
+                .AddToBackStack(tag)
+                .Commit();
+        }
+
+        public void HourTapped(Calendar calendar)
+        {
+            var dateTime = calendar?.ConvertToDateTime();
+            var (fragment, tag) = AddEditAppointmentFragment.NewInstance(dateTime ?? DateTime.Now);
             fragmentManager.BeginTransaction()
                 .Replace(Resource.Id.fragment_container, fragment, tag)
                 .AddToBackStack(tag)
@@ -318,7 +329,8 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
 
         bool DateDoubleTapped(Calendar calendar);
         void CalendarsClicked();
-        void CreateAppointmentClicked();
+        void CreateAppointmentClicked(Calendar calendar);
+        void HourTapped(Calendar calendar);
         void VisibleDatesChanged(Calendar startDate, Calendar endDate);
         void AppointmentTapped(ScheduleAppointment appointment);
         void SelectedCalendarsChanged(Dictionary<CalendarViewModel, bool> selectedCalendars);
