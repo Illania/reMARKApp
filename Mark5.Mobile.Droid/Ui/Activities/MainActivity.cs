@@ -83,7 +83,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             navigationView.Menu.Clear();
 
-            if (ServerConfig.SystemSettings?.SystemInfo.SystemVersion >= new Version(1, 35, 10))
+            if (ServerConfig.SystemSettings?.SystemInfo.SystemVersion >= new Version(1, 35, 12))
                 navigationView.InflateMenu(Resource.Menu.menu_drawer_1_35_10);
             else
                 navigationView.InflateMenu(Resource.Menu.menu_drawer);
