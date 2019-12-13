@@ -51,7 +51,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         public static (AppointmentFragment fragment, string tag) NewInstance(int calendarId, int appointmentId, int recurrenceIndex)
         {
             var fragment = new AppointmentFragment();
-            var tag = $"{nameof(AppointmentFragment)} [calendarId={calendarId}, fappointmentId={appointmentId}, recurrenceIndex={recurrenceIndex}]";
+            var tag = $"{nameof(AppointmentFragment)} [calendarId={calendarId}, appointmentId={appointmentId}, recurrenceIndex={recurrenceIndex}]";
 
             var args = new Bundle();
 

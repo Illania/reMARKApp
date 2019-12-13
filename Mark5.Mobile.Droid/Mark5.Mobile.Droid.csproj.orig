@@ -570,9 +570,6 @@
     <Compile Include="Ui\Fragments\Calendar\AddEditAppointmentFragment.cs" />
     <Compile Include="Ui\Fragments\Calendar\AddEditParticipantsFragment.cs" />
     <Compile Include="Ui\Fragments\Calendar\AddEditAppointmentCalendarListFragment.cs" />
-    <Compile Include="Ui\Fragments\Calendar\BaseAppointmentFragment.cs" />
-    <Compile Include="Ui\Views\CalendarViews\AddEditAppointmentViews.cs" />
-    <Compile Include="Ui\Views\CalendarViews\AppointmentViews.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -598,7 +595,6 @@
     <Folder Include="Resources\mipmap-anydpi-v26\" />
     <Folder Include="Ui\Fragments\Calendar\" />
     <Folder Include="Ui\Coordinators\" />
-    <Folder Include="Ui\Views\CalendarViews\" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\anim\enter_from_left.xml" />
@@ -1037,19 +1033,18 @@
       <SubType></SubType>
       <Generator></Generator>
     </AndroidResource>
+<<<<<<< HEAD
     <AndroidResource Include="Resources\drawable\partially_sent.axml">
-      <SubType></SubType>
-      <Generator></Generator>
-    </AndroidResource>
+=======
     <AndroidResource Include="Resources\drawable\ic_launcher_background.xml">
       <SubType></SubType>
       <Generator></Generator>
     </AndroidResource>
     <AndroidResource Include="Resources\drawable\ic_launcher_foreground.xml">
+>>>>>>> release/android/511
       <SubType></SubType>
       <Generator></Generator>
     </AndroidResource>
-
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FastScrollRecycler\FastScrollRecycler.csproj">
