@@ -166,7 +166,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         void CreateAppointmentButtonItem_Clicked(object sender, EventArgs e)
         {
-            Coordinator.CreateAppointmentClicked();
+            Coordinator.CreateAppointmentClicked(schedule.SelectedDate);
         }
 
         void CalendarsButtonItem_Clicked(object sender, EventArgs e)

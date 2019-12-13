@@ -71,9 +71,8 @@
 		<CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
 		<MtouchArch>ARM64</MtouchArch>
 		<ConsolePause>false</ConsolePause>
-		<CodesignKey>iPhone Distribution: Nordic IT Europe ApS (5Q7TTRG4M4)</CodesignKey>
+		<CodesignKey>Apple Distribution: Nordic IT Europe ApS (5Q7TTRG4M4)</CodesignKey>
 		<RunCodeAnalysis>true</RunCodeAnalysis>
-		<CodesignProvision>Mark5 Mobile Distribution</CodesignProvision>
 		<MtouchUseLlvm>true</MtouchUseLlvm>
 		<MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
 		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>

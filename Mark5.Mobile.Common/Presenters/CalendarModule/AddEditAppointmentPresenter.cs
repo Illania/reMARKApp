@@ -110,6 +110,9 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             else
                 Start = DateTime.Now.RoundUp(TimeSpan.FromMinutes(15));
 
+            if (Start.Hour == 0)
+                Start = Start.AddHours(8);
+
             End = Start.AddMinutes(30);
         }
 

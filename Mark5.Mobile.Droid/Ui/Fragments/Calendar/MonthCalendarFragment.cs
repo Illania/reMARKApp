@@ -71,7 +71,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 coordinator.CalendarsClicked();
 
             if (item.ItemId == MenuItemActions.CreateAppointment)
-                coordinator.CreateAppointmentClicked();
+                coordinator.CreateAppointmentClicked(schedule.SelectedDate);
 
             return true;
         }

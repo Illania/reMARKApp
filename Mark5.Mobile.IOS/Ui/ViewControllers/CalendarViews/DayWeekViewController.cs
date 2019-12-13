@@ -64,7 +64,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 schedule.CellLongPressed += ReMarkDayCalendar_CellTapped;
                 schedule.CellDoubleTapped += ReMarkDayCalendar_CellTapped;
                 schedule.VisibleDatesChanged += Schedule_VisibleDatesChanged;
-
             }
 
             if (addButtonItem != null)
@@ -137,7 +136,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         void AddButtonItem_Clicked(object sender, EventArgs e)
         {
-            Coordinator.CreateAppointmentClicked();
+            Coordinator.CreateAppointmentClicked(schedule.SelectedDate);
         }
 
         void ScheduleSwitchBtn_Clicked(object sender, EventArgs e)

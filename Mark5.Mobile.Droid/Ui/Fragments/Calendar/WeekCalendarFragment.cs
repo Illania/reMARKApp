@@ -46,9 +46,28 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         {
             HasOptionsMenu = true;
 
-            schedule = schedule ?? new WeekSchedule(Context);
+            if (schedule == null)
+            {
+                schedule = new WeekSchedule(Context);
+                schedule.CellTapped += Schedule_CellTapped;
+                schedule.CellDoubleTapped += Schedule_CellDoubleTapped;
+            }
 
             return schedule;
+        }
+
+        void Schedule_CellTapped(object sender, CellTappedEventArgs e)
+        {
+            if (e.ScheduleAppointment != null)
+                coordinator.AppointmentTapped(e.ScheduleAppointment);
+        }
+
+        void Schedule_CellDoubleTapped(object sender, CellTappedEventArgs e)
+        {
+            if (e.ScheduleAppointment != null)
+                coordinator.AppointmentTapped(e.ScheduleAppointment);
+            else
+                coordinator.HourTapped(e.Calendar);
         }
 
         public override void OnViewCreated(View view, Bundle savedInstanceState)
@@ -89,9 +108,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             }
 
             if (item.ItemId == MenuItemActions.CreateAppoitnment)
-            {
-                coordinator.CreateAppointmentClicked();
-            }
+                coordinator.CreateAppointmentClicked(schedule.SelectedDate);
 
             return true;
         }

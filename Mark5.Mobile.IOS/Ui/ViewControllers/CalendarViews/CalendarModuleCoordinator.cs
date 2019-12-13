@@ -101,9 +101,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             RootController.PushViewController(new DayWeekViewController(this, date), true);
         }
 
-        public void CreateAppointmentClicked()
+        public void CreateAppointmentClicked(NSDate date)
         {
-            RootController.PushViewController(new AddAppointmentViewController(), true);
+            RootController.PushViewController(new AddAppointmentViewController(((DateTime)date).ToLocalTime()), true);
         }
 
         public void MonthTapped(NSDate date)
@@ -318,7 +318,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         void VisibleDatesChanged(NSDate startDate, NSDate endDate);
         void DateDoubleTapped(NSDate date);
         void MonthTapped(NSDate date);
-        void CreateAppointmentClicked();
+        void CreateAppointmentClicked(NSDate date);
         void MonthViewLoaded();
         void YearTapped(NSDate nSDate);
         void CalendarsClicked();
