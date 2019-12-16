@@ -569,7 +569,7 @@
     <Compile Include="Ui\Fragments\Calendar\AddEditAppointmentFragment.cs" />
     <Compile Include="Ui\Fragments\Calendar\AddEditParticipantsFragment.cs" />
     <Compile Include="Ui\Fragments\Calendar\AddEditAppointmentCalendarListFragment.cs" />
-    <Compile Include="Ui\Fragments\Calendar\BaseAppointmentFragment.cs" />
+    <Compile Include="Ui\Fragments\Calendar\AppointmentFragment.cs" />
     <Compile Include="Ui\Views\CalendarViews\AddEditAppointmentViews.cs" />
     <Compile Include="Ui\Views\CalendarViews\AppointmentViews.cs" />
   </ItemGroup>

@@ -19,7 +19,7 @@ using Android.App;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 {
-    public class BaseAppointmentFragment : BaseFragment, IAppointmentView
+    public class AppointmentFragment : BaseFragment, IAppointmentView
     {
         const string CalendarBundleKey = "Calendar_Id";
         const string AppointmentBundleKey = "Appointment_Id";
@@ -44,10 +44,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         List<View> subviews = new List<View>();
 
-        public static (BaseAppointmentFragment fragment, string tag) NewInstance(int calendarId, int appointmentId, int recurrenceIndex)
+        public static (AppointmentFragment fragment, string tag) NewInstance(int calendarId, int appointmentId, int recurrenceIndex)
         {
-            var fragment = new BaseAppointmentFragment();
-            var tag = $"{nameof(BaseAppointmentFragment)} [calendarId={calendarId}, appointmentId={appointmentId}, recurrenceIndex={recurrenceIndex}]";
+            var fragment = new AppointmentFragment();
+            var tag = $"{nameof(AppointmentFragment)} [calendarId={calendarId}, appointmentId={appointmentId}, recurrenceIndex={recurrenceIndex}]";
 
             var args = new Bundle();
 
@@ -81,7 +81,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(BaseAppointmentFragment)}");
+            CommonConfig.Logger.Info($"Creating {nameof(AppointmentFragment)}");
 
             HasOptionsMenu = false;
 
@@ -110,7 +110,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         public override void OnViewCreated(View view, Bundle savedInstanceState)
         {
             base.OnViewCreated(view, savedInstanceState);
-            CommonConfig.Logger.Info($"Created {nameof(BaseAppointmentFragment)}...");
+            CommonConfig.Logger.Info($"Created {nameof(AppointmentFragment)}...");
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = null;
         }
