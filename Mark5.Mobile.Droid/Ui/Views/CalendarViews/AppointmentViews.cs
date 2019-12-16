@@ -2,6 +2,7 @@
 using System.Globalization;
 using Android.Animation;
 using Android.Content;
+using Android.Content.Res;
 using Android.Graphics;
 using Android.Graphics.Drawables;
 using Android.Support.V4.Content;
@@ -15,15 +16,6 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AppointmentViews
 {
-    class SeparatorSubview : View
-    {
-        public SeparatorSubview(Context c) : base(c)
-        {
-            SetBackgroundColor(new Color(ContextCompat.GetColor(Context, Resource.Color.lightgray)));
-            LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, Conversion.ConvertDpToPixels(1.5f));
-        }
-    }
-
     class BasicTextView : AppCompatTextView
     {
         public BasicTextView(Context context) : base(context)
@@ -84,27 +76,25 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AppointmentViews
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
             SetPadding(DistanceLarge, DistanceLarge, DistanceLarge, DistanceLarge);
 
-            var iconSize = Conversion.ConvertDpToPixels(25f);
-            icon = new AppCompatImageView(context)
-            {
-                LayoutParameters = new LayoutParams(iconSize, iconSize)
-                {
-                    Gravity = (int)GravityFlags.Left | (int)GravityFlags.Top,
-                    RightMargin = DistanceLarge,
-                    TopMargin = Conversion.ConvertDpToPixels(4),
-                },
-                Visibility = ViewStates.Invisible
-            };
-
-            AddView(icon);
-
             if (resourceId > 0)
             {
+                var iconSize = Conversion.ConvertDpToPixels(25f);
+                icon = new AppCompatImageView(context)
+                {
+                    LayoutParameters = new LayoutParams(iconSize, iconSize)
+                    {
+                        Gravity = (int)GravityFlags.Left | (int)GravityFlags.Top,
+                        RightMargin = DistanceLarge,
+                        TopMargin = Conversion.ConvertDpToPixels(4),
+                    },
+                };
+
+                AddView(icon);
+
                 var imageDrawable = AppCompatResources.GetDrawable(context, resourceId);
                 var color = new Color(ContextCompat.GetColor(Context, Resource.Color.softBlack));
                 DrawableCompat.SetTint(DrawableCompat.Wrap(imageDrawable), color);
 
-                icon.Visibility = ViewStates.Visible;
                 icon.SetImageDrawable(imageDrawable);
             }
 
@@ -284,15 +274,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AppointmentViews
 
     class ParticipantsView : AppointmentView
     {
-        readonly Action viewClicked;
         readonly LinearLayoutCompat internalLayout;
         readonly BasicTextView titleTextView;
 
-        public ParticipantsView(Context context, Action action)
+        public ParticipantsView(Context context)
             : base(context, Resource.Drawable.participants)
         {
-            viewClicked = action;
-
             internalLayout = new LinearLayoutCompat(Context)
             {
                 Orientation = Vertical,
@@ -304,13 +291,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AppointmentViews
             titleTextView.SetPadding(0, padding, 0, padding);
 
             AddView(internalLayout);
-
-            Click += ParticipantsView_Click;
-        }
-
-        private void ParticipantsView_Click(object sender, EventArgs e)
-        {
-            viewClicked?.Invoke();
         }
 
         public override void RefreshView()
@@ -469,6 +449,41 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AppointmentViews
                 title.Text = $"{minutes} minute(s)";
 
             title.Text += " before";
+        }
+    }
+
+    class SendInvitationView : AppointmentView
+    {
+        readonly Action buttonClicked;
+
+        public SendInvitationView(Context context, Action buttonClicked) :
+            base(context)
+        {
+            this.buttonClicked = buttonClicked;
+            SetBackgroundColor(Color.Transparent);
+
+            Gravity = (int)GravityFlags.CenterHorizontal;
+
+            var button = new AppCompatButton(Context);
+            button.LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent);
+            button.Text = "Send Invitations";
+            button.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkerblue)));
+            button.BackgroundTintList = ColorStateList.ValueOf(new Color(ContextCompat.GetColor(Context, Resource.Color.lightblue)));
+            button.Click += Button_Click;
+            AddView(button);
+        }
+
+        void Button_Click(object sender, EventArgs e)
+        {
+            buttonClicked?.Invoke();
+        }
+
+        public override void RefreshView()
+        {
+            if (ViewModel?.Participants?.Count > 0)
+                Visibility = ViewStates.Visible;
+            else
+                Visibility = ViewStates.Gone;
         }
     }
 }

@@ -1,21 +1,23 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using Android.OS;
-using Android.Views;
-using Android.Widget;
+using Android.App;
+using Android.Content.Res;
 using Android.Graphics;
+using Android.OS;
+using Android.Support.V4.Content;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
+using Android.Views;
+using Android.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Presenters.CalendarModule;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.CalendarViews.AppointmentViews;
-using CalendarView = Mark5.Mobile.Droid.Ui.Views.CalendarViews.AppointmentViews.CalendarView;
 using Mark5.Mobile.Droid.Utilities;
-using Android.App;
+using CalendarView = Mark5.Mobile.Droid.Ui.Views.CalendarViews.AppointmentViews.CalendarView;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 {
@@ -138,8 +140,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             subviews.Add(new DateView(Context));
             subviews.Add(new LocationView(Context));
             subviews.Add(new MessageView(Context));
-            subviews.Add(participantsView = new ParticipantsView(Context, null));
+            subviews.Add(new ParticipantsView(Context));
+            subviews.Add(new SendInvitationView(Context, SendInvitations_Click));
             subviews.ForEach(linearLayout.AddView);
+        }
+
+        async void SendInvitations_Click()
+        {
+            var lineNames = lineViewModels.Select(l => l.Name).ToArray();
+            var result = await Dialogs.ShowListDialog(Context, Resource.String.select_a_line, lineNames, true);
+            if (result >= 0)
+                await presenter.SendInvitationsClicked(lineViewModels[result]);
         }
 
         #endregion
