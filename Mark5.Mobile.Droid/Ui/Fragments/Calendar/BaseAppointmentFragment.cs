@@ -30,22 +30,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         int recurrenceIndex;
 
         Action dismissLoadingAction;
-        List<LineViewModel> lineViewModels;
 
         LinearLayoutCompat linearLayout;
         NestedScrollView scrollView;
         ProgressBar progressBar;
 
-        CalendarView calendarView;
         ParticipantsView participantsView;
-        ReocurrenceView recurrenceView;
 
         AppointmentViewModel viewModel;
-        List<CalendarViewModel> calendarList;
 
         List<View> subviews = new List<View>();
-
-        Action dismissAction;
 
         public static (BaseAppointmentFragment fragment, string tag) NewInstance(int calendarId, int appointmentId, int recurrenceIndex)
         {
@@ -128,10 +122,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         {
             subviews.Add(new NameView(Context));
             subviews.Add(new SeparatorSubview(Context));
-            subviews.Add(calendarView = new CalendarView(Context, null));
+            subviews.Add(new CalendarView(Context, null));
             subviews.Add(new SeparatorSubview(Context));
             subviews.Add(new DateView(Context));
-            subviews.Add(recurrenceView = new ReocurrenceView(Context, null));
             subviews.Add(new SeparatorSubview(Context));
             subviews.Add(participantsView = new ParticipantsView(Context, null));
             subviews.Add(new SeparatorSubview(Context));
