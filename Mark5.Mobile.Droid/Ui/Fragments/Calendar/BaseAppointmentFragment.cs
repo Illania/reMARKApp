@@ -14,6 +14,8 @@ using Mark5.Mobile.Common.Presenters.CalendarModule;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.CalendarViews.AppointmentViews;
 using CalendarView = Mark5.Mobile.Droid.Ui.Views.CalendarViews.AppointmentViews.CalendarView;
+using Mark5.Mobile.Droid.Utilities;
+using Android.App;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 {
@@ -30,6 +32,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         int recurrenceIndex;
 
         Action dismissLoadingAction;
+        List<LineViewModel> lineViewModels;
 
         LinearLayoutCompat linearLayout;
         NestedScrollView scrollView;
@@ -99,7 +102,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
             PrepareViews();
 
+            HasOptionsMenu = true;
+
             return rootView;
+        }
+
+        public override void OnViewCreated(View view, Bundle savedInstanceState)
+        {
+            base.OnViewCreated(view, savedInstanceState);
+            CommonConfig.Logger.Info($"Created {nameof(BaseAppointmentFragment)}...");
+
+            ((AppCompatActivity)Activity).SupportActionBar.Title = null;
         }
 
         public override async void OnResume()
@@ -120,21 +133,55 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         void PrepareViews()
         {
-            subviews.Add(new NameView(Context));
-            subviews.Add(new SeparatorSubview(Context));
+            subviews.Add(new SubjectView(Context));
             subviews.Add(new CalendarView(Context, null));
-            subviews.Add(new SeparatorSubview(Context));
             subviews.Add(new DateView(Context));
-            subviews.Add(new SeparatorSubview(Context));
-            subviews.Add(participantsView = new ParticipantsView(Context, null));
-            subviews.Add(new SeparatorSubview(Context));
             subviews.Add(new LocationView(Context));
-            subviews.Add(new SeparatorSubview(Context));
-            //subviews.Add(new ReminderView(Context));
-            //subviews.Add(new SeparatorSubview(Context));
             subviews.Add(new MessageView(Context));
-            subviews.Add(new SeparatorSubview(Context));
+            subviews.Add(participantsView = new ParticipantsView(Context, null));
             subviews.ForEach(linearLayout.AddView);
+        }
+
+        #endregion
+
+        #region Options menu related
+
+        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
+        {
+            menu.Clear();
+
+            var deleteItem = menu.Add(Menu.None, MenuItemActions.DeleteAppointment, MenuItemActions.DeleteAppointment, Resource.String.delete);
+            deleteItem.SetIcon(Resource.Drawable.delete);
+            deleteItem.SetShowAsAction(ShowAsAction.Always);
+
+            var editItem = menu.Add(Menu.None, MenuItemActions.EditAppointment, MenuItemActions.EditAppointment, Resource.String.edit);
+            editItem.SetIcon(Resource.Drawable.create);
+            editItem.SetShowAsAction(ShowAsAction.Always);
+        }
+
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            if (item.ItemId == MenuItemActions.DeleteAppointment)
+            {
+                AsyncHelpers.RunOnUiThreadAsync((Activity)Context, async () =>
+                {
+                    var confirm = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete, Resource.String.delete_are_you_sure);
+                    if (confirm)
+                        await presenter.DeleteAppointmentClicked();
+                });
+            }
+            else
+            {
+                presenter.EditAppointmentClicked();
+            }
+
+            return true;
+        }
+
+        static class MenuItemActions
+        {
+            public const int DeleteAppointment = 10;
+            public const int EditAppointment = 20;
         }
 
         #endregion
@@ -192,7 +239,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         public void UpdateParticipants(List<ParticipantsViewModel> participants)
         {
-            // participantsView?.Refresh(participants);  //TODO
+            participantsView?.RefreshView();
         }
 
         public void ShowSendInvitationsDialog()

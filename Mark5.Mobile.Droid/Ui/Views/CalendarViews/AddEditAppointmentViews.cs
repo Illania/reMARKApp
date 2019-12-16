@@ -6,6 +6,8 @@ using Android.Content;
 using Android.Graphics;
 using Android.Graphics.Drawables;
 using Android.Support.V4.Content;
+using Android.Support.V4.Graphics.Drawable;
+using Android.Support.V7.Content.Res;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Views.InputMethods;
@@ -55,7 +57,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AddEditAppointmentViews
             SetPadding(0, verticalPadding, 0, verticalPadding);
             SetBackgroundColor(Color.Transparent);
             SetHintTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
-            InputType = Android.Text.InputTypes.TextFlagCapCharacters;
+            InputType = Android.Text.InputTypes.TextFlagCapCharacters | Android.Text.InputTypes.TextFlagMultiLine | Android.Text.InputTypes.ClassText;
             this.SetTextAppearanceCompat(context, Resource.Style.editAppointmentField);
         }
     }
@@ -73,7 +75,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AddEditAppointmentViews
             SetPadding(0, verticalPadding, 0, verticalPadding);
             SetBackgroundColor(Color.Transparent);
             SetHintTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
-            InputType = Android.Text.InputTypes.TextFlagCapCharacters;
+            InputType = Android.Text.InputTypes.TextFlagCapCharacters | Android.Text.InputTypes.TextFlagMultiLine | Android.Text.InputTypes.ClassText;
             this.SetTextAppearanceCompat(context, Resource.Style.editAppointmentTitle);
         }
     }
@@ -117,8 +119,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AddEditAppointmentViews
 
             if (resourceId > 0)
             {
+                var imageDrawable = AppCompatResources.GetDrawable(context, resourceId);
+                var color = new Color(ContextCompat.GetColor(Context, Resource.Color.softBlack));
+                DrawableCompat.SetTint(DrawableCompat.Wrap(imageDrawable), color);
+
                 icon.Visibility = ViewStates.Visible;
-                icon.SetImageResource(resourceId);
+                icon.SetImageDrawable(imageDrawable);
             }
 
             LayoutTransition = new LayoutTransition();

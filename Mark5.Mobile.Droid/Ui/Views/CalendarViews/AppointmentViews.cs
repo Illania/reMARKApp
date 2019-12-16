@@ -5,6 +5,8 @@ using Android.Content;
 using Android.Graphics;
 using Android.Graphics.Drawables;
 using Android.Support.V4.Content;
+using Android.Support.V4.Graphics.Drawable;
+using Android.Support.V7.Content.Res;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Common.Presenters.CalendarModule;
@@ -26,32 +28,25 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AppointmentViews
     {
         public BasicTextView(Context context) : base(context)
         {
-            var verticalPadding = Conversion.ConvertDpToPixels(4);
-
             LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
             {
                 Gravity = (int)GravityFlags.CenterVertical
             };
-            SetPadding(0, verticalPadding, 0, verticalPadding);
             SetBackgroundColor(Color.Transparent);
-            this.SetTextAppearanceCompat(context, Resource.Style.editAppointmentText);
+            this.SetTextAppearanceCompat(context, Resource.Style.viewAppointmentText);
         }
     }
 
-    class BasicTextField : AppCompatTextView
+    class SubTextView : AppCompatTextView
     {
-        public BasicTextField(Context context) : base(context)
+        public SubTextView(Context context) : base(context)
         {
-            var verticalPadding = Conversion.ConvertDpToPixels(4);
-            LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent, 1)
+            LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
             {
                 Gravity = (int)GravityFlags.CenterVertical
             };
-            SetPadding(0, verticalPadding, 0, verticalPadding);
             SetBackgroundColor(Color.Transparent);
-            SetHintTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
-            InputType = Android.Text.InputTypes.TextFlagCapCharacters;
-            this.SetTextAppearanceCompat(context, Resource.Style.editAppointmentField);
+            this.SetTextAppearanceCompat(context, Resource.Style.viewAppointmentSubText);
         }
     }
 
@@ -59,17 +54,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AppointmentViews
     {
         public TitleTextView(Context context) : base(context)
         {
-            var verticalPadding = Conversion.ConvertDpToPixels(4);
-
             LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent, 1)
             {
                 Gravity = (int)GravityFlags.CenterVertical,
             };
-            SetPadding(0, verticalPadding, 0, verticalPadding);
             SetBackgroundColor(Color.Transparent);
-            SetHintTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray)));
-            InputType = Android.Text.InputTypes.TextFlagCapCharacters;
-            this.SetTextAppearanceCompat(context, Resource.Style.editAppointmentTitle);
+            this.SetTextAppearanceCompat(context, Resource.Style.viewAppointmentTitle);
         }
     }
 
@@ -103,7 +93,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AppointmentViews
                 {
                     Gravity = (int)GravityFlags.Left | (int)GravityFlags.Top,
                     RightMargin = DistanceLarge,
-                    TopMargin = Conversion.ConvertDpToPixels(4), //To balance the padding around text fields
+                    TopMargin = Conversion.ConvertDpToPixels(4),
                 },
                 Visibility = ViewStates.Invisible
             };
@@ -112,8 +102,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AppointmentViews
 
             if (resourceId > 0)
             {
+                var imageDrawable = AppCompatResources.GetDrawable(context, resourceId);
+                var color = new Color(ContextCompat.GetColor(Context, Resource.Color.softBlack));
+                DrawableCompat.SetTint(DrawableCompat.Wrap(imageDrawable), color);
+
                 icon.Visibility = ViewStates.Visible;
-                icon.SetImageResource(resourceId);
+                icon.SetImageDrawable(imageDrawable);
             }
 
             LayoutTransition = new LayoutTransition();
@@ -122,11 +116,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AppointmentViews
         abstract public void RefreshView();
     }
 
-    class NameView : AppointmentView
+    class SubjectView : AppointmentView
     {
-        TitleTextView textField;
+        readonly TitleTextView textField;
 
-        public NameView(Context context) : base(context)
+        public SubjectView(Context context) : base(context)
         {
             textField = new TitleTextView(context);
             AddView(textField);
@@ -135,67 +129,109 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AppointmentViews
         public override void RefreshView()
         {
             if (!string.IsNullOrEmpty(ViewModel.Subject))
+            {
                 textField.Text = ViewModel.Subject;
+                Visibility = ViewStates.Visible;
+            }
+            else
+            {
+                Visibility = ViewStates.Gone;
+            }
         }
     }
 
     class LocationView : AppointmentView
     {
-        BasicTextField textField;
+        readonly BasicTextView textField;
 
         public LocationView(Context context)
             : base(context, Resource.Drawable.location)
         {
-            textField = new BasicTextField(context);
+            textField = new BasicTextView(context);
+            Click += LocationView_Click;
             AddView(textField);
+        }
+
+        private void LocationView_Click(object sender, EventArgs e)
+        {
+            if (!string.IsNullOrEmpty(textField.Text))
+                Integration.OpenMap(Context, textField.Text);
         }
 
         public override void RefreshView()
         {
             if (!string.IsNullOrEmpty(ViewModel.Location))
+            {
                 textField.Text = ViewModel.Location;
+                Visibility = ViewStates.Visible;
+            }
+            else
+            {
+                Visibility = ViewStates.Gone;
+            }
         }
     }
 
     class DateView : AppointmentView
     {
-        BasicTextField textField;
+        readonly BasicTextView textField;
+        readonly SubTextView textField2;
+        readonly LinearLayoutCompat internalLayout;
 
         public DateView(Context context)
             : base(context, Resource.Drawable.time)
         {
-            textField = new BasicTextField(context);
+            internalLayout = new LinearLayoutCompat(Context)
+            {
+                Orientation = Vertical,
+                LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+            };
+
+            AddView(internalLayout);
+
+            textField = new BasicTextView(context);
+            textField2 = new SubTextView(context);
+
+            internalLayout.AddView(textField);
+            internalLayout.AddView(textField2);
         }
 
         public override void RefreshView()
         {
-            var viewModel = ViewModel;
             string Text;
-            if (ViewModel.Start.Date.CompareTo(viewModel.End.Date) == 0)
+            if (base.ViewModel.Start.Date.CompareTo(ViewModel.End.Date) == 0)
             {
-                Text = viewModel.Start.ToString("dddd, d MMMM yyyy", CultureInfo.CurrentCulture);
-                if (viewModel.AllDay)
+                Text = ViewModel.Start.ToString("dddd, d MMMM yyyy", CultureInfo.CurrentCulture);
+                if (ViewModel.AllDay)
                     Text += "\r\nAll Day";
                 else
-                    Text += $"\r\nfrom { viewModel.Start.ToString("hh:mm", CultureInfo.CurrentCulture) } to { viewModel.End.ToString("hh:mm", CultureInfo.CurrentCulture) }";
+                    Text += $"\r\nfrom { ViewModel.Start.ToString("hh:mm", CultureInfo.CurrentCulture) } to { ViewModel.End.ToString("hh:mm", CultureInfo.CurrentCulture) }";
             }
             else
             {
-                if (viewModel.AllDay)
+                if (ViewModel.AllDay)
                 {
-                    Text = $"All day from { viewModel.Start.ToString("ddd, d MMMM yyyy", CultureInfo.CurrentCulture) } ";
-                    Text += $"\r\nto { viewModel.End.ToString("ddd, d MMMM yyyy", CultureInfo.CurrentCulture) }";
+                    Text = $"All day from { ViewModel.Start.ToString("ddd, d MMMM yyyy", CultureInfo.CurrentCulture) } ";
+                    Text += $"\r\nto { ViewModel.End.ToString("ddd, d MMMM yyyy", CultureInfo.CurrentCulture) }";
                 }
                 else
                 {
-                    Text = $"from { viewModel.Start.ToString("hh:mm ddd, d MMMM yyyy", CultureInfo.CurrentCulture) } ";
-                    Text += $"\r\nto { viewModel.End.ToString("hh:mm ddd, d MMMM yyyy", CultureInfo.CurrentCulture) }";
+                    Text = $"from { ViewModel.Start.ToString("hh:mm ddd, d MMMM yyyy", CultureInfo.CurrentCulture) } ";
+                    Text += $"\r\nto { ViewModel.End.ToString("hh:mm ddd, d MMMM yyyy", CultureInfo.CurrentCulture) }";
                 }
             }
 
-            Text += $"\r\n{viewModel.RecurrenceInfo}";
-
             textField.Text = Text;
+
+            if (string.IsNullOrEmpty(ViewModel.RecurrenceInfo))
+            {
+                textField2.Visibility = ViewStates.Gone;
+            }
+            else
+            {
+                textField2.Text = ViewModel.RecurrenceInfo;
+                textField2.Visibility = ViewStates.Visible;
+            }
         }
     }
 
@@ -224,7 +260,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AppointmentViews
             };
 
             AddView(label);
-
         }
 
         public string HexColor
@@ -251,20 +286,22 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AppointmentViews
 
     class ParticipantsView : AppointmentView
     {
-        readonly BasicTextView title;
         readonly Action viewClicked;
+        readonly LinearLayoutCompat internalLayout;
 
         public ParticipantsView(Context context, Action action)
             : base(context, Resource.Drawable.participants)
         {
-            Orientation = Horizontal;
             viewClicked = action;
-            title = new BasicTextView(context)
+
+            internalLayout = new LinearLayoutCompat(Context)
             {
-                Text = "Participants",
+                Orientation = Vertical,
+                LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
             };
 
-            AddView(title);
+            AddView(internalLayout);
+
             Click += ParticipantsView_Click;
         }
 
@@ -275,58 +312,111 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AppointmentViews
 
         public override void RefreshView()
         {
-            if (ViewModel != null && ViewModel.Participants != null && ViewModel.Participants.Count > 0)
+            if (ViewModel.Participants == null || ViewModel.Participants.Count <= 0)
             {
-                title.Text = $"{ViewModel.Participants.Count} participants";
-                title.SetTextColor(defaultColor);
+                Visibility = ViewStates.Gone;
+                return;
             }
-            else
+
+            internalLayout.RemoveAllViews();
+
+            foreach (var participant in ViewModel.Participants)
             {
-                title.Text = "Add participants";
-                title.SetTextColor(hintColor);
+                ParticipantView partView = new ParticipantView(Context)
+                {
+                    LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent)
+                };
+                partView.Refresh(participant);
+                internalLayout.AddView(partView);
+            }
+        }
+
+        private class ParticipantView : LinearLayoutCompat
+        {
+            readonly AppCompatTextView label;
+            readonly AppCompatImageView appCompatImageButton;
+
+            public ParticipantView(Context context) : base(context)
+            {
+                Orientation = Horizontal;
+                LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
+
+                appCompatImageButton = new AppCompatImageView(Context)
+                {
+                    Clickable = false,
+                    LayoutParameters = new LayoutParams(Conversion.ConvertDpToPixels(20), Conversion.ConvertDpToPixels(20), 0.2f)
+                    {
+                        Gravity = (int)GravityFlags.CenterVertical | (int)GravityFlags.Left
+                    }
+                };
+
+                appCompatImageButton.SetImageResource(Resource.Drawable.arrow_right);
+                appCompatImageButton.SetColorFilter(Color.Black);
+                appCompatImageButton.SetPadding(0, 0, Conversion.ConvertDpToPixels(4f), 0);
+
+                AddView(appCompatImageButton);
+
+                label = new AppCompatTextView(Context)
+                {
+                    Gravity = GravityFlags.Left,
+                    LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent, 0.8f)
+                };
+
+                label.SetTextAppearanceCompat(context, Resource.Style.editAppointmentText);
+                AddView(label);
+
+                SetPadding(0, Conversion.ConvertDpToPixels(8f), 0, Conversion.ConvertDpToPixels(8f));
+            }
+
+            public void Refresh(ParticipantsViewModel participant)
+            {
+                if (string.IsNullOrEmpty(participant.Name) || string.IsNullOrEmpty(participant.Email))
+                    label.Text = participant.Name + participant.Email;
+                else
+                    label.Text = $"{participant.Name} <{participant.Email}>";
+
+                switch (participant.Status)
+                {
+                    case Mobile.Common.Model.ParticipantStatus.Accepted:
+                        appCompatImageButton.SetImageResource(Resource.Drawable.icon_check);
+                        break;
+                    case Mobile.Common.Model.ParticipantStatus.Invited:
+                    case Mobile.Common.Model.ParticipantStatus.NeedAction:
+                        appCompatImageButton.SetImageResource(Resource.Drawable.icon_question);
+                        break;
+                    case Mobile.Common.Model.ParticipantStatus.Tentative:
+                    case Mobile.Common.Model.ParticipantStatus.Declined:
+                        appCompatImageButton.SetImageResource(Resource.Drawable.icon_cross);
+                        break;
+                }
             }
         }
     }
 
     class MessageView : AppointmentView
     {
-        readonly BasicTextField textField;
+        readonly BasicTextView textField;
 
         public MessageView(Context context)
             : base(context, Resource.Drawable.description)
         {
-            textField = new BasicTextField(context);
+            textField = new BasicTextView(context);
+            textField.AutoLinkMask = Android.Text.Util.MatchOptions.All;
+
             AddView(textField);
         }
 
         public override void RefreshView()
         {
             if (!string.IsNullOrEmpty(ViewModel?.Location))
-                textField.Text = ViewModel.Description;
-        }
-    }
-
-    class ReocurrenceView : AppointmentView
-    {
-        readonly BasicTextView title;
-
-        public ReocurrenceView(Context context, Action viewClicked)
-            : base(context, Resource.Drawable.refresh_black)
-        {
-            title = new BasicTextView(context)
             {
-                Text = "Repeats"
-            };
-
-            AddView(title);
-        }
-
-        public override void RefreshView()
-        {
-            if (ViewModel?.RecurrenceInfo != null)
-                title.Text = ViewModel.RecurrenceInfo;
+                textField.Text = ViewModel.Description;
+                Visibility = ViewStates.Visible;
+            }
             else
-                title.Text = "Does not repeat";
+            {
+                Visibility = ViewStates.Gone;
+            }
         }
     }
 
