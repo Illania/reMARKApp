@@ -65,10 +65,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AppointmentViews
 
     abstract class AppointmentView : LinearLayoutCompat
     {
-        protected static int DistanceLarge = Conversion.ConvertDpToPixels(16f);
+        protected static int DistanceLarge = Conversion.ConvertDpToPixels(12f);
         protected static int DistanceNormal = Conversion.ConvertDpToPixels(8f);
-        protected static int DistanceSmall = Conversion.ConvertDpToPixels(4f);
-        protected static int DistanceVerySmall = Conversion.ConvertDpToPixels(4f);
 
         protected Color hintColor;
         protected Color defaultColor;
@@ -240,7 +238,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AppointmentViews
         readonly BasicTextView label;
         readonly View colorCircle;
 
-        public CalendarView(Context context, Action viewClicked)
+        public CalendarView(Context context)
             : base(context, Resource.Drawable.calendar_black)
         {
             colorCircle = new View(context)
@@ -288,6 +286,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AppointmentViews
     {
         readonly Action viewClicked;
         readonly LinearLayoutCompat internalLayout;
+        readonly BasicTextView titleTextView;
 
         public ParticipantsView(Context context, Action action)
             : base(context, Resource.Drawable.participants)
@@ -299,6 +298,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AppointmentViews
                 Orientation = Vertical,
                 LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
             };
+
+            var padding = Conversion.ConvertDpToPixels(4f);
+            titleTextView = new BasicTextView(context);
+            titleTextView.SetPadding(0, padding, 0, padding);
 
             AddView(internalLayout);
 
@@ -319,6 +322,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AppointmentViews
             }
 
             internalLayout.RemoveAllViews();
+            internalLayout.AddView(titleTextView);
 
             foreach (var participant in ViewModel.Participants)
             {
@@ -329,6 +333,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AppointmentViews
                 partView.Refresh(participant);
                 internalLayout.AddView(partView);
             }
+
+            titleTextView.Text = $"{ViewModel.Participants.Count} participants";
+            titleTextView.SetTextColor(defaultColor);
         }
 
         private class ParticipantView : LinearLayoutCompat
@@ -365,7 +372,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AppointmentViews
                 label.SetTextAppearanceCompat(context, Resource.Style.editAppointmentText);
                 AddView(label);
 
-                SetPadding(0, Conversion.ConvertDpToPixels(8f), 0, Conversion.ConvertDpToPixels(8f));
+                SetPadding(0, Conversion.ConvertDpToPixels(6f), 0, Conversion.ConvertDpToPixels(6f));
             }
 
             public void Refresh(ParticipantsViewModel participant)

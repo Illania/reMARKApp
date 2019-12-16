@@ -97,7 +97,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AddEditAppointmentViews
             : base(context)
         {
             hintColor = new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray));
-            defaultColor = new Color(ContextCompat.GetColor(Context, Resource.Color.black));
+            defaultColor = new Color(ContextCompat.GetColor(Context, Resource.Color.softBlack));
 
             Orientation = Horizontal;
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
