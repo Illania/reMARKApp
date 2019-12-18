@@ -59,6 +59,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             externalLayout.SetBackgroundResource(Resource.Color.white);
             externalLayout.SetPadding(paddingValue, paddingValue, paddingValue, paddingValue);
 
+            (Activity as BaseAppCompatActivity).Fab.Visibility = ViewStates.Gone;
+
             if (yearCalendar == null)
             {
                 yearCalendar = new YearCalendar(Context);
@@ -81,13 +83,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
     {
         readonly Color darkerBlueColor;
         readonly Color whiteColor;
-        readonly Color lightBlueColor;
 
         public YearCalendar(Context context) : base(context)
         {
             darkerBlueColor = new Color(ContextCompat.GetColor(context, Resource.Color.darkerblue));
             whiteColor = new Color(ContextCompat.GetColor(context, Resource.Color.white));
-            lightBlueColor = new Color(ContextCompat.GetColor(context, Resource.Color.lightblue));
 
             MonthViewLabelSetting labelSettings = new MonthViewLabelSetting
             {

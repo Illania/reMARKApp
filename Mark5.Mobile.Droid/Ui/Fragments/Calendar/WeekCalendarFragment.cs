@@ -8,6 +8,7 @@ using Com.Syncfusion.Schedule.Enums;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Utilities;
 using System;
+using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 {
@@ -42,18 +43,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 initialDate = Serializer.Deserialize<DateTime>(Arguments.GetString(InitialDateKey)).ConvertToCalendar();
         }
 
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        protected override void SetSchedule()
         {
-            HasOptionsMenu = true;
-
-            if (schedule == null)
-            {
-                schedule = new WeekSchedule(Context);
-                schedule.CellTapped += Schedule_CellTapped;
-                schedule.CellDoubleTapped += Schedule_CellDoubleTapped;
-            }
-
-            return schedule;
+            schedule = new WeekSchedule(Context);
+            schedule.CellTapped += Schedule_CellTapped;
+            schedule.CellDoubleTapped += Schedule_CellDoubleTapped;
         }
 
         void Schedule_CellTapped(object sender, CellTappedEventArgs e)
@@ -77,25 +71,26 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         }
 
         #region Toolbar setup
+
         static class MenuItemActions
         {
-            public const int CreateAppoitnment = 11;
             public const int SwitchViewMode = 10;
+            public const int Today = 20;
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
             menu.Clear();
 
-            var createAppointmentItem = menu.Add(Menu.None, MenuItemActions.CreateAppoitnment, MenuItemActions.CreateAppoitnment, Resource.String.insert_template);
-            createAppointmentItem.SetIcon(Resource.Drawable.add_appointment);
-            createAppointmentItem.SetShowAsAction(ShowAsAction.Always);
-            createAppointmentItem.SetOnMenuItemClickListener(this);
-
             var switchViewModeItem = menu.Add(Menu.None, MenuItemActions.SwitchViewMode, MenuItemActions.SwitchViewMode, Resource.String.insert_template);
             switchViewModeItem.SetTitle(viewModeDay ? "Week" : "Day");
             switchViewModeItem.SetShowAsAction(ShowAsAction.Always);
             switchViewModeItem.SetOnMenuItemClickListener(this);
+
+            var goToToday = menu.Add(Menu.None, MenuItemActions.Today, MenuItemActions.Today, Resource.String.today);
+            goToToday.SetIcon(Resource.Drawable.today);
+            goToToday.SetShowAsAction(ShowAsAction.Always);
+            goToToday.SetOnMenuItemClickListener(this);
         }
 
         public bool OnMenuItemClick(IMenuItem item)
@@ -107,8 +102,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 Activity.InvalidateOptionsMenu();
             }
 
-            if (item.ItemId == MenuItemActions.CreateAppoitnment)
-                coordinator.CreateAppointmentClicked(schedule.SelectedDate);
+            if (item.ItemId == MenuItemActions.Today)
+                MoveToDate(Java.Util.Calendar.Instance);
 
             return true;
         }
