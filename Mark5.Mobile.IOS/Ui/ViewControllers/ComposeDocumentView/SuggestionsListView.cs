@@ -32,6 +32,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         List<IDisposable> searchCancellationTokenSources = new List<IDisposable>();
 
         RecipientsView recipientsView;
+        bool includeSystemUsers;
 
         // This value will be later updated from notification.
         float keyboardHeight = 216f;
@@ -39,12 +40,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         readonly UIViewController viewController;
 
         public event EventHandler ShouldDisappear = delegate { };
+        public event EventHandler<Recipient> RecipientClicked = delegate { };
+        public event EventHandler<string> EnterPressed = delegate { };
 
         #region Initialization
 
-        public SuggestionsListView(UIViewController viewController)
+        public SuggestionsListView(UIViewController viewController, bool includeSystemUsers = false)
         {
             this.viewController = viewController;
+            this.includeSystemUsers = false;
 
             TranslatesAutoresizingMaskIntoConstraints = false;
 
@@ -87,9 +91,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 suggestionsTextView.HeightAnchor.ConstraintGreaterThanOrEqualTo(20f)
             });
 
-            suggestionsTextView.SearchRequested += (sender, e) => DoSearch(e);
-            suggestionsTextView.CommaOrEnterPressed += (sender, e) => Dismiss();
-            suggestionsTextView.ReachedOriginalState += (sender, e) => Dismiss();
+            suggestionsTextView.SearchRequested += SuggestionsTextView_SearchRequested;
+            suggestionsTextView.CommaOrEnterPressed += SuggestionsTextView_CommaOrEnterPressed;
+            suggestionsTextView.ReachedOriginalState += SuggestionsTextView_ReachedOriginalState;
 
             separator = new SeparatorSubView
             {
@@ -130,7 +134,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             if (recipientsView != null)
                 recipientsView.SuggestionOverlayActive = true;
 
-            suggestionsTextView.SetOriginalState(recipientsView);
+            suggestionsTextView.SetOriginalState(recipientsView?.GetText() ?? initialSearchString, recipientsView?.AddressType ?? DocumentAddressType.None);
 
             DoSearch(initialSearchString);
         }
@@ -193,7 +197,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 suggestionsListViewSource.Searching = true;
                 searchCancellationTokenSource = new CancellationTokenSource();
                 searchCancellationTokenSources.Add(searchCancellationTokenSource);
-                RecipentSuggestions.GetSuggestions(searchText, searchCancellationTokenSource.Token, HandleSugguestions);
+                RecipentSuggestions.GetSuggestions(searchText, searchCancellationTokenSource.Token, HandleSugguestions, true);
             }
             else
             {
@@ -217,6 +221,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         public void SuggestionSelected(Recipient printableSuggestion)
         {
             suggestionsTextView.AddSuggestion(printableSuggestion);
+            RecipientClicked(this, printableSuggestion);
             Dismiss();
 
             BeginInvokeOnMainThread(() =>
@@ -228,6 +233,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         }
 
         #endregion
+
+        void SuggestionsTextView_ReachedOriginalState(object sender, EventArgs e) => Dismiss();
+
+        void SuggestionsTextView_SearchRequested(object sender, string e) => DoSearch(e);
+
+        void SuggestionsTextView_CommaOrEnterPressed(object sender, EventArgs e)
+        {
+            EnterPressed(this, suggestionsTextView.GetText());
+            Dismiss();
+        }
 
         void Dismiss()
         {
@@ -242,7 +257,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             base.LayoutSubviews();
 
             nfloat offset = 0f;
-            if (viewController != null && viewController.NavigationController != null && viewController.NavigationController.NavigationBar != null && viewController.NavigationController.NavigationBar.Frame != CGRect.Empty)
+            if (viewController != null && viewController.NavigationController != null && recipientsView != null  //TODO Don't like so much this 
+                && viewController.NavigationController.NavigationBar != null && viewController.NavigationController.NavigationBar.Frame != CGRect.Empty)
                 offset = viewController.NavigationController.NavigationBar.Frame.Bottom;
             spaceHeightConstraint.Constant = offset;
             LayoutIfNeeded();
@@ -393,17 +409,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 CorrectMarkup();
             }
 
-            public void SetOriginalState(RecipientsView recipientsView)
+            public void SetOriginalState(string originalText, DocumentAddressType type)
             {
-                if (recipientsView != null)
+                if (originalText != null)
                 {
-                    var originalText = recipientsView.GetText();
                     originalState = originalText.Length > 1 ? originalText.Substring(0, originalText.Length - 1) : string.Empty;
-                    SetDocumentAddressType(recipientsView.AddressType);
+                    SetDocumentAddressType(type);
                     SetText(originalText);
                 }
             }
-
 
             #endregion
 
@@ -419,7 +433,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             {
                 base.HandleTextViewChanged(sender, e);
 
-                if (TextView.Text == originalState)
+                if (TextView.Text == originalState && AddressType != DocumentAddressType.None)
                     ReachedOriginalState(this, EventArgs.Empty);
             }
 
