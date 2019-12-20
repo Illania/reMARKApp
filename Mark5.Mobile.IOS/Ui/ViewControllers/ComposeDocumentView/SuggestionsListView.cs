@@ -36,15 +36,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         // This value will be later updated from notification.
         float keyboardHeight = 216f;
 
-        readonly ComposeDocumentViewController viewController;
+        readonly UIViewController viewController;
 
         public event EventHandler ShouldDisappear = delegate { };
 
         #region Initialization
 
-        public SuggestionsListView(ComposeDocumentViewController composeDocumentViewController)
+        public SuggestionsListView(UIViewController viewController)
         {
-            viewController = composeDocumentViewController;
+            this.viewController = viewController;
 
             TranslatesAutoresizingMaskIntoConstraints = false;
 
@@ -127,7 +127,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         public void Initialize(RecipientsView targetRecipientsView, string initialSearchString)
         {
             recipientsView = targetRecipientsView;
-            recipientsView.SuggestionOverlayActive = true;
+            if (recipientsView != null)
+                recipientsView.SuggestionOverlayActive = true;
 
             suggestionsTextView.SetOriginalState(recipientsView);
 
@@ -192,7 +193,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 suggestionsListViewSource.Searching = true;
                 searchCancellationTokenSource = new CancellationTokenSource();
                 searchCancellationTokenSources.Add(searchCancellationTokenSource);
-                RecipentSuggestions.GetSuggestions(searchText, SystemUsersDepartments, searchCancellationTokenSource.Token, HandleSugguestions);
+                RecipentSuggestions.GetSuggestions(searchText, searchCancellationTokenSource.Token, HandleSugguestions);
             }
             else
             {
@@ -230,8 +231,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         void Dismiss()
         {
-            recipientsView.SetText(suggestionsTextView.GetText());
-            recipientsView.SuggestionOverlayActive = false;
+            recipientsView?.SetText(suggestionsTextView.GetText());
+            if (recipientsView != null)
+                recipientsView.SuggestionOverlayActive = false;
             ShouldDisappear(this, EventArgs.Empty);
         }
 
@@ -393,11 +395,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             public void SetOriginalState(RecipientsView recipientsView)
             {
-                var originalText = recipientsView.GetText();
-                originalState = originalText.Length > 1 ? originalText.Substring(0, originalText.Length - 1) : string.Empty;
-                SetDocumentAddressType(recipientsView.AddressType);
-                SetText(originalText);
+                if (recipientsView != null)
+                {
+                    var originalText = recipientsView.GetText();
+                    originalState = originalText.Length > 1 ? originalText.Substring(0, originalText.Length - 1) : string.Empty;
+                    SetDocumentAddressType(recipientsView.AddressType);
+                    SetText(originalText);
+                }
             }
+
 
             #endregion
 

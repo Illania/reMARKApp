@@ -11,10 +11,11 @@ using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 {
-    public class AddEditAppointmentParticipantsViewController : AbstractTableViewController, IUITableViewDelegate
+    public class AddEditAppointmentParticipantsViewController : AbstractViewController, IUITableViewDelegate
     {
         readonly TaskCompletionSource<List<ParticipantsViewModel>> tcs = new TaskCompletionSource<List<ParticipantsViewModel>>();
         public Task<List<ParticipantsViewModel>> Result => tcs.Task;
@@ -25,6 +26,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         UIButton addButton;
 
         AddEditAppointmentViewModel viewModel;
+        SuggestionsListView suggestionsListView;
+
+        UITableView TableView;
 
         public AddEditAppointmentParticipantsViewController(AddEditAppointmentViewModel viewModel)
         {
@@ -106,6 +110,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         void InitializeView()
         {
+            TableView = new UITableView();
+            TableView.TranslatesAutoresizingMaskIntoConstraints = false;
             TableView.Source = new DataSource(TableView);
             TableView.AllowsSelection = true;
             TableView.AllowsMultipleSelection = true;
@@ -114,6 +120,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             TableView.EstimatedRowHeight = 40f;
             TableView.TableHeaderView = GetHeader();
             TableView.Delegate = this;
+
+            View.AddSubview(TableView);
+
+            View.AddConstraints(new[]
+            {
+                TableView.TopAnchor.ConstraintEqualTo(View.TopAnchor),
+                TableView.BottomAnchor.ConstraintEqualTo(View.BottomAnchor),
+                TableView.LeftAnchor.ConstraintEqualTo(View.LeftAnchor),
+                TableView.RightAnchor.ConstraintEqualTo(View.RightAnchor),
+            });
 
             EdgesForExtendedLayout = UIRectEdge.None;
         }
@@ -188,9 +204,47 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         void Field_EditingChanged(object sender, EventArgs e)
         {
             addButton.Enabled = Validator.IsEmailValid(field.Text);
+
+            //var initialSearchString = field.Text;
+            //if (string.IsNullOrEmpty(initialSearchString))
+            //    return;
+
+            //if (suggestionsListView == null)
+            //{
+            //    suggestionsListView = new SuggestionsListView(this);
+
+            //    View.AddSubview(suggestionsListView);
+            //    View.AddConstraints(new[]
+            //    {
+            //        suggestionsListView.TopAnchor.ConstraintEqualTo(View.TopAnchor),
+            //        suggestionsListView.LeftAnchor.ConstraintEqualTo(View.LeftAnchor),
+            //        suggestionsListView.RightAnchor.ConstraintEqualTo(View.RightAnchor),
+            //        suggestionsListView.BottomAnchor.ConstraintEqualTo(View.BottomAnchor)
+            //    });
+
+            //    View.SendSubviewToBack(suggestionsListView);
+            //}
+
+            //suggestionsListView.Initialize(null, initialSearchString);
+            //suggestionsListView.ShouldDisappear -= SuggestionsListView_ShouldDisappear;
+            //suggestionsListView.ShouldDisappear += SuggestionsListView_ShouldDisappear;
+
+            //View.BringSubviewToFront(suggestionsListView);
         }
 
-        public override UISwipeActionsConfiguration GetTrailingSwipeActionsConfiguration(UITableView tableView, NSIndexPath indexPath)
+
+        #region Suggestions methods  //TODO move afterwards
+
+        void SuggestionsListView_ShouldDisappear(object sender, EventArgs e)
+        {
+            View.SendSubviewToBack(suggestionsListView);
+            ((SuggestionsListView)sender).ShouldDisappear -= SuggestionsListView_ShouldDisappear;
+        }
+
+        #endregion
+
+        [Export("tableView:trailingSwipeActionsConfigurationForRowAtIndexPath:")]
+        public UISwipeActionsConfiguration GetTrailingSwipeActionsConfiguration(UITableView tableView, NSIndexPath indexPath)
         {
             var deleteAction = UIContextualAction.FromContextualActionStyle(UIContextualActionStyle.Destructive, "Delete", (someAction, view, success) =>
             {
