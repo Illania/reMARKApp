@@ -276,11 +276,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             DocumentPreview.Addresses.RemoveAll(a => a?.AddressType == AddressType);
             InvokeOnMainThread(() =>
             {
-                DocumentPreview.Addresses = GetEmails().Select(x =>
+                foreach (var da in GetEmails())
                 {
-                    x.AddressType = AddressType;
-                    return x;
-                }).ToList();
+                    da.AddressType = AddressType;
+                    DocumentPreview.Addresses.Add(da);
+                }
 
                 if (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
                 {
