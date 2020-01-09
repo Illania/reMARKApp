@@ -186,26 +186,28 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AppointmentViews
 
         public override void RefreshView()
         {
+            var culture = CultureInfo.InvariantCulture;
+
             string Text;
-            if (base.ViewModel.Start.Date.CompareTo(ViewModel.End.Date) == 0)
+            if (ViewModel.Start.Date.CompareTo(ViewModel.End.Date) == 0)
             {
-                Text = ViewModel.Start.ToString("dddd, d MMMM yyyy", CultureInfo.CurrentCulture);
+                Text = ViewModel.Start.ToString("dddd, d MMMM yyyy", culture);
                 if (ViewModel.AllDay)
                     Text += "\r\nAll Day";
                 else
-                    Text += $"\r\nfrom { ViewModel.Start.ToString("hh:mm", CultureInfo.CurrentCulture) } to { ViewModel.End.ToString("hh:mm", CultureInfo.CurrentCulture) }";
+                    Text += $"\r\nfrom { ViewModel.Start.ToString("hh:mm tt", culture) } to { ViewModel.End.ToString("hh:mm tt", culture) }";
             }
             else
             {
                 if (ViewModel.AllDay)
                 {
-                    Text = $"All day from { ViewModel.Start.ToString("ddd, d MMMM yyyy", CultureInfo.CurrentCulture) } ";
-                    Text += $"\r\nto { ViewModel.End.ToString("ddd, d MMMM yyyy", CultureInfo.CurrentCulture) }";
+                    Text = $"All day from { ViewModel.Start.ToString("ddd, d MMMM yyyy", culture) } ";
+                    Text += $"\r\nto { ViewModel.End.ToString("ddd, d MMMM yyyy", culture) }";
                 }
                 else
                 {
-                    Text = $"from { ViewModel.Start.ToString("hh:mm ddd, d MMMM yyyy", CultureInfo.CurrentCulture) } ";
-                    Text += $"\r\nto { ViewModel.End.ToString("hh:mm ddd, d MMMM yyyy", CultureInfo.CurrentCulture) }";
+                    Text = $"from { ViewModel.Start.ToString("hh:mm tt ddd, d MMMM yyyy", culture) } ";
+                    Text += $"\r\nto { ViewModel.End.ToString("hh:mm tt ddd, d MMMM yyyy", culture) }";
                 }
             }
 

@@ -350,7 +350,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AddEditAppointmentViews
         {
             if (ViewModel != null)
             {
-                DateTextView.Text = date.ToString("ddd, d MMMM yyyy", CultureInfo.CurrentCulture);
+                var culture = CultureInfo.InvariantCulture;
+
+                DateTextView.Text = date.ToString("ddd, d MMMM yyyy", culture);
 
                 if (ViewModel.AllDay)
                 {
@@ -359,7 +361,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AddEditAppointmentViews
                 else
                 {
                     TimeTextView.Visibility = ViewStates.Visible;
-                    TimeTextView.Text = date.ToString("HH:mm ", CultureInfo.CurrentCulture);
+                    TimeTextView.Text = date.ToString("hh:mm tt", culture);
                 }
             }
         }
