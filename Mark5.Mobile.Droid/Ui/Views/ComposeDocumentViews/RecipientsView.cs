@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.Graphics;
-using Android.OS;
 using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Text;
@@ -19,7 +17,6 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Common.Utilities.PortableCollections;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 
@@ -37,7 +34,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         public event EventHandler AddButtonClicked = delegate { };
 
         public bool Empty => (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
-        ? !Validator.ContainsValidEmail(fullEditorText) && !Validator.ContainsValidUsernames(fullEditorText, systemUsersDepartments) : !Validator.ContainsValidEmail(fullEditorText);
+        ? !Validator.ContainsValidEmail(fullEditorText) && !Validator.ContainsValidUsernames(fullEditorText, SystemUsersDepartments) : !Validator.ContainsValidEmail(fullEditorText);
 
         public bool AllRecipientsValid
         {
@@ -45,31 +42,17 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             {
                 return fullEditorText.Split(new[] { RecipientSeperator }, StringSplitOptions.RemoveEmptyEntries)
                                   .All(a => ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable
-                                       ? (Validator.ContainsValidEmails(a) || Validator.ContainsValidUsernames(a, systemUsersDepartments))
+                                       ? (Validator.ContainsValidEmails(a) || Validator.ContainsValidUsernames(a, SystemUsersDepartments))
                                        : Validator.ContainsValidEmails(a));
             }
         }
 
-        public SystemUsersDepartments SystemUsersDepartments
-        {
-            get
-            {
-                return systemUsersDepartments;
-            }
-            set
-            {
-                systemUsersDepartments = value;
-                ((SuggestionsAdapter.SuggestionsFilter)adapter.Filter).SystemUsersDepartments = value;
-            }
-        }
+        public SystemUsersDepartments SystemUsersDepartments { get; set; }
 
         string fullEditorText = string.Empty;
 
         readonly AppCompatMultiAutoCompleteTextView emailEditor;
         readonly DocumentAddressType AddressType;
-
-        SystemUsersDepartments systemUsersDepartments;
-        SuggestionsAdapter adapter;
 
         string savedRecipient;
         bool compressed;
@@ -119,8 +102,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             emailEditor.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
             emailEditor.SetBackgroundColor(Color.Transparent);
 
-            adapter = new SuggestionsAdapter();
-            emailEditor.Adapter = adapter;
+            emailEditor.Adapter = new SuggestionsAdapter();
             emailEditor.SetTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
             emailEditor.Threshold = 2;
             emailEditor.TextSize = 15;
@@ -273,7 +255,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 {
                     foreach (var user in GetInternalUsers())
                     {
-                        var systemUser = systemUsersDepartments.Users.FirstOrDefault(su => String.Equals(su.Username, user, StringComparison.OrdinalIgnoreCase));
+                        var systemUser = SystemUsersDepartments.Users.FirstOrDefault(su => String.Equals(su.Username, user, StringComparison.OrdinalIgnoreCase));
 
                         if (systemUser != null)
                         {
@@ -455,7 +437,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         void SetInternalUsers(string users)
         {
-            if (Validator.ContainsValidUsernames(users, systemUsersDepartments, out IEnumerable<Match> matches))
+            if (Validator.ContainsValidUsernames(users, SystemUsersDepartments, out IEnumerable<Match> matches))
             {
                 var sb = new StringBuilder();
                 sb.Append(string.Join(RecipientSeperator, matches.Select(m => m.Value)));
@@ -472,7 +454,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
         }
 
-        IEnumerable<string> GetInternalUsers() => Validator.ExtractUsernames(fullEditorText, systemUsersDepartments).Select(m => m.Value.Trim()).Distinct().ToList();
+        IEnumerable<string> GetInternalUsers() => Validator.ExtractUsernames(fullEditorText, SystemUsersDepartments).Select(m => m.Value.Trim()).Distinct().ToList();
 
         void Clear()
         {
@@ -622,7 +604,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
                 if (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
                 {
-                    var internalUserMatches = Validator.ExtractUsernames(emailEditor.Text, systemUsersDepartments);
+                    var internalUserMatches = Validator.ExtractUsernames(emailEditor.Text, SystemUsersDepartments);
 
                     foreach (Match match in internalUserMatches)
                     {
@@ -662,188 +644,5 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         }
 
         #endregion
-
-        #region Support class
-
-        public class SuggestionsAdapter : BaseAdapter<Recipient>, IFilterable
-        {
-            readonly SuggestionsObservableCollection suggestions = new SuggestionsObservableCollection();
-
-            public Filter Filter { get; }
-
-            public override int Count => suggestions.Count;
-
-            public string ActualConstraint;
-
-            public SuggestionsAdapter()
-            {
-                Filter = new SuggestionsFilter(this);
-            }
-
-            public override View GetView(int position, View convertView, ViewGroup parent)
-            {
-                var view = convertView ?? LayoutInflater.From(parent.Context).Inflate(Resource.Layout.suggestion_dropdown, parent, false);
-
-                var suggestionNameTextView = view.FindViewById<AppCompatTextView>(Resource.Id.suggestionName);
-                var suggestionAddressTextView = view.FindViewById<AppCompatTextView>(Resource.Id.suggestionAddress);
-                var progressBar = view.FindViewById<ProgressBar>(Resource.Id.suggestionProgressBar);
-                var separator = view.FindViewById<View>(Resource.Id.suggestionSeparator);
-
-                var isLoading = ((SuggestionsFilter)Filter).Loading;
-                var suggestion = suggestions[position];
-
-                separator.Visibility = position == Count - 1 && !isLoading ? ViewStates.Invisible : ViewStates.Visible;
-                progressBar.Visibility = position == Count - 1 && isLoading ? ViewStates.Visible : ViewStates.Gone;
-
-                var name = suggestion.Name;
-                if (!string.IsNullOrEmpty(suggestion.ShortId))
-                    name += " " + suggestion.ShortId;
-                var address = suggestion.Address;
-
-                var colorSelection = new Color(ContextCompat.GetColor(parent.Context, Resource.Color.darkblue));
-
-                var start = address.IndexOf(ActualConstraint, StringComparison.CurrentCultureIgnoreCase);
-                var end = start + ActualConstraint.Length;
-
-                var addressSpannable = new SpannableStringBuilder(address);
-
-                if (start >= 0)
-                    addressSpannable.SetSpan(new ForegroundColorSpan(colorSelection), start, end, SpanTypes.ExclusiveExclusive);
-
-                suggestionAddressTextView.TextFormatted = addressSpannable;
-
-                if (!string.IsNullOrEmpty(name))
-                {
-                    start = name.IndexOf(ActualConstraint, StringComparison.CurrentCultureIgnoreCase);
-                    end = start + ActualConstraint.Length;
-
-                    var nameSpannable = new SpannableStringBuilder(name);
-
-                    if (start >= 0)
-                        nameSpannable.SetSpan(new ForegroundColorSpan(colorSelection), start, end, SpanTypes.ExclusiveExclusive);
-
-                    suggestionNameTextView.TextFormatted = nameSpannable;
-                }
-
-                if (string.IsNullOrEmpty(name))
-                {
-                    suggestionNameTextView.Visibility = ViewStates.Gone;
-
-                    suggestionAddressTextView.TextSize = 18;
-                }
-                else
-                {
-                    suggestionNameTextView.Visibility = ViewStates.Visible;
-
-                    suggestionNameTextView.TextSize = 18;
-                    suggestionAddressTextView.TextSize = 15;
-                }
-
-                return view;
-            }
-
-            public override long GetItemId(int position)
-            {
-                return suggestions[position].GetHashCode();
-            }
-
-            public override Recipient this[int position] => suggestions[position];
-
-            public void AddSuggestions(List<Recipient> newSuggestions)
-            {
-                new Handler(Looper.MainLooper).Post(() =>
-                {
-                    suggestions.AddOrReplaceAllSorted(newSuggestions ?? new List<Recipient>());
-                    NotifyDataSetChanged();
-                });
-            }
-
-            public void Clean()
-            {
-                new Handler(Looper.MainLooper).Post(() =>
-                {
-                    suggestions.Clear();
-                    NotifyDataSetInvalidated();
-                });
-            }
-
-            public class SuggestionsFilter : Filter
-            {
-                public bool Loading => answersReceived < 3;
-                public SystemUsersDepartments SystemUsersDepartments { get; set; }
-
-                readonly SuggestionsAdapter suggestionsAdapter;
-
-                CancellationTokenSource searchCancellationTokenSource;
-                List<IDisposable> searchCancellationTokenSources = new List<IDisposable>();
-
-                int answersReceived;
-
-                public SuggestionsFilter(SuggestionsAdapter suggestionsAdapter)
-                {
-                    this.suggestionsAdapter = suggestionsAdapter;
-                }
-
-                #region Overrides
-
-                protected override FilterResults PerformFiltering(Java.Lang.ICharSequence constraint)
-                {
-                    if (searchCancellationTokenSource != null)
-                    {
-                        searchCancellationTokenSource.Cancel();
-                        searchCancellationTokenSource = null;
-                    }
-
-                    suggestionsAdapter.Clean();
-
-                    if (constraint != null)
-                    {
-                        answersReceived = 0;
-
-                        suggestionsAdapter.ActualConstraint = constraint.ToString();
-                        searchCancellationTokenSource = new CancellationTokenSource();
-                        searchCancellationTokenSources.Add(searchCancellationTokenSource);
-                        RecipentSuggestions.GetSuggestions(suggestionsAdapter.ActualConstraint, SystemUsersDepartments, searchCancellationTokenSource.Token, HandleSuggestions);
-                    }
-                    else
-                    {
-                        searchCancellationTokenSources.ForEach(id => id.Dispose());
-                        searchCancellationTokenSources.Clear();
-                    }
-
-                    return null;
-                }
-
-                protected override void PublishResults(Java.Lang.ICharSequence constraint, FilterResults results)
-                {
-                    //Nothing to do here 
-                }
-
-                #endregion
-
-                #region SuggestionService handlers
-
-                void HandleSuggestions(List<Recipient> newSuggestions, CancellationToken token)
-                {
-                    if (token.IsCancellationRequested)
-                        return;
-
-                    answersReceived += 1;
-                    suggestionsAdapter.AddSuggestions(newSuggestions);
-                }
-
-                #endregion
-            }
-
-            #endregion
-        }
-
-        public class SuggestionsObservableCollection : SortedObservableCollection<Recipient>
-        {
-            public SuggestionsObservableCollection()
-                : base(Recipient.LookupComparison, Recipient.SortingComparison)
-            {
-            }
-        }
     }
 }

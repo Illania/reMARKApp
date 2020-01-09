@@ -256,8 +256,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             CommonConfig.Logger.Info($"Resuming {nameof(ComposeDocumentFragment)}...");
 
-            if (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
-                await LoadSystemUsersDepartments();
             await LoadDocument();
 
             CommonConfig.Logger.Info($"Resumed {nameof(ComposeDocumentFragment)}...");
@@ -345,25 +343,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             toView.AddEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.To).Select(da => da.Address), true);
             ccView.AddEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Cc).Select(da => da.Address), true);
             bccView.AddEmails(addresses.Where(da => da.Type == CommunicationAddressType.Email && da.AddressType == DocumentAddressType.Bcc).Select(da => da.Address), true);
-        }
-
-        async Task LoadSystemUsersDepartments()
-        {
-            SystemUsersDepartments systemUsersDepartments = null;
-
-            try
-            {
-                systemUsersDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync(SourceType.Local);
-                systemUsersDepartments.Users.Add(ServerConfig.SystemSettings.UserInfo.User);
-            }
-            catch (Exception ex)
-            {
-                CommonConfig.Logger.Error("Error while retrieving system users.", ex);
-            }
-
-            toView.SystemUsersDepartments = systemUsersDepartments;
-            ccView.SystemUsersDepartments = systemUsersDepartments;
-            bccView.SystemUsersDepartments = systemUsersDepartments;
         }
 
         async Task LoadDocument()

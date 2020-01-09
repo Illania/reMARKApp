@@ -570,6 +570,7 @@
     <Compile Include="Ui\Fragments\Calendar\AddEditAppointmentFragment.cs" />
     <Compile Include="Ui\Fragments\Calendar\AddEditParticipantsFragment.cs" />
     <Compile Include="Ui\Fragments\Calendar\AddEditAppointmentCalendarListFragment.cs" />
+    <Compile Include="Ui\Common\SuggestionsAdapter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

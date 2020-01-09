@@ -21,10 +21,10 @@
             android:layout_height="wrap_content"
             android:scrollbars="none"
             android:fadeScrollbars="false">
-            <android.support.v7.widget.AppCompatEditText
+            <android.support.v7.widget.AppCompatAutoCompleteTextView
                 android:id="@+id/participant_text"
                 android:layout_marginStart="10dp"
-                android:hint="Add Email"
+                android:hint="Add participant"
                 android:textSize="@dimen/abc_text_size_menu_material"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
