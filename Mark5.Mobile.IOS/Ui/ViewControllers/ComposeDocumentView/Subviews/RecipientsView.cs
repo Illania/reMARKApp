@@ -44,8 +44,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         public event EventHandler CommaOrEnterPressed = delegate { };
         public event EventHandler AddButtonTapped = delegate { };
 
-        List<DocumentAddress> addresses;
-
         public RecipientsView(DocumentAddressType type, bool hideAddButton = false)
         {
             AddressType = type;
@@ -141,8 +139,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             textViewTapGestureRecognizer = new UITapGestureRecognizer();
             textViewTapGestureRecognizer.AddTarget(HandleTextTapped);
             textViewTapGestureRecognizer.NumberOfTapsRequired = 1;
-
-            addresses = new List<DocumentAddress>();
         }
 
         protected string GetTitleFromAddressType()

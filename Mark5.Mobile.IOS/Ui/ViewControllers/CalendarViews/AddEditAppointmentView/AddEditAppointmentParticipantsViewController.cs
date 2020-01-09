@@ -11,10 +11,12 @@ using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
+using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 {
-    public class AddEditAppointmentParticipantsViewController : AbstractTableViewController, IUITableViewDelegate
+    public class AddEditAppointmentParticipantsViewController : AbstractViewController, IUITableViewDelegate
     {
         readonly TaskCompletionSource<List<ParticipantsViewModel>> tcs = new TaskCompletionSource<List<ParticipantsViewModel>>();
         public Task<List<ParticipantsViewModel>> Result => tcs.Task;
@@ -25,6 +27,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         UIButton addButton;
 
         AddEditAppointmentViewModel viewModel;
+        SuggestionsListView suggestionsListView;
+
+        UITableView TableView;
 
         public AddEditAppointmentParticipantsViewController(AddEditAppointmentViewModel viewModel)
         {
@@ -106,6 +111,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         void InitializeView()
         {
+            TableView = new UITableView();
+            TableView.TranslatesAutoresizingMaskIntoConstraints = false;
             TableView.Source = new DataSource(TableView);
             TableView.AllowsSelection = true;
             TableView.AllowsMultipleSelection = true;
@@ -114,6 +121,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             TableView.EstimatedRowHeight = 40f;
             TableView.TableHeaderView = GetHeader();
             TableView.Delegate = this;
+
+            View.AddSubview(TableView);
+
+            View.AddConstraints(new[]
+            {
+                TableView.TopAnchor.ConstraintEqualTo(View.TopAnchor),
+                TableView.BottomAnchor.ConstraintEqualTo(View.BottomAnchor),
+                TableView.LeftAnchor.ConstraintEqualTo(View.LeftAnchor),
+                TableView.RightAnchor.ConstraintEqualTo(View.RightAnchor),
+            });
 
             EdgesForExtendedLayout = UIRectEdge.None;
         }
@@ -188,9 +205,64 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         void Field_EditingChanged(object sender, EventArgs e)
         {
             addButton.Enabled = Validator.IsEmailValid(field.Text);
+
+            var initialSearchString = field.Text;
+            if (string.IsNullOrEmpty(initialSearchString))
+                return;
+
+            if (suggestionsListView == null)
+            {
+                suggestionsListView = new SuggestionsListView(this, true);
+
+                View.AddSubview(suggestionsListView);
+                View.AddConstraints(new[]
+                {
+                    suggestionsListView.TopAnchor.ConstraintEqualTo(View.TopAnchor),
+                    suggestionsListView.LeftAnchor.ConstraintEqualTo(View.LeftAnchor),
+                    suggestionsListView.RightAnchor.ConstraintEqualTo(View.RightAnchor),
+                    suggestionsListView.BottomAnchor.ConstraintEqualTo(View.BottomAnchor)
+                });
+
+                View.SendSubviewToBack(suggestionsListView);
+            }
+
+            suggestionsListView.Initialize(null, initialSearchString);
+            suggestionsListView.ShouldDisappear -= SuggestionsListView_ShouldDisappear;
+            suggestionsListView.ShouldDisappear += SuggestionsListView_ShouldDisappear;
+
+            suggestionsListView.EnterPressed -= SuggestionsListView_EnterPressed;
+            suggestionsListView.EnterPressed += SuggestionsListView_EnterPressed;
+
+            suggestionsListView.RecipientClicked -= SuggestionsListView_RecipientClicked;
+            suggestionsListView.RecipientClicked += SuggestionsListView_RecipientClicked;
+
+
+            View.BringSubviewToFront(suggestionsListView);
         }
 
-        public override UISwipeActionsConfiguration GetTrailingSwipeActionsConfiguration(UITableView tableView, NSIndexPath indexPath)
+        #region Suggestions methods  //TODO move afterwards
+
+        void SuggestionsListView_RecipientClicked(object sender, Recipient e)
+        {
+            AddRecipients(e);
+        }
+
+        void SuggestionsListView_EnterPressed(object sender, string e)
+        {
+            field.Text = e.Trim().TrimEnd(',');
+            addButton.Enabled = Validator.IsEmailValid(field.Text);
+        }
+
+        void SuggestionsListView_ShouldDisappear(object sender, EventArgs e)
+        {
+            View.SendSubviewToBack(suggestionsListView);
+            ((SuggestionsListView)sender).ShouldDisappear -= SuggestionsListView_ShouldDisappear;
+        }
+
+        #endregion
+
+        [Export("tableView:trailingSwipeActionsConfigurationForRowAtIndexPath:")]
+        public UISwipeActionsConfiguration GetTrailingSwipeActionsConfiguration(UITableView tableView, NSIndexPath indexPath)
         {
             var deleteAction = UIContextualAction.FromContextualActionStyle(UIContextualActionStyle.Destructive, "Delete", (someAction, view, success) =>
             {
@@ -252,19 +324,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         {
             var vc = new PhonebookContactsListViewController();
             PresentViewController(new NavigationController(vc), true, null);
-
             var pa = await vc.Result;
-            if (pa != null)
-            {
-                viewModel.Participants.Add(new ParticipantsViewModel
-                {
-                    Name = pa.Name,
-                    Email = pa.Address,
-                    Status = Mobile.Common.Model.ParticipantStatus.NeedAction,
-                    Type = Mobile.Common.Model.ParticipantType.ComAddress
-                });
-                RefreshData();
-            }
+            AddRecipients(pa);
         }
 
         async Task DoOpenRecents()
@@ -272,18 +333,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             var vc = new RecentAddressesListViewController();
             PresentViewController(new NavigationController(vc), true, null);
             var pa = await vc.Result;
-            if (pa != null)
-            {
-                viewModel.Participants.Add(new ParticipantsViewModel
-                {
-                    Id = pa.Id,
-                    Name = pa.Name,
-                    Email = pa.Address,
-                    Status = Mobile.Common.Model.ParticipantStatus.NeedAction,
-                    Type = Mobile.Common.Model.ParticipantType.ComAddress
-                });
-                RefreshData();
-            }
+            AddRecipients(pa);
         }
 
         async Task DoOpenContacts()
@@ -291,18 +341,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             var vc = new PickerContactsFoldersListViewController();
             PresentViewController(new NavigationController(vc), true, null);
             var pa = await vc.Result;
-            if (pa != null)
-            {
-                viewModel.Participants.Add(new ParticipantsViewModel
-                {
-                    Id = pa.Id,
-                    Name = pa.Name,
-                    Email = pa.Address,
-                    Status = Mobile.Common.Model.ParticipantStatus.NeedAction,
-                    Type = Mobile.Common.Model.ParticipantType.Client
-                });
-                RefreshData();
-            }
+            AddRecipients(pa);
         }
 
         async Task DoOpenInternalContacts()
@@ -311,19 +350,74 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             vc.IncludeCurrentUser = false;
             PresentViewController(new NavigationController(vc), true, null);
             var pa = await vc.Result;
-            if (pa != null)
+            foreach (var su in pa)
+                viewModel.Participants.Add(new ParticipantsViewModel
+                {
+                    Id = su.Id,
+                    Name = su.Username,
+                    Email = string.Empty,
+                    Status = ParticipantStatus.NeedAction,
+                    Type = ParticipantType.User
+                });
+            RefreshData();
+        }
+
+        void AddRecipients(params Recipient[] recipients)
+        {
+            if (recipients == null)
+                return;
+
+            foreach (var pa in recipients)
             {
-                foreach (var su in pa)
-                    viewModel.Participants.Add(new ParticipantsViewModel
-                    {
-                        Id = su.Id,
-                        Name = su.Username,
-                        Email = string.Empty,
-                        Status = Mobile.Common.Model.ParticipantStatus.NeedAction,
-                        Type = Mobile.Common.Model.ParticipantType.User
-                    });
-                RefreshData();
+                ParticipantsViewModel pvm = null;
+                switch (pa.Type)
+                {
+                    case RecipientType.Phonebook:
+                        pvm = new ParticipantsViewModel
+                        {
+                            Name = pa.Name,
+                            Email = pa.Address,
+                            Status = ParticipantStatus.NeedAction,
+                            Type = ParticipantType.ComAddress
+                        };
+                        break;
+                    case RecipientType.Contact:
+                        pvm = new ParticipantsViewModel
+                        {
+                            Id = pa.Id,
+                            Name = pa.Name,
+                            Email = pa.Address,
+                            Status = ParticipantStatus.NeedAction,
+                            Type = ParticipantType.Client
+                        };
+                        break;
+                    case RecipientType.RecentAddress:
+                        pvm = new ParticipantsViewModel
+                        {
+                            Id = pa.Id,
+                            Name = pa.Name,
+                            Email = pa.Address,
+                            Status = ParticipantStatus.NeedAction,
+                            Type = ParticipantType.ComAddress
+                        };
+                        break;
+                    case RecipientType.Internal:
+                        pvm = new ParticipantsViewModel
+                        {
+                            Id = pa.Id,
+                            Name = pa.Address,
+                            Email = string.Empty,
+                            Status = ParticipantStatus.NeedAction,
+                            Type = ParticipantType.User
+                        };
+                        break;
+                }
+
+                viewModel.Participants.Add(pvm);
             }
+
+            field.Text = string.Empty;
+            RefreshData();
         }
 
         void RefreshData()
