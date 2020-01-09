@@ -7,7 +7,6 @@ using Android.Support.V7.App;
 using Android.Views;
 using Com.Syncfusion.Schedule;
 using Com.Syncfusion.Schedule.Enums;
-using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 {
@@ -25,21 +24,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             return (fragment, tag);
         }
 
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        protected override void SetSchedule()
         {
-            HasOptionsMenu = true;
-
-            (Activity as BaseAppCompatActivity).Fab.Visibility = ViewStates.Gone;
-
-            if (schedule == null)
-            {
-                schedule = new MonthSchedule(Context);
-                schedule.CellDoubleTapped += Schedule_CellDoubleTapped;
-                schedule.HeaderTapped += Schedule_HeaderTapped;
-                schedule.MonthInlineAppointmentTapped += Schedule_MonthInlineAppointmentTapped;
-            }
-
-            return schedule;
+            schedule = new MonthSchedule(Context);
+            schedule.LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.MatchParent);
+            schedule.CellDoubleTapped += Schedule_CellDoubleTapped;
+            schedule.HeaderTapped += Schedule_HeaderTapped;
+            schedule.MonthInlineAppointmentTapped += Schedule_MonthInlineAppointmentTapped;
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
@@ -52,14 +43,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             refresh.SetOnMenuItemClickListener(this);
 
             var calendarSelection = menu.Add(Menu.None, MenuItemActions.CalendarSelection, MenuItemActions.CalendarSelection, Resource.String.calendars);
-            calendarSelection.SetIcon(Resource.Drawable.calendar);
+            calendarSelection.SetIcon(Resource.Drawable.calendar_list);
             calendarSelection.SetShowAsAction(ShowAsAction.Always);
             calendarSelection.SetOnMenuItemClickListener(this);
 
-            var addAppointment = menu.Add(Menu.None, MenuItemActions.CreateAppointment, MenuItemActions.CreateAppointment, Resource.String.add_appointment);
-            addAppointment.SetIcon(Resource.Drawable.add_appointment);
-            addAppointment.SetShowAsAction(ShowAsAction.Always);
-            addAppointment.SetOnMenuItemClickListener(this);
+            var goToToday = menu.Add(Menu.None, MenuItemActions.Today, MenuItemActions.Today, Resource.String.today);
+            goToToday.SetIcon(Resource.Drawable.today);
+            goToToday.SetShowAsAction(ShowAsAction.Always);
+            goToToday.SetOnMenuItemClickListener(this);
         }
 
         public bool OnMenuItemClick(IMenuItem item)
@@ -70,8 +61,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             if (item.ItemId == MenuItemActions.CalendarSelection)
                 coordinator.CalendarsClicked();
 
-            if (item.ItemId == MenuItemActions.CreateAppointment)
-                coordinator.CreateAppointmentClicked(schedule.SelectedDate);
+            if (item.ItemId == MenuItemActions.Today)
+                MoveToDate(Java.Util.Calendar.Instance);
 
             return true;
         }
@@ -90,6 +81,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
             coordinator.RefreshClicked(startDate, endDate);
         }
+
         void Schedule_MonthInlineAppointmentTapped(object sender, MonthInlineAppointmentTappedEventArgs e)
         {
             coordinator.AppointmentTapped(e.ScheduleAppointment);
@@ -109,7 +101,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         {
             public const int Refresh = 10;
             public const int CalendarSelection = 20;
-            public const int CreateAppointment = 30;
+            public const int Today = 30;
         }
     }
 

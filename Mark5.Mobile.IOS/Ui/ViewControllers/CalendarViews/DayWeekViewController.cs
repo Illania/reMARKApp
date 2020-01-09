@@ -9,6 +9,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 {
     public class DayWeekViewController : CalendarViewController
     {
+        UIBarButtonItem todayButton;
         UIBarButtonItem addButtonItem;
         UIBarButtonItem switchButtonItem;
 
@@ -69,6 +70,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             if (addButtonItem != null)
                 addButtonItem.Clicked += AddButtonItem_Clicked;
 
+            if (todayButton != null)
+                todayButton.Clicked += TodayButtonItem_Clicked;
+
             if (switchButtonItem != null)
                 switchButtonItem.Clicked += ScheduleSwitchBtn_Clicked;
         }
@@ -85,6 +89,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             if (addButtonItem != null)
                 addButtonItem.Clicked -= AddButtonItem_Clicked;
+
+            if (todayButton != null)
+                todayButton.Clicked -= TodayButtonItem_Clicked;
 
             if (switchButtonItem != null)
                 switchButtonItem.Clicked -= ScheduleSwitchBtn_Clicked;
@@ -115,6 +122,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             switchButtonItem = new UIBarButtonItem();
 
             NavigationItem.SetRightBarButtonItems(new UIBarButtonItem[] { addButtonItem, switchButtonItem }, false);
+
+            todayButton = new UIBarButtonItem
+            {
+                Title = Localization.GetString("today"),
+            };
+
+            NavigationItem.LeftItemsSupplementBackButton = true;
+
+            NavigationItem.SetLeftBarButtonItem(todayButton, true);
+
             UpdateSwitchButtonTitle();
         }
 
@@ -132,6 +149,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             var endDate = schedule.VisibleDates.GetItem<NSDate>(schedule.VisibleDates.Count - 1);
 
             Coordinator.VisibleDatesChanged(startDate, endDate);
+        }
+
+        void TodayButtonItem_Clicked(object sender, EventArgs e)
+        {
+            MoveToDate(NSDate.Now);
         }
 
         void AddButtonItem_Clicked(object sender, EventArgs e)
