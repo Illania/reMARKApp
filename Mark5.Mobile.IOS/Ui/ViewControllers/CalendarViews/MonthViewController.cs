@@ -10,6 +10,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
     public class MonthViewController : CalendarViewController
     {
         UIBarButtonItem yearButton;
+        UIBarButtonItem todayButton;
         UIBarButtonItem calendarsButton;
         UIBarButtonItem createAppointmentsButton;
         UIBarButtonItem refreshButton;
@@ -67,6 +68,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             if (yearButton != null)
                 yearButton.Clicked += YearButtonItem_Clicked;
 
+            if (todayButton != null)
+                todayButton.Clicked += TodayButtonItem_Clicked;
+
             if (createAppointmentsButton != null)
                 createAppointmentsButton.Clicked += CreateAppointmentButtonItem_Clicked;
 
@@ -91,6 +95,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             if (yearButton != null)
                 yearButton.Clicked -= YearButtonItem_Clicked;
 
+            if (todayButton != null)
+                todayButton.Clicked -= TodayButtonItem_Clicked;
+
             if (createAppointmentsButton != null)
                 createAppointmentsButton.Clicked -= CreateAppointmentButtonItem_Clicked;
 
@@ -108,7 +115,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 Title = Localization.GetString("year"),
             };
 
-            NavigationItem.SetLeftBarButtonItem(yearButton, true);
+            todayButton = new UIBarButtonItem
+            {
+                Title = Localization.GetString("today"),
+            };
+
+            NavigationItem.SetLeftBarButtonItems(new UIBarButtonItem[] { yearButton, todayButton }, true);
 
             createAppointmentsButton = new UIBarButtonItem
             {
@@ -162,6 +174,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         void YearButtonItem_Clicked(object sender, EventArgs e)
         {
             GoToYear();
+        }
+
+        void TodayButtonItem_Clicked(object sender, EventArgs e)
+        {
+            MoveToDate(NSDate.Now);
         }
 
         void CreateAppointmentButtonItem_Clicked(object sender, EventArgs e)

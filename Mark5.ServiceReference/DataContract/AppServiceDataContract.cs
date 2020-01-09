@@ -2039,6 +2039,7 @@ namespace Mark5.ServiceReference.DataContract
         [EnumMember(Value = "CreateOrUpdateReminder")] CreateOrUpdateReminder = 4,
         [EnumMember(Value = "DeleteReminderIfExists")] DeleteReminderIfExists = 5,
         [EnumMember(Value = "Invited")] Invited = 6,
+        [EnumMember(Value = "TransmitFailed")] TransmitFailed = 7
     }
 
     [DataContract(Name = "DeviceType", Namespace = "com.nordic-it.appservice.v3")]

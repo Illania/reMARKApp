@@ -101,6 +101,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         {
             base.ViewWillAppear(animated);
 
+            if (UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
+                ModalInPresentation = true;
+
             InitializeHandlers();
         }
 
