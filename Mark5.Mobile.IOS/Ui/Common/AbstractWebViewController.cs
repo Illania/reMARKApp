@@ -552,6 +552,12 @@ namespace Mark5.Mobile.IOS.Ui.Common
             {
                 var htmlDocument = new HtmlDocument();
                 htmlDocument.LoadHtml(html);
+
+                //M5APP-920
+                var titleTag = htmlDocument.DocumentNode.SelectSingleNode("//head/title");
+                if (titleTag != null && string.IsNullOrEmpty(titleTag.InnerHtml))
+                    titleTag.InnerHtml = "\n";
+
                 var dn = htmlDocument.DocumentNode;
 
                 var nodesToRemove = new List<HtmlNode>();
