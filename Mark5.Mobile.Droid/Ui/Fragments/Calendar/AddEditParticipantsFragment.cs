@@ -27,7 +27,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         List<ParticipantsViewModel> participants = new List<ParticipantsViewModel>();
 
         AppCompatButton addButton;
-        AppCompatEditText participantTextView;
+        AppCompatAutoCompleteTextView participantTextView;
+        SuggestionsAdapter suggestionsAdapter;
 
         readonly TaskCompletionSource<List<ParticipantsViewModel>> tcs = new TaskCompletionSource<List<ParticipantsViewModel>>();
         public Task<List<ParticipantsViewModel>> TaskResult => tcs.Task;
@@ -71,9 +72,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             addButton.Enabled = false;
             UpdateAddButton();
 
-            participantTextView = rootView.FindViewById<AppCompatEditText>(Resource.Id.participant_text);
+            participantTextView = rootView.FindViewById<AppCompatAutoCompleteTextView>(Resource.Id.participant_text);
+            suggestionsAdapter = new SuggestionsAdapter(true);
 
             participantTextView.TextChanged += ParticipantTextView_TextChanged;
+            participantTextView.ItemClick += ParticipantTextView_ItemClick;
+            participantTextView.Adapter = suggestionsAdapter;
 
             var emptyView = rootView.FindViewById<AppCompatTextView>(Resource.Id.empty_view);
             emptyView.SetText(Resource.String.no_participants);
@@ -128,53 +132,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         public override void OnActivityResult(int requestCode, int resultCode, Intent data)
         {
-            ParticipantsViewModel newParticipant = null;
+            Recipient recipient = null;
 
             if (requestCode == RequestCodes.RecentAddressesRequestCode && resultCode == (int)Result.Ok)
-            {
-                var recipient = Serializer.Deserialize<Recipient>(data.GetStringExtra(RecentAddressesListActivity.RecipientResultKey));
-                newParticipant = new ParticipantsViewModel
-                {
-                    Id = recipient.Id,
-                    Email = recipient.Address,
-                    Name = recipient.Name,
-                    Status = ParticipantStatus.NeedAction,
-                    Type = ParticipantType.ComAddress
-                };
-            }
+                recipient = Serializer.Deserialize<Recipient>(data.GetStringExtra(RecentAddressesListActivity.RecipientResultKey));
             else if (requestCode == RequestCodes.PhonebookRequestCode && resultCode == (int)Result.Ok)
-            {
-                var recipient = Serializer.Deserialize<Recipient>(data.GetStringExtra(PhonebookContactsListActivity.RecipientResultKey));
-                newParticipant = new ParticipantsViewModel
-                {
-                    Name = recipient.Name,
-                    Email = recipient.Address,
-                    Status = ParticipantStatus.NeedAction,
-                    Type = ParticipantType.ComAddress
-                };
-            }
+                recipient = Serializer.Deserialize<Recipient>(data.GetStringExtra(PhonebookContactsListActivity.RecipientResultKey));
             else if (requestCode == RequestCodes.ContactsRequestCode && resultCode == (int)Result.Ok)
-            {
-                var recipient = Serializer.Deserialize<Recipient>(data.GetStringExtra(PickerContactFolderListActivity.RecipientResultKey));
-                newParticipant = new ParticipantsViewModel
-                {
-                    Id = recipient.Id,
-                    Name = recipient.Name,
-                    Email = recipient.Address,
-                    Status = ParticipantStatus.NeedAction,
-                    Type = ParticipantType.Client
-                };
-            }
+                recipient = Serializer.Deserialize<Recipient>(data.GetStringExtra(PickerContactFolderListActivity.RecipientResultKey));
 
-            if (newParticipant != null)
-            {
-                participants.Add(newParticipant);
-                adapter.AddItem(newParticipant);
-            }
+            if (recipient != null)
+                AddRecipient(recipient);
 
             if (requestCode == RequestCodes.InternalContactsRequestCode && resultCode == (int)Result.Ok)
             {
                 var users = Serializer.Deserialize<List<SystemUser>>(data.GetStringExtra(PickerInternalContactsListActivity.RecipientResultKey));
+                var ps = new List<ParticipantsViewModel>();
                 foreach (var user in users)
                 {
                     var participant = new ParticipantsViewModel
@@ -185,9 +158,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                         Status = ParticipantStatus.NeedAction,
                         Type = ParticipantType.User
                     };
-                    participants.Add(participant);
-                    adapter.AddItem(participant);
+                    ps.Add(participant);
                 }
+                AddParticipants(ps.ToArray());
             }
         }
 
@@ -220,9 +193,86 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 Type = ParticipantType.ComAddress
             };
 
-            participants.Add(participant);
-            adapter.AddItem(participant);
+            AddParticipants(participant);
+        }
 
+        void ParticipantTextView_ItemClick(object sender, Android.Widget.AdapterView.ItemClickEventArgs e)
+        {
+            AddRecipient(suggestionsAdapter[e.Position]);
+        }
+
+        void AddRecipient(Recipient recipient)
+        {
+            ParticipantsViewModel newParticipant = null;
+            switch (recipient.Type)
+            {
+                case RecipientType.RecentAddress:
+                    newParticipant = new ParticipantsViewModel
+                    {
+                        Id = recipient.Id,
+                        Email = recipient.Address,
+                        Name = recipient.Name,
+                        Status = ParticipantStatus.NeedAction,
+                        Type = ParticipantType.ComAddress
+                    };
+                    break;
+                case RecipientType.Unknown:
+                    newParticipant = new ParticipantsViewModel
+                    {
+                        Email = recipient.Address,
+                        Name = recipient.Name,
+                        Status = ParticipantStatus.NeedAction,
+                        Type = ParticipantType.ComAddress
+                    };
+                    break;
+                case RecipientType.Phonebook:
+                    newParticipant = new ParticipantsViewModel
+                    {
+                        Name = recipient.Name,
+                        Email = recipient.Address,
+                        Status = ParticipantStatus.NeedAction,
+                        Type = ParticipantType.ComAddress
+                    };
+                    break;
+                case RecipientType.Contact:
+                    newParticipant = new ParticipantsViewModel
+                    {
+                        Id = recipient.Id,
+                        Name = recipient.Name,
+                        Email = recipient.Address,
+                        Status = ParticipantStatus.NeedAction,
+                        Type = ParticipantType.Client
+                    };
+                    break;
+                case RecipientType.Internal:
+                    newParticipant = new ParticipantsViewModel
+                    {
+                        Id = recipient.Id,
+                        Name = recipient.Address,
+                        Email = string.Empty,
+                        Status = ParticipantStatus.NeedAction,
+                        Type = ParticipantType.User
+                    };
+                    break;
+            }
+
+            if (newParticipant != null)
+                AddParticipants(newParticipant);
+        }
+
+        void AddParticipants(params ParticipantsViewModel[] pvms)
+        {
+            foreach (var pvm in pvms)
+            {
+                participants.Add(pvm);
+                adapter.AddItem(pvm);
+            }
+
+            Reset();
+        }
+
+        void Reset()
+        {
             participantTextView.Text = string.Empty;
             addButton.Enabled = false;
             UpdateAddButton();

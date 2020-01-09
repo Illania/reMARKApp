@@ -479,6 +479,7 @@ namespace Mark5.Mobile.Common.DataAccess
                     suggestions = result;
                 });
 
+                suggestions.ForEach(s => s.Type = RecipientType.Contact);
                 return suggestions;
             }
             catch

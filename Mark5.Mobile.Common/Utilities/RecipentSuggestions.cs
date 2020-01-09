@@ -11,15 +11,15 @@ namespace Mark5.Mobile.Common.Utilities
 {
     public static class RecipentSuggestions
     {
-        public static void GetSuggestions(string phrase, SystemUsersDepartments systemUsersDepartments, CancellationToken token, Action<List<Recipient>, CancellationToken> handler)
+        public static void GetSuggestions(string phrase, CancellationToken token, Action<List<Recipient>, CancellationToken> handler, bool includeSystemUsers = false)
         {
             if (token.IsCancellationRequested)
                 return;
 
             GetSuggestionFromRecentAddresses(phrase, token, handler);
             GetSuggestionFromContacts(phrase, token, handler);
-            if (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
-                GetSuggestionFromInternalContacts(phrase, systemUsersDepartments, token, handler);
+            if (includeSystemUsers)
+                GetSuggestionFromInternalContacts(phrase, token, handler);
             GetSuggestionFromPhonebook(phrase, token, handler);
         }
 
@@ -76,17 +76,16 @@ namespace Mark5.Mobile.Common.Utilities
             });
         }
 
-        static void GetSuggestionFromInternalContacts(string phrase, SystemUsersDepartments systemUsersDepartments, CancellationToken token, Action<List<Recipient>, CancellationToken> handler)
+        static void GetSuggestionFromInternalContacts(string phrase, CancellationToken token, Action<List<Recipient>, CancellationToken> handler)
         {
             if (token.IsCancellationRequested)
                 return;
 
-            if (systemUsersDepartments == null)
-                return;
-
-            Task.Run(() =>
+            Task.Run(async () =>
             {
                 var filtered = new List<Recipient>();
+
+                var systemUsersDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync(SourceType.Local);
 
                 var matchingInternalUsers = systemUsersDepartments.Users.FindAll(user => user.FirstName.ContainsCaseInsensitive(phrase) || user.LastName.ContainsCaseInsensitive(phrase) || user.Username.ContainsCaseInsensitive(phrase));
 
