@@ -705,9 +705,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         protected void UpdateUI(DateTime date)
         {
+            var culture = CultureInfo.InvariantCulture;
+
             if (ViewModel != null)
             {
-                DateTextView.Text = date.ToString("ddd, d MMMM yyyy", CultureInfo.CurrentCulture);
+                DateTextView.Text = date.ToString("ddd, d MMMM yyyy", culture);
 
                 if (ViewModel.AllDay)
                 {
@@ -716,7 +718,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 else
                 {
                     TimeTextView.Visibility = ViewStates.Visible;
-                    TimeTextView.Text = date.ToString("HH:mm ", CultureInfo.CurrentCulture);
+                    TimeTextView.Text = date.ToString("hh:mm tt", culture);
                 }
             }
         }

@@ -331,7 +331,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 timePicker.Minute = initialMinute;
             }
 
-            timePicker.SetIs24HourView((Java.Lang.Boolean)true);
+            timePicker.SetIs24HourView((Java.Lang.Boolean)false);
 
             var builder = new MaterialDialog.Builder(context);
             builder.CustomView(timePicker, false);

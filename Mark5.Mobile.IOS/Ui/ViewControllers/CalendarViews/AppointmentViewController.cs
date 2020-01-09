@@ -517,25 +517,27 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             public void Refresh(AppointmentViewModel viewModel)
             {
+                var culture = CultureInfo.InvariantCulture;
+
                 if (viewModel.Start.Date.CompareTo(viewModel.End.Date) == 0)
                 {
-                    Text += viewModel.Start.ToString("dddd, d MMMM yyyy", CultureInfo.CurrentCulture);
+                    Text += viewModel.Start.ToString("dddd, d MMMM yyyy", culture);
                     if (viewModel.AllDay)
                         Text += "\r\nAll Day";
                     else
-                        Text += $"\r\nfrom { viewModel.Start.ToString("hh:mm", CultureInfo.CurrentCulture) } to { viewModel.End.ToString("hh:mm", CultureInfo.CurrentCulture) }";
+                        Text += $"\r\nfrom { viewModel.Start.ToString("hh:mm tt", culture) } to { viewModel.End.ToString("hh:mm tt", culture) }";
                 }
                 else
                 {
                     if (viewModel.AllDay)
                     {
-                        Text = $"All day from { viewModel.Start.ToString("ddd, d MMMM yyyy", CultureInfo.CurrentCulture) } ";
-                        Text += $"\r\nto { viewModel.End.ToString("ddd, d MMMM yyyy", CultureInfo.CurrentCulture) }";
+                        Text = $"All day from { viewModel.Start.ToString("ddd, d MMMM yyyy", culture) } ";
+                        Text += $"\r\nto { viewModel.End.ToString("ddd, d MMMM yyyy", culture) }";
                     }
                     else
                     {
-                        Text = $"from { viewModel.Start.ToString("hh:mm ddd, d MMMM yyyy", CultureInfo.CurrentCulture) } ";
-                        Text += $"\r\nto { viewModel.End.ToString("hh:mm ddd, d MMMM yyyy", CultureInfo.CurrentCulture) }";
+                        Text = $"from { viewModel.Start.ToString("hh:mm tt ddd, d MMMM yyyy", culture) } ";
+                        Text += $"\r\nto { viewModel.End.ToString("hh:mm tt ddd, d MMMM yyyy", culture) }";
                     }
                 }
 
