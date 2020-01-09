@@ -561,7 +561,6 @@
     <Compile Include="Ui\Fragments\Calendar\YearCalendarFragment.cs" />
     <Compile Include="Ui\Coordinators\CalendarCoordinator.cs" />
     <Compile Include="Ui\Fragments\Calendar\BaseCalendarFragment.cs" />
-    <Compile Include="Ui\Fragments\Calendar\AppointmentFragment.cs" />
     <Compile Include="Ui\Common\ConnectionDiagnosticsFragment.cs" />
     <Compile Include="Ui\Fragments\Calendar\ReoccurrenceFragment.cs" />
     <Compile Include="Ui\Views\RecurrenceViews\Common.cs" />
@@ -571,6 +570,9 @@
     <Compile Include="Ui\Fragments\Calendar\AddEditParticipantsFragment.cs" />
     <Compile Include="Ui\Fragments\Calendar\AddEditAppointmentCalendarListFragment.cs" />
     <Compile Include="Ui\Common\SuggestionsAdapter.cs" />
+    <Compile Include="Ui\Fragments\Calendar\AppointmentFragment.cs" />
+    <Compile Include="Ui\Views\CalendarViews\AddEditAppointmentViews.cs" />
+    <Compile Include="Ui\Views\CalendarViews\AppointmentViews.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -596,6 +598,7 @@
     <Folder Include="Resources\mipmap-anydpi-v26\" />
     <Folder Include="Ui\Fragments\Calendar\" />
     <Folder Include="Ui\Coordinators\" />
+    <Folder Include="Ui\Views\CalendarViews\" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\anim\enter_from_left.xml" />
