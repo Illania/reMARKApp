@@ -88,3 +88,15 @@ function InsertContent(type, id, content) {
     }
 };
 
+window.addEventListener("paste", function(e){
+    if (e && e.clipboardData && e.clipboardData.types && e.clipboardData.getData) {
+        types = e.clipboardData.types;
+        
+        if (((types instanceof DOMStringList) && types.contains("Files")) || (types.indexOf && types.indexOf('Files') !== -1)) {
+            e.stopPropagation();
+            e.preventDefault();
+            window.webkit.messageHandlers.onFilePaste.postMessage({});
+            return false;
+        }
+    }
+}, false);

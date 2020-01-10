@@ -449,6 +449,8 @@ Please note that these reports are not monitored 24/7 and will be available to d
 "today" = "Today";
 "unable_open_link_content" = "There are no applications that can open link type ";
 "unable_open_link_title" = "Unable to open link";
+"unable_to_paste_title" = "Unable to paste images/files";
+"unable_to_paste_content" = "Please add images or files as attachements";
 "unavailable" = "Unavailable";
 "updating_categories___" = "Updating categories...";
 "updating_config___" = "Updating configuration...";
