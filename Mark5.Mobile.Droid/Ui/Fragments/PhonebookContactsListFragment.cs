@@ -19,10 +19,15 @@ using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class PhonebookContactsListFragment : BaseFragment
+    public class PhonebookContactsListFragment : BaseFragment, IMenuItemOnActionExpandListener, SearchView.IOnQueryTextListener
     {
+        readonly Handler searchHandler = new Handler();
+
         RecyclerView recyclerView;
         PhonebookContactsListAdapter adapter;
+        PhonebookContactsListAdapter searchAdapter;
+        SearchView searchView;
+        IMenu menu;
 
         public static (PhonebookContactsListFragment fragment, string tag) NewInstance()
         {
@@ -60,7 +65,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }));
             recyclerView.SetAdapter(adapter);
 
-            HasOptionsMenu = false;
+            searchAdapter = new PhonebookContactsListAdapter();
+            searchAdapter.ItemClicked += Adapter_ItemClicked;
+
+            HasOptionsMenu = true;
 
             return rootView;
         }
@@ -123,6 +131,87 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             Activity?.Finish();
         }
 
+        #region Options Menu / Filtering
+        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
+        {
+            this.menu = menu;
+
+            inflater.Inflate(Resource.Menu.menu_main, menu);
+            var filterItem = menu.FindItem(Resource.Id.action_filter);
+            filterItem.SetOnActionExpandListener(this);
+
+            searchView = (SearchView)filterItem.ActionView;
+            searchView.QueryHint = GetString(Resource.String.filter);
+            searchView.SetOnQueryTextListener(this);
+        }
+
+        public bool OnMenuItemActionExpand(IMenuItem item)
+        {
+            if (item.ItemId == Resource.Id.action_filter)
+            {
+                recyclerView.SwapAdapter(searchAdapter, true);
+                (this as SearchView.IOnQueryTextListener).OnQueryTextChange(string.Empty);
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool OnMenuItemActionCollapse(IMenuItem item)
+        {
+            if (item.ItemId == Resource.Id.action_filter)
+            {
+                searchHandler.RemoveCallbacksAndMessages(null);
+                searchAdapter.Clear();
+                recyclerView.SwapAdapter(adapter, true);
+
+                return true;
+            }
+
+            return false;
+        }
+
+        bool SearchView.IOnQueryTextListener.OnQueryTextChange(string newText)
+        {
+            searchHandler.RemoveCallbacksAndMessages(null);
+            searchHandler.PostDelayed(() =>
+            {
+                if (string.IsNullOrWhiteSpace(newText))
+                    searchAdapter.ReplaceItems(adapter.Items);
+                else
+                    searchAdapter.ReplaceItems(adapter.Items.Where(recipient => MatchesQuery(recipient, newText)).ToList());
+            }, 500);
+
+            return false;
+        }
+
+        bool SearchView.IOnQueryTextListener.OnQueryTextSubmit(string query)
+        {
+            return false;
+        }
+
+        static bool MatchesQuery(Recipient recipient, string query)
+        {
+            if (recipient.Address?.ContainsCaseInsensitive(query) ?? false)
+                return true;
+
+            if (recipient.Name?.ContainsCaseInsensitive(query) ?? false)
+                return true;
+
+            if (recipient.AddressDescription?.ContainsCaseInsensitive(query) ?? false)
+                return true;
+
+            if (recipient.ContactDescription?.ContainsCaseInsensitive(query) ?? false)
+                return true;
+
+            if (recipient.ShortId?.ContainsCaseInsensitive(query) ?? false)
+                return true;
+
+            return false;
+        }
+
+        #endregion
+
         class PhonebookContactsListAdapter : RecyclerView.Adapter, ISectionedAdapter
         {
             public override int ItemCount => Items.Count;
@@ -153,6 +242,26 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 Items.AddRange(recipients);
 
                 NotifyItemRangeInserted(0, Items.Count);
+            }
+
+            public void Clear()
+            {
+                var size = Items.Count;
+                Items.Clear();
+                NotifyItemRangeRemoved(0, size);
+            }
+
+            public void ReplaceItems(List<Recipient> items)
+            {
+                Clear();
+                AppendItems(items);
+            }
+
+            public void AppendItems(List<Recipient> items)
+            {
+                var count = Items.Count;
+                Items.AddRange(items);
+                NotifyItemRangeInserted(count, items.Count);
             }
 
             string ISectionedAdapter.GetSectionName(int position)
