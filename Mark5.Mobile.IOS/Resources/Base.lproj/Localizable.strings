@@ -73,6 +73,7 @@
 "contact_picker_shortcodes" = "Mailing lists";
 "contact_picker_phonebook" = "Phonebook";
 "continue" = "Continue";
+"confirm_deletion" = "Confirm Deletion";
 "copy" = "Copy";
 "copy_to_clipboard" = "Copy to clipboard";
 "copy_to_folder" = "Copy to folder";

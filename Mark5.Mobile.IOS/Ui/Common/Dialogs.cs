@@ -79,10 +79,10 @@ namespace Mark5.Mobile.IOS.Ui.Common
             return ShowDestructiveActionSheetAsync(vc, destructiveText, new PopoverPresentationControllerDelegate(tableView, anchorCell));
         }
 
-        public static Task<bool> ShowDestructiveActionSheetAsync(UIViewController vc, string destructiveText, UIPopoverPresentationControllerDelegate d)
+        public static Task<bool> ShowDestructiveActionSheetAsync(UIViewController vc, string destructiveText, UIPopoverPresentationControllerDelegate d, string title = null)
         {
             var tcs = new TaskCompletionSource<bool>();
-            var actionSheet = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
+            var actionSheet = UIAlertController.Create(title, null, UIAlertControllerStyle.ActionSheet);
             actionSheet.AddAction(UIAlertAction.Create(destructiveText, UIAlertActionStyle.Destructive, a => tcs.SetResult(true)));
             actionSheet.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => tcs.SetResult(false)));
             if (actionSheet.PopoverPresentationController != null)
