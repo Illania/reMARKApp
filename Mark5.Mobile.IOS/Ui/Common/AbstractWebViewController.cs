@@ -65,6 +65,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             userContentController.AddScriptMessageHandler(this, "domloaded");
             userContentController.AddScriptMessageHandler(this, "mutated");
             userContentController.AddScriptMessageHandler(this, "input");
+            userContentController.AddScriptMessageHandler(this, "onFilePaste");
 
             var configuration = new WKWebViewConfiguration
             {
@@ -784,8 +785,10 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             if (messageName == "input" && int.TryParse(messageBody, out int caretYposition))
                 OnWebViewInput(caretYposition);
-        }
 
+            if (messageName == "onFilePaste")
+                OnFilePaste();
+        }
 
         protected virtual void OnWebViewDomLoaded() { }
 
@@ -888,6 +891,11 @@ namespace Mark5.Mobile.IOS.Ui.Common
             for (var i = 0; i < args.Length; i++)
                 output = output.Replace($"%%{i}%%", args[i].ToString());
             return output;
+        }
+
+        protected async void OnFilePaste()
+        {
+            await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("unable_to_paste_title"), Localization.GetString("unable_to_paste_content"));
         }
     }
 }
