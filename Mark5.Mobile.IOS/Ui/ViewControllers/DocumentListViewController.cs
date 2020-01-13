@@ -771,7 +771,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void Delete(List<DocumentPreview> selectedDocuments, UIPopoverPresentationControllerDelegate d)
         {
-            var result = await Dialogs.ShowDestructiveActionSheetAsync(this, Localization.GetString("delete"), d);
+            var result = await Dialogs.ShowDestructiveActionSheetAsync(this, Localization.GetString("delete"), d, Localization.GetString("confirm_deletion"));
             if (!result)
             {
                 EndEditing();
