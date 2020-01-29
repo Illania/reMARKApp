@@ -98,7 +98,7 @@
     <string name="diagnostics_wi_fi">Wi-Fi</string>
     <string name="diagnostics_network_name">Network name</string>
     <string name="diagnostics_server_address">Server address</string>
-    <string name="diagnostics_successfull_requests">Successfull requests</string>
+    <string name="diagnostics_successfull_requests">Successful requests</string>
     <string name="diagnostics_failed_requests">Failed requests</string>
     <string name="diagnostics_avg_request_time">Average request time</string>
     <string name="diagnostics_sec">sec.</string>
