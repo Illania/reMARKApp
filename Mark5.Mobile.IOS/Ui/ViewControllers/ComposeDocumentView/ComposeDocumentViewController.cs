@@ -484,7 +484,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                         Localization.GetString("template_selection_another")
                     };
 
-                    var result = await Dialogs.ShowListActionSheetAsync(this, templateListStrings);
+                    var result = await Dialogs.ShowListActionSheetAsync(this, templateListStrings, headerStackView);
                     switch (result)
                     {
                         case 0:
