@@ -27,6 +27,8 @@
     <Folder Include="Presenters\CalendarModule\" />
     <Folder Include="Manager\Interfaces\" />
     <Folder Include="DataAccess\Interfaces\" />
+    <Folder Include="Jobs\" />
+    <Folder Include="Synchronizer\" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Presenters\CalendarModule\AppointmentPresenter.cs.orig" />

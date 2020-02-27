@@ -319,6 +319,12 @@ namespace Mark5.Mobile.IOS
         {
             try
             {
+                if (notification?.Request?.Identifier.StartsWith("calendar", StringComparison.InvariantCulture) == true)
+                {
+                    options(UNNotificationPresentationOptions.Alert);
+                    return;
+                }
+
                 if (notification?.Request?.Identifier == LocalNotificationsListener.DocumentFailedToSendIdentifier)
                 {
                     options(UNNotificationPresentationOptions.Alert);
@@ -450,6 +456,7 @@ namespace Mark5.Mobile.IOS
                 CommonConfig.UsageAnalytics = new UsageAnalytics();
                 CommonConfig.ConcurrentQueueType = typeof(PortableConcurrentQueue<>);
                 CommonConfig.TimeZoneInfoDeserializer = TimeZoneInfo.FromSerializedString;
+                CommonConfig.DeviceReminderNotificationManager = new DeviceReminderNotificationManager();
 
                 if (UIDevice.CurrentDevice.CheckSystemVersion(10, 3))
                     CommonConfig.Utf8Normalizer = filename =>

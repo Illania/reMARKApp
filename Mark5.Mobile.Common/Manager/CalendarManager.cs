@@ -14,6 +14,7 @@ using System.Collections.Concurrent;
 using System.Threading;
 using Mark5.Mobile.Common.DataAccess.Exceptions;
 using Mark5.Mobile.Common.Model.HubMessages;
+using Mark5.Mobile.Common.Synchronizer;
 
 namespace Mark5.Mobile.Common.Manager
 {
@@ -51,6 +52,11 @@ namespace Mark5.Mobile.Common.Manager
                 var appointments = result.CalendarAppointments.WhereNotNull().Select(a => a.Convert()).ToList();
 
                 await calendarDataAccess.SaveCalendarAppointmentsAsync(calendarIds, appointments, startDateUTC, endDateUTC);
+
+                var now = DateTime.UtcNow;
+
+                if (now >= startDate && now <= endDate)  //TODO need to check this..
+                    await Synchronizers.LocalRemindersSynchronizer.Synchronize();
 
                 return appointments;
             }
