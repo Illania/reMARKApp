@@ -21,6 +21,7 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Service;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers;
+using Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews;
 using Mark5.Mobile.IOS.Utilities;
 using Microsoft.AppCenter;
 using Microsoft.AppCenter.Crashes;
@@ -319,13 +320,13 @@ namespace Mark5.Mobile.IOS
         {
             try
             {
-                if (notification?.Request?.Identifier.StartsWith("calendar", StringComparison.InvariantCulture) == true)
+                if (notification?.Request?.Identifier == LocalNotificationsListener.DocumentFailedToSendIdentifier)
                 {
                     options(UNNotificationPresentationOptions.Alert);
                     return;
                 }
 
-                if (notification?.Request?.Identifier == LocalNotificationsListener.DocumentFailedToSendIdentifier)
+                if (DeviceReminderNotificationManager.GetReminderInfo(notification) != null)
                 {
                     options(UNNotificationPresentationOptions.Alert);
                     return;
@@ -365,6 +366,17 @@ namespace Mark5.Mobile.IOS
                     return;
                 }
 
+
+                var reminderInfo = DeviceReminderNotificationManager.GetReminderInfo(response?.Notification);
+                if (reminderInfo != null)
+                {
+                    var vc = new AppointmentViewController(reminderInfo.Value.CalendarId,
+                        reminderInfo.Value.AppointmentId,
+                        reminderInfo.Value.RecurrenceIndex, false);
+
+                    Window.RootViewController.PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+                }
+
                 var n = response.Notification.ConvertToNotification();
 
                 if (n.ObjectType == ObjectType.Document)
@@ -400,8 +412,7 @@ namespace Mark5.Mobile.IOS
         //Let's not forget the silent notifications limitations (2-3 notifications per hour max, and other limitations per day)
         //[Export("application:didReceiveRemoteNotification:fetchCompletionHandler:")]
         //public override void DidReceiveRemoteNotification(UIApplication application, NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler)
-        //{
-
+        //
         //}
 
         #endregion

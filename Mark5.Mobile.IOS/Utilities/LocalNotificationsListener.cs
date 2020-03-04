@@ -1,6 +1,4 @@
 ﻿using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Manager;
-using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using UserNotifications;
 using Mark5.Mobile.Common.Model.HubMessages;

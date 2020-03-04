@@ -20,6 +20,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         readonly AppointmentPresenter presenter;
 
         bool loaded;
+        bool showActions;
 
         List<LineViewModel> lineViewModels;
 
@@ -40,11 +41,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         AppointmentViewModel appointment;
 
-        public AppointmentViewController(int calendarId, int appointmentId, int recurrenceIndex)
+        public AppointmentViewController(int calendarId, int appointmentId, int recurrenceIndex, bool showActions = true)
         {
             this.appointmentId = appointmentId;
             this.calendarId = calendarId;
             this.recurrenceIndex = recurrenceIndex;
+            this.showActions = showActions;
             presenter = new AppointmentPresenter();
             presenter.AttachView(this);
             presenter.Start();
@@ -129,17 +131,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         private void InitNavigationBar()
         {
-            deleteButtonItem = new UIBarButtonItem
+            if (showActions)
             {
-                Image = UIImage.FromBundle("Bin").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
-            };
+                deleteButtonItem = new UIBarButtonItem
+                {
+                    Image = UIImage.FromBundle("Bin").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
+                };
 
-            editButtonItem = new UIBarButtonItem
-            {
-                Image = UIImage.FromBundle("Edit").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
-            };
+                editButtonItem = new UIBarButtonItem
+                {
+                    Image = UIImage.FromBundle("Edit").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
+                };
 
-            NavigationItem.SetRightBarButtonItems(new[] { editButtonItem, deleteButtonItem }, false);
+                NavigationItem.SetRightBarButtonItems(new[] { editButtonItem, deleteButtonItem }, false);
+            }
         }
 
         private void InitView()

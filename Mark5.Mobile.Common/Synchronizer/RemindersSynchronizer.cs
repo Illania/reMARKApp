@@ -32,11 +32,10 @@ namespace Mark5.Mobile.Common.Synchronizer
 
                 var nextDayAppointments = await GetNearFutureAppointments();
                 var newReminders = ExtractRemindersFromAppointments(nextDayAppointments).ToList();
-
-                deviceReminderNotificationManager.SetDeviceRemindersNotification(newReminders);
-
                 await CacheReminders(newReminders);
-                NotifyLocalReminderNotificationManager(newReminders);
+
+                if (newReminders.Any())
+                    deviceReminderNotificationManager.SetDeviceRemindersNotification(newReminders);
             }
             catch (Exception ex)
             {
@@ -116,9 +115,5 @@ namespace Mark5.Mobile.Common.Synchronizer
         // we need to listen to those events with a broadcast receiver:
         //https://android.jlelse.eu/using-alarmmanager-like-a-pro-20f89f4ca720
 
-        void NotifyLocalReminderNotificationManager(List<CalendarReminder> reminders)
-        {
-
-        }
     }
 }

@@ -53,11 +53,6 @@ namespace Mark5.Mobile.Common.Manager
 
                 await calendarDataAccess.SaveCalendarAppointmentsAsync(calendarIds, appointments, startDateUTC, endDateUTC);
 
-                var now = DateTime.UtcNow;
-
-                if (now >= startDate && now <= endDate)  //TODO need to check this..
-                    await Synchronizers.LocalRemindersSynchronizer.Synchronize();
-
                 return appointments;
             }
 
@@ -257,6 +252,7 @@ namespace Mark5.Mobile.Common.Manager
                             AppointmentRetrieved(this, new AppointmentsRetrievedEventArgs(app, startDate, endDate));
 
                             cachedMonths.Add(monthDate);
+                            CheckIfShouldSynchronize();
                         }
                     }
                     catch (DataNotFoundException)
@@ -272,9 +268,21 @@ namespace Mark5.Mobile.Common.Manager
             }
         }
 
-        IEnumerable<MonthDate> GetUncached(DateTime start, DateTime end)
+        bool syncDone;
+
+        void CheckIfShouldSynchronize()
         {
-            return GetMonthDatePeriod(start, end).Where(md => !cachedMonths.Contains(md));
+            if (syncDone) //TODO improve
+                return;
+
+            var start = DateTime.UtcNow;
+            var end = start.AddDays(9);
+
+            if (cachedMonths.Contains(MonthDate.FromDateTime(start)) && cachedMonths.Contains(MonthDate.FromDateTime(end)))
+            {
+                Synchronizers.LocalRemindersSynchronizer.Synchronize();
+                syncDone = true;
+            }
         }
 
         List<MonthDate> GetMonthDatePeriod(DateTime start, DateTime end)
@@ -337,6 +345,7 @@ namespace Mark5.Mobile.Common.Manager
             queue.CompleteAdding();
             cachedMonths.Clear();
 
+            syncDone = false;
             started = false;
         }
 

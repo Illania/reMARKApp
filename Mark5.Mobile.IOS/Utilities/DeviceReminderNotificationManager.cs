@@ -11,6 +11,11 @@ namespace Mark5.Mobile.IOS.Utilities
 {
     public class DeviceReminderNotificationManager : IDeviceReminderNotificationManager
     {
+        static readonly string reminderNotificationId = "Reminder";
+        static readonly string appointmentIdKey = "appointmentId";
+        static readonly string recurrenceIndexKey = "recurrenceIndex";
+        static readonly string calendarIdKey = "calendarIdKey";
+
         readonly UNUserNotificationCenter notificationCenter = UNUserNotificationCenter.Current;
 
         readonly NSDateFormatter timeFormatter = new NSDateFormatter
@@ -45,19 +50,25 @@ namespace Mark5.Mobile.IOS.Utilities
 
         UNNotificationRequest CreateNotificationRequestFromReminder(CalendarReminder reminder)
         {
+            var userInfo = new Dictionary<string, string>();
+            userInfo.Add(appointmentIdKey, reminder.AppointmentId.ToString());
+            userInfo.Add(recurrenceIndexKey, reminder.RecurrenceIndex.ToString());
+            userInfo.Add(calendarIdKey, reminder.CalendarId.ToString());
+
+            var userInfoNs = NSDictionary.FromObjectsAndKeys(userInfo.Values.ToArray(), userInfo.Keys.ToArray());
+
             var notificationContent = new UNMutableNotificationContent
             {
                 Title = reminder.Subject,
-                Body = FormatDateTime(reminder.StartTime)
+                Body = FormatDateTime(reminder.StartTime),
+                UserInfo = userInfoNs,
             };
 
             var dateTime = reminder.ReminderTime;
             var dateComponents = GetComponentsFromDateTime(dateTime);
 
             var trigger = UNCalendarNotificationTrigger.CreateTrigger(dateComponents, false);
-
-            var identifier = $"calendar/{reminder.CalendarId}/{reminder.RecurrenceIndex}";
-            return UNNotificationRequest.FromIdentifier(identifier, notificationContent, trigger);
+            return UNNotificationRequest.FromIdentifier(reminderNotificationId, notificationContent, trigger);
         }
 
         string FormatDateTime(DateTime dateTime)
@@ -92,5 +103,32 @@ namespace Mark5.Mobile.IOS.Utilities
                 TimeZone = NSTimeZone.LocalTimeZone
             };
         }
+
+        #region Public methods
+
+        public static ReminderInfo? GetReminderInfo(UNNotification notification)
+        {
+            if (notification?.Request.Identifier != reminderNotificationId)
+                return null;
+
+            var userInfo = notification.Request.Content.UserInfo.ToDictionary<KeyValuePair<NSObject, NSObject>, string, string>(
+         item => (NSString)item.Key, item => item.Value.ToString());
+
+            return new ReminderInfo
+            {
+                AppointmentId = int.Parse(userInfo[appointmentIdKey]),
+                RecurrenceIndex = int.Parse(userInfo[recurrenceIndexKey]),
+                CalendarId = int.Parse(userInfo[calendarIdKey])
+            };
+        }
+
+        public struct ReminderInfo
+        {
+            public int AppointmentId { get; set; }
+            public int RecurrenceIndex { get; set; }
+            public int CalendarId { get; set; }
+        }
+        #endregion
+
     }
 }
