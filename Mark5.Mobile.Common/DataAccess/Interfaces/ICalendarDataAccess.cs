@@ -21,6 +21,10 @@ namespace Mark5.Mobile.Common.DataAccess
 
         Task SaveCalendarAlarmsAsync(List<int> calendarIds, List<CalendarAlarm> alarms, DateTime startDate, DateTime endDate);
 
+        Task<List<CalendarReminder>> GetCalendarRemindersAsync();
+
+        Task SaveCalendarRemindersAsync(List<CalendarReminder> reminders);
+
         Task RemoveOrphans();
     }
 }

@@ -26,6 +26,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         UIBarButtonItem editButtonItem;
         UIBarButtonItem deleteButtonItem;
+        UIBarButtonItem closeButtonItem;
 
         UIStackView stackView;
         AppointmentSubjectView subjectView;
@@ -107,6 +108,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             if (editButtonItem != null)
                 editButtonItem.Clicked += EditButtinItem_Clicked;
 
+            if (closeButtonItem != null)
+                closeButtonItem.Clicked += CloseButtonItem_Clicked;
+
             if (participantsView != null)
             {
                 participantsView.SendInvitationClicked += SendInvitationsButton_TouchUpInside;
@@ -121,6 +125,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             if (editButtonItem != null)
                 editButtonItem.Clicked -= EditButtinItem_Clicked;
+
+            if (closeButtonItem != null)
+                closeButtonItem.Clicked -= CloseButtonItem_Clicked;
 
             if (participantsView != null)
             {
@@ -144,6 +151,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 };
 
                 NavigationItem.SetRightBarButtonItems(new[] { editButtonItem, deleteButtonItem }, false);
+            }
+            else
+            {
+                closeButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Close);
+                NavigationItem.SetRightBarButtonItem(closeButtonItem, false);
             }
         }
 
@@ -212,7 +224,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             stackView.AddArrangedSubview(organizerView);
             stackView.AddArrangedSubview(calendarView);
-            //stackView.AddArrangedSubview(reminderView);
+            stackView.AddArrangedSubview(reminderView);
             stackView.AddArrangedSubview(participantsView);
         }
 
@@ -301,6 +313,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         private void EditButtinItem_Clicked(object sender, EventArgs e)
         {
             presenter.EditAppointmentClicked();
+        }
+
+        private void CloseButtonItem_Clicked(object sender, EventArgs e)
+        {
+            DismissViewController(true, null);
         }
 
         private async void DeleteButtonItem_Clicked(object sender, EventArgs e)

@@ -550,6 +550,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void DocumentSelected(DocumentPreview documentPreview)
         {
+            var vca = new DocumentViewController();
+            vca.SetRefreshDataOnAppear();
+            vca.SetData(documentPreview.Id);
+
+
+            PresentViewController(new NavigationController(vca, UIModalPresentationStyle.PageSheet), true, null);
+            return;
+
             if (SplitViewController != null && !SplitViewController.Collapsed)
             {
                 var nc = (UINavigationController)SplitViewController.ViewControllers[1];

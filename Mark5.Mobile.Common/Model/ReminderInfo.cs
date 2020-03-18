@@ -2,7 +2,7 @@
 {
     public class ReminderInfo
     {
-        public ReminderType Type;
+        public ReminderType Type { get; }
 
         public string Title
         {
@@ -26,6 +26,10 @@
                         return "2 hour before";
                     case ReminderType.OneDay:
                         return "1 day before";
+                    case ReminderType.TwoDays:
+                        return "2 days before";
+                    case ReminderType.OneWeek:  //TODO need to do the same on Android
+                        return "1 week before";
                     default:
                         return "";
                 }
@@ -54,7 +58,9 @@
             ThirtyMinutes = 30,
             OneHour = 60,
             TwoHours = 120,
-            OneDay = 24 * 60
+            OneDay = 24 * 60,
+            TwoDays = 48 * 60,
+            OneWeek = 24 * 7 * 60
         };
 
         public override string ToString()

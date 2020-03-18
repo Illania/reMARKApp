@@ -24,10 +24,8 @@ namespace Mark5.Mobile.Common.Synchronizer
         {
             try
             {
-                if (!initialized)
-                {
-                    //TOOD Retrieve reminders from db
-                }
+                await InitializeReminders();
+
                 deviceReminderNotificationManager.CancelDeviceReminderNotifications(currentReminders);
 
                 var nextDayAppointments = await GetNearFutureAppointments();
@@ -45,13 +43,17 @@ namespace Mark5.Mobile.Common.Synchronizer
 
         async Task CacheReminders(List<CalendarReminder> reminders)
         {
-            //save in cache here
-            //save in persistence (db/filesystem)
+            currentReminders = reminders;
+            await Managers.CalendarManager.SaveCalendarRemindersAsync(currentReminders);
         }
 
         async Task InitializeReminders()
         {
-
+            if (!initialized)
+            {
+                currentReminders = await Managers.CalendarManager.GetCalendarRemindersAsync();
+                initialized = true;
+            }
         }
 
         async Task<List<CalendarAppointment>> GetNearFutureAppointments()

@@ -194,6 +194,18 @@ namespace Mark5.Mobile.Common.Manager
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
+
+
+        public async Task<List<CalendarReminder>> GetCalendarRemindersAsync()
+        {
+            return await calendarDataAccess.GetCalendarRemindersAsync();
+        }
+
+        public async Task SaveCalendarRemindersAsync(List<CalendarReminder> reminders)
+        {
+            await calendarDataAccess.SaveCalendarRemindersAsync(reminders);
+        }
+
     }
 
     class AppointmentsCache : IAppointmentsCache
@@ -276,7 +288,7 @@ namespace Mark5.Mobile.Common.Manager
                 return;
 
             var start = DateTime.UtcNow;
-            var end = start.AddDays(9);
+            var end = start.AddDays(8);
 
             if (cachedMonths.Contains(MonthDate.FromDateTime(start)) && cachedMonths.Contains(MonthDate.FromDateTime(end)))
             {

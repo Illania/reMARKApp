@@ -28,7 +28,6 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
                 view.StopEditingLoading();
                 view.CloseView();
-
             }
             catch (Exception ex)
             {
