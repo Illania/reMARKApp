@@ -573,6 +573,8 @@
     <Compile Include="Ui\Fragments\Calendar\AppointmentFragment.cs" />
     <Compile Include="Ui\Views\CalendarViews\AddEditAppointmentViews.cs" />
     <Compile Include="Ui\Views\CalendarViews\AppointmentViews.cs" />
+    <Compile Include="Utilities\DeviceReminder\DeviceReminderNotificationManager.cs" />
+    <Compile Include="Utilities\DeviceReminder\DeviceReminderBroadcastReceiver.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -599,6 +601,7 @@
     <Folder Include="Ui\Fragments\Calendar\" />
     <Folder Include="Ui\Coordinators\" />
     <Folder Include="Ui\Views\CalendarViews\" />
+    <Folder Include="Utilities\DeviceReminder\" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\anim\enter_from_left.xml" />
