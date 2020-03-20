@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using BackgroundTasks;
 using Firebase.CloudMessaging;
 using Firebase.Core;
 using Foundation;
@@ -12,6 +13,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Extensions;
+using Mark5.Mobile.Common.Job;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.HubMessages;
@@ -36,6 +38,8 @@ namespace Mark5.Mobile.IOS
     [Register("AppDelegate")]
     public class AppDelegate : UIApplicationDelegate, IUNUserNotificationCenterDelegate, IMessagingDelegate
     {
+        const string backgroundTaskID = "com.nordic-it.mark5.mobile.ios.task";
+
         public override UIWindow Window { get; set; }
 
         public override bool WillFinishLaunching(UIApplication application, NSDictionary launchOptions)
@@ -104,6 +108,9 @@ namespace Mark5.Mobile.IOS
             UIApplication.SharedApplication.SetMinimumBackgroundFetchInterval(OneDayInterval);
 
             Window.MakeKeyAndVisible();
+
+            if (UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
+                BGTaskScheduler.Shared.Register(backgroundTaskID, null, HandleBackgroundTask);
 
             if (launchOptions == null)
                 return true;
@@ -192,6 +199,9 @@ namespace Mark5.Mobile.IOS
             Services.DocumentsUploadService?.Start();
             Services.DocumentPreviewsDownloadService?.Start();
             Services.DocumentsDownloadService?.Start();
+
+            if (UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
+                ScheduleBackgroundTask();
         }
 
         public override void DidEnterBackground(UIApplication application)
@@ -417,26 +427,68 @@ namespace Mark5.Mobile.IOS
 
         #endregion
 
+
+        #region Background Activities
+
         public override void PerformFetch(UIApplication application, Action<UIBackgroundFetchResult> completionHandler)
+        {
+            CommonConfig.Logger.Info("Background Fetch started...");
+
+            Task.Run(async () =>
+            {
+                try
+                {
+                    await RunJobs();
+
+                    completionHandler(UIBackgroundFetchResult.NewData);
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error("Background Fetch error!", ex);
+                    completionHandler(UIBackgroundFetchResult.Failed);
+                }
+            });
+        }
+
+        void ScheduleBackgroundTask()
+        {
+            var request = new BGAppRefreshTaskRequest(backgroundTaskID);
+            request.EarliestBeginDate = NSDate.Now.AddSeconds(10); //1 hour
+
+            BGTaskScheduler.Shared.Submit(request, out var _error);
+
+            if (_error != null)
+                CommonConfig.Logger.Error($"Error while scheduling background task: {_error} ");
+        }
+
+        void HandleBackgroundTask(BGTask task)  //TODO This needs to be tested on a physical device, as it does not work on a simulator
         {
             Task.Run(async () =>
             {
                 try
                 {
-                    CommonConfig.Logger.Info("Background Fetch: Retrieving system settings...");
-
-                    ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Remote);
-                    if (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
-                        await Managers.SystemManager.GetSystemUsersDepartmentsAsync(SourceType.Remote);
-                    completionHandler(UIBackgroundFetchResult.NewData);
+                    await RunJobs();
+                    task.SetTaskCompleted(true);
                 }
                 catch (Exception ex)
                 {
-                    CommonConfig.Logger.Error("Background Fetch: Error while retrieving system settings.", ex);
-                    completionHandler(UIBackgroundFetchResult.Failed);
+                    CommonConfig.Logger.Error("Background task error!", ex);
+                    task.SetTaskCompleted(false);
                 }
             });
+
+            ScheduleBackgroundTask();
         }
+
+        async Task RunJobs()
+        {
+            var job1 = Jobs.SystemSettingsUpdateJob.Run();
+            var job2 = Jobs.RemindersUpdateJob.Run();
+            await Task.WhenAll(job1, job2);
+        }
+
+
+        #endregion
 
         void InitializeCommon()
         {

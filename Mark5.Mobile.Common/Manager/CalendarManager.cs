@@ -247,7 +247,7 @@ namespace Mark5.Mobile.Common.Manager
 
         async Task Work(CancellationToken token)
         {
-            var calendarsList = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars;
+            var calendarsList = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars.Select(c => c.Id).ToList();
 
             while (!queue.IsCompleted && !token.IsCancellationRequested)
             {
@@ -257,7 +257,7 @@ namespace Mark5.Mobile.Common.Manager
                     {
                         (var startDate, var endDate) = GetTimePeriod(monthDate);
 
-                        var app = await Managers.CalendarManager.GetCalendarAppointmentsAsync(calendarsList.Select(c => c.Id).ToList(), startDate, endDate, SourceType.Auto);
+                        var app = await Managers.CalendarManager.GetCalendarAppointmentsAsync(calendarsList, startDate, endDate, SourceType.Auto);
 
                         if (!token.IsCancellationRequested)
                         {
@@ -284,7 +284,7 @@ namespace Mark5.Mobile.Common.Manager
 
         void CheckIfShouldSynchronize()
         {
-            if (syncDone) //TODO improve
+            if (syncDone)
                 return;
 
             var start = DateTime.UtcNow;

@@ -27,7 +27,7 @@
     <Folder Include="Presenters\CalendarModule\" />
     <Folder Include="Manager\Interfaces\" />
     <Folder Include="DataAccess\Interfaces\" />
-    <Folder Include="Jobs\" />
+    <Folder Include="Job\" />
     <Folder Include="Synchronizer\" />
   </ItemGroup>
   <ItemGroup>

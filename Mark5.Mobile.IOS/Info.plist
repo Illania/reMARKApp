@@ -72,5 +72,9 @@
 	<string>5.4</string>
 	<key>CFBundleVersion</key>
 	<string>519</string>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.nordic-it.mark5.mobile.ios.task</string>
+	</array>
 </dict>
 </plist>

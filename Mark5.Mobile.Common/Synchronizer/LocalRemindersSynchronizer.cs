@@ -14,7 +14,7 @@ namespace Mark5.Mobile.Common.Synchronizer
         Task Synchronize();
     }
 
-    public class LocalRemindersSynchronizer : ILocalRemindersSynchronizer
+    class LocalRemindersSynchronizer : ILocalRemindersSynchronizer
     {
         bool initialized;
         List<CalendarReminder> currentReminders;  //Need to be started from DB
