@@ -62,6 +62,7 @@ namespace Mark5.Mobile.IOS.Utilities
                 Title = reminder.Subject,
                 Body = FormatDateTime(reminder.StartTime),
                 UserInfo = userInfoNs,
+                Sound = UNNotificationSound.Default,
             };
 
             var dateTime = reminder.ReminderTime;
