@@ -324,7 +324,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     Services.DocumentsDownloadService.Notify();
                 }
             }
-            catch (Exception ex)
+            catch (System.Exception ex)
             {
                 CommonConfig.Logger.Error($"Automatic refresh failed [endId={endId}]", ex);
             }
@@ -1043,23 +1043,31 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public void UpdateRemovedEntities(EntityRemovedMessage m)
         {
-            foreach (var entityId in m.EntitiesId)
-            {
-                var position = adapter.GetPosition(entityId);
-                if (position >= 0)
-                {
-                    shouldNotifyAdapter = true;
-                    adapter.RemoveItemAtPosition(position);
-                }
 
-                position = searchAdapter.GetPosition(entityId);
-                if (position >= 0)
+            void RemoveItem()
+            {
+                foreach (var entityId in m.EntitiesId)
                 {
-                    shouldNotifySearchAdapter = true;
-                    searchAdapter.RemoveItemAtPosition(position);
+                    var position = adapter.GetPosition(entityId);
+                    if (position >= 0)
+                    {
+                        shouldNotifyAdapter = true;
+                        adapter.RemoveItemAtPosition(position);
+                    }
+
+                    position = searchAdapter.GetPosition(entityId);
+                    if (position >= 0)
+                    {
+                        shouldNotifySearchAdapter = true;
+                        searchAdapter.RemoveItemAtPosition(position);
+                    }
                 }
             }
+            Activity?.RunOnUiThread(() => { RemoveItem(); });
+            //recyclerView.Post(new Java.Lang.Runnable(RemoveItem));
+                   
         }
+           
 
         #endregion
 
