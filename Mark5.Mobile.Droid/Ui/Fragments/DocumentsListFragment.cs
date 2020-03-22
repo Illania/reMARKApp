@@ -324,7 +324,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     Services.DocumentsDownloadService.Notify();
                 }
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 CommonConfig.Logger.Error($"Automatic refresh failed [endId={endId}]", ex);
             }
@@ -1064,8 +1064,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
             Activity?.RunOnUiThread(() => { RemoveItem(); });
-            //recyclerView.Post(new Java.Lang.Runnable(RemoveItem));
-                   
         }
            
 
