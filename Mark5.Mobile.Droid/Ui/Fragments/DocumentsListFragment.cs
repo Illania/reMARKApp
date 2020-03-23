@@ -1043,8 +1043,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public void UpdateRemovedEntities(EntityRemovedMessage m)
         {
-
-            void RemoveItem()
+            Activity?.RunOnUiThread(() =>
             {
                 foreach (var entityId in m.EntitiesId)
                 {
@@ -1059,11 +1058,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     if (position >= 0)
                     {
                         shouldNotifySearchAdapter = true;
-                        searchAdapter.RemoveItemAtPosition(position);
+                        searchAdapter.RemoveItemAtPosition(position); 
                     }
                 }
-            }
-            Activity?.RunOnUiThread(() => { RemoveItem(); });
+            });
         }
            
 
