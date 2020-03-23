@@ -7,6 +7,7 @@ using Android.Support.V4.Content;
 using Android.Text.Format;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Ui.Activities;
 
 namespace Mark5.Mobile.Droid.Utilities.DeviceReminder
 {
@@ -24,34 +25,41 @@ namespace Mark5.Mobile.Droid.Utilities.DeviceReminder
             if (intent.Action != DeviceReminderNotificationManager.ReminderAction)
                 return;
 
-            var reminder = Serializer.Deserialize<CalendarReminder>(intent.GetStringExtra(DeviceReminderNotificationManager.ReminderKey));
+            CreateChannelIfNotExists(context);
 
+            var reminder = Serializer.Deserialize<CalendarReminder>(intent.GetStringExtra(DeviceReminderNotificationManager.ReminderKey));
+            var reminderId = $"{reminder.CalendarId}/{reminder.AppointmentId}/{reminder.RecurrenceIndex}";
+
+
+            var appIntent = MainActivity.CreateShowAppointmentIntent(context, reminder.CalendarId, reminder.AppointmentId, reminder.RecurrenceIndex);
+            appIntent.AddFlags(ActivityFlags.SingleTop);
+            var pendingIntent = PendingIntent.GetActivity(context, 0, appIntent, PendingIntentFlags.OneShot);
+            //PendingIntent pendingIntent = PendingIntent.GetActivity(context, notification.ObjectId, intent, PendingIntentFlags.OneShot);
 
             var title = reminder.Subject;
-            var d = reminder.StartTime.ConvertDateTimeToTimestampMilliseconds();
-            var date = d.FormatUserTimestampAsCompactMediumDateTimeString(context);
+            var date = FormatDateTime(context, reminder.StartTime);
 
             //TODO need to put correct timing
-            //TODO need to add channel creation
             //TODO need to add intent when clicking
-            var nb = new NotificationCompat.Builder(Application.Context, CalendarChannelId)
+            var nb = new NotificationCompat.Builder(context, CalendarChannelId)
               .SetSmallIcon(Resource.Mipmap.ic_icon)
-              .SetColor(ContextCompat.GetColor(Application.Context, Resource.Color.darkerblue))
+              .SetColor(ContextCompat.GetColor(context, Resource.Color.darkerblue))
               .SetContentTitle(title).SetContentText(date)
               .SetAutoCancel(true)
+              .SetContentIntent(pendingIntent)
               .SetPriority((int)NotificationPriority.High)
               .SetStyle(new NotificationCompat.BigTextStyle()
               .BigText(date));
 
             var notificationManager = (NotificationManager)context.GetSystemService(Context.NotificationService);
 
-            notificationManager.Notify(0, nb.Build()); //TODO need to change id 
+            notificationManager.Notify(reminderId, 0, nb.Build());
         }
 
-        string FormatDateTime(DateTime dateTime)
+        string FormatDateTime(Context context, DateTime dateTime)
         {
-            string date = null;
-            string time = null;
+            string date;
+            string time;
 
             var timestamp = dateTime.ConvertDateTimeToTimestampMilliseconds();
 
@@ -60,9 +68,9 @@ namespace Mark5.Mobile.Droid.Utilities.DeviceReminder
             else if (dateTime.Date == DateTime.Today.AddDays(1))
                 date = "Tomorrow";
             else
-                date = FormatUserTimestampAsDateString(timestamp, Application.Context); //TODO maybe context can be moved
+                date = FormatUserTimestampAsDateString(timestamp, context);
 
-            time = FormatUserTimestampAsTimeString(timestamp, Application.Context);
+            time = FormatUserTimestampAsTimeString(timestamp, context);
 
             return $"{date} at {time}";
         }
@@ -83,7 +91,7 @@ namespace Mark5.Mobile.Droid.Utilities.DeviceReminder
             return df.Format(date);
         }
 
-        public static void CreateChannelIfNotExists(Context context)
+        void CreateChannelIfNotExists(Context context)
         {
             if (Build.VERSION.SdkInt < BuildVersionCodes.O)
                 return;

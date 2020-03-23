@@ -78,7 +78,6 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
         public Task ShowError(Exception ex)
         {
             return Task.CompletedTask;
-            //TODO
         }
 
         public void ShowAppointment(int calendarId, int appointmentId, int recurrenceIndex)
@@ -90,6 +89,20 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
                .Replace(Resource.Id.fragment_container, fragment, tag)
                .AddToBackStack(tag)
                .Commit();
+        }
+
+        public void ShowAppointmentFromNotification(int calendarId, int appointmentId, int recurrenceIndex, bool addToBackStack)
+        {
+            var (fragment, tag) = AppointmentFragment.NewInstance(calendarId, appointmentId, recurrenceIndex, false);
+
+            var transaction = fragmentManager.BeginTransaction()
+               .SetCustomAnimations(Resource.Animation.fade_in, Resource.Animation.fade_out)
+               .Replace(Resource.Id.fragment_container, fragment, tag);
+
+            if (addToBackStack)
+                transaction = transaction.AddToBackStack(tag);
+
+            transaction.Commit();
         }
 
         public void DeleteAppointmentsWithIds(List<int> appointmentIds)

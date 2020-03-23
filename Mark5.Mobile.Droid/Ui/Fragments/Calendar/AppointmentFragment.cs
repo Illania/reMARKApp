@@ -21,15 +21,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 {
     public class AppointmentFragment : BaseFragment, IAppointmentView
     {
-        const string CalendarBundleKey = "Calendar_Id";
-        const string AppointmentBundleKey = "Appointment_Id";
-        const string ReocurrenceBundleKey = "Reocurrence_Id";
+        const string CalendarBundleKey = "CalendarKey";
+        const string AppointmentBundleKey = "AppointmentKey";
+        const string ReocurrenceBundleKey = "ReocurrenceKey";
+        const string ShowActionsKey = "ShowActionsKey";
 
         AppointmentPresenter presenter;
 
         int calendarId;
         int appointmentId;
         int recurrenceIndex;
+        bool showActions;
 
         Action dismissLoadingAction;
         List<LineViewModel> lineViewModels;
@@ -44,7 +46,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         List<View> subviews = new List<View>();
 
-        public static (AppointmentFragment fragment, string tag) NewInstance(int calendarId, int appointmentId, int recurrenceIndex)
+        public static (AppointmentFragment fragment, string tag) NewInstance(int calendarId, int appointmentId, int recurrenceIndex, bool showActions = true)
         {
             var fragment = new AppointmentFragment();
             var tag = $"{nameof(AppointmentFragment)} [calendarId={calendarId}, appointmentId={appointmentId}, recurrenceIndex={recurrenceIndex}]";
@@ -54,6 +56,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             args.PutInt(CalendarBundleKey, calendarId);
             args.PutInt(AppointmentBundleKey, appointmentId);
             args.PutInt(ReocurrenceBundleKey, recurrenceIndex);
+            args.PutBoolean(ShowActionsKey, showActions);
 
             fragment.Arguments = args;
             return (fragment, tag);
@@ -102,7 +105,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
             PrepareViews();
 
-            HasOptionsMenu = true;
+            HasOptionsMenu = showActions;
 
             return rootView;
         }

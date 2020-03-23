@@ -16,7 +16,6 @@ namespace Mark5.Mobile.Droid.Utilities.DeviceReminder
 
         static readonly DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0);
 
-
         public void CancelDeviceReminderNotifications(List<CalendarReminder> remindersToCancel)
         {
             //TODO later

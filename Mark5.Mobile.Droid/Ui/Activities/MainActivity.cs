@@ -29,6 +29,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     {
         const string StateKey = "State_d7a09340-3478-43d7-93c3-8974b687a5ec";
 
+        const string CalendarIdKey = "calendarId";
+        const string AppointmentIdKey = "appointmentId";
+        const string RecurrenceIndexKey = "recurrenceIndex";
+
         Toolbar toolbar;
         DrawerLayout drawer;
         SmoothActionBarDrawerToggle drawerToggle;
@@ -42,6 +46,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         bool firstSelection = true;
         bool permissionsAsked;
+        bool showCalendarIntent;
 
         MainActivityState state;
 
@@ -50,10 +55,41 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             return new Intent(context, typeof(MainActivity));
         }
 
+        public static Intent CreateShowAppointmentIntent(Context context, int calendarId, int appointmentId, int recurrenceIndex)
+        {
+            var intent = new Intent(context, typeof(MainActivity));
+
+            intent.PutExtra(CalendarIdKey, calendarId);
+            intent.PutExtra(AppointmentIdKey, appointmentId);
+            intent.PutExtra(RecurrenceIndexKey, recurrenceIndex);
+
+            return intent;
+        }
+
         #region Activity lifecycle
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
+
+            CalendarCoordinator = new CalendarModuleCoordinator(this);
+
+            if (Intent.HasExtra(CalendarIdKey))
+            {
+                SetContentView(Resource.Layout.base_layout);
+
+                toolbar = FindViewById<Toolbar>(Resource.Id.toolbar);
+                SetSupportActionBar(toolbar);
+                SupportActionBar.SetDisplayHomeAsUpEnabled(true);
+                SupportActionBar.SetHomeButtonEnabled(true);
+
+                var calendarId = Intent.GetIntExtra(CalendarIdKey, 0);
+                var appointmentId = Intent.GetIntExtra(AppointmentIdKey, 0);
+                var recurrenceIndex = Intent.GetIntExtra(RecurrenceIndexKey, 0);
+
+                showCalendarIntent = true;
+                CalendarCoordinator.ShowAppointmentFromNotification(calendarId, appointmentId, recurrenceIndex, false);
+                return;
+            }
 
             CommonConfig.Logger.Info($"Starting {nameof(MainActivity)}...");
 
@@ -96,8 +132,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             navHeaderTitleTextView = header.FindViewById<AppCompatTextView>(Resource.Id.nav_header_title);
 
-            CalendarCoordinator = new CalendarModuleCoordinator(this);
-
             if (savedInstanceState == null)
             {
                 state = new MainActivityState
@@ -126,17 +160,37 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }
         }
 
+        protected override void OnNewIntent(Intent intent)
+        {
+            if (intent.HasExtra(CalendarIdKey))
+            {
+                var calendarId = intent.GetIntExtra(CalendarIdKey, 0);
+                var appointmentId = intent.GetIntExtra(AppointmentIdKey, 0);
+                var recurrenceIndex = intent.GetIntExtra(RecurrenceIndexKey, 0);
+
+                CalendarCoordinator.ShowAppointmentFromNotification(calendarId, appointmentId, recurrenceIndex, true);
+                return;
+            }
+        }
+
         protected override void OnPostCreate(Bundle savedInstanceState)
         {
             base.OnPostCreate(savedInstanceState);
 
-            drawerToggle.DrawerIndicatorEnabled = SupportFragmentManager.BackStackEntryCount <= 1;
-            drawerToggle.SyncState();
+            if (drawerToggle != null)
+            {
+                drawerToggle.DrawerIndicatorEnabled = SupportFragmentManager.BackStackEntryCount <= 1;
+                drawerToggle.SyncState();
+            }
+
         }
 
         protected override void OnResume()
         {
             base.OnResume();
+
+            if (showCalendarIntent == true)
+                return;
 
             OnBoardingUtilities.ShowOnBoardingIfNecessary(this);
 
@@ -180,6 +234,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         public override void OnBackPressed()
         {
+            if (showCalendarIntent == true)
+            {
+                base.OnBackPressed();
+                return;
+            }
+
             if (drawer.IsDrawerOpen(GravityCompat.Start))
                 drawer.CloseDrawer(GravityCompat.Start);
             else if (SupportFragmentManager.BackStackEntryCount > 1)
@@ -192,6 +252,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         {
             base.OnSaveInstanceState(outState);
 
+            if (showCalendarIntent == true)
+                return;
+
             state.NavHeaderTitle = navHeaderTitleTextView.Text;
 
             state.LastSelectedItemId = lastSelectedItem.ItemId;
@@ -203,6 +266,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         protected override void OnRestoreInstanceState(Bundle savedInstanceState)
         {
             base.OnRestoreInstanceState(savedInstanceState);
+
+            if (showCalendarIntent == true)
+                return;
 
             if (savedInstanceState?.ContainsKey(StateKey) == true)
             {
@@ -225,7 +291,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
-            if (drawerToggle.OnOptionsItemSelected(item))
+            if (drawerToggle?.OnOptionsItemSelected(item) == true)
                 return true;
 
             return base.OnOptionsItemSelected(item);
