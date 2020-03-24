@@ -102,7 +102,7 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
             if (addToBackStack)
                 transaction = transaction.AddToBackStack(tag);
 
-            transaction.Commit();
+            transaction.CommitAllowingStateLoss();
         }
 
         public void DeleteAppointmentsWithIds(List<int> appointmentIds)

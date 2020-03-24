@@ -20,9 +20,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             get
             {
                 if (fab == null)
-                {
                     fab = FindViewById<FloatingActionButton>(Resource.Id.fab);
-                }
 
                 return fab;
             }

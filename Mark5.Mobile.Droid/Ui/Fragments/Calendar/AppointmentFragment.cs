@@ -77,6 +77,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             if (Arguments.ContainsKey(ReocurrenceBundleKey))
                 recurrenceIndex = Arguments.GetInt(ReocurrenceBundleKey);
 
+            if (Arguments.ContainsKey(ShowActionsKey))
+                showActions = Arguments.GetBoolean(ShowActionsKey);
+
             presenter = new AppointmentPresenter();
             presenter.AttachView(this);
             presenter.Start();
@@ -85,8 +88,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             CommonConfig.Logger.Info($"Creating {nameof(AppointmentFragment)}");
-
-            HasOptionsMenu = false;
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_with_progress, container, false);
             rootView.SetBackgroundColor(Color.White);
