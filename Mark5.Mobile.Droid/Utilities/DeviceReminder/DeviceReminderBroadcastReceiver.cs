@@ -15,8 +15,6 @@ namespace Mark5.Mobile.Droid.Utilities.DeviceReminder
     [IntentFilter(new[] { DeviceReminderNotificationManager.ReminderAction })]
     public class DeviceReminderBroadcastReceiver : BroadcastReceiver
     {
-        bool registered;
-
         public static readonly string CalendarChannelId = "calendar";
         static readonly string calendarChannelName = "Calendar";
 
@@ -30,17 +28,14 @@ namespace Mark5.Mobile.Droid.Utilities.DeviceReminder
             var reminder = Serializer.Deserialize<CalendarReminder>(intent.GetStringExtra(DeviceReminderNotificationManager.ReminderKey));
             var reminderId = $"{reminder.CalendarId}/{reminder.AppointmentId}/{reminder.RecurrenceIndex}";
 
-
-            var appIntent = MainActivity.CreateShowAppointmentIntent(context, reminder.CalendarId, reminder.AppointmentId, reminder.RecurrenceIndex);
-            appIntent.AddFlags(ActivityFlags.SingleTop);
+            var appIntent = WrapperActivity.CreateShowAppointmentIntent(context, reminder.CalendarId, reminder.AppointmentId, reminder.RecurrenceIndex);
             var pendingIntent = PendingIntent.GetActivity(context, 0, appIntent, PendingIntentFlags.OneShot);
-            //PendingIntent pendingIntent = PendingIntent.GetActivity(context, notification.ObjectId, intent, PendingIntentFlags.OneShot);
 
             var title = reminder.Subject;
             var date = FormatDateTime(context, reminder.StartTime);
 
             //TODO need to put correct timing
-            //TODO need to add intent when clicking
+            //TODO need to check why icon is strange
             var nb = new NotificationCompat.Builder(context, CalendarChannelId)
               .SetSmallIcon(Resource.Mipmap.ic_icon)
               .SetColor(ContextCompat.GetColor(context, Resource.Color.darkerblue))

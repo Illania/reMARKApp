@@ -575,6 +575,8 @@
     <Compile Include="Ui\Views\CalendarViews\AppointmentViews.cs" />
     <Compile Include="Utilities\DeviceReminder\DeviceReminderNotificationManager.cs" />
     <Compile Include="Utilities\DeviceReminder\DeviceReminderBroadcastReceiver.cs" />
+    <Compile Include="Ui\Activities\AppointmentActivity.cs" />
+    <Compile Include="Ui\Activities\WrapperActivity.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

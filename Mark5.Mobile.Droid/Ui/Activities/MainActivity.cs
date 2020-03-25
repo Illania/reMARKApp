@@ -25,6 +25,7 @@ using Mark5.Mobile.Droid.Utilities;
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
     [Android.App.Activity]
+    //[Android.App.Activity(ParentActivity = typeof(SplashActivity))]
     public class MainActivity : BaseAppCompatActivity, NavigationView.IOnNavigationItemSelectedListener, FragmentManager.IOnBackStackChangedListener
     {
         const string StateKey = "State_d7a09340-3478-43d7-93c3-8974b687a5ec";
@@ -46,7 +47,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         bool firstSelection = true;
         bool permissionsAsked;
-        bool showCalendarIntent;
 
         MainActivityState state;
 
@@ -72,24 +72,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             base.OnCreate(savedInstanceState);
 
             CalendarCoordinator = new CalendarModuleCoordinator(this);
-
-            if (Intent.HasExtra(CalendarIdKey))
-            {
-                SetContentView(Resource.Layout.base_layout);
-
-                toolbar = FindViewById<Toolbar>(Resource.Id.toolbar);
-                SetSupportActionBar(toolbar);
-                SupportActionBar.SetDisplayHomeAsUpEnabled(true);
-                SupportActionBar.SetHomeButtonEnabled(true);
-
-                var calendarId = Intent.GetIntExtra(CalendarIdKey, 0);
-                var appointmentId = Intent.GetIntExtra(AppointmentIdKey, 0);
-                var recurrenceIndex = Intent.GetIntExtra(RecurrenceIndexKey, 0);
-
-                showCalendarIntent = true;
-                CalendarCoordinator.ShowAppointmentFromNotification(calendarId, appointmentId, recurrenceIndex, false);
-                return;
-            }
 
             CommonConfig.Logger.Info($"Starting {nameof(MainActivity)}...");
 
@@ -158,6 +140,18 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 CommonConfig.Logger.Info($"Restored {nameof(MainActivity)}");
             }
+
+            if (Intent.HasExtra(CalendarIdKey))
+            {
+                var calendarId = Intent.GetIntExtra(CalendarIdKey, 0);
+                var appointmentId = Intent.GetIntExtra(AppointmentIdKey, 0);
+                var recurrenceIndex = Intent.GetIntExtra(RecurrenceIndexKey, 0);
+
+                var intent = AppointmentActivity.CreateIntent(this, calendarId, appointmentId, recurrenceIndex);
+                StartActivity(intent);
+
+                return;
+            }
         }
 
         protected override void OnNewIntent(Intent intent)
@@ -188,9 +182,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         protected override void OnResume()
         {
             base.OnResume();
-
-            if (showCalendarIntent == true)
-                return;
 
             OnBoardingUtilities.ShowOnBoardingIfNecessary(this);
 
@@ -234,12 +225,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         public override void OnBackPressed()
         {
-            if (showCalendarIntent == true)
-            {
-                base.OnBackPressed();
-                return;
-            }
-
             if (drawer.IsDrawerOpen(GravityCompat.Start))
                 drawer.CloseDrawer(GravityCompat.Start);
             else if (SupportFragmentManager.BackStackEntryCount > 1)
@@ -252,9 +237,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         {
             base.OnSaveInstanceState(outState);
 
-            if (showCalendarIntent == true)
-                return;
-
             state.NavHeaderTitle = navHeaderTitleTextView.Text;
 
             state.LastSelectedItemId = lastSelectedItem.ItemId;
@@ -266,9 +248,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         protected override void OnRestoreInstanceState(Bundle savedInstanceState)
         {
             base.OnRestoreInstanceState(savedInstanceState);
-
-            if (showCalendarIntent == true)
-                return;
 
             if (savedInstanceState?.ContainsKey(StateKey) == true)
             {

@@ -35,7 +35,7 @@ namespace Mark5.Mobile.Droid.Utilities.DeviceReminder
 
             var alarmTime = (long)(reminder.ReminderTime.ToUniversalTime() - epoch).TotalMilliseconds; //TODO need to check if correct
 
-            var alarmTime2 = JavaSystem.CurrentTimeMillis() + 15 * 100;
+            var alarmTime2 = JavaSystem.CurrentTimeMillis() + 2 * 1000;
             alarmManager.SetExact(AlarmType.RtcWakeup, alarmTime2, pi);
         }
 
