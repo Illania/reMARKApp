@@ -19,7 +19,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
         {
             get
             {
-                fab ??= FindViewById<FloatingActionButton>(Resource.Id.fab);
+                fab = fab ?? FindViewById<FloatingActionButton>(Resource.Id.fab);
                 return fab;
             }
         }
