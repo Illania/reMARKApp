@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Android.App;
 using Android.Content;
-using Java.Lang;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 
@@ -10,7 +9,7 @@ namespace Mark5.Mobile.Droid.Utilities.DeviceReminder
 {
     public class DeviceReminderNotificationManager : IDeviceReminderNotificationManager
     {
-        AlarmManager alarmManager = Application.Context.GetSystemService(Context.AlarmService) as AlarmManager;
+        readonly AlarmManager alarmManager = Application.Context.GetSystemService(Context.AlarmService) as AlarmManager;
         public const string ReminderKey = "reminderKey";
         public const string ReminderAction = "reminderAction";
 
@@ -18,30 +17,32 @@ namespace Mark5.Mobile.Droid.Utilities.DeviceReminder
 
         public void CancelDeviceReminderNotifications(List<CalendarReminder> remindersToCancel)
         {
-            //TODO later
+            foreach (var reminder in remindersToCancel)
+                alarmManager.Cancel(GetPendingIntentForReminder(reminder));
         }
 
         public void SetDeviceRemindersNotification(List<CalendarReminder> remindersToSet)
         {
             foreach (var reminder in remindersToSet)
-            {
                 SetAlarmForReminder(reminder);
-            }
         }
 
         void SetAlarmForReminder(CalendarReminder reminder)
         {
             var pi = GetPendingIntentForReminder(reminder);
 
-            var alarmTime = (long)(reminder.ReminderTime.ToUniversalTime() - epoch).TotalMilliseconds; //TODO need to check if correct
+            var alarmTime = (long)(reminder.ReminderTime.ToUniversalTime() - epoch).TotalMilliseconds;
 
-            var alarmTime2 = JavaSystem.CurrentTimeMillis() + 2 * 1000;
-            alarmManager.SetExact(AlarmType.RtcWakeup, alarmTime2, pi);
+            //var alarmTime2 = Java.Lang.JavaSystem.CurrentTimeMillis() + 8 * 1000;  //TODO used for testing, should be removed
+            alarmManager.SetExact(AlarmType.RtcWakeup, alarmTime, pi);
         }
 
         PendingIntent GetPendingIntentForReminder(CalendarReminder reminder)
         {
+            var reminderId = $"{reminder.CalendarId}/{reminder.AppointmentId}/{reminder.RecurrenceIndex}/{reminder.ReminderTime.Ticks}";
+            var uri = Android.Net.Uri.Parse("reminder://" + reminderId);
             var intent = new Intent(Application.Context, typeof(DeviceReminderBroadcastReceiver));
+            intent.SetData(uri);
             intent.SetAction(ReminderAction);
             intent.PutExtra(ReminderKey, Serializer.Serialize(reminder));
 

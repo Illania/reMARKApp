@@ -140,6 +140,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             subviews.Add(new SubjectView(Context));
             subviews.Add(new CalendarView(Context));
             subviews.Add(new DateView(Context));
+            subviews.Add(new ReminderView(Context));
             subviews.Add(new LocationView(Context));
             subviews.Add(new MessageView(Context));
             subviews.Add(new ParticipantsView(Context));

@@ -17,8 +17,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         const string AppointmentIdKey = "appointmentId";
         const string RecurrenceIndexKey = "recurrenceIndex";
 
-        Toolbar toolbar;
-
         public static Intent CreateIntent(Context context, int calendarId, int appointmentId, int recurrenceIndex)
         {
             var intent = new Intent(context, typeof(AppointmentActivity));
@@ -40,7 +38,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             SetContentView(Resource.Layout.base_layout);
 
-            toolbar = FindViewById<Toolbar>(Resource.Id.toolbar);
+            var toolbar = FindViewById<Toolbar>(Resource.Id.toolbar);
             SetSupportActionBar(toolbar);
             SupportActionBar.SetDisplayHomeAsUpEnabled(true);
 

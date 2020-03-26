@@ -1,11 +1,11 @@
-﻿using System;
-using Android.App;
+﻿using Android.App;
 using Android.Content;
 using Android.OS;
 using Android.Support.V7.App;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
+    //This activity is used just to decide which other activity to open according to the status.
     [Activity(NoHistory = true)]
     public class WrapperActivity : AppCompatActivity
     {

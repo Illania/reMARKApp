@@ -215,8 +215,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             subviews.Add(new SeparatorSubview(Context));
             subviews.Add(new LocationView(Context));
             subviews.Add(new SeparatorSubview(Context));
-            //subviews.Add(new ReminderView(Context));
-            //subviews.Add(new SeparatorSubview(Context));
+            subviews.Add(new ReminderView(Context));
+            subviews.Add(new SeparatorSubview(Context));
             subviews.Add(new MessageView(Context));
             subviews.Add(new SeparatorSubview(Context));
             subviews.ForEach(linearLayout.AddView);

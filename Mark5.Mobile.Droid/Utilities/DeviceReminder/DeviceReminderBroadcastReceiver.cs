@@ -34,12 +34,11 @@ namespace Mark5.Mobile.Droid.Utilities.DeviceReminder
             var title = reminder.Subject;
             var date = FormatDateTime(context, reminder.StartTime);
 
-            //TODO need to put correct timing
-            //TODO need to check why icon is strange
             var nb = new NotificationCompat.Builder(context, CalendarChannelId)
               .SetSmallIcon(Resource.Mipmap.ic_icon)
               .SetColor(ContextCompat.GetColor(context, Resource.Color.darkerblue))
               .SetContentTitle(title).SetContentText(date)
+              .SetCategory(Android.App.Notification.CategoryAlarm)
               .SetAutoCancel(true)
               .SetContentIntent(pendingIntent)
               .SetPriority((int)NotificationPriority.High)
@@ -50,6 +49,10 @@ namespace Mark5.Mobile.Droid.Utilities.DeviceReminder
 
             notificationManager.Notify(reminderId, 0, nb.Build());
         }
+
+        //TODO check what we did with the other "job" (for system settings
+        //TODO create recurring service to download new alarms
+        //TODO all alarms get cancelled when phone reboots (create ticket)
 
         string FormatDateTime(Context context, DateTime dateTime)
         {
@@ -98,7 +101,7 @@ namespace Mark5.Mobile.Droid.Utilities.DeviceReminder
             if (channel != null)
                 return;
 
-            channel = new NotificationChannel(CalendarChannelId, calendarChannelName, NotificationImportance.High);
+            channel = new NotificationChannel(CalendarChannelId, calendarChannelName, NotificationImportance.Max);
             notificationManager.CreateNotificationChannel(channel);
 #pragma warning restore XA0001 // Find issues with Android API usage
         }
