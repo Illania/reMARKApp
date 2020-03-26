@@ -23,8 +23,6 @@ namespace Mark5.Mobile.Droid.Utilities.DeviceReminder
             if (intent.Action != DeviceReminderNotificationManager.ReminderAction)
                 return;
 
-            CreateChannelIfNotExists(context);
-
             var reminder = Serializer.Deserialize<CalendarReminder>(intent.GetStringExtra(DeviceReminderNotificationManager.ReminderKey));
             var reminderId = $"{reminder.CalendarId}/{reminder.AppointmentId}/{reminder.RecurrenceIndex}";
 
@@ -53,6 +51,7 @@ namespace Mark5.Mobile.Droid.Utilities.DeviceReminder
         //TODO check what we did with the other "job" (for system settings
         //TODO create recurring service to download new alarms
         //TODO all alarms get cancelled when phone reboots (create ticket)
+        //TODO create ticket for AllDay reminders
 
         string FormatDateTime(Context context, DateTime dateTime)
         {
@@ -89,7 +88,7 @@ namespace Mark5.Mobile.Droid.Utilities.DeviceReminder
             return df.Format(date);
         }
 
-        void CreateChannelIfNotExists(Context context)
+        public static void CreateChannelIfNotExists(Context context)
         {
             if (Build.VERSION.SdkInt < BuildVersionCodes.O)
                 return;

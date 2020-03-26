@@ -17,7 +17,7 @@ namespace Mark5.Mobile.Common.Synchronizer
     class LocalRemindersSynchronizer : ILocalRemindersSynchronizer
     {
         bool initialized;
-        List<CalendarReminder> currentReminders;  //Need to be started from DB
+        List<CalendarReminder> currentReminders;
         IDeviceReminderNotificationManager deviceReminderNotificationManager = CommonConfig.DeviceReminderNotificationManager;
 
         public async Task Synchronize()
@@ -89,12 +89,17 @@ namespace Mark5.Mobile.Common.Synchronizer
 
                 foreach (var occurrence in app.Occurrences)
                 {
+                    var reminderTime = occurrence.StartDate.AddSeconds(-app.ReminderTimeBeforeStart);
+
+                    if (reminderTime < DateTime.Now.AddMinutes(-5))
+                        continue;
+
                     var reminder = new CalendarReminder
                     {
                         AppointmentId = app.Id,
                         CalendarId = app.CalendarId,
                         Description = app.Description,
-                        AllDay = app.AllDay,  //TODO need to check what happens with this
+                        AllDay = app.AllDay,
                         Location = app.Location,
                         RecurrenceIndex = occurrence.RecurrenceIndex,
                         Subject = app.Subject,
@@ -107,15 +112,5 @@ namespace Mark5.Mobile.Common.Synchronizer
 
             return reminders;
         }
-
-        //TODO on ios the identifier for notification is a string, perfect
-        //and we can remove all the pending notification request, perfect
-
-        //On Android unfortunately, we can't do a total cancel, but we need to do it one by one, by recreating the pending intent we created before.
-        //This would mean that on android we need to keep a list on the sistem of the current pending intents or similar in order to remove them
-        //All alarms get cancelled when the phone reboots on Android or when the user changes its date/times from settings. In both cases
-        // we need to listen to those events with a broadcast receiver:
-        //https://android.jlelse.eu/using-alarmmanager-like-a-pro-20f89f4ca720
-
     }
 }

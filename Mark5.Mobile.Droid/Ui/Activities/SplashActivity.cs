@@ -21,6 +21,8 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Service;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
+using Mark5.Mobile.Droid.Utilities.DeviceReminder;
+using Mark5.Mobile.Droid.Utilities.Workers;
 using Microsoft.AppCenter.Crashes;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
@@ -196,6 +198,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 CommonConfig.Logger.Info($"Initialized - will present {nameof(MainActivity)}");
 
+                //DeviceReminderWorker.Schedule();  //TODO need to move it down
+
                 return true;
             }).ContinueWith(t =>
             {
@@ -212,6 +216,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 Services.DocumentsDownloadService?.Start();
 
                 PushNotificationsUtilities.CreateChannelIfNotExists(this);
+                DeviceReminderBroadcastReceiver.CreateChannelIfNotExists(this);
 
                 if (t.Result)
                 {
