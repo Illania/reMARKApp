@@ -48,11 +48,6 @@ namespace Mark5.Mobile.Droid.Utilities.DeviceReminder
             notificationManager.Notify(reminderId, 0, nb.Build());
         }
 
-        //TODO check what we did with the other "job" (for system settings
-        //TODO create recurring service to download new alarms
-        //TODO all alarms get cancelled when phone reboots (create ticket)
-        //TODO create ticket for AllDay reminders
-
         string FormatDateTime(Context context, DateTime dateTime)
         {
             string date;

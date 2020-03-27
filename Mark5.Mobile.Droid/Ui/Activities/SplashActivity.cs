@@ -140,17 +140,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                         break;
                 }
 
-                CommonConfig.Logger.Info($"Initializing {nameof(Managers)}...");
-
-                Managers.Initialize(ci);
-                Managers.DocumentsManager.MaxToFetch = PlatformConfig.Preferences.DocumentsToDownload;
-                Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
-                Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
-                Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
-
-                CommonConfig.Logger.Info("Retrieving system settings...");
-                ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
-
                 if (PlatformConfig.Preferences.ClearCache)
                 {
                     CommonConfig.UsageAnalytics.LogEvent(new SettingsCacheCleanUpEvent());
@@ -198,8 +187,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 CommonConfig.Logger.Info($"Initialized - will present {nameof(MainActivity)}");
 
-                //DeviceReminderWorker.Schedule();  //TODO need to move it down
-
                 return true;
             }).ContinueWith(t =>
             {
@@ -214,6 +201,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 Services.DocumentsUploadService?.Start();
                 Services.DocumentPreviewsDownloadService?.Start();
                 Services.DocumentsDownloadService?.Start();
+
+                DeviceReminderWorker.Schedule();
 
                 PushNotificationsUtilities.CreateChannelIfNotExists(this);
                 DeviceReminderBroadcastReceiver.CreateChannelIfNotExists(this);
