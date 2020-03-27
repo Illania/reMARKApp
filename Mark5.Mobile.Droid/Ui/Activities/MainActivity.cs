@@ -391,7 +391,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             public ModuleType ModuleType { get; }
 
-            public MenuItemContent(ModuleType moduleType, CalendarModuleCoordinator cal = null) //TODO this is so shitty
+            public MenuItemContent(ModuleType moduleType, CalendarModuleCoordinator cal = null) //TODO This could be improved
             {
                 ModuleType = moduleType;
                 coordinator = cal;

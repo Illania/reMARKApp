@@ -28,7 +28,7 @@
                         return "1 day before";
                     case ReminderType.TwoDays:
                         return "2 days before";
-                    case ReminderType.OneWeek:  //TODO need to do the same on Android
+                    case ReminderType.OneWeek:
                         return "1 week before";
                     default:
                         return "";
