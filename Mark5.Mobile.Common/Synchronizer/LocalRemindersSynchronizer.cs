@@ -24,6 +24,8 @@ namespace Mark5.Mobile.Common.Synchronizer
         {
             try
             {
+                CommonConfig.Logger.Info("Synchronizing local reminders");
+
                 await InitializeReminders();
 
                 deviceReminderNotificationManager.CancelDeviceReminderNotifications(currentReminders);

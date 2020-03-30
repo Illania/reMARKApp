@@ -41,7 +41,8 @@ namespace Mark5.Mobile.IOS.Utilities
 
             Action<NSError> errorHandler = (NSError error) =>
             {
-                CommonConfig.Logger.Error($"Error while sending notification request - {error}");
+                if (error != null)
+                    CommonConfig.Logger.Error($"Error while sending notification request - {error}");
             };
 
             foreach (var request in notificationRequests)

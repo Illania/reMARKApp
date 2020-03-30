@@ -39,6 +39,7 @@ namespace Mark5.Mobile.IOS
     public class AppDelegate : UIApplicationDelegate, IUNUserNotificationCenterDelegate, IMessagingDelegate
     {
         const string backgroundTaskID = "com.nordic-it.mark5.mobile.ios.task";
+        DateTime lastForegroundTaskRunDate = DateTime.MinValue;
 
         public override UIWindow Window { get; set; }
 
@@ -200,8 +201,7 @@ namespace Mark5.Mobile.IOS
             Services.DocumentPreviewsDownloadService?.Start();
             Services.DocumentsDownloadService?.Start();
 
-            if (UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
-                ScheduleBackgroundTask();
+            HandleForegroundTask();
         }
 
         public override void DidEnterBackground(UIApplication application)
@@ -211,6 +211,9 @@ namespace Mark5.Mobile.IOS
             Services.DocumentsDownloadService?.Stop();
 
             LocalAuthenticationManager.NotifyApplicationEnteredBackground();
+
+            if (UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
+                ScheduleBackgroundTask();
         }
 
         public override void ReceiveMemoryWarning(UIApplication application)
@@ -428,7 +431,7 @@ namespace Mark5.Mobile.IOS
         #endregion
 
 
-        #region Background Activities
+        #region Update Activities
 
         public override void PerformFetch(UIApplication application, Action<UIBackgroundFetchResult> completionHandler)
         {
@@ -452,6 +455,8 @@ namespace Mark5.Mobile.IOS
 
         void ScheduleBackgroundTask()
         {
+            CommonConfig.Logger.Error("Scheduling background task ");
+
             var request = new BGAppRefreshTaskRequest(backgroundTaskID);
             request.EarliestBeginDate = NSDate.Now.AddSeconds(10); //1 hour
 
@@ -461,12 +466,13 @@ namespace Mark5.Mobile.IOS
                 CommonConfig.Logger.Error($"Error while scheduling background task: {_error} ");
         }
 
-        void HandleBackgroundTask(BGTask task)  //TODO This needs to be tested on a physical device, as it does not work on a simulator
+        void HandleBackgroundTask(BGTask task)
         {
             Task.Run(async () =>
             {
                 try
                 {
+                    CommonConfig.Logger.Info("Running background task ");
                     await RunJobs();
                     task.SetTaskCompleted(true);
                 }
@@ -477,11 +483,36 @@ namespace Mark5.Mobile.IOS
                 }
             });
 
+            //This is necessary because the task otherwise is not run periodically
             ScheduleBackgroundTask();
+        }
+
+        void HandleForegroundTask()
+        {
+            if (lastForegroundTaskRunDate > DateTime.Now.AddHours(-1))
+                return;
+
+            lastForegroundTaskRunDate = DateTime.Now;
+
+            Task.Run(async () =>
+            {
+                try
+                {
+                    CommonConfig.Logger.Info("Running foreground task ");
+                    await RunJobs();
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error("Foreground task error!", ex);
+                }
+            });
         }
 
         async Task RunJobs()
         {
+            if (!await AuthenticatorFactory.Create().IsAuthenticatedAsync())
+                return;
+
             var job1 = Jobs.SystemSettingsUpdateJob.Run();
             var job2 = Jobs.RemindersUpdateJob.Run();
             await Task.WhenAll(job1, job2);
