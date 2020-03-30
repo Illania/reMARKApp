@@ -12,6 +12,7 @@ namespace Mark5.Mobile.Common.Synchronizer
     public interface ILocalRemindersSynchronizer
     {
         Task Synchronize();
+        Task CancelAllReminders();
     }
 
     class LocalRemindersSynchronizer : ILocalRemindersSynchronizer
@@ -41,6 +42,13 @@ namespace Mark5.Mobile.Common.Synchronizer
             {
                 CommonConfig.Logger.Error("Error while synchronizing local reminders", ex);
             }
+        }
+
+        public async Task CancelAllReminders()
+        {
+            await InitializeReminders();
+
+            deviceReminderNotificationManager.CancelDeviceReminderNotifications(currentReminders);
         }
 
         async Task CacheReminders(List<CalendarReminder> reminders)

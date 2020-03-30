@@ -9,6 +9,7 @@ using Android.Preferences;
 using Android.Support.V4.Net;
 using Android.Widget;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Synchronizer;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
@@ -112,6 +113,8 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public static async Task ClearData(Context context)
         {
+            await Synchronizers.LocalRemindersSynchronizer.CancelAllReminders();
+
             var preferences = PreferenceManager.GetDefaultSharedPreferences(context);
             var editor = preferences.Edit();
             editor.Clear();

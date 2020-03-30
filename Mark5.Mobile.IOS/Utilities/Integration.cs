@@ -2,15 +2,18 @@ using System;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading.Tasks;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Synchronizer;
 using Mark5.Mobile.IOS.Common.CallId;
 using Mark5.Mobile.IOS.Ui.Common;
 using ObjCRuntime;
 using PCLStorage;
 using UIKit;
+using UserNotifications;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
@@ -116,6 +119,8 @@ namespace Mark5.Mobile.IOS.Utilities
 
         public static void ClearData()
         {
+            UNUserNotificationCenter.Current.RemoveAllPendingNotificationRequests();
+
             var localStorage = FileSystem.Current.LocalStorage;
             var dataFolder = PortablePath.Combine(localStorage.Path, "v2");
             var cacheFolder = PortablePath.Combine(localStorage.Path, "Caches", "v2");
