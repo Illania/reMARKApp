@@ -500,6 +500,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             }
             builder.Cancelable(false);
             builder.Show();
+            await tcs.Task;
             return;
         }
 
