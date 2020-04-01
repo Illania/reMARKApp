@@ -17,7 +17,7 @@ using Mark5.Mobile.IOS.Utilities;
 using TinyMessenger;
 using UIKit;
 
-namespace Mark5.Mobile.IOS.Ui.ViewControllers
+namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
 {
     public class DocumentsSearchResultsViewController : AbstractTableViewController, IPrimaryViewController, IUIGestureRecognizerDelegate, IUIViewControllerRestoration
     {

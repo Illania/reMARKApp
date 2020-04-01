@@ -10,7 +10,7 @@ using Mark5.Mobile.IOS.Utilities;
 using Mark5.Mobile.IOS.Utilities.Extensions;
 using UIKit;
 
-namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
+namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
 {
     public abstract class AbstractSearchCriteriaViewController : AbstractViewController
     {

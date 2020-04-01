@@ -155,10 +155,10 @@
 		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\MailViewerSubview.cs" />
 		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\PriorityView.cs" />
 		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\SubjectView.cs" />
-		<Compile Include="Ui\ViewControllers\SearchCriteriaView\AbstractSearchCriteriaViewController.cs" />
-		<Compile Include="Ui\ViewControllers\SearchCriteriaView\ContactsSearchCriteriaViewController.cs" />
-		<Compile Include="Ui\ViewControllers\SearchCriteriaView\DocumentsSearchCriteriaViewController.cs" />
-		<Compile Include="Ui\ViewControllers\SearchCriteriaView\ShortcodesSearchCriteriaViewController.cs" />
+		<Compile Include="Ui\ViewControllers\SearchView\AbstractSearchCriteriaViewController.cs" />
+		<Compile Include="Ui\ViewControllers\SearchView\ContactsSearchCriteriaViewController.cs" />
+		<Compile Include="Ui\ViewControllers\SearchView\DocumentsSearchCriteriaViewController.cs" />
+		<Compile Include="Ui\ViewControllers\SearchView\ShortcodesSearchCriteriaViewController.cs" />
 		<Compile Include="Utilities\ConsoleAndFileLogger.cs" />
 		<Compile Include="Utilities\DateTimeFormatter.cs" />
 		<Compile Include="Utilities\DeviceInfoProvider.cs" />
@@ -292,9 +292,10 @@
 		<Compile Include="Ui\ViewControllers\CalendarViews\AddEditAppointmentView\RecurrenceView\Subviews\PatternView.cs" />
 		<Compile Include="Ui\ViewControllers\CalendarViews\AddEditAppointmentView\RecurrenceView\Subviews\RangeView.cs" />
 		<Compile Include="Ui\Common\OutgoingWarningBar.cs" />
-		<Compile Include="Ui\ViewControllers\SearchResultsView\ContactsSearchResultsViewController.cs" />
-		<Compile Include="Ui\ViewControllers\SearchResultsView\DocumentsSearchResultsViewController.cs" />
-		<Compile Include="Ui\ViewControllers\SearchResultsView\ShortcodesSearchResultsViewController.cs" />
+		<Compile Include="Ui\ViewControllers\SearchView\ContactsSearchResultsViewController.cs" />
+		<Compile Include="Ui\ViewControllers\SearchView\DocumentsSearchResultsViewController.cs" />
+		<Compile Include="Ui\ViewControllers\SearchView\DocumentsSplitSearchViewController.cs" />
+		<Compile Include="Ui\ViewControllers\SearchView\ShortcodesSearchResultsViewController.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
@@ -786,7 +787,6 @@
 	  <Folder Include="Ui\ViewControllers\CalendarViews\AddEditAppointmentView\" />
 	  <Folder Include="Ui\ViewControllers\CalendarViews\AddEditAppointmentView\RecurrenceView\" />
 	  <Folder Include="Assets_icons.xcassets\Partially-Sent.imageset\" />
-	  <Folder Include="Ui\ViewControllers\SearchResultsView\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 	<Import Project="..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets" Condition="Exists('..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets')" />
