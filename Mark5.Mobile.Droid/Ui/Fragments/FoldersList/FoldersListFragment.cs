@@ -436,10 +436,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (!RemoteFolder.HasSubFolders)
                 return;
 
-            RefreshLayout.Post(() => RefreshLayout.Refreshing = true);
+            if (forceRefresh)
+            {
+                RefreshLayout.Post(() => RefreshLayout.Refreshing = true);
 
-            await Task.Delay(300); // Let the animation finish
-
+                await Task.Delay(300); // Let the animation finish
+            }
+            
             if (AvailableSections.Contains(Section.Remote))
                 await RefreshRemote(forceRefresh);
 
@@ -449,7 +452,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (AvailableSections.Contains(Section.Local))
                 RefreshLocal();
 
-            RefreshLayout.Post(() => RefreshLayout.Refreshing = false);
+            if(forceRefresh)
+                RefreshLayout.Post(() => RefreshLayout.Refreshing = false);
 
             RestoreSelection();
         }
@@ -477,6 +481,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     }
 
                 if (remoteFolders == null)
+                {
                     try
                     {
                         remoteFolders = await Managers.FoldersManager.GetFoldersAsync(RemoteFolder);
@@ -486,6 +491,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         CommonConfig.Logger.Error($"Downloading folders failed [folder.name={RemoteFolder.Name}, folder.id={RemoteFolder.Id}]", ex);
                         await Dialogs.ShowErrorDialogAsync(Activity, ex);
                     }
+                }
 
                 if (remoteFolders != null)
                     Adapter.Refresh(remoteFolders, Section.Remote);
