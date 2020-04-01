@@ -127,6 +127,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
             }
         }
 
+        #region Views
+
         class DocumentDirectionSearchView : AbstractDocumentsSearchView
         {
             readonly UILabel allView;
@@ -1732,6 +1734,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
                 UpdateRow();
             }
         }
+
+        #endregion
 
         #region State restoration
 
