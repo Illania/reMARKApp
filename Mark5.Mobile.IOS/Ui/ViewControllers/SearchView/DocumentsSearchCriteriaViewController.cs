@@ -10,6 +10,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
+using Mark5.Mobile.IOS.Utilities;
 using ObjCRuntime;
 using UIKit;
 
@@ -76,14 +77,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
 
         protected override void SearchButton_TouchUpInside(object sender, EventArgs e)
         {
-            SearchButton.TouchUpInside -= SearchButton_TouchUpInside;
-
             criteria.PartialWordSearch = PlatformConfig.Preferences.PartialWordSearch;
             criteria.MaxToFetch = PlatformConfig.Preferences.DocumentsToSearch;
 
             CommonConfig.Logger.Info($"Starting search... [criteria={Serializer.Serialize(criteria)}]");
 
-            NavigationController.PushViewController(new DocumentsSearchResultsViewController { Criteria = criteria }, true);
+            if (Integration.IsIPad())
+                PresentViewController(new DocumentsSplitSearchViewController(criteria), true, null);
+            else
+                NavigationController.PushViewController(new DocumentsSearchResultsViewController { Criteria = criteria }, true);
         }
 
         protected override async Task SaveCriteria()

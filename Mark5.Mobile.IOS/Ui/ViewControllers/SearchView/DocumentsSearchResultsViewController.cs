@@ -12,6 +12,7 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
+using Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Utilities;
 using TinyMessenger;
@@ -29,6 +30,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
         TinyMessageSubscriptionToken readStatusChangedToken;
         TinyMessageSubscriptionToken commentsCountChangedToken;
         TinyMessageSubscriptionToken categoriesChangedToken;
+        TinyMessageSubscriptionToken goToDocumentToken;
 
         #region UIViewController overrides
 
@@ -120,6 +122,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             readStatusChangedToken = CommonConfig.MessengerHub.Subscribe<DocumentPreviewReadStatusChangedMessage>(ReadStatusChangedHandler);
             commentsCountChangedToken = CommonConfig.MessengerHub.Subscribe<EntityPreviewCommentCountChangedMessage>(CommentsCountChangedHandler, m => m.ObjectType == ObjectType.Document);
             categoriesChangedToken = CommonConfig.MessengerHub.Subscribe<EntityCategoriesChangedMessage>(CategoriesChangedHandler, m => m.ObjectType == ObjectType.Document);
+            goToDocumentToken = CommonConfig.MessengerHub.Subscribe<GoToDocumentMessage>(HandleAction);
         }
 
         void UnsubscribeFromMessages()
@@ -127,6 +130,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             readStatusChangedToken?.Dispose();
             commentsCountChangedToken?.Dispose();
             categoriesChangedToken?.Dispose();
+            goToDocumentToken?.Dispose();
         }
 
         #endregion
@@ -269,10 +273,27 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
 
         public void DocumentSelected(DocumentPreview documentPreview)
         {
-            var vc = new DocumentViewController(Integration.IsIPad());
-            vc.SetData(documentPreview, true);
-            vc.SetRefreshDataOnAppear();
-            NavigationController.PushViewController(vc, true);
+            if (Integration.IsIPad())
+            {
+                var nc = (UINavigationController)SplitViewController.ViewControllers[1];
+                nc.PopToViewController(nc.ViewControllers[0], false);
+
+                var vc = (DocumentPageViewController)nc.ViewControllers[0];
+                vc.DocumentPreviews = ((DataSource)TableView.Source).Items;
+
+                if (vc.IsShowingDocumentWithId(documentPreview.Id))
+                    return;
+
+                vc.HidesBottomBarWhenPushed = false;
+                vc.SetPage(null, documentPreview, false);
+            }
+            else
+            {
+                var vc = new DocumentViewController(Integration.IsIPad());
+                vc.SetData(documentPreview, true);
+                vc.SetRefreshDataOnAppear();
+                NavigationController.PushViewController(vc, true);
+            }
         }
 
         public void DocumentPreviewLongPressed(UILongPressGestureRecognizer recognizer)
@@ -564,6 +585,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                         TableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
                 }
 
+            });
+        }
+
+        void HandleAction(GoToDocumentMessage message)
+        {
+            BeginInvokeOnMainThread(() =>
+            {
+                var index = ((DataSource)TableView.Source).Items.FindIndex(dp => dp.Id == message.DocumentId);
+
+                if (index >= 0)
+                {
+                    TableView.SelectRow(NSIndexPath.FromRowSection(index, 0), true, UITableViewScrollPosition.None);
+                    TableView.ScrollToRow(NSIndexPath.FromRowSection(index, 0), UITableViewScrollPosition.None, true);
+                }
             });
         }
 
