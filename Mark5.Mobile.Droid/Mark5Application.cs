@@ -7,10 +7,14 @@ using Android.Runtime;
 using Android.Support.V7.App;
 using Firebase.Analytics;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Database;
+using Mark5.Mobile.Common.Manager;
+using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Service;
 using Mark5.Mobile.Droid.Utilities;
+using Mark5.Mobile.Droid.Utilities.DeviceReminder;
 using PCLStorage;
 using TinyMessenger;
 using Xamarin.Android.Net;
@@ -61,6 +65,7 @@ namespace Mark5.Mobile.Droid
                     CommonConfig.Utf8Normalizer = s => s;
                     CommonConfig.UsageAnalytics = new UsageAnalytics(FirebaseAnalytics.GetInstance(this));
                     CommonConfig.TimeZoneInfoDeserializer = TimeZoneInfo.FromSerializedString;
+                    CommonConfig.DeviceReminderNotificationManager = new DeviceReminderNotificationManager();
 
 #if !DEBUG
                     CommonConfig.Logger.Level = LogLevel.INFO;
@@ -73,7 +78,22 @@ namespace Mark5.Mobile.Droid
                     PlatformConfig.SSLCertificateVerificationManager = new SSLCertificateVerificationManager();
                     PlatformConfig.ReachabilityMonitor = new ReachabilityMonitor();
                     PlatformConfig.CallStateBroadcastReceiver = new CallStateBroadcastReceiver();
+                    PlatformConfig.DeviceReminderBroadcastReceiver = new DeviceReminderBroadcastReceiver();
                     PlatformConfig.Preferences = new Preferences();
+
+                    var authenticator = AuthenticatorFactory.Create();
+                    if (await authenticator.IsAuthenticatedAsync())
+                    {
+                        var ci = await authenticator.GetConnectionInfoAsync();
+
+                        Managers.Initialize(ci);
+                        Managers.DocumentsManager.MaxToFetch = PlatformConfig.Preferences.DocumentsToDownload;
+                        Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
+                        Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
+                        Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
+
+                        ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
+                    }
                 })
                 .Wait();
 

@@ -232,7 +232,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 UpdateSchedule();
             }
 
-            public void DeleteAppointmentsWithIds(List<int> appointmentIds)  //TODO needs to be tested
+            public void DeleteAppointmentsWithIds(List<int> appointmentIds)
             {
                 AppointmentViewModels.Where(i => appointmentIds.Contains(i.Id)).ToList().ForEach((obj) => AppointmentViewModels.Remove(obj));
 

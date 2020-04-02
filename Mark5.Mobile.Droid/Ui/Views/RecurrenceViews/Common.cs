@@ -433,7 +433,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
             if (value <= 0)
                 value = 1;
 
-            SetSelection(value - 1);  //TODO the same needs to be done on iOS
+            SetSelection(value - 1);
         }
 
         public override void Update(int i)

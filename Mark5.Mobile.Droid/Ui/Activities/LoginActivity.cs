@@ -19,6 +19,8 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Service;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
+using Mark5.Mobile.Droid.Utilities.DeviceReminder;
+using Mark5.Mobile.Droid.Utilities.Workers;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
@@ -322,6 +324,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     Services.DocumentsUploadService.Start();
                     Services.DocumentPreviewsDownloadService.Start();
                     Services.DocumentsDownloadService.Start();
+                    DeviceReminderWorker.Schedule();
 
                     CommonConfig.Logger.Info($"Refreshing reachability status...");
                     await CommonConfig.Reachability.Refresh();
@@ -336,6 +339,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                     if (!String.IsNullOrEmpty(ServerConfig.SystemSettings.SystemInfo.CustomerName))
                         CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.CustomerName, ServerConfig.SystemSettings.SystemInfo.CustomerName);
+
+                    PushNotificationsUtilities.CreateChannelIfNotExists(this);
+                    DeviceReminderBroadcastReceiver.CreateChannelIfNotExists(this);
 
                     SendPushNotificationToken();
 
@@ -358,7 +364,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 if (Dialogs.IsAccessDisabled(ex))
                     await Dialogs.ShowConfirmDialogAsync(this, Resource.String.log_in_failed_title, Resource.String.log_in_failed_message_access_disabled);
                 else
-                await Dialogs.ShowConfirmDialogAsync(this, Resource.String.log_in_failed_title, Resource.String.log_in_failed_message);
+                    await Dialogs.ShowConfirmDialogAsync(this, Resource.String.log_in_failed_title, Resource.String.log_in_failed_message);
             }
             finally
             {

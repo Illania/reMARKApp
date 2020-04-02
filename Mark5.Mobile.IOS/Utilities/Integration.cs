@@ -11,6 +11,7 @@ using Mark5.Mobile.IOS.Ui.Common;
 using ObjCRuntime;
 using PCLStorage;
 using UIKit;
+using UserNotifications;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
@@ -116,6 +117,8 @@ namespace Mark5.Mobile.IOS.Utilities
 
         public static void ClearData()
         {
+            UNUserNotificationCenter.Current.RemoveAllPendingNotificationRequests();
+
             var localStorage = FileSystem.Current.LocalStorage;
             var dataFolder = PortablePath.Combine(localStorage.Path, "v2");
             var cacheFolder = PortablePath.Combine(localStorage.Path, "Caches", "v2");

@@ -295,6 +295,7 @@
 		<Compile Include="Ui\ViewControllers\CalendarViews\AddEditAppointmentView\RecurrenceView\Subviews\PatternView.cs" />
 		<Compile Include="Ui\ViewControllers\CalendarViews\AddEditAppointmentView\RecurrenceView\Subviews\RangeView.cs" />
 		<Compile Include="Ui\Common\OutgoingWarningBar.cs" />
+		<Compile Include="Utilities\DeviceReminderNotificationManager.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

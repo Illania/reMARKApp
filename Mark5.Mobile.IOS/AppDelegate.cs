@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using BackgroundTasks;
 using Firebase.CloudMessaging;
 using Firebase.Core;
 using Foundation;
@@ -12,6 +13,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Extensions;
+using Mark5.Mobile.Common.Job;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.HubMessages;
@@ -21,6 +23,7 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Service;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers;
+using Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews;
 using Mark5.Mobile.IOS.Utilities;
 using Microsoft.AppCenter;
 using Microsoft.AppCenter.Crashes;
@@ -35,6 +38,9 @@ namespace Mark5.Mobile.IOS
     [Register("AppDelegate")]
     public class AppDelegate : UIApplicationDelegate, IUNUserNotificationCenterDelegate, IMessagingDelegate
     {
+        const string backgroundTaskID = "com.nordic-it.mark5.mobile.ios.task";
+        DateTime lastForegroundTaskRunDate = DateTime.MinValue;
+
         public override UIWindow Window { get; set; }
 
         public override bool WillFinishLaunching(UIApplication application, NSDictionary launchOptions)
@@ -103,6 +109,9 @@ namespace Mark5.Mobile.IOS
             UIApplication.SharedApplication.SetMinimumBackgroundFetchInterval(OneDayInterval);
 
             Window.MakeKeyAndVisible();
+
+            if (UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
+                BGTaskScheduler.Shared.Register(backgroundTaskID, null, HandleBackgroundTask);
 
             if (launchOptions == null)
                 return true;
@@ -191,6 +200,8 @@ namespace Mark5.Mobile.IOS
             Services.DocumentsUploadService?.Start();
             Services.DocumentPreviewsDownloadService?.Start();
             Services.DocumentsDownloadService?.Start();
+
+            HandleForegroundTask();
         }
 
         public override void DidEnterBackground(UIApplication application)
@@ -200,6 +211,9 @@ namespace Mark5.Mobile.IOS
             Services.DocumentsDownloadService?.Stop();
 
             LocalAuthenticationManager.NotifyApplicationEnteredBackground();
+
+            if (UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
+                ScheduleBackgroundTask();
         }
 
         public override void ReceiveMemoryWarning(UIApplication application)
@@ -325,6 +339,12 @@ namespace Mark5.Mobile.IOS
                     return;
                 }
 
+                if (DeviceReminderNotificationManager.GetReminderInfo(notification) != null)
+                {
+                    options(UNNotificationPresentationOptions.Alert);
+                    return;
+                }
+
                 var n = notification.ConvertToNotification();
 
                 if (n.ObjectType == ObjectType.Document)
@@ -357,6 +377,17 @@ namespace Mark5.Mobile.IOS
                 {
                     completionHandler();
                     return;
+                }
+
+
+                var reminderInfo = DeviceReminderNotificationManager.GetReminderInfo(response?.Notification);
+                if (reminderInfo != null)
+                {
+                    var vc = new AppointmentViewController(reminderInfo.Value.CalendarId,
+                        reminderInfo.Value.AppointmentId,
+                        reminderInfo.Value.RecurrenceIndex, false);
+
+                    Window.RootViewController.PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
                 }
 
                 var n = response.Notification.ConvertToNotification();
@@ -394,32 +425,101 @@ namespace Mark5.Mobile.IOS
         //Let's not forget the silent notifications limitations (2-3 notifications per hour max, and other limitations per day)
         //[Export("application:didReceiveRemoteNotification:fetchCompletionHandler:")]
         //public override void DidReceiveRemoteNotification(UIApplication application, NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler)
-        //{
-
+        //
         //}
 
         #endregion
 
+
+        #region Update Activities
+
         public override void PerformFetch(UIApplication application, Action<UIBackgroundFetchResult> completionHandler)
+        {
+            CommonConfig.Logger.Info("Background Fetch started...");
+
+            Task.Run(async () =>
+            {
+                try
+                {
+                    await RunJobs();
+
+                    completionHandler(UIBackgroundFetchResult.NewData);
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error("Background Fetch error!", ex);
+                    completionHandler(UIBackgroundFetchResult.Failed);
+                }
+            });
+        }
+
+        void ScheduleBackgroundTask()
+        {
+            CommonConfig.Logger.Error("Scheduling background task ");
+
+            var request = new BGAppRefreshTaskRequest(backgroundTaskID);
+            request.EarliestBeginDate = NSDate.Now.AddSeconds(10); //1 hour
+
+            BGTaskScheduler.Shared.Submit(request, out var _error);
+
+            if (_error != null)
+                CommonConfig.Logger.Error($"Error while scheduling background task: {_error} ");
+        }
+
+        void HandleBackgroundTask(BGTask task)
         {
             Task.Run(async () =>
             {
                 try
                 {
-                    CommonConfig.Logger.Info("Background Fetch: Retrieving system settings...");
-
-                    ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Remote);
-                    if (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
-                        await Managers.SystemManager.GetSystemUsersDepartmentsAsync(SourceType.Remote);
-                    completionHandler(UIBackgroundFetchResult.NewData);
+                    CommonConfig.Logger.Info("Running background task ");
+                    await RunJobs();
+                    task.SetTaskCompleted(true);
                 }
                 catch (Exception ex)
                 {
-                    CommonConfig.Logger.Error("Background Fetch: Error while retrieving system settings.", ex);
-                    completionHandler(UIBackgroundFetchResult.Failed);
+                    CommonConfig.Logger.Error("Background task error!", ex);
+                    task.SetTaskCompleted(false);
+                }
+            });
+
+            //This is necessary because the task otherwise is not run periodically
+            ScheduleBackgroundTask();
+        }
+
+        void HandleForegroundTask()
+        {
+            if (lastForegroundTaskRunDate > DateTime.Now.AddHours(-1))
+                return;
+
+            lastForegroundTaskRunDate = DateTime.Now;
+
+            Task.Run(async () =>
+            {
+                try
+                {
+                    CommonConfig.Logger.Info("Running foreground task ");
+                    await RunJobs();
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error("Foreground task error!", ex);
                 }
             });
         }
+
+        async Task RunJobs()
+        {
+            if (!await AuthenticatorFactory.Create().IsAuthenticatedAsync())
+                return;
+
+            var job1 = Jobs.SystemSettingsUpdateJob.Run();
+            var job2 = Jobs.RemindersUpdateJob.Run();
+            await Task.WhenAll(job1, job2);
+        }
+
+
+        #endregion
 
         void InitializeCommon()
         {
@@ -450,6 +550,7 @@ namespace Mark5.Mobile.IOS
                 CommonConfig.UsageAnalytics = new UsageAnalytics();
                 CommonConfig.ConcurrentQueueType = typeof(PortableConcurrentQueue<>);
                 CommonConfig.TimeZoneInfoDeserializer = TimeZoneInfo.FromSerializedString;
+                CommonConfig.DeviceReminderNotificationManager = new DeviceReminderNotificationManager();
 
                 if (UIDevice.CurrentDevice.CheckSystemVersion(10, 3))
                     CommonConfig.Utf8Normalizer = filename =>

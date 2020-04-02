@@ -14,6 +14,7 @@ using System.Collections.Concurrent;
 using System.Threading;
 using Mark5.Mobile.Common.DataAccess.Exceptions;
 using Mark5.Mobile.Common.Model.HubMessages;
+using Mark5.Mobile.Common.Synchronizer;
 
 namespace Mark5.Mobile.Common.Manager
 {
@@ -193,6 +194,18 @@ namespace Mark5.Mobile.Common.Manager
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
+
+
+        public async Task<List<CalendarReminder>> GetCalendarRemindersAsync()
+        {
+            return await calendarDataAccess.GetCalendarRemindersAsync();
+        }
+
+        public async Task SaveCalendarRemindersAsync(List<CalendarReminder> reminders)
+        {
+            await calendarDataAccess.SaveCalendarRemindersAsync(reminders);
+        }
+
     }
 
     class AppointmentsCache : IAppointmentsCache
@@ -234,7 +247,7 @@ namespace Mark5.Mobile.Common.Manager
 
         async Task Work(CancellationToken token)
         {
-            var calendarsList = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars;
+            var calendarsList = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars.Select(c => c.Id).ToList();
 
             while (!queue.IsCompleted && !token.IsCancellationRequested)
             {
@@ -244,13 +257,14 @@ namespace Mark5.Mobile.Common.Manager
                     {
                         (var startDate, var endDate) = GetTimePeriod(monthDate);
 
-                        var app = await Managers.CalendarManager.GetCalendarAppointmentsAsync(calendarsList.Select(c => c.Id).ToList(), startDate, endDate, SourceType.Auto);
+                        var app = await Managers.CalendarManager.GetCalendarAppointmentsAsync(calendarsList, startDate, endDate, SourceType.Auto);
 
                         if (!token.IsCancellationRequested)
                         {
                             AppointmentRetrieved(this, new AppointmentsRetrievedEventArgs(app, startDate, endDate));
 
                             cachedMonths.Add(monthDate);
+                            CheckIfShouldSynchronize();
                         }
                     }
                     catch (DataNotFoundException)
@@ -266,9 +280,21 @@ namespace Mark5.Mobile.Common.Manager
             }
         }
 
-        IEnumerable<MonthDate> GetUncached(DateTime start, DateTime end)
+        bool syncDone;
+
+        void CheckIfShouldSynchronize()
         {
-            return GetMonthDatePeriod(start, end).Where(md => !cachedMonths.Contains(md));
+            if (syncDone)
+                return;
+
+            var start = DateTime.UtcNow;
+            var end = start.AddDays(8);
+
+            if (cachedMonths.Contains(MonthDate.FromDateTime(start)) && cachedMonths.Contains(MonthDate.FromDateTime(end)))
+            {
+                Synchronizers.LocalRemindersSynchronizer.Synchronize();
+                syncDone = true;
+            }
         }
 
         List<MonthDate> GetMonthDatePeriod(DateTime start, DateTime end)
@@ -331,6 +357,7 @@ namespace Mark5.Mobile.Common.Manager
             queue.CompleteAdding();
             cachedMonths.Clear();
 
+            syncDone = false;
             started = false;
         }
 

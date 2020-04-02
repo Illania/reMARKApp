@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Android.App;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.App;
@@ -20,7 +21,8 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Service;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
-using Microsoft.AppCenter;
+using Mark5.Mobile.Droid.Utilities.DeviceReminder;
+using Mark5.Mobile.Droid.Utilities.Workers;
 using Microsoft.AppCenter.Crashes;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
@@ -28,6 +30,21 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     [Activity(MainLauncher = true, Icon = "@mipmap/ic_icon", Theme = "@style/mark5Splash", ScreenOrientation = ScreenOrientation.Portrait, NoHistory = true, ResizeableActivity = true)]
     public class SplashActivity : AppCompatActivity
     {
+        const string CalendarIdKey = "calendarId";
+        const string AppointmentIdKey = "appointmentId";
+        const string RecurrenceIndexKey = "recurrenceIndex";
+
+        public static Intent CreateShowAppointmentIntent(Context context, int calendarId, int appointmentId, int recurrenceIndex)
+        {
+            var intent = new Intent(context, typeof(SplashActivity));
+
+            intent.PutExtra(CalendarIdKey, calendarId);
+            intent.PutExtra(AppointmentIdKey, appointmentId);
+            intent.PutExtra(RecurrenceIndexKey, recurrenceIndex);
+
+            return intent;
+        }
+
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -123,17 +140,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                         break;
                 }
 
-                CommonConfig.Logger.Info($"Initializing {nameof(Managers)}...");
-
-                Managers.Initialize(ci);
-                Managers.DocumentsManager.MaxToFetch = PlatformConfig.Preferences.DocumentsToDownload;
-                Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
-                Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
-                Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
-
-                CommonConfig.Logger.Info("Retrieving system settings...");
-                ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
-
                 if (PlatformConfig.Preferences.ClearCache)
                 {
                     CommonConfig.UsageAnalytics.LogEvent(new SettingsCacheCleanUpEvent());
@@ -196,10 +202,27 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 Services.DocumentPreviewsDownloadService?.Start();
                 Services.DocumentsDownloadService?.Start();
 
+                DeviceReminderWorker.Schedule();
+
                 PushNotificationsUtilities.CreateChannelIfNotExists(this);
+                DeviceReminderBroadcastReceiver.CreateChannelIfNotExists(this);
 
                 if (t.Result)
-                    StartActivity(MainActivity.CreateIntent(this));
+                {
+                    Intent intent = null;
+                    if (Intent.HasExtra(CalendarIdKey))
+                    {
+                        var calendarId = Intent.GetIntExtra(CalendarIdKey, 0);
+                        var appointmentId = Intent.GetIntExtra(AppointmentIdKey, 0);
+                        var recurrenceIndex = Intent.GetIntExtra(RecurrenceIndexKey, 0);
+
+                        intent = MainActivity.CreateShowAppointmentIntent(this, calendarId, appointmentId, recurrenceIndex);
+                    }
+                    else
+                        intent = MainActivity.CreateIntent(this);
+
+                    StartActivity(intent);
+                }
                 else
                     ShowLoginButton();
 

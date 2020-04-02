@@ -20,11 +20,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         readonly AppointmentPresenter presenter;
 
         bool loaded;
+        bool showActions;
 
         List<LineViewModel> lineViewModels;
 
         UIBarButtonItem editButtonItem;
         UIBarButtonItem deleteButtonItem;
+        UIBarButtonItem closeButtonItem;
 
         UIStackView stackView;
         AppointmentSubjectView subjectView;
@@ -40,11 +42,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         AppointmentViewModel appointment;
 
-        public AppointmentViewController(int calendarId, int appointmentId, int recurrenceIndex)
+        public AppointmentViewController(int calendarId, int appointmentId, int recurrenceIndex, bool showActions = true)
         {
             this.appointmentId = appointmentId;
             this.calendarId = calendarId;
             this.recurrenceIndex = recurrenceIndex;
+            this.showActions = showActions;
             presenter = new AppointmentPresenter();
             presenter.AttachView(this);
             presenter.Start();
@@ -105,6 +108,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             if (editButtonItem != null)
                 editButtonItem.Clicked += EditButtinItem_Clicked;
 
+            if (closeButtonItem != null)
+                closeButtonItem.Clicked += CloseButtonItem_Clicked;
+
             if (participantsView != null)
             {
                 participantsView.SendInvitationClicked += SendInvitationsButton_TouchUpInside;
@@ -120,6 +126,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             if (editButtonItem != null)
                 editButtonItem.Clicked -= EditButtinItem_Clicked;
 
+            if (closeButtonItem != null)
+                closeButtonItem.Clicked -= CloseButtonItem_Clicked;
+
             if (participantsView != null)
             {
                 participantsView.SendInvitationClicked -= SendInvitationsButton_TouchUpInside;
@@ -129,17 +138,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         private void InitNavigationBar()
         {
-            deleteButtonItem = new UIBarButtonItem
+            if (showActions)
             {
-                Image = UIImage.FromBundle("Bin").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
-            };
+                deleteButtonItem = new UIBarButtonItem
+                {
+                    Image = UIImage.FromBundle("Bin").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
+                };
 
-            editButtonItem = new UIBarButtonItem
+                editButtonItem = new UIBarButtonItem
+                {
+                    Image = UIImage.FromBundle("Edit").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
+                };
+
+                NavigationItem.SetRightBarButtonItems(new[] { editButtonItem, deleteButtonItem }, false);
+            }
+            else
             {
-                Image = UIImage.FromBundle("Edit").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
-            };
-
-            NavigationItem.SetRightBarButtonItems(new[] { editButtonItem, deleteButtonItem }, false);
+                closeButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Close);
+                NavigationItem.SetRightBarButtonItem(closeButtonItem, false);
+            }
         }
 
         private void InitView()
@@ -207,7 +224,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             stackView.AddArrangedSubview(organizerView);
             stackView.AddArrangedSubview(calendarView);
-            //stackView.AddArrangedSubview(reminderView);
+            stackView.AddArrangedSubview(reminderView);
             stackView.AddArrangedSubview(participantsView);
         }
 
@@ -296,6 +313,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         private void EditButtinItem_Clicked(object sender, EventArgs e)
         {
             presenter.EditAppointmentClicked();
+        }
+
+        private void CloseButtonItem_Clicked(object sender, EventArgs e)
+        {
+            DismissViewController(true, null);
         }
 
         private async void DeleteButtonItem_Clicked(object sender, EventArgs e)

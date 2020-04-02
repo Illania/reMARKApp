@@ -19,6 +19,10 @@ namespace Mark5.Mobile.Common.Manager
 
         Task<List<CalendarAlarm>> GetCalendarAlarmsAsync(List<int> calendarIds, DateTime startDate, DateTime endDate, SourceType sourceType = SourceType.Auto);
 
+        Task<List<CalendarReminder>> GetCalendarRemindersAsync();
+
+        Task SaveCalendarRemindersAsync(List<CalendarReminder> reminders);
+
         IAppointmentsCache AppointmentsCache { get; }
     }
 
