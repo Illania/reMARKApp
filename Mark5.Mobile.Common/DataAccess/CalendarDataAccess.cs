@@ -191,7 +191,42 @@ namespace Mark5.Mobile.Common.DataAccess
 
         }
 
-        public async Task<List<CalendarAlarm>> GetCalendarAlarmsAsync(List<int> calendarIds, DateTime startDate, DateTime endDate)
+        public async Task<List<CalendarReminder>> GetCalendarRemindersAsync()
+        {
+            try
+            {
+                List<CalendarReminder> reminders = null;
+
+                await calendarDatabase.RunInConnectionAsync(c =>
+                {
+                    reminders = c.Table<CalendarReminder>().ToList();
+                });
+
+                return reminders;
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error getting calendar reminders.", ex);
+            }
+        }
+
+        public async Task SaveCalendarRemindersAsync(List<CalendarReminder> reminders)
+        {
+            try
+            {
+                await calendarDatabase.RunInConnectionAsync(c =>
+                        {
+                            c.DeleteAll<CalendarReminder>();
+                            c.InsertAll(reminders);
+                        });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error while savings calendar reminders.", ex);
+            }
+        }
+
+        public async Task<List<CalendarAlarm>> GetCalendarAlarmsAsync(List<int> calendarIds, DateTime startDate, DateTime endDate)  //TODO eventually remove calendar alarms
         {
             try
             {

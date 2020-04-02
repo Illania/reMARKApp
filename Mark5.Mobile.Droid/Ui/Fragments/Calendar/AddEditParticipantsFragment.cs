@@ -290,12 +290,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             menu.Clear();
 
             var addItem = menu.Add(Menu.None, MenuItemActions.AddParticipants, MenuItemActions.AddParticipants, Resource.String.participants);
-            addItem.SetIcon(Resource.Drawable.add_appointment);  //TODO need to rename to just add after refactoring
+            addItem.SetIcon(Resource.Drawable.add_appointment);
             addItem.SetShowAsAction(ShowAsAction.Always);
             addItem.SetOnMenuItemClickListener(this);
 
             var saveItem = menu.Add(Menu.None, MenuItemActions.SaveParticipants, MenuItemActions.SaveParticipants, Resource.String.save);
-            saveItem.SetShowAsAction(ShowAsAction.Always);  //Either we use an icon here too, or we change it in the previous view
+            saveItem.SetShowAsAction(ShowAsAction.Always);
             saveItem.SetOnMenuItemClickListener(this);
         }
 

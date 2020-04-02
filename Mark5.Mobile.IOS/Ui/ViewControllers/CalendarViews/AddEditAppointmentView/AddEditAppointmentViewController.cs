@@ -450,7 +450,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                         startDateRow.Unwrap(),
                         endDateRow.Unwrap(),
                         new ReoccurrenceRow(this),
-                        //new ReminderRow(this)
+                        new ReminderRow(this)
                     };
                 }
 

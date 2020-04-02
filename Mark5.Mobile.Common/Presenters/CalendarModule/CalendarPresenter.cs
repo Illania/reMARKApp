@@ -187,13 +187,13 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             LoadAppointments(lastVisibleStartDate, lastVisibleEndDate);
         }
 
-        private void HandleDeletedAppointment(EntityRemovedMessage erm)
-        {
-            view.DeleteAppointmentsWithIds(erm.EntitiesId);
-        }
-
         //This is not the prettiest, but a good fast solution
         //When we want to optimize, we can use the method to retrieve occurrences to make an improved versions
+        private void HandleDeletedAppointment(EntityRemovedMessage erm)
+        {
+            Refresh();
+        }
+
         private void HandleAddedAppointment(EntityAddedMessage erm)
         {
             Refresh();

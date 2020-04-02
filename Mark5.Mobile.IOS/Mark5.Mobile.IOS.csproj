@@ -296,6 +296,7 @@
 		<Compile Include="Ui\ViewControllers\SearchView\DocumentsSearchResultsViewController.cs" />
 		<Compile Include="Ui\ViewControllers\SearchView\DocumentsSplitSearchViewController.cs" />
 		<Compile Include="Ui\ViewControllers\SearchView\ShortcodesSearchResultsViewController.cs" />
+		<Compile Include="Utilities\DeviceReminderNotificationManager.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
