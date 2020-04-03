@@ -12,12 +12,13 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
+using Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Utilities;
 using TinyMessenger;
 using UIKit;
 
-namespace Mark5.Mobile.IOS.Ui.ViewControllers
+namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
 {
     public class DocumentsSearchResultsViewController : AbstractTableViewController, IPrimaryViewController, IUIGestureRecognizerDelegate, IUIViewControllerRestoration
     {
@@ -25,10 +26,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         UIBarButtonItem exitEditItem;
         UIBarButtonItem editItem;
+        UIBarButtonItem closeItem;
 
         TinyMessageSubscriptionToken readStatusChangedToken;
         TinyMessageSubscriptionToken commentsCountChangedToken;
         TinyMessageSubscriptionToken categoriesChangedToken;
+        TinyMessageSubscriptionToken goToDocumentToken;
+        TinyMessageSubscriptionToken deletedToken;
 
         #region UIViewController overrides
 
@@ -120,6 +124,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             readStatusChangedToken = CommonConfig.MessengerHub.Subscribe<DocumentPreviewReadStatusChangedMessage>(ReadStatusChangedHandler);
             commentsCountChangedToken = CommonConfig.MessengerHub.Subscribe<EntityPreviewCommentCountChangedMessage>(CommentsCountChangedHandler, m => m.ObjectType == ObjectType.Document);
             categoriesChangedToken = CommonConfig.MessengerHub.Subscribe<EntityCategoriesChangedMessage>(CategoriesChangedHandler, m => m.ObjectType == ObjectType.Document);
+            goToDocumentToken = CommonConfig.MessengerHub.Subscribe<GoToDocumentMessage>(GoToDocumentHandler);
+            deletedToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedMessage>(DeletedHandler, m => m.ObjectType == ObjectType.Document);
         }
 
         void UnsubscribeFromMessages()
@@ -127,6 +133,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             readStatusChangedToken?.Dispose();
             commentsCountChangedToken?.Dispose();
             categoriesChangedToken?.Dispose();
+            goToDocumentToken?.Dispose();
+            deletedToken?.Dispose();
         }
 
         #endregion
@@ -139,6 +147,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             exitEditItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
             editItem = new UIBarButtonItem(UIBarButtonSystemItem.Edit);
+
+            closeItem = new UIBarButtonItem
+            {
+                Title = Localization.GetString("close")
+            };
+
+            if (!Integration.IsRunningAtLeast(13) && Integration.IsIPad())
+                NavigationItem.SetRightBarButtonItem(closeItem, false);
         }
 
         void InitializeView()
@@ -153,6 +169,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeHandlers()
         {
+            if (closeItem != null)
+                closeItem.Clicked += CloseItem_Clicked;
+
             if (exitEditItem != null)
                 exitEditItem.Clicked += ExitEditItem_Clicked;
 
@@ -162,6 +181,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void DeinitializeHandlers()
         {
+            if (closeItem != null)
+                closeItem.Clicked -= CloseItem_Clicked;
+
             if (exitEditItem != null)
                 exitEditItem.Clicked -= ExitEditItem_Clicked;
 
@@ -172,6 +194,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         #endregion
 
         #region NavigationBar handlers
+
+        private void CloseItem_Clicked(object sender, EventArgs e)
+        {
+            DismissViewController(true, null);
+        }
 
         void ExitEditItem_Clicked(object sender, EventArgs e) => EndEditing();
 
@@ -259,7 +286,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 await Dialogs.ShowErrorAlertAsync(this, ex);
 
-                NavigationController?.PopViewController(true);
+                if (Integration.IsIPad())
+                    DismissViewController(true, null);
+                else
+                    NavigationController?.PopViewController(true);
             }
         }
 
@@ -269,10 +299,27 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void DocumentSelected(DocumentPreview documentPreview)
         {
-            var vc = new DocumentViewController(Integration.IsIPad());
-            vc.SetData(documentPreview, true);
-            vc.SetRefreshDataOnAppear();
-            NavigationController.PushViewController(vc, true);
+            if (Integration.IsIPad())
+            {
+                var nc = (UINavigationController)SplitViewController.ViewControllers[1];
+                nc.PopToViewController(nc.ViewControllers[0], false);
+
+                var vc = (DocumentPageViewController)nc.ViewControllers[0];
+                vc.DocumentPreviews = ((DataSource)TableView.Source).Items;
+
+                if (vc.IsShowingDocumentWithId(documentPreview.Id))
+                    return;
+
+                vc.HidesBottomBarWhenPushed = false;
+                vc.SetPage(null, documentPreview, false);
+            }
+            else
+            {
+                var vc = new DocumentViewController(Integration.IsIPad());
+                vc.SetData(documentPreview, true);
+                vc.SetRefreshDataOnAppear();
+                NavigationController.PushViewController(vc, true);
+            }
         }
 
         public void DocumentPreviewLongPressed(UILongPressGestureRecognizer recognizer)
@@ -567,6 +614,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             });
         }
 
+        void GoToDocumentHandler(GoToDocumentMessage message)
+        {
+            BeginInvokeOnMainThread(() =>
+            {
+                var index = ((DataSource)TableView.Source).Items.FindIndex(dp => dp.Id == message.DocumentId);
+
+                if (index >= 0)
+                {
+                    TableView.SelectRow(NSIndexPath.FromRowSection(index, 0), true, UITableViewScrollPosition.None);
+                    TableView.ScrollToRow(NSIndexPath.FromRowSection(index, 0), UITableViewScrollPosition.None, true);
+                }
+            });
+        }
+
+        void DeletedHandler(EntityRemovedMessage m) => RemoveDocumentsFromList(m.EntitiesId);
+
         #endregion
 
         #region Utilities
@@ -582,6 +645,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             TableView.SetEditing(false, true);
             NavigationItem.SetLeftBarButtonItem(NavigationItem.BackBarButtonItem, true);
+            NavigationItem.SetRightBarButtonItem(null, true);
+
+            if (!Integration.IsRunningAtLeast(13) && Integration.IsIPad())
+                NavigationItem.SetRightBarButtonItem(closeItem, false);
         }
 
         #endregion

@@ -1,7 +1,7 @@
 ﻿using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.IOS.Ui.Common;
-using Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView;
+using Mark5.Mobile.IOS.Ui.ViewControllers.SearchView;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 

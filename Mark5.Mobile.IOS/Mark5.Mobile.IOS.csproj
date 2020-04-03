@@ -119,11 +119,9 @@
 		<Compile Include="Ui\TableViewCells\WaitTableViewCell.cs" />
 		<Compile Include="Ui\ViewControllers\CommentsListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ContactViewController.cs" />
-		<Compile Include="Ui\ViewControllers\ContactsSearchResultsViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ContactsSplitViewController.cs" />
 		<Compile Include="Ui\ViewControllers\CopyToWorktrayViewController.cs" />
 		<Compile Include="Ui\ViewControllers\DocumentListViewController.cs" />
-		<Compile Include="Ui\ViewControllers\DocumentsSearchResultsViewController.cs" />
 		<Compile Include="Ui\ViewControllers\DocumentsSplitViewController.cs" />
 		<Compile Include="Ui\ViewControllers\FoldersNotificationsListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\LoginSettingsViewController.cs" />
@@ -136,7 +134,6 @@
 		<Compile Include="Ui\ViewControllers\SelectCategoriesListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\SettingsViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ShortcodeViewController.cs" />
-		<Compile Include="Ui\ViewControllers\ShortcodesSearchResultsViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ShortcodesSplitViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ComposeDocumentView\SuggestionsListView.cs" />
 		<Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\AttachmentsView.cs" />
@@ -158,10 +155,10 @@
 		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\MailViewerSubview.cs" />
 		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\PriorityView.cs" />
 		<Compile Include="Ui\ViewControllers\MailViewerView\Subviews\SubjectView.cs" />
-		<Compile Include="Ui\ViewControllers\SearchCriteriaView\AbstractSearchCriteriaViewController.cs" />
-		<Compile Include="Ui\ViewControllers\SearchCriteriaView\ContactsSearchCriteriaViewController.cs" />
-		<Compile Include="Ui\ViewControllers\SearchCriteriaView\DocumentsSearchCriteriaViewController.cs" />
-		<Compile Include="Ui\ViewControllers\SearchCriteriaView\ShortcodesSearchCriteriaViewController.cs" />
+		<Compile Include="Ui\ViewControllers\SearchView\AbstractSearchCriteriaViewController.cs" />
+		<Compile Include="Ui\ViewControllers\SearchView\ContactsSearchCriteriaViewController.cs" />
+		<Compile Include="Ui\ViewControllers\SearchView\DocumentsSearchCriteriaViewController.cs" />
+		<Compile Include="Ui\ViewControllers\SearchView\ShortcodesSearchCriteriaViewController.cs" />
 		<Compile Include="Utilities\ConsoleAndFileLogger.cs" />
 		<Compile Include="Utilities\DateTimeFormatter.cs" />
 		<Compile Include="Utilities\DeviceInfoProvider.cs" />
@@ -295,6 +292,10 @@
 		<Compile Include="Ui\ViewControllers\CalendarViews\AddEditAppointmentView\RecurrenceView\Subviews\PatternView.cs" />
 		<Compile Include="Ui\ViewControllers\CalendarViews\AddEditAppointmentView\RecurrenceView\Subviews\RangeView.cs" />
 		<Compile Include="Ui\Common\OutgoingWarningBar.cs" />
+		<Compile Include="Ui\ViewControllers\SearchView\ContactsSearchResultsViewController.cs" />
+		<Compile Include="Ui\ViewControllers\SearchView\DocumentsSearchResultsViewController.cs" />
+		<Compile Include="Ui\ViewControllers\SearchView\DocumentsSplitSearchViewController.cs" />
+		<Compile Include="Ui\ViewControllers\SearchView\ShortcodesSearchResultsViewController.cs" />
 		<Compile Include="Utilities\DeviceReminderNotificationManager.cs" />
 	</ItemGroup>
 	<ItemGroup>

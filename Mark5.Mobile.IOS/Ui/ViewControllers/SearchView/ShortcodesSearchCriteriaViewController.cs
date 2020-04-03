@@ -10,7 +10,7 @@ using Mark5.Mobile.IOS.Ui.Common;
 using ObjCRuntime;
 using UIKit;
 
-namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchCriteriaView
+namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
 {
     public class ShortcodesSearchCriteriaViewController : AbstractSearchCriteriaViewController, IUIViewControllerRestoration
     {

@@ -12,8 +12,6 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         protected AbstractSplitViewController()
         {
-            PreferredDisplayMode = UISplitViewControllerDisplayMode.AllVisible;
-
             SeparateSecondaryViewController = HandleSeparateSecondaryViewController;
             CollapseSecondViewController = HandleCollapseSecondViewController;
         }
@@ -27,6 +25,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
         public override void LoadView()
         {
             base.LoadView();
+
+            PreferredDisplayMode = UISplitViewControllerDisplayMode.AllVisible;
 
             ViewControllers = new UIViewController[]
             {
