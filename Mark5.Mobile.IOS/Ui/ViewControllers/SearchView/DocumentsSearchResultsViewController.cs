@@ -31,6 +31,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
         TinyMessageSubscriptionToken commentsCountChangedToken;
         TinyMessageSubscriptionToken categoriesChangedToken;
         TinyMessageSubscriptionToken goToDocumentToken;
+        TinyMessageSubscriptionToken deletedToken;
 
         #region UIViewController overrides
 
@@ -122,7 +123,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             readStatusChangedToken = CommonConfig.MessengerHub.Subscribe<DocumentPreviewReadStatusChangedMessage>(ReadStatusChangedHandler);
             commentsCountChangedToken = CommonConfig.MessengerHub.Subscribe<EntityPreviewCommentCountChangedMessage>(CommentsCountChangedHandler, m => m.ObjectType == ObjectType.Document);
             categoriesChangedToken = CommonConfig.MessengerHub.Subscribe<EntityCategoriesChangedMessage>(CategoriesChangedHandler, m => m.ObjectType == ObjectType.Document);
-            goToDocumentToken = CommonConfig.MessengerHub.Subscribe<GoToDocumentMessage>(HandleAction);
+            goToDocumentToken = CommonConfig.MessengerHub.Subscribe<GoToDocumentMessage>(GoToDocumentHandler);
+            deletedToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedMessage>(DeletedHandler, m => m.ObjectType == ObjectType.Document);
         }
 
         void UnsubscribeFromMessages()
@@ -131,6 +133,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             commentsCountChangedToken?.Dispose();
             categoriesChangedToken?.Dispose();
             goToDocumentToken?.Dispose();
+            deletedToken?.Dispose();
         }
 
         #endregion
@@ -588,7 +591,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             });
         }
 
-        void HandleAction(GoToDocumentMessage message)
+        void GoToDocumentHandler(GoToDocumentMessage message)
         {
             BeginInvokeOnMainThread(() =>
             {
@@ -601,6 +604,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 }
             });
         }
+
+        void DeletedHandler(EntityRemovedMessage m) => RemoveDocumentsFromList(m.EntitiesId);
 
         #endregion
 
