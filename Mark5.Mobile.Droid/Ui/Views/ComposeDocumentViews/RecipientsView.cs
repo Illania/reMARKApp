@@ -179,7 +179,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                             SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.To).Select(da => da.Address).Union(replyToAddresses));
                     }
                     else if (AddressType == DocumentAddressType.Cc)
-                        SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.Cc).Select(da => da.Address));
+                        SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.Cc).Select(da => da.Address).Distinct());
                 }
                 if (PreviousDocumentPreview.Direction == DocumentDirection.Outgoing)
                     SetEmails(PreviousDocumentPreview.Addresses.Where(da => da.AddressType == AddressType).Select(da => da.Address));
