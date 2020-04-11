@@ -25,5 +25,7 @@ namespace Mark5.Mobile.Common.Manager
 
         Task<bool> CreateOrUpdateShortcodeAsync(Shortcode shortcode, ShortcodePreview shortcodePreview, SourceType sourceType = SourceType.Auto);
 
+        Task<List<Recipient>> GetSuggestions(string phrase);
+
     }
 }

@@ -264,5 +264,36 @@ namespace Mark5.Mobile.Common.DataAccess
                 c.DeleteAll<Shortcode>();
             });
         }
+
+        public async Task<List<ShortcodePreview>> GetShortcodePreviewSuggestions(string phrase)
+        {
+            try
+            {
+                List<ShortcodePreview> suggestions = null;
+                
+                await shortcodesDatabase.RunInConnectionAsync(c =>
+                {
+          
+                    var commandString = $"select SCP.{nameof(ShortcodePreview.Id)}, SCP.{nameof(ShortcodePreview.Name)}"
+                         + $" from {nameof(ShortcodePreview)} SCP"
+                         + $" where (SCP.{nameof(ShortcodePreview.Name)} like @phrase)"
+                         + $" limit 100"
+                         + "  collate Nocase";
+                 
+                    var cmd = c.CreateCommand(commandString);
+                    cmd.Bind("@phrase", $"%{phrase}%");
+                    var result = cmd.ExecuteQuery<ShortcodePreview>();
+                    suggestions = result;
+                });
+
+         
+                return suggestions;
+            }
+            catch
+            {
+                return new List<ShortcodePreview>();
+            }
+        }
+
     }
 }

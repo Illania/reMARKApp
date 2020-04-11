@@ -323,7 +323,8 @@ namespace Mark5.Mobile.Common.Model
         RecentAddress,
         Phonebook,
         Contact,
-        Internal
+        Internal,
+        Shortcode
     }
 
     #endregion

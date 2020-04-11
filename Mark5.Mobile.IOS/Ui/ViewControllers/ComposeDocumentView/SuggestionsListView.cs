@@ -353,20 +353,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             public void AddSuggestion(Recipient printableSuggestion)
             {
                 var text = TextView.Text;
-                var splittedRecipients = text.Split(new[]
-                        {
-                        RecipientSeperator
-                    },
-                        StringSplitOptions.None)
-                    .ToList();
+                var splittedRecipients = text.Split(new[]{ RecipientSeperator }, StringSplitOptions.None).ToList();
                 splittedRecipients.RemoveAt(splittedRecipients.Count - 1);
-                if (printableSuggestion.Address.Contains('@'))
+                if (printableSuggestion.Type == RecipientType.Shortcode)
                 {
-                    splittedRecipients.Add(printableSuggestion.ToString());
+                    var addresses = printableSuggestion.Address.Split(new[] { RecipientSeperator }, StringSplitOptions.None).ToList();
+                    foreach (var address in addresses)
+                        splittedRecipients.Add(address);
                 }
                 else
                 {
-                    splittedRecipients.Add(printableSuggestion.Address);
+                    if (printableSuggestion.Address.Contains('@'))
+                    {
+                        splittedRecipients.Add(printableSuggestion.ToString());
+                    }
+                    else
+                    {
+                        splittedRecipients.Add(printableSuggestion.Address);
+                    }
                 }
 
                 TextView.Text = string.Join(RecipientSeperator, splittedRecipients) + RecipientSeperator;
