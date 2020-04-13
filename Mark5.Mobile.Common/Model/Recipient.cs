@@ -56,6 +56,7 @@ namespace Mark5.Mobile.Common.Model
         //This is used by the SuggestionAdapter in Android for the text to be inserted
         public override string ToString()
         {
+            if (Type == RecipientType.Shortcode) return Address;
             return Type == RecipientType.Internal ? Address : string.IsNullOrEmpty(Name) ? Address : $"{Name} <{Address}>";
         }
 

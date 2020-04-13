@@ -68,7 +68,16 @@ namespace Mark5.Mobile.Droid.Ui.Common
             if (start >= 0)
                 addressSpannable.SetSpan(new ForegroundColorSpan(colorSelection), start, end, SpanTypes.ExclusiveExclusive);
 
-            suggestionAddressTextView.TextFormatted = addressSpannable;
+            if (suggestion.Type == RecipientType.Shortcode)
+            {
+                var addressPreview = addressSpannable.SubSequence(0, 30).Trim(',');
+                addressPreview += "...";
+                suggestionAddressTextView.TextFormatted = new SpannableStringBuilder(addressPreview);
+            }
+            else
+            {
+                suggestionAddressTextView.TextFormatted = addressSpannable;
+            }
 
             if (!string.IsNullOrEmpty(name))
             {
