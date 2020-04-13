@@ -18,6 +18,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
     public class AddEditShortcodeViewController : AbstractTableViewController
     {
+        readonly TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
+        public Task<bool> Result => tcs.Task;
+        private bool saved = false;
+
         public Shortcode Shortcode { get; set; }
         public ShortcodePreview ShortcodePreview { get; set; }
         public ShortcodeCreationModeFlag CreationModeFlag { get; set; }
@@ -89,6 +93,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         protected override void Recycle()
         {
             base.Recycle();
+
+            tcs?.TrySetResult(saved);
 
             saveButtonItem = null;
             cancelButtonItem = null;
@@ -205,6 +211,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void CancelButton_Clicked(object sender, EventArgs e)
         {
             DismissViewController(true, null);
+            if (!tcs.TrySetResult(false))
+                CommonConfig.Logger.Error("Result was already set!");
         }
 
         async void SaveButton_Clicked(object sender, EventArgs e)
@@ -222,6 +230,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 dismissAction();
                 DismissViewController(true, null);
+                if (!tcs.TrySetResult(true))
+                    CommonConfig.Logger.Error("Result was already set!");
             }
             catch (Exception ex)
             {
