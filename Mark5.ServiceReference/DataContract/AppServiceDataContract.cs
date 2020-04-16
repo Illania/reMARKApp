@@ -2396,6 +2396,9 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "WorktrayEnabled", Order = 1)]
         public bool? WorktrayEnabled { get; set; } = null;
+
+        [DataMember(Name = "UseForFROM", Order = 1)]
+        public int UseForFROM { get; set; }
     }
 
     [DataContract(Name = "ContactsModuleInfo", Namespace = "com.nordic-it.appservice.v3")]

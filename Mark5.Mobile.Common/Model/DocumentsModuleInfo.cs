@@ -91,5 +91,7 @@ namespace Mark5.Mobile.Common.Model
         public bool HandledFieldEnabled { get; set; }
         public DocumentsModulePermissions Permissions { get; set; }
         public bool? WorktrayEnabled { get; set; }
+
+        public int UseForFROM { get; set; }
     }
 }

@@ -299,6 +299,7 @@ namespace Mark5.Mobile.Common.Model.Converters
                 OnSendToSystemUser = dmi.OnSendToSystemUser.ConvertEnum<OnSendToSystemUser>(),
                 Permissions = dmi.Permissions?.Convert(),
                 WorktrayEnabled = dmi.WorktrayEnabled,
+                UseForFROM = dmi.UseForFROM
             };
             if (dmi.AttachmentKeywords != null)
                 result.AttachmentKeywords.AddRange(dmi.AttachmentKeywords.Where(s => !string.IsNullOrWhiteSpace(s)));
