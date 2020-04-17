@@ -21,7 +21,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
     {
         readonly TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
         public Task<bool> Result => tcs.Task;
-        private bool saved = false;
 
         public Contact Contact { get; set; }
         public ContactPreview ContactPreview { get; set; }
@@ -104,7 +103,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.Recycle();
 
-            tcs?.TrySetResult(saved);
+            tcs?.TrySetResult(false);
 
             saveButtonItem = null;
             cancelButtonItem = null;
