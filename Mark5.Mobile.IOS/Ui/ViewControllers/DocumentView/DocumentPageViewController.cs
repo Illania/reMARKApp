@@ -11,7 +11,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
 {
-    public class DocumentPageViewController : AbstractPageViewController, IDocumentPageViewControllerDelegate
+    public class DocumentPageViewController : AbstractPageViewController, IDocumentPageViewControllerDelegate, ISecondaryViewController
     {
         UIBarButtonItem previousDocumentButtonItem;
         UIBarButtonItem nextDocumentButtonItem;
@@ -31,6 +31,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
         public Folder Folder { get; set; }
         public DocumentPreview InitialDocumentPreview { get; set; }
         public List<DocumentPreview> DocumentPreviews { get; set; }
+
+        public bool Empty => !IsShowingAnyDocument();
 
         readonly List<DocumentViewController> viewControllerCache = new List<DocumentViewController>(CacheCapacity + 1);
 
@@ -222,6 +224,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
         #endregion
 
         #region Utilities
+
+        bool IsShowingAnyDocument()
+        {
+            var vc = (DocumentViewController)ViewControllers.FirstOrDefault();
+            return vc?.IsRecycled() == false && vc.DocumentPreview?.Id != null;
+        }
 
         bool HasNext(DocumentPreview documentPreview)
         {
