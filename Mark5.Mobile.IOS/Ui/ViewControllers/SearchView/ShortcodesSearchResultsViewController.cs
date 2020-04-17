@@ -22,6 +22,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
 
         UIBarButtonItem exitEditItem;
         UIBarButtonItem editItem;
+        UIBarButtonItem closeItem;
+
 
         #region UIViewController overrides
 
@@ -118,6 +120,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
 
             exitEditItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
             editItem = new UIBarButtonItem(UIBarButtonSystemItem.Edit);
+
+            closeItem = new UIBarButtonItem
+            {
+                Title = Localization.GetString("close")
+            };
+
+            if (!Integration.IsRunningAtLeast(13) && Integration.IsIPad())
+                NavigationItem.SetRightBarButtonItem(closeItem, false);
         }
 
         void InitializeView()
@@ -137,6 +147,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
 
             if (editItem != null)
                 editItem.Clicked += EditItem_Clicked;
+
+            if (closeItem != null)
+                closeItem.Clicked += CloseItem_Clicked;
         }
 
         void DeinitializeHandlers()
@@ -146,11 +159,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
 
             if (editItem != null)
                 editItem.Clicked -= EditItem_Clicked;
+
+            if (closeItem != null)
+                closeItem.Clicked -= CloseItem_Clicked;
         }
 
         #endregion
 
         #region NavigationBar handlers
+
+        private void CloseItem_Clicked(object sender, EventArgs e)
+        {
+            DismissViewController(true, null);
+        }
 
         void ExitEditItem_Clicked(object sender, EventArgs e) => EndEditing();
 
@@ -219,7 +240,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
 
                 await Dialogs.ShowErrorAlertAsync(this, ex);
 
-                NavigationController?.PopViewController(true);
+                if (Integration.IsIPad())
+                    DismissViewController(true, null);
+                else
+                    NavigationController?.PopViewController(true);
             }
         }
 
@@ -229,10 +253,27 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
 
         public void ShortcodeSelected(UITableView tableView, ShortcodePreview shortcodePreview)
         {
-            var vc = new ShortcodeViewController();
-            vc.SetData(shortcodePreview, true, true);
-            vc.SetRefreshDataOnAppear();
-            NavigationController.PushViewController(vc, true);
+            if (Integration.IsIPad())
+            {
+                var nc = (UINavigationController)SplitViewController.ViewControllers[1];
+                nc.PopToViewController(nc.ViewControllers[0], false);
+
+                var vc = (ShortcodeViewController)nc.ViewControllers[0];
+
+                if (vc.IsShowingShortcodeWithId(shortcodePreview.Id))
+                    return;
+
+                vc.ClearData();
+                vc.SetData(shortcodePreview.Id);
+                vc.RefreshData();
+            }
+            else
+            {
+                var vc = new ShortcodeViewController();
+                vc.SetData(shortcodePreview, true, true);
+                vc.SetRefreshDataOnAppear();
+                NavigationController.PushViewController(vc, true);
+            }
         }
 
         public void ShortcodePreviewLongPressed(UILongPressGestureRecognizer recognizer)
@@ -276,6 +317,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             TableView.SetEditing(false, true);
             NavigationItem.SetRightBarButtonItem(null, true);
             NavigationItem.SetLeftBarButtonItem(NavigationItem.BackBarButtonItem, true);
+
+            if (!Integration.IsRunningAtLeast(13) && Integration.IsIPad())
+                NavigationItem.SetRightBarButtonItem(closeItem, false);
         }
 
         #endregion

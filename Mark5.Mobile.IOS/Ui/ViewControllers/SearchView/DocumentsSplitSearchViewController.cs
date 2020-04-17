@@ -17,7 +17,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
         {
             return new NavigationController(new DocumentsSearchResultsViewController() { Criteria = criteria })
             {
-                RestorationIdentifier = "Primary_NavigationController_" + nameof(DocumentsSearchResultsViewController)
+                RestorationIdentifier = "Search_Primary_NavigationController_" + nameof(DocumentsSearchResultsViewController)
             };
         }
 
@@ -25,7 +25,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
         {
             return new NavigationController(new DocumentPageViewController())
             {
-                RestorationIdentifier = "Secondary_NavigationController_" + nameof(DocumentPageViewController)
+                RestorationIdentifier = "Search_Secondary_NavigationController_" + nameof(DocumentPageViewController)
             };
         }
     }
