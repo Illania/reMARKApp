@@ -404,6 +404,9 @@
 		<Reference Include="SQLite-net">
 		  <HintPath>..\packages\sqlite-net-pcl.1.5.231\lib\netstandard1.1\SQLite-net.dll</HintPath>
 		</Reference>
+		<Reference Include="GMImagePicker.Xamarin">
+		  <HintPath>..\packages\GMImagePicker.Xamarin.2.3.5\lib\xamarinios10\GMImagePicker.Xamarin.dll</HintPath>
+		</Reference>
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Mark5.Mobile.Common\Mark5.Mobile.Common.csproj">
