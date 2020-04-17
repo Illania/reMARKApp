@@ -60,6 +60,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillAppear(animated);
 
+            if (UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
+                ModalInPresentation = true;
+
             if (Integration.IsRunningAtLeast(11))
             {
                 if (NavigationController != null)
