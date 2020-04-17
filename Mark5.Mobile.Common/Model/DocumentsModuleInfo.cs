@@ -92,6 +92,6 @@ namespace Mark5.Mobile.Common.Model
         public DocumentsModulePermissions Permissions { get; set; }
         public bool? WorktrayEnabled { get; set; }
 
-        public int UseForFROM { get; set; }
+        public UseForFrom UseForFrom { get; set; } = UseForFrom.LicenseName;
     }
 }

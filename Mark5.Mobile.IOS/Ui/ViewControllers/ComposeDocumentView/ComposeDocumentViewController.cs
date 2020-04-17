@@ -1349,18 +1349,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             {
                 
                 var fromString = string.Empty;
-                switch (ServerConfig.SystemSettings.DocumentsModuleInfo.UseForFROM)
+                switch (ServerConfig.SystemSettings.DocumentsModuleInfo.UseForFrom)
                 {
-                    case 0:
+                    case UseForFrom.LicenseName:
                         fromString = ServerConfig.SystemSettings.SystemInfo.CustomerName;
                         break;
-                    case 1:
+                    case UseForFrom.UserName:
                         fromString = ServerConfig.SystemSettings.UserInfo.User.FullName;
                         break;
-                    case 2:
+                    case UseForFrom.UserLogin:
                         fromString = ServerConfig.SystemSettings.UserInfo.User.Username;
                         break;
-                    case 3:
+                    case UseForFrom.LineName:
                         fromString = document.Lines.Select(l=>l.FromAddress).FirstOrDefault();
                         break;
                 }

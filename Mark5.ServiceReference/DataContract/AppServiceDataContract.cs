@@ -700,6 +700,15 @@ namespace Mark5.ServiceReference.DataContract
         [EnumMember(Value = "Locked")] Locked = 10
     }
 
+    [DataContract(Name = "UseForFrom", Namespace = "com.nordic-it.appservice.v3")]
+    public enum UseForFrom
+    {
+        [EnumMember(Value = "LicenseName")] LicenseName = 0,
+        [EnumMember(Value = "UserName")] UserName = 1,
+        [EnumMember(Value = "UserLogin")] UserLogin = 2,
+        [EnumMember(Value = "LineName")] LineName = 3
+    }
+
     #endregion
 
     #region Contact
@@ -2397,8 +2406,8 @@ namespace Mark5.ServiceReference.DataContract
         [DataMember(Name = "WorktrayEnabled", Order = 1)]
         public bool? WorktrayEnabled { get; set; } = null;
 
-        [DataMember(Name = "UseForFROM", Order = 1)]
-        public int UseForFROM { get; set; }
+        [DataMember(Name = "UseForFrom", Order = 1)]
+        public UseForFrom UseForFrom { get; set; }
     }
 
     [DataContract(Name = "ContactsModuleInfo", Namespace = "com.nordic-it.appservice.v3")]
