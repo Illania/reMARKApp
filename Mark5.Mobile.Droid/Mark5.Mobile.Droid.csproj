@@ -19,6 +19,8 @@
     <AndroidEnableMultiDex>true</AndroidEnableMultiDex>
     <AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
     <JavaMaximumHeapSize>1G</JavaMaximumHeapSize>
+    <AndroidSupportedAbis>armeabi-v7a;x86;arm64-v8a;x86_64</AndroidSupportedAbis>
+    <AndroidCreatePackagePerAbi>true</AndroidCreatePackagePerAbi>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -29,7 +31,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AndroidLinkMode>None</AndroidLinkMode>
-    <AndroidSupportedAbis>armeabi-v7a;x86;x86_64;arm64-v8a</AndroidSupportedAbis>
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <MandroidI18n>cjk;mideast;west;other;rare</MandroidI18n>
     <AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidClientHandler</AndroidHttpClientHandlerType>
@@ -43,6 +44,7 @@
     <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
     <NoWarn>
     </NoWarn>
+    <AndroidDexTool>dx</AndroidDexTool>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -58,12 +60,12 @@
     <AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidClientHandler</AndroidHttpClientHandlerType>
     <JavaMaximumHeapSize>1G</JavaMaximumHeapSize>
     <AndroidTlsProvider>btls</AndroidTlsProvider>
-    <AndroidSupportedAbis>armeabi-v7a;arm64-v8a</AndroidSupportedAbis>
     <AndroidKeyStore>True</AndroidKeyStore>
     <AndroidSigningKeyStore>../../extra/App Development Certificates/Android/default.keystore</AndroidSigningKeyStore>
     <AndroidSigningStorePass>Xs4Droid2015!</AndroidSigningStorePass>
     <AndroidSigningKeyAlias>default</AndroidSigningKeyAlias>
     <AndroidSigningKeyPass>Xs4Droid2015!</AndroidSigningKeyPass>
+    <AndroidDexTool>dx</AndroidDexTool>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -349,6 +351,7 @@
     <Compile Include="Utilities\Integration.cs" />
     <Compile Include="Utilities\LocalNotificationsListener.cs" />
     <Compile Include="Utilities\MimeTypeMap.cs" />
+    <Compile Include="Utilities\ObjectTypeHelper.cs" />
     <Compile Include="Utilities\Phonebook.cs" />
     <Compile Include="Utilities\PortableConcurrentQueue.cs" />
     <Compile Include="Utilities\Preferences.cs" />
@@ -641,7 +644,6 @@
     <AndroidResource Include="Resources\anim\slide_down.xml" />
     <AndroidResource Include="Resources\anim\slide_up.xml" />
     <AndroidResource Include="Resources\color\drawer_item.xml" />
-    <AndroidResource Include="Resources\color\drawer_item_background.xml" />
     <AndroidResource Include="Resources\color\drawer_item_icon.xml" />
     <AndroidResource Include="Resources\drawable\circle_blue.xml" />
     <AndroidResource Include="Resources\drawable\circle_dark.xml" />
@@ -1107,10 +1109,6 @@
     <ProjectReference Include="..\MaterialDialogs\MaterialDialogs.csproj">
       <Project>{03F5EB27-28E4-4309-962C-628C73475478}</Project>
       <Name>MaterialDialogs</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Mark5.Mobile.IOS\Mark5.Mobile.IOS.csproj">
-      <Project>{3FB59A6F-9438-433D-A3BA-247D914A06AE}</Project>
-      <Name>Mark5.Mobile.IOS</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

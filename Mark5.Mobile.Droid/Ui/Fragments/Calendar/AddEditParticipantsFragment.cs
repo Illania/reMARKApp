@@ -73,7 +73,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             UpdateAddButton();
 
             participantTextView = rootView.FindViewById<AppCompatAutoCompleteTextView>(Resource.Id.participant_text);
-            suggestionsAdapter = new SuggestionsAdapter(true);
+            suggestionsAdapter = new SuggestionsAdapter(DocumentAddressType.None,true);
 
             participantTextView.TextChanged += ParticipantTextView_TextChanged;
             participantTextView.ItemClick += ParticipantTextView_ItemClick;

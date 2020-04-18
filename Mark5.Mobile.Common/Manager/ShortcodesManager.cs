@@ -192,23 +192,8 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task<List<Recipient>> GetSuggestions(string phrase)
         {
-            var recipients = new List<Recipient>();
-            var result = await shortcodesDataAccess.GetShortcodePreviewSuggestions(phrase);
-            if (result.Any())
-            {
-                foreach (var shortcode in result)
-                {                  
-                    var shortCodeInfo = await GetShortcodeWithPreviewAsync(-1, shortcode.Id);
-                    var addresses = shortCodeInfo.Shortcode.Addresses.Select(a => a.Address).ToList();
-                    var recipient = new Recipient() {
-                        Name = shortCodeInfo.ShortcodePreview.Name,
-                        Address = string.Join(",", addresses),
-                        Type = RecipientType.Shortcode
-                    };
-                    recipients.Add(recipient);
-                }
-            }
-            return recipients;
+            var result = await shortcodesDataAccess.GetSuggestions(phrase);
+            return result;
         }
     }
 }

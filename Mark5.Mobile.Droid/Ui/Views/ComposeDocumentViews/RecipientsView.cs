@@ -1,24 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.Graphics;
+using Android.Runtime;
 using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Text;
 using Android.Text.Style;
 using Android.Views;
 using Android.Widget;
+using Java.Lang;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
+using Exception = System.Exception;
+using Math = System.Math;
+using Object = System.Object;
+using String = System.String;
+using StringBuilder = System.Text.StringBuilder;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 {
@@ -92,28 +98,29 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             titleTextView.SetText(titleId);
             AddView(titleTextView);
 
-            emailEditor = new AppCompatMultiAutoCompleteTextView(context);
+            emailEditor = new RecipientAutocompleteTextView(context, AddressType)
+            {
+                Adapter = new SuggestionsAdapter(AddressType),
+                Threshold = 2,
+                InputType =
+                    InputTypes.ClassText | InputTypes.TextVariationEmailAddress | InputTypes.TextFlagMultiLine,
+                Ellipsize = TextUtils.TruncateAt.End,
+                DropDownVerticalOffset = Conversion.ConvertDpToPixels(4)
+            };
             emailEditor.SetPadding(0, 0, 0, 0);
+            emailEditor.SetTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
+            emailEditor.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
+            emailEditor.SetBackgroundColor(Color.Transparent);
+            emailEditor.BeforeTextChanged += TextView_BeforeTextChanged;
+            emailEditor.AfterTextChanged += TextView_AfterTextChanged;
+            emailEditor.FocusChange += TextView_FocusChange;
+            
             var contentLayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
             {
                 RightMargin = DistanceNormal,
                 Weight = 1
             };
-            emailEditor.SetTextAppearanceCompat(context, Resource.Style.fontPrimary);
-            emailEditor.SetBackgroundColor(Color.Transparent);
-
-            emailEditor.Adapter = new SuggestionsAdapter();
-            emailEditor.SetTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
-            emailEditor.Threshold = 2;
-            emailEditor.TextSize = 15;
-            emailEditor.InputType = InputTypes.ClassText | InputTypes.TextVariationEmailAddress | InputTypes.TextFlagMultiLine;
-            emailEditor.Ellipsize = TextUtils.TruncateAt.End;
-            emailEditor.DropDownVerticalOffset = Conversion.ConvertDpToPixels(4);
-
-            emailEditor.BeforeTextChanged += TextView_BeforeTextChanged;
-            emailEditor.AfterTextChanged += TextView_AfterTextChanged;
-            emailEditor.FocusChange += TextView_FocusChange;
-
+            
             AddView(emailEditor, contentLayoutParameters);
 
             var addButton = new AppCompatImageButton(Context);
@@ -511,7 +518,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
                 char lastChar;
 
-                while ((lastChar = spannable.LastOrDefault()) != default(char) && (lastChar == ' ' || lastChar == ',' || lastChar == '\t' || lastChar.ToString() == System.Environment.NewLine))
+                while ((lastChar = spannable.LastOrDefault()) != default(char) && (lastChar == ' ' 
+                || lastChar == ',' || lastChar == '\t' || lastChar.ToString() == System.Environment.NewLine))
                 {
                     textHasChangedFlag = true;
 
@@ -645,4 +653,35 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         #endregion
     }
+    
+    
+    public class RecipientAutocompleteTextView : AppCompatMultiAutoCompleteTextView
+    {
+        private readonly DocumentAddressType _addressType;
+
+        public RecipientAutocompleteTextView(Context context, DocumentAddressType addressType) : base(context)
+        {
+            _addressType = addressType;
+        }
+
+        /// <summary>
+        /// Method allows us to put our custom text value (instead of Recipient.ToString()) into address field after user has clicked on a suggestion.
+        /// </summary>
+        /// <param name="selectedItem">Recipient object selected in Suggestions dropdown</param>
+        /// <returns>Text that should be put into address field (to/cc/bcc)</returns>
+        protected override ICharSequence ConvertSelectionToStringFormatted(Java.Lang.Object selectedItem)
+        {
+            var selectedObject = selectedItem.Cast<object>();
+
+            if (selectedObject is Recipient recipient)
+            {
+                return new Java.Lang.String(recipient.GetFullAddressText(_addressType));
+            }
+
+            return base.ConvertSelectionToStringFormatted(selectedItem);
+        }
+    }
+
+ 
 }
+

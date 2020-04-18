@@ -12,6 +12,7 @@ using Android.Widget;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.PortableCollections;
+using Object = Java.Lang.Object;
 
 namespace Mark5.Mobile.Droid.Ui.Common
 {
@@ -28,14 +29,16 @@ namespace Mark5.Mobile.Droid.Ui.Common
         readonly SuggestionsObservableCollection suggestions = new SuggestionsObservableCollection();
 
         public Filter Filter { get; }
+        private DocumentAddressType _addressType { get; }
 
         public override int Count => suggestions.Count;
 
         public string ActualConstraint;
 
-        public SuggestionsAdapter(bool includeInternalContacts = false)
+        public SuggestionsAdapter(DocumentAddressType addressType, bool includeInternalContacts = false)
         {
             Filter = new SuggestionsFilter(this, includeInternalContacts);
+            _addressType = addressType;
         }
 
         public override View GetView(int position, View convertView, ViewGroup parent)
@@ -56,7 +59,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             var name = suggestion.Name;
             if (!string.IsNullOrEmpty(suggestion.ShortId))
                 name += " " + suggestion.ShortId;
-            var address = suggestion.Address;
+            var address = suggestion.GetAddressPreviewText(_addressType);
 
             var colorSelection = new Color(ContextCompat.GetColor(parent.Context, Resource.Color.darkblue));
 
@@ -70,7 +73,8 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
             if (suggestion.Type == RecipientType.Shortcode)
             {
-                var addressPreview = addressSpannable.SubSequence(0, 30).Trim(',');
+                var addressPreviewLength = suggestion.GetAddressPreviewText(_addressType).Length;
+                var addressPreview = address.Substring(0, addressPreviewLength > 30 ? 30 : addressPreviewLength).Trim(',');
                 addressPreview += "...";
                 suggestionAddressTextView.TextFormatted = new SpannableStringBuilder(addressPreview);
             }

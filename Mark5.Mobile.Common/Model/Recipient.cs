@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.Common.Model
 {
@@ -12,6 +14,10 @@ namespace Mark5.Mobile.Common.Model
         public string AddressDescription { get; set; }
         public string ShortId { get; set; }
         public RecipientType Type { get; set; }
+
+        public List<DocumentAddress> Addresses => Type == RecipientType.Shortcode 
+            ? Serializer.Deserialize<List<DocumentAddress>>(Address) 
+            : new List<DocumentAddress>();
 
         public Recipient(RecentAddress ra)
             : this(ra.Name, ra.Address, RecipientType.RecentAddress)
@@ -42,7 +48,8 @@ namespace Mark5.Mobile.Common.Model
                 return false;
 
             var other = (Recipient)obj;
-            return string.Equals(Name, other.Name, StringComparison.CurrentCultureIgnoreCase) && string.Equals(Address, other.Address, StringComparison.CurrentCultureIgnoreCase) && Type == other.Type;
+            return string.Equals(Name, other.Name, StringComparison.CurrentCultureIgnoreCase) && string.Equals(Address, 
+                other.Address, StringComparison.CurrentCultureIgnoreCase) && Type == other.Type;
         }
 
         public override int GetHashCode()
@@ -53,11 +60,23 @@ namespace Mark5.Mobile.Common.Model
             }
         }
 
-        //This is used by the SuggestionAdapter in Android for the text to be inserted
-        public override string ToString()
+        public string GetAddressPreviewText(DocumentAddressType addressType)
         {
-            if (Type == RecipientType.Shortcode) return Address;
-            return Type == RecipientType.Internal ? Address : string.IsNullOrEmpty(Name) ? Address : $"{Name} <{Address}>";
+            return Type == RecipientType.Shortcode 
+                ? string.Join(",",Addresses
+                    .Where(a => a.AddressType == addressType)
+                    .Select(a => a.Address).ToList()) 
+                : Address;
+        }
+
+        public string GetFullAddressText(DocumentAddressType addressType)
+        {
+            if (Type == RecipientType.Shortcode) 
+                return GetAddressPreviewText(addressType);
+            
+            return Type == RecipientType.Internal 
+                ? Address 
+                : string.IsNullOrEmpty(Name) ? Address : $"{Name} <{Address}>";
         }
 
         #endregion

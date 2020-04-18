@@ -35,7 +35,7 @@ namespace Mark5.Mobile.Common.DataAccess
 
         Task DeleteAllAsync();
 
-        Task<List<ShortcodePreview>> GetShortcodePreviewSuggestions(string phrase);
+        Task<List<Recipient>> GetSuggestions(string phrase);
 
     }
 }

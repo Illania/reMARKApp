@@ -7,6 +7,7 @@ using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Containers;
 using Mark5.Mobile.Common.Model.Links;
+using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.Common.DataAccess
 {
@@ -265,24 +266,29 @@ namespace Mark5.Mobile.Common.DataAccess
             });
         }
 
-        public async Task<List<ShortcodePreview>> GetShortcodePreviewSuggestions(string phrase)
+        public async Task<List<Recipient>> GetSuggestions(string phrase)
         {
             try
             {
-                List<ShortcodePreview> suggestions = null;
+                List<Recipient> suggestions = null;
                 
                 await shortcodesDatabase.RunInConnectionAsync(c =>
                 {
           
-                    var commandString = $"select SCP.{nameof(ShortcodePreview.Id)}, SCP.{nameof(ShortcodePreview.Name)}"
+                    var commandString = $"select SCP.{nameof(ShortcodePreview.Name)} as {nameof(Recipient.Name)},"
+                         + $" SC.{nameof(Shortcode.AddressString)} as {nameof(Recipient.Address)},"
+                         + $" {(int)RecipientType.Shortcode} as {nameof(Recipient.Type)}"
                          + $" from {nameof(ShortcodePreview)} SCP"
+                         + $" inner join {nameof(Shortcode)} SC" 
+                         + $" on SCP.{nameof(ShortcodePreview.Id)} = SC.{nameof(Shortcode.Id)} "
                          + $" where (SCP.{nameof(ShortcodePreview.Name)} like @phrase)"
-                         + $" limit 100"
+                         + "  limit 100"
                          + "  collate Nocase";
                  
                     var cmd = c.CreateCommand(commandString);
                     cmd.Bind("@phrase", $"%{phrase}%");
-                    var result = cmd.ExecuteQuery<ShortcodePreview>();
+                    var result = cmd.ExecuteQuery<Recipient>();
+                    
                     suggestions = result;
                 });
 
@@ -291,7 +297,7 @@ namespace Mark5.Mobile.Common.DataAccess
             }
             catch
             {
-                return new List<ShortcodePreview>();
+                return new List<Recipient>();
             }
         }
 

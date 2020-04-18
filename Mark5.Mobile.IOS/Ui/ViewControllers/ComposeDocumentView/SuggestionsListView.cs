@@ -197,7 +197,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         public void SuggestionSelected(Recipient printableSuggestion)
         {
-            suggestionsTextView.AddSuggestion(printableSuggestion);
+            suggestionsTextView.AddSuggestion(printableSuggestion, recipientsView.AddressType);
             RecipientClicked(this, printableSuggestion);
             Dismiss();
 
@@ -273,14 +273,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 if (string.IsNullOrWhiteSpace(s.Name))
                 {
                     var cell = tableView.DequeueReusableCell("cell1") ?? UITableViewCellUtilities.CreateDefault("cell1");
-                    cell.TextLabel.Text = s.Address;
+                    cell.TextLabel.Text = s.GetAddressPreviewText(suggestionsListView.recipientsView.AddressType);
                     return cell;
                 }
                 else
                 {
                     var cell = tableView.DequeueReusableCell("cell2") ?? UITableViewCellUtilities.CreateWithSubtitle("cell2");
                     cell.TextLabel.Text = s.Name;
-                    cell.DetailTextLabel.Text = s.Address;
+                    cell.DetailTextLabel.Text = s.GetAddressPreviewText(suggestionsListView.recipientsView.AddressType);
                     return cell;
                 }
             }
@@ -350,27 +350,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             #region Public methods
 
-            public void AddSuggestion(Recipient printableSuggestion)
+            public void AddSuggestion(Recipient printableSuggestion, DocumentAddressType addressType)
             {
                 var text = TextView.Text;
                 var splittedRecipients = text.Split(new[]{ RecipientSeperator }, StringSplitOptions.None).ToList();
                 splittedRecipients.RemoveAt(splittedRecipients.Count - 1);
+                
                 if (printableSuggestion.Type == RecipientType.Shortcode)
                 {
-                    var addresses = printableSuggestion.Address.Split(new[] { RecipientSeperator }, StringSplitOptions.None).ToList();
-                    foreach (var address in addresses)
-                        splittedRecipients.Add(address);
+                    var addresses = printableSuggestion.Addresses
+                        .Where(a => a.AddressType == addressType)
+                        .Select(a => a.Address)
+                        .ToList();
+                    
+                    splittedRecipients.AddRange(addresses);
                 }
                 else
                 {
-                    if (printableSuggestion.Address.Contains('@'))
-                    {
-                        splittedRecipients.Add(printableSuggestion.ToString());
-                    }
-                    else
-                    {
-                        splittedRecipients.Add(printableSuggestion.Address);
-                    }
+                    splittedRecipients.Add(printableSuggestion.Address.Contains('@')
+                        ? printableSuggestion.ToString()
+                        : printableSuggestion.Address);
                 }
 
                 TextView.Text = string.Join(RecipientSeperator, splittedRecipients) + RecipientSeperator;
