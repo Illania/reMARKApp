@@ -6,12 +6,14 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Utilities;
+using TinyMessenger;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
@@ -24,6 +26,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
         UIBarButtonItem editItem;
         UIBarButtonItem closeItem;
 
+        TinyMessageSubscriptionToken deletedToken;
+
         #region UIViewController overrides
 
         public override void LoadView()
@@ -32,6 +36,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
 
             InitializeNavigationBar();
             InitializeView();
+            SubscribeToMessages();
         }
 
         public override void ViewDidLoad()
@@ -85,6 +90,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             CommonConfig.Logger.Warning("Received memory warning!");
 
             ((DataSource)TableView.Source)?.Reset();
+
+            UnsubscribeFromMessages();
 
             GC.Collect();
             base.DidReceiveMemoryWarning();
@@ -158,6 +165,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
 
             if (closeItem != null)
                 closeItem.Clicked -= CloseItem_Clicked;
+        }
+
+        void SubscribeToMessages()
+        {
+            deletedToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedMessage>(DeletedHandler, m => m.ObjectType == ObjectType.Contact);
+        }
+
+        void UnsubscribeFromMessages()
+        {
+            deletedToken?.Dispose();
         }
 
         #endregion
@@ -241,6 +258,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 else
                     NavigationController?.PopViewController(true);
             }
+        }
+
+        #endregion
+
+        #region Message handlers
+
+        void DeletedHandler(EntityRemovedMessage m)
+        {
+            BeginInvokeOnMainThread(() =>
+            {
+                ((DataSource)TableView.Source).RemoveItems(m.EntitiesId.ToList());
+            });
         }
 
         #endregion
@@ -418,7 +447,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
         class DataSource : UITableViewSource
         {
             public bool Empty => !items.SelectMany(v => v).Any();
-            public IEnumerable<ContactPreview> Items => items.SelectMany(i => i);
+            public List<ContactPreview> Items => items.SelectMany(i => i).ToList();
 
             readonly WeakReference<ContactsSearchResultsViewController> viewControllerWeakReference;
             readonly WeakReference<UITableView> tableViewWeakReference;
