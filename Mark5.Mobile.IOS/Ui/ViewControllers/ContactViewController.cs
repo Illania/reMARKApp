@@ -555,6 +555,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     CreationModeFlag = ContactCreationModeFlag.Edit
                 };
                 PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+
+                var contactUpdated = await vc.Result;
+
+                if (contactUpdated)
+                    RefreshData();
+                  
             }
             else
             {
