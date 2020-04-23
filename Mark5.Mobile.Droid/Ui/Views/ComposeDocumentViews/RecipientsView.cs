@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.Graphics;
-using Android.Runtime;
 using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Text;
@@ -17,12 +16,12 @@ using Java.Lang;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 using Exception = System.Exception;
 using Math = System.Math;
-using Object = System.Object;
 using String = System.String;
 using StringBuilder = System.Text.StringBuilder;
 
@@ -58,7 +57,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         string fullEditorText = string.Empty;
 
         readonly AppCompatMultiAutoCompleteTextView emailEditor;
-        readonly DocumentAddressType AddressType;
+        internal readonly DocumentAddressType AddressType;
 
         string savedRecipient;
         bool compressed;
@@ -114,6 +113,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             emailEditor.BeforeTextChanged += TextView_BeforeTextChanged;
             emailEditor.AfterTextChanged += TextView_AfterTextChanged;
             emailEditor.FocusChange += TextView_FocusChange;
+            emailEditor.ItemClick += TextView_ItemClick;
             
             var contentLayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
             {
@@ -307,7 +307,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
             else
             {
-                CommonConfig.Logger.Info(string.Format("No valid internal users found in {0}.", internalUsers));
+                CommonConfig.Logger.Info($"No valid internal users found in {internalUsers}.");
             }
         }
 
@@ -346,7 +346,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
             else
             {
-                CommonConfig.Logger.Info(string.Format("No valid emails found in {0}.", emails));
+                CommonConfig.Logger.Info($"No valid emails found in {emails}.");
             }
         }
 
@@ -479,6 +479,20 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         #region Control event handlers
 
+        private void TextView_ItemClick(object sender, AdapterView.ItemClickEventArgs e)
+        {
+            if (!(sender is RecipientAutocompleteTextView recipientTextView))
+                return;
+
+            if (recipientTextView.SelectedRecipient == null) 
+                return;
+
+            var recipientSuggestion = recipientTextView.SelectedRecipient;
+            
+            if(recipientSuggestion.Type == RecipientType.Shortcode) 
+                CommonConfig.MessengerHub.Publish(new ShortcodeRecipientSelectedMessage(recipientTextView, recipientSuggestion));
+        }
+        
         void AddButton_Click(object sender, EventArgs e) => AddButtonClicked(this, EventArgs.Empty);
 
         void TextView_FocusChange(object sender, FocusChangeEventArgs e)
@@ -558,10 +572,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         void UpdateTextView()
         {
-            if (compressed)
-                emailEditor.Text = fullEditorText.SafeSubstring(0, 100);
-            else
-                emailEditor.Text = fullEditorText;
+            emailEditor.Text = compressed 
+                ? fullEditorText.SafeSubstring(0, 100) 
+                : fullEditorText;
         }
 
         void CompressView()
@@ -657,11 +670,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
     
     public class RecipientAutocompleteTextView : AppCompatMultiAutoCompleteTextView
     {
-        private readonly DocumentAddressType _addressType;
+        internal DocumentAddressType AddressType { get; }
+
+        internal Recipient SelectedRecipient { get; set; }
 
         public RecipientAutocompleteTextView(Context context, DocumentAddressType addressType) : base(context)
         {
-            _addressType = addressType;
+            AddressType = addressType;
         }
 
         /// <summary>
@@ -673,9 +688,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             var selectedObject = selectedItem.Cast<object>();
 
-            if (selectedObject is Recipient recipient)
+            if (selectedObject is Recipient recipientSuggestion)
             {
-                return new Java.Lang.String(recipient.GetFullAddressText(_addressType));
+                SelectedRecipient = recipientSuggestion;
+                return new Java.Lang.String(recipientSuggestion.GetFullAddressText(AddressType));
             }
 
             return base.ConvertSelectionToStringFormatted(selectedItem);
