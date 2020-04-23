@@ -65,7 +65,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         bool HandleCollapseSecondViewController(UISplitViewController splitViewController, UIViewController secondaryViewController, UIViewController primaryViewController)
         {
             var secondaryNavigationController = (NavigationController)secondaryViewController;
-            if (((ISecondaryViewController)secondaryNavigationController.ViewControllers[0]).Empty)
+            if ((secondaryNavigationController.ViewControllers[0] as ISecondaryViewController)?.Empty == true)
                 return true;
 
             var primaryNavigationController = (NavigationController)primaryViewController;

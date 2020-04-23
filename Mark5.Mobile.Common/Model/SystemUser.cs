@@ -12,5 +12,20 @@ namespace Mark5.Mobile.Common.Model
         public string PatronymicName { get; set; }
         public string LastName { get; set; }
         public byte[] Avatar { get; set; }
+
+        public string FullName
+        {
+            get
+            {
+                var fullName = string.Empty;
+                if (!string.IsNullOrWhiteSpace(FirstName))
+                    fullName += FirstName.Trim();
+                if (!string.IsNullOrWhiteSpace(PatronymicName))
+                    fullName += " " + PatronymicName.Trim();
+                if (!string.IsNullOrWhiteSpace(LastName))
+                    fullName += " " + LastName.Trim();
+                return fullName.Trim();
+            }
+        }
     }
 }

@@ -115,6 +115,14 @@ namespace Mark5.Mobile.Common.Model
         Locked = 10
     }
 
+    public enum UseForFrom
+    {
+        LicenseName = 0,
+        UserName = 1,
+        UserLogin = 2,
+        LineName = 3
+    }
+
     #endregion
 
     #region Contacts

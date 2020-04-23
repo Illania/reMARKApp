@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Foundation;
+using GMImagePicker;
 using HtmlAgilityPack;
 using MailBee.Html;
 using Mark5.Mobile.Common;
@@ -404,14 +405,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                         {
                             var config = HtmlProcessingConfiguration.DefaultForEditing;
                             config.InjectReplyHeader = true;
-                            config.ReplyHeaderParameters = GetReplyHeaderParameters(previousDocumentPreview);
+                            config.ReplyHeaderParameters = GetReplyHeaderParameters(previousDocumentPreview, previousDocument);
                             previousDocumentContent = await ProcessHtml(previousDocument.HtmlBody, config);
                         }
                         else if (!string.IsNullOrWhiteSpace(previousDocument?.PlainTextBody))
                         {
                             var config = PlainTextProcessingConfiguration.DefaultForEditing;
                             config.InjectReplyHeader = true;
-                            config.ReplyHeaderParameters = GetReplyHeaderParameters(previousDocumentPreview);
+                            config.ReplyHeaderParameters = GetReplyHeaderParameters(previousDocumentPreview, previousDocument);
                             previousDocumentContent = await ProcessPlainText(previousDocument.PlainTextBody, config);
                         }
                         else
@@ -1175,18 +1176,59 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         void InsertExistingPhoto(PopoverPresentationControllerDelegate d)
         {
-            var picker = new UIImagePickerController
+            var picker = new GMImagePickerController
             {
-                AllowsEditing = false,
-                SourceType = UIImagePickerControllerSourceType.SavedPhotosAlbum,
-                MediaTypes = new[] { UTType.Image.ToString() },
-                Delegate = new ImagePickerControllerDelegate(this, HandleAttachmentImage),
-                ModalPresentationStyle = UIModalPresentationStyle.PageSheet
+                MediaTypes = new[] { Photos.PHAssetMediaType.Image },
+                Title = "Add Images",
+                CustomDoneButtonTitle = "Add",
+                CustomCancelButtonTitle = "Cancel",
+                AllowsMultipleSelection = true
             };
+
+            picker.FinishedPickingAssets += (sender, e) =>
+            {
+
+                var imageManager = new PHImageManager();
+                var options = new PHImageRequestOptions
+                {
+                    DeliveryMode = PHImageRequestOptionsDeliveryMode.HighQualityFormat,
+                    ResizeMode = PHImageRequestOptionsResizeMode.Exact,
+                    Synchronous = true,
+                    NetworkAccessAllowed = true
+                };
+
+                foreach (var asset in e.Assets)
+                {
+                    imageManager.RequestImageData(asset, options, (data, dataUti, orientation, info) =>
+                    {
+                        var originalImage = UIImage.LoadFromData(data);
+                        var jpegImage = originalImage.AsJPEG();                    
+
+                        var filename = PHAssetResource.GetAssetResources(asset)[0].OriginalFilename;
+                        filename = Path.ChangeExtension(filename,".jpeg");
+
+                        HandleAttachmentImage(filename, jpegImage);
+
+                    });
+                }
+            };
+
+            picker.Canceled += ImagePicking_Canceled;
+
             if (picker.PopoverPresentationController != null)
                 picker.PopoverPresentationController.Delegate = d;
             PresentViewController(picker, true, null);
         }
+
+
+        private void ImagePicking_Canceled(object sender, EventArgs e)
+        {
+            if (sender is UIImagePickerController controller)
+            {
+                controller.DismissViewController(true, null);
+            }
+        }
+
 
         void InsertFile(PopoverPresentationControllerDelegate d)
         {
@@ -1198,49 +1240,56 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 "public.eml"
             }, UIDocumentPickerMode.Import)
             {
-                Delegate = new DocumentMenuDelegate(this, HandleAttachmentUrl)
+                Delegate = new DocumentMenuDelegate(this, HandleAttachmentUrls),
+                AllowsMultipleSelection = true
             };
             if (picker.PopoverPresentationController != null)
                 picker.PopoverPresentationController.Delegate = d;
             PresentViewController(picker, true, null);
         }
 
-        async void HandleAttachmentUrl(NSUrl url)
+        async void HandleAttachmentUrls(NSUrl[] urls)
         {
             Stream stream = null;
 
-            try
+            foreach (var url in urls)
             {
-                var filename = url.LastPathComponent;
-                stream = new FileStream(url.Path, FileMode.Open, FileAccess.Read);
-                var result = url.TryGetResource(NSUrl.FileSizeKey, out NSObject sizeObject, out NSError _error);
-
-                if (!result)
-                    throw new Exception(_error.ToString());
-
-                var sizeInBytes = int.Parse(sizeObject.ToString());
-
-                if (sizeInBytes > ServerConfig.SystemSettings.DocumentsModuleInfo.MaximumAttachmentSizeBytes)
+                try
                 {
-                    await Dialogs.ShowErrorAlertAsync(this, new Exception(Localization.GetString("attachment_too_big")));
-                    return;
+                    
+                    var filename = url.LastPathComponent;
+                    stream = new FileStream(url.Path, FileMode.Open, FileAccess.Read);
+                    var result = url.TryGetResource(NSUrl.FileSizeKey, out NSObject sizeObject, out NSError _error);
+
+                    if (!result)
+                        throw new Exception(_error.ToString());
+
+                    var sizeInBytes = int.Parse(sizeObject.ToString());
+
+                    if (sizeInBytes > ServerConfig.SystemSettings.DocumentsModuleInfo.MaximumAttachmentSizeBytes)
+                    {
+                        await Dialogs.ShowErrorAlertAsync(this, new Exception(Localization.GetString("attachment_too_big")));
+                        return;
+                    }
+
+                    var file = await Managers.DocumentsManager.SaveDocumentWorkingCopyAttachmentAsync(filename, stream);
+                    attachmentsView.AddFileDescription(new FileDescription(file));
                 }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error($"Failed to save attachment [Url={url}, PreviousDocumentId={PreviousDocumentId}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={DocumentCreationModeFlag}]", ex);
 
-                var file = await Managers.DocumentsManager.SaveDocumentWorkingCopyAttachmentAsync(filename, stream);
-                attachmentsView.AddFileDescription(new FileDescription(file));
+                    await Dialogs.ShowErrorAlertAsync(this, new Exception(Localization.GetString("error_saving_local_attachment")));
+                }
+                finally
+                {
+                    stream?.Dispose();
+                }
             }
-            catch (Exception ex)
-            {
-                CommonConfig.Logger.Error($"Failed to save attachment [Url={url}, PreviousDocumentId={PreviousDocumentId}, PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={DocumentCreationModeFlag}]", ex);
-
-                await Dialogs.ShowErrorAlertAsync(this, new Exception(Localization.GetString("error_saving_local_attachment")));
-            }
-            finally
-            {
-                stream?.Dispose();
-            }
+                
         }
 
+     
         async void HandleAttachmentImage(string filename, NSData jpegData)
         {
             Stream stream = null;
@@ -1372,22 +1421,45 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             template.Content = templateContent;
         }
 
-        static string[] GetReplyHeaderParameters(DocumentPreview documentPreview)
+        static string[] GetReplyHeaderParameters(DocumentPreview documentPreview, Document document)
         {
-            var from = GetAddressTextFromPreviousDocument(documentPreview, DocumentAddressType.From);
+            var from = GetAddressTextFromPreviousDocument(documentPreview, document, DocumentAddressType.From);
+            
             var date = documentPreview.DateReceivedTimestamp
                                       .ConvertTimestampMillisecondsToDateTime()
                                       .ConvertUtcToUserTime()
                                       .ConvertDateTimeToTimestampMilliseconds()
                                       .FormatUserTimestampAsTimeAndDateString();
-            var to = GetAddressTextFromPreviousDocument(documentPreview, DocumentAddressType.To, DocumentAddressType.Cc);
+            var to = GetAddressTextFromPreviousDocument(documentPreview, document, DocumentAddressType.To, DocumentAddressType.Cc);
             var subject = documentPreview.Subject;
 
             return new[] { from, date, to, subject };
         }
 
-        static string GetAddressTextFromPreviousDocument(DocumentPreview documentPreview, params DocumentAddressType[] addressTypes)
+        static string GetAddressTextFromPreviousDocument(DocumentPreview documentPreview, Document document, params DocumentAddressType[] addressTypes)
         {
+            if (documentPreview.Direction == DocumentDirection.Outgoing && addressTypes[0].Equals(DocumentAddressType.From))
+            {
+                
+                var fromString = string.Empty;
+                switch (ServerConfig.SystemSettings.DocumentsModuleInfo.UseForFrom)
+                {
+                    case UseForFrom.LicenseName:
+                        fromString = ServerConfig.SystemSettings.SystemInfo.CustomerName;
+                        break;
+                    case UseForFrom.UserName:
+                        fromString = ServerConfig.SystemSettings.UserInfo.User.FullName;
+                        break;
+                    case UseForFrom.UserLogin:
+                        fromString = ServerConfig.SystemSettings.UserInfo.User.Username;
+                        break;
+                    case UseForFrom.LineName:
+                        fromString = document.Lines.Select(l=>l.FromAddress).FirstOrDefault();
+                        break;
+                }
+                return fromString;
+            }
+            
             var sb = new StringBuilder();
             var addresses = documentPreview.Addresses.Where(da => addressTypes.Contains(da.AddressType)).ToArray();
             for (var i = 0; i < addresses.Length; i++)
@@ -1420,6 +1492,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             {
                 try
                 {
+                    
                     NSData jpegImage;
                     using (var image = (UIImage)info[UIImagePickerController.OriginalImage])
                     {
@@ -1463,20 +1536,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             }
         }
 
-        class DocumentMenuDelegate : UIDocumentPickerDelegate, IUIDocumentPickerDelegate
+        class DocumentMenuDelegate : UIDocumentPickerDelegate
         {
-            readonly WeakReference<ComposeDocumentViewController> vcWeak;
-            readonly Action<NSUrl> handler;
+            readonly Action<NSUrl[]> _handler;
 
-            public DocumentMenuDelegate(ComposeDocumentViewController vc, Action<NSUrl> handler)
+            public DocumentMenuDelegate(ComposeDocumentViewController vc, Action<NSUrl[]> handler)
             {
-                vcWeak = vc.Wrap();
-                this.handler = handler;
+                vc.Wrap();
+                _handler = handler;
+            }
+
+            public override void DidPickDocument(UIDocumentPickerViewController controller, NSUrl[] urls)
+            {
+                _handler(urls);
+              
             }
 
             public override void DidPickDocument(UIDocumentPickerViewController controller, NSUrl url)
             {
-                handler(url);
+                DidPickDocument(controller, new[] { url });
             }
         }
 

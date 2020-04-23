@@ -339,7 +339,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        void EditButtonItem_Clicked(object sender, EventArgs e)
+        async void EditButtonItem_Clicked(object sender, EventArgs e)
         {
             var vc = new AddEditShortcodeViewController
             {
@@ -347,7 +347,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Shortcode = shortcode,
                 CreationModeFlag = ShortcodeCreationModeFlag.Edit
             };
+
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+            var scUpdated = await vc.Result;
+
+            if (scUpdated)
+                RefreshData();
         }
 
         void FileToButton_Clicked(object sender, EventArgs e)

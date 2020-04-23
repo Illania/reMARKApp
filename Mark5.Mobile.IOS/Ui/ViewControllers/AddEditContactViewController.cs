@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
@@ -18,6 +19,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
     public class AddEditContactViewController : AbstractTableViewController
     {
+        readonly TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
+        public Task<bool> Result => tcs.Task;
+
         public Contact Contact { get; set; }
         public ContactPreview ContactPreview { get; set; }
         public ContactType ContactType { get; set; }
@@ -54,6 +58,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
+
+            if (UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
+                ModalInPresentation = true;
 
             if (Integration.IsRunningAtLeast(11))
             {
@@ -95,6 +102,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         protected override void Recycle()
         {
             base.Recycle();
+
+            tcs?.TrySetResult(false);
 
             saveButtonItem = null;
             cancelButtonItem = null;
@@ -290,6 +299,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void CancelButton_Clicked(object sender, EventArgs e)
         {
             DismissViewController(true, null);
+            if (!tcs.TrySetResult(false))
+                CommonConfig.Logger.Error("Result was already set!");
         }
 
         async void SaveButton_Clicked(object sender, EventArgs e)
@@ -311,6 +322,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 dismissAction();
                 DismissViewController(true, null);
+                if (!tcs.TrySetResult(true))
+                    CommonConfig.Logger.Error("Result was already set!");
             }
             catch (Exception ex)
             {
