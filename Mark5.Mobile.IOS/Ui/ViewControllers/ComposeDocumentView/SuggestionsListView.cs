@@ -358,7 +358,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 
                 if (printableSuggestion.Type == RecipientType.Shortcode)
                 {
-                    var addresses = printableSuggestion.Addresses
+                    var addresses = printableSuggestion.ShortcodeAddresses
                         .Where(a => a.AddressType == addressType)
                         .Select(a => a.Address)
                         .ToList();

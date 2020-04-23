@@ -15,7 +15,7 @@ namespace Mark5.Mobile.Common.Model
         public string ShortId { get; set; }
         public RecipientType Type { get; set; }
 
-        public List<DocumentAddress> Addresses => Type == RecipientType.Shortcode 
+        public List<DocumentAddress> ShortcodeAddresses => Type == RecipientType.Shortcode 
             ? Serializer.Deserialize<List<DocumentAddress>>(Address) 
             : new List<DocumentAddress>();
 
@@ -34,6 +34,25 @@ namespace Mark5.Mobile.Common.Model
             Address = address;
             Type = type;
             Id = id;
+        }
+        
+        public string GetAddressPreviewText(DocumentAddressType addressType)
+        {
+            return Type == RecipientType.Shortcode 
+                ? string.Join(", ",ShortcodeAddresses
+                    .Where(a => a.AddressType == addressType)
+                    .Select(a => a.Address).ToList()) 
+                : Address;
+        }
+
+        public string GetFullAddressText(DocumentAddressType addressType)
+        {
+            if (Type == RecipientType.Shortcode) 
+                return GetAddressPreviewText(addressType);
+            
+            return Type == RecipientType.Internal 
+                ? Address 
+                : string.IsNullOrEmpty(Name) ? Address : $"{Name} <{Address}>";
         }
 
         #region Overrides
@@ -58,25 +77,6 @@ namespace Mark5.Mobile.Common.Model
             {
                 return (Name != null ? Name.GetHashCode() : 0) ^ (Address != null ? Address.GetHashCode() : 0) ^ Type.GetHashCode();
             }
-        }
-
-        public string GetAddressPreviewText(DocumentAddressType addressType)
-        {
-            return Type == RecipientType.Shortcode 
-                ? string.Join(",",Addresses
-                    .Where(a => a.AddressType == addressType)
-                    .Select(a => a.Address).ToList()) 
-                : Address;
-        }
-
-        public string GetFullAddressText(DocumentAddressType addressType)
-        {
-            if (Type == RecipientType.Shortcode) 
-                return GetAddressPreviewText(addressType);
-            
-            return Type == RecipientType.Internal 
-                ? Address 
-                : string.IsNullOrEmpty(Name) ? Address : $"{Name} <{Address}>";
         }
 
         #endregion
