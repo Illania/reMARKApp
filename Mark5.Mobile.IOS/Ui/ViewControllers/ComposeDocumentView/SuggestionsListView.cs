@@ -4,13 +4,16 @@ using System.Linq;
 using System.Threading;
 using CoreGraphics;
 using Foundation;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.PortableCollections;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews;
 using Mark5.Mobile.IOS.Utilities;
+using TinyMessenger;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
@@ -112,7 +115,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 recipientsView.SuggestionOverlayActive = true;
 
             suggestionsTextView.SetOriginalState(recipientsView?.GetText() ?? initialSearchString, recipientsView?.AddressType ?? DocumentAddressType.None);
-
+            suggestionsTextView.AddressType = recipientsView.AddressType;
             DoSearch(initialSearchString);
         }
 
@@ -358,6 +361,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 
                 if (printableSuggestion.Type == RecipientType.Shortcode)
                 {
+                    CommonConfig.MessengerHub.Publish(new ShortcodeRecipientSelectedMessage(this, printableSuggestion));
+                    
                     var addresses = printableSuggestion.ShortcodeAddresses
                         .Where(a => a.AddressType == addressType)
                         .Select(a => a.Address)
@@ -404,8 +409,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 if (TextView.Text == originalState && AddressType != DocumentAddressType.None)
                     ReachedOriginalState(this, EventArgs.Empty);
             }
-
+            
             #endregion
+
         }
     }
 }

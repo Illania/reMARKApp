@@ -23,7 +23,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         protected const string RecipentFormat = "{0} <{1}>";
 
         public SystemUsersDepartments SystemUsersDepartments { get; set; }
-        public DocumentAddressType AddressType { get; protected set; }
+        public DocumentAddressType AddressType { get; protected internal set; }
         public bool Empty => ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable
         ? !Validator.ContainsValidEmail(TextView.Text) && !Validator.ContainsValidUsernames(TextView.Text, SystemUsersDepartments) : !Validator.ContainsValidEmail(TextView.Text);
 
@@ -455,7 +455,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         #region Helper methods
 
-        protected void CorrectMarkup()
+        protected internal void CorrectMarkup()
         {
             TextView.TextStorage.BeginEditing();
 

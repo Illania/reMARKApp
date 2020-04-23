@@ -11,6 +11,7 @@ using MailBee.Html;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Model;
@@ -22,6 +23,7 @@ using Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView;
 using Mark5.Mobile.IOS.Utilities;
 using MobileCoreServices;
 using Photos;
+using TinyMessenger;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
@@ -30,7 +32,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
     {
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
         const int AutoSaveWorkingCopyInterval = 5000; // 5 seconds
-
+        protected const string RecipientSeperator = ", ";
+        
         readonly string DefaultTitle = Localization.GetString("new_document");
 
         public bool RestoreWorkingCopy { get; set; }
@@ -73,6 +76,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         Worker autoSaveWorkingCopyWorker;
 
         SystemUsersDepartments systemUserDepartments;
+        
+        TinyMessageSubscriptionToken shortcodeSuggestionSelectedToken;
 
         public override void ViewDidLoad()
         {
@@ -105,6 +110,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 ModalInPresentation = true;
 
             InitializeHandlers();
+            SubscribeToMessages();
         }
 
         public override void ViewDidAppear(bool animated)
@@ -127,6 +133,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         {
             CommonConfig.Logger.Warning("Received memory warning!");
 
+            UnsubscribeFromMessages();
+            
             GC.Collect();
             base.DidReceiveMemoryWarning();
         }
@@ -768,6 +776,42 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 CommonConfig.Logger.Error($"Failed to remove attachment [document.Id={document.Id}, e.AttachmentDescription.Name={e.AttachmentDescription?.Name}, e.FileDescription.Name={e.FileDescription?.Name}]", ex);
                 await Dialogs.ShowErrorAlertAsync(this, ex);
             }
+        }
+
+        #endregion
+        
+        #region Message handlers
+        void SubscribeToMessages()
+        {
+            shortcodeSuggestionSelectedToken = CommonConfig.MessengerHub
+                .Subscribe<ShortcodeRecipientSelectedMessage>(HandleShortcodeSuggestionSelected );
+        }
+
+        private void HandleShortcodeSuggestionSelected(ShortcodeRecipientSelectedMessage shortcodeRecipientMessage)
+        {
+            var recipientViews = new List<RecipientsView>{ccView, bccView, toView};
+            foreach (var view in recipientViews)
+            {
+                var text = view.GetText();
+                var splittedRecipients = text.Split(new[]{ RecipientSeperator }, StringSplitOptions.None).ToList();
+                splittedRecipients.RemoveAt(splittedRecipients.Count - 1);
+                {
+                }
+                var addresses = shortcodeRecipientMessage.ShortcodeRecipient.ShortcodeAddresses
+                    .Where(a => a.AddressType == view.AddressType)
+                    .Select(a => a.Address)
+                    .ToList();
+                    
+                splittedRecipients.AddRange(addresses);
+
+                view.SetText(string.Join(RecipientSeperator, splittedRecipients) + RecipientSeperator);
+                view.CorrectMarkup();
+            }
+        }
+
+        void UnsubscribeFromMessages()
+        {
+            shortcodeSuggestionSelectedToken?.Dispose();
         }
 
         #endregion

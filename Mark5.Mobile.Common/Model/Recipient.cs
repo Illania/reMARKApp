@@ -79,6 +79,14 @@ namespace Mark5.Mobile.Common.Model
             }
         }
 
+        public override string ToString()
+        {
+            return Type == RecipientType.Shortcode
+               ? string.Join(", ", ShortcodeAddresses
+                   .Select(a => a.Address).ToList())
+               : Address;
+        }
+
         #endregion
 
         public static int SortingComparison(Recipient x, Recipient y)
