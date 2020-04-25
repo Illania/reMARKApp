@@ -34,7 +34,7 @@ namespace Mark5.Mobile.Common.Model.Actions
             DocumentIds = documentIds;
         }
 
-        public static SetReadStatusAction Create(bool readStatus, int[] documentIds)
+        public static SetReadStatusAction Create(bool readStatus, params int[] documentIds)
         {
             return new SetReadStatusAction(readStatus, documentIds);
         }
@@ -46,7 +46,8 @@ namespace Mark5.Mobile.Common.Model.Actions
 
         public override Task Undo()
         {
-            throw new NotImplementedException();
+            //TODO need to create a new method that will retrieve documentPreview and document, apply changes, and save them
+            return Task.CompletedTask;
         }
     }
 
