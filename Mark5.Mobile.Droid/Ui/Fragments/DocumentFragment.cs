@@ -588,7 +588,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (token.IsCancellationRequested)
                     return;
 
-                await Managers.DocumentsManager.SetDocumentReadStatusAsync(dp, d, true, ServerConfig.SystemSettings.UserInfo.User);
+                await Managers.DocumentsManager.SetDocumentReadStatusAsync(dp, d, true);
 
                 if (token.IsCancellationRequested)
                     return;

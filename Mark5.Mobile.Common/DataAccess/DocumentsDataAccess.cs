@@ -237,15 +237,16 @@ namespace Mark5.Mobile.Common.DataAccess
             {
                 await documentsDatabase.RunInConnectionAsync(c =>
                 {
-                    var cmd = c.CreateCommand($"update \"{nameof(DocumentPreview)}\" " + $"set \"{nameof(DocumentPreview.IsReadByCurrent)}\" = @isReadByCurrent, " + $"    \"{nameof(DocumentPreview.IsReadByAnyone)}\" = @isReadByAnyone " + $"where \"{nameof(DocumentPreview.Id)}\" = @documentPreviewId");
+                    var cmd = c.CreateCommand($"update \"{nameof(DocumentPreview)}\" " + $"set \"{nameof(DocumentPreview.IsReadByCurrent)}\" = @isReadByCurrent, " +
+                        $"    \"{nameof(DocumentPreview.IsReadByAnyone)}\" = @isReadByAnyone " + $"where \"{nameof(DocumentPreview.Id)}\" = @documentPreviewId");
                     cmd.Bind("@isReadByCurrent", documentPreview.IsReadByCurrent);
                     cmd.Bind("@isReadByAnyone", documentPreview.IsReadByAnyone);
                     cmd.Bind("@documentPreviewId", documentPreview.Id);
 
                     cmd.ExecuteNonQuery();
 
-
-                    cmd = c.CreateCommand($"update \"{nameof(Document)}\" " + $"set \"{nameof(Document.ReadByUserIdsString)}\" = @readByUserIdsString, " + $"    \"{nameof(Document.ReadByUserNamesString)}\" = @readByUserNamesString " + $"where \"{nameof(Document.Id)}\" = @documentId");
+                    cmd = c.CreateCommand($"update \"{nameof(Document)}\" " + $"set \"{nameof(Document.ReadByUserIdsString)}\" = @readByUserIdsString, " +
+                        $"    \"{nameof(Document.ReadByUserNamesString)}\" = @readByUserNamesString " + $"where \"{nameof(Document.Id)}\" = @documentId");
                     cmd.Bind("@readByUserIdsString", document.ReadByUserIdsString);
                     cmd.Bind("@readByUserNamesString", document.ReadByUserNamesString);
                     cmd.Bind("@documentId", documentPreview.Id);
@@ -267,7 +268,8 @@ namespace Mark5.Mobile.Common.DataAccess
                 {
                     foreach (var documentPreview in documentPreviews)
                     {
-                        var cmd = c.CreateCommand($"update \"{nameof(DocumentPreview)}\" " + $"set \"{nameof(DocumentPreview.IsReadByCurrent)}\" = @isReadByCurrent " + $"   and \"{nameof(DocumentPreview.IsReadByAnyone)}\" = @isReadByAnyone " + $"where \"{nameof(DocumentPreview.Id)}\" = @documentPreviewId");
+                        var cmd = c.CreateCommand($"update \"{nameof(DocumentPreview)}\" " + $"set \"{nameof(DocumentPreview.IsReadByCurrent)}\" = @isReadByCurrent " +
+                            $"   and \"{nameof(DocumentPreview.IsReadByAnyone)}\" = @isReadByAnyone " + $"where \"{nameof(DocumentPreview.Id)}\" = @documentPreviewId");
                         cmd.Bind("@isReadByCurrent", documentPreview.IsReadByCurrent);
                         cmd.Bind("@isReadByAnyone", documentPreview.IsReadByAnyone);
                         cmd.Bind("@documentPreviewId", documentPreview.Id);
