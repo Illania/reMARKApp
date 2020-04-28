@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Manager;
+using Mark5.Mobile.Common.Utilities;
+using SQLite;
 
 namespace Mark5.Mobile.Common.Model.Actions
 {
@@ -9,25 +12,39 @@ namespace Mark5.Mobile.Common.Model.Actions
     {
         public ActionType Type { get; }
 
+        [Column("Guid")]
+        [PrimaryKey]
+        public Guid Guid { get; private set; }
+
+        [Column("Date")]
+        public DateTime Date { get; private set; }
+
+        //TODO probably should add a date
+
         protected Action(ActionType type)
         {
             Type = type;
+            Guid = Guid.NewGuid();
+            Date = DateTime.UtcNow;
         }
-
-        public abstract Task Execute();
-
-        public abstract Task Undo();
     }
 
-
+    [Table("SetReadStatusAction")]
     public class SetReadStatusAction : Action
     {
-        bool ReadStatus { get; }
-        int[] DocumentIds { get; }
+        [Column("ReadStatus")]
+        public bool ReadStatus { get; }
 
-        DocumentsManager documentsManager = (DocumentsManager)Managers.DocumentsManager;
+        [Ignore]
+        public List<int> DocumentIds { get; private set; }
 
-        private SetReadStatusAction(bool readStatus, int[] documentIds)
+        [Column("DocumentIdsString")]
+        public string DocumentIdsString { get => Serializer.Serialize(DocumentIds); set => DocumentIds = Serializer.Deserialize<List<int>>(value); }
+
+        public SetReadStatusAction() : base(ActionType.SetReadStatus)
+        { }
+
+        private SetReadStatusAction(bool readStatus, List<int> documentIds)
             : base(ActionType.SetReadStatus)
         {
             ReadStatus = readStatus;
@@ -36,18 +53,7 @@ namespace Mark5.Mobile.Common.Model.Actions
 
         public static SetReadStatusAction Create(bool readStatus, params int[] documentIds)
         {
-            return new SetReadStatusAction(readStatus, documentIds);
-        }
-
-        public override async Task Execute()
-        {
-            await documentsManager.SetRemoteReadStatusAsync(ReadStatus, DocumentIds);
-        }
-
-        public override Task Undo()
-        {
-            //TODO need to create a new method that will retrieve documentPreview and document, apply changes, and save them
-            return Task.CompletedTask;
+            return new SetReadStatusAction(readStatus, documentIds.ToList());
         }
     }
 

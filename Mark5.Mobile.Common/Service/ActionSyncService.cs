@@ -15,7 +15,7 @@ namespace Mark5.Mobile.Common.Service
         {
             /* Need to save actions in a new db
              * At start we load them from db
-             * We can also include status of action: ToDo, Successfull, Errror (or something like that)
+             * We can also include status of action: ToDo, Successfull, Error (or something like that)
              *
              * We retrieve them then, when online
              *  We do Action.Execute()
