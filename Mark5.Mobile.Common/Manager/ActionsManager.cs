@@ -11,6 +11,8 @@ namespace Mark5.Mobile.Common.Manager
     {
         readonly IActionsDataAccess actionsDataAccess;
 
+        public IActionsHandler ActionsHandler { get; } = new ActionsHandler();
+
         public ActionsManager(ConnectionInfo connectionInfo, IAppServiceProxy appServiceProxy, IActionsDataAccess actionsDataAccess)
             : base(connectionInfo, appServiceProxy)
         {
@@ -38,25 +40,27 @@ namespace Mark5.Mobile.Common.Manager
             if (action.Type == ActionType.SetReadStatus)
                 await actionsDataAccess.DeleteSetReadStatusActionAsync(action.Guid);
         }
-
-        public static class Handler
-        {
-            static readonly DocumentsManager documentsManager = (DocumentsManager)Managers.DocumentsManager;  //TODO Don't like this too much...
-
-            public static async Task Execute(Action action)
-            {
-                if (action.Type == ActionType.SetReadStatus)
-                {
-                    var sra = action as SetReadStatusAction;
-                    await documentsManager.SetRemoteReadStatusAsync(sra.ReadStatus, sra.DocumentIds.ToArray());
-                }
-            }
-
-            public static async Task Undo(Action action)
-            {
-                await Task.CompletedTask; //TODO for now
-            }
-        }
     }
 
+
+    public class ActionsHandler : IActionsHandler
+    {
+        static readonly DocumentsManager documentsManager = (DocumentsManager)Managers.DocumentsManager;  //TODO Don't like this too much...
+
+        public async Task Execute(Action action)
+        {
+            if (action.Type == ActionType.SetReadStatus)
+            {
+                var sra = action as SetReadStatusAction;
+                await documentsManager.SetRemoteReadStatusAsync(sra.ReadStatus, sra.DocumentIds.ToArray());
+            }
+        }
+
+        public async Task Undo(Action action)
+        {
+            await Task.CompletedTask; //TODO for now
+        }
+    }
 }
+
+

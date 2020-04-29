@@ -628,6 +628,8 @@ namespace Mark5.Mobile.Common.Manager
             });
         }
 
+        #endregion
+
         #region DocumentsUploadService specific
 
         internal async Task SendDocumentAsync(Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId, long sendOnTimestamp, bool confirmRead, bool confirmDelivery, List<Guid> temporaryAttachmentGuids, IEventReply eventReply, SourceType sourceType = SourceType.Auto)
@@ -699,7 +701,7 @@ namespace Mark5.Mobile.Common.Manager
                     var previousDocument = container.Document;
                     var previousDocumentPreview = container.DocumentPreview;
 
-                    await SetDocumentReadStatusAsync(previousDocumentPreview, previousDocument, true, ServerConfig.SystemSettings.UserInfo.User, SourceType.Remote);
+                    //await SetDocumentReadStatusAsync(previousDocumentPreview, previousDocument, true, ServerConfig.SystemSettings.UserInfo.User, SourceType.Remote);  //TODO
                 }
                 catch (Exception ex)
                 {
