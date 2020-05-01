@@ -54,7 +54,7 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
         {
             var (fragment, tag) = CalendarListFragment.NewInstance(calendars);
             fragmentManager.BeginTransaction()
-                .Replace(Resource.Id.fragment_container, fragment, tag)
+                .Add(Resource.Id.fragment_container, fragment, tag)
                 .AddToBackStack(tag)
                 .Commit();
         }
