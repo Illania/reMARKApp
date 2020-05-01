@@ -86,6 +86,16 @@ namespace Mark5.Mobile.Droid
                     {
                         var ci = await authenticator.GetConnectionInfoAsync();
 
+                        switch (ci.SslMode)
+                        {
+                            case SslMode.AllowSelfSigned:
+                                PlatformConfig.SSLCertificateVerificationManager.EnableSelfSignedCertificates();
+                                break;
+                            default:
+                                PlatformConfig.SSLCertificateVerificationManager.DisableSelfSignedCertificates();
+                                break;
+                        }
+
                         Managers.Initialize(ci);
                         Managers.DocumentsManager.MaxToFetch = PlatformConfig.Preferences.DocumentsToDownload;
                         Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
