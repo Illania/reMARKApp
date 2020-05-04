@@ -369,6 +369,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             foreach (var pa in recipients)
             {
+                if (pa == null) continue;
+
                 ParticipantsViewModel pvm = null;
                 switch (pa.Type)
                 {
