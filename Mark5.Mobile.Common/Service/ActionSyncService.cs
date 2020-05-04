@@ -45,7 +45,6 @@ namespace Mark5.Mobile.Common.Service
                     {
                         try
                         {
-                            throw new Exception("TEST"); //TODO for testing
                             await handler.Execute(action);
                         }
                         catch (Exception ex)

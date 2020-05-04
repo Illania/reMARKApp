@@ -301,7 +301,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 case NavigationModule.NavigationModuleType.Calendar:
                     module = ModuleType.Calendar;
                     moduleNavigationButton.SetImage(UIImage.FromBundle(nextModule.Image).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
-                    SelectedIndex = 2;  //TODO this is actually somewhat important otherwise the navigation controller gets substituted
+                    SelectedIndex = 2;  //This is actually important otherwise the navigation controller gets substituted
                     break;
                 case NavigationModule.NavigationModuleType.Settings:
                     moduleNavigationButton.SetImage(UIImage.FromBundle(nextModule.Image).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);

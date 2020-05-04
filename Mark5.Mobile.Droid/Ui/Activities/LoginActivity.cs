@@ -321,9 +321,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
 
                     CommonConfig.Logger.Info($"Starting services...");
-                    Services.DocumentsUploadService.Start();
-                    Services.DocumentPreviewsDownloadService.Start();
-                    Services.DocumentsDownloadService.Start();
+                    Services.DocumentsUploadService?.Start();
+                    Services.DocumentPreviewsDownloadService?.Start();
+                    Services.DocumentsDownloadService?.Start();
+                    Services.ActionSyncService?.Start();
                     DeviceReminderWorker.Schedule();
 
                     CommonConfig.Logger.Info($"Refreshing reachability status...");
