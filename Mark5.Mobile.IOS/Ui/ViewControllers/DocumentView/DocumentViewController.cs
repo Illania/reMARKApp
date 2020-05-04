@@ -609,7 +609,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     if (token.IsCancellationRequested)
                         return;
 
-                    await Managers.DocumentsManager.SetDocumentReadStatusAsync(dp, d, true, ServerConfig.SystemSettings.UserInfo.User);
+                    await Managers.DocumentsManager.SetDocumentReadStatusAsync(dp, d, true);
                 }
                 catch (Exception ex)
                 {
@@ -949,7 +949,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 CommonConfig.UsageAnalytics.LogEvent(new SetReadStatusEvent(1));
 
-                await Managers.DocumentsManager.SetDocumentReadStatusAsync(documentPreview, document, !isReadByCurrent, ServerConfig.SystemSettings.UserInfo.User);
+                await Managers.DocumentsManager.SetDocumentReadStatusAsync(documentPreview, document, !isReadByCurrent);
 
                 dismissAction();
             }

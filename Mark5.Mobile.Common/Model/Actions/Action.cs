@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Utilities;
 using SQLite;
 
@@ -14,18 +12,16 @@ namespace Mark5.Mobile.Common.Model.Actions
 
         [Column("Guid")]
         [PrimaryKey]
-        public Guid Guid { get; private set; }
+        public Guid Guid { get; set; }
 
         [Column("Date")]
-        public DateTime Date { get; private set; }
-
-        //TODO probably should add a date
+        public DateTime CreatedDate { get; set; }
 
         protected Action(ActionType type)
         {
             Type = type;
             Guid = Guid.NewGuid();
-            Date = DateTime.UtcNow;
+            CreatedDate = DateTime.UtcNow;
         }
     }
 
@@ -33,7 +29,7 @@ namespace Mark5.Mobile.Common.Model.Actions
     public class SetReadStatusAction : Action
     {
         [Column("ReadStatus")]
-        public bool ReadStatus { get; }
+        public bool ReadStatus { get; set; }
 
         [Ignore]
         public List<int> DocumentIds { get; private set; }

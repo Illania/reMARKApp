@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Mark5.Mobile.Common.DataAccess;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Actions;
+using Mark5.Mobile.Common.Service;
 using Mark5.ServiceReference.AppService;
 
 namespace Mark5.Mobile.Common.Manager
@@ -19,10 +20,12 @@ namespace Mark5.Mobile.Common.Manager
             this.actionsDataAccess = actionsDataAccess;
         }
 
-        public async Task SaveActionAsync(Action action)  //TODO maybe it's better to call it queueAction
+        public async Task QueueActionAsync(Action action)
         {
             if (action.Type == ActionType.SetReadStatus)
                 await actionsDataAccess.SaveSetReadStatusActionAsync(action as SetReadStatusAction);
+
+            Services.ActionSyncService.Notify();
         }
 
         public async Task<List<Action>> GetActionsAsync(List<ActionType> types = null)
@@ -42,10 +45,9 @@ namespace Mark5.Mobile.Common.Manager
         }
     }
 
-
     public class ActionsHandler : IActionsHandler
     {
-        static readonly DocumentsManager documentsManager = (DocumentsManager)Managers.DocumentsManager;  //TODO Don't like this too much...
+        static readonly DocumentsManager documentsManager = (DocumentsManager)Managers.DocumentsManager;
 
         public async Task Execute(Action action)
         {
@@ -58,7 +60,11 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task Undo(Action action)
         {
-            await Task.CompletedTask; //TODO for now
+            if (action.Type == ActionType.SetReadStatus)
+            {
+                var sra = action as SetReadStatusAction;
+                await documentsManager.SetLocalReadStatusAsync(!sra.ReadStatus, sra.DocumentIds.ToArray());
+            }
         }
     }
 }

@@ -7,7 +7,7 @@ namespace Mark5.Mobile.Common.Manager
 {
     public interface IActionsManager
     {
-        Task SaveActionAsync(Action action);
+        Task QueueActionAsync(Action action);
 
         Task<List<Action>> GetActionsAsync(List<ActionType> types = null);
 
@@ -15,7 +15,6 @@ namespace Mark5.Mobile.Common.Manager
 
         IActionsHandler ActionsHandler { get; }
     }
-
 
     public interface IActionsHandler
     {

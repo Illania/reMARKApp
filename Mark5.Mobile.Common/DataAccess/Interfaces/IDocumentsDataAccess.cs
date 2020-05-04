@@ -31,6 +31,8 @@ namespace Mark5.Mobile.Common.DataAccess
 
         Task SetDocumentPreviewsPriorityAsync(List<DocumentPreview> documentPreviews, Priority priority);
 
+        Task SetReadStatusAsync(List<int> documentIds, bool readStatus);
+
         Task RemoveFromFolderAsync(List<DocumentPreview> documentPreviews, Folder folder);
 
         Task RemoveFromFolderAsync(List<Document> documents, Folder folder);

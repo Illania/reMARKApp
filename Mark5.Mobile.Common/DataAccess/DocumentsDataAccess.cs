@@ -284,6 +284,51 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
+        public async Task SetReadStatusAsync(List<int> documentIds, bool readStatus)
+        {
+            try
+            {
+                await documentsDatabase.RunInConnectionAsync(c =>
+                {
+                    foreach (var documentId in documentIds)
+                    {
+
+                        var documentPreview = c.Find<DocumentPreview>(documentId);
+                        if (documentPreview != null)
+                        {
+                            documentPreview.SetReadStatus(readStatus);
+
+                            var cmd = c.CreateCommand($"update \"{nameof(DocumentPreview)}\" " + $"set \"{nameof(DocumentPreview.IsReadByCurrent)}\" = @isReadByCurrent " +
+                            $"   and \"{nameof(DocumentPreview.IsReadByAnyone)}\" = @isReadByAnyone " + $"where \"{nameof(DocumentPreview.Id)}\" = @documentPreviewId");
+                            cmd.Bind("@isReadByCurrent", documentPreview.IsReadByCurrent);
+                            cmd.Bind("@isReadByAnyone", documentPreview.IsReadByAnyone);
+                            cmd.Bind("@documentPreviewId", documentPreview.Id);
+
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        var document = c.Find<Document>(documentId);
+                        if (document != null)
+                        {
+                            document.SetReadStatus(readStatus);
+
+                            var cmd = c.CreateCommand($"update \"{nameof(Document)}\" " + $"set \"{nameof(Document.ReadByUserIdsString)}\" = @readByUserIdsString, " +
+                            $"    \"{nameof(Document.ReadByUserNamesString)}\" = @readByUserNamesString " + $"where \"{nameof(Document.Id)}\" = @documentId");
+                            cmd.Bind("@readByUserIdsString", document.ReadByUserIdsString);
+                            cmd.Bind("@readByUserNamesString", document.ReadByUserNamesString);
+                            cmd.Bind("@documentId", documentPreview.Id);
+
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error setting documents", ex);
+            }
+        }
+
         public async Task SetDocumentPreviewsPriorityAsync(List<DocumentPreview> documentPreviews, Priority priority)
         {
             try
