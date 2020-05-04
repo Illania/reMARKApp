@@ -77,6 +77,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         {
             coordinator.MonthTapped(e.NewValue);
         }
+
+        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
+        {
+            menu.Clear();
+        }
     }
 
     class YearCalendar : SfCalendar
