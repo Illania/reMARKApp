@@ -143,17 +143,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         protected string GetTitleFromAddressType()
         {
-            switch (AddressType)
+            return AddressType switch
             {
-                case DocumentAddressType.To:
-                    return Localization.GetString("to");
-                case DocumentAddressType.Cc:
-                    return Localization.GetString("cc");
-                case DocumentAddressType.Bcc:
-                    return Localization.GetString("bcc");
-                default:
-                    return string.Empty;
-            }
+                DocumentAddressType.To => Localization.GetString("to"),
+                DocumentAddressType.Cc => Localization.GetString("cc"),
+                DocumentAddressType.Bcc => Localization.GetString("bcc"),
+                _ => string.Empty,
+            };
         }
 
         #region Overrides

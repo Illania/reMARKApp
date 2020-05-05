@@ -12,7 +12,6 @@ using MailBee.Html;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Model;
@@ -22,9 +21,7 @@ using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView;
 using Mark5.Mobile.IOS.Utilities;
-using MobileCoreServices;
 using Photos;
-using TinyMessenger;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
@@ -33,8 +30,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
     {
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
         const int AutoSaveWorkingCopyInterval = 5000; // 5 seconds
-        protected const string RecipientSeperator = ", ";
-        
+
         readonly string DefaultTitle = Localization.GetString("new_document");
 
         public bool RestoreWorkingCopy { get; set; }
@@ -77,8 +73,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         Worker autoSaveWorkingCopyWorker;
 
         SystemUsersDepartments systemUserDepartments;
-        
-        TinyMessageSubscriptionToken shortcodeSuggestionSelectedToken;
 
         public override void ViewDidLoad()
         {
@@ -111,7 +105,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 ModalInPresentation = true;
 
             InitializeHandlers();
-            SubscribeToMessages();
         }
 
         public override void ViewDidAppear(bool animated)
@@ -134,8 +127,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         {
             CommonConfig.Logger.Warning("Received memory warning!");
 
-            UnsubscribeFromMessages();
-            
             GC.Collect();
             base.DidReceiveMemoryWarning();
         }
@@ -620,7 +611,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             if (suggestionsListView == null)
             {
-                suggestionsListView = new SuggestionsListView(this);
+                suggestionsListView = new SuggestionsListView(this, includeShortcodes: true);
                 suggestionsListView.SystemUsersDepartments = systemUserDepartments;
 
                 View.AddSubview(suggestionsListView);
@@ -638,6 +629,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             suggestionsListView.Initialize((RecipientsView)sender, initialSearchString);
             suggestionsListView.ShouldDisappear -= SuggestionsListView_ShouldDisappear;
             suggestionsListView.ShouldDisappear += SuggestionsListView_ShouldDisappear;
+            suggestionsListView.RecipientClicked -= SuggestionsListView_RecipientClicked;
+            suggestionsListView.RecipientClicked += SuggestionsListView_RecipientClicked;
 
             View.BringSubviewToFront(suggestionsListView);
         }
@@ -677,6 +670,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 default:
                     return;
             }
+        }
+
+        void SuggestionsListView_RecipientClicked(object sender, Recipient r)
+        {
+            if (r.Type != RecipientType.Shortcode)
+                return;
+
+            toView.AddEmails(r.ShortcodeAddresses.Where(a => a.AddressType == DocumentAddressType.To).Select(a => a.Address));
+            ccView.AddEmails(r.ShortcodeAddresses.Where(a => a.AddressType == DocumentAddressType.Cc).Select(a => a.Address));
+            bccView.AddEmails(r.ShortcodeAddresses.Where(a => a.AddressType == DocumentAddressType.Bcc).Select(a => a.Address));
         }
 
         async void AttachmentsView_Tapped(object sender, AttachmentsView.TappedEventArgs e)
@@ -777,42 +780,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 CommonConfig.Logger.Error($"Failed to remove attachment [document.Id={document.Id}, e.AttachmentDescription.Name={e.AttachmentDescription?.Name}, e.FileDescription.Name={e.FileDescription?.Name}]", ex);
                 await Dialogs.ShowErrorAlertAsync(this, ex);
             }
-        }
-
-        #endregion
-        
-        #region Message handlers
-        void SubscribeToMessages()
-        {
-            shortcodeSuggestionSelectedToken = CommonConfig.MessengerHub
-                .Subscribe<ShortcodeRecipientSelectedMessage>(HandleShortcodeSuggestionSelected );
-        }
-
-        private void HandleShortcodeSuggestionSelected(ShortcodeRecipientSelectedMessage shortcodeRecipientMessage)
-        {
-            var recipientViews = new List<RecipientsView>{ccView, bccView, toView};
-            foreach (var view in recipientViews)
-            {
-                var text = view.GetText();
-                var splittedRecipients = text.Split(new[]{ RecipientSeperator }, StringSplitOptions.None).ToList();
-                splittedRecipients.RemoveAt(splittedRecipients.Count - 1);
-                {
-                }
-                var addresses = shortcodeRecipientMessage.ShortcodeRecipient.ShortcodeAddresses
-                    .Where(a => a.AddressType == view.AddressType)
-                    .Select(a => a.Address)
-                    .ToList();
-                    
-                splittedRecipients.AddRange(addresses);
-
-                view.SetText(string.Join(RecipientSeperator, splittedRecipients) + RecipientSeperator);
-                view.CorrectMarkup();
-            }
-        }
-
-        void UnsubscribeFromMessages()
-        {
-            shortcodeSuggestionSelectedToken?.Dispose();
         }
 
         #endregion
@@ -1202,10 +1169,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     imageManager.RequestImageData(asset, options, (data, dataUti, orientation, info) =>
                     {
                         var originalImage = UIImage.LoadFromData(data);
-                        var jpegImage = originalImage.AsJPEG();                    
+                        var jpegImage = originalImage.AsJPEG();
 
                         var filename = PHAssetResource.GetAssetResources(asset)[0].OriginalFilename;
-                        filename = Path.ChangeExtension(filename,".jpeg");
+                        filename = Path.ChangeExtension(filename, ".jpeg");
 
                         HandleAttachmentImage(filename, jpegImage);
 
@@ -1256,7 +1223,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             {
                 try
                 {
-                    
+
                     var filename = url.LastPathComponent;
                     stream = new FileStream(url.Path, FileMode.Open, FileAccess.Read);
                     var result = url.TryGetResource(NSUrl.FileSizeKey, out NSObject sizeObject, out NSError _error);
@@ -1286,10 +1253,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     stream?.Dispose();
                 }
             }
-                
+
         }
 
-     
+
         async void HandleAttachmentImage(string filename, NSData jpegData)
         {
             Stream stream = null;
@@ -1424,7 +1391,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         static string[] GetReplyHeaderParameters(DocumentPreview documentPreview, Document document)
         {
             var from = GetAddressTextFromPreviousDocument(documentPreview, document, DocumentAddressType.From);
-            
+
             var date = documentPreview.DateReceivedTimestamp
                                       .ConvertTimestampMillisecondsToDateTime()
                                       .ConvertUtcToUserTime()
@@ -1440,7 +1407,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         {
             if (documentPreview.Direction == DocumentDirection.Outgoing && addressTypes[0].Equals(DocumentAddressType.From))
             {
-                
+
                 var fromString = string.Empty;
                 switch (ServerConfig.SystemSettings.DocumentsModuleInfo.UseForFrom)
                 {
@@ -1454,12 +1421,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                         fromString = ServerConfig.SystemSettings.UserInfo.User.Username;
                         break;
                     case UseForFrom.LineName:
-                        fromString = document.Lines.Select(l=>l.FromAddress).FirstOrDefault();
+                        fromString = document.Lines.Select(l => l.FromAddress).FirstOrDefault();
                         break;
                 }
                 return fromString;
             }
-            
+
             var sb = new StringBuilder();
             var addresses = documentPreview.Addresses.Where(da => addressTypes.Contains(da.AddressType)).ToArray();
             for (var i = 0; i < addresses.Length; i++)
@@ -1492,7 +1459,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             {
                 try
                 {
-                    
+
                     NSData jpegImage;
                     using (var image = (UIImage)info[UIImagePickerController.OriginalImage])
                     {
@@ -1549,7 +1516,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             public override void DidPickDocument(UIDocumentPickerViewController controller, NSUrl[] urls)
             {
                 _handler(urls);
-              
+
             }
 
             public override void DidPickDocument(UIDocumentPickerViewController controller, NSUrl url)
