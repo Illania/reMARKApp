@@ -11,15 +11,22 @@ namespace Mark5.Mobile.Common.Utilities
 {
     public static class RecipentSuggestions
     {
-        public static void GetSuggestions(string phrase, CancellationToken token, Action<List<Recipient>, CancellationToken> handler, bool includeSystemUsers = false)
+        public static void GetSuggestions(string phrase, CancellationToken token, Action<List<Recipient>, CancellationToken> handler
+            , bool includeSystemUsers = false, bool includeShortcodes = false)
         {
             if (token.IsCancellationRequested)
                 return;
 
             GetSuggestionFromRecentAddresses(phrase, token, handler);
+
             GetSuggestionFromContacts(phrase, token, handler);
+
+            if (includeShortcodes)
+                GetSuggestionFromShortcodes(phrase, token, handler);
+
             if (includeSystemUsers)
                 GetSuggestionFromInternalContacts(phrase, token, handler);
+
             GetSuggestionFromPhonebook(phrase, token, handler);
         }
 
@@ -67,6 +74,26 @@ namespace Mark5.Mobile.Common.Utilities
                 try
                 {
                     filtered = await Managers.ContactsManager.GetSuggestions(phrase);
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error("Error while retrieving suggestions from database", ex);
+                }
+                handler(filtered, token);
+            });
+        }
+
+        static void GetSuggestionFromShortcodes(string phrase, CancellationToken token, Action<List<Recipient>, CancellationToken> handler)
+        {
+            if (token.IsCancellationRequested)
+                return;
+
+            Task.Run(async () =>
+            {
+                var filtered = new List<Recipient>();
+                try
+                {
+                    filtered = await Managers.ShortcodesManager.GetSuggestions(phrase);
                 }
                 catch (Exception ex)
                 {

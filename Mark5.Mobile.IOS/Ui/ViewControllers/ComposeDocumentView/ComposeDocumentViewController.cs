@@ -21,7 +21,6 @@ using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView;
 using Mark5.Mobile.IOS.Utilities;
-using MobileCoreServices;
 using Photos;
 using UIKit;
 
@@ -612,7 +611,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             if (suggestionsListView == null)
             {
-                suggestionsListView = new SuggestionsListView(this);
+                suggestionsListView = new SuggestionsListView(this, includeShortcodes: true);
                 suggestionsListView.SystemUsersDepartments = systemUserDepartments;
 
                 View.AddSubview(suggestionsListView);
@@ -630,6 +629,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             suggestionsListView.Initialize((RecipientsView)sender, initialSearchString);
             suggestionsListView.ShouldDisappear -= SuggestionsListView_ShouldDisappear;
             suggestionsListView.ShouldDisappear += SuggestionsListView_ShouldDisappear;
+            suggestionsListView.RecipientClicked -= SuggestionsListView_RecipientClicked;
+            suggestionsListView.RecipientClicked += SuggestionsListView_RecipientClicked;
 
             View.BringSubviewToFront(suggestionsListView);
         }
@@ -669,6 +670,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 default:
                     return;
             }
+        }
+
+        void SuggestionsListView_RecipientClicked(object sender, Recipient r)
+        {
+            if (r.Type != RecipientType.Shortcode)
+                return;
+
+            toView.AddEmails(r.ShortcodeAddresses.Where(a => a.AddressType == DocumentAddressType.To).Select(a => a.Address));
+            ccView.AddEmails(r.ShortcodeAddresses.Where(a => a.AddressType == DocumentAddressType.Cc).Select(a => a.Address));
+            bccView.AddEmails(r.ShortcodeAddresses.Where(a => a.AddressType == DocumentAddressType.Bcc).Select(a => a.Address));
         }
 
         async void AttachmentsView_Tapped(object sender, AttachmentsView.TappedEventArgs e)
@@ -1158,10 +1169,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     imageManager.RequestImageData(asset, options, (data, dataUti, orientation, info) =>
                     {
                         var originalImage = UIImage.LoadFromData(data);
-                        var jpegImage = originalImage.AsJPEG();                    
+                        var jpegImage = originalImage.AsJPEG();
 
                         var filename = PHAssetResource.GetAssetResources(asset)[0].OriginalFilename;
-                        filename = Path.ChangeExtension(filename,".jpeg");
+                        filename = Path.ChangeExtension(filename, ".jpeg");
 
                         HandleAttachmentImage(filename, jpegImage);
 
@@ -1212,7 +1223,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             {
                 try
                 {
-                    
+
                     var filename = url.LastPathComponent;
                     stream = new FileStream(url.Path, FileMode.Open, FileAccess.Read);
                     var result = url.TryGetResource(NSUrl.FileSizeKey, out NSObject sizeObject, out NSError _error);
@@ -1242,10 +1253,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     stream?.Dispose();
                 }
             }
-                
+
         }
 
-     
+
         async void HandleAttachmentImage(string filename, NSData jpegData)
         {
             Stream stream = null;
@@ -1380,7 +1391,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         static string[] GetReplyHeaderParameters(DocumentPreview documentPreview, Document document)
         {
             var from = GetAddressTextFromPreviousDocument(documentPreview, document, DocumentAddressType.From);
-            
+
             var date = documentPreview.DateReceivedTimestamp
                                       .ConvertTimestampMillisecondsToDateTime()
                                       .ConvertUtcToUserTime()
@@ -1396,7 +1407,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         {
             if (documentPreview.Direction == DocumentDirection.Outgoing && addressTypes[0].Equals(DocumentAddressType.From))
             {
-                
+
                 var fromString = string.Empty;
                 switch (ServerConfig.SystemSettings.DocumentsModuleInfo.UseForFrom)
                 {
@@ -1410,12 +1421,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                         fromString = ServerConfig.SystemSettings.UserInfo.User.Username;
                         break;
                     case UseForFrom.LineName:
-                        fromString = document.Lines.Select(l=>l.FromAddress).FirstOrDefault();
+                        fromString = document.Lines.Select(l => l.FromAddress).FirstOrDefault();
                         break;
                 }
                 return fromString;
             }
-            
+
             var sb = new StringBuilder();
             var addresses = documentPreview.Addresses.Where(da => addressTypes.Contains(da.AddressType)).ToArray();
             for (var i = 0; i < addresses.Length; i++)
@@ -1448,7 +1459,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             {
                 try
                 {
-                    
+
                     NSData jpegImage;
                     using (var image = (UIImage)info[UIImagePickerController.OriginalImage])
                     {
@@ -1505,7 +1516,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             public override void DidPickDocument(UIDocumentPickerViewController controller, NSUrl[] urls)
             {
                 _handler(urls);
-              
+
             }
 
             public override void DidPickDocument(UIDocumentPickerViewController controller, NSUrl url)

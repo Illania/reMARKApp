@@ -7,6 +7,12 @@
     <PackageTargetFallback>monoandroid;xamarinios</PackageTargetFallback>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <LangVersion>8.0</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <LangVersion>8.0</LangVersion>
+  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference\Mark5.ServiceReference.csproj" />
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj" />

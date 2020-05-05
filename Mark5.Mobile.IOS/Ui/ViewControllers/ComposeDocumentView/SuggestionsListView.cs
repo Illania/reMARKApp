@@ -30,6 +30,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         RecipientsView recipientsView;
         readonly bool includeSystemUsers;
+        readonly bool includeShortcodes;
 
         // This value will be later updated from notification.
         float keyboardHeight = 216f;
@@ -40,9 +41,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         #region Initialization
 
-        public SuggestionsListView(UIViewController viewController, bool includeSystemUsers = false)
+        public SuggestionsListView(UIViewController viewController, bool includeSystemUsers = false, bool includeShortcodes = false)
         {
             this.includeSystemUsers = includeSystemUsers;
+            this.includeShortcodes = includeShortcodes;
 
             TranslatesAutoresizingMaskIntoConstraints = false;
 
@@ -112,7 +114,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 recipientsView.SuggestionOverlayActive = true;
 
             suggestionsTextView.SetOriginalState(recipientsView?.GetText() ?? initialSearchString, recipientsView?.AddressType ?? DocumentAddressType.None);
-
             DoSearch(initialSearchString);
         }
 
@@ -174,7 +175,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 suggestionsListViewSource.Searching = true;
                 searchCancellationTokenSource = new CancellationTokenSource();
                 searchCancellationTokenSources.Add(searchCancellationTokenSource);
-                RecipentSuggestions.GetSuggestions(searchText, searchCancellationTokenSource.Token, HandleSugguestions, includeSystemUsers);
+                RecipentSuggestions.GetSuggestions(searchText, searchCancellationTokenSource.Token, HandleSugguestions, includeSystemUsers, includeShortcodes);
             }
             else
             {
@@ -198,8 +199,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         public void SuggestionSelected(Recipient printableSuggestion)
         {
             suggestionsTextView.AddSuggestion(printableSuggestion);
-            RecipientClicked(this, printableSuggestion);
             Dismiss();
+            RecipientClicked(this, printableSuggestion);
 
             BeginInvokeOnMainThread(() =>
             {
@@ -273,14 +274,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 if (string.IsNullOrWhiteSpace(s.Name))
                 {
                     var cell = tableView.DequeueReusableCell("cell1") ?? UITableViewCellUtilities.CreateDefault("cell1");
-                    cell.TextLabel.Text = s.Address;
+                    cell.TextLabel.Text = s.GetAddressPreviewText();
                     return cell;
                 }
                 else
                 {
                     var cell = tableView.DequeueReusableCell("cell2") ?? UITableViewCellUtilities.CreateWithSubtitle("cell2");
                     cell.TextLabel.Text = s.Name;
-                    cell.DetailTextLabel.Text = s.Address;
+                    cell.DetailTextLabel.Text = s.GetAddressPreviewText();
                     return cell;
                 }
             }
@@ -353,23 +354,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             public void AddSuggestion(Recipient printableSuggestion)
             {
                 var text = TextView.Text;
-                var splittedRecipients = text.Split(new[]
-                        {
-                        RecipientSeperator
-                    },
-                        StringSplitOptions.None)
-                    .ToList();
+                var splittedRecipients = text.Split(new[] { RecipientSeperator }, StringSplitOptions.None).ToList();
                 splittedRecipients.RemoveAt(splittedRecipients.Count - 1);
-                if (printableSuggestion.Address.Contains('@'))
-                {
-                    splittedRecipients.Add(printableSuggestion.ToString());
-                }
-                else
-                {
-                    splittedRecipients.Add(printableSuggestion.Address);
-                }
 
-                TextView.Text = string.Join(RecipientSeperator, splittedRecipients) + RecipientSeperator;
+                if (printableSuggestion.Type != RecipientType.Shortcode)
+                    splittedRecipients.Add(printableSuggestion.Address.Contains('@')
+                    ? printableSuggestion.ToString()
+                    : printableSuggestion.Address);
+
+                if (splittedRecipients.Count == 0)
+                    TextView.Text = string.Empty;
+                else
+                    TextView.Text = string.Join(RecipientSeperator, splittedRecipients) + RecipientSeperator;
 
                 CorrectMarkup();
             }
@@ -403,6 +399,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             }
 
             #endregion
+
         }
     }
 }
