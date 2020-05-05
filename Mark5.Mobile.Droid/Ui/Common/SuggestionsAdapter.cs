@@ -28,16 +28,14 @@ namespace Mark5.Mobile.Droid.Ui.Common
         readonly SuggestionsObservableCollection suggestions = new SuggestionsObservableCollection();
 
         public Filter Filter { get; }
-        private DocumentAddressType _addressType { get; }
 
         public override int Count => suggestions.Count;
 
         public string ActualConstraint;
 
-        public SuggestionsAdapter(DocumentAddressType addressType, bool includeInternalContacts = false)
+        public SuggestionsAdapter(bool includeInternalContacts = false, bool includeShortcodes = false)
         {
-            Filter = new SuggestionsFilter(this, includeInternalContacts);
-            _addressType = addressType;
+            Filter = new SuggestionsFilter(this, includeInternalContacts, includeShortcodes);
         }
 
         public override View GetView(int position, View convertView, ViewGroup parent)
@@ -58,29 +56,28 @@ namespace Mark5.Mobile.Droid.Ui.Common
             var name = suggestion.Name;
             if (!string.IsNullOrEmpty(suggestion.ShortId))
                 name += " " + suggestion.ShortId;
-            var address = suggestion.GetAddressPreviewText(_addressType);
+
+            var address = suggestion.GetAddressPreviewText();
+            var addressLength = address.Length;
+            var addressPreview = address;
+
+            if (addressLength > 30)
+            {
+                addressPreview = address.Substring(0, 30).Trim(',');
+                addressPreview += "...";
+            }
 
             var colorSelection = new Color(ContextCompat.GetColor(parent.Context, Resource.Color.darkblue));
 
-            var start = address.IndexOf(ActualConstraint, StringComparison.CurrentCultureIgnoreCase);
+            var start = addressPreview.IndexOf(ActualConstraint, StringComparison.CurrentCultureIgnoreCase);
             var end = start + ActualConstraint.Length;
 
-            var addressSpannable = new SpannableStringBuilder(address);
+            var addressSpannable = new SpannableStringBuilder(addressPreview);
 
             if (start >= 0)
                 addressSpannable.SetSpan(new ForegroundColorSpan(colorSelection), start, end, SpanTypes.ExclusiveExclusive);
 
-            if (suggestion.Type == RecipientType.Shortcode)
-            {
-                var addressPreviewLength = suggestion.GetAddressPreviewText(_addressType).Length;
-                var addressPreview = address.Substring(0, addressPreviewLength > 30 ? 30 : addressPreviewLength).Trim(',');
-                addressPreview += "...";
-                suggestionAddressTextView.TextFormatted = new SpannableStringBuilder(addressPreview);
-            }
-            else
-            {
-                suggestionAddressTextView.TextFormatted = addressSpannable;
-            }
+            suggestionAddressTextView.TextFormatted = addressSpannable;
 
             if (!string.IsNullOrEmpty(name))
             {
@@ -139,7 +136,19 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
         public class SuggestionsFilter : Filter
         {
-            public bool Loading => answersReceived < (includeInternalContacts ? 4 : 3);
+            public bool Loading
+            {
+                get
+                {
+                    var baseAnswersCount = 3;
+                    if (includeInternalContacts)
+                        baseAnswersCount += 1;
+                    if (includeShortcodes)
+                        baseAnswersCount += 1;
+
+                    return answersReceived < baseAnswersCount;             //TODO this needs to be tested
+                }
+            }
 
             readonly SuggestionsAdapter suggestionsAdapter;
 
@@ -148,11 +157,14 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
             int answersReceived;
             bool includeInternalContacts;
+            bool includeShortcodes;
 
-            public SuggestionsFilter(SuggestionsAdapter suggestionsAdapter, bool includeInternalContacts)
+
+            public SuggestionsFilter(SuggestionsAdapter suggestionsAdapter, bool includeInternalContacts, bool includeShortcodes)
             {
                 this.suggestionsAdapter = suggestionsAdapter;
                 this.includeInternalContacts = includeInternalContacts;
+                this.includeShortcodes = includeShortcodes;
             }
 
             #region Overrides
@@ -174,7 +186,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
                     suggestionsAdapter.ActualConstraint = constraint.ToString();
                     searchCancellationTokenSource = new CancellationTokenSource();
                     searchCancellationTokenSources.Add(searchCancellationTokenSource);
-                    RecipentSuggestions.GetSuggestions(suggestionsAdapter.ActualConstraint, searchCancellationTokenSource.Token, HandleSuggestions, includeInternalContacts);
+                    RecipentSuggestions.GetSuggestions(suggestionsAdapter.ActualConstraint, searchCancellationTokenSource.Token, HandleSuggestions, includeInternalContacts, includeShortcodes);
                 }
                 else
                 {

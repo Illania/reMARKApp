@@ -16,7 +16,6 @@ using Android.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.Droid.Model;
@@ -89,7 +88,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         Worker autoSaveWorkingCopyWorker;
         Rect visibleRect = new Rect();
-        
+
         TinyMessageSubscriptionToken shortcodeSuggestionSelectedToken;
 
         public static (ComposeDocumentFragment fragment, string tag) NewInstance(DocumentCreationModeFlag documentCreationModeFlag, CopyToNewOption? copyToNewOption, bool? restoreWorkingCopy,
@@ -179,8 +178,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 preconfiguredSubject = Arguments.GetString(PreconfiguredSubjectBundleKey);
 
             restoreWorkingCopy = restoreWorkingCopy || Restored;
-            
-            SubscribeToMessages();
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -199,16 +196,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             toView = new ToView(Context);
             toView.AddButtonClicked += RecipientView_AddButtonClicked;
             toView.Edited += Subview_Edited;
+            toView.ShortcodeClicked += RecipientView_ShortcodeClicked;
             subViews.Add(toView);
 
             ccView = new CcView(Context);
             ccView.AddButtonClicked += RecipientView_AddButtonClicked;
             ccView.Edited += Subview_Edited;
+            ccView.ShortcodeClicked += RecipientView_ShortcodeClicked;
             subViews.Add(ccView);
 
             bccView = new BccView(Context);
             bccView.AddButtonClicked += RecipientView_AddButtonClicked;
             bccView.Edited += Subview_Edited;
+            bccView.ShortcodeClicked += RecipientView_ShortcodeClicked;
             subViews.Add(bccView);
 
             priorityView = new PriorityView(Context);
@@ -253,7 +253,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             base.OnDestroyView();
             rootView.ViewTreeObserver.GlobalLayout -= RootView_OnGlobalLayout;
-            UnsubscribeFromMessages();
         }
 
         public override async void OnResume()
@@ -466,39 +465,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public const int TemplatePreviewInitialRequestCode = 777;
 
         }
-        
-        #region Message handlers
-        void SubscribeToMessages()
-        {
-            shortcodeSuggestionSelectedToken = CommonConfig.MessengerHub
-                .Subscribe<ShortcodeRecipientSelectedMessage>(HandleShortcodeSuggestionSelected );
-        }
-
-        private void HandleShortcodeSuggestionSelected(ShortcodeRecipientSelectedMessage shortcodeRecipientMessage)
-        {
-            if (!(shortcodeRecipientMessage.Sender is RecipientAutocompleteTextView senderView))
-                return;
-
-            var addresses = shortcodeRecipientMessage.ShortcodeRecipient.ShortcodeAddresses;
-
-            (RecipientsView view, DocumentAddressType addressType)[] addressControls = {
-                (toView, DocumentAddressType.To),
-                (ccView, DocumentAddressType.Cc),
-                (bccView, DocumentAddressType.Bcc),
-            }; 
-            
-            foreach(var addressControlInfo in addressControls)
-                if(senderView.AddressType != addressControlInfo.addressType)
-                    addressControlInfo.view.AddEmails(addresses.Where(da => da.AddressType == addressControlInfo.addressType)
-                        .Select(da => da.Address), true);
-        }
-
-        void UnsubscribeFromMessages()
-        {
-            shortcodeSuggestionSelectedToken?.Dispose();
-        }
-
-        #endregion
 
         #region Subviews event handlers
 
@@ -690,6 +656,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 focusedRecipientView.RequestEditorFocus();
         }
 
+        private void RecipientView_ShortcodeClicked(object sender, List<DocumentAddress> addresses)
+        {
+            (RecipientsView view, DocumentAddressType addressType)[] addressControls = {
+                (toView, DocumentAddressType.To),
+                (ccView, DocumentAddressType.Cc),
+                (bccView, DocumentAddressType.Bcc),
+            };
+
+            foreach (var addressControlInfo in addressControls)
+                addressControlInfo.view.AddEmails(addresses.Where(da => da.AddressType == addressControlInfo.addressType)
+                    .Select(da => da.Address), true);
+        }
+
         #endregion
 
         #region Scrolling related
@@ -846,7 +825,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             else
             {
                 if (data.ClipData == null) return;
-                
+
                 var mClipData = data.ClipData;
 
                 for (var i = 0; i < mClipData.ItemCount; i++)

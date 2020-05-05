@@ -37,6 +37,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public event EventHandler Edited = delegate { };
         public event EventHandler AddButtonClicked = delegate { };
+        public event EventHandler<List<DocumentAddress>> ShortcodeClicked = delegate { };
 
         public bool Empty => (ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable)
         ? !Validator.ContainsValidEmail(fullEditorText) && !Validator.ContainsValidUsernames(fullEditorText, SystemUsersDepartments) : !Validator.ContainsValidEmail(fullEditorText);
@@ -99,7 +100,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
             emailEditor = new RecipientAutocompleteTextView(context, AddressType)
             {
-                Adapter = new SuggestionsAdapter(AddressType),
+                Adapter = new SuggestionsAdapter(includeInternalContacts: false, includeShortcodes: true),
                 Threshold = 2,
                 InputType =
                     InputTypes.ClassText | InputTypes.TextVariationEmailAddress | InputTypes.TextFlagMultiLine,
@@ -114,13 +115,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             emailEditor.AfterTextChanged += TextView_AfterTextChanged;
             emailEditor.FocusChange += TextView_FocusChange;
             emailEditor.ItemClick += TextView_ItemClick;
-            
+
             var contentLayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
             {
                 RightMargin = DistanceNormal,
                 Weight = 1
             };
-            
+
             AddView(emailEditor, contentLayoutParameters);
 
             var addButton = new AppCompatImageButton(Context);
@@ -484,15 +485,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             if (!(sender is RecipientAutocompleteTextView recipientTextView))
                 return;
 
-            if (recipientTextView.SelectedRecipient == null) 
+            if (recipientTextView.SelectedRecipient == null)
                 return;
 
-            var recipientSuggestion = recipientTextView.SelectedRecipient;
-            
-            if(recipientSuggestion.Type == RecipientType.Shortcode) 
-                CommonConfig.MessengerHub.Publish(new ShortcodeRecipientSelectedMessage(recipientTextView, recipientSuggestion));
+            if (recipientTextView.SelectedRecipient.Type == RecipientType.Shortcode)
+                ShortcodeClicked(this, recipientTextView.SelectedRecipient.ShortcodeAddresses);
         }
-        
+
         void AddButton_Click(object sender, EventArgs e) => AddButtonClicked(this, EventArgs.Empty);
 
         void TextView_FocusChange(object sender, FocusChangeEventArgs e)
@@ -532,7 +531,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
                 char lastChar;
 
-                while ((lastChar = spannable.LastOrDefault()) != default(char) && (lastChar == ' ' 
+                while ((lastChar = spannable.LastOrDefault()) != default(char) && (lastChar == ' '
                 || lastChar == ',' || lastChar == '\t' || lastChar.ToString() == System.Environment.NewLine))
                 {
                     textHasChangedFlag = true;
@@ -555,6 +554,19 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                     spannable.Delete(spannable.Length() - 1, spannable.Length());
                     e.Editable.Replace(0, e.Editable.Length(), spannable);
                 }
+                else if (e.Editable.ToString() == ", ")
+                {
+                    textHasChangedFlag = true;
+
+                    e.Editable.Clear();
+                }
+                else if (e.Editable.ToString().EndsWith(" , "))
+                {
+                    textHasChangedFlag = true;
+
+                    spannable.Delete(spannable.Length() - 3, spannable.Length());
+                    e.Editable.Replace(0, e.Editable.Length(), spannable);
+                }
             }
 
             CorrectMarkup();
@@ -572,8 +584,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         void UpdateTextView()
         {
-            emailEditor.Text = compressed 
-                ? fullEditorText.SafeSubstring(0, 100) 
+            emailEditor.Text = compressed
+                ? fullEditorText.SafeSubstring(0, 100)
                 : fullEditorText;
         }
 
@@ -666,8 +678,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         #endregion
     }
-    
-    
+
+
     public class RecipientAutocompleteTextView : AppCompatMultiAutoCompleteTextView
     {
         internal DocumentAddressType AddressType { get; }
@@ -691,13 +703,21 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             if (selectedObject is Recipient recipientSuggestion)
             {
                 SelectedRecipient = recipientSuggestion;
-                return new Java.Lang.String(recipientSuggestion.GetFullAddressText(AddressType));
+                if (SelectedRecipient.Type == RecipientType.Shortcode)
+                    return new Java.Lang.String("");
+                else
+                    return new Java.Lang.String(recipientSuggestion.GetFullAddressText());
             }
 
             return base.ConvertSelectionToStringFormatted(selectedItem);
         }
+
+        public override void PerformValidation()
+        {
+            base.PerformValidation();
+        }
     }
 
- 
+
 }
 

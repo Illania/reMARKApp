@@ -11,19 +11,22 @@ namespace Mark5.Mobile.Common.Utilities
 {
     public static class RecipentSuggestions
     {
-        public static void GetSuggestions(string phrase, CancellationToken token, Action<List<Recipient>, CancellationToken> handler, bool includeSystemUsers = false)
+        public static void GetSuggestions(string phrase, CancellationToken token, Action<List<Recipient>, CancellationToken> handler
+            , bool includeSystemUsers = false, bool includeShortcodes = false)
         {
             if (token.IsCancellationRequested)
                 return;
 
             GetSuggestionFromRecentAddresses(phrase, token, handler);
-            
+
             GetSuggestionFromContacts(phrase, token, handler);
 
-            GetSuggestionFromShortcodes(phrase, token, handler);
+            if (includeShortcodes)
+                GetSuggestionFromShortcodes(phrase, token, handler);
 
             if (includeSystemUsers)
                 GetSuggestionFromInternalContacts(phrase, token, handler);
+
             GetSuggestionFromPhonebook(phrase, token, handler);
         }
 

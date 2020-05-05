@@ -15,8 +15,8 @@ namespace Mark5.Mobile.Common.Model
         public string ShortId { get; set; }
         public RecipientType Type { get; set; }
 
-        public List<DocumentAddress> ShortcodeAddresses => Type == RecipientType.Shortcode 
-            ? Serializer.Deserialize<List<DocumentAddress>>(Address) 
+        public List<DocumentAddress> ShortcodeAddresses => Type == RecipientType.Shortcode
+            ? Serializer.Deserialize<List<DocumentAddress>>(Address)
             : new List<DocumentAddress>();
 
         public Recipient(RecentAddress ra)
@@ -35,23 +35,22 @@ namespace Mark5.Mobile.Common.Model
             Type = type;
             Id = id;
         }
-        
-        public string GetAddressPreviewText(DocumentAddressType addressType)
+
+        public string GetAddressPreviewText()
         {
-            return Type == RecipientType.Shortcode 
-                ? string.Join(", ",ShortcodeAddresses
-                    .Where(a => a.AddressType == addressType)
-                    .Select(a => a.Address).ToList()) 
+            return Type == RecipientType.Shortcode
+                ? string.Join(", ", ShortcodeAddresses
+                    .Select(a => a.Address).ToList())
                 : Address;
         }
 
-        public string GetFullAddressText(DocumentAddressType addressType)
+        public string GetFullAddressText()
         {
-            if (Type == RecipientType.Shortcode) 
-                return GetAddressPreviewText(addressType);
-            
-            return Type == RecipientType.Internal 
-                ? Address 
+            if (Type == RecipientType.Shortcode)
+                return GetAddressPreviewText();
+
+            return Type == RecipientType.Internal
+                ? Address
                 : string.IsNullOrEmpty(Name) ? Address : $"{Name} <{Address}>";
         }
 
@@ -67,7 +66,7 @@ namespace Mark5.Mobile.Common.Model
                 return false;
 
             var other = (Recipient)obj;
-            return string.Equals(Name, other.Name, StringComparison.CurrentCultureIgnoreCase) && string.Equals(Address, 
+            return string.Equals(Name, other.Name, StringComparison.CurrentCultureIgnoreCase) && string.Equals(Address,
                 other.Address, StringComparison.CurrentCultureIgnoreCase) && Type == other.Type;
         }
 
