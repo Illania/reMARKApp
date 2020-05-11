@@ -30,13 +30,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         readonly AppCompatButton showOldContentButton;
         readonly CustomWebView oldContentWebView;
         readonly Context context;
+        readonly FormattingView formattingView;
 
         readonly SemaphoreSlim newContentSemaphore = new SemaphoreSlim(1, 1);
         readonly SemaphoreSlim oldContentSemaphore = new SemaphoreSlim(1, 1);
 
         bool oldContentShown;
 
-        public ContentView(Context context, Action<View, int> moveViewToCaretAction)
+        public ContentView(Context context, FormattingView formattingView, Action<View, int> moveViewToCaretAction)
             : base(context)
         {
             this.context = context;
@@ -47,10 +48,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             };
             SetPadding(DistanceNormal, DistanceNormal, DistanceNormal, DistanceNormal);
 
-            newContentWebView = new CustomWebView(context)
+            this.formattingView = formattingView;
+
+            formattingView.BoldClicked += FormattingView_BoldClicked;
+            formattingView.ItalicClicked += FormattingView_ItalicClicked;
+            formattingView.UnderlineClicked += FormattingView_UnderlineClicked;
+
+            newContentWebView = new CustomWebView(context, moveViewToCaretAction, OnStartActionMode, OnDestroyActionMode)
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                OnInputAction = moveViewToCaretAction,
             };
             newContentWebView.SetBackgroundColor(Color.Transparent);
             var customWebViewClient = new CustomWebViewClient();
@@ -77,10 +83,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             showOldContentButton.Click += ShowOldContentButton_Click;
             AddView(showOldContentButton);
 
-            oldContentWebView = new CustomWebView(context)
+            oldContentWebView = new CustomWebView(context, moveViewToCaretAction, OnStartActionMode, OnDestroyActionMode)
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
-                OnInputAction = moveViewToCaretAction,
             };
             var oldContentWebViewClient = new CustomWebViewClient();
             oldContentWebViewClient.PageFinishedLoading += (sender, e) => { oldContentSemaphore.Release(); };
@@ -182,10 +187,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             string insertTemplateJs;
 
-            if(initializing) {
+            if (initializing)
+            {
                 using (var sr = new StreamReader(context.Assets.Open("initTemplate.js")))
                     insertTemplateJs = sr.ReadToEnd();
-            } else {
+            }
+            else
+            {
                 using (var sr = new StreamReader(context.Assets.Open("insertTemplate.js")))
                     insertTemplateJs = sr.ReadToEnd();
             }
@@ -345,7 +353,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             if (documentPreview.Direction == DocumentDirection.Outgoing && addressTypes[0].Equals(DocumentAddressType.From))
             {
-                
+
                 var fromString = string.Empty;
                 switch (ServerConfig.SystemSettings.DocumentsModuleInfo.UseForFrom)
                 {
@@ -359,7 +367,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                         fromString = ServerConfig.SystemSettings.UserInfo.User.Username;
                         break;
                     case UseForFrom.LineName:
-                        fromString = document.Lines.Select(l=>l.FromAddress).FirstOrDefault();
+                        fromString = document.Lines.Select(l => l.FromAddress).FirstOrDefault();
                         break;
                 }
                 return fromString;
@@ -380,5 +388,37 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
             return sb.ToString();
         }
+
+        #region Formatting related
+
+        private void OnStartActionMode()
+        {
+            formattingView.Visibility = ViewStates.Visible;
+        }
+
+        private void OnDestroyActionMode()
+        {
+            formattingView.Visibility = ViewStates.Gone;
+        }
+
+        private void FormattingView_BoldClicked(object sender, EventArgs e)
+        {
+            newContentWebView.SetBold();
+            oldContentWebView.SetBold();
+        }
+
+        private void FormattingView_ItalicClicked(object sender, EventArgs e)
+        {
+            newContentWebView.SetItalic();
+            oldContentWebView.SetItalic();
+        }
+
+        private void FormattingView_UnderlineClicked(object sender, EventArgs e)
+        {
+            newContentWebView.SetUnderline();
+            oldContentWebView.SetUnderline();
+        }
+
+        #endregion
     }
 }
