@@ -35,12 +35,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         readonly SemaphoreSlim newContentSemaphore = new SemaphoreSlim(1, 1);
         readonly SemaphoreSlim oldContentSemaphore = new SemaphoreSlim(1, 1);
 
+        readonly Action formattingViewVisibilityChangeAction;
+
         bool oldContentShown;
 
-        public ContentView(Context context, FormattingView formattingView, Action<View, int> moveViewToCaretAction)
+        public ContentView(Context context, FormattingView formattingView, Action<View, int> moveViewToCaretAction, Action formattingViewVisibilityChangeAction)
             : base(context)
         {
             this.context = context;
+            this.formattingViewVisibilityChangeAction = formattingViewVisibilityChangeAction;
             Orientation = Vertical;
             LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, 0)
             {
@@ -394,11 +397,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         private void OnStartActionMode()
         {
             formattingView.Visibility = ViewStates.Visible;
+            formattingViewVisibilityChangeAction?.Invoke();
         }
 
         private void OnDestroyActionMode()
         {
             formattingView.Visibility = ViewStates.Gone;
+            formattingViewVisibilityChangeAction?.Invoke();
         }
 
         private void FormattingView_BoldClicked(object sender, EventArgs e)

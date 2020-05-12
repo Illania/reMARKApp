@@ -232,7 +232,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             attachmentsView.Clicked += AttachmentsView_Clicked;
             subViews.Add(attachmentsView);
 
-            contentView = new ContentView(Context, formattingView, MoveViewToCaret);
+            contentView = new ContentView(Context, formattingView, MoveViewToCaret, FormattingViewVisibilityChanged);
             subViews.Add(contentView);
 
             foreach (var subview in subViews)
@@ -679,8 +679,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Scrolling related
 
-        ViewStates prevVis = ViewStates.Gone;
-
         void RootView_OnGlobalLayout(object sender, EventArgs e)
         {
             if (View == null)
@@ -694,13 +692,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             visibleRect.Left = windowCoordinates[0];
             visibleRect.Right = windowCoordinates[0] + View.Width;
 
-            if (formattingView.Visibility != prevVis)
-            {
-                var height = formattingView.Height;
-                var delta = formattingView.Visibility == ViewStates.Visible ? height : -height;
-                Activity.RunOnUiThread(() => scrollView.ScrollBy(0, delta));
-                prevVis = formattingView.Visibility;
-            }
+        }
+
+        void FormattingViewVisibilityChanged()
+        {
+            var height = formattingView.Height;
+            var delta = formattingView.Visibility == ViewStates.Visible ? height : -height;
+            Activity.RunOnUiThread(() => scrollView.ScrollBy(0, delta));
         }
 
         void MoveViewToCaret(View webView, int relativeCaretPositionDp)
