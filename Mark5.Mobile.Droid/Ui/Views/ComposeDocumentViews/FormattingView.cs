@@ -26,25 +26,34 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             LayoutParameters = lp;
             Orientation = Horizontal;
 
-            SetBackgroundColor(Android.Graphics.Color.Beige);
+            SetBackgroundColor(Android.Graphics.Color.White);
 
             padding = Conversion.ConvertDpToPixels(1f);
 
             var boldButton = GetButton(context, "B");
+            boldButton.SetTypeface(null, Android.Graphics.TypefaceStyle.Bold);
             boldButton.Click += BoldButton_Click;
 
             var italicButton = GetButton(context, "I");
+            italicButton.SetTypeface(null, Android.Graphics.TypefaceStyle.Italic);
             italicButton.Click += ItalicButton_Click;
 
             var underlineButton = GetButton(context, "U");
+            underlineButton.PaintFlags |= Android.Graphics.PaintFlags.UnderlineText;
             underlineButton.Click += UnderlineButton_Click;
 
             var closeButton = GetButton(context, "X");
             closeButton.Click += CloseButton_Click;
 
+            var fillView = new View(Context);
+            var lpf = new LinearLayout.LayoutParams(0, LayoutParams.MatchParent);
+            lpf.Weight = 1;
+            fillView.LayoutParameters = lpf;
+
             AddView(boldButton);
             AddView(italicButton);
             AddView(underlineButton);
+            AddView(fillView);
             AddView(closeButton);
 
             Hide();
@@ -85,7 +94,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             var button = new AppCompatButton(context);
             button.Text = text;
             button.Gravity = GravityFlags.Center;
-            button.SetPadding(padding, padding, padding, padding);
+
+            var lp = new LinearLayout.LayoutParams(LayoutParams.WrapContent, LayoutParams.WrapContent);
+            lp.Weight = 0;
+
+            button.LayoutParameters = lp;
+            button.SetMinimumHeight(50);
+            button.SetMinimumWidth(50);
 
             return button;
         }
