@@ -9,9 +9,9 @@
         <item>Other users\'</item>
     </string-array>
     <string-array name="search_document_from_to">
+        <item>From or To</item>
         <item>From</item>
         <item>To</item>
-        <item>From and To</item>
     </string-array>
     <string-array name="search_document_subject_message">
         <item>Subject or Message</item>
