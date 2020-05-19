@@ -89,8 +89,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         Worker autoSaveWorkingCopyWorker;
         Rect visibleRect = new Rect();
 
-        TinyMessageSubscriptionToken shortcodeSuggestionSelectedToken;
-
         public static (ComposeDocumentFragment fragment, string tag) NewInstance(DocumentCreationModeFlag documentCreationModeFlag, CopyToNewOption? copyToNewOption, bool? restoreWorkingCopy,
                                                                                  DocumentDirection? previousDocumentDirection, int? previousDocumentFolderId, int? previousDocumentId,
                                                                                  Dictionary<DocumentAddressType, string[]> preconfiguredEmailAddresses, string preconfiguredContent,
