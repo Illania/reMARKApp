@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.Actions;
 using Mark5.Mobile.Common.Model.Links;
 
 namespace Mark5.Mobile.Common.Database
@@ -49,6 +50,10 @@ namespace Mark5.Mobile.Common.Database
                 c.CreateTable<Notification>();
                 c.CreateTable<ReadNotificationInfo>();
             });
+            await DatabaseConnectionProvider.ActionsDatabase.RunInConnectionAsync(c =>
+            {
+                c.CreateTable<SetReadStatusAction>();
+            });
         }
 
         public static async Task ClearDatabases()
@@ -94,6 +99,10 @@ namespace Mark5.Mobile.Common.Database
                 c.DeleteAll<Notification>();
                 c.DeleteAll<ReadNotificationInfo>();
             });
+            await DatabaseConnectionProvider.ActionsDatabase.RunInConnectionAsync(c =>
+            {
+                c.DeleteAll<SetReadStatusAction>();
+            });
         }
 
         public static async Task CompactDatabases()
@@ -103,6 +112,7 @@ namespace Mark5.Mobile.Common.Database
             await DatabaseConnectionProvider.ShortcodesDatabase.RunInConnectionWithoutTransactionAsync(c => { c.CreateCommand("VACUUM;").ExecuteNonQuery(); });
             await DatabaseConnectionProvider.CalendarDatabase.RunInConnectionWithoutTransactionAsync(c => { c.CreateCommand("VACUUM;").ExecuteNonQuery(); });
             await DatabaseConnectionProvider.SystemDatabase.RunInConnectionWithoutTransactionAsync(c => { c.CreateCommand("VACUUM;").ExecuteNonQuery(); });
+            await DatabaseConnectionProvider.ActionsDatabase.RunInConnectionWithoutTransactionAsync(c => { c.CreateCommand("VACUUM;").ExecuteNonQuery(); });
         }
 
         public static async Task ResetDatabases()

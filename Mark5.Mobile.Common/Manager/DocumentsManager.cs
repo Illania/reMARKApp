@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Mark5.Mobile.Common.DataAccess;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.Actions;
 using Mark5.Mobile.Common.Model.Containers;
 using Mark5.Mobile.Common.Model.Converters;
 using Mark5.Mobile.Common.Model.Exceptions;
@@ -28,7 +29,10 @@ namespace Mark5.Mobile.Common.Manager
         readonly IFileTransferServiceProxy fileTransferServiceProxy;
         readonly IDocumentsDataAccess documentsDataAccess;
 
-        public DocumentsManager(ConnectionInfo connectionInfo, IAppServiceProxy appServiceProxy, IFileTransferServiceProxy fileTransferServiceProxy, IDocumentsDataAccess documentsDataAccess)
+        IActionsManager ActionsManager => Managers.ActionsManager;
+
+        public DocumentsManager(ConnectionInfo connectionInfo, IAppServiceProxy appServiceProxy, IFileTransferServiceProxy fileTransferServiceProxy
+            , IDocumentsDataAccess documentsDataAccess)
             : base(connectionInfo, appServiceProxy)
         {
             this.fileTransferServiceProxy = fileTransferServiceProxy;
@@ -147,64 +151,24 @@ namespace Mark5.Mobile.Common.Manager
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task SetDocumentReadStatusAsync(DocumentPreview documentPreview, Document document, bool isRead, SystemUser currentUser, SourceType sourceType = SourceType.Auto)
+        public async Task SetDocumentReadStatusAsync(DocumentPreview documentPreview, Document document, bool isRead, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
 
             if (sourceType == SourceType.Remote)
-            {
-                await AppServiceProxy.SetDocumentsReadStatusAsync(new DataContract.SetDocumentsReadStatusParameters
-                {
-                    Token = Token,
-                    DocumentIds = new int[]
-                    {
-                        documentPreview.Id
-                    },
-                    IsRead = isRead
-                });
+                await SetRemoteReadStatusAsync(isRead, documentPreview.Id);
+            else if (sourceType == SourceType.Local)
+                await ActionsManager.QueueActionAsync(SetReadStatusAction.Create(isRead, documentPreview.Id));
+            else
+                throw new ArgumentException("Invalid sourceType provided.");
 
-                documentPreview.IsReadByCurrent = isRead;
-                documentPreview.IsReadByAnyone = documentPreview.IsReadByAnyone || isRead;
+            documentPreview.SetReadStatus(isRead);
+            document.SetReadStatus(isRead);
 
-                if (isRead)
-                {
-                    if (!document.ReadByUserIds.Contains(currentUser.Id))
-                        document.ReadByUserIds.Add(currentUser.Id);
+            await documentsDataAccess.SetDocumentReadStatusAsync(documentPreview, document);
 
-                    if (!document.ReadByUserNames.ContainsKey(currentUser.Id))
-                        document.ReadByUserNames[currentUser.Id] = currentUser.Username;
-                    else
-                        document.ReadByUserNames[currentUser.Id] += '|' + currentUser.Username;
-                }
-                else
-                {
-                    if (document.ReadByUserNames.ContainsKey(currentUser.Id))
-                        if (!document.ReadByUserNames[currentUser.Id].Contains('|'))
-                        {
-                            document.ReadByUserIds.Remove(currentUser.Id);
-                            document.ReadByUserNames.Remove(currentUser.Id);
-                        }
-                        else
-                        {
-                            var usernames = document.ReadByUserNames[currentUser.Id].Split('|');
-                            var index = Array.IndexOf(usernames, currentUser.Username);
-                            if (index >= 0)
-                                usernames = usernames.Where((s, i) => i != index).ToArray();
-                            document.ReadByUserNames[currentUser.Id] = string.Join("|", usernames);
-                        }
-                }
-                await documentsDataAccess.SetDocumentReadStatusAsync(documentPreview, document);
-
-                CommonConfig.MessengerHub.Publish(new DocumentPreviewReadStatusChangedMessage(this, documentPreview.Id, documentPreview.IsReadByCurrent, documentPreview.IsReadByAnyone));
-
-                return;
-            }
-
-            if (sourceType == SourceType.Local)
-                throw new InvalidSourceTypeException("This action can only be performed when online.");
-
-            throw new ArgumentException("Invalid sourceType provided.");
+            CommonConfig.MessengerHub.Publish(new DocumentPreviewReadStatusChangedMessage(this, documentPreview.Id, documentPreview.IsReadByCurrent, documentPreview.IsReadByAnyone));
         }
 
         public async Task SetDocumentsReadStatusAsync(List<DocumentPreview> documentPreviews, bool isRead, SourceType sourceType = SourceType.Auto)
@@ -213,30 +177,21 @@ namespace Mark5.Mobile.Common.Manager
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
 
             if (sourceType == SourceType.Remote)
+                await SetRemoteReadStatusAsync(isRead, documentPreviews.Select(dp => dp.Id).ToArray());
+            else if (sourceType == SourceType.Local)
+                await ActionsManager.QueueActionAsync(SetReadStatusAction.Create(isRead, documentPreviews.Select(dp => dp.Id).ToArray()));
+            else
+                throw new ArgumentException("Invalid sourceType provided.");
+
+            foreach (var dp in documentPreviews)
             {
-                await AppServiceProxy.SetDocumentsReadStatusAsync(new DataContract.SetDocumentsReadStatusParameters
-                {
-                    Token = Token,
-                    DocumentIds = documentPreviews.Select(dp => dp.Id).ToArray(),
-                    IsRead = isRead
-                });
-
-                foreach (var dp in documentPreviews)
-                {
-                    dp.IsReadByCurrent = isRead;
-                    dp.IsReadByAnyone = dp.IsReadByAnyone || isRead;
-                    CommonConfig.MessengerHub.Publish(new DocumentPreviewReadStatusChangedMessage(this, dp.Id, dp.IsReadByCurrent, dp.IsReadByAnyone));
-                }
-
-                await documentsDataAccess.SetDocumentPreviewsReadStatusAsync(documentPreviews);
-
-                return;
+                dp.SetReadStatus(isRead);
+                CommonConfig.MessengerHub.Publish(new DocumentPreviewReadStatusChangedMessage(this, dp.Id, dp.IsReadByCurrent, dp.IsReadByAnyone));
             }
 
-            if (sourceType == SourceType.Local)
-                throw new InvalidSourceTypeException("This action can only be performed when online.");
+            await documentsDataAccess.SetDocumentPreviewsReadStatusAsync(documentPreviews);
 
-            throw new ArgumentException("Invalid sourceType provided.");
+            return;
         }
 
         public async Task SetDocumentsPriorityAsync(List<DocumentPreview> documentPreviews, Priority priority, SourceType sourceType = SourceType.Auto)
@@ -263,8 +218,7 @@ namespace Mark5.Mobile.Common.Manager
 
                 return;
             }
-
-            if (sourceType == SourceType.Local)
+            else if (sourceType == SourceType.Local)
                 throw new InvalidSourceTypeException("This action can only be performed when online.");
 
             throw new ArgumentException("Invalid sourceType provided.");
@@ -651,6 +605,25 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task DeleteDocumentWorkingCopyAttachmentAsync(string filename) => await FileSystemStorage.DeleteDocumentWorkingCopyAttachmentAsync(filename);
 
+        #region SetReadStatus specific
+
+        internal async Task SetRemoteReadStatusAsync(bool isRead, params int[] ids)
+        {
+            await AppServiceProxy.SetDocumentsReadStatusAsync(new DataContract.SetDocumentsReadStatusParameters
+            {
+                Token = Token,
+                DocumentIds = ids,
+                IsRead = isRead
+            });
+        }
+
+        internal async Task SetLocalReadStatusAsync(bool isRead, params int[] ids)
+        {
+            await documentsDataAccess.SetReadStatusAsync(ids.ToList(), isRead);
+        }
+
+        #endregion
+
         #region DocumentsUploadService specific
 
         internal async Task SendDocumentAsync(Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId, long sendOnTimestamp, bool confirmRead, bool confirmDelivery, List<Guid> temporaryAttachmentGuids, IEventReply eventReply, SourceType sourceType = SourceType.Auto)
@@ -722,7 +695,7 @@ namespace Mark5.Mobile.Common.Manager
                     var previousDocument = container.Document;
                     var previousDocumentPreview = container.DocumentPreview;
 
-                    await SetDocumentReadStatusAsync(previousDocumentPreview, previousDocument, true, ServerConfig.SystemSettings.UserInfo.User, SourceType.Remote);
+                    //await SetDocumentReadStatusAsync(previousDocumentPreview, previousDocument, true, ServerConfig.SystemSettings.UserInfo.User, SourceType.Remote);  //TODO
                 }
                 catch (Exception ex)
                 {

@@ -35,6 +35,7 @@
     <Folder Include="DataAccess\Interfaces\" />
     <Folder Include="Job\" />
     <Folder Include="Synchronizer\" />
+    <Folder Include="Model\Actions\" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Presenters\CalendarModule\AppointmentPresenter.cs.orig" />

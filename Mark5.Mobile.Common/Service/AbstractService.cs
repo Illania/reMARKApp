@@ -37,6 +37,9 @@ namespace Mark5.Mobile.Common.Service
                 if (workerTask != null)
                     return;
 
+                CommonConfig.Reachability.ReachabilityRefreshed -= ReachabilityRefreshed;
+                CommonConfig.Reachability.ReachabilityRefreshed += ReachabilityRefreshed;
+
                 if (Managers.ActiveConnectionInfo == null)
                     return;
 
@@ -45,9 +48,6 @@ namespace Mark5.Mobile.Common.Service
 
                 workerTaskCts?.Cancel();
                 workerTaskCts = new CancellationTokenSource();
-
-                CommonConfig.Reachability.ReachabilityRefreshed -= ReachabilityRefreshed;
-                CommonConfig.Reachability.ReachabilityRefreshed += ReachabilityRefreshed;
 
                 workerTask = Task.Run(async () => await Work(workerTaskCts.Token));
             }

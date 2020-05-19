@@ -20,6 +20,7 @@ namespace Mark5.Mobile.Common.Manager
         public static ISystemManager SystemManager { get; private set; }
         public static ICommonActionsManager CommonActionsManager { get; private set; }
         public static ICleanUpManager CleanUpManager { get; private set; }
+        internal static IActionsManager ActionsManager { get; private set; }
 
         public static void Initialize(ConnectionInfo connectionInfo)
         {
@@ -44,6 +45,7 @@ namespace Mark5.Mobile.Common.Manager
             var shortcodesDataAccess = new ShortcodesDataAccess(DatabaseConnectionProvider.ShortcodesDatabase);
             var calendarDataAccess = new CalendarDataAccess(DatabaseConnectionProvider.CalendarDatabase);
             var notificationsDataAccess = new NotificationsDataAccess(DatabaseConnectionProvider.SystemDatabase);
+            var actionsDataAccess = new ActionsDataAccess(DatabaseConnectionProvider.ActionsDatabase);
 
             FoldersManager = new FoldersManager(connectionInfo, appServiceProxy, foldersDataAccess);
             DocumentsManager = new DocumentsManager(connectionInfo, appServiceProxy, fileTransferServiceProxy, documentsDataAccess);
@@ -55,6 +57,7 @@ namespace Mark5.Mobile.Common.Manager
             SystemManager = new SystemManager(connectionInfo, appServiceProxy);
             CommonActionsManager = new CommonActionsManager(connectionInfo, appServiceProxy, documentsDataAccess, contactsDataAccess, shortcodesDataAccess, calendarDataAccess);
             CleanUpManager = new CleanUpManager(documentsDataAccess, contactsDataAccess, shortcodesDataAccess, calendarDataAccess);
+            ActionsManager = new ActionsManager(connectionInfo, appServiceProxy, actionsDataAccess);
         }
     }
 }

@@ -5,5 +5,6 @@
         public static IDocumentsUploadService DocumentsUploadService { get; set; } = new DocumentsUploadService();
         public static IDocumentPreviewsDownloadService DocumentPreviewsDownloadService { get; set; } = new DocumentPreviewsDownloadService();
         public static IDocumentsDownloadService DocumentsDownloadService { get; set; } = new DocumentsDownloadService();
+        public static IActionSyncService ActionSyncService { get; set; } = new ActionSyncService();
     }
 }

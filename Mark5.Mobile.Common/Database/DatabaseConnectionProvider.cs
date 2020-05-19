@@ -63,6 +63,17 @@ namespace Mark5.Mobile.Common.Database
             }
         }
 
+        public static DatabaseConnectionProvider ActionsDatabase
+        {
+            get
+            {
+                if (CommonConfig.DataFolder == null)
+                    throw new InvalidOperationException("Data and/or cache folder is not configured.");
+
+                return actionsDatabase.Value;
+            }
+        }
+
         static readonly Lazy<DatabaseConnectionProvider> documentsDatabase = new Lazy<DatabaseConnectionProvider>(() => new DatabaseConnectionProvider("documents.sqlite3"), LazyThreadSafetyMode.ExecutionAndPublication);
 
         static readonly Lazy<DatabaseConnectionProvider> contactsDatabase = new Lazy<DatabaseConnectionProvider>(() => new DatabaseConnectionProvider("contacts.sqlite3"), LazyThreadSafetyMode.ExecutionAndPublication);
@@ -72,6 +83,8 @@ namespace Mark5.Mobile.Common.Database
         static readonly Lazy<DatabaseConnectionProvider> calendarDatabase = new Lazy<DatabaseConnectionProvider>(() => new DatabaseConnectionProvider("calendar.sqlite3"), LazyThreadSafetyMode.ExecutionAndPublication);
 
         static readonly Lazy<DatabaseConnectionProvider> systemDatabase = new Lazy<DatabaseConnectionProvider>(() => new DatabaseConnectionProvider("system.sqlite3"), LazyThreadSafetyMode.ExecutionAndPublication);
+
+        static readonly Lazy<DatabaseConnectionProvider> actionsDatabase = new Lazy<DatabaseConnectionProvider>(() => new DatabaseConnectionProvider("actions.sqlite3"), LazyThreadSafetyMode.ExecutionAndPublication);
 
         public static DatabaseConnectionProvider DatabaseForModuleType(ModuleType moduleType)
         {

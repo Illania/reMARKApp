@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Mark5.Mobile.Common.Utilities;
 using Newtonsoft.Json;
@@ -171,6 +172,39 @@ namespace Mark5.Mobile.Common.Model
                 ReadByUserIds = ReadByUserIds,
                 Comments = Comments,
             };
+        }
+
+        internal void SetReadStatus(bool isRead)
+        {
+            var currentUser = ServerConfig.SystemSettings.UserInfo.User;
+
+            if (isRead)
+            {
+                if (!ReadByUserIds.Contains(currentUser.Id))
+                    ReadByUserIds.Add(currentUser.Id);
+
+                if (!ReadByUserNames.ContainsKey(currentUser.Id))
+                    ReadByUserNames[currentUser.Id] = currentUser.Username;
+                else
+                    ReadByUserNames[currentUser.Id] += '|' + currentUser.Username;
+            }
+            else
+            {
+                if (ReadByUserNames.ContainsKey(currentUser.Id))
+                    if (!ReadByUserNames[currentUser.Id].Contains('|'))
+                    {
+                        ReadByUserIds.Remove(currentUser.Id);
+                        ReadByUserNames.Remove(currentUser.Id);
+                    }
+                    else
+                    {
+                        var usernames = ReadByUserNames[currentUser.Id].Split('|');
+                        var index = Array.IndexOf(usernames, currentUser.Username);
+                        if (index >= 0)
+                            usernames = usernames.Where((s, i) => i != index).ToArray();
+                        ReadByUserNames[currentUser.Id] = string.Join("|", usernames);
+                    }
+            }
         }
     }
 

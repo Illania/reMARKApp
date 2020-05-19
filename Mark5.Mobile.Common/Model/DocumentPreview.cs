@@ -90,6 +90,12 @@ namespace Mark5.Mobile.Common.Model
 
         #endregion
 
+        internal void SetReadStatus(bool isRead)
+        {
+            IsReadByCurrent = isRead;
+            IsReadByAnyone = IsReadByAnyone || isRead;
+        }
+
         public override string ToString()
         {
             return $"[DocumentPreview: Id={Id}, ReferenceNumber={ReferenceNumber}, Subject={Subject}, DateReceivedTimestamp={DateReceivedTimestamp}]";
