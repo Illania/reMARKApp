@@ -81,6 +81,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         SubjectView subjectView;
         AttachmentsView attachmentsView;
         ContentView contentView;
+        FormattingView formattingView;
 
         RecipientsView focusedRecipientView;
 
@@ -192,6 +193,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             scrollView = rootView.FindViewById<NestedScrollView>(Resource.Id.scroll_view);
             scrollView.Visibility = ViewStates.Visible;
             linearLayout = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.linear_layout);
+            var frame = rootView.FindViewById<FrameLayout>(Resource.Id.frame_layout);
+
+            formattingView = new FormattingView(Context);
+            frame.AddView(formattingView);
 
             toView = new ToView(Context);
             toView.AddButtonClicked += RecipientView_AddButtonClicked;
@@ -227,7 +232,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             attachmentsView.Clicked += AttachmentsView_Clicked;
             subViews.Add(attachmentsView);
 
-            contentView = new ContentView(Context, MoveViewToCaret);
+            contentView = new ContentView(Context, formattingView, MoveViewToCaret, FormattingViewVisibilityChanged);
             subViews.Add(contentView);
 
             foreach (var subview in subViews)
@@ -236,6 +241,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (subview != attachmentsView && subview != contentView)
                     linearLayout.AddView(new Divider(Context));
             }
+
 
             fab = ((BaseAppCompatActivity)Activity).Fab;
             fab.SetImageResource(Resource.Drawable.action_send);
@@ -685,6 +691,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             visibleRect.Bottom = windowCoordinates[1] + View.Height;
             visibleRect.Left = windowCoordinates[0];
             visibleRect.Right = windowCoordinates[0] + View.Width;
+
+        }
+
+        void FormattingViewVisibilityChanged()
+        {
+            var height = formattingView.Height;
+            var delta = formattingView.Visibility == ViewStates.Visible ? height : -height;
+            Activity.RunOnUiThread(() => scrollView.ScrollBy(0, delta));
         }
 
         void MoveViewToCaret(View webView, int relativeCaretPositionDp)
@@ -700,7 +714,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var relativeCaretPositionPx = Conversion.ConvertDpToPixels(relativeCaretPositionDp);
 
             var absoluteCaretPositionTop = relativeCaretPositionPx + webViewYPosition - 10; //Added a little bit of padding
-            var caretSize = 50;
+            var caretSize = 150;
             var absoluteCaretPositionBottom = absoluteCaretPositionTop + caretSize;
 
             int delta = 0;

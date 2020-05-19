@@ -604,6 +604,7 @@
     <Compile Include="Ui\Activities\AppointmentActivity.cs" />
     <Compile Include="Ui\Activities\WrapperActivity.cs" />
     <Compile Include="Utilities\Worker\DeviceReminderWorker.cs" />
+    <Compile Include="Ui\Views\ComposeDocumentViews\FormattingView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
