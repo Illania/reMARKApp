@@ -212,7 +212,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             if (suggestionsListView == null)
             {
-                suggestionsListView = new SuggestionsListView(this, true);
+                suggestionsListView = new SuggestionsListView(this, includeSystemUsers: true);
 
                 View.AddSubview(suggestionsListView);
                 View.AddConstraints(new[]
@@ -369,6 +369,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             foreach (var pa in recipients)
             {
+                if (pa == null) continue;
+
                 ParticipantsViewModel pvm = null;
                 switch (pa.Type)
                 {

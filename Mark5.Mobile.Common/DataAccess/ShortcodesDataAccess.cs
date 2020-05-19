@@ -264,5 +264,41 @@ namespace Mark5.Mobile.Common.DataAccess
                 c.DeleteAll<Shortcode>();
             });
         }
+
+        public async Task<List<Recipient>> GetSuggestions(string phrase)
+        {
+            try
+            {
+                List<Recipient> suggestions = null;
+
+                await shortcodesDatabase.RunInConnectionAsync(c =>
+                {
+
+                    var commandString = $"select SCP.{nameof(ShortcodePreview.Name)} as {nameof(Recipient.Name)},"
+                         + $" SC.{nameof(Shortcode.AddressString)} as {nameof(Recipient.Address)},"
+                         + $" {(int)RecipientType.Shortcode} as {nameof(Recipient.Type)}"
+                         + $" from {nameof(ShortcodePreview)} SCP"
+                         + $" inner join {nameof(Shortcode)} SC"
+                         + $" on SCP.{nameof(ShortcodePreview.Id)} = SC.{nameof(Shortcode.Id)} "
+                         + $" where (SCP.{nameof(ShortcodePreview.Name)} like @phrase)"
+                         + "  limit 100"
+                         + "  collate Nocase";
+
+                    var cmd = c.CreateCommand(commandString);
+                    cmd.Bind("@phrase", $"%{phrase}%");
+                    var result = cmd.ExecuteQuery<Recipient>();
+
+                    suggestions = result;
+                });
+
+
+                return suggestions;
+            }
+            catch
+            {
+                return new List<Recipient>();
+            }
+        }
+
     }
 }

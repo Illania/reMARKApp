@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Android.App;
@@ -25,8 +24,8 @@ using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
 using Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews;
 using Mark5.Mobile.Droid.Utilities;
-using Mark5.ServiceReference.Exceptions;
 using PCLStorage;
+using TinyMessenger;
 using Uri = Android.Net.Uri;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
@@ -89,6 +88,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         Worker autoSaveWorkingCopyWorker;
         Rect visibleRect = new Rect();
+
+        TinyMessageSubscriptionToken shortcodeSuggestionSelectedToken;
 
         public static (ComposeDocumentFragment fragment, string tag) NewInstance(DocumentCreationModeFlag documentCreationModeFlag, CopyToNewOption? copyToNewOption, bool? restoreWorkingCopy,
                                                                                  DocumentDirection? previousDocumentDirection, int? previousDocumentFolderId, int? previousDocumentId,
@@ -195,16 +196,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             toView = new ToView(Context);
             toView.AddButtonClicked += RecipientView_AddButtonClicked;
             toView.Edited += Subview_Edited;
+            toView.ShortcodeClicked += RecipientView_ShortcodeClicked;
             subViews.Add(toView);
 
             ccView = new CcView(Context);
             ccView.AddButtonClicked += RecipientView_AddButtonClicked;
             ccView.Edited += Subview_Edited;
+            ccView.ShortcodeClicked += RecipientView_ShortcodeClicked;
             subViews.Add(ccView);
 
             bccView = new BccView(Context);
             bccView.AddButtonClicked += RecipientView_AddButtonClicked;
             bccView.Edited += Subview_Edited;
+            bccView.ShortcodeClicked += RecipientView_ShortcodeClicked;
             subViews.Add(bccView);
 
             priorityView = new PriorityView(Context);
@@ -652,6 +656,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 focusedRecipientView.RequestEditorFocus();
         }
 
+        private void RecipientView_ShortcodeClicked(object sender, List<DocumentAddress> addresses)
+        {
+            (RecipientsView view, DocumentAddressType addressType)[] addressControls = {
+                (toView, DocumentAddressType.To),
+                (ccView, DocumentAddressType.Cc),
+                (bccView, DocumentAddressType.Bcc),
+            };
+
+            foreach (var addressControlInfo in addressControls)
+                addressControlInfo.view.AddEmails(addresses.Where(da => da.AddressType == addressControlInfo.addressType)
+                    .Select(da => da.Address), true);
+        }
+
         #endregion
 
         #region Scrolling related
@@ -808,7 +825,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             else
             {
                 if (data.ClipData == null) return;
-                
+
                 var mClipData = data.ClipData;
 
                 for (var i = 0; i < mClipData.ItemCount; i++)

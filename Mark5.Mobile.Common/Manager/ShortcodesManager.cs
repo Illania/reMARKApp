@@ -189,5 +189,11 @@ namespace Mark5.Mobile.Common.Manager
 
             throw new ArgumentException("Invalid sourceType provided");
         }
+
+        public async Task<List<Recipient>> GetSuggestions(string phrase)
+        {
+            var result = await shortcodesDataAccess.GetSuggestions(phrase);
+            return result;
+        }
     }
 }

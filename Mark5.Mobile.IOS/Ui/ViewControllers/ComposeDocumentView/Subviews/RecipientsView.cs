@@ -23,7 +23,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         protected const string RecipentFormat = "{0} <{1}>";
 
         public SystemUsersDepartments SystemUsersDepartments { get; set; }
-        public DocumentAddressType AddressType { get; protected set; }
+        public DocumentAddressType AddressType { get; protected internal set; }
         public bool Empty => ServerConfig.SystemSettings.SystemInfo.InternalMailsAvailable
         ? !Validator.ContainsValidEmail(TextView.Text) && !Validator.ContainsValidUsernames(TextView.Text, SystemUsersDepartments) : !Validator.ContainsValidEmail(TextView.Text);
 
@@ -143,17 +143,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         protected string GetTitleFromAddressType()
         {
-            switch (AddressType)
+            return AddressType switch
             {
-                case DocumentAddressType.To:
-                    return Localization.GetString("to");
-                case DocumentAddressType.Cc:
-                    return Localization.GetString("cc");
-                case DocumentAddressType.Bcc:
-                    return Localization.GetString("bcc");
-                default:
-                    return string.Empty;
-            }
+                DocumentAddressType.To => Localization.GetString("to"),
+                DocumentAddressType.Cc => Localization.GetString("cc"),
+                DocumentAddressType.Bcc => Localization.GetString("bcc"),
+                _ => string.Empty,
+            };
         }
 
         #region Overrides
@@ -455,7 +451,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         #region Helper methods
 
-        protected void CorrectMarkup()
+        protected internal void CorrectMarkup()
         {
             TextView.TextStorage.BeginEditing();
 
