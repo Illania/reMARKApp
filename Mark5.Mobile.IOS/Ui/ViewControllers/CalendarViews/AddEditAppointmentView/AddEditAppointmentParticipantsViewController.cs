@@ -350,6 +350,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             vc.IncludeCurrentUser = false;
             PresentViewController(new NavigationController(vc), true, null);
             var pa = await vc.Result;
+            if (pa == null || !pa.Any())
+                return;
             foreach (var su in pa)
                 viewModel.Participants.Add(new ParticipantsViewModel
                 {

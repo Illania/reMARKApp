@@ -110,8 +110,9 @@ namespace Mark5.Mobile.IOS
 
             Window.MakeKeyAndVisible();
 
-            if (UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
-                BGTaskScheduler.Shared.Register(backgroundTaskID, null, HandleBackgroundTask);
+            //Check note on background task down
+            //if (UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
+            //    BGTaskScheduler.Shared.Register(backgroundTaskID, null, HandleBackgroundTask);
 
             if (launchOptions == null)
                 return true;
@@ -214,8 +215,9 @@ namespace Mark5.Mobile.IOS
 
             LocalAuthenticationManager.NotifyApplicationEnteredBackground();
 
-            if (UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
-                ScheduleBackgroundTask();
+            //Check note on background task down
+            //if (UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
+            //    ScheduleBackgroundTask();
         }
 
         public override void ReceiveMemoryWarning(UIApplication application)
@@ -455,12 +457,19 @@ namespace Mark5.Mobile.IOS
             });
         }
 
+        //https://github.com/xamarin/xamarin-macios/issues/7456
+        //Unfortunately we can't use BGTaskScheduler because there is a bug in Xamarin.
+        //If we want to reactivate it we need also to add following to info.plist
+        // 	<key>BGTaskSchedulerPermittedIdentifiers</key>
+        //  <array>
+        //      <string>com.nordic-it.mark5.mobile.ios.task</string>
+        //  </array>
         void ScheduleBackgroundTask()
         {
             CommonConfig.Logger.Error("Scheduling background task ");
 
             var request = new BGAppRefreshTaskRequest(backgroundTaskID);
-            request.EarliestBeginDate = NSDate.Now.AddSeconds(10); //1 hour
+            request.EarliestBeginDate = NSDate.Now.AddSeconds(60 * 60); //1 hour
 
             BGTaskScheduler.Shared.Submit(request, out var _error);
 
