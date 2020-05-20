@@ -70,10 +70,6 @@
 	<string>reMARK</string>
 	<key>CFBundleShortVersionString</key>
 	<string>5.5</string>
-	<key>BGTaskSchedulerPermittedIdentifiers</key>
-	<array>
-		<string>com.nordic-it.mark5.mobile.ios.task</string>
-	</array>
 	<key>CFBundleVersion</key>
 	<string>526</string>
 </dict>
