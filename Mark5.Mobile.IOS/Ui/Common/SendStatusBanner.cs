@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities.Extensions;
@@ -10,8 +11,13 @@ namespace Mark5.Mobile.IOS.Ui.Common
 {
     public class SendStatusBanner : UIView
     {
+        readonly double animationDuration = 0.5;
+        readonly double bannerDuration = 3;
+
         WeakReference<UITableViewController> weakViewController;
         TinyMessageSubscriptionToken documentUploadStatusChangedToken;
+        NSLayoutConstraint bottomConstraint;
+        NSLayoutConstraint topConstraint;
 
         public static void Attach(UITableViewController viewController)
         {
@@ -29,6 +35,16 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 rb.RemoveFromSuperview();
         }
 
+        void SubscribeToMessages()
+        {
+            documentUploadStatusChangedToken = CommonConfig.MessengerHub.Subscribe<DocumentUploadStatusChangedMessage>(DocumentUploadStatusChanged);
+        }
+
+        void UnsubscribeFromMessages()
+        {
+            documentUploadStatusChangedToken?.Dispose();
+        }
+
         public SendStatusBanner(UITableViewController viewController)
         {
             weakViewController = viewController.Wrap();
@@ -37,16 +53,19 @@ namespace Mark5.Mobile.IOS.Ui.Common
             Layer.ZPosition = float.MaxValue;
             Opaque = true;
             BackgroundColor = UIColor.Clear;
+            Hidden = true;
 
             CreateBanner();
         }
 
         void CreateBanner()
         {
-            var backgroundView = new UIView();
-            backgroundView.TranslatesAutoresizingMaskIntoConstraints = false;
-            backgroundView.BackgroundColor = Theme.TintColor;
-            backgroundView.ClipsToBounds = false;
+            var backgroundView = new UIView
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                BackgroundColor = Theme.TintColor,
+                ClipsToBounds = false
+            };
             backgroundView.Layer.CornerRadius = 12;
 
             AddSubview(backgroundView);
@@ -57,15 +76,14 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 backgroundView.TopAnchor.ConstraintEqualTo(TopAnchor),
             });
 
-            var banner = new UILabel();
-            banner.TranslatesAutoresizingMaskIntoConstraints = false;
-            banner.Text = "Test text";
-            banner.TextColor = UIColor.White;
+            var banner = new UILabel
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                Text = "Test text",
+                TextColor = UIColor.White
+            };
             banner.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
-            //banner.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
-
             banner.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
-            //banner.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
 
             nfloat internalPadding = 15;
 
@@ -76,11 +94,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 banner.BottomAnchor.ConstraintEqualTo(backgroundView.BottomAnchor, -internalPadding),
                 banner.TopAnchor.ConstraintEqualTo(backgroundView.TopAnchor, internalPadding),
             });
-
         }
-
-        NSLayoutConstraint bottomConstraint;
-        NSLayoutConstraint topConstraint;
 
         public override void MovedToSuperview()
         {
@@ -94,7 +108,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                     WidthAnchor.ConstraintEqualTo(Superview.WidthAnchor),
                     bottomConstraint = BottomAnchor.ConstraintEqualTo(Superview.SafeAreaLayoutGuide.BottomAnchor),
                     CenterXAnchor.ConstraintEqualTo(Superview.CenterXAnchor),
-                    topConstraint = TopAnchor.ConstraintEqualTo(Superview.SafeAreaLayoutGuide.BottomAnchor),
+                    topConstraint = TopAnchor.ConstraintEqualTo(Superview.SafeAreaLayoutGuide.BottomAnchor, 100),
                 });
 
                 bottomConstraint.Active = false;
@@ -103,30 +117,44 @@ namespace Mark5.Mobile.IOS.Ui.Common
             {
                 UnsubscribeFromMessages();
             }
-            Superview.LayoutIfNeeded();
 
-            Animate(5, () =>
+
+        }
+
+        void ShowBanner()
+        {
+
+            void action()
             {
                 bottomConstraint.Active = true;
                 topConstraint.Active = false;
 
                 Superview.LayoutIfNeeded();
-            });
+            }
+
+            Hidden = false;
+            Superview.LayoutIfNeeded();
+            AnimateNotify(animationDuration, 0d, 0.7f, 0, UIViewAnimationOptions.CurveEaseInOut, action, null);
+            Task.Delay(TimeSpan.FromSeconds(animationDuration + bannerDuration)).ContinueWith((task) => BeginInvokeOnMainThread(HideBanner));
         }
 
-        void SubscribeToMessages()
+        void HideBanner()
         {
-            documentUploadStatusChangedToken = CommonConfig.MessengerHub.Subscribe<DocumentUploadStatusChangedMessage>(DocumentUploadStatusChanged);
-        }
+            void action()
+            {
+                bottomConstraint.Active = false;
+                topConstraint.Active = true;
 
-        void UnsubscribeFromMessages()
-        {
-            documentUploadStatusChangedToken?.Dispose();
+                Superview.LayoutIfNeeded();
+            }
+
+            Superview.LayoutIfNeeded();
+            AnimateNotify(animationDuration, 0d, 0.7f, 0, UIViewAnimationOptions.CurveEaseInOut, action, (c) => { Hidden = true; });
         }
 
         void DocumentUploadStatusChanged(DocumentUploadStatusChangedMessage obj)
         {
-            throw new NotImplementedException();
+            ShowBanner();
         }
     }
 }
