@@ -643,6 +643,15 @@ namespace Mark5.Mobile.Common.Storage
             if (failedFolderGuid == null)
                 return;
 
+            var file = await failedFolderGuid.GetFileAsync("documentToUploadInfo.json");
+            if (file != null)
+            {
+                var fileContent = await file.ReadAllTextAsync();
+                var info = Serializer.Deserialize<DocumentToUploadInfo>(fileContent);
+                info.SendDateTime = DateTime.UtcNow;
+                await file.WriteAllTextAsync(Serializer.Serialize(info));
+            }
+
             await failedFolderGuid.MoveRecursivelyAsync(CommonConfig.DocumentsToUploadFolder, CreationCollisionOption.FailIfExists);
             await failedFolderGuid.DeleteAsync();
         }
