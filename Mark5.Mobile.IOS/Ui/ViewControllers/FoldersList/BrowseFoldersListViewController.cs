@@ -34,6 +34,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             base.ViewWillAppear(animated);
             OutgoingWarningBar.Attach(this);
             ReachabilityBar.Attach(this);
+            SendStatusBanner.Attach(this);
         }
 
         public override void ViewDidDisappear(bool animated)
@@ -41,6 +42,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             base.ViewDidDisappear(animated);
             OutgoingWarningBar.Detach(this);
             ReachabilityBar.Detach(this);
+            SendStatusBanner.Detach(this);
         }
 
         protected override void FolderSelected(Folder folder, bool isFromFavorite)
