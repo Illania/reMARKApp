@@ -3,11 +3,14 @@ using System.Text;
 using Android.Content;
 using Android.OS;
 using Android.Support.Design.Widget;
+using Android.Support.V4.Content;
 using Android.Support.V7.App;
 using Android.Views;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
+using TinyMessenger;
 
 namespace Mark5.Mobile.Droid.Ui.Common
 {
@@ -15,11 +18,13 @@ namespace Mark5.Mobile.Droid.Ui.Common
     {
         FloatingActionButton fab;
 
+        TinyMessageSubscriptionToken documentUploadStatusChangedToken;
+
         public FloatingActionButton Fab
         {
             get
             {
-                fab = fab ?? FindViewById<FloatingActionButton>(Resource.Id.fab);
+                fab ??= FindViewById<FloatingActionButton>(Resource.Id.fab);
                 return fab;
             }
         }
@@ -55,6 +60,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             }
 
             UpdateFab(CommonConfig.Reachability.IsReachable);
+            SubscribeToMessages();
         }
 
         void UpdateFab(bool isReachable)
@@ -83,6 +89,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 CommonConfig.Reachability.OnPause();
                 CommonConfig.Reachability.ReachabilityRefreshed -= ReachabilityService_ReachabilityRefreshed;
             }
+            UnsubscribeFromMessages();
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
@@ -94,6 +101,27 @@ namespace Mark5.Mobile.Droid.Ui.Common
             }
 
             return base.OnOptionsItemSelected(item);
+        }
+
+        void SubscribeToMessages()
+        {
+            documentUploadStatusChangedToken = CommonConfig.MessengerHub.Subscribe<DocumentUploadStatusChangedMessage>(DocumentUploadStatusChanged);
+        }
+
+        void UnsubscribeFromMessages()
+        {
+            documentUploadStatusChangedToken?.Dispose();
+        }
+
+        void DocumentUploadStatusChanged(DocumentUploadStatusChangedMessage obj)
+        {
+            if (obj.Change == DocumentUploadStatusChangedMessage.Status.DocumentSending)
+                return;
+
+            var coordinator = FindViewById<CoordinatorLayout>(Resource.Id.coordinator);
+            var snackbar = Snackbar.Make(coordinator, "TEST", Snackbar.LengthShort);
+            //snackbar.View.SetBackgroundColor(new Android.Graphics.Color(ContextCompat.GetColor(this, Resource.Color.darkerblue)));
+            snackbar.Show();
         }
 
         void ReachabilityService_ReachabilityRefreshed(object sender, ReachabilityRefreshedEventArgs e)
