@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
 using AudioToolbox;
@@ -12,15 +13,19 @@ namespace Mark5.Mobile.IOS.Ui.Common
 {
     public class SendStatusBanner : UIView
     {
+        //TODO test if works with actual sending
+        //TODO test if works with different views
         readonly double animationDuration = 0.25;
-        readonly double bannerDuration = 3;
+        readonly double bannerDuration = 2;
 
-        WeakReference<UITableViewController> weakViewController;
+        WeakReference<UIViewController> weakViewController;
         TinyMessageSubscriptionToken documentUploadStatusChangedToken;
         NSLayoutConstraint bottomConstraint;
         NSLayoutConstraint topConstraint;
+        BannerView bannerView;
+        ConcurrentQueue<BannerInfo> queue = new ConcurrentQueue<BannerInfo>();
 
-        public static void Attach(UITableViewController viewController)
+        public static void Attach(UIViewController viewController)
         {
             var view = viewController.View;
 
@@ -28,7 +33,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             view.AddSubview(rb);
         }
 
-        public static void Detach(UITableViewController controller)
+        public static void Detach(UIViewController controller)
         {
             var view = controller.View;
 
@@ -36,17 +41,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 rb.RemoveFromSuperview();
         }
 
-        void SubscribeToMessages()
-        {
-            documentUploadStatusChangedToken = CommonConfig.MessengerHub.Subscribe<DocumentUploadStatusChangedMessage>(DocumentUploadStatusChanged);
-        }
-
-        void UnsubscribeFromMessages()
-        {
-            documentUploadStatusChangedToken?.Dispose();
-        }
-
-        public SendStatusBanner(UITableViewController viewController)
+        public SendStatusBanner(UIViewController viewController)
         {
             weakViewController = viewController.Wrap();
 
@@ -56,44 +51,12 @@ namespace Mark5.Mobile.IOS.Ui.Common
             BackgroundColor = UIColor.Clear;
             Hidden = true;
 
-            CreateBanner();
-        }
-
-        void CreateBanner()
-        {
-            var backgroundView = new UIView
-            {
-                TranslatesAutoresizingMaskIntoConstraints = false,
-                BackgroundColor = Theme.TintColor,
-                ClipsToBounds = false
-            };
-            backgroundView.Layer.CornerRadius = 12;
-
-            AddSubview(backgroundView);
+            bannerView = new BannerView();
+            AddSubview(bannerView);
             AddConstraints(new[] {
-                backgroundView.LeftAnchor.ConstraintEqualTo(LeftAnchor, 10),
-                backgroundView.RightAnchor.ConstraintEqualTo(RightAnchor, -10),
-                backgroundView.BottomAnchor.ConstraintEqualTo(BottomAnchor, -25),
-                backgroundView.TopAnchor.ConstraintEqualTo(TopAnchor),
-            });
-
-            var banner = new UILabel
-            {
-                TranslatesAutoresizingMaskIntoConstraints = false,
-                Text = "Test text",
-                TextColor = UIColor.White
-            };
-            banner.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
-            banner.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
-
-            nfloat internalPadding = 15;
-
-            backgroundView.AddSubview(banner);
-            backgroundView.AddConstraints(new[] {
-                banner.LeftAnchor.ConstraintEqualTo(backgroundView.LeftAnchor, internalPadding),
-                banner.RightAnchor.ConstraintEqualTo(backgroundView.RightAnchor, -internalPadding),
-                banner.BottomAnchor.ConstraintEqualTo(backgroundView.BottomAnchor, -internalPadding),
-                banner.TopAnchor.ConstraintEqualTo(backgroundView.TopAnchor, internalPadding),
+                bannerView.CenterXAnchor.ConstraintEqualTo(CenterXAnchor),
+                bannerView.BottomAnchor.ConstraintEqualTo(BottomAnchor, -25),
+                bannerView.TopAnchor.ConstraintEqualTo(TopAnchor),
             });
         }
 
@@ -117,45 +80,152 @@ namespace Mark5.Mobile.IOS.Ui.Common
             else
             {
                 UnsubscribeFromMessages();
+                queue.Clear();
             }
-
-
         }
 
-        void ShowBanner()
+        void SubscribeToMessages()
         {
-            void action()
+            documentUploadStatusChangedToken = CommonConfig.MessengerHub.Subscribe<DocumentUploadStatusChangedMessage>(DocumentUploadStatusChanged);
+        }
+
+        void UnsubscribeFromMessages()
+        {
+            documentUploadStatusChangedToken?.Dispose();
+        }
+
+        void ShowBanner(BannerInfo info)
+        {
+            BeginInvokeOnMainThread(() =>
             {
-                bottomConstraint.Active = true;
-                topConstraint.Active = false;
+                if (Superview == null)
+                    return;
 
-                Superview.LayoutIfNeeded();
-            }
+                bannerView.SetData(info);
 
-            Hidden = false;
-            Superview.LayoutIfNeeded();
-            AnimateNotify(animationDuration, 0d, 0.7f, 0, UIViewAnimationOptions.CurveEaseInOut, action, null);
-            Task.Delay(TimeSpan.FromSeconds(animationDuration + bannerDuration)).ContinueWith((task) => BeginInvokeOnMainThread(HideBanner));
-            SystemSound.Vibrate.PlayAlertSound();
+                void action()
+                {
+                    bottomConstraint.Active = true;
+                    topConstraint.Active = false;
+
+                    Superview?.LayoutIfNeeded();
+                }
+
+                Hidden = false;
+                Superview?.LayoutIfNeeded();
+                AnimateNotify(animationDuration, 0d, 0.7f, 0, UIViewAnimationOptions.CurveEaseInOut, action, null);
+                Task.Delay(TimeSpan.FromSeconds(animationDuration + bannerDuration)).ContinueWith((task) => HideBanner()); ;
+                SystemSound.Vibrate.PlayAlertSound();
+            });
         }
 
         void HideBanner()
         {
-            void action()
+            BeginInvokeOnMainThread(() =>
             {
-                bottomConstraint.Active = false;
-                topConstraint.Active = true;
+                if (Superview == null)
+                    return;
 
-                Superview.LayoutIfNeeded();
-            }
+                void action()
+                {
+                    bottomConstraint.Active = false;
+                    topConstraint.Active = true;
 
-            Superview.LayoutIfNeeded();
-            AnimateNotify(animationDuration, 0d, 0.7f, 0, UIViewAnimationOptions.CurveEaseInOut, action, (c) => { Hidden = true; });
+                    Superview?.LayoutIfNeeded();
+                }
+
+                Superview?.LayoutIfNeeded();
+                AnimateNotify(animationDuration, 0d, 0.7f, 0, UIViewAnimationOptions.CurveEaseInOut, action, (c) =>
+                {
+                    Hidden = true;
+                    OnBannerHidden();
+                });
+            });
+        }
+
+        void QueueBanner(BannerInfo info)
+        {
+            if (queue.IsEmpty)
+                ShowBanner(info);
+
+            queue.Enqueue(info);
+        }
+
+        void OnBannerHidden()
+        {
+            queue.TryDequeue(out _);
+
+            if (queue.TryPeek(out var info))
+                ShowBanner(info);
         }
 
         void DocumentUploadStatusChanged(DocumentUploadStatusChangedMessage obj)
         {
-            ShowBanner();
+            if (obj.Change == DocumentUploadStatusChangedMessage.Status.DocumentSending)
+                return;
+
+            QueueBanner(BannerInfo.FromStatus(obj.Change));
+        }
+
+        class BannerInfo
+        {
+            public string Text { get; private set; }
+            public UIColor Color { get; private set; }
+
+            private BannerInfo() { }
+
+            public static BannerInfo FromStatus(DocumentUploadStatusChangedMessage.Status status)
+            {
+                var bannerInfo = new BannerInfo();
+                if (status == DocumentUploadStatusChangedMessage.Status.DocumentSent)
+                {
+                    bannerInfo.Text = "Email was sent";
+                    bannerInfo.Color = Theme.TintColor;
+                }
+                else if (status == DocumentUploadStatusChangedMessage.Status.DocumentSentFailed)
+                {
+                    bannerInfo.Text = "Error while sending email";
+                    bannerInfo.Color = UIColor.Red;
+                }
+
+                return bannerInfo;
+            }
+        }
+
+        class BannerView : UIView
+        {
+            readonly UILabel bannerLabel;
+
+            public BannerView()
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false;
+                ClipsToBounds = false;
+                Layer.CornerRadius = 10;
+
+                bannerLabel = new UILabel
+                {
+                    TranslatesAutoresizingMaskIntoConstraints = false,
+                    TextColor = UIColor.White
+                };
+                bannerLabel.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+                bannerLabel.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+
+                nfloat internalPadding = 8;
+
+                AddSubview(bannerLabel);
+                AddConstraints(new[] {
+                    bannerLabel.LeftAnchor.ConstraintEqualTo(LeftAnchor, internalPadding),
+                    bannerLabel.RightAnchor.ConstraintEqualTo(RightAnchor, -internalPadding),
+                    bannerLabel.BottomAnchor.ConstraintEqualTo(BottomAnchor, -internalPadding),
+                    bannerLabel.TopAnchor.ConstraintEqualTo(TopAnchor, internalPadding),
+                });
+            }
+
+            public void SetData(BannerInfo info)
+            {
+                BackgroundColor = info.Color;
+                bannerLabel.Text = info.Text;
+            }
         }
     }
 }

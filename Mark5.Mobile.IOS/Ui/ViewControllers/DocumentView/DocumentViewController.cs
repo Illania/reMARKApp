@@ -116,6 +116,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (!forceShowActionBar && Integration.IsIPad())
                 NavigationController.ToolbarHidden = true;
+
+            SendStatusBanner.Attach(this);
         }
 
         public override void ViewDidAppear(bool animated)
@@ -148,6 +150,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (NavigationController != null && !(ParentViewController is DocumentPageViewController))
                 NavigationController.ToolbarHidden = true;
+
+            SendStatusBanner.Detach(this);
         }
 
         public override void DidReceiveMemoryWarning()

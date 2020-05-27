@@ -159,6 +159,8 @@
 "edit_not_possible" = "Comments can be edited maximum one minute after creation";
 "edit_original_email" = "Edit original email";
 "editing_comment___" = "Editing comment...";
+"email_sent" = "Email sent";
+"email_error" = "Error while sending email";
 "empty_token_enable_title" = "Problem while enabling notifications";
 "empty_token_enable_content" = "It is not possible to enable notifications at the moment. Please try again later or restart the app.";
 "empty_token_disable_title" = "Problem while disabling notifications";

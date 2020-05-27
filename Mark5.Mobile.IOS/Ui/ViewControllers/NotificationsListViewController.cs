@@ -77,6 +77,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     TableView.DeselectRow(selectedIndexPath, true);
 
             ReachabilityBar.Attach(this);
+            SendStatusBanner.Attach(this);
         }
 
         public override void ViewDidAppear(bool animated)
@@ -124,6 +125,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.ViewDidDisappear(animated);
 
             ReachabilityBar.Detach(this);
+            SendStatusBanner.Detach(this);
         }
 
         public override void DidReceiveMemoryWarning()
