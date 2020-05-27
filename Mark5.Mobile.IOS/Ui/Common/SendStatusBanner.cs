@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using AudioToolbox;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model.HubMessages;
-using Mark5.Mobile.Common.Utilities.Extensions;
 using TinyMessenger;
 using UIKit;
 
@@ -13,23 +12,20 @@ namespace Mark5.Mobile.IOS.Ui.Common
 {
     public class SendStatusBanner : UIView
     {
-        //TODO test if works with actual sending
-        //TODO test if works with different views
         readonly double animationDuration = 0.25;
         readonly double bannerDuration = 2;
+        readonly BannerView bannerView;
 
-        WeakReference<UIViewController> weakViewController;
         TinyMessageSubscriptionToken documentUploadStatusChangedToken;
         NSLayoutConstraint bottomConstraint;
         NSLayoutConstraint topConstraint;
-        BannerView bannerView;
         ConcurrentQueue<BannerInfo> queue = new ConcurrentQueue<BannerInfo>();
 
         public static void Attach(UIViewController viewController)
         {
             var view = viewController.View;
 
-            var rb = new SendStatusBanner(viewController);
+            var rb = new SendStatusBanner();
             view.AddSubview(rb);
         }
 
@@ -41,10 +37,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 rb.RemoveFromSuperview();
         }
 
-        public SendStatusBanner(UIViewController viewController)
+        public SendStatusBanner()
         {
-            weakViewController = viewController.Wrap();
-
             TranslatesAutoresizingMaskIntoConstraints = false;
             Layer.ZPosition = float.MaxValue;
             Opaque = true;
