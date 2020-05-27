@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using AudioToolbox;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities.Extensions;
@@ -11,7 +12,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 {
     public class SendStatusBanner : UIView
     {
-        readonly double animationDuration = 0.5;
+        readonly double animationDuration = 0.25;
         readonly double bannerDuration = 3;
 
         WeakReference<UITableViewController> weakViewController;
@@ -123,7 +124,6 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         void ShowBanner()
         {
-
             void action()
             {
                 bottomConstraint.Active = true;
@@ -136,6 +136,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             Superview.LayoutIfNeeded();
             AnimateNotify(animationDuration, 0d, 0.7f, 0, UIViewAnimationOptions.CurveEaseInOut, action, null);
             Task.Delay(TimeSpan.FromSeconds(animationDuration + bannerDuration)).ContinueWith((task) => BeginInvokeOnMainThread(HideBanner));
+            SystemSound.Vibrate.PlayAlertSound();
         }
 
         void HideBanner()
