@@ -173,12 +173,12 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 var bannerInfo = new BannerInfo();
                 if (status == DocumentUploadStatusChangedMessage.Status.DocumentSent)
                 {
-                    bannerInfo.Text = "Email was sent";
+                    bannerInfo.Text = Localization.GetString("email_sent");
                     bannerInfo.Color = Theme.TintColor;
                 }
                 else if (status == DocumentUploadStatusChangedMessage.Status.DocumentSentFailed)
                 {
-                    bannerInfo.Text = "Error while sending email";
+                    bannerInfo.Text = Localization.GetString("email_error");
                     bannerInfo.Color = UIColor.Red;
                 }
 
