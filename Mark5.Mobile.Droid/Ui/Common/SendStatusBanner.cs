@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using Android.Content;
+using Android.OS;
 using Android.Support.Design.Widget;
 using Android.Support.V4.Content;
 using Mark5.Mobile.Common;
@@ -60,6 +62,16 @@ namespace Mark5.Mobile.Droid.Ui.Common
             snackbar.AddCallback(new BannerCallback(OnBannerHidden));
             snackbar.View.SetBackgroundColor(new Android.Graphics.Color(ContextCompat.GetColor(activity, info.ColorRes)));
             snackbar.Show();
+            Vibrate();
+        }
+
+        void Vibrate()
+        {
+            var vibrator = (Vibrator)activity.GetSystemService(Context.VibratorService);
+            if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
+                vibrator.Vibrate(VibrationEffect.CreateOneShot(250, VibrationEffect.DefaultAmplitude));
+            else
+                vibrator.Vibrate(250);
         }
 
         void QueueBanner(BannerInfo info)
