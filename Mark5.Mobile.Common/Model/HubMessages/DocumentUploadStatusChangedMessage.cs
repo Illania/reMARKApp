@@ -10,7 +10,8 @@ namespace Mark5.Mobile.Common.Model.HubMessages
             None,
             DocumentSending,
             DocumentSent,
-            DocumentSentFailed
+            DocumentSentFailed,
+            DocumentDiscarded,
         }
 
         public Status Change { get; }

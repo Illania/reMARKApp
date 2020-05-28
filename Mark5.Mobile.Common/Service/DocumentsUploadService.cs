@@ -71,8 +71,7 @@ namespace Mark5.Mobile.Common.Service
                             {
                                 await FileSystemStorage.DeleteDocumentToUpload(documentToUploadGuid);
 
-                                //TODO This one should have a different one
-                                CommonConfig.MessengerHub.Publish(new DocumentUploadStatusChangedMessage(this, DocumentUploadStatusChangedMessage.Status.DocumentSent, documentToUploadGuid));
+                                CommonConfig.MessengerHub.Publish(new DocumentUploadStatusChangedMessage(this, DocumentUploadStatusChangedMessage.Status.DocumentDiscarded, documentToUploadGuid));
                                 continue;
                             }
 

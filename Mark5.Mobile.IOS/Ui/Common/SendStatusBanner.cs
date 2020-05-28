@@ -155,7 +155,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         void DocumentUploadStatusChanged(DocumentUploadStatusChangedMessage obj)
         {
-            if (obj.Change == DocumentUploadStatusChangedMessage.Status.DocumentSending)
+            if (obj.Change != DocumentUploadStatusChangedMessage.Status.DocumentSent && obj.Change != DocumentUploadStatusChangedMessage.Status.DocumentSentFailed)
                 return;
 
             QueueBanner(BannerInfo.FromStatus(obj.Change));
