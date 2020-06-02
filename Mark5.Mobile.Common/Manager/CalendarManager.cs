@@ -210,7 +210,7 @@ namespace Mark5.Mobile.Common.Manager
 
     class AppointmentsCache : IAppointmentsCache
     {
-        readonly int cachingNeighbours = 2;
+        readonly int cachingNeighbours = 1;
 
         BlockingCollection<MonthDate> queue;
         CancellationTokenSource tokenSource;
