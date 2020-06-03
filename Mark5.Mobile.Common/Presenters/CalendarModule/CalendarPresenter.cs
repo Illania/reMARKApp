@@ -37,7 +37,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         public CalendarPresenter()
         {
-            calendarsList = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars;
+            calendarsList = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars.OrderBy(c => c.Name).ToList();
             calendarsSelectedState = new Dictionary<int, bool>();
             calendarsColor = new Dictionary<int, string>();
 
@@ -218,7 +218,11 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             }
             else
             {
-                calendarsList.ForEach(c => calendarsSelectedState.Add(c.Id, true));
+                calendarsList.ForEach(c => calendarsSelectedState.Add(c.Id, false));
+
+                var preselected = calendarsList.FirstOrDefault(c => !c.Shared) ?? calendarsList.FirstOrDefault();
+                if (preselected != null)
+                    calendarsSelectedState[preselected.Id] = true;
             }
         }
 

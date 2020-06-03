@@ -14,6 +14,9 @@ namespace Mark5.Mobile.Common.Job
     {
         public async Task Run()
         {
+            if (ServerConfig.SystemSettings?.SystemInfo.SystemVersion < new Version(1, 35, 12))
+                return;
+
             try
             {
                 var calendarsList = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars.Select(c => c.Id).ToList();
