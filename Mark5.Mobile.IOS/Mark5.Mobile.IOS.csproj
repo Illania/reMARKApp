@@ -302,6 +302,7 @@
 		<Compile Include="Utilities\DeviceReminderNotificationManager.cs" />
 		<Compile Include="Ui\ViewControllers\SearchView\ContactsSplitSearchViewController.cs" />
 		<Compile Include="Ui\ViewControllers\SearchView\ShortcodesSplitSearchViewController.cs" />
+		<Compile Include="Ui\Common\SendStatusBanner.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

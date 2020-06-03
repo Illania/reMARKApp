@@ -67,6 +67,14 @@ namespace Mark5.Mobile.Common.Service
                                 continue;
                             }
 
+                            if (ShouldDiscard(info))
+                            {
+                                await FileSystemStorage.DeleteDocumentToUpload(documentToUploadGuid);
+
+                                CommonConfig.MessengerHub.Publish(new DocumentUploadStatusChangedMessage(this, DocumentUploadStatusChangedMessage.Status.DocumentDiscarded, documentToUploadGuid));
+                                continue;
+                            }
+
                             var uploadedAttachmentsGuids = new List<Guid>();
                             var attachmentNames = await FileSystemStorage.GetDocumentToUploadAttachmentNames(documentToUploadGuid);
                             if (attachmentNames != null && attachmentNames.Length > 0)
@@ -161,6 +169,11 @@ namespace Mark5.Mobile.Common.Service
             }
 
             CommonConfig.Logger.Info("Stopped upload task");
+        }
+
+        bool ShouldDiscard(DocumentToUploadInfo info)
+        {
+            return (DateTime.UtcNow - info.SendDateTime) > TimeSpan.FromDays(2);
         }
     }
 }

@@ -29,6 +29,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             base.ViewWillAppear(animated);
 
             ReachabilityBar.Attach(this);
+            SendStatusBanner.Attach(this);
         }
 
         public override void ViewDidDisappear(bool animated)
@@ -36,6 +37,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             base.ViewDidDisappear(animated);
 
             ReachabilityBar.Detach(this);
+            SendStatusBanner.Detach(this);
         }
 
         protected override void InitializeNavigationBar()

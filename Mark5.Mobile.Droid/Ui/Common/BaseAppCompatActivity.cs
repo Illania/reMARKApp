@@ -6,6 +6,7 @@ using Android.Support.Design.Widget;
 using Android.Support.V7.App;
 using Android.Views;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 
@@ -14,12 +15,13 @@ namespace Mark5.Mobile.Droid.Ui.Common
     public abstract class BaseAppCompatActivity : AppCompatActivity
     {
         FloatingActionButton fab;
+        SendStatusBanner banner;
 
         public FloatingActionButton Fab
         {
             get
             {
-                fab = fab ?? FindViewById<FloatingActionButton>(Resource.Id.fab);
+                fab ??= FindViewById<FloatingActionButton>(Resource.Id.fab);
                 return fab;
             }
         }
@@ -36,6 +38,8 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 Finish();
                 return;
             }
+
+            banner = new SendStatusBanner(this);
         }
 
         protected override void OnResume()
@@ -55,6 +59,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             }
 
             UpdateFab(CommonConfig.Reachability.IsReachable);
+            banner.Start();
         }
 
         void UpdateFab(bool isReachable)
@@ -83,6 +88,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 CommonConfig.Reachability.OnPause();
                 CommonConfig.Reachability.ReachabilityRefreshed -= ReachabilityService_ReachabilityRefreshed;
             }
+            banner.Stop();
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
