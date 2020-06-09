@@ -29,7 +29,6 @@ var savedRange = null;
 document.addEventListener("selectionchange", HandleSelectionChange, false);
 
 function PastePlain(text) {
-    console.log(text)
     document.execCommand('inserttext', false, text);
 }
 
