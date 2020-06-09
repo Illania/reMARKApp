@@ -261,8 +261,6 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 keyboardHeight -= View.SafeAreaInsets.Bottom;
         }
 
-
-
         protected void HeaderView_BeginAnimating(object sender, EventArgs e) => headerAnimationRunning = true;
 
         protected void HeaderView_EndAnimating(object sender, EventArgs e) => headerAnimationRunning = false;
