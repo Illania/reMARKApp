@@ -25,7 +25,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             if (allowPasteAsText)
             {
-                var pasteMenuItem = new UIMenuItem("Paste plain", new Selector("pasteAsText:"));
+                var pasteMenuItem = new UIMenuItem("Paste as plain text", new Selector("pasteAsText:"));
                 UIMenuController.SharedMenuController.MenuItems = new[] { pasteMenuItem };
                 UIMenuController.SharedMenuController.Update();
             }
