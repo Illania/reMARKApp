@@ -3,6 +3,7 @@ using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
+using Android.Support.V7.View;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
@@ -168,6 +169,24 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         public override void OnBackPressed()
         {
             cdf?.AskIfShouldSave();
+        }
+
+        public override void OnActionModeStarted(Android.Views.ActionMode mode)
+        {
+            cdf?.OnActionModeStarted();
+            base.OnActionModeStarted(mode);
+        }
+
+        public override void OnActionModeFinished(Android.Views.ActionMode mode)
+        {
+            cdf?.OnActionModeFinished();
+            base.OnActionModeFinished(mode);
+        }
+
+        public override void OnSupportActionModeFinished(Android.Support.V7.View.ActionMode mode)
+        {
+            cdf?.OnActionModeFinished();
+            base.OnSupportActionModeFinished(mode);
         }
 
         public override void Finish()

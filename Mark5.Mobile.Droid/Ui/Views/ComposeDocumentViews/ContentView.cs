@@ -57,7 +57,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             formattingView.ItalicClicked += FormattingView_ItalicClicked;
             formattingView.UnderlineClicked += FormattingView_UnderlineClicked;
 
-            newContentWebView = new CustomWebView(context, moveViewToCaretAction, OnStartActionMode, OnDestroyActionMode)
+            newContentWebView = new CustomWebView(context, moveViewToCaretAction)
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
             };
@@ -86,7 +86,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             showOldContentButton.Click += ShowOldContentButton_Click;
             AddView(showOldContentButton);
 
-            oldContentWebView = new CustomWebView(context, moveViewToCaretAction, OnStartActionMode, OnDestroyActionMode)
+            oldContentWebView = new CustomWebView(context, moveViewToCaretAction)
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
             };
@@ -393,18 +393,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         }
 
         #region Formatting related
-
-        private void OnStartActionMode()
-        {
-            formattingView.Visibility = ViewStates.Visible;
-            formattingViewVisibilityChangeAction?.Invoke();
-        }
-
-        private void OnDestroyActionMode()
-        {
-            formattingView.Visibility = ViewStates.Gone;
-            formattingViewVisibilityChangeAction?.Invoke();
-        }
 
         private void FormattingView_BoldClicked(object sender, EventArgs e)
         {
