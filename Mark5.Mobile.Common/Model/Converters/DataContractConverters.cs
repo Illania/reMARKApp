@@ -256,8 +256,8 @@ namespace Mark5.Mobile.Common.Model.Converters
                 result.Comments.AddRange(d.Comments.WhereNotNull().Select(Convert));
             if (d.ExtraFields != null)
                 result.ExtraFields = d.ExtraFields.Where(kv => kv.Key != null).ToDictionary(kv => kv.Key.Convert(), kv => kv.Value);
-            if (d.ICalendars != null)
-                result.ICalendars.AddRange(d.ICalendars.WhereNotNull().Select(Convert));
+            if (d.Invitations != null)
+                result.Invitations.AddRange(d.Invitations.WhereNotNull().Select(Convert));
             return result;
         }
 
@@ -696,50 +696,35 @@ namespace Mark5.Mobile.Common.Model.Converters
 
 
         #region ICalendar
-        public static ICalendarInfo Convert(this DataContract.ICalendarInfo calendarInfo)
+
+        public static CalendarInvitation Convert(this DataContract.CalendarInvitation ci)
         {
-            return new ICalendarInfo
+            return new CalendarInvitation
             {
-                Events = calendarInfo.Events.WhereNotNull().Select(Convert).ToList(),
-                Reply = calendarInfo.Reply?.Convert(),
-                MethodType = calendarInfo.MethodType.ConvertEnum<MethodType>()
+                Id = ci.Id,
+                AppointmentId = ci.AppointmentId,
+                CalendarId = ci.CalendarId,
+                Description = ci.Description,
+                Summary = ci.Summary,
+                Location = ci.Location,
+                Start = ci.Start,
+                End = ci.End,
+                SerializedTimeZoneInfo = ci.SerializedTimeZoneInfo,
+                MethodType = ci.MethodType.ConvertEnum<MethodType>(),
+                Attendees = ci.Attendees.WhereNotNull().Select(Convert).ToList(),
+                Status = ci.Status.ConvertEnum<ParticipantStatus>(),
+                RecurrenceInfo = ci.RecurrenceInfo?.Convert()
             };
         }
 
-        public static IEventInfo Convert(this DataContract.IEventInfo eventInfo)
+        public static Attendee Convert(this DataContract.Attendee at)
         {
-            return new IEventInfo
+            return new Attendee
             {
-                Id = eventInfo.Id,
-                Description = eventInfo.Description,
-                Summary = eventInfo.Summary,
-                End = eventInfo.End,
-                Start = eventInfo.Start,
-                Location = eventInfo.Location,
-                Attendees = eventInfo.Attendees.WhereNotNull().Select(Convert).ToList(),
-            };
-        }
-
-        public static IReplyInfo Convert(this DataContract.IReplyInfo replyInfo)
-        {
-            return new IReplyInfo
-            {
-                AppId = replyInfo.AppId,
-                Status = replyInfo.Status.ConvertEnum<ParticipantStatus>(),
-                FromAddress = replyInfo.FromAddress
-            };
-        }
-
-        public static IAttendeeInfo Convert(this DataContract.IAttendeeInfo attendeeInfo)
-        {
-            return new IAttendeeInfo
-            {
-                Status = attendeeInfo.Status.ConvertEnum<ParticipantStatus>(),
-                RSVP = attendeeInfo.RSVP,
-                CN = attendeeInfo.CN,
-                IsOrganizer = attendeeInfo.IsOrganizer,
-                Type = attendeeInfo.Type.ConvertEnum<ParticipantType>(),
-                Url = attendeeInfo.Url
+                Name = at.Name,
+                IsOrganizer = at.IsOrganizer,
+                Status = at.Status.ConvertEnum<ParticipantStatus>(),
+                Type = at.Type.ConvertEnum<ParticipantType>(),
             };
         }
 
