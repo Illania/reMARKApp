@@ -11,6 +11,5 @@ namespace Mark5.Mobile.Common.Model
         public bool ConfirmRead { get; set; }
         public bool ConfirmDelivery { get; set; }
         public DateTime SendDateTime { get; set; }
-        public IEventReply IEventReply { get; set; }
     }
 }

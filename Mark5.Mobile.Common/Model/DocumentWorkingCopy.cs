@@ -12,6 +12,5 @@
         public bool ConfirmDelivery { get; set; }
         public DocumentPreview DocumentPreview { get; set; }
         public Document Document { get; set; }
-        public IEventReply IEventReply { get; set; }
     }
 }
