@@ -9,6 +9,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 {
     public class EditOriginalDocumentViewController : AbstractWebViewController
     {
+        //TODO need to check if this is useful or not
         public string Content { get; set; }
 
         readonly TaskCompletionSource<string> tcs = new TaskCompletionSource<string>();

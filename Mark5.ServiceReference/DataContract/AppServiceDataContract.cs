@@ -1526,11 +1526,11 @@ namespace Mark5.ServiceReference.DataContract
         [DataMember(Name = "CalendarId", Order = 0)]
         public int CalendarId { get; set; }
 
-        [DataMember(Name = "Start", Order = 0)]
-        public DateTime Start { get; set; }
+        [DataMember(Name = "StartDate", Order = 0)]
+        public DateTime StartDate { get; set; }
 
-        [DataMember(Name = "End", Order = 0)]
-        public DateTime End { get; set; }
+        [DataMember(Name = "EndDate", Order = 0)]
+        public DateTime EndDate { get; set; }
 
         [DataMember(Name = "SerializedTimeZoneInfo", Order = 0)]
         public string SerializedTimeZoneInfo { get; set; }
