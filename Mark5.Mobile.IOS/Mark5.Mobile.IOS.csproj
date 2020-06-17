@@ -306,6 +306,8 @@
 		<Compile Include="Utilities\HtmlUtilities.cs" />
 		<Compile Include="Model\HtmlProcessingConfiguration.cs" />
 		<Compile Include="Model\PlainTextProcessingConfiguration.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\CalendarInvitationView.cs" />
+		<Compile Include="Ui\ViewControllers\InvitationReplyViewController.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

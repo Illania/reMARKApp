@@ -12,6 +12,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
     {
         public event EventHandler<RecipientTappedEventArgs> RecipientTapped = delegate { };
         public event EventHandler<AttachmentButtonTappedEventArgs> AttachmentTapped = delegate { };
+        public event EventHandler AppointmentReplyTapped = delegate { };
 
         public event EventHandler BeginAnimating = delegate { };
         public event EventHandler Animating = delegate { };
@@ -44,6 +45,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         CreatorView creatorView;
         ExtraFieldsView extraFieldsView;
         AttachmentsView attachmentsListView;
+        CalendarInvitationView calendarInvitationView;
 
         SeparatorSubView firstSeparator;
         SeparatorSubView secondSeparator;
@@ -98,6 +100,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             subViews.Add(creatorView = new CreatorView());
             subViews.Add(extraFieldsView = new ExtraFieldsView());
             subViews.Add(attachmentsListView = new AttachmentsView());
+            subViews.Add(calendarInvitationView = new CalendarInvitationView());
 
             firstSeparator = new SeparatorSubView();
             secondSeparator = new SeparatorSubView();
@@ -125,6 +128,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             contentView.AddArrangedSubview(extraFieldsView);
             contentView.AddArrangedSubview(bottomView);
             contentView.AddArrangedSubview(attachmentsListView);
+            contentView.AddArrangedSubview(calendarInvitationView);
 
             contentView.AddConstraints(new[]
              {
@@ -170,6 +174,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
             if (attachmentsListView != null)
                 attachmentsListView.AttachmentTapped += AttachmentTapped;
+
+            if (calendarInvitationView != null)
+                calendarInvitationView.AppointmentReplyTapped += AppointmentReplyTapped;
         }
 
         void DeinitializeHandlers()
@@ -363,6 +370,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
             PrepareContent();
             attachmentsListView.UpdateVisibility();
+            calendarInvitationView.UpdateVisibility();
         }
 
         public void UpdatePriority()

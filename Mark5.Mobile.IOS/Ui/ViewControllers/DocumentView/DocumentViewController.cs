@@ -260,6 +260,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 headerView.BeginAnimating += HeaderView_BeginAnimating;
                 headerView.Animating += HeaderView_Animating;
                 headerView.EndAnimating += HeaderView_EndAnimating;
+                headerView.AppointmentReplyTapped += HeaderView_AppointmentReplyTapped;
             }
 
             if (flagButton != null)
@@ -278,6 +279,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (editDocumentButtonItem != null)
                 editDocumentButtonItem.Clicked += EditDocumentButtonItem_Clicked;
+        }
+
+        private async void HeaderView_AppointmentReplyTapped(object sender, EventArgs e)
+        {
+            var appointmentReplyVC = new InvitationReplyViewController(document.Invitations.First().Status)
+            {
+                ModalPresentationStyle = UIModalPresentationStyle.OverFullScreen,
+                ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve
+            };
+
+            NavigationController.PresentViewController(appointmentReplyVC, true, null);
+
+            InvitationReplyDetailViewModel detailsModel = await appointmentReplyVC.Result;
+
+            //if (detailsModel != null)
+            //    await SendAppointmentReply(detailsModel);
         }
 
         /*
