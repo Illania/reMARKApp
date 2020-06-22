@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.IOS.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
 

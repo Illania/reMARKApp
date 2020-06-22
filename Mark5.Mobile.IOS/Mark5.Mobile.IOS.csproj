@@ -303,6 +303,9 @@
 		<Compile Include="Ui\ViewControllers\SearchView\ContactsSplitSearchViewController.cs" />
 		<Compile Include="Ui\ViewControllers\SearchView\ShortcodesSplitSearchViewController.cs" />
 		<Compile Include="Ui\Common\SendStatusBanner.cs" />
+		<Compile Include="Utilities\HtmlUtilities.cs" />
+		<Compile Include="Model\HtmlProcessingConfiguration.cs" />
+		<Compile Include="Model\PlainTextProcessingConfiguration.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

@@ -402,14 +402,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                             var config = HtmlProcessingConfiguration.DefaultForEditing;
                             config.InjectReplyHeader = true;
                             config.ReplyHeaderParameters = GetReplyHeaderParameters(previousDocumentPreview, previousDocument);
-                            previousDocumentContent = await ProcessHtml(previousDocument.HtmlBody, config);
+                            previousDocumentContent = await HtmlUtilities.ProcessHtml(previousDocument.HtmlBody, config);
                         }
                         else if (!string.IsNullOrWhiteSpace(previousDocument?.PlainTextBody))
                         {
                             var config = PlainTextProcessingConfiguration.DefaultForEditing;
                             config.InjectReplyHeader = true;
                             config.ReplyHeaderParameters = GetReplyHeaderParameters(previousDocumentPreview, previousDocument);
-                            previousDocumentContent = await ProcessPlainText(previousDocument.PlainTextBody, config);
+                            previousDocumentContent = await HtmlUtilities.ProcessPlainText(previousDocument.PlainTextBody, config);
                         }
                         else
                             previousDocumentContent = null;
