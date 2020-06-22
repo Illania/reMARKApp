@@ -74,6 +74,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         SystemUsersDepartments systemUserDepartments;
 
+        public ComposeDocumentViewController()
+        {
+            allowsPasteAsText = true;
+        }
+
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
