@@ -1542,6 +1542,11 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "ReplyToCalendarInvitationResult", Namespace = "com.nordic-it.appservice.v3")]
     public class ReplyToCalendarInvitationResult
     {
+        [DataMember(Name = "AppointmentId", Order = 0)]
+        public int AppointmentId { get; set; } = -1;
+
+        [DataMember(Name = "CalendarId", Order = 0)]
+        public int CalendarId { get; set; } = -1;
     }
 
     [DataContract(Name = "CalendarInvitation", Namespace = "com.nordic-it.appservice.v3")]
