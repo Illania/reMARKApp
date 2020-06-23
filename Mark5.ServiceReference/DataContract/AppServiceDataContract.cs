@@ -1514,6 +1514,36 @@ namespace Mark5.ServiceReference.DataContract
 
     #region ICalendar related
 
+    [DataContract(Name = "ReplyToCalendarInvitationParameters", Namespace = "com.nordic-it.appservice.v3")]
+    public class ReplyToCalendarInvitationParameters : AbstractParameters
+    {
+        [DataMember(Name = "Document", Order = 0)]
+        public Document Document { get; set; }
+
+        [DataMember(Name = "DocumentPreview", Order = 0)]
+        public DocumentPreview DocumentPreview { get; set; }
+
+        [DataMember(Name = "OriginalDocumentId", Order = 0)]
+        public int OriginalDocumentId { get; set; } = -1;
+
+        [DataMember(Name = "OriginalDocumentFolderId", Order = 0)]
+        public int OriginalDocumentFolderId { get; set; } = -1;
+
+        [DataMember(Name = "Invitation", Order = 0)]
+        public CalendarInvitation Invitation { get; set; }
+
+        [DataMember(Name = "Answer", Order = 0)]
+        public ParticipantStatus Answer { get; set; }
+
+        [DataMember(Name = "IsSilent", Order = 0)]
+        public bool IsSilent { get; set; }
+    }
+
+    [DataContract(Name = "ReplyToCalendarInvitationResult", Namespace = "com.nordic-it.appservice.v3")]
+    public class ReplyToCalendarInvitationResult
+    {
+    }
+
     [DataContract(Name = "CalendarInvitation", Namespace = "com.nordic-it.appservice.v3")]
     public class CalendarInvitation
     {

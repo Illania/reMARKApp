@@ -419,6 +419,7 @@
 "sending_document___" = "Sending email...";
 "sending_inviations__" = "Sending invitations...";
 "sending_response__" = "Sending response...";
+"sending_reply___" = "Sending reply...";
 "send_with_mark5_title" = "Send with reMARK?";
 "send_feedback_with_mark5_content" = "Do you want to send feedback with reMARK?";
 "send_report_with_mark5_content" = "Do you want to send the generated report with reMARK? 

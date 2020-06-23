@@ -246,6 +246,11 @@ namespace Mark5.ServiceReference.AppService
             return await InvokeAsync<GetLinesResult, GetLinesParameters>("GetLines", parameters, ct);
         }
 
+        public async Task<ReplyToCalendarInvitationResult> ReplyToCalendarInvitationAsync(ReplyToCalendarInvitationParameters parameters, CancellationToken ct = default(CancellationToken))
+        {
+            return await InvokeAsync<ReplyToCalendarInvitationResult, ReplyToCalendarInvitationParameters>("ReplyToCalendarInvitation", parameters, ct);
+        }
+
         public async Task<GetContactPreviewsResult> GetContactPreviewsAsync(GetContactPreviewsParameters parameters, CancellationToken ct = default(CancellationToken))
         {
             return await InvokeAsync<GetContactPreviewsResult, GetContactPreviewsParameters>("GetContactPreviews", parameters, ct);

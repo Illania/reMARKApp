@@ -224,6 +224,37 @@ namespace Mark5.Mobile.Common.Manager
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
+        public async Task ReplyToCalendarInvitationAsync(Document document, DocumentPreview documentPreview, CalendarInvitation invitation,
+            ParticipantStatus answer, bool isSilent, int originalDocumentId, int originalDocumentFolderId,
+            SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
+            {
+                await AppServiceProxy.ReplyToCalendarInvitationAsync(new DataContract.ReplyToCalendarInvitationParameters
+                {
+                    Token = Token,
+                    Document = document.Convert(),
+                    DocumentPreview = documentPreview.Convert(),
+                    Invitation = invitation.Convert(),
+                    Answer = answer.ConvertEnum<DataContract.ParticipantStatus>(),
+                    IsSilent = isSilent,
+                    OriginalDocumentId = originalDocumentId,
+                    OriginalDocumentFolderId = originalDocumentFolderId,
+                });
+
+                //TODO here we could change the status of tha invitation in the db...
+
+                return;
+            }
+            else if (sourceType == SourceType.Local)
+                throw new InvalidSourceTypeException("This action can only be performed when online.");
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
+
         public async Task MoveToSpamAsync(List<DocumentPreview> documentPreviews, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)

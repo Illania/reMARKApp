@@ -748,7 +748,8 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Attachments = doc.Attachments.Select(Convert).ToList(),
                 Comments = doc.Comments.Select(Convert).ToList(),
                 ExtraFields = doc.ExtraFields.ToDictionary(kv => kv.Key.Convert(), kv => kv.Value),
-                IsEncrypted = doc.IsEncrypted
+                IsEncrypted = doc.IsEncrypted,
+                Invitations = doc.Invitations?.Select(Convert).ToList(),
             };
         }
 
@@ -1083,6 +1084,42 @@ namespace Mark5.Mobile.Common.Model.Converters
             }
 
             return favorites;
+        }
+
+        #endregion
+
+        #region ICalendar
+
+        public static DataContract.CalendarInvitation Convert(this CalendarInvitation ci)
+        {
+            return new DataContract.CalendarInvitation
+            {
+                Id = ci.Id,
+                AppointmentId = ci.AppointmentId,
+                CalendarId = ci.CalendarId,
+                Description = ci.Description,
+                Summary = ci.Summary,
+                Location = ci.Location,
+                StartDate = ci.StartDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
+                EndDate = ci.EndDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
+                SerializedTimeZoneInfo = ci.SerializedTimeZoneInfo,
+                MethodType = ci.MethodType.ConvertEnum<DataContract.MethodType>(),
+                Attendees = ci.Attendees.WhereNotNull().Select(Convert).ToList(),
+                Status = ci.Status.ConvertEnum<DataContract.ParticipantStatus>(),
+                RecurrenceInfo = ci.RecurrenceInfo?.Convert()
+            };
+        }
+
+
+        public static DataContract.Attendee Convert(this Attendee at)
+        {
+            return new DataContract.Attendee
+            {
+                Name = at.Name,
+                IsOrganizer = at.IsOrganizer,
+                Status = at.Status.ConvertEnum<DataContract.ParticipantStatus>(),
+                Type = at.Type.ConvertEnum<DataContract.ParticipantType>(),
+            };
         }
 
         #endregion

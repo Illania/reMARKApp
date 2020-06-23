@@ -57,13 +57,13 @@
 		<ConsolePause>false</ConsolePause>
 		<MtouchArch>ARM64</MtouchArch>
 		<CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
-		<CodesignKey>iPhone Developer: Lars Hansen (TUYUES9KMZ)</CodesignKey>
+		<CodesignKey>Apple Development: Lars Hansen (TUYUES9KMZ)</CodesignKey>
 		<MtouchDebug>true</MtouchDebug>
 		<RunCodeAnalysis>true</RunCodeAnalysis>
 		<MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
 		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
-		<CodesignProvision>Mark5 Development 2020</CodesignProvision>
 		<LangVersion>8.0</LangVersion>
+		<CodesignProvision>Mark5 Development 2020 - B</CodesignProvision>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
 		<DebugType>none</DebugType>
@@ -308,6 +308,7 @@
 		<Compile Include="Model\PlainTextProcessingConfiguration.cs" />
 		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\CalendarInvitationView.cs" />
 		<Compile Include="Ui\ViewControllers\InvitationReplyViewController.cs" />
+		<Compile Include="Utilities\LineUtilities.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

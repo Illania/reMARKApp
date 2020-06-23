@@ -15,13 +15,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public Line Line;
         public string Message;
         public ParticipantStatus Status;
-
-        public InvitationReplyDetailViewModel()
-        {
-            Message = string.Empty;
-            Line = ServerConfig.SystemSettings.DocumentsModuleInfo.DefaultOutgoingLine;  //TODO need to check if this is correct
-            Status = ParticipantStatus.NeedAction;
-        }
     }
 
     public class InvitationReplyViewController : UIViewController
@@ -30,8 +23,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         readonly float InnerHorizontalMargine = 25f;
         readonly float InnerVerticalMargine = 20f;
         readonly InvitationReplyDetailViewModel model;
+        readonly ParticipantStatus userStatus;
 
-        ParticipantStatus userStatus;
         UIView viewsContainer;
         UITextView messageView;
         UILabel lineLabel;
@@ -42,10 +35,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public Task<InvitationReplyDetailViewModel> Result => tcs.Task;
 
-        public InvitationReplyViewController(ParticipantStatus userStatus)
+        public InvitationReplyViewController(ParticipantStatus userStatus, Line predefinedLine)
         {
-            model = new InvitationReplyDetailViewModel();
             this.userStatus = userStatus;
+            model = new InvitationReplyDetailViewModel
+            {
+                Line = predefinedLine
+            };
         }
 
         #region VC Lifecycle
@@ -72,7 +68,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             messageView.Ended += MessageView_StartedEnded;
             messageView.Started += MessageView_StartedEnded;
-            messageView.Changed += MessageView_Changed;
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -81,7 +76,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             messageView.Ended -= MessageView_StartedEnded;
             messageView.Started -= MessageView_StartedEnded;
-            messageView.Changed -= MessageView_Changed;
         }
 
         #endregion
@@ -90,7 +84,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         private void InitializeViews()
         {
-            View.BackgroundColor = UIColor.Black.ColorWithAlpha(0.7f);
+            View.BackgroundColor = UIColor.Black.ColorWithAlpha(0.7f); //TODO check on ipad
 
             viewsContainer = InitializeContainer();
 
@@ -263,17 +257,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Listeners/Delegates/Actions
 
-        private void MessageView_Changed(object sender, EventArgs e)
-        {
-            var field = (UITextView)sender;
-            model.Message = field.Text;
-        }
-
         private void MessageView_StartedEnded(object sender, EventArgs e)
         {
             var field = (UITextView)sender;
 
-            if (field.Text.Equals(Localization.GetString("add_message")))  //TODO check if this could be done with a hint - placeholder
+            if (field.Text.Equals(Localization.GetString("add_message")))
             {
                 field.Text = string.Empty;
                 field.TextColor = Theme.DarkerBlue;
@@ -315,6 +303,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (IsValid())
             {
                 model.Status = status;
+                model.Message = messageView.Text;
                 tcs.TrySetResult(model);
                 DismissModalViewController(true);
             }
@@ -327,7 +316,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void UpdateLine()
         {
-            lineLabel.Text = model.Line != null ? model.Line.Name : Localization.GetString("tap_select_line");
+            lineLabel.Text = model?.Line?.Name ?? Localization.GetString("tap_select_line");
         }
 
         void UpdateButtons()
@@ -347,17 +336,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         }
 
-        bool IsValid()
-        {
-            return model.Line != null;
-        }
+        bool IsValid() => model.Line != null;
 
         #endregion
     }
 
     public class ReplyButton : UIButton
     {
-        ParticipantStatus participantStatus;
+        readonly ParticipantStatus participantStatus;
 
         public EventHandler<ParticipantStatus> ButtonTapped = delegate { };
 

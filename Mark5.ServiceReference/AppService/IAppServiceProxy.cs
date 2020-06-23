@@ -45,6 +45,8 @@ namespace Mark5.ServiceReference.AppService
 
         Task<GetLinesResult> GetLinesAsync(GetLinesParameters parameters, CancellationToken ct = default(CancellationToken));
 
+        Task<ReplyToCalendarInvitationResult> ReplyToCalendarInvitationAsync(ReplyToCalendarInvitationParameters parameters, CancellationToken ct = default(CancellationToken));
+
         #endregion
 
         #region Contacts module
