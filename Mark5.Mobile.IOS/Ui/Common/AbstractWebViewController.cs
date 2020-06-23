@@ -13,11 +13,49 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Model;
 using Mark5.Mobile.IOS.Utilities;
+using ObjCRuntime;
 using UIKit;
 using WebKit;
 
 namespace Mark5.Mobile.IOS.Ui.Common
 {
+    public class CustomWebView : WKWebView
+    {
+        public CustomWebView(CGRect frame, WKWebViewConfiguration configuration, bool allowPasteAsText = false)
+            : base(frame, configuration)
+        {
+            if (allowPasteAsText)
+            {
+                var pasteMenuItem = new UIMenuItem("Paste as plain text", new Selector("pasteAsText:"));
+                UIMenuController.SharedMenuController.MenuItems = new[] { pasteMenuItem };
+                UIMenuController.SharedMenuController.Update();
+            }
+        }
+
+        [Export("pasteAsText:")]
+        void PasteAsText(UIMenuController controller)
+        {
+            var stringToPaste = UIPasteboard.General.String
+                .Replace("\r", "")
+                .Replace("\n", "\\n");
+
+            var js = $"PastePlain(\'{stringToPaste}\')";
+            EvaluateJavaScript("javascript: " + js, completionHandler: (result, error) =>
+            {
+                if (error != null)
+                    CommonConfig.Logger.Debug("Error while pasting as text: " + error);
+            });
+        }
+
+        public override bool CanPerform(Selector action, NSObject withSender)
+        {
+            if (action.Name == "pasteAsText:" && UIPasteboard.General.HasStrings)
+                return true;
+
+            return base.CanPerform(action, withSender);
+        }
+    }
+
     public abstract class AbstractWebViewController : AbstractViewController, IWKNavigationDelegate, IWKScriptMessageHandler, IUIScrollViewDelegate
     {
         public int LoadTimeoutMiliseconds { get; set; } = 2500;
@@ -25,7 +63,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         protected bool IsLoading => webView?.IsLoading ?? false;
 
         UIActivityIndicatorView loadIndicatorView;
-        WKWebView webView;
+        CustomWebView webView;
         UIView headerContainerView;
         UIView headerView;
         UIProgressView webViewProgressView;
@@ -38,6 +76,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
         nfloat keyboardHeight;
 
         NSObject keyboardDisShowNotification;
+
+        protected bool allowsPasteAsText;
 
         public override void ViewDidLoad()
         {
@@ -79,7 +119,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 SelectionGranularity = WKSelectionGranularity.Character
             };
 
-            webView = new WKWebView(CGRect.Empty, configuration)
+            webView = new CustomWebView(CGRect.Empty, configuration, allowsPasteAsText)
             {
                 Hidden = true,
                 NavigationDelegate = this,

@@ -1,26 +1,22 @@
-﻿document.addEventListener("DOMContentLoaded", function() {
+﻿document.addEventListener("DOMContentLoaded", function () {
     window.webkit.messageHandlers.domloaded.postMessage({});
 });
 
-document.addEventListener("input", function() {
+document.addEventListener("input", function () {
     window.webkit.messageHandlers.input.postMessage(getCaretYCoordinate());
 });
 
-getCaretYCoordinate = function() {
+getCaretYCoordinate = function () {
     var y = 0;
     var selection = window.getSelection();
-    if (selection.rangeCount) 
-    {
+    if (selection.rangeCount) {
         var range = selection.getRangeAt(0);
-        if (range.startOffset == 0 && range.startContainer.offsetTop != undefined) 
-        {
+        if (range.startOffset == 0 && range.startContainer.offsetTop != undefined) {
             y = range.startContainer.offsetTop - window.pageYOffset;
-        } 
-        else if (range.getClientRects) 
-        {
+        }
+        else if (range.getClientRects) {
             var rects = range.getClientRects();
-            if (rects.length > 0)
-            {
+            if (rects.length > 0) {
                 y = rects[0].top;
             }
         }
@@ -31,6 +27,10 @@ getCaretYCoordinate = function() {
 var savedRange = null;
 
 document.addEventListener("selectionchange", HandleSelectionChange, false);
+
+function PastePlain(text) {
+    document.execCommand('inserttext', false, text);
+}
 
 function HandleSelectionChange() {
     var sel = window.getSelection && window.getSelection();
@@ -54,13 +54,13 @@ function InsertContent(type, id, content) {
     }
 
     var selection = window.getSelection();
-    if(selection !== undefined && savedRange !== null) {
+    if (selection !== undefined && savedRange !== null) {
         var range = savedRange;
         range.deleteContents();
 
         var fragment = document.createDocumentFragment(), node, lastNode;
 
-        while((node = templateNode.firstChild)) {
+        while ((node = templateNode.firstChild)) {
             lastNode = fragment.appendChild(node);
         }
 
@@ -69,7 +69,7 @@ function InsertContent(type, id, content) {
         if (lastNode) {
             range = range.cloneRange();
             range.setStartAfter(lastNode);
-            range.collapse(true); 
+            range.collapse(true);
             selection.removeAllRanges();
             selection.addRange(range);
         }
@@ -88,10 +88,10 @@ function InsertContent(type, id, content) {
     }
 };
 
-window.addEventListener("paste", function(e){
+window.addEventListener("paste", function (e) {
     if (e && e.clipboardData && e.clipboardData.types && e.clipboardData.getData) {
         types = e.clipboardData.types;
-        
+
         if (((types instanceof DOMStringList) && types.contains("Files")) || (types.indexOf && types.indexOf('Files') !== -1)) {
             e.stopPropagation();
             e.preventDefault();

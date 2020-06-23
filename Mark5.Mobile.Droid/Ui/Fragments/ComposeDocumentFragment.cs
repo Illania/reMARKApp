@@ -25,7 +25,6 @@ using Mark5.Mobile.Droid.Ui.Views.Common;
 using Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews;
 using Mark5.Mobile.Droid.Utilities;
 using PCLStorage;
-using TinyMessenger;
 using Uri = Android.Net.Uri;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
@@ -692,13 +691,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         }
 
-        void FormattingViewVisibilityChanged()
-        {
-            var height = formattingView.Height;
-            var delta = formattingView.Visibility == ViewStates.Visible ? height : -height;
-            Activity.RunOnUiThread(() => scrollView.ScrollBy(0, delta));
-        }
-
         void MoveViewToCaret(View webView, int relativeCaretPositionDp)
         {
             if (relativeCaretPositionDp <= 0)
@@ -993,6 +985,29 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             public const int InsertTemplate = 10;
             public const int AddAttachment = 20;
+        }
+
+        #endregion
+
+        #region Formatting view related
+
+        public void OnActionModeStarted()
+        {
+            formattingView.Visibility = ViewStates.Visible;
+            FormattingViewVisibilityChanged();
+        }
+
+        public void OnActionModeFinished()
+        {
+            formattingView.Visibility = ViewStates.Gone;
+            FormattingViewVisibilityChanged();
+        }
+
+        void FormattingViewVisibilityChanged()
+        {
+            var height = formattingView.Height;
+            var delta = formattingView.Visibility == ViewStates.Visible ? height : -height;
+            Activity.RunOnUiThread(() => scrollView.ScrollBy(0, delta));
         }
 
         #endregion
