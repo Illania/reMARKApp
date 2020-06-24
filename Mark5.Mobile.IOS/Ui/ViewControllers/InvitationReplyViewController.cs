@@ -303,7 +303,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (IsValid())
             {
                 model.Status = status;
-                model.Message = messageView.Text;
+                if (!messageView.Text.Equals(Localization.GetString("add_message")))
+                    model.Message = messageView.Text;
                 tcs.TrySetResult(model);
                 DismissModalViewController(true);
             }

@@ -173,7 +173,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             editDocumentButtonItem = null;
 
             headerView.RemoveFromSuperview();
-
             headerView = null;
         }
 
@@ -296,7 +295,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InvitationReplyDetailViewModel detailsModel = await appointmentReplyVC.Result;
 
             if (detailsModel != null)
-                await SendInvitationReply(invitation, detailsModel);
+                await SendInvitationReply(sender as CalendarInvitationView, invitation, detailsModel);
         }
 
         void DeinitializeHandlers()
@@ -1098,7 +1097,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        async Task SendInvitationReply(CalendarInvitation invitation, InvitationReplyDetailViewModel vm)
+        async Task SendInvitationReply(CalendarInvitationView cv, CalendarInvitation invitation, InvitationReplyDetailViewModel vm)
         {
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("sending_reply___"));
 
@@ -1169,6 +1168,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 await Managers.DocumentsManager.ReplyToCalendarInvitationAsync(responseDocument, responseDocumentPreview,
                     invitation, vm.Status, string.IsNullOrEmpty(vm.Message), document.Id, folder?.Id ?? folderId ?? 0);
+
+                invitation.Status = vm.Status;
+                cv.RefreshView();
 
                 dismissAction();
             }
