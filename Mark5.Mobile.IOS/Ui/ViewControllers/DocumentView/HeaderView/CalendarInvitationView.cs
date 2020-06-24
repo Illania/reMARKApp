@@ -18,8 +18,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         public CalendarInvitationView()
         {
             BackgroundColor = Theme.White;
-            LayoutMarginsRelativeArrangement = true;
-            DirectionalLayoutMargins = new NSDirectionalEdgeInsets(0, 20, 0, 20);
 
             summaryLabel = new UILabel
             {
@@ -72,9 +70,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             });
 
             ContainerView.BackgroundColor = Theme.LightBlue;
-            //ContainerView.Layer.BorderColor = Theme.DarkerBlue.CGColor;
-            //ContainerView.Layer.BorderWidth = 2;
-            //ContainerView.Layer.CornerRadius = 20;
         }
 
         private void RespondBtn_TouchUpInside(object sender, EventArgs e)
@@ -95,34 +90,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             var culture = CultureInfo.InvariantCulture;
             var start = appointment.StartDate;
             var end = appointment.EndDate;
+            var recurrenceInfo = appointment.RecurrenceInfo;
 
             if (start.Date.CompareTo(end.Date) == 0)
             {
                 whenText += start.ToString("dddd, d MMMM yyyy", culture);
-                //if (viewModel.AllDay)
-                //    Text += "\r\nAll Day";  //TODO need to check all day
-                //else
                 whenText += $"\r\nfrom { start.ToString("hh:mm tt", culture) } to { end.ToString("hh:mm tt", culture) }";
             }
             else
             {
-                //if (viewModel.AllDay)
-                //{
-                //    Text = $"All day from { viewModel.Start.ToString("ddd, d MMMM yyyy", culture) } ";
-                //    Text += $"\r\nto { viewModel.End.ToString("ddd, d MMMM yyyy", culture) }";
-                //}
-                //else
-                //{
                 whenText = $"from { start.ToString("hh:mm tt ddd, d MMMM yyyy", culture) } ";
                 whenText += $"\r\nto { end.ToString("hh:mm tt ddd, d MMMM yyyy", culture) }";
-                //}
             }
 
-            //if (viewModel.RecurrenceInfo != null)  //TODO we need to take care also of this
-            //{
-            //    Text += $"\n{viewModel.RecurrenceInfo}";
-            //}
-
+            if (recurrenceInfo != null)
+                whenText += $"\n{recurrenceInfo.ToFriendlyString()}";
 
             whenLabel.Text = whenText;
 
@@ -152,15 +134,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
         public override void UpdateVisibility()
         {
-            var invitation = Document?.Invitations?.FirstOrDefault();
-
-            if (invitation == null)
-            {
-                Hidden = true;
-                return;
-            }
-
-            Hidden = false;
+            Hidden = Document?.Invitations?.FirstOrDefault() == null;
         }
     }
 }

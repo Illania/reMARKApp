@@ -349,9 +349,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     documentPreview.Id = PreviousDocumentId.Value;
                 }
 
-                document.Invitations = previousDocument?.Invitations;
-
-
                 var subViews = headerStackView.Subviews.OfType<ComposeDocumentSubView>().ToArray();
                 foreach (var subView in subViews)
                 {
