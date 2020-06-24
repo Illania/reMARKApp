@@ -161,7 +161,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         private void InitView()
         {
-            UIScrollView scrollView = new UIScrollView
+            var scrollView = new UIScrollView
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 BackgroundColor = UIColor.GroupTableViewBackgroundColor,
@@ -196,9 +196,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             scrollView.AddConstraints(new[]
             {
                     stackView.LeftAnchor.ConstraintEqualTo(scrollView.ReadableContentGuide.LeftAnchor),
-                    stackView.TopAnchor.ConstraintEqualTo(scrollView.ReadableContentGuide.TopAnchor),
                     stackView.RightAnchor.ConstraintEqualTo(scrollView.ReadableContentGuide.RightAnchor),
-                    stackView.WidthAnchor.ConstraintEqualTo(scrollView.ReadableContentGuide.WidthAnchor)
+                    stackView.TopAnchor.ConstraintEqualTo(scrollView.TopAnchor),
+                    stackView.BottomAnchor.ConstraintEqualTo(scrollView.BottomAnchor),
+                    stackView.WidthAnchor.ConstraintEqualTo(scrollView.ReadableContentGuide.WidthAnchor),
             });
 
             subjectView = new AppointmentSubjectView();
