@@ -1161,6 +1161,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     dpvh.UnreadIndicator = unreadIndicatorMe ? !dp.IsReadByCurrent : !dp.IsReadByAnyone;
                     dpvh.AttachmentIndicator = dp.AttachmentsCount > 0;
                     dpvh.CommentIndicator = dp.CommentsCount > 0;
+                    dpvh.PriorityHighIndicator = dp.Priority == Priority.Urgent; 
+                    dpvh.PriorityLowIndicator = dp.Priority == Priority.Low;
 
                     if (compactList)
                     {
@@ -1187,6 +1189,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     edpvh.Preview = string.IsNullOrWhiteSpace(dp.Preview) ? context.GetString(Resource.String.no_content) : Regex.Replace(dp.Preview, @"^\s+$[\r\n]*", "", RegexOptions.Multiline);
                     edpvh.Categories = dp.Categories;
                     edpvh.CommentIndicator = dp.CommentsCount > 0;
+                    edpvh.PriorityHighIndicator = dp.Priority == Priority.Urgent;
+                    edpvh.PriorityLowIndicator = dp.Priority == Priority.Low;
 
                     edpvh.Selected = selectedDocumentsInView.ContainsKey(dp.Id);
                 }
@@ -1664,6 +1668,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public bool AttachmentIndicator { set => attachmentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
             public bool CommentIndicator { set => commentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
+            
+            public bool PriorityHighIndicator { set => priorityHighImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
+            
+            public bool PriorityLowIndicator { set => priorityLowImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
             public bool Compact
             {
@@ -1711,6 +1719,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             readonly AppCompatImageView failImageView;
             readonly AppCompatImageView attachmentImageView;
             readonly AppCompatImageView commentImageView;
+            readonly AppCompatImageView priorityHighImageView;
+            readonly AppCompatImageView priorityLowImageView;
             readonly LinearLayoutCompat itemContent;
             readonly View selectedOverlay;
             readonly View swipedBackground;
@@ -1731,6 +1741,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 unreadImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_unread);
                 attachmentImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_attachment);
                 commentImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_comment);
+                priorityHighImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_high_priority);
+                priorityLowImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_low_priority);
                 itemContent = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.list_item_document_internal_layout);
                 selectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
                 swipedBackground = itemView.FindViewById<View>(Resource.Id.swiped_background);
@@ -1766,7 +1778,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             public bool CommentIndicator { set => commentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
-
+           
+            public bool PriorityHighIndicator { set => priorityHighImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
+            
+            public bool PriorityLowIndicator { set => priorityLowImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
+            
             public bool Selected { set => selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
             public int SwipedDirection
@@ -1795,6 +1811,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             readonly AppCompatTextView previewTextView;
             readonly LinearLayoutCompat categoriesLayout;
             readonly AppCompatImageView commentImageView;
+            readonly AppCompatImageView priorityHighImageView;
+            readonly AppCompatImageView priorityLowImageView;
             readonly LinearLayoutCompat itemContent;
             readonly View selectedOverlay;
             readonly View swipedBackground;
@@ -1807,6 +1825,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 previewTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_document_external_preview);
                 categoriesLayout = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.list_item_document_external_categories);
                 commentImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_external_comment);
+                priorityHighImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_high_priority);
+                priorityLowImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_high_priority);
                 itemContent = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.list_item_document_external_internal_layout);
                 selectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
                 swipedBackground = itemView.FindViewById<View>(Resource.Id.swiped_background);
