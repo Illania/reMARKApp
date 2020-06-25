@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+        <string name="accept">Accept</string>
+    <string name="accepted">Accepted</string>
     <string name="account">Account</string>
     <string name="add_attachment">Add attachment</string>
     <string name="add_appointment">Add appointment</string>
@@ -7,6 +9,7 @@
     <string name="add_tite">Add title</string>
     <string name="add_location">Add location</string>
     <string name="add_message">Add message</string>
+        <string name="add_message_optional">Add message (optional)</string>
     <string name="add_favorites">Add to favourites</string>
     <string name="add_offline">Enable sync</string>
     <string name="adding_comment">Adding comment</string>
@@ -30,6 +33,7 @@
     <string name="by">by</string>
     <string name="call">Call</string>
     <string name="cancel">Cancel</string>
+        <string name="cancelled">Cancelled</string>
     <string name="calendar">Calendar</string>
     <string name="calendars">Calendars</string>
     <string name="cannot_edit_comment_content">This comment cannot be edited anymore</string>
@@ -76,6 +80,8 @@
     <string name="company">Company</string>
     <string name="department">Department</string>
     <string name="date">Date:</string>
+        <string name="decline">Decline</string>
+    <string name="declined">Declined</string>
     <string name="delete">Delete</string>
     <string name="delete_are_you_sure">Are you sure you want to delete selected?</string>
     <string name="delete_from_folder">Remove from folder</string>
@@ -254,6 +260,8 @@
     <string name="ledger">Ledger</string>
     <string name="line">Mailbox</string>
     <string name="lines">Mailboxes</string>
+    <string name="line_missing_title">Mailbox Missing</string>
+    <string name="line_missing_content">Please select a Mailbox from which to send the response</string>
     <string name="loading_appointments">Loading appointments</string>
     <string name="loading_contact">Loading contact</string>
     <string name="loading_document">Loading email</string>
@@ -361,6 +369,7 @@
     <string name="reply_all">Reply all</string>
     <string name="reply_to">Reply to:</string>
     <string name="resend">Resend</string>
+    <string name="respond">Respond</string>
     <string name="responsible_users">Responsible users</string>
     <string name="save">Save</string>
     <string name="save_draft">Save draft</string>
@@ -447,6 +456,7 @@
     <string name="send">Send</string>
     <string name="sending_document">Sending email</string>
     <string name="sending_invitations">Sending invitations...</string>
+    <string name="sending_appointment_response">Sending response...</string>
     <string name="send_with_mark5_title">Send with reMARK</string>
     <string name="send_report_with_mark5_content">Do you want to send the generated report with reMARK?\n\nPlease note that these reports are not monitored 24/7 and will be available to developers only. If you need direct assistance, contact Nordic IT Support.</string>
     <string name="send_feedback_with_mark5_content">Do you want to send feedback with reMARK?</string>
@@ -473,6 +483,8 @@
     <string name="sync_fav_folders_use_device">Use from current device</string>
     <string name="sync_error_network">Internet connection required when favorite synchronization is enabled in settings</string>
     <string name="sync_error_general">Something went wrong while synchronizing favorites</string>
+    <string name="tap_select_line">Tap to select a mailbox</string>
+    <string name="tentative">Tentative</string>
     <string name="templates">Templates</string>
     <string name="template_attachment_title">Attachment from template</string>
     <string name="template_attachment_content">It is not possible to open attachments from templates</string>

@@ -283,7 +283,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         private async void HeaderView_AppointmentReplyTapped(object sender, EventArgs e)
         {
             var invitation = document.Invitations.First();
-            var line = LineUtilities.GetLineForCreationModeFlag(DocumentCreationModeFlag.Reply, document);
+            var line = LineUtilities.GetLineForCreationModeFlag(DocumentCreationModeFlag.Reply, document, PlatformConfig.Preferences.AlwaysUseDefaultLine);
             var appointmentReplyVC = new InvitationReplyViewController(invitation.Status, line)
             {
                 ModalPresentationStyle = UIModalPresentationStyle.OverFullScreen,

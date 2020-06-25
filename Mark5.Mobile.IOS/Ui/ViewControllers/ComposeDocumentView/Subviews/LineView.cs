@@ -93,7 +93,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 return Task.CompletedTask;
             }
 
-            SetLine(LineUtilities.GetLineForCreationModeFlag(DocumentCreationModeFlag, PreviousDocument));
+            SetLine(LineUtilities.GetLineForCreationModeFlag(DocumentCreationModeFlag, PreviousDocument, PlatformConfig.Preferences.AlwaysUseDefaultLine));
             return Task.CompletedTask;
         }
 

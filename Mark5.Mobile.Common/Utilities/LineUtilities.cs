@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Linq;
-using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Utilities;
 
-namespace Mark5.Mobile.IOS.Utilities
+namespace Mark5.Mobile.Common.Utilities
 {
     public static class LineUtilities
     {
-        public static Line GetLineForCreationModeFlag(DocumentCreationModeFlag creationModeFlag, Document previousDocument)
+        public static Line GetLineForCreationModeFlag(DocumentCreationModeFlag creationModeFlag, Document previousDocument, bool alwaysUseDefaultLine)
         {
             var defaultOutgoingLine = ServerConfig.SystemSettings.DocumentsModuleInfo.DefaultOutgoingLine;
-            var availableOutgoingLines = ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines;
+            var availableOutgoingLines = ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Where(l => l != null && l.Guid != Guid.Empty).ToList(); ;
 
             if (creationModeFlag == DocumentCreationModeFlag.New)
                 return defaultOutgoingLine;
@@ -23,7 +21,7 @@ namespace Mark5.Mobile.IOS.Utilities
                 creationModeFlag == DocumentCreationModeFlag.ReplyAll ||
                 creationModeFlag == DocumentCreationModeFlag.Forward)
             {
-                if (PlatformConfig.Preferences.AlwaysUseDefaultLine && defaultOutgoingLine != null)
+                if (alwaysUseDefaultLine && defaultOutgoingLine != null)
                     return defaultOutgoingLine;
 
                 if (availableOutgoingLines.Count == 1)

@@ -18,6 +18,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Model;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
@@ -211,6 +212,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             av.AttachmentLongClicked += AttachmentsView_AttachmentLongClicked;
             linearLayout.AddView(av);
 
+            var civ = new CalendarInvitationView(Context);
+            civ.ReplySelected += CalendarInvitationView_ReplySelected;
+            linearLayout.AddView(civ);
+
             var contentView = new ContentView(Context);
             contentView.MailToLinkClicked += ContentView_MailToLinkClicked;
             linearLayout.AddView(contentView);
@@ -219,6 +224,105 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             return rootView;
         }
+
+        //TODO this needs to be put much more down
+        private async void CalendarInvitationView_ReplySelected(object sender, InvitationReplyDetailViewModel vm)
+        {
+            var civ = sender as CalendarInvitationView;
+            var invitation = Document?.Invitations?.FirstOrDefault();
+
+            if (invitation == null)
+                return;
+
+            await SendInvitationReply(civ, invitation, vm);
+        }
+
+        async Task SendInvitationReply(CalendarInvitationView cv, CalendarInvitation invitation, InvitationReplyDetailViewModel vm)
+        {
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.sending_appointment_response, Resource.String.please_wait);
+
+            try
+            {
+                CommonConfig.Logger.Info($"Attempting to reply to calendar invitation for document [documentId={Document.Id}]");
+
+
+                var responseDocument = new Document();
+                var responseDocumentPreview = new DocumentPreview();
+
+                //Line
+                responseDocument.Lines = new List<Line> { vm.Line };
+
+                //Body
+                string previousDocumentContent = string.Empty;
+
+                if (!string.IsNullOrWhiteSpace(Document?.HtmlBody))
+                {
+                    var config = HtmlProcessingConfiguration.DefaultForEditing;
+                    config.InjectReplyHeader = true;
+                    config.ReplyHeaderParameters = HtmlUtilities.GetReplyHeaderParameters(Context, DocumentPreview, Document);
+                    previousDocumentContent = await HtmlUtilities.ProcessHtml(Context, Document.HtmlBody, config);
+                }
+                else if (!string.IsNullOrWhiteSpace(Document?.PlainTextBody))
+                {
+                    var config = PlainTextProcessingConfiguration.DefaultForEditing;
+                    config.InjectReplyHeader = true;
+                    config.ReplyHeaderParameters = HtmlUtilities.GetReplyHeaderParameters(Context, DocumentPreview, Document);
+                    previousDocumentContent = await HtmlUtilities.ProcessPlainText(Context, Document.PlainTextBody, config);
+                }
+
+                responseDocument.HtmlBody = await HtmlUtilities.MergeReplyWithPreviousDocument(vm.Message, previousDocumentContent);
+
+                //Subject
+                var responseSubjectString = string.Empty;
+                switch (vm.Status)
+                {
+                    case ParticipantStatus.Accepted:
+                        responseSubjectString = "ACCEPTED: ";
+                        break;
+                    case ParticipantStatus.Declined:
+                        responseSubjectString = "DECLINED: ";
+                        break;
+                    case ParticipantStatus.Tentative:
+                        responseSubjectString = "TENTATIVE: ";
+                        break;
+                    default:
+                        break;
+                }
+
+                responseDocumentPreview.Subject = responseSubjectString + DocumentPreview.Subject;
+
+                //Addresses
+                DocumentPreview.Addresses.Where(x => x.AddressType == DocumentAddressType.From).ToList().ForEach(da =>
+                {
+                    var address = new DocumentAddress
+                    {
+                        Address = da.Address,
+                        Name = da.Name,
+                        Type = CommunicationAddressType.Email,
+                        AddressType = DocumentAddressType.To
+                    };
+                    responseDocumentPreview.Addresses.Add(address);
+                });
+
+                responseDocumentPreview.Direction = DocumentDirection.Outgoing;
+
+                await Managers.DocumentsManager.ReplyToCalendarInvitationAsync(responseDocument, responseDocumentPreview,
+                    invitation, vm.Status, string.IsNullOrEmpty(vm.Message), Document.Id, Folder?.Id ?? FolderId ?? 0);
+
+                invitation.Status = vm.Status;
+                await cv.RefreshView();
+
+                dismissAction();
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Error while replying to calendar invitation for document [documentId={Document.Id}]", ex);
+                await Dialogs.ShowErrorDialogAsync(Context, ex);
+            }
+        }
+
 
         void ContentView_MailToLinkClicked(object sender, string url)
         {

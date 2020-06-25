@@ -10,13 +10,6 @@ using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    public class InvitationReplyDetailViewModel
-    {
-        public Line Line;
-        public string Message;
-        public ParticipantStatus Status;
-    }
-
     public class InvitationReplyViewController : UIViewController
     {
         readonly TaskCompletionSource<InvitationReplyDetailViewModel> tcs = new TaskCompletionSource<InvitationReplyDetailViewModel>();
@@ -334,7 +327,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     declineButton.Enabled = false;
                     break;
             }
-
         }
 
         bool IsValid() => model.Line != null;
