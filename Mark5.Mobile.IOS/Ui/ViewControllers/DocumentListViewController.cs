@@ -45,6 +45,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         AutoRefreshWorker autoRefreshWorker;
         Action newDocumentsAvailableAction;
 
+        TinyMessageSubscriptionToken priorityChangedToken;
         TinyMessageSubscriptionToken readStatusChangedToken;
         TinyMessageSubscriptionToken commentsCountChangedToken;
         TinyMessageSubscriptionToken categoriesChangedToken;
@@ -326,6 +327,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void SubscribeToMessages()
         {
             readStatusChangedToken = CommonConfig.MessengerHub.Subscribe<DocumentPreviewReadStatusChangedMessage>(ReadStatusChangedHandler);
+            priorityChangedToken = CommonConfig.MessengerHub.Subscribe<DocumentPreviewPriorityChangedMessage>(PriorityChangedHandler);
             commentsCountChangedToken = CommonConfig.MessengerHub.Subscribe<EntityPreviewCommentCountChangedMessage>(CommentsCountChangedHandler);
             categoriesChangedToken = CommonConfig.MessengerHub.Subscribe<EntityCategoriesChangedMessage>(CategoriesChangedHandler, m => m.ObjectType == ObjectType.Document);
             removedFromFolderToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(HandleRemovedFromFolder, m => m.ObjectType == ObjectType.Document);
@@ -337,6 +339,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void UnsubscribeFromMessages()
         {
             readStatusChangedToken?.Dispose();
+            priorityChangedToken?.Dispose();
             commentsCountChangedToken?.Dispose();
             categoriesChangedToken?.Dispose();
             removedFromFolderToken?.Dispose();
@@ -690,6 +693,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 CommonConfig.Logger.Info($"Attempting to setting priority for documents");
                 await Managers.DocumentsManager.SetDocumentsPriorityAsync(selectedDocuments, priority);
 
+                var updatedItems = selectedDocuments.Select(d => d.Id);
+                ((DataSource)TableView.Source).UpdateItems(updatedItems);
+                ((DataSource)((UITableViewController)searchController?.SearchResultsController)?.TableView?.Source)?.UpdateItems(updatedItems);
+
                 EndEditing();
 
                 UpdatePriorityForDocument(selectedDocuments.Select(d => d.Id));
@@ -1003,6 +1010,36 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         var documentPreview = ((DataSource)tableView.Source).Items[index];
                         documentPreview.IsReadByCurrent = message.IsReadByCurrent;
                         documentPreview.IsReadByAnyone = message.IsReadByAnyone;
+
+                        var selectedRow = tableView.IndexPathForSelectedRow;
+
+                        tableView.ReloadRows(new[] { NSIndexPath.FromRowSection(index, 0) }, UITableViewRowAnimation.Fade);
+
+                        if (selectedRow != null)
+                            tableView.SelectRow(selectedRow, false, UITableViewScrollPosition.None);
+                    }
+
+                }
+
+            });
+
+        }
+
+        void PriorityChangedHandler(DocumentPreviewPriorityChangedMessage message)
+        {
+            BeginInvokeOnMainThread(() =>
+            {
+                foreach (var tableView in new UITableView[] { TableView, ((UITableViewController)searchController?.SearchResultsController)?.TableView })
+                {
+                    if (tableView == null || tableView.Source == null)
+                        continue;
+
+                    var index = ((DataSource)tableView.Source).Items.FindIndex(dp => dp.Id == message.DocumentPreviewId);
+
+                    if (index >= 0)
+                    {
+                        var documentPreview = ((DataSource)tableView.Source).Items[index];
+                        documentPreview.Priority= message.Priority;
 
                         var selectedRow = tableView.IndexPathForSelectedRow;
 

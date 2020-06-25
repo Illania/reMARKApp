@@ -370,6 +370,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             if (priorityView == null)
                 return;
 
+            dateView.RefreshView();
             priorityView.RefreshView();
 
             if (detailsShown)

@@ -57,12 +57,12 @@
 		<ConsolePause>false</ConsolePause>
 		<MtouchArch>ARM64</MtouchArch>
 		<CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
-		<CodesignKey>iPhone Developer: Lars Hansen (TUYUES9KMZ)</CodesignKey>
+		<CodesignKey>Apple Development: Lars Hansen (TUYUES9KMZ)</CodesignKey>
 		<MtouchDebug>true</MtouchDebug>
 		<RunCodeAnalysis>true</RunCodeAnalysis>
 		<MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
 		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
-		<CodesignProvision>Mark5 Development 2020</CodesignProvision>
+		<CodesignProvision>Mark5 Development 2020 - B</CodesignProvision>
 		<LangVersion>8.0</LangVersion>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
@@ -676,6 +676,10 @@
 		<ImageAsset Include="Assets_icons.xcassets\Participant-Unknown.imageset\round-help_outline-24px.pdf" />
 		<ImageAsset Include="Assets_icons.xcassets\Partially-Sent.imageset\Contents.json" />
 		<ImageAsset Include="Assets_icons.xcassets\Partially-Sent.imageset\partially_sent-1.pdf" />
+		<ImageAsset Include="Assets_icons.xcassets\Priority-Low.imageset\Contents.json" />
+		<ImageAsset Include="Assets_icons.xcassets\Priority-High.imageset\Contents.json" />
+		<ImageAsset Include="Assets_icons.xcassets\Priority-High.imageset\high_priority.pdf" />
+		<ImageAsset Include="Assets_icons.xcassets\Priority-Low.imageset\low_priority.pdf" />
 	</ItemGroup>
 	<ItemGroup>
 		<BundleResource Include="Resources\Base.lproj\Localizable.strings" />
@@ -788,6 +792,12 @@
 	  <Folder Include="Ui\ViewControllers\CalendarViews\AddEditAppointmentView\" />
 	  <Folder Include="Ui\ViewControllers\CalendarViews\AddEditAppointmentView\RecurrenceView\" />
 	  <Folder Include="Assets_icons.xcassets\Partially-Sent.imageset\" />
+	  <Folder Include="Assets_icons.xcassets\Priority.appiconset\" />
+	  <Folder Include="Assets_icons.xcassets\Priority-Low.imageset\" />
+	  <Folder Include="Assets_icons.xcassets\Priority-High.imageset\" />
+	  <Folder Include="Assets_icons.xcassets\Priority-Low.imageset\" />
+	  <Folder Include="Assets_icons.xcassets\Priority-High.imageset\" />
+	  <Folder Include="Assets_icons.xcassets\Pr.imageset\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 	<Import Project="..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets" Condition="Exists('..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets')" />
