@@ -1826,7 +1826,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 categoriesLayout = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.list_item_document_external_categories);
                 commentImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_external_comment);
                 priorityHighImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_high_priority);
-                priorityLowImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_high_priority);
+                priorityLowImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_low_priority);
                 itemContent = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.list_item_document_external_internal_layout);
                 selectedOverlay = itemView.FindViewById<View>(Resource.Id.selected_overlay);
                 swipedBackground = itemView.FindViewById<View>(Resource.Id.swiped_background);
