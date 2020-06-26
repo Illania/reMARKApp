@@ -45,6 +45,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UITextField hostnameTextField;
         UITextField passwordTextField;
         UITextField portTextField;
+        UIButton showPasswordButton;
         UIButton loginButton;
 
         NSLayoutConstraint containerCenter;
@@ -263,6 +264,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 passwordTextField.WidthAnchor.ConstraintEqualTo(TextFieldWidth),
                 passwordTextField.HeightAnchor.ConstraintEqualTo(TextFieldHeight)
             });
+
+            showPasswordButton = new UIButton()
+            {
+                Frame = new CGRect(0, 0, 50, 50),
+            };
+            showPasswordButton.SetImage(passwordTextField.SecureTextEntry
+                ? UIImage.FromBundle("Password-Show").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate).ApplyTintColor(UIColor.White)
+                : UIImage.FromBundle("Password-Hide").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate).ApplyTintColor(UIColor.White), UIControlState.Normal);
+            showPasswordButton.ContentEdgeInsets = new UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 5);
+            showPasswordButton.ImageView.ContentMode = UIViewContentMode.ScaleAspectFit;
+            showPasswordButton.TouchUpInside += (sender, e) =>
+            {
+                var updatedIsPassword = !passwordTextField.SecureTextEntry;
+                passwordTextField.SecureTextEntry = updatedIsPassword;
+                showPasswordButton.SetImage(updatedIsPassword
+               ? UIImage.FromBundle("Password-Show").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate).ApplyTintColor(UIColor.White)
+               : UIImage.FromBundle("Password-Hide").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate).ApplyTintColor(UIColor.White), UIControlState.Normal);
+
+            };
+            passwordTextField.RightViewMode = UITextFieldViewMode.Always;
+            passwordTextField.RightView = showPasswordButton;
+            passwordTextField.RightViewRect(new CGRect(0, 0, 50, 50));
 
             hostnameTextField = new UITextField
             {
