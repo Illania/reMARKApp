@@ -335,88 +335,24 @@ namespace Mark5.Mobile.Droid.Utilities
             {
                 try
                 {
-                    //TODO technique 2
-                    var htmlDocument = new HtmlDocument();
-                    htmlDocument.LoadHtml(previousContent);
+                    var previousDocumentHtml = new HtmlDocument();
+                    previousDocumentHtml.LoadHtml(previousContent);
 
-                    var bodyNode = htmlDocument.DocumentNode.SelectSingleNode("//body");
+                    string html;
+                    using (var sr = new StreamReader(context.Assets.Open("blank.html")))
+                        html = sr.ReadToEnd();
 
-                    var editor = bodyNode?.SelectSingleNode("//div[@id='editor']");
+                    var mergedHtmlDocument = new HtmlDocument();
+                    mergedHtmlDocument.LoadHtml(html);
 
-                    if (!string.IsNullOrEmpty(message))
-                    {
-                        //Add the new content
-                        HtmlNode text = HtmlNode.CreateNode(HtmlDocument.HtmlEncode(message));
-                        editor.AppendChild(text);
-                    }
+                    var newNode = mergedHtmlDocument.DocumentNode.SelectSingleNode("//div[@id='new']");
+                    newNode.InnerHtml = message ?? string.Empty;
+                    newNode.Attributes.Remove("id");
+                    var oldNode = mergedHtmlDocument.DocumentNode.SelectSingleNode("//div[@id='old']");
+                    oldNode.AppendChildren(previousDocumentHtml.DocumentNode.SelectSingleNode("//body").ChildNodes);
+                    oldNode.Attributes.Remove("id");
 
-                    return htmlDocument.DocumentNode.OuterHtml;
-
-
-                    //TECHNIQUE 1
-                    //var newHtmlDocument = new HtmlDocument();
-                    //newHtmlDocument.LoadHtml(message);  //TODO I'm a little unsure about this...
-
-                    //var oldHtmlDocument = new HtmlDocument();
-                    //oldHtmlDocument.LoadHtml(previousContent);
-
-                    //string html;
-                    //using (var sr = new StreamReader(context.Assets.Open("blank.html")))
-                    //    html = sr.ReadToEnd();
-
-                    //var mergedHtmlDocument = new HtmlDocument();
-                    //mergedHtmlDocument.LoadHtml(html);
-
-                    //var newNode = mergedHtmlDocument.DocumentNode.SelectSingleNode("//div[@id='new']");
-                    //newNode.AppendChildren(newHtmlDocument.DocumentNode.SelectSingleNode("//body").ChildNodes);
-                    //newNode.Attributes.Remove("id");
-                    //var oldNode = mergedHtmlDocument.DocumentNode.SelectSingleNode("//div[@id='old']");
-                    //oldNode.AppendChildren(oldHtmlDocument.DocumentNode.SelectSingleNode("//body").ChildNodes);
-                    //oldNode.Attributes.Remove("id");
-
-                    //return mergedHtmlDocument.DocumentNode.OuterHtml;
-
-
-
-
-
-
-
-
-
-                    var html = File.ReadAllText(NSBundle.MainBundle.PathForResource("html/replyEditor", "html"));
-
-                    var htmlDocument = new HtmlDocument();
-                    htmlDocument.LoadHtml(html);
-                    var bodyNode = htmlDocument.DocumentNode.SelectSingleNode("//body");
-                    var previousContentNode = bodyNode?.SelectSingleNode("//div[@id='previousContent']");
-
-                    if (previousContentNode == null)
-                        CommonConfig.Logger.Error("resources/html/replyEditor.html is missing 'previousContent' element");
-                    else
-                    {
-                        var previousContentDocument = new HtmlDocument();
-                        previousContentDocument.LoadHtml(previousContent);
-                        var prevBody = previousContentDocument.DocumentNode.SelectSingleNode("//body");
-
-                        if (prevBody == null)
-                            previousContentNode.InnerHtml = previousContent;
-                        else
-                            previousContentNode.AppendChildren(prevBody.ChildNodes);
-
-                        html = htmlDocument.DocumentNode.OuterHtml;
-                    }
-
-                    var editor = bodyNode?.SelectSingleNode("//div[@id='editor']");
-
-                    if (!string.IsNullOrEmpty(message))
-                    {
-                        //Add the new content
-                        HtmlNode text = HtmlNode.CreateNode(HtmlDocument.HtmlEncode(message));
-                        editor.AppendChild(text);
-                    }
-
-                    return htmlDocument.DocumentNode.OuterHtml;
+                    return mergedHtmlDocument.DocumentNode.OuterHtml;
                 }
                 catch (Exception ex)
                 {

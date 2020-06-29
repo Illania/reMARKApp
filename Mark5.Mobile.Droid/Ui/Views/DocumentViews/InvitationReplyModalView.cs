@@ -128,17 +128,24 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             if (DetailsModel.Line != null)
                 lineLabel.Text = DetailsModel.Line.Name;
 
+            AppCompatButton buttonToDisable = null;
             switch (userStatus)
             {
                 case ParticipantStatus.Accepted:
-                    acceptButton.Enabled = false;
+                    buttonToDisable = acceptButton;
                     break;
                 case ParticipantStatus.Tentative:
-                    tentativeButton.Enabled = false;
+                    buttonToDisable = tentativeButton;
                     break;
                 case ParticipantStatus.Declined:
-                    declineButton.Enabled = false;
+                    buttonToDisable = declineButton;
                     break;
+            }
+
+            if (buttonToDisable != null)
+            {
+                buttonToDisable.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.mediumGray2)));
+                buttonToDisable.Enabled = false;
             }
         }
 
@@ -223,8 +230,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 participantStatus = status;
                 Text = GetTitle();
                 SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkerblue)));
+                SetBackgroundColor(Color.Transparent);
                 SetMaxLines(1);
-                //SetAutoSizeTextTypeUniformWithConfiguration(10, 13, 1, (int)ComplexUnitType.Dip);
                 Click += (sender, e) => ButtonTapped(sender, participantStatus);
             }
 
