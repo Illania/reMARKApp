@@ -77,7 +77,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         private void InitializeViews()
         {
-            View.BackgroundColor = UIColor.Black.ColorWithAlpha(0.7f); //TODO check on ipad
+            View.BackgroundColor = UIColor.Black.ColorWithAlpha(0.7f);
 
             viewsContainer = InitializeContainer();
 

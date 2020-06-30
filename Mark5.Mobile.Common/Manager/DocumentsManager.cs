@@ -245,8 +245,6 @@ namespace Mark5.Mobile.Common.Manager
                     OriginalDocumentFolderId = originalDocumentFolderId,
                 });
 
-                //TODO here we could change the status of tha invitation in the db...
-
                 return;
             }
             else if (sourceType == SourceType.Local)
