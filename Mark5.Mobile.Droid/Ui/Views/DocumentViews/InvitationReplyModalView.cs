@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Linq;
-using System.Threading.Tasks;
 using Android.Content;
 using Android.Graphics;
 using Android.Support.V4.Content;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
-using Android.Util;
 using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common;
@@ -18,11 +16,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 {
     public class InvitationReplyModalView : LinearLayoutCompat
     {
-        int verticalMargine;
-        int horizontalMargine;
-        AppCompatTextView lineLabel;
-        ParticipantStatus userStatus;
+        readonly int verticalMargine;
+        readonly int horizontalMargine;
+        readonly ParticipantStatus userStatus;
 
+        AppCompatTextView lineLabel;
         ReplyButton acceptButton;
         ReplyButton tentativeButton;
         ReplyButton declineButton;
@@ -30,7 +28,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
         public InvitationReplyDetailViewModel DetailsModel;
         public EventHandler<InvitationReplyDetailViewModel> ResponseSelected = delegate { };
 
-        public InvitationReplyModalView(Context context, ParticipantStatus userStatus, Line predefinedLine) : base(context)  //TODO need to pass the line
+        public InvitationReplyModalView(Context context, ParticipantStatus userStatus, Line predefinedLine)
+            : base(context)
         {
             this.userStatus = userStatus;
 

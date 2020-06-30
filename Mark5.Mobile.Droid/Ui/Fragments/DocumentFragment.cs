@@ -56,7 +56,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         CancellationTokenSource setReadStatusCancellationTokenSource;
 
-        public static (DocumentFragment fragment, string tag) NewInstance(Folder folder = null, int? folderId = null, DocumentPreview dp = null, int? docId = null, Guid? notificationGuid = null, Guid? failDocToUploadGuid = null)
+        public static (DocumentFragment fragment, string tag) NewInstance(Folder folder = null, int? folderId = null,
+            DocumentPreview dp = null, int? docId = null, Guid? notificationGuid = null, Guid? failDocToUploadGuid = null)
         {
             var args = new Bundle();
 
