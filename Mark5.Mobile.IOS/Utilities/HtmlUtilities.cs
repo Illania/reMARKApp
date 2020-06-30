@@ -331,7 +331,7 @@ namespace Mark5.Mobile.IOS.Utilities
 
         public static Task<string> MergeReplyWithPreviousDocument(string message, string previousContent)
         {
-            return Task.Run(() =>
+            return Task.Run(async () =>
             {
                 try
                 {
@@ -367,7 +367,8 @@ namespace Mark5.Mobile.IOS.Utilities
                         editor.AppendChild(text);
                     }
 
-                    return htmlDocument.DocumentNode.OuterHtml;
+                    var cleanContent = await CleanContent(htmlDocument.DocumentNode.OuterHtml);
+                    return cleanContent;
                 }
                 catch (Exception ex)
                 {
@@ -375,6 +376,40 @@ namespace Mark5.Mobile.IOS.Utilities
 
                     return string.Empty;
                 }
+            });
+        }
+
+        public static Task<string> CleanContent(string content)
+        {
+            return Task.Run(() =>
+            {
+                var htmlDocument = new HtmlDocument();
+                htmlDocument.LoadHtml(content);
+
+                var headNode = htmlDocument.DocumentNode.SelectSingleNode("//head");
+                headNode?.ChildNodes.FirstOrDefault(n => n.Name == "link" && n.Attributes.Any(attr => attr.Name == "id" && attr.Value == "fonts"))?.Remove();
+                headNode?.ChildNodes.FirstOrDefault(n => n.Name == "meta" && n.Attributes.Any(attr => attr.Name == "id" && attr.Value == "viewport"))?.Remove();
+                headNode?.ChildNodes.FirstOrDefault(n => n.Name == "style" && n.Attributes.Any(attr => attr.Name == "id" && attr.Value == "style1"))?.Remove();
+
+                var bodyNode = htmlDocument.DocumentNode.SelectSingleNode("//body");
+                bodyNode?.Attributes.FirstOrDefault(attr => attr.Name == "contentEditable")?.Remove();
+                bodyNode?.ChildNodes.FirstOrDefault(n => n.Name == "div" && n.Attributes.Any(attr => attr.Name == "id" && attr.Value == "headerpadding"))?.Remove();
+
+                var editorNode = bodyNode?.SelectSingleNode("//div[@id='editor']");
+                editorNode?.Attributes.FirstOrDefault(attr => attr.Name == "contentEditable")?.Remove();
+
+                var previousContentNode = bodyNode?.SelectSingleNode("//div[@id='previousContent']");
+                previousContentNode?.Attributes.FirstOrDefault(attr => attr.Name == "contentEditable")?.Remove();
+
+                var html = htmlDocument.DocumentNode.OuterHtml;
+
+                html = PreMailer.Net.PreMailer.MoveCssInline(html, true, null, null, true, true).Html;
+
+                var p = new Processor();
+                p.Dom.OuterHtml = html;
+                html = p.Dom.ProcessToString(RuleSet.GetSafeHtmlRules(), null);
+
+                return html;
             });
         }
     }
