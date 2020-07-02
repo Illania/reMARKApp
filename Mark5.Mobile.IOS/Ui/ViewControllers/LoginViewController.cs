@@ -346,36 +346,38 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         private void FlipShowHidePasswordImage(bool securedTextShown)
         {
             var imgPasswordShow = UIImage.FromBundle("Password-Show").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
-            var imgPaswordHide = UIImage.FromBundle("Password-Hide").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+            var imgPasswordHide = UIImage.FromBundle("Password-Hide").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
 
-            bool isIos13Plus = UIDevice.CurrentDevice.CheckSystemVersion(13, 0);
+            var isIos13Plus = UIDevice.CurrentDevice.CheckSystemVersion(13, 0);
             if (isIos13Plus)
             {
                 imgPasswordShow.ApplyTintColor(UIColor.White);
-                imgPaswordHide.ApplyTintColor(UIColor.White);
+                imgPasswordHide.ApplyTintColor(UIColor.White);
             }
             else
             {   
                 imgPasswordShow = GetTintedImageForiOS12(imgPasswordShow);
-                imgPaswordHide = GetTintedImageForiOS12(imgPaswordHide);
+                imgPasswordHide = GetTintedImageForiOS12(imgPasswordHide);
             }
 
             showPasswordButton.SetImage(securedTextShown
               ? imgPasswordShow
-              : imgPaswordHide, UIControlState.Normal);
+              : imgPasswordHide, UIControlState.Normal);
 
         }
 
         UIImage GetTintedImageForiOS12(UIImage originalImage)
         {
-            CGRect drawRectT = new CGRect(0, 0, originalImage.Size.Width, originalImage.Size.Height);
-            var tmpImg = new UIImageView(drawRectT);
-            tmpImg.Image = originalImage.ImageWithRenderingMode(UIKit.UIImageRenderingMode.AlwaysTemplate);
-            tmpImg.TintColor = UIColor.White;
+            var drawRectT = new CGRect(0, 0, originalImage.Size.Width, originalImage.Size.Height);
+            var tmpImg = new UIImageView(drawRectT)
+            {
+                Image = originalImage.ImageWithRenderingMode(UIKit.UIImageRenderingMode.AlwaysTemplate),
+                TintColor = UIColor.White
+            };
 
             UIGraphics.BeginImageContextWithOptions(tmpImg.Bounds.Size, tmpImg.Opaque, 0.0f);
             tmpImg.Layer.RenderInContext(UIGraphics.GetCurrentContext());
-            UIImage convertedImage = UIGraphics.GetImageFromCurrentImageContext();
+            var convertedImage = UIGraphics.GetImageFromCurrentImageContext();
             UIGraphics.EndImageContext();
 
             return convertedImage;
