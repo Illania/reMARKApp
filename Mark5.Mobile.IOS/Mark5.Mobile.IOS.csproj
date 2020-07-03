@@ -682,6 +682,10 @@
 		<ImageAsset Include="Assets_icons.xcassets\Password-Show.imageset\hide_45.png" />
 		<ImageAsset Include="Assets_icons.xcassets\Password-Hide.imageset\show_30.png" />
 		<ImageAsset Include="Assets_icons.xcassets\Password-Hide.imageset\show_45.png" />
+		<ImageAsset Include="Assets_icons.xcassets\Priority-Low.imageset\Contents.json" />
+		<ImageAsset Include="Assets_icons.xcassets\Priority-High.imageset\Contents.json" />
+		<ImageAsset Include="Assets_icons.xcassets\Priority-High.imageset\high_priority.pdf" />
+		<ImageAsset Include="Assets_icons.xcassets\Priority-Low.imageset\low_priority.pdf" />
 	</ItemGroup>
 	<ItemGroup>
 		<BundleResource Include="Resources\Base.lproj\Localizable.strings" />
@@ -794,6 +798,12 @@
 	  <Folder Include="Ui\ViewControllers\CalendarViews\AddEditAppointmentView\" />
 	  <Folder Include="Ui\ViewControllers\CalendarViews\AddEditAppointmentView\RecurrenceView\" />
 	  <Folder Include="Assets_icons.xcassets\Partially-Sent.imageset\" />
+	  <Folder Include="Assets_icons.xcassets\Priority.appiconset\" />
+	  <Folder Include="Assets_icons.xcassets\Priority-Low.imageset\" />
+	  <Folder Include="Assets_icons.xcassets\Priority-High.imageset\" />
+	  <Folder Include="Assets_icons.xcassets\Priority-Low.imageset\" />
+	  <Folder Include="Assets_icons.xcassets\Priority-High.imageset\" />
+	  <Folder Include="Assets_icons.xcassets\Pr.imageset\" />
 	  <Folder Include="Assets_icons.xcassets\Password-Show.imageset\" />
 	  <Folder Include="Assets_icons.xcassets\Password-Hide.imageset\" />
 	</ItemGroup>
