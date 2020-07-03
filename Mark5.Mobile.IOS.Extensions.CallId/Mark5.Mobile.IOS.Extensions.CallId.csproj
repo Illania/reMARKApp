@@ -69,7 +69,7 @@
     <DefineConstants>DEBUG;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodesignKey>iPhone Developer: Lars Hansen (TUYUES9KMZ)</CodesignKey>
+    <CodesignKey>Apple Development: Lars Hansen (TUYUES9KMZ)</CodesignKey>
     <DeviceSpecificBuild>true</DeviceSpecificBuild>
     <MtouchDebug>true</MtouchDebug>
     <MtouchNoSymbolStrip>false</MtouchNoSymbolStrip>
@@ -81,7 +81,7 @@
     <MtouchArch>ARM64</MtouchArch>
     <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
     <MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
-    <CodesignProvision>Mark5 CallID Development 2020</CodesignProvision>
+    <CodesignProvision>Mark5 CallID Development 2020 - B</CodesignProvision>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
