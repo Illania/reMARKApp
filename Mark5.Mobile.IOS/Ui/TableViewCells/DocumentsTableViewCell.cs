@@ -21,6 +21,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         readonly UIStackView categoriesStackView;
         readonly UIImageView directionIndicatorImageView;
         readonly UIImageView unreadIndicatorImageView;
+        readonly UIImageView priorityIndicatorImageView;
         readonly UIImageView attachmentsIndicatorImageView;
         readonly UIImageView commentsIndicatorImageView;
         readonly UILabel topLabel;
@@ -236,6 +237,22 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                     commentsIndicatorImageView.WidthAnchor.ConstraintEqualTo(15f),
                     commentsIndicatorImageView.HeightAnchor.ConstraintEqualTo(15f)
                 });
+
+                priorityIndicatorImageView = new UIImageView
+                {
+                    ContentMode = UIViewContentMode.ScaleToFill,
+                    Image = UIImage.FromBundle("Priority-Low").ImageWithRenderingMode(UIImageRenderingMode.AlwaysOriginal),
+                    TranslatesAutoresizingMaskIntoConstraints = false
+                };
+
+                ContentView.AddSubview(priorityIndicatorImageView);
+                ContentView.AddConstraints(new[]
+                {
+                    priorityIndicatorImageView.LeadingAnchor.ConstraintEqualTo(leadingMarginGuide.TrailingAnchor),
+                    priorityIndicatorImageView.TopAnchor.ConstraintEqualTo(commentsIndicatorImageView.BottomAnchor, 4f),
+                    priorityIndicatorImageView.WidthAnchor.ConstraintEqualTo(15f),
+                    priorityIndicatorImageView.HeightAnchor.ConstraintEqualTo(15f),
+                });
             }
         }
 
@@ -257,6 +274,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             {
                 InitializeAttachmentIndicator(dp);
                 InitializeCommentsIndicator(dp);
+                InitializePriorityIndicator(dp);
             }
         }
 
@@ -385,6 +403,19 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 return;
 
             attachmentsIndicatorImageView.Alpha = dp.AttachmentsCount > 0 ? 1f : 0f;
+        }
+
+        void InitializePriorityIndicator(DocumentPreview dp)
+        {
+            if (priorityIndicatorImageView == null)
+                return;
+
+            if (dp.Priority == Priority.Urgent)
+                priorityIndicatorImageView.Image = UIImage.FromBundle("Priority-High").ImageWithRenderingMode(UIImageRenderingMode.AlwaysOriginal);
+            else
+                priorityIndicatorImageView.Image = UIImage.FromBundle("Priority-Low").ImageWithRenderingMode(UIImageRenderingMode.AlwaysOriginal);
+
+            priorityIndicatorImageView.Alpha = (dp.Priority == Priority.Low || dp.Priority == Priority.Urgent) ? 1f : 0f;
         }
 
         void InitializeCommentsIndicator(DocumentPreview dp)

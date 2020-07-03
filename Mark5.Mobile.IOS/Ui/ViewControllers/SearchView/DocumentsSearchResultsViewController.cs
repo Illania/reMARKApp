@@ -250,7 +250,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
                 }));
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"), UIAlertActionStyle.Default, a => ShowPriorityActionSheet(selectedDocuments, (UIBarButtonItem)sender)));
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"), UIAlertActionStyle.Default,
+                a => ShowPriorityActionSheet(selectedDocuments, (UIBarButtonItem)sender, rows)));
 
             if (ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || selectedDocuments.All(dp => dp.Direction == DocumentDirection.Draft))
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedDocuments, d)));
@@ -369,7 +370,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     EndEditing();
                 }));
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"), UIAlertActionStyle.Default, a => ShowPriorityActionSheet(selectedDocument, TableView, TableView.CellAt(indexPath))));
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"),
+                UIAlertActionStyle.Default,
+                a => ShowPriorityActionSheet(selectedDocument, TableView, TableView.CellAt(indexPath), new[] {indexPath})));
 
             if (ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || selectedDocument.Direction == DocumentDirection.Draft)
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedDocument, d)));
@@ -447,7 +450,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             }
         }
 
-        async void ShowPriorityActionSheet(List<DocumentPreview> selectedDocuments, UIBarButtonItem barButtonItem)
+        async void ShowPriorityActionSheet(List<DocumentPreview> selectedDocuments, UIBarButtonItem barButtonItem, NSIndexPath[] rows)
         {
             var priorities = new List<Priority> { Priority.Low, Priority.Normal, Priority.Urgent };
             var priorityStrings = priorities.Select(p => UI.PrettyPriorityString(p));
@@ -458,10 +461,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
 
             var priority = priorities[result];
 
-            await SetPriority(selectedDocuments, priority);
+            await SetPriority(selectedDocuments, priority, rows);
         }
 
-        async void ShowPriorityActionSheet(DocumentPreview selectedDocument, UITableView tv, UITableViewCell cell)
+        async void ShowPriorityActionSheet(DocumentPreview selectedDocument, UITableView tv, UITableViewCell cell, NSIndexPath[] rows)
         {
             var priorities = new List<Priority> { Priority.Low, Priority.Normal, Priority.Urgent };
             var priorityStrings = priorities.Select(p => UI.PrettyPriorityString(p));
@@ -471,10 +474,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 return;
 
             var priority = priorities[result];
-            await SetPriority(new List<DocumentPreview> { selectedDocument }, priority);
+            await SetPriority(new List<DocumentPreview> { selectedDocument }, priority, rows);
         }
 
-        async Task SetPriority(List<DocumentPreview> selectedDocuments, Priority priority)
+        async Task SetPriority(List<DocumentPreview> selectedDocuments, Priority priority, NSIndexPath[] rows)
         {
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("setting_priority___"));
 
@@ -482,6 +485,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             {
                 CommonConfig.Logger.Info($"Attempting to setting priority for documents");
                 await Managers.DocumentsManager.SetDocumentsPriorityAsync(selectedDocuments, priority);
+                TableView.ReloadRows(rows, UITableViewRowAnimation.Fade);
 
                 EndEditing();
 

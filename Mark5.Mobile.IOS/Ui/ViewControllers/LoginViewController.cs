@@ -45,6 +45,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UITextField hostnameTextField;
         UITextField passwordTextField;
         UITextField portTextField;
+        UIButton showPasswordButton;
         UIButton loginButton;
 
         NSLayoutConstraint containerCenter;
@@ -264,6 +265,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 passwordTextField.HeightAnchor.ConstraintEqualTo(TextFieldHeight)
             });
 
+            showPasswordButton = new UIButton()
+            {
+                Frame = new CGRect(0, 0, 30, 30),
+            };
+            FlipShowHidePasswordImage(passwordTextField.SecureTextEntry);
+            showPasswordButton.ContentEdgeInsets = new UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 5);
+            showPasswordButton.ImageView.ContentMode = UIViewContentMode.ScaleAspectFit;
+           
+            passwordTextField.RightViewMode = UITextFieldViewMode.Always;
+            passwordTextField.RightView = showPasswordButton;
+
             hostnameTextField = new UITextField
             {
                 BorderStyle = UITextBorderStyle.RoundedRect,
@@ -329,6 +341,46 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 loginButton.HeightAnchor.ConstraintEqualTo(LoginButtonHeight),
                 loginButton.BottomAnchor.ConstraintEqualTo(containerView.BottomAnchor),
             });
+        }
+
+        private void FlipShowHidePasswordImage(bool securedTextShown)
+        {
+            var imgPasswordShow = UIImage.FromBundle("Password-Show").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+            var imgPasswordHide = UIImage.FromBundle("Password-Hide").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+
+            var isIos13Plus = UIDevice.CurrentDevice.CheckSystemVersion(13, 0);
+            if (isIos13Plus)
+            {
+                imgPasswordShow.ApplyTintColor(UIColor.White);
+                imgPasswordHide.ApplyTintColor(UIColor.White);
+            }
+            else
+            {   
+                imgPasswordShow = GetTintedImageForiOS12(imgPasswordShow);
+                imgPasswordHide = GetTintedImageForiOS12(imgPasswordHide);
+            }
+
+            showPasswordButton.SetImage(securedTextShown
+              ? imgPasswordShow
+              : imgPasswordHide, UIControlState.Normal);
+
+        }
+
+        UIImage GetTintedImageForiOS12(UIImage originalImage)
+        {
+            var drawRectT = new CGRect(0, 0, originalImage.Size.Width, originalImage.Size.Height);
+            var tmpImg = new UIImageView(drawRectT)
+            {
+                Image = originalImage.ImageWithRenderingMode(UIKit.UIImageRenderingMode.AlwaysTemplate),
+                TintColor = UIColor.White
+            };
+
+            UIGraphics.BeginImageContextWithOptions(tmpImg.Bounds.Size, tmpImg.Opaque, 0.0f);
+            tmpImg.Layer.RenderInContext(UIGraphics.GetCurrentContext());
+            var convertedImage = UIGraphics.GetImageFromCurrentImageContext();
+            UIGraphics.EndImageContext();
+
+            return convertedImage;
         }
 
         async Task RefreshData()
@@ -403,6 +455,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return true;
             };
             loginButton.TouchUpInside += LoginButton_TouchUpInside;
+            showPasswordButton.TouchUpInside += ShowPasswordButton_TouchUpInside;
         }
 
         void DeinitializeHandlers()
@@ -417,6 +470,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             portTextField.EditingChanged -= TextField_EditingChanged;
             portTextField.ShouldReturn = null;
             loginButton.TouchUpInside -= LoginButton_TouchUpInside;
+            showPasswordButton.TouchUpInside -= ShowPasswordButton_TouchUpInside;
         }
 
         #endregion
@@ -439,6 +493,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             var loginSettingsViewController = (LoginSettingsViewController)sender;
             loginSettingsViewController.RestrictedSettingsValuesUpdated -= LoginSettingsViewController_RestrictedSettingsValuesUpdated;
+        }
+
+        void ShowPasswordButton_TouchUpInside(object sender, EventArgs e)
+        {
+            var updatedIsPassword = !passwordTextField.SecureTextEntry;
+            passwordTextField.SecureTextEntry = updatedIsPassword;
+            FlipShowHidePasswordImage(updatedIsPassword);
         }
 
         #endregion

@@ -580,7 +580,10 @@
     <Compile Include="Ui\Fragments\PickerInternalContactsListFragment.cs" />
     <Compile Include="Service\ReachabilityMonitor.cs" />
     <Compile Include="Utilities\PushNotificationsUtilities.cs" />
-    <Compile Include="Resources\Resource.designer.cs" />
+    <Compile Include="Resources\Resource.designer.cs">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+    </Compile>
     <Compile Include="Ui\Fragments\Calendar\MonthCalendarFragment.cs" />
     <Compile Include="Ui\Fragments\Calendar\WeekCalendarFragment.cs" />
     <Compile Include="Ui\Fragments\Calendar\CalendarListFragment.cs" />
@@ -654,7 +657,9 @@
     <AndroidResource Include="Resources\color\drawer_item_icon.xml" />
     <AndroidResource Include="Resources\drawable\circle_blue.xml" />
     <AndroidResource Include="Resources\drawable\circle_dark.xml" />
+    <AndroidResource Include="Resources\drawable\high_priority.xml" />
     <AndroidResource Include="Resources\drawable\line_divider.axml" />
+    <AndroidResource Include="Resources\drawable\low_priority.xml" />
     <AndroidResource Include="Resources\drawable\rounded_background.xml" />
     <AndroidResource Include="Resources\drawable\search_button_background.axml" />
     <AndroidResource Include="Resources\drawable\search_divider_horizontal.axml" />
