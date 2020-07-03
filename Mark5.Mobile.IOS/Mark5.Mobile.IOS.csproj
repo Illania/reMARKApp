@@ -676,6 +676,12 @@
 		<ImageAsset Include="Assets_icons.xcassets\Participant-Unknown.imageset\round-help_outline-24px.pdf" />
 		<ImageAsset Include="Assets_icons.xcassets\Partially-Sent.imageset\Contents.json" />
 		<ImageAsset Include="Assets_icons.xcassets\Partially-Sent.imageset\partially_sent-1.pdf" />
+		<ImageAsset Include="Assets_icons.xcassets\Password-Show.imageset\Contents.json" />
+		<ImageAsset Include="Assets_icons.xcassets\Password-Hide.imageset\Contents.json" />
+		<ImageAsset Include="Assets_icons.xcassets\Password-Show.imageset\hide_30.png" />
+		<ImageAsset Include="Assets_icons.xcassets\Password-Show.imageset\hide_45.png" />
+		<ImageAsset Include="Assets_icons.xcassets\Password-Hide.imageset\show_30.png" />
+		<ImageAsset Include="Assets_icons.xcassets\Password-Hide.imageset\show_45.png" />
 		<ImageAsset Include="Assets_icons.xcassets\Priority-Low.imageset\Contents.json" />
 		<ImageAsset Include="Assets_icons.xcassets\Priority-High.imageset\Contents.json" />
 		<ImageAsset Include="Assets_icons.xcassets\Priority-High.imageset\high_priority.pdf" />
@@ -798,6 +804,8 @@
 	  <Folder Include="Assets_icons.xcassets\Priority-Low.imageset\" />
 	  <Folder Include="Assets_icons.xcassets\Priority-High.imageset\" />
 	  <Folder Include="Assets_icons.xcassets\Pr.imageset\" />
+	  <Folder Include="Assets_icons.xcassets\Password-Show.imageset\" />
+	  <Folder Include="Assets_icons.xcassets\Password-Hide.imageset\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 	<Import Project="..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets" Condition="Exists('..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets')" />
