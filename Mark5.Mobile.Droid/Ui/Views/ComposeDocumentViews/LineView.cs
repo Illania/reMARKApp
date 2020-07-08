@@ -74,40 +74,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 return Task.CompletedTask;
             }
 
-            if (DocumentCreationModeFlag == DocumentCreationModeFlag.New)
-                SetLine(defaultOutgoingLine);
-
-            if (DocumentCreationModeFlag == DocumentCreationModeFlag.Edit)
-                SetLine(PreviousDocument.Lines.FirstOrDefault());
-
-            if (DocumentCreationModeFlag == DocumentCreationModeFlag.Reply ||
-                DocumentCreationModeFlag == DocumentCreationModeFlag.ReplyAll ||
-                DocumentCreationModeFlag == DocumentCreationModeFlag.Forward)
-            {
-                if (PlatformConfig.Preferences.AlwaysUseDefaultLine && defaultOutgoingLine != null)
-                {
-                    SetLine(defaultOutgoingLine);
-                    return Task.CompletedTask;
-                }
-
-                if (availableOutgoingLines.Count(l => l != null && l.Guid != Guid.Empty) == 1)
-                {
-                    SetLine(availableOutgoingLines.FirstOrDefault(l => l != null && l.Guid != Guid.Empty));
-                    return Task.CompletedTask;
-                }
-
-                if (PreviousDocument.Lines.FirstOrDefault(l => l.Guid == defaultOutgoingLine?.Guid) != null)
-                    SetLine(defaultOutgoingLine);
-                else
-                {
-                    var intersection = PreviousDocument.Lines.Intersect(availableOutgoingLines, LambdaEqualityComparer<Line>.Create(l => l.Guid)).ToArray();
-                    if (intersection.Length == 1)
-                        SetLine(intersection.FirstOrDefault());
-                    else
-                        SetLine(null);
-                }
-            }
-
+            SetLine(LineUtilities.GetLineForCreationModeFlag(DocumentCreationModeFlag, PreviousDocument, PlatformConfig.Preferences.AlwaysUseDefaultLine));
             return Task.CompletedTask;
         }
 

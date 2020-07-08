@@ -5,7 +5,7 @@ using Android.Views;
 using Android.Webkit;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Model;
-using Mark5.Mobile.IOS.Utilities.Extensions;
+using Mark5.Mobile.Droid.Utilities.Extensions;
 
 namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 {

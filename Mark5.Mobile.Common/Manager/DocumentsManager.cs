@@ -224,6 +224,35 @@ namespace Mark5.Mobile.Common.Manager
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
+        public async Task ReplyToCalendarInvitationAsync(Document document, DocumentPreview documentPreview, CalendarInvitation invitation,
+            ParticipantStatus answer, bool isSilent, int originalDocumentId, int originalDocumentFolderId,
+            SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
+            {
+                await AppServiceProxy.ReplyToCalendarInvitationAsync(new DataContract.ReplyToCalendarInvitationParameters
+                {
+                    Token = Token,
+                    Document = document.Convert(),
+                    DocumentPreview = documentPreview.Convert(),
+                    Invitation = invitation.Convert(),
+                    Answer = answer.ConvertEnum<DataContract.ParticipantStatus>(),
+                    IsSilent = isSilent,
+                    OriginalDocumentId = originalDocumentId,
+                    OriginalDocumentFolderId = originalDocumentFolderId,
+                });
+
+                return;
+            }
+            else if (sourceType == SourceType.Local)
+                throw new InvalidSourceTypeException("This action can only be performed when online.");
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
+
         public async Task MoveToSpamAsync(List<DocumentPreview> documentPreviews, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
@@ -626,7 +655,9 @@ namespace Mark5.Mobile.Common.Manager
 
         #region DocumentsUploadService specific
 
-        internal async Task SendDocumentAsync(Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId, long sendOnTimestamp, bool confirmRead, bool confirmDelivery, List<Guid> temporaryAttachmentGuids, IEventReply eventReply, SourceType sourceType = SourceType.Auto)
+        internal async Task SendDocumentAsync(Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag,
+            int precedingDocumentId, int precedingDocumentFolderId, long sendOnTimestamp, bool confirmRead, bool confirmDelivery,
+            List<Guid> temporaryAttachmentGuids, SourceType sourceType = SourceType.Auto)
         {
             CommonConfig.UsageAnalytics.LogEvent(new DocumentSentEvent(flag));
 

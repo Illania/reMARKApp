@@ -401,14 +401,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                         {
                             var config = HtmlProcessingConfiguration.DefaultForEditing;
                             config.InjectReplyHeader = true;
-                            config.ReplyHeaderParameters = GetReplyHeaderParameters(previousDocumentPreview, previousDocument);
+                            config.ReplyHeaderParameters = HtmlUtilities.GetReplyHeaderParameters(previousDocumentPreview, previousDocument);
                             previousDocumentContent = await HtmlUtilities.ProcessHtml(previousDocument.HtmlBody, config);
                         }
                         else if (!string.IsNullOrWhiteSpace(previousDocument?.PlainTextBody))
                         {
                             var config = PlainTextProcessingConfiguration.DefaultForEditing;
                             config.InjectReplyHeader = true;
-                            config.ReplyHeaderParameters = GetReplyHeaderParameters(previousDocumentPreview, previousDocument);
+                            config.ReplyHeaderParameters = HtmlUtilities.GetReplyHeaderParameters(previousDocumentPreview, previousDocument);
                             previousDocumentContent = await HtmlUtilities.ProcessPlainText(previousDocument.PlainTextBody, config);
                         }
                         else
@@ -915,43 +915,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         protected override async Task<string> GetContent()
         {
             var newContent = await base.GetContent();
-            newContent = await CleanContent(newContent);
+            newContent = await HtmlUtilities.CleanContent(newContent);
 
             return newContent;
-        }
-
-        Task<string> CleanContent(string content)
-        {
-            return Task.Run(() =>
-            {
-                var htmlDocument = new HtmlDocument();
-                htmlDocument.LoadHtml(content);
-
-                var headNode = htmlDocument.DocumentNode.SelectSingleNode("//head");
-                headNode?.ChildNodes.FirstOrDefault(n => n.Name == "link" && n.Attributes.Any(attr => attr.Name == "id" && attr.Value == "fonts"))?.Remove();
-                headNode?.ChildNodes.FirstOrDefault(n => n.Name == "meta" && n.Attributes.Any(attr => attr.Name == "id" && attr.Value == "viewport"))?.Remove();
-                headNode?.ChildNodes.FirstOrDefault(n => n.Name == "style" && n.Attributes.Any(attr => attr.Name == "id" && attr.Value == "style1"))?.Remove();
-
-                var bodyNode = htmlDocument.DocumentNode.SelectSingleNode("//body");
-                bodyNode?.Attributes.FirstOrDefault(attr => attr.Name == "contentEditable")?.Remove();
-                bodyNode?.ChildNodes.FirstOrDefault(n => n.Name == "div" && n.Attributes.Any(attr => attr.Name == "id" && attr.Value == "headerpadding"))?.Remove();
-
-                var editorNode = bodyNode?.SelectSingleNode("//div[@id='editor']");
-                editorNode?.Attributes.FirstOrDefault(attr => attr.Name == "contentEditable")?.Remove();
-
-                var previousContentNode = bodyNode?.SelectSingleNode("//div[@id='previousContent']");
-                previousContentNode?.Attributes.FirstOrDefault(attr => attr.Name == "contentEditable")?.Remove();
-
-                var html = htmlDocument.DocumentNode.OuterHtml;
-
-                html = PreMailer.Net.PreMailer.MoveCssInline(html, true, null, null, true, true).Html;
-
-                var p = new Processor();
-                p.Dom.OuterHtml = html;
-                html = p.Dom.ProcessToString(RuleSet.GetSafeHtmlRules(), null);
-
-                return html;
-            });
         }
 
         #endregion
@@ -1391,62 +1357,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             }
 
             template.Content = templateContent;
-        }
-
-        static string[] GetReplyHeaderParameters(DocumentPreview documentPreview, Document document)
-        {
-            var from = GetAddressTextFromPreviousDocument(documentPreview, document, DocumentAddressType.From);
-
-            var date = documentPreview.DateReceivedTimestamp
-                                      .ConvertTimestampMillisecondsToDateTime()
-                                      .ConvertUtcToUserTime()
-                                      .ConvertDateTimeToTimestampMilliseconds()
-                                      .FormatUserTimestampAsTimeAndDateString();
-            var to = GetAddressTextFromPreviousDocument(documentPreview, document, DocumentAddressType.To, DocumentAddressType.Cc);
-            var subject = documentPreview.Subject;
-
-            return new[] { from, date, to, subject };
-        }
-
-        static string GetAddressTextFromPreviousDocument(DocumentPreview documentPreview, Document document, params DocumentAddressType[] addressTypes)
-        {
-            if (documentPreview.Direction == DocumentDirection.Outgoing && addressTypes[0].Equals(DocumentAddressType.From))
-            {
-
-                var fromString = string.Empty;
-                switch (ServerConfig.SystemSettings.DocumentsModuleInfo.UseForFrom)
-                {
-                    case UseForFrom.LicenseName:
-                        fromString = ServerConfig.SystemSettings.SystemInfo.CustomerName;
-                        break;
-                    case UseForFrom.UserName:
-                        fromString = ServerConfig.SystemSettings.UserInfo.User.FullName;
-                        break;
-                    case UseForFrom.UserLogin:
-                        fromString = ServerConfig.SystemSettings.UserInfo.User.Username;
-                        break;
-                    case UseForFrom.LineName:
-                        fromString = document.Lines.Select(l => l.FromAddress).FirstOrDefault();
-                        break;
-                }
-                return fromString;
-            }
-
-            var sb = new StringBuilder();
-            var addresses = documentPreview.Addresses.Where(da => addressTypes.Contains(da.AddressType)).ToArray();
-            for (var i = 0; i < addresses.Length; i++)
-            {
-                var hasName = !string.IsNullOrWhiteSpace(addresses[i].Name);
-                if (hasName)
-                    sb.Append(addresses[i].Name).Append(" &lt;");
-                sb.Append(addresses[i].Address);
-                if (hasName)
-                    sb.Append("&gt;");
-                if (i < addresses.Length - 1)
-                    sb.Append(", ");
-            }
-
-            return sb.ToString();
         }
 
         class ImagePickerControllerDelegate : UIImagePickerControllerDelegate

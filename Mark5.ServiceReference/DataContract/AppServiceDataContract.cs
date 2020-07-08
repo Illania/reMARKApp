@@ -424,11 +424,11 @@ namespace Mark5.ServiceReference.DataContract
         [DataMember(Name = "ExtraFields", Order = 0)]
         public Dictionary<DocumentExtraFieldInfo, string> ExtraFields { get; set; } = new Dictionary<DocumentExtraFieldInfo, string>();
 
-        [DataMember(Name = "ICalendars", Order = 0)]
-        public List<ICalendarInfo> ICalendars = new List<ICalendarInfo>();
-
         [DataMember(Name = "IsEncrypted", Order = 0)]
         public bool IsEncrypted { get; set; }
+
+        [DataMember(Name = "Invitations", Order = 2)]
+        public List<CalendarInvitation> Invitations = new List<CalendarInvitation>();
     }
 
     [DataContract(Name = "DocumentPreview", Namespace = "com.nordic-it.appservice.v3")]
@@ -1514,17 +1514,98 @@ namespace Mark5.ServiceReference.DataContract
 
     #region ICalendar related
 
-    [DataContract(Name = "ICalendarInfo", Namespace = "com.nordic-it.appservice.v3")]
-    public class ICalendarInfo
+    [DataContract(Name = "ReplyToCalendarInvitationParameters", Namespace = "com.nordic-it.appservice.v3")]
+    public class ReplyToCalendarInvitationParameters : AbstractParameters
     {
-        [DataMember(Name = "Events", Order = 0)]
-        public List<IEventInfo> Events = new List<IEventInfo>();
+        [DataMember(Name = "Document", Order = 0)]
+        public Document Document { get; set; }
+
+        [DataMember(Name = "DocumentPreview", Order = 0)]
+        public DocumentPreview DocumentPreview { get; set; }
+
+        [DataMember(Name = "OriginalDocumentId", Order = 0)]
+        public int OriginalDocumentId { get; set; } = -1;
+
+        [DataMember(Name = "OriginalDocumentFolderId", Order = 0)]
+        public int OriginalDocumentFolderId { get; set; } = -1;
+
+        [DataMember(Name = "Invitation", Order = 0)]
+        public CalendarInvitation Invitation { get; set; }
+
+        [DataMember(Name = "Answer", Order = 0)]
+        public ParticipantStatus Answer { get; set; }
+
+        [DataMember(Name = "IsSilent", Order = 0)]
+        public bool IsSilent { get; set; }
+    }
+
+    [DataContract(Name = "ReplyToCalendarInvitationResult", Namespace = "com.nordic-it.appservice.v3")]
+    public class ReplyToCalendarInvitationResult
+    {
+        [DataMember(Name = "AppointmentId", Order = 0)]
+        public int AppointmentId { get; set; } = -1;
+
+        [DataMember(Name = "CalendarId", Order = 0)]
+        public int CalendarId { get; set; } = -1;
+    }
+
+    [DataContract(Name = "CalendarInvitation", Namespace = "com.nordic-it.appservice.v3")]
+    public class CalendarInvitation
+    {
+        [DataMember(Name = "Id", Order = 0)]
+        public string Id { get; set; }
+
+        [DataMember(Name = "AppointmentId", Order = 0)]
+        public int AppointmentId { get; set; }
+
+        [DataMember(Name = "CalendarId", Order = 0)]
+        public int CalendarId { get; set; }
+
+        [DataMember(Name = "StartDate", Order = 0)]
+        public DateTime StartDate { get; set; }
+
+        [DataMember(Name = "EndDate", Order = 0)]
+        public DateTime EndDate { get; set; }
+
+        [DataMember(Name = "SerializedTimeZoneInfo", Order = 0)]
+        public string SerializedTimeZoneInfo { get; set; }
+
+        [DataMember(Name = "Description", Order = 0)]
+        public string Description { get; set; }
+
+        [DataMember(Name = "Location", Order = 0)]
+        public string Location { get; set; }
+
+        [DataMember(Name = "Summary", Order = 0)]
+        public string Summary { get; set; }
+
+        [DataMember(Name = "RecurrenceInfo", Order = 0)]
+        public RecurrenceInfo RecurrenceInfo { get; set; }
 
         [DataMember(Name = "MethodType", Order = 0)]
         public MethodType MethodType { get; set; }
 
-        [DataMember(Name = "Reply", Order = 0)]
-        public IReplyInfo Reply { get; set; }
+        [DataMember(Name = "Status", Order = 0)]
+        public ParticipantStatus Status { get; set; }
+
+        [DataMember(Name = "Attendees", Order = 0)]
+        public List<Attendee> Attendees { get; set; } = new List<Attendee>();
+    }
+
+    [DataContract(Name = "Attendee", Namespace = "com.nordic-it.appservice.v3")]
+    public class Attendee
+    {
+        [DataMember(Name = "Name", Order = 0)]
+        public string Name { get; set; }
+
+        [DataMember(Name = "Status", Order = 0)]
+        public ParticipantStatus Status { get; set; }
+
+        [DataMember(Name = "Type", Order = 0)]
+        public ParticipantType Type { get; set; }
+
+        [DataMember(Name = "IsOrganizer", Order = 0)]
+        public bool IsOrganizer { get; set; }
     }
 
     [DataContract(Name = "MethodType", Namespace = "com.nordic-it.appservice.v3")]
@@ -1540,66 +1621,6 @@ namespace Mark5.ServiceReference.DataContract
         Publish = 3
     }
 
-    [DataContract(Name = "IEventInfo", Namespace = "com.nordic-it.appservice.v3")]
-    public sealed class IEventInfo
-    {
-        [DataMember(Name = "Id", Order = 0)]
-        public string Id { get; set; }
-
-        [DataMember(Name = "Attendees", Order = 0)]
-        public List<IAttendeeInfo> Attendees = new List<IAttendeeInfo>();
-
-        [DataMember(Name = "Description", Order = 0)]
-        public string Description { get; set; }
-
-        [DataMember(Name = "End", Order = 0)]
-        public DateTime End { get; set; }
-
-        [DataMember(Name = "Location", Order = 0)]
-        public string Location { get; set; }
-
-        [DataMember(Name = "Start", Order = 0)]
-        public DateTime Start { get; set; }
-
-        [DataMember(Name = "Summary", Order = 0)]
-        public string Summary { get; set; }
-    }
-
-    [DataContract(Name = "IAttendeeInfo", Namespace = "com.nordic-it.appservice.v3")]
-    public sealed class IAttendeeInfo
-    {
-        /// <summary> common name </summary>
-        [DataMember(Name = "CN", Order = 0)]
-        public string CN { get; set; }
-
-        [DataMember(Name = "RSVP", Order = 0)]
-        public bool RSVP { get; set; }
-
-        [DataMember(Name = "Status", Order = 0)]
-        public ParticipantStatus Status { get; set; }
-
-        [DataMember(Name = "Type", Order = 0)]
-        public ParticipantType Type { get; set; }
-
-        [DataMember(Name = "Url", Order = 0)]
-        public string Url { get; set; }
-
-        [DataMember(Name = "IsOrganizer", Order = 0)]
-        public bool IsOrganizer { get; set; }
-    }
-
-    [DataContract(Name = "IReplyInfo", Namespace = "com.nordic-it.appservice.v3")]
-    public sealed class IReplyInfo
-    {
-        [DataMember(Name = "AppId", Order = 0)]
-        public string AppId { get; set; }
-
-        [DataMember(Name = "FromAddress", Order = 0)]
-        public string FromAddress { get; set; }
-
-        [DataMember(Name = "Status", Order = 0)]
-        public ParticipantStatus Status { get; set; }
-    }
     #endregion
 
     #region Search

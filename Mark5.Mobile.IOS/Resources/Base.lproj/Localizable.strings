@@ -1,4 +1,6 @@
 ﻿"account" = "Account";
+"accept" = "Accept";
+"accepted" = "Accepted";
 "attention" = "Attention";
 "area" = "Area";
 "access_disabled" = "Your device does not have access enabled. Please contact your system administrator and restart the reMARK app.";
@@ -18,6 +20,7 @@
 "add_physical_address" = "add address";
 "add_to_favorites" = "Add to\nfavorites";
 "add_birthdate" = "add birthdate";
+"add_message" = "Add message (optional)";
 "adding_contact___" = "Adding contact...";
 "adding_comment___" = "Adding comment...";
 "adding_shortcode___" = "Adding mailing list...";
@@ -37,6 +40,7 @@
 "calendars" = "Calendars";
 "call" = "Call";
 "cancel" = "Cancel";
+"cancelled" = "Cancelled";
 "cannot_mail_report_content" = "There are no mail accounts configured on your device. You need to have an account configured before you can send feedback.";
 "cannot_mail_report_title" = "Cannot send report";
 "cannot_open_attachment_content" = "There is no app installed that can open this file.";
@@ -93,6 +97,8 @@
 "creator" = "Creator";
 "day" = "Day";
 "date" = "Date";
+"decline" = "Decline";
+"declined" = "Declined";
 "description" = "Description";
 "delete" = "Delete";
 "delete_draft" = "Delete draft";
@@ -218,6 +224,8 @@
 "last_downloaded_on" = "Last downloaded on: ";
 "ledger" = "Ledger";
 "line" = "Mailbox";
+"line_missing_title" = "Mailbox Missing";
+"line_missing_content" = "Please select a Mailbox from which to send the response";
 "loading_appointment___" = "Loading appointment...";
 "loading_appointments___" = "Loading appointments...";
 "loading_shortcode___" = "Loading mailing list...";
@@ -345,6 +353,7 @@
 "report" = "Report";
 "resend" = "Resend";
 "reset" = "Reset";
+"respond" = "Respond";
 "responsible_users" = "Responsible users";
 "restart_required_content" = "You need to restart reMARK, for this setting to take effect.";
 "restart_required_title" = "Restart required";
@@ -409,6 +418,8 @@
 "send_text" = "Send message";
 "sending_document___" = "Sending email...";
 "sending_inviations__" = "Sending invitations...";
+"sending_response__" = "Sending response...";
+"sending_reply___" = "Sending reply...";
 "send_with_mark5_title" = "Send with reMARK?";
 "send_feedback_with_mark5_content" = "Do you want to send feedback with reMARK?";
 "send_report_with_mark5_content" = "Do you want to send the generated report with reMARK? 
@@ -437,6 +448,8 @@ Please note that these reports are not monitored 24/7 and will be available to d
 "take_photo" = "Capture new photo";
 "tap_select_line" = "Tap to select a mailbox";
 "telex" = "Telex";
+"tentative" = "Tentative";
+"tentatively_accepted" = "Tentatively accepted";
 "templates" = "Templates";
 "template_attachment_title" = "Attachment from template";
 "template_attachment_content" = "It is not possible to open attachments from templates";

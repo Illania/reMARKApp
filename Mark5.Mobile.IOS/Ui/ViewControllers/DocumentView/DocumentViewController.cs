@@ -173,7 +173,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             editDocumentButtonItem = null;
 
             headerView.RemoveFromSuperview();
-
             headerView = null;
         }
 
@@ -260,6 +259,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 headerView.BeginAnimating += HeaderView_BeginAnimating;
                 headerView.Animating += HeaderView_Animating;
                 headerView.EndAnimating += HeaderView_EndAnimating;
+                headerView.AppointmentReplyTapped += HeaderView_AppointmentReplyTapped;
             }
 
             if (flagButton != null)
@@ -280,56 +280,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 editDocumentButtonItem.Clicked += EditDocumentButtonItem_Clicked;
         }
 
-        /*
-         *  Working silent ICalendar reply Document/DocumentPreview mock object
-         *
-        async Task HeaderView_ICalendarResponseTappedAsync(object sender, ICalendarResponseTapped e)
+        private async void HeaderView_AppointmentReplyTapped(object sender, EventArgs e)
         {
-            try
+            var invitation = document.Invitations.First();
+            var line = LineUtilities.GetLineForCreationModeFlag(DocumentCreationModeFlag.Reply, document, PlatformConfig.Preferences.AlwaysUseDefaultLine);
+            var appointmentReplyVC = new InvitationReplyViewController(invitation.Status, line)
             {
-                Document mockDocument = new Document
-                {
-                    Lines = new List<Line> { ServerConfig.SystemSettings.DocumentsModuleInfo.DefaultOutgoingLine },
-                    HtmlBody = ""
-                };
+                ModalPresentationStyle = UIModalPresentationStyle.OverFullScreen,
+                ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve
+            };
 
-                List<DocumentAddress> addresses = new List<DocumentAddress>();
+            NavigationController.PresentViewController(appointmentReplyVC, true, null);
 
-                addresses = documentPreview.Addresses.Where(x => x.AddressType == DocumentAddressType.From).ToList();
+            InvitationReplyDetailViewModel detailsModel = await appointmentReplyVC.Result;
 
-                addresses.ForEach(x =>
-                {
-                    x.Type = CommunicationAddressType.Email;
-                    x.AddressType = DocumentAddressType.To;
-                });
-
-                DocumentPreview mockDocumentPreview = new DocumentPreview
-                {
-                    Direction = DocumentDirection.Outgoing,
-                    Addresses = addresses,
-                    Subject = ""
-                };
-
-                await Managers.DocumentsManager.SaveDocumentWorkingCopyAsync(new DocumentWorkingCopy
-                {
-                    DocumentCreationModeFlag = DocumentCreationModeFlag.Reply,
-                    CopyToNewOption = CopyToNewOption.None,
-                    PreviousDocumentFolderId = folderId ?? folder?.Id,
-                    PreviousDocumentId = documentPreview.Id,
-                    PreviousDocumentDirection = documentPreview.Direction,
-                    DocumentPreview = mockDocumentPreview,
-                    Document = mockDocument,
-                    IEventReply = new IEventReply(document, ParticipantStatus.Accepted, true)
-                });
-
-                await Managers.DocumentsManager.QueueWorkingCopyToUpload();
-            }
-            catch (Exception ex)
-            {
-                CommonConfig.Logger.Error($"Exception thrown in HeaderView_ICalendarResponseTappedAsync", ex);
-            }
+            if (detailsModel != null)
+                await SendInvitationReply(sender as CalendarInvitationView, invitation, detailsModel);
         }
-        */
 
         void DeinitializeHandlers()
         {
@@ -1126,6 +1093,92 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 dismissAction();
 
                 CommonConfig.Logger.Error($"Error while deleting document [documentId={document.Id}]", ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
+            }
+        }
+
+        async Task SendInvitationReply(CalendarInvitationView cv, CalendarInvitation invitation, InvitationReplyDetailViewModel vm)
+        {
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("sending_reply___"));
+
+            try
+            {
+                CommonConfig.Logger.Info($"Attempting to reply to calendar invitation for document [documentId={document.Id}]");
+
+
+                var responseDocument = new Document();
+                var responseDocumentPreview = new DocumentPreview();
+
+                //Line
+                responseDocument.Lines = new List<Line> { vm.Line };
+
+                //Body
+                string previousDocumentContent = string.Empty;
+
+                if (!string.IsNullOrWhiteSpace(document?.HtmlBody))
+                {
+                    var config = HtmlProcessingConfiguration.DefaultForEditing;
+                    config.InjectReplyHeader = true;
+                    config.ReplyHeaderParameters = HtmlUtilities.GetReplyHeaderParameters(documentPreview, document);
+                    previousDocumentContent = await HtmlUtilities.ProcessHtml(document.HtmlBody, config);
+                }
+                else if (!string.IsNullOrWhiteSpace(document?.PlainTextBody))
+                {
+                    var config = PlainTextProcessingConfiguration.DefaultForEditing;
+                    config.InjectReplyHeader = true;
+                    config.ReplyHeaderParameters = HtmlUtilities.GetReplyHeaderParameters(documentPreview, document);
+                    previousDocumentContent = await HtmlUtilities.ProcessPlainText(document.PlainTextBody, config);
+                }
+
+                responseDocument.HtmlBody = await HtmlUtilities.MergeReplyWithPreviousDocument(vm.Message, previousDocumentContent);
+
+                //Subject
+                var responseSubjectString = string.Empty;
+                switch (vm.Status)
+                {
+                    case ParticipantStatus.Accepted:
+                        responseSubjectString = "ACCEPTED: ";
+                        break;
+                    case ParticipantStatus.Declined:
+                        responseSubjectString = "DECLINED: ";
+                        break;
+                    case ParticipantStatus.Tentative:
+                        responseSubjectString = "TENTATIVE: ";
+                        break;
+                    default:
+                        break;
+                }
+
+                responseDocumentPreview.Subject = responseSubjectString + documentPreview.Subject;
+
+                //Addresses
+                documentPreview.Addresses.Where(x => x.AddressType == DocumentAddressType.From).ToList().ForEach(da =>
+                {
+                    var address = new DocumentAddress
+                    {
+                        Address = da.Address,
+                        Name = da.Name,
+                        Type = CommunicationAddressType.Email,
+                        AddressType = DocumentAddressType.To
+                    };
+                    responseDocumentPreview.Addresses.Add(address);
+                });
+
+                responseDocumentPreview.Direction = DocumentDirection.Outgoing;
+
+                await Managers.DocumentsManager.ReplyToCalendarInvitationAsync(responseDocument, responseDocumentPreview,
+                    invitation, vm.Status, string.IsNullOrEmpty(vm.Message), document.Id, folder?.Id ?? folderId ?? 0);
+
+                invitation.Status = vm.Status;
+                cv.RefreshView();
+
+                dismissAction();
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Error while replying to calendar invitation for document [documentId={document.Id}]", ex);
                 await Dialogs.ShowErrorAlertAsync(this, ex);
             }
         }

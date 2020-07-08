@@ -50,7 +50,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 scrollView.TopAnchor.ConstraintEqualTo(titleLabel.BottomAnchor, 1f),
                 scrollView.LeftAnchor.ConstraintEqualTo(ContainerView.LeftAnchor),
                 scrollView.RightAnchor.ConstraintEqualTo(ContainerView.RightAnchor),
-                scrollView.BottomAnchor.ConstraintEqualTo(ContainerView.BottomAnchor),
+                scrollView.BottomAnchor.ConstraintEqualTo(ContainerView.BottomAnchor, -10f),
             });
 
             stackView = new UIStackView

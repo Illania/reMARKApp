@@ -33,6 +33,10 @@ namespace Mark5.Mobile.Common.Manager
 
         Task SetDocumentsPriorityAsync(List<DocumentPreview> documentPreviews, Priority priority, SourceType sourceType = SourceType.Auto);
 
+        Task ReplyToCalendarInvitationAsync(Document document, DocumentPreview documentPreview, CalendarInvitation invitation,
+            ParticipantStatus answer, bool isSilent, int originalDocumentId, int originalDocumentFolderId,
+            SourceType sourceType = SourceType.Auto);
+
         Task MoveToSpamAsync(List<DocumentPreview> documentPreviews, SourceType sourceType = SourceType.Auto);
 
         Task<List<TemplatePreview>> GetTemplatePreviewsAsync(SourceType sourceType = SourceType.Auto);

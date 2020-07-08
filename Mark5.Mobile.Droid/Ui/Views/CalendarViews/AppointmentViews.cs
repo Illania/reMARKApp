@@ -333,7 +333,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AppointmentViews
                 appCompatImageButton = new AppCompatImageView(Context)
                 {
                     Clickable = false,
-                    LayoutParameters = new LayoutParams(Conversion.ConvertDpToPixels(20), Conversion.ConvertDpToPixels(20), 0.2f)
+                    LayoutParameters = new LayoutParams(Conversion.ConvertDpToPixels(20), Conversion.ConvertDpToPixels(20))
                     {
                         Gravity = (int)GravityFlags.CenterVertical | (int)GravityFlags.Left
                     }
@@ -348,7 +348,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AppointmentViews
                 label = new AppCompatTextView(Context)
                 {
                     Gravity = GravityFlags.Left,
-                    LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent, 0.8f)
+                    LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
+                    {
+                        Gravity = (int)GravityFlags.CenterVertical
+                    }
                 };
 
                 label.SetTextAppearanceCompat(context, Resource.Style.editAppointmentText);
@@ -370,10 +373,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AppointmentViews
                         appCompatImageButton.SetImageResource(Resource.Drawable.icon_check);
                         break;
                     case Mobile.Common.Model.ParticipantStatus.Invited:
+                    case Mobile.Common.Model.ParticipantStatus.Inviting:
                     case Mobile.Common.Model.ParticipantStatus.NeedAction:
+                    case Mobile.Common.Model.ParticipantStatus.Tentative:
                         appCompatImageButton.SetImageResource(Resource.Drawable.icon_question);
                         break;
-                    case Mobile.Common.Model.ParticipantStatus.Tentative:
                     case Mobile.Common.Model.ParticipantStatus.Declined:
                         appCompatImageButton.SetImageResource(Resource.Drawable.icon_cross);
                         break;

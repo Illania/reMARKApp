@@ -30,7 +30,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public CategoriesListViewController(BusinessEntityPreview businessEntityPreview) : base(UITableViewStyle.Grouped)
         {
-            this.BusinessEntityPreview = businessEntityPreview;
+            BusinessEntityPreview = businessEntityPreview;
             if (businessEntityPreview is DocumentPreview documentPreview)
             {
                 categories.AddRange(documentPreview.Categories);

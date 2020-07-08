@@ -9,7 +9,7 @@ using Mark5.Mobile.Droid.Model;
 using Mark5.Mobile.Droid.Utilities;
 using Newtonsoft.Json;
 
-namespace Mark5.Mobile.IOS.Utilities.Extensions
+namespace Mark5.Mobile.Droid.Utilities.Extensions
 {
     public static class WebViewExtensions
     {
