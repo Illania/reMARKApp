@@ -19,7 +19,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             base.ViewDidLoad();
 
             schedule.AppointmentMapping = GetAppointmentMapping();
-            schedule.ItemsSource = Coordinator.Items;
+            UpdateSource();
         }
 
         public void MoveToDate(NSDate date)
@@ -29,6 +29,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 schedule.MoveToDate(date);
                 schedule.SelectedDate = date;
             }
+        }
+
+        public void UpdateSource()
+        {
+            schedule.ItemsSource = Coordinator.Items;
         }
 
         public static AppointmentMapping GetAppointmentMapping()
