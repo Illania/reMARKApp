@@ -13,6 +13,7 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Service;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
+using Mark5.ServiceReference.Exceptions;
 using UIKit;
 using UserNotifications;
 
@@ -726,8 +727,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (Dialogs.IsAccessDisabled(ex))
                     await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("login_failed"), Localization.GetString("login_failed_access_disabled"));
+                else if (IsAcountLocked(ex))
+                    await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("login_failed"), Localization.GetString("login_failed_account_locked"));
                 else
-                await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("login_failed"), Localization.GetString("login_failed_desc"));
+                    await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("login_failed"), Localization.GetString("login_failed_desc"));
 
                 hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Error);
 
@@ -798,6 +801,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             loginButton.Enabled = result;
             loginButton.Alpha = result ? 1f : 0.7f;
+        }
+
+        public static bool IsAcountLocked(Exception ex)
+        {
+            if (ex is HttpAppServiceException httpEx)
+            {
+                var code = httpEx?.Detail?.Code;
+
+                return code == AppServiceFaultCode.PasswordPolicyError;
+            }
+
+            return false;
         }
 
         #endregion
