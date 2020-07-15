@@ -18,7 +18,7 @@
         <item>Open attachment</item>
         <item>Remove attachment</item>
     </string-array>
-        <string name="access_disabled">Your device does not have access enabled. Please contact your system administrator and restart the reMARK app.</string>
+    <string name="access_disabled">Your device does not have access enabled. Please contact your system administrator and restart the reMARK app.</string>
     <string name="app_name">reMARK</string>
     <string name="attachment_cannot_be_opened_summary">There are no apps installed on this device, that can open this type of attachment.</string>
     <string name="attachment_cannot_be_opened_title">Attachment cannot be opened</string>
@@ -271,6 +271,7 @@
     <string name="loading_shortcode">Loading mailing list</string>
     <string name="log_in">Log in</string>
     <string name="log_in_failed_message_access_disabled">Your device does not have access enabled. Please contact your system administrator</string>
+    <string name="log_in_failed_message_account_locked">Account locked. Please contact your system administrator.</string>
     <string name="log_in_failed_message">Please check your credentials and try again</string>
     <string name="log_in_failed_title">Log in failed</string>
     <string name="logging_in">Logging in</string>

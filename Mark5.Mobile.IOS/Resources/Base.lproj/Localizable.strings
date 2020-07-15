@@ -242,6 +242,7 @@
 "login_failed" = "Login failed";
 "login_failed_desc" = "Could not log in to reMARK. Please check your username, password and server address.\n\nYou may also want to verify SSL settings, by tapping Settings in top right corner of the screen.";
 "login_failed_access_disabled" = "Your device does not have access enabled. Please contact your system administrator and restart the reMARK app.";
+"login_failed_account_locked" = "Account locked. Please contact your system administrator.";
 "low" = "Low";
 "mark5_server_reachability" = "reMARK server: ";
 "mark5_ios_system_report" = "reMARK iOS System Report";

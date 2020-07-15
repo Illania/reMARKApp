@@ -21,6 +21,7 @@ using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 using Mark5.Mobile.Droid.Utilities.DeviceReminder;
 using Mark5.Mobile.Droid.Utilities.Workers;
+using Mark5.ServiceReference.Exceptions;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
@@ -364,6 +365,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 if (Dialogs.IsAccessDisabled(ex))
                     await Dialogs.ShowConfirmDialogAsync(this, Resource.String.log_in_failed_title, Resource.String.log_in_failed_message_access_disabled);
+                else if (IsAcountLocked(ex))
+                    await Dialogs.ShowConfirmDialogAsync(this, Resource.String.log_in_failed_title, Resource.String.log_in_failed_message_account_locked);
                 else
                     await Dialogs.ShowConfirmDialogAsync(this, Resource.String.log_in_failed_title, Resource.String.log_in_failed_message);
             }
@@ -371,6 +374,18 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 btn.Clickable = true;
             }
+        }
+
+        public static bool IsAcountLocked(Exception ex)
+        {
+            if (ex is HttpAppServiceException httpEx)
+            {
+                var code = httpEx?.Detail?.Code;
+
+                return code == AppServiceFaultCode.PasswordPolicyError;
+            }
+
+            return false;
         }
 
         void SendPushNotificationToken()
