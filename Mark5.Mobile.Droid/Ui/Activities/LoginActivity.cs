@@ -317,7 +317,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     CommonConfig.Logger.Info("Retrieving system settings...");
 
                     ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync();
-                    SystemSettingsJobService.ScheduleJob();
+                    SystemSettingsWorker.Schedule();
 
                     await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
 
