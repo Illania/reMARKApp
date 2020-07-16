@@ -36,6 +36,7 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
             fragmentManager = a.SupportFragmentManager;
 
             uiCache = new UICache();
+            uiCache.SourceUpdated += UiCache_SourceUpdated;
             presenter = new CalendarPresenter();
             presenter.AttachView(this);
             presenter.Start();
@@ -210,9 +211,20 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
 
         #endregion
 
+        #region UICache event handlers
+
+        void UiCache_SourceUpdated(object sender, EventArgs e)
+        {
+            monthCalendarFragment.UpdateSource();
+        }
+
+        #endregion
+
         class UICache
         {
-            public ObservableCollection<Appointment> Items { get; } = new ObservableCollection<Appointment>();
+            public event EventHandler SourceUpdated = delegate { };
+
+            public ObservableCollection<Appointment> Items { get; private set; } = new ObservableCollection<Appointment>();
 
             List<AppointmentPreviewViewModel> AppointmentViewModels { get; } = new List<AppointmentPreviewViewModel>();
             List<CalendarViewModel> CalendarViewModels { get; } = new List<CalendarViewModel>();
@@ -220,18 +232,10 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
 
             public void CacheAppointments(IEnumerable<AppointmentPreviewViewModel> appointmentViewModels, DateTime start, DateTime end)
             {
-                CommonConfig.Logger.Debug($"PERIOD : {start} - {end}");
                 AppointmentViewModels.Where(i => AppointmentIsInPeriod(i, start, end)).ToList().ForEach((obj) => AppointmentViewModels.Remove(obj));
                 AppointmentViewModels.AddRange(appointmentViewModels);
 
-                MainThread.BeginInvokeOnMainThread(() =>
-                {
-                    Items.Where(i => AppointmentIsInPeriod(i, start, end)).ToList().ForEach((obj) => Items.Remove(obj));
-                    foreach (var caViewModel in AppointmentsInSelectedCalendars(appointmentViewModels))
-                    {
-                        Items.Add(Convert(caViewModel));
-                    }
-                });
+                UpdateSchedule();
             }
 
             public void UpdateSchedule()
@@ -242,10 +246,12 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
                 MainThread.BeginInvokeOnMainThread(() =>
                 {
                     Items.Clear();
-                    foreach (var item in AppointmentsInSelectedCalendars(AppointmentViewModels))
-                    {
-                        Items.Add(Convert(item));
-                    }
+                    var newItems = new ObservableCollection<Appointment>();
+                    foreach (var caViewModel in AppointmentsInSelectedCalendars(AppointmentViewModels))
+                        newItems.Add(Convert(caViewModel));
+
+                    Items = newItems;
+                    SourceUpdated(this, EventArgs.Empty);
                 });
             }
 

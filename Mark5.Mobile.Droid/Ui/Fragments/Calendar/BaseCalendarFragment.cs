@@ -75,7 +75,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             (Activity as BaseAppCompatActivity).Fab.Visibility = ViewStates.Gone;
 
             schedule.VisibleDatesChanged += Schedule_VisibleDatesChanged;
-            schedule.ItemsSource = coordinator.Items;
+            UpdateSource();
         }
 
         public override void OnPause()
@@ -99,6 +99,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 schedule.MoveToDate = date;
                 schedule.SelectedDate = date;
             }
+        }
+
+        public void UpdateSource()
+        {
+            schedule.ItemsSource = coordinator.Items;
         }
 
         public static AppointmentMapping GetAppointmentMapping()
