@@ -167,7 +167,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 if (!String.IsNullOrEmpty(ServerConfig.SystemSettings.SystemInfo.CustomerName))
                     CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.CustomerName, ServerConfig.SystemSettings.SystemInfo.CustomerName);
 
-                SystemSettingsJobService.ScheduleJob();
+                SystemSettingsWorker.Schedule();
 
                 LocalNotificationsListener.Initialize();
 

@@ -44,7 +44,7 @@
     <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
     <NoWarn>
     </NoWarn>
-    <AndroidDexTool>dx</AndroidDexTool>
+    <AndroidDexTool>d8</AndroidDexTool>
     <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -567,7 +567,6 @@
     <Compile Include="Model\PlainTextProcessingConfiguration.cs" />
     <Compile Include="Utilities\HtmlUtilities.cs" />
     <Compile Include="Utilities\Extensions\WebViewExtensions.cs" />
-    <Compile Include="Utilities\SystemSettingsJobService.cs" />
     <Compile Include="Utilities\Fingerprint\FingerprintUiHelper.cs" />
     <Compile Include="Utilities\ApplicationLifecycleHandler.cs" />
     <Compile Include="Ui\Fragments\AuthenticationDialogFragment.cs" />
@@ -612,6 +611,7 @@
     <Compile Include="Ui\Views\DocumentViews\CalendarInvitationView.cs" />
     <Compile Include="Ui\Views\DocumentViews\InvitationReplyModalView.cs" />
     <Compile Include="Utilities\LineUtilities.cs" />
+    <Compile Include="Utilities\Worker\SystemSettingsWorker.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
