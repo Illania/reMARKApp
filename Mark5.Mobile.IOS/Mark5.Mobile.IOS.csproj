@@ -688,6 +688,8 @@
 		<ImageAsset Include="Assets_icons.xcassets\Priority-High.imageset\Contents.json" />
 		<ImageAsset Include="Assets_icons.xcassets\Priority-High.imageset\high_priority.pdf" />
 		<ImageAsset Include="Assets_icons.xcassets\Priority-Low.imageset\low_priority.pdf" />
+		<ImageAsset Include="Assets_icons.xcassets\AzureLogin.imageset\Contents.json" />
+		<ImageAsset Include="Assets_icons.xcassets\AzureLogin.imageset\azure_login_dark.pdf" />
 	</ItemGroup>
 	<ItemGroup>
 		<BundleResource Include="Resources\Base.lproj\Localizable.strings" />
@@ -808,6 +810,7 @@
 	  <Folder Include="Assets_icons.xcassets\Pr.imageset\" />
 	  <Folder Include="Assets_icons.xcassets\Password-Show.imageset\" />
 	  <Folder Include="Assets_icons.xcassets\Password-Hide.imageset\" />
+	  <Folder Include="Assets_icons.xcassets\AzureLogin.imageset\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 	<Import Project="..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets" Condition="Exists('..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets')" />

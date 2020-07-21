@@ -26,6 +26,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         const float TextFieldToAnimationViewDistance = 50;
         const float TextFieldToTextFieldDistance = 10f;
         const float LoginButtonToTextFieldDistance = 20f;
+        const float LoginButtonToAzureLoginButtonDistance = 20f;
 
         const float TextFieldWidth = 180f;
         const float TextFieldHeight = 28f;
@@ -48,6 +49,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UITextField portTextField;
         UIButton showPasswordButton;
         UIButton loginButton;
+        UIButton loginWithAzureButton;
 
         NSLayoutConstraint containerCenter;
 
@@ -75,7 +77,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.LoadView();
 
             InitializeView();
-            InitializeSubViews();
+            try
+            {
+                InitializeSubViews();
+
+            }
+            catch (Exception ex)
+            {
+
+            }
         }
 
         public override void ViewWillAppear(bool animated)
@@ -273,7 +283,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             FlipShowHidePasswordImage(passwordTextField.SecureTextEntry);
             showPasswordButton.ContentEdgeInsets = new UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 5);
             showPasswordButton.ImageView.ContentMode = UIViewContentMode.ScaleAspectFit;
-           
+
             passwordTextField.RightViewMode = UITextFieldViewMode.Always;
             passwordTextField.RightView = showPasswordButton;
 
@@ -340,7 +350,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 loginButton.CenterXAnchor.ConstraintEqualTo(usernameTextField.CenterXAnchor),
                 loginButton.WidthAnchor.ConstraintEqualTo(LoginButtonWidth),
                 loginButton.HeightAnchor.ConstraintEqualTo(LoginButtonHeight),
-                loginButton.BottomAnchor.ConstraintEqualTo(containerView.BottomAnchor),
+            });
+
+            loginWithAzureButton = new UIButton();
+            loginWithAzureButton.SetImage(UIImage.FromBundle("AzureLogin"), UIControlState.Normal);
+            loginWithAzureButton.TranslatesAutoresizingMaskIntoConstraints = false;
+            loginWithAzureButton.Alpha = 0;
+            loginWithAzureButton.Enabled = true;
+            containerView.AddSubview(loginWithAzureButton);
+            containerView.AddConstraints(new[]
+            {
+                loginWithAzureButton.TopAnchor.ConstraintEqualTo(loginButton.BottomAnchor, LoginButtonToAzureLoginButtonDistance),
+                loginWithAzureButton.CenterXAnchor.ConstraintEqualTo(usernameTextField.CenterXAnchor),
+                //loginWithAzureButton.WidthAnchor.ConstraintEqualTo(LoginButtonWidth),
+                //loginWithAzureButton.HeightAnchor.ConstraintEqualTo(LoginButtonHeight),
+                loginWithAzureButton.BottomAnchor.ConstraintEqualTo(containerView.BottomAnchor),
             });
         }
 
@@ -356,7 +380,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 imgPasswordHide.ApplyTintColor(UIColor.White);
             }
             else
-            {   
+            {
                 imgPasswordShow = GetTintedImageForiOS12(imgPasswordShow);
                 imgPasswordHide = GetTintedImageForiOS12(imgPasswordHide);
             }
@@ -423,6 +447,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                      passwordTextField.Alpha = 1;
                      portTextField.Alpha = 1;
                      loginButton.Alpha = 0.7f;
+                     loginWithAzureButton.Alpha = 1f;
                  });
              });
         }
