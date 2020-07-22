@@ -7,6 +7,7 @@ using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Manager;
+using Mark5.Mobile.Common.MicrosoftAuthenticator;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Service;
 using Mark5.Mobile.Common.Utilities;
@@ -362,8 +363,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 loginWithAzureButton.TopAnchor.ConstraintEqualTo(loginButton.BottomAnchor, LoginButtonToAzureLoginButtonDistance),
                 loginWithAzureButton.CenterXAnchor.ConstraintEqualTo(usernameTextField.CenterXAnchor),
-                //loginWithAzureButton.WidthAnchor.ConstraintEqualTo(LoginButtonWidth),
-                //loginWithAzureButton.HeightAnchor.ConstraintEqualTo(LoginButtonHeight),
                 loginWithAzureButton.BottomAnchor.ConstraintEqualTo(containerView.BottomAnchor),
             });
         }
@@ -481,6 +480,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return true;
             };
             loginButton.TouchUpInside += LoginButton_TouchUpInside;
+            loginWithAzureButton.TouchUpInside += LoginWithAzureButton_TouchUpInside;
             showPasswordButton.TouchUpInside += ShowPasswordButton_TouchUpInside;
         }
 
@@ -496,6 +496,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             portTextField.EditingChanged -= TextField_EditingChanged;
             portTextField.ShouldReturn = null;
             loginButton.TouchUpInside -= LoginButton_TouchUpInside;
+            loginWithAzureButton.TouchUpInside -= LoginWithAzureButton_TouchUpInside;
             showPasswordButton.TouchUpInside -= ShowPasswordButton_TouchUpInside;
         }
 
@@ -531,6 +532,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         #endregion
 
         #region Actions
+
+        private async void LoginWithAzureButton_TouchUpInside(object sender, EventArgs e)
+        {
+            var ms = new MicrosoftAuthService();
+            await ms.DoAuthentication(this);
+        }
 
         async void LoginButton_TouchUpInside(object sender, EventArgs e)
         {
