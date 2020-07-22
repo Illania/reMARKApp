@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Mark5.Mobile.Common.Model;
 using Microsoft.Identity.Client;
 using Newtonsoft.Json;
 
@@ -46,7 +48,7 @@ namespace Mark5.Mobile.Common.MicrosoftAuthenticator
                 }
                 catch (MsalUiRequiredException)
                 {
-                    //The login needs to be interactive
+                    //The login needs to be interactive, nothing to do
                 }
             }
 
@@ -65,7 +67,7 @@ namespace Mark5.Mobile.Common.MicrosoftAuthenticator
             }
         }
 
-        public async Task<MicrosoftUser> GetCurrentUser()
+        public async Task<MicrosoftUser> GetMicrosoftUser()
         {
             using var client = new HttpClient();
             var message = new HttpRequestMessage(HttpMethod.Get, GraphCurrentUserUrl);
@@ -82,11 +84,31 @@ namespace Mark5.Mobile.Common.MicrosoftAuthenticator
             return currentUser;
         }
 
+        public async Task<List<MicrosoftConnectionInfo>> GetMicrosoftConnectionInfoList()
+        {
+            //TODO this function needs to be modified, this is only for testing
+            var connectionInfo = new MicrosoftConnectionInfo
+            {
+                Hostname = "hostname",
+                Port = "port",
+                SslMode = SslMode.On
+            };
+
+            return new List<MicrosoftConnectionInfo> { connectionInfo };
+        }
+
         public class MicrosoftUser
         {
             public string Id { get; set; }
             public string DisplayName { get; set; }
             public string Mail { get; set; }
+        }
+
+        public class MicrosoftConnectionInfo
+        {
+            public string Hostname { get; set; }
+            public string Port { get; set; }
+            public SslMode SslMode { get; set; }
         }
 
     }
