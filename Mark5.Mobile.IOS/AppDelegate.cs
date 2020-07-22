@@ -27,6 +27,7 @@ using Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews;
 using Mark5.Mobile.IOS.Utilities;
 using Microsoft.AppCenter;
 using Microsoft.AppCenter.Crashes;
+using Microsoft.Identity.Client;
 using ModernHttpClient;
 using PCLStorage;
 using TinyMessenger;
@@ -89,6 +90,13 @@ namespace Mark5.Mobile.IOS
             }
 
             return false; // Always return false to pass handling of notifications to FinishedLaunching
+        }
+
+        //This function is necessary for Microsoft Authentication
+        public override bool OpenUrl(UIApplication app, NSUrl url, NSDictionary options)
+        {
+            AuthenticationContinuationHelper.SetAuthenticationContinuationEventArgs(url);
+            return true;
         }
 
         public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
