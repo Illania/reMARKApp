@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Microsoft.Graph;
 using Microsoft.Identity.Client;
 
 namespace Mark5.Mobile.Common.MicrosoftAuthenticator
@@ -11,7 +13,9 @@ namespace Mark5.Mobile.Common.MicrosoftAuthenticator
         string RedirectURI = "msauth.com.nordic-it.mark5.mobile.ios://auth"; //TODO it is different for Android
         string[] Scopes = { "User.Read" };
 
+        GraphServiceClient GraphClient;
         IPublicClientApplication pca;
+        IAccount account;
 
         public MicrosoftAuthService()
         {
@@ -30,8 +34,8 @@ namespace Mark5.Mobile.Common.MicrosoftAuthenticator
                 try
                 {
 
-                    var firstAccount = accounts.FirstOrDefault();
-                    var authResult = await pca.AcquireTokenSilent(Scopes, firstAccount).ExecuteAsync();
+                    account = accounts.FirstOrDefault();
+                    var authResult = await pca.AcquireTokenSilent(Scopes, account).ExecuteAsync();
                     token = authResult.AccessToken;
                 }
                 catch (MsalUiRequiredException)
@@ -44,7 +48,10 @@ namespace Mark5.Mobile.Common.MicrosoftAuthenticator
                                                     .ExecuteAsync();
 
                         if (authResult != null)
+                        {
                             token = authResult.AccessToken;
+                            account = authResult.Account;
+                        }
                     }
                     catch (Exception)
                     {
@@ -58,6 +65,26 @@ namespace Mark5.Mobile.Common.MicrosoftAuthenticator
             }
             //return token;
 
+        }
+
+        private async Task InitializeGraphClientAsync()
+        {
+            try
+            {
+                // Initialize Graph client
+                GraphClient = new GraphServiceClient(new DelegateAuthenticationProvider(
+                    async (requestMessage) =>
+                    {
+                        var result = await pca.AcquireTokenSilent(Scopes, account)
+                            .ExecuteAsync();
+
+                        requestMessage.Headers.Authorization =
+                            new AuthenticationHeaderValue("Bearer", result.AccessToken);
+                    }));
+            }
+            catch (Exception ex)
+            {
+            }
         }
     }
 }
