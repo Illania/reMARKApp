@@ -7,13 +7,16 @@ using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
 using Microsoft.Identity.Client;
 using Newtonsoft.Json;
+using Xamarin.Essentials;
 
 namespace Mark5.Mobile.Common.Azure
 {
     public class MicrosoftAuthService
     {
         readonly string clientId = "ca4a3013-2f7f-4733-aa6c-126c8d34216f";
-        readonly string redirectURI = "msauth.com.nordic-it.mark5.mobile.ios://auth"; //TODO it is different for Android
+        readonly string iosRedirectURI = "msauth.com.nordic-it.mark5.mobile.ios://auth";
+        readonly string androidRedirectUURI = "msauth://com.nordic_it.mark5.android/dUOzGWwhv%2BzH%2F6bxqKb4ZlnNC8M%3D";
+
         readonly string[] scopes = { "User.Read" };
 
         private static readonly string graphApiUrl = "https://graph.microsoft.com/v1.0";
@@ -25,10 +28,19 @@ namespace Mark5.Mobile.Common.Azure
 
         public MicrosoftAuthService()
         {
-            pca = PublicClientApplicationBuilder.Create(clientId)
-                                    .WithRedirectUri(redirectURI)
-                                    .WithIosKeychainSecurityGroup("com.microsoft.adalcache")
-                                    .Build();
+            if (DeviceInfo.Platform == DevicePlatform.iOS)
+            {
+                pca = PublicClientApplicationBuilder.Create(clientId)
+                        .WithRedirectUri(iosRedirectURI)
+                        .WithIosKeychainSecurityGroup("com.microsoft.adalcache")
+                        .Build();
+            }
+            else if (DeviceInfo.Platform == DevicePlatform.Android)
+            {
+                pca = PublicClientApplicationBuilder.Create(clientId)
+                        .WithRedirectUri(androidRedirectUURI)
+                        .Build();
+            }
         }
 
         public async Task Authenticate(object parentWindow, bool forceInteractive = false)

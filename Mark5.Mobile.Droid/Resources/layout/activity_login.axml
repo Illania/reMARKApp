@@ -102,13 +102,19 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:layout_marginLeft="8dp" />
+            <android.support.v7.widget.AppCompatImageButton
+                android:id="@+id/sign_microsoft_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom | right"
+                android:src="@drawable/sign_microsoft_light" />
         </android.support.v7.widget.LinearLayoutCompat>
     </android.support.v4.widget.NestedScrollView>
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/login_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center_horizontal"
+        android:layout_gravity="bottom|left"
         android:layout_margin="@dimen/fab_margin"
         android:visibility="visible"
         app:backgroundTint="@color/lightblue"

@@ -28,7 +28,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         const float TextFieldToAnimationViewDistance = 50;
         const float TextFieldToTextFieldDistance = 10f;
         const float LoginButtonToTextFieldDistance = 20f;
-        const float LoginButtonToMicrosoftLoginButtonDistance = 20f;
+        const float OrLabelToLoginButtonDistance = 15f;
+        const float LoginWithMicrosoftButtonToOrLabelDistance = 20f;
 
         const float TextFieldWidth = 180f;
         const float TextFieldHeight = 28f;
@@ -49,6 +50,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UITextField hostnameTextField;
         UITextField passwordTextField;
         UITextField portTextField;
+        UILabel orLabel;
         UIButton showPasswordButton;
         UIButton loginButton;
         UIButton loginWithMicrosoftButton;
@@ -341,6 +343,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 loginButton.HeightAnchor.ConstraintEqualTo(LoginButtonHeight),
             });
 
+            orLabel = new UILabel();
+            orLabel.Text = "or";
+            orLabel.Font = Theme.DefaultFont;
+            orLabel.TranslatesAutoresizingMaskIntoConstraints = false;
+            orLabel.TextColor = Theme.DarkBlue;
+            orLabel.TextAlignment = UITextAlignment.Center;
+            orLabel.Alpha = 0;
+            containerView.AddSubview(orLabel);
+            containerView.AddConstraints(new[]
+            {
+                orLabel.TopAnchor.ConstraintEqualTo(loginButton.BottomAnchor, OrLabelToLoginButtonDistance),
+                orLabel.CenterXAnchor.ConstraintEqualTo(usernameTextField.CenterXAnchor),
+                orLabel.WidthAnchor.ConstraintEqualTo(LoginButtonWidth),
+            });
+
             loginWithMicrosoftButton = new UIButton();
             loginWithMicrosoftButton.SetImage(UIImage.FromBundle("AzureLogin"), UIControlState.Normal);
             loginWithMicrosoftButton.TranslatesAutoresizingMaskIntoConstraints = false;
@@ -349,7 +366,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             containerView.AddSubview(loginWithMicrosoftButton);
             containerView.AddConstraints(new[]
             {
-                loginWithMicrosoftButton.TopAnchor.ConstraintEqualTo(loginButton.BottomAnchor, LoginButtonToMicrosoftLoginButtonDistance),
+                loginWithMicrosoftButton.TopAnchor.ConstraintEqualTo(orLabel.BottomAnchor, LoginWithMicrosoftButtonToOrLabelDistance),
                 loginWithMicrosoftButton.CenterXAnchor.ConstraintEqualTo(usernameTextField.CenterXAnchor),
                 loginWithMicrosoftButton.BottomAnchor.ConstraintEqualTo(containerView.BottomAnchor),
             });
@@ -433,6 +450,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                      passwordTextField.Alpha = 1;
                      portTextField.Alpha = 1;
                      loginButton.Alpha = 0.7f;
+                     orLabel.Alpha = 1;
                      loginWithMicrosoftButton.Alpha = 1f;
                  });
              });
@@ -539,7 +557,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             try
             {
                 microsoftAuthService = new MicrosoftAuthService();
-                await microsoftAuthService.Authenticate(this, true);
+                await microsoftAuthService.Authenticate(this, false);
 
                 var azureUser = await microsoftAuthService.GetAzureUser();
                 var endpointList = await microsoftAuthService.GetAzureEndpointInfoList();
@@ -565,6 +583,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var azureUserId = azureUser.Id;
                 var hostname = endpointInfo.Hostname;
                 var port = endpointInfo.Port;
+                var sslMode = endpointInfo.SslMode;
 
                 CommonConfig.Logger.Info($"Logging in with Azure Id... [azureUserId={azureUserId}, hostname={hostname}, port={port}, ssl={sslMode}]");
 
