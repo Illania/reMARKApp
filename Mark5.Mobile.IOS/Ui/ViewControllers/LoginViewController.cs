@@ -7,8 +7,8 @@ using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
+using Mark5.Mobile.Common.Azure;
 using Mark5.Mobile.Common.Manager;
-using Mark5.Mobile.Common.MicrosoftAuthenticator;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Service;
 using Mark5.Mobile.Common.Utilities;
@@ -28,7 +28,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         const float TextFieldToAnimationViewDistance = 50;
         const float TextFieldToTextFieldDistance = 10f;
         const float LoginButtonToTextFieldDistance = 20f;
-        const float LoginButtonToAzureLoginButtonDistance = 20f;
+        const float LoginButtonToMicrosoftLoginButtonDistance = 20f;
 
         const float TextFieldWidth = 180f;
         const float TextFieldHeight = 28f;
@@ -58,7 +58,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         bool startLogoScaleAnimationDone;
 
         IAuthenticator authenticator;
-        MicrosoftAuthenticator microsoftAuthenticator;
+        MicrosoftAuthService microsoftAuthService;
 
         SslMode sslMode = SslMode.On;
 
@@ -349,7 +349,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             containerView.AddSubview(loginWithMicrosoftButton);
             containerView.AddConstraints(new[]
             {
-                loginWithMicrosoftButton.TopAnchor.ConstraintEqualTo(loginButton.BottomAnchor, LoginButtonToAzureLoginButtonDistance),
+                loginWithMicrosoftButton.TopAnchor.ConstraintEqualTo(loginButton.BottomAnchor, LoginButtonToMicrosoftLoginButtonDistance),
                 loginWithMicrosoftButton.CenterXAnchor.ConstraintEqualTo(usernameTextField.CenterXAnchor),
                 loginWithMicrosoftButton.BottomAnchor.ConstraintEqualTo(containerView.BottomAnchor),
             });
@@ -529,55 +529,59 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             hostnameTextField.ResignFirstResponder();
             portTextField.ResignFirstResponder();
 
-            //TODO this should be treated similarly to the other authenticator
-            microsoftAuthenticator = new MicrosoftAuthenticator();
-            await microsoftAuthenticator.Authenticate(this, true);
-
-            var microsoftUser = await microsoftAuthenticator.GetMicrosoftUser();
-            var connectionInfoList = await microsoftAuthenticator.GetMicrosoftConnectionInfoList();
-
-            if (!connectionInfoList.Any())
-            {
-                //TODO error
-
-            }
-
-            if (connectionInfoList.Count > 1)
-            {
-                //TODO needs to choose which one
-            }
-
-            //TODO here we assume we have only one
-            var microsoftConnectionInfo = connectionInfoList.First();
-
-            //We also assume that all the details are correct (no need to validate or confirm SSL)
             CancellationToken token;
 
             var hapticGenerator = new UINotificationFeedbackGenerator();
             hapticGenerator.Prepare();
 
+            CommonConfig.Logger.Info($"Attempting login with Azure...");
+
             try
             {
-                var microsoftUserId = microsoftUser.Id;
-                var hostname = microsoftConnectionInfo.Hostname;
-                var port = microsoftConnectionInfo.Port;
+                microsoftAuthService = new MicrosoftAuthService();
+                await microsoftAuthService.Authenticate(this, true);
 
-                CommonConfig.Logger.Info($"Logging in with Microsoft Id... [microsoftUserId={microsoftUserId}, hostname={hostname}, port={port}, ssl={sslMode}]");
+                var azureUser = await microsoftAuthService.GetAzureUser();
+                var endpointList = await microsoftAuthService.GetAzureEndpointInfoList();
+
+                if (!endpointList.Any())
+                    throw new Exception("No connection info was found on Azure");
+
+                AzureEndpointInfo endpointInfo = null;
+
+                if (endpointList.Count > 1)
+                {
+                    var cInfoNamesList = endpointList.Select(c => c.Name).ToArray();
+                    var index = await Dialogs.ShowListActionSheetWithTitleAsync(this, cInfoNamesList, loginWithMicrosoftButton, "Select system to connect to");
+                    if (index == -1)
+                        return;
+
+                    endpointInfo = endpointList[index];
+                }
+                else
+                    endpointInfo = endpointList.First();
+
+                //We assume that all the connection details are correct (no need to validate or confirm hostname, port, SSL)
+                var azureUserId = azureUser.Id;
+                var hostname = endpointInfo.Hostname;
+                var port = endpointInfo.Port;
+
+                CommonConfig.Logger.Info($"Logging in with Azure Id... [azureUserId={azureUserId}, hostname={hostname}, port={port}, ssl={sslMode}]");
 
                 cts = new CancellationTokenSource();
                 token = cts.Token;
 
                 dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("logging_in___"), OnCancelLogin);
 
-                CommonConfig.Logger.Info("Authenticating with Microsoft Id...");
+                CommonConfig.Logger.Info("Authenticating with Azure Id...");
 
-                var ci = await authenticator.AuthenticateWithMicrosoftAsync(microsoftUserId, sslMode, hostname, int.Parse(port), token);
+                var ci = await authenticator.AuthenticateWithAzureIdAsync(azureUserId, sslMode, hostname, port, token);
 
                 await InitializeApplication(ci, token);
             }
             catch (Exception ex)
             {
-                await ManageLoginException(ex, token);
+                await ManageLoginException(ex, token, true);
 
                 loginWithMicrosoftButton.TouchUpInside += LoginWithMicrosoftButton_TouchUpInside;
             }
@@ -635,7 +639,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
             catch (Exception ex)
             {
-                await ManageLoginException(ex, token);
+                await ManageLoginException(ex, token, false);
 
                 usernameTextField.BecomeFirstResponder();
 
@@ -643,7 +647,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        async Task ManageLoginException(Exception ex, CancellationToken token)
+        async Task ManageLoginException(Exception ex, CancellationToken token, bool loginFromAzure)
         {
             var hapticGenerator = new UINotificationFeedbackGenerator();
             hapticGenerator.Prepare();
@@ -663,7 +667,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             else if (IsAcountLocked(ex))
                 await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("login_failed"), Localization.GetString("login_failed_account_locked"));
             else
-                await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("login_failed"), Localization.GetString("login_failed_desc"));
+                await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("login_failed"), loginFromAzure ? Localization.GetString("login_failed_azure_desc") : Localization.GetString("login_failed_desc"));
 
             hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Error);
         }

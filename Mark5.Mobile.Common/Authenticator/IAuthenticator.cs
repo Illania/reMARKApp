@@ -10,7 +10,7 @@ namespace Mark5.Mobile.Common.Authenticator
 
         Task<ConnectionInfo> AuthenticateAsync(string username, string password, SslMode sslMode, string hostname, int port, CancellationToken ct = default(CancellationToken));
 
-        Task<ConnectionInfo> AuthenticateWithMicrosoftAsync(string microsoftUserId, SslMode sslMode, string hostname, int port, CancellationToken ct = default(CancellationToken));
+        Task<ConnectionInfo> AuthenticateWithAzureIdAsync(string userAzureId, SslMode sslMode, string hostname, int port, CancellationToken ct = default(CancellationToken));
 
         Task<ConnectionInfo> GetConnectionInfoAsync(CancellationToken ct = default(CancellationToken));
 

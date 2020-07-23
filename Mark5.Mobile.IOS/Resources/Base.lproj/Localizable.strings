@@ -240,6 +240,7 @@
 "logging_out___" = "Logging out...";
 "login" = "Login";
 "login_failed" = "Login failed";
+"login_failed_azure_desc" = "Could not log in to reMARK. An error happened during authentication.";
 "login_failed_desc" = "Could not log in to reMARK. Please check your username, password and server address.\n\nYou may also want to verify SSL settings, by tapping Settings in top right corner of the screen.";
 "login_failed_access_disabled" = "Your device does not have access enabled. Please contact your system administrator and restart the reMARK app.";
 "login_failed_account_locked" = "Account locked. Please contact your system administrator.";

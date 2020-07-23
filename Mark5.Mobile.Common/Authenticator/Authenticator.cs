@@ -52,31 +52,17 @@ namespace Mark5.Mobile.Common.Authenticator
             return connectionInfo;
         }
 
-        public async Task<ConnectionInfo> AuthenticateWithMicrosoftAsync(string userId, SslMode sslMode, string hostname, int port, CancellationToken ct = default(CancellationToken))
+        public async Task<ConnectionInfo> AuthenticateWithAzureIdAsync(string userId, SslMode sslMode, string hostname, int port, CancellationToken ct = default(CancellationToken))
         {
-            //TODO The body of this function needs to be modified
             var deviceType = CommonConfig.DeviceInfoProvider.GetDeviceType();
             var deviceName = CommonConfig.DeviceInfoProvider.GetDeviceName();
             var deviceId = CommonConfig.DeviceInfoProvider.GetDeviceId();
 
-            var proxy = AppServiceProxyFactory.Create(sslMode != SslMode.Off,
-                                                      hostname,
-                                                      port,
-                                                      CommonConfig.HttpClientHandler,
-                                                      CommonConfig.OnStartTransmission,
-                                                      CommonConfig.OnStopTransmission);
-            var result = await proxy.AuthenticateAsync(new DataContract.AuthenticateParameters
-            {
-                Username = userId,
-                DeviceType = deviceType.ConvertEnum<DataContract.DeviceType>(),
-                FriendlyDeviceName = deviceName,
-                InstallationId = deviceId
-            },
-                ct);
+            //TODO here we need to add the new authentication function
 
             var connectionInfo = new ConnectionInfo
             {
-                Token = result.Token,
+                Token = "testToken", //Just for testing
                 Username = userId,
                 Hostname = hostname,
                 Port = port,
