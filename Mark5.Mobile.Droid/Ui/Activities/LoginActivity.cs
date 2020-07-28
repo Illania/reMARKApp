@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Android.App;
@@ -11,6 +12,7 @@ using Android.Views;
 using Firebase.Iid;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
+using Mark5.Mobile.Common.Azure;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -22,6 +24,7 @@ using Mark5.Mobile.Droid.Utilities;
 using Mark5.Mobile.Droid.Utilities.DeviceReminder;
 using Mark5.Mobile.Droid.Utilities.Workers;
 using Mark5.ServiceReference.Exceptions;
+using Microsoft.Identity.Client;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
@@ -108,6 +111,15 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             CommonConfig.Logger.Info($"Resumed {nameof(LoginActivity)}");
         }
 
+        protected override void OnActivityResult(int requestCode,
+                                         Result resultCode, Intent data)
+        {
+            base.OnActivityResult(requestCode, resultCode, data);
+            AuthenticationContinuationHelper.SetAuthenticationContinuationEventArgs(requestCode,
+                                                                                    resultCode,
+                                                                                    data);
+        }
+
         async Task RefreshData()
         {
             if (!string.IsNullOrEmpty(usernameEditText.Text + hostnameEditText.Text))
@@ -184,17 +196,70 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             return false;
         }
 
-        private void LoginWithMicrosoftButton_Click(object sender, EventArgs e)
+        async void LoginWithMicrosoftButton_Click(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            CommonConfig.Logger.Info($"Attempting login...");
 
-            //TODO
-            // Extract input validation
-            //Extract SSL confirmation
-            //Extract Exception validation
-            //Extract app initialization
+            var btn = (AppCompatImageButton)sender;
 
-            //TODO fix MSAL activity parameters and check what else I need for logging in
+            btn.Clickable = false;
+
+            CancellationToken token;
+
+            try
+            {
+                var microsoftAuthService = new MicrosoftAuthService();
+                await microsoftAuthService.Authenticate(this, false);
+
+                var azureUser = await microsoftAuthService.GetAzureUser();
+                var endpointList = await microsoftAuthService.GetAzureEndpointInfoList();
+
+                if (!endpointList.Any())
+                    throw new Exception("No connection info was found on Azure");
+
+                AzureEndpointInfo endpointInfo = null;
+
+                if (endpointList.Count > 1)
+                {
+                    var cInfoNamesList = endpointList.Select(c => c.Name).ToArray();
+                    var index = await Dialogs.ShowListDialog(this, "Select system to connect to", cInfoNamesList, false);
+                    if (index == -1)
+                        return;
+
+                    endpointInfo = endpointList[index];
+                }
+                else
+                    endpointInfo = endpointList.First();
+
+                //We assume that all the connection details are correct (no need to validate or confirm hostname, port, SSL)
+                var azureUserId = azureUser.Id;
+                var hostname = endpointInfo.Hostname;
+                var port = endpointInfo.Port;
+                var sslMode = endpointInfo.SslMode;
+
+                SetSSLMode(sslMode);
+
+                CommonConfig.Logger.Info($"Logging in with Azure Id... [azureUserId={azureUserId}, hostname={hostname}, port={port}, ssl={sslMode}]");
+
+                cts = new CancellationTokenSource();
+                token = cts.Token;
+
+                dismissAction = Dialogs.ShowInfiniteProgressDialog(this, Resource.String.logging_in, Resource.String.please_wait, cts);
+
+                CommonConfig.Logger.Info("Authenticating...");
+
+                var ci = await authenticator.AuthenticateWithAzureIdAsync(azureUserId, sslMode, hostname, port, token);
+
+                await InitializeApplication(ci, token);
+            }
+            catch (Exception ex)
+            {
+                await ManageLoginException(ex, token, true);
+            }
+            finally
+            {
+                btn.Clickable = true;
+            }
         }
 
         async void LoginButton_Click(object sender, EventArgs e)
@@ -215,44 +280,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var port = portEditText.Text;
                 var sslMode = (SslMode)sslSpinner.SelectedItemPosition;
 
-                var errors = false;
-                if (!Validator.IsUsernameValid(username))
-                {
-                    CommonConfig.Logger.Info($"Invalid username was entered: {username}");
-
-                    usernameEditText.Error = GetText(Resource.String.username_invalid);
-                    errors = true;
-                }
-                if (!Validator.IsPasswordValid(password))
-                {
-                    CommonConfig.Logger.Info($"Invalid password was entered: {password}");
-
-                    passwordEditText.Error = GetText(Resource.String.password_invalid);
-                    errors = true;
-                }
-                if (!Validator.IsHostNameValid(hostname))
-                {
-                    CommonConfig.Logger.Info($"Invalid hostname was entered: {hostname}");
-
-                    hostnameEditText.Error = GetText(Resource.String.hostname_invalid);
-                    errors = true;
-                }
-                if (!Validator.IsPortValid(port))
-                {
-                    CommonConfig.Logger.Info($"Invalid port was entered: {port}");
-
-                    portEditText.Error = GetText(Resource.String.port_invalid);
-                    errors = true;
-                }
-
+                var errors = ValidateInputs(username, password, hostname, port);
                 if (errors)
                     return;
 
-                if (sslMode == SslMode.AllowSelfSigned && !await Dialogs.ShowYesNoDialogAsync(this, Resource.String.warning, Resource.String.ssl_accept_selfsigned_warning))
-                    return;
-
-                if (sslMode == SslMode.Off && !await Dialogs.ShowYesNoDialogAsync(this, Resource.String.warning, Resource.String.ssl_off_warning))
-                    return;
+                await ConfirmSSLMode(sslMode);
+                SetSSLMode(sslMode);
 
                 CommonConfig.Logger.Info($"Logging in... [username={username}, hostname={hostname}, port={port}, ssl={sslMode}]");
 
@@ -260,78 +293,15 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 token = cts.Token;
                 dismissAction = Dialogs.ShowInfiniteProgressDialog(this, Resource.String.logging_in, Resource.String.please_wait, cts);
 
-                switch (sslMode)
-                {
-                    case SslMode.AllowSelfSigned:
-                        PlatformConfig.SSLCertificateVerificationManager.EnableSelfSignedCertificates();
-                        break;
-                    default:
-                        PlatformConfig.SSLCertificateVerificationManager.DisableSelfSignedCertificates();
-                        break;
-                }
-
                 CommonConfig.Logger.Info("Authenticating...");
 
                 var ci = await authenticator.AuthenticateAsync(username, password, sslMode, hostname, int.Parse(port), token);
 
-                if (token.IsCancellationRequested)
-                {
-                    CommonConfig.Logger.Info($"Authentication was cancelled...");
-                    cts = null;
-                    return;
-                }
-
-                CommonConfig.Logger.Info($"Authenticated - saving connection info {ci}...");
-
-                await authenticator.SaveConnectionInfoAsync(ci);
-
-                CommonConfig.Logger.Info($"Initializing {nameof(Managers)}...");
-
-                Managers.Initialize(ci);
-                Managers.DocumentsManager.MaxToFetch = PlatformConfig.Preferences.DocumentsToDownload;
-                Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
-                Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
-                Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
-
-                CommonConfig.Logger.Info("Retrieving system settings...");
-
-                ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync();
-                SystemSettingsWorker.Schedule();
-
-                await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
-
-                CommonConfig.Logger.Info($"Starting services...");
-                Services.DocumentsUploadService?.Start();
-                Services.DocumentPreviewsDownloadService?.Start();
-                Services.DocumentsDownloadService?.Start();
-                Services.ActionSyncService?.Start();
-                DeviceReminderWorker.Schedule();
-
-                CommonConfig.Logger.Info($"Refreshing reachability status...");
-                await CommonConfig.Reachability.Refresh();
-
-                CommonConfig.Logger.Info($"Registering {nameof(ReachabilityMonitor)}...");
-                PlatformConfig.ReachabilityMonitor.Register(ApplicationContext);
-
-                CommonConfig.Logger.Info($"Logged in - will present {nameof(MainActivity)}");
-
-                CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Hostname, hostname);
-                CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.SSL, sslMode.ToString());
-
-                if (!String.IsNullOrEmpty(ServerConfig.SystemSettings.SystemInfo.CustomerName))
-                    CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.CustomerName, ServerConfig.SystemSettings.SystemInfo.CustomerName);
-
-                PushNotificationsUtilities.CreateChannelIfNotExists(this);
-                DeviceReminderBroadcastReceiver.CreateChannelIfNotExists(this);
-
-                SendPushNotificationToken();
-
-                StartActivity(MainActivity.CreateIntent(this));
-                Finish();
+                await InitializeApplication(ci, token);
             }
             catch (Exception ex)
             {
-                await ManageLoginException(ex, token);
+                await ManageLoginException(ex, token, false);
             }
             finally
             {
@@ -339,9 +309,124 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }
         }
 
-        public async Task<bool>
+        async Task ConfirmSSLMode(SslMode sslMode)
+        {
+            if (sslMode == SslMode.AllowSelfSigned
+                && !await Dialogs.ShowYesNoDialogAsync(this, Resource.String.warning, Resource.String.ssl_accept_selfsigned_warning))
+                return;
 
-        public async Task ManageLoginException(Exception ex, CancellationToken token)
+            if (sslMode == SslMode.Off
+                && !await Dialogs.ShowYesNoDialogAsync(this, Resource.String.warning, Resource.String.ssl_off_warning))
+                return;
+        }
+
+        void SetSSLMode(SslMode sslMode)
+        {
+            switch (sslMode)
+            {
+                case SslMode.AllowSelfSigned:
+                    PlatformConfig.SSLCertificateVerificationManager.EnableSelfSignedCertificates();
+                    break;
+                default:
+                    PlatformConfig.SSLCertificateVerificationManager.DisableSelfSignedCertificates();
+                    break;
+            }
+        }
+
+        bool ValidateInputs(string username, string password, string hostname, string port)
+        {
+            var errors = false;
+            if (!Validator.IsUsernameValid(username))
+            {
+                CommonConfig.Logger.Info($"Invalid username was entered: {username}");
+
+                usernameEditText.Error = GetText(Resource.String.username_invalid);
+                errors = true;
+            }
+            if (!Validator.IsPasswordValid(password))
+            {
+                CommonConfig.Logger.Info($"Invalid password was entered: {password}");
+
+                passwordEditText.Error = GetText(Resource.String.password_invalid);
+                errors = true;
+            }
+            if (!Validator.IsHostNameValid(hostname))
+            {
+                CommonConfig.Logger.Info($"Invalid hostname was entered: {hostname}");
+
+                hostnameEditText.Error = GetText(Resource.String.hostname_invalid);
+                errors = true;
+            }
+            if (!Validator.IsPortValid(port))
+            {
+                CommonConfig.Logger.Info($"Invalid port was entered: {port}");
+
+                portEditText.Error = GetText(Resource.String.port_invalid);
+                errors = true;
+            }
+
+            return errors;
+        }
+
+        async Task InitializeApplication(ConnectionInfo ci, CancellationToken token)
+        {
+            if (token.IsCancellationRequested)
+            {
+                CommonConfig.Logger.Info($"Authentication was cancelled...");
+                cts = null;
+                return;
+            }
+
+            CommonConfig.Logger.Info($"Authenticated - saving connection info {ci}...");
+
+            await authenticator.SaveConnectionInfoAsync(ci);
+
+            CommonConfig.Logger.Info($"Initializing {nameof(Managers)}...");
+
+            Managers.Initialize(ci);
+            Managers.DocumentsManager.MaxToFetch = PlatformConfig.Preferences.DocumentsToDownload;
+            Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
+            Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
+            Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
+
+            CommonConfig.Logger.Info("Retrieving system settings...");
+
+            ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync();
+            SystemSettingsWorker.Schedule();
+
+            await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
+
+            CommonConfig.Logger.Info($"Starting services...");
+            Services.DocumentsUploadService?.Start();
+            Services.DocumentPreviewsDownloadService?.Start();
+            Services.DocumentsDownloadService?.Start();
+            Services.ActionSyncService?.Start();
+            DeviceReminderWorker.Schedule();
+
+            CommonConfig.Logger.Info($"Refreshing reachability status...");
+            await CommonConfig.Reachability.Refresh();
+
+            CommonConfig.Logger.Info($"Registering {nameof(ReachabilityMonitor)}...");
+            PlatformConfig.ReachabilityMonitor.Register(ApplicationContext);
+
+            CommonConfig.Logger.Info($"Logged in - will present {nameof(MainActivity)}");
+
+            CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Hostname, ci.Hostname);
+            CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.SSL, ci.SslMode.ToString());
+
+            if (!String.IsNullOrEmpty(ServerConfig.SystemSettings.SystemInfo.CustomerName))
+                CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.CustomerName, ServerConfig.SystemSettings.SystemInfo.CustomerName);
+
+            PushNotificationsUtilities.CreateChannelIfNotExists(this);
+            DeviceReminderBroadcastReceiver.CreateChannelIfNotExists(this);
+
+            SendPushNotificationToken();
+
+            StartActivity(MainActivity.CreateIntent(this));
+            Finish();
+        }
+
+        async Task ManageLoginException(Exception ex, CancellationToken token, bool loginFromAzure)
         {
             if (token.IsCancellationRequested)
                 return;
@@ -358,7 +443,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             else if (IsAcountLocked(ex))
                 await Dialogs.ShowConfirmDialogAsync(this, Resource.String.log_in_failed_title, Resource.String.log_in_failed_message_account_locked);
             else
-                await Dialogs.ShowConfirmDialogAsync(this, Resource.String.log_in_failed_title, Resource.String.log_in_failed_message);
+                await Dialogs.ShowConfirmDialogAsync(this, Resource.String.log_in_failed_title,
+                    loginFromAzure ? Resource.String.log_in_failed_azure_message : Resource.String.log_in_failed_message);
         }
 
         public static bool IsAcountLocked(Exception ex)

@@ -616,7 +616,7 @@
     <Compile Include="Ui\Views\DocumentViews\InvitationReplyModalView.cs" />
     <Compile Include="Utilities\LineUtilities.cs" />
     <Compile Include="Utilities\Worker\SystemSettingsWorker.cs" />
-    <Compile Include="EmptyClass.cs" />
+    <Compile Include="Ui\Activities\MsalActivity.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

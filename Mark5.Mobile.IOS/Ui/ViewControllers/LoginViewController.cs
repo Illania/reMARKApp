@@ -585,6 +585,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var port = endpointInfo.Port;
                 var sslMode = endpointInfo.SslMode;
 
+                SetSSLMode(sslMode);
+
                 CommonConfig.Logger.Info($"Logging in with Azure Id... [azureUserId={azureUserId}, hostname={hostname}, port={port}, ssl={sslMode}]");
 
                 cts = new CancellationTokenSource();
@@ -637,6 +639,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     loginButton.TouchUpInside += LoginButton_TouchUpInside;
                     return;
                 }
+
+                SetSSLMode(sslMode);
 
                 CommonConfig.Logger.Info($"Logging in... [username={username}, hostname={hostname}, port={port}, ssl={sslMode}]");
 
@@ -717,6 +721,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
             }
 
+            return true;
+        }
+
+        void SetSSLMode(SslMode sslMode)
+        {
             switch (sslMode)
             {
                 case SslMode.AllowSelfSigned:
@@ -726,8 +735,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     PlatformConfig.SSLCertificateVerificationManager.DisableSelfSignedCertificates();
                     break;
             }
-
-            return true;
         }
 
         async Task<bool> ValidateInputs(string username, string password, string hostname, string port)
