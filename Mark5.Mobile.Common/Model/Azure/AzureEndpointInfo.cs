@@ -1,6 +1,4 @@
-﻿using Mark5.Mobile.Common.Model;
-
-namespace Mark5.Mobile.Common.Azure
+﻿namespace Mark5.Mobile.Common.Model.Azure
 {
     public class AzureEndpointInfo
     {

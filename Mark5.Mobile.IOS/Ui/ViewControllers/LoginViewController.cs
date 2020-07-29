@@ -10,6 +10,7 @@ using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Azure;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.Azure;
 using Mark5.Mobile.Common.Service;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Service;
@@ -596,7 +597,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 CommonConfig.Logger.Info("Authenticating with Azure Id...");
 
-                var ci = await authenticator.AuthenticateWithAzureIdAsync(azureUserId, sslMode, hostname, port, token);
+                var ci = await authenticator.AuthenticateWithAzureAsync(azureUser, sslMode, hostname, port, token);
 
                 await InitializeApplication(ci, token);
             }

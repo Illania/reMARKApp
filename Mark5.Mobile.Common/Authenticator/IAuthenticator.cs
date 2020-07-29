@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.Azure;
 
 namespace Mark5.Mobile.Common.Authenticator
 {
@@ -10,7 +11,7 @@ namespace Mark5.Mobile.Common.Authenticator
 
         Task<ConnectionInfo> AuthenticateAsync(string username, string password, SslMode sslMode, string hostname, int port, CancellationToken ct = default(CancellationToken));
 
-        Task<ConnectionInfo> AuthenticateWithAzureIdAsync(string userAzureId, SslMode sslMode, string hostname, int port, CancellationToken ct = default(CancellationToken));
+        Task<ConnectionInfo> AuthenticateWithAzureAsync(AzureUser azureUser, SslMode sslMode, string hostname, int port, CancellationToken ct = default(CancellationToken));
 
         Task<ConnectionInfo> GetConnectionInfoAsync(CancellationToken ct = default(CancellationToken));
 

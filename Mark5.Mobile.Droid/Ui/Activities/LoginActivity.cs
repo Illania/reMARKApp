@@ -16,6 +16,7 @@ using Mark5.Mobile.Common.Azure;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.Azure;
 using Mark5.Mobile.Common.Service;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Service;
@@ -248,7 +249,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 CommonConfig.Logger.Info("Authenticating...");
 
-                var ci = await authenticator.AuthenticateWithAzureIdAsync(azureUserId, sslMode, hostname, port, token);
+                var ci = await authenticator.AuthenticateWithAzureAsync(azureUser, sslMode, hostname, port, token);
 
                 await InitializeApplication(ci, token);
             }

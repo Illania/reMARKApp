@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.Azure;
 using Microsoft.Identity.Client;
 using Newtonsoft.Json;
 using Xamarin.Essentials;

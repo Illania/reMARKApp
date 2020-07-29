@@ -3,7 +3,7 @@
     public class ConnectionInfo
     {
         public string Token { get; set; }
-        public string MicrosoftUserId { get; set; }
+        public string AzureUserId { get; set; }
         public string Username { get; set; }
         public string Hostname { get; set; }
         public int Port { get; set; }
