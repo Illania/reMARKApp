@@ -3,6 +3,7 @@
     public class ConnectionInfo
     {
         public string Token { get; set; }
+        public string MicrosoftUserId { get; set; }
         public string Username { get; set; }
         public string Hostname { get; set; }
         public int Port { get; set; }
@@ -13,7 +14,8 @@
 
         public override string ToString()
         {
-            return $"[ConnectionInfo: Token={Token}, Username={Username}, Hostname={Hostname}, Port={Port}, SslMode={SslMode}, DeviceType={DeviceType}, FriendlyDeviceName={FriendlyDeviceName}, InstallationId={InstallationId}]";
+            return $"[ConnectionInfo: Token={Token}, Username={Username}, Hostname={Hostname}, Port={Port}, " +
+                $"SslMode={SslMode}, DeviceType={DeviceType}, FriendlyDeviceName={FriendlyDeviceName}, InstallationId={InstallationId}]";
         }
     }
 }

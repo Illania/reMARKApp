@@ -52,6 +52,29 @@ namespace Mark5.Mobile.Common.Authenticator
             return connectionInfo;
         }
 
+        public async Task<ConnectionInfo> AuthenticateWithAzureIdAsync(string userId, SslMode sslMode, string hostname, int port, CancellationToken ct = default(CancellationToken))
+        {
+            var deviceType = CommonConfig.DeviceInfoProvider.GetDeviceType();
+            var deviceName = CommonConfig.DeviceInfoProvider.GetDeviceName();
+            var deviceId = CommonConfig.DeviceInfoProvider.GetDeviceId();
+
+            //TODO here we need to add the new authentication function
+
+            var connectionInfo = new ConnectionInfo
+            {
+                Token = "testToken", //Just for testing
+                Username = userId,
+                Hostname = hostname,
+                Port = port,
+                SslMode = sslMode,
+                DeviceType = deviceType,
+                FriendlyDeviceName = deviceName,
+                InstallationId = deviceId
+            };
+
+            return connectionInfo;
+        }
+
         public async Task<ConnectionInfo> GetConnectionInfoAsync(CancellationToken ct = default(CancellationToken))
         {
             return await FileSystemStorage.GetConnectionInfoAsync(ct);

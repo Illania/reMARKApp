@@ -334,6 +334,12 @@
     <Reference Include="PhoneNumbers">
       <HintPath>..\packages\libphonenumber-csharp.8.12.6\lib\netstandard2.0\PhoneNumbers.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Identity.Client">
+      <HintPath>..\packages\Microsoft.Identity.Client.4.16.1\lib\monoandroid90\Microsoft.Identity.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="System.IdentityModel" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -610,6 +616,7 @@
     <Compile Include="Ui\Views\DocumentViews\InvitationReplyModalView.cs" />
     <Compile Include="Utilities\LineUtilities.cs" />
     <Compile Include="Utilities\Worker\SystemSettingsWorker.cs" />
+    <Compile Include="Ui\Activities\MsalActivity.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -1095,6 +1102,14 @@
       <Generator></Generator>
     </AndroidResource>
     <AndroidResource Include="Resources\drawable\calendar_list.xml">
+      <SubType></SubType>
+      <Generator></Generator>
+    </AndroidResource>
+    <AndroidResource Include="Resources\drawable\sign_microsoft_light.xml">
+      <SubType></SubType>
+      <Generator></Generator>
+    </AndroidResource>
+    <AndroidResource Include="Resources\drawable\sign_microsoft_dark.xml">
       <SubType></SubType>
       <Generator></Generator>
     </AndroidResource>
