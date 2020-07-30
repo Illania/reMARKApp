@@ -696,7 +696,7 @@
 		<ImageAsset Include="Assets_icons.xcassets\Priority-High.imageset\high_priority.pdf" />
 		<ImageAsset Include="Assets_icons.xcassets\Priority-Low.imageset\low_priority.pdf" />
 		<ImageAsset Include="Assets_icons.xcassets\AzureLogin.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\AzureLogin.imageset\azure_login_dark.pdf" />
+		<ImageAsset Include="Assets_icons.xcassets\AzureLogin.imageset\azure_login_light.pdf" />
 	</ItemGroup>
 	<ItemGroup>
 		<BundleResource Include="Resources\Base.lproj\Localizable.strings" />
