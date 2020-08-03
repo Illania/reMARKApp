@@ -47,7 +47,6 @@ namespace Mark5.Mobile.Droid.Utilities
 
         static bool ApplicationHasBeenUpdated(Context context)
         {
-            return false; //TODO need to be enabled again after we decide what to do with onboarding
             var currentVersionCode = float.Parse(context.PackageManager.GetPackageInfo(context.PackageName, 0).VersionName);
             var storedVersionCode = PreferenceManager.GetDefaultSharedPreferences(context).GetFloat(appVersionKey, 0);
 
@@ -91,12 +90,18 @@ namespace Mark5.Mobile.Droid.Utilities
         {
             return new List<OnBoardingPageModel>
             {
-                new OnBoardingPageModel("Welcome to reMARK", "We have renamed the MARK5 app \"reMARK\". It has all the same functionality as before and is perfectly compatible with MARK5. " +
-                    "We have made a few changes in the reMARK app. Press next to see what has happened.", Resource.Drawable.onboarding_1),
-                new OnBoardingPageModel("History and overview", "Actions and links have been renamed. \"Actions\" is now called \"History\" and \"Links\" is now called \"Overview\". " +
-                    "You find history and overview in the same place as before and they have the same functionality.", Resource.Drawable.onboarding_5),
-                new OnBoardingPageModel("Outgoing emails", "Now you can see pending emails in \"Outgoing\" just by browsing your folder list." +
-                    " The number shows how many pending emails you have. If there is a red dot, it indicates that an email has failed to send.",Resource.Drawable.onboarding_6),
+                new OnBoardingPageModel("Welcome to reMARK", "We have made a few changes in the reMARK app. Press next to see what has happened.",
+                     Resource.Drawable.onboarding_1),
+                new OnBoardingPageModel("Select multiple files as an attachment", "It is now possible to select multiple files as an attachment when composing an email.",
+                     Resource.Drawable.onboarding_2),
+                new OnBoardingPageModel("Basic formatting", "Basic formatting (Bold/Italic/Underline) now available in email composing.",
+                     Resource.Drawable.onboarding_3),
+                new OnBoardingPageModel("Offline sync of read action", "Offline? Your read action will still be updated and then synced when you go back online.",
+                     Resource.Drawable.onboarding_4),
+                new OnBoardingPageModel("Autocomplete with mailing lists", "Now autocomplete will also suggests mailing lists when composing emails.",
+                     Resource.Drawable.onboarding_5),
+                new OnBoardingPageModel("Calendar invitations", "Now you can answer to calendar invitations in mails.",
+                     Resource.Drawable.onboarding_6),
             };
         }
 
