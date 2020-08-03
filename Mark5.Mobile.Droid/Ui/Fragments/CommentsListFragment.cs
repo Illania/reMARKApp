@@ -220,7 +220,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         var contact = entity as Contact;
                         await Managers.ContactsManager.DeleteComment(contact, comment);
                         break;
-                        
+
                     default:
                         throw new ArgumentException("The input business entity does not have comments defined in the model");
                 }
@@ -229,8 +229,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 dismissAction();
 
-                CommonConfig.Logger.Error($"Failed to delete comment from entity [objectType={entity?.ObjectType}, entity.Id={entity?.Id}, comment.Id={comment.Id}, comment.Content={comment.Content}] ", ex.InnerException);
-                await Dialogs.ShowErrorDialogAsync(Activity, ex.InnerException);
+                CommonConfig.Logger.Error($"Failed to delete comment from entity [objectType={entity?.ObjectType}, entity.Id={entity?.Id}, comment.Id={comment.Id}, comment.Content={comment.Content}] ", ex);
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
                 return;
             }
@@ -257,7 +257,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         var contact = entity as Contact;
                         await Managers.ContactsManager.EditComment(contact, newComment);
                         break;
-                        
+
                     default:
                         throw new ArgumentException("The input business entity does not have comments defined in the model");
                 }
@@ -266,8 +266,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 dismissAction();
 
-                CommonConfig.Logger.Error($"Failed to edit comment for entity [objectType={entity?.ObjectType}, entity.Id={entity?.Id}, comment.Id={comment.Id}, comment.Content={comment.Content}] ", ex.InnerException);
-                await Dialogs.ShowErrorDialogAsync(Activity, ex.InnerException);
+                CommonConfig.Logger.Error($"Failed to edit comment for entity [objectType={entity?.ObjectType}, entity.Id={entity?.Id}, comment.Id={comment.Id}, comment.Content={comment.Content}] ", ex);
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
                 return;
             }
