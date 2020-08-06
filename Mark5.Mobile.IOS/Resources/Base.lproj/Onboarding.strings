@@ -1,5 +1,5 @@
 ﻿"1_title" = "Welcome to reMARK";
-"1_content" = "We have made a few changes in the reMARK app. Press next to see what has happened.";
+"1_content" = "We have made a few changes in the reMARK app. Press next to see what has changed.";
 "2_title" = "Select multiple files as an attachment";
 "2_content" = "It is now possible to select multiple files as an attachment when composing an email.";
 "3_title" = "Offline sync of read action";
@@ -7,6 +7,6 @@
 "4_title" = "Paste as plain text";
 "4_content" = "When pasting text into an email, you can now also select \"Paste as plain text\". The text that is being pasted follows the style of the text that it is being pasted into.";
 "5_title" = "Autocomplete with mailing lists";
-"5_content" = "Now autocomplete will also suggests mailing lists when composing emails";
+"5_content" = "Now autocomplete will also suggest mailing lists when composing emails";
 "6_title" = "Calendar invitations";
 "6_content" = "Now you can answer to calendar invitations in mails.";

@@ -90,7 +90,7 @@ namespace Mark5.Mobile.Droid.Utilities
         {
             return new List<OnBoardingPageModel>
             {
-                new OnBoardingPageModel("Welcome to reMARK", "We have made a few changes in the reMARK app. Press next to see what has happened.",
+                new OnBoardingPageModel("Welcome to reMARK", "We have made a few changes in the reMARK app. Press next to see what has changed.",
                      Resource.Drawable.onboarding_1),
                 new OnBoardingPageModel("Select multiple files as an attachment", "It is now possible to select multiple files as an attachment when composing an email.",
                      Resource.Drawable.onboarding_2),
@@ -98,7 +98,7 @@ namespace Mark5.Mobile.Droid.Utilities
                      Resource.Drawable.onboarding_3),
                 new OnBoardingPageModel("Offline sync of read action", "Offline? Your read action will still be updated and then synced when you go back online.",
                      Resource.Drawable.onboarding_4),
-                new OnBoardingPageModel("Autocomplete with mailing lists", "Now autocomplete will also suggests mailing lists when composing emails.",
+                new OnBoardingPageModel("Autocomplete with mailing lists", "Now autocomplete will also suggest mailing lists when composing emails.",
                      Resource.Drawable.onboarding_5),
                 new OnBoardingPageModel("Calendar invitations", "Now you can answer to calendar invitations in mails.",
                      Resource.Drawable.onboarding_6),
