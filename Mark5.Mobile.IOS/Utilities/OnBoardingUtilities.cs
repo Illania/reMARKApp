@@ -36,7 +36,6 @@ namespace Mark5.Mobile.IOS.Utilities
 
         static bool ApplicationHasBeenUpdated()
         {
-            return false; //Until we find a solution for the onboarding
             var userDefaults = NSUserDefaults.StandardUserDefaults;
             var currentVersionName = float.Parse(NSBundle.MainBundle.InfoDictionary.ValueForKey(new NSString("CFBundleShortVersionString")).ToString());
             var storedVersionName = userDefaults.FloatForKey(appVersionKey);
