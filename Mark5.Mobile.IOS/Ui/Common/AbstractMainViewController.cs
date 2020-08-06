@@ -153,7 +153,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             base.ViewDidAppear(animated);
 
-            //OnBoardingUtilities.ShowOnBoardingIfNecessary(this); //Not using onboarding at the moment...
+            OnBoardingUtilities.ShowOnBoardingIfNecessary(this);
 
             CheckAutoSavedDocument();
         }

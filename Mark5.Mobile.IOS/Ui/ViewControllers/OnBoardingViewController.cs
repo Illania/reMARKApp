@@ -212,6 +212,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             titleLabel.Text = pageModel.Title;
             titleLabel.TextColor = Theme.DarkBlue;
             titleLabel.Font = Theme.DefaultBoldFont.WithSize(24);
+            titleLabel.Lines = 0;
 
             descriptionTextView = new UITextView
             {
