@@ -53,7 +53,7 @@ namespace Mark5.Mobile.Common.Azure
                 }));
         }
 
-        public async Task Authenticate(object parentWindow, bool forceInteractive = true) //TODO for testing
+        public async Task Authenticate(object parentWindow, bool forceInteractive = true)
         {
             if (account != null && string.IsNullOrEmpty(accessToken))
                 return;
@@ -117,7 +117,8 @@ namespace Mark5.Mobile.Common.Azure
                 try
                 {
                     var info = JsonConvert.DeserializeObject<AzureEndpointInfo>(addData[key].ToString());
-                    endpointList.Add(info);
+                    if (!string.IsNullOrEmpty(info.Name) && !string.IsNullOrEmpty(info.Hostname))
+                        endpointList.Add(info);
                 }
                 catch (Newtonsoft.Json.JsonReaderException)
                 {

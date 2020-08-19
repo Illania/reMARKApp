@@ -558,7 +558,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             try
             {
                 microsoftAuthService = new MicrosoftAuthService();
-                await microsoftAuthService.Authenticate(this, true); //
+                await microsoftAuthService.Authenticate(this);
 
                 var azureUser = await microsoftAuthService.GetAzureUser();
                 var endpointList = await microsoftAuthService.GetAzureEndpointInfoList();

@@ -39,7 +39,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         TextInputEditText hostnameEditText;
         TextInputEditText portEditText;
         AppCompatSpinner sslSpinner;
-        FloatingActionButton loginButton;
+        AppCompatButton loginButton;
         AppCompatImageButton loginWithMicrosoftButton;
 
         IAuthenticator authenticator;
@@ -77,7 +77,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             portEditText.TextChanged += (sender, e) => portEditText.Error = null;
             sslSpinner = FindViewById<AppCompatSpinner>(Resource.Id.ssl_spinner);
             sslSpinner.Adapter = CustomArrayAdapter.CreateWithLeftPaddingMatchingEditText(this, Resource.Array.ssl_modes, Resource.Layout.login_spinner, Resource.Layout.support_simple_spinner_dropdown_item);
-            loginButton = FindViewById<FloatingActionButton>(Resource.Id.login_button);
+            loginButton = FindViewById<AppCompatButton>(Resource.Id.login_button);
             loginButton.Click += LoginButton_Click;
             loginWithMicrosoftButton = FindViewById<AppCompatImageButton>(Resource.Id.sign_microsoft_button);
             loginWithMicrosoftButton.Click += LoginWithMicrosoftButton_Click;
@@ -210,7 +210,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             try
             {
                 var microsoftAuthService = new MicrosoftAuthService();
-                await microsoftAuthService.Authenticate(this, false);
+                await microsoftAuthService.Authenticate(this);
 
                 var azureUser = await microsoftAuthService.GetAzureUser();
                 var endpointList = await microsoftAuthService.GetAzureEndpointInfoList();
@@ -236,7 +236,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var azureUserId = azureUser.Id;
                 var hostname = endpointInfo.Hostname;
                 var port = endpointInfo.Port;
-                var sslMode = endpointInfo.SslMode;
+                var sslMode = endpointInfo.UseSsl ? SslMode.On : SslMode.Off;
 
                 SetSSLMode(sslMode);
 
@@ -267,7 +267,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         {
             CommonConfig.Logger.Info($"Attempting login...");
 
-            var btn = (FloatingActionButton)sender;
+            var btn = (AppCompatButton)sender;
 
             btn.Clickable = false;
 
