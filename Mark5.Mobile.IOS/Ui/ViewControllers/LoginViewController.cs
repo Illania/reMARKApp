@@ -558,7 +558,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             try
             {
                 microsoftAuthService = new MicrosoftAuthService();
-                await microsoftAuthService.Authenticate(this, false);
+                await microsoftAuthService.Authenticate(this, true); //
 
                 var azureUser = await microsoftAuthService.GetAzureUser();
                 var endpointList = await microsoftAuthService.GetAzureEndpointInfoList();
@@ -584,7 +584,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var azureUserId = azureUser.Id;
                 var hostname = endpointInfo.Hostname;
                 var port = endpointInfo.Port;
-                var sslMode = endpointInfo.SslMode;
+                var sslMode = endpointInfo.UseSsl ? SslMode.On : SslMode.Off;
 
                 SetSSLMode(sslMode);
 

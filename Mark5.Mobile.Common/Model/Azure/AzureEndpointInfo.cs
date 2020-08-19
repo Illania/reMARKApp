@@ -2,9 +2,11 @@
 {
     public class AzureEndpointInfo
     {
+        public string CustomerName { get; set; }
+        public string CustomerGuid { get; set; }
         public string Name { get; set; }
         public string Hostname { get; set; }
         public int Port { get; set; }
-        public SslMode SslMode { get; set; }
+        public bool UseSsl { get; set; }
     }
 }
