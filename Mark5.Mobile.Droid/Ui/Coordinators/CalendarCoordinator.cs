@@ -78,6 +78,11 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
 
         public Task ShowError(Exception ex)
         {
+            activity?.RunOnUiThread(async () =>
+            {
+                await Dialogs.ShowErrorDialogAsync(activity, ex);
+            });
+
             return Task.CompletedTask;
         }
 
