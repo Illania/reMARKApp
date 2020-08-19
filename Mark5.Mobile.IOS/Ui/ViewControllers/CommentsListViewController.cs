@@ -137,7 +137,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             tableView.EstimatedRowHeight = 20f;
             View.AddSubview(tableView);
 
-            NSLayoutConstraint tableViewBottomConstraint = null;
+            NSLayoutConstraint tableViewBottomConstraint;
 
             if (Integration.IsRunningAtLeast(11))
                 tableViewBottomConstraint = tableView.BottomAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.BottomAnchor);
@@ -164,9 +164,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             commentView.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
 
             if (Integration.IsRunningAtLeast(11))
-                commentViewBottomConstraint = commentView.BottomAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.BottomAnchor);
-            else
-                commentViewBottomConstraint = commentView.BottomAnchor.ConstraintEqualTo(View.BottomAnchor);
+                commentViewBottomConstraint = commentView.BottomAnchor.ConstraintEqualTo(tableView.BottomAnchor);
 
             View.AddSubview(commentView);
             View.AddConstraints(new[]
@@ -224,7 +222,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 commentTextScrollView.BottomAnchor.ConstraintEqualTo(commentView.BottomAnchor,-7f),
                 commentTextScrollView.HeightAnchor.ConstraintGreaterThanOrEqualTo(0f),
                 commentTextScrollViewHeightConstraint = commentTextScrollView.HeightAnchor.ConstraintEqualTo(0f),
-                   
+
                 addCommentButton.RightAnchor.ConstraintEqualTo(commentView.RightAnchor,-7f),
                 addCommentButton.CenterYAnchor.ConstraintEqualTo(commentTextScrollView.CenterYAnchor)
             });
@@ -373,7 +371,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var height = KeyboardObserverInputAccessoryView.GetVisibleKeyboardHeight(View, frame);
 
             if (Integration.IsRunningAtLeast(11))
-                commentViewBottomConstraint.Constant = height == 0 ? 0 : -height + (View.SafeAreaInsets.Bottom);
+                commentViewBottomConstraint.Constant = height <= 0 ? 0 : -height + (View.SafeAreaInsets.Bottom);
             else
                 commentViewBottomConstraint.Constant = -height;
 
