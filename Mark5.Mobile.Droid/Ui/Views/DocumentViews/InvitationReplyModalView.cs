@@ -16,8 +16,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 {
     public class InvitationReplyModalView : LinearLayoutCompat
     {
-        readonly int verticalMargine;
-        readonly int horizontalMargine;
+        readonly int verticalMargin;
+        readonly int horizontalMargin;
+        readonly int reducedHorizontalMargin;
+
         readonly ParticipantStatus userStatus;
 
         AppCompatTextView lineLabel;
@@ -39,8 +41,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 Line = predefinedLine
             };
 
-            verticalMargine = Conversion.ConvertDpToPixels(20f);
-            horizontalMargine = Conversion.ConvertDpToPixels(20f);
+            verticalMargin = Conversion.ConvertDpToPixels(20f);
+            horizontalMargin = Conversion.ConvertDpToPixels(20f);
+            reducedHorizontalMargin = Conversion.ConvertDpToPixels(5f);
 
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
             Orientation = Vertical;
@@ -59,9 +62,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 Clickable = true,
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
                 {
-                    LeftMargin = horizontalMargine,
-                    RightMargin = horizontalMargine,
-                    TopMargin = verticalMargine
+                    LeftMargin = horizontalMargin,
+                    RightMargin = horizontalMargin,
+                    TopMargin = verticalMargin
                 }
             };
 
@@ -100,10 +103,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
                 {
-                    LeftMargin = horizontalMargine,
-                    RightMargin = horizontalMargine,
-                    TopMargin = verticalMargine,
-                    BottomMargin = verticalMargine
+                    LeftMargin = horizontalMargin,
+                    RightMargin = horizontalMargin,
+                    TopMargin = verticalMargin,
+                    BottomMargin = verticalMargin
                 }
             };
 
@@ -154,29 +157,29 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
                 {
-                    LeftMargin = horizontalMargine,
-                    RightMargin = horizontalMargine,
-                    BottomMargin = verticalMargine
+                    LeftMargin = reducedHorizontalMargin,
+                    RightMargin = reducedHorizontalMargin,
+                    BottomMargin = verticalMargin
                 }
             };
 
             acceptButton = new ReplyButton(Context, ParticipantStatus.Accepted)
             {
-                LayoutParameters = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1)
+                LayoutParameters = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 7)
             };
             acceptButton.ButtonTapped += ButtonClicked;
             container.AddView(acceptButton);
 
             tentativeButton = new ReplyButton(Context, ParticipantStatus.Tentative)
             {
-                LayoutParameters = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1)
+                LayoutParameters = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 9)
             };
             tentativeButton.ButtonTapped += ButtonClicked;
             container.AddView(tentativeButton);
 
             declineButton = new ReplyButton(Context, ParticipantStatus.Declined)
             {
-                LayoutParameters = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1)
+                LayoutParameters = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 8)
             };
             declineButton.ButtonTapped += ButtonClicked;
             container.AddView(declineButton);
