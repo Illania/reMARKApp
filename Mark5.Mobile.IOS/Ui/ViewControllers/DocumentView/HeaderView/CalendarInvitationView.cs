@@ -81,7 +81,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         {
             var appointment = Document?.Invitations?.FirstOrDefault();
 
-            if (appointment == null)
+            if (appointment == null || DocumentPreview?.Direction == DocumentDirection.Outgoing)
                 return;
 
             summaryLabel.Text = appointment.Summary;
