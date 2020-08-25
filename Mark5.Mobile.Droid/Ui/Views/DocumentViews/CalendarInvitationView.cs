@@ -151,7 +151,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 return Task.CompletedTask;
             }
 
-            int buttonTitle = 0;
+            int buttonTitle;
 
             switch (appointment.Status)
             {
