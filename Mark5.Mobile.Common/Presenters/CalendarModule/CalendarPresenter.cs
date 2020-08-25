@@ -155,6 +155,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         private void Cache_NoAppointmentToRetrieve(object sender, EventArgs e)
         {
+            firstLoad = false;
             view.StopLoading();
         }
 
@@ -162,6 +163,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         {
             if (!shownRetrievalError)
             {
+                firstLoad = false;
                 shownRetrievalError = true;
                 view.StopLoading();
                 view.ShowError(e);
