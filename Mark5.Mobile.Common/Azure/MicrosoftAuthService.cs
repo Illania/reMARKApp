@@ -53,13 +53,15 @@ namespace Mark5.Mobile.Common.Azure
                 }));
         }
 
-        public async Task Authenticate(object parentWindow, bool forceInteractive = true)
+        public async Task Authenticate(object parentWindow, bool forceInteractive = false)
         {
             if (account != null && string.IsNullOrEmpty(accessToken))
                 return;
 
             AuthenticationResult authResult = null;
             var accounts = await pca.GetAccountsAsync();
+            if (accounts.Count() > 1)
+                forceInteractive = true;
 
             if (!forceInteractive)
             {
