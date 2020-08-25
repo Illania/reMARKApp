@@ -210,7 +210,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
             var dialog = new AlertDialog.Builder(Context);
 
-            dialog.SetSingleChoiceItems(choices, 0, (obj, selected) =>
+            dialog.SetSingleChoiceItems(choices, -1, (obj, selected) =>
             {
                 var dial = obj as AlertDialog;
                 DetailsModel.Line = ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines[selected.Which];
