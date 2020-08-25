@@ -15,7 +15,7 @@ namespace Mark5.Mobile.Common.Azure
     {
         const string clientId = "ca4a3013-2f7f-4733-aa6c-126c8d34216f";
         const string iosRedirectURI = "msauth.com.nordic-it.mark5.mobile.ios://auth";
-        const string androidRedirectUURI = "msauth://com.nordic_it.mark5.android/dUOzGWwhv%2BzH%2F6bxqKb4ZlnNC8M%3D";
+        const string androidRedirectURI = "msauth://com.nordic_it.mark5.android/dUOzGWwhv%2BzH%2F6bxqKb4ZlnNC8M%3D";
         const string extensionName = "com.remark-app.endpoint";
 
         readonly string[] scopes = { };
@@ -38,7 +38,7 @@ namespace Mark5.Mobile.Common.Azure
             else if (DeviceInfo.Platform == DevicePlatform.Android)
             {
                 pca = PublicClientApplicationBuilder.Create(clientId)
-                        .WithRedirectUri(androidRedirectUURI)
+                        .WithRedirectUri(androidRedirectURI)
                         .Build();
             }
 
@@ -120,9 +120,9 @@ namespace Mark5.Mobile.Common.Azure
                     if (!string.IsNullOrEmpty(info.Name) && !string.IsNullOrEmpty(info.Hostname))
                         endpointList.Add(info);
                 }
-                catch (Newtonsoft.Json.JsonReaderException)
+                catch (JsonReaderException)
                 {
-                    //We expext this kind of exception
+                    //We expect this kind of exception
                     //If this happens it means we are trying to parse one of the "default" elements of extension additional data
                 }
             }

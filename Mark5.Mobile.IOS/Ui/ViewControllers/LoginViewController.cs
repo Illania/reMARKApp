@@ -66,7 +66,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         SslMode sslMode = SslMode.On;
 
         NSObject keyboardWillAppearObsever;
-        NSObject keyboardWillHideObserver;
 
         ConnectionInfo retainedConnectionInfo;
 
@@ -89,7 +88,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InitializeHandlers();
 
             keyboardWillAppearObsever = UIKeyboard.Notifications.ObserveWillChangeFrame(OnKeyboardWillChangeFrame);
-            keyboardWillHideObserver = UIKeyboard.Notifications.ObserveWillHide(OnKeyboardWillHide);
+            UIKeyboard.Notifications.ObserveWillHide(OnKeyboardWillHide);
         }
 
         public override async void ViewDidAppear(bool animated)
@@ -162,7 +161,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             containerView.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             containerView.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             View.AddSubview(containerView);
-            View.AddConstraints(new NSLayoutConstraint[]
+            View.AddConstraints(new[]
             {
                 containerView.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor),
                 containerCenter = containerView.CenterYAnchor.ConstraintEqualTo(View.CenterYAnchor),
@@ -173,7 +172,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             animationView.TranslatesAutoresizingMaskIntoConstraints = false;
             containerView.AddSubview(animationView);
 
-            View.AddConstraints(new NSLayoutConstraint[]
+            View.AddConstraints(new[]
             {
                 animationView.CenterXAnchor.ConstraintEqualTo(containerView.CenterXAnchor),
                 animationView.TopAnchor.ConstraintEqualTo(containerView.TopAnchor),
@@ -328,13 +327,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 portTextField.HeightAnchor.ConstraintEqualTo(TextFieldHeight)
             });
 
-            loginButton = new UIButton();
-            loginButton.SetTitle(Localization.GetString("login"), UIControlState.Normal);
+            loginButton = new UIButton {Enabled = false, Alpha = 0};
             loginButton.TitleLabel.Font = Theme.DefaultBoldFont;
             loginButton.TranslatesAutoresizingMaskIntoConstraints = false;
+            loginButton.SetTitle(Localization.GetString("login"), UIControlState.Normal);
             loginButton.SetTitleColor(Theme.DarkBlue, UIControlState.Normal);
-            loginButton.Enabled = false;
-            loginButton.Alpha = 0;
+            
             containerView.AddSubview(loginButton);
             containerView.AddConstraints(new[]
             {
@@ -344,13 +342,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 loginButton.HeightAnchor.ConstraintEqualTo(LoginButtonHeight),
             });
 
-            orLabel = new UILabel();
-            orLabel.Text = "or";
-            orLabel.Font = Theme.DefaultFont;
-            orLabel.TranslatesAutoresizingMaskIntoConstraints = false;
-            orLabel.TextColor = Theme.DarkBlue;
-            orLabel.TextAlignment = UITextAlignment.Center;
-            orLabel.Alpha = 0;
+            orLabel = new UILabel
+            {
+                Text = "or",
+                Font = Theme.DefaultFont,
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                TextColor = Theme.DarkBlue,
+                TextAlignment = UITextAlignment.Center,
+                Alpha = 0
+            };
             containerView.AddSubview(orLabel);
             containerView.AddConstraints(new[]
             {
@@ -359,11 +359,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 orLabel.WidthAnchor.ConstraintEqualTo(LoginButtonWidth),
             });
 
-            loginWithMicrosoftButton = new UIButton();
+            loginWithMicrosoftButton = new UIButton {Alpha = 0, Enabled = true};
             loginWithMicrosoftButton.SetImage(UIImage.FromBundle("AzureLogin"), UIControlState.Normal);
             loginWithMicrosoftButton.TranslatesAutoresizingMaskIntoConstraints = false;
-            loginWithMicrosoftButton.Alpha = 0;
-            loginWithMicrosoftButton.Enabled = true;
+            
             containerView.AddSubview(loginWithMicrosoftButton);
             containerView.AddConstraints(new[]
             {
