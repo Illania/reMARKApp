@@ -4,6 +4,7 @@ using Mark5.Mobile.Common.Extensions;
 using DataContract = Mark5.ServiceReference.DataContract;
 using System.Collections.Generic;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Common.Model.Azure;
 
 namespace Mark5.Mobile.Common.Model.Converters
 {
@@ -733,6 +734,17 @@ namespace Mark5.Mobile.Common.Model.Converters
         #endregion
 
         #region Model to DataContract
+
+        public static DataContract.AzureUser Convert(this AzureUser au)
+        {
+            return new DataContract.AzureUser
+            {
+                Id = au.Id,
+                DisplayName = au.DisplayName,
+                UserPrincipalName = au.UserPrincipalName,
+                Mail = au.Mail
+            };
+        }
 
         public static DataContract.Document Convert(this Document doc)
         {

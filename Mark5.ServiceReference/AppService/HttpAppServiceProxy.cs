@@ -191,6 +191,11 @@ namespace Mark5.ServiceReference.AppService
             return await InvokeAsync<AuthenticateResult, AuthenticateParameters>("Authenticate", parameters, ct);
         }
 
+        public async Task<AuthenticateWithAzureResult> AuthenticateWithAzureAsync(AuthenticateWithAzureParameters parameters, CancellationToken ct = default(CancellationToken))
+        {
+            return await InvokeAsync<AuthenticateWithAzureResult, AuthenticateWithAzureParameters>("AuthenticateWithAzure", parameters, ct);
+        }
+
         public async Task<GetFoldersResult> GetFoldersAsync(GetFoldersParameters parameters, CancellationToken ct = default(CancellationToken))
         {
             return await InvokeAsync<GetFoldersResult, GetFoldersParameters>("GetFolders", parameters, ct);

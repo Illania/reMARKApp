@@ -28,6 +28,7 @@
 		<MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
 		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
 		<LangVersion>8.0</LangVersion>
+		<CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
 		<DebugType>none</DebugType>
@@ -406,6 +407,21 @@
 		<Reference Include="GMImagePicker.Xamarin">
 		  <HintPath>..\packages\GMImagePicker.Xamarin.2.3.5\lib\xamarinios10\GMImagePicker.Xamarin.dll</HintPath>
 		</Reference>
+		<Reference Include="Microsoft.Identity.Client">
+		  <HintPath>..\packages\Microsoft.Identity.Client.4.16.1\lib\xamarinios10\Microsoft.Identity.Client.dll</HintPath>
+		</Reference>
+		<Reference Include="System.IdentityModel" />
+		<Reference Include="System.Runtime.Serialization" />
+		<Reference Include="System.Xml.Linq" />
+		<Reference Include="System.Diagnostics.DiagnosticSource">
+		  <HintPath>..\packages\System.Diagnostics.DiagnosticSource.4.6.0\lib\netstandard1.3\System.Diagnostics.DiagnosticSource.dll</HintPath>
+		</Reference>
+		<Reference Include="Microsoft.Graph.Core">
+		  <HintPath>..\packages\Microsoft.Graph.Core.1.19.0\lib\xamarinios10\Microsoft.Graph.Core.dll</HintPath>
+		</Reference>
+		<Reference Include="Microsoft.Graph">
+		  <HintPath>..\packages\Microsoft.Graph.1.21.0\lib\netstandard1.3\Microsoft.Graph.dll</HintPath>
+		</Reference>
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Mark5.Mobile.Common\Mark5.Mobile.Common.csproj">
@@ -688,6 +704,8 @@
 		<ImageAsset Include="Assets_icons.xcassets\Priority-High.imageset\Contents.json" />
 		<ImageAsset Include="Assets_icons.xcassets\Priority-High.imageset\high_priority.pdf" />
 		<ImageAsset Include="Assets_icons.xcassets\Priority-Low.imageset\low_priority.pdf" />
+		<ImageAsset Include="Assets_icons.xcassets\AzureLogin.imageset\Contents.json" />
+		<ImageAsset Include="Assets_icons.xcassets\AzureLogin.imageset\azure_login_light.pdf" />
 	</ItemGroup>
 	<ItemGroup>
 		<BundleResource Include="Resources\Base.lproj\Localizable.strings" />
@@ -808,6 +826,7 @@
 	  <Folder Include="Assets_icons.xcassets\Pr.imageset\" />
 	  <Folder Include="Assets_icons.xcassets\Password-Show.imageset\" />
 	  <Folder Include="Assets_icons.xcassets\Password-Hide.imageset\" />
+	  <Folder Include="Assets_icons.xcassets\AzureLogin.imageset\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 	<Import Project="..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets" Condition="Exists('..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets')" />

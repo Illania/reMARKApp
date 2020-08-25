@@ -13,6 +13,8 @@ namespace Mark5.ServiceReference.AppService
 
         Task<AuthenticateResult> AuthenticateAsync(AuthenticateParameters parameters, CancellationToken ct = default(CancellationToken));
 
+        Task<AuthenticateWithAzureResult> AuthenticateWithAzureAsync(AuthenticateWithAzureParameters parameters, CancellationToken ct = default(CancellationToken));
+
         #endregion
 
         #region Folders

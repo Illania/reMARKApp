@@ -273,6 +273,7 @@
     <string name="log_in_failed_message_access_disabled">Your device does not have access enabled. Please contact your system administrator</string>
     <string name="log_in_failed_message_account_locked">Account locked. Please contact your system administrator.</string>
     <string name="log_in_failed_message">Please check your credentials and try again</string>
+    <string name="log_in_failed_azure_message">Could not log in to reMARK. An error happened during authentication.</string>
     <string name="log_in_failed_title">Log in failed</string>
     <string name="logging_in">Logging in</string>
     <string name="low_priority_document">This email has low priority</string>
@@ -324,6 +325,7 @@
     <string name="offline">Offline</string>
     <string name="ok">OK</string>
     <string name="on">on</string>
+    <string name="or">OR</string>
     <string name="open_drawer">Open navigation drawer</string>
     <string name="opening_attachment">Opening attachment</string>
     <string name="outgoing">Outgoing</string>
