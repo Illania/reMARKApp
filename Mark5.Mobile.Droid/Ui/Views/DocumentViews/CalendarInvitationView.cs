@@ -111,11 +111,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
         {
             var appointment = Document?.Invitations?.FirstOrDefault();
 
-            if (appointment == null)
+            if (appointment == null || DocumentPreview?.Direction == DocumentDirection.Outgoing)
             {
                 Visibility = ViewStates.Gone;
                 return Task.CompletedTask;
-
             }
 
             Visibility = ViewStates.Visible;
