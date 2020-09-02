@@ -48,6 +48,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
             var leadingMarginGuide = new UILayoutGuide();
             ContentView.AddLayoutGuide(leadingMarginGuide);
+            ContentView.ClipsToBounds = true;
 
             leadingMarginGuide.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor).Active = true;
             var leadingMarginWidthAnchor = leadingMarginGuide.WidthAnchor.ConstraintEqualTo(0f);
