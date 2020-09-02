@@ -158,7 +158,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             if (obj.Change != DocumentUploadStatusChangedMessage.Status.DocumentSent && obj.Change != DocumentUploadStatusChangedMessage.Status.DocumentSentFailed)
                 return;
 
-            QueueBanner(BannerInfo.FromStatus(obj.Change));
+            QueueBanner(BannerInfo.FromMessage(obj));
         }
 
         class BannerInfo
@@ -168,17 +168,19 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             private BannerInfo() { }
 
-            public static BannerInfo FromStatus(DocumentUploadStatusChangedMessage.Status status)
+            public static BannerInfo FromMessage(DocumentUploadStatusChangedMessage msg)
             {
+                var status = msg.Change;
+
                 var bannerInfo = new BannerInfo();
                 if (status == DocumentUploadStatusChangedMessage.Status.DocumentSent)
                 {
-                    bannerInfo.Text = Localization.GetString("email_sent");
+                    bannerInfo.Text = msg.IsDraft ? Localization.GetString("draft_saved") : Localization.GetString("email_sent");
                     bannerInfo.Color = Theme.TintColor;
                 }
                 else if (status == DocumentUploadStatusChangedMessage.Status.DocumentSentFailed)
                 {
-                    bannerInfo.Text = Localization.GetString("email_error");
+                    bannerInfo.Text = msg.IsDraft ? Localization.GetString("draft_error") : Localization.GetString("email_error");
                     bannerInfo.Color = UIColor.Red;
                 }
 

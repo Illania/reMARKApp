@@ -124,6 +124,8 @@
     <string name="download_in_progress_cancel_to_go_back">Download is in progress, Cancel the download to go back.</string>
     <string name="download_in_progress_warning">If you cancel download all progress will be lost and you will have to download this folder again. Do you want to cancel?</string>
     <string name="downloading_percentage">Downloading %1$d%%...</string>
+    <string name="draft_saved">Draft saved</string>
+    <string name="draft_error">Error while saving draft</string>
     <string name="edit">Edit</string>
     <string name="edit_appointment">Edit Appointment</string>
     <string name="edit_comment_message">Edit comment message</string>
