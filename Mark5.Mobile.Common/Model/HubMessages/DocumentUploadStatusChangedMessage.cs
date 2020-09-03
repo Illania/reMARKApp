@@ -14,14 +14,17 @@ namespace Mark5.Mobile.Common.Model.HubMessages
             DocumentDiscarded,
         }
 
+        public bool IsDraft { get; }
+
         public Status Change { get; }
         public Guid DocumentGuid { get; }
 
-        public DocumentUploadStatusChangedMessage(object sender, Status change, Guid documentGuid)
+        public DocumentUploadStatusChangedMessage(object sender, Status change, Guid documentGuid, bool isDraft = false)
             : base(sender)
         {
             Change = change;
             DocumentGuid = documentGuid;
+            IsDraft = isDraft;
         }
     }
 }
