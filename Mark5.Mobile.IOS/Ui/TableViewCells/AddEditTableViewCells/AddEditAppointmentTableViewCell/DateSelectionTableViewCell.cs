@@ -15,7 +15,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
         static readonly string Key = "DateSelectioTableViewCell";
         readonly DateRowType rowType;
 
-        UIDatePicker datePicker;
+        UIDatePickerStyled datePicker;
 
         public Action<DateTimeChangeEvent> DateChanged = delegate { };
         public UITextField DateTextField;
@@ -34,7 +34,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
             };
             ContentView.Add(Label);
 
-            datePicker = new UIDatePicker
+            datePicker = new UIDatePickerStyled
             {
                 Mode = UIDatePickerMode.DateAndTime
             };
@@ -145,7 +145,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
 
         private void SetDateOnlyPicker(DateTime dateTime)
         {
-            datePicker = new UIDatePicker
+            datePicker = new UIDatePickerStyled
             {
                 Mode = UIDatePickerMode.Date
             };
@@ -156,7 +156,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
 
         private void SetDateAndTimePicker(DateTime dateTime)
         {
-            datePicker = new UIDatePicker
+            datePicker = new UIDatePickerStyled
             {
                 Mode = UIDatePickerMode.DateAndTime
             };
