@@ -18,7 +18,7 @@ namespace Mark5.Mobile.Common.Azure
         const string androidRedirectURI = "msauth://com.nordic_it.mark5.android/dUOzGWwhv%2BzH%2F6bxqKb4ZlnNC8M%3D";
         const string extensionName = "com.remark-app.endpoint";
 
-        readonly string[] scopes = { };
+        readonly string[] scopes = { "User.Read" };
 
         readonly IPublicClientApplication pca;
         readonly GraphServiceClient graphClient;
@@ -53,7 +53,7 @@ namespace Mark5.Mobile.Common.Azure
                 }));
         }
 
-        public async Task Authenticate(object parentWindow, bool forceInteractive = false)
+        public async Task Authenticate(object parentWindow, bool forceInteractive = true)
         {
             if (account != null && string.IsNullOrEmpty(accessToken))
                 return;
