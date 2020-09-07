@@ -20,6 +20,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         Action loadingDialogDismissal;
 
         readonly MonthViewController monthViewController;
+        DayWeekViewController dayWeekViewController;
         readonly UICache uiCache;
 
         public NavigationController RootController { get; }
@@ -104,7 +105,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         public void DateDoubleTapped(NSDate date)
         {
-            RootController.PushViewController(new DayWeekViewController(this, date), true);
+            dayWeekViewController = new DayWeekViewController(this, date);
+            RootController.PushViewController(dayWeekViewController, true);
         }
 
         public void CreateAppointmentClicked(NSDate date)
@@ -133,6 +135,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             presenter = new CalendarPresenter();
             presenter.AttachView(this);
             presenter.Start();
+        }
+
+        public void ReleaseDayViewController()
+        {
+            dayWeekViewController = null;
         }
 
         public void YearTapped(NSDate date)
@@ -177,6 +184,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         private void UiCache_SourceUpdated(object sender, EventArgs e)
         {
+            dayWeekViewController?.UpdateSource();
             monthViewController.UpdateSource();
         }
 
@@ -328,6 +336,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         void MonthTapped(NSDate date);
         void CreateAppointmentClicked(NSDate date);
         void MonthViewLoaded();
+        void ReleaseDayViewController();
         void YearTapped(NSDate nSDate);
         void CalendarsClicked();
         void AppointmentTapped(ScheduleAppointment appointment);
