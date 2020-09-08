@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="56dp">
+    android:layout_height="wrap_content"
+    android:minHeight="56dp">
     <include
         layout="@layout/selected_overlay" />
     <android.support.v7.widget.LinearLayoutCompat
@@ -30,7 +31,7 @@
         <android.support.v7.widget.LinearLayoutCompat
             android:id="@+id/folderNameLayout"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:paddingTop="8dp"
             android:paddingBottom="8dp"
             android:orientation="vertical"
@@ -40,10 +41,8 @@
                 android:id="@+id/list_item_folder_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:textAppearance="@style/fontListPrimary"
-                android:layout_marginBottom="2dp"
-                android:layout_weight="1" />
+                android:textAppearance="@style/fontListPrimary"/>
+                android:layout_marginBottom="2dp" />
             <android.support.v7.widget.AppCompatTextView
                 android:id="@+id/list_item_folder_subtitle"
                 android:singleLine="true"
