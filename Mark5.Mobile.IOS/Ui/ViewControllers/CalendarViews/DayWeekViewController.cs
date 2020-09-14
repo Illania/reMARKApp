@@ -12,12 +12,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         UIBarButtonItem todayButton;
         UIBarButtonItem addButtonItem;
         UIBarButtonItem switchButtonItem;
+        readonly ICalendarCoordinator calendarCoordinator;
 
         readonly NSDate initialDate;
 
         public DayWeekViewController(ICalendarCoordinator coordinator, NSDate date) : base(coordinator)
         {
             initialDate = date;
+            calendarCoordinator = coordinator;
         }
 
         public override void LoadView()
@@ -55,6 +57,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             base.ViewWillDisappear(animated);
 
             DeInitializeHandlers();
+
+            if (IsMovingFromParentViewController) {
+                calendarCoordinator?.ReleaseDayViewController();
+            }
+            
         }
 
         void InitializeHandlers()
