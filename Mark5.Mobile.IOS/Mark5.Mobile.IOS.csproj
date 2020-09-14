@@ -668,8 +668,6 @@
 		<ImageAsset Include="Assets_icons.xcassets\Nav-contacts.imageset\Contents.json" />
 		<ImageAsset Include="Assets_icons.xcassets\Nav-contacts.imageset\Nav-contacts%402x.png" />
 		<ImageAsset Include="Assets_icons.xcassets\Nav-contacts.imageset\Nav-contacts%403x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Nav-search.imageset\Nav-search%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Nav-search.imageset\Nav-search%403x.png" />
 		<ImageAsset Include="Assets_icons.xcassets\Nav-calendar.imageset\Contents.json" />
 		<ImageAsset Include="Assets_icons.xcassets\Nav-calendar.imageset\Nav-calendar%402x.png" />
 		<ImageAsset Include="Assets_icons.xcassets\Nav-calendar.imageset\Nav-calendar%403x.png" />
@@ -706,6 +704,7 @@
 		<ImageAsset Include="Assets_icons.xcassets\Priority-Low.imageset\low_priority.pdf" />
 		<ImageAsset Include="Assets_icons.xcassets\AzureLogin.imageset\Contents.json" />
 		<ImageAsset Include="Assets_icons.xcassets\AzureLogin.imageset\azure_login_light.pdf" />
+		<ImageAsset Include="Assets_icons.xcassets\Nav-search.imageset\nav-search-1.pdf" />
 	</ItemGroup>
 	<ItemGroup>
 		<BundleResource Include="Resources\Base.lproj\Localizable.strings" />
