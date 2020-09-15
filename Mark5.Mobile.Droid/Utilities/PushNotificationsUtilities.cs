@@ -135,8 +135,6 @@ namespace Mark5.Mobile.Droid.Utilities
             builder.SetPriority((int)NotificationPriority.High);
 
             Android.App.Notification notification = builder.Build();
-            notification.Defaults = 0;
-
             notificationManager.Notify(StackNotification, notification);
         }
 

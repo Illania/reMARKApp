@@ -28,7 +28,7 @@ namespace Mark5.Mobile.Droid.Utilities
         {
             var ctx = Application.Context;
             var pi = ctx.PackageManager.GetPackageInfo(ctx.PackageName, 0);
-            return $"{pi.VersionName} ({pi.VersionCode})";
+            return $"{pi.VersionName} ({pi.LongVersionCode}";
         }
     }
 }
