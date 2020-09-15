@@ -424,14 +424,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void RefreshAllOnAppear()
         {
-            ((DataSource)TableView.Source)?.Clear();
             contactId = contactPreview.Id;
             contactPreview = null;
 
             if (SplitViewController == null || SplitViewController.Collapsed)
                 refreshDataOnAppear = true;
             else
-                RefreshData();
+                RefreshData(true);
         }
 
         void RowLongPressed(UILongPressGestureRecognizer gr)
@@ -559,7 +558,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var contactUpdated = await vc.Result;
 
                 if (contactUpdated)
-                    RefreshData();
+                    RefreshData(true);
                   
             }
             else
@@ -774,8 +773,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public bool IsShowingContactWithId(int contactId) => contactPreview?.Id == contactId || this.contactId == contactId;
 
-        public async void RefreshData()
+        public async void RefreshData(bool forceClean = false)
         {
+            if (forceClean)
+                ((DataSource)TableView.Source)?.Clear();
+
             cts?.Cancel();
             cts = new CancellationTokenSource();
             var token = cts.Token;
