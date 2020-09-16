@@ -68,6 +68,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         bool refreshDataOnAppear;
         bool hideDoneButton;
         bool forceShowActionBar;
+        bool finishedLoading;
 
         TinyMessageSubscriptionToken readStatusChangedToken;
         TinyMessageSubscriptionToken draftSentToken;
@@ -126,6 +127,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.ViewDidAppear(animated);
 
             CommonConfig.Logger.Info("Appeared");
+
+            if (IsRefreshing)
+            {
+                Clear();
+                refreshDataOnAppear = true;
+            }
 
             if (refreshDataOnAppear)
             {

@@ -1,14 +1,11 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 using CoreGraphics;
 using Foundation;
 using HtmlAgilityPack;
-using MailBee.Html;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Model;
@@ -61,6 +58,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         public int LoadTimeoutMiliseconds { get; set; } = 2500;
 
         protected bool IsLoading => webView?.IsLoading ?? false;
+        protected bool IsRefreshing { get; private set; }
 
         UIActivityIndicatorView loadIndicatorView;
         CustomWebView webView;
@@ -72,7 +70,6 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         string headerPaddingJsTemplate;
         bool headerAnimationRunning;
-
         nfloat keyboardHeight;
 
         NSObject keyboardDisShowNotification;
@@ -288,6 +285,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         protected async Task StartRefreshing()
         {
+            IsRefreshing = true;
             webView.Hidden = true;
             loadIndicatorView.StartAnimating();
 
@@ -315,6 +313,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             webView.Hidden = false;
             loadIndicatorView.StopAnimating();
+            IsRefreshing = false;
         }
 
         protected void Clear()
@@ -322,7 +321,10 @@ namespace Mark5.Mobile.IOS.Ui.Common
             if (webView != null)
                 webView.Hidden = true;
 
+            loadTcs.TrySetCanceled();
+            loadTcs = null;
             loadIndicatorView?.StopAnimating();
+            IsRefreshing = false;
         }
 
         public void ResetOffset()

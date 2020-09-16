@@ -65,9 +65,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
             if (NavigationController != null)
             {
                 if (NavigationController.NavigationBar != null)
-                {
                     NavigationController.NavigationBar.Translucent = false;
-                }
 
                 NavigationController.ToolbarHidden = Integration.IsIPad();
             }
@@ -81,9 +79,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
             if (NavigationController != null)
             {
                 if (NavigationController.NavigationBar != null)
-                {
                     NavigationController.NavigationBar.Translucent = true;
-                }
+
                 NavigationController.ToolbarHidden = true;
             }
             DeinitializeHandlers();
@@ -290,9 +287,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
         void UpdateToolBar(DocumentViewController vc)
         {
             if (Integration.IsIPad())
-            {
                 vc?.RefreshToolbar();
-            }
             else
             {
                 var ti = vc?.ToolbarItems;
@@ -352,7 +347,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
         #region Swipe Related
         //Both the delegate and the datasource are used only when swiping
 
-        DocumentViewController GoToPageAndReturnVC(DocumentPreview documentPreview, UIPageViewControllerNavigationDirection direction)
+        DocumentViewController GoToPageAndReturnVC(DocumentPreview documentPreview)
         {
             CommonConfig.UsageAnalytics.LogEvent(new DocumentQuickSwitchEvent());
             var vc = GetDocumentViewController(Folder, documentPreview);
@@ -395,7 +390,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
                     if (index < 0 || index >= pageVC.DocumentPreviews.Count - 1)
                         return null;
                     var nextDocumentPreview = pageVC.DocumentPreviews[index + 1];
-                    return pageVC.GoToPageAndReturnVC(nextDocumentPreview, UIPageViewControllerNavigationDirection.Forward);
+                    return pageVC.GoToPageAndReturnVC(nextDocumentPreview);
                 }
                 catch (Exception ex)
                 {
@@ -415,7 +410,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
                     if (index < 1)
                         return null;
                     var previousDocumentPreview = pageVC.DocumentPreviews[index - 1];
-                    return pageVC.GoToPageAndReturnVC(previousDocumentPreview, UIPageViewControllerNavigationDirection.Reverse);
+                    return pageVC.GoToPageAndReturnVC(previousDocumentPreview);
                 }
                 catch (Exception ex)
                 {
