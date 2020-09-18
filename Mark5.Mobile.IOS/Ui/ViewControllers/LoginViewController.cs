@@ -327,12 +327,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 portTextField.HeightAnchor.ConstraintEqualTo(TextFieldHeight)
             });
 
-            loginButton = new UIButton {Enabled = false, Alpha = 0};
+            loginButton = new UIButton { Enabled = false, Alpha = 0 };
             loginButton.TitleLabel.Font = Theme.DefaultBoldFont;
             loginButton.TranslatesAutoresizingMaskIntoConstraints = false;
             loginButton.SetTitle(Localization.GetString("login"), UIControlState.Normal);
             loginButton.SetTitleColor(Theme.DarkBlue, UIControlState.Normal);
-            
+
             containerView.AddSubview(loginButton);
             containerView.AddConstraints(new[]
             {
@@ -359,10 +359,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 orLabel.WidthAnchor.ConstraintEqualTo(LoginButtonWidth),
             });
 
-            loginWithMicrosoftButton = new UIButton {Alpha = 0, Enabled = true};
+            loginWithMicrosoftButton = new UIButton { Alpha = 0, Enabled = true };
             loginWithMicrosoftButton.SetImage(UIImage.FromBundle("AzureLogin"), UIControlState.Normal);
             loginWithMicrosoftButton.TranslatesAutoresizingMaskIntoConstraints = false;
-            
+
             containerView.AddSubview(loginWithMicrosoftButton);
             containerView.AddConstraints(new[]
             {
@@ -413,13 +413,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async Task RefreshData()
         {
-            retainedConnectionInfo = await authenticator.GetRetainedConnectionInfoAsync();
-            if (retainedConnectionInfo != null && string.IsNullOrEmpty(usernameTextField.Text + hostnameTextField.Text))
+            try
             {
-                usernameTextField.Text = retainedConnectionInfo.Username;
-                hostnameTextField.Text = retainedConnectionInfo.Hostname;
-                portTextField.Text = retainedConnectionInfo.Port.ToString();
-                sslMode = retainedConnectionInfo.SslMode;
+                retainedConnectionInfo = await authenticator.GetRetainedConnectionInfoAsync();
+                if (retainedConnectionInfo != null && string.IsNullOrEmpty(usernameTextField.Text + hostnameTextField.Text))
+                {
+                    usernameTextField.Text = retainedConnectionInfo.Username;
+                    hostnameTextField.Text = retainedConnectionInfo.Hostname;
+                    portTextField.Text = retainedConnectionInfo.Port.ToString();
+                    sslMode = retainedConnectionInfo.SslMode;
+                }
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Error while restoring retained connection info", ex);
             }
         }
 
