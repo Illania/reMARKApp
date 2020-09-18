@@ -34,7 +34,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             if (string.IsNullOrEmpty(UIPasteboard.General?.String))
             {
-                CommonConfig.Logger.Info("UIPasteboard is empty, canno paste as text");
+                CommonConfig.Logger.Info("UIPasteboard is empty, cannot paste as text");
                 return;
             }
 
