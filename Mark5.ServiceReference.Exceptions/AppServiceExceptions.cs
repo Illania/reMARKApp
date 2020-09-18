@@ -56,6 +56,12 @@ namespace Mark5.ServiceReference.Exceptions
 
         public AppServiceFaultDetail Detail { get; }
 
+        //This is used only for serialization
+        public HttpAppServiceException()
+        {
+
+        }
+
         public HttpAppServiceException(HttpStatusCode statusCode, string message)
             : base(message)
         {
