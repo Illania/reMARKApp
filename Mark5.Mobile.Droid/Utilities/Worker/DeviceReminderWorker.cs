@@ -8,6 +8,8 @@ namespace Mark5.Mobile.Droid.Utilities.Workers
 {
     public class DeviceReminderWorker : Worker
     {
+        static readonly string workerName = "DeviceReminderWorker";
+
         public DeviceReminderWorker(Context context, WorkerParameters workerParams) : base(context, workerParams)
         {
         }
@@ -35,7 +37,7 @@ namespace Mark5.Mobile.Droid.Utilities.Workers
                     .SetConstraints(constraints)
                     .Build();
 
-                WorkManager.Instance.Enqueue(pwr);
+                WorkManager.Instance.EnqueueUniquePeriodicWork(workerName, ExistingPeriodicWorkPolicy.Replace, pwr);
             }
             catch (Exception ex)
             {
