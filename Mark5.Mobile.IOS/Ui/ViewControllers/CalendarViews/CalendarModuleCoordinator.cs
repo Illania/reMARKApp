@@ -185,7 +185,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         private void UiCache_SourceUpdated(object sender, EventArgs e)
         {
             dayWeekViewController?.UpdateSource();
-            monthViewController.UpdateSource();
+            monthViewController?.UpdateSource();
         }
 
         #endregion
