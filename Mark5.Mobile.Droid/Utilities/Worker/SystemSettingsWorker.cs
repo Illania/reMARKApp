@@ -6,15 +6,16 @@ using Mark5.Mobile.Common.Job;
 
 namespace Mark5.Mobile.Droid.Utilities.Workers
 {
-    public class SystemSettingsWorker: Worker
+    public class SystemSettingsWorker : Worker
     {
+        static readonly string workerName = "SystemSettingsWorker";
 
         public SystemSettingsWorker(Context context, WorkerParameters workerParams) : base(context, workerParams)
         {
         }
 
         public override Result DoWork()
-        {          
+        {
             try
             {
                 AsyncHelpers.RunSync(Jobs.SystemSettingsUpdateJob.Run);
@@ -35,8 +36,8 @@ namespace Mark5.Mobile.Droid.Utilities.Workers
                 var pwr = PeriodicWorkRequest.Builder.From<DeviceReminderWorker>(1, Java.Util.Concurrent.TimeUnit.Days)
                     .SetConstraints(constraints)
                     .Build();
-                
-                WorkManager.Instance.Enqueue(pwr);
+
+                WorkManager.Instance.EnqueueUniquePeriodicWork(workerName, ExistingPeriodicWorkPolicy.Replace, pwr);
             }
             catch (Exception ex)
             {
