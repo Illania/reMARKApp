@@ -32,6 +32,12 @@ namespace Mark5.Mobile.IOS.Ui.Common
         [Export("pasteAsText:")]
         void PasteAsText(UIMenuController controller)
         {
+            if (string.IsNullOrEmpty(UIPasteboard.General?.String))
+            {
+                CommonConfig.Logger.Info("UIPasteboard is empty, cannot paste as text");
+                return;
+            }
+
             var stringToPaste = UIPasteboard.General.String
                 .Replace("\r", "")
                 .Replace("\n", "\\n");
