@@ -103,7 +103,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         public void UpdateSource()
         {
-            schedule.ItemsSource = coordinator.Items;
+            if (schedule != null && coordinator != null)
+                schedule.ItemsSource = coordinator.Items;
         }
 
         public static AppointmentMapping GetAppointmentMapping()
