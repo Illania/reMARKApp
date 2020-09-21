@@ -71,7 +71,11 @@ namespace Mark5.Mobile.Droid.Ui.Common
             if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
                 vibrator.Vibrate(VibrationEffect.CreateOneShot(250, VibrationEffect.DefaultAmplitude));
             else
+            {
+#pragma warning disable 612, 618
                 vibrator.Vibrate(250);
+#pragma warning restore 612, 618
+            }
         }
 
         void QueueBanner(BannerInfo info)
