@@ -6,6 +6,7 @@ using Android.App;
 using Android.Content;
 using Android.Net;
 using Android.OS;
+using Android.Support.V4.Content.PM;
 using Firebase;
 using Firebase.Iid;
 using Mark5.Mobile.Common;
@@ -67,7 +68,8 @@ namespace Mark5.Mobile.Droid.Utilities
             sb.AppendLine("===== General =====");
             sb.AppendLine("Platform: Android");
             var pi = Application.Context.PackageManager.GetPackageInfo(Application.Context.PackageName, 0);
-            sb.AppendLine("Version: " + pi.VersionName + " (" + pi.LongVersionCode + ")");
+            var longVersionCode = PackageInfoCompat.GetLongVersionCode(pi);
+            sb.AppendLine("Version: " + pi.VersionName + " (" + longVersionCode + ")");
             sb.AppendLine("UTC Date: " + DateTime.UtcNow);
             sb.AppendLine("Local Date: " + DateTime.Now);
             sb.AppendLine();

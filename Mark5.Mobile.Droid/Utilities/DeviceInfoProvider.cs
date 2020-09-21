@@ -2,6 +2,7 @@
 using Android.Bluetooth;
 using Android.OS;
 using Android.Provider;
+using Android.Support.V4.Content.PM;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 
@@ -28,7 +29,9 @@ namespace Mark5.Mobile.Droid.Utilities
         {
             var ctx = Application.Context;
             var pi = ctx.PackageManager.GetPackageInfo(ctx.PackageName, 0);
-            return $"{pi.VersionName} ({pi.LongVersionCode}";
+            var longVersionCode = PackageInfoCompat.GetLongVersionCode(pi);
+
+            return $"{pi.VersionName} ({longVersionCode}";
         }
     }
 }
