@@ -70,6 +70,7 @@
     <AndroidDexTool>dx</AndroidDexTool>
     <LangVersion>8.0</LangVersion>
     <AndroidCreatePackagePerAbi>false</AndroidCreatePackagePerAbi>
+    <AndroidSupportedAbis>armeabi-v7a;arm64-v8a</AndroidSupportedAbis>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
