@@ -309,6 +309,7 @@
 		<Compile Include="Model\PlainTextProcessingConfiguration.cs" />
 		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\CalendarInvitationView.cs" />
 		<Compile Include="Ui\ViewControllers\InvitationReplyViewController.cs" />
+		<Compile Include="Ui\Common\UIDatePickerStyled.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

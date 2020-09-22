@@ -642,12 +642,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             readonly UIToolbar fromDatePickerToolbar;
             readonly UIBarButtonItem fromDateCancelButton;
             readonly UIBarButtonItem fromDateDoneButton;
-            readonly UIDatePicker fromDatePicker;
+            readonly UIDatePickerStyled fromDatePicker;
 
             readonly UIToolbar toDatePickerToolbar;
             readonly UIBarButtonItem toDateCancelButton;
             readonly UIBarButtonItem toDateDoneButton;
-            readonly UIDatePicker toDatePicker;
+            readonly UIDatePickerStyled toDatePicker;
 
             public DateRangeView()
             {
@@ -690,7 +690,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     }
                 };
 
-                fromDatePicker = new UIDatePicker
+                fromDatePicker = new UIDatePickerStyled
                 {
                     Mode = UIDatePickerMode.Date
                 };
@@ -759,7 +759,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     }
                 };
 
-                toDatePicker = new UIDatePicker
+                toDatePicker = new UIDatePickerStyled
                 {
                     Mode = UIDatePickerMode.Date
                 };

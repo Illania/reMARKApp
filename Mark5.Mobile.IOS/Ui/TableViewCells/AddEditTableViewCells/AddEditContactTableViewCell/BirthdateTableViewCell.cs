@@ -19,7 +19,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
         readonly UITextField dateTextField;
         readonly UIToolbar datePickerToolbar;
         readonly UIBarButtonItem dateDoneButton;
-        readonly UIDatePicker datePicker;
+        readonly UIDatePickerStyled datePicker;
 
         public BirthdateTableViewCell()
             : base(UITableViewCellStyle.Default, Key)
@@ -38,11 +38,11 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
                     }
             };
 
-            datePicker = new UIDatePicker
+            datePicker = new UIDatePickerStyled
             {
                 Mode = UIDatePickerMode.Date,
                 MinimumDate = null,
-                MaximumDate = NSDate.Now,
+                MaximumDate = NSDate.Now
             };
 
             dateTextField = new UITextField
