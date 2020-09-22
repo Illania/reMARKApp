@@ -71,9 +71,9 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             }
         }
 
-        public void EditAppointmentClicked()
+        public async void EditAppointmentClicked(AppointmentChangeType appointmentChangeType)
         {
-            view.OpenEditAppointment(appointment.CalendarId, appointment.Id);
+            view.OpenEditAppointment(appointment.CalendarId, appointment.Id, appointmentChangeType);
         }
 
         public async Task SendInvitationsClicked(LineViewModel lvm)
@@ -241,7 +241,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         Task DeleteAppointmentClicked();
         Task SendInvitationsClicked(LineViewModel lvm);
 
-        void EditAppointmentClicked();
+        void EditAppointmentClicked(AppointmentChangeType appointmentChangeType);
     }
 
     public interface IAppointmentView : IView
@@ -249,7 +249,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         void ShowAppointment(AppointmentViewModel appointment);
         void SetLines(IEnumerable<LineViewModel> lines);
         void CloseView();
-        void OpenEditAppointment(int calendarId, int appointmentId);
+        void OpenEditAppointment(int calendarId, int appointmentId, AppointmentChangeType appointmentChangeType);
 
         void ShowAppointmentLoadingDialog();
         void ShowDeletingDialog();

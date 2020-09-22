@@ -11,6 +11,7 @@ using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Presenters.CalendarModule;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.CalendarViews.AppointmentViews;
@@ -207,9 +208,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             FragmentManager?.PopBackStack();
         }
 
-        public void OpenEditAppointment(int calendarId, int appointmentId)
+        public void OpenEditAppointment(int calendarId, int appointmentId, AppointmentChangeType appointmentChangeType)
         {
-            var (aeaf, tag) = AddEditAppointmentFragment.NewInstance(calendarId, appointmentId);
+            var (aeaf, tag) = AddEditAppointmentFragment.NewInstance(calendarId, appointmentId, appointmentChangeType);
             ((AppCompatActivity)Activity).SupportFragmentManager.BeginTransaction()
                           .SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right)
                           .Replace(Resource.Id.fragment_container, aeaf, tag)

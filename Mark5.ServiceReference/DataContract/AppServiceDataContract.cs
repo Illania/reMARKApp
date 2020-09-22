@@ -1174,6 +1174,9 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "CalendarAppointment", Order = 0)]
         public CalendarAppointment CalendarAppointment { get; set; }
+
+        [DataMember(Name = "AppointmentChangeType", Order = 1)]
+        public AppointmentChangeType AppointmentChangeType { get; set; }
     }
 
     [DataContract(Name = "CreateOrUpdateCalendarAppointmentResult", Namespace = "com.nordic-it.appservice.v3")]
@@ -1490,6 +1493,15 @@ namespace Mark5.ServiceReference.DataContract
         [EnumMember(Value = "Inviting")] Inviting = 4,
         [EnumMember(Value = "Invited")] Invited = 5
     }
+
+    [DataContract(Name = "AppointmentChangeType", Namespace = "com.nordic-it.appservice.v3")]
+    public enum AppointmentChangeType
+    {
+        [EnumMember(Value = "Default")] Default = 0,
+        [EnumMember(Value = "Occurence")] Occurence = 1,
+        [EnumMember(Value = "Series")] Series = 2
+    }
+
 
     [DataContract(Name = "SendCalendarAppointmentInvitationsResult", Namespace = "com.nordic-it.appservice.v3")]
     public class SendCalendarAppointmentInvitationsResult

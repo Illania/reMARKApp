@@ -11,6 +11,7 @@ using Mark5.Mobile.Common.Presenters.CalendarModule;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
+using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 {
@@ -236,9 +237,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             NavigationController.PopViewController(true);
         }
 
-        public void OpenEditAppointment(int calendarId, int appointmentId)
+        public void OpenEditAppointment(int calendarId, int appointmentId, AppointmentChangeType appointmentChangeType)
         {
-            NavigationController.PushViewController(new EditAppointmentViewController(appointmentId, calendarId), true);
+            NavigationController.PushViewController(new EditAppointmentViewController(appointmentId, calendarId, appointmentChangeType), true);
         }
 
         public void SetLines(IEnumerable<LineViewModel> lines)
@@ -311,9 +312,36 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         #region Event handlers
 
-        private void EditButtinItem_Clicked(object sender, EventArgs e)
+        private async void EditButtinItem_Clicked(object sender, EventArgs e)
         {
-            presenter.EditAppointmentClicked();
+            if (appointment.RecurrenceInfo == null)
+            {
+                presenter.EditAppointmentClicked(AppointmentChangeType.Default);
+                return;
+            }
+
+            ShowRecurrentAppointmentEditMenu(sender);
+            
+        }
+
+        private async void ShowRecurrentAppointmentEditMenu(object sender)
+        {
+            var d = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
+            var source = await Dialogs.ShowListActionSheetAsync(this, new[] {
+                Localization.GetString("edit_this_event_only"),
+                Localization.GetString("edit_all_events_in_series")}, d);
+            if (source < 0)
+                return;
+
+            if (source == 0)
+            {
+                presenter.EditAppointmentClicked(AppointmentChangeType.Occurence);
+            }
+
+            if (source == 1)
+            {
+                presenter.EditAppointmentClicked(AppointmentChangeType.Series);
+            }
         }
 
         private void CloseButtonItem_Clicked(object sender, EventArgs e)
@@ -323,11 +351,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         private async void DeleteButtonItem_Clicked(object sender, EventArgs e)
         {
-            var d = new PopoverPresentationControllerDelegate(deleteButtonItem);
+            var d = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
+            var source = await Dialogs.ShowListActionSheetAsync(this, new[] {
+                Localization.GetString("delete_this_event_only"),
+                Localization.GetString("delete_all_events_in_series")}, d);
+            if (source < 0)
+                return;
 
-            var result = await Dialogs.ShowDestructiveActionSheetAsync(this, Localization.GetString("delete"), d);
-            if (result)
+            if (source == 0)
+            {
                 await presenter.DeleteAppointmentClicked();
+            }
+
+            if (source == 1)
+            {
+                await presenter.DeleteAppointmentClicked();
+            }
+          
         }
 
         async void SendInvitationsButton_TouchUpInside(object sender, EventArgs e)

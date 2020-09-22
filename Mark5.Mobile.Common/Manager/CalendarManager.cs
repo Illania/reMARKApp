@@ -90,7 +90,7 @@ namespace Mark5.Mobile.Common.Manager
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task<bool> CreateOrUpdateCalendarAppointmentAsync(int calendarId, CalendarAppointment calendarAppointment, SourceType sourceType = SourceType.Auto)
+        public async Task<bool> CreateOrUpdateCalendarAppointmentAsync(int calendarId, CalendarAppointment calendarAppointment, AppointmentChangeType appointmentChangeType, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
@@ -101,7 +101,8 @@ namespace Mark5.Mobile.Common.Manager
                 {
                     Token = Token,
                     CalendarId = calendarId,
-                    CalendarAppointment = calendarAppointment.Convert()
+                    CalendarAppointment = calendarAppointment.Convert(),
+                    AppointmentChangeType = appointmentChangeType.ConvertEnum<DataContract.AppointmentChangeType>()
                 });
 
                 calendarAppointment.Id = result.Id;

@@ -18,11 +18,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 {
     public class EditAppointmentViewController : AbstractAddEditAppointmentViewController
     {
-        public EditAppointmentViewController(int appointmentId, int calendarId)
+        public EditAppointmentViewController(int appointmentId, int calendarId, AppointmentChangeType appointmentChangeType)
             : base(appointmentId, calendarId)
         {
             Title = Localization.GetString("edit_appointment");
             CreationModeFlag = ContactCreationModeFlag.Edit;
+            AppointmentChangeType = appointmentChangeType;
         }
     }
 
@@ -49,6 +50,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         protected ContactCreationModeFlag CreationModeFlag;
         protected DateTime StartDate;
+        protected AppointmentChangeType AppointmentChangeType;
+
 
         public AbstractAddEditAppointmentViewController(int appointmentId = -1, int calendarId = -1)
             : base(UITableViewStyle.Grouped)
@@ -144,7 +147,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             var isValid = ((DataSource)TableView.Source).IsFormCorrect();
 
             if (isValid)
-                await presenter.AddOrEditAppointment(viewModel);
+                await presenter.AddOrEditAppointment(viewModel, AppointmentChangeType);
             else
                 await Dialogs.ShowConfirmAlertAsync(this, "Cannot Save Event", "The start date must be before the end date");
         }

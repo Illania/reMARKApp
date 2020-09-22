@@ -14,7 +14,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         public override void Stop() { }
 
-        public async Task AddOrEditAppointment(AddEditAppointmentViewModel vm)
+        public async Task AddOrEditAppointment(AddEditAppointmentViewModel vm, AppointmentChangeType appointmentChangeType)
         {
             var ca = vm.ConvertToModel();
 
@@ -24,7 +24,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             {
                 CommonConfig.Logger.Info($"Adding or editing appointment: AppointmentId = {ca.Id}, CalendarId = {ca.CalendarId} ");
 
-                await Managers.CalendarManager.CreateOrUpdateCalendarAppointmentAsync(ca.CalendarId, ca);
+                await Managers.CalendarManager.CreateOrUpdateCalendarAppointmentAsync(ca.CalendarId, ca, appointmentChangeType);
 
                 view.StopEditingLoading();
                 view.CloseView();
@@ -237,7 +237,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         Task LoadEmptyAppointment(DateTime startDate);
         Task LoadAppointment(int calendarId, int appointmentId);
         void LoadCalendarsList();
-        Task AddOrEditAppointment(AddEditAppointmentViewModel vm);
+        Task AddOrEditAppointment(AddEditAppointmentViewModel vm, AppointmentChangeType appointmentChangeType);
     }
 
     public interface IAddEditAppointmentView : IView
