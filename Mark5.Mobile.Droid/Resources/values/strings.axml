@@ -477,7 +477,7 @@
     <string name="show_more">Show more</string>
     <string name="show_previous_message">Show previous message</string>
     <string name="showing_previous_message">Showing previous message...</string>
-    <string name="ssl_accept_selfsigned_warning">You chose to accept certificates. This may decrease security of the connection. Do you want to continue?</string>
+    <string name="ssl_accept_selfsigned_warning">You chose to accept self-signed certificates. This may decrease security of the connection. Do you want to continue? \nPLEASE NOTE THAT SELF-SIGNED CERTIFICATES WILL NOT BE SUPPORTED ANYMORE FROM NEXT VERSION OF REMARK APP</string>
     <string name="ssl_off_warning">You chose to turn off SSL. Connection will be unsecure. Do you want to continue?</string>
     <string name="subject">Subject</string>
     <string name="subscribe_folder">Subscribe</string>
