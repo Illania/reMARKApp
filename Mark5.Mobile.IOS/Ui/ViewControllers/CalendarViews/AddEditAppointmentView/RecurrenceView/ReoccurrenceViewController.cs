@@ -83,7 +83,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
             });
 
             patternView = new PatternView();
-            patternView.BackgroundColor = UIColor.Blue;
             rangeView = new RangeView();
 
             scrollView.AddSubview(patternView);
