@@ -1277,6 +1277,9 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "RecurrenceIndex", Order = 0)]
         public int RecurrenceIndex { get; set; } = -1;
+
+        [DataMember(Name = "ChangedOccurenceId", Order = 1)]
+        public int ChangedOccurenceId{ get; set; } = -1;
     }
 
     [DataContract(Name = "CalendarAlarm", Namespace = "com.nordic-it.appservice.v3")]

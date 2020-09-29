@@ -22,6 +22,9 @@ namespace Mark5.Mobile.Common.Model
         [Column("CalendarId")]
         public int CalendarId { get; set; }
 
+        [Column("ChangedOccurenceId")]
+        public int ChangedOccurenceId { get; set; }
+
         public DateTime StartDate
         {
             get => StartDateTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTimeCalendar();

@@ -272,13 +272,12 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         {
             var apv = new AppointmentPreviewViewModel
             {
-                Id = ca.Id,
+                Id = cao.ChangedOccurenceId > -1 ? cao.ChangedOccurenceId : ca.Id,
                 RecurrenceIndex = cao.RecurrenceIndex,
                 CalendarId = ca.CalendarId,
                 Subject = ca.Subject,
                 AllDay = ca.AllDay,
-
-                HexColor = calendarColors[ca.CalendarId],
+                HexColor = calendarColors[ca.CalendarId]
             };
 
             if (apv.AllDay)

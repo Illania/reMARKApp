@@ -18,12 +18,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 {
     public class EditAppointmentViewController : AbstractAddEditAppointmentViewController
     {
-        public EditAppointmentViewController(int appointmentId, int calendarId, AppointmentChangeType appointmentChangeType)
+        public EditAppointmentViewController(int appointmentId, int calendarId, AppointmentChangeType appointmentChangeType, int recurrenceIndex)
             : base(appointmentId, calendarId)
         {
             Title = Localization.GetString("edit_appointment");
             CreationModeFlag = ContactCreationModeFlag.Edit;
             AppointmentChangeType = appointmentChangeType;
+            RecurrenceIndex = recurrenceIndex;
+
         }
     }
 
@@ -51,6 +53,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         protected ContactCreationModeFlag CreationModeFlag;
         protected DateTime StartDate;
         protected AppointmentChangeType AppointmentChangeType;
+        protected int RecurrenceIndex;
 
 
         public AbstractAddEditAppointmentViewController(int appointmentId = -1, int calendarId = -1)
@@ -114,7 +117,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                     await presenter.LoadEmptyAppointment(StartDate);
 
                 if (CreationModeFlag == ContactCreationModeFlag.Edit)
-                    await presenter.LoadAppointment(calendarId, appointmentId);
+                    await presenter.LoadAppointment(calendarId, appointmentId, RecurrenceIndex);
             }
             else
                 RefreshTable();
@@ -145,7 +148,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         private async void SaveButtonItem_Clicked(object sender, EventArgs e)
         {
             var isValid = ((DataSource)TableView.Source).IsFormCorrect();
-
+            viewModel.RecurrenceIndex = RecurrenceIndex;
             if (isValid)
                 await presenter.AddOrEditAppointment(viewModel, AppointmentChangeType);
             else

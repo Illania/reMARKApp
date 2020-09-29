@@ -239,7 +239,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         public void OpenEditAppointment(int calendarId, int appointmentId, AppointmentChangeType appointmentChangeType)
         {
-            NavigationController.PushViewController(new EditAppointmentViewController(appointmentId, calendarId, appointmentChangeType), true);
+            var recIndex = appointmentChangeType == AppointmentChangeType.Series ? -1 : recurrenceIndex;
+            NavigationController.PushViewController(new EditAppointmentViewController(appointmentId, calendarId, appointmentChangeType, recIndex), true);
         }
 
         public void SetLines(IEnumerable<LineViewModel> lines)
@@ -604,7 +605,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                     }
                 }
 
-                if (viewModel.RecurrenceInfo != null)
+                if (viewModel.Type == CalendarOccurenceType.Pattern)
                 {
                     Text += $"\n{viewModel.RecurrenceInfo}";
                 }

@@ -23,6 +23,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         const string CreationModeFlagBundleKey = "CreationModeFlag_ab9071da-34f6-45fc-9a03-a0b348814dcd";
         const string AppointmentIdBundleKey = "AppointmentId_d09e0cb6-e224-4327-8d09-43ce921f53c6";
         const string CalendarIdBundleKey = "CalendarId_d09e0cb6-e224-4327-8d09-43ce921f53c6";
+        const string RecurrenceIndexBundleKey = "RecurrenceIndex_7D5D4F43-FA17-4E51-944B-F33D06111515";
+        const string AppointmentChangeTypeBundleKey = "AppointmentChangeType_2FC09FB5-3244-403B-B676-C820AE93429B";
         const string StartDateIdBundleKey = "StartDate_3b43a244-6a24-496f-9d33-1eeb1c277005";
 
         AddEditAppointmentPresenter presenter;
@@ -31,6 +33,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         bool loaded;
         int calendarId;
         int appointmentId;
+        int appointmentChangeType;
+        int recurrenceIndex;
         DateTime startDate;
 
         LinearLayoutCompat linearLayout;
@@ -67,7 +71,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             return (fragment, tag);
         }
 
-        public static (AddEditAppointmentFragment fragment, string tag) NewInstance(int calendarId, int appointmentId)
+        public static (AddEditAppointmentFragment fragment, string tag) NewInstance(int calendarId, int appointmentId,
+            AppointmentChangeType appointmentChangeType, int recurrenceIndex)
         {
             Bundle args = new Bundle();
 
@@ -79,6 +84,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             args.PutInt(CreationModeFlagBundleKey, (int)ContactCreationModeFlag.Edit);
             args.PutInt(AppointmentIdBundleKey, appointmentId);
             args.PutInt(CalendarIdBundleKey, calendarId);
+            args.PutInt(AppointmentChangeTypeBundleKey, (int)appointmentChangeType);
+            args.PutInt(RecurrenceIndexBundleKey, recurrenceIndex);
 
             var tag = $"{nameof(AddEditAppointmentFragment)}";
 
@@ -98,6 +105,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
             if (Arguments.ContainsKey(CalendarIdBundleKey))
                 calendarId = Arguments.GetInt(CalendarIdBundleKey);
+
+            if (Arguments.ContainsKey(AppointmentChangeTypeBundleKey))
+                appointmentChangeType= Arguments.GetInt(AppointmentChangeTypeBundleKey);
 
             if (Arguments.ContainsKey(StartDateIdBundleKey))
                 startDate = new DateTime(Arguments.GetLong(StartDateIdBundleKey));
@@ -152,7 +162,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 if (creationModeFlag == ContactCreationModeFlag.New)
                     await presenter.LoadEmptyAppointment(startDate);
                 else
-                    await presenter.LoadAppointment(calendarId, appointmentId);
+                    await presenter.LoadAppointment(calendarId, appointmentId, recurrenceIndex);
                 loaded = true;
 
                 StopLoading();
@@ -230,7 +240,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         async void AddOrEditAppointment()
         {
-            await presenter.AddOrEditAppointment(viewModel);
+            await presenter.AddOrEditAppointment(viewModel, (AppointmentChangeType)appointmentChangeType);
         }
 
         async void ReocurrenceClicked()

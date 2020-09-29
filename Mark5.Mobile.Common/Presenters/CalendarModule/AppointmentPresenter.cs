@@ -146,6 +146,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         public long ReminderTimeBefore { get; private set; }
         public List<ParticipantsViewModel> Participants { get; private set; }
         public CalendarViewModel Calendar { get; private set; }
+        public CalendarOccurenceType Type { get; set; }
 
         public static AppointmentViewModel ConvertToViewModel(CalendarAppointment appointment, int recurrenceIndex = -1)
         {
@@ -160,12 +161,15 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 RecurrenceInfo = appointment.RecurrenceInfo?.ToFriendlyString(),
                 ReminderTimeBefore = appointment.ReminderTimeBeforeStart,
                 Participants = appointment.Participants?.Select(ParticipantsViewModel.ConvertToViewModel).ToList(),
+                Type = appointment.Type
             };
 
             var calendar = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars.First(ca => ca.Id == appointment.CalendarId);
             appModel.Calendar = CalendarViewModel.ConvertToViewModel(calendar);
 
-            var occurrence = appointment.Occurrences.FirstOrDefault(r => r.RecurrenceIndex == recurrenceIndex);
+            var recIndex = appModel.Type == CalendarOccurenceType.ChangedOccurrence ?  -1 : recurrenceIndex;
+                    
+            var occurrence = appointment.Occurrences.FirstOrDefault(r => r.RecurrenceIndex == recIndex);
 
             if (occurrence == null)
                 throw new ArgumentException("Can't find occurrence with the given recurrence index");
@@ -184,6 +188,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
             return appModel;
         }
+
     }
 
     public class ParticipantsViewModel

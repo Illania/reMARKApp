@@ -187,7 +187,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             }
             else
             {
-                presenter.EditAppointmentClicked();
+                presenter.EditAppointmentClicked(AppointmentChangeType.Default);
             }
 
             return true;
@@ -210,7 +210,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         public void OpenEditAppointment(int calendarId, int appointmentId, AppointmentChangeType appointmentChangeType)
         {
-            var (aeaf, tag) = AddEditAppointmentFragment.NewInstance(calendarId, appointmentId, appointmentChangeType);
+            var (aeaf, tag) = AddEditAppointmentFragment.NewInstance(calendarId, appointmentId, appointmentChangeType, recurrenceIndex);
             ((AppCompatActivity)Activity).SupportFragmentManager.BeginTransaction()
                           .SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right)
                           .Replace(Resource.Id.fragment_container, aeaf, tag)
