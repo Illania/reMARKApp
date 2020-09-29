@@ -52,6 +52,8 @@ namespace Mark5.Mobile.Common.Service
                     {
                         CommonConfig.MessengerHub.Publish(new DocumentUploadStatusChangedMessage(this, DocumentUploadStatusChangedMessage.Status.DocumentSending, documentToUploadGuid));
 
+                        bool isDraft = false;
+
                         try
                         {
                             if (CommonConfig.Logger.IsDebugEnabled())
@@ -66,6 +68,8 @@ namespace Mark5.Mobile.Common.Service
                                 CommonConfig.Logger.Error($"Document to upload is corrupt [info={info != null}, documentPreview={documentPreview != null}, document={document != null}]");
                                 continue;
                             }
+
+                            isDraft = documentPreview.Direction == DocumentDirection.Draft;
 
                             if (ShouldDiscard(info))
                             {
@@ -133,7 +137,7 @@ namespace Mark5.Mobile.Common.Service
 
                             await FileSystemStorage.DeleteDocumentToUpload(documentToUploadGuid);
 
-                            CommonConfig.MessengerHub.Publish(new DocumentUploadStatusChangedMessage(this, DocumentUploadStatusChangedMessage.Status.DocumentSent, documentToUploadGuid));
+                            CommonConfig.MessengerHub.Publish(new DocumentUploadStatusChangedMessage(this, DocumentUploadStatusChangedMessage.Status.DocumentSent, documentToUploadGuid, isDraft));
                         }
                         catch (HttpAppServiceException hasx) when (hasx?.Detail?.Code == AppServiceFaultCode.DocumentAlreadySentError)
                         {
@@ -141,7 +145,7 @@ namespace Mark5.Mobile.Common.Service
 
                             await FileSystemStorage.DeleteDocumentToUpload(documentToUploadGuid);
 
-                            CommonConfig.MessengerHub.Publish(new DocumentUploadStatusChangedMessage(this, DocumentUploadStatusChangedMessage.Status.DocumentSent, documentToUploadGuid));
+                            CommonConfig.MessengerHub.Publish(new DocumentUploadStatusChangedMessage(this, DocumentUploadStatusChangedMessage.Status.DocumentSent, documentToUploadGuid, isDraft));
                         }
                         catch (Exception ex)
                         {
@@ -149,7 +153,7 @@ namespace Mark5.Mobile.Common.Service
 
                             await FileSystemStorage.MoveDocumentToUploadToFailed(documentToUploadGuid, ex);
 
-                            CommonConfig.MessengerHub.Publish(new DocumentUploadStatusChangedMessage(this, DocumentUploadStatusChangedMessage.Status.DocumentSentFailed, documentToUploadGuid));
+                            CommonConfig.MessengerHub.Publish(new DocumentUploadStatusChangedMessage(this, DocumentUploadStatusChangedMessage.Status.DocumentSentFailed, documentToUploadGuid, isDraft));
                         }
                         finally
                         {

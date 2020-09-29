@@ -328,7 +328,14 @@ namespace Mark5.Mobile.Common.Manager
 
         void CacheCalendarContent(DateTime start, DateTime end)
         {
-            var uncached = GetMonthDatePeriod(start, end).Where(md => !cachedMonths.Contains(md));
+            var uncached = GetMonthDatePeriod(start, end).Where(md => !cachedMonths.Contains(md)).ToList();
+
+            var currentMonthDate = MonthDate.FromDateTime(DateTime.Now);
+            if (uncached.Contains(currentMonthDate))
+            {
+                Append(currentMonthDate);
+                uncached.Remove(currentMonthDate);
+            }
 
             uncached.ForEach(Append);
 

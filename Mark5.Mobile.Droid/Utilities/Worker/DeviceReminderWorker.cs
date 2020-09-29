@@ -8,12 +8,16 @@ namespace Mark5.Mobile.Droid.Utilities.Workers
 {
     public class DeviceReminderWorker : Worker
     {
+        static readonly string workerName = "DeviceReminderWorker";
+
         public DeviceReminderWorker(Context context, WorkerParameters workerParams) : base(context, workerParams)
         {
         }
 
         public override Result DoWork()
         {
+            return new Result.Success(); //Temporarily
+
             try
             {
                 AsyncHelpers.RunSync(Jobs.RemindersUpdateJob.Run);
@@ -28,6 +32,8 @@ namespace Mark5.Mobile.Droid.Utilities.Workers
 
         public static void Schedule()
         {
+            return; //Temporarily
+
             try
             {
                 var constraints = new Constraints.Builder().SetRequiredNetworkType(NetworkType.Connected).Build();
@@ -35,7 +41,7 @@ namespace Mark5.Mobile.Droid.Utilities.Workers
                     .SetConstraints(constraints)
                     .Build();
 
-                WorkManager.Instance.Enqueue(pwr);
+                WorkManager.Instance.EnqueueUniquePeriodicWork(workerName, ExistingPeriodicWorkPolicy.Replace, pwr);
             }
             catch (Exception ex)
             {

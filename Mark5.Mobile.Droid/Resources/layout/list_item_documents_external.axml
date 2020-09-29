@@ -42,6 +42,20 @@
                 android:src="@drawable/comment"
                 android:tint="@color/darkblue"
                 android:visibility="gone" />
+               <android.support.v7.widget.AppCompatImageView
+                    android:id="@+id/list_item_document_external_high_priority"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_margin="4dp"
+                    android:src="@drawable/high_priority"
+                    android:visibility="gone" />
+            <android.support.v7.widget.AppCompatImageView
+                    android:id="@+id/list_item_document_external_low_priority"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_margin="4dp"
+                    android:src="@drawable/low_priority"
+                    android:visibility="gone" />
         </android.support.v7.widget.LinearLayoutCompat>
         <android.support.v7.widget.LinearLayoutCompat
             android:layout_width="match_parent"

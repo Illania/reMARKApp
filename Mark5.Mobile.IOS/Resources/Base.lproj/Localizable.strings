@@ -135,6 +135,8 @@
 "diagnostics_sec" = "sec.";
 "diagnostics_progress" = "Performing Diagnostics";
 "diagnostics_bad_broken_description" = "Connection to the service is broken or unstable. If the problem persists, please contact your IT support.";
+"draft_saved" = "Draft saved";
+"draft_error" = "Error while saving draft";
 "documents" = "Emails";
 "done" = "Done";
 "dont_close_app" = "Please do not close the app before download is completed.\n\nClosing the app will interrupt download and all progress will be lost!";
@@ -240,6 +242,7 @@
 "logging_out___" = "Logging out...";
 "login" = "Login";
 "login_failed" = "Login failed";
+"login_failed_azure_desc" = "Could not log in to reMARK. An error happened during authentication.";
 "login_failed_desc" = "Could not log in to reMARK. Please check your username, password and server address.\n\nYou may also want to verify SSL settings, by tapping Settings in top right corner of the screen.";
 "login_failed_access_disabled" = "Your device does not have access enabled. Please contact your system administrator and restart the reMARK app.";
 "login_failed_account_locked" = "Account locked. Please contact your system administrator.";
@@ -476,7 +479,7 @@ Please note that these reports are not monitored 24/7 and will be available to d
 "use_passcode" = "Use Passcode";
 "vat" = "VAT";
 "warning" = "Warning";
-"warning_selfsigned_on" = "Self signed certificates will be accepted. Please be aware that this lowers security of communication between reMARK server and your device.";
+"warning_selfsigned_on" = "Self signed certificates will be accepted. Please be aware that this lowers security of communication between reMARK server and your device. \nPLEASE NOTE THAT SELF-SIGNED CERTIFICATES WILL NOT BE SUPPORTED ANYMORE FROM NEXT VERSION OF REMARK APP";
 "warning_ssl_off" = "SSL is disabled. Please be aware that all the communication between your device and reMARK server will not be secure.";
 "webpage" = "Webpage";
 "week" = "Week";

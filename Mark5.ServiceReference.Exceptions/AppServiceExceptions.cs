@@ -56,6 +56,12 @@ namespace Mark5.ServiceReference.Exceptions
 
         public AppServiceFaultDetail Detail { get; }
 
+        //This is used only for serialization
+        public HttpAppServiceException()
+        {
+
+        }
+
         public HttpAppServiceException(HttpStatusCode statusCode, string message)
             : base(message)
         {
@@ -104,6 +110,8 @@ namespace Mark5.ServiceReference.Exceptions
         [EnumMember(Value = "AccessDisabled")] AccessDisabled = 1003,
         [EnumMember(Value = "MobileLicenseError")] MobileLicenseError = 1004,
         [EnumMember(Value = "PasswordPolicyError")] PasswordPolicyError = 1005,
+        [EnumMember(Value = "AzureLoginDisabled")] AzureLoginDisabled = 1010,
+        [EnumMember(Value = "AzureUserMissing")] AzureUserMissing = 1011,
 
         [EnumMember(Value = "GetFoldersError")] GetFoldersError = 1100,
 

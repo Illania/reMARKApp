@@ -124,6 +124,8 @@
     <string name="download_in_progress_cancel_to_go_back">Download is in progress, Cancel the download to go back.</string>
     <string name="download_in_progress_warning">If you cancel download all progress will be lost and you will have to download this folder again. Do you want to cancel?</string>
     <string name="downloading_percentage">Downloading %1$d%%...</string>
+    <string name="draft_saved">Draft saved</string>
+    <string name="draft_error">Error while saving draft</string>
     <string name="edit">Edit</string>
     <string name="edit_appointment">Edit Appointment</string>
     <string name="edit_comment_message">Edit comment message</string>
@@ -273,6 +275,7 @@
     <string name="log_in_failed_message_access_disabled">Your device does not have access enabled. Please contact your system administrator</string>
     <string name="log_in_failed_message_account_locked">Account locked. Please contact your system administrator.</string>
     <string name="log_in_failed_message">Please check your credentials and try again</string>
+    <string name="log_in_failed_azure_message">Could not log in to reMARK. An error happened during authentication.</string>
     <string name="log_in_failed_title">Log in failed</string>
     <string name="logging_in">Logging in</string>
     <string name="low_priority_document">This email has low priority</string>
@@ -324,6 +327,7 @@
     <string name="offline">Offline</string>
     <string name="ok">OK</string>
     <string name="on">on</string>
+    <string name="or">OR</string>
     <string name="open_drawer">Open navigation drawer</string>
     <string name="opening_attachment">Opening attachment</string>
     <string name="outgoing">Outgoing</string>
@@ -473,7 +477,7 @@
     <string name="show_more">Show more</string>
     <string name="show_previous_message">Show previous message</string>
     <string name="showing_previous_message">Showing previous message...</string>
-    <string name="ssl_accept_selfsigned_warning">You chose to accept certificates. This may decrease security of the connection. Do you want to continue?</string>
+    <string name="ssl_accept_selfsigned_warning">You chose to accept self-signed certificates. This may decrease security of the connection. Do you want to continue? \nPLEASE NOTE THAT SELF-SIGNED CERTIFICATES WILL NOT BE SUPPORTED ANYMORE FROM NEXT VERSION OF REMARK APP</string>
     <string name="ssl_off_warning">You chose to turn off SSL. Connection will be unsecure. Do you want to continue?</string>
     <string name="subject">Subject</string>
     <string name="subscribe_folder">Subscribe</string>

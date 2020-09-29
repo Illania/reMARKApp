@@ -260,14 +260,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
 
     class DateField : BaseField
     {
-        UIDatePicker datePicker;
+        UIDatePickerStyled datePicker;
         Action<DateTime> selectedAction;
 
         public DateField(Action<DateTime> selectedAction)
             : base(false)
         {
             this.selectedAction = selectedAction;
-            datePicker = new UIDatePicker
+            datePicker = new UIDatePickerStyled
             {
                 Mode = UIDatePickerMode.Date
             };

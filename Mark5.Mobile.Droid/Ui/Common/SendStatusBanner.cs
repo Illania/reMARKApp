@@ -71,7 +71,11 @@ namespace Mark5.Mobile.Droid.Ui.Common
             if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
                 vibrator.Vibrate(VibrationEffect.CreateOneShot(250, VibrationEffect.DefaultAmplitude));
             else
+            {
+#pragma warning disable 612, 618
                 vibrator.Vibrate(250);
+#pragma warning restore 612, 618
+            }
         }
 
         void QueueBanner(BannerInfo info)
@@ -95,7 +99,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             if (obj.Change != DocumentUploadStatusChangedMessage.Status.DocumentSent && obj.Change != DocumentUploadStatusChangedMessage.Status.DocumentSentFailed)
                 return;
 
-            QueueBanner(BannerInfo.FromStatus(obj.Change));
+            QueueBanner(BannerInfo.FromMessage(obj));
         }
 
         class BannerInfo
@@ -105,17 +109,20 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
             private BannerInfo() { }
 
-            public static BannerInfo FromStatus(DocumentUploadStatusChangedMessage.Status status)
+            public static BannerInfo FromMessage(DocumentUploadStatusChangedMessage msg)
             {
+                var status = msg.Change;
+                var isDraft = msg.IsDraft;
+
                 var bannerInfo = new BannerInfo();
                 if (status == DocumentUploadStatusChangedMessage.Status.DocumentSent)
                 {
-                    bannerInfo.TextRes = Resource.String.email_sent;
+                    bannerInfo.TextRes = isDraft ? Resource.String.draft_saved : Resource.String.email_sent;
                     bannerInfo.ColorRes = Resource.Color.darkerblue;
                 }
                 else if (status == DocumentUploadStatusChangedMessage.Status.DocumentSentFailed)
                 {
-                    bannerInfo.TextRes = Resource.String.email_error;
+                    bannerInfo.TextRes = isDraft ? Resource.String.draft_error : Resource.String.email_error;
                     bannerInfo.ColorRes = Resource.Color.red;
                 }
 

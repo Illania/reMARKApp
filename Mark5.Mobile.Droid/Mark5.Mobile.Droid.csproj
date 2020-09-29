@@ -70,6 +70,7 @@
     <AndroidDexTool>dx</AndroidDexTool>
     <LangVersion>8.0</LangVersion>
     <AndroidCreatePackagePerAbi>false</AndroidCreatePackagePerAbi>
+    <AndroidSupportedAbis>armeabi-v7a;arm64-v8a</AndroidSupportedAbis>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -333,6 +334,21 @@
     </Reference>
     <Reference Include="PhoneNumbers">
       <HintPath>..\packages\libphonenumber-csharp.8.12.6\lib\netstandard2.0\PhoneNumbers.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Identity.Client">
+      <HintPath>..\packages\Microsoft.Identity.Client.4.16.1\lib\monoandroid90\Microsoft.Identity.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="System.IdentityModel" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Diagnostics.DiagnosticSource">
+      <HintPath>..\packages\System.Diagnostics.DiagnosticSource.4.6.0\lib\netstandard1.3\System.Diagnostics.DiagnosticSource.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Graph.Core">
+      <HintPath>..\packages\Microsoft.Graph.Core.1.19.0\lib\monoandroid70\Microsoft.Graph.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Graph">
+      <HintPath>..\packages\Microsoft.Graph.1.21.0\lib\netstandard1.3\Microsoft.Graph.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -610,6 +626,7 @@
     <Compile Include="Ui\Views\DocumentViews\InvitationReplyModalView.cs" />
     <Compile Include="Utilities\LineUtilities.cs" />
     <Compile Include="Utilities\Worker\SystemSettingsWorker.cs" />
+    <Compile Include="Ui\Activities\MsalActivity.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -1098,7 +1115,15 @@
       <SubType></SubType>
       <Generator></Generator>
     </AndroidResource>
-    <AndroidResource Include="Resources\drawable\onboarding_2.xml">
+    <AndroidResource Include="Resources\drawable\sign_microsoft_light.xml">
+      <SubType></SubType>
+      <Generator></Generator>
+    </AndroidResource>
+    <AndroidResource Include="Resources\drawable\sign_microsoft_dark.xml">
+      <SubType></SubType>
+      <Generator></Generator>
+    </AndroidResource>
+<AndroidResource Include="Resources\drawable\onboarding_2.xml">
       <SubType></SubType>
       <Generator></Generator>
     </AndroidResource>
@@ -1110,6 +1135,8 @@
       <SubType></SubType>
       <Generator></Generator>
     </AndroidResource>
+
+    
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FastScrollRecycler\FastScrollRecycler.csproj">

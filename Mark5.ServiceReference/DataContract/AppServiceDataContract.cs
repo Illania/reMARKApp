@@ -43,6 +43,45 @@ namespace Mark5.ServiceReference.DataContract
         public string Token { get; set; }
     }
 
+    [DataContract(Name = "AuthenticateWithAzureParameters", Namespace = "com.nordic-it.appservice.v3")]
+    public class AuthenticateWithAzureParameters
+    {
+        [DataMember(Name = "AzureUser", Order = 0, IsRequired = true)]
+        public AzureUser AzureUser { get; set; }
+
+        [DataMember(Name = "InstallationId", Order = 0, IsRequired = true)]
+        public string InstallationId { get; set; }
+
+        [DataMember(Name = "FriendlyDeviceName", Order = 0, IsRequired = true)]
+        public string FriendlyDeviceName { get; set; }
+
+        [DataMember(Name = "DeviceType", Order = 0, IsRequired = true)]
+        public DeviceType DeviceType { get; set; }
+    }
+
+    [DataContract(Name = "AuthenticateWithAzureResult", Namespace = "com.nordic-it.appservice.v3")]
+    public class AuthenticateWithAzureResult
+    {
+        [DataMember(Name = "Token", Order = 0, IsRequired = true)]
+        public string Token { get; set; }
+    }
+
+    [DataContract(Name = "AzureUser", Namespace = "com.nordic-it.appservice.v3")]
+    public class AzureUser
+    {
+        [DataMember(Name = "Id", Order = 0)]
+        public string Id { get; set; }
+
+        [DataMember(Name = "UserPrincipalName", Order = 0)]
+        public string UserPrincipalName { get; set; }
+
+        [DataMember(Name = "DisplayName", Order = 0)]
+        public string DisplayName { get; set; }
+
+        [DataMember(Name = "Mail", Order = 0)]
+        public string Mail { get; set; }
+    }
+
     #endregion
 
     #region Folders

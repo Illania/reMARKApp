@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.Azure;
 using Mark5.Mobile.Common.Model.Converters;
 using Mark5.Mobile.Common.Storage;
 using Mark5.ServiceReference;
@@ -34,13 +35,48 @@ namespace Mark5.Mobile.Common.Authenticator
                 DeviceType = deviceType.ConvertEnum<DataContract.DeviceType>(),
                 FriendlyDeviceName = deviceName,
                 InstallationId = deviceId
-            },
-                ct);
+            }, ct);
 
             var connectionInfo = new ConnectionInfo
             {
                 Token = result.Token,
                 Username = username,
+                Hostname = hostname,
+                Port = port,
+                SslMode = sslMode,
+                DeviceType = deviceType,
+                FriendlyDeviceName = deviceName,
+                InstallationId = deviceId
+            };
+
+            return connectionInfo;
+        }
+
+        public async Task<ConnectionInfo> AuthenticateWithAzureAsync(AzureUser azureUser, SslMode sslMode, string hostname, int port, CancellationToken ct = default(CancellationToken))
+        {
+            var deviceType = CommonConfig.DeviceInfoProvider.GetDeviceType();
+            var deviceName = CommonConfig.DeviceInfoProvider.GetDeviceName();
+            var deviceId = CommonConfig.DeviceInfoProvider.GetDeviceId();
+
+            var proxy = AppServiceProxyFactory.Create(sslMode != SslMode.Off,
+                                          hostname,
+                                          port,
+                                          CommonConfig.HttpClientHandler,
+                                          CommonConfig.OnStartTransmission,
+                                          CommonConfig.OnStopTransmission);
+
+            var result = await proxy.AuthenticateWithAzureAsync(new DataContract.AuthenticateWithAzureParameters
+            {
+                AzureUser = azureUser.Convert(),
+                DeviceType = deviceType.ConvertEnum<DataContract.DeviceType>(),
+                FriendlyDeviceName = deviceName,
+                InstallationId = deviceId
+            }, ct);
+
+            var connectionInfo = new ConnectionInfo
+            {
+                Token = result.Token,
+                AzureUserId = azureUser.Id,
                 Hostname = hostname,
                 Port = port,
                 SslMode = sslMode,
