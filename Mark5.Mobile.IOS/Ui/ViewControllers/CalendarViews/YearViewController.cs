@@ -42,7 +42,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             });
 
             NavigationController.NavigationBarHidden = true;
+        }
 
+        public override void ViewDidAppear(bool animated)
+        {
             reMarkYearCalendar.MoveToDate(initialDate);
         }
 

@@ -345,7 +345,7 @@
 		  <HintPath>..\packages\Syncfusion.Xamarin.SfSchedule.IOS.18.2.0.56\lib\Xamarin.iOS10\Syncfusion.SfSchedule.iOS.dll</HintPath>
 		</Reference>
 		<Reference Include="Syncfusion.SfCalendar.iOS">
-		  <HintPath>..\packages\Syncfusion.Xamarin.SfCalendar.IOS.17.2.0.47\lib\Xamarin.iOS10\Syncfusion.SfCalendar.iOS.dll</HintPath>
+		  <HintPath>..\packages\Syncfusion.Xamarin.SfCalendar.IOS.18.2.0.56\lib\Xamarin.iOS10\Syncfusion.SfCalendar.iOS.dll</HintPath>
 		</Reference>
 		<Reference Include="Xamarin.Essentials">
 		  <HintPath>..\packages\Xamarin.Essentials.1.1.0\lib\xamarinios10\Xamarin.Essentials.dll</HintPath>
