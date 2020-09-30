@@ -406,7 +406,7 @@
 		  <HintPath>..\packages\sqlite-net-pcl.1.5.231\lib\netstandard1.1\SQLite-net.dll</HintPath>
 		</Reference>
 		<Reference Include="GMImagePicker.Xamarin">
-		  <HintPath>..\packages\GMImagePicker.Xamarin.2.3.5\lib\xamarinios10\GMImagePicker.Xamarin.dll</HintPath>
+		  <HintPath>..\packages\GMImagePicker.Xamarin.2.5.0\lib\xamarinios10\GMImagePicker.Xamarin.dll</HintPath>
 		</Reference>
 		<Reference Include="Microsoft.Identity.Client">
 		  <HintPath>..\packages\Microsoft.Identity.Client.4.16.1\lib\xamarinios10\Microsoft.Identity.Client.dll</HintPath>
@@ -423,6 +423,7 @@
 		<Reference Include="Microsoft.Graph">
 		  <HintPath>..\packages\Microsoft.Graph.1.21.0\lib\netstandard1.3\Microsoft.Graph.dll</HintPath>
 		</Reference>
+		<Reference Include="System.Drawing.Common.dll" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Mark5.Mobile.Common\Mark5.Mobile.Common.csproj">
