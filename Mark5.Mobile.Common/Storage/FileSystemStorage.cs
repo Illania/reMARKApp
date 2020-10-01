@@ -699,7 +699,16 @@ namespace Mark5.Mobile.Common.Storage
         {
             var files = await CommonConfig.DocumentWorkingCopyFolder.GetFilesAsync();
             foreach (var file in files)
-                await file.DeleteAsync();
+            {
+                try
+                {
+                    await file.DeleteAsync();
+                }
+                catch (FileNotFoundException ex)
+                {
+                    CommonConfig.Logger.Error($"Failed to delete document, document not found:'{file.Name}', Path='{file.Name}'", ex);
+                }
+            }
         }
 
         public static async Task DeleteDocumentWorkingCopyAttachmentAsync(string filename)
