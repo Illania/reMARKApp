@@ -7,7 +7,9 @@ using Android.Graphics;
 using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using MaterialDialogs;
@@ -107,11 +109,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             ReplySelected(this, responseDetails);
         }
 
-        public override Task RefreshView()
+        public override Task RefreshView(bool sendNotification = false)
         {
-            var appointment = Document?.Invitations?.FirstOrDefault();
+            var invitation = Document?.Invitations?.FirstOrDefault();
 
-            if (appointment == null || DocumentPreview?.Direction == DocumentDirection.Outgoing)
+            if (invitation == null || DocumentPreview?.Direction == DocumentDirection.Outgoing)
             {
                 Visibility = ViewStates.Gone;
                 return Task.CompletedTask;
@@ -119,13 +121,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
             Visibility = ViewStates.Visible;
 
-            summaryLabel.Text = appointment.Summary;
+            summaryLabel.Text = invitation.Summary;
 
             string whenText = string.Empty;
             var culture = CultureInfo.InvariantCulture;
-            var start = appointment.StartDate;
-            var end = appointment.EndDate;
-            var recurrenceInfo = appointment.RecurrenceInfo;
+            var start = invitation.StartDate;
+            var end = invitation.EndDate;
+            var recurrenceInfo = invitation.RecurrenceInfo;
 
             if (start.Date.CompareTo(end.Date) == 0)
             {
@@ -143,7 +145,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
             whenLabel.Text = whenText;
 
-            if (appointment.MethodType == MethodType.Cancelled)
+            if (invitation.MethodType == MethodType.Cancelled)
             {
                 respondButton.Text = Resources.GetString(Resource.String.cancelled);
                 respondButton.Enabled = false;
@@ -152,7 +154,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
             int buttonTitle;
 
-            switch (appointment.Status)
+            switch (invitation.Status)
             {
                 case ParticipantStatus.Accepted:
                     buttonTitle = Resource.String.accepted;
@@ -167,6 +169,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                     buttonTitle = Resource.String.respond;
                     break;
             }
+
+            //notify to update calendar datasource
+            if (sendNotification && (invitation.Status == ParticipantStatus.Accepted || invitation.Status == ParticipantStatus.Tentative)) 
+                CommonConfig.MessengerHub.Publish(new EntityAddedMessage(this, ObjectType.CalendarAppointment, invitation.AppointmentId));
 
             respondButton.Text = Resources.GetString(buttonTitle);
             return Task.CompletedTask;

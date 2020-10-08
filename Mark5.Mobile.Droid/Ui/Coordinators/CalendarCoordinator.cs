@@ -220,7 +220,7 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
 
         void UiCache_SourceUpdated(object sender, EventArgs e)
         {
-            monthCalendarFragment.UpdateSource();
+            monthCalendarFragment?.UpdateSource();
         }
 
         #endregion
@@ -243,7 +243,7 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
                 UpdateSchedule();
             }
 
-            public void UpdateSchedule()
+            private void UpdateSchedule()
             {
                 if (!AppointmentViewModels.Any())
                     return;
@@ -252,8 +252,11 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
                 {
                     Items.Clear();
                     var newItems = new ObservableCollection<Appointment>();
-                    foreach (var caViewModel in AppointmentsInSelectedCalendars(AppointmentViewModels))
+
+                    foreach (var caViewModel in AppointmentsInSelectedCalendars(AppointmentViewModels).ToList())
+                    { 
                         newItems.Add(Convert(caViewModel));
+                    }
 
                     Items = newItems;
                     SourceUpdated(this, EventArgs.Empty);
@@ -296,14 +299,6 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
             {
                 var appStart = appointment.Start;
                 var appEnd = appointment.End;
-
-                return DateTimeInPeriod(appStart, appEnd, start, end);
-            }
-
-            bool AppointmentIsInPeriod(Appointment appointment, DateTime start, DateTime end)
-            {
-                var appStart = appointment.Start.ConvertToDateTime();
-                var appEnd = appointment.End.ConvertToDateTime();
 
                 return DateTimeInPeriod(appStart, appEnd, start, end);
             }

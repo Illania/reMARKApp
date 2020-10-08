@@ -30,6 +30,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             Visibility = ViewStates.Gone;
         }
 
-        public abstract Task RefreshView();
+        public abstract Task RefreshView(bool sendNotification = false);
     }
 }

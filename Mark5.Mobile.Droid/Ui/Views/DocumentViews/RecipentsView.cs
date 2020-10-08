@@ -279,7 +279,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             extendedLayout.SetColumnShrinkable(1, true);
         }
 
-        public override Task RefreshView()
+        public override Task RefreshView(bool sendNotification = false)
         {
             if (DocumentPreview != null && Document != null)
                 Visibility = ViewStates.Visible;

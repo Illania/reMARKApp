@@ -1033,7 +1033,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     invitation, vm.Status, string.IsNullOrEmpty(vm.Message), Document.Id, Folder?.Id ?? FolderId ?? 0);
 
                 invitation.Status = vm.Status;
-                await cv.RefreshView();
+                await cv.RefreshView(true);
 
                 dismissAction();
             }
