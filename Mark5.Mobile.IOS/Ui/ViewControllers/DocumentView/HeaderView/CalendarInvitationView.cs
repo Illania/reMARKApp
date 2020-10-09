@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
-using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
 
@@ -132,10 +130,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                     respondButton.SetTitle(Localization.GetString("respond"), UIControlState.Normal);
                     break;
             }
-
-            //notify to update calendar datasource
-            if (invitation.Status == ParticipantStatus.Accepted || invitation.Status == ParticipantStatus.Tentative)
-                CommonConfig.MessengerHub.Publish(new EntityAddedMessage(this, ObjectType.CalendarAppointment, invitation.AppointmentId));
+   
         }
 
         public override void UpdateVisibility()

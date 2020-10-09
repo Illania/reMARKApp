@@ -1179,6 +1179,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 invitation.Status = vm.Status;
                 cv.RefreshView();
 
+                //notify to update calendar datasource
+                if (invitation.Status == ParticipantStatus.Accepted || invitation.Status == ParticipantStatus.Tentative)
+                    CommonConfig.MessengerHub.Publish(new EntityAddedMessage(this, ObjectType.CalendarAppointment, invitation.AppointmentId));
+
                 dismissAction();
             }
             catch (Exception ex)
