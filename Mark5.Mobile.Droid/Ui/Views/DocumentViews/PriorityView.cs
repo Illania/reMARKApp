@@ -33,7 +33,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             AddView(message);
         }
 
-        public override Task RefreshView(bool sendNotification = false)
+        public override Task RefreshView()
         {
             if (DocumentPreview != null)
             {

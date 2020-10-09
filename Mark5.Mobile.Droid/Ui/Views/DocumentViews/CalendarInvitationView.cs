@@ -7,9 +7,7 @@ using Android.Graphics;
 using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
-using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using MaterialDialogs;
@@ -109,7 +107,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             ReplySelected(this, responseDetails);
         }
 
-        public override Task RefreshView(bool sendNotification = false)
+        public override Task RefreshView()
         {
             var invitation = Document?.Invitations?.FirstOrDefault();
 
@@ -169,10 +167,6 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                     buttonTitle = Resource.String.respond;
                     break;
             }
-
-            //notify to update calendar datasource
-            if (sendNotification && (invitation.Status == ParticipantStatus.Accepted || invitation.Status == ParticipantStatus.Tentative)) 
-                CommonConfig.MessengerHub.Publish(new EntityAddedMessage(this, ObjectType.CalendarAppointment, invitation.AppointmentId));
 
             respondButton.Text = Resources.GetString(buttonTitle);
             return Task.CompletedTask;

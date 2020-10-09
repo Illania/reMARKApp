@@ -39,7 +39,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             AddView(webView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
         }
 
-        public override async Task RefreshView(bool sendNotification = false)
+        public override async Task RefreshView()
         {
             if (DocumentPreview != null && Document != null)
             {
