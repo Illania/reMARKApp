@@ -17,6 +17,7 @@ using Android.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Model;
 using Mark5.Mobile.Droid.Ui.Activities;
@@ -1034,6 +1035,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 invitation.Status = vm.Status;
                 await cv.RefreshView();
+
+                //notify to update calendar datasource
+                if (invitation.Status == ParticipantStatus.Accepted || invitation.Status == ParticipantStatus.Tentative)
+                    CommonConfig.MessengerHub.Publish(new EntityAddedMessage(this, ObjectType.CalendarAppointment, invitation.AppointmentId));
 
                 dismissAction();
             }

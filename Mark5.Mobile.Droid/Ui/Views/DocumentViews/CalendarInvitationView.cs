@@ -109,9 +109,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
         public override Task RefreshView()
         {
-            var appointment = Document?.Invitations?.FirstOrDefault();
+            var invitation = Document?.Invitations?.FirstOrDefault();
 
-            if (appointment == null || DocumentPreview?.Direction == DocumentDirection.Outgoing)
+            if (invitation == null || DocumentPreview?.Direction == DocumentDirection.Outgoing)
             {
                 Visibility = ViewStates.Gone;
                 return Task.CompletedTask;
@@ -119,13 +119,13 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
             Visibility = ViewStates.Visible;
 
-            summaryLabel.Text = appointment.Summary;
+            summaryLabel.Text = invitation.Summary;
 
             string whenText = string.Empty;
             var culture = CultureInfo.InvariantCulture;
-            var start = appointment.StartDate;
-            var end = appointment.EndDate;
-            var recurrenceInfo = appointment.RecurrenceInfo;
+            var start = invitation.StartDate;
+            var end = invitation.EndDate;
+            var recurrenceInfo = invitation.RecurrenceInfo;
 
             if (start.Date.CompareTo(end.Date) == 0)
             {
@@ -143,7 +143,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
             whenLabel.Text = whenText;
 
-            if (appointment.MethodType == MethodType.Cancelled)
+            if (invitation.MethodType == MethodType.Cancelled)
             {
                 respondButton.Text = Resources.GetString(Resource.String.cancelled);
                 respondButton.Enabled = false;
@@ -152,7 +152,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
             int buttonTitle;
 
-            switch (appointment.Status)
+            switch (invitation.Status)
             {
                 case ParticipantStatus.Accepted:
                     buttonTitle = Resource.String.accepted;
