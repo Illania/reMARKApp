@@ -33,7 +33,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         const string CalendarIdKey = "calendarId";
         const string AppointmentIdKey = "appointmentId";
         const string RecurrenceIndexKey = "recurrenceIndex";
-
+        private const string LicenseKey = "MzM0NzYyQDMxMzgyZTMzMmUzMGFQdm5JaUZ5Q2cycXdpd3hiZVdFWVNxM01uU0oydERSc1c1NmdKSDBFcUU9";
         Toolbar toolbar;
         DrawerLayout drawer;
         SmoothActionBarDrawerToggle drawerToggle;
@@ -75,7 +75,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             CommonConfig.Logger.Info($"Starting {nameof(MainActivity)}...");
 
-            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("MzEzMTA2QDMxMzgyZTMyMmUzMFlBSUd5QTVkUlVEbFEyUHZ3cml6TnRJY2wyMWhla1JMQ1dLNTNmaEUvL0E9");
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(LicenseKey);
 
             OverridePendingTransition(Resource.Animation.fade_in, Resource.Animation.fade_out);
 

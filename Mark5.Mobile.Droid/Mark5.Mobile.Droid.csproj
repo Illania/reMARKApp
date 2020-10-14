@@ -273,13 +273,13 @@
       <HintPath>..\packages\Xamarin.Android.Support.v7.MediaRouter.28.0.0.3\lib\monoandroid90\Xamarin.Android.Support.v7.MediaRouter.dll</HintPath>
     </Reference>
     <Reference Include="Syncfusion.Licensing">
-      <HintPath>..\packages\Syncfusion.Licensing.18.2.0.56\lib\MonoAndroid10\Syncfusion.Licensing.dll</HintPath>
+      <HintPath>..\packages\Syncfusion.Licensing.18.3.0.40\lib\MonoAndroid90\Syncfusion.Licensing.dll</HintPath>
     </Reference>
     <Reference Include="Syncfusion.SfSchedule.Android">
-      <HintPath>..\packages\Syncfusion.Xamarin.SfSchedule.Android.18.2.0.56\lib\MonoAndroid10\Syncfusion.SfSchedule.Android.dll</HintPath>
+      <HintPath>..\packages\Syncfusion.Xamarin.SfSchedule.Android.18.3.0.40\lib\MonoAndroid10\Syncfusion.SfSchedule.Android.dll</HintPath>
     </Reference>
     <Reference Include="Syncfusion.SfCalendar.Android">
-      <HintPath>..\packages\Syncfusion.Xamarin.SfCalendar.Android.18.2.0.56\lib\MonoAndroid10\Syncfusion.SfCalendar.Android.dll</HintPath>
+      <HintPath>..\packages\Syncfusion.Xamarin.SfCalendar.Android.18.3.0.40\lib\MonoAndroid10\Syncfusion.SfCalendar.Android.dll</HintPath>
     </Reference>
     <Reference Include="AngleSharp">
       <HintPath>..\packages\AngleSharp.0.9.11\lib\portable-windows8+net45+windowsphone8+wpa+monoandroid+monotouch\AngleSharp.dll</HintPath>

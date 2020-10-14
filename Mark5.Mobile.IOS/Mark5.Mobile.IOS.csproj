@@ -336,16 +336,16 @@
 		  <HintPath>..\packages\SQLitePCLRaw.core.1.1.14\lib\Xamarin.iOS10\SQLitePCLRaw.core.dll</HintPath>
 		</Reference>
     <Reference Include="Syncfusion.Licensing">
-      <HintPath>..\packages\Syncfusion.Licensing.18.2.0.59\lib\Xamarin.iOS10\Syncfusion.Licensing.dll</HintPath>
+      <HintPath>..\packages\Syncfusion.Licensing.18.3.0.40\lib\Xamarin.iOS10\Syncfusion.Licensing.dll</HintPath>
     </Reference>
 		<Reference Include="Lottie.iOS">
 		  <HintPath>..\packages\Com.Airbnb.iOS.Lottie.2.5.7\lib\xamarinios10\Lottie.iOS.dll</HintPath>
 		</Reference>
 		<Reference Include="Syncfusion.SfSchedule.iOS">
-		  <HintPath>..\packages\Syncfusion.Xamarin.SfSchedule.IOS.18.2.0.59\lib\Xamarin.iOS10\Syncfusion.SfSchedule.iOS.dll</HintPath>
+		  <HintPath>..\packages\Syncfusion.Xamarin.SfSchedule.IOS.18.3.0.40\lib\Xamarin.iOS10\Syncfusion.SfSchedule.iOS.dll</HintPath>
 		</Reference>
 		<Reference Include="Syncfusion.SfCalendar.iOS">
-		  <HintPath>..\packages\Syncfusion.Xamarin.SfCalendar.IOS.18.2.0.59\lib\Xamarin.iOS10\Syncfusion.SfCalendar.iOS.dll</HintPath>
+		  <HintPath>..\packages\Syncfusion.Xamarin.SfCalendar.IOS.18.3.0.40\lib\Xamarin.iOS10\Syncfusion.SfCalendar.iOS.dll</HintPath>
 		</Reference>
 		<Reference Include="Xamarin.Essentials">
 		  <HintPath>..\packages\Xamarin.Essentials.1.1.0\lib\xamarinios10\Xamarin.Essentials.dll</HintPath>
