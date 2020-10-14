@@ -254,13 +254,17 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
                     var newItems = new ObservableCollection<Appointment>();
 
                     foreach (var caViewModel in AppointmentsInSelectedCalendars(AppointmentViewModels).ToList())
-                    { 
-                        newItems.Add(Convert(caViewModel));
-                    }
-
+                        if(!AppointmentExists(newItems, caViewModel))
+                            newItems.Add(Convert(caViewModel));
+                    
                     Items = newItems;
                     SourceUpdated(this, EventArgs.Empty);
                 });
+            }
+
+            private bool AppointmentExists(ObservableCollection<Appointment> appointments, AppointmentPreviewViewModel viewModel)
+            {
+                return appointments.Where(a => a.Id == $"{viewModel.CalendarId} {viewModel.Id} {viewModel.RecurrenceIndex}").ToList().Count > 0;
             }
 
             public void SetCalendars(List<CalendarViewModel> calendars)
