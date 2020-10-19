@@ -118,7 +118,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         }
 
         public bool IsRecurring() {
-            return RecurrenceInfo != null && Type == CalendarOccurenceType.Pattern;
+            return RecurrenceInfo != null;
         }
 
         public static AddEditAppointmentViewModel ConvertToViewModel(CalendarAppointment appointment, int recurrenceIndex)
@@ -208,12 +208,12 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 var endAllDay = DateTime.SpecifyKind(End.Date, DateTimeKind.Utc);
                 occurrence1 = new CalendarAppointmentOccurrence
                 {
-                    RecurrenceIndex = RecurrenceIndex,
+                    RecurrenceIndex = ca.Type == CalendarOccurenceType.Normal ? -1 : RecurrenceIndex,
                     StartDate = startAllDay,
                     EndDate = Start.Date == End.Date ? endAllDay : endAllDay.AddDays(1),
                 };
 
-                if (RecurrenceIndex > -1)
+                if (RecurrenceIndex > -1 && RecurrenceInfo!=null)
                 {
                     var startAllDay_ = DateTime.SpecifyKind(RecurrenceInfo.StartDate.Date, DateTimeKind.Utc);
                     var endAllDay_ = DateTime.SpecifyKind(RecurrenceInfo.EndDate.Date, DateTimeKind.Utc);
@@ -229,13 +229,13 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             {
                 occurrence1 = new CalendarAppointmentOccurrence
                 {
-                    RecurrenceIndex = RecurrenceIndex,
+                    RecurrenceIndex = ca.Type == CalendarOccurenceType.ChangedOccurrence ? RecurrenceIndex : -1,
                     StartDate = Start,
                     EndDate = End,
                 };
 
 
-                if (RecurrenceIndex > -1)
+                if (Type  == CalendarOccurenceType.ChangedOccurrence && RecurrenceIndex > -1 && RecurrenceInfo!=null)
                 {
                     occurrence2 = new CalendarAppointmentOccurrence
                     {

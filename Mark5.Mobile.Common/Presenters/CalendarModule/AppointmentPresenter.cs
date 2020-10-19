@@ -125,8 +125,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         void HandleEditedAppointment(EntityChangedMessage obj)
         {
-            if (obj.EntityId == appointment.Id)
-                view.CloseView();
+             view.CloseView();
         }
 
         #endregion
@@ -166,10 +165,8 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
             var calendar = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars.First(ca => ca.Id == appointment.CalendarId);
             appModel.Calendar = CalendarViewModel.ConvertToViewModel(calendar);
-
-            var recIndex = appModel.Type == CalendarOccurenceType.ChangedOccurrence ?  -1 : recurrenceIndex;
                     
-            var occurrence = appointment.Occurrences.FirstOrDefault(r => r.RecurrenceIndex == recIndex);
+            var occurrence = appointment.Occurrences.FirstOrDefault(r => r.RecurrenceIndex == recurrenceIndex);
 
             if (occurrence == null)
                 throw new ArgumentException("Can't find occurrence with the given recurrence index");
