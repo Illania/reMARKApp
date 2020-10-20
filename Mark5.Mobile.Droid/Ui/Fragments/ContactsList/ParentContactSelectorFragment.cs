@@ -18,6 +18,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         const string ChildrenTypeBundleKey = "ChildrenTypeBundleKey_986c3788-3b4a-445c-8dcd-50f98c738f76";
 
+        Action dismissAction;
+
         public static (ParentContactSelectorFragment fragment, string tag) NewInstance(ContactType childrenType, Folder folder)
         {
             var args = new Bundle();
@@ -42,6 +44,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 childrenType = (ContactType)Arguments.GetInt(ChildrenTypeBundleKey);
 
             return base.OnCreateView(inflater, container, savedInstanceState);
+        }
+
+        public override void OnDestroyView()
+        {
+            dismissAction?.Invoke();
+            base.OnDestroyView();
         }
 
         #region Adapter callbacks
@@ -75,7 +83,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
                 else
                 {
-                    var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.loading_contact, Resource.String.please_wait);
+                    dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.loading_contact, Resource.String.please_wait);
 
                     try
                     {

@@ -35,6 +35,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         string savedCommentText;
 
+        Action dismissAction;
+
         public static (CommentsListFragment fragment, string tag) NewInstance(BusinessEntity be)
         {
             CommonConfig.UsageAnalytics.LogEvent(new OpenCommentsEvent(be.ModuleType));
@@ -134,6 +136,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
+        public override void OnDestroyView()
+        {
+            dismissAction?.Invoke();
+            base.OnDestroyView();
+        }
+
         public override void OnSaveInstanceState(Bundle outState)
         {
             base.OnSaveInstanceState(outState);
@@ -206,7 +214,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async void DeleteComment(Comment comment)
         {
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.deleting_comment, Resource.String.please_wait);
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.deleting_comment, Resource.String.please_wait);
 
             try
             {
@@ -241,7 +249,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async void EditComment(Comment comment, string newContent)
         {
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.editing_comment, Resource.String.please_wait);
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.editing_comment, Resource.String.please_wait);
             var newComment = comment.ShallowCopy();
             newComment.Content = newContent;
 
@@ -283,7 +291,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async void AddCommentButton_Click(object sender, EventArgs e)
         {
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.adding_comment, Resource.String.please_wait);
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.adding_comment, Resource.String.please_wait);
             var newCommentContent = addCommentEditText.Text;
 
             try

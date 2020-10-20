@@ -44,6 +44,8 @@ namespace Mark5.Mobile.Droid
         List<Category> availableCategories = new List<Category>();
         List<Section> Sections { get; set; }
 
+        Action dismissAction;
+
         public static (CategoriesListFragment fragment, string tag) NewInstance(BusinessEntityPreview businessEntity)
         {
             CommonConfig.UsageAnalytics.LogEvent(new OpenCategoriesEvent(businessEntity.ModuleType));
@@ -135,6 +137,12 @@ namespace Mark5.Mobile.Droid
             UnsubscribeFromMessages();
         }
 
+        public override void OnDestroyView()
+        {
+            dismissAction?.Invoke();
+            base.OnDestroyView();
+        }
+
         protected virtual void SetDefaultSections()
         {
             CommonConfig.Logger.Info("Setting sections");
@@ -204,7 +212,7 @@ namespace Mark5.Mobile.Droid
 
         async Task SaveAndFinish()
         {
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.updating_categories, Resource.String.please_wait);
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.updating_categories, Resource.String.please_wait);
             try
             {
                 switch (BusinessEntityPreview.ObjectType)

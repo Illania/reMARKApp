@@ -24,6 +24,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         Folder fromFolder;
         ActionType actionType;
 
+        Action dismissAction;
+
         public static (CopyMoveToFolderListFragment fragment, string tag) NewInstance(Folder remoteFolder, List<int> ids, ObjectType ot, Folder fromFolder = null, ActionType? actionType = null, bool? loadRemoteFromCache = null)
         {
             var args = new Bundle();
@@ -69,6 +71,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 actionType = (ActionType)Arguments.GetInt(ActionTypeBundleKey);
 
             return base.OnCreateView(inflater, container, savedInstanceState);
+        }
+
+        public override void OnDestroyView()
+        {
+            dismissAction?.Invoke();
+            base.OnDestroyView();
         }
 
         #endregion
@@ -140,7 +148,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return;
 
             CommonConfig.Logger.Info($"Moving business entity to folder [businessEntities.Count={businessEntitiesIds?.Count}, businessEntity.Type={objectType}, toFolder.Id={toFolder?.Id}, fromFolder.Id={fromFolder?.Id}]");
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.moving_to_folder, Resource.String.please_wait);
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.moving_to_folder, Resource.String.please_wait);
 
             try
             {
@@ -187,7 +195,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return;
 
             CommonConfig.Logger.Info($"Copying business entities to folder [businessEntities.Count={businessEntitiesIds?.Count}, businessEntities.Type={objectType}, folder.Id={folder?.Id}]");
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.copying_to_folder, Resource.String.please_wait);
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.copying_to_folder, Resource.String.please_wait);
 
             try
             {

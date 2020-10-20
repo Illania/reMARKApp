@@ -55,6 +55,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         FloatingActionButton fab;
         List<int> recoveredSelectedItemsPosition;
 
+        Action dismissAction;
+
         protected FolderListAdapter CurrentAdapter => SearchEnabled ? SearchAdapter : Adapter;
 
         TinyMessageSubscriptionToken outgoingDocumentCountChangedToken;
@@ -192,6 +194,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             SetSections();
 
             CommonConfig.Logger.Info($"Created {nameof(FoldersListFragment)} [folder.id={RemoteFolder?.Id}, folder.name={RemoteFolder?.Name}]");
+        }
+
+        public override void OnDestroyView()
+        {
+            dismissAction?.Invoke();
+            base.OnDestroyView();
         }
 
         public override void OnResume()
@@ -762,7 +770,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             var module = selectedFolders.First().Module;
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, enabled ? Resource.String.enabling_notifications : Resource.String.disabling_notifications_folders, Resource.String.please_wait);
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, enabled ? Resource.String.enabling_notifications : Resource.String.disabling_notifications_folders, Resource.String.please_wait);
 
             try
             {

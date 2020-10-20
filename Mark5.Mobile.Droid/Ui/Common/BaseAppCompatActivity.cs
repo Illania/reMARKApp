@@ -6,7 +6,6 @@ using Android.Support.Design.Widget;
 using Android.Support.V7.App;
 using Android.Views;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 
@@ -16,6 +15,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
     {
         FloatingActionButton fab;
         SendStatusBanner banner;
+        Action dismissAction;
 
         public FloatingActionButton Fab
         {
@@ -60,6 +60,12 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
             UpdateFab(CommonConfig.Reachability.IsReachable);
             banner.Start();
+        }
+
+        protected override void OnDestroy()
+        {
+            dismissAction?.Invoke();
+            base.OnDestroy();           
         }
 
         void UpdateFab(bool isReachable)
@@ -111,7 +117,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
         async void ConnectionBar_Click(object sender, EventArgs e)
         {
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(this, Resource.String.testing_connection, Resource.String.please_wait);
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(this, Resource.String.testing_connection, Resource.String.please_wait);
 
             await CommonConfig.Reachability.Refresh();
 
@@ -120,7 +126,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
         async void ConnectionBar_LongClick(object sender, EventArgs e)
         {
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(this, Resource.String.testing_connection, Resource.String.please_wait);
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(this, Resource.String.testing_connection, Resource.String.please_wait);
 
             try
             {

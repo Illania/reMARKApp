@@ -49,6 +49,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         NestedScrollView scrollView;
         LinearLayoutCompat linearLayout;
 
+        Action dismissAction;
+
         public static (ShortcodeFragment fragment, string tag) NewInstance(int? folderId, Folder folder, int? shortcodeId, ShortcodePreview shortcodePreview, Guid? notificationGuid)
         {
             CommonConfig.UsageAnalytics.LogEvent(new OpenShortcodeEvent());
@@ -129,6 +131,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             HasOptionsMenu = true;
 
             return rootView;
+        }
+
+        public override void OnDestroyView()
+        {
+            dismissAction?.Invoke();
+            base.OnDestroyView();
         }
 
         public override void OnViewCreated(View view, Bundle savedInstanceState)
@@ -278,7 +286,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 CommonConfig.Logger.Info($"Attempting copy to worktray [shortcodePreview={shortcodePreview}]...");
 
-                var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.copying_to_worktray, Resource.String.please_wait);
+                dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.copying_to_worktray, Resource.String.please_wait);
 
                 try
                 {
@@ -313,7 +321,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             CommonConfig.Logger.Info($"Attempting to delete from folder [shortcodePreview={shortcodePreview}]...");
 
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.deleting_from_folder, Resource.String.please_wait);
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.deleting_from_folder, Resource.String.please_wait);
 
             try
             {
@@ -343,7 +351,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             CommonConfig.Logger.Info($"Attempting to delete [shortcodePreview={shortcodePreview}]...");
 
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.deleting, Resource.String.please_wait);
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.deleting, Resource.String.please_wait);
 
             try
             {

@@ -28,6 +28,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         DocumentsToUploadListAdapter adapter;
         ActionMode actionMode;
 
+        Action dismissAction;
+
         TinyMessageSubscriptionToken documentUploadStatusChangedToken;
 
         public static (DocumentsToUploadListFragment fragment, string var) NewInstance()
@@ -75,6 +77,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.documents);
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = GetString(Resource.String.outgoing);
+        }
+
+        public override void OnDestroyView()
+        {
+            dismissAction?.Invoke();
+            base.OnDestroyView();
         }
 
         public override async void OnResume()
@@ -244,7 +252,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (selectedItems.Count != 1)
                     return true;
 
-                var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.dialog_creating_report, Resource.String.please_wait);
+                dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.dialog_creating_report, Resource.String.please_wait);
                 Task.Run(async () => 
                 {
                     var ex = await Managers.DocumentsManager.GetFailedDocumentException(selectedItems[0].Guid);

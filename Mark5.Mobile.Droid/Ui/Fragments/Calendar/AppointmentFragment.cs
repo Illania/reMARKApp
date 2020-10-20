@@ -33,7 +33,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         int recurrenceIndex;
         bool showActions;
 
-        Action dismissLoadingAction;
+        Action dismissAction;
         List<LineViewModel> lineViewModels;
 
         LinearLayoutCompat linearLayout;
@@ -129,6 +129,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         {
             presenter?.Stop();
             base.OnDestroy();
+        }
+
+        public override void OnDestroyView()
+        {
+            dismissAction?.Invoke();
+            base.OnDestroyView();
         }
 
         #endregion
@@ -239,14 +245,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         public void ShowAppointmentLoadingDialog()
         {
-            dismissLoadingAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.loading_appointments, Resource.String.please_wait);
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.loading_appointments, Resource.String.please_wait);
             progressBar.Visibility = ViewStates.Visible;
             scrollView.Visibility = ViewStates.Gone;
         }
 
         public void CloseDialog()
         {
-            dismissLoadingAction?.Invoke();
+            dismissAction?.Invoke();
             progressBar.Visibility = ViewStates.Gone;
             scrollView.Visibility = ViewStates.Visible;
         }
@@ -258,12 +264,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         public void ShowSendInvitationsDialog()
         {
-            dismissLoadingAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.sending_invitations, Resource.String.please_wait);
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.sending_invitations, Resource.String.please_wait);
         }
 
         public void ShowDeletingDialog()
         {
-            dismissLoadingAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.deleting, Resource.String.please_wait);
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.deleting, Resource.String.please_wait);
         }
 
         public async Task ShowLoadError(Exception ex)

@@ -12,6 +12,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class PickerShortcodesListFragment : AbstractShortcodesListFragment
     {
+        Action dismissAction;
+
         public static (PickerShortcodesListFragment fragment, string tag) NewInstance(Folder folder)
         {
             var args = new Bundle();
@@ -27,11 +29,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return (fragment, tag);
         }
 
+        public override void OnDestroyView()
+        {
+            dismissAction?.Invoke();
+            base.OnDestroyView();
+        }
+
         #region Adapter callbacks
 
         protected override async void Adapter_ItemClicked(object sender, ShortcodePreview shortcodePreview)
         {
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.loading_shortcode, Resource.String.please_wait);
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.loading_shortcode, Resource.String.please_wait);
 
             try
             {
