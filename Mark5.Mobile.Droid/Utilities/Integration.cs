@@ -127,7 +127,17 @@ namespace Mark5.Mobile.Droid.Utilities
                 CommonConfig.DocumentWorkingCopyFolder };
 
             foreach (var folder in foldersToRemove)
-                await folder.DeleteAsync();
+            {
+                try
+                {
+                    await folder.DeleteAsync();
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Info($"Unable to delete folder, path:{folder.Path}: {ex.Message}");
+                }
+            }
+               
         }
     }
 }
