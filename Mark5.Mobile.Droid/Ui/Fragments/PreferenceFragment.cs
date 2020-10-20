@@ -28,6 +28,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     public class PreferenceFragment : PreferenceFragmentCompat, PreferenceFragmentCompat.IOnPreferenceStartScreenCallback, ISharedPreferencesOnSharedPreferenceChangeListener
     {
         public override Fragment CallbackFragment => this;
+        Action dismissAction;
 
         public static (PreferenceFragment fragment, string tag) NewInstance()
         {
@@ -57,6 +58,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             base.OnPause();
 
             PreferenceManager.SharedPreferences.UnregisterOnSharedPreferenceChangeListener(this);
+        }
+
+        public override void OnDestroyView()
+        {
+            dismissAction?.Invoke();
+            base.OnDestroyView();
         }
 
         public override void OnActivityResult(int requestCode, int resultCode, Intent data)
@@ -224,7 +231,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (preference.Key == GetString(Resource.String.pref_key_about_send_feedback))
             {
-                var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.dialog_creating_report, Resource.String.please_wait);
+                dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.dialog_creating_report, Resource.String.please_wait);
                 Task.Run(() => { return SystemReportCollector.CreateFullReport(); })
                     .ContinueWith(async t =>
                 {
@@ -256,7 +263,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (preference.Key == GetString(Resource.String.pref_key_advanced_create_system_report))
             {
-                var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.dialog_creating_report, Resource.String.please_wait);
+                dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.dialog_creating_report, Resource.String.please_wait);
 
                 Task.Run(() => { return SystemReportCollector.CreateFullReport(); })
                     .ContinueWith(async t =>
@@ -294,7 +301,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 CommonConfig.UsageAnalytics.LogEvent(new SettingsUpdateSystemConfigurationEvent());
 
-                var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.dialog_update_config_title, Resource.String.please_wait);
+                dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.dialog_update_config_title, Resource.String.please_wait);
                 Task.Run(async () =>
                 {
                     try
@@ -339,7 +346,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     Resource.String.dialog_logout_content,
                     async () =>
                     {
-                        var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.dialog_logging_out_title, Resource.String.please_wait);
+                        dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.dialog_logging_out_title, Resource.String.please_wait);
 
                         try
                         {

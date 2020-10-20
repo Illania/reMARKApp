@@ -51,6 +51,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         List<AddEditShortcodeView> subviews = new List<AddEditShortcodeView>();
 
+        Action dismissAction;
+
         public static (AddEditShortcodeFragment fragment, string tag) NewInstance(ShortcodeCreationModeFlag? flag, ShortcodePreview shortcodePreview)
         {
             if (flag == ShortcodeCreationModeFlag.Edit)
@@ -179,6 +181,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             await RefreshData();
         }
 
+        public override void OnDestroyView()
+        {
+            dismissAction?.Invoke();
+            base.OnDestroyView();
+        }
+
         public override void OnStop()
         {
             base.OnStop();
@@ -240,7 +248,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             var titleResource = creationModeFlag == ShortcodeCreationModeFlag.Edit ? Resource.String.edit_shortcode_edit_loading : Resource.String.edit_shortcode_add_loading;
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, titleResource, Resource.String.please_wait);
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, titleResource, Resource.String.please_wait);
 
             try
             {

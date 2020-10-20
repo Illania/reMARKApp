@@ -22,6 +22,8 @@ namespace Mark5.Mobile.Droid.Ui.Common
         NestedScrollView scrollView;
         readonly int padding = 40;
 
+        Action dismissAction;
+
         public static (ConnectionDiagnosticsFragment fragment, string tag) NewInstance()
         {
             var fragment = new ConnectionDiagnosticsFragment();
@@ -100,6 +102,12 @@ namespace Mark5.Mobile.Droid.Ui.Common
             StartDiagnostics();
         }
 
+        public override void OnDestroyView()
+        {
+            dismissAction?.Invoke();
+            base.OnDestroyView();
+        }
+
         private void DiagnosticsBtn_Click(object sender, EventArgs e)
         {
             StartDiagnostics();
@@ -107,7 +115,6 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
         private void StartDiagnostics()
         {
-            Action dismissAction = null;
 
             Activity.RunOnUiThread(() =>
             {

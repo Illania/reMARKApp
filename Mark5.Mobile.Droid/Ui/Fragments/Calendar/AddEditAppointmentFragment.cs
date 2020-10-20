@@ -167,6 +167,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             linearLayout.Animate().Alpha(1f).SetDuration(500);
         }
 
+        public override void OnDestroyView()
+        {
+            dismissAction?.Invoke();
+            base.OnDestroyView();  
+        }
+
         #endregion
 
         #region IMenu

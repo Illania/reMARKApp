@@ -89,6 +89,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         Worker autoSaveWorkingCopyWorker;
         Rect visibleRect = new Rect();
 
+        Action dismissAction;
+
         public static (ComposeDocumentFragment fragment, string tag) NewInstance(DocumentCreationModeFlag documentCreationModeFlag, CopyToNewOption? copyToNewOption, bool? restoreWorkingCopy,
                                                                                  DocumentDirection? previousDocumentDirection, int? previousDocumentFolderId, int? previousDocumentId,
                                                                                  Dictionary<DocumentAddressType, string[]> preconfiguredEmailAddresses, string preconfiguredContent,
@@ -254,6 +256,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnDestroyView()
         {
+            dismissAction?.Invoke();
             base.OnDestroyView();
             rootView.ViewTreeObserver.GlobalLayout -= RootView_OnGlobalLayout;
         }
@@ -360,7 +363,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             documentLoaded = true;
 
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.loading_document, Resource.String.please_wait);
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.loading_document, Resource.String.please_wait);
 
             try
             {
@@ -543,7 +546,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 CommonConfig.UsageAnalytics.LogEvent(new ComposeOpenAttachmentEvent());
 
-                var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.opening_attachment, Resource.String.please_wait);
+                dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.opening_attachment, Resource.String.please_wait);
 
                 string path = null;
 
@@ -755,7 +758,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             async void sendAction()
             {
-                var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, saveDraft ? Resource.String.saving_draft : Resource.String.sending_document, Resource.String.please_wait);
+                dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, saveDraft ? Resource.String.saving_draft : Resource.String.sending_document, Resource.String.please_wait);
 
                 foreach (var subView in subViews)
                     await subView.UpdateDocument();
@@ -1064,7 +1067,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async Task GetDefaultTemplate(bool initializing)
         {
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.loading_template, Resource.String.please_wait);
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.loading_template, Resource.String.please_wait);
 
             try
             {
@@ -1093,7 +1096,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async Task GetTemplate(TemplatePreview templatePreview, bool initializing)
         {
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.loading_template, Resource.String.please_wait);
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.loading_template, Resource.String.please_wait);
 
             try
             {
