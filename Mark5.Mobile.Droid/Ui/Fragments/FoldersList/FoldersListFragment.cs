@@ -397,23 +397,26 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             CommonConfig.Logger.Info($"Updating outgoing folder...");
 
-            var outgoing = Folder.LocalRootForModule(RemoteFolder.Module).SubFolders.First();
-            if (outgoing != null)
-            {
-                outgoing.PendingDocumentCount = outgoingMessageCount.PendingCount;
-                outgoing.HasFailedDocuments = outgoingMessageCount.HasFailedDocuments;
-                Activity.RunOnUiThread(Adapter.RefreshOutgoing);
+            var outgoing = Folder.LocalRootForModule(RemoteFolder.Module)?.SubFolders?.FirstOrDefault();
+            
+            if (outgoing == null) 
+                return;
+            
+            outgoing.PendingDocumentCount = outgoingMessageCount.PendingCount;
+            outgoing.HasFailedDocuments = outgoingMessageCount.HasFailedDocuments;
+            Activity.RunOnUiThread(Adapter.RefreshOutgoing);
 
-                Activity.RunOnUiThread(() =>
-                {
-                    var view = ((AppCompatActivity)Activity).FindViewById(Resource.Id.outgoing_warning_bar);
-                    if (view != null)
-                        if (outgoingMessageCount.HasFailedDocuments)
-                            view.Visibility = ViewStates.Visible;
-                        else
-                            view.Visibility = ViewStates.Gone;
-                });
-            }
+            Activity.RunOnUiThread(() =>
+            {
+                var view = ((AppCompatActivity)Activity).FindViewById(Resource.Id.outgoing_warning_bar);
+                
+                if (view == null) 
+                    return;
+                
+                view.Visibility = outgoingMessageCount.HasFailedDocuments 
+                    ? ViewStates.Visible 
+                    : ViewStates.Gone;
+            });
         }
 
         void RefreshLocal()
