@@ -77,6 +77,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
                 new ReminderInfo(ReminderInfo.ReminderType.None),
                 new ReminderInfo(ReminderInfo.ReminderType.AtTheTime),
                 new ReminderInfo(ReminderInfo.ReminderType.FiveMinutes),
+                new ReminderInfo(ReminderInfo.ReminderType.TenMinutes),
                 new ReminderInfo(ReminderInfo.ReminderType.FifteenMinutes),
                 new ReminderInfo(ReminderInfo.ReminderType.ThirtyMinutes),
                 new ReminderInfo(ReminderInfo.ReminderType.OneHour),
