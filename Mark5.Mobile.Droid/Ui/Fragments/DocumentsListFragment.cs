@@ -570,7 +570,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.SelectDeselectAll)
             {
-                SelectDeselectAll(item);
+                SelectDeselectAll();
                 return true;
             }
 
@@ -748,14 +748,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         }
 
-        void SelectDeselectAll(IMenuItem item)
+        void SelectDeselectAll()
         {
-            if (selectEnabled)
-                CurrentAdapter.SetSelected(CurrentAdapter.Items, true);
-            else
-                CurrentAdapter.SetSelected(CurrentAdapter.Items, false);
-
-            actionMode.Title = CurrentAdapter.SelectedItemCount.ToString();
+            if (actionMode == null) 
+                return;
+            
+            CurrentAdapter?.SetSelected(CurrentAdapter.Items, selectEnabled);
+            actionMode.Title = CurrentAdapter?.SelectedItemCount.ToString();
             selectEnabled = !selectEnabled;
             actionMode.Invalidate();
         }
