@@ -16,6 +16,8 @@
                         return "At time of event";
                     case ReminderType.FiveMinutes:
                         return "5 minutes before";
+                    case ReminderType.TenMinutes:
+                        return "10 minutes before";
                     case ReminderType.FifteenMinutes:
                         return "15 minutes before";
                     case ReminderType.ThirtyMinutes:
@@ -54,6 +56,7 @@
             None = -1,
             AtTheTime = 0,
             FiveMinutes = 5,
+            TenMinutes = 10,
             FifteenMinutes = 15,
             ThirtyMinutes = 30,
             OneHour = 60,
