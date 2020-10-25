@@ -84,6 +84,12 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
             Label.Text = label;
         }
 
+        public void SetEnabled(bool enabled)
+        {
+            Label.Enabled = Title.Enabled = ChevronButton.Enabled = enabled;
+            IsEnabled = enabled;
+        }
+
         public override void Reset()
         {
             SetErrorState(false);

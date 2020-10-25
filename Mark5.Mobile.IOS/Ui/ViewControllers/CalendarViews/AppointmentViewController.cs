@@ -107,7 +107,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 deleteButtonItem.Clicked += DeleteButtonItem_Clicked;
 
             if (editButtonItem != null)
-                editButtonItem.Clicked += EditButtinItem_Clicked;
+                editButtonItem.Clicked += EditButtonItem_Clicked;
 
             if (closeButtonItem != null)
                 closeButtonItem.Clicked += CloseButtonItem_Clicked;
@@ -125,7 +125,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 deleteButtonItem.Clicked -= DeleteButtonItem_Clicked;
 
             if (editButtonItem != null)
-                editButtonItem.Clicked -= EditButtinItem_Clicked;
+                editButtonItem.Clicked -= EditButtonItem_Clicked;
 
             if (closeButtonItem != null)
                 closeButtonItem.Clicked -= CloseButtonItem_Clicked;
@@ -313,9 +313,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         #region Event handlers
 
-        private async void EditButtinItem_Clicked(object sender, EventArgs e)
+        private async void EditButtonItem_Clicked(object sender, EventArgs e)
         {
-            if (appointment.RecurrenceInfo == null)
+            if (!appointment.IsRecurring())
             {
                 presenter.EditAppointmentClicked(AppointmentChangeType.Default);
                 return;

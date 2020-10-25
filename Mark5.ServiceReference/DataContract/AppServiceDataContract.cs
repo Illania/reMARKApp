@@ -1280,6 +1280,10 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "ChangedOccurenceId", Order = 1)]
         public int ChangedOccurenceId{ get; set; } = -1;
+
+        [DataMember(Name = "Subject", Order = 2)]
+        public string Subject { get; set; } = string.Empty;
+
     }
 
     [DataContract(Name = "CalendarAlarm", Namespace = "com.nordic-it.appservice.v3")]

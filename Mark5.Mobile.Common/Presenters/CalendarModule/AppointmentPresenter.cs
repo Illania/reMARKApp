@@ -186,6 +186,13 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             return appModel;
         }
 
+        public bool IsRecurring()
+        {
+            return RecurrenceInfo != null && Type != CalendarOccurenceType.ChangedOccurrence
+                && Type != CalendarOccurenceType.DeletedOccurrence
+                && Type != CalendarOccurenceType.Occurrence;
+        }
+
     }
 
     public class ParticipantsViewModel

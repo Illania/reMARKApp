@@ -80,7 +80,8 @@ namespace Mark5.Mobile.Common.Model.Converters
                 RecurrenceIndex = ca.RecurrenceIndex,
                 AppointmentId = appointmentId,
                 CalendarId = calendarId,
-                ChangedOccurenceId = ca.ChangedOccurenceId
+                ChangedOccurenceId = ca.ChangedOccurenceId,
+                Subject = ca.Subject
             };
         }
 
