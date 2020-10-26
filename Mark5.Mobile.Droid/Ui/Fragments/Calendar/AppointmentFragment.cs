@@ -174,20 +174,67 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             editItem.SetShowAsAction(ShowAsAction.Always);
         }
 
+        public async void ShowDeleteAppointmentMenu()
+        {
+            if (!viewModel.IsRecurring())
+            {
+                await presenter.DeleteAppointmentClicked();
+                return;
+            }
+
+            var choice = await Dialogs.ShowListDialog(Context, Resource.String.picker_delete_event, Resource.Array.picker_choice_delete_appointment, true);
+
+            if (choice < 0)
+                return;
+
+            switch (choice)
+            {
+                case 0:
+                    await presenter.DeleteAppointmentClicked();
+                    break;
+                case 1:
+                    await presenter.DeleteAppointmentClicked();
+                    break;
+                default:
+                    return;
+            }
+        }
+
+        public async void ShowEditppointmentMenu()
+        {
+            if (!viewModel.IsRecurring())
+            {
+                presenter.EditAppointmentClicked(AppointmentChangeType.Default);
+                return;
+            }
+
+            var choice = await Dialogs.ShowListDialog(Context, Resource.String.picker_edit_event, Resource.Array.picker_choice_edit_appointment, true);
+
+            if (choice < 0)
+                return;
+
+            switch (choice)
+            {
+                case 0:
+                    presenter.EditAppointmentClicked(AppointmentChangeType.Occurence);
+                    break;
+                case 1:
+                    presenter.EditAppointmentClicked(AppointmentChangeType.Series);
+                    break;
+                default:
+                    return;
+            }
+        }
+
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
             if (item.ItemId == MenuItemActions.DeleteAppointment)
             {
-                AsyncHelpers.RunOnUiThreadAsync((Activity)Context, async () =>
-                {
-                    var confirm = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete, Resource.String.delete_are_you_sure);
-                    if (confirm)
-                        await presenter.DeleteAppointmentClicked();
-                });
+                ShowDeleteAppointmentMenu();  
             }
             else
             {
-                presenter.EditAppointmentClicked(AppointmentChangeType.Default);
+                ShowEditppointmentMenu();
             }
 
             return true;
@@ -210,7 +257,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         public void OpenEditAppointment(int calendarId, int appointmentId, AppointmentChangeType appointmentChangeType)
         {
-            var (aeaf, tag) = AddEditAppointmentFragment.NewInstance(calendarId, appointmentId, appointmentChangeType, recurrenceIndex);
+            var recIndex = appointmentChangeType == AppointmentChangeType.Series ? -1 : recurrenceIndex;
+            var (aeaf, tag) = AddEditAppointmentFragment.NewInstance(calendarId, appointmentId, appointmentChangeType, recIndex);
+
             ((AppCompatActivity)Activity).SupportFragmentManager.BeginTransaction()
                           .SetCustomAnimations(Resource.Animation.enter_from_right, Resource.Animation.exit_to_left, Resource.Animation.enter_from_left, Resource.Animation.exit_to_right)
                           .Replace(Resource.Id.fragment_container, aeaf, tag)

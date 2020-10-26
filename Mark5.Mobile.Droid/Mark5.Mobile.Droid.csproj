@@ -592,10 +592,6 @@
     <Compile Include="Ui\Fragments\PickerInternalContactsListFragment.cs" />
     <Compile Include="Service\ReachabilityMonitor.cs" />
     <Compile Include="Utilities\PushNotificationsUtilities.cs" />
-    <Compile Include="Resources\Resource.designer.cs">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
-    </Compile>
     <Compile Include="Ui\Fragments\Calendar\MonthCalendarFragment.cs" />
     <Compile Include="Ui\Fragments\Calendar\WeekCalendarFragment.cs" />
     <Compile Include="Ui\Fragments\Calendar\CalendarListFragment.cs" />
@@ -626,6 +622,10 @@
     <Compile Include="Utilities\LineUtilities.cs" />
     <Compile Include="Utilities\Worker\SystemSettingsWorker.cs" />
     <Compile Include="Ui\Activities\MsalActivity.cs" />
+    <Compile Include="Resources\Resource.designer.cs">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

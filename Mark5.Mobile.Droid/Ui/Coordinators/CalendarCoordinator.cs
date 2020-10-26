@@ -252,7 +252,7 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
                 {
                     Items.Clear();
                     var newItems = new ObservableCollection<Appointment>();
-                    foreach (var caViewModel in AppointmentsInSelectedCalendars(AppointmentViewModels))
+                    foreach (var caViewModel in AppointmentsInSelectedCalendars(AppointmentViewModels).ToList())
                         newItems.Add(Convert(caViewModel));
 
                     Items = newItems;

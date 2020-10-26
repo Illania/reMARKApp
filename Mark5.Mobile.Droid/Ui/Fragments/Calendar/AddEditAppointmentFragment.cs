@@ -45,7 +45,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         EndDateView endDateView;
         CalendarView calendarView;
         ParticipantsView participantsView;
-        ReocurrenceView recurrenceView;
+        RecurrenceView recurrenceView;
 
         AddEditAppointmentViewModel viewModel;
         List<CalendarViewModel> calendarList;
@@ -109,6 +109,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             if (Arguments.ContainsKey(AppointmentChangeTypeBundleKey))
                 appointmentChangeType= Arguments.GetInt(AppointmentChangeTypeBundleKey);
 
+            if (Arguments.ContainsKey(RecurrenceIndexBundleKey))
+                recurrenceIndex= Arguments.GetInt(RecurrenceIndexBundleKey);
+
             if (Arguments.ContainsKey(StartDateIdBundleKey))
                 startDate = new DateTime(Arguments.GetLong(StartDateIdBundleKey));
 
@@ -162,7 +165,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 if (creationModeFlag == ContactCreationModeFlag.New)
                     await presenter.LoadEmptyAppointment(startDate);
                 else
-                    await presenter.LoadAppointment(calendarId, appointmentId, recurrenceIndex);
+                    await presenter.LoadAppointment(calendarId, appointmentId, recurrenceIndex, (AppointmentChangeType)appointmentChangeType);
                 loaded = true;
 
                 StopLoading();
@@ -194,6 +197,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         {
             if (item.ItemId == MenuItemActions.SaveAppointment)
             {
+                viewModel.RecurrenceIndex = recurrenceIndex;
                 AddOrEditAppointment();
                 return true;
             }
@@ -219,7 +223,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             subviews.Add(new AllDayToggleView(Context, AllDayToggleChanged));
             subviews.Add(startDateView = new StartDateView(Context));
             subviews.Add(endDateView = new EndDateView(Context));
-            subviews.Add(recurrenceView = new ReocurrenceView(Context, ReocurrenceClicked));
+            subviews.Add(recurrenceView = new RecurrenceView(Context, ReocurrenceClicked));
             subviews.Add(new SeparatorSubview(Context));
             subviews.Add(participantsView = new ParticipantsView(Context, ParticipantsClicked));
             subviews.Add(new SeparatorSubview(Context));
