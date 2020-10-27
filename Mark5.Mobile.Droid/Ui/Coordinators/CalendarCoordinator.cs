@@ -207,6 +207,7 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
 
         public void AppointmentTapped(ScheduleAppointment appointment)
         {
+            if (appointment == null) return;
             var splitted = appointment.Notes.ToString().Split(" ");
             var calendarId = int.Parse(splitted[0]);
             var appointmentId = int.Parse(splitted[1]);
