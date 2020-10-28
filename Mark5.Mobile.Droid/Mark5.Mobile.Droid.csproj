@@ -985,8 +985,6 @@
     <AndroidResource Include="Resources\drawable-xxxhdpi\check_mark.png" />
     <AndroidResource Include="Resources\drawable\onboarding_1.xml" />
     <AndroidResource Include="Resources\drawable\circle_red.xml" />
-    <AndroidResource Include="Resources\drawable\onboarding_5.xml" />
-    <AndroidResource Include="Resources\drawable\onboarding_6.xml" />
     <AndroidResource Include="Resources\values\style.axml" />
         <AndroidResource Include="Resources\drawable\remark_symbol.xml">
       <SubType></SubType>
@@ -1123,20 +1121,10 @@
       <SubType></SubType>
       <Generator></Generator>
     </AndroidResource>
-<AndroidResource Include="Resources\drawable\onboarding_2.xml">
+    <AndroidResource Include="Resources\drawable\onboarding_2.xml">
       <SubType></SubType>
       <Generator></Generator>
     </AndroidResource>
-    <AndroidResource Include="Resources\drawable\onboarding_3.xml">
-      <SubType></SubType>
-      <Generator></Generator>
-    </AndroidResource>
-    <AndroidResource Include="Resources\drawable\onboarding_4.xml">
-      <SubType></SubType>
-      <Generator></Generator>
-    </AndroidResource>
-
-    
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FastScrollRecycler\FastScrollRecycler.csproj">
