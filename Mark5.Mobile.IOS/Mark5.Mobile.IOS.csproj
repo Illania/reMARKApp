@@ -655,15 +655,7 @@
 		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_1.imageset\Contents.json" />
 		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_1.imageset\Page01.pdf" />
 		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_2.imageset\Contents.json" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_2.imageset\Page02.pdf" />
 		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_3.imageset\Contents.json" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_3.imageset\Page03.pdf" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_4.imageset\Contents.json" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_4.imageset\Page04.pdf" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_5.imageset\Contents.json" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_5.imageset\Page05.pdf" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_6.imageset\Contents.json" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_6.imageset\Page06.pdf" />
 		<ImageAsset Include="Assets_icons.xcassets\Nav-search.imageset\Contents.json" />
 		<ImageAsset Include="Assets_icons.xcassets\Nav-mail.imageset\Contents.json" />
 		<ImageAsset Include="Assets_icons.xcassets\Nav-mail.imageset\Nav-mail%402x.png" />
@@ -707,6 +699,8 @@
 		<ImageAsset Include="Assets_icons.xcassets\AzureLogin.imageset\Contents.json" />
 		<ImageAsset Include="Assets_icons.xcassets\AzureLogin.imageset\azure_login_light.pdf" />
 		<ImageAsset Include="Assets_icons.xcassets\Nav-search.imageset\nav-search-1.pdf" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_2.imageset\ios-update.pdf" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_3.imageset\microsoft-account.pdf" />
 	</ItemGroup>
 	<ItemGroup>
 		<BundleResource Include="Resources\Base.lproj\Localizable.strings" />
