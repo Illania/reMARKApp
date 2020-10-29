@@ -352,6 +352,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         private async void DeleteButtonItem_Clicked(object sender, EventArgs e)
         {
+            if (!appointment.IsRecurring())
+            {
+                await presenter.DeleteAppointmentClicked(AppointmentDeleteType.Default);
+                return;
+            }
+
             var d = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
             var source = await Dialogs.ShowListActionSheetAsync(this, new[] {
                 Localization.GetString("delete_this_event_only"),

@@ -178,7 +178,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         {
             if (!viewModel.IsRecurring())
             {
-                await presenter.DeleteAppointmentClicked();
+                await presenter.DeleteAppointmentClicked(AppointmentDeleteType.Default);
                 return;
             }
 
@@ -190,10 +190,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             switch (choice)
             {
                 case 0:
-                    await presenter.DeleteAppointmentClicked();
+                    await presenter.DeleteAppointmentClicked(AppointmentDeleteType.Occurence);
                     break;
                 case 1:
-                    await presenter.DeleteAppointmentClicked();
+                    await presenter.DeleteAppointmentClicked(AppointmentDeleteType.Series);
                     break;
                 default:
                     return;
