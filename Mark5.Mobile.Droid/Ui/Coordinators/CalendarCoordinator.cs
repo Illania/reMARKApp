@@ -207,6 +207,7 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
 
         public void AppointmentTapped(ScheduleAppointment appointment)
         {
+            if (appointment == null) return;
             var splitted = appointment.Notes.ToString().Split(" ");
             var calendarId = int.Parse(splitted[0]);
             var appointmentId = int.Parse(splitted[1]);
@@ -220,7 +221,7 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
 
         void UiCache_SourceUpdated(object sender, EventArgs e)
         {
-            monthCalendarFragment.UpdateSource();
+            monthCalendarFragment?.UpdateSource();
         }
 
         #endregion
@@ -243,7 +244,7 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
                 UpdateSchedule();
             }
 
-            public void UpdateSchedule()
+            private void UpdateSchedule()
             {
                 if (!AppointmentViewModels.Any())
                     return;
@@ -252,12 +253,19 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
                 {
                     Items.Clear();
                     var newItems = new ObservableCollection<Appointment>();
-                    foreach (var caViewModel in AppointmentsInSelectedCalendars(AppointmentViewModels).ToList())
-                        newItems.Add(Convert(caViewModel));
 
+                    foreach (var caViewModel in AppointmentsInSelectedCalendars(AppointmentViewModels).ToList())
+                        if(!AppointmentExists(newItems, caViewModel))
+                            newItems.Add(Convert(caViewModel));
+                    
                     Items = newItems;
                     SourceUpdated(this, EventArgs.Empty);
                 });
+            }
+
+            private bool AppointmentExists(ObservableCollection<Appointment> appointments, AppointmentPreviewViewModel viewModel)
+            {
+                return appointments.Where(a => a.Id == $"{viewModel.CalendarId} {viewModel.Id} {viewModel.RecurrenceIndex}").ToList().Count > 0;
             }
 
             public void SetCalendars(List<CalendarViewModel> calendars)
@@ -296,14 +304,6 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
             {
                 var appStart = appointment.Start;
                 var appEnd = appointment.End;
-
-                return DateTimeInPeriod(appStart, appEnd, start, end);
-            }
-
-            bool AppointmentIsInPeriod(Appointment appointment, DateTime start, DateTime end)
-            {
-                var appStart = appointment.Start.ConvertToDateTime();
-                var appEnd = appointment.End.ConvertToDateTime();
 
                 return DateTimeInPeriod(appStart, appEnd, start, end);
             }

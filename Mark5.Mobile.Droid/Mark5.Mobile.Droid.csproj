@@ -70,6 +70,7 @@
     <AndroidDexTool>dx</AndroidDexTool>
     <LangVersion>8.0</LangVersion>
     <AndroidCreatePackagePerAbi>false</AndroidCreatePackagePerAbi>
+    <AndroidSupportedAbis>armeabi-v7a;arm64-v8a</AndroidSupportedAbis>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -272,13 +273,13 @@
       <HintPath>..\packages\Xamarin.Android.Support.v7.MediaRouter.28.0.0.3\lib\monoandroid90\Xamarin.Android.Support.v7.MediaRouter.dll</HintPath>
     </Reference>
     <Reference Include="Syncfusion.Licensing">
-      <HintPath>..\packages\Syncfusion.Licensing.17.2.0.47\lib\MonoAndroid10\Syncfusion.Licensing.dll</HintPath>
+      <HintPath>..\packages\Syncfusion.Licensing.18.2.0.56\lib\MonoAndroid10\Syncfusion.Licensing.dll</HintPath>
     </Reference>
     <Reference Include="Syncfusion.SfSchedule.Android">
-      <HintPath>..\packages\Syncfusion.Xamarin.SfSchedule.Android.17.2.0.47\lib\MonoAndroid10\Syncfusion.SfSchedule.Android.dll</HintPath>
+      <HintPath>..\packages\Syncfusion.Xamarin.SfSchedule.Android.18.2.0.56\lib\MonoAndroid10\Syncfusion.SfSchedule.Android.dll</HintPath>
     </Reference>
     <Reference Include="Syncfusion.SfCalendar.Android">
-      <HintPath>..\packages\Syncfusion.Xamarin.SfCalendar.Android.17.2.0.47\lib\MonoAndroid10\Syncfusion.SfCalendar.Android.dll</HintPath>
+      <HintPath>..\packages\Syncfusion.Xamarin.SfCalendar.Android.18.2.0.56\lib\MonoAndroid10\Syncfusion.SfCalendar.Android.dll</HintPath>
     </Reference>
     <Reference Include="AngleSharp">
       <HintPath>..\packages\AngleSharp.0.9.11\lib\portable-windows8+net45+windowsphone8+wpa+monoandroid+monotouch\AngleSharp.dll</HintPath>
@@ -984,8 +985,6 @@
     <AndroidResource Include="Resources\drawable-xxxhdpi\check_mark.png" />
     <AndroidResource Include="Resources\drawable\onboarding_1.xml" />
     <AndroidResource Include="Resources\drawable\circle_red.xml" />
-    <AndroidResource Include="Resources\drawable\onboarding_5.xml" />
-    <AndroidResource Include="Resources\drawable\onboarding_6.xml" />
     <AndroidResource Include="Resources\values\style.axml" />
         <AndroidResource Include="Resources\drawable\remark_symbol.xml">
       <SubType></SubType>
@@ -1122,20 +1121,10 @@
       <SubType></SubType>
       <Generator></Generator>
     </AndroidResource>
-<AndroidResource Include="Resources\drawable\onboarding_2.xml">
+    <AndroidResource Include="Resources\drawable\onboarding_2.xml">
       <SubType></SubType>
       <Generator></Generator>
     </AndroidResource>
-    <AndroidResource Include="Resources\drawable\onboarding_3.xml">
-      <SubType></SubType>
-      <Generator></Generator>
-    </AndroidResource>
-    <AndroidResource Include="Resources\drawable\onboarding_4.xml">
-      <SubType></SubType>
-      <Generator></Generator>
-    </AndroidResource>
-
-    
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FastScrollRecycler\FastScrollRecycler.csproj">

@@ -10,9 +10,12 @@ using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
-{
+{ 
+
     public class PickerContactsListFragment : AbstractContactsListFragment
     {
+        Action dismissAction;
+
         public static (PickerContactsListFragment fragment, string tag) NewInstance(Folder folder)
         {
             var args = new Bundle();
@@ -28,11 +31,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return (fragment, tag);
         }
 
+        public override void OnDestroyView()
+        {
+            dismissAction?.Invoke();
+            base.OnDestroyView();
+        }
+
         #region Adapter callbacks
 
         protected override async void Adapter_ItemClicked(object sender, ContactPreview contactPreview)
         {
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.loading_contact, Resource.String.please_wait);
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.loading_contact, Resource.String.please_wait);
 
             try
             {

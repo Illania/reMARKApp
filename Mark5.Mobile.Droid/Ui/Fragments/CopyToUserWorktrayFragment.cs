@@ -39,6 +39,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         CopyToUserWorktrayAdapter searchAdapter;
         AppCompatButton copyButton;
 
+        Action dismissAction;
+
         public static (CopyToUserWorktrayFragment fragment, string tag) NewInstance(List<int> ids, ObjectType ot)
         {
             var args = new Bundle();
@@ -105,7 +107,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 CommonConfig.Logger.Info($"Attempting copy to worktray [businessEntities.Count={businessEntitiesIds.Count}, selectedUsers.Count={selectedSystemUsers.Count}]...");
 
-                var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.copying_to_worktray, Resource.String.please_wait);
+                dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.copying_to_worktray, Resource.String.please_wait);
 
                 try
                 {
@@ -136,6 +138,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(CopyToUserWorktrayFragment)} [[businessEntities.Count={businessEntitiesIds?.Count}]");
+        }
+
+        public override void OnDestroyView()
+        {
+            dismissAction?.Invoke();
+            base.OnDestroyView();
         }
 
         public override async void OnResume()

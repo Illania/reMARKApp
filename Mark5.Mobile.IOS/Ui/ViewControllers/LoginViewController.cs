@@ -628,10 +628,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
-                var username = usernameTextField.Text;
-                var password = passwordTextField.Text;
-                var hostname = hostnameTextField.Text;
-                var port = portTextField.Text;
+                var username = usernameTextField.Text.TrimEnd();
+                var password = passwordTextField.Text.TrimEnd();
+                var hostname = hostnameTextField.Text.TrimEnd();
+                var port = portTextField.Text.TrimEnd();
 
                 var inputsAreValid = await ValidateInputs(username, password, hostname, port);
                 if (!inputsAreValid)

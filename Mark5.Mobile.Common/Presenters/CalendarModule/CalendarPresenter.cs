@@ -26,8 +26,8 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         TinyMessageSubscriptionToken addedAppointmentToken;
         TinyMessageSubscriptionToken editedAppointmentToken;
 
-        DateTime lastVisibleStartDate;
-        DateTime lastVisibleEndDate;
+        DateTime lastVisibleStartDate = new DateTime(2000,1 ,1);
+        DateTime lastVisibleEndDate = new DateTime(2100, 1, 1);
 
         bool started;
 

@@ -39,6 +39,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         MailMessage mailMessage;
 
+        Action dismissAction;
+
         public static Intent CreateIntent(Context context)
         {
             return new Intent(context, typeof(MailViewerActivity));
@@ -74,6 +76,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             linearLayout.AddView(new ContentView(this));
 
             LoadMailFromUri();
+        }
+
+        protected override void OnDestroy()
+        {
+            dismissAction?.Invoke();
+            base.OnDestroy();
         }
 
         static byte[] ReadToEnd(Stream input)
@@ -137,7 +145,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             if (uri == null && Intent.ClipData != null && Intent.ClipData.ItemCount > 0)
                 uri = Intent.ClipData.GetItemAt(0).Uri;
 
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(this, Resource.String.loading_mail, Resource.String.please_wait);
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(this, Resource.String.loading_mail, Resource.String.please_wait);
 
             Task.Run(async () =>
                 {
@@ -281,7 +289,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         async void AttachmentsView_AttachmentClicked(object sender, MailBee.Mime.Attachment att)
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(this, Resource.String.opening_attachment, Resource.String.please_wait);
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(this, Resource.String.opening_attachment, Resource.String.please_wait);
 
             try
             {
@@ -317,7 +325,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         async void AttachmentsView_AttachmentLongClicked(object sender, MailBee.Mime.Attachment att)
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(this, Resource.String.opening_attachment, Resource.String.please_wait);
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(this, Resource.String.opening_attachment, Resource.String.please_wait);
 
             try
             {

@@ -1564,6 +1564,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             UIContextualAction BuildLeadingContextualAction(UITableView tableView, NSIndexPath indexPath)
             {
+                if (indexPath == null)
+                    return null;
+
                 var documentPreview = Items[indexPath.Row];
 
                 EmailSwipeAction leadingAction = PlatformConfig.Preferences.EmailLeadingSwipeActions.First();
@@ -1583,10 +1586,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
             public override UISwipeActionsConfiguration GetLeadingSwipeActionsConfiguration(UITableView tableView, NSIndexPath indexPath)
-            {
+            { 
                 var leadingSwipe = UISwipeActionsConfiguration.FromActions(new UIContextualAction[] { BuildLeadingContextualAction(tableView, indexPath) });
 
                 leadingSwipe.PerformsFirstActionWithFullSwipe = true;
+
+                var actions = leadingSwipe.Actions[0];
+                if (!leadingSwipe.Actions.Any(a => a != null))
+                    return null;
 
                 return leadingSwipe;
             }

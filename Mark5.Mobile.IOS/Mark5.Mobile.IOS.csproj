@@ -336,16 +336,16 @@
 		  <HintPath>..\packages\SQLitePCLRaw.core.1.1.14\lib\Xamarin.iOS10\SQLitePCLRaw.core.dll</HintPath>
 		</Reference>
     <Reference Include="Syncfusion.Licensing">
-      <HintPath>..\packages\Syncfusion.Licensing.17.2.0.47\lib\Xamarin.iOS10\Syncfusion.Licensing.dll</HintPath>
+      <HintPath>..\packages\Syncfusion.Licensing.18.2.0.59\lib\Xamarin.iOS10\Syncfusion.Licensing.dll</HintPath>
     </Reference>
 		<Reference Include="Lottie.iOS">
 		  <HintPath>..\packages\Com.Airbnb.iOS.Lottie.2.5.7\lib\xamarinios10\Lottie.iOS.dll</HintPath>
 		</Reference>
 		<Reference Include="Syncfusion.SfSchedule.iOS">
-		  <HintPath>..\packages\Syncfusion.Xamarin.SfSchedule.IOS.17.2.0.47\lib\Xamarin.iOS10\Syncfusion.SfSchedule.iOS.dll</HintPath>
+		  <HintPath>..\packages\Syncfusion.Xamarin.SfSchedule.IOS.18.2.0.59\lib\Xamarin.iOS10\Syncfusion.SfSchedule.iOS.dll</HintPath>
 		</Reference>
 		<Reference Include="Syncfusion.SfCalendar.iOS">
-		  <HintPath>..\packages\Syncfusion.Xamarin.SfCalendar.IOS.17.2.0.47\lib\Xamarin.iOS10\Syncfusion.SfCalendar.iOS.dll</HintPath>
+		  <HintPath>..\packages\Syncfusion.Xamarin.SfCalendar.IOS.18.2.0.59\lib\Xamarin.iOS10\Syncfusion.SfCalendar.iOS.dll</HintPath>
 		</Reference>
 		<Reference Include="Xamarin.Essentials">
 		  <HintPath>..\packages\Xamarin.Essentials.1.1.0\lib\xamarinios10\Xamarin.Essentials.dll</HintPath>
@@ -406,7 +406,7 @@
 		  <HintPath>..\packages\sqlite-net-pcl.1.5.231\lib\netstandard1.1\SQLite-net.dll</HintPath>
 		</Reference>
 		<Reference Include="GMImagePicker.Xamarin">
-		  <HintPath>..\packages\GMImagePicker.Xamarin.2.3.5\lib\xamarinios10\GMImagePicker.Xamarin.dll</HintPath>
+		  <HintPath>..\packages\GMImagePicker.Xamarin.2.5.0\lib\xamarinios10\GMImagePicker.Xamarin.dll</HintPath>
 		</Reference>
 		<Reference Include="Microsoft.Identity.Client">
 		  <HintPath>..\packages\Microsoft.Identity.Client.4.16.1\lib\xamarinios10\Microsoft.Identity.Client.dll</HintPath>
@@ -423,6 +423,7 @@
 		<Reference Include="Microsoft.Graph">
 		  <HintPath>..\packages\Microsoft.Graph.1.21.0\lib\netstandard1.3\Microsoft.Graph.dll</HintPath>
 		</Reference>
+		<Reference Include="System.Drawing.Common.dll" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Mark5.Mobile.Common\Mark5.Mobile.Common.csproj">
@@ -658,15 +659,7 @@
 		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_1.imageset\Contents.json" />
 		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_1.imageset\Page01.pdf" />
 		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_2.imageset\Contents.json" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_2.imageset\Page02.pdf" />
 		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_3.imageset\Contents.json" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_3.imageset\Page03.pdf" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_4.imageset\Contents.json" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_4.imageset\Page04.pdf" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_5.imageset\Contents.json" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_5.imageset\Page05.pdf" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_6.imageset\Contents.json" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_6.imageset\Page06.pdf" />
 		<ImageAsset Include="Assets_icons.xcassets\Nav-search.imageset\Contents.json" />
 		<ImageAsset Include="Assets_icons.xcassets\Nav-mail.imageset\Contents.json" />
 		<ImageAsset Include="Assets_icons.xcassets\Nav-mail.imageset\Nav-mail%402x.png" />
@@ -710,6 +703,8 @@
 		<ImageAsset Include="Assets_icons.xcassets\AzureLogin.imageset\Contents.json" />
 		<ImageAsset Include="Assets_icons.xcassets\AzureLogin.imageset\azure_login_light.pdf" />
 		<ImageAsset Include="Assets_icons.xcassets\Nav-search.imageset\nav-search-1.pdf" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_2.imageset\ios-update.pdf" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_3.imageset\microsoft-account.pdf" />
 	</ItemGroup>
 	<ItemGroup>
 		<BundleResource Include="Resources\Base.lproj\Localizable.strings" />

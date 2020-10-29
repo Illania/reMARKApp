@@ -573,6 +573,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AddEditAppointmentViews
                 new ReminderInfo(ReminderInfo.ReminderType.None),
                 new ReminderInfo(ReminderInfo.ReminderType.AtTheTime),
                 new ReminderInfo(ReminderInfo.ReminderType.FiveMinutes),
+                new ReminderInfo(ReminderInfo.ReminderType.TenMinutes),
                 new ReminderInfo(ReminderInfo.ReminderType.FifteenMinutes),
                 new ReminderInfo(ReminderInfo.ReminderType.ThirtyMinutes),
                 new ReminderInfo(ReminderInfo.ReminderType.OneHour),

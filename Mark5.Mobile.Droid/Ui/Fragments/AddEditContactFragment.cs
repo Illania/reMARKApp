@@ -58,6 +58,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         bool secondaryLayoutShown;
 
+        Action dismissAction;
+
         public static (AddEditContactFragment fragment, string tag) NewInstance(Contact contact, ContactPreview contactPreview, int? contactId, ContactType? contactType, ContactCreationModeFlag? creationModeFlag,
                                                                                 ContactPreview parentContactPreview, bool? parentPreselected)
         {
@@ -250,6 +252,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(resId);
 
+        }
+
+        public override void OnDestroyView()
+        {
+            dismissAction?.Invoke();
+            base.OnDestroyView();
         }
 
         public override void OnStop()
@@ -456,7 +464,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             var titleResource = creationModeFlag == ContactCreationModeFlag.Edit ? Resource.String.edit_contact_edit_loading : Resource.String.edit_contact_add_loading;
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, titleResource, Resource.String.please_wait);
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, titleResource, Resource.String.please_wait);
 
             try
             {

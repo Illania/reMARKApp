@@ -16,6 +16,8 @@ namespace Mark5.Mobile.Droid.Utilities.Workers
 
         public override Result DoWork()
         {
+            return new Result.Success(); //Temporarily
+
             try
             {
                 AsyncHelpers.RunSync(Jobs.SystemSettingsUpdateJob.Run);
@@ -30,6 +32,8 @@ namespace Mark5.Mobile.Droid.Utilities.Workers
 
         public static void Schedule()
         {
+            return; //Temporarily
+
             try
             {
                 var constraints = new Constraints.Builder().SetRequiredNetworkType(NetworkType.Connected).Build();

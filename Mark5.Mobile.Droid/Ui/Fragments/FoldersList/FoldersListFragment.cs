@@ -55,6 +55,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         FloatingActionButton fab;
         List<int> recoveredSelectedItemsPosition;
 
+        Action dismissAction;
+
         protected FolderListAdapter CurrentAdapter => SearchEnabled ? SearchAdapter : Adapter;
 
         TinyMessageSubscriptionToken outgoingDocumentCountChangedToken;
@@ -192,6 +194,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             SetSections();
 
             CommonConfig.Logger.Info($"Created {nameof(FoldersListFragment)} [folder.id={RemoteFolder?.Id}, folder.name={RemoteFolder?.Name}]");
+        }
+
+        public override void OnDestroyView()
+        {
+            dismissAction?.Invoke();
+            base.OnDestroyView();
         }
 
         public override void OnResume()
@@ -389,23 +397,26 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             CommonConfig.Logger.Info($"Updating outgoing folder...");
 
-            var outgoing = Folder.LocalRootForModule(RemoteFolder.Module).SubFolders.First();
-            if (outgoing != null)
-            {
-                outgoing.PendingDocumentCount = outgoingMessageCount.PendingCount;
-                outgoing.HasFailedDocuments = outgoingMessageCount.HasFailedDocuments;
-                Activity.RunOnUiThread(Adapter.RefreshOutgoing);
+            var outgoing = Folder.LocalRootForModule(RemoteFolder.Module)?.SubFolders?.FirstOrDefault();
+            
+            if (outgoing == null) 
+                return;
+            
+            outgoing.PendingDocumentCount = outgoingMessageCount.PendingCount;
+            outgoing.HasFailedDocuments = outgoingMessageCount.HasFailedDocuments;
+            Activity.RunOnUiThread(Adapter.RefreshOutgoing);
 
-                Activity.RunOnUiThread(() =>
-                {
-                    var view = ((AppCompatActivity)Activity).FindViewById(Resource.Id.outgoing_warning_bar);
-                    if (view != null)
-                        if (outgoingMessageCount.HasFailedDocuments)
-                            view.Visibility = ViewStates.Visible;
-                        else
-                            view.Visibility = ViewStates.Gone;
-                });
-            }
+            Activity.RunOnUiThread(() =>
+            {
+                var view = ((AppCompatActivity)Activity).FindViewById(Resource.Id.outgoing_warning_bar);
+                
+                if (view == null) 
+                    return;
+                
+                view.Visibility = outgoingMessageCount.HasFailedDocuments 
+                    ? ViewStates.Visible 
+                    : ViewStates.Gone;
+            });
         }
 
         void RefreshLocal()
@@ -762,7 +773,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             var module = selectedFolders.First().Module;
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, enabled ? Resource.String.enabling_notifications : Resource.String.disabling_notifications_folders, Resource.String.please_wait);
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, enabled ? Resource.String.enabling_notifications : Resource.String.disabling_notifications_folders, Resource.String.please_wait);
 
             try
             {

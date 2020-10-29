@@ -62,6 +62,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         CancellationTokenSource cts;
 
+        Action dismissAction;
+
         #region Fragment overrides
 
         public override void OnCreate(Bundle savedInstanceState)
@@ -160,6 +162,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 ActionMode = null;
                 searchAdapter.NotifyDataSetChanged();
             }
+        }
+
+        public override void OnDestroyView()
+        {
+            dismissAction?.Invoke();
+            base.OnDestroyView();
         }
 
         public override void OnActivityResult(int requestCode, int resultCode, Intent data)
@@ -386,7 +394,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 CommonConfig.Logger.Info($"Attempting copy to worktray [businessEntities.Count={CurrentAdapter.SelectedItemCount}]...");
 
-                var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.copying_to_worktray, Resource.String.please_wait);
+                dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.copying_to_worktray, Resource.String.please_wait);
 
                 try
                 {
@@ -419,7 +427,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             CommonConfig.Logger.Info($"Attempting to delete from folder [businessEntities.Count={CurrentAdapter.SelectedItemCount}]...");
 
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.deleting_from_folder, Resource.String.please_wait);
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.deleting_from_folder, Resource.String.please_wait);
 
             try
             {
@@ -446,7 +454,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             CommonConfig.Logger.Info($"Attempting to delete [businessEntities.Count={CurrentAdapter.SelectedItemCount}]...");
 
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.deleting, Resource.String.please_wait);
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.deleting, Resource.String.please_wait);
 
             try
             {

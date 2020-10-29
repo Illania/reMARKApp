@@ -230,13 +230,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 SelectionTextColor = Theme.White,
                 AgendaViewStyle = new AgendaViewStyle
                 {
-                    SubjectTextColor = Theme.DarkerBlue,
-                    SubjectTextStyle = Theme.DefaultLightFont,
+                    SubjectTextStyle = Theme.DefaultBoldFont,
                     TimeTextStyle = Theme.CalendarTimeLightFont,
-                    TimeTextColor = Theme.DarkGray,
                     DateTextColor = Theme.DarkGray,
                     DateTextStyle = Theme.DefaultLightFont,
-                    HeaderHeight = 50f
+                    HeaderHeight = 50f,
                 }
             };
 

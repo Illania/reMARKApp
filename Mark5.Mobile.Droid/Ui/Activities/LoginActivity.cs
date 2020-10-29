@@ -112,6 +112,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             CommonConfig.Logger.Info($"Resumed {nameof(LoginActivity)}");
         }
 
+        protected override void OnDestroy()
+        {
+            dismissAction?.Invoke();
+            base.OnDestroy();
+        }
+
         protected override void OnActivityResult(int requestCode,
                                          Result resultCode, Intent data)
         {
@@ -179,7 +185,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         {
             if (item.ItemId == MenuItemActions.SystemReport)
             {
-                var dismissAction = Dialogs.ShowInfiniteProgressDialog(this, Resource.String.dialog_creating_report, Resource.String.please_wait);
+                dismissAction = Dialogs.ShowInfiniteProgressDialog(this, Resource.String.dialog_creating_report, Resource.String.please_wait);
 
                 Task.Run(() => { return SystemReportCollector.CreateFullReport(); })
                     .ContinueWith(t =>
@@ -275,10 +281,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             try
             {
-                var username = usernameEditText.Text;
-                var password = passwordEditText.Text;
-                var hostname = hostnameEditText.Text;
-                var port = portEditText.Text;
+                var username = usernameEditText.Text.TrimEnd();
+                var password = passwordEditText.Text.TrimEnd();
+                var hostname = hostnameEditText.Text.TrimEnd();
+                var port = portEditText.Text.TrimEnd();
                 var sslMode = (SslMode)sslSpinner.SelectedItemPosition;
 
                 var errors = ValidateInputs(username, password, hostname, port);

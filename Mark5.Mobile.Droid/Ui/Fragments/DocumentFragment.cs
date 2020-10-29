@@ -17,6 +17,7 @@ using Android.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Model;
 using Mark5.Mobile.Droid.Ui.Activities;
@@ -55,6 +56,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         AppCompatImageView button3;
 
         CancellationTokenSource setReadStatusCancellationTokenSource;
+
+        Action dismissAction;
 
         public static (DocumentFragment fragment, string tag) NewInstance(Folder folder = null, int? folderId = null,
             DocumentPreview dp = null, int? docId = null, Guid? notificationGuid = null, Guid? failDocToUploadGuid = null)
@@ -270,6 +273,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
             CommonConfig.Logger.Info($"Created {nameof(DocumentFragment)} [folder.id={FolderId ?? Folder?.Id}, document.id={DocumentId ?? DocumentPreview?.Id ?? Document?.Id}]");
+        }
+
+        public override void OnDestroyView()
+        {
+            dismissAction?.Invoke();
+            base.OnDestroyView();
         }
 
         public override async void OnResume()
@@ -635,7 +644,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             CommonConfig.Logger.Info($"Attempting to mark as read [documentPreview={DocumentPreview}]...");
 
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.marking_as_read, Resource.String.please_wait);
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.marking_as_read, Resource.String.please_wait);
 
             try
             {
@@ -661,7 +670,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             CommonConfig.Logger.Info($"Attempting to mark as unread [documentPreview={DocumentPreview}]...");
 
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.marking_as_unread, Resource.String.please_wait);
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.marking_as_unread, Resource.String.please_wait);
 
             try
             {
@@ -691,7 +700,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 CommonConfig.Logger.Info($"Attempting copy to worktray [documentPreview={DocumentPreview}]...");
 
-                var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.copying_to_worktray, Resource.String.please_wait);
+                dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.copying_to_worktray, Resource.String.please_wait);
 
                 try
                 {
@@ -732,7 +741,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             CommonConfig.Logger.Info($"Attempting to set priority [documentPreview={DocumentPreview}]...");
 
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.setting_priority, Resource.String.please_wait);
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.setting_priority, Resource.String.please_wait);
 
             try
             {
@@ -764,7 +773,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             CommonConfig.Logger.Info($"Attempting to delete from folder [documentPreview={DocumentPreview}]...");
 
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.deleting_from_folder, Resource.String.please_wait);
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.deleting_from_folder, Resource.String.please_wait);
 
             try
             {
@@ -794,7 +803,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             CommonConfig.Logger.Info($"Attempting to delete [documentPreview={DocumentPreview}]...");
 
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.deleting, Resource.String.please_wait);
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.deleting, Resource.String.please_wait);
 
             try
             {
@@ -862,7 +871,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             CommonConfig.UsageAnalytics.LogEvent(new DocumentOpenAttachmentEvent());
 
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.opening_attachment, Resource.String.please_wait);
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.opening_attachment, Resource.String.please_wait);
 
             try
             {
@@ -911,7 +920,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async void AttachmentsView_AttachmentLongClicked(object sender, AttachmentDescription attachmentDescription)
         {
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.opening_attachment, Resource.String.please_wait);
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.opening_attachment, Resource.String.please_wait);
 
             try
             {
@@ -962,7 +971,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async Task SendInvitationReply(CalendarInvitationView cv, CalendarInvitation invitation, InvitationReplyDetailViewModel vm)
         {
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.sending_appointment_response, Resource.String.please_wait);
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.sending_appointment_response, Resource.String.please_wait);
 
             try
             {
@@ -1034,6 +1043,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 invitation.Status = vm.Status;
                 await cv.RefreshView();
+
+                //notify to update calendar datasource
+                if (invitation.Status == ParticipantStatus.Accepted || invitation.Status == ParticipantStatus.Tentative)
+                    CommonConfig.MessengerHub.Publish(new EntityAddedMessage(this, ObjectType.CalendarAppointment, invitation.AppointmentId));
 
                 dismissAction();
             }

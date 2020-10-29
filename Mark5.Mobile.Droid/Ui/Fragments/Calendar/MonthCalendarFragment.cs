@@ -110,12 +110,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         readonly int darkerBlueColor;
         readonly int whiteColor;
         readonly int lightBlueColor;
+        readonly int darkGrayColor;
 
         public MonthSchedule(Context context) : base(context)
         {
             darkerBlueColor = ContextCompat.GetColor(context, Resource.Color.darkerblue);
             whiteColor = ContextCompat.GetColor(context, Resource.Color.white);
             lightBlueColor = ContextCompat.GetColor(context, Resource.Color.lightblue);
+            darkGrayColor = ContextCompat.GetColor(context, Resource.Color.darkgray);
 
             ViewHeaderStyle dayHeaderStyle = new ViewHeaderStyle
             {
@@ -138,6 +140,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 ShowAgendaView = true,
                 TodayBackgroundColor = new Color(lightBlueColor),
                 SelectionTextColor = new Color(darkerBlueColor),
+                AgendaViewStyle = new AgendaViewStyle
+                {
+                    DateTextColor = new Color(darkGrayColor),
+                    HeaderHeight = 50f,
+                }
             };
 
             MonthCellLoaded += MonthSchedule_MonthCellLoaded;
