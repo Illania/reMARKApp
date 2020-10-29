@@ -281,10 +281,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             try
             {
-                var username = usernameEditText.Text;
-                var password = passwordEditText.Text;
-                var hostname = hostnameEditText.Text;
-                var port = portEditText.Text;
+                var username = usernameEditText.Text.TrimEnd();
+                var password = passwordEditText.Text.TrimEnd();
+                var hostname = hostnameEditText.Text.TrimEnd();
+                var port = portEditText.Text.TrimEnd();
                 var sslMode = (SslMode)sslSpinner.SelectedItemPosition;
 
                 var errors = ValidateInputs(username, password, hostname, port);
