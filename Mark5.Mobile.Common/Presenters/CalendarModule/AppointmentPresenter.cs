@@ -49,7 +49,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             }
         }
 
-        public async Task DeleteAppointmentClicked()
+        public async Task DeleteAppointmentClicked(AppointmentDeleteType appointmentDeleteType)
         {
             view.ShowDeletingDialog();
 
@@ -57,7 +57,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             {
                 CommonConfig.Logger.Info($"Deleting appointment with ID = {appointment.Id}");
 
-                await Managers.CommonActionsManager.Delete(new List<IBusinessEntity> { appointment });
+                await Managers.CalendarManager.DeleteCalendarAppointmentAsync(appointment , appointmentDeleteType);
 
                 view.CloseDialog();
                 view.CloseView();
@@ -247,7 +247,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
     public interface IAppointmentPresenter : IPresenter<IAppointmentView>
     {
         Task LoadAppointment(int appointmentId, int recurrenceIndex, int calendarId);
-        Task DeleteAppointmentClicked();
+        Task DeleteAppointmentClicked(AppointmentDeleteType appointmentDeleteType);
         Task SendInvitationsClicked(LineViewModel lvm);
 
         void EditAppointmentClicked(AppointmentChangeType appointmentChangeType);

@@ -15,6 +15,8 @@ namespace Mark5.Mobile.Common.Manager
 
         Task<bool> CreateOrUpdateCalendarAppointmentAsync(int calendarId, CalendarAppointment calendarAppointment, AppointmentChangeType appointmentChangeype, SourceType sourceType = SourceType.Auto);
 
+        Task DeleteCalendarAppointmentAsync(CalendarAppointment calendarAppointment, AppointmentDeleteType appointmentDeleteType, SourceType sourceType = SourceType.Auto);
+
         Task<bool> SendCalendarAppointmentInvitationsAsync(int apointmentId, Guid lineGuid);
 
         Task<List<CalendarAlarm>> GetCalendarAlarmsAsync(List<int> calendarIds, DateTime startDate, DateTime endDate, SourceType sourceType = SourceType.Auto);

@@ -1192,6 +1192,22 @@ namespace Mark5.ServiceReference.DataContract
         public Guid Guid { get; set; }
     }
 
+    [DataContract(Name = "DeleteCalendarAppointmentParameters", Namespace = "com.nordic-it.appservice.v3")]
+    public class DeleteCalendarAppointmentParameters : AbstractParameters
+    {
+
+        [DataMember(Name = "CalendarAppointment", Order = 0)]
+        public CalendarAppointment CalendarAppointment { get; set; }
+
+        [DataMember(Name = "AppointmentDeleteType", Order = 0)]
+        public AppointmentDeleteType AppointmentDeleteType { get; set; }
+    }
+
+    [DataContract(Name = "DeleteCalendarAppointmentResult", Namespace = "com.nordic-it.appservice.v3")]
+    public class DeleteCalendarAppointmentResult
+    {
+    }
+
     [DataContract(Name = "Calendar", Namespace = "com.nordic-it.appservice.v3")]
     public class Calendar
     {
@@ -1509,6 +1525,13 @@ namespace Mark5.ServiceReference.DataContract
         [EnumMember(Value = "Series")] Series = 2
     }
 
+    [DataContract(Name = "AppointmentDeleteType", Namespace = "com.nordic-it.appservice.v3")]
+    public enum AppointmentDeleteType
+    {
+        [EnumMember(Value = "Default")] Default = 0,
+        [EnumMember(Value = "Occurence")] Occurence = 1,
+        [EnumMember(Value = "Series")] Series = 2
+    }
 
     [DataContract(Name = "SendCalendarAppointmentInvitationsResult", Namespace = "com.nordic-it.appservice.v3")]
     public class SendCalendarAppointmentInvitationsResult

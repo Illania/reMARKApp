@@ -361,12 +361,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             if (source == 0)
             {
-                await presenter.DeleteAppointmentClicked();
+                await presenter.DeleteAppointmentClicked(AppointmentDeleteType.Occurence);
             }
 
             if (source == 1)
             {
-                await presenter.DeleteAppointmentClicked();
+                await presenter.DeleteAppointmentClicked(AppointmentDeleteType.Series);
             }
           
         }
