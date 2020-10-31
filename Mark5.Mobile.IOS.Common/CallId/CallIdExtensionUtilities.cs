@@ -12,6 +12,12 @@ namespace Mark5.Mobile.IOS.Common.CallId
         {
             TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
 
+            if(IsChinaCustomer())
+            {
+                tcs.SetResult(false);
+                return tcs.Task;
+            }
+
             CXCallDirectoryManager.SharedInstance.GetEnabledStatusForExtension(extensionId,
                                                                                (CXCallDirectoryEnabledStatus status, NSError statuserror) =>
             {
@@ -55,5 +61,16 @@ namespace Mark5.Mobile.IOS.Common.CallId
                 }
             });
         }
+
+        public static bool IsChinaCustomer()
+        {
+            NSLocale userLocale = NSLocale.CurrentLocale;
+            if (userLocale.CountryCode.Contains("CN") || userLocale.CountryCode.Contains("CHN"))
+            {
+                return true;
+            }
+            return false;
+        }
+    
     }
 }
