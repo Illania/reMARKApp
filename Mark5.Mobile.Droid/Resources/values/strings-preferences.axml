@@ -80,6 +80,9 @@
     <string name="pref_documents_show_time_older_emails_summary_off">Emails older than one day will show only the date</string>
     <string name="pref_documents_show_time_older_emails_summary_on">Emails older than one day will show both date and time</string>
     <string name="pref_documents_show_time_older_emails_title">Show time for older emails</string>
+    <string name="pref_documents_sort_by_date_summary_off">Emails will be sorted by ID</string>
+    <string name="pref_documents_sort_by_date_summary_on">Emails will be sorted by date</string>
+    <string name="pref_documents_sort_by_date_title">Sort by date</string>
     <string name="pref_documents_download_as_plaintext_summary_off">Email content will be downloaded in HTML format.</string>
     <string name="pref_documents_download_as_plaintext_summary_on">Email content will be downloaded in plain text format.</string>
     <string name="pref_documents_download_as_plaintext_title">View emails in plain text</string>
@@ -145,6 +148,7 @@
     <string name="pref_key_contacts_view_options">pref_key_contacts_view_options</string>
     <string name="pref_key_documents_compact_list">pref_key_documents_compact_list</string>
     <string name="pref_key_documents_show_time_older_emails">pref_key_show_time_older_emails</string>
+    <string name="pref_key_documents_sort_by_date">pref_key_sort_by_date</string>
     <string name="pref_key_documents_download_as_plaintext">pref_key_documents_download_as_plaintext</string>
     <string name="pref_key_documents_large_attachment_warn">pref_key_documents_large_attachment_warn</string>
     <string name="pref_key_documents_mark_as_read">pref_key_documents_mark_as_read</string>

@@ -25,6 +25,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Service;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
@@ -375,7 +376,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (forceClear)
                     adapter.Clear();
 
-                adapter.AppendItems(documentPreviews);
+                if (PlatformConfig.Preferences.SortByDate)
+                    adapter.InsertItems(documentPreviews);
+                else
+                    adapter.AppendItems(documentPreviews);
 
                 if (savedSelectedDocumentPreviews?.Count > 0)
                 {
@@ -1230,7 +1234,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public void PrependItems(List<DocumentPreview> items)
             {
                 var count = items.Count;
-                Items.InsertRange(0, items);
+ 
+                if (PlatformConfig.Preferences.SortByDate)
+                {
+                    Items.Sort();
+                    foreach (var item in items)
+                        Items.AddSorted(item);
+                }
+                else
+                    Items.InsertRange(0, items);
+
                 NotifyItemRangeInserted(0, count);
             }
 
@@ -1238,6 +1251,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var count = Items.Count;
                 Items.AddRange(items);
+                NotifyItemRangeInserted(count, items.Count);
+            }
+
+            public void InsertItems(List<DocumentPreview> items)
+            {
+                var count = Items.Count;
+                Items.Sort();
+                foreach (var item in items)
+                    Items.AddSorted(item);
                 NotifyItemRangeInserted(count, items.Count);
             }
 

@@ -56,6 +56,7 @@
 "shortcodes_to_search" = "Mailing list search results";
 "show_creator_outgoing" = "Show creator for outgoing emails";
 "show_time_old_emails" = "Show time for older emails";
+"sort_by_date" = "Sort by date";
 "ssl" = "SSL";
 "sync_favorite_folders_title" = "Sync favorite folders";
 "sync_favorite_folders_footer" = "Synchronize favorite folders across devices and installations";

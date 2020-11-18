@@ -26,6 +26,7 @@ namespace Mark5.Mobile.IOS.Utilities
             public const string DocumentBodyRequestTypeKey = "DocumentBodyRequestType";
             public const string LargeAttachmentWarningKey = "LargeAttachmentWarning";
             public const string ShowTimeForOldEmails = "ShowTimeForOldEmails";
+            public const string SortByDate = "SortByDate";
             public const string ConfirmRemoveSwipe = "ConfirmRemoveSwipe";
             public const string HideReadNotificationsKey = "HideReadNotifications";
 
@@ -179,6 +180,8 @@ namespace Mark5.Mobile.IOS.Utilities
         public int MarkAsReadDelaySeconds => (int)ud.IntForKey(Keys.MarkAsReadDelaySecondsKey);
 
         public bool ShowTimeForOldEmails => ud.BoolForKey(Keys.ShowTimeForOldEmails);
+
+        public bool SortByDate => ud.BoolForKey(Keys.SortByDate);
 
         public bool UnreadIndicatorMe => ud.BoolForKey(Keys.UnreadIndicatorMeKey);
 

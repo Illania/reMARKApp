@@ -18,6 +18,7 @@ using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Utilities;
+using Mark5.Mobile.IOS.Utilities.Extensions;
 using TinyMessenger;
 using UIKit;
 
@@ -92,7 +93,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
             InitializeHandlers();
-
+            
             if (TableView?.IndexPathForSelectedRow != null)
                 TableView.DeselectRow(TableView.IndexPathForSelectedRow, true);
 
@@ -485,8 +486,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 Services.DocumentsDownloadService.Notify();
 
-                ((DataSource)TableView.Source).AppendItems(documentPreviews);
-
+                if(PlatformConfig.Preferences.SortByDate)
+                    ((DataSource)TableView.Source).InsertItems(documentPreviews);
+                else
+                    ((DataSource)TableView.Source).AppendItems(documentPreviews);
+                
                 if (documentPreviews.Any())
                     newDocumentsAvailableAction?.Invoke();
             }
@@ -1464,6 +1468,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (Empty)
                 {
+                    if (PlatformConfig.Preferences.SortByDate)
+                        Items.Sort();
+
                     Items.InsertRange(0, documentPreviews);
 
                     tableViewWeakReference.Unwrap()?.BeginUpdates();
@@ -1480,7 +1487,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
                 else
                 {
-                    Items.InsertRange(0, documentPreviews);
+                    if (PlatformConfig.Preferences.SortByDate)
+                    {
+                        foreach (var i in documentPreviews)
+                            Items.AddSorted(i);
+                    }
+                    else
+                        Items.InsertRange(0, documentPreviews);
+                        
                     var indexes = Enumerable.Range(0, documentPreviews.Count()).Select(i => NSIndexPath.FromRowSection(i, 0)).ToArray();
                     tableViewWeakReference.Unwrap()?.InsertRows(indexes, UITableViewRowAnimation.Fade);
                 }
@@ -1492,6 +1506,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 loading = false;
 
                 Items.AddRange(documentPreviews);
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+            }
+
+            public void InsertItems(IEnumerable<DocumentPreview> documentPreviews)
+            {
+                loading = false;
+                Items.Sort();
+                foreach (var documentPreview in documentPreviews)
+                    Items.AddSorted(documentPreview);
                 tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
 
