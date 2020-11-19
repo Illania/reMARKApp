@@ -1468,9 +1468,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 if (Empty)
                 {
-                    if (PlatformConfig.Preferences.SortByDate)
-                        Items.Sort();
-
                     Items.InsertRange(0, documentPreviews);
 
                     tableViewWeakReference.Unwrap()?.BeginUpdates();
@@ -1489,6 +1486,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     if (PlatformConfig.Preferences.SortByDate)
                     {
+                        Items.Sort();
                         foreach (var i in documentPreviews)
                             Items.AddSorted(i);
                     }
