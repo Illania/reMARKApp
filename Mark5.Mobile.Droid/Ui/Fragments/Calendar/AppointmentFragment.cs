@@ -188,21 +188,33 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 return;
             }
 
-            var choice = await Dialogs.ShowListDialog(Context, Resource.String.picker_delete_event, Resource.Array.picker_choice_delete_appointment, true);
-
-            if (choice < 0)
-                return;
-
-            switch (choice)
+            if (ServerConfig.SystemSettings?.SystemInfo?.ChangeSingleOccurrenceAvailable == true)
             {
-                case 0:
-                    await presenter.DeleteAppointmentClicked(AppointmentDeleteType.Occurence);
-                    break;
-                case 1:
-                    await presenter.DeleteAppointmentClicked(AppointmentDeleteType.Series);
-                    break;
-                default:
+                var choice = await Dialogs.ShowListDialog(Context, Resource.String.picker_delete_event, Resource.Array.picker_choice_delete_appointment, true);
+
+                if (choice < 0)
                     return;
+
+                switch (choice)
+                {
+                    case 0:
+                        await presenter.DeleteAppointmentClicked(AppointmentDeleteType.Occurence);
+                        break;
+                    case 1:
+                        await presenter.DeleteAppointmentClicked(AppointmentDeleteType.Series);
+                        break;
+                    default:
+                        return;
+                }
+            }
+            else
+            {
+                await AsyncHelpers.RunOnUiThreadAsync((Activity)Context, async () =>
+                 {
+                     var confirm = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete, Resource.String.delete_are_you_sure);
+                     if (confirm)
+                         await presenter.DeleteAppointmentClicked(AppointmentDeleteType.Series);
+                 });
             }
         }
 
@@ -214,21 +226,28 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 return;
             }
 
-            var choice = await Dialogs.ShowListDialog(Context, Resource.String.picker_edit_event, Resource.Array.picker_choice_edit_appointment, true);
-
-            if (choice < 0)
-                return;
-
-            switch (choice)
+            if (ServerConfig.SystemSettings?.SystemInfo?.ChangeSingleOccurrenceAvailable == true)
             {
-                case 0:
-                    presenter.EditAppointmentClicked(AppointmentChangeType.Occurence);
-                    break;
-                case 1:
-                    presenter.EditAppointmentClicked(AppointmentChangeType.Series);
-                    break;
-                default:
+                var choice = await Dialogs.ShowListDialog(Context, Resource.String.picker_edit_event, Resource.Array.picker_choice_edit_appointment, true);
+
+                if (choice < 0)
                     return;
+
+                switch (choice)
+                {
+                    case 0:
+                        presenter.EditAppointmentClicked(AppointmentChangeType.Occurence);
+                        break;
+                    case 1:
+                        presenter.EditAppointmentClicked(AppointmentChangeType.Series);
+                        break;
+                    default:
+                        return;
+                }
+            }
+            else
+            {
+                presenter.EditAppointmentClicked(AppointmentChangeType.Series);
             }
         }
 

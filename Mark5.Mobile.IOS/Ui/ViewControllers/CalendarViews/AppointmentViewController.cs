@@ -321,7 +321,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 return;
             }
 
-            ShowRecurrentAppointmentEditMenu(sender);
+            if (ServerConfig.SystemSettings?.SystemInfo?.ChangeSingleOccurrenceAvailable == true)
+            {
+
+                ShowRecurrentAppointmentEditMenu(sender);
+            }
+            else
+            {
+                presenter.EditAppointmentClicked(AppointmentChangeType.Series);
+            }
             
         }
 
@@ -358,21 +366,31 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 return;
             }
 
-            var d = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
-            var source = await Dialogs.ShowListActionSheetAsync(this, new[] {
+            if (ServerConfig.SystemSettings?.SystemInfo?.ChangeSingleOccurrenceAvailable == true)
+            {
+                var d = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
+                var source = await Dialogs.ShowListActionSheetAsync(this, new[] {
                 Localization.GetString("delete_this_event_only"),
                 Localization.GetString("delete_all_events_in_series")}, d);
-            if (source < 0)
-                return;
+                if (source < 0)
+                    return;
 
-            if (source == 0)
-            {
-                await presenter.DeleteAppointmentClicked(AppointmentDeleteType.Occurence);
+                if (source == 0)
+                {
+                    await presenter.DeleteAppointmentClicked(AppointmentDeleteType.Occurence);
+                }
+
+                if (source == 1)
+                {
+                    await presenter.DeleteAppointmentClicked(AppointmentDeleteType.Series);
+                }
             }
-
-            if (source == 1)
+            else
             {
-                await presenter.DeleteAppointmentClicked(AppointmentDeleteType.Series);
+                var d = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
+                var result = await Dialogs.ShowDestructiveActionSheetAsync(this, Localization.GetString("delete"), d);
+                if (result)
+                    await presenter.DeleteAppointmentClicked(AppointmentDeleteType.Series);
             }
           
         }

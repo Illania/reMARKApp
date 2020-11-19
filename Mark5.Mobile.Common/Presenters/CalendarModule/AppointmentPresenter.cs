@@ -31,6 +31,9 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 CommonConfig.Logger.Info($"Retrieving appointment: AppointmentId = {appointmentId}, RecurrenceIndex = {recurrenceIndex}, CalendarId = {calendarId} ");
 
                 view.ShowAppointmentLoadingDialog();
+                if (ServerConfig.SystemSettings?.SystemInfo?.ChangeSingleOccurrenceAvailable != true)
+                    recurrenceIndex = -1;
+
                 appointment = await Managers.CalendarManager.GetCalendarAppointmentAsync(calendarId, appointmentId, recurrenceIndex, SourceType.Auto);
 
                 view.ShowAppointment(AppointmentViewModel.ConvertToViewModel(appointment, recurrenceIndex));
@@ -57,7 +60,10 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             {
                 CommonConfig.Logger.Info($"Deleting appointment with ID = {appointment.Id}");
 
-                await Managers.CalendarManager.DeleteCalendarAppointmentAsync(appointment , appointmentDeleteType);
+                if (ServerConfig.SystemSettings?.SystemInfo?.ChangeSingleOccurrenceAvailable == true)
+                    await Managers.CalendarManager.DeleteCalendarAppointmentAsync(appointment , appointmentDeleteType);
+                else
+                    await Managers.CommonActionsManager.Delete(new List<IBusinessEntity> { appointment });
 
                 view.CloseDialog();
                 view.CloseView();

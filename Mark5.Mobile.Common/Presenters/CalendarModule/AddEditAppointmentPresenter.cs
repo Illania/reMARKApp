@@ -58,6 +58,9 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             {
                 CommonConfig.Logger.Info($"Retrieving appointment: AppointmentId = {appointmentId}, CalendarId = {calendarId} ");
 
+                if (ServerConfig.SystemSettings?.SystemInfo?.ChangeSingleOccurrenceAvailable != true)
+                    recurrenceIndex = -1;
+                
                 var appointment = await Managers.CalendarManager.GetCalendarAppointmentAsync(calendarId, appointmentId, recurrenceIndex, SourceType.Local);
 
                 view.ShowAppointment(AddEditAppointmentViewModel.ConvertToViewModel(appointment, recurrenceIndex, changeType));

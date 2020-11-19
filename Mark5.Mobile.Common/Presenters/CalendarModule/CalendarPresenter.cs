@@ -273,7 +273,9 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         {
             var apv = new AppointmentPreviewViewModel
             {
-                Id = cao.ChangedOccurenceId > -1 ? cao.ChangedOccurenceId : ca.Id,
+                Id = (ServerConfig.SystemSettings?.SystemInfo?.ChangeSingleOccurrenceAvailable == true && cao.ChangedOccurenceId > -1)
+                ? cao.ChangedOccurenceId
+                : ca.Id,
                 RecurrenceIndex = cao.RecurrenceIndex,
                 CalendarId = ca.CalendarId,
                 Subject = string.IsNullOrEmpty(cao.Subject)? ca.Subject: cao.Subject, 
