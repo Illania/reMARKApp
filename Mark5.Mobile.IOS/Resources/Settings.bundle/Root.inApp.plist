@@ -100,7 +100,17 @@
 			<key>DefaultValue</key>
 			<false/>
 		</dict>
-			<dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>sort_by_date</string>
+			<key>Key</key>
+			<string>SortByDate</string>
+			<key>DefaultValue</key>
+			<false/>
+		</dict>
+		<dict>
 			<key>Type</key>
 			<string>PSMultiValueSpecifier</string>
 			<key>Key</key>
@@ -108,7 +118,7 @@
 			<key>Title</key>
 			<string>email_swipe_actions</string>
 		</dict>
-				<dict>
+		<dict>
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 			<key>Title</key>
@@ -184,7 +194,6 @@
 			<key>DefaultValue</key>
 			<true/>
 		</dict>
-		
 		<dict>
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
@@ -364,7 +373,7 @@
 			<key>DefaultValue</key>
 			<string>No</string>
 		</dict>
-		 <dict>
+		<dict>
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 			<key>Key</key>

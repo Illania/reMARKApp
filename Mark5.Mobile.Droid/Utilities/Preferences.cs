@@ -26,6 +26,8 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public bool UnreadIndicatorMe => sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_documents_read_indicator_me), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_documents_read_indicator_me_default));
 
+        public bool SortByDate => sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_documents_sort_by_date), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_documents_sort_by_date_default));
+
         public bool ShowTimeOlderEmails => sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_documents_show_time_older_emails), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_documents_show_time_older_emails_default));
 
         public bool CompactDocumentsList => sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_documents_compact_list), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_documents_compact_list_default));

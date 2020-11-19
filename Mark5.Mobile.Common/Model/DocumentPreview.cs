@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Mark5.Mobile.Common.Utilities;
 using SQLite;
 
 namespace Mark5.Mobile.Common.Model
 {
     [Table("DocumentPreview")]
-    public class DocumentPreview : BusinessEntityPreview
+    public class DocumentPreview : BusinessEntityPreview, IComparable<DocumentPreview>
     {
         [Ignore]
         public override ObjectType ObjectType => ObjectType.Document;
@@ -100,5 +101,13 @@ namespace Mark5.Mobile.Common.Model
         {
             return $"[DocumentPreview: Id={Id}, ReferenceNumber={ReferenceNumber}, Subject={Subject}, DateReceivedTimestamp={DateReceivedTimestamp}]";
         }
+
+        public int CompareTo(DocumentPreview other)
+        {
+            if (DateReceivedTimestamp > other.DateReceivedTimestamp) return -1;
+            if (DateReceivedTimestamp == other.DateReceivedTimestamp) return 0;
+            return 1;
+        }
+      
     }
 }
