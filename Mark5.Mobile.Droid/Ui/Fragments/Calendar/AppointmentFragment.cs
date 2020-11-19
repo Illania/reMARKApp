@@ -218,7 +218,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             }
         }
 
-        public async void ShowEditppointmentMenu()
+        public async void ShowEditAppointmentMenu()
         {
             if (!viewModel.IsRecurring())
             {
@@ -259,7 +259,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             }
             else
             {
-                ShowEditppointmentMenu();
+                ShowEditAppointmentMenu();
             }
 
             return true;
