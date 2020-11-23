@@ -42,4 +42,12 @@
         <item>Phonebook</item>
         <item>Internal contacts</item>
     </string-array>
+     <string-array name="picker_choice_delete_appointment">
+        <item>Delete this event only</item>
+        <item>Delete all events in series</item>
+    </string-array>
+     <string-array name="picker_choice_edit_appointment">
+        <item>Edit this event only</item>
+        <item>Edit all events in series</item>
+    </string-array>
 </resources>

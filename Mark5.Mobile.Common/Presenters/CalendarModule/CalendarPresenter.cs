@@ -253,6 +253,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         public static List<AppointmentPreviewViewModel> ConvertToViewModels(CalendarAppointment ca, Dictionary<int, string> calendarColors)
         {
             var appViewModels = new List<AppointmentPreviewViewModel>();
+
             if (ca.RecurrenceInfo == null)
             {
                 appViewModels.Add(ConvertToViewModel(ca, ca.Occurrences[0], calendarColors));
@@ -272,13 +273,14 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         {
             var apv = new AppointmentPreviewViewModel
             {
-                Id = ca.Id,
+                Id = (ServerConfig.SystemSettings?.SystemInfo?.ChangeSingleOccurrenceAvailable == true && cao.ChangedOccurenceId > -1)
+                ? cao.ChangedOccurenceId
+                : ca.Id,
                 RecurrenceIndex = cao.RecurrenceIndex,
                 CalendarId = ca.CalendarId,
-                Subject = ca.Subject,
+                Subject = string.IsNullOrEmpty(cao.Subject)? ca.Subject: cao.Subject, 
                 AllDay = ca.AllDay,
-
-                HexColor = calendarColors[ca.CalendarId],
+                HexColor = calendarColors[ca.CalendarId]
             };
 
             if (apv.AllDay)

@@ -11,6 +11,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
         protected float InnerVerticalMargin = 4f;
         protected float InnerRowHeight = 32f;
 
+        public bool IsEnabled { get; set; } = true;
+
         float separatorMeasure = 0.5f;
 
         protected AddEditTableViewCell(UITableViewCellStyle style, string reuseIdentifier)

@@ -103,6 +103,8 @@
 "delete" = "Delete";
 "delete_draft" = "Delete draft";
 "delete_from_folder" = "Remove from folder";
+"delete_this_event_only" = "Delete this event only";
+"delete_all_events_in_series" = "Delete all events in series";
 "deleting___" = "Deleting...";
 "deleting_comment___" = "Deleting comment...";
 "deleting_from_folder___" = "Removing from folder...";
@@ -166,6 +168,8 @@
 "edit_message" = "Edit message";
 "edit_not_possible" = "Comments can be edited maximum one minute after creation";
 "edit_original_email" = "Edit original email";
+"edit_this_event_only" = "Edit this event only";
+"edit_all_events_in_series" = "Edit all events in series";
 "editing_comment___" = "Editing comment...";
 "email_sent" = "Email sent";
 "email_error" = "Error while sending email";

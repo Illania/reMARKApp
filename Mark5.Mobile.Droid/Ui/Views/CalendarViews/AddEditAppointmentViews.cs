@@ -87,8 +87,11 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AddEditAppointmentViews
         protected static int DistanceSmall = Conversion.ConvertDpToPixels(4f);
         protected static int DistanceVerySmall = Conversion.ConvertDpToPixels(4f);
 
+        public bool IsEnabled { get; set; } = true;
+
         protected Color hintColor;
         protected Color defaultColor;
+        protected Color disabledColor;
 
         public AddEditAppointmentViewModel ViewModel;
         readonly AppCompatImageView icon;
@@ -98,6 +101,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AddEditAppointmentViews
         {
             hintColor = new Color(ContextCompat.GetColor(Context, Resource.Color.darkgray));
             defaultColor = new Color(ContextCompat.GetColor(Context, Resource.Color.softBlack));
+            disabledColor = new Color(ContextCompat.GetColor(Context, Resource.Color.lightgray));
 
             Orientation = Horizontal;
             LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
@@ -504,15 +508,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AddEditAppointmentViews
         }
     }
 
-    class ReocurrenceView : AddEditAppointmentView
+    class RecurrenceView : AddEditAppointmentView
     {
         readonly BasicTextView title;
         readonly Action viewClicked;
 
-        public ReocurrenceView(Context context, Action viewClicked)
+        public RecurrenceView(Context context, Action viewClicked)
             : base(context, Resource.Drawable.refresh_black)
         {
-            Click += RecurrencView_Click;
+            Click += RecurrenceView_Click;
             this.viewClicked = viewClicked;
 
             title = new BasicTextView(context)
@@ -523,17 +527,29 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AddEditAppointmentViews
             AddView(title);
         }
 
-        private void RecurrencView_Click(object sender, EventArgs e)
+        private void RecurrenceView_Click(object sender, EventArgs e)
         {
-            viewClicked?.Invoke();
+            if(IsEnabled)
+                viewClicked?.Invoke();
         }
 
         public override void RefreshView()
         {
-            if (ViewModel?.RecurrenceInfo != null)
+            if (ViewModel?.RecurrenceInfo != null &&
+                        (ViewModel.ChangeType != AppointmentChangeType.Occurence || ViewModel.Type != CalendarOccurenceType.ChangedOccurrence))
                 title.Text = ViewModel.RecurrenceInfo.ToFriendlyString();
             else
                 title.Text = "Does not repeat";
+
+            if (ViewModel.ChangeType == AppointmentChangeType.Occurence || ViewModel.Type == CalendarOccurenceType.ChangedOccurrence)
+                SetEnabled(false);
+        }
+
+        private void SetEnabled(bool enabled)
+        {
+            title.Enabled = enabled;
+            title.SetTextColor(disabledColor);
+            IsEnabled = enabled;
         }
     }
 

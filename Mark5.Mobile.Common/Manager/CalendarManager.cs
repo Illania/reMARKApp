@@ -90,7 +90,7 @@ namespace Mark5.Mobile.Common.Manager
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task<bool> CreateOrUpdateCalendarAppointmentAsync(int calendarId, CalendarAppointment calendarAppointment, SourceType sourceType = SourceType.Auto)
+        public async Task<bool> CreateOrUpdateCalendarAppointmentAsync(int calendarId, CalendarAppointment calendarAppointment, AppointmentChangeType appointmentChangeType, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
@@ -101,7 +101,8 @@ namespace Mark5.Mobile.Common.Manager
                 {
                     Token = Token,
                     CalendarId = calendarId,
-                    CalendarAppointment = calendarAppointment.Convert()
+                    CalendarAppointment = calendarAppointment.Convert(),
+                    AppointmentChangeType = appointmentChangeType.ConvertEnum<DataContract.AppointmentChangeType>()
                 });
 
                 calendarAppointment.Id = result.Id;
@@ -133,6 +134,37 @@ namespace Mark5.Mobile.Common.Manager
             });
 
             return true;
+        }
+
+        public async Task DeleteCalendarAppointmentAsync(CalendarAppointment calendarAppointment, AppointmentDeleteType appointmentDeleteType, SourceType sourceType = SourceType.Auto)
+        {
+            CommonConfig.UsageAnalytics.LogEvent(new DeleteEvent(calendarAppointment.ModuleType, 1));
+
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
+            {
+                await AppServiceProxy.DeleteCalendarAppointmentAsync(new DataContract.DeleteCalendarAppointmentParameters
+                {
+                    Token = Token,
+                    CalendarAppointment = calendarAppointment.Convert(),
+                    AppointmentDeleteType = appointmentDeleteType.ConvertEnum<DataContract.AppointmentDeleteType>()
+                });
+
+                if (calendarAppointment != null)
+                    await calendarDataAccess.DeleteAsync(new List<CalendarAppointment> { calendarAppointment });
+
+                CommonConfig.MessengerHub.Publish(new EntityRemovedMessage(this,
+                                                                           calendarAppointment.ObjectType, new List<int>(calendarAppointment.Id)));
+
+                return;
+            }
+
+            if (sourceType == SourceType.Local)
+                throw new InvalidSourceTypeException("This action can only be performed when online.");
+
+            throw new ArgumentException("Invalid sourceType provided.");
         }
 
         public async Task<List<CalendarAppointmentOccurrence>> GetCalendarAppointmentOccurrencesAsync(int calendarId, int calendarAppointmentId, DateTime startDate, DateTime endDate, SourceType sourceType = SourceType.Auto)

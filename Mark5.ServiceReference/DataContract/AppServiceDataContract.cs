@@ -1174,6 +1174,9 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "CalendarAppointment", Order = 0)]
         public CalendarAppointment CalendarAppointment { get; set; }
+
+        [DataMember(Name = "AppointmentChangeType", Order = 1)]
+        public AppointmentChangeType AppointmentChangeType { get; set; }
     }
 
     [DataContract(Name = "CreateOrUpdateCalendarAppointmentResult", Namespace = "com.nordic-it.appservice.v3")]
@@ -1187,6 +1190,22 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "Guid", Order = 0)]
         public Guid Guid { get; set; }
+    }
+
+    [DataContract(Name = "DeleteCalendarAppointmentParameters", Namespace = "com.nordic-it.appservice.v3")]
+    public class DeleteCalendarAppointmentParameters : AbstractParameters
+    {
+
+        [DataMember(Name = "CalendarAppointment", Order = 0)]
+        public CalendarAppointment CalendarAppointment { get; set; }
+
+        [DataMember(Name = "AppointmentDeleteType", Order = 0)]
+        public AppointmentDeleteType AppointmentDeleteType { get; set; }
+    }
+
+    [DataContract(Name = "DeleteCalendarAppointmentResult", Namespace = "com.nordic-it.appservice.v3")]
+    public class DeleteCalendarAppointmentResult
+    {
     }
 
     [DataContract(Name = "Calendar", Namespace = "com.nordic-it.appservice.v3")]
@@ -1274,6 +1293,13 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "RecurrenceIndex", Order = 0)]
         public int RecurrenceIndex { get; set; } = -1;
+
+        [DataMember(Name = "ChangedOccurenceId", Order = 1)]
+        public int ChangedOccurenceId{ get; set; } = -1;
+
+        [DataMember(Name = "Subject", Order = 2)]
+        public string Subject { get; set; } = string.Empty;
+
     }
 
     [DataContract(Name = "CalendarAlarm", Namespace = "com.nordic-it.appservice.v3")]
@@ -1489,6 +1515,22 @@ namespace Mark5.ServiceReference.DataContract
         [EnumMember(Value = "Tentative")] Tentative = 3,
         [EnumMember(Value = "Inviting")] Inviting = 4,
         [EnumMember(Value = "Invited")] Invited = 5
+    }
+
+    [DataContract(Name = "AppointmentChangeType", Namespace = "com.nordic-it.appservice.v3")]
+    public enum AppointmentChangeType
+    {
+        [EnumMember(Value = "Default")] Default = 0,
+        [EnumMember(Value = "Occurence")] Occurence = 1,
+        [EnumMember(Value = "Series")] Series = 2
+    }
+
+    [DataContract(Name = "AppointmentDeleteType", Namespace = "com.nordic-it.appservice.v3")]
+    public enum AppointmentDeleteType
+    {
+        [EnumMember(Value = "Default")] Default = 0,
+        [EnumMember(Value = "Occurence")] Occurence = 1,
+        [EnumMember(Value = "Series")] Series = 2
     }
 
     [DataContract(Name = "SendCalendarAppointmentInvitationsResult", Namespace = "com.nordic-it.appservice.v3")]

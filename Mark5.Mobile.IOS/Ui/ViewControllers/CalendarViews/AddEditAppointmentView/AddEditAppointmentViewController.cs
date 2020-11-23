@@ -18,11 +18,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 {
     public class EditAppointmentViewController : AbstractAddEditAppointmentViewController
     {
-        public EditAppointmentViewController(int appointmentId, int calendarId)
+        public EditAppointmentViewController(int appointmentId, int calendarId, AppointmentChangeType appointmentChangeType, int recurrenceIndex)
             : base(appointmentId, calendarId)
         {
             Title = Localization.GetString("edit_appointment");
             CreationModeFlag = ContactCreationModeFlag.Edit;
+            AppointmentChangeType = appointmentChangeType;
+            RecurrenceIndex = recurrenceIndex;
+
         }
     }
 
@@ -49,6 +52,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         protected ContactCreationModeFlag CreationModeFlag;
         protected DateTime StartDate;
+        protected AppointmentChangeType AppointmentChangeType;
+        protected int RecurrenceIndex;
+
 
         public AbstractAddEditAppointmentViewController(int appointmentId = -1, int calendarId = -1)
             : base(UITableViewStyle.Grouped)
@@ -78,7 +84,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         {
             base.ViewWillAppear(animated);
             InitializeHandlers();
-            await RefreshData();
+            await RefreshData(AppointmentChangeType);
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -103,7 +109,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             TableView.Alpha = 0;
         }
 
-        async Task RefreshData()
+        async Task RefreshData(AppointmentChangeType changeType)
         {
             if (viewModel == null)
             {
@@ -111,7 +117,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                     await presenter.LoadEmptyAppointment(StartDate);
 
                 if (CreationModeFlag == ContactCreationModeFlag.Edit)
-                    await presenter.LoadAppointment(calendarId, appointmentId);
+                    await presenter.LoadAppointment(calendarId, appointmentId, RecurrenceIndex, changeType);
             }
             else
                 RefreshTable();
@@ -142,9 +148,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         private async void SaveButtonItem_Clicked(object sender, EventArgs e)
         {
             var isValid = ((DataSource)TableView.Source).IsFormCorrect();
-
+            viewModel.RecurrenceIndex = RecurrenceIndex;
             if (isValid)
-                await presenter.AddOrEditAppointment(viewModel);
+                await presenter.AddOrEditAppointment(viewModel, AppointmentChangeType);
             else
                 await Dialogs.ShowConfirmAlertAsync(this, "Cannot Save Event", "The start date must be before the end date");
         }
@@ -289,7 +295,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                     return;
 
                 var row = RowAtIndexPath(indexPath);
-                row.OnClicked(indexPath);
+                if(row.IsEnabled())
+                    row.OnClicked(indexPath);
 
                 if (tableView?.IndexPathForSelectedRow != null)
                     tableView.DeselectRow(tableView.IndexPathForSelectedRow, true);
@@ -449,7 +456,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                         new AllDayToggleRow(this, DateChanged),
                         startDateRow.Unwrap(),
                         endDateRow.Unwrap(),
-                        new ReoccurrenceRow(this),
+                        new RecurrenceRow(this),
                         new ReminderRow(this)
                     };
                 }
@@ -516,7 +523,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             class RowCollection : List<AbstractRow> { }
             #endregion
 
-            #region Custome row definitions
+            #region Custom row definitions
             abstract class AbstractRow
             {
                 protected AddEditTableViewCell Cell;
@@ -532,6 +539,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 public abstract string Key { get; }
 
                 public virtual bool IsRowValid() { return true; }
+
+                public virtual bool IsEnabled() { return Cell.IsEnabled; }
 
                 bool error;
 
@@ -852,11 +861,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 }
             }
 
-            class ReoccurrenceRow : AbstractRow
+            class RecurrenceRow : AbstractRow
             {
-                public override string Key => "ReoccurrenceRow";
+                public override string Key => "RecurrenceRow";
 
-                public ReoccurrenceRow(AbstractSection section) : base(section)
+                public RecurrenceRow(AbstractSection section) : base(section)
                 {
                 }
 
@@ -864,10 +873,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
                 public override void RefreshRow()
                 {
-                    if (ViewModel != null && ViewModel.RecurrenceInfo != null)
+                    if (ViewModel != null && ViewModel.RecurrenceInfo != null &&
+                        (ViewModel.ChangeType != AppointmentChangeType.Occurence || ViewModel.Type != CalendarOccurenceType.ChangedOccurrence))
                         ((AppointmentDisclosureTableViewCell)Cell).SetLabel(ViewModel.RecurrenceInfo.ToFriendlyString());
                     else
                         ((AppointmentDisclosureTableViewCell)Cell).SetLabel(Localization.GetString("never"));
+
+                    if (ViewModel.ChangeType == AppointmentChangeType.Occurence || ViewModel.Type == CalendarOccurenceType.ChangedOccurrence)
+                        ((AppointmentDisclosureTableViewCell)Cell).SetEnabled(false);
                 }
 
                 protected override void Initialize()

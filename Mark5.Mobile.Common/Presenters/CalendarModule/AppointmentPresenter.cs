@@ -31,6 +31,9 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 CommonConfig.Logger.Info($"Retrieving appointment: AppointmentId = {appointmentId}, RecurrenceIndex = {recurrenceIndex}, CalendarId = {calendarId} ");
 
                 view.ShowAppointmentLoadingDialog();
+                if (ServerConfig.SystemSettings?.SystemInfo?.ChangeSingleOccurrenceAvailable != true)
+                    recurrenceIndex = -1;
+
                 appointment = await Managers.CalendarManager.GetCalendarAppointmentAsync(calendarId, appointmentId, recurrenceIndex, SourceType.Auto);
 
                 view.ShowAppointment(AppointmentViewModel.ConvertToViewModel(appointment, recurrenceIndex));
@@ -49,7 +52,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             }
         }
 
-        public async Task DeleteAppointmentClicked()
+        public async Task DeleteAppointmentClicked(AppointmentDeleteType appointmentDeleteType)
         {
             view.ShowDeletingDialog();
 
@@ -57,7 +60,10 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             {
                 CommonConfig.Logger.Info($"Deleting appointment with ID = {appointment.Id}");
 
-                await Managers.CommonActionsManager.Delete(new List<IBusinessEntity> { appointment });
+                if (ServerConfig.SystemSettings?.SystemInfo?.ChangeSingleOccurrenceAvailable == true)
+                    await Managers.CalendarManager.DeleteCalendarAppointmentAsync(appointment , appointmentDeleteType);
+                else
+                    await Managers.CommonActionsManager.Delete(new List<IBusinessEntity> { appointment });
 
                 view.CloseDialog();
                 view.CloseView();
@@ -71,9 +77,9 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             }
         }
 
-        public void EditAppointmentClicked()
+        public async void EditAppointmentClicked(AppointmentChangeType appointmentChangeType)
         {
-            view.OpenEditAppointment(appointment.CalendarId, appointment.Id);
+            view.OpenEditAppointment(appointment.CalendarId, appointment.Id, appointmentChangeType);
         }
 
         public async Task SendInvitationsClicked(LineViewModel lvm)
@@ -125,8 +131,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         void HandleEditedAppointment(EntityChangedMessage obj)
         {
-            if (obj.EntityId == appointment.Id)
-                view.CloseView();
+             view.CloseView();
         }
 
         #endregion
@@ -146,6 +151,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         public long ReminderTimeBefore { get; private set; }
         public List<ParticipantsViewModel> Participants { get; private set; }
         public CalendarViewModel Calendar { get; private set; }
+        public CalendarOccurenceType Type { get; set; }
 
         public static AppointmentViewModel ConvertToViewModel(CalendarAppointment appointment, int recurrenceIndex = -1)
         {
@@ -160,11 +166,12 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 RecurrenceInfo = appointment.RecurrenceInfo?.ToFriendlyString(),
                 ReminderTimeBefore = appointment.ReminderTimeBeforeStart,
                 Participants = appointment.Participants?.Select(ParticipantsViewModel.ConvertToViewModel).ToList(),
+                Type = appointment.Type
             };
 
             var calendar = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars.First(ca => ca.Id == appointment.CalendarId);
             appModel.Calendar = CalendarViewModel.ConvertToViewModel(calendar);
-
+                    
             var occurrence = appointment.Occurrences.FirstOrDefault(r => r.RecurrenceIndex == recurrenceIndex);
 
             if (occurrence == null)
@@ -184,6 +191,14 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
             return appModel;
         }
+
+        public bool IsRecurring()
+        {
+            return RecurrenceInfo != null && Type != CalendarOccurenceType.ChangedOccurrence
+                && Type != CalendarOccurenceType.DeletedOccurrence
+                && Type != CalendarOccurenceType.Occurrence;
+        }
+
     }
 
     public class ParticipantsViewModel
@@ -238,10 +253,10 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
     public interface IAppointmentPresenter : IPresenter<IAppointmentView>
     {
         Task LoadAppointment(int appointmentId, int recurrenceIndex, int calendarId);
-        Task DeleteAppointmentClicked();
+        Task DeleteAppointmentClicked(AppointmentDeleteType appointmentDeleteType);
         Task SendInvitationsClicked(LineViewModel lvm);
 
-        void EditAppointmentClicked();
+        void EditAppointmentClicked(AppointmentChangeType appointmentChangeType);
     }
 
     public interface IAppointmentView : IView
@@ -249,7 +264,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         void ShowAppointment(AppointmentViewModel appointment);
         void SetLines(IEnumerable<LineViewModel> lines);
         void CloseView();
-        void OpenEditAppointment(int calendarId, int appointmentId);
+        void OpenEditAppointment(int calendarId, int appointmentId, AppointmentChangeType appointmentChangeType);
 
         void ShowAppointmentLoadingDialog();
         void ShowDeletingDialog();

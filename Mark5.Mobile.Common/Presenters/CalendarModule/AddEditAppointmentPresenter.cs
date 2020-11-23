@@ -14,9 +14,9 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         public override void Stop() { }
 
-        public async Task AddOrEditAppointment(AddEditAppointmentViewModel vm)
+        public async Task AddOrEditAppointment(AddEditAppointmentViewModel vm, AppointmentChangeType appointmentChangeType)
         {
-            var ca = vm.ConvertToModel();
+            var ca = vm.ConvertToModel(appointmentChangeType);
 
             view.ShowEditingLoading();
 
@@ -24,7 +24,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             {
                 CommonConfig.Logger.Info($"Adding or editing appointment: AppointmentId = {ca.Id}, CalendarId = {ca.CalendarId} ");
 
-                await Managers.CalendarManager.CreateOrUpdateCalendarAppointmentAsync(ca.CalendarId, ca);
+                await Managers.CalendarManager.CreateOrUpdateCalendarAppointmentAsync(ca.CalendarId, ca, appointmentChangeType);
 
                 view.StopEditingLoading();
                 view.CloseView();
@@ -52,15 +52,18 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             return Task.CompletedTask;
         }
 
-        public async Task LoadAppointment(int calendarId, int appointmentId)
+        public async Task LoadAppointment(int calendarId, int appointmentId, int recurrenceIndex, AppointmentChangeType changeType)
         {
             try
             {
                 CommonConfig.Logger.Info($"Retrieving appointment: AppointmentId = {appointmentId}, CalendarId = {calendarId} ");
 
-                var appointment = await Managers.CalendarManager.GetCalendarAppointmentAsync(calendarId, appointmentId, -1, SourceType.Local);
+                if (ServerConfig.SystemSettings?.SystemInfo?.ChangeSingleOccurrenceAvailable != true)
+                    recurrenceIndex = -1;
+                
+                var appointment = await Managers.CalendarManager.GetCalendarAppointmentAsync(calendarId, appointmentId, recurrenceIndex, SourceType.Local);
 
-                view.ShowAppointment(AddEditAppointmentViewModel.ConvertToViewModel(appointment));
+                view.ShowAppointment(AddEditAppointmentViewModel.ConvertToViewModel(appointment, recurrenceIndex, changeType));
             }
             catch (Exception ex)
             {
@@ -90,9 +93,12 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         public bool AllDay { get; set; }
         public int CreatorId { get; set; }
         public RecurrenceInfo RecurrenceInfo { get; set; }
+        public int RecurrenceIndex { get; set; }
         public long ReminderTimeBeforeStart { get; set; }
         public List<ParticipantsViewModel> Participants { get; set; }
         public CalendarViewModel Calendar { get; set; }
+        public CalendarOccurenceType Type { get; set; }
+        public AppointmentChangeType ChangeType { get; set; } = AppointmentChangeType.Default;
 
         public AddEditAppointmentViewModel() { }
 
@@ -115,7 +121,14 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             End = Start.AddMinutes(30);
         }
 
-        public static AddEditAppointmentViewModel ConvertToViewModel(CalendarAppointment appointment)
+        public bool IsRecurring() {
+
+            return RecurrenceInfo != null && Type != CalendarOccurenceType.ChangedOccurrence
+                && Type != CalendarOccurenceType.DeletedOccurrence
+                && Type != CalendarOccurenceType.Occurrence;
+        }
+
+        public static AddEditAppointmentViewModel ConvertToViewModel(CalendarAppointment appointment, int recurrenceIndex, AppointmentChangeType changeType)
         {
             var appModel = new AddEditAppointmentViewModel
             {
@@ -128,12 +141,14 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 RecurrenceInfo = appointment.RecurrenceInfo,
                 ReminderTimeBeforeStart = appointment.ReminderTimeBeforeStart,
                 Participants = appointment.Participants.Select(ParticipantsViewModel.ConvertToViewModel).ToList(),
+                Type = appointment.Type,
+                ChangeType = changeType
             };
 
             var calendar = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars.First(ca => ca.Id == appointment.CalendarId);
             appModel.Calendar = CalendarViewModel.ConvertToViewModel(calendar);
 
-            var occurrence = appointment.Occurrences.FirstOrDefault(r => r.RecurrenceIndex == -1);
+            var occurrence = appointment.Occurrences.FirstOrDefault(r => r.RecurrenceIndex == recurrenceIndex);
 
             if (occurrence == null)
                 throw new ArgumentException("Can't find occurrence of the main appointment");
@@ -153,7 +168,15 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             return appModel;
         }
 
-        public CalendarAppointment ConvertToModel()
+        public CalendarOccurenceType GetAppointmentType()
+        {
+            if (IsRecurring())
+                return CalendarOccurenceType.Pattern;
+
+            return Type;
+        }
+
+        public CalendarAppointment ConvertToModel(AppointmentChangeType appointmentChangeType)
         {
             var ca = new CalendarAppointment
             {
@@ -167,7 +190,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 RecurrenceInfo = RecurrenceInfo,
                 Participants = Participants.Select(ParticipantsViewModel.ConvertToModel).ToList(),
                 CreatorId = CreatorId,
-                Type = RecurrenceInfo == null ? CalendarOccurenceType.Normal : CalendarOccurenceType.Pattern,
+                Type = GetAppointmentType()
             };
 
             if (ReminderTimeBeforeStart >= 0)
@@ -182,30 +205,54 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             if (Id < 0)
                 ca.Guid = Guid.NewGuid();
 
-            CalendarAppointmentOccurrence occurrence;
+            CalendarAppointmentOccurrence changedOccurrence = null, initialOccurrence = null;
 
             if (ca.AllDay)
             {
                 var startAllDay = DateTime.SpecifyKind(Start.Date, DateTimeKind.Utc);
                 var endAllDay = DateTime.SpecifyKind(End.Date, DateTimeKind.Utc);
-                occurrence = new CalendarAppointmentOccurrence
+                changedOccurrence = new CalendarAppointmentOccurrence
                 {
-                    RecurrenceIndex = -1,
+                    RecurrenceIndex = appointmentChangeType == AppointmentChangeType.Occurence ? RecurrenceIndex : -1,
                     StartDate = startAllDay,
                     EndDate = Start.Date == End.Date ? endAllDay : endAllDay.AddDays(1),
                 };
+
+                if (appointmentChangeType == AppointmentChangeType.Occurence && RecurrenceIndex > -1 && RecurrenceInfo!=null)
+                {
+                    var startAllDay_ = DateTime.SpecifyKind(RecurrenceInfo.StartDate.Date, DateTimeKind.Utc);
+                    var endAllDay_ = DateTime.SpecifyKind(RecurrenceInfo.EndDate.Date, DateTimeKind.Utc);
+                    initialOccurrence = new CalendarAppointmentOccurrence
+                    {
+                        RecurrenceIndex = -1,
+                        StartDate = startAllDay_,
+                        EndDate = RecurrenceInfo.StartDate.Date == RecurrenceInfo.EndDate.Date ? endAllDay_ : endAllDay_.AddDays(1),
+                    };
+                }
             }
             else
             {
-                occurrence = new CalendarAppointmentOccurrence
+                changedOccurrence = new CalendarAppointmentOccurrence
                 {
-                    RecurrenceIndex = -1,
+                    RecurrenceIndex = appointmentChangeType == AppointmentChangeType.Occurence ? RecurrenceIndex : -1,
                     StartDate = Start,
                     EndDate = End,
                 };
+
+                if (appointmentChangeType == AppointmentChangeType.Occurence && RecurrenceIndex > -1 && RecurrenceInfo!=null)
+                {
+                    initialOccurrence = new CalendarAppointmentOccurrence
+                    {
+                        RecurrenceIndex = -1,
+                        StartDate = RecurrenceInfo.StartDate,
+                        EndDate = RecurrenceInfo.EndDate
+                    };
+                }
             }
 
-            ca.Occurrences.Add(occurrence);
+            ca.Occurrences.Add(changedOccurrence);
+            if (initialOccurrence != null)
+                ca.Occurrences.Add(initialOccurrence);
 
             return ca;
         }
@@ -235,9 +282,9 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
     public interface IAddEditAppointmentPresenter : IPresenter<IAddEditAppointmentView>
     {
         Task LoadEmptyAppointment(DateTime startDate);
-        Task LoadAppointment(int calendarId, int appointmentId);
+        Task LoadAppointment(int calendarId, int appointmentId, int recurrenceIndex, AppointmentChangeType changeType);
         void LoadCalendarsList();
-        Task AddOrEditAppointment(AddEditAppointmentViewModel vm);
+        Task AddOrEditAppointment(AddEditAppointmentViewModel vm, AppointmentChangeType appointmentChangeType);
     }
 
     public interface IAddEditAppointmentView : IView
