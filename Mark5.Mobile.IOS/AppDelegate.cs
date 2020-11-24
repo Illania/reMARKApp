@@ -40,6 +40,7 @@ namespace Mark5.Mobile.IOS
     public class AppDelegate : UIApplicationDelegate, IUNUserNotificationCenterDelegate, IMessagingDelegate
     {
         const string backgroundTaskID = "com.nordic-it.mark5.mobile.ios.task";
+        private const string syncFusionLicenseKey = "MzU3NTc2QDMxMzgyZTMzMmUzMGNVUXBkU3N4ZU1RbE5OS21KNjRaY2cxakVwVDhzejlObjJPOXV3ZWdHQUk9";
         DateTime lastForegroundTaskRunDate = DateTime.MinValue;
 
         public override UIWindow Window { get; set; }
@@ -101,7 +102,7 @@ namespace Mark5.Mobile.IOS
 
         public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
         {
-            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("MzEzMTA2QDMxMzgyZTMyMmUzMFlBSUd5QTVkUlVEbFEyUHZ3cml6TnRJY2wyMWhla1JMQ1dLNTNmaEUvL0E9");
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(syncFusionLicenseKey);
 
             Crashes.GetErrorAttachments =
     report => { return new[] { ErrorAttachmentLog.AttachmentWithText(SystemReportCollector.CreateLogReport(), "deviceLogs.txt") }; };
