@@ -143,11 +143,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     case SslMode.On:
                         sslSpinner.SetSelection(0);
                         return;
-                    case SslMode.AllowSelfSigned:
-                        sslSpinner.SetSelection(1);
-                        return;
                     case SslMode.Off:
-                        sslSpinner.SetSelection(2);
+                        sslSpinner.SetSelection(1);
                         return;
                 }
             }
@@ -244,8 +241,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var port = endpointInfo.Port;
                 var sslMode = endpointInfo.UseSsl ? SslMode.On : SslMode.Off;
 
-                SetSSLMode(sslMode);
-
                 CommonConfig.Logger.Info($"Logging in with Azure Id... [azureUserId={azureUserId}, hostname={hostname}, port={port}, ssl={sslMode}]");
 
                 cts = new CancellationTokenSource();
@@ -292,7 +287,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     return;
 
                 await ConfirmSSLMode(sslMode);
-                SetSSLMode(sslMode);
 
                 CommonConfig.Logger.Info($"Logging in... [username={username}, hostname={hostname}, port={port}, ssl={sslMode}]");
 
@@ -318,26 +312,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         async Task ConfirmSSLMode(SslMode sslMode)
         {
-            if (sslMode == SslMode.AllowSelfSigned
-                && !await Dialogs.ShowYesNoDialogAsync(this, Resource.String.warning, Resource.String.ssl_accept_selfsigned_warning))
-                return;
-
             if (sslMode == SslMode.Off
                 && !await Dialogs.ShowYesNoDialogAsync(this, Resource.String.warning, Resource.String.ssl_off_warning))
                 return;
-        }
-
-        void SetSSLMode(SslMode sslMode)
-        {
-            switch (sslMode)
-            {
-                case SslMode.AllowSelfSigned:
-                    PlatformConfig.SSLCertificateVerificationManager.EnableSelfSignedCertificates();
-                    break;
-                default:
-                    PlatformConfig.SSLCertificateVerificationManager.DisableSelfSignedCertificates();
-                    break;
-            }
         }
 
         bool ValidateInputs(string username, string password, string hostname, string port)

@@ -396,7 +396,6 @@ namespace Mark5.Mobile.Common.Model
     public enum SslMode
     {
         On,
-        AllowSelfSigned,
         Off
     }
 

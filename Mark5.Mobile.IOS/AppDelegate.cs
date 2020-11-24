@@ -631,16 +631,8 @@ namespace Mark5.Mobile.IOS
 
                 CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Hostname, ci.Hostname);
                 CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.SSL, ci.SslMode.ToString());
-
-                switch (ci.SslMode)
-                {
-                    case SslMode.AllowSelfSigned:
-                        PlatformConfig.SSLCertificateVerificationManager.EnableSelfSignedCertificates();
-                        break;
-                    default:
-                        PlatformConfig.SSLCertificateVerificationManager.DisableSelfSignedCertificates();
-                        break;
-                }
+        
+                PlatformConfig.SSLCertificateVerificationManager.DisableSelfSignedCertificates();                 
 
                 CommonConfig.Logger.Info($"Initializing {nameof(Managers)}...");
                 Managers.Initialize(ci);

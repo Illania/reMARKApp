@@ -26,16 +26,6 @@
 		</dict>
 		<dict>
 			<key>Type</key>
-			<string>PSToggleSwitchSpecifier</string>
-			<key>Title</key>
-			<string>accept_selfsigned</string>
-			<key>Key</key>
-			<string>acceptSelfSigned</string>
-			<key>DefaultValue</key>
-			<string>No</string>
-		</dict>
-		<dict>
-			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 			<key>Title</key>
 			<string>advanced</string>

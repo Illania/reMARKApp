@@ -123,9 +123,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     case SslMode.On:
                         sslPreference.Summary = GetString(Resource.String.ssl_on);
                         break;
-                    case SslMode.AllowSelfSigned:
-                        sslPreference.Summary = GetString(Resource.String.ssl_self_signed);
-                        break;
                     default:
                         var summary = new SpannableString(GetString(Resource.String.ssl_off));
                         summary.SetSpan(new StyleSpan(TypefaceStyle.Bold), 0, summary.Length(), SpanTypes.ExclusiveInclusive);
