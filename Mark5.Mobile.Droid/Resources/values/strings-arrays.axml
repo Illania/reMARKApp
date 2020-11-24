@@ -20,7 +20,6 @@
     </string-array>
     <string-array name="ssl_modes">
         <item>SSL Enabled</item>
-        <item>SSL Enabled (allow self-signed)</item>
         <item>SSL Disabled</item>
     </string-array>
     <string-array name="picker_choice_with_internal_contacts">

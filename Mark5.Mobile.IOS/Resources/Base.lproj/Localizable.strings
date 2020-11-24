@@ -483,7 +483,6 @@ Please note that these reports are not monitored 24/7 and will be available to d
 "use_passcode" = "Use Passcode";
 "vat" = "VAT";
 "warning" = "Warning";
-"warning_selfsigned_on" = "Self signed certificates will be accepted. Please be aware that this lowers security of communication between reMARK server and your device. \nPLEASE NOTE THAT SELF-SIGNED CERTIFICATES WILL NOT BE SUPPORTED ANYMORE FROM NEXT VERSION OF REMARK APP";
 "warning_ssl_off" = "SSL is disabled. Please be aware that all the communication between your device and reMARK server will not be secure.";
 "webpage" = "Webpage";
 "week" = "Week";

@@ -592,8 +592,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var port = endpointInfo.Port;
                 var sslMode = endpointInfo.UseSsl ? SslMode.On : SslMode.Off;
 
-                SetSSLMode(sslMode);
-
                 CommonConfig.Logger.Info($"Logging in with Azure Id... [azureUserId={azureUserId}, hostname={hostname}, port={port}, ssl={sslMode}]");
 
                 cts = new CancellationTokenSource();
@@ -646,8 +644,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     loginButton.TouchUpInside += LoginButton_TouchUpInside;
                     return;
                 }
-
-                SetSSLMode(sslMode);
 
                 CommonConfig.Logger.Info($"Logging in... [username={username}, hostname={hostname}, port={port}, ssl={sslMode}]");
 
@@ -717,31 +713,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return false;
                 }
             }
-            else if (sslMode == SslMode.AllowSelfSigned)
-            {
-                hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Warning);
-
-                if (!await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("warning"), Localization.GetString("warning_selfsigned_on"), Localization.GetString("continue"), Localization.GetString("cancel")))
-                {
-                    loginButton.TouchUpInside += LoginButton_TouchUpInside;
-                    return false;
-                }
-            }
-
+          
             return true;
-        }
-
-        void SetSSLMode(SslMode sslMode)
-        {
-            switch (sslMode)
-            {
-                case SslMode.AllowSelfSigned:
-                    PlatformConfig.SSLCertificateVerificationManager.EnableSelfSignedCertificates();
-                    break;
-                default:
-                    PlatformConfig.SSLCertificateVerificationManager.DisableSelfSignedCertificates();
-                    break;
-            }
         }
 
         async Task<bool> ValidateInputs(string username, string password, string hostname, string port)
