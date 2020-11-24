@@ -40,7 +40,7 @@ namespace Mark5.Mobile.IOS
     public class AppDelegate : UIApplicationDelegate, IUNUserNotificationCenterDelegate, IMessagingDelegate
     {
         const string backgroundTaskID = "com.nordic-it.mark5.mobile.ios.task";
-        private const string syncFusionLicenseKey = "MzM0NzYyQDMxMzgyZTMzMmUzMGFQdm5JaUZ5Q2cycXdpd3hiZVdFWVNxM01uU0oydERSc1c1NmdKSDBFcUU9";
+        private const string syncFusionLicenseKey = "MzU3NTc2QDMxMzgyZTMzMmUzMGNVUXBkU3N4ZU1RbE5OS21KNjRaY2cxakVwVDhzejlObjJPOXV3ZWdHQUk9";
         DateTime lastForegroundTaskRunDate = DateTime.MinValue;
 
         public override UIWindow Window { get; set; }
