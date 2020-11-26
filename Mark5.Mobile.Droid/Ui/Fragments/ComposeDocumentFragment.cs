@@ -1067,8 +1067,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async Task GetDefaultTemplate(bool initializing)
         {
-            dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.loading_template, Resource.String.please_wait);
-
             try
             {
                 var template = await Managers.DocumentsManager.GetDefaultTemplateAsync(documentCreationModeFlag);
@@ -1079,12 +1077,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 CommonConfig.Logger.Error($"Error while getting default template [restoreWorkingCopy={restoreWorkingCopy}, documentCreationModeFlag={documentCreationModeFlag}, copyToNewOption={copyToNewOption}, previousDocumentFolderId={previousDocumentFolderId}, previousDocumentId={previousDocumentId}]", ex);
 
-                dismissAction();
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
-            }
-            finally
-            {
-                dismissAction();
             }
         }
 

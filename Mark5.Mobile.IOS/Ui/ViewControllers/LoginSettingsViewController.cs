@@ -15,7 +15,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
     public class LoginSettingsViewController : AbstractAppSettingsViewController, ISettingsDelegate
     {
         const string SslEnabledKey = "sslEnabled";
-        const string AcceptSelfSignedKey = "acceptSelfSigned";
         const string CreateReportKey = "createReport";
         const string AppVersionKey = "appVersion";
         const string OpenSettingsAppKey = "openSettingsApp";
@@ -39,16 +38,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             SettingsStore = new InMemorySettingsStore();
 
             SettingsStore.SetBool(values.SslMode != SslMode.Off, SslEnabledKey);
-            SettingsStore.SetBool(values.SslMode == SslMode.AllowSelfSigned, AcceptSelfSignedKey);
         }
 
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
-
-            observer = NSNotificationCenter.DefaultCenter.AddObserver(new NSString(InAppSettingsKit.SettingsStore.AppSettingChangedNotification), n => UpdateValues(n.Object.ToString()));
-
-            UpdateValues(SslEnabledKey);
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -71,14 +65,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (RestrictedSettingsValuesUpdated != null)
             {
                 var sslEnabled = SettingsStore.GetBool(SslEnabledKey);
-                var acceptSelfSigned = SettingsStore.GetBool(AcceptSelfSignedKey);
 
                 var rsv = new SettingsValues();
 
-                if (sslEnabled && !acceptSelfSigned)
+                if (sslEnabled)
                     rsv.SslMode = SslMode.On;
-                else if (sslEnabled && acceptSelfSigned)
-                    rsv.SslMode = SslMode.AllowSelfSigned;
                 else
                     rsv.SslMode = SslMode.Off;
 
@@ -86,24 +77,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
             DismissViewController(true, null);
-        }
-
-        void UpdateValues(string key)
-        {
-            if (key == SslEnabledKey)
-            {
-                var sslEnabled = SettingsStore.GetBool(SslEnabledKey);
-
-                if (!sslEnabled)
-                {
-                    SetHiddenKeys(new[] { AcceptSelfSignedKey }, true);
-                    SettingsStore.SetBool(false, AcceptSelfSignedKey);
-                }
-                else
-                {
-                    SetHiddenKeys(new string[0], true);
-                }
-            }
         }
 
         [Export("tableView:cellForSpecifier:")]
