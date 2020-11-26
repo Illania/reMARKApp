@@ -20,7 +20,7 @@
         android:layout_marginTop="100.0dp"
         android:theme="@style/mark5progressbarlight" />
     <android.support.v7.widget.AppCompatButton
-        android:id="@+id/login_button"
+        android:id="@+id/splash_login_button"
         android:text="@string/log_in"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
