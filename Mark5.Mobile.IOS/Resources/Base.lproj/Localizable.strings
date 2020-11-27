@@ -39,6 +39,7 @@
 "calendar" = "Calendar";
 "calendars" = "Calendars";
 "call" = "Call";
+"camera_not_available"= "Camera not available";
 "cancel" = "Cancel";
 "cancelled" = "Cancelled";
 "cannot_mail_report_content" = "There are no mail accounts configured on your device. You need to have an account configured before you can send feedback.";
