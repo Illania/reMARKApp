@@ -1,11 +1,7 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using CommonTests.Pages;
+﻿using CommonTests.Pages;
 using NUnit.Framework;
 using Xamarin.UITest;
 using Xamarin.UITest.Android;
-using Xamarin.UITest.Queries;
 
 namespace DroidTests
 {
@@ -22,17 +18,18 @@ namespace DroidTests
                 .InstalledApp("com.nordic_it.mark5.android")
                 .PreferIdeSettings()
                 .StartApp(Xamarin.UITest.Configuration.AppDataMode.Clear);
+
+            CommonTests.AppManager.Initialize(app, Platform.Android);
+
         }
 
         [Test]
-        public void AppLaunches()
+        [Category("Common")]
+        [Ignore("For inner test usage")]
+        public void LoginAndSwipeOnboarding()
         {
-            CommonTests.AppManager.Initialize(app, Platform.Android);
-
-           // app.Repl();
-
             new WelcomePage().Login();
-
+          
             new LoginPage().EnterCredentials(new Credentials()
             {
                 username = "ag",
@@ -42,10 +39,42 @@ namespace DroidTests
                 useSsl = true
             }).Login();
 
-            new DocumentListPage().VerifyOnboardingIsShown().SwipeOnboardingPages();
-            app.Repl();
-           
-            
+            new FoldersListPage()
+                .VerifyOnboardingIsShown()
+                .SwipeOnboardingPages();
         }
+
+        [Test]
+        [Category("Documents")]
+        public void OpenDocument()
+        {
+            LoginAndSwipeOnboarding();
+
+            new FoldersListPage().OpenAllEmailsFolder();
+
+            var documentListPage = new DocumentListPage();
+
+            var openedDocumentSubject = documentListPage.GetFirstDocumentSubject();
+
+            documentListPage.OpenFirstDocument();
+
+            new DocumentPage().VerifyDocumentSubjectIsCorrect(openedDocumentSubject);
+        }
+
+        [Test]
+        [Category("Documents")]
+        public void SendDocument()
+        {
+            LoginAndSwipeOnboarding();
+
+            new FoldersListPage().OpenDocumentEditor();
+
+            new ComposeDocumentPage().ComposeDocument(new Document() {
+                toAddress = "ag@nordic-it.com",
+                subject = "SendDocument test" });
+
+            new FoldersListPage().VerifyEmailSentNotifierBarShown();
+        }
+
     }
 }

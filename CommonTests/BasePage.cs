@@ -17,7 +17,7 @@ namespace CommonTests
 
         protected BasePage()
         {
-            AssertOnPage(TimeSpan.FromSeconds(15));
+            AssertOnPage(TimeSpan.FromSeconds(20));
             app.Screenshot("On " + this.GetType().Name);
         }
 

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Linq;
-using NUnit.Framework;
-using Xamarin.UITest;
-
-// Aliases Func<AppQuery, AppQuery> with Query
+﻿// Aliases Func<AppQuery, AppQuery> with Query
 using Query = System.Func<Xamarin.UITest.Queries.AppQuery, Xamarin.UITest.Queries.AppQuery>;
 
 namespace CommonTests.Pages
@@ -23,7 +18,7 @@ namespace CommonTests.Pages
         protected override PlatformQuery Trait => new PlatformQuery
         {
             Android = x => x.Marked("login_form"),
-            //iOS = x => x.Marked("Task Details")
+            //iOS = x => x.Marked("login_form")
         };
 
         public LoginPage()

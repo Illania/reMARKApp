@@ -26,7 +26,7 @@ namespace CommonTests.Pages
         protected override PlatformQuery Trait => new PlatformQuery
         {
             Android = x => x.Marked("splash_login_button"),
-            //iOS = x => x.Marked("Task Details")
+            //iOS = x => x.Marked("splash_login_button")
         };
 
         public void Login()

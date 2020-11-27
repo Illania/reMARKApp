@@ -3,30 +3,29 @@ using Query = System.Func<Xamarin.UITest.Queries.AppQuery, Xamarin.UITest.Querie
 
 namespace CommonTests.Pages
 {
-    public class FoldersListPage : BasePage
+    public class DocumentListPage : BasePage
     {
         readonly int OnboardingPageCount = 0;
         readonly Query onboardingPageWelcomeTextField;
         readonly Query onboardingDoneButton;
-        readonly Query allEmailsFolder;
-        readonly Query composeDocumentButton;
-        readonly Query emailSentNotifierBar;
-        
+        readonly Query firstDocument;
+        readonly Query subjectDocumentListItem;
+      
         protected override PlatformQuery Trait => new PlatformQuery
         {
-            Android = x => x.Marked("Folders"),
-            //iOS = x => x.Marked("Folders")
+            Android = x => x.Marked("Emails"),
+            //iOS = x => x.Marked("Emails")
         };
 
-        public FoldersListPage()
+        public DocumentListPage()
         {
             if (OnAndroid)
             {
                 OnboardingPageCount = 1;
                 onboardingPageWelcomeTextField = x => x.Marked("Welcome to reMARK");
                 onboardingDoneButton = x => x.Marked("DONE");
-                allEmailsFolder = x => x.Marked("All email");
-                composeDocumentButton = x => x.Marked("fab");
+                firstDocument = x => x.Id("recycler_view").Child(0);
+                subjectDocumentListItem = x => x.Id("list_item_document_subject");
             }
 
             if (OniOS)
@@ -35,7 +34,7 @@ namespace CommonTests.Pages
             }
         }
 
-        public FoldersListPage VerifyOnboardingIsShown()
+        public DocumentListPage VerifyOnboardingIsShown()
         {
             app.WaitForElement(onboardingPageWelcomeTextField);
             app.Screenshot($"Onboarding page shown: {onboardingPageWelcomeTextField}");
@@ -43,7 +42,7 @@ namespace CommonTests.Pages
             return this;
         }
 
-        public FoldersListPage SwipeOnboardingPages()
+        public DocumentListPage SwipeOnboardingPages()
         {
             if(OnAndroid)
             {
@@ -66,28 +65,31 @@ namespace CommonTests.Pages
 
             return this;
 
-        }     
+        }
+
+        public string GetFirstDocumentSubject()
+        {
+            if(OnAndroid)
+            {
+                app.WaitForElement(subjectDocumentListItem);
+                return app.Query(subjectDocumentListItem)[0].Text;
+            }
+
+            if(OniOS)
+            {
+                
+            }
+
+            return string.Empty;
+
+        }
     
-        public void OpenAllEmailsFolder()
-        {
-            app.WaitForElement(allEmailsFolder);
-            app.Tap(allEmailsFolder);
-            app.Screenshot("All emails folder opened");         
+        public void OpenFirstDocument()
+        {             
+            app.WaitForElement(firstDocument);
+            app.Screenshot("First document tapped");
+            app.Tap(firstDocument);
         }
 
-        public void OpenDocumentEditor()
-        {
-            app.WaitForElement(composeDocumentButton);
-            app.Tap(composeDocumentButton);
-            app.Screenshot("Document editor opened");
-        }
-
-        public void VerifyEmailSentNotifierBarShown()
-        {
-            app.WaitForElement(emailSentNotifierBar);
-            app.Screenshot("Email sent notifier bar shown");
-        }
-
-        
     }
 }
