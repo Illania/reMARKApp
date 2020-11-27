@@ -562,19 +562,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             if (source == 1)
             {
                 CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.TakePhoto));
-                InsertNewPhoto(d);
+                await InsertNewPhoto(d, (UIBarButtonItem)sender);
             }
 
             if (source == 2)
             {
                 CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.PickPhoto));
-                InsertExistingPhoto(d);
+                InsertExistingPhoto(d, (UIBarButtonItem)sender);
             }
 
             if (source == 3)
             {
                 CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.Local));
-                InsertFile(d);
+                InsertFile(d, (UIBarButtonItem)sender);
             }
         }
 
@@ -1096,27 +1096,38 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         #region Attachments
 
-        void InsertNewPhoto(PopoverPresentationControllerDelegate d)
+        async Task InsertNewPhoto(PopoverPresentationControllerDelegate d, UIBarButtonItem sender)
         {
-            var picker = new UIImagePickerController
+            try
             {
-                AllowsEditing = false,
-                SourceType = UIImagePickerControllerSourceType.Camera,
-                CameraCaptureMode = UIImagePickerControllerCameraCaptureMode.Photo,
-                CameraDevice = UIImagePickerControllerCameraDevice.Rear,
-                Delegate = new ImagePickerControllerDelegate(this, HandleAttachmentImage),
-                ModalPresentationStyle = UIModalPresentationStyle.PageSheet
-            };
-            if (picker.PopoverPresentationController != null)
-                picker.PopoverPresentationController.Delegate = d;
-            PresentViewController(picker, true, null);
+                var picker = new UIImagePickerController
+                {
+                    AllowsEditing = false,
+                    SourceType = UIImagePickerControllerSourceType.Camera,
+                    CameraCaptureMode = UIImagePickerControllerCameraCaptureMode.Photo,
+                    CameraDevice = UIImagePickerControllerCameraDevice.Rear,
+                    Delegate = new ImagePickerControllerDelegate(this, HandleAttachmentImage),
+                    ModalPresentationStyle = UIModalPresentationStyle.PageSheet
+                };
+                if (picker.PopoverPresentationController != null)
+                {
+                    picker.PopoverPresentationController.Delegate = d;
+                    picker.PopoverPresentationController.BarButtonItem = sender;
+                   
+                }
+                PresentViewController(picker, true, null);
+            }
+            catch (MonoTouchException)
+            {
+                await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("warning"), Localization.GetString("camera_not_available"));
+            }
         }
 
-        void InsertExistingPhoto(PopoverPresentationControllerDelegate d)
+        void InsertExistingPhoto(PopoverPresentationControllerDelegate d, UIBarButtonItem sender)
         {
             var picker = new GMImagePickerController
             {
-                MediaTypes = new[] { Photos.PHAssetMediaType.Image },
+                MediaTypes = new[] { PHAssetMediaType.Image },
                 Title = "Add Images",
                 CustomDoneButtonTitle = "Add",
                 CustomCancelButtonTitle = "Cancel",
@@ -1154,7 +1165,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             picker.Canceled += ImagePicking_Canceled;
 
             if (picker.PopoverPresentationController != null)
+            {
+                picker.PopoverPresentationController.BarButtonItem = sender;
                 picker.PopoverPresentationController.Delegate = d;
+            }
             PresentViewController(picker, true, null);
         }
 
@@ -1168,7 +1182,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         }
 
 
-        void InsertFile(PopoverPresentationControllerDelegate d)
+        void InsertFile(PopoverPresentationControllerDelegate d, UIBarButtonItem sender)
         {
             var picker = new UIDocumentPickerViewController(new[]
             {
@@ -1182,7 +1196,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 AllowsMultipleSelection = true
             };
             if (picker.PopoverPresentationController != null)
+            {
                 picker.PopoverPresentationController.Delegate = d;
+                picker.PopoverPresentationController.BarButtonItem = sender;
+            }
             PresentViewController(picker, true, null);
         }
 
