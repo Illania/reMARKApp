@@ -75,13 +75,13 @@
 	<key>CFBundleDisplayName</key>
 	<string>reMARK</string>
 	<key>CFBundleURLTypes</key>
-<array>
-   <dict>
-      <key>CFBundleURLSchemes</key>
-      <array>
-         <string>msauth.com.nordic-it.mark5.mobile.ios</string>
-      </array>
-   </dict>
-</array>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>msauth.com.nordic-it.mark5.mobile.ios</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

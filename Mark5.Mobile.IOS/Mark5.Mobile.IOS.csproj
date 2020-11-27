@@ -39,6 +39,7 @@
 		<MtouchLink>None</MtouchLink>
 		<MtouchArch>x86_64</MtouchArch>
 		<ConsolePause>false</ConsolePause>
+        <CopyAppBundle>true</CopyAppBundle>
 		<RunCodeAnalysis>true</RunCodeAnalysis>
 		<CodesignProvision>Mark5 Mobile Distribution</CodesignProvision>
 		<CodesignKey>iPhone Distribution: Nordic IT Europe ApS (5Q7TTRG4M4)</CodesignKey>
@@ -424,6 +425,9 @@
 		  <HintPath>..\packages\Microsoft.Graph.1.21.0\lib\netstandard1.3\Microsoft.Graph.dll</HintPath>
 		</Reference>
 		<Reference Include="System.Drawing.Common.dll" />
+		<Reference Include="Calabash">
+		  <HintPath>..\packages\Xamarin.TestCloud.Agent.0.22.1\lib\Xamarin.iOS\Calabash.dll</HintPath>
+		</Reference>
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Mark5.Mobile.Common\Mark5.Mobile.Common.csproj">

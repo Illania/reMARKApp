@@ -145,6 +145,11 @@ namespace Mark5.Mobile.IOS
                     }
                 }
 
+            #if ENABLE_TEST_CLOUD
+              Xamarin.Calabash.Start();
+            #endif
+
+
             }
             catch (Exception ex)
             {
@@ -236,7 +241,7 @@ namespace Mark5.Mobile.IOS
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true, true);
         }
 
-        #region Notification handling
+#region Notification handling
 
         public override void RegisteredForRemoteNotifications(UIApplication application, NSData deviceToken)
         {
@@ -441,10 +446,10 @@ namespace Mark5.Mobile.IOS
         //
         //}
 
-        #endregion
+#endregion
 
 
-        #region Update Activities
+#region Update Activities
 
         public override void PerformFetch(UIApplication application, Action<UIBackgroundFetchResult> completionHandler)
         {
@@ -539,7 +544,7 @@ namespace Mark5.Mobile.IOS
         }
 
 
-        #endregion
+#endregion
 
         void InitializeCommon()
         {

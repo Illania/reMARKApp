@@ -236,7 +236,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         {
             var animationView = FindViewById<LottieAnimationView>(Resource.Id.animation_view);
             var progressBar = FindViewById<ProgressBar>(Resource.Id.progress_bar);
-            var loginButton = FindViewById<AppCompatButton>(Resource.Id.login_button);
+            var loginButton = FindViewById<AppCompatButton>(Resource.Id.splash_login_button);
 
             loginButton.Click += (sender, e) => StartActivity(LoginActivity.CreateIntent(this));
 
