@@ -485,7 +485,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 if (IsRootOfFoldersList)
                 {
-                    var gds = (GrouppedDataSource)TableView.Source;
+
 
                     if (PlatformConfig.Preferences.SyncFavoriteFoldersEnabled && CommonConfig.Reachability.IsReachable)
                     {
@@ -500,23 +500,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                         }
                     }
 
-                    var favorites = await Managers.FoldersManager.GetFavoriteFoldersAsync(ParentFolder.Module);
+                    if (TableView.Source is GrouppedDataSource gds)
+                    {
+                        var favorites = await Managers.FoldersManager.GetFavoriteFoldersAsync(ParentFolder.Module);
 
-                    if (ParentFolder.Module == ModuleType.Documents)
-                        gds.SetFolders(GrouppedDataSource.Section.Local, Folder.LocalRootForModule(ModuleType.Documents).SubFolders);
+                        if (ParentFolder.Module == ModuleType.Documents)
+                            gds.SetFolders(GrouppedDataSource.Section.Local, Folder.LocalRootForModule(ModuleType.Documents).SubFolders);
 
-                    gds.SetFolders(GrouppedDataSource.Section.Favorites, favorites);
-                    gds.SetFolders(GrouppedDataSource.Section.Folders, remoteFolders);
+                        gds.SetFolders(GrouppedDataSource.Section.Favorites, favorites);
+                        gds.SetFolders(GrouppedDataSource.Section.Folders, remoteFolders);
 
-                    if (EditModeItem != null)
-                        EditModeItem.Enabled = gds.GetItemsInSection(GrouppedDataSource.Section.Favorites) > 0;
+                        if (EditModeItem != null)
+                            EditModeItem.Enabled = gds.GetItemsInSection(GrouppedDataSource.Section.Favorites) > 0;
+                    }
                 }
                 else
                 {
-                    var ds = (DataSource)TableView.Source;
-                    ds.SetFolders(remoteFolders);
+                    if (TableView.Source is DataSource ds)
+                    {
+                        ds.SetFolders(remoteFolders);
 
-                    CommonConfig.Logger.Info($"Refreshed folders list [parentFolder={ParentFolder}]");
+                        CommonConfig.Logger.Info($"Refreshed folders list [parentFolder={ParentFolder}]");
+                    }                    
                 }
 
                 await Task.Delay(150); // Let animations finish
