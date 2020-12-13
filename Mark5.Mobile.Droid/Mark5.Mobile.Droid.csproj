@@ -627,6 +627,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:UpdateGeneratedFiles</Generator>
     </Compile>
+    <Compile Include="Ui\Common\ViewPagerFixed.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
