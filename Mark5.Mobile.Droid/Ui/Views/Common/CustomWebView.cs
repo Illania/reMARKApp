@@ -3,6 +3,7 @@ using Android.Content;
 using Android.Runtime;
 using Android.Views;
 using Android.Webkit;
+using Mark5.Mobile.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Views.Common
 {
@@ -61,7 +62,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.Common
         [Obsolete]
         public override bool ShouldOverrideUrlLoading(WebView view, string url)
         {
-            view.Context.StartActivity(new Intent(Intent.ActionView, Android.Net.Uri.Parse(url)));
+            try
+            {
+                view.Context.StartActivity(new Intent(Intent.ActionView, Android.Net.Uri.Parse(url)));
+            }
+            catch(Exception ex)
+            {
+                CommonConfig.Logger.Warning(ex.Message);
+            }
             return true;
         }
 
