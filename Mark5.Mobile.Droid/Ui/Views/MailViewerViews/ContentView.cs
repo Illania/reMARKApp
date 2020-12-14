@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Android.Content;
 using Android.Views;
 using Android.Webkit;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Droid.Model;
 using Mark5.Mobile.Droid.Utilities.Extensions;
 
@@ -81,7 +82,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.MailViewerViews
             [Obsolete]
             public override bool ShouldOverrideUrlLoading(WebView view, string url)
             {
-                view.Context.StartActivity(new Intent(Intent.ActionView, Android.Net.Uri.Parse(url)));
+                try
+                {
+                    view.Context.StartActivity(new Intent(Intent.ActionView, Android.Net.Uri.Parse(url)));
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Warning(ex.Message);
+                }
                 return true;
             }
         }

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Android.Content;
 using Android.Views;
 using Android.Webkit;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Model;
 using Mark5.Mobile.Droid.Utilities.Extensions;
@@ -91,11 +92,29 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             [Obsolete]
             public override bool ShouldOverrideUrlLoading(WebView view, string url)
             {
+                if (!Uri.IsWellFormedUriString(url, UriKind.Absolute))
+                    return true;
+
                 if (url.StartsWith("mailto", StringComparison.InvariantCultureIgnoreCase))
                     MailToLinkClicked(this, url);
                 else
-                    view.Context.StartActivity(new Intent(Intent.ActionView, Android.Net.Uri.Parse(url)));
+                {
+                    OpenUrl(view, url);
+                }
+
                 return true;
+            }
+
+            private static void OpenUrl(WebView view, string url)
+            {
+                try
+                {
+                    view.Context.StartActivity(new Intent(Intent.ActionView, Android.Net.Uri.Parse(url)));
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Warning(ex.Message);
+                }
             }
         }
     }
