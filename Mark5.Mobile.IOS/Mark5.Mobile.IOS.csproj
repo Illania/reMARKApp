@@ -16,7 +16,7 @@
 		<DebugType>full</DebugType>
 		<Optimize>false</Optimize>
 		<OutputPath>bin\iPhoneSimulator\Debug</OutputPath>
-		<DefineConstants>DEBUG</DefineConstants>
+		<DefineConstants>__IOS__;__MOBILE__;__UNIFIED__;DEBUG;ENABLE_TEST_CLOUD;</DefineConstants>
 		<ErrorReport>prompt</ErrorReport>
 		<WarningLevel>4</WarningLevel>
 		<ConsolePause>false</ConsolePause>
@@ -66,6 +66,7 @@
 		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
 		<CodesignProvision>Mark5 Development 2020 - B</CodesignProvision>
 		<LangVersion>8.0</LangVersion>
+		<MtouchLink>SdkOnly</MtouchLink>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
 		<DebugType>none</DebugType>
@@ -83,6 +84,7 @@
 		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
 		<CodesignProvision>Mark5 Distribution 2020</CodesignProvision>
 		<LangVersion>8.0</LangVersion>
+		<MtouchLink>SdkOnly</MtouchLink>
 	</PropertyGroup>
 	<ItemGroup>
 		<Compile Include="Properties\AssemblyInfo.cs" />
@@ -311,6 +313,11 @@
 		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\CalendarInvitationView.cs" />
 		<Compile Include="Ui\ViewControllers\InvitationReplyViewController.cs" />
 		<Compile Include="Ui\Common\UIDatePickerStyled.cs" />
+		<Compile Include="NotificationsConstants.cs" />
+		<Compile Include="PushNotifications\ANHRegistrator.cs" />
+		<Compile Include="PushNotifications\FCMRegistrator.cs" />
+		<Compile Include="PushNotifications\IPushNotificationsRegistrator.cs" />
+		<Compile Include="TinyIoC.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
@@ -325,7 +332,7 @@
 		</Reference>
 		<Reference Include="System.Web.Services" />
 		<Reference Include="Newtonsoft.Json">
-		  <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\netstandard2.0\Newtonsoft.Json.dll</HintPath>
+		  <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\netstandard2.0\Newtonsoft.Json.dll</HintPath>
 		</Reference>
 		<Reference Include="ModernHttpClient">
 		  <HintPath>..\packages\modernhttpclient.2.4.2\lib\Xamarin.iOS10\ModernHttpClient.dll</HintPath>
@@ -427,6 +434,36 @@
 		</Reference>
 		<Reference Include="InAppSettingsKit">
 		  <HintPath>..\Components\InAppSettingsKit-2.15\lib\InAppSettingsKit.dll</HintPath>
+		</Reference>
+		<Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions">
+		  <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.Abstractions.3.1.8\lib\netstandard2.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+		</Reference>
+		<Reference Include="Microsoft.Extensions.Logging.Abstractions">
+		  <HintPath>..\packages\Microsoft.Extensions.Logging.Abstractions.3.1.8\lib\netstandard2.0\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
+		</Reference>
+		<Reference Include="System.Buffers">
+		  <HintPath>..\packages\System.Buffers.4.4.0\lib\netstandard2.0\System.Buffers.dll</HintPath>
+		</Reference>
+		<Reference Include="System.Runtime.CompilerServices.Unsafe">
+		  <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.7.1\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+		</Reference>
+		<Reference Include="System.Memory">
+		  <HintPath>..\packages\System.Memory.4.5.2\lib\netstandard2.0\System.Memory.dll</HintPath>
+		</Reference>
+		<Reference Include="Microsoft.Extensions.Primitives">
+		  <HintPath>..\packages\Microsoft.Extensions.Primitives.3.1.8\lib\netstandard2.0\Microsoft.Extensions.Primitives.dll</HintPath>
+		</Reference>
+		<Reference Include="Microsoft.Extensions.Caching.Abstractions">
+		  <HintPath>..\packages\Microsoft.Extensions.Caching.Abstractions.3.1.8\lib\netstandard2.0\Microsoft.Extensions.Caching.Abstractions.dll</HintPath>
+		</Reference>
+		<Reference Include="Microsoft.Extensions.Options">
+		  <HintPath>..\packages\Microsoft.Extensions.Options.3.1.8\lib\netstandard2.0\Microsoft.Extensions.Options.dll</HintPath>
+		</Reference>
+		<Reference Include="Microsoft.Extensions.Caching.Memory">
+		  <HintPath>..\packages\Microsoft.Extensions.Caching.Memory.3.1.8\lib\netstandard2.0\Microsoft.Extensions.Caching.Memory.dll</HintPath>
+		</Reference>
+		<Reference Include="Xamarin.Azure.NotificationHubs.iOS">
+		  <HintPath>..\packages\Xamarin.Azure.NotificationHubs.iOS.3.1.1\lib\xamarinios10\Xamarin.Azure.NotificationHubs.iOS.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 	<ItemGroup>
@@ -830,6 +867,7 @@
 	  <Folder Include="Assets_icons.xcassets\Password-Show.imageset\" />
 	  <Folder Include="Assets_icons.xcassets\Password-Hide.imageset\" />
 	  <Folder Include="Assets_icons.xcassets\AzureLogin.imageset\" />
+	  <Folder Include="PushNotifications\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 	<Import Project="..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets" Condition="Exists('..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets')" />

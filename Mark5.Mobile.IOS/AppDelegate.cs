@@ -30,6 +30,7 @@ using Microsoft.AppCenter.Crashes;
 using Microsoft.Identity.Client;
 using ModernHttpClient;
 using PCLStorage;
+using TinyIoC;
 using TinyMessenger;
 using UIKit;
 using UserNotifications;
@@ -39,11 +40,13 @@ namespace Mark5.Mobile.IOS
     [Register("AppDelegate")]
     public class AppDelegate : UIApplicationDelegate, IUNUserNotificationCenterDelegate, IMessagingDelegate
     {
+        private IPushNotificationsRegistrator pushNotificationsRegistrator;
         const string backgroundTaskID = "com.nordic-it.mark5.mobile.ios.task";
         private const string syncFusionLicenseKey = "MzU3NTc2QDMxMzgyZTMzMmUzMGNVUXBkU3N4ZU1RbE5OS21KNjRaY2cxakVwVDhzejlObjJPOXV3ZWdHQUk9";
         DateTime lastForegroundTaskRunDate = DateTime.MinValue;
 
         public override UIWindow Window { get; set; }
+
 
         public override bool WillFinishLaunching(UIApplication application, NSDictionary launchOptions)
         {
@@ -56,6 +59,14 @@ namespace Mark5.Mobile.IOS
 
                 App.Configure(); //Firebase Analytics
                 Messaging.SharedInstance.Delegate = this;
+
+                var serviceVersion = ServerConfig.SystemSettings?.SystemInfo?.ServiceVersion;
+               //if (serviceVersion.CompareTo(new Version(3, 4, 0)) < 0)
+               //     TinyIoCContainer.Current.Register<IPushNotificationsRegistrator>(new FCMRegistrator());
+               // else
+                    TinyIoCContainer.Current.Register<IPushNotificationsRegistrator>(new ANHRegistrator());
+
+                pushNotificationsRegistrator = TinyIoCContainer.Current.Resolve<IPushNotificationsRegistrator>();
 
                 CommonConfig.Logger.Info("reMARK initializing...");
                 var isLoggedIn = InitializePlatform(application);
@@ -105,13 +116,17 @@ namespace Mark5.Mobile.IOS
             Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(syncFusionLicenseKey);
 
             Crashes.GetErrorAttachments =
-    report => { return new[] { ErrorAttachmentLog.AttachmentWithText(SystemReportCollector.CreateLogReport(), "deviceLogs.txt") }; };
+                report => { return new[] { ErrorAttachmentLog.AttachmentWithText(SystemReportCollector.CreateLogReport(), "deviceLogs.txt") }; };
             AppCenter.Start("8aec5b28-2ac5-4956-997c-4867ef65d957", typeof(Crashes));
 
 #if DEBUG
             Crashes.SetEnabledAsync(false);
 #else
             Crashes.SetEnabledAsync(PlatformConfig.Preferences.EnableReporting);
+#endif
+
+#if ENABLE_TEST_CLOUD
+              Xamarin.Calabash.Start();
 #endif
 
             var OneDayInterval = 60 * 24;
@@ -122,6 +137,8 @@ namespace Mark5.Mobile.IOS
             //Check note on background task down
             //if (UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
             //    BGTaskScheduler.Shared.Register(backgroundTaskID, null, HandleBackgroundTask);
+
+            pushNotificationsRegistrator.Register();
 
             if (launchOptions == null)
                 return true;
@@ -144,12 +161,6 @@ namespace Mark5.Mobile.IOS
                         }
                     }
                 }
-
-            #if ENABLE_TEST_CLOUD
-              Xamarin.Calabash.Start();
-            #endif
-
-
             }
             catch (Exception ex)
             {
@@ -241,8 +252,12 @@ namespace Mark5.Mobile.IOS
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true, true);
         }
 
-#region Notification handling
-
+        #region Notification handling
+        /// <summary>
+        /// Indicates that a call to RegisterForRemoteNotifications() succeeded.
+        /// </summary>
+        /// <param name="application">Reference to the UIApplication that invoked this delegate method.</param>
+        /// <param name="deviceToken">Received token.</param>
         public override void RegisteredForRemoteNotifications(UIApplication application, NSData deviceToken)
         {
             CommonConfig.Logger.Info($"Received APNS token: {deviceToken}");
@@ -255,24 +270,14 @@ namespace Mark5.Mobile.IOS
                 return;
             }
 
-            if (serviceVersion == null)
-            {
-                CommonConfig.Logger.Info($"It is not possible to update the APNS token because the server version is null");
-                return;
-            }
-
-            bool notificationsInChinaEnabled = ServerConfig.SystemSettings?.SystemInfo?.NotificationsInChina == true;
-
-            if (serviceVersion.CompareTo(new Version(3, 1, 5)) >= 0 && !notificationsInChinaEnabled)
-            {
-                CommonConfig.Logger.Info($"Not sending the APNS token because the current service version is equal or higher than 3.2.0 and Notifications Not Enabled in China");
-                return;
-            }
+            //for ANH only
+            pushNotificationsRegistrator.RegisterToken(deviceToken);
 
             string newToken = string.Empty;
-
+            
             try
             {
+                //formats the string as hexadecimal characters.
                 newToken = string.Join("", deviceToken.Select(b => b.ToString("x2")));
             }
             catch (Exception ex)
@@ -281,8 +286,10 @@ namespace Mark5.Mobile.IOS
                 return;
             }
 
-            UpdatePushNotificationToken(newToken);
+            pushNotificationsRegistrator.UpdateToken(newToken);
         }
+
+      
 
         public override void FailedToRegisterForRemoteNotifications(UIApplication application, NSError error)
         {
@@ -293,60 +300,18 @@ namespace Mark5.Mobile.IOS
         [Export("messaging:didReceiveRegistrationToken:")]  //FCM Token
         public void DidReceiveRegistrationToken(Messaging messaging, string fcmToken)
         {
-            UpdateFcmToken(fcmToken);
-        }
-
-        void UpdateFcmToken(string fcmToken)
-        {
-            CommonConfig.Logger.Info($"Received FCM token: {fcmToken}");
-
-            var serviceVersion = ServerConfig.SystemSettings?.SystemInfo?.ServiceVersion;
-
-            if (serviceVersion == null)
-            {
-                CommonConfig.Logger.Info($"It is not possible to update the push notification token because the server version is null");
-                return;
-            }
-
-            if (serviceVersion.CompareTo(new Version(3, 1, 5)) < 0)
-            {
-                CommonConfig.Logger.Info($"Not sending the FCM token because the current service version is lesss than 3.2.0");
-                return;
-            }
-
             if (ServerConfig.SystemSettings?.SystemInfo?.NotificationsInChina == true)
             {
                 CommonConfig.Logger.Info($"Not sending the FCM token because the current service is using Chinese Notifications");
                 return;
             }
 
-            UpdatePushNotificationToken(fcmToken);
-        }
-
-        void UpdatePushNotificationToken(string newToken)
-        {
-            var oldToken = PlatformConfig.Preferences.PushNotificationToken;
-            PlatformConfig.Preferences.PushNotificationToken = newToken;
-
-            if (!string.IsNullOrWhiteSpace(oldToken) && oldToken != newToken)
-            {
-                CommonConfig.Logger.Info("New push notification token is different, so try to unsubscribe old one...");
-                Managers.NotificationsManager.UnSubscribe(DeviceType.IOS, oldToken).FireAndForget();
-            }
-
-            if (!string.IsNullOrWhiteSpace(newToken))
-            {
-                CommonConfig.Logger.Info("Sending new push notification token...");
-                Managers.NotificationsManager.Subscribe(DeviceType.IOS, newToken).FireAndForget();
-            }
-            else
-            {
-                CommonConfig.Logger.Info("Received empty or null push notification token...");
-            }
+            pushNotificationsRegistrator.UpdateToken(fcmToken);
         }
 
         // iOS 10+, called when presenting notification
-        [Export("userNotificationCenter:willPresentNotification:withCompletionHandler:")]
+        //Asks the delegate how to handle a notification that arrived while the app was running in the foreground
+       [Export("userNotificationCenter:willPresentNotification:withCompletionHandler:")]
         public void WillPresentNotification(UNUserNotificationCenter center, UNNotification notification, Action<UNNotificationPresentationOptions> options)
         {
             try
@@ -385,59 +350,101 @@ namespace Mark5.Mobile.IOS
             }
         }
 
-        // iOS 10+, called when recieved response
+        // Called after the user selects an action from a notification from the app(iOS 10+).
         [Export("userNotificationCenter:didReceiveNotificationResponse:withCompletionHandler:")]
         public void DidReceiveNotificationResponse(UNUserNotificationCenter center, UNNotificationResponse response, Action completionHandler)
         {
-            try
+            /* try
+             {
+                 if (response?.Notification?.Request?.Identifier == LocalNotificationsListener.DocumentFailedToSendIdentifier)
+                 {
+                     completionHandler();
+                     return;
+                 }
+
+
+                 var reminderInfo = DeviceReminderNotificationManager.GetReminderInfo(response?.Notification);
+                 if (reminderInfo != null)
+                 {
+                     var vc = new AppointmentViewController(reminderInfo.Value.CalendarId,
+                         reminderInfo.Value.AppointmentId,
+                         reminderInfo.Value.RecurrenceIndex, false);
+
+                     Window.RootViewController.PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+                 }
+
+                 var n = response.Notification.ConvertToNotification();
+
+                 if (n.ObjectType == ObjectType.Document)
+                 {
+                     var vc = new DocumentViewController();
+                     vc.SetRefreshDataOnAppear();
+                     vc.SetData(n.ObjectId);
+
+                     // we want to remove the previous document view controller in case user is opening emails from notifications - one after another.
+                     if (Window.RootViewController.PresentedViewController != null && Window.RootViewController.PresentedViewController is NavigationController)
+                     {
+                         var navController = Window.RootViewController.PresentedViewController as NavigationController;
+                         if (navController.TopViewController is DocumentViewController)
+                         {
+                             navController.DismissViewController(false, null);
+                         }
+                     }
+
+                     Window.RootViewController.PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+                 }
+             }
+             catch (Exception ex)
+             {
+                 CommonConfig.Logger.Error(ex);
+             }
+             finally
+             {
+                 completionHandler();
+             }
+            */
+
+            ProcessNotification(response?.Notification, false);
+        }
+
+        void ProcessNotification(UNNotification notification, bool fromFinishedLaunching)
+        {
+
+            var dataDict = notification.Request.Content.UserInfo;
+            // Check to see if the dictionary has the aps key.  This is the notification payload you would have sent
+            if (null != dataDict && dataDict.ContainsKey(new NSString("aps")))
             {
-                if (response?.Notification?.Request?.Identifier == LocalNotificationsListener.DocumentFailedToSendIdentifier)
+                //Get the aps dictionary
+                NSDictionary aps = dataDict.ObjectForKey(new NSString("aps")) as NSDictionary;
+
+                string alert = string.Empty;
+
+                //Extract the alert text
+                // NOTE: If you're using the simple alert by just specifying
+                // "  aps:{alert:"alert msg here"}  ", this will work fine.
+                // But if you're using a complex alert with Localization keys, etc.,
+                // your "alert" object from the aps dictionary will be another NSDictionary.
+                // Basically the JSON gets dumped right into a NSDictionary,
+                // so keep that in mind.
+                if (aps.ContainsKey(new NSString("alert")))
+                    alert = (aps[new NSString("alert")] as NSString).ToString();
+
+                //If this came from the ReceivedRemoteNotification while the app was running,
+                // we of course need to manually process things like the sound, badge, and alert.
+                if (!fromFinishedLaunching)
                 {
-                    completionHandler();
-                    return;
-                }
-
-
-                var reminderInfo = DeviceReminderNotificationManager.GetReminderInfo(response?.Notification);
-                if (reminderInfo != null)
-                {
-                    var vc = new AppointmentViewController(reminderInfo.Value.CalendarId,
-                        reminderInfo.Value.AppointmentId,
-                        reminderInfo.Value.RecurrenceIndex, false);
-
-                    Window.RootViewController.PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-                }
-
-                var n = response.Notification.ConvertToNotification();
-
-                if (n.ObjectType == ObjectType.Document)
-                {
-                    var vc = new DocumentViewController();
-                    vc.SetRefreshDataOnAppear();
-                    vc.SetData(n.ObjectId);
-
-                    // we want to remove the previous document view controller in case user is opening emails from notifications - one after another.
-                    if (Window.RootViewController.PresentedViewController != null && Window.RootViewController.PresentedViewController is NavigationController)
+                    //Manually show an alert
+                    if (!string.IsNullOrEmpty(alert))
                     {
-                        var navController = Window.RootViewController.PresentedViewController as NavigationController;
-                        if (navController.TopViewController is DocumentViewController)
-                        {
-                            navController.DismissViewController(false, null);
-                        }
+                        var myAlert = UIAlertController.Create("Notification", alert, UIAlertControllerStyle.Alert);
+                        myAlert.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Default, null));
+                        UIApplication.SharedApplication.KeyWindow.RootViewController.PresentViewController(myAlert, true, null);
                     }
-
-                    Window.RootViewController.PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
                 }
-            }
-            catch (Exception ex)
-            {
-                CommonConfig.Logger.Error(ex);
-            }
-            finally
-            {
-                completionHandler();
             }
         }
+
+        public void OnAuthorizationRequestCompleted(bool result, NSError error) => pushNotificationsRegistrator.OnAuthorizationRequestCompleted(result, error);
 
         //This needs to be implemented to support silent notifications. 
         //Let's not forget the silent notifications limitations (2-3 notifications per hour max, and other limitations per day)
@@ -446,10 +453,10 @@ namespace Mark5.Mobile.IOS
         //
         //}
 
-#endregion
+        #endregion
 
 
-#region Update Activities
+        #region Update Activities
 
         public override void PerformFetch(UIApplication application, Action<UIBackgroundFetchResult> completionHandler)
         {
@@ -685,8 +692,7 @@ namespace Mark5.Mobile.IOS
                 {
                     CommonConfig.Logger.Info("Refreshing APNS token...");
 
-                    UNUserNotificationCenter.Current.RequestAuthorization(UNAuthorizationOptions.Alert | UNAuthorizationOptions.Badge | UNAuthorizationOptions.Sound,
-                        OnAuthorizationRequested);
+                    pushNotificationsRegistrator.Register();
                 });
 
                 CommonConfig.Logger.Info($"Initialized - will present {nameof(AbstractMainViewController)}");
@@ -694,20 +700,6 @@ namespace Mark5.Mobile.IOS
                 return true;
             }).Result;
         }
-
-        public void OnAuthorizationRequested(bool result, NSError error)
-        {
-            if (result)
-            {
-                BeginInvokeOnMainThread(UIApplication.SharedApplication.RegisterForRemoteNotifications);
-                if (!string.IsNullOrWhiteSpace(Messaging.SharedInstance.FcmToken))
-                    UpdateFcmToken(Messaging.SharedInstance.FcmToken);
-            }
-            else
-            {
-                if (error != null)
-                    CommonConfig.Logger.Error(new NSErrorException(error));
-            }
-        }
+ 
     }
 }
