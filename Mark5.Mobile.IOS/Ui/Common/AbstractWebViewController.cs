@@ -544,7 +544,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             if (headerContainerView.Bounds.Height > 0)
                 SetHeaderPadding(headerContainerView.Bounds.Height / webView.ScrollView.ZoomScale);
 
-            loadTcs.SetResult(true);
+            loadTcs.TrySetResult(true);
         }
 
         [Export("webView:didFailNavigation:withError:")]
