@@ -397,6 +397,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             CommonConfig.Logger.Info($"Updating outgoing folder...");
 
+            if (outgoingMessageCount == null || RemoteFolder == null)
+                return;
+            
             var outgoing = Folder.LocalRootForModule(RemoteFolder.Module)?.SubFolders?.FirstOrDefault();
             
             if (outgoing == null) 
