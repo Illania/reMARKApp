@@ -9,11 +9,9 @@ using Android.OS;
 using Android.Support.Design.Widget;
 using Android.Support.V7.Widget;
 using Android.Views;
-using Firebase.Iid;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Azure;
-using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Azure;
@@ -25,6 +23,7 @@ using Mark5.Mobile.Droid.Utilities;
 using Mark5.Mobile.Droid.Utilities.DeviceReminder;
 using Mark5.Mobile.Droid.Utilities.Workers;
 using Mark5.ServiceReference.Exceptions;
+using ME.Pushy.Sdk;
 using Microsoft.Identity.Client;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
@@ -398,13 +397,14 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Hostname, ci.Hostname);
             CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.SSL, ci.SslMode.ToString());
 
-            if (!String.IsNullOrEmpty(ServerConfig.SystemSettings.SystemInfo.CustomerName))
+            if (!string.IsNullOrEmpty(ServerConfig.SystemSettings.SystemInfo.CustomerName))
                 CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.CustomerName, ServerConfig.SystemSettings.SystemInfo.CustomerName);
 
             PushNotificationsUtilities.CreateChannelIfNotExists(this);
             DeviceReminderBroadcastReceiver.CreateChannelIfNotExists(this);
 
-            SendPushNotificationToken();
+            if(!Pushy.IsRegistered(this))
+                await PushNotificationsUtilities.RegisterForPushNotifications(this);
 
             StartActivity(MainActivity.CreateIntent(this));
             Finish();
@@ -442,34 +442,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             return false;
         }
-
-        void SendPushNotificationToken()
-        {
-            try
-            {
-                var token = FirebaseInstanceId.Instance.Token;
-
-                if (string.IsNullOrEmpty(token))
-                    return;
-
-                if (CommonConfig.Logger.IsDebugEnabled())
-                    CommonConfig.Logger.Debug($"Firebase token: {token}");
-
-                PlatformConfig.Preferences.PushNotificationToken = token;
-
-                if (Managers.ActiveConnectionInfo != null)
-                {
-                    CommonConfig.Logger.Info($"Sending Firebase token to service...");
-
-                    Managers.NotificationsManager.Subscribe(DeviceType.Android, token).FireAndForget();
-                }
-            }
-            catch (Exception ex)
-            {
-                CommonConfig.Logger.Error("Error while subscribing to push notifications after login", ex);
-            }
-        }
-
+        
         static class MenuItemActions
         {
             public const int SystemReport = 10;

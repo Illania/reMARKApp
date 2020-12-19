@@ -9,12 +9,10 @@ using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
 using Com.Airbnb.Lottie;
-using Firebase.Iid;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Manager;
-using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Service;
 using Mark5.Mobile.Common.Storage;
 using Mark5.Mobile.Common.Utilities;
@@ -23,7 +21,6 @@ using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 using Mark5.Mobile.Droid.Utilities.DeviceReminder;
 using Mark5.Mobile.Droid.Utilities.Workers;
-using Microsoft.AppCenter;
 using Microsoft.AppCenter.Crashes;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
@@ -173,8 +170,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 DateTimeConverter.UseServerTimezone = PlatformConfig.Preferences.UseServerTimeZone;
 
-                if (!string.IsNullOrWhiteSpace(FirebaseInstanceId.Instance.Token))
-                    PlatformConfig.Preferences.PushNotificationToken = FirebaseInstanceId.Instance.Token;
+ 
 
                 CommonConfig.Logger.Info($"Initialized - will present {nameof(MainActivity)}");
 

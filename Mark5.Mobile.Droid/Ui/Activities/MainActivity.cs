@@ -4,7 +4,6 @@ using System.Linq;
 using Android;
 using Android.Content;
 using Android.Content.PM;
-using Android.Gms.Common;
 using Android.Graphics;
 using Android.OS;
 using Android.Support.Design.Widget;
@@ -22,6 +21,7 @@ using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Coordinators;
 using Mark5.Mobile.Droid.Ui.Fragments;
 using Mark5.Mobile.Droid.Utilities;
+using ME.Pushy.Sdk;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
@@ -35,8 +35,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         const string AppointmentIdKey = "appointmentId";
         const string RecurrenceIndexKey = "recurrenceIndex";
         private const string LicenseKey = "MzU3NTc2QDMxMzgyZTMzMmUzMGNVUXBkU3N4ZU1RbE5OS21KNjRaY2cxakVwVDhzejlObjJPOXV3ZWdHQUk9";
-        public const string TAG = "MainActivity";
-        internal static readonly string CHANNEL_ID = "email_notification_channel";
         Toolbar toolbar;
         DrawerLayout drawer;
         SmoothActionBarDrawerToggle drawerToggle;
@@ -74,20 +72,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         {
             base.OnCreate(savedInstanceState);
 
-            if (Intent.Extras != null)
-            {
-                foreach (var key in Intent.Extras.KeySet())
-                {
-                    if (key != null)
-                    {
-                        var value = Intent.Extras.GetString(key);
-                        CommonConfig.Logger.Debug($"Key: {key} Value: {value}");
-                    }
-                }
-            }
-
-            IsPlayServicesAvailable();
-            CreateNotificationChannel();
+            Pushy.Listen(this);
 
             CalendarCoordinator = new CalendarModuleCoordinator(this);
 
@@ -297,46 +282,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         #endregion
 
         #region Utility methods
-
-        public bool IsPlayServicesAvailable()
-        {
-            int resultCode = GoogleApiAvailability.Instance.IsGooglePlayServicesAvailable(this);
-            if (resultCode != ConnectionResult.Success)
-            {
-                if (GoogleApiAvailability.Instance.IsUserResolvableError(resultCode))
-                    CommonConfig.Logger.Debug(GoogleApiAvailability.Instance.GetErrorString(resultCode));
-                else
-                {
-                    CommonConfig.Logger.Debug("This device is not supported");
-                    Finish();
-                }
-                return false;
-            }
-
-            CommonConfig.Logger.Debug("Google Play Services is available.");
-            return true;
-        }
-
-        private void CreateNotificationChannel()
-        {
-            if (Build.VERSION.SdkInt < BuildVersionCodes.O)
-            {
-                // Notification channels are new in API 26 (and not a part of the
-                // support library). There is no need to create a notification
-                // channel on older versions of Android.
-                return;
-            }
-
-            var channelName = CHANNEL_ID;
-            var channelDescription = string.Empty;
-            var channel = new Android.App.NotificationChannel(CHANNEL_ID, channelName, Android.App.NotificationImportance.Default)
-            {
-                Description = channelDescription
-            };
-
-            var notificationManager = (Android.App.NotificationManager)GetSystemService(NotificationService);
-            notificationManager.CreateNotificationChannel(channel);
-        }
 
         public void LockDrawer()
         {

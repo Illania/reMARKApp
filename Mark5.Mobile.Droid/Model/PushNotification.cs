@@ -17,8 +17,6 @@ namespace Mark5.Mobile.Droid.Model
     [JsonObject(MemberSerialization.OptIn)]
     public class PushNotificationNotification
     {
-        [JsonProperty("icon")]
-        public string Icon { get; set; }
 
         [JsonProperty("title")]
         public string Title { get; set; }

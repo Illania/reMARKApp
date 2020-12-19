@@ -14,7 +14,6 @@ using Android.Support.V7.App;
 using Android.Support.V7.Preferences;
 using Android.Text;
 using Android.Text.Style;
-using Firebase.Iid;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Manager;
@@ -301,16 +300,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.dialog_update_config_title, Resource.String.please_wait);
                 Task.Run(async () =>
                 {
-                    try
-                    {
-                        FirebaseInstanceId.Instance?.DeleteInstanceId();
-                        var _nullToken = FirebaseInstanceId.Instance?.Token; // Token will be null, but it will cause refresh
-                    }
-                    catch (Exception ex)
-                    {
-                        CommonConfig.Logger.Error("Could not reset Firebase token!", ex);
-                    }
-
                     try
                     {
                         var ss = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Remote);
