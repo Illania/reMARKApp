@@ -21,6 +21,7 @@ using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 using Mark5.Mobile.Droid.Utilities.DeviceReminder;
 using Mark5.Mobile.Droid.Utilities.Workers;
+using ME.Pushy.Sdk;
 using Microsoft.AppCenter.Crashes;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
@@ -161,7 +162,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     PlatformConfig.CallStateBroadcastReceiver.Register();
                 }
 
-                if (!String.IsNullOrEmpty(ServerConfig.SystemSettings.SystemInfo.CustomerName))
+                if (!string.IsNullOrEmpty(ServerConfig.SystemSettings.SystemInfo.CustomerName))
                     CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.CustomerName, ServerConfig.SystemSettings.SystemInfo.CustomerName);
 
                 SystemSettingsWorker.Schedule();
@@ -170,7 +171,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 DateTimeConverter.UseServerTimezone = PlatformConfig.Preferences.UseServerTimeZone;
 
- 
+                if (!Pushy.IsRegistered(this))
+                    await PushNotificationsUtilities.RegisterForPushNotifications(this);
 
                 CommonConfig.Logger.Info($"Initialized - will present {nameof(MainActivity)}");
 
