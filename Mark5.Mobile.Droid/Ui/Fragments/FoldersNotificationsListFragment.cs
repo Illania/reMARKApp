@@ -10,6 +10,8 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 using System.Linq;
+using Android.Support.V4.Content;
+using Android.Graphics;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -76,6 +78,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             pager.AddOnPageChangeListener(this);
             pager.Adapter = new PagerAdapter(ChildFragmentManager, remoteFolder);
 
+            
             tabLayout.TabSelected += (sender, e) => pager.CurrentItem = e.Tab.Position;
 
             for (var i = 0; i < 2; i++)

@@ -645,9 +645,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public void OnDestroyActionMode(ActionMode mode)
         {
-            Activity.Window.AddFlags(WindowManagerFlags.TranslucentStatus);
-            Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
-
             fab?.Show();
 
             (Activity as MainActivity)?.UnlockDrawer();
@@ -657,10 +654,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         }
 
         public virtual bool OnPrepareActionMode(ActionMode mode, IMenu menu)
-        {
-            Activity.Window.ClearFlags(WindowManagerFlags.TranslucentStatus);
-            Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
-
+        {        
             fab?.Hide();
 
             (Activity as MainActivity)?.LockDrawer();

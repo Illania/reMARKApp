@@ -3,13 +3,15 @@
     <!-- Themes -->
     <style name="mark5Base" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowBackground">@color/white</item>
+
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentStatus">false</item>
         <item name="android:textColorPrimary">@color/black</item>
         <item name="android:textColorSecondary">@color/darkgray</item>
         <item name="android:textColorHint">@color/darkgray</item>
         <item name="android:textAppearanceLargePopupMenu">@style/popupMenuTextAppearanceLarge</item>
         <item name="android:textAppearanceSmallPopupMenu">@style/popupMenuTextAppearanceSmall</item>
+        <item name="android:statusBarColor">@color/darkerblue</item>
         <item name="windowActionModeOverlay">true</item>
         <item name="colorPrimary">@color/darkerblue</item>
         <item name="colorPrimaryDark">@color/darkerblue</item>
