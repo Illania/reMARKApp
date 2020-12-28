@@ -1994,6 +1994,10 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "Enabled", Order = 0)]
         public bool Enabled { get; set; }
+
+        [DataMember(Name = "InstallationId", Order = 1)]
+        public string InstallationId { get; set; }
+
     }
 
     [DataContract(Name = "SetFoldersNotificationsResult", Namespace = "com.nordic-it.appservice.v3")]
@@ -2049,6 +2053,9 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "Enabled", Order = 0)]
         public bool Enabled { get; set; }
+
+        [DataMember(Name = "InstallationId", Order = 1)]
+        public string InstallationId { get; set; }
     }
 
     [DataContract(Name = "SetCalendarNotificationsEnabledResult", Namespace = "com.nordic-it.appservice.v3")]
@@ -2084,6 +2091,9 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "SoundName", Order = 0)]
         public string SoundName { get; set; }
+
+        [DataMember(Name = "InstallationId", Order = 1)]
+        public string InstallationId { get; set; }
     }
 
     [DataContract(Name = "SetNotificationsSoundResult", Namespace = "com.nordic-it.appservice.v3")]
@@ -2462,8 +2472,6 @@ namespace Mark5.ServiceReference.DataContract
         [DataMember(Name = "ServerTimeZoneInfoSerialized", Order = 1)]
         public string ServerTimeZoneInfoSerialized { get; set; }
 
-        [DataMember(Name = "NotificationsInChina", Order = 1)]
-        public bool NotificationsInChina { get; set; }
     }
 
     [DataContract(Name = "DocumentsModuleInfo", Namespace = "com.nordic-it.appservice.v3")]

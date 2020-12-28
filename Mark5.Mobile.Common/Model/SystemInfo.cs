@@ -14,7 +14,6 @@ namespace Mark5.Mobile.Common.Model
         public bool SyncFavoritesAvailable => ServiceVersionGreaterThanOrEqual(3, 2, 0);
         public bool ChangeSingleOccurrenceAvailable => SystemVersionGreaterThanOrEqual(1, 39, 0);
         public bool InternalMailsAvailable => false;
-        public bool NotificationsInChina { get; set; }
 
         List<ModuleType> availableModules;
         public List<ModuleType> AvailableModules

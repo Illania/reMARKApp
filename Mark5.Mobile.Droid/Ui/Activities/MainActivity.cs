@@ -21,6 +21,7 @@ using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Coordinators;
 using Mark5.Mobile.Droid.Ui.Fragments;
 using Mark5.Mobile.Droid.Utilities;
+using ME.Pushy.Sdk;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
@@ -70,6 +71,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
+
+            Pushy.Listen(this);
 
             CalendarCoordinator = new CalendarModuleCoordinator(this);
 

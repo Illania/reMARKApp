@@ -11,7 +11,6 @@ using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 using MessageUI;
 using UIKit;
-using Xamarin.Essentials;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
@@ -129,6 +128,7 @@ namespace Mark5.Mobile.IOS.Utilities
             sb.AppendLine("Friendly device name: " + Managers.ActiveConnectionInfo?.FriendlyDeviceName);
             sb.AppendLine("Installation ID: " + Managers.ActiveConnectionInfo?.InstallationId);
             sb.AppendLine("APNS Token: " + PlatformConfig.Preferences.PushNotificationToken);
+            sb.AppendLine("Azure Notifications Hubs registration Id: " + PlatformConfig.Preferences.AzureHubRegistrationId);
             sb.AppendLine();
 
             sb.AppendLine("===== Server information =====");

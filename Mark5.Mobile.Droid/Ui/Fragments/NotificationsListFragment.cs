@@ -174,8 +174,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (!Restored)
                     refreshLayout.Refreshing = true;
 
-                notifications = await Managers.NotificationsManager.GetNotificationsAsync(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken,
-                                                                                          Restored ? SourceType.Local : SourceType.Auto);
+                notifications = await Managers.NotificationsManager.GetNotificationsAsync(DeviceType.Android, PlatformConfig.Preferences.PushNotificationToken);
                 notifications = notifications.Where(n => objectTypes.Contains(n.ObjectType)).ToList();
 
                 adapter.Clear();

@@ -48,8 +48,9 @@ namespace Mark5.Mobile.Common.Manager
                     Token = Token,
                     DeviceType = deviceType.ConvertEnum<DataContract.DeviceType>(),
                     PushToken = pushToken,
-                    Enabled = true
-                });
+                    Enabled = true,
+                    InstallationId = CommonConfig.DeviceInfoProvider.GetDeviceId()
+            });
 
                 return;
             }
@@ -75,8 +76,9 @@ namespace Mark5.Mobile.Common.Manager
                     Token = Token,
                     DeviceType = deviceType.ConvertEnum<DataContract.DeviceType>(),
                     PushToken = pushToken,
-                    Enabled = false
-                });
+                    Enabled = false,
+                    InstallationId = CommonConfig.DeviceInfoProvider.GetDeviceId()
+            });
 
                 return;
             }
@@ -175,8 +177,9 @@ namespace Mark5.Mobile.Common.Manager
                     PushToken = pushToken,
                     ModuleType = moduleType.ConvertEnum<DataContract.ModuleType>(),
                     FolderIds = folderIds,
-                    Enabled = enabled
-                });
+                    Enabled = enabled,
+                    InstallationId = CommonConfig.DeviceInfoProvider.GetDeviceId()
+            });
 
                 folders.ForEach(f => f.Subscribed = enabled);
 
@@ -247,8 +250,9 @@ namespace Mark5.Mobile.Common.Manager
                     Token = Token,
                     DeviceType = deviceType.ConvertEnum<DataContract.DeviceType>(),
                     PushToken = pushToken,
-                    Enabled = enabled
-                });
+                    Enabled = enabled,
+                    InstallationId = CommonConfig.DeviceInfoProvider.GetDeviceId()
+            });
 
                 var notificationSettings = await FileSystemStorage.GetNotificationSettingsAsync() ?? new NotificationSettings();
                 notificationSettings.CalendarNotificationsEnabled = enabled;
@@ -310,8 +314,9 @@ namespace Mark5.Mobile.Common.Manager
                     Token = Token,
                     DeviceType = deviceType.ConvertEnum<DataContract.DeviceType>(),
                     PushToken = pushToken,
-                    SoundName = soundName
-                });
+                    SoundName = soundName,
+                    InstallationId = CommonConfig.DeviceInfoProvider.GetDeviceId()
+            });
 
                 var notificationSettings = await FileSystemStorage.GetNotificationSettingsAsync() ?? new NotificationSettings();
                 notificationSettings.SoundName = soundName;
