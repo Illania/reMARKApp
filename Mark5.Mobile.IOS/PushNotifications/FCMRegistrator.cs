@@ -1,13 +1,14 @@
 ﻿using Mark5.Mobile.Common;
 using System;
 using Foundation;
+using Firebase.CloudMessaging;
+using System.Threading.Tasks;
 
-namespace Mark5.Mobile.IOS
+namespace Mark5.Mobile.IOS.PushNotifications
 {
-    public class FCMRegistrator: IPushNotificationsRegistrator
+    public class FCMRegistrator : IPushNotificationsRegistrator
     {
 
-      
         public bool ShouldUpdateToken()
         {
 
@@ -19,9 +20,7 @@ namespace Mark5.Mobile.IOS
                 return false;
             }
 
-            bool notificationsInChinaEnabled = ServerConfig.SystemSettings?.SystemInfo?.NotificationsInChina == true;
-
-            if (serviceVersion.CompareTo(new Version(3, 2, 0)) < 0 && !notificationsInChinaEnabled)
+            if (serviceVersion.CompareTo(new Version(3, 2, 0)) < 0)
             {
                 CommonConfig.Logger.Info($"Not sending the FCM token because the current service version is less than 3.2.0");
                 return false;
@@ -30,9 +29,12 @@ namespace Mark5.Mobile.IOS
             return true;
         }
 
-        public void RegisterToken(NSData token)
+        public async Task RegisterToken(NSData deviceToken)
         {
-            //do nothing
+            //ignore
         }
+
+        public string ActiveToken => Messaging.SharedInstance.FcmToken;
+        
     }
 }

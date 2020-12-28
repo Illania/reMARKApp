@@ -20,6 +20,7 @@ using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Service;
 using Mark5.Mobile.Common.Storage;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.IOS.PushNotifications;
 using Mark5.Mobile.IOS.Service;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers;
@@ -138,7 +139,7 @@ namespace Mark5.Mobile.IOS
             //if (UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
             //    BGTaskScheduler.Shared.Register(backgroundTaskID, null, HandleBackgroundTask);
 
-            pushNotificationsRegistrator.Register();
+            pushNotificationsRegistrator.RequestAuthorization();
 
             if (launchOptions == null)
                 return true;
@@ -258,7 +259,7 @@ namespace Mark5.Mobile.IOS
         /// </summary>
         /// <param name="application">Reference to the UIApplication that invoked this delegate method.</param>
         /// <param name="deviceToken">Received token.</param>
-        public override void RegisteredForRemoteNotifications(UIApplication application, NSData deviceToken)
+        public override async void RegisteredForRemoteNotifications(UIApplication application, NSData deviceToken)
         {
             CommonConfig.Logger.Info($"Received APNS token: {deviceToken}");
 
@@ -270,15 +271,14 @@ namespace Mark5.Mobile.IOS
                 return;
             }
 
-            //for ANH only
-            pushNotificationsRegistrator.RegisterToken(deviceToken);
+            await pushNotificationsRegistrator.RegisterToken(deviceToken);
 
             string newToken = string.Empty;
             
             try
             {
                 //formats the string as hexadecimal characters.
-                newToken = string.Join("", deviceToken.Select(b => b.ToString("x2")));
+               newToken = string.Join("", deviceToken.Select(b => b.ToString("x2")));
             }
             catch (Exception ex)
             {
@@ -297,16 +297,15 @@ namespace Mark5.Mobile.IOS
             PlatformConfig.Preferences.PushNotificationToken = string.Empty;
         }
 
-        [Export("messaging:didReceiveRegistrationToken:")]  //FCM Token
-        public void DidReceiveRegistrationToken(Messaging messaging, string fcmToken)
+        [Export("messaging:didReceiveRegistrationToken:")]
+        //Firebase Messaging delegate
+        public void DidReceiveRegistrationToken(Messaging messaging, string pushToken)
         {
-            if (ServerConfig.SystemSettings?.SystemInfo?.NotificationsInChina == true)
-            {
-                CommonConfig.Logger.Info($"Not sending the FCM token because the current service is using Chinese Notifications");
+            //Should be called only for fcm registrator
+            if (!(pushNotificationsRegistrator is FCMRegistrator))
                 return;
-            }
 
-            pushNotificationsRegistrator.UpdateToken(fcmToken);
+            pushNotificationsRegistrator.UpdateToken(pushToken);
         }
 
         // iOS 10+, called when presenting notification
@@ -354,7 +353,7 @@ namespace Mark5.Mobile.IOS
         [Export("userNotificationCenter:didReceiveNotificationResponse:withCompletionHandler:")]
         public void DidReceiveNotificationResponse(UNUserNotificationCenter center, UNNotificationResponse response, Action completionHandler)
         {
-            /* try
+             try
              {
                  if (response?.Notification?.Request?.Identifier == LocalNotificationsListener.DocumentFailedToSendIdentifier)
                  {
@@ -402,46 +401,7 @@ namespace Mark5.Mobile.IOS
              {
                  completionHandler();
              }
-            */
-
-            ProcessNotification(response?.Notification, false);
-        }
-
-        void ProcessNotification(UNNotification notification, bool fromFinishedLaunching)
-        {
-
-            var dataDict = notification.Request.Content.UserInfo;
-            // Check to see if the dictionary has the aps key.  This is the notification payload you would have sent
-            if (null != dataDict && dataDict.ContainsKey(new NSString("aps")))
-            {
-                //Get the aps dictionary
-                NSDictionary aps = dataDict.ObjectForKey(new NSString("aps")) as NSDictionary;
-
-                string alert = string.Empty;
-
-                //Extract the alert text
-                // NOTE: If you're using the simple alert by just specifying
-                // "  aps:{alert:"alert msg here"}  ", this will work fine.
-                // But if you're using a complex alert with Localization keys, etc.,
-                // your "alert" object from the aps dictionary will be another NSDictionary.
-                // Basically the JSON gets dumped right into a NSDictionary,
-                // so keep that in mind.
-                if (aps.ContainsKey(new NSString("alert")))
-                    alert = (aps[new NSString("alert")] as NSString).ToString();
-
-                //If this came from the ReceivedRemoteNotification while the app was running,
-                // we of course need to manually process things like the sound, badge, and alert.
-                if (!fromFinishedLaunching)
-                {
-                    //Manually show an alert
-                    if (!string.IsNullOrEmpty(alert))
-                    {
-                        var myAlert = UIAlertController.Create("Notification", alert, UIAlertControllerStyle.Alert);
-                        myAlert.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Default, null));
-                        UIApplication.SharedApplication.KeyWindow.RootViewController.PresentViewController(myAlert, true, null);
-                    }
-                }
-            }
+            
         }
 
         public void OnAuthorizationRequestCompleted(bool result, NSError error) => pushNotificationsRegistrator.OnAuthorizationRequestCompleted(result, error);
@@ -692,7 +652,7 @@ namespace Mark5.Mobile.IOS
                 {
                     CommonConfig.Logger.Info("Refreshing APNS token...");
 
-                    pushNotificationsRegistrator.Register();
+                    pushNotificationsRegistrator.RequestAuthorization();
                 });
 
                 CommonConfig.Logger.Info($"Initialized - will present {nameof(AbstractMainViewController)}");

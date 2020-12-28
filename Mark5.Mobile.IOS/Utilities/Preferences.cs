@@ -49,6 +49,8 @@ namespace Mark5.Mobile.IOS.Utilities
 
             public const string PushNotificationTokenKey = "PushNotificationToken";
 
+            public const string AzureHubRegistrationId = "AzureHubRegistrationId";
+
             public const string ResetOnLaunchKey = "ResetOnLaunch";
 
             public const string EmailTrailingSwipeActions = "EmailTrailingSwipeActions";
@@ -243,6 +245,16 @@ namespace Mark5.Mobile.IOS.Utilities
             set
             {
                 ud.SetString(value, Keys.PushNotificationTokenKey);
+                ud.Synchronize();
+            }
+        }
+
+        public string AzureHubRegistrationId
+        {
+            get => ud.StringForKey(Keys.AzureHubRegistrationId);
+            set
+            {
+                ud.SetString(value, Keys.AzureHubRegistrationId);
                 ud.Synchronize();
             }
         }

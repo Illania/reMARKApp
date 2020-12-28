@@ -1,33 +1,83 @@
-﻿using Foundation;
-using WindowsAzure.Messaging;
-using System.Diagnostics;
-using Mark5.Mobile.Common;
+﻿using Mark5.Mobile.Common;
+using Foundation;
 using System;
+using Microsoft.Azure.NotificationHubs;
+using System.Threading.Tasks;
+using System.Linq;
+using System.Collections.Generic;
 
-namespace Mark5.Mobile.IOS
+namespace Mark5.Mobile.IOS.PushNotifications
 {
     public class ANHRegistrator: IPushNotificationsRegistrator
     {
 
-        public void RegisterToken(NSData deviceToken)
-        {
-            var Hub = new SBNotificationHub(NotificationsConstants.ListenConnectionString, NotificationsConstants.NotificationHubName);
+        public NotificationHubClient notificationHubClient => new NotificationHubClient(
+            NotificationsConstants.PrimaryConnectionString,
+            NotificationsConstants.NotificationHubName);
 
-            Hub.UnregisterAll(deviceToken, (error) =>
+
+        public async Task<List<RegistrationDescription>> GetRegistrationForToken(NSData token)
+        {
+            var tokenString = string.Join("", token.Select(b => b.ToString("x2")));
+            var registrations = await notificationHubClient.GetRegistrationsByChannelAsync(tokenString, 100);
+            return registrations.ToList();
+         
+        }
+
+        public async Task RegisterToken(NSData deviceToken)
+        {
+
+            // make sure there are no existing registrations for this push handle (used for iOS and Android)    
+            var savedRegistrationId = PlatformConfig.Preferences.AzureHubRegistrationId;
+            var newToken = string.Join("", deviceToken.Select(b => b.ToString("x2")));
+
+            var registrations = await GetRegistrationForToken(deviceToken);
+            if (registrations.Count > 0)
             {
-                if (error != null)
+                foreach (RegistrationDescription registration in registrations)
                 {
-                    Debug.WriteLine("Error calling Unregister: {0}", error.ToString());
-                    return;
+                    if (string.IsNullOrEmpty(savedRegistrationId))
+                    {
+                        PlatformConfig.Preferences.AzureHubRegistrationId = registration.RegistrationId;
+                    }
+                    else
+                    {
+                        try
+                        {
+                            await notificationHubClient.DeleteRegistrationAsync(registration);
+                        }
+                        catch(Microsoft.Azure.NotificationHubs.Messaging.MessagingEntityNotFoundException)
+                        {
+                            //ignore
+                        }
+                    }
                 }
 
-                NSSet tags = null; // create tags if you want
-                Hub.RegisterNative(deviceToken, tags, (errorCallback) =>
+            }
+            else
+            {
+                //if no registration exists create new registration
+                var newRegistrationId = await notificationHubClient.CreateRegistrationIdAsync();
+
+                PlatformConfig.Preferences.AzureHubRegistrationId = newRegistrationId;
+
+                RegistrationDescription newRegistration = new AppleRegistrationDescription(newToken)
                 {
-                    if (errorCallback != null)
-                        Debug.WriteLine("RegisterNative error: " + errorCallback.ToString());
-                });
-            });
+                    RegistrationId = newRegistrationId,
+                    Tags = null
+                };
+
+                try
+                {
+                    await notificationHubClient.CreateOrUpdateRegistrationAsync(newRegistration);
+                }
+                catch (Exception)
+                {
+                    PlatformConfig.Preferences.AzureHubRegistrationId = string.Empty;
+                }
+
+            }
+
         }
 
         public bool ShouldUpdateToken()
@@ -40,16 +90,16 @@ namespace Mark5.Mobile.IOS
                 return false;
             }
 
-            bool notificationsInChinaEnabled = ServerConfig.SystemSettings?.SystemInfo?.NotificationsInChina == true;
-
-            if (serviceVersion.CompareTo(new Version(3, 4, 0)) < 0 && !notificationsInChinaEnabled)
-            {
-                CommonConfig.Logger.Info($"Not sending the FCM token because the current service version is less than 3.4.0");
+           if (serviceVersion.CompareTo(new Version(4, 0, 0)) < 0)
+           {
+                CommonConfig.Logger.Info($"Not sending the token because the current service version is less than 4.0.0");
                 return false;
-            }
+           }
 
             return true; 
         }
+
+        public string ActiveToken => string.Empty;
 
     }
 }

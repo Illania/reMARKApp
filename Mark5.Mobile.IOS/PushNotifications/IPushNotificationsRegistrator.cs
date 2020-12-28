@@ -1,34 +1,42 @@
-﻿using Firebase.CloudMessaging;
-using Foundation;
+﻿using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using UIKit;
 using UserNotifications;
 using Mark5.Mobile.Common.Extensions;
+using System.Threading.Tasks;
 
-namespace Mark5.Mobile.IOS
+namespace Mark5.Mobile.IOS.PushNotifications
 {
     public interface IPushNotificationsRegistrator
     {
 
-        void Register()
+        public string ActiveToken { get; }
+
+        public Task RegisterToken(NSData deviceToken);
+
+        public bool ShouldUpdateToken();
+
+        public void RequestAuthorization()
         { 
-            UNUserNotificationCenter.Current.RequestAuthorization(UNAuthorizationOptions.Alert | UNAuthorizationOptions.Badge | UNAuthorizationOptions.Sound,
-                    OnAuthorizationRequestCompleted);  
+            UNUserNotificationCenter.Current.RequestAuthorization(
+                UNAuthorizationOptions.Alert
+                | UNAuthorizationOptions.Badge
+                | UNAuthorizationOptions.Sound,
+                OnAuthorizationRequestCompleted);  
         }
 
-        void RegisterToken(NSData token);
-
-        void OnAuthorizationRequestCompleted(bool result, NSError error)
+        public void OnAuthorizationRequestCompleted(bool result, NSError error)
         {
             if (result)
             {
                 var nsobject = new NSObject();
                 //Registers for receipt of push notifications using the Apple Push Service.
                 nsobject.InvokeOnMainThread(UIApplication.SharedApplication.RegisterForRemoteNotifications);
-                if (!string.IsNullOrWhiteSpace(Messaging.SharedInstance.FcmToken))
-                    UpdateToken(Messaging.SharedInstance.FcmToken);
+
+                if (!string.IsNullOrWhiteSpace(ActiveToken))
+                   UpdateToken(ActiveToken);
             }
             else
             {
@@ -38,7 +46,7 @@ namespace Mark5.Mobile.IOS
 
         }
 
-        void UpdateToken(string newToken)
+        public void UpdateToken(string newToken)
         {
             if (!ShouldUpdateToken())
                 return;
@@ -63,7 +71,6 @@ namespace Mark5.Mobile.IOS
             }
 
         }
-
-        bool ShouldUpdateToken();
+   
     }
 }

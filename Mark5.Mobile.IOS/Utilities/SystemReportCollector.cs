@@ -11,7 +11,6 @@ using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 using MessageUI;
 using UIKit;
-using Xamarin.Essentials;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
