@@ -62,10 +62,10 @@ namespace Mark5.Mobile.IOS
                 Messaging.SharedInstance.Delegate = this;
 
                 var serviceVersion = ServerConfig.SystemSettings?.SystemInfo?.ServiceVersion;
-               //if (serviceVersion.CompareTo(new Version(3, 4, 0)) < 0)
-               //     TinyIoCContainer.Current.Register<IPushNotificationsRegistrator>(new FCMRegistrator());
-               // else
-                    TinyIoCContainer.Current.Register<IPushNotificationsRegistrator>(new ANHRegistrator());
+               if (serviceVersion.CompareTo(new Version(4, 0, 0)) < 0)
+                   TinyIoCContainer.Current.Register<IPushNotificationsRegistrator>(new FCMRegistrator());
+               else
+                   TinyIoCContainer.Current.Register<IPushNotificationsRegistrator>(new ANHRegistrator());
 
                 pushNotificationsRegistrator = TinyIoCContainer.Current.Resolve<IPushNotificationsRegistrator>();
 
