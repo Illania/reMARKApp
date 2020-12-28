@@ -355,18 +355,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public void OnDestroyActionMode(ActionMode mode)
         {
-            Activity.Window.AddFlags(WindowManagerFlags.TranslucentStatus);
-            Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
-
             CurrentAdapter.ClearSelections();
             ActionMode = null;
         }
 
         bool ActionMode.ICallback.OnPrepareActionMode(ActionMode mode, IMenu menu)
         {
-            Activity.Window.ClearFlags(WindowManagerFlags.TranslucentStatus);
-            Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
-
             menu.Clear();
 
             if (ServerConfig.SystemSettings.ShortcodesModuleInfo.WorktrayEnabled ?? true)

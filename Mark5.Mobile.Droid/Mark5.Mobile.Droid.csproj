@@ -632,6 +632,7 @@
       <Generator>MSBuild:UpdateGeneratedFiles</Generator>
     </Compile>
     <Compile Include="Service\PushReceiver.cs" />
+    <Compile Include="Ui\Common\ViewPagerFixed.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
