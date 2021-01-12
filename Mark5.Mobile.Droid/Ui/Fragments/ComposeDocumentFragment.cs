@@ -16,6 +16,7 @@ using Android.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.Exceptions;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.Droid.Model;
@@ -874,7 +875,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         private async Task HandleOneAttachment(Uri uri)
         {
-            var attachmentTooBig = false;
             IFile file = null;
 
             var stream = Activity.ContentResolver.OpenInputStream(uri);
@@ -898,23 +898,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 if (size > ServerConfig.SystemSettings.DocumentsModuleInfo.MaximumAttachmentSizeBytes)
                 {
-                    attachmentTooBig = true;
                     await Managers.DocumentsManager.DeleteDocumentWorkingCopyAttachmentAsync(filename);
-                    throw new Exception();
+                    throw new ReMarkException(ErrorConstants.Codes.FileTooLarge);
                 }
+
+                attachmentsView.AddFileDescription(new FileDescription(file));
 
                 stream?.Dispose();
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
-                CommonConfig.Logger.Error($"Failed to save attachment", ex.InnerException);
-                var resourceStringId = attachmentTooBig
-                    ? Resource.String.attachment_too_big
-                    : Resource.String.error_saving_local_attachment;
-                await Dialogs.ShowErrorDialogAsync(Activity, new Exception(Resources.GetString(resourceStringId)));
+                CommonConfig.Logger.Error($"Failed to save attachment", ex);
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
             }
-
-            attachmentsView.AddFileDescription(new FileDescription(file));
         }
 
         #endregion

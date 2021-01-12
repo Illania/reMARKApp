@@ -195,7 +195,7 @@ namespace Mark5.Mobile.Common.Manager
             }
 
             if (sourceType == SourceType.Local)
-                throw new InvalidSourceTypeException("This action can only be performed when online.");
+                throw new ReMarkException(ErrorConstants.Codes.InvalidSourceType);
 
             throw new ArgumentException("Invalid sourceType provided");
         }
@@ -254,7 +254,7 @@ namespace Mark5.Mobile.Common.Manager
             }
 
             if (sourceType == SourceType.Local)
-                throw new InvalidSourceTypeException("This action can only be performed when online.");
+                throw new ReMarkException(ErrorConstants.Codes.InvalidSourceType);
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
@@ -285,7 +285,7 @@ namespace Mark5.Mobile.Common.Manager
             }
 
             if (sourceType == SourceType.Local)
-                throw new InvalidSourceTypeException("This action can only be performed when online.");
+                throw new ReMarkException(ErrorConstants.Codes.InvalidSourceType);
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
@@ -320,7 +320,7 @@ namespace Mark5.Mobile.Common.Manager
             }
 
             if (sourceType == SourceType.Local)
-                throw new InvalidSourceTypeException("This action can only be performed when online.");
+                throw new ReMarkException(ErrorConstants.Codes.InvalidSourceType);
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
@@ -350,7 +350,7 @@ namespace Mark5.Mobile.Common.Manager
             }
 
             if (sourceType == SourceType.Local)
-                throw new InvalidSourceTypeException("This action can only be performed when online.");
+                throw new ReMarkException(ErrorConstants.Codes.InvalidSourceType);
 
             throw new ArgumentException("Invalid sourceType provided.");
         }

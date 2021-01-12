@@ -6,6 +6,7 @@
 	<string name="datanotfoundexception_title">You are offline</string>
 	<string name="filetransferserviceexception_title">Error</string>
 	<string name="generalexception_title">Unexpected exception</string>
+	<string name="file_too_large">File too large</string>
 	<string name="invalidsourcetypeexception_message">This action cannot be performed offline</string>
 	<string name="invalidsourcetypeexception_title">Unavailable offline</string>
 	<string name="couldnotopenemlmsg_title">Could not open file</string>

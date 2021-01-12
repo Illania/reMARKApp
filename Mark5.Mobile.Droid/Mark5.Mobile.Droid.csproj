@@ -362,7 +362,6 @@
     <Compile Include="Mark5Application.cs" />
     <Compile Include="PlatformConfig.cs" />
     <Compile Include="Model\PushNotification.cs" />
-    <Compile Include="Model\Exceptions\MailViewerException.cs" />
     <Compile Include="Service\Reachability.cs" />
     <Compile Include="Utilities\Conversion.cs" />
     <Compile Include="Utilities\DateTimeFormatter.cs" />
@@ -627,12 +626,9 @@
     <Compile Include="Utilities\LineUtilities.cs" />
     <Compile Include="Utilities\Worker\SystemSettingsWorker.cs" />
     <Compile Include="Ui\Activities\MsalActivity.cs" />
-    <Compile Include="Resources\Resource.designer.cs">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
-    </Compile>
     <Compile Include="Service\PushReceiver.cs" />
     <Compile Include="Ui\Common\ViewPagerFixed.cs" />
+    <Compile Include="Resources\Resource.designer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

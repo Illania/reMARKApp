@@ -289,7 +289,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 return Localization.GetString("error_datanotfoundexception_title");
             if (ex is DataAccessException)
                 return Localization.GetString("error_dataaccessexception_title");
-            if (ex is InvalidSourceTypeException)
+            if (ex is ReMarkException && ((ReMarkException)ex).ErrorCode.Equals(ErrorConstants.Codes.InvalidSourceType))
                 return Localization.GetString("error_invalidsourcetypeexception_title");
             if (ex is ArgumentException)
                 return Localization.GetString("error_argumentexception_title");
@@ -313,7 +313,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 return Localization.GetString("error_datanotfoundexception_message");
             if (ex is DataAccessException)
                 return ex.Message;
-            if (ex is InvalidSourceTypeException)
+            if (ex is ReMarkException && ((ReMarkException)ex).ErrorCode.Equals(ErrorConstants.Codes.InvalidSourceType))
                 return Localization.GetString("error_invalidsourcetypeexception_message");
             if (ex is ArgumentException)
                 return ex.Message;
@@ -333,7 +333,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 return false;
             if (ex is DataAccessException)
                 return true;
-            if (ex is InvalidSourceTypeException)
+            if (ex is ReMarkException && ((ReMarkException)ex).ErrorCode.Equals(ErrorConstants.Codes.InvalidSourceType))
                 return false;
             if (ex is ArgumentException)
                 return false;

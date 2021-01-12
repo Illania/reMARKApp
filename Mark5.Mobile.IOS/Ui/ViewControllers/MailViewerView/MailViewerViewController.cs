@@ -10,6 +10,7 @@ using MailBee.Outlook;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Extensions;
+using Mark5.Mobile.Common.Model.Exceptions;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Model;
 using Mark5.Mobile.IOS.Model.Exceptions;
@@ -150,14 +151,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             {
                 var auth = AuthenticatorFactory.Create();
                 if (!await auth.IsAuthenticatedAsync())
-                    throw new MailViewerException("You need to log in to reMARK before you can use mail viewer.");
+                    throw new ReMarkException(ErrorConstants.Codes.LoginNeeded);
 
                 if (url == null)
-                    throw new MailViewerException("File could not be loaded.");
+                    throw new ReMarkException(ErrorConstants.Codes.FileCouldNotBeLoaded);
 
                 var result = url.TryGetResource(NSUrl.FileSizeKey, out NSObject sizeObject, out NSError _error);
                 if (!result)
-                    throw new MailViewerException(_error.ToString());
+                    throw new ReMarkException(_error.ToString());
 
                 var name = url.LastPathComponent;
                 var size = int.Parse(sizeObject.ToString());
@@ -166,7 +167,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
                 {
                     CommonConfig.Logger.Error($"Attempted to open file that is too large. Size {size} bytes.");
 
-                    throw new MailViewerException("File too large.");
+                    throw new ReMarkException(ErrorConstants.Codes.FileTooLarge);
                 }
 
                 if (name.EndsWith(".eml", StringComparison.CurrentCultureIgnoreCase))
@@ -190,7 +191,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
                     }
                     catch (MailBeeException ex)
                     {
-                        throw new MailViewerException("File could not be loaded.", ex);
+                        throw new ReMarkException(ErrorConstants.Codes.FileCouldNotBeLoaded, ex);
                     }
                 }
 
@@ -223,13 +224,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
                                 }
                                 catch (MailBeeException ex)
                                 {
-                                    throw new MailViewerException("File could not be loaded.", ex);
+                                    throw new ReMarkException(ErrorConstants.Codes.FileCouldNotBeLoaded, ex);
                                 }
                             }
                         }
                     }
 
-                throw new MailViewerException("Unsupported file.");
+                throw new ReMarkException(ErrorConstants.Codes.UnsupportedFile);
             }).ContinueWith(async t =>
             {
                 if (t.IsFaulted)
@@ -382,7 +383,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
             fm.CreateDirectory(specificDir, true, null, out NSError _error);
 
             if (_error != null)
-                throw new MailViewerException(_error.ToString());
+                throw new ReMarkException(_error.ToString());
 
             var cacheFile = specificDir.Append(filename, false);
 

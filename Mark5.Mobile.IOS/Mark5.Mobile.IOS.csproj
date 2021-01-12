@@ -92,7 +92,6 @@
 		<Compile Include="Main.cs" />
 		<Compile Include="PlatformConfig.cs" />
 		<Compile Include="Model\PushNotification.cs" />
-		<Compile Include="Model\Exceptions\MailViewerException.cs" />
 		<Compile Include="Service\ReachabilityProvider.cs" />
 		<Compile Include="Service\ReachabilityReceiver.cs" />
 		<Compile Include="Service\Reachability.cs" />
