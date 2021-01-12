@@ -11,7 +11,6 @@ using Android.Widget;
 using Mark5.Mobile.Common.DataAccess.Exceptions;
 using Mark5.Mobile.Common.Model.Exceptions;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Model.Exceptions;
 using Mark5.Mobile.Droid.Utilities;
 using Mark5.ServiceReference.Exceptions;
 using Mark5.Mobile.Common.Authenticator;
@@ -603,9 +602,11 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 return context.GetString(Resource.String.datanotfoundexception_title);
             if (ex is DataAccessException)
                 return context.GetString(Resource.String.dataaccessexception_title);
-            if (ex is InvalidSourceTypeException)
+            if (ex is ReMarkException && ((ReMarkException)ex).ErrorCode.Equals(ErrorConstants.Codes.InvalidSourceType))
                 return context.GetString(Resource.String.invalidsourcetypeexception_title);
-            if (ex is MailViewerException)
+            if (ex is ReMarkException && ((ReMarkException)ex).ErrorCode.Equals(ErrorConstants.Codes.FileTooLarge))
+                return context.GetString(Resource.String.file_too_large);
+            if (ex is ReMarkException && ((ReMarkException)ex).ErrorCode.Equals(ErrorConstants.Codes.FileCouldNotBeLoaded))
                 return context.GetString(Resource.String.couldnotopenemlmsg_title);
 
             return context.GetString(Resource.String.generalexception_title);
@@ -623,9 +624,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 return context.GetString(Resource.String.datanotfoundexception_message);
             if (ex is DataAccessException)
                 return ex.Message;
-            if (ex is InvalidSourceTypeException)
-                return context.GetString(Resource.String.invalidsourcetypeexception_message);
-            if (ex is MailViewerException)
+            if (ex is ReMarkException)
                 return ex.Message;
 
             return ex.Message;
@@ -643,11 +642,11 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 return false;
             if (ex is DataAccessException)
                 return true;
-            if (ex is InvalidSourceTypeException)
+            if (ex is ReMarkException && ((ReMarkException)ex).ErrorCode.Equals(ErrorConstants.Codes.InvalidSourceType))
                 return false;
-            if (ex is MailViewerException)
+            if (ex is ReMarkException && ((ReMarkException)ex).ErrorCode.Equals(ErrorConstants.Codes.FileCouldNotBeLoaded))
                 return true;
-
+            
             return true;
         }
 

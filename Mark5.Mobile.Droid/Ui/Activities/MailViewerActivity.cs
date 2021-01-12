@@ -17,8 +17,8 @@ using MailBee.Outlook;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Extensions;
+using Mark5.Mobile.Common.Model.Exceptions;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Model.Exceptions;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
 using Mark5.Mobile.Droid.Ui.Views.MailViewerViews;
@@ -151,10 +151,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 {
                     var auth = AuthenticatorFactory.Create();
                     if (!await auth.IsAuthenticatedAsync())
-                        throw new MailViewerException("You need to log in to reMARK before you can use mail viewer.");
+                        throw new ReMarkException(ErrorConstants.Codes.LoginNeeded);
 
                     if (uri == null)
-                        throw new MailViewerException("File could not be loaded.");
+                        throw new ReMarkException(ErrorConstants.Codes.FileCouldNotBeLoaded);
 
                     string name;
                     long size;
@@ -162,7 +162,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     using (var cursor = ContentResolver.Query(uri, null, null, null, null, null))
                     {
                         if (cursor == null)
-                            throw new MailViewerException("File could not be loaded.");
+                            throw new ReMarkException(ErrorConstants.Codes.FileCouldNotBeLoaded);
 
                         cursor.MoveToFirst();
 
@@ -174,7 +174,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     {
                         CommonConfig.Logger.Error($"Attempted to open file that is too large. Size {size} bytes.");
 
-                        throw new MailViewerException("File too large.");
+                        throw new ReMarkException(ErrorConstants.Codes.FileTooLarge);
                     }
 
                     if (name.EndsWith(".eml", StringComparison.CurrentCultureIgnoreCase))
@@ -198,7 +198,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                         }
                         catch (MailBeeException ex)
                         {
-                            throw new MailViewerException("File could not be loaded.", ex);
+                            throw new ReMarkException(ErrorConstants.Codes.FileCouldNotBeLoaded, ex);
                         }
                     }
 
@@ -231,13 +231,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                                     }
                                     catch (MailBeeException ex)
                                     {
-                                        throw new MailViewerException("File could not be loaded.", ex);
+                                        throw new ReMarkException(ErrorConstants.Codes.FileCouldNotBeLoaded,ex.InnerException);
                                     }
                                 }
                             }
                         }
 
-                    throw new MailViewerException("Unsupported file.");
+                    throw new ReMarkException(ErrorConstants.Codes.UnsupportedFile);
                 })
                 .ContinueWith(async t =>
                     {
