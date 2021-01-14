@@ -1621,6 +1621,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
             {
+                if (indexPath == null)
+                {
+                    CommonConfig.Logger.Warning($"IndexPath in DocumentListViewController.EditActionsForRow() was null.");
+                    return null;
+                }
+                
                 var actionWrappers = new List<SwipeActionUIWrapper>();
 
                 if (indexPath.Row < 0 || indexPath.Row >= Items.Count)
@@ -1628,10 +1634,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var documentPreview = Items[indexPath.Row];
 
+                if (documentPreview == null)
+                {
+                    CommonConfig.Logger.Warning($"DocumentPreview in DocumentListViewController.EditActionsForRow() was null");
+                    return null;
+                }
+
                 List<EmailSwipeAction> trailingSwipeActions = PlatformConfig.Preferences.EmailTrailingSwipeActions;
 
                 trailingSwipeActions.Reverse();
                 var folder = viewControllerWeakReference.Unwrap()?.Folder;
+
+                if (folder == null)
+                {
+                    CommonConfig.Logger.Warning($"Folder in DocumentListViewController.EditActionsForRow() was null");
+                    return null;
+                }
 
                 foreach (EmailSwipeAction swipeAction in trailingSwipeActions)
                 {

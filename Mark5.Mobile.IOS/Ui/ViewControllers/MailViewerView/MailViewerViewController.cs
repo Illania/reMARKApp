@@ -13,7 +13,6 @@ using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model.Exceptions;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Model;
-using Mark5.Mobile.IOS.Model.Exceptions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews;
 using Mark5.Mobile.IOS.Utilities;
