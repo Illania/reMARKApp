@@ -14,6 +14,7 @@ using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Common.Extensions;
 using System.Threading.Tasks;
 using ME.Pushy.Sdk;
+using Mark5.Mobile.Droid.Service;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
@@ -71,7 +72,8 @@ namespace Mark5.Mobile.Droid.Utilities
 
 
                     // Automatically configure a Notification Channel for devices running Android O+
-                    Pushy.SetNotificationChannel(notificationBuilder, context);
+                    if(PushNotificationsConstants.PushNotificationsProviderType == PushNotificationsProviderType.Pushy)
+                        Pushy.SetNotificationChannel(notificationBuilder, context);
 
                     notificationManager.Notify(notification.ObjectId, notificationBuilder.Build());
 
@@ -164,6 +166,12 @@ namespace Mark5.Mobile.Droid.Utilities
 #pragma warning restore XA0001 // Find issues with Android API usage
         }
 
+
+        /// <summary>
+        /// Executes Pushy registration in a background thread, receives the token and saves it in preferences, subscribes device on the app server
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public static async Task RegisterForPushNotifications(Context context)
         {
             // Execute Pushy.Register() in a background thread

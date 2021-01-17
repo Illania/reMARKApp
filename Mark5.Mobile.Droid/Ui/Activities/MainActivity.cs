@@ -17,6 +17,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Service;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Coordinators;
 using Mark5.Mobile.Droid.Ui.Fragments;
@@ -71,8 +72,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
+            PushNotificationsConstants.PushNotificationsProviderType = PushNotificationsProviderType.Firebase;
 
-            Pushy.Listen(this);
+            if(PushNotificationsConstants.PushNotificationsProviderType == PushNotificationsProviderType.Pushy)
+                Pushy.Listen(this);
 
             CalendarCoordinator = new CalendarModuleCoordinator(this);
 

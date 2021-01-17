@@ -403,8 +403,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             PushNotificationsUtilities.CreateChannelIfNotExists(this);
             DeviceReminderBroadcastReceiver.CreateChannelIfNotExists(this);
 
-            if(!Pushy.IsRegistered(this))
-                await PushNotificationsUtilities.RegisterForPushNotifications(this);
+            if (PushNotificationsConstants.PushNotificationsProviderType == PushNotificationsProviderType.Pushy)
+            {
+                if (!Pushy.IsRegistered(this))
+                    await PushNotificationsUtilities.RegisterForPushNotifications(this);
+            }
+            else
+                FirebaseInstanceManager.SendPushToken();
 
             StartActivity(MainActivity.CreateIntent(this));
             Finish();

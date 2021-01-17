@@ -13,6 +13,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Service;
 using Mark5.Mobile.Droid.Ui.Activities;
 using ME.Pushy.Sdk;
 
@@ -91,7 +92,10 @@ namespace Mark5.Mobile.Droid.Utilities
             sb.AppendLine("Version.SdkInt: " + Build.VERSION.SdkInt);
             sb.AppendLine("Version.SecurityPatch: " + Build.VERSION.SecurityPatch);
             sb.AppendLine("Root: " + Integration.IsRootedMethod1() + "," + Integration.IsRootedMethod2() + "," + Integration.IsRootedMethod3());
-            sb.AppendLine("Pushy is registered: " + (Pushy.IsRegistered(Application.Context) ? "yes" : "no"));
+            if (PushNotificationsConstants.PushNotificationsProviderType == PushNotificationsProviderType.Pushy)
+                sb.AppendLine("Pushy is registered: " + (Pushy.IsRegistered(Application.Context) ? "yes" : "no"));
+            else
+                sb.AppendLine("Firebase initialized: " + FirebaseApp.Instance == null ? "false" : "true");
             sb.AppendLine();
 
             sb.AppendLine("===== Connection information =====");
@@ -101,7 +105,10 @@ namespace Mark5.Mobile.Droid.Utilities
             sb.AppendLine("SSL: " + Managers.ActiveConnectionInfo?.SslMode);
             sb.AppendLine("Friendly device name: " + Managers.ActiveConnectionInfo?.FriendlyDeviceName);
             sb.AppendLine("Installation ID: " + Managers.ActiveConnectionInfo?.InstallationId);
-            sb.AppendLine("Pushy token: " + PlatformConfig.Preferences.PushNotificationToken ?? string.Empty);
+            if (PushNotificationsConstants.PushNotificationsProviderType == PushNotificationsProviderType.Pushy)
+                sb.AppendLine("Pushy token: " + PlatformConfig.Preferences.PushNotificationToken ?? string.Empty);
+            else
+                sb.AppendLine("Firebase Instance ID: " + FirebaseInstanceId.Instance?.Token);
             sb.AppendLine();
 
             sb.AppendLine("===== Preferences =====");
