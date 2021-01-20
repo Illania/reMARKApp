@@ -24,6 +24,7 @@ using Mark5.Mobile.Droid.Utilities.Workers;
 using ME.Pushy.Sdk;
 using Microsoft.AppCenter;
 using Microsoft.AppCenter.Crashes;
+using TinyIoC;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
@@ -173,16 +174,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 DateTimeConverter.UseServerTimezone = PlatformConfig.Preferences.UseServerTimeZone;
 
-                if (ServerConfig.SystemSettings?.SystemInfo?.NewPushNotificationsSystemAvailable == true)
-                {
-                    if (!Pushy.IsRegistered(this))
-                        await PushNotificationsUtilities.RegisterForPushNotifications(this);
-                }
-                else
-                {
-                    FirebaseInstanceManager.UpdatePushToken();
-                }
-       
+                UpdateTokenInPreferences();
+                
                 CommonConfig.Logger.Info($"Initialized - will present {nameof(MainActivity)}");
 
                 return true;
@@ -231,6 +224,19 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }, TaskScheduler.FromCurrentSynchronizationContext());
 
             CommonConfig.Logger.Info($"Started {nameof(SplashActivity)}");
+        }
+
+
+        void UpdateTokenInPreferences()
+        {
+            try
+            {
+                TinyIoCContainer.Current.Resolve<IPushNotificationsRegistrator>().UpdateToken();
+            }
+            catch (Exception)
+            {
+
+            }
         }
 
         void ProcessNotification()

@@ -368,7 +368,6 @@
     <Compile Include="Mark5Application.cs" />
     <Compile Include="PlatformConfig.cs" />
     <Compile Include="Model\PushNotification.cs" />
-    <Compile Include="Service\Reachability.cs" />
     <Compile Include="Utilities\Conversion.cs" />
     <Compile Include="Utilities\DateTimeFormatter.cs" />
     <Compile Include="Utilities\DeviceInfoProvider.cs" />
@@ -600,7 +599,6 @@
     <Compile Include="Ui\Fragments\CategoriesListFragment.cs" />
     <Compile Include="Ui\Activities\PickerInternalContactsListActivity.cs" />
     <Compile Include="Ui\Fragments\PickerInternalContactsListFragment.cs" />
-    <Compile Include="Service\ReachabilityMonitor.cs" />
     <Compile Include="Utilities\PushNotificationsUtilities.cs" />
     <Compile Include="Ui\Fragments\Calendar\MonthCalendarFragment.cs" />
     <Compile Include="Ui\Fragments\Calendar\WeekCalendarFragment.cs" />
@@ -632,12 +630,17 @@
     <Compile Include="Utilities\LineUtilities.cs" />
     <Compile Include="Utilities\Worker\SystemSettingsWorker.cs" />
     <Compile Include="Ui\Activities\MsalActivity.cs" />
-    <Compile Include="Service\PushReceiver.cs" />
     <Compile Include="Ui\Common\ViewPagerFixed.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
-    <Compile Include="Service\PushNotificationInstanceIdService.cs" />
-    <Compile Include="Service\PushNotificationMessagingService.cs" />
-    <Compile Include="Service\FirebaseInstanceManager.cs" />
+    <Compile Include="Service\PushNotifications\Firebase\FirebaseRegistrator.cs" />
+    <Compile Include="Service\PushNotifications\Firebase\FirebaseInstanceIdService.cs" />
+    <Compile Include="Service\PushNotifications\Firebase\FirebaseMessagingService.cs" />
+    <Compile Include="Service\PushNotifications\Pushy\PushyRegistrator.cs" />
+    <Compile Include="Service\PushNotifications\Pushy\PushyReceiver.cs" />
+    <Compile Include="Service\Reachability\Reachability.cs" />
+    <Compile Include="Service\Reachability\ReachabilityMonitor.cs" />
+    <Compile Include="Service\PushNotifications\IPushNotificationsRegistrator.cs" />
+    <Compile Include="TinyIoC.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -666,6 +669,10 @@
     <Folder Include="Ui\Views\CalendarViews\" />
     <Folder Include="Utilities\DeviceReminder\" />
     <Folder Include="Utilities\Worker\" />
+    <Folder Include="Service\PushNotifications\" />
+    <Folder Include="Service\PushNotifications\Firebase\" />
+    <Folder Include="Service\PushNotifications\Pushy\" />
+    <Folder Include="Service\Reachability\" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\anim\enter_from_left.xml" />

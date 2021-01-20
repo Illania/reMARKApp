@@ -3,12 +3,13 @@ using Android.App;
 using Android.Content;
 using Firebase.Messaging;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Droid.Utilities;
 
-namespace Mark5.Mobile.Droid.Utilities.Service
+namespace Mark5.Mobile.Droid.Service
 {
     [Service]
     [IntentFilter(new[] { "com.google.firebase.MESSAGING_EVENT" })]
-    public class PushNotificationMessagingService : FirebaseMessagingService
+    public class FirebaseMessagingService : Firebase.Messaging.FirebaseMessagingService
     {
         public override async void OnMessageReceived(RemoteMessage message)
         {

@@ -8,7 +8,7 @@ namespace Mark5.Mobile.Droid.Service
 {
     [BroadcastReceiver(Enabled = true, Exported = false)]
 	[IntentFilter(new[] { "pushy.me" })]
-	public class PushReceiver : BroadcastReceiver
+	public class PushyReceiver : BroadcastReceiver
 	{ 
         public override async void OnReceive(Context context, Intent intent)
 		{
@@ -23,7 +23,6 @@ namespace Mark5.Mobile.Droid.Service
                     $"message.data.keys={string.Join(",", intent.Extras.KeySet())}]", ex);
 			}
 
-			
-		}
+        }
 	}
 }

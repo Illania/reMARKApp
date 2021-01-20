@@ -11,10 +11,8 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
-using Mark5.Mobile.Common.Extensions;
 using System.Threading.Tasks;
 using ME.Pushy.Sdk;
-using Mark5.Mobile.Droid.Service;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
@@ -164,44 +162,6 @@ namespace Mark5.Mobile.Droid.Utilities
             channel = new NotificationChannel(DocumentChannelId, documentChannelName, NotificationImportance.High);
             notificationManager.CreateNotificationChannel(channel);
 #pragma warning restore XA0001 // Find issues with Android API usage
-        }
-
-
-        /// <summary>
-        /// Executes Pushy registration in a background thread, receives the token and saves it in preferences, subscribes device on the app server
-        /// </summary>
-        /// <param name="context"></param>
-        /// <returns></returns>
-        public static async Task RegisterForPushNotifications(Context context)
-        {
-            // Execute Pushy.Register() in a background thread
-            await Task.Run(() =>
-            {
-                try
-                {
-                    // Assign a unique token to this device
-                    string token = Pushy.Register(context);
-
-                    if (string.IsNullOrEmpty(token))
-                        return;
-
-                    if (CommonConfig.Logger.IsDebugEnabled())
-                        CommonConfig.Logger.Debug($"Firebase token: {token}");
-
-                    PlatformConfig.Preferences.PushNotificationToken = token;
-
-                    if (Managers.ActiveConnectionInfo != null)
-                    {
-                        CommonConfig.Logger.Info($"Sending Firebase token to service...");
-
-                        Managers.NotificationsManager.Subscribe(DeviceType.Android, token).FireAndForget();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    CommonConfig.Logger.Error("Error while subscribing to push notifications after login", ex);
-                }
-            });
         }
 
     }

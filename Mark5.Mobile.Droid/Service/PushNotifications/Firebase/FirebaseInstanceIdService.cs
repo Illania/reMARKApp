@@ -11,7 +11,7 @@ namespace Mark5.Mobile.Droid.Service
 {
     [Service]
     [IntentFilter(new[] { "com.google.firebase.INSTANCE_ID_EVENT" })]
-    public class PushNotificationInstanceIdService : FirebaseInstanceIdService
+    public class FirebaseInstanceIdService : Firebase.Iid.FirebaseInstanceIdService
     {
         public override void OnTokenRefresh()
         {
