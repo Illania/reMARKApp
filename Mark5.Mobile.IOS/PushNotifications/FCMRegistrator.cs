@@ -8,6 +8,12 @@ namespace Mark5.Mobile.IOS.PushNotifications
 {
     public class FCMRegistrator : IPushNotificationsRegistrator
     {
+        public string ActiveToken => Messaging.SharedInstance.FcmToken;
+
+        public async Task RegisterToken(NSData deviceToken)
+        {
+            //ignore
+        }
 
         public bool ShouldUpdateToken()
         {
@@ -27,14 +33,7 @@ namespace Mark5.Mobile.IOS.PushNotifications
             }
 
             return true;
-        }
-
-        public async Task RegisterToken(NSData deviceToken)
-        {
-            //ignore
-        }
-
-        public string ActiveToken => Messaging.SharedInstance.FcmToken;
+        }        
         
     }
 }

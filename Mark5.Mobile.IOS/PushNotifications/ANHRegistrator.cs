@@ -8,20 +8,20 @@ using System.Collections.Generic;
 
 namespace Mark5.Mobile.IOS.PushNotifications
 {
-    public class ANHRegistrator: IPushNotificationsRegistrator
+    public class ANHRegistrator : IPushNotificationsRegistrator
     {
+        public string ActiveToken => string.Empty;
 
         public NotificationHubClient notificationHubClient => new NotificationHubClient(
             NotificationsConstants.PrimaryConnectionString,
             NotificationsConstants.NotificationHubName);
-
 
         public async Task<List<RegistrationDescription>> GetRegistrationForToken(NSData token)
         {
             var tokenString = string.Join("", token.Select(b => b.ToString("x2")));
             var registrations = await notificationHubClient.GetRegistrationsByChannelAsync(tokenString, 100);
             return registrations.ToList();
-         
+
         }
 
         public async Task RegisterToken(NSData deviceToken)
@@ -46,7 +46,7 @@ namespace Mark5.Mobile.IOS.PushNotifications
                         {
                             await notificationHubClient.DeleteRegistrationAsync(registration);
                         }
-                        catch(Microsoft.Azure.NotificationHubs.Messaging.MessagingEntityNotFoundException)
+                        catch (Microsoft.Azure.NotificationHubs.Messaging.MessagingEntityNotFoundException)
                         {
                             //ignore
                         }
@@ -90,16 +90,14 @@ namespace Mark5.Mobile.IOS.PushNotifications
                 return false;
             }
 
-           if (serviceVersion.CompareTo(new Version(4, 0, 0)) < 0)
+            if (ServerConfig.SystemSettings?.SystemInfo?.NewPushNotificationsSystemAvailable != true)
            {
-                CommonConfig.Logger.Info($"Not sending the token because the current service version is less than 4.0.0");
+                CommonConfig.Logger.Info($"Not sending the token because the current service version is less than 4.0.0 or system version is less than 1.37.13");
                 return false;
            }
 
             return true; 
         }
-
-        public string ActiveToken => string.Empty;
 
     }
 }

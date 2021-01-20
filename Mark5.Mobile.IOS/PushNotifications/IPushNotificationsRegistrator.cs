@@ -16,6 +16,32 @@ namespace Mark5.Mobile.IOS.PushNotifications
 
         public Task RegisterToken(NSData deviceToken);
 
+        public void UpdateToken(string newToken)
+        {
+            if (!ShouldUpdateToken())
+                return;
+
+            var oldToken = PlatformConfig.Preferences.PushNotificationToken;
+            PlatformConfig.Preferences.PushNotificationToken = newToken;
+
+            if (!string.IsNullOrWhiteSpace(oldToken) && oldToken != newToken)
+            {
+                CommonConfig.Logger.Info("New push notification token is different, so try to unsubscribe old one...");
+                Managers.NotificationsManager.UnSubscribe(DeviceType.IOS, oldToken).FireAndForget();
+            }
+
+            if (!string.IsNullOrWhiteSpace(newToken))
+            {
+                CommonConfig.Logger.Info("Sending new push notification token...");
+                Managers.NotificationsManager.Subscribe(DeviceType.IOS, newToken).FireAndForget();
+            }
+            else
+            {
+                CommonConfig.Logger.Info("Received empty or null push notification token...");
+            }
+
+        }
+
         public bool ShouldUpdateToken();
 
         public void RequestAuthorization()
@@ -46,31 +72,5 @@ namespace Mark5.Mobile.IOS.PushNotifications
 
         }
 
-        public void UpdateToken(string newToken)
-        {
-            if (!ShouldUpdateToken())
-                return;
-
-            var oldToken = PlatformConfig.Preferences.PushNotificationToken;
-            PlatformConfig.Preferences.PushNotificationToken = newToken;
-
-            if (!string.IsNullOrWhiteSpace(oldToken) && oldToken != newToken)
-            {
-                CommonConfig.Logger.Info("New push notification token is different, so try to unsubscribe old one...");
-                Managers.NotificationsManager.UnSubscribe(DeviceType.IOS, oldToken).FireAndForget();
-            }
-
-            if (!string.IsNullOrWhiteSpace(newToken))
-            {
-                CommonConfig.Logger.Info("Sending new push notification token...");
-                Managers.NotificationsManager.Subscribe(DeviceType.IOS, newToken).FireAndForget();
-            }
-            else
-            {
-                CommonConfig.Logger.Info("Received empty or null push notification token...");
-            }
-
-        }
-   
     }
 }

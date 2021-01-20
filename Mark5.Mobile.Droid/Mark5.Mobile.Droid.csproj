@@ -356,13 +356,18 @@
     <Reference Include="Xamarin.GooglePlayServices.Base">
       <HintPath>..\packages\Xamarin.GooglePlayServices.Base.60.1142.1\lib\MonoAndroid80\Xamarin.GooglePlayServices.Base.dll</HintPath>
     </Reference>
+    <Reference Include="Xamarin.Firebase.Messaging">
+      <HintPath>..\packages\Xamarin.Firebase.Messaging.60.1142.1\lib\MonoAndroid80\Xamarin.Firebase.Messaging.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Firebase.Analytics">
+      <HintPath>..\packages\Xamarin.Firebase.Analytics.60.1142.1\lib\MonoAndroid80\Xamarin.Firebase.Analytics.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Mark5Application.cs" />
     <Compile Include="PlatformConfig.cs" />
     <Compile Include="Model\PushNotification.cs" />
-    <Compile Include="Service\Reachability.cs" />
     <Compile Include="Utilities\Conversion.cs" />
     <Compile Include="Utilities\DateTimeFormatter.cs" />
     <Compile Include="Utilities\DeviceInfoProvider.cs" />
@@ -594,7 +599,6 @@
     <Compile Include="Ui\Fragments\CategoriesListFragment.cs" />
     <Compile Include="Ui\Activities\PickerInternalContactsListActivity.cs" />
     <Compile Include="Ui\Fragments\PickerInternalContactsListFragment.cs" />
-    <Compile Include="Service\ReachabilityMonitor.cs" />
     <Compile Include="Utilities\PushNotificationsUtilities.cs" />
     <Compile Include="Ui\Fragments\Calendar\MonthCalendarFragment.cs" />
     <Compile Include="Ui\Fragments\Calendar\WeekCalendarFragment.cs" />
@@ -626,9 +630,17 @@
     <Compile Include="Utilities\LineUtilities.cs" />
     <Compile Include="Utilities\Worker\SystemSettingsWorker.cs" />
     <Compile Include="Ui\Activities\MsalActivity.cs" />
-    <Compile Include="Service\PushReceiver.cs" />
     <Compile Include="Ui\Common\ViewPagerFixed.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
+    <Compile Include="Service\PushNotifications\Firebase\FirebaseRegistrator.cs" />
+    <Compile Include="Service\PushNotifications\Firebase\FirebaseInstanceIdService.cs" />
+    <Compile Include="Service\PushNotifications\Firebase\FirebaseMessagingService.cs" />
+    <Compile Include="Service\PushNotifications\Pushy\PushyRegistrator.cs" />
+    <Compile Include="Service\PushNotifications\Pushy\PushyReceiver.cs" />
+    <Compile Include="Service\Reachability\Reachability.cs" />
+    <Compile Include="Service\Reachability\ReachabilityMonitor.cs" />
+    <Compile Include="Service\PushNotifications\IPushNotificationsRegistrator.cs" />
+    <Compile Include="TinyIoC.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -657,6 +669,10 @@
     <Folder Include="Ui\Views\CalendarViews\" />
     <Folder Include="Utilities\DeviceReminder\" />
     <Folder Include="Utilities\Worker\" />
+    <Folder Include="Service\PushNotifications\" />
+    <Folder Include="Service\PushNotifications\Firebase\" />
+    <Folder Include="Service\PushNotifications\Pushy\" />
+    <Folder Include="Service\Reachability\" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\anim\enter_from_left.xml" />
@@ -1219,4 +1235,6 @@
   <Import Project="..\packages\Xamarin.Firebase.Iid.60.1142.1\build\MonoAndroid80\Xamarin.Firebase.Iid.targets" Condition="Exists('..\packages\Xamarin.Firebase.Iid.60.1142.1\build\MonoAndroid80\Xamarin.Firebase.Iid.targets')" />
   <Import Project="..\packages\Xamarin.Firebase.Analytics.Impl.60.1142.1\build\MonoAndroid80\Xamarin.Firebase.Analytics.Impl.targets" Condition="Exists('..\packages\Xamarin.Firebase.Analytics.Impl.60.1142.1\build\MonoAndroid80\Xamarin.Firebase.Analytics.Impl.targets')" />
   <Import Project="..\packages\Xamarin.GooglePlayServices.Base.60.1142.1\build\MonoAndroid80\Xamarin.GooglePlayServices.Base.targets" Condition="Exists('..\packages\Xamarin.GooglePlayServices.Base.60.1142.1\build\MonoAndroid80\Xamarin.GooglePlayServices.Base.targets')" />
+  <Import Project="..\packages\Xamarin.Firebase.Messaging.60.1142.1\build\MonoAndroid80\Xamarin.Firebase.Messaging.targets" Condition="Exists('..\packages\Xamarin.Firebase.Messaging.60.1142.1\build\MonoAndroid80\Xamarin.Firebase.Messaging.targets')" />
+  <Import Project="..\packages\Xamarin.Firebase.Analytics.60.1142.1\build\MonoAndroid80\Xamarin.Firebase.Analytics.targets" Condition="Exists('..\packages\Xamarin.Firebase.Analytics.60.1142.1\build\MonoAndroid80\Xamarin.Firebase.Analytics.targets')" />
 </Project>

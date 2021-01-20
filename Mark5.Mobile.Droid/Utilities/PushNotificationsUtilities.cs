@@ -11,7 +11,6 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
-using Mark5.Mobile.Common.Extensions;
 using System.Threading.Tasks;
 using ME.Pushy.Sdk;
 
@@ -71,7 +70,8 @@ namespace Mark5.Mobile.Droid.Utilities
 
 
                     // Automatically configure a Notification Channel for devices running Android O+
-                    Pushy.SetNotificationChannel(notificationBuilder, context);
+                    if (ServerConfig.SystemSettings?.SystemInfo?.NewPushNotificationsSystemAvailable == true)
+                        Pushy.SetNotificationChannel(notificationBuilder, context);
 
                     notificationManager.Notify(notification.ObjectId, notificationBuilder.Build());
 
@@ -162,38 +162,6 @@ namespace Mark5.Mobile.Droid.Utilities
             channel = new NotificationChannel(DocumentChannelId, documentChannelName, NotificationImportance.High);
             notificationManager.CreateNotificationChannel(channel);
 #pragma warning restore XA0001 // Find issues with Android API usage
-        }
-
-        public static async Task RegisterForPushNotifications(Context context)
-        {
-            // Execute Pushy.Register() in a background thread
-            await Task.Run(() =>
-            {
-                try
-                {
-                    // Assign a unique token to this device
-                    string token = Pushy.Register(context);
-
-                    if (string.IsNullOrEmpty(token))
-                        return;
-
-                    if (CommonConfig.Logger.IsDebugEnabled())
-                        CommonConfig.Logger.Debug($"Firebase token: {token}");
-
-                    PlatformConfig.Preferences.PushNotificationToken = token;
-
-                    if (Managers.ActiveConnectionInfo != null)
-                    {
-                        CommonConfig.Logger.Info($"Sending Firebase token to service...");
-
-                        Managers.NotificationsManager.Subscribe(DeviceType.Android, token).FireAndForget();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    CommonConfig.Logger.Error("Error while subscribing to push notifications after login", ex);
-                }
-            });
         }
 
     }

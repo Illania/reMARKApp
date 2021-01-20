@@ -19,8 +19,10 @@ using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Service;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
+using TinyIoC;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -300,6 +302,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.dialog_update_config_title, Resource.String.please_wait);
                 Task.Run(async () =>
                 {
+                    TinyIoCContainer.Current.Resolve<IPushNotificationsRegistrator>().DeleteToken();
+
                     try
                     {
                         var ss = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Remote);

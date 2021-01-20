@@ -1,5 +1,6 @@
 ﻿using System;
 using Android.OS;
+using Firebase.Messaging;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Model;
@@ -9,6 +10,48 @@ namespace Mark5.Mobile.Droid.Utilities
     public static class PushNotificationsConverter
     {
       
+
+        public static Notification ConvertToNotification(this RemoteMessage m)
+        {
+            return m.ConvertToPushNotification().ConvertToNotification();
+        }
+
+        public static PushNotification ConvertToPushNotification(this RemoteMessage message)
+        {
+            if (message.Data.ContainsKey("data"))
+            {
+                return new PushNotification
+                {
+                    Data = Serializer.Deserialize<PushNotificationData>(message.Data["data"]),
+                    Notification = Serializer.Deserialize<PushNotificationNotification>(message.Data["notification"])
+                };
+            }
+            else
+            {
+                var data = new PushNotificationData
+                {
+                    Silent = message.Data.ContainsKey("silent") ? int.Parse(message.Data["silent"]) : 0,
+                    Guid = message.Data.ContainsKey("guid") ? Guid.Parse(message.Data["guid"]) : Guid.Empty,
+                    Type = message.Data.ContainsKey("type") ? (EventType)Enum.Parse(typeof(EventType), message.Data["type"]) : EventType.None,
+                    ObjectId = message.Data.ContainsKey("objectId") ? int.Parse(message.Data["objectId"]) : 0,
+                    FolderId = message.Data.ContainsKey("folderId") ? int.Parse(message.Data["folderId"]) : 0,
+                    ObjectType = message.Data.ContainsKey("objectType") ? (ObjectType)Enum.Parse(typeof(ObjectType), message.Data["objectType"]) : ObjectType.None,
+                    RemindOn = message.Data.ContainsKey("remindOn") ? message.Data["remindOn"] : null,
+                };
+
+                var notification = new PushNotificationNotification
+                {
+                    Title = message.Data.ContainsKey("title") ? message.Data["title"] : null,
+                    Body = message.Data.ContainsKey("body") ? message.Data["body"] : null
+                };
+
+                return new PushNotification
+                {
+                    Data = data,
+                    Notification = notification,
+                };
+            }
+        }
         public static Notification ExtractNotification(Bundle extra)
         {
             var data = new PushNotificationData

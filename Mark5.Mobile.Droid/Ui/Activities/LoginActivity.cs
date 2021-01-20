@@ -25,6 +25,7 @@ using Mark5.Mobile.Droid.Utilities.Workers;
 using Mark5.ServiceReference.Exceptions;
 using ME.Pushy.Sdk;
 using Microsoft.Identity.Client;
+using TinyIoC;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
@@ -44,6 +45,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         IAuthenticator authenticator;
         ConnectionInfo retainedConnectionInfo;
 
+        IPushNotificationsRegistrator pushNotificationsRegistrator;
+             
         Action dismissAction;
 
         public static Intent CreateIntent(Context context)
@@ -392,6 +395,14 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             CommonConfig.Logger.Info($"Registering {nameof(ReachabilityMonitor)}...");
             PlatformConfig.ReachabilityMonitor.Register(ApplicationContext);
 
+            if (ServerConfig.SystemSettings?.SystemInfo?.NewPushNotificationsSystemAvailable == true)
+                TinyIoCContainer.Current.Register<IPushNotificationsRegistrator>(new PushyRegistrator());
+            else
+                TinyIoCContainer.Current.Register<IPushNotificationsRegistrator>(new FirebaseRegistrator());
+
+            pushNotificationsRegistrator = TinyIoCContainer.Current.Resolve<IPushNotificationsRegistrator>();
+
+
             CommonConfig.Logger.Info($"Logged in - will present {nameof(MainActivity)}");
 
             CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Hostname, ci.Hostname);
@@ -403,8 +414,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             PushNotificationsUtilities.CreateChannelIfNotExists(this);
             DeviceReminderBroadcastReceiver.CreateChannelIfNotExists(this);
 
-            if(!Pushy.IsRegistered(this))
-                await PushNotificationsUtilities.RegisterForPushNotifications(this);
+            await pushNotificationsRegistrator.RegisterToken(this);
+            pushNotificationsRegistrator.Listen(this);
 
             StartActivity(MainActivity.CreateIntent(this));
             Finish();

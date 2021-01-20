@@ -22,11 +22,14 @@ using Mark5.Mobile.Droid.Utilities;
 using Mark5.Mobile.Droid.Utilities.DeviceReminder;
 using Mark5.Mobile.Droid.Utilities.Workers;
 using ME.Pushy.Sdk;
+using Microsoft.AppCenter;
 using Microsoft.AppCenter.Crashes;
+using TinyIoC;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-    [Activity(MainLauncher = true, Icon = "@mipmap/ic_icon", Theme = "@style/mark5Splash", ScreenOrientation = ScreenOrientation.Portrait, NoHistory = true, ResizeableActivity = true)]
+    [Activity(MainLauncher = true, Icon = "@mipmap/ic_icon", Theme = "@style/mark5Splash", ScreenOrientation = ScreenOrientation.Portrait,
+        NoHistory = true, ResizeableActivity = true)]
     public class SplashActivity : AppCompatActivity
     {
         const string CalendarIdKey = "calendarId";
@@ -171,9 +174,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 DateTimeConverter.UseServerTimezone = PlatformConfig.Preferences.UseServerTimeZone;
 
-                if (!Pushy.IsRegistered(this))
-                    await PushNotificationsUtilities.RegisterForPushNotifications(this);
-
+                UpdateTokenInPreferences();
+                
                 CommonConfig.Logger.Info($"Initialized - will present {nameof(MainActivity)}");
 
                 return true;
@@ -222,6 +224,19 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }, TaskScheduler.FromCurrentSynchronizationContext());
 
             CommonConfig.Logger.Info($"Started {nameof(SplashActivity)}");
+        }
+
+
+        void UpdateTokenInPreferences()
+        {
+            try
+            {
+                TinyIoCContainer.Current.Resolve<IPushNotificationsRegistrator>().UpdateToken();
+            }
+            catch (Exception)
+            {
+
+            }
         }
 
         void ProcessNotification()
