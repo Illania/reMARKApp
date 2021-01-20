@@ -92,7 +92,7 @@ namespace Mark5.Mobile.Droid.Utilities
             sb.AppendLine("Version.SdkInt: " + Build.VERSION.SdkInt);
             sb.AppendLine("Version.SecurityPatch: " + Build.VERSION.SecurityPatch);
             sb.AppendLine("Root: " + Integration.IsRootedMethod1() + "," + Integration.IsRootedMethod2() + "," + Integration.IsRootedMethod3());
-            if (PushNotificationsConstants.PushNotificationsProviderType == PushNotificationsProviderType.Pushy)
+            if(ServerConfig.SystemSettings?.SystemInfo?.NewPushNotificationsSystemAvailable == true)
                 sb.AppendLine("Pushy is registered: " + (Pushy.IsRegistered(Application.Context) ? "yes" : "no"));
             else
                 sb.AppendLine("Firebase initialized: " + FirebaseApp.Instance == null ? "false" : "true");
@@ -105,7 +105,7 @@ namespace Mark5.Mobile.Droid.Utilities
             sb.AppendLine("SSL: " + Managers.ActiveConnectionInfo?.SslMode);
             sb.AppendLine("Friendly device name: " + Managers.ActiveConnectionInfo?.FriendlyDeviceName);
             sb.AppendLine("Installation ID: " + Managers.ActiveConnectionInfo?.InstallationId);
-            if (PushNotificationsConstants.PushNotificationsProviderType == PushNotificationsProviderType.Pushy)
+            if(ServerConfig.SystemSettings?.SystemInfo?.NewPushNotificationsSystemAvailable == true)
                 sb.AppendLine("Pushy token: " + PlatformConfig.Preferences.PushNotificationToken ?? string.Empty);
             else
                 sb.AppendLine("Firebase Instance ID: " + FirebaseInstanceId.Instance?.Token);

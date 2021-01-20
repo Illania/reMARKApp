@@ -72,7 +72,7 @@ namespace Mark5.Mobile.Droid.Utilities
 
 
                     // Automatically configure a Notification Channel for devices running Android O+
-                    if(PushNotificationsConstants.PushNotificationsProviderType == PushNotificationsProviderType.Pushy)
+                    if (ServerConfig.SystemSettings?.SystemInfo?.NewPushNotificationsSystemAvailable == true)
                         Pushy.SetNotificationChannel(notificationBuilder, context);
 
                     notificationManager.Notify(notification.ObjectId, notificationBuilder.Build());

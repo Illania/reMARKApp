@@ -301,7 +301,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.dialog_update_config_title, Resource.String.please_wait);
                 Task.Run(async () =>
                 {
-                    if (PushNotificationsConstants.PushNotificationsProviderType == PushNotificationsProviderType.Firebase)
+                    if(ServerConfig.SystemSettings?.SystemInfo?.NewPushNotificationsSystemAvailable != true)
                     {
                         FirebaseInstanceManager.DeleteInstance();
                     }

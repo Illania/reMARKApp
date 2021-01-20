@@ -9,7 +9,6 @@ using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
 using Com.Airbnb.Lottie;
-using Firebase.Iid;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Database;
@@ -23,11 +22,13 @@ using Mark5.Mobile.Droid.Utilities;
 using Mark5.Mobile.Droid.Utilities.DeviceReminder;
 using Mark5.Mobile.Droid.Utilities.Workers;
 using ME.Pushy.Sdk;
+using Microsoft.AppCenter;
 using Microsoft.AppCenter.Crashes;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-    [Activity(MainLauncher = true, Icon = "@mipmap/ic_icon", Theme = "@style/mark5Splash", ScreenOrientation = ScreenOrientation.Portrait, NoHistory = true, ResizeableActivity = true)]
+    [Activity(MainLauncher = true, Icon = "@mipmap/ic_icon", Theme = "@style/mark5Splash", ScreenOrientation = ScreenOrientation.Portrait,
+        NoHistory = true, ResizeableActivity = true)]
     public class SplashActivity : AppCompatActivity
     {
         const string CalendarIdKey = "calendarId";
@@ -172,7 +173,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 DateTimeConverter.UseServerTimezone = PlatformConfig.Preferences.UseServerTimeZone;
 
-                if(PushNotificationsConstants.PushNotificationsProviderType == PushNotificationsProviderType.Pushy)
+                if (ServerConfig.SystemSettings?.SystemInfo?.NewPushNotificationsSystemAvailable == true)
                 {
                     if (!Pushy.IsRegistered(this))
                         await PushNotificationsUtilities.RegisterForPushNotifications(this);

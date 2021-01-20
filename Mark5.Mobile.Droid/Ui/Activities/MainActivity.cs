@@ -27,7 +27,6 @@ using ME.Pushy.Sdk;
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
     [Android.App.Activity]
-    //[Android.App.Activity(ParentActivity = typeof(SplashActivity))]
     public class MainActivity : BaseAppCompatActivity, NavigationView.IOnNavigationItemSelectedListener, FragmentManager.IOnBackStackChangedListener
     {
         const string StateKey = "State_d7a09340-3478-43d7-93c3-8974b687a5ec";
@@ -72,11 +71,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-            PushNotificationsConstants.PushNotificationsProviderType = PushNotificationsProviderType.Firebase;
-
-            if(PushNotificationsConstants.PushNotificationsProviderType == PushNotificationsProviderType.Pushy)
-                Pushy.Listen(this);
-
+        
             CalendarCoordinator = new CalendarModuleCoordinator(this);
 
             CommonConfig.Logger.Info($"Starting {nameof(MainActivity)}...");

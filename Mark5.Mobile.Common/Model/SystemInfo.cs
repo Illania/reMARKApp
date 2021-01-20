@@ -15,6 +15,12 @@ namespace Mark5.Mobile.Common.Model
         public bool ChangeSingleOccurrenceAvailable => SystemVersionGreaterThanOrEqual(1, 39, 0);
         public bool InternalMailsAvailable => false;
 
+        /// <summary>
+        /// New Notifications System works only on systems with API 4.0.0 or greater or with server versions equal or greater that 1.37.13.
+        /// All 1.33 and 1.35 version work with old notifications system.
+        /// </summary>
+        public bool NewPushNotificationsSystemAvailable => ServiceVersionGreaterThanOrEqual(4, 0, 0) || SystemVersionGreaterThanOrEqual(1, 37, 13);
+
         List<ModuleType> availableModules;
         public List<ModuleType> AvailableModules
         {

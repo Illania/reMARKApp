@@ -61,11 +61,10 @@ namespace Mark5.Mobile.IOS
                 App.Configure(); //Firebase Analytics
                 Messaging.SharedInstance.Delegate = this;
 
-                var serviceVersion = ServerConfig.SystemSettings?.SystemInfo?.ServiceVersion;
-               if (serviceVersion.CompareTo(new Version(4, 0, 0)) < 0)
+               if (ServerConfig.SystemSettings?.SystemInfo?.NewPushNotificationsSystemAvailable == true)
+                    TinyIoCContainer.Current.Register<IPushNotificationsRegistrator>(new ANHRegistrator());
+                else
                    TinyIoCContainer.Current.Register<IPushNotificationsRegistrator>(new FCMRegistrator());
-               else
-                   TinyIoCContainer.Current.Register<IPushNotificationsRegistrator>(new ANHRegistrator());
 
                 pushNotificationsRegistrator = TinyIoCContainer.Current.Resolve<IPushNotificationsRegistrator>();
 

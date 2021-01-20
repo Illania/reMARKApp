@@ -637,7 +637,6 @@
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Service\PushNotificationInstanceIdService.cs" />
     <Compile Include="Service\PushNotificationMessagingService.cs" />
-    <Compile Include="Service\PushNotificationsConstants.cs" />
     <Compile Include="Service\FirebaseInstanceManager.cs" />
   </ItemGroup>
   <ItemGroup>
