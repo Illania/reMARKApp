@@ -252,7 +252,7 @@
         <item name="android:textColor">@color/darkerblue</item>
     </style>
     <style name="tabTextAppearance" parent="TextAppearance.Design.Tab">
-        <item name="android:textColor">@color/darkblue</item>
+        <item name="android:textColor">@color/lightgray</item>
         <item name="textAllCaps">false</item>
     </style>
     <style name="fontCallerId" parent="TextAppearance.AppCompat.Body1">
