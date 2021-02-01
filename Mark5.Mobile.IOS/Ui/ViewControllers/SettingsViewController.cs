@@ -52,6 +52,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             NeverShowPrivacySettings = false;
             ShowCreditsFooter = false;
             Delegate = this;
+            base.NavigationItem.RightBarButtonItem = null;
         }
 
         public override void ViewDidLoad()
