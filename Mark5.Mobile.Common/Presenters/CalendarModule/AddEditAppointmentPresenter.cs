@@ -173,7 +173,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             if (IsRecurring())
                 return CalendarOccurenceType.Pattern;
 
-            return Type;
+            return Type == CalendarOccurenceType.None ? CalendarOccurenceType.Normal : Type;
         }
 
         public CalendarAppointment ConvertToModel(AppointmentChangeType appointmentChangeType)
