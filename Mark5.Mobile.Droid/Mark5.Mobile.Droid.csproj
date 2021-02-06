@@ -631,7 +631,6 @@
     <Compile Include="Utilities\Worker\SystemSettingsWorker.cs" />
     <Compile Include="Ui\Activities\MsalActivity.cs" />
     <Compile Include="Ui\Common\ViewPagerFixed.cs" />
-    <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Service\PushNotifications\Firebase\FirebaseRegistrator.cs" />
     <Compile Include="Service\PushNotifications\Firebase\FirebaseInstanceIdService.cs" />
     <Compile Include="Service\PushNotifications\Firebase\FirebaseMessagingService.cs" />
@@ -641,6 +640,7 @@
     <Compile Include="Service\Reachability\ReachabilityMonitor.cs" />
     <Compile Include="Service\PushNotifications\IPushNotificationsRegistrator.cs" />
     <Compile Include="TinyIoC.cs" />
+    <Compile Include="Resources\Resource.designer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -1140,6 +1140,14 @@
       <Generator></Generator>
     </AndroidResource>
     <AndroidResource Include="Resources\drawable\onboarding_2.xml">
+      <SubType></SubType>
+      <Generator></Generator>
+    </AndroidResource>
+    <AndroidResource Include="Resources\drawable\onboarding_3.xml">
+      <SubType></SubType>
+      <Generator></Generator>
+    </AndroidResource>
+    <AndroidResource Include="Resources\drawable\onboarding_4.xml">
       <SubType></SubType>
       <Generator></Generator>
     </AndroidResource>

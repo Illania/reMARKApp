@@ -10,8 +10,6 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 using System.Linq;
-using Android.Support.V4.Content;
-using Android.Graphics;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -146,7 +144,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class PagerAdapter : FragmentPagerAdapter
         {
-            public override int Count => 2;
+            public override int Count => 4;
 
             readonly Folder folder;
 
