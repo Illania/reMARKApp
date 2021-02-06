@@ -12,7 +12,7 @@ namespace Mark5.Mobile.Common.Model
         public string CustomerName { get; set; }
         public Guid CustomerGuid { get; set; }
         public bool SyncFavoritesAvailable => ServiceVersionGreaterThanOrEqual(3, 2, 0);
-        public bool ChangeSingleOccurrenceAvailable => SystemVersionGreaterThanOrEqual(1, 39, 0);
+        public bool ChangeSingleOccurrenceAvailable => SystemVersionGreaterThanOrEqual(1, 38, 10);
         public bool InternalMailsAvailable => false;
 
         /// <summary>
