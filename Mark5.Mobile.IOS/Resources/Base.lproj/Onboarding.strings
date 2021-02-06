@@ -1,6 +1,6 @@
 ﻿"1_title" = "Welcome to reMARK";
 "1_content" = "We have made a few changes in the reMARK app. Press next to see what has changed.";
-"2_title" = "Compatibility with iOS 14";
-"2_content" = "We have fixed all issues related to new iOS update.";
-"3_title" = "Login with Microsoft account";
-"3_content" = "Now you can login to app using your Microsoft Azure AD account.";
+"2_title" = "Subscribe to push notifications on single device";
+"2_content" = "Now you can subscribe and unsubscribe folders for push notifications on each device independently.";
+"3_title" = "Sort emails by date";
+"3_content" = "Now you can sort your emails either by date or id.";
