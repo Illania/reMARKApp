@@ -144,7 +144,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class PagerAdapter : FragmentPagerAdapter
         {
-            public override int Count => 4;
+            public override int Count => 2;
 
             readonly Folder folder;
 
