@@ -770,6 +770,8 @@
 		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_3.imageset\microsoft-account.pdf" />
 		<ImageAsset Include="Assets_icons.xcassets\Delayed.imageset\Contents.json" />
 		<ImageAsset Include="Assets_icons.xcassets\Delayed.imageset\timer.pdf" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_2.imageset\onboarding_2.pdf" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_3.imageset\onboarding_3.pdf" />
 	</ItemGroup>
 	<ItemGroup>
 		<BundleResource Include="Resources\Base.lproj\Localizable.strings" />

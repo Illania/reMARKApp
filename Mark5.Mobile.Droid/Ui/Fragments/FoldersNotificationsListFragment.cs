@@ -10,8 +10,6 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
 using System.Linq;
-using Android.Support.V4.Content;
-using Android.Graphics;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
