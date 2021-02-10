@@ -56,6 +56,8 @@
 "changes_not_saved" = "Changes not saved!";
 "changes_not_saved_description" = "Current changes are not saved and will be discarded";
 "city" = "City";
+"confirm_delayed_send_title" = "Confirm delayed send";
+"confirm_delayed_send_content" = "The mail will be sent at:\n {0}\nDo you wish to proceed?";
 "country" = "Country";
 "clear_contacts_cache_summary" = "Do you want to remove cached contacts?";
 "clear_contacts_cache_title" = "Clear contacts cache";
@@ -423,7 +425,11 @@
 "select_users" = "Select users";
 "select_categories"="Select Categories";
 "select_line"="Select mailbox";
+"selected_time_before_current_time_title" = "The selected time is invalid";
+"selected_time_before_current_time_content" = "The selected time is before the current time. Please try again.";
 "send" = "Send";
+"send_email_after" = "Send email after";
+"send_email_at" = "Send email at";
 "send_text" = "Send message";
 "sending_document___" = "Sending email...";
 "sending_inviations__" = "Sending invitations...";

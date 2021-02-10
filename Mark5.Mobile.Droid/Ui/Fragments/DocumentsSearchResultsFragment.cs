@@ -270,6 +270,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     dpvh.Categories = dp.Categories;
                     dpvh.IncomingIndicator = dp.Direction == DocumentDirection.Incoming;
                     dpvh.OutgoingIndicator = dp.Direction == DocumentDirection.Outgoing;
+                    dpvh.DelayedIndicator = dp.TransmitStatus == TransmitStatus.Delayed;
                     dpvh.DraftIndicator = dp.Direction == DocumentDirection.Draft;
                     dpvh.UnreadIndicator = PlatformConfig.Preferences.UnreadIndicatorMe ? !dp.IsReadByCurrent : !dp.IsReadByAnyone;
                     dpvh.AttachmentIndicator = dp.AttachmentsCount > 0;
@@ -383,6 +384,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public bool OutgoingIndicator { set => outgoingImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
+            public bool DelayedIndicator { set => delayedImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
+
             public bool DraftIndicator { set => draftImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
             public bool UnreadIndicator { set => unreadImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
@@ -400,6 +403,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             readonly LinearLayoutCompat categoriesLayout;
             readonly AppCompatImageView incomingImageView;
             readonly AppCompatImageView outgoingImageView;
+            readonly AppCompatImageView delayedImageView;
             readonly AppCompatImageView draftImageView;
             readonly AppCompatImageView unreadImageView;
             readonly AppCompatImageView attachmentImageView;
@@ -416,6 +420,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 categoriesLayout = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.list_item_document_categories);
                 incomingImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_direction_incoming);
                 outgoingImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_direction_outgoing);
+                delayedImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_direction_delayed);
                 draftImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_direction_draft);
                 unreadImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_unread);
                 attachmentImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_attachment);

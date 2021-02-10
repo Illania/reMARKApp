@@ -14,6 +14,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         #region Nordic IT Colors
 
+        public static UIColor OpaqueLightGray => LightGray.ColorWithAlpha(0.5f);
         public static UIColor LightBlue => UIColor.FromRGB(199f / 255f, 222f / 255f, 232f / 255f);
         public static UIColor Blue => UIColor.FromRGB(69f / 255f, 133f / 255f, 176f / 255f);
         public static UIColor DarkBlue => UIColor.FromRGB(23f / 255f, 79f / 255f, 107f / 255f);

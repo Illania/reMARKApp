@@ -384,6 +384,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                         image = UIImage.FromBundle("Edit-Small").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
                         break;
                 }
+                if(dp.TransmitStatus == TransmitStatus.Delayed)
+                    image = UIImage.FromBundle("Delayed").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
             }
 
             directionIndicatorImageView.Image = image;

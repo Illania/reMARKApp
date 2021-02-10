@@ -18,6 +18,10 @@
         <item>Subject</item>
         <item>Message</item>
     </string-array>
+        <string-array name="set_time_options">
+        <item>Send email at</item>
+        <item>Send email after</item>
+    </string-array>
     <string-array name="ssl_modes">
         <item>SSL Enabled</item>
         <item>SSL Disabled</item>
