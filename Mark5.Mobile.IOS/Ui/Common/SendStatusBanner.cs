@@ -183,7 +183,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 else if (status == DocumentUploadStatusChangedMessage.Status.DocumentDelayed)
                 {
                     bannerInfo.Text = Localization.GetString("delayed_send_queued");
-                    bannerInfo.Color = Theme.TintColor;
+                    bannerInfo.Color = Theme.DarkBlue;
                 }
                 else if (status == DocumentUploadStatusChangedMessage.Status.DocumentSentFailed)
                 {

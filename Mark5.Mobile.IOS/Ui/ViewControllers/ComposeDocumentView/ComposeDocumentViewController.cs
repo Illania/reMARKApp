@@ -59,6 +59,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         UIBarButtonItem cancelButtonItem;
         UIBarButtonItem insertButtonItem;
         UIBarButtonItem sendButtonItem;
+        UIButton sendButton;
+        UILongPressGestureRecognizer sendButtonLongPressGestureRecognizer;
 
         UIStackView headerStackView;
         ToView toView;
@@ -143,6 +145,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             cancelButtonItem = null;
             sendButtonItem = null;
             insertButtonItem = null;
+            sendButton = null;
 
             toView?.RemoveFromSuperview();
             ccView?.RemoveFromSuperview();
@@ -180,11 +183,35 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             {
                 Title = Localization.GetString("cancel")
             };
-            sendButtonItem = new UIBarButtonItem
+
+
+            if (ServerConfig.SystemSettings?.SystemInfo?.DelaySendAvailable == true)
             {
-                Title = Localization.GetString("send"),
-                Enabled = false
-            };
+                sendButton = new UIButton
+                {
+                    TranslatesAutoresizingMaskIntoConstraints = false,
+                    Opaque = false,
+                    Enabled = false,
+                };
+
+                sendButton.SetTitleColor(Theme.DarkBlue, UIControlState.Normal);
+                sendButton.SetTitle(Localization.GetString("send"), UIControlState.Normal);
+                sendButton.Font = Theme.DefaultFont;
+
+
+                sendButtonItem = new UIBarButtonItem
+                {
+                    CustomView = sendButton
+                };
+            }
+            else
+            {
+                sendButtonItem = new UIBarButtonItem
+                {
+                    Title = Localization.GetString("send"),
+                    Enabled = false
+                };
+            }
             insertButtonItem = new UIBarButtonItem
             {
                 Image = UIImage.FromBundle("Attachment").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
@@ -240,8 +267,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         {
             cancelButtonItem.Clicked += CancelButtonItem_Clicked;
             insertButtonItem.Clicked += InsertButtonItem_Clicked;
-            sendButtonItem.Clicked += SendButtonItem_Clicked;
 
+            if (ServerConfig.SystemSettings?.SystemInfo?.DelaySendAvailable == true)
+            {
+                sendButton.TouchUpInside += SendButton_TouchUpInside;
+                sendButtonLongPressGestureRecognizer = new UILongPressGestureRecognizer(SendButton_LongPress);
+                sendButton.AddGestureRecognizer(sendButtonLongPressGestureRecognizer);
+            }
+            else
+            {
+                sendButtonItem.Clicked += SendButtonItem_Clicked;
+            }
+                
             toView.AddButtonTapped += RecipientView_AddButtonTapped;
             ccView.AddButtonTapped += RecipientView_AddButtonTapped;
             bccView.AddButtonTapped += RecipientView_AddButtonTapped;
@@ -264,7 +301,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         {
             cancelButtonItem.Clicked -= CancelButtonItem_Clicked;
             insertButtonItem.Clicked -= InsertButtonItem_Clicked;
-            sendButtonItem.Clicked -= SendButtonItem_Clicked;
+
+            if (ServerConfig.SystemSettings?.SystemInfo?.DelaySendAvailable == true)
+            {
+                sendButton.TouchUpInside -= SendButton_TouchUpInside;
+                sendButton.RemoveGestureRecognizer(sendButtonLongPressGestureRecognizer);
+            }
+            else
+            {
+                sendButtonItem.Clicked -= SendButtonItem_Clicked;
+            }
 
             toView.AddButtonTapped -= RecipientView_AddButtonTapped;
             ccView.AddButtonTapped -= RecipientView_AddButtonTapped;
@@ -297,7 +343,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             await LoadTemplate();
 
             insertButtonItem.Enabled = true;
-            sendButtonItem.Enabled = true;
+
+            if (ServerConfig.SystemSettings?.SystemInfo?.DelaySendAvailable == true)
+                sendButton.Enabled = true;
+            else
+                sendButtonItem.Enabled = true;
 
             autoSaveWorkingCopyWorker?.Stop();
             autoSaveWorkingCopyWorker = new Worker(SaveWorkingCopy, AutoSaveWorkingCopyInterval);
@@ -578,15 +628,34 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             }
         }
 
+        void SendButton_TouchUpInside(object sender, EventArgs e)
+        {
+            SendButtonItem_Clicked(sender, new SendButtonClickedEventArgs() { Delayed = false });
+        }
+
+        void SendButton_LongPress()
+        {
+            SendButtonItem_Clicked(sendButton, new SendButtonClickedEventArgs() { Delayed = true });
+        }
+
         async void SendButtonItem_Clicked(object sender, EventArgs e)
         {
+            
             if (autoSaveWorkingCopyWorker != null)
             {
                 autoSaveWorkingCopyWorker.Stop();
                 await autoSaveWorkingCopyWorker.Finished();
             }
 
-            var sent = await SendDocument();
+
+            bool sent;
+
+            if (!(e is SendButtonClickedEventArgs sendButtonClickedEventArgs && sendButtonClickedEventArgs.Delayed == true))
+                sent = await SendDocument();
+            else
+                sent = await SendDocumentWithDelay();
+
+
             if (!sent)
                 return;
 
@@ -791,7 +860,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         #region Sending/saving/deleting
 
-        async Task<bool> SendDocument()
+        async Task<bool> CheckDocument()
         {
             if (!ContainsValidRecipients(toView, ccView, bccView))
             {
@@ -819,6 +888,72 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     return false;
             }
 
+            return true;
+        }
+
+        async Task<bool> SendDocument()
+        {
+            var result = await CheckDocument();
+            if (!result)
+                return false;
+
+            return await SaveAndQueueWorkingCopy();
+        }
+
+        async Task<bool> SendDocumentWithDelay()
+        {
+            var result = await CheckDocument();
+            if (!result)
+                return false;
+
+            var options = new[]
+            {
+                Localization.GetString("send_email_at"),
+                Localization.GetString("send_email_after")
+            };
+
+            var choice = await Dialogs.ShowListActionSheetAsync(this, options);
+
+            try
+            {
+                if (choice == 0)
+                {
+                    var dp = new DatePickerDialogViewController();
+                    dp.ModalPresentationStyle = UIModalPresentationStyle.OverCurrentContext;
+                    dp.ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve;
+                    PresentViewController(dp, false, null);
+
+                    var pickedDateTime = await dp.Result;
+
+                    //DateTime is already UTC, so no conversion to UTC needed,
+                    return await SaveAndQueueWorkingCopy(pickedDateTime.ConvertDateTimeToTimestampMilliseconds());
+                }
+
+                if (choice == 1)
+                {
+                    var cd = new CountDownPickerDialogViewController();
+                    cd.ModalPresentationStyle = UIModalPresentationStyle.OverCurrentContext;
+                    cd.ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve;
+                    PresentViewController(cd, false, null);
+
+                    var pickedDateTime = await cd.Result;
+
+                    //DateTime is already UTC, so no conversion to UTC needed,
+                    return await SaveAndQueueWorkingCopy(pickedDateTime.ConvertDateTimeToTimestampMilliseconds());
+                }
+            }
+            catch (TaskCanceledException ex)
+            {
+                return false;
+            }
+
+            return false;
+        }
+
+
+        async Task<bool> SaveAndQueueWorkingCopy(long timestamp = -1)
+        {
+            
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("sending_document___"));
 
             try
@@ -838,7 +973,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     PreviousDocumentId = PreviousDocumentId,
                     PreviousDocumentDirection = PreviousDocumentDirection,
                     DocumentPreview = documentPreview,
-                    Document = document
+                    Document = document,
+                    SendOnTimestamp = timestamp
                 });
 
                 await Managers.DocumentsManager.QueueWorkingCopyToUpload();
@@ -1455,6 +1591,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             {
                 DidPickDocument(controller, new[] { url });
             }
+        }
+
+        public class SendButtonClickedEventArgs: EventArgs
+        {
+            public bool Delayed { get; set; }
         }
 
         #endregion

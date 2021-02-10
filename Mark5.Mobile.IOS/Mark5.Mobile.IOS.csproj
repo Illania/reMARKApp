@@ -317,6 +317,8 @@
 		<Compile Include="PushNotifications\FCMRegistrator.cs" />
 		<Compile Include="PushNotifications\IPushNotificationsRegistrator.cs" />
 		<Compile Include="TinyIoC.cs" />
+		<Compile Include="Ui\ViewControllers\CountDownPickerDialogViewController.cs" />
+		<Compile Include="Ui\ViewControllers\DatePickerDialogViewController.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
@@ -766,6 +768,8 @@
 		<ImageAsset Include="Assets_icons.xcassets\Nav-search.imageset\nav-search-1.pdf" />
 		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_2.imageset\ios-update.pdf" />
 		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_3.imageset\microsoft-account.pdf" />
+		<ImageAsset Include="Assets_icons.xcassets\Delayed.imageset\Contents.json" />
+		<ImageAsset Include="Assets_icons.xcassets\Delayed.imageset\timer.pdf" />
 	</ItemGroup>
 	<ItemGroup>
 		<BundleResource Include="Resources\Base.lproj\Localizable.strings" />
@@ -888,6 +892,7 @@
 	  <Folder Include="Assets_icons.xcassets\Password-Hide.imageset\" />
 	  <Folder Include="Assets_icons.xcassets\AzureLogin.imageset\" />
 	  <Folder Include="PushNotifications\" />
+	  <Folder Include="Assets_icons.xcassets\Delayed.imageset\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 	<Import Project="..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets" Condition="Exists('..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets')" />
