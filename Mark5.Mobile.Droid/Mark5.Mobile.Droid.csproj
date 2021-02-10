@@ -1144,6 +1144,9 @@
       <Generator></Generator>
     </AndroidResource>
     <AndroidResource Include="Resources\drawable\timer.xml">
+      <SubType></SubType>
+      <Generator></Generator>
+    </AndroidResource>
     <AndroidResource Include="Resources\drawable\onboarding_3.xml">
       <SubType></SubType>
       <Generator></Generator>

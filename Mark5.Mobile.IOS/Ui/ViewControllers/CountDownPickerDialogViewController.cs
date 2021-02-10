@@ -13,7 +13,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.InitializeView();
 
             datePicker.Mode = UIDatePickerMode.CountDownTimer;
-            datePicker.MinuteInterval = 5;
+            datePicker.MinuteInterval = 5;   
+            datePicker.MinimumDate = (NSDate)DateTime.SpecifyKind(DateTime.Now.Date.AddHours(-12).AddMinutes(5), DateTimeKind.Utc);
+            datePicker.CountDownDuration = 300;
         }
 
         protected override async void OkButton_TouchedUpInside(object sender, EventArgs e)

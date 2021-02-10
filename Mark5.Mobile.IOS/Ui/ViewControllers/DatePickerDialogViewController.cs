@@ -57,9 +57,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             datePicker = new UIDatePicker
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
+                Mode = UIDatePickerMode.DateAndTime,
+                MinimumDate = NSDate.Now
             };
-            datePicker.Mode = UIDatePickerMode.DateAndTime;
-            datePicker.MinimumDate = NSDate.Now;
 
             cancelButton = new UIButton
             {
