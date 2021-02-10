@@ -675,6 +675,7 @@ namespace Mark5.Mobile.Common.Manager
                     PreceedingDocumentId = precedingDocumentId,
                     PreceedingDocumentFolderId = precedingDocumentFolderId,
                     SendOn = sendOnTimestamp.ConvertTimestampMillisecondsToDateTime(),
+                    Delayed = sendOnTimestamp > 0,
                     ConfirmRead = confirmRead,
                     ConfirmDelivery = confirmDelivery,
                     TemporaryAttachmentGuids = temporaryAttachmentGuids ?? new List<Guid>()

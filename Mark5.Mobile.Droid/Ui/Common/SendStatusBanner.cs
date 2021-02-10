@@ -96,7 +96,9 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
         void DocumentUploadStatusChanged(DocumentUploadStatusChangedMessage obj)
         {
-            if (obj.Change != DocumentUploadStatusChangedMessage.Status.DocumentSent && obj.Change != DocumentUploadStatusChangedMessage.Status.DocumentSentFailed)
+            if (obj.Change != DocumentUploadStatusChangedMessage.Status.DocumentSent
+                && obj.Change != DocumentUploadStatusChangedMessage.Status.DocumentSentFailed
+                && obj.Change != DocumentUploadStatusChangedMessage.Status.DocumentDelayed)
                 return;
 
             QueueBanner(BannerInfo.FromMessage(obj));
@@ -119,6 +121,11 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 {
                     bannerInfo.TextRes = isDraft ? Resource.String.draft_saved : Resource.String.email_sent;
                     bannerInfo.ColorRes = Resource.Color.darkerblue;
+                }
+                else if(status == DocumentUploadStatusChangedMessage.Status.DocumentDelayed)
+                {
+                    bannerInfo.TextRes = Resource.String.delayed_send_queued;
+                    bannerInfo.ColorRes = Resource.Color.darkgray;
                 }
                 else if (status == DocumentUploadStatusChangedMessage.Status.DocumentSentFailed)
                 {

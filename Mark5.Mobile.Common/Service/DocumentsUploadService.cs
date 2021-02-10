@@ -133,11 +133,25 @@ namespace Mark5.Mobile.Common.Service
                                                                     uploadedAttachmentsGuids,
                                                                     SourceType.Remote);
 
-                            CommonConfig.Logger.Info($"Document sent [documentToUploadGuid={documentToUploadGuid}]");
+                            if (info.SendOnTimestamp < 0)
+                            {
+                                CommonConfig.Logger.Info($"Document sent [documentToUploadGuid={documentToUploadGuid}]");
+
+                              
+                                CommonConfig.MessengerHub.Publish(new DocumentUploadStatusChangedMessage(this, DocumentUploadStatusChangedMessage.Status.DocumentSent, documentToUploadGuid, isDraft));
+                                
+                            }
+                            else
+                            { 
+                                CommonConfig.Logger.Info($"Document queued for delayed send [documentToUploadGuid={documentToUploadGuid}]");
+                                
+                                
+                                CommonConfig.MessengerHub.Publish(new DocumentUploadStatusChangedMessage(this, DocumentUploadStatusChangedMessage.Status.DocumentDelayed, documentToUploadGuid, isDraft));
+                                
+                            }
 
                             await FileSystemStorage.DeleteDocumentToUpload(documentToUploadGuid);
 
-                            CommonConfig.MessengerHub.Publish(new DocumentUploadStatusChangedMessage(this, DocumentUploadStatusChangedMessage.Status.DocumentSent, documentToUploadGuid, isDraft));
                         }
                         catch (HttpAppServiceException hasx) when (hasx?.Detail?.Code == AppServiceFaultCode.DocumentAlreadySentError)
                         {

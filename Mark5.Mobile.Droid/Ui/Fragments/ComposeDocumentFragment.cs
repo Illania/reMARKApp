@@ -246,6 +246,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             fab = ((BaseAppCompatActivity)Activity).Fab;
             fab.SetImageResource(Resource.Drawable.action_send);
             fab.SetOnClickListener(new ActionOnClickListener(() => SendDocument()));
+            if (ServerConfig.SystemSettings?.SystemInfo?.DelaySendAvailable == true)
+                fab.SetOnLongClickListener(new ActionOnLongClickListener(SendDocumentWithDelay));
             fab.Enabled = false;
             fab.Alpha = 0.6f;
             fab.Visibility = ViewStates.Visible;
@@ -822,6 +824,125 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             else
                 sendAction();
         }
+
+
+        void SendDocumentWithDelay()
+        {
+            async void selectDelay()
+            {
+                var option = await Dialogs.ShowListDialog(Context, Resource.String.set_time, Resource.Array.set_time_options, true);
+
+                try
+                {
+
+                    DateTime pickedDate;
+                    if (option == 0) //Pick date and time
+                    {
+                        pickedDate = await Dialogs.ShowDatePicker(Context);
+                        var (pickedHour, pickedMinute) = await Dialogs.ShowTimePicker(Context);
+                        pickedDate = pickedDate.Date.AddHours(pickedHour).AddMinutes(pickedMinute);
+
+                        if (pickedDate <= DateTime.Now)
+                        {
+                            Dialogs.ShowConfirmDialog(Context, Resource.String.selected_time_before_current_time_title, Resource.String.selected_time_before_current_time_content);
+                            fab.Enabled = true;
+                            return;
+                        }
+                    }
+                    else //Pick time after now
+                    {
+                        var (pickedHours, pickedMinutes) = await Dialogs.ShowHourMinutePicker(Context);
+                        pickedDate = DateTime.Now.AddHours(pickedHours).AddMinutes(pickedMinutes);
+                        fab.Enabled = true;
+                    }
+
+                    var pickedDateMilliseconds = pickedDate.ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
+
+                    var dateFormat = Android.Text.Format.DateFormat.GetDateFormat(Application.Context);
+                    var timeFormat = Android.Text.Format.DateFormat.GetTimeFormat(Application.Context);
+
+                    var dateToPrint = new Java.Util.Date(pickedDateMilliseconds);
+
+                    var sendConfirmed = await Dialogs.ShowYesNoDialogAsync(Context, Resources.GetString(Resource.String.confirm_delay_send_title),
+                                                                           String.Format(Resources.GetString(Resource.String.confirm_delay_send_content), dateFormat.Format(dateToPrint) + ", " + timeFormat.Format(dateToPrint)),
+                                                                           centerTitle: true, centerContent: true);
+
+                    if (sendConfirmed)
+                        SaveAndQueueWorkingCopy(false, pickedDateMilliseconds);
+                    else
+                    {
+                        fab.Enabled = true;
+                        return;
+                    }
+                }
+                catch (TaskCanceledException ex)
+                {
+                    fab.Enabled = true;
+                    return;
+                }
+
+            }
+
+            fab.Enabled = false;
+
+            CheckDocument(selectDelay);
+        }
+
+        void CheckDocument(Action positiveAction)
+        {
+            var allRecipientsValid = new RecipientsView[] { toView, ccView, bccView }.All(rv => rv.AllRecipientsValid);
+
+            if (!allRecipientsValid && subjectView.Empty)
+                Dialogs.ShowYesNoDialog(Context, Resource.String.invalid_recipients_and_subject_title, Resource.String.invalid_recipients_and_subject_content, positiveAction, () => fab.Enabled = true);
+            else if (!allRecipientsValid)
+                Dialogs.ShowYesNoDialog(Context, Resource.String.invalid_recipients_title, Resource.String.invalid_recipients_content, positiveAction, () => fab.Enabled = true);
+            else if (subjectView.Empty)
+                Dialogs.ShowYesNoDialog(Context, Resource.String.invalid_subject_title, Resource.String.invalid_subject_content, positiveAction, () => fab.Enabled = true);
+            else
+                positiveAction();
+        }
+
+        async void SaveAndQueueWorkingCopy(bool saveDraft = false, long timestamp = -1)
+        {
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, saveDraft ? Resource.String.saving_draft : Resource.String.sending_document, Resource.String.please_wait);
+
+            foreach (var subView in subViews)
+                await subView.UpdateDocument();
+
+            documentPreview.Direction = saveDraft ? DocumentDirection.Draft : DocumentDirection.Outgoing;
+
+            if (autoSaveWorkingCopyWorker != null)
+            {
+                autoSaveWorkingCopyWorker.Stop();
+                await autoSaveWorkingCopyWorker.Finished();
+            }
+
+            await Managers.DocumentsManager.SaveDocumentWorkingCopyAsync(new DocumentWorkingCopy
+            {
+                DocumentCreationModeFlag = documentCreationModeFlag,
+                CopyToNewOption = copyToNewOption,
+                PreviousDocumentFolderId = previousDocumentFolderId,
+                PreviousDocumentId = previousDocumentId,
+                PreviousDocumentDirection = previousDocumentDirection,
+                DocumentPreview = documentPreview,
+                Document = document,
+                SendOnTimestamp = timestamp
+            });
+            var t = Managers.DocumentsManager.QueueWorkingCopyToUpload();
+            await t;
+
+            dismissAction();
+
+            if (t.IsFaulted)
+            {
+                CommonConfig.Logger.Error($"Failed to queue document for upload [saveDraft={saveDraft}, restoreWorkingCopy={restoreWorkingCopy}, documentCreationModeFlag={documentCreationModeFlag}, copyToNewOption={copyToNewOption}, previousDocumentFolderId={previousDocumentFolderId}, previousDocumentId={previousDocumentId}] at timestamp={timestamp}", t.Exception.InnerException);
+                await Dialogs.ShowErrorDialogAsync(Activity, t.Exception.InnerException);
+                fab.Enabled = true;
+            }
+            else
+                Activity?.Finish();
+        }
+        
 
         async void HandleAddAttachment(Intent data)
         {

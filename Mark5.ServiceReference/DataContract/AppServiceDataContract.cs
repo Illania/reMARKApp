@@ -303,6 +303,10 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "IEventReplyParameters", Order = 1)]
         public IEventReplyParameters IEventReplyParameters { get; set; }
+
+        [DataMember(Name = "Delayed", Order = 1)]
+        public bool Delayed { get; set; }
+
     }
 
     [DataContract(Name = "SendDocumentResult", Namespace = "com.nordic-it.appservice.v3")]

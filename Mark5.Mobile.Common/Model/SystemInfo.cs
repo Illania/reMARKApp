@@ -13,6 +13,7 @@ namespace Mark5.Mobile.Common.Model
         public Guid CustomerGuid { get; set; }
         public bool SyncFavoritesAvailable => ServiceVersionGreaterThanOrEqual(3, 2, 0);
         public bool ChangeSingleOccurrenceAvailable => SystemVersionGreaterThanOrEqual(1, 39, 0);
+        public bool DelaySendAvailable => SystemVersionGreaterThanOrEqual(1, 38, 11);
         public bool InternalMailsAvailable => false;
 
         /// <summary>

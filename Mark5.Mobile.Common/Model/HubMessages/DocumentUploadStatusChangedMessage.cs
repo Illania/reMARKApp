@@ -12,6 +12,7 @@ namespace Mark5.Mobile.Common.Model.HubMessages
             DocumentSent,
             DocumentSentFailed,
             DocumentDiscarded,
+            DocumentDelayed
         }
 
         public bool IsDraft { get; }

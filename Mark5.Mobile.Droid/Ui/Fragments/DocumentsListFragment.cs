@@ -320,15 +320,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 var documents = await Managers.DocumentsManager.GetDocumentPreviewsAsync(Folder, endId: endId);
 
-                if (documents.Count > 0)
+                var incomingCount = documents?.Count(d => d.Direction == DocumentDirection.Incoming && d.TransmitStatus != TransmitStatus.Delayed) ?? 0;
+                if (incomingCount > 0)
                 {
-                    CommonConfig.Logger.Info($"Received {documents?.Count} new documents");
+                    CommonConfig.Logger.Info($"Received {incomingCount} new documents");
 
                     var snackbar = Snackbar.Make(coordinatorLayout, Resources.GetQuantityString(Resource.Plurals.new_documents_received, documents.Count, documents.Count), Snackbar.LengthShort);
                     snackbar.View.SetBackgroundColor(new Color(ContextCompat.GetColor(Activity, Resource.Color.darkerblue)));
                     snackbar.Show();
 
-                    Activity?.RunOnUiThread(() => { adapter?.PrependItems(documents); });
+                    Activity?.RunOnUiThread(() => {
+                        adapter?.PrependItems(documents);
+                    });
 
                     Services.DocumentsDownloadService.Notify();
                 }
@@ -1157,11 +1160,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     dpvh.BubbleDate = d.FormatUserTimestampAsCompactLongDateTimeString(context);
                     dpvh.Preview = string.IsNullOrWhiteSpace(dp.Preview) ? context.GetString(Resource.String.no_content) : Regex.Replace(dp.Preview, @"^\s+$[\r\n]*", "", RegexOptions.Multiline);
                     dpvh.Categories = dp.Categories;
-
                     dpvh.FailIndicator = isFailed;
                     dpvh.PartiallySentIndicator = isPartiallySent;
                     dpvh.IncomingIndicator = dp.Direction == DocumentDirection.Incoming && (!isPartiallySent) && (!isFailed);
-                    dpvh.OutgoingIndicator = dp.Direction == DocumentDirection.Outgoing && (!isPartiallySent) && (!isFailed);
+                    dpvh.OutgoingIndicator = dp.Direction == DocumentDirection.Outgoing && (!isPartiallySent) && (!isFailed) && !(dp.TransmitStatus == TransmitStatus.Delayed);
+                    dpvh.DelayedIndicator = dp.TransmitStatus == TransmitStatus.Delayed && (!isPartiallySent) && (!isFailed);
                     dpvh.DraftIndicator = dp.Direction == DocumentDirection.Draft;
                     dpvh.UnreadIndicator = unreadIndicatorMe ? !dp.IsReadByCurrent : !dp.IsReadByAnyone;
                     dpvh.AttachmentIndicator = dp.AttachmentsCount > 0;
@@ -1680,6 +1683,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public bool OutgoingIndicator { set => outgoingImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
+            public bool DelayedIndicator { set => delayedImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
+
             public bool PartiallySentIndicator { set => partiallySentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
             public bool FailIndicator { set => failImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
@@ -1736,6 +1741,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             readonly LinearLayoutCompat categoriesLayout;
             readonly AppCompatImageView incomingImageView;
             readonly AppCompatImageView outgoingImageView;
+            readonly AppCompatImageView delayedImageView;
             readonly AppCompatImageView draftImageView;
             readonly AppCompatImageView unreadImageView;
             readonly AppCompatImageView partiallySentImageView;
@@ -1758,6 +1764,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 categoriesLayout = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.list_item_document_categories);
                 incomingImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_direction_incoming);
                 outgoingImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_direction_outgoing);
+                delayedImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_direction_delayed);
                 failImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_failed);
                 partiallySentImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_partially_sent);
                 draftImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_direction_draft);
