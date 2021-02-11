@@ -425,10 +425,34 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             eas.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"), UIAlertActionStyle.Default, a => ShowPriorityActionSheet(selectedDocuments, (UIBarButtonItem)sender)));
 
             if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, a => RemoveFromFolder(selectedDocuments, d)));
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"),
+                    UIAlertActionStyle.Default,
+                    a => RemoveFromFolder(selectedDocuments, d)));
 
             if (ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || selectedDocuments.All(dp => dp.Direction == DocumentDirection.Draft))
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, a => Delete(selectedDocuments, d)));
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"),
+                    UIAlertActionStyle.Destructive,
+                    a => Delete(selectedDocuments, d)));
+
+            if (ServerConfig.SystemSettings?.SystemInfo?.DelaySendAvailable == true && selectedDocuments.Any(dp => dp.TransmitStatus == TransmitStatus.Delayed))
+            {
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("send_now"),
+                   UIAlertActionStyle.Default,
+                   a =>
+                   {
+                       ForceSend(selectedDocuments);
+                       EndEditing();
+                   }));
+
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel_send"),
+                  UIAlertActionStyle.Default,
+                  a =>
+                  {
+                      CancelSend(selectedDocuments);
+                      EndEditing();
+                  }));
+            }
+
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => exitEditItem.Enabled = true));
 
@@ -898,6 +922,66 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error($"Marking as unread failed [documentPreviews.Count={documentPreviews.Count}]", ex);
+
+                await Dialogs.ShowErrorAlertAsync(this, ex);
+            }
+        }
+
+        async void ForceSend(List<DocumentPreview> documentPreviews)
+        {
+            var delayedItems = documentPreviews.Where(i => i.TransmitStatus == TransmitStatus.Delayed).ToList();
+
+            CommonConfig.Logger.Info($"Attempting to force send delayed items [businessEntities.Count={delayedItems.Count}]...");
+
+            try
+            {
+                CommonConfig.UsageAnalytics.LogEvent(new ForceSendEvent());
+
+                await Managers.DocumentsManager.ForceSendDocument(delayedItems);
+                var updatedItemsIds = delayedItems.Select(d => d.Id);
+                ((DataSource)TableView.Source).UpdateItems(updatedItemsIds);
+                ((DataSource)((UITableViewController)searchController?.SearchResultsController)?.TableView?.Source)?.UpdateItems(updatedItemsIds);
+
+                CommonConfig.Logger.Info($"Documents with IDs:{string.Join(",", delayedItems.Select(i => i.Id).ToList()).TrimEnd(',')} forced sent.");
+
+                foreach (var item in delayedItems)
+                    CommonConfig.MessengerHub.Publish(new DocumentUploadStatusChangedMessage(this, DocumentUploadStatusChangedMessage.Status.DocumentSent,
+                        Guid.Empty, false));
+
+            }
+            catch (Exception ex)
+            {
+
+                CommonConfig.Logger.Error($"Force send failed [businessEntities.Count={delayedItems.Count}]", ex);
+
+                await Dialogs.ShowErrorAlertAsync(this, ex);
+            }
+        }
+
+        async void CancelSend(List<DocumentPreview> documentPreviews)
+        {
+            var delayedItems = documentPreviews.Where(i => i.TransmitStatus == TransmitStatus.Delayed).ToList();
+
+            CommonConfig.Logger.Info($"Attempting to cancel send delayed items [businessEntities.Count={delayedItems.Count}]...");
+
+            try
+            {
+                CommonConfig.UsageAnalytics.LogEvent(new CancelSendEvent());
+
+                await Managers.DocumentsManager.CancelSendDocument(delayedItems);
+                var updatedItemsIds = delayedItems.Select(d => d.Id);
+                ((DataSource)TableView.Source).UpdateItems(updatedItemsIds);
+                ((DataSource)((UITableViewController)searchController?.SearchResultsController)?.TableView?.Source)?.UpdateItems(updatedItemsIds);
+
+                foreach (var item in delayedItems)
+                    CommonConfig.MessengerHub.Publish(new DocumentUploadStatusChangedMessage(this, DocumentUploadStatusChangedMessage.Status.DocumentSendCancelled,
+                        Guid.Empty, false));
+
+            }
+            catch (Exception ex)
+            {
+           
+                CommonConfig.Logger.Error($"Cancel send failed [businessEntities.Count={delayedItems.Count}]", ex);
 
                 await Dialogs.ShowErrorAlertAsync(this, ex);
             }

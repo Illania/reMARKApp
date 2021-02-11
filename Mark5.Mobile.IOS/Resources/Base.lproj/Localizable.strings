@@ -41,6 +41,7 @@
 "call" = "Call";
 "camera_not_available"= "Camera not available";
 "cancel" = "Cancel";
+"cancel_send" = "Cancel send";
 "cancelled" = "Cancelled";
 "cannot_mail_report_content" = "There are no mail accounts configured on your device. You need to have an account configured before you can send feedback.";
 "cannot_mail_report_title" = "Cannot send report";
@@ -428,6 +429,8 @@
 "selected_time_before_current_time_title" = "The selected time is invalid";
 "selected_time_before_current_time_content" = "The selected time is before the current time. Please try again.";
 "send" = "Send";
+"send_cancelled" = "Send cancelled";
+"send_now" = "Send now";
 "send_email_after" = "Send email after";
 "send_email_at" = "Send email at";
 "send_text" = "Send message";

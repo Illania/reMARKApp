@@ -655,7 +655,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async void ForceSend(List<DocumentPreview> items)
         {
-            CommonConfig.Logger.Info($"Attempting to force send delayed items [businessEntities.Count={items.Count}]...");
+            var delayedItems = items.Where(i => i.TransmitStatus == TransmitStatus.Delayed).ToList();
+
+            CommonConfig.Logger.Info($"Attempting to force send delayed items [businessEntities.Count={delayedItems.Count}]...");
 
             dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.send_now, Resource.String.please_wait);
 
@@ -663,13 +665,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 CommonConfig.UsageAnalytics.LogEvent(new ForceSendEvent());
 
-                await Managers.DocumentsManager.ForceSendDocument(items);
-                adapter.RefreshItems(items);
-                searchAdapter.RefreshItems(items);
+                await Managers.DocumentsManager.ForceSendDocument(delayedItems);
+                adapter.RefreshItems(delayedItems);
+                searchAdapter.RefreshItems(delayedItems);
 
                 CommonConfig.Logger.Info($"Documents with IDs:{string.Join(",",items.Select(i=>i.Id).ToList()).TrimEnd(',')} forced sent.");
 
-                foreach(var item in items)
+                foreach(var item in delayedItems)
                     CommonConfig.MessengerHub.Publish(new DocumentUploadStatusChangedMessage(this, DocumentUploadStatusChangedMessage.Status.DocumentSent,
                         Guid.Empty, false));
 
@@ -681,7 +683,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 dismissAction();
 
-                CommonConfig.Logger.Error($"Force send failed [businessEntities.Count={items.Count}]", ex);
+                CommonConfig.Logger.Error($"Force send failed [businessEntities.Count={delayedItems.Count}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
             }
@@ -689,7 +691,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async void CancelSend(List<DocumentPreview> items)
         {
-            CommonConfig.Logger.Info($"Attempting to cancel send delayed items [businessEntities.Count={items.Count}]...");
+            var delayedItems = items.Where(i => i.TransmitStatus == TransmitStatus.Delayed).ToList();
+
+            CommonConfig.Logger.Info($"Attempting to cancel send delayed items [businessEntities.Count={delayedItems.Count}]...");
 
             dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.cancel_send, Resource.String.please_wait);
 
@@ -697,11 +701,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 CommonConfig.UsageAnalytics.LogEvent(new CancelSendEvent());
 
-                await Managers.DocumentsManager.CancelSendDocument(items);
-                adapter.RefreshItems(items);
-                searchAdapter.RefreshItems(items);
+                await Managers.DocumentsManager.CancelSendDocument(delayedItems);
+                adapter.RefreshItems(delayedItems);
+                searchAdapter.RefreshItems(delayedItems);
 
-                foreach (var item in items)
+                foreach (var item in delayedItems)
                     CommonConfig.MessengerHub.Publish(new DocumentUploadStatusChangedMessage(this, DocumentUploadStatusChangedMessage.Status.DocumentSendCancelled,
                         Guid.Empty, false));
 
@@ -712,7 +716,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 dismissAction();
 
-                CommonConfig.Logger.Error($"Cancel send failed [businessEntities.Count={items.Count}]", ex);
+                CommonConfig.Logger.Error($"Cancel send failed [businessEntities.Count={delayedItems.Count}]", ex);
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
             }
