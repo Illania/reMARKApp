@@ -175,6 +175,9 @@ namespace Mark5.ServiceReference.Exceptions
         [EnumMember(Value = "UpdateFavoriteFoldersError")] UpdateFavoriteFoldersError = 3002,
         [EnumMember(Value = "AddFavoriteFoldersError")] AddFavoriteFoldersError = 3003,
         [EnumMember(Value = "RemoveFavoriteFoldersError")] RemoveFavoriteFoldersError = 3004,
+
+        [EnumMember(Value = "CancelSendDocumentError")] CancelSendDocumentError = 3005,
+        [EnumMember(Value = "ForceSendDocumentError")]ForceSendDocumentError = 3006
     }
 
     #endregion

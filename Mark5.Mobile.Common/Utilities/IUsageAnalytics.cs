@@ -262,6 +262,22 @@ namespace Mark5.Mobile.Common.Utilities
         }
     }
 
+    public class CancelSendEvent : AnalyticsEvent
+    {
+        public CancelSendEvent()
+            : base(ModuleType.Documents, "cancel_send")
+        {
+        }
+    }
+
+    public class ForceSendEvent : AnalyticsEvent
+    {
+        public ForceSendEvent()
+            : base(ModuleType.Documents, "force_send")
+        {
+        }
+    }
+
     public class SetPriorityEvent : AnalyticsEvent
     {
         public SetPriorityEvent(int quantity)

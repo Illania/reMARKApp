@@ -500,6 +500,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 selectAllItem.SetIcon(Resource.Drawable.action_deselect_all);
             }
 
+            if (ServerConfig.SystemSettings?.SystemInfo?.DelaySendAvailable == true && CurrentAdapter.SelectedItems.Any(dp => dp.TransmitStatus == TransmitStatus.Delayed))
+            {
+                menu.Add(MenuItemGroup.Actions, MenuItemActions.SendNow, MenuItemActions.SendNow, Resource.String.send_now);
+                menu.Add(MenuItemGroup.Actions, MenuItemActions.CancelSend, MenuItemActions.CancelSend, Resource.String.cancel_send);
+            }
+
             if (CurrentAdapter.SelectedItems.Any(dp => !dp.IsReadByCurrent) || !CurrentAdapter.SelectedItems.Any())
                 menu.Add(MenuItemGroup.Actions, MenuItemActions.MarkAsRead, MenuItemActions.MarkAsRead, Resource.String.mark_as_read);
 
@@ -532,6 +538,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         bool ActionMode.ICallback.OnActionItemClicked(ActionMode mode, IMenuItem item)
         {
+            if (item.ItemId == MenuItemActions.SendNow)
+            {
+                ForceSend(CurrentAdapter.SelectedItems);
+                return true;
+            }
+
+            if (item.ItemId == MenuItemActions.CancelSend)
+            {
+                CancelSend(CurrentAdapter.SelectedItems);
+                return true;
+            }
+
             if (item.ItemId == MenuItemActions.MarkAsRead)
             {
                 MarkAsRead(CurrentAdapter.SelectedItems);
@@ -633,6 +651,73 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
             }
         }
+
+
+        async void ForceSend(List<DocumentPreview> items)
+        {
+            CommonConfig.Logger.Info($"Attempting to force send delayed items [businessEntities.Count={items.Count}]...");
+
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.send_now, Resource.String.please_wait);
+
+            try
+            {
+                CommonConfig.UsageAnalytics.LogEvent(new ForceSendEvent());
+
+                await Managers.DocumentsManager.ForceSendDocument(items);
+                adapter.RefreshItems(items);
+                searchAdapter.RefreshItems(items);
+
+                CommonConfig.Logger.Info($"Documents with IDs:{string.Join(",",items.Select(i=>i.Id).ToList()).TrimEnd(',')} forced sent.");
+
+                foreach(var item in items)
+                    CommonConfig.MessengerHub.Publish(new DocumentUploadStatusChangedMessage(this, DocumentUploadStatusChangedMessage.Status.DocumentSent,
+                        Guid.Empty, false));
+
+
+                dismissAction();
+                actionMode?.Finish();
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Force send failed [businessEntities.Count={items.Count}]", ex);
+
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+            }
+        }
+
+        async void CancelSend(List<DocumentPreview> items)
+        {
+            CommonConfig.Logger.Info($"Attempting to cancel send delayed items [businessEntities.Count={items.Count}]...");
+
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.cancel_send, Resource.String.please_wait);
+
+            try
+            {
+                CommonConfig.UsageAnalytics.LogEvent(new CancelSendEvent());
+
+                await Managers.DocumentsManager.CancelSendDocument(items);
+                adapter.RefreshItems(items);
+                searchAdapter.RefreshItems(items);
+
+                foreach (var item in items)
+                    CommonConfig.MessengerHub.Publish(new DocumentUploadStatusChangedMessage(this, DocumentUploadStatusChangedMessage.Status.DocumentSendCancelled,
+                        Guid.Empty, false));
+
+                dismissAction();
+                actionMode?.Finish();
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Cancel send failed [businessEntities.Count={items.Count}]", ex);
+
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+            }
+        }
+
 
         async void MarkAsRead(List<DocumentPreview> items)
         {
@@ -829,6 +914,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public const int Categories = 50;
             public const int DeleteFromFolder = 60;
             public const int Delete = 61;
+            public const int SendNow = 70;
+            public const int CancelSend = 71;
         }
 
         static class MenuItemGroup
@@ -1153,6 +1240,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                     var isFailed = dp.TransmitStatus == TransmitStatus.Fail || dp.TransmitStatus == TransmitStatus.FailedBounced;
                     var isPartiallySent = dp.TransmitStatus == TransmitStatus.PartialSent;
+                    var isDelayed = dp.TransmitStatus == TransmitStatus.Delayed;
+                    var isCancelled = dp.TransmitStatus == TransmitStatus.InCancel || dp.TransmitStatus == TransmitStatus.Fail;
 
                     dpvh.Subject = string.IsNullOrWhiteSpace(dp.Subject) ? context.GetString(Resource.String.no_subject) : dp.Subject;
                     var d = dp.DateReceivedTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds();
@@ -1163,8 +1252,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     dpvh.FailIndicator = isFailed;
                     dpvh.PartiallySentIndicator = isPartiallySent;
                     dpvh.IncomingIndicator = dp.Direction == DocumentDirection.Incoming && (!isPartiallySent) && (!isFailed);
-                    dpvh.OutgoingIndicator = dp.Direction == DocumentDirection.Outgoing && (!isPartiallySent) && (!isFailed) && !(dp.TransmitStatus == TransmitStatus.Delayed);
+                    dpvh.OutgoingIndicator = dp.Direction == DocumentDirection.Outgoing && (!isPartiallySent) && (!isFailed) && (!isDelayed);
                     dpvh.DelayedIndicator = dp.TransmitStatus == TransmitStatus.Delayed && (!isPartiallySent) && (!isFailed);
+                    dpvh.CancelledIndicator = isCancelled;
                     dpvh.DraftIndicator = dp.Direction == DocumentDirection.Draft;
                     dpvh.UnreadIndicator = unreadIndicatorMe ? !dp.IsReadByCurrent : !dp.IsReadByAnyone;
                     dpvh.AttachmentIndicator = dp.AttachmentsCount > 0;
@@ -1685,6 +1775,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public bool DelayedIndicator { set => delayedImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
+            public bool CancelledIndicator { set => cancelledImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
+
             public bool PartiallySentIndicator { set => partiallySentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
             public bool FailIndicator { set => failImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
@@ -1742,6 +1834,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             readonly AppCompatImageView incomingImageView;
             readonly AppCompatImageView outgoingImageView;
             readonly AppCompatImageView delayedImageView;
+            readonly AppCompatImageView cancelledImageView;
             readonly AppCompatImageView draftImageView;
             readonly AppCompatImageView unreadImageView;
             readonly AppCompatImageView partiallySentImageView;
@@ -1765,6 +1858,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 incomingImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_direction_incoming);
                 outgoingImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_direction_outgoing);
                 delayedImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_direction_delayed);
+                cancelledImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_failed);
                 failImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_failed);
                 partiallySentImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_partially_sent);
                 draftImageView = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_document_direction_draft);
