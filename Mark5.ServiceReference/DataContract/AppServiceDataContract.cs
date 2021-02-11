@@ -322,6 +322,35 @@ namespace Mark5.ServiceReference.DataContract
         public string ReferenceNumber { get; set; }
     }
 
+
+    [DataContract(Name = "CancelSendDocumentParameters", Namespace = "com.nordic-it.appservice.v3")]
+    public class CancelSendDocumentParameters : AbstractParameters
+    {
+        [DataMember(Name = "DocumentIds", Order = 0)]
+        public int[] DocumentIds { get; set; }
+    }
+
+    [DataContract(Name = "CancelSendDocumentResult", Namespace = "com.nordic-it.appservice.v3")]
+    public class CancelSendDocumentResult 
+    {
+
+    }
+
+    [DataContract(Name = "ForceSendDocumentParameters", Namespace = "com.nordic-it.appservice.v3")]
+    public class ForceSendDocumentParameters : AbstractParameters
+    {
+        [DataMember(Name = "DocumentIds", Order = 0)]
+        public int[] DocumentIds { get; set; }
+
+    }
+
+    [DataContract(Name = "ForceSendDocumentResult", Namespace = "com.nordic-it.appservice.v3")]
+    public class ForceSendDocumentResult 
+    {
+
+    }
+
+
     [DataContract(Name = "SetDocumentsReadStatusParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class SetDocumentsReadStatusParameters : AbstractParameters
     {

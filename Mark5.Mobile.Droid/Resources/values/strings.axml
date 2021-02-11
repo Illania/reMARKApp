@@ -33,7 +33,8 @@
     <string name="by">by</string>
     <string name="call">Call</string>
     <string name="cancel">Cancel</string>
-        <string name="cancelled">Cancelled</string>
+    <string name="cancel_send">Cancel send</string>
+    <string name="cancelled">Cancelled</string>
     <string name="calendar">Calendar</string>
     <string name="calendars">Calendars</string>
     <string name="cannot_edit_comment_content">This comment cannot be edited anymore</string>
@@ -466,6 +467,8 @@
     <string name="selected_time_before_current_time_title">The selected time is invalid</string>
     <string name="selected_time_before_current_time_content">The selected time is before the current time. Please try again.</string>
     <string name="send">Send</string>
+    <string name="send_cancelled">Send cancelled</string>
+    <string name="send_now">Send now</string>
     <string name="sending_document">Sending email</string>
     <string name="sending_invitations">Sending invitations...</string>
     <string name="sending_appointment_response">Sending response...</string>

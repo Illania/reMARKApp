@@ -634,6 +634,54 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task DeleteDocumentWorkingCopyAttachmentAsync(string filename) => await FileSystemStorage.DeleteDocumentWorkingCopyAttachmentAsync(filename);
 
+        public async Task CancelSendDocument(List<DocumentPreview> documentPreviews, SourceType sourceType = SourceType.Auto)
+        {
+
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
+            {
+                await AppServiceProxy.CancelSendDocumentAsync(new DataContract.CancelSendDocumentParameters
+                {
+                    Token = Token,
+                    DocumentIds = documentPreviews.Select(dp => dp.Id).ToArray()
+                });
+
+                return;
+            }
+
+            if (sourceType == SourceType.Local)
+                throw new ReMarkException(ErrorConstants.Codes.InvalidSourceType);
+
+            throw new ArgumentException("Invalid sourceType provided");
+
+        }
+
+        public async Task ForceSendDocument(List<DocumentPreview> documentPreviews, SourceType sourceType = SourceType.Auto)
+        {
+
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
+            {
+                await AppServiceProxy.ForceSendDocumentAsync(new DataContract.ForceSendDocumentParameters
+                {
+                    Token = Token,
+                    DocumentIds = documentPreviews.Select(dp => dp.Id).ToArray()
+                });
+
+                return;
+            }
+
+            if (sourceType == SourceType.Local)
+                throw new ReMarkException(ErrorConstants.Codes.InvalidSourceType);
+
+            throw new ArgumentException("Invalid sourceType provided");
+
+        }
+
         #region SetReadStatus specific
 
         internal async Task SetRemoteReadStatusAsync(bool isRead, params int[] ids)

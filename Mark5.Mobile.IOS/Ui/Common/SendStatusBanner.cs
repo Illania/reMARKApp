@@ -157,7 +157,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             if (obj.Change != DocumentUploadStatusChangedMessage.Status.DocumentSent
                 && obj.Change != DocumentUploadStatusChangedMessage.Status.DocumentSentFailed
-                && obj.Change != DocumentUploadStatusChangedMessage.Status.DocumentDelayed)
+                && obj.Change != DocumentUploadStatusChangedMessage.Status.DocumentDelayed
+                && obj.Change != DocumentUploadStatusChangedMessage.Status.DocumentSendCancelled)
                 return;
 
             QueueBanner(BannerInfo.FromMessage(obj));
@@ -189,6 +190,11 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 {
                     bannerInfo.Text = msg.IsDraft ? Localization.GetString("draft_error") : Localization.GetString("email_error");
                     bannerInfo.Color = UIColor.Red;
+                }
+                else if (status == DocumentUploadStatusChangedMessage.Status.DocumentSendCancelled)
+                {
+                    bannerInfo.Text = Localization.GetString("send_cancelled");
+                    bannerInfo.Color = Theme.DarkGray;
                 }
 
                 return bannerInfo;

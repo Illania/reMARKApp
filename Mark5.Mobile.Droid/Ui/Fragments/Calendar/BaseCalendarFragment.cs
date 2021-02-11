@@ -86,10 +86,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         private void Schedule_VisibleDatesChanged(object sender, VisibleDatesChangedEventArgs e)
         {
-            var startDate = schedule.VisibleDates.First();
-            var endDate = schedule.VisibleDates.Last();
+            var startDate = schedule?.VisibleDates?.First();
+            var endDate = schedule?.VisibleDates?.Last();
 
-            coordinator.VisibleDatesChanged(startDate, endDate);
+            coordinator?.VisibleDatesChanged(startDate, endDate);
         }
 
         public void MoveToDate(Java.Util.Calendar date)

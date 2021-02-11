@@ -33,6 +33,10 @@ namespace Mark5.ServiceReference.AppService
 
         Task<SendDocumentResult> SendDocumentAsync(SendDocumentParameters parameters, CancellationToken ct = default(CancellationToken));
 
+        Task<CancelSendDocumentResult> CancelSendDocumentAsync(CancelSendDocumentParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<ForceSendDocumentResult> ForceSendDocumentAsync(ForceSendDocumentParameters parameters, CancellationToken ct = default(CancellationToken));
+
         Task<SetDocumentsReadStatusResult> SetDocumentsReadStatusAsync(SetDocumentsReadStatusParameters parameters, CancellationToken ct = default(CancellationToken));
 
         Task<SetDocumentPriorityResult> SetDocumentPriorityAsync(SetDocumentPriorityParameters parameters, CancellationToken ct = default(CancellationToken));

@@ -11,6 +11,7 @@ namespace Mark5.Mobile.Common.Manager
     public interface IDocumentsManager
     {
         int MaxToFetch { get; set; }
+
         DocumentBodyTypeRequest DocumentBodyTypeRequest { get; set; }
 
         Task<List<DocumentPreview>> GetDocumentPreviewsAsync(Folder folder, int startId = -1, int endId = -1, SourceType sourceType = SourceType.Auto);
@@ -88,5 +89,11 @@ namespace Mark5.Mobile.Common.Manager
         Task DeleteDocumentWorkingCopyAttachmentAsync(string filename);
 
         Task NotifyPendingAndFailedCountChanged();
+
+        Task CancelSendDocument(List<DocumentPreview> documentPreviews, SourceType sourceType = SourceType.Auto);
+
+        Task ForceSendDocument(List<DocumentPreview> documentPreviews, SourceType sourceType = SourceType.Auto);
+       
+
     }
 }

@@ -359,7 +359,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
             UIImage image = null;
 
-            if (dp.TransmitStatus == TransmitStatus.Fail || dp.TransmitStatus == TransmitStatus.FailedBounced)
+            if (dp.TransmitStatus == TransmitStatus.Fail || dp.TransmitStatus == TransmitStatus.FailedBounced || dp.TransmitStatus == TransmitStatus.InCancel)
             {
                 directionIndicatorImageView.TintColor = UIColor.Red;
                 image = UIImage.FromBundle("Failed").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
@@ -369,6 +369,11 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 directionIndicatorImageView.TintColor = Theme.Gray;
                 image = UIImage.FromBundle("Partially-Sent").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
             }
+            else if (dp.TransmitStatus == TransmitStatus.Delayed)
+            {
+                directionIndicatorImageView.TintColor = Theme.TintColor;
+                image = UIImage.FromBundle("Delayed").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+            } 
             else
             {
                 directionIndicatorImageView.TintColor = Theme.TintColor;
@@ -384,8 +389,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                         image = UIImage.FromBundle("Edit-Small").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
                         break;
                 }
-                if(dp.TransmitStatus == TransmitStatus.Delayed)
-                    image = UIImage.FromBundle("Delayed").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+
             }
 
             directionIndicatorImageView.Image = image;

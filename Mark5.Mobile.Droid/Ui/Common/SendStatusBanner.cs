@@ -98,7 +98,8 @@ namespace Mark5.Mobile.Droid.Ui.Common
         {
             if (obj.Change != DocumentUploadStatusChangedMessage.Status.DocumentSent
                 && obj.Change != DocumentUploadStatusChangedMessage.Status.DocumentSentFailed
-                && obj.Change != DocumentUploadStatusChangedMessage.Status.DocumentDelayed)
+                && obj.Change != DocumentUploadStatusChangedMessage.Status.DocumentDelayed
+                && obj.Change != DocumentUploadStatusChangedMessage.Status.DocumentSendCancelled)
                 return;
 
             QueueBanner(BannerInfo.FromMessage(obj));
@@ -131,6 +132,11 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 {
                     bannerInfo.TextRes = isDraft ? Resource.String.draft_error : Resource.String.email_error;
                     bannerInfo.ColorRes = Resource.Color.red;
+                }
+                else if (status == DocumentUploadStatusChangedMessage.Status.DocumentSendCancelled)
+                {
+                    bannerInfo.TextRes = Resource.String.send_cancelled;
+                    bannerInfo.ColorRes = Resource.Color.darkgray;
                 }
 
                 return bannerInfo;
