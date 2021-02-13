@@ -276,7 +276,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             }
             else
             {
-                sendButtonItem.Clicked += SendButtonItem_Clicked;
+                sendButtonItem.Clicked += SendButton_Clicked;
             }
                 
             toView.AddButtonTapped += RecipientView_AddButtonTapped;
@@ -309,7 +309,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             }
             else
             {
-                sendButtonItem.Clicked -= SendButtonItem_Clicked;
+                sendButtonItem.Clicked -= SendButton_Clicked;
             }
 
             toView.AddButtonTapped -= RecipientView_AddButtonTapped;
@@ -628,6 +628,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             }
         }
 
+        void SendButton_Clicked(object sender, EventArgs e)
+        {
+            var useSendingDelay = PlatformConfig.Preferences.SendingDelay > 0;
+            SendButtonItem_Clicked(sender, new SendButtonClickedEventArgs() { Delayed = useSendingDelay , UsePicker = !useSendingDelay});
+        }
+
         void SendButton_TouchUpInside(object sender, EventArgs e)
         {
             SendButtonItem_Clicked(sender, new SendButtonClickedEventArgs() { Delayed = false });
@@ -639,22 +645,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         }
 
         async void SendButtonItem_Clicked(object sender, EventArgs e)
-        {
-            
+        {          
             if (autoSaveWorkingCopyWorker != null)
             {
                 autoSaveWorkingCopyWorker.Stop();
                 await autoSaveWorkingCopyWorker.Finished();
             }
 
-
             bool sent;
-
-            if (!(e is SendButtonClickedEventArgs sendButtonClickedEventArgs && sendButtonClickedEventArgs.Delayed == true))
+            if (!(e is SendButtonClickedEventArgs sendButtonClickedEventArgs))
+                return;
+            if (sendButtonClickedEventArgs.Delayed == false)
                 sent = await SendDocument();
             else
-                sent = await SendDocumentWithDelay();
-
+                sent = await SendDocumentWithDelay(sendButtonClickedEventArgs.UsePicker);
 
             if (!sent)
                 return;
@@ -900,54 +904,68 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             return await SaveAndQueueWorkingCopy();
         }
 
-        async Task<bool> SendDocumentWithDelay()
+        async Task<bool> SendDocumentWithDelay(bool usePicker = true)
         {
             var result = await CheckDocument();
             if (!result)
                 return false;
 
-            var options = new[]
+            try
             {
+                var pickedDateTime = DateTime.Now.ToUniversalTime();
+
+                if (!usePicker)
+                {
+                    var sendingDelay = PlatformConfig.Preferences.SendingDelay;
+                    pickedDateTime = pickedDateTime.AddSeconds(sendingDelay);
+                }  
+                else
+                    pickedDateTime = await GetDelaySendDateTimeFromPicker();
+
+                return await SaveAndQueueWorkingCopy(pickedDateTime.ConvertDateTimeToTimestampMilliseconds());
+
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        private async Task<DateTime> GetDelaySendDateTimeFromPicker()
+        {
+            var options = new[]
+           {
                 Localization.GetString("send_email_at"),
                 Localization.GetString("send_email_after")
             };
 
             var choice = await Dialogs.ShowListActionSheetAsync(this, options);
 
-            try
+            var pickedDateTime = DateTime.Now.ToUniversalTime();
+
+            if (choice == 0)
             {
-                if (choice == 0)
-                {
-                    var dp = new DatePickerDialogViewController();
-                    dp.ModalPresentationStyle = UIModalPresentationStyle.OverCurrentContext;
-                    dp.ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve;
-                    PresentViewController(dp, false, null);
+                var dp = new DatePickerDialogViewController();
+                dp.ModalPresentationStyle = UIModalPresentationStyle.OverCurrentContext;
+                dp.ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve;
+                PresentViewController(dp, false, null);
 
-                    var pickedDateTime = await dp.Result;
-
-                    //DateTime is already UTC, so no conversion to UTC needed,
-                    return await SaveAndQueueWorkingCopy(pickedDateTime.ConvertDateTimeToTimestampMilliseconds());
-                }
-
-                if (choice == 1)
-                {
-                    var cd = new CountDownPickerDialogViewController();
-                    cd.ModalPresentationStyle = UIModalPresentationStyle.OverCurrentContext;
-                    cd.ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve;
-                    PresentViewController(cd, false, null);
-
-                    var pickedDateTime = await cd.Result;
-
-                    //DateTime is already UTC, so no conversion to UTC needed,
-                    return await SaveAndQueueWorkingCopy(pickedDateTime.ConvertDateTimeToTimestampMilliseconds());
-                }
-            }
-            catch (TaskCanceledException ex)
-            {
-                return false;
+                pickedDateTime = await dp.Result;
             }
 
-            return false;
+            if (choice == 1)
+            {
+                var cd = new CountDownPickerDialogViewController
+                {
+                    ModalPresentationStyle = UIModalPresentationStyle.OverCurrentContext,
+                    ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve
+                };
+                PresentViewController(cd, false, null);
+
+                pickedDateTime = await cd.Result;
+            }
+
+            return pickedDateTime;
         }
 
 
@@ -1596,6 +1614,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         public class SendButtonClickedEventArgs: EventArgs
         {
             public bool Delayed { get; set; }
+            public bool UsePicker { get; set; } = true;
         }
 
         #endregion

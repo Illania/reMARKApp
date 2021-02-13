@@ -14,8 +14,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             datePicker.Mode = UIDatePickerMode.CountDownTimer;
             datePicker.MinuteInterval = 5;   
-            datePicker.MinimumDate = (NSDate)DateTime.SpecifyKind(DateTime.Now.Date.AddHours(-12).AddMinutes(5), DateTimeKind.Utc);
-            datePicker.CountDownDuration = 300;
+            datePicker.MinimumDate = (NSDate)DateTime.SpecifyKind(DateTime.Now.Date.AddHours(-12), DateTimeKind.Utc);
+            if (PlatformConfig.Preferences.RememberLastUserDelaySettings == true)
+                datePicker.CountDownDuration = PlatformConfig.Preferences.LastUserSendingDelay;
+            else
+                datePicker.CountDownDuration = 300;
         }
 
         protected override async void OkButton_TouchedUpInside(object sender, EventArgs e)
@@ -38,7 +41,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                                                                       String.Format(Localization.GetString("confirm_delayed_send_content"), dateFormatter.ToString(pickedNSDate)));
 
             if (sendConfirmed)
+            {
+                if (PlatformConfig.Preferences.RememberLastUserDelaySettings == true)
+                    PlatformConfig.Preferences.LastUserSendingDelay = (int)datePicker.CountDownDuration;
                 tcs.SetResult(pickedDateTime);
+            }
             else
                 tcs.SetCanceled();
 

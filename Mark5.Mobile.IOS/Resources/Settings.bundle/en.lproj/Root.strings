@@ -45,12 +45,14 @@
 "me" = "Me";
 "open_settings_app" = "Open Settings app";
 "partial_word_search" = "Partial word search";
-"plain" = "Plain Text"; 
+"plain" = "Plain Text";
+"remember_last_user_delay_settings" = "Remember last user delay settings";
 "remove_line" = "Remove mailbox address";
 "search" = "Search";
 "security" = "Security";
 "security_footer" = "SSL should remain enabled to provide secure communication. Otherwise, communication between reMARK on your iOS device and reMARK server can be intercepted.";
 "send_feedback" = "Send feedback";
+"sending_delay" = "Sending delay";
 "server" = "Server";
 "shortcodes_to_search" = "Mailing list search results";
 "show_creator_outgoing" = "Show creator for outgoing emails";
