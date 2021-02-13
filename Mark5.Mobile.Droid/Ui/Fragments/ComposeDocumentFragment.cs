@@ -92,6 +92,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         Action dismissAction;
 
+        (int pickedHours, int pickedMinutes) LastPickedUserSendingDelay = (0,0);
+
         public static (ComposeDocumentFragment fragment, string tag) NewInstance(DocumentCreationModeFlag documentCreationModeFlag, CopyToNewOption? copyToNewOption, bool? restoreWorkingCopy,
                                                                                  DocumentDirection? previousDocumentDirection, int? previousDocumentFolderId, int? previousDocumentId,
                                                                                  Dictionary<DocumentAddressType, string[]> preconfiguredEmailAddresses, string preconfiguredContent,
@@ -245,9 +247,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             fab = ((BaseAppCompatActivity)Activity).Fab;
             fab.SetImageResource(Resource.Drawable.action_send);
-            fab.SetOnClickListener(new ActionOnClickListener(() => SendDocument()));
+            fab.SetOnClickListener(new ActionOnClickListener(() => DecideHowToSendDocument()));
             if (ServerConfig.SystemSettings?.SystemInfo?.DelaySendAvailable == true)
-                fab.SetOnLongClickListener(new ActionOnLongClickListener(SendDocumentWithDelay));
+                fab.SetOnLongClickListener(new ActionOnLongClickListener(() => SendDocumentWithDelay()));
             fab.Enabled = false;
             fab.Alpha = 0.6f;
             fab.Visibility = ViewStates.Visible;
@@ -752,6 +754,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             Activity?.Finish();
         }
 
+        void DecideHowToSendDocument()
+        {
+            var sendingDelay = PlatformConfig.Preferences.SendingDelay;
+            if (sendingDelay > 0)
+                SendDocumentWithDelay(false);
+            else
+                SendDocument();
+        }
+
         void SendDocument(bool saveDraft = false)
         {
             fab.Enabled = false;
@@ -825,50 +836,49 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 sendAction();
         }
 
-
-        void SendDocumentWithDelay()
+        void SendDocumentWithDelay(bool usePicker = true)
         {
             async void selectDelay()
             {
-                var option = await Dialogs.ShowListDialog(Context, Resource.String.set_time, Resource.Array.set_time_options, true);
+                var pickedDateTime = DateTime.Now;
 
                 try
                 {
 
-                    DateTime pickedDate;
-                    if (option == 0) //Pick date and time
+                    if (!usePicker)
                     {
-                        pickedDate = await Dialogs.ShowDatePicker(Context);
-                        var (pickedHour, pickedMinute) = await Dialogs.ShowTimePicker(Context);
-                        pickedDate = pickedDate.Date.AddHours(pickedHour).AddMinutes(pickedMinute);
-
-                        if (pickedDate <= DateTime.Now)
-                        {
-                            Dialogs.ShowConfirmDialog(Context, Resource.String.selected_time_before_current_time_title, Resource.String.selected_time_before_current_time_content);
-                            fab.Enabled = true;
-                            return;
-                        }
+                        var sendingDelay = PlatformConfig.Preferences.SendingDelay;
+                        pickedDateTime = pickedDateTime.AddSeconds(sendingDelay);
                     }
-                    else //Pick time after now
-                    {
-                        var (pickedHours, pickedMinutes) = await Dialogs.ShowHourMinutePicker(Context);
-                        pickedDate = DateTime.Now.AddHours(pickedHours).AddMinutes(pickedMinutes);
-                        fab.Enabled = true;
-                    }
+                    else
+                        pickedDateTime = await GetDelaySendDateTimeFromPicker();
 
-                    var pickedDateMilliseconds = pickedDate.ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
+                    var pickedDateMilliseconds = pickedDateTime.ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
 
                     var dateFormat = Android.Text.Format.DateFormat.GetDateFormat(Application.Context);
                     var timeFormat = Android.Text.Format.DateFormat.GetTimeFormat(Application.Context);
 
                     var dateToPrint = new Java.Util.Date(pickedDateMilliseconds);
 
+                    if(!usePicker)
+                    {
+                        SaveAndQueueWorkingCopy(false, pickedDateMilliseconds);
+                        return;
+ 
+                    }
+  
                     var sendConfirmed = await Dialogs.ShowYesNoDialogAsync(Context, Resources.GetString(Resource.String.confirm_delay_send_title),
                                                                            String.Format(Resources.GetString(Resource.String.confirm_delay_send_content), dateFormat.Format(dateToPrint) + ", " + timeFormat.Format(dateToPrint)),
                                                                            centerTitle: true, centerContent: true);
 
                     if (sendConfirmed)
+                    {
+                        if (PlatformConfig.Preferences.RememberLastUserDelaySettings)
+                            PlatformConfig.Preferences.LastUserSendingDelay = LastPickedUserSendingDelay.pickedHours * 3600 + LastPickedUserSendingDelay.pickedMinutes * 60;
+
                         SaveAndQueueWorkingCopy(false, pickedDateMilliseconds);
+                    }    
+                       
                     else
                     {
                         fab.Enabled = true;
@@ -886,6 +896,44 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             fab.Enabled = false;
 
             CheckDocument(selectDelay);
+        }
+
+        public async Task<DateTime> GetDelaySendDateTimeFromPicker()
+        {
+            var option = await Dialogs.ShowListDialog(Context, Resource.String.set_time, Resource.Array.set_time_options, true);
+
+            DateTime pickedDate;
+            if (option == 0) //Pick date and time
+            {
+                pickedDate = await Dialogs.ShowDatePicker(Context);
+                var (pickedHour, pickedMinute) = await Dialogs.ShowTimePicker(Context);
+                pickedDate = pickedDate.Date.AddHours(pickedHour).AddMinutes(pickedMinute);
+
+                if (pickedDate <= DateTime.Now)
+                {
+                    Dialogs.ShowConfirmDialog(Context, Resource.String.selected_time_before_current_time_title, Resource.String.selected_time_before_current_time_content);
+                    fab.Enabled = true;
+                }
+            }
+            else //Pick time after now
+            {
+                (int hours, int minutes) defaultTime = (0, 5);
+
+                if (PlatformConfig.Preferences.RememberLastUserDelaySettings)
+                    defaultTime = ConvertSecondsToHoursAndMinutes(PlatformConfig.Preferences.LastUserSendingDelay);
+
+                LastPickedUserSendingDelay = await Dialogs.ShowHourMinutePicker(Context, (defaultTime.hours, defaultTime.minutes));
+
+                pickedDate = DateTime.Now.AddHours(LastPickedUserSendingDelay.pickedHours).AddMinutes(LastPickedUserSendingDelay.pickedMinutes);
+                fab.Enabled = true;
+            }
+            return pickedDate;
+        }
+
+        (int, int) ConvertSecondsToHoursAndMinutes(int seconds)
+        {
+            TimeSpan t = TimeSpan.FromSeconds(seconds);
+            return (t.Hours, t.Minutes);
         }
 
         void CheckDocument(Action positiveAction)

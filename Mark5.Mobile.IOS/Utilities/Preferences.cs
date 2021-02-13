@@ -25,6 +25,9 @@ namespace Mark5.Mobile.IOS.Utilities
             public const string MarkAsReadDelaySecondsKey = "MarkAsReadDelaySeconds";
             public const string DocumentBodyRequestTypeKey = "DocumentBodyRequestType";
             public const string LargeAttachmentWarningKey = "LargeAttachmentWarning";
+            public const string SendingDelay = "SendingDelay";
+            public const string RememberLastUserDelaySettings = "RememberLastUserDelaySettings";
+            public const string LastUserSendingDelay = "LastUserSendingDelay";
             public const string ShowTimeForOldEmails = "ShowTimeForOldEmails";
             public const string SortByDate = "SortByDate";
             public const string ConfirmRemoveSwipe = "ConfirmRemoveSwipe";
@@ -96,6 +99,15 @@ namespace Mark5.Mobile.IOS.Utilities
                 },
                 {
                     new NSString(Keys.LargeAttachmentWarningKey), NSNumber.FromBoolean(true)
+                },
+                {
+                    new NSString(Keys.SendingDelay), NSNumber.FromInt16(0)
+                },
+                {
+                    new NSString(Keys.RememberLastUserDelaySettings), NSNumber.FromBoolean(false)
+                },
+                {
+                    new NSString(Keys.LastUserSendingDelay), NSNumber.FromInt16(0)
                 },
                 {
                     new NSString(Keys.ShowTimeForOldEmails), NSNumber.FromBoolean(false)
@@ -192,6 +204,20 @@ namespace Mark5.Mobile.IOS.Utilities
         public bool CompactDocumentsList => ud.BoolForKey(Keys.CompactDocumentsListKey);
 
         public bool LargeAttachmentWarning => ud.BoolForKey(Keys.LargeAttachmentWarningKey);
+
+        public int SendingDelay => (int)ud.IntForKey(Keys.SendingDelay);
+
+        public bool RememberLastUserDelaySettings => ud.BoolForKey(Keys.RememberLastUserDelaySettings);
+
+        public int LastUserSendingDelay
+        {
+            get => (int)ud.IntForKey(Keys.LastUserSendingDelay);
+            set
+            {
+                ud.SetInt(value, Keys.LastUserSendingDelay);
+                ud.Synchronize();
+            }
+        }
 
         public DocumentBodyTypeRequest DocumentBodyRequestType => ud.BoolForKey(Keys.DocumentBodyRequestTypeKey) ? DocumentBodyTypeRequest.PlainTextOnly : DocumentBodyTypeRequest.HtmlOnly;
 

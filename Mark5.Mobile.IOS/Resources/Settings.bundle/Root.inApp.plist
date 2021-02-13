@@ -196,6 +196,46 @@
 		</dict>
 		<dict>
 			<key>Type</key>
+			<string>PSMultiValueSpecifier</string>
+			<key>Title</key>
+			<string>sending_delay</string>
+			<key>Key</key>
+			<string>SendingDelay</string>
+			<key>DefaultValue</key>
+			<integer>0</integer>
+			<key>Titles</key>
+			<array>
+				<string>None</string>
+				<string>30 seconds</string>
+				<string>1 minute</string>
+				<string>2 minutes</string>
+				<string>3 minutes</string>
+				<string>5 minutes</string>
+				<string>10 minutes</string>
+			</array>
+			<key>Values</key>
+			<array>
+				<integer>0</integer>
+				<integer>30</integer>
+				<integer>60</integer>
+				<integer>120</integer>
+				<integer>180</integer>
+				<integer>300</integer>
+				<integer>600</integer>
+			</array>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>remember_last_user_delay_settings</string>
+			<key>Key</key>
+			<string>RememberLastUserDelaySettings</string>
+			<key>DefaultValue</key>
+			<false/>
+		</dict>
+		<dict>
+			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 			<key>Title</key>
 			<string>compose_options</string>

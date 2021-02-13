@@ -104,6 +104,7 @@
 "decline" = "Decline";
 "declined" = "Declined";
 "description" = "Description";
+"delayed_send_queued"= "Delayed send queued";
 "delete" = "Delete";
 "delete_draft" = "Delete draft";
 "delete_from_folder" = "Remove from folder";

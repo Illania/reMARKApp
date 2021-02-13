@@ -387,7 +387,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             return tcs.Task;
         }
 
-        public static Task<(int, int)> ShowHourMinutePicker(Context context)
+        public static Task<(int, int)> ShowHourMinutePicker(Context context, (int hours,int minutes) defaultTime)
         {
             var pickerContainer = new LinearLayoutCompat(context)
             {
@@ -408,6 +408,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             hourPicker.MinValue = 0;
             hourPicker.MaxValue = displayedHourValues.Count - 1;
             hourPicker.SetDisplayedValues(displayedHourValues.ToArray());
+            hourPicker.Value = defaultTime.hours;
 
             var minutePicker = new NumberPicker(context)
             {
@@ -424,6 +425,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             minutePicker.MinValue = 0;
             minutePicker.MaxValue = displayedMinuteValues.Count - 1;
             minutePicker.SetDisplayedValues(displayedMinuteValues.ToArray());
+            minutePicker.Value = defaultTime.minutes/step;
 
             pickerContainer.AddView(hourPicker);
             pickerContainer.AddView(minutePicker);

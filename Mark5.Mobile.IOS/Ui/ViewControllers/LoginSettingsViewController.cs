@@ -26,8 +26,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public event EventHandler<SettingsValues> RestrictedSettingsValuesUpdated;
 
-        NSObject observer;
-
         public LoginSettingsViewController(SettingsValues values)
         {
             Delegate = this;
@@ -49,7 +47,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillDisappear(animated);
 
-            observer?.Dispose();
         }
 
         protected override void Dispose(bool disposing)
