@@ -38,6 +38,10 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public bool ConfirmationRemoveSwipe => sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_documents_confirm_remove), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_documents_confirm_remove_default));
 
+        public int SendingDelay => int.Parse(sp.GetString(Application.Context.GetString(Resource.String.pref_key_sending_delay), Application.Context.Resources.GetString(Resource.String.pref_sending_delay_default)));
+
+        public bool RememberLastUserDelaySettings => sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_remember_last_user_delay_settings), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_remember_last_user_delay_settings_default));
+
         #endregion
 
         #region Caller Identification
@@ -150,6 +154,17 @@ namespace Mark5.Mobile.Droid.Utilities
             {
                 var e = sp.Edit();
                 e.PutString(Application.Context.GetString(Resource.String.push_notification_token), value);
+                e.Commit();
+            }
+        }
+
+        public int LastUserSendingDelay
+        {
+            get => sp.GetInt(Application.Context.GetString(Resource.String.pref_key_last_user_sending_delay), 0);
+            set
+            {
+                var e = sp.Edit();
+                e.PutInt(Application.Context.GetString(Resource.String.pref_key_last_user_sending_delay), value);
                 e.Commit();
             }
         }
