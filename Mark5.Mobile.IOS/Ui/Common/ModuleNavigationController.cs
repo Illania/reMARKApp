@@ -98,7 +98,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             float verticalSpacingFirstBtns = 60f;
             float verticalSpacing2ndRow = 115f;
-            var separatorPadding = Integration.IsIPad() ? 70f : 35f;
+            var separatorPadding = Integration.IsIPadOrMac() ? 70f : 35f;
 
             View.AddSubviews(new UIView[] {
                 closeButtonContainer,
@@ -119,7 +119,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 closeButtonContainer.BottomAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.BottomAnchor : BottomLayoutGuide.GetTopAnchor(), 2),
             });
 
-            if (Integration.IsIPad())
+            if (Integration.IsIPadOrMac())
                 View.AddConstraint(View.WidthAnchor.ConstraintLessThanOrEqualTo(300));
 
             closeButtonContainer.AddSubview(closeButton);
@@ -187,7 +187,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             float horizontalSpacing = UIDevice.CurrentDevice.Orientation.IsLandscape() ? 200f : 105f;
 
-            if (Integration.IsIPad())
+            if (Integration.IsIPadOrMac())
                 horizontalSpacing += 15f;
 
             NSLayoutConstraint mailBtnHorizontalConstraint = mailBtn.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor, -horizontalSpacing);

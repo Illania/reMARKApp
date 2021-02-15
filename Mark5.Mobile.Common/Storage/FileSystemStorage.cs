@@ -6,8 +6,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
-using PCLStorage;
+using Mark5.Mobile.Common.Storage.AppFileStorage.Interface;
 using Mark5.Mobile.Common.Extensions;
+using Mark5.Mobile.Common.Storage.AppFileStorage.Enum;
+using Mark5.Mobile.Common.Storage.AppFileStorage.Utils;
 
 namespace Mark5.Mobile.Common.Storage
 {
@@ -234,7 +236,7 @@ namespace Mark5.Mobile.Common.Storage
             var folder = await CommonConfig.AttachmentsFolder.GetFolderAsync(attachmentDescription.Id.ToString());
 
             var file = await folder.CreateFileAsync(CommonConfig.Utf8Normalizer(attachmentDescription.SafeName), CreationCollisionOption.ReplaceExisting, ct);
-            using (var fileStream = await file.OpenAsync(PCLStorage.FileAccess.ReadAndWrite))
+            using (var fileStream = await file.OpenAsync(AppFileStorage.Enum.FileAccess.ReadAndWrite))
             {
                 await attachmentStream.CopyToAsync(fileStream);
             }
@@ -590,7 +592,7 @@ namespace Mark5.Mobile.Common.Storage
             if (att == null)
                 return null;
 
-            return await att.OpenAsync(PCLStorage.FileAccess.Read);
+            return await att.OpenAsync(AppFileStorage.Enum.FileAccess.Read);
         }
 
         public static async Task DeleteDocumentToUpload(Guid guid)
@@ -670,7 +672,7 @@ namespace Mark5.Mobile.Common.Storage
         public static async Task<IFile> SaveDocumentWorkingCopyAttachmentAsync(string filename, Stream stream)
         {
             var file = await CommonConfig.DocumentWorkingCopyFolder.CreateFileAsync(filename, CreationCollisionOption.GenerateUniqueName);
-            using (var fileStream = await file.OpenAsync(PCLStorage.FileAccess.ReadAndWrite))
+            using (var fileStream = await file.OpenAsync(AppFileStorage.Enum.FileAccess.ReadAndWrite))
                 try
                 {
                     await stream.CopyToAsync(fileStream);

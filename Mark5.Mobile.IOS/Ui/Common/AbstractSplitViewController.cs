@@ -47,7 +47,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             if (lastPrimaryViewController == null)
                 return CreateSecondaryNavigationController();
 
-            primaryNavigationController.ToolbarHidden = Integration.IsIPad();
+            primaryNavigationController.ToolbarHidden = Integration.IsIPadOrMac();
 
             var poppedViewControllers = primaryNavigationController.PopToViewController(lastPrimaryViewController, false);
             if (poppedViewControllers != null && poppedViewControllers.Length > 0)

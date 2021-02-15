@@ -105,9 +105,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             containerView.AddConstraints(new NSLayoutConstraint[]
             {
-                    datePicker.TopAnchor.ConstraintEqualTo(containerView.TopAnchor, Integration.IsIPad() ? 30 : 20),
-                    datePicker.LeftAnchor.ConstraintEqualTo(containerView.LeftAnchor, Integration.IsIPad() ? 30 : 20),
-                    datePicker.RightAnchor.ConstraintEqualTo(containerView.RightAnchor, Integration.IsIPad() ? -30 : -20),
+                    datePicker.TopAnchor.ConstraintEqualTo(containerView.TopAnchor, Integration.IsIPadOrMac() ? 30 : 20),
+                    datePicker.LeftAnchor.ConstraintEqualTo(containerView.LeftAnchor, Integration.IsIPadOrMac() ? 30 : 20),
+                    datePicker.RightAnchor.ConstraintEqualTo(containerView.RightAnchor, Integration.IsIPadOrMac() ? -30 : -20),
                     datePicker.CenterXAnchor.ConstraintEqualTo(containerView.CenterXAnchor),
 
                     horizontalLine.TopAnchor.ConstraintEqualTo(datePicker.BottomAnchor),

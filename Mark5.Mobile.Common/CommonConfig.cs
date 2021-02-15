@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Net.Http;
 using Mark5.Mobile.Common.Utilities;
-using PCLStorage;
 using TinyMessenger;
+using Mark5.Mobile.Common.Storage.AppFileStorage.Interface;
 
 namespace Mark5.Mobile.Common
 {

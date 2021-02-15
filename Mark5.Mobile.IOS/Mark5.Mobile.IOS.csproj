@@ -393,12 +393,6 @@
 		<Reference Include="PreMailer.Net">
 		  <HintPath>..\packages\PreMailer.Net.2.0.1\lib\netstandard2.0\PreMailer.Net.dll</HintPath>
 		</Reference>
-		<Reference Include="PCLStorage.Abstractions">
-		  <HintPath>..\packages\PCLStorage.1.0.2\lib\portable-Xamarin.iOS+Xamarin.Mac\PCLStorage.Abstractions.dll</HintPath>
-		</Reference>
-		<Reference Include="PCLStorage">
-		  <HintPath>..\packages\PCLStorage.1.0.2\lib\portable-Xamarin.iOS+Xamarin.Mac\PCLStorage.dll</HintPath>
-		</Reference>
 		<Reference Include="SQLitePCLRaw.provider.sqlite3">
 		  <HintPath>..\packages\SQLitePCLRaw.provider.sqlite3.ios_unified.1.1.11\lib\Xamarin.iOS10\SQLitePCLRaw.provider.sqlite3.dll</HintPath>
 		</Reference>

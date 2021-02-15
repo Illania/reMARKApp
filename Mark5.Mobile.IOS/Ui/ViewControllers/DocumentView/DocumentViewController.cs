@@ -96,7 +96,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InitNavigationBar();
             InitHeaderView();
 
-            if (forceShowActionBar || !Integration.IsIPad())
+            if (forceShowActionBar || !Integration.IsIPadOrMac())
                 InitToolbar();
 
             if (Integration.IsRunningAtLeast(11))
@@ -116,7 +116,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (NavigationController != null && !(ParentViewController is DocumentPageViewController))
                 NavigationController.ToolbarHidden = false;
 
-            if (!forceShowActionBar && Integration.IsIPad())
+            if (!forceShowActionBar && Integration.IsIPadOrMac())
                 NavigationController.ToolbarHidden = true;
 
             SendStatusBanner.Attach(this);
@@ -464,7 +464,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (userActionsButton != null)
                 userActionsButton.Enabled = false;
 
-            if (Integration.IsIPad())
+            if (Integration.IsIPadOrMac())
                 DocumentPageViewControllerDelegate?.UpdateIPadNavigationButtons(false, "0");
 
             Clear();
@@ -610,7 +610,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var enableBottomActions = failedDocumentToUploadGuid == Guid.Empty;
             if (enableBottomActions)
             {
-                if (!forceShowActionBar && Integration.IsIPad())
+                if (!forceShowActionBar && Integration.IsIPadOrMac())
                 {
                     DocumentPageViewControllerDelegate?.UpdateIPadNavigationButtons(document != null, document?.Comments?.Count.ToString());
                 }
@@ -1266,7 +1266,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void CommentsCountChangedHandler(EntityPreviewCommentCountChangedMessage m)
         {
-            if (Integration.IsIPad())
+            if (Integration.IsIPadOrMac())
                 BeginInvokeOnMainThread(() => DocumentPageViewControllerDelegate?.UpdateIPadNavigationButtons(true, document.Comments.Count().ToString()));
             else
                 BeginInvokeOnMainThread(() => commentsBadgeButton.SetBadgeValue(document.Comments.Count().ToString(), false));

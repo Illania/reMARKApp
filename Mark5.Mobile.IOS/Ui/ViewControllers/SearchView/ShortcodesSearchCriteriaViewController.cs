@@ -60,7 +60,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
 
             CommonConfig.Logger.Info($"Starting search... [criteria={Serializer.Serialize(criteria)}]");
 
-            if (Integration.IsIPad())
+            if (Integration.IsIPadOrMac())
                 PresentViewController(new ShortcodesSplitSearchViewController(criteria), true, null);
             else
                 NavigationController.PushViewController(new ShortcodesSearchResultsViewController { Criteria = criteria }, true);
