@@ -1,5 +1,5 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\Xamarin.Build.Download.0.4.11\build\Xamarin.Build.Download.props" Condition="Exists('..\packages\Xamarin.Build.Download.0.4.11\build\Xamarin.Build.Download.props')" />
+  <Import Project="..\packages\Xamarin.Build.Download.0.10.0\build\Xamarin.Build.Download.props" Condition="Exists('..\packages\Xamarin.Build.Download.0.10.0\build\Xamarin.Build.Download.props')" />
 	<PropertyGroup>
 		<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
 		<Platform Condition=" '$(Platform)' == '' ">iPhoneSimulator</Platform>
@@ -329,7 +329,7 @@
 		<Reference Include="System.IO.Compression" />
 		<Reference Include="System.Net.Http" />
 		<Reference Include="MailBee.NET">
-		  <HintPath>..\packages\MailBee.NET.11.2.0\lib\netstandard2.0\MailBee.NET.dll</HintPath>
+		  <HintPath>..\packages\MailBee.NET.12.2.0\lib\netstandard2.0\MailBee.NET.dll</HintPath>
 		</Reference>
 		<Reference Include="System.Web.Services" />
 		<Reference Include="Newtonsoft.Json">
@@ -339,13 +339,13 @@
 		  <HintPath>..\packages\modernhttpclient.2.4.2\lib\Xamarin.iOS10\ModernHttpClient.dll</HintPath>
 		</Reference>
 		<Reference Include="SQLitePCLRaw.core">
-		  <HintPath>..\packages\SQLitePCLRaw.core.1.1.14\lib\Xamarin.iOS10\SQLitePCLRaw.core.dll</HintPath>
+		  <HintPath>..\packages\SQLitePCLRaw.core.2.0.4\lib\netstandard2.0\SQLitePCLRaw.core.dll</HintPath>
 		</Reference>
     <Reference Include="Syncfusion.Licensing">
       <HintPath>..\packages\Syncfusion.Licensing.18.3.0.51\lib\Xamarin.iOS10\Syncfusion.Licensing.dll</HintPath>
     </Reference>
 		<Reference Include="Lottie.iOS">
-		  <HintPath>..\packages\Com.Airbnb.iOS.Lottie.2.5.7\lib\xamarinios10\Lottie.iOS.dll</HintPath>
+		  <HintPath>..\packages\Com.Airbnb.iOS.Lottie.2.5.13\lib\xamarinios10\Lottie.iOS.dll</HintPath>
 		</Reference>
 		<Reference Include="Syncfusion.SfSchedule.iOS">
 		  <HintPath>..\packages\Syncfusion.Xamarin.SfSchedule.IOS.18.3.0.51\lib\Xamarin.iOS10\Syncfusion.SfSchedule.iOS.dll</HintPath>
@@ -354,7 +354,7 @@
 		  <HintPath>..\packages\Syncfusion.Xamarin.SfCalendar.IOS.18.3.0.51\lib\Xamarin.iOS10\Syncfusion.SfCalendar.iOS.dll</HintPath>
 		</Reference>
 		<Reference Include="Xamarin.Essentials">
-		  <HintPath>..\packages\Xamarin.Essentials.1.1.0\lib\xamarinios10\Xamarin.Essentials.dll</HintPath>
+		  <HintPath>..\packages\Xamarin.Essentials.1.6.1\lib\xamarinios10\Xamarin.Essentials.dll</HintPath>
 		</Reference>
 		<Reference Include="OpenTK-1.0" />
 		<Reference Include="Firebase.Core">
@@ -370,58 +370,55 @@
 		  <HintPath>..\packages\Xamarin.Firebase.iOS.CloudMessaging.3.1.2\lib\Xamarin.iOS10\Firebase.CloudMessaging.dll</HintPath>
 		</Reference>
 		<Reference Include="Polly">
-		  <HintPath>..\packages\Polly.7.1.0\lib\netstandard2.0\Polly.dll</HintPath>
+		  <HintPath>..\packages\Polly.7.2.1\lib\netstandard2.0\Polly.dll</HintPath>
 		</Reference>
 		<Reference Include="Microsoft.AppCenter">
-		  <HintPath>..\packages\Microsoft.AppCenter.2.0.0\lib\Xamarin.iOS10\Microsoft.AppCenter.dll</HintPath>
+		  <HintPath>..\packages\Microsoft.AppCenter.4.1.0\lib\Xamarin.iOS10\Microsoft.AppCenter.dll</HintPath>
 		</Reference>
 		<Reference Include="Microsoft.AppCenter.iOS.Bindings">
-		  <HintPath>..\packages\Microsoft.AppCenter.2.0.0\lib\Xamarin.iOS10\Microsoft.AppCenter.iOS.Bindings.dll</HintPath>
+		  <HintPath>..\packages\Microsoft.AppCenter.4.1.0\lib\Xamarin.iOS10\Microsoft.AppCenter.iOS.Bindings.dll</HintPath>
 		</Reference>
 		<Reference Include="Microsoft.AppCenter.Crashes">
-		  <HintPath>..\packages\Microsoft.AppCenter.Crashes.2.0.0\lib\Xamarin.iOS10\Microsoft.AppCenter.Crashes.dll</HintPath>
+		  <HintPath>..\packages\Microsoft.AppCenter.Crashes.4.1.0\lib\Xamarin.iOS10\Microsoft.AppCenter.Crashes.dll</HintPath>
 		</Reference>
 		<Reference Include="Microsoft.AppCenter.Crashes.iOS.Bindings">
-		  <HintPath>..\packages\Microsoft.AppCenter.Crashes.2.0.0\lib\Xamarin.iOS10\Microsoft.AppCenter.Crashes.iOS.Bindings.dll</HintPath>
+		  <HintPath>..\packages\Microsoft.AppCenter.Crashes.4.1.0\lib\Xamarin.iOS10\Microsoft.AppCenter.Crashes.iOS.Bindings.dll</HintPath>
 		</Reference>
 		<Reference Include="HtmlAgilityPack">
-		  <HintPath>..\packages\HtmlAgilityPack.1.11.8\lib\netstandard2.0\HtmlAgilityPack.dll</HintPath>
+		  <HintPath>..\packages\HtmlAgilityPack.1.11.30\lib\netstandard2.0\HtmlAgilityPack.dll</HintPath>
 		</Reference>
 		<Reference Include="AngleSharp">
-		  <HintPath>..\packages\AngleSharp.0.9.11\lib\portable-windows8+net45+windowsphone8+wpa+monoandroid+monotouch\AngleSharp.dll</HintPath>
+		  <HintPath>..\packages\AngleSharp.0.14.0\lib\netstandard2.0\AngleSharp.dll</HintPath>
 		</Reference>
 		<Reference Include="PreMailer.Net">
-		  <HintPath>..\packages\PreMailer.Net.2.0.1\lib\netstandard2.0\PreMailer.Net.dll</HintPath>
+		  <HintPath>..\packages\PreMailer.Net.2.2.0\lib\netstandard2.0\PreMailer.Net.dll</HintPath>
 		</Reference>
 		<Reference Include="SQLitePCLRaw.provider.sqlite3">
-		  <HintPath>..\packages\SQLitePCLRaw.provider.sqlite3.ios_unified.1.1.11\lib\Xamarin.iOS10\SQLitePCLRaw.provider.sqlite3.dll</HintPath>
-		</Reference>
-		<Reference Include="SQLitePCLRaw.batteries_green">
-		  <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.11\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_green.dll</HintPath>
+		  <HintPath>..\packages\SQLitePCLRaw.provider.sqlite3.ios_unified.1.1.14\lib\Xamarin.iOS10\SQLitePCLRaw.provider.sqlite3.dll</HintPath>
 		</Reference>
 		<Reference Include="SQLitePCLRaw.batteries_v2">
-		  <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.11\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_v2.dll</HintPath>
+		  <HintPath>..\packages\SQLitePCLRaw.bundle_green.2.0.4\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_v2.dll</HintPath>
 		</Reference>
 		<Reference Include="SQLite-net">
-		  <HintPath>..\packages\sqlite-net-pcl.1.5.231\lib\netstandard1.1\SQLite-net.dll</HintPath>
+		  <HintPath>..\packages\sqlite-net-pcl.1.7.335\lib\netstandard2.0\SQLite-net.dll</HintPath>
 		</Reference>
 		<Reference Include="GMImagePicker.Xamarin">
-		  <HintPath>..\packages\GMImagePicker.Xamarin.2.5.0\lib\xamarinios10\GMImagePicker.Xamarin.dll</HintPath>
+		  <HintPath>..\packages\GMImagePicker.Xamarin.2.5.1\lib\xamarinios10\GMImagePicker.Xamarin.dll</HintPath>
 		</Reference>
 		<Reference Include="Microsoft.Identity.Client">
-		  <HintPath>..\packages\Microsoft.Identity.Client.4.16.1\lib\xamarinios10\Microsoft.Identity.Client.dll</HintPath>
+		  <HintPath>..\packages\Microsoft.Identity.Client.4.26.0\lib\xamarinios10\Microsoft.Identity.Client.dll</HintPath>
 		</Reference>
 		<Reference Include="System.IdentityModel" />
 		<Reference Include="System.Runtime.Serialization" />
 		<Reference Include="System.Xml.Linq" />
 		<Reference Include="System.Diagnostics.DiagnosticSource">
-		  <HintPath>..\packages\System.Diagnostics.DiagnosticSource.4.6.0\lib\netstandard1.3\System.Diagnostics.DiagnosticSource.dll</HintPath>
+		  <HintPath>..\packages\System.Diagnostics.DiagnosticSource.5.0.1\lib\netstandard1.3\System.Diagnostics.DiagnosticSource.dll</HintPath>
 		</Reference>
 		<Reference Include="Microsoft.Graph.Core">
-		  <HintPath>..\packages\Microsoft.Graph.Core.1.19.0\lib\xamarinios10\Microsoft.Graph.Core.dll</HintPath>
+		  <HintPath>..\packages\Microsoft.Graph.Core.1.24.0\lib\xamarinios10\Microsoft.Graph.Core.dll</HintPath>
 		</Reference>
 		<Reference Include="Microsoft.Graph">
-		  <HintPath>..\packages\Microsoft.Graph.1.21.0\lib\netstandard1.3\Microsoft.Graph.dll</HintPath>
+		  <HintPath>..\packages\Microsoft.Graph.3.24.0\lib\netstandard2.0\Microsoft.Graph.dll</HintPath>
 		</Reference>
 		<Reference Include="System.Drawing.Common.dll" />
 		<Reference Include="Calabash">
@@ -431,55 +428,80 @@
 		  <HintPath>..\Components\InAppSettingsKit-2.15\lib\InAppSettingsKit.dll</HintPath>
 		</Reference>
 		<Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions">
-		  <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.Abstractions.3.1.8\lib\netstandard2.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+		  <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.Abstractions.5.0.0\lib\netstandard2.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
 		</Reference>
 		<Reference Include="Microsoft.Extensions.Logging.Abstractions">
-		  <HintPath>..\packages\Microsoft.Extensions.Logging.Abstractions.3.1.8\lib\netstandard2.0\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
+		  <HintPath>..\packages\Microsoft.Extensions.Logging.Abstractions.5.0.0\lib\netstandard2.0\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
 		</Reference>
 		<Reference Include="System.Buffers">
-		  <HintPath>..\packages\System.Buffers.4.4.0\lib\netstandard2.0\System.Buffers.dll</HintPath>
+		  <HintPath>..\packages\System.Buffers.4.5.1\lib\netstandard2.0\System.Buffers.dll</HintPath>
 		</Reference>
 		<Reference Include="System.Runtime.CompilerServices.Unsafe">
-		  <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.7.1\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+		  <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.5.0.0\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
 		</Reference>
 		<Reference Include="System.Memory">
-		  <HintPath>..\packages\System.Memory.4.5.2\lib\netstandard2.0\System.Memory.dll</HintPath>
+		  <HintPath>..\packages\System.Memory.4.5.4\lib\netstandard2.0\System.Memory.dll</HintPath>
 		</Reference>
 		<Reference Include="Microsoft.Extensions.Primitives">
-		  <HintPath>..\packages\Microsoft.Extensions.Primitives.3.1.8\lib\netstandard2.0\Microsoft.Extensions.Primitives.dll</HintPath>
+		  <HintPath>..\packages\Microsoft.Extensions.Primitives.5.0.0\lib\netstandard2.0\Microsoft.Extensions.Primitives.dll</HintPath>
 		</Reference>
 		<Reference Include="Microsoft.Extensions.Caching.Abstractions">
-		  <HintPath>..\packages\Microsoft.Extensions.Caching.Abstractions.3.1.8\lib\netstandard2.0\Microsoft.Extensions.Caching.Abstractions.dll</HintPath>
+		  <HintPath>..\packages\Microsoft.Extensions.Caching.Abstractions.5.0.0\lib\netstandard2.0\Microsoft.Extensions.Caching.Abstractions.dll</HintPath>
 		</Reference>
 		<Reference Include="Microsoft.Extensions.Options">
-		  <HintPath>..\packages\Microsoft.Extensions.Options.3.1.8\lib\netstandard2.0\Microsoft.Extensions.Options.dll</HintPath>
+		  <HintPath>..\packages\Microsoft.Extensions.Options.5.0.0\lib\netstandard2.0\Microsoft.Extensions.Options.dll</HintPath>
 		</Reference>
 		<Reference Include="Microsoft.Extensions.Caching.Memory">
-		  <HintPath>..\packages\Microsoft.Extensions.Caching.Memory.3.1.8\lib\netstandard2.0\Microsoft.Extensions.Caching.Memory.dll</HintPath>
+		  <HintPath>..\packages\Microsoft.Extensions.Caching.Memory.5.0.0\lib\netstandard2.0\Microsoft.Extensions.Caching.Memory.dll</HintPath>
 		</Reference>
 		<Reference Include="Xamarin.Azure.NotificationHubs.iOS">
 		  <HintPath>..\packages\Xamarin.Azure.NotificationHubs.iOS.3.1.1\lib\xamarinios10\Xamarin.Azure.NotificationHubs.iOS.dll</HintPath>
 		</Reference>
 		<Reference Include="PInvoke.Windows.Core">
-		  <HintPath>..\packages\PInvoke.Windows.Core.0.3.2\lib\portable-net45+win+wpa81+MonoAndroid10+xamarinios10+MonoTouch10\PInvoke.Windows.Core.dll</HintPath>
+		  <HintPath>..\packages\PInvoke.Windows.Core.0.7.78\lib\netstandard2.0\PInvoke.Windows.Core.dll</HintPath>
 		</Reference>
 		<Reference Include="PInvoke.Kernel32">
-		  <HintPath>..\packages\PInvoke.Kernel32.0.3.2\lib\portable-net45+win+wpa81+MonoAndroid10+xamarinios10+MonoTouch10\PInvoke.Kernel32.dll</HintPath>
+		  <HintPath>..\packages\PInvoke.Kernel32.0.7.78\lib\netstandard2.0\PInvoke.Kernel32.dll</HintPath>
 		</Reference>
 		<Reference Include="PInvoke.BCrypt">
-		  <HintPath>..\packages\PInvoke.BCrypt.0.3.2\lib\portable-net45+win+wpa81+MonoAndroid10+xamarinios10+MonoTouch10\PInvoke.BCrypt.dll</HintPath>
+		  <HintPath>..\packages\PInvoke.BCrypt.0.7.78\lib\netstandard2.0\PInvoke.BCrypt.dll</HintPath>
 		</Reference>
 		<Reference Include="PInvoke.NCrypt">
-		  <HintPath>..\packages\PInvoke.NCrypt.0.3.2\lib\portable-net45+win+wpa81+MonoAndroid10+xamarinios10+MonoTouch10\PInvoke.NCrypt.dll</HintPath>
+		  <HintPath>..\packages\PInvoke.NCrypt.0.7.78\lib\netstandard2.0\PInvoke.NCrypt.dll</HintPath>
 		</Reference>
 		<Reference Include="Validation">
-		  <HintPath>..\packages\Validation.2.2.8\lib\dotnet\Validation.dll</HintPath>
+		  <HintPath>..\packages\Validation.2.4.22\lib\netstandard1.3\Validation.dll</HintPath>
 		</Reference>
 		<Reference Include="PCLCrypto">
 		  <HintPath>..\packages\PCLCrypto.2.0.147\lib\xamarinios10\PCLCrypto.dll</HintPath>
 		</Reference>
 		<Reference Include="Microsoft.Azure.NotificationHubs">
 		  <HintPath>..\packages\Microsoft.Azure.NotificationHubs.4.1.0\lib\netstandard2.0\Microsoft.Azure.NotificationHubs.dll</HintPath>
+		</Reference>
+		<Reference Include="System.CodeDom">
+		  <HintPath>..\packages\System.CodeDom.4.5.0\lib\netstandard2.0\System.CodeDom.dll</HintPath>
+		</Reference>
+		<Reference Include="System.Management">
+		  <HintPath>..\packages\System.Management.4.5.0\lib\netstandard2.0\System.Management.dll</HintPath>
+		</Reference>
+		<Reference Include="System.Security.Cryptography.Pkcs">
+		  <HintPath>..\packages\System.Security.Cryptography.Pkcs.4.5.0\lib\netstandard2.0\System.Security.Cryptography.Pkcs.dll</HintPath>
+		</Reference>
+		<Reference Include="System.Security.Principal.Windows">
+		  <HintPath>..\packages\System.Security.Principal.Windows.4.5.0\lib\netstandard2.0\System.Security.Principal.Windows.dll</HintPath>
+		</Reference>
+		<Reference Include="System.Security.AccessControl">
+		  <HintPath>..\packages\System.Security.AccessControl.4.5.0\lib\netstandard2.0\System.Security.AccessControl.dll</HintPath>
+		</Reference>
+		<Reference Include="Microsoft.Win32.Registry">
+		  <HintPath>..\packages\Microsoft.Win32.Registry.4.5.0\lib\netstandard2.0\Microsoft.Win32.Registry.dll</HintPath>
+		</Reference>
+		<Reference Include="System.Numerics" />
+		<Reference Include="SQLitePCLRaw.provider.dynamic_cdecl">
+		  <HintPath>..\packages\SQLitePCLRaw.provider.dynamic_cdecl.2.0.4\lib\netstandard2.0\SQLitePCLRaw.provider.dynamic_cdecl.dll</HintPath>
+		</Reference>
+		<Reference Include="SQLitePCLRaw.nativelibrary">
+		  <HintPath>..\packages\SQLitePCLRaw.bundle_green.2.0.4\lib\Xamarin.iOS10\SQLitePCLRaw.nativelibrary.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 	<ItemGroup>
@@ -891,8 +913,8 @@
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 	<Import Project="..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets" Condition="Exists('..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets')" />
 	<Import Project="..\packages\Xamarin.Firebase.iOS.Analytics.4.0.5\build\Xamarin.Firebase.iOS.Analytics.targets" Condition="Exists('..\packages\Xamarin.Firebase.iOS.Analytics.4.0.5\build\Xamarin.Firebase.iOS.Analytics.targets')" />
-	<Import Project="..\packages\Xamarin.Build.Download.0.4.11\build\Xamarin.Build.Download.targets" Condition="Exists('..\packages\Xamarin.Build.Download.0.4.11\build\Xamarin.Build.Download.targets')" />
 	<Import Project="..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets')" />
 	<Import Project="..\packages\Xamarin.Firebase.iOS.InstanceID.3.4.0\build\Xamarin.Firebase.iOS.InstanceID.targets" Condition="Exists('..\packages\Xamarin.Firebase.iOS.InstanceID.3.4.0\build\Xamarin.Firebase.iOS.InstanceID.targets')" />
 	<Import Project="..\packages\Xamarin.Firebase.iOS.Analytics.5.5.0\build\Xamarin.Firebase.iOS.Analytics.targets" Condition="Exists('..\packages\Xamarin.Firebase.iOS.Analytics.5.5.0\build\Xamarin.Firebase.iOS.Analytics.targets')" />
+	<Import Project="..\packages\Xamarin.Build.Download.0.10.0\build\Xamarin.Build.Download.targets" Condition="Exists('..\packages\Xamarin.Build.Download.0.10.0\build\Xamarin.Build.Download.targets')" />
 </Project>
