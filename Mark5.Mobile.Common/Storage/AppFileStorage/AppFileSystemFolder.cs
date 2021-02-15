@@ -12,7 +12,7 @@ using Mark5.Mobile.Common.Storage.AppFileStorage.Utils;
 namespace Mark5.Mobile.Common.Storage.AppFileStorage
 {
     /// <summary>
-    /// Represents a folder in the <see cref="DesktopFileSystem"/>
+    /// Represents a folder in the <see cref="AppFileSystem"/>
     /// </summary>
     [DebuggerDisplay("Name = {_name}")]
     public class AppFileSystemFolder : IFolder

@@ -20,7 +20,7 @@ namespace Mark5.Mobile.Common.Storage.AppFileStorage
                 IFileSystem ret = _fileSystem.Value;
                 if (ret == null)
                 {
-                    throw FileSystem.NotImplementedInReferenceAssembly();
+                    throw NotImplementedInReferenceAssembly();
                 }
                 return ret;
             }
