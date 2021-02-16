@@ -9,6 +9,7 @@ using Android.Preferences;
 using Android.Support.V4.Net;
 using Android.Widget;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Storage.AppFileStorage.Interface;
 using Mark5.Mobile.Common.Synchronizer;
 
 namespace Mark5.Mobile.Droid.Utilities
@@ -120,7 +121,7 @@ namespace Mark5.Mobile.Droid.Utilities
             editor.Clear();
             editor.Commit();
 
-            var foldersToRemove = new List<PCLStorage.IFolder> { CommonConfig.DataFolder,
+            var foldersToRemove = new List<IFolder> { CommonConfig.DataFolder,
                 CommonConfig.DatabaseFolder,
                 CommonConfig.AttachmentsFolder,
                 CommonConfig.DocumentsToUploadFolder,

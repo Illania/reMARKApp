@@ -23,7 +23,6 @@ using Mark5.Mobile.Droid.Utilities;
 using Mark5.Mobile.Droid.Utilities.DeviceReminder;
 using Mark5.Mobile.Droid.Utilities.Workers;
 using Mark5.ServiceReference.Exceptions;
-using ME.Pushy.Sdk;
 using Microsoft.Identity.Client;
 using TinyIoC;
 

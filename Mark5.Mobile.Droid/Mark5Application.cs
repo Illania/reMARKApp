@@ -11,11 +11,12 @@ using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Storage.AppFileStorage;
+using Mark5.Mobile.Common.Storage.AppFileStorage.Enum;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Service;
 using Mark5.Mobile.Droid.Utilities;
 using Mark5.Mobile.Droid.Utilities.DeviceReminder;
-using PCLStorage;
 using TinyMessenger;
 using Xamarin.Android.Net;
 
@@ -49,11 +50,11 @@ namespace Mark5.Mobile.Droid
                     var mainFolder = FileSystem.Current.LocalStorage;
 
                     CommonConfig.PathSeparator = Path.DirectorySeparatorChar;
-                    CommonConfig.DataFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "data"), CreationCollisionOption.OpenIfExists);
-                    CommonConfig.DatabaseFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "db"), CreationCollisionOption.OpenIfExists);
-                    CommonConfig.AttachmentsFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("..", "cache", "att"), CreationCollisionOption.OpenIfExists);
-                    CommonConfig.DocumentsToUploadFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "documents_upload"), CreationCollisionOption.OpenIfExists);
-                    CommonConfig.DocumentWorkingCopyFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("data", "document_work"), CreationCollisionOption.OpenIfExists);
+                    CommonConfig.DataFolder = await mainFolder.CreateFolderAsync(Path.Combine("data", "data"), CreationCollisionOption.OpenIfExists);
+                    CommonConfig.DatabaseFolder = await mainFolder.CreateFolderAsync(Path.Combine("data", "db"), CreationCollisionOption.OpenIfExists);
+                    CommonConfig.AttachmentsFolder = await mainFolder.CreateFolderAsync(Path.Combine("..", "cache", "att"), CreationCollisionOption.OpenIfExists);
+                    CommonConfig.DocumentsToUploadFolder = await mainFolder.CreateFolderAsync(Path.Combine("data", "documents_upload"), CreationCollisionOption.OpenIfExists);
+                    CommonConfig.DocumentWorkingCopyFolder = await mainFolder.CreateFolderAsync(Path.Combine("data", "document_work"), CreationCollisionOption.OpenIfExists);
                     CommonConfig.RetainedDataFolder = await mainFolder.CreateFolderAsync("retained", CreationCollisionOption.OpenIfExists);
                     CommonConfig.Logger = new SimpleLogger();
                     CommonConfig.DeviceInfoProvider = new DeviceInfoProvider();

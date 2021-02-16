@@ -1,5 +1,5 @@
-﻿using PCLStorage;
-using System.IO;
+﻿using System.IO;
+using Mark5.Mobile.Common.Storage.AppFileStorage.Interface;
 
 namespace Mark5.Mobile.Droid.Model
 {
