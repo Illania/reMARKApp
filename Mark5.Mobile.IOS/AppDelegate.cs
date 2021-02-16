@@ -19,6 +19,8 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Service;
 using Mark5.Mobile.Common.Storage;
+using Mark5.Mobile.Common.Storage.AppFileStorage;
+using Mark5.Mobile.Common.Storage.AppFileStorage.Enum;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.PushNotifications;
 using Mark5.Mobile.IOS.Service;
@@ -30,7 +32,6 @@ using Microsoft.AppCenter;
 using Microsoft.AppCenter.Crashes;
 using Microsoft.Identity.Client;
 using ModernHttpClient;
-using PCLStorage;
 using TinyIoC;
 using TinyMessenger;
 using UIKit;
@@ -85,7 +86,7 @@ namespace Mark5.Mobile.IOS
 
                 if (!isLoggedIn)
                     vc = new LoginViewController();
-                else if (Integration.IsIPad())
+                else if (Integration.IsIPadOrMac())
                     vc = new SplitMainViewController();
                 else
                     vc = new SimpleMainViewController();
@@ -168,6 +169,22 @@ namespace Mark5.Mobile.IOS
             }
 
             return true;
+        }
+
+        private void TryRequestAuthorization()
+        {
+            try
+            {
+                pushNotificationsRegistrator.RequestAuthorization();
+            }
+            catch (NSErrorException nex)
+            {
+                CommonConfig.Logger.Error($"Error while requesting authorization", nex);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Error while requesting authorization", ex);
+            }
         }
 
         public override bool ShouldSaveApplicationState(UIApplication application, NSCoder coder) => true;
@@ -524,11 +541,11 @@ namespace Mark5.Mobile.IOS
                     Integration.ClearData();
 
                 CommonConfig.PathSeparator = Path.DirectorySeparatorChar;
-                CommonConfig.DataFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("v2", "data"), CreationCollisionOption.OpenIfExists);
-                CommonConfig.DatabaseFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("v2", "db"), CreationCollisionOption.OpenIfExists);
-                CommonConfig.AttachmentsFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("Caches", "v2", "att"), CreationCollisionOption.OpenIfExists);
-                CommonConfig.DocumentsToUploadFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("v2", "documents_upload"), CreationCollisionOption.OpenIfExists);
-                CommonConfig.DocumentWorkingCopyFolder = await mainFolder.CreateFolderAsync(PortablePath.Combine("v2", "document_work"), CreationCollisionOption.OpenIfExists);
+                CommonConfig.DataFolder = await mainFolder.CreateFolderAsync(Path.Combine("v2", "data"), CreationCollisionOption.OpenIfExists);
+                CommonConfig.DatabaseFolder = await mainFolder.CreateFolderAsync(Path.Combine("v2", "db"), CreationCollisionOption.OpenIfExists);
+                CommonConfig.AttachmentsFolder = await mainFolder.CreateFolderAsync(Path.Combine("Caches", "v2", "att"), CreationCollisionOption.OpenIfExists);
+                CommonConfig.DocumentsToUploadFolder = await mainFolder.CreateFolderAsync(Path.Combine("v2", "documents_upload"), CreationCollisionOption.OpenIfExists);
+                CommonConfig.DocumentWorkingCopyFolder = await mainFolder.CreateFolderAsync(Path.Combine("v2", "document_work"), CreationCollisionOption.OpenIfExists);
                 CommonConfig.RetainedDataFolder = await mainFolder.CreateFolderAsync("retained", CreationCollisionOption.OpenIfExists);
                 CommonConfig.Logger = new ConsoleAndFileLogger();
                 CommonConfig.DeviceInfoProvider = new DeviceInfoProvider();
@@ -651,7 +668,7 @@ namespace Mark5.Mobile.IOS
                 {
                     CommonConfig.Logger.Info("Refreshing APNS token...");
 
-                    pushNotificationsRegistrator.RequestAuthorization();
+                    TryRequestAuthorization();
                 });
 
                 CommonConfig.Logger.Info($"Initialized - will present {nameof(AbstractMainViewController)}");

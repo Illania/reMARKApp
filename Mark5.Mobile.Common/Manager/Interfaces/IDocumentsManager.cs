@@ -4,7 +4,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Containers;
-using PCLStorage;
+using Mark5.Mobile.Common.Storage.AppFileStorage.Interface;
 
 namespace Mark5.Mobile.Common.Manager
 {

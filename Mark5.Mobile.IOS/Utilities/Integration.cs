@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -6,10 +7,10 @@ using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Storage.AppFileStorage;
 using Mark5.Mobile.IOS.Common.CallId;
 using Mark5.Mobile.IOS.Ui.Common;
 using ObjCRuntime;
-using PCLStorage;
 using UIKit;
 using UserNotifications;
 
@@ -34,6 +35,10 @@ namespace Mark5.Mobile.IOS.Utilities
 
         public static bool IsIPhone() => UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Phone;
         public static bool IsIPad() => UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Pad;
+        public static bool IsIPadOrMac() => UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Pad
+            || UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Mac;
+        public static bool IsMac() => UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Mac;
+        
 
         #endregion
 
@@ -120,8 +125,8 @@ namespace Mark5.Mobile.IOS.Utilities
             UNUserNotificationCenter.Current.RemoveAllPendingNotificationRequests();
 
             var localStorage = FileSystem.Current.LocalStorage;
-            var dataFolder = PortablePath.Combine(localStorage.Path, "v2");
-            var cacheFolder = PortablePath.Combine(localStorage.Path, "Caches", "v2");
+            var dataFolder = Path.Combine(localStorage.Path, "v2");
+            var cacheFolder = Path.Combine(localStorage.Path, "Caches", "v2");
 
             try
             {

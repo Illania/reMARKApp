@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
-using PCLStorage;
+using Mark5.Mobile.Common.Storage.AppFileStorage.Enum;
+using Mark5.Mobile.Common.Storage.AppFileStorage.Utils;
 
 namespace Mark5.Mobile.Common.Storage
 {

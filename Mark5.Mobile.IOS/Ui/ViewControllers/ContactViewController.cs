@@ -94,7 +94,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             SubscribeToMessages();
 
             if (NavigationController != null)
-                NavigationController.ToolbarHidden = Integration.IsIPad();
+                NavigationController.ToolbarHidden = Integration.IsIPadOrMac();
         }
 
         public override void ViewDidAppear(bool animated)
@@ -310,7 +310,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     }
                 };
 
-            if (!Integration.IsIPad())
+            if (!Integration.IsIPadOrMac())
             {
                 ToolbarItems = buttons;
             }
