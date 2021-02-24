@@ -82,7 +82,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             };
             scrollView.AddSubview(StackView);
 
-            if (Integration.IsIPadOrMac())
+            if (Integration.IsIPad())
             {
                 scrollView.AddConstraints(new[]
                 {

@@ -2,13 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Foundation;
 using GMImagePicker;
-using HtmlAgilityPack;
-using MailBee.Html;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -599,33 +596,71 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         async void InsertButtonItem_Clicked(object sender, EventArgs e)
         {
             var d = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
-            var source = await Dialogs.ShowListActionSheetAsync(this, new[] { Localization.GetString("insert_template"), Localization.GetString("take_photo"), Localization.GetString("existing_photo"), Localization.GetString("browse_files") }, d);
-            if (source < 0)
-                return;
 
-            if (source == 0)
+            if(!Integration.IsiOSApplicationOnMac())
             {
-                CommonConfig.UsageAnalytics.LogEvent(new ComposeInsertTemplateEvent());
-                await InsertOtherTemplate();
+                var source = await Dialogs.ShowListActionSheetAsync(this, new[] {
+                Localization.GetString("insert_template"),
+                Localization.GetString("take_photo"),
+                Localization.GetString("existing_photo"),
+                Localization.GetString("browse_files") }, d);
+
+                if (source < 0)
+                    return;
+
+                if (source == 0)
+                {
+                    CommonConfig.UsageAnalytics.LogEvent(new ComposeInsertTemplateEvent());
+                    await InsertOtherTemplate();
+                }
+
+                if (source == 1)
+                {
+                    CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.TakePhoto));
+                    await InsertNewPhoto(d, (UIBarButtonItem)sender);
+                }
+
+                if (source == 2)
+                {
+                    CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.PickPhoto));
+                    InsertExistingPhoto(d, (UIBarButtonItem)sender);
+                }
+
+                if (source == 3)
+                {
+                    CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.Local));
+                    InsertFile(d, (UIBarButtonItem)sender);
+                }
+            }
+            else
+            {
+                var source = await Dialogs.ShowListActionSheetAsync(this, new[] {
+                Localization.GetString("insert_template"),
+                Localization.GetString("take_photo"),
+                Localization.GetString("browse_files") }, d);
+
+                if (source < 0)
+                    return;
+
+                if (source == 0)
+                {
+                    CommonConfig.UsageAnalytics.LogEvent(new ComposeInsertTemplateEvent());
+                    await InsertOtherTemplate();
+                }
+
+                if (source == 1)
+                {
+                    CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.TakePhoto));
+                    await InsertNewPhoto(d, (UIBarButtonItem)sender);
+                }
+
+                if (source == 2)
+                {
+                    CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.Local));
+                    InsertFile(d, (UIBarButtonItem)sender);
+                }
             }
 
-            if (source == 1)
-            {
-                CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.TakePhoto));
-                await InsertNewPhoto(d, (UIBarButtonItem)sender);
-            }
-
-            if (source == 2)
-            {
-                CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.PickPhoto));
-                InsertExistingPhoto(d, (UIBarButtonItem)sender);
-            }
-
-            if (source == 3)
-            {
-                CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.Local));
-                InsertFile(d, (UIBarButtonItem)sender);
-            }
         }
 
         void SendButton_Clicked(object sender, EventArgs e)
@@ -1275,55 +1310,67 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             {
                 await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("warning"), Localization.GetString("camera_not_available"));
             }
+            catch(Exception ex)
+            {
+                CommonConfig.Logger.Error("Error happened when opening 'Insert new photo' dialog.", ex);
+            }
         }
 
         void InsertExistingPhoto(PopoverPresentationControllerDelegate d, UIBarButtonItem sender)
         {
-            var picker = new GMImagePickerController
+            try
             {
-                MediaTypes = new[] { PHAssetMediaType.Image },
-                Title = "Add Images",
-                CustomDoneButtonTitle = "Add",
-                CustomCancelButtonTitle = "Cancel",
-                AllowsMultipleSelection = true
-            };
-
-            picker.FinishedPickingAssets += (sender, e) =>
-            {
-
-                var imageManager = new PHImageManager();
-                var options = new PHImageRequestOptions
+                var picker = new GMImagePickerController
                 {
-                    DeliveryMode = PHImageRequestOptionsDeliveryMode.HighQualityFormat,
-                    ResizeMode = PHImageRequestOptionsResizeMode.Exact,
-                    Synchronous = true,
-                    NetworkAccessAllowed = true
+                    MediaTypes = new[] { PHAssetMediaType.Image },
+                    Title = "Add Images",
+                    CustomDoneButtonTitle = "Add",
+                    CustomCancelButtonTitle = "Cancel",
+                    AllowsMultipleSelection = true
                 };
 
-                foreach (var asset in e.Assets)
+                picker.FinishedPickingAssets += (sender, e) =>
                 {
-                    imageManager.RequestImageData(asset, options, (data, dataUti, orientation, info) =>
+
+                    var imageManager = new PHImageManager();
+                    var options = new PHImageRequestOptions
                     {
-                        var originalImage = UIImage.LoadFromData(data);
-                        var jpegImage = originalImage.AsJPEG();
+                        DeliveryMode = PHImageRequestOptionsDeliveryMode.HighQualityFormat,
+                        ResizeMode = PHImageRequestOptionsResizeMode.Exact,
+                        Synchronous = true,
+                        NetworkAccessAllowed = true
+                    };
 
-                        var filename = PHAssetResource.GetAssetResources(asset)[0].OriginalFilename;
-                        filename = Path.ChangeExtension(filename, ".jpeg");
+                    foreach (var asset in e.Assets)
+                    {
+                        imageManager.RequestImageData(asset, options, (data, dataUti, orientation, info) =>
+                        {
+                            var originalImage = UIImage.LoadFromData(data);
+                            var jpegImage = originalImage.AsJPEG();
 
-                        HandleAttachmentImage(filename, jpegImage);
+                            var filename = PHAssetResource.GetAssetResources(asset)[0].OriginalFilename;
+                            filename = Path.ChangeExtension(filename, ".jpeg");
 
-                    });
+                            HandleAttachmentImage(filename, jpegImage);
+
+                        });
+                    }
+                };
+
+                picker.Canceled += ImagePicking_Canceled;
+
+                if (picker.PopoverPresentationController != null)
+                {
+                    picker.PopoverPresentationController.BarButtonItem = sender;
+                    picker.PopoverPresentationController.Delegate = d;
                 }
-            };
-
-            picker.Canceled += ImagePicking_Canceled;
-
-            if (picker.PopoverPresentationController != null)
-            {
-                picker.PopoverPresentationController.BarButtonItem = sender;
-                picker.PopoverPresentationController.Delegate = d;
+                PresentViewController(picker, true, null);
             }
-            PresentViewController(picker, true, null);
+            catch(Exception ex)
+            {
+                CommonConfig.Logger.Error("Error happened when opening 'Add existing photo' dialog.", ex);
+            }
+          
         }
 
 

@@ -26,7 +26,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         public NavigationController(UIViewController rootViewController, UIModalPresentationStyle iPhoneStyle, UIModalPresentationStyle iPadStyle)
             : this(rootViewController)
         {
-            ModalPresentationStyle = Integration.IsIPadOrMac() ? iPadStyle : iPhoneStyle;
+            ModalPresentationStyle = Integration.IsIPad() ? iPadStyle : iPhoneStyle;
         }
 
         public override void LoadView()

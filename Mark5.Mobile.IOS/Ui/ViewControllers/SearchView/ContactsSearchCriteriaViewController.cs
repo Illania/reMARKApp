@@ -64,7 +64,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
 
             CommonConfig.Logger.Info($"Starting search... [criteria={Serializer.Serialize(criteria)}]");
 
-            if (Integration.IsIPadOrMac())
+            if (Integration.IsIPad())
                 PresentViewController(new ContactsSplitSearchViewController(criteria), true, null);
             else
                 NavigationController.PushViewController(new ContactsSearchResultsViewController { Criteria = criteria }, true);

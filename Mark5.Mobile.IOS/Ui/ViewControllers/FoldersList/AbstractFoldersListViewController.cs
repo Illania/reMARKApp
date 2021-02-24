@@ -187,77 +187,85 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         protected virtual void InitializeNavigationBar()
         {
-            if (IsRootOfFoldersList)
-                switch (ParentFolder.Module)
-                {
-                    case ModuleType.Documents:
-                        NavigationItem.Title = Localization.GetString("documents");
-                        break;
-                    case ModuleType.Contacts:
-                        NavigationItem.Title = Localization.GetString("contacts");
-                        break;
-                    case ModuleType.Shortcodes:
-                        NavigationItem.Title = Localization.GetString("shortcodes");
-                        break;
-                    default:
-                        NavigationItem.Title = " ";
-                        break;
-                }
-            else
-                NavigationItem.Title = ParentFolder.Name;
-
-            if (DisableNavigationBarActions)
-                return;
-
-            if (ParentFolder.Module == ModuleType.Documents)
-            {
-                ComposeDocumentItem = new UIBarButtonItem
-                {
-                    Image = UIImage.FromBundle("Create")
-                };
-                NavigationItem.SetRightBarButtonItem(ComposeDocumentItem, false);
-
-                if (IsRootOfFoldersList)
-                {
-                    EditModeItem = new UIBarButtonItem
-                    {
-                        Title = Localization.GetString("edit"),
-                        Enabled = false
-                    };
-                    NavigationItem.SetLeftBarButtonItem(EditModeItem, false);
-                }
-            }
-
-            if (ParentFolder.Module == ModuleType.Contacts && ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed)
-            {
-                CreateContactItem = new UIBarButtonItem
-                {
-                    Image = UIImage.FromBundle("Create")
-                };
-                NavigationItem.SetRightBarButtonItem(CreateContactItem, false);
-            }
-
-            if (ParentFolder.Module == ModuleType.Shortcodes && ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.CreateAllowed)
-            {
-                CreateShortcodeItem = new UIBarButtonItem
-                {
-                    Image = UIImage.FromBundle("Create")
-                };
-                NavigationItem.SetRightBarButtonItem(CreateShortcodeItem, false);
-            }
-
-            if (ParentFolder.Module == ModuleType.Contacts || ParentFolder.Module == ModuleType.Shortcodes || ParentFolder.Module == ModuleType.Calendar)
+            try
             {
                 if (IsRootOfFoldersList)
-                {
-                    EditModeItem = new UIBarButtonItem
+                    switch (ParentFolder.Module)
                     {
-                        Title = Localization.GetString("edit"),
-                        Enabled = false
+                        case ModuleType.Documents:
+                            NavigationItem.Title = Localization.GetString("documents");
+                            break;
+                        case ModuleType.Contacts:
+                            NavigationItem.Title = Localization.GetString("contacts");
+                            break;
+                        case ModuleType.Shortcodes:
+                            NavigationItem.Title = Localization.GetString("shortcodes");
+                            break;
+                        default:
+                            NavigationItem.Title = " ";
+                            break;
+                    }
+                else
+                    NavigationItem.Title = ParentFolder.Name;
+
+                if (DisableNavigationBarActions)
+                    return;
+
+                if (ParentFolder.Module == ModuleType.Documents)
+                {
+                    ComposeDocumentItem = new UIBarButtonItem
+                    {
+                        Image = UIImage.FromBundle("Create")
                     };
-                    NavigationItem.SetLeftBarButtonItem(EditModeItem, false);
+                    NavigationItem.SetRightBarButtonItem(ComposeDocumentItem, false);
+
+                    if (IsRootOfFoldersList)
+                    {
+                        EditModeItem = new UIBarButtonItem
+                        {
+                            Title = Localization.GetString("edit"),
+                            Enabled = false
+                        };
+                        NavigationItem.SetLeftBarButtonItem(EditModeItem, false);
+                    }
                 }
+
+                if (ParentFolder.Module == ModuleType.Contacts && ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed)
+                {
+                    CreateContactItem = new UIBarButtonItem
+                    {
+                        Image = UIImage.FromBundle("Create")
+                    };
+                    NavigationItem.SetRightBarButtonItem(CreateContactItem, false);
+                }
+
+                if (ParentFolder.Module == ModuleType.Shortcodes && ServerConfig.SystemSettings.ShortcodesModuleInfo.Permissions.CreateAllowed)
+                {
+                    CreateShortcodeItem = new UIBarButtonItem
+                    {
+                        Image = UIImage.FromBundle("Create")
+                    };
+                    NavigationItem.SetRightBarButtonItem(CreateShortcodeItem, false);
+                }
+
+                if (ParentFolder.Module == ModuleType.Contacts || ParentFolder.Module == ModuleType.Shortcodes || ParentFolder.Module == ModuleType.Calendar)
+                {
+                    if (IsRootOfFoldersList)
+                    {
+                        EditModeItem = new UIBarButtonItem
+                        {
+                            Title = Localization.GetString("edit"),
+                            Enabled = false
+                        };
+                        NavigationItem.SetLeftBarButtonItem(EditModeItem, false);
+                    }
+                }
+
             }
+            catch(Exception ex)
+            {
+                CommonConfig.Logger.Error("Can't initialize NavigationBar for AbstractFoldersListViewController", ex);
+            } 
         }
 
         protected virtual void InitializeView()

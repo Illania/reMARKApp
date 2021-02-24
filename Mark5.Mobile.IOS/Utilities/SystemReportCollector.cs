@@ -110,6 +110,7 @@ namespace Mark5.Mobile.IOS.Utilities
             sb.AppendLine("UserInterfaceIdiom: " + UIDevice.CurrentDevice.UserInterfaceIdiom.ToString());
             sb.AppendLine("Model: " + UIDevice.CurrentDevice.Model);
             sb.AppendLine("Model number: " + Integration.GetModelNumber());
+            sb.AppendLine("Is Mac: " + Integration.IsiOSApplicationOnMac().ToString());
             sb.AppendLine("Installation ID: " + CommonConfig.DeviceInfoProvider.GetDeviceId());
             sb.AppendLine("LocalizedModel: " + UIDevice.CurrentDevice.LocalizedModel);
             sb.AppendLine("SystemName: " + UIDevice.CurrentDevice.SystemName);

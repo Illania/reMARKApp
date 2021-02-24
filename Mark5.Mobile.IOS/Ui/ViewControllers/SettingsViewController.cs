@@ -88,12 +88,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public override void WillDisplayFooterView(UITableView tableView, UIView footerView, nint section)
         {
-            if (footerView is UITableViewHeaderFooterView footer)
-            {
-                var text = footer.TextLabel.Text ?? string.Empty;
-                footer.TextLabel.Text = null;
-                footer.TextLabel.AttributedText = new NSAttributedString(text, new UIStringAttributes { Font = Theme.DefaultFont.WithRelativeSize(-2f) });
-            }
+            if (!(footerView is UITableViewHeaderFooterView footer && !(footer.TextLabel == null)))
+                return;
+            
+            var text = footer.TextLabel.Text ?? string.Empty;
+            footer.TextLabel.Text = null;
+            footer.TextLabel.AttributedText = new NSAttributedString(text, new UIStringAttributes { Font = Theme.DefaultFont.WithRelativeSize(-2f) });
+            
         }
 
         public override nfloat GetHeightForFooter(UITableView tableView, nint section)

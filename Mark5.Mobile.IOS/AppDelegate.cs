@@ -86,7 +86,7 @@ namespace Mark5.Mobile.IOS
 
                 if (!isLoggedIn)
                     vc = new LoginViewController();
-                else if (Integration.IsIPadOrMac())
+                else if (Integration.IsIPad())
                     vc = new SplitMainViewController();
                 else
                     vc = new SimpleMainViewController();
@@ -114,10 +114,11 @@ namespace Mark5.Mobile.IOS
 
         public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
         {
+
             Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(syncFusionLicenseKey);
 
             Crashes.GetErrorAttachments =
-                report => { return new[] { ErrorAttachmentLog.AttachmentWithText(SystemReportCollector.CreateLogReport(), "deviceLogs.txt") }; };
+                    report => { return new[] { ErrorAttachmentLog.AttachmentWithText(SystemReportCollector.CreateLogReport(), "deviceLogs.txt") }; };
             AppCenter.Start("8aec5b28-2ac5-4956-997c-4867ef65d957", typeof(Crashes));
 
 #if DEBUG
@@ -127,7 +128,7 @@ namespace Mark5.Mobile.IOS
 #endif
 
 #if ENABLE_TEST_CLOUD
-              Xamarin.Calabash.Start();
+            Xamarin.Calabash.Start();
 #endif
 
             var OneDayInterval = 60 * 24;
@@ -158,7 +159,8 @@ namespace Mark5.Mobile.IOS
                             var vc = new DocumentViewController();
                             vc.SetRefreshDataOnAppear();
                             vc.SetData(n.ObjectId);
-                            Window.RootViewController.PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+                            Window.RootViewController.PresentViewController(new NavigationController(vc,
+                                UIModalPresentationStyle.PageSheet), true, null);
                         }
                     }
                 }

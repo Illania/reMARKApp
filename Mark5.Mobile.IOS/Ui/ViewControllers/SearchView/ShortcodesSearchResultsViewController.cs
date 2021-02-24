@@ -132,7 +132,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 Title = Localization.GetString("close")
             };
 
-            if (!Integration.IsRunningAtLeast(13) && Integration.IsIPadOrMac())
+            if (!Integration.IsRunningAtLeast(13) && Integration.IsIPad())
                 NavigationItem.SetRightBarButtonItem(closeItem, false);
         }
 
@@ -258,7 +258,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
 
                 await Dialogs.ShowErrorAlertAsync(this, ex);
 
-                if (Integration.IsIPadOrMac())
+                if (Integration.IsIPad())
                     DismissViewController(true, null);
                 else
                     NavigationController?.PopViewController(true);
@@ -283,7 +283,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
 
         public void ShortcodeSelected(UITableView tableView, ShortcodePreview shortcodePreview)
         {
-            if (Integration.IsIPadOrMac())
+            if (Integration.IsIPad())
             {
                 var nc = (UINavigationController)SplitViewController.ViewControllers[1];
                 nc.PopToViewController(nc.ViewControllers[0], false);
@@ -348,7 +348,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             NavigationItem.SetRightBarButtonItem(null, true);
             NavigationItem.SetLeftBarButtonItem(NavigationItem.BackBarButtonItem, true);
 
-            if (!Integration.IsRunningAtLeast(13) && Integration.IsIPadOrMac())
+            if (!Integration.IsRunningAtLeast(13) && Integration.IsIPad())
                 NavigationItem.SetRightBarButtonItem(closeItem, false);
         }
 

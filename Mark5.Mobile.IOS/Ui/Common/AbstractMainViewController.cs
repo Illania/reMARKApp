@@ -222,7 +222,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             var vc = new ModuleNavigationController(CurrentNavigationModuleType);
 
-            if (Integration.IsIPadOrMac())
+            if (Integration.IsIPad())
             {
                 IPadModalPresentationController customPresentationController = new IPadModalPresentationController(vc, this);
                 vc.TransitioningDelegate = customPresentationController;

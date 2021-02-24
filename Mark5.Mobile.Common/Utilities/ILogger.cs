@@ -14,6 +14,7 @@ namespace Mark5.Mobile.Common.Utilities
 
     public interface ILogger
     {
+        string Path { get; set; }
         LogLevel Level { get; set; }
 
         #region Trace

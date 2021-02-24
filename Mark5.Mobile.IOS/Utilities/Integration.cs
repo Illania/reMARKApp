@@ -35,10 +35,14 @@ namespace Mark5.Mobile.IOS.Utilities
 
         public static bool IsIPhone() => UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Phone;
         public static bool IsIPad() => UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Pad;
-        public static bool IsIPadOrMac() => UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Pad
-            || UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Mac;
-        public static bool IsMac() => UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Mac;
-        
+
+        public static bool IsiOSApplicationOnMac()
+        {
+            if (!UIDevice.CurrentDevice.CheckSystemVersion(14, 0))
+                return false;
+            else
+                return NSProcessInfo.ProcessInfo.IsiOSApplicationOnMac;
+        }
 
         #endregion
 

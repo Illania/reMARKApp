@@ -161,12 +161,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var availableCategories = new List<Category>();
 
-            categories.Sort((x, y) => String.Compare(x.Name, y.Name, true));
+            categories.Sort((x, y) => string.Compare(x.Name, y.Name, true));
 
             ((DataSource)TableView.Source).SetItems(DataSource.Section.Selected, categories);
             availableCategories = allCategories.Where(x => !categories.Contains(x)).ToList();
 
-            availableCategories.Sort((x, y) => String.Compare(x.Name, y.Name, true));
+            availableCategories.Sort((x, y) => string.Compare(x.Name, y.Name, true));
 
             ((DataSource)TableView.Source).SetItems(DataSource.Section.Available, availableCategories);
 
@@ -416,15 +416,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var newIndex = MoveCategory(indexPath.LongSection, category);
                 viewControllerWeakReference.Unwrap()?.MoveCategory(category);
 
-                // dont delete the row if it's the last element, because we are displaying "No categories" cell
-                if (items[indexPath.LongSection].Count >= 1)
-                {
-                    tableView.DeleteRows(new NSIndexPath[] { NSIndexPath.Create(indexPath.LongSection, indexPath.Row) }, UITableViewRowAnimation.Middle);
-                }
+                tableView.DeleteRows(new NSIndexPath[] { NSIndexPath.Create(indexPath.LongSection, indexPath.Row) }, UITableViewRowAnimation.Middle);                
 
                 if (indexPath.LongSection == Section.Selected)
                 {
-                    var availableCategories = viewControllerWeakReference.Unwrap()?.GetAvailableCategories();
+                    _ = viewControllerWeakReference.Unwrap()?.GetAvailableCategories();
                     if (items[Section.Available].Count <= 1)
                     {
                         tableView.ReloadSections(NSIndexSet.FromIndex(Section.Available), UITableViewRowAnimation.Middle);
@@ -453,9 +449,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override nint RowsInSection(UITableView tableview, nint section)
             {
-                if (loading[section] || items[section].Count < 1)
-                    return 1;
-
                 return items[section].Count;
             }
 

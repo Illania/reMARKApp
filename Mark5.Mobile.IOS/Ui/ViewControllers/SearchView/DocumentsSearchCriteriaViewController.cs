@@ -82,7 +82,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
 
             CommonConfig.Logger.Info($"Starting search... [criteria={Serializer.Serialize(criteria)}]");
 
-            if (Integration.IsIPadOrMac())
+            if (Integration.IsIPad())
                 PresentViewController(new DocumentsSplitSearchViewController(criteria), true, null);
             else
                 NavigationController.PushViewController(new DocumentsSearchResultsViewController { Criteria = criteria }, true);

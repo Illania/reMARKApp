@@ -7,6 +7,7 @@ namespace Mark5.Mobile.Common.Utilities
         public bool Enabled { get; set; } = true;
 
         public LogLevel Level { get; set; }
+        public string Path { get; set; }
 
         #region Trace
 
