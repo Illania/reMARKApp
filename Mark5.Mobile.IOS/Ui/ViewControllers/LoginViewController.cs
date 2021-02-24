@@ -589,7 +589,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 //We assume that all the connection details are correct (no need to validate or confirm hostname, port, SSL)
                 var azureUserId = azureUser.Id;
                 var hostname = endpointInfo.Hostname;
-                var port = endpointInfo.Port;
+                var port = endpointInfo.Port > 0 ? endpointInfo.Port.ToString() : string.Empty;
                 var sslMode = endpointInfo.UseSsl ? SslMode.On : SslMode.Off;
 
                 CommonConfig.Logger.Info($"Logging in with Azure Id... [azureUserId={azureUserId}, hostname={hostname}, port={port}, ssl={sslMode}]");
@@ -659,7 +659,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 CommonConfig.Logger.Info("Authenticating...");
 
-                var ci = await authenticator.AuthenticateAsync(username, password, sslMode, hostname, int.Parse(port), token);
+
+                var ci = await authenticator.AuthenticateAsync(username, password, sslMode, hostname, port, token);
 
                 await InitializeApplication(ci, token);
             }
@@ -747,15 +748,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 errors = true;
                 await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("wrong_hostname_title"), Localization.GetString("wrong_hostname_summary"));
-
-                hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Warning);
-            }
-            else if (!Validator.IsPortValid(port))
-            {
-                CommonConfig.Logger.Info($"Invalid port was entered: {port}");
-
-                errors = true;
-                await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("wrong_port_title"), Localization.GetString("wrong_port_summary"));
 
                 hapticGenerator.NotificationOccurred(UINotificationFeedbackType.Warning);
             }
@@ -885,7 +877,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             result &= Validator.IsUsernameValid(usernameTextField.Text);
             result &= Validator.IsPasswordValid(passwordTextField.Text);
             result &= Validator.IsHostNameValid(hostnameTextField.Text);
-            result &= Validator.IsPortValid(portTextField.Text);
 
             loginButton.Enabled = result;
             loginButton.Alpha = result ? 1f : 0.7f;

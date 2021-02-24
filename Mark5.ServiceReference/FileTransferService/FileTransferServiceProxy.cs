@@ -41,13 +41,14 @@ namespace Mark5.ServiceReference.FileTransferService
 
         Version currentServiceVersion;
 
-        public FileTransferServiceProxy(bool ssl, string hostname, int port, Func<HttpMessageHandler> httpClientHandler, Action onStartTransmission, Action onStopTransmission)
+        public FileTransferServiceProxy(bool ssl, string hostname, string port, Func<HttpMessageHandler> httpClientHandler, Action onStartTransmission, Action onStopTransmission)
         {
             this.httpClientHandler = httpClientHandler;
             this.onStartTransmission = onStartTransmission;
             this.onStopTransmission = onStopTransmission;
+            var usePort = !string.IsNullOrEmpty(port);
 
-            endpointUrl = $"{(ssl ? "https" : "http")}://{hostname}:{port}/fts3";
+            endpointUrl = $"{(ssl ? "https" : "http")}://{hostname}{(usePort ? (":" + port) : "")}/fts3";
         }
 
         public async Task<GetServiceVersionResponse> GetServiceVersionAsync(GetServiceVersionRequest req, CancellationToken ct = default(CancellationToken))
