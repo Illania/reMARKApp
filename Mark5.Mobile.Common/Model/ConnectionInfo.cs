@@ -6,7 +6,7 @@
         public string AzureUserId { get; set; }
         public string Username { get; set; }
         public string Hostname { get; set; }
-        public int Port { get; set; }
+        public string Port { get; set; }
         public SslMode SslMode { get; set; }
         public DeviceType DeviceType { get; set; }
         public string FriendlyDeviceName { get; set; }

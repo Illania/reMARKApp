@@ -16,7 +16,7 @@ namespace Mark5.Mobile.Common.Authenticator
             return await GetConnectionInfoAsync(ct) != null;
         }
 
-        public async Task<ConnectionInfo> AuthenticateAsync(string username, string password, SslMode sslMode, string hostname, int port, CancellationToken ct = default(CancellationToken))
+        public async Task<ConnectionInfo> AuthenticateAsync(string username, string password, SslMode sslMode, string hostname, string port, CancellationToken ct = default(CancellationToken))
         {
             var deviceType = CommonConfig.DeviceInfoProvider.GetDeviceType();
             var deviceName = CommonConfig.DeviceInfoProvider.GetDeviceName();
@@ -52,7 +52,7 @@ namespace Mark5.Mobile.Common.Authenticator
             return connectionInfo;
         }
 
-        public async Task<ConnectionInfo> AuthenticateWithAzureAsync(AzureUser azureUser, SslMode sslMode, string hostname, int port, CancellationToken ct = default(CancellationToken))
+        public async Task<ConnectionInfo> AuthenticateWithAzureAsync(AzureUser azureUser, SslMode sslMode, string hostname, string port, CancellationToken ct = default(CancellationToken))
         {
             var deviceType = CommonConfig.DeviceInfoProvider.GetDeviceType();
             var deviceName = CommonConfig.DeviceInfoProvider.GetDeviceName();

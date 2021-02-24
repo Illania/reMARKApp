@@ -23,13 +23,14 @@ namespace Mark5.ServiceReference.AppService
         readonly Action onStopTransmission;
         readonly string requestUri;
 
-        public HttpAppServiceProxy(bool ssl, string hostname, int port, Func<HttpMessageHandler> httpClientHandler, Action onStartTransmission, Action onStopTransmission)
+        public HttpAppServiceProxy(bool ssl, string hostname, string port, Func<HttpMessageHandler> httpClientHandler, Action onStartTransmission, Action onStopTransmission)
         {
             this.httpClientHandler = httpClientHandler;
             this.onStartTransmission = onStartTransmission;
             this.onStopTransmission = onStopTransmission;
-
-            requestUri = $"{(ssl ? "https" : "http")}://{hostname}:{port}/app3";
+            var usePort = !string.IsNullOrEmpty(port);
+          
+            requestUri = $"{(ssl ? "https" : "http")}://{hostname}{(usePort ? (":" + port) : "" )}/app3";
         }
 
         async Task<R> InvokeAsync<R, P>(string soapAction, P parameters, CancellationToken ct, bool useShortTimeout = false,

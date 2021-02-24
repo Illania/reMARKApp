@@ -6,7 +6,7 @@ namespace Mark5.ServiceReference
 {
     public static class FileTransferServiceProxyFactory
     {
-        public static IFileTransferServiceProxy Create(bool ssl, string hostname, int port, Func<HttpMessageHandler> httpClientHandler, Action onStartTransmission, Action onStopTransmission)
+        public static IFileTransferServiceProxy Create(bool ssl, string hostname, string port, Func<HttpMessageHandler> httpClientHandler, Action onStartTransmission, Action onStopTransmission)
         {
             return new FileTransferServiceProxy(ssl, hostname, port, httpClientHandler, onStartTransmission, onStopTransmission);
         }

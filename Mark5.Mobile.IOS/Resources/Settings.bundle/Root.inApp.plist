@@ -186,16 +186,6 @@
 		</dict>
 		<dict>
 			<key>Type</key>
-			<string>PSToggleSwitchSpecifier</string>
-			<key>Title</key>
-			<string>large_attachment_warning</string>
-			<key>Key</key>
-			<string>LargeAttachmentWarning</string>
-			<key>DefaultValue</key>
-			<true/>
-		</dict>
-		<dict>
-			<key>Type</key>
 			<string>PSMultiValueSpecifier</string>
 			<key>Title</key>
 			<string>sending_delay</string>
@@ -233,6 +223,16 @@
 			<string>RememberLastUserDelaySettings</string>
 			<key>DefaultValue</key>
 			<false/>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>large_attachment_warning</string>
+			<key>Key</key>
+			<string>LargeAttachmentWarning</string>
+			<key>DefaultValue</key>
+			<true/>
 		</dict>
 		<dict>
 			<key>Type</key>

@@ -342,13 +342,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 hostnameEditText.Error = GetText(Resource.String.hostname_invalid);
                 errors = true;
             }
-            if (!Validator.IsPortValid(port))
-            {
-                CommonConfig.Logger.Info($"Invalid port was entered: {port}");
-
-                portEditText.Error = GetText(Resource.String.port_invalid);
-                errors = true;
-            }
 
             return errors;
         }
