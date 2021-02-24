@@ -22,7 +22,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             var content = GetPageModels();
 
-            if (Integration.IsIPadOrMac())
+            if (Integration.IsIPad())
                 PreferredContentSize = new CoreGraphics.CGSize(content[0].Image.Size.Width + 60, 750);
 
             DataSource = new OnBoardingDataSource(this, content);
@@ -247,11 +247,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (Integration.IsRunningAtLeast(11))
             {
-                View.AddConstraint(topView.TopAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.TopAnchor, Integration.IsIPadOrMac() ? 30 : 20));
+                View.AddConstraint(topView.TopAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.TopAnchor, Integration.IsIPad() ? 30 : 20));
             }
             else
             {
-                View.AddConstraint(topView.TopAnchor.ConstraintEqualTo(View.TopAnchor, Integration.IsIPadOrMac() ? 30 : 20));
+                View.AddConstraint(topView.TopAnchor.ConstraintEqualTo(View.TopAnchor, Integration.IsIPad() ? 30 : 20));
             }
 
             View.AddConstraints(new NSLayoutConstraint[]

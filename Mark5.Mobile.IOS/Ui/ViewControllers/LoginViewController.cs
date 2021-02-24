@@ -807,10 +807,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             dismissAction?.Invoke();
 
-            UNUserNotificationCenter.Current.RequestAuthorization(UNAuthorizationOptions.Alert | UNAuthorizationOptions.Badge | UNAuthorizationOptions.Sound, (result, error) =>
-            {
-                ((AppDelegate)UIApplication.SharedApplication.Delegate)?.OnAuthorizationRequestCompleted(result, error);
-            });
+            TryRequestAuthorization();
 
             CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.Hostname, ci.Hostname);
             CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.SSL, ci.SslMode.ToString());
@@ -818,14 +815,40 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (!String.IsNullOrEmpty(ServerConfig.SystemSettings.SystemInfo.CustomerName))
                 CommonConfig.UsageAnalytics.SetUserProperty(UserProperty.CustomerName, ServerConfig.SystemSettings.SystemInfo.CustomerName);
 
+
             UIViewController vc;
             if (Integration.IsIPad())
+            {
                 vc = new SplitMainViewController { ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve };
+            }             
             else
+            {
                 vc = new SimpleMainViewController { ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve };
-
+            }
+                
             var window = ((AppDelegate)UIApplication.SharedApplication.Delegate).Window;
             UIView.TransitionNotify(window, 0.25, UIViewAnimationOptions.TransitionCrossDissolve, () => window.RootViewController = vc, null);
+        }
+
+        private void TryRequestAuthorization()
+        {
+            try
+            {
+                UNUserNotificationCenter.Current.RequestAuthorization(UNAuthorizationOptions.Alert
+                | UNAuthorizationOptions.Badge
+                | UNAuthorizationOptions.Sound, (result, error) =>
+                {
+                    ((AppDelegate)UIApplication.SharedApplication.Delegate)?.OnAuthorizationRequestCompleted(result, error);
+                });
+            }
+            catch (NSErrorException nex)
+            {
+                CommonConfig.Logger.Error($"Error while requesting authorization", nex);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Error while requesting authorization", ex);
+            }
         }
 
         #endregion

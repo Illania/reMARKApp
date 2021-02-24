@@ -6,6 +6,7 @@ using UIKit;
 using UserNotifications;
 using Mark5.Mobile.Common.Extensions;
 using System.Threading.Tasks;
+using System;
 
 namespace Mark5.Mobile.IOS.PushNotifications
 {
@@ -45,31 +46,54 @@ namespace Mark5.Mobile.IOS.PushNotifications
         public bool ShouldUpdateToken();
 
         public void RequestAuthorization()
-        { 
-            UNUserNotificationCenter.Current.RequestAuthorization(
-                UNAuthorizationOptions.Alert
-                | UNAuthorizationOptions.Badge
-                | UNAuthorizationOptions.Sound,
-                OnAuthorizationRequestCompleted);  
+        {
+            try
+            {
+
+                UNUserNotificationCenter.Current.RequestAuthorization(
+                    UNAuthorizationOptions.Alert
+                    | UNAuthorizationOptions.Badge
+                    | UNAuthorizationOptions.Sound,
+                    OnAuthorizationRequestCompleted);
+            }
+            catch (NSErrorException nex)
+            {
+                CommonConfig.Logger.Error($"Error while requesting authorization", nex);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Error while requesting authorization", ex);
+            }
         }
 
         public void OnAuthorizationRequestCompleted(bool result, NSError error)
         {
-            if (result)
+            try
             {
-                var nsobject = new NSObject();
-                //Registers for receipt of push notifications using the Apple Push Service.
-                nsobject.InvokeOnMainThread(UIApplication.SharedApplication.RegisterForRemoteNotifications);
+                if (result)
+                {
+                    var nsobject = new NSObject();
+                    //Registers for receipt of push notifications using the Apple Push Service.
+                    nsobject.InvokeOnMainThread(UIApplication.SharedApplication.RegisterForRemoteNotifications);
 
-                if (!string.IsNullOrWhiteSpace(ActiveToken))
-                   UpdateToken(ActiveToken);
+                    if (!string.IsNullOrWhiteSpace(ActiveToken))
+                        UpdateToken(ActiveToken);
+                }
+                else
+                {
+                    if (error != null)
+                        CommonConfig.Logger.Error(new NSErrorException(error));
+                }
             }
-            else
+            catch (NSErrorException nex)
             {
-                if (error != null)
-                    CommonConfig.Logger.Error(new NSErrorException(error));
+                CommonConfig.Logger.Error($"Error while requesting authorization", nex);
             }
-
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Error while requesting authorization", ex);
+            }
+            
         }
 
     }

@@ -1,6 +1,7 @@
 using System;
 using CoreGraphics;
 using Foundation;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.IOS.Utilities;
 using Mark5.Mobile.IOS.Utilities.Extensions;
 using UIKit;
@@ -143,33 +144,40 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         public static void ApplyTheme(this UIView view)
         {
-            if (view is UITableViewHeaderFooterView header)
+            try
             {
-                var text = header.TextLabel.Text ?? string.Empty;
-                header.TextLabel.Text = null;
-                header.TextLabel.AttributedText = new NSAttributedString(text, new UIStringAttributes { Font = DefaultLightFont, ForegroundColor = DarkerBlue });
-                return;
-            }
+                if (view is UITableViewHeaderFooterView header)
+                {
+                    if (header?.TextLabel == null)
+                        return;
+                    var text = header.TextLabel?.Text ?? string.Empty;
+                    header.TextLabel.Text = null;
+                    header.TextLabel.AttributedText = new NSAttributedString(text, new UIStringAttributes { Font = DefaultLightFont, ForegroundColor = DarkerBlue });
+                    return;
+                }
 
-            if (view is UIButton button)
+                if (view is UIButton button)
+                {
+                    button.TitleLabel.Font = DefaultFont;
+                    return;
+                }
+
+                if (view is UITextField textField)
+                {
+                    textField.Font = DefaultFont;
+                    return;
+                }
+
+                if (view is UITextView textView)
+                {
+                    textView.Font = DefaultFont;
+                    return;
+                }
+            }
+            catch (Exception ex)
             {
-                button.TitleLabel.Font = DefaultFont;
-                return;
+                CommonConfig.Logger.Error($"Can't apply theme to header view or view type {view.GetType().Name}.", ex);
             }
-
-            if (view is UITextField textField)
-            {
-                textField.Font = DefaultFont;
-                return;
-            }
-
-            if (view is UITextView textView)
-            {
-                textView.Font = DefaultFont;
-                return;
-            }
-
-            throw new ArgumentException($"No theme found for view type {view.GetType().Name}!");
         }
 
         #endregion

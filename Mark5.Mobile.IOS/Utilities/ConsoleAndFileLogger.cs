@@ -36,6 +36,8 @@ namespace Mark5.Mobile.IOS.Utilities
                 if (!fm.FileExists(logFilePath))
                     fm.CreateFile(logFilePath, new NSData(), new NSFileAttributes());
 
+                Path = logFilePath;
+
 #if DEBUG
                 WriteToConsole("Log path: " + logPath);
                 WriteToConsole("Log file path: " + logFilePath);

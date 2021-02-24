@@ -67,7 +67,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
                 if (NavigationController.NavigationBar != null)
                     NavigationController.NavigationBar.Translucent = false;
 
-                NavigationController.ToolbarHidden = Integration.IsIPadOrMac();
+                NavigationController.ToolbarHidden = Integration.IsIPad();
             }
             InitializeHandlers();
         }
@@ -286,7 +286,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
 
         void UpdateToolBar(DocumentViewController vc)
         {
-            if (Integration.IsIPadOrMac())
+            if (Integration.IsIPad())
                 vc?.RefreshToolbar();
             else
             {
