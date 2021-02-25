@@ -957,6 +957,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 else
                     pickedDateTime = await GetDelaySendDateTimeFromPicker();
 
+                if (pickedDateTime.Equals(DateTime.MinValue))
+                    return false;
+
                 return await SaveAndQueueWorkingCopy(pickedDateTime.ConvertDateTimeToTimestampMilliseconds());
 
             }
@@ -998,6 +1001,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 PresentViewController(cd, false, null);
 
                 pickedDateTime = await cd.Result;
+            }
+            if(choice == -1)
+            {
+                return DateTime.MinValue;
             }
 
             return pickedDateTime;
