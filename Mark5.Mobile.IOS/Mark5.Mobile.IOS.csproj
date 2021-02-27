@@ -319,6 +319,7 @@
 		<Compile Include="TinyIoC.cs" />
 		<Compile Include="Ui\ViewControllers\CountDownPickerDialogViewController.cs" />
 		<Compile Include="Ui\ViewControllers\DatePickerDialogViewController.cs" />
+		<Compile Include="Utilities\AttachmentsUtilities.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

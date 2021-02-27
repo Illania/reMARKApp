@@ -23,6 +23,7 @@ using Mark5.Mobile.IOS.Utilities;
 using TinyMessenger;
 using UIKit;
 using WebKit;
+using Xamarin.Essentials;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
@@ -659,29 +660,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (string.IsNullOrWhiteSpace(path))
                     throw new Exception("Unable to open attachment.");
 
-                var url = NSUrl.FromFilename(path);
+                await AttachmentsUtilities.OpenAttachment(path, this, document.Id, attachmentDescription?.Name ?? string.Empty);
 
-                if (MailViewerViewController.CanOpen(url))
-                {
-                    PresentViewController(new NavigationController(new MailViewerViewController(url), UIModalPresentationStyle.PageSheet), true, null);
-                }
-                else
-                {
-                    var attachmentInteractionController = UIDocumentInteractionController.FromUrl(url);
-                    attachmentInteractionController.Delegate = new DocumentInteractionControllerDelegate(this);
-
-                    var previewSuccessful = attachmentInteractionController.PresentPreview(true);
-                    if (!previewSuccessful)
-                    {
-                        CommonConfig.Logger.Info($"Failed to present preview for attachment. Presenting open with instead. [documentId={document.Id}, attachment={attachmentDescription}]");
-                        var openInSuccessful = attachmentInteractionController.PresentOptionsMenu(View.Frame, View, true);
-                        if (!openInSuccessful)
-                        {
-                            CommonConfig.Logger.Warning($"Failed to present open in view - there is no app that can open this type of attachment installed. [documentId={document.Id}, attachment={attachmentDescription}]");
-                            await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("cannot_open_attachment_title"), Localization.GetString("cannot_open_attachment_content"));
-                        }
-                    }
-                }
             }
             catch (Exception ex)
             {
