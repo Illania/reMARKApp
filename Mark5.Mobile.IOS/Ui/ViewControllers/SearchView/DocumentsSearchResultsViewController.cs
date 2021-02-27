@@ -27,6 +27,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
         UIBarButtonItem exitEditItem;
         UIBarButtonItem editItem;
         UIBarButtonItem closeItem;
+        UIBarButtonItem closeLeftButton;
 
         TinyMessageSubscriptionToken readStatusChangedToken;
         TinyMessageSubscriptionToken commentsCountChangedToken;
@@ -155,6 +156,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
 
             if (!Integration.IsRunningAtLeast(13) && Integration.IsIPad())
                 NavigationItem.SetRightBarButtonItem(closeItem, false);
+
+            if(Integration.IsiOSApplicationOnMac())
+            {
+                closeLeftButton = new UIBarButtonItem
+                {
+                    Title = Localization.GetString("close")
+                };
+                NavigationItem.SetLeftBarButtonItem(closeLeftButton, false);
+            }
+    
         }
 
         void InitializeView()
@@ -172,6 +183,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             if (closeItem != null)
                 closeItem.Clicked += CloseItem_Clicked;
 
+            if (closeLeftButton != null)
+                closeLeftButton.Clicked += CloseItem_Clicked;
+
             if (exitEditItem != null)
                 exitEditItem.Clicked += ExitEditItem_Clicked;
 
@@ -183,6 +197,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
         {
             if (closeItem != null)
                 closeItem.Clicked -= CloseItem_Clicked;
+
+            if (closeLeftButton != null)
+                closeLeftButton.Clicked -= CloseItem_Clicked;
 
             if (exitEditItem != null)
                 exitEditItem.Clicked -= ExitEditItem_Clicked;

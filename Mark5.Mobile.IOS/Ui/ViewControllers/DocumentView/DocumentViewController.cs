@@ -119,7 +119,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (!forceShowActionBar && Integration.IsIPad())
                 NavigationController.ToolbarHidden = true;
 
-            SendStatusBanner.Attach(this);
+            if(!Integration.IsIPad())
+                SendStatusBanner.Attach(this);
         }
 
         public override void ViewDidAppear(bool animated)
