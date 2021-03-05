@@ -86,13 +86,14 @@ namespace Mark5.Mobile.IOS
 
                 if (!isLoggedIn)
                     vc = new LoginViewController();
-                else if (Integration.IsIPad())
+                else if (Integration.IsIPad() && !Integration.IsiOSApplicationOnMac())
                     vc = new SplitMainViewController();
+                else if (Integration.IsiOSApplicationOnMac())
+                    vc = new TransitionViewController();
                 else
                     vc = new SimpleMainViewController();
 
                 Window.RootViewController = vc;
-
                 startupTime.Stop();
 
                 CommonConfig.Logger.Info($"Total startup time: {startupTime.ElapsedMilliseconds}ms");
