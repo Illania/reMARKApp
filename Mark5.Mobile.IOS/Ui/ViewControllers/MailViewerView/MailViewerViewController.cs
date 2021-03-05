@@ -17,6 +17,7 @@ using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
+using Xamarin.Essentials;
 using Attachment = MailBee.Mime.Attachment;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
@@ -284,28 +285,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
 
                 var tempFile = await CreateTempFile(filename, attachment.GetData());
 
-                if (CanOpen(tempFile))
-                    PresentViewController(new NavigationController(new MailViewerViewController(tempFile), UIModalPresentationStyle.PageSheet), true, null);
-                else
-                {
-                    var attachmentInteractionController = UIDocumentInteractionController.FromUrl(tempFile);
-                    attachmentInteractionController.Delegate = new DocumentInteractionControllerDelegate(this);
+                await AttachmentsUtilities.OpenAttachment(tempFile.Path, this, 0, attachment.Description);
 
-                    var previewSuccessful = attachmentInteractionController.PresentPreview(true);
-
-                    if (!previewSuccessful)
-                    {
-                        CommonConfig.Logger.Info("Failed to present preview for attachment - presenting open with instead");
-
-                        var openInSuccessful = attachmentInteractionController.PresentOptionsMenu(View.Frame, View, true);
-                        if (!openInSuccessful)
-                        {
-                            CommonConfig.Logger.Warning("Failed to present open in view - there is no app that can open this type of attachment installed");
-
-                            await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("cannot_open_attachment_title"), Localization.GetString("cannot_open_attachment_content"));
-                        }
-                    }
-                }
 
                 dismissAction();
             }
