@@ -178,6 +178,16 @@
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 			<key>Title</key>
+			<string>Use smart links</string>
+			<key>Key</key>
+			<string>UseSmartLinks</string>
+			<key>DefaultValue</key>
+			<false/>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
 			<string>hide_read_notifications</string>
 			<key>Key</key>
 			<string>HideReadNotifications</string>

@@ -781,12 +781,8 @@
 		<ImageAsset Include="Assets_icons.xcassets\AzureLogin.imageset\Contents.json" />
 		<ImageAsset Include="Assets_icons.xcassets\AzureLogin.imageset\azure_login_light.pdf" />
 		<ImageAsset Include="Assets_icons.xcassets\Nav-search.imageset\nav-search-1.pdf" />
-<<<<<<< HEAD
 		<ImageAsset Include="Assets_icons.xcassets\Delayed.imageset\Contents.json" />
 		<ImageAsset Include="Assets_icons.xcassets\Delayed.imageset\timer.pdf" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_2.imageset\onboarding_2.pdf" />
-=======
->>>>>>> 9b06376d... updated onboarding images
 		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_3.imageset\onboarding_3.pdf" />
 		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_2.imageset\app icons-15.pdf" />
 	</ItemGroup>
