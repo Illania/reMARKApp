@@ -117,7 +117,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 AllowsInlineMediaPlayback = false,
                 Preferences = preferences,
                 UserContentController = userContentController,
-                DataDetectorTypes = WKDataDetectorTypes.All,
+                DataDetectorTypes = PlatformConfig.Preferences.UseSmartLinks ? WKDataDetectorTypes.All : WKDataDetectorTypes.None,
                 WebsiteDataStore = WKWebsiteDataStore.NonPersistentDataStore,
                 SelectionGranularity = WKSelectionGranularity.Character
             };
