@@ -667,7 +667,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                else
                {
                     var currentItemIndex = document.Attachments.IndexOf(attachmentDescription);
-                    var attachmentsList = await LoadAttachments();
+                    var attachmentsList = await Managers.DocumentsManager.GetAttachmentsAsync(document);
                     AttachmentsUtilities.OpenAttachmentsInQuickLook(attachmentsList, currentItemIndex, this);
                }
                     
@@ -686,31 +686,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        async Task<List<string>> LoadAttachments()
-        {
-            var attachmentList = new List<string>();
-            foreach (var attachmentDescription in document.Attachments)
-            {
-                var path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, document, false, SourceType.Local);
-
-                if (string.IsNullOrWhiteSpace(path))
-                {
-                    if (PlatformConfig.Preferences.LargeAttachmentWarning
-                        && attachmentDescription.SizeInBytes > LargeAttachmentSizeInBytes)
-                    {
-                        continue;
-                    }
-
-                    path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, document, false, SourceType.Remote);
-                }
-
-                if (string.IsNullOrWhiteSpace(path))
-                    continue;
-
-                attachmentList.Add(path);
-            }
-            return attachmentList;
-        }
+        
 
         void HeaderView_RecipientTapped(object sender, RecipientTappedEventArgs e)
         {
