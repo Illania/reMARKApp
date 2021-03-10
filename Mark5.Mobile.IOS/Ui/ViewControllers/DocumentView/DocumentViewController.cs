@@ -642,25 +642,35 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
-                var path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, document, false, SourceType.Local);
-
-                if (string.IsNullOrWhiteSpace(path))
+                if(!Integration.IsIPad())
                 {
-                    if (PlatformConfig.Preferences.LargeAttachmentWarning
-                        && attachmentDescription.SizeInBytes > LargeAttachmentSizeInBytes
-                        && !await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("warning"), string.Format(Localization.GetString("big_attachment_warning"), UI.PrettyFileSize(attachmentDescription.SizeInBytes))))
+                    var path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, document, false, SourceType.Local);
+
+                    if (string.IsNullOrWhiteSpace(path))
                     {
-                        dismissAction();
-                        return;
+                        if (PlatformConfig.Preferences.LargeAttachmentWarning
+                            && attachmentDescription.SizeInBytes > LargeAttachmentSizeInBytes
+                            && !await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("warning"), string.Format(Localization.GetString("big_attachment_warning"), UI.PrettyFileSize(attachmentDescription.SizeInBytes))))
+                        {
+                            dismissAction();
+                            return;
+                        }
+
+                        path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, document, false, SourceType.Remote);
                     }
 
-                    path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, document, false, SourceType.Remote);
+                    if (string.IsNullOrWhiteSpace(path))
+                        throw new Exception("Unable to open attachment.");
+
+                    await AttachmentsUtilities.OpenAttachment(path, this, document.Id, attachmentDescription?.Name ?? string.Empty);
                 }
-
-                if (string.IsNullOrWhiteSpace(path))
-                    throw new Exception("Unable to open attachment.");
-
-                await AttachmentsUtilities.OpenAttachment(path, this, document.Id, attachmentDescription?.Name ?? string.Empty);
+               else
+               {
+                    var currentItemIndex = document.Attachments.IndexOf(attachmentDescription);
+                    var attachmentsList = await Managers.DocumentsManager.GetAttachmentsAsync(document);
+                    AttachmentsUtilities.OpenAttachmentsInQuickLook(attachmentsList, currentItemIndex, this);
+               }
+                    
 
             }
             catch (Exception ex)
@@ -675,6 +685,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 dismissAction();
             }
         }
+
+        
 
         void HeaderView_RecipientTapped(object sender, RecipientTappedEventArgs e)
         {

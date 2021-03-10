@@ -44,7 +44,7 @@
     <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
     <MtouchUseLlvm>true</MtouchUseLlvm>
     <MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
-    <CodesignProvision>Mark5 CallID Distribution 2020</CodesignProvision>
+    <CodesignProvision>reMark App 2021 AdHoc CallID</CodesignProvision>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
     <DebugType>pdbonly</DebugType>
@@ -53,13 +53,14 @@
     <DefineConstants></DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodesignKey>iPhone Developer</CodesignKey>
+    <CodesignKey>Apple Distribution: Nordic IT Europe ApS (5Q7TTRG4M4)</CodesignKey>
     <MtouchNoSymbolStrip>false</MtouchNoSymbolStrip>
     <MtouchLink>None</MtouchLink>
     <MtouchArch>x86_64</MtouchArch>
     <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
     <MtouchUseLlvm>true</MtouchUseLlvm>
     <MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
+    <CodesignProvision>reMark iOS CallID 2021 Distribution</CodesignProvision>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
     <DebugSymbols>true</DebugSymbols>

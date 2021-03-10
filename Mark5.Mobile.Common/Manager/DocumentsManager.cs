@@ -24,6 +24,8 @@ namespace Mark5.Mobile.Common.Manager
     class DocumentsManager : AbstractManager, IDocumentsManager
     {
         public int MaxToFetch { get; set; } = 500;
+        const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
+
         public DocumentBodyTypeRequest DocumentBodyTypeRequest { get; set; } = DocumentBodyTypeRequest.HtmlOnly;
 
         readonly IFileTransferServiceProxy fileTransferServiceProxy;
@@ -565,6 +567,32 @@ namespace Mark5.Mobile.Common.Manager
             }
 
             throw new ArgumentException("Invalid sourceType provided.");
+        }
+
+
+        public async Task<List<string>> GetAttachmentsAsync(Document document)
+        {
+            var attachmentList = new List<string>();
+            foreach (var attachmentDescription in document.Attachments)
+            {
+                var path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, document, false, SourceType.Local);
+
+                if (string.IsNullOrWhiteSpace(path))
+                {
+                    if (attachmentDescription.SizeInBytes > LargeAttachmentSizeInBytes)
+                    {
+                        continue;
+                    }
+
+                    path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, document, false, SourceType.Remote);
+                }
+
+                if (string.IsNullOrWhiteSpace(path))
+                    continue;
+
+                attachmentList.Add(path);
+            }
+            return attachmentList;
         }
 
         public async Task QueueWorkingCopyToUpload()
