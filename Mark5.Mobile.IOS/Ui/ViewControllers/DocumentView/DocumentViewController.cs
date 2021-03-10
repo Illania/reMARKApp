@@ -642,25 +642,35 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
-                var path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, document, false, SourceType.Local);
-
-                if (string.IsNullOrWhiteSpace(path))
+                if(!Integration.IsIPad())
                 {
-                    if (PlatformConfig.Preferences.LargeAttachmentWarning
-                        && attachmentDescription.SizeInBytes > LargeAttachmentSizeInBytes
-                        && !await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("warning"), string.Format(Localization.GetString("big_attachment_warning"), UI.PrettyFileSize(attachmentDescription.SizeInBytes))))
+                    var path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, document, false, SourceType.Local);
+
+                    if (string.IsNullOrWhiteSpace(path))
                     {
-                        dismissAction();
-                        return;
+                        if (PlatformConfig.Preferences.LargeAttachmentWarning
+                            && attachmentDescription.SizeInBytes > LargeAttachmentSizeInBytes
+                            && !await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("warning"), string.Format(Localization.GetString("big_attachment_warning"), UI.PrettyFileSize(attachmentDescription.SizeInBytes))))
+                        {
+                            dismissAction();
+                            return;
+                        }
+
+                        path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, document, false, SourceType.Remote);
                     }
 
-                    path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, document, false, SourceType.Remote);
+                    if (string.IsNullOrWhiteSpace(path))
+                        throw new Exception("Unable to open attachment.");
+
+                    await AttachmentsUtilities.OpenAttachment(path, this, document.Id, attachmentDescription?.Name ?? string.Empty);
                 }
-
-                if (string.IsNullOrWhiteSpace(path))
-                    throw new Exception("Unable to open attachment.");
-
-                await AttachmentsUtilities.OpenAttachment(path, this, document.Id, attachmentDescription?.Name ?? string.Empty);
+               else
+               {
+                    var currentItemIndex = document.Attachments.IndexOf(attachmentDescription);
+                    var attachmentsList = await LoadAttachments();
+                    AttachmentsUtilities.OpenAttachmentsInQuickLook(attachmentsList, currentItemIndex, this);
+               }
+                    
 
             }
             catch (Exception ex)
@@ -674,6 +684,32 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 dismissAction();
             }
+        }
+
+        async Task<List<string>> LoadAttachments()
+        {
+            var attachmentList = new List<string>();
+            foreach (var attachmentDescription in document.Attachments)
+            {
+                var path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, document, false, SourceType.Local);
+
+                if (string.IsNullOrWhiteSpace(path))
+                {
+                    if (PlatformConfig.Preferences.LargeAttachmentWarning
+                        && attachmentDescription.SizeInBytes > LargeAttachmentSizeInBytes)
+                    {
+                        continue;
+                    }
+
+                    path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, document, false, SourceType.Remote);
+                }
+
+                if (string.IsNullOrWhiteSpace(path))
+                    continue;
+
+                attachmentList.Add(path);
+            }
+            return attachmentList;
         }
 
         void HeaderView_RecipientTapped(object sender, RecipientTappedEventArgs e)

@@ -1,10 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView;
+using QuickLook;
 using UIKit;
-using Xamarin.Essentials;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
@@ -35,14 +37,58 @@ namespace Mark5.Mobile.IOS.Utilities
                     }
                 }
             }
-            else
-            {
-                await Launcher.OpenAsync(new OpenFileRequest
-                {
-                    File = new ReadOnlyFile(fileName)
-                });
-            }
+           
         }
 
+        public static void OpenAttachmentsInQuickLook(List<string> attachments,int currentItemIndex, UIViewController viewController)
+        {
+            var previewController = new QLPreviewController
+            {
+                DataSource = new QuickLookSource(attachments),
+                CurrentPreviewItemIndex = currentItemIndex
+            };
+            previewController.View.TintColor = Theme.LightGray;
+            previewController.View.BackgroundColor = Theme.White;
+
+            if (Integration.IsiOSApplicationOnMac())
+                viewController.PresentViewController(previewController, true, null);
+            else
+                viewController.NavigationController.PushViewController(previewController, true);
+        }
+
+    }
+
+    public class QuickLookSource : QLPreviewControllerDataSource
+    {
+        List<string> documents;
+
+        public QuickLookSource(List<string> docs)
+        {
+            documents = docs;
+        }
+
+        public override nint PreviewItemCount(QLPreviewController controller)
+        {
+            return documents.Count;
+        }
+
+        public override IQLPreviewItem GetPreviewItem(QLPreviewController controller, nint index)
+        {
+            return new PreviewItem(documents[(int)index]);
+        }
+
+    }
+
+    public class PreviewItem : QLPreviewItem
+    {
+        readonly NSUrl fileUrl;
+
+        public override NSUrl ItemUrl => fileUrl;
+        public override string ItemTitle => fileUrl.LastPathComponent;
+
+        public PreviewItem(string url)
+        {
+            fileUrl = NSUrl.FromFilename(url);
+        }
     }
 }

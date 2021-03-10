@@ -810,32 +810,41 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             try
             {
                 string path = null;
-
-                if (e.AttachmentDescription != null)
+                if(!Integration.IsIPad())
                 {
-                    path = await Managers.DocumentsManager.GetAttachmentAsync(e.AttachmentDescription, previousDocument, false, SourceType.Local);
+
+                    if (e.AttachmentDescription != null)
+                    {
+                        path = await Managers.DocumentsManager.GetAttachmentAsync(e.AttachmentDescription, previousDocument, false, SourceType.Local);
+
+                        if (string.IsNullOrWhiteSpace(path))
+                        {
+                            if (PlatformConfig.Preferences.LargeAttachmentWarning &&
+                                e.AttachmentDescription.SizeInBytes > LargeAttachmentSizeInBytes &&
+                                !await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("warning"), string.Format(Localization.GetString("big_attachment_warning"), UI.PrettyFileSize(e.AttachmentDescription.SizeInBytes))))
+                            {
+                                dismissAction();
+                                return;
+                            }
+
+                            path = await Managers.DocumentsManager.GetAttachmentAsync(e.AttachmentDescription, previousDocument, false, SourceType.Remote);
+                        }
+                    }
+
+                    if (e.FileDescription != null)
+                        path = e.FileDescription.Path;
 
                     if (string.IsNullOrWhiteSpace(path))
-                    {
-                        if (PlatformConfig.Preferences.LargeAttachmentWarning &&
-                            e.AttachmentDescription.SizeInBytes > LargeAttachmentSizeInBytes &&
-                            !await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("warning"), string.Format(Localization.GetString("big_attachment_warning"), UI.PrettyFileSize(e.AttachmentDescription.SizeInBytes))))
-                        {
-                            dismissAction();
-                            return;
-                        }
+                        throw new Exception("Unable to open attachment.");
 
-                        path = await Managers.DocumentsManager.GetAttachmentAsync(e.AttachmentDescription, previousDocument, false, SourceType.Remote);
-                    }
+                    await AttachmentsUtilities.OpenAttachment(path, this, document.Id, e.AttachmentDescription?.Name ?? string.Empty);
                 }
-
-                if (e.FileDescription != null)
-                    path = e.FileDescription.Path;
-
-                if (string.IsNullOrWhiteSpace(path))
-                    throw new Exception("Unable to open attachment.");
-
-                await AttachmentsUtilities.OpenAttachment(path, this, document.Id, e.AttachmentDescription?.Name ?? string.Empty);
+                else
+                {
+                    var currentItemIndex = document.Attachments.IndexOf(e.AttachmentDescription);
+                    var attachmentsList = await LoadAttachments();
+                    AttachmentsUtilities.OpenAttachmentsInQuickLook(attachmentsList, currentItemIndex, this);
+                }
 
             }
             catch (Exception ex)
@@ -849,6 +858,33 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             {
                 dismissAction();
             }
+        }
+
+
+        async Task<List<string>> LoadAttachments()
+        {
+            var attachmentList = new List<string>();
+            foreach (var attachmentDescription in document.Attachments)
+            {
+                var path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, document, false, SourceType.Local);
+
+                if (string.IsNullOrWhiteSpace(path))
+                {
+                    if (PlatformConfig.Preferences.LargeAttachmentWarning
+                        && attachmentDescription.SizeInBytes > LargeAttachmentSizeInBytes)
+                    {
+                        continue;
+                    }
+
+                    path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, document, false, SourceType.Remote);
+                }
+
+                if (string.IsNullOrWhiteSpace(path))
+                    continue;
+
+                attachmentList.Add(path);
+            }
+            return attachmentList;
         }
 
         async void AttachmentsView_DeleteTapped(object sender, AttachmentsView.DeleteTappedEventArgs e)
