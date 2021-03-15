@@ -1075,7 +1075,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     {
                         var subtitleString = string.Empty;
                         if (folder.Subscribed)
-                            subtitleString += context.GetString(Resource.String.notifications);
+                        {
+                            viewHolder.FolderIconOverlay.Visibility = ViewStates.Visible;
+                            viewHolder.FolderIconOverlay.SetImageResource(Resource.Drawable.checkmark);
+                        }  
+                        else
+                            viewHolder.FolderIconOverlay.Visibility = ViewStates.Gone;
+
                         if (AsyncHelpers.RunSync(() => Managers.FoldersManager.IsSavedFolderOfflineInfo(folder)))
                         {
                             if (subtitleString.Length > 0)
@@ -1096,6 +1102,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         viewHolder.FolderIcon.SetImageResource(Resource.Drawable.folder_draft);
                     else
                         viewHolder.FolderIcon.SetImageResource(Resource.Drawable.folder);
+
 
                     viewHolder.FailedDocumentIndicator.Visibility = folder.HasFailedDocuments ? ViewStates.Visible : ViewStates.Gone;
 
@@ -1435,6 +1442,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public AppCompatTextView FolderNameTitle { get; }
             public AppCompatTextView FolderNameSubTitle { get; }
             public AppCompatImageView FolderIcon { get; }
+            public AppCompatImageView FolderIconOverlay { get; }
             public ImageView FailedDocumentIndicator { get; }
             public AppCompatTextView PendingDocumentCount { get; }
             public View SelectedOverlay { get; }
@@ -1454,6 +1462,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 FolderNameSubTitle = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_folder_subtitle);
 
                 FolderIcon = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_folder_icon);
+                FolderIconOverlay = itemView.FindViewById<AppCompatImageView>(Resource.Id.list_item_folder_icon_overlay);
 
                 var internalContainerLayout = itemView.FindViewById<LinearLayoutCompat>(Resource.Id.list_item_folder_internal_Layout);
                 internalContainerLayout.Click += (sender, e) => ItemClicked(this, itemView);
