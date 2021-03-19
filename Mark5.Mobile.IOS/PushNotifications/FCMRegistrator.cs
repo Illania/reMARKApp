@@ -26,9 +26,9 @@ namespace Mark5.Mobile.IOS.PushNotifications
                 return false;
             }
 
-            if (serviceVersion.CompareTo(new Version(3, 2, 0)) < 0)
+            if (serviceVersion.CompareTo(new Version(3, 1, 5)) < 0)
             {
-                CommonConfig.Logger.Info($"Not sending the FCM token because the current service version is less than 3.2.0");
+                CommonConfig.Logger.Info($"Not sending the FCM token because the current service version is less than 3.1.5");
                 return false;
             }
 
