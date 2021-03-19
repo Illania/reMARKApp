@@ -62,16 +62,16 @@ namespace Mark5.Mobile.IOS
                 App.Configure(); //Firebase Analytics
                 Messaging.SharedInstance.Delegate = this;
 
-               if (ServerConfig.SystemSettings?.SystemInfo?.NewPushNotificationsSystemAvailable == true)
-                    TinyIoCContainer.Current.Register<IPushNotificationsRegistrator>(new ANHRegistrator());
-                else
-                   TinyIoCContainer.Current.Register<IPushNotificationsRegistrator>(new FCMRegistrator());
-
-                pushNotificationsRegistrator = TinyIoCContainer.Current.Resolve<IPushNotificationsRegistrator>();
-
                 CommonConfig.Logger.Info("reMARK initializing...");
                 var isLoggedIn = InitializePlatform(application);
                 CommonConfig.Logger.Info("reMARK initialized");
+
+                if (ServerConfig.SystemSettings?.SystemInfo?.NewPushNotificationsSystemAvailable == true)
+                    TinyIoCContainer.Current.Register<IPushNotificationsRegistrator>(new ANHRegistrator());
+                else
+                    TinyIoCContainer.Current.Register<IPushNotificationsRegistrator>(new FCMRegistrator());
+
+                pushNotificationsRegistrator = TinyIoCContainer.Current.Resolve<IPushNotificationsRegistrator>();
 
 #if DEBUG
                 AnalyticsConfiguration.SharedInstance.SetAnalyticsCollectionEnabled(false);
