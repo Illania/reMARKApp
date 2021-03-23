@@ -26,6 +26,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 {
     public abstract class AbstractFoldersListViewController : AbstractTableViewController, IPrimaryViewController, IUISearchResultsUpdating
     {
+        #region Properties
         protected virtual bool LoadRemoteFromCache { get; }
 
         protected readonly Folder ParentFolder;
@@ -43,8 +44,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         UISearchController searchController;
         CancellationTokenSource searchCancellationTokenSource;
-        readonly List<CancellationTokenSource> searchCancellationTokenSourceList = new List<CancellationTokenSource>();
+        readonly List<CancellationTokenSource> searchCancellationTokenSourceList = new();
 
+        #endregion
+
+        #region Constructors
         protected AbstractFoldersListViewController(ModuleType module, bool disableRowActions, bool disableNavigationBarActions, bool disableSearch)
             : base(UITableViewStyle.Grouped)
         {
@@ -64,6 +68,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             DisableNavigationBarActions = disableNavigationBarActions;
             DisableSearch = disableSearch;
         }
+        #endregion
 
         #region UIViewController overrides
 
@@ -273,8 +278,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             RefreshControl = new UIRefreshControl();
 
             TableView.Source = IsRootOfFoldersList
-                ? new GrouppedDataSource(this, TableView, ParentFolder.Module, DisableRowActions) as UITableViewSource
-                : new DataSource(this, TableView, ParentFolder.Module, DisableRowActions) as UITableViewSource;
+                ? new GrouppedDataSource(this, TableView, ParentFolder.Module, DisableRowActions)
+                : new DataSource(this, TableView, ParentFolder.Module, DisableRowActions);
             TableView.RowHeight = UITableView.AutomaticDimension;
             TableView.EstimatedRowHeight = 50f;
             TableView.RefreshControl = RefreshControl;
@@ -987,6 +992,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 var root = Folder.RootForModule(ParentFolder.Module);
 
                 var localFolders = new List<Folder>();
+
                 await Task.Run(() => SearchRecursively(root, searchText, localFolders, cancellationToken));
 
                 var t = Task.Run(() => SearchRemoteFolders(searchText, cancellationToken));
@@ -1485,7 +1491,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     return emptyCell;
                 }
 
-                if (!(tableView.DequeueReusableCell(FoldersTableViewCell.DefaultId) is FoldersTableViewCell cell))
+                if (tableView.DequeueReusableCell(FoldersTableViewCell.DefaultId) is not FoldersTableViewCell cell)
                 {
                     cell = new FoldersTableViewCell
                     {
@@ -1753,8 +1759,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 var f = items[indexPath.Row];
 
-                var cell = tableView.DequeueReusableCell(FoldersSearchResultsTableViewCell.DefaultId) as FoldersSearchResultsTableViewCell ?? new FoldersSearchResultsTableViewCell();
-                cell.Initialize(f);
+
+                var cell = tableView.DequeueReusableCell(FoldersTableViewCell.DefaultId) as FoldersTableViewCell
+                    ?? new FoldersTableViewCell()
+                    {
+                        ExpandGestureRecognizer = new UITapGestureRecognizer(ExpandCollapse)
+                    };
+                cell.Initialize(f,false);
 
                 if (viewControllerWeakReference.Unwrap()?.ShouldDisableFolder(f) ?? false)
                     cell.Disable();
@@ -1813,6 +1824,27 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 searchQuery = searchText;
             }
+
+
+            void ExpandCollapse(UITapGestureRecognizer g)
+            {
+                var viewLocation = g.View.Bounds.Location;
+                var location = tableViewWeakReference.Unwrap()?.ConvertPointFromView(viewLocation, g.View);
+                if (location == null)
+                    return;
+
+                var indexPath = tableViewWeakReference.Unwrap()?.IndexPathForRowAtPoint(location.Value);
+                if (indexPath == null)
+                    return;
+
+                var f = items[indexPath.Row];
+
+                if (viewControllerWeakReference.Unwrap()?.ShouldDisableFolder(f) ?? false)
+                    return;
+
+                viewControllerWeakReference.Unwrap()?.FolderExpand(f);
+            }
+
 
             public void Reset()
             {
@@ -1873,6 +1905,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             }
 
         }
+
         #endregion
     }
 }

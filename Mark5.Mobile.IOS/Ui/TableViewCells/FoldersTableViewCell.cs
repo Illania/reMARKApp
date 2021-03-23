@@ -9,7 +9,23 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
     public class FoldersTableViewCell : UITableViewCell
     {
-        public static readonly NSString DefaultId = new NSString(nameof(FoldersTableViewCell));
+        #region Properties
+
+        public static readonly NSString DefaultId = new(nameof(FoldersTableViewCell));
+
+        readonly UIImageView folderIconImage;
+        readonly UIImageView subscribedIndicatorImage;
+        readonly UIImageView offlineIndicatorImage;
+
+        readonly UILabel nameLabel;
+        readonly UILabel documentCount;
+        readonly UIButton expandButton;
+
+        readonly NSLayoutConstraint offlineIndicatorWidthConstraint;
+        readonly NSLayoutConstraint offlineIndicatorLeadingConstraint;
+
+        
+        public UIView failedDocumentIndicator;
 
         public UITapGestureRecognizer ExpandGestureRecognizer
         {
@@ -21,17 +37,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             }
         }
 
-        readonly UIImageView folderIconImage;
-        readonly UIImageView subscribedIndicatorImage;
-        readonly UIImageView offlineIndicatorImage;
-        readonly UILabel nameLabel;
-        readonly UIButton expandButton;
-
-        readonly NSLayoutConstraint offlineIndicatorWidthConstraint;
-        readonly NSLayoutConstraint offlineIndicatorLeadingConstraint;
-
-        public UILabel documentCount;
-        public UIView failedDocumentIndicator;
+        #endregion
 
         public FoldersTableViewCell()
             : base(UITableViewCellStyle.Default, DefaultId)
