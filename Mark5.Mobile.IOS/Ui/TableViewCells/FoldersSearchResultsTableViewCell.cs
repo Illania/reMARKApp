@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using Foundation;
+﻿using Foundation;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
@@ -9,11 +7,13 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
     public class FoldersSearchResultsTableViewCell : UITableViewCell
     {
-        public static readonly NSString DefaultId = new NSString("FoldersSearchResultsTableViewCell");
+        #region Properties
+        public static readonly NSString DefaultId = new("FoldersSearchResultsTableViewCell");
 
         readonly UILabel folderNameLabel;
         readonly UILabel folderPathLabel;
         readonly UIImageView folderIconImage;
+        #endregion
 
         public FoldersSearchResultsTableViewCell()
             : base(UITableViewCellStyle.Default, DefaultId)
