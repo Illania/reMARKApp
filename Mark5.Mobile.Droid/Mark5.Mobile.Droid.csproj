@@ -641,6 +641,7 @@
     <Compile Include="Service\PushNotifications\IPushNotificationsRegistrator.cs" />
     <Compile Include="TinyIoC.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
+    <Compile Include="Utilities\Extensions\DateTimeExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

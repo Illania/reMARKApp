@@ -84,16 +84,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         }
     }
 
+
+    
     class YearCalendar : SfCalendar
     {
         readonly Color darkerBlueColor;
         readonly Color whiteColor;
+        readonly Color lightGrayColor;
 
         public YearCalendar(Context context) : base(context)
         {
             darkerBlueColor = new Color(ContextCompat.GetColor(context, Resource.Color.darkerblue));
             whiteColor = new Color(ContextCompat.GetColor(context, Resource.Color.white));
-
+            lightGrayColor = new Color(ContextCompat.GetColor(context, Resource.Color.lightgray));
+            
             MonthViewLabelSetting labelSettings = new MonthViewLabelSetting
             {
                 DateLabelSize = 10,
@@ -110,7 +114,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 TodayTextColor = darkerBlueColor,
                 WeekEndTextColor = whiteColor,
                 InlineTextColor = whiteColor,
-                DisabledTextColor = whiteColor,
+                DisabledTextColor = lightGrayColor,
                 CurrentMonthTextColor = darkerBlueColor,
                 WeekDayTextColor = whiteColor,
                 DateSelectionColor = whiteColor,
@@ -118,7 +122,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 TodaySelectionTextColor = whiteColor,
                 TodaySelectionBackgroundColor = whiteColor,
                 PreviousMonthTextColor = whiteColor,
-                BorderColor = darkerBlueColor
+                BorderColor = darkerBlueColor,
             };
 
             YearViewSettings yearViewSettings = new YearViewSettings
@@ -131,6 +135,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
                 DateTextColor = darkerBlueColor,
             };
 
+            MinDate = new DateTime(2010, 1, 1).ConvertToCalendar();
             ShowEventsInline = false;
             HeaderHeight = 100;
             ViewMode = ViewMode.YearView;

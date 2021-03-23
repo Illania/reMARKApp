@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Android.Content;
 using Android.Graphics;
 using Android.OS;
@@ -7,6 +8,7 @@ using Android.Support.V7.App;
 using Android.Views;
 using Com.Syncfusion.Schedule;
 using Com.Syncfusion.Schedule.Enums;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 {
@@ -26,11 +28,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
         protected override void SetSchedule()
         {
-            schedule = new MonthSchedule(Context);
-            schedule.LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.MatchParent);
+            schedule = new MonthSchedule(Context)
+            {
+                LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.MatchParent),
+                MinDisplayDate = new DateTime(2010, 1, 1).ConvertToCalendar()
+            };
             schedule.CellDoubleTapped += Schedule_CellDoubleTapped;
             schedule.HeaderTapped += Schedule_HeaderTapped;
             schedule.MonthInlineAppointmentTapped += Schedule_MonthInlineAppointmentTapped;
+            
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)

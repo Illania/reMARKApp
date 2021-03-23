@@ -321,6 +321,7 @@
 		<Compile Include="Ui\ViewControllers\DatePickerDialogViewController.cs" />
 		<Compile Include="Utilities\AttachmentsUtilities.cs" />
 		<Compile Include="Ui\ViewControllers\TransitionViewController.cs" />
+		<Compile Include="Utilities\Extensions\DateTimeExtensions.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

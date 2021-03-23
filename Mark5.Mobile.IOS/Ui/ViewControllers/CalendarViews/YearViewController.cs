@@ -1,5 +1,7 @@
-﻿using Foundation;
+﻿using System;
+using Foundation;
 using Mark5.Mobile.IOS.Ui.Common;
+using Mark5.Mobile.IOS.Utilities.Extensions;
 using Syncfusion.SfCalendar.iOS;
 using UIKit;
 
@@ -58,6 +60,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
     public class ReMarkYearCalendar : SFCalendar
     {
+
         readonly SFYearViewSettings yearViewSettings = new SFYearViewSettings
         {
             HeaderLabelAlignment = NSTextAlignment.NSTextAlignmentCenter,
@@ -83,6 +86,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             MonthViewSettings = monthViewSettings;
             YearViewSettings = yearViewSettings;
             DrawYearCell += ReMarkYearCalendar_DrawYearCell;
+            MinDate = new DateTime(2010, 1, 1).ToNSDate(DateTimeKind.Local);
         }
 
         void ReMarkYearCalendar_DrawYearCell(object sender, DrawYearCellEventArgs e)
