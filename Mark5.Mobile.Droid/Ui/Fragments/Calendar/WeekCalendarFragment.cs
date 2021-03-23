@@ -8,7 +8,6 @@ using Com.Syncfusion.Schedule.Enums;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Utilities;
 using System;
-using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 {
@@ -146,6 +145,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 
             HeaderStyle = headerStyle;
             ViewHeaderStyle = dayHeaderStyle;
+            MinDisplayDate = new DateTime(2010, 1, 1).ConvertToCalendar();
         }
     }
 

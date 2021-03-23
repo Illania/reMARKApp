@@ -89,6 +89,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             var startDate = schedule?.VisibleDates?.First();
             var endDate = schedule?.VisibleDates?.Last();
 
+            if (startDate == null || endDate == null)
+                return;
+
             coordinator?.VisibleDatesChanged(startDate, endDate);
         }
 
