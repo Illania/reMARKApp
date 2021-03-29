@@ -32,6 +32,12 @@ namespace Mark5.Mobile.IOS.PushNotifications
                 return false;
             }
 
+            if (ServerConfig.SystemSettings?.SystemInfo?.NotificationsInChina == true)
+            {
+                CommonConfig.Logger.Info($"Not sending the FCM token because the current service is using Chinese Notifications");
+                return false;
+            }
+
             return true;
         }        
         
