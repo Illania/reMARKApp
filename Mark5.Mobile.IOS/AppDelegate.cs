@@ -292,6 +292,20 @@ namespace Mark5.Mobile.IOS
 
             await pushNotificationsRegistrator.RegisterToken(deviceToken);
 
+            if (serviceVersion == null)
+            {
+                CommonConfig.Logger.Info($"It is not possible to update the APNS token because the server version is null");
+                return;
+            }
+
+            bool notificationsInChinaEnabled = ServerConfig.SystemSettings?.SystemInfo?.NotificationsInChina == true;
+
+
+            if (serviceVersion.CompareTo(new Version(3, 1, 5)) >= 0 && !notificationsInChinaEnabled && !(pushNotificationsRegistrator is ANHRegistrator))
+            {
+                CommonConfig.Logger.Info($"Not sending the APNS token because the current service version is equal or higher than 3.1.5 and Notifications Not Enabled in China");
+                return;
+            }
             string newToken = string.Empty;
             
             try

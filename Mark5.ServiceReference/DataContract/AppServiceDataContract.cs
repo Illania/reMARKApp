@@ -2505,6 +2505,9 @@ namespace Mark5.ServiceReference.DataContract
         [DataMember(Name = "ServerTimeZoneInfoSerialized", Order = 1)]
         public string ServerTimeZoneInfoSerialized { get; set; }
 
+        [DataMember(Name = "NotificationsInChina", Order = 1)]
+        public bool NotificationsInChina { get; set; } = false;
+
     }
 
     [DataContract(Name = "DocumentsModuleInfo", Namespace = "com.nordic-it.appservice.v3")]

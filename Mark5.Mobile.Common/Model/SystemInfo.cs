@@ -15,6 +15,8 @@ namespace Mark5.Mobile.Common.Model
         public bool ChangeSingleOccurrenceAvailable => SystemVersionGreaterThanOrEqual(1, 38, 10);
         public bool DelaySendAvailable => SystemVersionGreaterThanOrEqual(1, 38, 14);
         public bool InternalMailsAvailable => false;
+        public bool NotificationsInChina { get; set; }
+
 
         /// <summary>
         /// New Notifications System works only on systems with API 4.0.0 or greater or with server versions equal or greater that 1.37.13.
