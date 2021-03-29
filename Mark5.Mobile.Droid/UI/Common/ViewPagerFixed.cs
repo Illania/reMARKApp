@@ -23,7 +23,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             {
                 return base.OnTouchEvent(ev);
             }
-            catch (ArgumentOutOfRangeException)
+            catch(Java.Lang.IllegalArgumentException)
             {
                 //ignore
             }
@@ -37,7 +37,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             {
                 return base.OnInterceptTouchEvent(ev);
             }
-            catch (ArgumentOutOfRangeException)
+            catch (Java.Lang.IllegalArgumentException)
             {
                 //ignore
             }
