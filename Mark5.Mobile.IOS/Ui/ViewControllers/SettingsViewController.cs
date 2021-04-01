@@ -25,7 +25,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
     public class SettingsViewController : AbstractAppSettingsViewController, ISettingsDelegate
     {
         const string UseServerTimezoneKey = "UseServerTimezone";
-        const string CreateSystemReportKey = "createSystemReport";
         const string DocumentBodyRequestTypeKey = "DocumentBodyRequestType";
         const string DocumentsToDownloadKey = "DocumentsToDownload";
         const string CallerIdentificationEnabled = "CallerIdentificationEnabled";
@@ -314,41 +313,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     CommonConfig.Logger.Error("Could not mail system report", ex);
 
                     Dialogs.ShowErrorAlert(this, ex);
-                }
-
-                return;
-            }
-
-            if (specifier.Key == CreateSystemReportKey)
-            {
-                try
-                {
-                    var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("creating_system_report___"));
-
-                    var report = await SystemReportCollector.CreateFullReportAsync();
-
-                    dismissAction();
-
-                    var sendWithReMARK = await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("send_with_mark5_title"), Localization.GetString("send_report_with_mark5_content"));
-
-                    if (sendWithReMARK)
-                    {
-                        var cvc = SystemReportCollector.CreateShareReportComposeDocumentViewController(report);
-                        PresentViewController(new NavigationController(cvc, UIModalPresentationStyle.PageSheet), true, null);
-                    }
-                    else
-                    {
-                        var src = SystemReportCollector.CreateShareReportController(report);
-                        if (src.PopoverPresentationController != null)
-                            src.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate(sender.TableView, sender.TableView.CellAt(sender.SettingsReader.GetIndexPath(specifier.Key)));
-                        PresentViewController(src, true, null);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    CommonConfig.Logger.Error("Could not share system report", ex);
-
-                    await Dialogs.ShowErrorAlertAsync(this, ex);
                 }
 
                 return;

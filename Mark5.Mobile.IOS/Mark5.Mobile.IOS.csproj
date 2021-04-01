@@ -64,7 +64,7 @@
 		<RunCodeAnalysis>true</RunCodeAnalysis>
 		<MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
 		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
-		<CodesignProvision>Mark5 Development 2020 - B</CodesignProvision>
+		<CodesignProvision>reMARK App 2021 Development</CodesignProvision>
 		<LangVersion>9.0</LangVersion>
 		<MtouchLink>SdkOnly</MtouchLink>
 	</PropertyGroup>
@@ -82,9 +82,9 @@
 		<MtouchUseLlvm>true</MtouchUseLlvm>
 		<MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
 		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
-		<CodesignProvision>reMark App 2021 AdHoc</CodesignProvision>
 		<LangVersion>9.0</LangVersion>
 		<MtouchLink>SdkOnly</MtouchLink>
+		<CodesignProvision>reMark iOS 2021 Distribution</CodesignProvision>
 	</PropertyGroup>
 	<ItemGroup>
 		<Compile Include="Properties\AssemblyInfo.cs" />

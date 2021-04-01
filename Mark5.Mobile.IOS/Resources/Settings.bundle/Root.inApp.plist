@@ -579,14 +579,6 @@
 			<key>Type</key>
 			<string>IASKButtonSpecifier</string>
 			<key>Title</key>
-			<string>create_system_report</string>
-			<key>Key</key>
-			<string>createSystemReport</string>
-		</dict>
-		<dict>
-			<key>Type</key>
-			<string>IASKButtonSpecifier</string>
-			<key>Title</key>
 			<string>update_config</string>
 			<key>Key</key>
 			<string>updateConfig</string>
