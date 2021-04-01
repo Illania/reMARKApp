@@ -259,31 +259,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     Dialogs.ShowConfirmDialog(Context, Resource.String.auth_not_enrolled_title, Resource.String.auth_not_enrolled_content);
             }
 
-            if (preference.Key == GetString(Resource.String.pref_key_advanced_create_system_report))
-            {
-                dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.dialog_creating_report, Resource.String.please_wait);
-
-                Task.Run(() => { return SystemReportCollector.CreateFullReport(); })
-                    .ContinueWith(async t =>
-                        {
-                            dismissAction();
-
-                            if (!t.IsFaulted)
-                            {
-                                var sendWithReMARK = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.send_with_mark5_title, Resource.String.send_report_with_mark5_content);
-
-                                if (sendWithReMARK)
-                                    StartActivity(SystemReportCollector.CreateShareReportComposeDocumentActivityIntent(Context, t.Result));
-                                else
-                                    StartActivity(SystemReportCollector.CreateShareReportIntent(Context, t.Result));
-                            }
-
-                        },
-                        TaskScheduler.FromCurrentSynchronizationContext());
-
-                return true;
-            }
-
             if (preference.Key == GetString(Resource.String.pref_key_advanced_connection_diagnostics))
             {
                 ConnectionDiagnosticsFragment connectionDiagnosticsFragment;
