@@ -27,6 +27,8 @@ namespace Mark5.Mobile.Droid
     {
         public bool StartedFromRoot { get; set; }
 
+        public bool StartedFromShareOptions { get; set; }
+
         public ApplicationLifecycleHandler LifecycleHandler;
 
         public Mark5Application(IntPtr javaReference, JniHandleOwnership transfer)

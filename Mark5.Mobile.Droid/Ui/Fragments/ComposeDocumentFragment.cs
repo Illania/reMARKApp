@@ -43,6 +43,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         const string PreconfiguredEmailAddressesBundleKey = "PreconfiguredEmailAdresses_d5a9b692-2f14-4865-bf25-d317f0f4abd2";
         const string PreconfiguredContentBundleKey = "PreconfiguredContent_5ca57487-4b87-483f-a712-94c648c0495c";
         const string PreconfiguredSubjectBundleKey = "PreconfiguredSubject_f68ab59f-6b38-4b59-ace3-92c5c38626f1";
+        const string PreconfiguredAttachmentListBundleKey = "PreconfiguredAttachmentList_3B6E6F04-9D57-432D-B350-C2248DB8A8C5";
 
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
         const int AutoSaveWorkingCopyInterval = 5000; // 2.5 seconds
@@ -53,6 +54,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         Dictionary<DocumentAddressType, string[]> preconfiguredEmailAddresses;
         string preconfiguredContent;
         string preconfiguredSubject;
+        List<System.Uri> preconfiguredAttachmentList;
 
         bool restoreWorkingCopy;
 
@@ -82,7 +84,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         AttachmentsView attachmentsView;
         ContentView contentView;
         FormattingView formattingView;
-
         RecipientsView focusedRecipientView;
 
         FloatingActionButton fab;
@@ -97,7 +98,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public static (ComposeDocumentFragment fragment, string tag) NewInstance(DocumentCreationModeFlag documentCreationModeFlag, CopyToNewOption? copyToNewOption, bool? restoreWorkingCopy,
                                                                                  DocumentDirection? previousDocumentDirection, int? previousDocumentFolderId, int? previousDocumentId,
                                                                                  Dictionary<DocumentAddressType, string[]> preconfiguredEmailAddresses, string preconfiguredContent,
-                                                                                 string preconfiguredSubject)
+                                                                                 string preconfiguredSubject, List<System.Uri> preconfiguredAttachmentList)
         {
             if (copyToNewOption != null && copyToNewOption != CopyToNewOption.None)
                 CommonConfig.UsageAnalytics.LogEvent(new ComposeCopyToNewEvent());
@@ -141,8 +142,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (preconfiguredSubject != null)
                 args.PutString(PreconfiguredSubjectBundleKey, preconfiguredSubject);
 
-            var fragment = new ComposeDocumentFragment();
-            fragment.Arguments = args;
+            if (preconfiguredAttachmentList != null)
+                args.PutString(PreconfiguredAttachmentListBundleKey, Serializer.Serialize(preconfiguredAttachmentList));
+
+            var fragment = new ComposeDocumentFragment
+            {
+                Arguments = args
+            };
 
             var tag = $"{nameof(ComposeDocumentFragment)} [restoreWorkingCopy={restoreWorkingCopy}, documentCreationModeFlag={documentCreationModeFlag}, copyToNewOption={copyToNewOption}, previousDocumentFolderId={previousDocumentFolderId}, previousDocumentId={previousDocumentId}]";
 
@@ -179,6 +185,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (Arguments.ContainsKey(PreconfiguredSubjectBundleKey))
                 preconfiguredSubject = Arguments.GetString(PreconfiguredSubjectBundleKey);
+
+
+            if (Arguments.ContainsKey(PreconfiguredAttachmentListBundleKey))
+                preconfiguredAttachmentList = Serializer.Deserialize<List<System.Uri>>(Arguments.GetString(PreconfiguredAttachmentListBundleKey));
 
             restoreWorkingCopy = restoreWorkingCopy || Restored;
         }
@@ -449,6 +459,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (preconfiguredSubject != null)
                 subjectView.SetSubject(preconfiguredSubject);
+
+            if (preconfiguredAttachmentList != null)
+            {
+                foreach (var uri in preconfiguredAttachmentList)
+                {
+                    var androidUri = Uri.Parse(uri.AbsoluteUri);
+                    await HandleOneAttachment(androidUri);
+                }
+            }     
 
             if (preconfiguredContent != null)
                 await contentView.InsertPlainText(preconfiguredContent);

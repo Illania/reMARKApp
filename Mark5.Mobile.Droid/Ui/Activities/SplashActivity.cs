@@ -1,18 +1,25 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
+using Android.Provider;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
 using Com.Airbnb.Lottie;
+using Java.IO;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Manager;
+using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Service;
 using Mark5.Mobile.Common.Storage;
 using Mark5.Mobile.Common.Utilities;
@@ -21,15 +28,13 @@ using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 using Mark5.Mobile.Droid.Utilities.DeviceReminder;
 using Mark5.Mobile.Droid.Utilities.Workers;
-using ME.Pushy.Sdk;
-using Microsoft.AppCenter;
 using Microsoft.AppCenter.Crashes;
 using TinyIoC;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
     [Activity(MainLauncher = true, Icon = "@mipmap/ic_icon", Theme = "@style/mark5Splash", ScreenOrientation = ScreenOrientation.Portrait,
-        NoHistory = true, ResizeableActivity = true)]
+        NoHistory = true, ResizeableActivity = true, Name = "com.nordic_it.mark5.android.SplashActivity")]
     public class SplashActivity : AppCompatActivity
     {
         const string CalendarIdKey = "calendarId";
@@ -63,7 +68,166 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             ((Mark5Application)ApplicationContext).StartedFromRoot = true;
 
+            HandleSendIntent(this.Intent);
+
         }
+
+        #region Sharing options handling
+        private void HandleSendIntent(Intent intent)
+        {
+            string action = intent.Action;
+            string type = intent.Type;
+
+            if (Intent.ActionSend.Equals(action) && type != null)
+            {
+                ((Mark5Application)ApplicationContext).StartedFromShareOptions = true;
+
+                if (type.Equals("text/plain"))
+                {
+                    HandleSendText(intent);
+                }
+                else if (type.StartsWith("image/") || type.Equals("text/x-vcard") || type.StartsWith("application/"))
+                {
+                    HandleSendFile(intent);
+                }
+            }
+            else if (Intent.ActionSendMultiple.Equals(action) && type != null)
+            {
+                ((Mark5Application)ApplicationContext).StartedFromShareOptions = true;
+
+                if (type.StartsWith("image/") || type.StartsWith("application/") || type.Equals("*/*"))
+                {
+                    HandleSendMultipleFiles(intent); 
+                }
+            }
+        }
+
+        private void HandleSendFile(Intent intent)
+        {
+            var contactUri = (Android.Net.Uri)intent.GetParcelableExtra(Intent.ExtraStream);
+
+            var fullPathToSave = GetFilePath(contactUri);
+          
+            var fileStream = ContentResolver.OpenInputStream(contactUri);
+
+            if(TrySaveSharedFile(fullPathToSave, fileStream) == true)
+            {
+                StartActivity(ComposeDocumentActivity.CreateIntent(this, DocumentCreationModeFlag.New, CopyToNewOption.None,
+                    false, DocumentDirection.None, null, null, null, null, null, new List<Uri>() { new Uri(fullPathToSave) }));
+            }
+
+        }
+
+        private void HandleSendText(Intent intent)
+        {
+            string sharedText = intent.GetStringExtra(Intent.ExtraText);
+            if (sharedText != null)
+            {
+                StartActivity(ComposeDocumentActivity.CreateIntent(this, DocumentCreationModeFlag.New, CopyToNewOption.None,
+                 false, DocumentDirection.None, null, null, null, sharedText));
+            }
+        }
+
+        private void HandleSendMultipleFiles(Intent intent)
+        {
+            var fileUris = intent.GetParcelableArrayListExtra(Intent.ExtraStream);
+            var uriList = new List<Uri>();
+            if (fileUris != null)
+            {
+                foreach (var uri in fileUris)
+                {
+                    if (!(uri is Android.Net.Uri fileUri))
+                        continue;
+
+                    var fullPathToSave = GetFilePath(fileUri);
+
+                    var fileStream = ContentResolver.OpenInputStream(fileUri);
+
+                    if (TrySaveSharedFile(fullPathToSave, fileStream) == true)
+                    {
+                        uriList.Add(new Uri(fullPathToSave));
+                    }
+                }
+            }
+
+            if (uriList.Any())
+            {
+                StartActivity(ComposeDocumentActivity.CreateIntent(this, DocumentCreationModeFlag.New, CopyToNewOption.None,
+                    false, DocumentDirection.None, null, null, null, null, null, uriList));
+            }
+
+        }
+
+        private string GetFilePath(Android.Net.Uri uri)
+        {
+            string name = null;
+
+            var cursor = ContentResolver.Query(uri, new string[] { OpenableColumns.DisplayName, OpenableColumns.Size }, null, null, null);
+            if (cursor != null)
+            {
+                try
+                {
+                    if (cursor.MoveToFirst())
+                    {
+                        name = cursor.GetString(0);
+                    }
+                }
+                finally
+                {
+                    cursor.Close();
+                }
+            }
+            var newName = ReplaceIllegalCharacters(name);
+            var folderName = Path.Combine(CommonConfig.AttachmentsFolder.Path);
+            var folderPath = Path.Combine(folderName, Guid.NewGuid().ToString());
+
+            if (!Directory.Exists(folderPath))
+                Directory.CreateDirectory(folderPath);
+
+            var fullPathToSave = Path.Combine(folderPath, newName);
+
+            return fullPathToSave;
+
+        }
+
+        private static bool TrySaveSharedFile(string fullPathToSave, Stream fileStream)
+        {
+            try
+            {
+                var uri2 = new Java.Net.URI("file://" + fullPathToSave);
+                Java.IO.File file = new Java.IO.File(uri2);
+                OutputStream output = new FileOutputStream(file);
+                byte[] buffer = new byte[4 * 1024]; // or other buffer size
+                int read;
+
+                while ((read = fileStream.Read(buffer)) != 0)
+                {
+                    output.Write(buffer, 0, read);
+                }
+
+                output.Flush();
+
+                return true;
+
+            }
+            catch (Exception ex)
+            {
+                System.Console.WriteLine(ex.Message);
+                return false;
+            }
+        }
+
+        private static string ReplaceIllegalCharacters(string illegal)
+        {
+            var invalidFileNameChars = Path.GetInvalidFileNameChars();
+            var invalidPathChars = Path.GetInvalidPathChars();
+            var invalidChars = new char[] { '"', '»', '«', '\'', ' ' };
+            string regexSearch = new string(invalidFileNameChars) + new string(invalidPathChars) + new string(invalidChars);
+            Regex r = new Regex(string.Format("[{0}]", Regex.Escape(regexSearch)));
+            return r.Replace(illegal, "");
+        }
+
+        #endregion
 
         protected override void OnStart()
         {
@@ -181,6 +345,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 return true;
             }).ContinueWith(t =>
             {
+                if (((Mark5Application)ApplicationContext).StartedFromShareOptions == true)
+                    return;
+
                 if (t.IsFaulted)
                 {
                     Exception ex = t.Exception;
@@ -225,7 +392,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             CommonConfig.Logger.Info($"Started {nameof(SplashActivity)}");
         }
-
 
         void UpdateTokenInPreferences()
         {

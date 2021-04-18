@@ -1,9 +1,9 @@
+using System;
 using System.Collections.Generic;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
-using Android.Support.V7.View;
 using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
@@ -25,6 +25,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         const string PreconfiguredEmailAddressesIntentKey = "PreconfiguredEmailAddresses_25ff402c-268e-477c-890c-80d68e60ab01";
         const string PreconfiguredContentIntentKey = "PreconfiguredContent_78fe5450-4294-461b-b51a-41222f1b2b14";
         const string PreconfiguredSubjectIntentKey = "PreconfiguredSubject_831fc95b-a407-4cfe-a1fc-6bd12986286f";
+        const string PreconfiguredAttachmentListIntentKey = "PreconfiguredAttachmentList_4F18BD85-1832-4EAA-8A92-4AF927247572";
 
         const string cdfFragmentTagKey = "fragmentTagKey";
         string cdfFragmentTag;
@@ -41,7 +42,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                                           int? previousDocumentId = null,
                                           Dictionary<DocumentAddressType, string[]> preconfiguredEmailAddresses = null,
                                           string preconfiguredContent = null,
-                                          string preconfiguredSubject = null)
+                                          string preconfiguredSubject = null,
+                                          List<Uri> preconfiguredAttachmentList = null)
         {
             var intent = new Intent(context, typeof(ComposeDocumentActivity));
 
@@ -66,6 +68,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             if (preconfiguredSubject != null)
                 intent.PutExtra(PreconfiguredSubjectIntentKey, preconfiguredSubject);
+
+            if (preconfiguredAttachmentList != null)
+                intent.PutExtra(PreconfiguredAttachmentListIntentKey, Serializer.Serialize(preconfiguredAttachmentList));
+
 
             return intent;
         }
@@ -108,6 +114,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 Dictionary<DocumentAddressType, string[]> preconfiguredEmailAddresses = null;
                 string preconfiguredContent = null;
                 string preconfiguredSubject = null;
+                List<Uri> preconfiguredAttachmentList = null;
 
                 if (Intent.HasExtra(DocumentCreationModeFlagIntentKey))
                     documentCreationMode = (DocumentCreationModeFlag)Intent.Extras.GetInt(DocumentCreationModeFlagIntentKey);
@@ -136,6 +143,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 if (Intent.HasExtra(PreconfiguredSubjectIntentKey))
                     preconfiguredSubject = Intent.Extras.GetString(PreconfiguredSubjectIntentKey);
 
+                if (Intent.HasExtra(PreconfiguredAttachmentListIntentKey))
+                    preconfiguredAttachmentList = Serializer.Deserialize<List<Uri>>(Intent.Extras.GetString(PreconfiguredAttachmentListIntentKey));
+
                 (cdf, cdfFragmentTag) = ComposeDocumentFragment.NewInstance(documentCreationMode.Value,
                                                                             copyToNewOption,
                                                                             restoreWorkingCopy,
@@ -144,7 +154,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                                                                             previousDocumentId,
                                                                             preconfiguredEmailAddresses,
                                                                             preconfiguredContent,
-                                                                            preconfiguredSubject);
+                                                                            preconfiguredSubject,
+                                                                            preconfiguredAttachmentList);
 
                 var ft = SupportFragmentManager.BeginTransaction();
                 ft.Replace(Resource.Id.fragment_container, cdf, cdfFragmentTag);

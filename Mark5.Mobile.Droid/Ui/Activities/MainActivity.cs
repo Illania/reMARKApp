@@ -1,11 +1,17 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Android;
 using Android.Content;
 using Android.Content.PM;
+using Android.Content.Res;
+using Android.Database;
 using Android.Graphics;
 using Android.OS;
+using Android.Provider;
 using Android.Support.Design.Widget;
 using Android.Support.V4.App;
 using Android.Support.V4.Content;
@@ -13,6 +19,7 @@ using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.Widget;
 using Android.Views;
+using Java.IO;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -21,10 +28,12 @@ using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Coordinators;
 using Mark5.Mobile.Droid.Ui.Fragments;
 using Mark5.Mobile.Droid.Utilities;
+using File = Java.IO.File;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-    [Android.App.Activity]
+    [Android.App.Activity(Name = "com.nordic_it.mark5.android.MainActivity", Label = "MainActivity")]
+
     public class MainActivity : BaseAppCompatActivity, NavigationView.IOnNavigationItemSelectedListener, FragmentManager.IOnBackStackChangedListener
     {
         const string StateKey = "State_d7a09340-3478-43d7-93c3-8974b687a5ec";
@@ -69,7 +78,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-        
+
             CalendarCoordinator = new CalendarModuleCoordinator(this);
 
             CommonConfig.Logger.Info($"Starting {nameof(MainActivity)}...");
@@ -146,13 +155,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var appointmentId = Intent.GetIntExtra(AppointmentIdKey, 0);
                 var recurrenceIndex = Intent.GetIntExtra(RecurrenceIndexKey, 0);
 
-                var intent = AppointmentActivity.CreateIntent(this, calendarId, appointmentId, recurrenceIndex);
-                StartActivity(intent);
+                var intent_ = AppointmentActivity.CreateIntent(this, calendarId, appointmentId, recurrenceIndex);
+                StartActivity(intent_);
 
                 return;
             }
         }
-
+      
         protected override void OnNewIntent(Intent intent)
         {
             if (intent.HasExtra(CalendarIdKey))
@@ -260,7 +269,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             }
         }
 
-        public override void OnConfigurationChanged(Android.Content.Res.Configuration newConfig)
+        public override void OnConfigurationChanged(Configuration newConfig)
         {
             base.OnConfigurationChanged(newConfig);
 
@@ -460,7 +469,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                     f.Arguments = arguments;
                     f.SetInitialSavedState(state);
-
+                    
                     var ft = fm.BeginTransaction();
                     ft.SetCustomAnimations(Resource.Animation.fade_in, Resource.Animation.fade_out);
                     ft.Replace(Resource.Id.fragment_container, f, tag);
