@@ -24,14 +24,14 @@ namespace Mark5.Mobile.IOS.Extensions.CallId
             }
             catch (Exception ex)
             {
-                new ErrorLogger().WriteToLog(ex);
+                CallIdErrorLogger.WriteToLog("Error when trying to get contacts from shared db", ex);
             }
             cxContext.CompleteRequest(null);
         }
 
         public void RequestFailed(CXCallDirectoryExtensionContext extensionContext, NSError error)
         {
-            new ErrorLogger().WriteToLog(new NSErrorException(error));
+            CallIdErrorLogger.WriteToLog("CallId request failed", new NSErrorException(error));
         }
     }
 }

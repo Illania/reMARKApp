@@ -1,4 +1,5 @@
-﻿using Mark5.Mobile.IOS.Ui.Common;
+﻿using Mark5.Mobile.IOS.Common.ShareExtension;
+using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews;
 using UIKit;
 
@@ -14,6 +15,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         NavigationController calendarNavigationController;
 
         CalendarModuleCoordinator calendarCoordinator;
+
+        public SplitMainViewController() { }
+
+        public SplitMainViewController(SharingOptions sharingOptions)
+        {
+            this.sharingOptions = sharingOptions;
+            openedfromSharingOptions = true;
+        }
 
         public override void LoadView()
         {

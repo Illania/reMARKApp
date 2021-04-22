@@ -3,6 +3,9 @@ using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using UIKit;
 using Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews;
+using System.Collections.Generic;
+using Foundation;
+using Mark5.Mobile.IOS.Common.ShareExtension;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
@@ -14,6 +17,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         NavigationController calendarNavigationController;
 
         CalendarModuleCoordinator calendarCoordinator;
+
+
+        public SimpleMainViewController() { }
+
+        public SimpleMainViewController(SharingOptions sharingOptions)
+        {
+            this.sharingOptions = sharingOptions;
+            openedfromSharingOptions = true;
+        }
 
         public override void LoadView()
         {

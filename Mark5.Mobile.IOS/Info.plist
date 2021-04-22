@@ -80,6 +80,8 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>msauth.com.nordic-it.mark5.mobile.ios</string>
+				<string>remark.share.url</string>
+				<string>remark.share.text</string>
 			</array>
 		</dict>
 	</array>

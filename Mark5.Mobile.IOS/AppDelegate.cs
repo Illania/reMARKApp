@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -22,11 +23,13 @@ using Mark5.Mobile.Common.Storage;
 using Mark5.Mobile.Common.Storage.AppFileStorage;
 using Mark5.Mobile.Common.Storage.AppFileStorage.Enum;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.IOS.Common.ShareExtension;
 using Mark5.Mobile.IOS.PushNotifications;
 using Mark5.Mobile.IOS.Service;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers;
 using Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews;
+using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 using Mark5.Mobile.IOS.Utilities;
 using Microsoft.AppCenter;
 using Microsoft.AppCenter.Crashes;
@@ -48,6 +51,7 @@ namespace Mark5.Mobile.IOS
         DateTime lastForegroundTaskRunDate = DateTime.MinValue;
 
         public override UIWindow Window { get; set; }
+        private bool isLoggedIn = false;
 
 
         public override bool WillFinishLaunching(UIApplication application, NSDictionary launchOptions)
@@ -63,7 +67,7 @@ namespace Mark5.Mobile.IOS
                 Messaging.SharedInstance.Delegate = this;
 
                 CommonConfig.Logger.Info("reMARK initializing...");
-                var isLoggedIn = InitializePlatform(application);
+                isLoggedIn = InitializePlatform(application);
                 CommonConfig.Logger.Info("reMARK initialized");
 
                 if (ServerConfig.SystemSettings?.SystemInfo?.NewPushNotificationsSystemAvailable == true)
@@ -109,6 +113,51 @@ namespace Mark5.Mobile.IOS
         //This function is necessary for Microsoft Authentication
         public override bool OpenUrl(UIApplication app, NSUrl url, NSDictionary options)
         {
+            if (url.Scheme == "remark.share.url" || url.Scheme == "remark.share.text")
+            {
+
+                UIViewController vc;
+                if (!isLoggedIn)
+                {
+                    vc = new LoginViewController();
+                    Window.RootViewController = vc;
+                    return true;
+                }
+                else
+                {
+                    List<NSUrl> urlList = new();
+                    SharedContentInsertType insertType = SharedContentInsertType.File;
+                    if (url.Scheme == "remark.share.url")
+                    {
+                        var data = url.AbsoluteString.Replace("remark.share.url://", "");
+                        var pathArray = data.Split(';');
+
+                        foreach (var path in pathArray)
+                        {
+                            urlList.Add(new NSUrl(path));
+                        }
+
+                    }
+                    else if(url.Scheme == "remark.share.text")
+                    {
+                        var textFilePath = url.AbsoluteString.Replace("remark.share.text://", "");
+                        urlList.Add(new NSUrl(textFilePath));
+                    }
+
+
+                    if (Integration.IsIPad())
+                        vc = new SplitMainViewController(new SharingOptions(insertType, urlList));
+                    else
+                        vc = new SimpleMainViewController(new SharingOptions(insertType, urlList));
+
+                    Window.RootViewController = new NavigationController(vc, UIModalPresentationStyle.PageSheet);
+
+                    return true;
+                }
+            } 
+               
+         
+            
             AuthenticationContinuationHelper.SetAuthenticationContinuationEventArgs(url);
             return true;
         }
@@ -561,6 +610,7 @@ namespace Mark5.Mobile.IOS
                 CommonConfig.DataFolder = await mainFolder.CreateFolderAsync(Path.Combine("v2", "data"), CreationCollisionOption.OpenIfExists);
                 CommonConfig.DatabaseFolder = await mainFolder.CreateFolderAsync(Path.Combine("v2", "db"), CreationCollisionOption.OpenIfExists);
                 CommonConfig.AttachmentsFolder = await mainFolder.CreateFolderAsync(Path.Combine("Caches", "v2", "att"), CreationCollisionOption.OpenIfExists);
+                CommonConfig.ShareFolder = await mainFolder.CreateFolderAsync(Path.Combine("Caches", "v2", "share"), CreationCollisionOption.OpenIfExists);
                 CommonConfig.DocumentsToUploadFolder = await mainFolder.CreateFolderAsync(Path.Combine("v2", "documents_upload"), CreationCollisionOption.OpenIfExists);
                 CommonConfig.DocumentWorkingCopyFolder = await mainFolder.CreateFolderAsync(Path.Combine("v2", "document_work"), CreationCollisionOption.OpenIfExists);
                 CommonConfig.RetainedDataFolder = await mainFolder.CreateFolderAsync("retained", CreationCollisionOption.OpenIfExists);

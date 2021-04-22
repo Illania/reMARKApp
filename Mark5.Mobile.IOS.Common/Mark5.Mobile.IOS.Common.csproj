@@ -25,8 +25,9 @@
     <IOSDebuggerPort>43473</IOSDebuggerPort>
     <DeviceSpecificBuild>false</DeviceSpecificBuild>
     <MtouchVerbosity></MtouchVerbosity>
-    <MtouchLink></MtouchLink>
+    <MtouchLink>SdkOnly</MtouchLink>
     <MtouchHttpClientHandler></MtouchHttpClientHandler>
+    <LangVersion>9.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -40,6 +41,7 @@
     <MtouchLink>SdkOnly</MtouchLink>
     <MtouchVerbosity></MtouchVerbosity>
     <MtouchHttpClientHandler></MtouchHttpClientHandler>
+    <LangVersion>9.0</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -81,6 +83,8 @@
     <Folder Include="Resources\" />
     <Folder Include="CallId\" />
     <Folder Include="Exceptions\" />
+    <Folder Include="Base\" />
+    <Folder Include="ShareExtension\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -90,7 +94,11 @@
     <Compile Include="CallId\ExtensionContact.cs" />
     <Compile Include="CallId\CallIdDataAccess.cs" />
     <Compile Include="CallId\CallIdExtensionUtilities.cs" />
-    <Compile Include="CallId\ErrorLogger.cs" />
+    <Compile Include="Base\ErrorLogger.cs" />
+    <Compile Include="CallId\CallIdErrorLogger.cs" />
+    <Compile Include="ShareExtension\ShareExtensionContainerUtilities.cs" />
+    <Compile Include="ShareExtension\ShareExtensionErrorLogger.cs" />
+    <Compile Include="ShareExtension\SharingOptions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
