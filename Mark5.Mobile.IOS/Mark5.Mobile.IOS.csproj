@@ -536,6 +536,11 @@
 		  <Project>{9C956B45-460F-4EFE-B462-0DB6CA91A50D}</Project>
 		  <Name>Mark5.ServiceReference</Name>
 		</ProjectReference>
+		<ProjectReference Include="..\reMARK.Mobile.IOS.Extensions.Share\reMARK.Mobile.IOS.Extensions.Share.csproj">
+		  <IsAppExtension>true</IsAppExtension>
+		  <Project>{DF8A4ADA-FC79-4599-A2D5-2355A42CEEFD}</Project>
+		  <Name>reMARK.Mobile.IOS.Extensions.Share</Name>
+		</ProjectReference>
 	</ItemGroup>
 	<ItemGroup>
 		<None Include="Info.plist" />

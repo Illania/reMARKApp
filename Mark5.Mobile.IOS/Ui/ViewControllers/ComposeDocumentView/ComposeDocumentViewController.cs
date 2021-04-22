@@ -11,12 +11,12 @@ using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.Extensions;
+using Mark5.Mobile.IOS.Common.ShareExtension;
 using Mark5.Mobile.IOS.Model;
 using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
-using Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView;
 using Mark5.Mobile.IOS.Utilities;
 using Photos;
 using UIKit;
@@ -25,6 +25,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 {
     public class ComposeDocumentViewController : AbstractWebViewController, IUIAdaptivePresentationControllerDelegate
     {
+
+        public const string AppGroupId = "group.com.nordic-it.mark5.mobile.ios";
         const int LargeAttachmentSizeInBytes = 20 * 1024 * 1024; // 20MB
         const int AutoSaveWorkingCopyInterval = 5000; // 5 seconds
 
@@ -42,8 +44,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         public Dictionary<DocumentAddressType, string[]> PreconfiguredEmailAddresses { get; set; }
         public string PreconfiguredSubject { get; set; }
 
-        DocumentPreview documentPreview = new DocumentPreview();
-        Document document = new Document();
+        DocumentPreview documentPreview = new();
+        Document document = new();
 
         DocumentPreview previousDocumentPreview;
         Document previousDocument;
@@ -73,9 +75,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         SystemUsersDepartments systemUserDepartments;
 
+        private readonly SharingOptions sharingOptions;
+
         public ComposeDocumentViewController()
         {
             allowsPasteAsText = true;
+        }
+
+        public ComposeDocumentViewController(SharingOptions sharingOptions)
+        {
+            this.sharingOptions = sharingOptions;
         }
 
         public override void ViewDidLoad()
@@ -99,6 +108,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             InitializeView();
 
             NavigationController.PresentationController.Delegate = this;
+
+            if (sharingOptions.SharedContentInsertType == SharedContentInsertType.File && sharingOptions.UrlList.Count > 0)
+            {
+                HandleAttachmentUrls(sharingOptions.UrlList.ToArray());
+            }
+
         }
 
         public override void ViewWillAppear(bool animated)
@@ -118,6 +133,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             CommonConfig.Logger.Info("Appeared");
 
             RefreshData();
+          
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -1408,14 +1424,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 {
 
                     var filename = url.LastPathComponent;
+
                     stream = new FileStream(url.Path, FileMode.Open, FileAccess.Read);
                     var result = url.TryGetResource(NSUrl.FileSizeKey, out NSObject sizeObject, out NSError _error);
-
+                    
                     if (!result)
                         throw new Exception(_error.ToString());
 
-                    var sizeInBytes = int.Parse(sizeObject.ToString());
+                    long sizeInBytes = 0;
 
+                    if (sizeObject != null)
+                    {
+                        sizeInBytes = int.Parse(sizeObject.ToString());
+                    }
+                    else
+                    {
+                        sizeInBytes = stream.Length;
+                    }
                     if (sizeInBytes > ServerConfig.SystemSettings.DocumentsModuleInfo.MaximumAttachmentSizeBytes)
                     {
                         await Dialogs.ShowErrorAlertAsync(this, new Exception(Localization.GetString("attachment_too_big")));

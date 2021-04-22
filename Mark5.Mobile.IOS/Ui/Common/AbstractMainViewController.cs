@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.IOS.Common.ShareExtension;
 using Mark5.Mobile.IOS.Model;
 using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.ViewControllers;
@@ -35,6 +38,12 @@ namespace Mark5.Mobile.IOS.Ui.Common
         UIButton searchButton;
 
         TinyMessageSubscriptionToken reMarkNav;
+
+        #region ShareOptions
+        protected bool openedfromSharingOptions = false;
+        protected SharingOptions sharingOptions;
+        #endregion
+
 
         public override void LoadView()
         {
@@ -155,7 +164,10 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             OnBoardingUtilities.ShowOnBoardingIfNecessary(this);
 
-            CheckAutoSavedDocument();
+            if (openedfromSharingOptions)
+                CreateDocumentFromSharingOptions();
+            else
+                CheckAutoSavedDocument();
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -184,6 +196,27 @@ namespace Mark5.Mobile.IOS.Ui.Common
             base.ViewDidLayoutSubviews();
             View.BringSubviewToFront(navigationButtonContainer);
             View.BringSubviewToFront(searchButtonContainer);
+        }
+
+        protected void CreateDocumentFromSharingOptions()
+        {
+            if (sharingOptions == null)
+                return;
+
+            var sharedText = string.Empty;
+
+            if (sharingOptions.SharedContentInsertType == SharedContentInsertType.Text)
+            {
+                var textFileUrl = sharingOptions.UrlList.FirstOrDefault();
+                sharedText = File.ReadAllText(textFileUrl.Path);
+            }
+
+            var vc = new ComposeDocumentViewController(sharingOptions) {
+                DocumentCreationModeFlag = DocumentCreationModeFlag.New,
+                PreconfiguredContent = string.IsNullOrEmpty(sharedText) ? null : sharedText
+            };
+
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         async void CheckAutoSavedDocument()
