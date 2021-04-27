@@ -740,8 +740,6 @@
 		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon152.png" />
 		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon167.png" />
 		<ImageAsset Include="Assets.xcassets\AppIcon.appiconset\appIcon1024.png" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_1.imageset\Contents.json" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_1.imageset\Page01.pdf" />
 		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_2.imageset\Contents.json" />
 		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_3.imageset\Contents.json" />
 		<ImageAsset Include="Assets_icons.xcassets\Nav-search.imageset\Contents.json" />
@@ -789,8 +787,14 @@
 		<ImageAsset Include="Assets_icons.xcassets\Nav-search.imageset\nav-search-1.pdf" />
 		<ImageAsset Include="Assets_icons.xcassets\Delayed.imageset\Contents.json" />
 		<ImageAsset Include="Assets_icons.xcassets\Delayed.imageset\timer.pdf" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_3.imageset\onboarding_3.pdf" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_2.imageset\app icons-15.pdf" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_2.imageset\onboarding_2.pdf" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_3.imageset\onboarding_3-1.pdf" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_1.imageset\Contents.json" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_1.imageset\Page01.pdf" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_4.imageset\Contents.json" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_4.imageset\onboarding_4.pdf" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_5.imageset\Contents.json" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_5.imageset\onboarding_5.pdf" />
 	</ItemGroup>
 	<ItemGroup>
 		<BundleResource Include="Resources\Base.lproj\Localizable.strings" />
@@ -880,7 +884,6 @@
 	  <Folder Include="Assets_onboarding.xcassets\2.8_3.imageset\" />
 	  <Folder Include="Assets_onboarding.xcassets\2.8_4.imageset\" />
 	  <Folder Include="Assets_onboarding.xcassets\2.8_5.imageset\" />
-	  <Folder Include="Assets_onboarding.xcassets\onboarding_1.imageset\" />
 	  <Folder Include="Assets_onboarding.xcassets\onboarding_2.imageset\" />
 	  <Folder Include="Assets_onboarding.xcassets\onboarding_3.imageset\" />
 	  <Folder Include="Assets_onboarding.xcassets\onboarding_4.imageset\" />
@@ -914,6 +917,9 @@
 	  <Folder Include="Assets_icons.xcassets\AzureLogin.imageset\" />
 	  <Folder Include="PushNotifications\" />
 	  <Folder Include="Assets_icons.xcassets\Delayed.imageset\" />
+	  <Folder Include="Assets_onboarding.xcassets\onboarding_1.imageset\" />
+	  <Folder Include="Assets_onboarding.xcassets\onboarding_4.imageset\" />
+	  <Folder Include="Assets_onboarding.xcassets\onboarding_5.imageset\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 	<Import Project="..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets" Condition="Exists('..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets')" />
