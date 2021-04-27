@@ -1,6 +1,10 @@
 ﻿"1_title" = "Welcome to reMARK";
 "1_content" = "We have made a few changes in the reMARK app. Press next to see what has changed.";
-"2_title" = "Subscribe to push notifications on single device";
-"2_content" = "Now you can subscribe and unsubscribe folders for push notifications on each device independently.";
-"3_title" = "Sort emails by date";
-"3_content" = "Now you can sort your emails either by date or id.";
+"2_title" = "Apple Silicon M1 support";
+"2_content" = "Now you can install the app on MacBooks with M1 AppleSilicon processors.";
+"3_title" = "Delayed send";
+"3_content" = "Now you can send emails with a delay or at the specified time.";
+"4_title" = "Navigation to subfolders in search results";
+"4_content" = "Now you can navigate to subfolders when using folders search.";
+"5_title" = "Possibility to turn on/off Apple smartlinks";
+"5_content" = "Now you can disable usage of Apple smart links when reading and composing emails.";

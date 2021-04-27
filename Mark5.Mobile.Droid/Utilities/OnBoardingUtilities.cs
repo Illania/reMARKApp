@@ -92,13 +92,8 @@ namespace Mark5.Mobile.Droid.Utilities
             {
                 new OnBoardingPageModel("Welcome to reMARK", "We have made a few changes in the reMARK app. Press next to see what has changed.",
                      Resource.Drawable.onboarding_1),
-                new OnBoardingPageModel("Push Notifications in China", "Now push notifications are available also in China.",
-                     Resource.Drawable.onboarding_2),
-                new OnBoardingPageModel("Subscribe to push notifications on single device", "Now you can subscribe and unsubscribe folders for push notifications on each device independently.",
-                     Resource.Drawable.onboarding_3),
-                new OnBoardingPageModel("Sort emails by date", "Now you can sort your emails either by date or id.",
-                     Resource.Drawable.onboarding_4)
-
+                new OnBoardingPageModel("Delayed send", "Now you can send emails with a delay or at the specified time",
+                     Resource.Drawable.onboarding_2)
             };
         }
 
