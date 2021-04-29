@@ -610,7 +610,6 @@ namespace Mark5.Mobile.IOS
                 CommonConfig.DataFolder = await mainFolder.CreateFolderAsync(Path.Combine("v2", "data"), CreationCollisionOption.OpenIfExists);
                 CommonConfig.DatabaseFolder = await mainFolder.CreateFolderAsync(Path.Combine("v2", "db"), CreationCollisionOption.OpenIfExists);
                 CommonConfig.AttachmentsFolder = await mainFolder.CreateFolderAsync(Path.Combine("Caches", "v2", "att"), CreationCollisionOption.OpenIfExists);
-                CommonConfig.ShareFolder = await mainFolder.CreateFolderAsync(Path.Combine("Caches", "v2", "share"), CreationCollisionOption.OpenIfExists);
                 CommonConfig.DocumentsToUploadFolder = await mainFolder.CreateFolderAsync(Path.Combine("v2", "documents_upload"), CreationCollisionOption.OpenIfExists);
                 CommonConfig.DocumentWorkingCopyFolder = await mainFolder.CreateFolderAsync(Path.Combine("v2", "document_work"), CreationCollisionOption.OpenIfExists);
                 CommonConfig.RetainedDataFolder = await mainFolder.CreateFolderAsync("retained", CreationCollisionOption.OpenIfExists);

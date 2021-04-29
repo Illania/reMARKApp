@@ -109,7 +109,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             NavigationController.PresentationController.Delegate = this;
 
-            if (sharingOptions.SharedContentInsertType == SharedContentInsertType.File && sharingOptions.UrlList.Count > 0)
+            if (sharingOptions?.SharedContentInsertType == SharedContentInsertType.File && sharingOptions?.UrlList.Count > 0)
             {
                 HandleAttachmentUrls(sharingOptions.UrlList.ToArray());
             }
