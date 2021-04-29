@@ -66,8 +66,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
             if (DocumentCreationModeFlag == DocumentCreationModeFlag.Forward ||
                 DocumentCreationModeFlag == DocumentCreationModeFlag.Edit ||
-                DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption.HasFlag(CopyToNewOption.Attachments))
+                DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption.HasFlag(CopyToNewOption.Attachments) ||
+                PlatformConfig.Preferences.ReplyWithAttachments == true)
             {
+                if (PreviousDocument == null)
+                    return Task.CompletedTask;
+
                 foreach (var attachmentDescription in PreviousDocument.Attachments)
                     AddAttachment(attachmentDescription);
             }

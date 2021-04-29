@@ -48,6 +48,7 @@
 "plain" = "Plain Text";
 "remember_last_user_delay_settings" = "Remember last user delay settings";
 "remove_line" = "Remove mailbox address";
+"reply_with_attachments" = "Reply with attachments";
 "search" = "Search";
 "security" = "Security";
 "security_footer" = "SSL should remain enabled to provide secure communication. Otherwise, communication between reMARK on your iOS device and reMARK server can be intercepted.";

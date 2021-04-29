@@ -85,8 +85,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
             if (DocumentCreationModeFlag == DocumentCreationModeFlag.Forward ||
                 DocumentCreationModeFlag == DocumentCreationModeFlag.Edit ||
-                DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption.HasFlag(CopyToNewOption.Attachments))
+                DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption.HasFlag(CopyToNewOption.Attachments)||
+                PlatformConfig.Preferences.ReplyWithAttachments == true)
             {
+                if (PreviousDocument == null)
+                    return Task.CompletedTask;
+
                 foreach (var attachmentDescription in PreviousDocument.Attachments)
                     AddAttachment(attachmentDescription);
             }

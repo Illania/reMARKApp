@@ -27,6 +27,7 @@ namespace Mark5.Mobile.IOS.Utilities
             public const string LargeAttachmentWarningKey = "LargeAttachmentWarning";
             public const string SendingDelay = "SendingDelay";
             public const string RememberLastUserDelaySettings = "RememberLastUserDelaySettings";
+            public const string ReplyWithAttachments = "ReplyWithAttachments";
             public const string LastUserSendingDelay = "LastUserSendingDelay";
             public const string ShowTimeForOldEmails = "ShowTimeForOldEmails";
             public const string SortByDate = "SortByDate";
@@ -106,6 +107,9 @@ namespace Mark5.Mobile.IOS.Utilities
                 },
                 {
                     new NSString(Keys.RememberLastUserDelaySettings), NSNumber.FromBoolean(false)
+                },
+                {
+                    new NSString(Keys.ReplyWithAttachments), NSNumber.FromBoolean(false)
                 },
                 {
                     new NSString(Keys.LastUserSendingDelay), NSNumber.FromInt16(0)
@@ -212,6 +216,8 @@ namespace Mark5.Mobile.IOS.Utilities
         public int SendingDelay => (int)ud.IntForKey(Keys.SendingDelay);
 
         public bool RememberLastUserDelaySettings => ud.BoolForKey(Keys.RememberLastUserDelaySettings);
+
+        public bool ReplyWithAttachments => ud.BoolForKey(Keys.ReplyWithAttachments);
 
         public int LastUserSendingDelay
         {

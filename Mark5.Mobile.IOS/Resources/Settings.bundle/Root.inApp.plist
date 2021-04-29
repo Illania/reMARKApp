@@ -238,6 +238,16 @@
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 			<key>Title</key>
+			<string>reply_with_attachments</string>
+			<key>Key</key>
+			<string>ReplyWithAttachments</string>
+			<key>DefaultValue</key>
+			<false/>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
 			<string>large_attachment_warning</string>
 			<key>Key</key>
 			<string>LargeAttachmentWarning</string>
