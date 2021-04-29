@@ -88,6 +88,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption.HasFlag(CopyToNewOption.Attachments)||
                 PlatformConfig.Preferences.ReplyWithAttachments == true)
             {
+                if (PreviousDocument == null)
+                    return Task.CompletedTask;
+
                 foreach (var attachmentDescription in PreviousDocument.Attachments)
                     AddAttachment(attachmentDescription);
             }
