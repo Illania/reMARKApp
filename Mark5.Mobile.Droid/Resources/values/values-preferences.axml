@@ -86,6 +86,7 @@
     <bool name="pref_documents_sort_by_date_default">false</bool>
     <string name="pref_sending_delay_default">0</string>
     <bool name="pref_remember_last_user_delay_settings_default">false</bool>
+    <bool name="pref_reply_with_attachments_default">false</bool>
     <bool name="pref_documents_read_indicator_me_default">true</bool>
     <bool name="pref_documents_compact_list_default">false</bool>
     <string name="pref_documents_mark_as_read_default">0</string>

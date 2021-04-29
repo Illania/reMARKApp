@@ -42,6 +42,8 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public bool RememberLastUserDelaySettings => sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_remember_last_user_delay_settings), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_remember_last_user_delay_settings_default));
 
+        public bool ReplyWithAttachments => sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_reply_with_attachments), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_reply_with_attachments_default));
+
         #endregion
 
         #region Caller Identification

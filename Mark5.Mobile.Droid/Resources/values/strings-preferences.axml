@@ -210,6 +210,10 @@
     <string name="pref_key_remember_last_user_delay_settings">pref_key_remember_last_user_delay_settings</string>
     <string name="pref_remember_last_user_delay_settings_summary_on">Your last \'send after\' applied delay settings will be saved.</string>
     <string name="pref_remember_last_user_delay_settings_summary_off">Your last \'send after\' applied delay settings won\'t be saved.</string>
+    <string name="pref_reply_with_attachments_title">Reply with attachments</string>
+    <string name="pref_key_reply_with_attachments">pref_key_reply_with_attachments</string>
+    <string name="pref_reply_with_attachments_summary_on">Source email attachments will be included into reply.</string>
+    <string name="pref_reply_with_attachments_summary_off">Source email attachments won\'t be included into reply.</string>
     <string name="pref_sending_delay_title">Sending delay</string>
     <string name="pref_sending_delay_dialog_title">Sending delay</string>
     <string name="pref_sending_delay_summary">Delay before sending email. Applied to all send emails automatically.</string>
