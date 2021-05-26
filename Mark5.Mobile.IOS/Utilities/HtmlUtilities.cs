@@ -98,6 +98,7 @@ namespace Mark5.Mobile.IOS.Utilities
             catch(Exception ex)
             {
                 CommonConfig.Logger.Error("Error happened during html processing: ", ex);
+                return string.Empty;
             }
             
         }
