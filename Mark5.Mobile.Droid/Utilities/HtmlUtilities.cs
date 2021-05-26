@@ -20,81 +20,93 @@ namespace Mark5.Mobile.Droid.Utilities
     {
         public static async Task<string> ProcessHtml(Context ctx, string html, HtmlProcessingConfiguration config)
         {
-            var sw = Stopwatch.StartNew();
-
-            if (config.MakeHtmlSafe)
+            try
             {
-                html = await MakeHtmlSafe(html);
+                var sw = Stopwatch.StartNew();
+
+                if (config.MakeHtmlSafe)
+                {
+                    html = await MakeHtmlSafe(html);
+
+                    if (CommonConfig.Logger.IsDebugEnabled())
+                        CommonConfig.Logger.Debug($"MakeHtmlSafe {sw.ElapsedMilliseconds}ms");
+                    sw.Restart();
+                }
+
+                if (config.MakeHtmlKindaSafe)
+                {
+                    html = await MakeHtmlKindaSafe(html);
+
+                    if (CommonConfig.Logger.IsDebugEnabled())
+                        CommonConfig.Logger.Debug($"MakeHtmlKindaSafe {sw.ElapsedMilliseconds}ms");
+                    sw.Restart();
+                }
+
+                if (config.InlineCss)
+                {
+                    html = await InlineCss(html);
+
+                    if (CommonConfig.Logger.IsDebugEnabled())
+                        CommonConfig.Logger.Debug($"InlineCss {sw.ElapsedMilliseconds}ms");
+                    sw.Restart();
+                }
+
+                var htmlDocument = new HtmlDocument
+                {
+                    OptionReadEncoding = false
+                };
+                htmlDocument.LoadHtml(html);
 
                 if (CommonConfig.Logger.IsDebugEnabled())
-                    CommonConfig.Logger.Debug($"MakeHtmlSafe {sw.ElapsedMilliseconds}ms");
+                    CommonConfig.Logger.Debug($"LoadHtml {sw.ElapsedMilliseconds}ms");
                 sw.Restart();
-            }
 
-            if (config.MakeHtmlKindaSafe)
+                if (config.CorrectScale)
+                {
+                    await CorrectScale(htmlDocument);
+
+                    if (CommonConfig.Logger.IsDebugEnabled())
+                        CommonConfig.Logger.Debug($"CorrectScale {sw.ElapsedMilliseconds}ms");
+                    sw.Restart();
+                }
+
+                if (config.InjectFonts)
+                {
+                    await InjectFonts(htmlDocument);
+
+                    if (CommonConfig.Logger.IsDebugEnabled())
+                        CommonConfig.Logger.Debug($"InjectFonts {sw.ElapsedMilliseconds}ms");
+                    sw.Restart();
+                }
+
+                if (config.MakeEditable)
+                {
+                    await MakeEditable(htmlDocument);
+
+                    if (CommonConfig.Logger.IsDebugEnabled())
+                        CommonConfig.Logger.Debug($"MakeEditable {sw.ElapsedMilliseconds}ms");
+                    sw.Restart();
+                }
+
+                if (config.InjectReplyHeader)
+                {
+                    await InjectReplyHeader(ctx, htmlDocument, config.ReplyHeaderParameters);
+
+                    if (CommonConfig.Logger.IsDebugEnabled())
+                        CommonConfig.Logger.Debug($"InjectReplyHeader {sw.ElapsedMilliseconds}ms");
+                    sw.Restart();
+                }
+
+                sw.Stop();
+
+                return htmlDocument.DocumentNode.OuterHtml;
+            }
+            catch(Exception ex)
             {
-                html = await MakeHtmlKindaSafe(html);
-
-                if (CommonConfig.Logger.IsDebugEnabled())
-                    CommonConfig.Logger.Debug($"MakeHtmlKindaSafe {sw.ElapsedMilliseconds}ms");
-                sw.Restart();
+                CommonConfig.Logger.Error("Error happened during html processing: ", ex);
+                return string.Empty;
             }
-
-            if (config.InlineCss)
-            {
-                html = await InlineCss(html);
-
-                if (CommonConfig.Logger.IsDebugEnabled())
-                    CommonConfig.Logger.Debug($"InlineCss {sw.ElapsedMilliseconds}ms");
-                sw.Restart();
-            }
-
-            var htmlDocument = new HtmlDocument();
-            htmlDocument.LoadHtml(html);
-
-            if (CommonConfig.Logger.IsDebugEnabled())
-                CommonConfig.Logger.Debug($"LoadHtml {sw.ElapsedMilliseconds}ms");
-            sw.Restart();
-
-            if (config.CorrectScale)
-            {
-                await CorrectScale(htmlDocument);
-
-                if (CommonConfig.Logger.IsDebugEnabled())
-                    CommonConfig.Logger.Debug($"CorrectScale {sw.ElapsedMilliseconds}ms");
-                sw.Restart();
-            }
-
-            if (config.InjectFonts)
-            {
-                await InjectFonts(htmlDocument);
-
-                if (CommonConfig.Logger.IsDebugEnabled())
-                    CommonConfig.Logger.Debug($"InjectFonts {sw.ElapsedMilliseconds}ms");
-                sw.Restart();
-            }
-
-            if (config.MakeEditable)
-            {
-                await MakeEditable(htmlDocument);
-
-                if (CommonConfig.Logger.IsDebugEnabled())
-                    CommonConfig.Logger.Debug($"MakeEditable {sw.ElapsedMilliseconds}ms");
-                sw.Restart();
-            }
-
-            if (config.InjectReplyHeader)
-            {
-                await InjectReplyHeader(ctx, htmlDocument, config.ReplyHeaderParameters);
-
-                if (CommonConfig.Logger.IsDebugEnabled())
-                    CommonConfig.Logger.Debug($"InjectReplyHeader {sw.ElapsedMilliseconds}ms");
-                sw.Restart();
-            }
-
-            sw.Stop();
-
-            return htmlDocument.DocumentNode.OuterHtml;
+            
         }
 
         public static async Task<string> ProcessPlainText(Context ctx, string text, PlainTextProcessingConfiguration config)
@@ -138,7 +150,10 @@ namespace Mark5.Mobile.Droid.Utilities
         {
             return Task.Run(() =>
             {
-                var htmlDocument = new HtmlDocument();
+                var htmlDocument = new HtmlDocument
+                {
+                    OptionReadEncoding = false
+                };
                 htmlDocument.LoadHtml(html);
 
                 //M5APP-920
