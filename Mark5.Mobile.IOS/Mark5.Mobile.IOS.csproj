@@ -503,6 +503,51 @@
 		<Reference Include="Firebase.Analytics">
 		  <HintPath>..\packages\Xamarin.Firebase.iOS.Analytics.5.5.0\lib\Xamarin.iOS10\Firebase.Analytics.dll</HintPath>
 		</Reference>
+		<Reference Include="Microsoft.Bcl.AsyncInterfaces">
+		  <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.5.0.0\lib\netstandard2.1\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
+		</Reference>
+		<Reference Include="System.Collections.Immutable">
+		  <HintPath>..\packages\System.Collections.Immutable.5.0.0\lib\netstandard2.0\System.Collections.Immutable.dll</HintPath>
+		</Reference>
+		<Reference Include="System.Reflection.Metadata">
+		  <HintPath>..\packages\System.Reflection.Metadata.5.0.0\lib\netstandard2.0\System.Reflection.Metadata.dll</HintPath>
+		</Reference>
+		<Reference Include="System.Text.Encodings.Web">
+		  <HintPath>..\packages\System.Text.Encodings.Web.5.0.0\lib\netstandard2.1\System.Text.Encodings.Web.dll</HintPath>
+		</Reference>
+		<Reference Include="System.Text.Json">
+		  <HintPath>..\packages\System.Text.Json.5.0.0\lib\netstandard2.0\System.Text.Json.dll</HintPath>
+		</Reference>
+		<Reference Include="Sentry">
+		  <HintPath>..\packages\Sentry.3.3.4\lib\netstandard2.1\Sentry.dll</HintPath>
+		</Reference>
+		<Reference Include="Microsoft.Extensions.Configuration.Abstractions">
+		  <HintPath>..\packages\Microsoft.Extensions.Configuration.Abstractions.5.0.0\lib\netstandard2.0\Microsoft.Extensions.Configuration.Abstractions.dll</HintPath>
+		</Reference>
+		<Reference Include="Microsoft.Extensions.Configuration">
+		  <HintPath>..\packages\Microsoft.Extensions.Configuration.5.0.0\lib\netstandard2.0\Microsoft.Extensions.Configuration.dll</HintPath>
+		</Reference>
+		<Reference Include="Microsoft.Extensions.Configuration.Binder">
+		  <HintPath>..\packages\Microsoft.Extensions.Configuration.Binder.5.0.0\lib\netstandard2.0\Microsoft.Extensions.Configuration.Binder.dll</HintPath>
+		</Reference>
+		<Reference Include="Microsoft.Extensions.Logging">
+		  <HintPath>..\packages\Microsoft.Extensions.Logging.5.0.0\lib\netstandard2.1\Microsoft.Extensions.Logging.dll</HintPath>
+		</Reference>
+		<Reference Include="Microsoft.Extensions.Http">
+		  <HintPath>..\packages\Microsoft.Extensions.Http.2.1.0\lib\netstandard2.0\Microsoft.Extensions.Http.dll</HintPath>
+		</Reference>
+		<Reference Include="Microsoft.Extensions.Options.ConfigurationExtensions">
+		  <HintPath>..\packages\Microsoft.Extensions.Options.ConfigurationExtensions.5.0.0\lib\netstandard2.0\Microsoft.Extensions.Options.ConfigurationExtensions.dll</HintPath>
+		</Reference>
+		<Reference Include="Microsoft.Extensions.Logging.Configuration">
+		  <HintPath>..\packages\Microsoft.Extensions.Logging.Configuration.5.0.0\lib\netstandard2.0\Microsoft.Extensions.Logging.Configuration.dll</HintPath>
+		</Reference>
+		<Reference Include="Sentry.Extensions.Logging">
+		  <HintPath>..\packages\Sentry.Extensions.Logging.3.3.4\lib\netstandard2.0\Sentry.Extensions.Logging.dll</HintPath>
+		</Reference>
+		<Reference Include="Microsoft.Extensions.DependencyInjection">
+		  <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.5.0.0\lib\netstandard2.1\Microsoft.Extensions.DependencyInjection.dll</HintPath>
+		</Reference>
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Mark5.Mobile.Common\Mark5.Mobile.Common.csproj">

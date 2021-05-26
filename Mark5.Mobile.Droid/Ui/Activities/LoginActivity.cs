@@ -23,7 +23,9 @@ using Mark5.Mobile.Droid.Utilities;
 using Mark5.Mobile.Droid.Utilities.DeviceReminder;
 using Mark5.Mobile.Droid.Utilities.Workers;
 using Mark5.ServiceReference.Exceptions;
+using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Client;
+using Sentry;
 using TinyIoC;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
@@ -393,7 +395,22 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 TinyIoCContainer.Current.Register<IPushNotificationsRegistrator>(new FirebaseRegistrator());
 
             pushNotificationsRegistrator = TinyIoCContainer.Current.Resolve<IPushNotificationsRegistrator>();
-
+ 
+            using var loggerFactory = new LoggerFactory().AddSentry(o =>
+            {
+                o.DiagnosticLevel = SentryLevel.Debug;
+                o.Dsn = "https://8cf8a86b756e4fc68ae5e60062eec608@o588553.ingest.sentry.io/5783224";
+                o.Release = $"{CommonConfig.DeviceInfoProvider.GetAppVersionString()}";
+                o.MinimumEventLevel = Microsoft.Extensions.Logging.LogLevel.Information;
+                o.ConfigureScope(s => {
+                    s.SetTag("RootScope", "sent with all events");
+                    s.SetTag("DeviceName", ci.FriendlyDeviceName);
+                    s.SetTag("ServerName", $"{ci.Hostname}:{ci.Port}");
+                    s.SetTag("SslEnabled", $"{ci.SslMode}");
+                    s.User = new User { Username = ci.Username };
+                });
+            });
+            CommonConfig.Sentry = loggerFactory.CreateLogger("base");
 
             CommonConfig.Logger.Info($"Logged in - will present {nameof(MainActivity)}");
 

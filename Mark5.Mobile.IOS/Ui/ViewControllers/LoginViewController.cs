@@ -17,6 +17,8 @@ using Mark5.Mobile.IOS.Service;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
 using Mark5.ServiceReference.Exceptions;
+using Microsoft.Extensions.Logging;
+using Sentry;
 using UIKit;
 using UserNotifications;
 
@@ -794,6 +796,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             CommonConfig.Logger.Info($"Registering {nameof(ReachabilityReceiver)}...");
             PlatformConfig.ReachabilityReceiver.Register();
+
+            using var loggerFactory = new LoggerFactory().AddSentry(o =>
+            {
+                o.DiagnosticLevel = SentryLevel.Debug;
+                o.Dsn = "https://7005b8e24f4b45d68b5c1d789da957ed@o588553.ingest.sentry.io/5779906";
+                o.Release = $"{CommonConfig.DeviceInfoProvider.GetAppVersionString()}";
+                o.MinimumEventLevel = Microsoft.Extensions.Logging.LogLevel.Information;
+                o.ConfigureScope(s => {
+                    s.SetTag("RootScope", "sent with all events");
+                    s.SetTag("DeviceName", ci.FriendlyDeviceName);
+                    s.SetTag("ServerName", $"{ci.Hostname}:{ci.Port}");
+                    s.SetTag("SslEnabled", $"{ci.SslMode}");
+                    s.User = new User { Username = ci.Username };
+                });
+            });
+            CommonConfig.Sentry = loggerFactory.CreateLogger("base");
 
             CommonConfig.Logger.Info($"Logged in - will present {nameof(AbstractMainViewController)}");
 

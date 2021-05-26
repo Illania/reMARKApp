@@ -5,6 +5,7 @@ using Microsoft.Azure.NotificationHubs;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 
 namespace Mark5.Mobile.IOS.PushNotifications
 {
@@ -71,9 +72,10 @@ namespace Mark5.Mobile.IOS.PushNotifications
                 {
                     await notificationHubClient.CreateOrUpdateRegistrationAsync(newRegistration);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     PlatformConfig.Preferences.AzureHubRegistrationId = string.Empty;
+                    CommonConfig.Sentry.LogError($"Error while creating/updating  Azure Notifications Hub registration, token: {newToken}, registrationId: {newRegistrationId}", ex);
                 }
 
             }
@@ -87,12 +89,14 @@ namespace Mark5.Mobile.IOS.PushNotifications
             if (serviceVersion == null)
             {
                 CommonConfig.Logger.Info($"It is not possible to update the push notification token because the server version is null");
+                CommonConfig.Sentry.LogInformation($"It is not possible to update the push notification token because the server version is null");
                 return false;
             }
 
             if (ServerConfig.SystemSettings?.SystemInfo?.NewPushNotificationsSystemAvailable != true)
            {
                 CommonConfig.Logger.Info($"Not sending the token because the current service version is less than 4.0.0 or system version is less than 1.37.13");
+                CommonConfig.Sentry.LogInformation($"Not sending the token because the current service version is less than 4.0.0 or system version is less than 1.37.13");
                 return false;
            }
 

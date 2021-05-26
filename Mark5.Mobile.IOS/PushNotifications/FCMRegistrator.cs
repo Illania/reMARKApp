@@ -3,6 +3,7 @@ using System;
 using Foundation;
 using Firebase.CloudMessaging;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Mark5.Mobile.IOS.PushNotifications
 {
@@ -23,18 +24,21 @@ namespace Mark5.Mobile.IOS.PushNotifications
             if (serviceVersion == null)
             {
                 CommonConfig.Logger.Info($"It is not possible to update the push notification token because the server version is null");
+                CommonConfig.Sentry?.LogInformation($"It is not possible to update the push notification token because the server version is null");
                 return false;
             }
 
             if (serviceVersion.CompareTo(new Version(3, 1, 5)) < 0)
             {
                 CommonConfig.Logger.Info($"Not sending the FCM token because the current service version is less than 3.1.5");
+                CommonConfig.Sentry?.LogInformation($"Not sending the FCM token because the current service version is less than 3.1.5");
                 return false;
             }
 
             if (ServerConfig.SystemSettings?.SystemInfo?.NotificationsInChina == true)
             {
                 CommonConfig.Logger.Info($"Not sending the FCM token because the current service is using Chinese Notifications");
+                CommonConfig.Sentry?.LogInformation($"Not sending the FCM token because the current service is using Chinese Notifications");
                 return false;
             }
 
