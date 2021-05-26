@@ -6,6 +6,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Extensions;
 using Android.Content;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Mark5.Mobile.Droid.Service
 {
@@ -36,10 +37,13 @@ namespace Mark5.Mobile.Droid.Service
 
                         Managers.NotificationsManager.Subscribe(DeviceType.Android, token).FireAndForget();
                     }
+
+                    CommonConfig.Sentry.LogInformation($"Registered Firebase token: {token}");
                 }
                 catch (Exception ex)
                 {
                     CommonConfig.Logger.Error("Error while subscribing to push notifications after login", ex);
+                    CommonConfig.Sentry.LogError("Error while subscribing to push notifications after login", ex);
                 }
             });
         }
@@ -47,7 +51,10 @@ namespace Mark5.Mobile.Droid.Service
         public void UpdateToken()
         {
             if (!string.IsNullOrWhiteSpace(ActiveToken))
+            {
                 PlatformConfig.Preferences.PushNotificationToken = FirebaseInstanceId.Instance.Token;
+                CommonConfig.Sentry.LogError($"Firebase token {ActiveToken} updated to  new token {FirebaseInstanceId.Instance.Token}");
+            }
         }
 
         public void DeleteToken()
@@ -60,6 +67,7 @@ namespace Mark5.Mobile.Droid.Service
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error("Could not reset Firebase token!", ex);
+                CommonConfig.Sentry.LogError("Could not reset Firebase token!", ex);
             }
         }
          

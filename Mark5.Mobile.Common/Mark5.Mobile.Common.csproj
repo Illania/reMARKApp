@@ -23,6 +23,8 @@
     <PackageReference Include="sqlite-net-pcl" Version="1.5.231" />
     <PackageReference Include="Microsoft.Identity.Client" Version="4.26.0" />
     <PackageReference Include="Microsoft.Graph" Version="3.24.0" />
+    <PackageReference Include="Sentry" Version="3.3.4" />
+    <PackageReference Include="Sentry.Extensions.Logging" Version="3.3.4" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Model\HubMessages\" />

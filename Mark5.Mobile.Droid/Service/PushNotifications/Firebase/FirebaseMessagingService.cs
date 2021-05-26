@@ -4,6 +4,7 @@ using Android.Content;
 using Firebase.Messaging;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Droid.Utilities;
+using Microsoft.Extensions.Logging;
 
 namespace Mark5.Mobile.Droid.Service
 {
@@ -21,6 +22,8 @@ namespace Mark5.Mobile.Droid.Service
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error($"Could not process notification. [message.from={message.From}, message.data.keys={string.Join(",", message.Data.Keys)}]", ex);
+                CommonConfig.Sentry.LogError($"Could not process notification. [message.from={message.From}, message.data.keys={string.Join(",", message.Data.Keys)}]", ex);
+
             }
         }
     }

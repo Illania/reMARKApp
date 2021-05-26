@@ -6,6 +6,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Microsoft.Extensions.Logging;
 
 namespace Mark5.Mobile.Droid.Service
 {
@@ -22,6 +23,8 @@ namespace Mark5.Mobile.Droid.Service
                 if (CommonConfig.Logger.IsDebugEnabled())
                     CommonConfig.Logger.Debug($"Received Firebase token: {token}");
 
+                CommonConfig.Sentry.LogInformation($"Received Firebase token: {token}");
+
                 var oldToken = PlatformConfig.Preferences.PushNotificationToken;
                 PlatformConfig.Preferences.PushNotificationToken = token;
 
@@ -32,6 +35,7 @@ namespace Mark5.Mobile.Droid.Service
                     if (!string.IsNullOrWhiteSpace(oldToken) && oldToken != token)
                     {
                         CommonConfig.Logger.Info($"New Firebase token is different, so try to unsubscribe old one...");
+                        CommonConfig.Sentry.LogInformation($"New Firebase token is different, so try to unsubscribe old one...");
 
                         Managers.NotificationsManager.UnSubscribe(DeviceType.Android, token).FireAndForget();
                     }
@@ -41,7 +45,8 @@ namespace Mark5.Mobile.Droid.Service
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error(ex);
+                CommonConfig.Logger.Error("Error while refreshing Firebase token",ex);
+                CommonConfig.Sentry.LogError("Error while refreshing Firebase token", ex);
             }
         }
     }

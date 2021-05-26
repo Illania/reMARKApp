@@ -3,6 +3,7 @@ using System.Net.Http;
 using Mark5.Mobile.Common.Utilities;
 using TinyMessenger;
 using Mark5.Mobile.Common.Storage.AppFileStorage.Interface;
+using Microsoft.Extensions.Logging;
 
 namespace Mark5.Mobile.Common
 {
@@ -15,7 +16,8 @@ namespace Mark5.Mobile.Common
         public static IFolder DocumentsToUploadFolder { get; set; }
         public static IFolder DocumentWorkingCopyFolder { get; set; }
         public static IFolder RetainedDataFolder { get; set; }
-        public static ILogger Logger { get; set; }
+        public static Utilities.ILogger Logger { get; set; }
+        public static Microsoft.Extensions.Logging.ILogger Sentry{ get; set; }
         public static IDeviceInfoProvider DeviceInfoProvider { get; set; }
         public static Func<HttpMessageHandler> HttpClientHandler { get; set; }
         public static Action OnStartTransmission { get; set; }
