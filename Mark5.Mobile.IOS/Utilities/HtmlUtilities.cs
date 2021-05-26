@@ -20,75 +20,86 @@ namespace Mark5.Mobile.IOS.Utilities
     {
         public static async Task<string> ProcessHtml(string html, HtmlProcessingConfiguration config)
         {
-            var sw = Stopwatch.StartNew();
-
-            if (config.MakeHtmlSafe)
+            try
             {
-                html = await MakeHtmlSafe(html);
+                var sw = Stopwatch.StartNew();
 
-                CommonConfig.Logger.Debug($"MakeHtmlSafe {sw.ElapsedMilliseconds}ms");
+                if (config.MakeHtmlSafe)
+                {
+                    html = await MakeHtmlSafe(html);
+
+                    CommonConfig.Logger.Debug($"MakeHtmlSafe {sw.ElapsedMilliseconds}ms");
+                    sw.Restart();
+                }
+
+                if (config.MakeHtmlKindaSafe)
+                {
+                    html = await MakeHtmlKindaSafe(html);
+
+                    CommonConfig.Logger.Debug($"MakeHtmlKindaSafe {sw.ElapsedMilliseconds}ms");
+                    sw.Restart();
+                }
+
+                if (config.InlineCss)
+                {
+                    html = await InlineCss(html);
+
+                    CommonConfig.Logger.Debug($"InlineCss {sw.ElapsedMilliseconds}ms");
+                    sw.Restart();
+                }
+
+                var htmlDocument = new HtmlDocument
+                {
+                    OptionReadEncoding = false
+                };
+                htmlDocument.LoadHtml(html);
+
+                CommonConfig.Logger.Debug($"LoadHtml {sw.ElapsedMilliseconds}ms");
                 sw.Restart();
-            }
 
-            if (config.MakeHtmlKindaSafe)
+                if (config.CorrectScale)
+                {
+                    await CorrectScale(htmlDocument);
+
+                    CommonConfig.Logger.Debug($"CorrectScale {sw.ElapsedMilliseconds}ms");
+                    sw.Restart();
+                }
+
+                if (config.InjectFonts)
+                {
+                    await InjectFonts(htmlDocument);
+
+                    CommonConfig.Logger.Debug($"InjectFonts {sw.ElapsedMilliseconds}ms");
+                    sw.Restart();
+                }
+
+                if (config.MakeEditable)
+                {
+                    await MakeEditable(htmlDocument);
+
+                    CommonConfig.Logger.Debug($"MakeEditable {sw.ElapsedMilliseconds}ms");
+                    sw.Restart();
+                }
+
+                if (config.InjectReplyHeader)
+                {
+                    await InjectReplyHeader(htmlDocument, config.ReplyHeaderParameters);
+
+                    CommonConfig.Logger.Debug($"InjectReplyHeader {sw.ElapsedMilliseconds}ms");
+                    sw.Restart();
+                }
+
+                await InjectOverflowCorrection(htmlDocument);
+
+                sw.Stop();
+
+                return htmlDocument.DocumentNode.OuterHtml;
+            }
+            catch(Exception ex)
             {
-                html = await MakeHtmlKindaSafe(html);
-
-                CommonConfig.Logger.Debug($"MakeHtmlKindaSafe {sw.ElapsedMilliseconds}ms");
-                sw.Restart();
+                CommonConfig.Logger.Error("Error happened during html processing: ", ex);
             }
-
-            if (config.InlineCss)
-            {
-                html = await InlineCss(html);
-
-                CommonConfig.Logger.Debug($"InlineCss {sw.ElapsedMilliseconds}ms");
-                sw.Restart();
-            }
-
-            var htmlDocument = new HtmlDocument();
-            htmlDocument.LoadHtml(html);
-
-            CommonConfig.Logger.Debug($"LoadHtml {sw.ElapsedMilliseconds}ms");
-            sw.Restart();
-
-            if (config.CorrectScale)
-            {
-                await CorrectScale(htmlDocument);
-
-                CommonConfig.Logger.Debug($"CorrectScale {sw.ElapsedMilliseconds}ms");
-                sw.Restart();
-            }
-
-            if (config.InjectFonts)
-            {
-                await InjectFonts(htmlDocument);
-
-                CommonConfig.Logger.Debug($"InjectFonts {sw.ElapsedMilliseconds}ms");
-                sw.Restart();
-            }
-
-            if (config.MakeEditable)
-            {
-                await MakeEditable(htmlDocument);
-
-                CommonConfig.Logger.Debug($"MakeEditable {sw.ElapsedMilliseconds}ms");
-                sw.Restart();
-            }
-
-            if (config.InjectReplyHeader)
-            {
-                await InjectReplyHeader(htmlDocument, config.ReplyHeaderParameters);
-
-                CommonConfig.Logger.Debug($"InjectReplyHeader {sw.ElapsedMilliseconds}ms");
-                sw.Restart();
-            }
-
-            await InjectOverflowCorrection(htmlDocument);
-
-            sw.Stop();
-
-            return htmlDocument.DocumentNode.OuterHtml;
+            
         }
 
         public static async Task<string> ProcessPlainText(string text, PlainTextProcessingConfiguration config)
@@ -140,7 +151,11 @@ namespace Mark5.Mobile.IOS.Utilities
         {
             return Task.Run(() =>
             {
-                var htmlDocument = new HtmlDocument();
+
+                var htmlDocument = new HtmlDocument
+                {
+                    OptionReadEncoding = false
+                };
                 htmlDocument.LoadHtml(html);
 
                 //M5APP-920
@@ -163,6 +178,7 @@ namespace Mark5.Mobile.IOS.Utilities
                     nodeToRemove.Remove();
 
                 return htmlDocument.DocumentNode.OuterHtml;
+    
             });
         }
 
