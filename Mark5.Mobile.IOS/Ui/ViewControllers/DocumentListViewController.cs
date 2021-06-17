@@ -93,7 +93,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
             InitializeHandlers();
-            
+
             if (TableView?.IndexPathForSelectedRow != null)
                 TableView.DeselectRow(TableView.IndexPathForSelectedRow, true);
 
@@ -284,9 +284,49 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (!Integration.IsRunningAtLeast(11))
                 TableView.TableHeaderView = searchController.SearchBar;
         }
+        public override bool CanBecomeFirstResponder => true;
+        public override UIKeyCommand[] KeyCommands {
+            get
+            {
+                if (Integration.IsiOSApplicationOnMac())
+                {
+                    return new UIKeyCommand[] { UIKeyCommand.Create((NSString)" ", 0, new ObjCRuntime.Selector("spacebarPressed")) };
+                }
+                else
+                    return base.KeyCommands;         
+        }
+    }
+
+        [Export("spacebarPressed")]
+        private void OnSpacebarPressed()
+        {
+            var selectedRowIp = TableView.IndexPathsForSelectedRows?.FirstOrDefault();
+
+            if (selectedRowIp == null)
+                return;
+
+            var selectedDocument = ((DataSource)TableView.Source).Items[selectedRowIp.Row];   
+            MarkAsRead(selectedDocument);
+
+            if (selectedRowIp.Row == ((DataSource)TableView.Source).Items.Count - 1)
+                return;
+
+            var nextRowIndex = NSIndexPath.FromRowSection(selectedRowIp.Row + 1, 0);
+            //if next row is not yet visible scroll it at the top of the view
+            var nextRowScrollPosition = UITableViewScrollPosition.Top;
+            //if row is visible don't scroll
+            if (TableView.IndexPathsForVisibleRows.Contains(nextRowIndex))
+                nextRowScrollPosition = UITableViewScrollPosition.None;
+
+            TableView.SelectRow(nextRowIndex, true, nextRowScrollPosition);
+            var dp = ((DataSource)TableView.Source).Items[nextRowIndex.Row];
+            DocumentSelected(dp);
+        }
+
 
         void InitializeHandlers()
         {
+            
             if (composeDocumentItem != null)
                 composeDocumentItem.Clicked += ComposeDocumentItem_Clicked;
 
