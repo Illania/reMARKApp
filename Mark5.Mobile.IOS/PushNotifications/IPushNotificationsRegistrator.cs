@@ -83,6 +83,26 @@ namespace Mark5.Mobile.IOS.PushNotifications
                     //Registers for receipt of push notifications using the Apple Push Service.
                     nsobject.InvokeOnMainThread(UIApplication.SharedApplication.RegisterForRemoteNotifications);
 
+                    var serviceVersion = ServerConfig.SystemSettings?.SystemInfo?.ServiceVersion;
+
+                    if (serviceVersion == null)
+                    {
+                        CommonConfig.Logger.Info($"It is not possible to update the push notification token because the server version is null");
+                        return;
+                    }
+
+                    if (serviceVersion.CompareTo(new Version(3, 1, 5)) < 0)
+                    {
+                        CommonConfig.Logger.Info($"Not sending the push token because the current service version is less than 3.1.5");
+                        return;
+                    }
+
+                    if (ServerConfig.SystemSettings?.SystemInfo?.NotificationsInChina == true)
+                    {
+                        CommonConfig.Logger.Info($"Not sending the push token because the current service is using Chinese Notifications");
+                        return;
+                    }
+
                     if (!string.IsNullOrWhiteSpace(ActiveToken))
                     {
                         UpdateToken(ActiveToken);
