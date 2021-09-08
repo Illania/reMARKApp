@@ -22,12 +22,16 @@ namespace Mark5.ServiceReference.AppService
         readonly Action onStartTransmission;
         readonly Action onStopTransmission;
         readonly string requestUri;
+        readonly string bearerToken;
 
-        public HttpAppServiceProxy(bool ssl, string hostname, string port, Func<HttpMessageHandler> httpClientHandler, Action onStartTransmission, Action onStopTransmission)
+        public HttpAppServiceProxy(bool ssl, string hostname, string port, Func<HttpMessageHandler> httpClientHandler, Action onStartTransmission, Action onStopTransmission,
+            string bearerToken)
         {
             this.httpClientHandler = httpClientHandler;
             this.onStartTransmission = onStartTransmission;
             this.onStopTransmission = onStopTransmission;
+            this.bearerToken = bearerToken;
+
             var usePort = !string.IsNullOrEmpty(port);
           
             requestUri = $"{(ssl ? "https" : "http")}://{hostname}{(usePort ? (":" + port) : "" )}/app3";
@@ -43,10 +47,12 @@ namespace Mark5.ServiceReference.AppService
 
                 using (var c = new HttpClient(httpClientHandler())
                 {
-                    Timeout = TimeSpan.FromSeconds(useShortTimeout ? Config.HttpClientShortTimeoutSeconds : Config.HttpClientTimeoutSeconds),
+                    Timeout = TimeSpan.FromSeconds(useShortTimeout ? Config.HttpClientShortTimeoutSeconds : Config.HttpClientTimeoutSeconds)
                 })
                 {
-                    var req = CreateRequest(soapAction, parameters, checkXmlCharacters);
+                    if(!string.IsNullOrEmpty(bearerToken))
+                        c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+                    var req = CreateRequest(soapAction, parameters, checkXmlCharacters, bearerToken);
                     var res = await c.SendAsync(req, ct);
                     statusCode = res.StatusCode;
                     return await ProcessResponse<R>(soapAction, res);
@@ -68,10 +74,11 @@ namespace Mark5.ServiceReference.AppService
             }
         }
 
-        HttpRequestMessage CreateRequest<P>(string soapAction, P parameters, bool checkXmlCharacters = true) where P : class
+        HttpRequestMessage CreateRequest<P>(string soapAction, P parameters, bool checkXmlCharacters = true, string bearerToken = "") where P : class
         {
             var req = new HttpRequestMessage(HttpMethod.Post, requestUri);
-
+            if(!string.IsNullOrEmpty(bearerToken))
+                req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
             var dcs = new DataContractSerializer(typeof(P));
             var sw = new StringWriterWithEncoding(Encoding.UTF8);
             using (var w = XmlWriter.Create(sw, new XmlWriterSettings
@@ -102,14 +109,12 @@ namespace Mark5.ServiceReference.AppService
             content.Headers.Add("SOAPAction", soapAction);
             content.Headers.ContentType = new MediaTypeHeaderValue("text/xml") { CharSet = "utf-8" };
             req.Content = content;
-
             return req;
         }
 
         async Task<R> ProcessResponse<R>(string soapAction, HttpResponseMessage res) where R : class
         {
             var responseContent = await res.Content.ReadAsStringAsync();
-
             var doc = new XmlDocument();
             doc.LoadXml(responseContent);
 

@@ -130,6 +130,7 @@ namespace Mark5.Mobile.IOS.Utilities
             sb.AppendLine("Installation ID: " + Managers.ActiveConnectionInfo?.InstallationId);
             sb.AppendLine("APNS Token: " + PlatformConfig.Preferences.PushNotificationToken);
             sb.AppendLine("Azure Notifications Hubs registration Id: " + PlatformConfig.Preferences.AzureHubRegistrationId);
+            sb.AppendLine("Azure Application Proxy Bearer Token: " + PlatformConfig.Preferences.AzureApplicationProxyBearerToken);
             sb.AppendLine();
 
             sb.AppendLine("===== Server information =====");

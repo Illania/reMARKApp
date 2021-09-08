@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 using Airbnb.Lottie;
@@ -64,6 +66,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         IAuthenticator authenticator;
         MicrosoftAuthService microsoftAuthService;
+        AzureAppProxyAuthService azureAppProxyAuthService;
 
         SslMode sslMode = SslMode.On;
 
@@ -566,7 +569,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             try
             {
                 microsoftAuthService = new MicrosoftAuthService();
-                await microsoftAuthService.Authenticate(this);
+                var accessToken = await microsoftAuthService.Authenticate(this);
 
                 var azureUser = await microsoftAuthService.GetAzureUser();
                 var endpointList = await microsoftAuthService.GetAzureEndpointInfoList();
@@ -588,6 +591,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 else
                     endpointInfo = endpointList.First();
 
+                var azureAppProxyInfo = await microsoftAuthService.GetAzureApplicationProxyInfo();
+
                 //We assume that all the connection details are correct (no need to validate or confirm hostname, port, SSL)
                 var azureUserId = azureUser.Id;
                 var hostname = endpointInfo.Hostname;
@@ -603,8 +608,27 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 CommonConfig.Logger.Info("Authenticating with Azure Id...");
 
-                var ci = await authenticator.AuthenticateWithAzureAsync(azureUser, sslMode, hostname, port, token);
+                var ci = new ConnectionInfo();
 
+                azureAppProxyInfo.IsEnabled = true;
+                azureAppProxyInfo.ApplicationProxyClientId = "3880f63b-c6bd-41c0-989e-a6160612d763";
+                azureAppProxyInfo.AppClientId = "3880f63b-c6bd-41c0-989e-a6160612d763";
+
+                //If using Application Proxy get access token for proxy app and use it in http requests to server
+                if(azureAppProxyInfo.IsEnabled
+                    && !string.IsNullOrEmpty(azureAppProxyInfo.AppClientId)
+                    && !string.IsNullOrEmpty(azureAppProxyInfo.ApplicationProxyClientId))
+                {
+                    azureAppProxyAuthService = new AzureAppProxyAuthService(azureAppProxyInfo.AppClientId, azureAppProxyInfo.ApplicationProxyClientId);
+                    accessToken = await azureAppProxyAuthService.Authenticate(this);
+                    PlatformConfig.Preferences.AzureApplicationProxyBearerToken = accessToken;
+                    ci = await authenticator.AuthenticateWithAzureAsync(azureUser, sslMode, hostname, port, token, accessToken);
+                }
+                else
+                {
+                    ci = await authenticator.AuthenticateWithAzureAsync(azureUser, sslMode, hostname, port, token);
+                }
+                
                 await InitializeApplication(ci, token);
             }
             catch (Exception ex)
@@ -757,7 +781,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             return !errors;
         }
 
-        async Task InitializeApplication(ConnectionInfo ci, CancellationToken token)
+        async Task InitializeApplication(ConnectionInfo ci, CancellationToken token, string appToken = "")
         {
             if (token.IsCancellationRequested)
             {
@@ -772,7 +796,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             CommonConfig.Logger.Info($"Initializing {nameof(Managers)}...");
 
-            Managers.Initialize(ci);
+            Managers.Initialize(ci, appToken);
             Managers.DocumentsManager.MaxToFetch = PlatformConfig.Preferences.DocumentsToDownload;
             Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
             Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;

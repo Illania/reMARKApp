@@ -4,6 +4,7 @@
     {
         public string Token { get; set; }
         public string AzureUserId { get; set; }
+        public string AzureAppProxyBearerToken { get; set; }
         public string Username { get; set; }
         public string Hostname { get; set; }
         public string Port { get; set; }
@@ -15,7 +16,8 @@
         public override string ToString()
         {
             return $"[ConnectionInfo: Token={Token}, Username={Username}, Hostname={Hostname}, Port={Port}, " +
-                $"SslMode={SslMode}, DeviceType={DeviceType}, FriendlyDeviceName={FriendlyDeviceName}, InstallationId={InstallationId}]";
+                $"SslMode={SslMode}, DeviceType={DeviceType}, FriendlyDeviceName={FriendlyDeviceName}, InstallationId={InstallationId}]," +
+                $"AzureAppProxyBearerToken={AzureAppProxyBearerToken}";
         }
     }
 }

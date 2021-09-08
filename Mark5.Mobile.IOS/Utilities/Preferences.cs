@@ -55,6 +55,7 @@ namespace Mark5.Mobile.IOS.Utilities
             public const string PushNotificationTokenKey = "PushNotificationToken";
 
             public const string AzureHubRegistrationId = "AzureHubRegistrationId";
+            public const string AzureApplicationProxyBearerToken = "AzureApplicationProxyBearerToken";
 
             public const string ResetOnLaunchKey = "ResetOnLaunch";
 
@@ -293,6 +294,16 @@ namespace Mark5.Mobile.IOS.Utilities
             set
             {
                 ud.SetString(value, Keys.AzureHubRegistrationId);
+                ud.Synchronize();
+            }
+        }
+
+        public string AzureApplicationProxyBearerToken
+        {
+            get => ud.StringForKey(Keys.AzureApplicationProxyBearerToken);
+            set
+            {
+                ud.SetString(value, Keys.AzureApplicationProxyBearerToken);
                 ud.Synchronize();
             }
         }

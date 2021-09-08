@@ -37,7 +37,8 @@ namespace Mark5.Mobile.Common.Testers
                                                           ci.Port,
                                                           CommonConfig.HttpClientHandler,
                                                           null,
-                                                          null);
+                                                          null,
+                                                          ci.AzureAppProxyBearerToken);
 
                 var policy = Policy.Handle<Exception>().WaitAndRetryAsync(attempts, attempt => TimeSpan.FromMilliseconds(timeOut), (exception, calculatedWaitDuration) =>
                 {

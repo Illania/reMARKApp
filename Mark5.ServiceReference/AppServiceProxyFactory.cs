@@ -6,9 +6,10 @@ namespace Mark5.ServiceReference
 {
     public static class AppServiceProxyFactory
     {
-        public static IAppServiceProxy Create(bool ssl, string hostname, string port, Func<HttpMessageHandler> httpClientHandler, Action onStartTransmission, Action onStopTransmission)
+        public static IAppServiceProxy Create(bool ssl, string hostname, string port, Func<HttpMessageHandler> httpClientHandler,
+            Action onStartTransmission, Action onStopTransmission, string bearer = "")
         {
-            return new HttpAppServiceProxy(ssl, hostname, port, httpClientHandler, onStartTransmission, onStopTransmission);
+            return new HttpAppServiceProxy(ssl, hostname, port, httpClientHandler, onStartTransmission, onStopTransmission, bearer);
         }
     }
 }

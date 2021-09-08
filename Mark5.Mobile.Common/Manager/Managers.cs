@@ -22,7 +22,7 @@ namespace Mark5.Mobile.Common.Manager
         public static ICleanUpManager CleanUpManager { get; private set; }
         internal static IActionsManager ActionsManager { get; private set; }
 
-        public static void Initialize(ConnectionInfo connectionInfo)
+        public static void Initialize(ConnectionInfo connectionInfo, string appToken = "")
         {
             ActiveConnectionInfo = connectionInfo ?? throw new ArgumentNullException(nameof(connectionInfo));
 
@@ -31,7 +31,8 @@ namespace Mark5.Mobile.Common.Manager
                                                                 connectionInfo.Port,
                                                                 CommonConfig.HttpClientHandler,
                                                                 CommonConfig.OnStartTransmission,
-                                                                CommonConfig.OnStopTransmission);
+                                                                CommonConfig.OnStopTransmission,
+                                                                appToken);
             var fileTransferServiceProxy = FileTransferServiceProxyFactory.Create(connectionInfo.SslMode != SslMode.Off,
                                                                                   connectionInfo.Hostname,
                                                                                   connectionInfo.Port,

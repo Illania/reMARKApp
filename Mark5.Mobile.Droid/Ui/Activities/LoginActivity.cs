@@ -1,5 +1,7 @@
 using System;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 using Android.App;
@@ -252,6 +254,17 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 dismissAction = Dialogs.ShowInfiniteProgressDialog(this, Resource.String.logging_in, Resource.String.please_wait, cts);
 
                 CommonConfig.Logger.Info("Authenticating...");
+
+                HttpClient httpClient = new HttpClient();
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.ToString());
+                HttpResponseMessage response = await httpClient.GetAsync("https://remarkmobileapp.nordic-it.com/app3");
+
+
+
+
+
+
+
 
                 var ci = await authenticator.AuthenticateWithAzureAsync(azureUser, sslMode, hostname, port.ToString(), token);
 

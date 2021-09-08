@@ -20,11 +20,12 @@ namespace Mark5.Mobile.IOS.PushNotifications
 
         public void UpdateToken(string newToken)
         {
-            if (!ShouldUpdateToken())
-                return;
-
+            
             var oldToken = PlatformConfig.Preferences.PushNotificationToken;
             PlatformConfig.Preferences.PushNotificationToken = newToken;
+
+            if (!ShouldUpdateToken())
+                return;
 
             if (!string.IsNullOrWhiteSpace(oldToken) && oldToken != newToken)
             {

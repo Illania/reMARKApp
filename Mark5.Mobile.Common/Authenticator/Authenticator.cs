@@ -52,7 +52,8 @@ namespace Mark5.Mobile.Common.Authenticator
             return connectionInfo;
         }
 
-        public async Task<ConnectionInfo> AuthenticateWithAzureAsync(AzureUser azureUser, SslMode sslMode, string hostname, string port, CancellationToken ct = default(CancellationToken))
+        public async Task<ConnectionInfo> AuthenticateWithAzureAsync(AzureUser azureUser, SslMode sslMode, string hostname, string port,
+            CancellationToken ct = default(CancellationToken), string accessToken = "")
         {
             var deviceType = CommonConfig.DeviceInfoProvider.GetDeviceType();
             var deviceName = CommonConfig.DeviceInfoProvider.GetDeviceName();
@@ -63,7 +64,8 @@ namespace Mark5.Mobile.Common.Authenticator
                                           port,
                                           CommonConfig.HttpClientHandler,
                                           CommonConfig.OnStartTransmission,
-                                          CommonConfig.OnStopTransmission);
+                                          CommonConfig.OnStopTransmission,
+                                          accessToken);
 
             var result = await proxy.AuthenticateWithAzureAsync(new DataContract.AuthenticateWithAzureParameters
             {
@@ -82,7 +84,8 @@ namespace Mark5.Mobile.Common.Authenticator
                 SslMode = sslMode,
                 DeviceType = deviceType,
                 FriendlyDeviceName = deviceName,
-                InstallationId = deviceId
+                InstallationId = deviceId,
+                AzureAppProxyBearerToken = accessToken
             };
 
             return connectionInfo;
