@@ -240,10 +240,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 else
                     endpointInfo = endpointList.First();
 
+                var azureAppProxyInfo = await microsoftAuthService.GetAzureApplicationProxyInfo();
+
                 //We assume that all the connection details are correct (no need to validate or confirm hostname, port, SSL)
                 var azureUserId = azureUser.Id;
                 var hostname = endpointInfo.Hostname;
-                var port = endpointInfo.Port;
+                var port = endpointInfo.Port.ToString();
                 var sslMode = endpointInfo.UseSsl ? SslMode.On : SslMode.Off;
 
                 CommonConfig.Logger.Info($"Logging in with Azure Id... [azureUserId={azureUserId}, hostname={hostname}, port={port}, ssl={sslMode}]");
@@ -255,20 +257,29 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 CommonConfig.Logger.Info("Authenticating...");
 
-                HttpClient httpClient = new HttpClient();
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.ToString());
-                HttpResponseMessage response = await httpClient.GetAsync("https://remarkmobileapp.nordic-it.com/app3");
+                var ci = new ConnectionInfo();
 
+                azureAppProxyInfo.IsEnabled = true;
+                azureAppProxyInfo.ApplicationProxyClientId = "3880f63b-c6bd-41c0-989e-a6160612d763";
+                azureAppProxyInfo.AppClientId = "3880f63b-c6bd-41c0-989e-a6160612d763";
+                var accessToken = "":
 
+                //If using Application Proxy get access token for proxy app and use it in http requests to server
+                if (azureAppProxyInfo.IsEnabled
+                    && !string.IsNullOrEmpty(azureAppProxyInfo.AppClientId)
+                    && !string.IsNullOrEmpty(azureAppProxyInfo.ApplicationProxyClientId))
+                {
+                    var azureAppProxyAuthService = new AzureAppProxyAuthService(azureAppProxyInfo.AppClientId, azureAppProxyInfo.ApplicationProxyClientId);
+                    accessToken = await azureAppProxyAuthService.Authenticate(this);
+                    PlatformConfig.Preferences.AzureApplicationProxyBearerToken = accessToken;
+                    ci = await authenticator.AuthenticateWithAzureAsync(azureUser, sslMode, hostname, port, token, accessToken);
+                }
+                else
+                {
+                    ci = await authenticator.AuthenticateWithAzureAsync(azureUser, sslMode, hostname, port, token);
+                }
 
-
-
-
-
-
-                var ci = await authenticator.AuthenticateWithAzureAsync(azureUser, sslMode, hostname, port.ToString(), token);
-
-                await InitializeApplication(ci, token);
+                await InitializeApplication(ci, token, accessToken);
             }
             catch (Exception ex)
             {
@@ -361,7 +372,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             return errors;
         }
 
-        async Task InitializeApplication(ConnectionInfo ci, CancellationToken token)
+        async Task InitializeApplication(ConnectionInfo ci, CancellationToken token, string appToken = "")
         {
             if (token.IsCancellationRequested)
             {

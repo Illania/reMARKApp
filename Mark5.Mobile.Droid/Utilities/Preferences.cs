@@ -160,6 +160,17 @@ namespace Mark5.Mobile.Droid.Utilities
             }
         }
 
+        public string AzureApplicationProxyBearerToken
+        {
+            get => sp.GetString(Application.Context.GetString(Resource.String.azure_application_proxy_token), string.Empty);
+            set
+            {
+                var e = sp.Edit();
+                e.PutString(Application.Context.GetString(Resource.String.azure_application_proxy_token), value);
+                e.Commit();
+            }
+        }
+       
         public int LastUserSendingDelay
         {
             get => sp.GetInt(Application.Context.GetString(Resource.String.pref_key_last_user_sending_delay), 0);

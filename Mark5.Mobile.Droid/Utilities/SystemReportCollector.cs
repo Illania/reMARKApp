@@ -109,6 +109,7 @@ namespace Mark5.Mobile.Droid.Utilities
                 sb.AppendLine("Pushy token: " + PlatformConfig.Preferences.PushNotificationToken ?? string.Empty);
             else
                 sb.AppendLine("Firebase Instance ID: " + FirebaseInstanceId.Instance?.Token);
+            sb.AppendLine("Azure Application Proxy Bearer Token: " + PlatformConfig.Preferences.AzureApplicationProxyBearerToken);
             sb.AppendLine();
 
             sb.AppendLine("===== Preferences =====");

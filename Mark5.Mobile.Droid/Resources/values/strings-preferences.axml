@@ -182,6 +182,7 @@
     <string name="pref_search_shortcodes_to_get_summary">Max %s maliling lists will appear in the search results</string>
     <string name="pref_search_partial_word_title">Partial word search</string>
     <string name="push_notification_token">push_notification_token</string>
+    <string name="azure_application_proxy_token">azure_application_proxy_token</string>
     <string name="ssl_off">Disabled</string>
     <string name="ssl_on">Enabled</string>
     <string name="ssl_self_signed">Enabled (allow self-signed)</string>
