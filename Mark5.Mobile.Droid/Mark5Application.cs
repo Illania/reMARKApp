@@ -90,8 +90,8 @@ namespace Mark5.Mobile.Droid
                         var ci = await authenticator.GetConnectionInfoAsync();
 
                         PlatformConfig.SSLCertificateVerificationManager.DisableSelfSignedCertificates();
-                               
-                        Managers.Initialize(ci);
+
+                        Managers.Initialize(ci, PlatformConfig.Preferences.AzureApplicationProxyBearerToken);
                         Managers.DocumentsManager.MaxToFetch = PlatformConfig.Preferences.DocumentsToDownload;
                         Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
                         Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;

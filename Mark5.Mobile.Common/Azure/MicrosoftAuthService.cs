@@ -16,8 +16,8 @@ namespace Mark5.Mobile.Common.Azure
         const string clientId = "ca4a3013-2f7f-4733-aa6c-126c8d34216f";
         const string iosRedirectURI = "msauth.com.nordic-it.mark5.mobile.ios://auth";
         const string androidRedirectURI = "msauth://com.nordic_it.mark5.android/dUOzGWwhv%2BzH%2F6bxqKb4ZlnNC8M%3D";
-        const string extensionName = "com.remark-app.endpoint";
-
+        const string endpointInfoExtName = "com.remark-app.endpoint";
+        const string appProxyExtName = "com.remark-app.proxy";
         readonly string[] scopes = { "User.Read" };
 
         readonly IPublicClientApplication pca;
@@ -28,35 +28,44 @@ namespace Mark5.Mobile.Common.Azure
 
         public MicrosoftAuthService()
         {
-            if (DeviceInfo.Platform == DevicePlatform.iOS)
+            try
             {
-                pca = PublicClientApplicationBuilder.Create(clientId)
-                        .WithRedirectUri(iosRedirectURI)
-                        .WithIosKeychainSecurityGroup("com.microsoft.adalcache")
-                        .Build();
-            }
-            else if (DeviceInfo.Platform == DevicePlatform.Android)
-            {
-                pca = PublicClientApplicationBuilder.Create(clientId)
-                        .WithRedirectUri(androidRedirectURI)
-                        .Build();
-            }
-
-            graphClient = new GraphServiceClient(new DelegateAuthenticationProvider(
-                async (requestMessage) =>
+                if (DeviceInfo.Platform == DevicePlatform.iOS)
                 {
-                    var result = await pca.AcquireTokenSilent(scopes, account)
-                        .ExecuteAsync();
+                    pca = PublicClientApplicationBuilder.Create(clientId)
+                            .WithRedirectUri(iosRedirectURI)
+                            .WithIosKeychainSecurityGroup("com.microsoft.adalcache")
+                            .Build();
 
-                    requestMessage.Headers.Authorization =
-                        new AuthenticationHeaderValue("Bearer", result.AccessToken);
-                }));
+                }
+                else if (DeviceInfo.Platform == DevicePlatform.Android)
+                {
+                    pca = PublicClientApplicationBuilder.Create(clientId)
+                            .WithRedirectUri(androidRedirectURI)
+                            .Build();
+                }
+
+                graphClient = new GraphServiceClient(new DelegateAuthenticationProvider(
+                    async (requestMessage) =>
+                    {
+                        var result = await pca.AcquireTokenSilent(scopes, account)
+                            .ExecuteAsync();
+
+                        requestMessage.Headers.Authorization =
+                            new AuthenticationHeaderValue("Bearer", result.AccessToken);
+                    }));
+            }
+            catch(Exception ex)
+            {
+                var message = ex.Message;
+            }
+           
         }
 
-        public async Task Authenticate(object parentWindow, bool forceInteractive = true)
+        public async Task<string> Authenticate(object parentWindow, bool forceInteractive = true)
         {
             if (account != null && string.IsNullOrEmpty(accessToken))
-                return;
+                return accessToken;
 
             AuthenticationResult authResult = null;
             var accounts = await pca.GetAccountsAsync();
@@ -90,6 +99,7 @@ namespace Mark5.Mobile.Common.Azure
                 directoryId = authResult.TenantId;
                 account = authResult.Account;
             }
+            return accessToken;
         }
 
         public async Task<AzureUser> GetAzureUser()
@@ -111,7 +121,7 @@ namespace Mark5.Mobile.Common.Azure
         {
             var endpointList = new List<AzureEndpointInfo>();
 
-            var extension = await graphClient.Organization[directoryId].Extensions[extensionName].Request().GetAsync();
+            var extension = await graphClient.Organization[directoryId].Extensions[endpointInfoExtName].Request().GetAsync();
             var addData = extension.AdditionalData;
 
             foreach (var key in addData.Keys)
@@ -131,5 +141,42 @@ namespace Mark5.Mobile.Common.Azure
 
             return endpointList;
         }
+
+        public async Task<AzureApplicationProxyInfo> GetAzureApplicationProxyInfo()
+        {
+            var proxyInfo = new AzureApplicationProxyInfo();
+            IDictionary<string, object> addData;
+            try
+            {
+                var extension = await graphClient.Organization[directoryId].Extensions[appProxyExtName].Request().GetAsync();
+                addData = extension.AdditionalData;
+            }
+            catch(Exception ex)
+            {
+                addData = null;
+            }
+            
+
+            if(addData !=  null)
+            {
+                try
+                {
+                    proxyInfo = new AzureApplicationProxyInfo()
+                    {
+                        IsEnabled = Convert.ToBoolean(addData["IsEnabled"]),
+                        AppClientId = Convert.ToString(addData["AppClientId"]),
+                        ApplicationProxyClientId = Convert.ToString(addData["ApplicationProxyClientId"])
+                    };
+                  
+                }
+                catch (Exception ex)
+                {
+                }
+            }
+
+            return proxyInfo;
+        }
+
+
     }
 }
