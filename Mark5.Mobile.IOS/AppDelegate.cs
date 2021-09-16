@@ -126,13 +126,7 @@ namespace Mark5.Mobile.IOS
             {
 
                 UIViewController vc;
-                if (!isLoggedIn)
-                {
-                    vc = new LoginViewController();
-                    Window.RootViewController = vc;
-                    return true;
-                }
-                else
+                try
                 {
                     List<NSUrl> urlList = new();
                     SharedContentInsertType insertType = SharedContentInsertType.File;
@@ -149,6 +143,7 @@ namespace Mark5.Mobile.IOS
                     }
                     else if(url.Scheme == "remark.share.text")
                     {
+                        insertType = SharedContentInsertType.Text;
                         var textFilePath = url.AbsoluteString.Replace("remark.share.text://", "");
                         urlList.Add(new NSUrl(textFilePath));
                     }
@@ -161,6 +156,12 @@ namespace Mark5.Mobile.IOS
 
                     Window.RootViewController = new NavigationController(vc, UIModalPresentationStyle.PageSheet);
 
+                    return true;
+                }
+                catch(Exception ex)
+                {
+                    vc = new LoginViewController();
+                    Window.RootViewController = vc;
                     return true;
                 }
             } 
