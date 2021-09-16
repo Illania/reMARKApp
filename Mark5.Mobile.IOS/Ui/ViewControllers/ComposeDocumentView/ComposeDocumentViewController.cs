@@ -687,7 +687,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         void SendButton_TouchUpInside(object sender, EventArgs e)
         {
-            SendButtonItem_Clicked(sender, new SendButtonClickedEventArgs() { Delayed = false });
+            var useSendingDelay = PlatformConfig.Preferences.SendingDelay > 0;
+            SendButtonItem_Clicked(sender, new SendButtonClickedEventArgs() { Delayed = useSendingDelay, UsePicker = !useSendingDelay });
         }
 
         void SendButton_LongPress()
