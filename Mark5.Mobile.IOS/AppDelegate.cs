@@ -70,13 +70,22 @@ namespace Mark5.Mobile.IOS
                 isLoggedIn = InitializePlatform(application);
                 CommonConfig.Logger.Info("reMARK initialized");
 
-                if (ServerConfig.SystemSettings?.SystemInfo?.NewPushNotificationsSystemAvailable == true)
-                    TinyIoCContainer.Current.Register<IPushNotificationsRegistrator>(new ANHRegistrator());
-                else
-                    TinyIoCContainer.Current.Register<IPushNotificationsRegistrator>(new FCMRegistrator());
-
-                pushNotificationsRegistrator = TinyIoCContainer.Current.Resolve<IPushNotificationsRegistrator>();
-
+                if (isLoggedIn)
+                {
+                    if (ServerConfig.SystemSettings?.SystemInfo?.NewPushNotificationsSystemAvailable == true)
+                    {
+                        TinyIoCContainer.Current.Register<IPushNotificationsRegistrator>(new ANHRegistrator());
+                        CommonConfig.Logger.Info("using ANH registrator...");
+                    }
+                    else
+                    {
+                        TinyIoCContainer.Current.Register<IPushNotificationsRegistrator>(new FCMRegistrator());
+                        CommonConfig.Logger.Info("using FCM registrator...");
+                    }
+                    pushNotificationsRegistrator = TinyIoCContainer.Current.Resolve<IPushNotificationsRegistrator>();
+                }
+                    
+                
 #if DEBUG
                 AnalyticsConfiguration.SharedInstance.SetAnalyticsCollectionEnabled(false);
 #else
@@ -189,8 +198,6 @@ namespace Mark5.Mobile.IOS
             //Check note on background task down
             //if (UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
             //    BGTaskScheduler.Shared.Register(backgroundTaskID, null, HandleBackgroundTask);
-
-            pushNotificationsRegistrator.RequestAuthorization();
 
             if (launchOptions == null)
                 return true;
@@ -486,7 +493,22 @@ namespace Mark5.Mobile.IOS
             
         }
 
-        public void OnAuthorizationRequestCompleted(bool result, NSError error) => pushNotificationsRegistrator.OnAuthorizationRequestCompleted(result, error);
+        public void OnAuthorizationRequestCompleted(bool result, NSError error)
+        {
+            if(pushNotificationsRegistrator == null)
+            {
+                if (ServerConfig.SystemSettings?.SystemInfo?.NewPushNotificationsSystemAvailable == true)
+                {
+                    TinyIoCContainer.Current.Register<IPushNotificationsRegistrator>(new ANHRegistrator());
+                }
+                else
+                {
+                    TinyIoCContainer.Current.Register<IPushNotificationsRegistrator>(new FCMRegistrator());
+                }
+                pushNotificationsRegistrator = TinyIoCContainer.Current.Resolve<IPushNotificationsRegistrator>();
+            }
+            pushNotificationsRegistrator.OnAuthorizationRequestCompleted(result, error);
+        }
 
         //This needs to be implemented to support silent notifications. 
         //Let's not forget the silent notifications limitations (2-3 notifications per hour max, and other limitations per day)
