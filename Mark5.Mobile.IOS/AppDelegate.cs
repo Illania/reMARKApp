@@ -355,6 +355,8 @@ namespace Mark5.Mobile.IOS
                 CommonConfig.Logger.Info($"Not sending the APNS token because the current service version is equal or higher than 3.1.5 and Notifications Not Enabled in China");
                 return;
             }
+
+            //create and update APNS token (for PushSharp)
             string newToken = string.Empty;
             
             try
@@ -386,6 +388,28 @@ namespace Mark5.Mobile.IOS
             //Should be called only for fcm registrator
             if (!(pushNotificationsRegistrator is FCMRegistrator))
                 return;
+
+            CommonConfig.Logger.Info($"Received FCM token: {pushToken}");
+
+            var serviceVersion = ServerConfig.SystemSettings?.SystemInfo?.ServiceVersion;
+
+            if (serviceVersion == null)
+            {
+                CommonConfig.Logger.Info($"It is not possible to update the push notification token because the server version is null");
+                return;
+            }
+
+            if (serviceVersion.CompareTo(new Version(3, 1, 5)) < 0)
+            {
+                CommonConfig.Logger.Info($"Not sending the FCM token because the current service version is less than 3.1.5");
+                return ;
+            }
+
+            if (ServerConfig.SystemSettings?.SystemInfo?.NotificationsInChina == true)
+            {
+                CommonConfig.Logger.Info($"Not sending the FCM token because the current service is using Chinese Notifications");
+                return;
+            }
 
             pushNotificationsRegistrator.UpdateToken(pushToken);
         }

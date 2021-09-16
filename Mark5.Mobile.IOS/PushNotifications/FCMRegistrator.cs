@@ -28,19 +28,6 @@ namespace Mark5.Mobile.IOS.PushNotifications
                 return false;
             }
 
-            if (serviceVersion.CompareTo(new Version(3, 1, 5)) < 0)
-            {
-                CommonConfig.Logger.Info($"Not sending the FCM token because the current service version is less than 3.1.5");
-                CommonConfig.Sentry?.LogInformation($"Not sending the FCM token because the current service version is less than 3.1.5");
-                return false;
-            }
-
-            if (ServerConfig.SystemSettings?.SystemInfo?.NotificationsInChina == true)
-            {
-                CommonConfig.Logger.Info($"Not sending the FCM token because the current service is using Chinese Notifications");
-                CommonConfig.Sentry?.LogInformation($"Not sending the FCM token because the current service is using Chinese Notifications");
-                return false;
-            }
 
             return true;
         }        
