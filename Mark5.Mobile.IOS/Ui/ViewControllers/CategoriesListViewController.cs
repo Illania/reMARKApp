@@ -64,6 +64,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NavigationController.NavigationBar.PrefersLargeTitles = true;
                 NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
             }
+
+            if (UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
+                ModalInPresentation = true;
         }
 
         public override async void ViewDidAppear(bool animated)
