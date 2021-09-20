@@ -245,7 +245,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 //We assume that all the connection details are correct (no need to validate or confirm hostname, port, SSL)
                 var azureUserId = azureUser.Id;
                 var hostname = endpointInfo.Hostname;
-                var port = endpointInfo.Port.ToString();
+                var port = endpointInfo.Port > 0 ? endpointInfo.Port.ToString() : string.Empty;
                 var sslMode = endpointInfo.UseSsl ? SslMode.On : SslMode.Off;
 
                 CommonConfig.Logger.Info($"Logging in with Azure Id... [azureUserId={azureUserId}, hostname={hostname}, port={port}, ssl={sslMode}]");
@@ -258,11 +258,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 CommonConfig.Logger.Info("Authenticating...");
 
                 var ci = new ConnectionInfo();
-
-                azureAppProxyInfo.IsEnabled = true;
-                azureAppProxyInfo.ApplicationProxyClientId = "3880f63b-c6bd-41c0-989e-a6160612d763";
-                azureAppProxyInfo.AppClientId = "3880f63b-c6bd-41c0-989e-a6160612d763";
-                var accessToken = "":
+                var accessToken = "";
 
                 //If using Application Proxy get access token for proxy app and use it in http requests to server
                 if (azureAppProxyInfo.IsEnabled
@@ -374,7 +370,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
         async Task InitializeApplication(ConnectionInfo ci, CancellationToken token, string appToken = "")
         {
-            if (token.IsCancellationRequested)
+            if (token.IsCancellationRequested && string.IsNullOrEmpty(appToken))
             {
                 CommonConfig.Logger.Info($"Authentication was cancelled...");
                 cts = null;
@@ -387,7 +383,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             CommonConfig.Logger.Info($"Initializing {nameof(Managers)}...");
 
-            Managers.Initialize(ci);
+            Managers.Initialize(ci, appToken);
             Managers.DocumentsManager.MaxToFetch = PlatformConfig.Preferences.DocumentsToDownload;
             Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
             Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;

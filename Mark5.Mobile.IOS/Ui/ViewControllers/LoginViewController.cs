@@ -610,10 +610,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var ci = new ConnectionInfo();
 
-                azureAppProxyInfo.IsEnabled = true;
-                azureAppProxyInfo.ApplicationProxyClientId = "3880f63b-c6bd-41c0-989e-a6160612d763";
-                azureAppProxyInfo.AppClientId = "3880f63b-c6bd-41c0-989e-a6160612d763";
-
                 //If using Application Proxy get access token for proxy app and use it in http requests to server
                 if(azureAppProxyInfo.IsEnabled
                     && !string.IsNullOrEmpty(azureAppProxyInfo.AppClientId)
@@ -629,7 +625,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     ci = await authenticator.AuthenticateWithAzureAsync(azureUser, sslMode, hostname, port, token);
                 }
                 
-                await InitializeApplication(ci, token);
+                await InitializeApplication(ci, token, accessToken);
             }
             catch (Exception ex)
             {
@@ -783,7 +779,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async Task InitializeApplication(ConnectionInfo ci, CancellationToken token, string appToken = "")
         {
-            if (token.IsCancellationRequested)
+            if (token.IsCancellationRequested && string.IsNullOrEmpty(appToken))
             {
                 CommonConfig.Logger.Info($"Authentication was cancelled...");
                 cts = null;
