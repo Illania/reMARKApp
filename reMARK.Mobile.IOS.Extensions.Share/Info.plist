@@ -7,7 +7,7 @@
 	<key>CFBundleName</key>
 	<string>reMARK.Mobile.IOS.Extensions.Share</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.nordic-it.mark5.mobile.ios.extensions.share</string>
+	<string>com.nordic-it.mark5.mobile.ios.share</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleInfoDictionaryVersion</key>
@@ -15,12 +15,12 @@
 	<key>CFBundlePackageType</key>
 	<string>XPC!</string>
 	<key>CFBundleShortVersionString</key>
-	<string>5.9</string>
+	<string>5.10</string>
 	<key>CFBundleVersion</key>
-	<string>543</string>
+	<string>547</string>
 	<key>MinimumOSVersion</key>
-	<string>14.4</string>
-<key>NSExtension</key>
+	<string>10.0</string>
+	<key>NSExtension</key>
 	<dict>
 		<key>NSExtensionAttributes</key>
 		<dict>
