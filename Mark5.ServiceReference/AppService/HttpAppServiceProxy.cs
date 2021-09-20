@@ -50,10 +50,9 @@ namespace Mark5.ServiceReference.AppService
                     Timeout = TimeSpan.FromSeconds(useShortTimeout ? Config.HttpClientShortTimeoutSeconds : Config.HttpClientTimeoutSeconds)
                 })
                 {
-                    if(!string.IsNullOrEmpty(bearerToken))
-                        c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
                     var req = CreateRequest(soapAction, parameters, checkXmlCharacters, bearerToken);
-                    var res = await c.SendAsync(req, ct);
+                    var useBearerToken = !string.IsNullOrEmpty(bearerToken);
+                    var res = useBearerToken ? await c.SendAsync(req) : await c.SendAsync(req, ct);
                     statusCode = res.StatusCode;
                     return await ProcessResponse<R>(soapAction, res);
                 }
