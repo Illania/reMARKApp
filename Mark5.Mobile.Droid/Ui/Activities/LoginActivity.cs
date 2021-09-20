@@ -258,10 +258,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 CommonConfig.Logger.Info("Authenticating...");
 
                 var ci = new ConnectionInfo();
-
-                azureAppProxyInfo.IsEnabled = true;
-                azureAppProxyInfo.ApplicationProxyClientId = "3880f63b-c6bd-41c0-989e-a6160612d763";
-                azureAppProxyInfo.AppClientId = "ad89dd92-46a4-44c1-adfe-362c6bdfefa2";
                 var accessToken = "";
 
                 //If using Application Proxy get access token for proxy app and use it in http requests to server
