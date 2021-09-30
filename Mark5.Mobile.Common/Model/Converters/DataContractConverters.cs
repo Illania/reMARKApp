@@ -1101,6 +1101,16 @@ namespace Mark5.Mobile.Common.Model.Converters
             return favorites;
         }
 
+        public static DataContract.RecentAddress Convert(this RecentAddress ra)
+        {
+            return new DataContract.RecentAddress
+            {
+                Name = ra.Name,
+                AddressType = ra.AddressType.ConvertEnum<DataContract.DocumentAddressType>(),
+                Address = ra.Address
+            };
+        }
+
         #endregion
 
         #region ICalendar

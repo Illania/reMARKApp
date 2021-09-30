@@ -426,6 +426,11 @@ namespace Mark5.ServiceReference.AppService
             return await InvokeAsync<GetRecentAddressesResult, GetRecentAddressesParameters>("GetRecentAddresses", parameters, ct);
         }
 
+        public async Task<DeleteRecentAddressesResult> DeleteRecentAddressesAsync(DeleteRecentAddressesParameters parameters, CancellationToken ct = default(CancellationToken))
+        {
+            return await InvokeAsync<DeleteRecentAddressesResult, DeleteRecentAddressesParameters>("DeleteRecentAddresses", parameters, ct);
+        }
+
         public async Task<FileToFolderResult> FileToFolderAsync(FileToFolderParameters parameters, CancellationToken ct = default(CancellationToken))
         {
             return await InvokeAsync<FileToFolderResult, FileToFolderParameters>("FileToFolder", parameters, ct);

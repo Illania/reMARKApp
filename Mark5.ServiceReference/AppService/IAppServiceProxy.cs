@@ -143,6 +143,8 @@ namespace Mark5.ServiceReference.AppService
 
         Task<GetRecentAddressesResult> GetRecentAddressesAsync(GetRecentAddressesParameters parameters, CancellationToken ct = default(CancellationToken));
 
+        Task<DeleteRecentAddressesResult> DeleteRecentAddressesAsync(DeleteRecentAddressesParameters parameters, CancellationToken ct = default(CancellationToken));
+
         Task<FileToFolderResult> FileToFolderAsync(FileToFolderParameters parameters, CancellationToken ct = default(CancellationToken));
 
         Task<CopyToWorktrayResult> CopyToWorktrayAsync(CopyToWorktrayParameters parameters, CancellationToken ct = default(CancellationToken));

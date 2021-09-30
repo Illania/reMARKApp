@@ -2341,11 +2341,23 @@ namespace Mark5.ServiceReference.DataContract
     {
     }
 
+    [DataContract(Name = "DeleteRecentAddressesParameters", Namespace = "com.nordic-it.appservice.v3")]
+    public class DeleteRecentAddressesParameters : AbstractParameters
+    {
+        [DataMember(Name = "RecentAddresses", Order = 0)]
+        public List<RecentAddress> RecentAddresses { get; set; } = new List<RecentAddress>();
+    }
+
     [DataContract(Name = "GetRecentAddressesResult", Namespace = "com.nordic-it.appservice.v3")]
     public class GetRecentAddressesResult
     {
         [DataMember(Name = "RecentAddresses", Order = 0)]
         public List<RecentAddress> RecentAddresses { get; set; } = new List<RecentAddress>();
+    }
+
+    [DataContract(Name = "DeleteRecentAddressesResult", Namespace = "com.nordic-it.appservice.v3")]
+    public class DeleteRecentAddressesResult
+    {
     }
 
     [DataContract(Name = "FileToFolderParameters", Namespace = "com.nordic-it.appservice.v3")]

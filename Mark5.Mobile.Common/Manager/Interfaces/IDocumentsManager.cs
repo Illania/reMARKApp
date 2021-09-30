@@ -48,6 +48,8 @@ namespace Mark5.Mobile.Common.Manager
 
         Task<List<RecentAddress>> GetRecentAddressesAsync(SourceType sourceType = SourceType.Auto);
 
+        Task<List<RecentAddress>> DeleteRecentAddressesAsync(List<RecentAddress> recentAddresses, SourceType sourceType = SourceType.Auto);
+
         Task<List<Category>> GetAllCategoriesAsync(SourceType sourceType = SourceType.Auto);
 
         Task SetCategoriesAsync(DocumentPreview documentPreview, List<Category> categories, SourceType sourceType = SourceType.Auto);
