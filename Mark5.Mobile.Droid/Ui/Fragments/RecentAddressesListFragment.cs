@@ -1,13 +1,20 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
+using Android.Graphics;
+using Android.Graphics.Drawables;
 using Android.OS;
+using Android.Support.V4.Content;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
+using Android.Support.V7.Widget.Helper;
+using Android.Text;
+using Android.Util;
 using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
@@ -15,6 +22,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
+using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -27,6 +35,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         RecentAddressesListAdapter adapter;
 
         List<RecentAddress> recentAddresses;
+
+        Action dismissAction;
+
+        SwipeHelperCallback swipeHelperCallback;
+        ItemTouchHelper itemTouchHelper;
 
         public static (RecentAddressesListFragment fragment, string tag) NewInstance()
         {
@@ -71,6 +84,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 recyclerView.Visibility = adapter.ItemCount > 0 ? ViewStates.Visible : ViewStates.Gone;
             }));
             recyclerView.SetAdapter(adapter);
+
+            swipeHelperCallback = new SwipeHelperCallback(Context, this, adapter, refreshLayout);
+            itemTouchHelper = new ItemTouchHelper(swipeHelperCallback);
+            itemTouchHelper.AttachToRecyclerView(recyclerView);
 
             HasOptionsMenu = false;
 
@@ -130,6 +147,32 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             Activity?.Finish();
         }
 
+        async void DeleteAction(List<RecentAddress> items)
+        {
+            var yesNo = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete, Resource.String.delete_are_you_sure);
+            if (!yesNo)
+                return;
+
+            CommonConfig.Logger.Info($"Attempting to delete [businessEntities.Count={items.Count}]...");
+
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.deleting, Resource.String.please_wait);
+
+            try
+            {
+                await Managers.DocumentsManager.DeleteRecentAddressesAsync(items);
+                adapter.RemoveItems(items);
+                dismissAction();
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Deleting failed [businessEntities.Count={items.Count}]", ex);
+
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+            }
+        }
+
         class RecentAddressesListAdapter : RecyclerView.Adapter
         {
             public override int ItemCount => Items.Count;
@@ -163,7 +206,182 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 NotifyItemRangeInserted(0, ItemCount);
             }
 
-            class RecentAddressViewHolder : RecyclerView.ViewHolder
+            public void RemoveItems(List<RecentAddress> items)
+            {
+                foreach (var item in items)
+                {
+                    var position = GetPosition(item);
+                    if (position >= 0)
+                    {
+                        Items.RemoveAt(position);
+                        NotifyItemRemoved(position);
+                    }
+                }
+            }
+
+            public int GetPosition(int raId)
+            {
+                var position = -1;
+                for (var i = 0; i < Items.Count; i++)
+                    if (Items[i].Id == raId)
+                    {
+                        position = i;
+                        break;
+                    }
+
+                return position;
+            }
+
+            public int GetPosition(RecentAddress ra)
+            {
+                return GetPosition(ra.Id);
+            }
+        }
+
+        class SwipeHelperCallback : ItemTouchHelper.Callback
+        {
+            public bool Enabled { get; set; } = true;
+
+            readonly Context context;
+            readonly RecentAddressesListAdapter adapter;
+            readonly RecentAddressesListFragment fragment;
+            readonly SwipeRefreshLayout refreshLayout;
+            Drawable rightBackground;
+
+            public SwipeHelperCallback(Context context, RecentAddressesListFragment fragment, RecentAddressesListAdapter adapter,
+                SwipeRefreshLayout refreshLayout)
+            {
+                this.context = context;
+                this.fragment = fragment;
+                this.adapter = adapter;
+                this.refreshLayout = refreshLayout;
+            }
+
+            public override int GetMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder)
+            {
+                if (!Enabled)
+                    return MakeMovementFlags(0, 0);
+
+                return MakeMovementFlags(0, ItemTouchHelper.Left | ItemTouchHelper.Right);
+            }
+
+            public override bool OnMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target)
+            {
+                return false;
+            }
+
+            public override void OnSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState)
+            {
+                base.OnSelectedChanged(viewHolder, actionState);
+
+                refreshLayout.Enabled = actionState == ItemTouchHelper.ActionStateIdle;
+            }
+
+            public override void OnChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, bool isCurrentlyActive)
+            {
+
+                if (actionState != ItemTouchHelper.ActionStateSwipe || viewHolder.AdapterPosition == -1) //Sometimes it gets called for viewHolders that are already gone
+                    return;
+
+                var itemView = viewHolder.ItemView;
+                var itemViewHeight = itemView.Bottom - itemView.Top;
+
+                var paint = new TextPaint();
+                paint.TextSize = (int)TypedValue.ApplyDimension(ComplexUnitType.Sp, 14, Android.App.Application.Context.Resources.DisplayMetrics);
+                paint.Color = Color.White;
+                paint.TextAlign = Paint.Align.Left;
+                paint.SetTypeface(Typeface.Create(Typeface.Default, TypefaceStyle.Normal));
+
+                var iconMargin = Conversion.ConvertDpToPixels(30);
+
+                var baseline = -paint.Ascent();
+                var textHeight = (int)(baseline + paint.Descent() + 0.5f);
+
+                if (dX < 0)
+                {
+                    Preferences.RecentAddressSwipeAction action = Preferences.RecentAddressSwipeAction.Delete;
+                    int bgColor = Resource.Color.darkblue;
+                    rightBackground = new ColorDrawable(new Color(ContextCompat.GetColor(context, bgColor)));
+                    string text = GetSwipeActionTitle(action, viewHolder.AdapterPosition);
+                    rightBackground.SetBounds(itemView.Right + (int)dX, itemView.Top, itemView.Right, itemView.Bottom);
+                    rightBackground.Draw(c);
+                    var textLayout = new StaticLayout(text, paint, c.Width, Layout.Alignment.AlignNormal, 1, 0, false);
+                    var iconWidth = text.Split(new string[]
+                            {
+                            "\n"
+                            },
+                            StringSplitOptions.None)
+                        .Select(s => (int)(paint.MeasureText(s) + 0.5f))
+                        .Max();
+
+                    var textRight = itemView.Right - iconMargin;
+                    var textLeft = textRight - iconWidth;
+                    var textTop = itemView.Top + (itemViewHeight - textHeight)/ 2;
+
+                    c.Save();
+                    c.Translate(textLeft, textTop);
+                    textLayout.Draw(c);
+                    c.Restore();
+                }
+
+                base.OnChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+            }
+
+
+        public override void OnSwiped(RecyclerView.ViewHolder viewHolder, int direction)
+        {
+            ResetViewHolder(viewHolder, direction);
+            if (direction == ItemTouchHelper.Left)
+            {
+                SwipeActionSelected(Preferences.RecentAddressSwipeAction.Delete, viewHolder.AdapterPosition);
+            }
+            else if (direction == ItemTouchHelper.Right)
+            {
+                SwipeActionSelected(Preferences.RecentAddressSwipeAction.Delete, viewHolder.AdapterPosition);
+            }
+        }
+
+        void ResetViewHolder(RecyclerView.ViewHolder viewHolder, int direction)
+        {
+            var position = viewHolder.AdapterPosition;
+            var view = viewHolder.ItemView;
+
+            viewHolder.ItemView.TranslationX = 0;
+            viewHolder.ItemView.TranslationY = 0;
+
+            adapter.NotifyItemChanged(position);
+        }
+
+        async void SwipeActionSelected(Preferences.RecentAddressSwipeAction action, int adapterPosition)
+        {
+            CommonConfig.UsageAnalytics.LogEvent(new SwipeActionUsedEvent());
+
+            
+                switch (action)
+                {
+                    case Preferences.RecentAddressSwipeAction.Delete:
+                        fragment.DeleteAction(new List<RecentAddress>() { adapter.Items[adapterPosition] });
+                        break;
+                }
+            
+
+        }
+
+        string GetSwipeActionTitle(Preferences.RecentAddressSwipeAction action, int position)
+        {
+            switch (action)
+            {
+                case Preferences.RecentAddressSwipeAction.Delete:
+                    return context.Resources.GetString(Resource.String.delete);
+                default:
+                    return "Forgot case ?";
+            }
+        }
+
+
+    }
+
+        class RecentAddressViewHolder : RecyclerView.ViewHolder
             {
                 public string Address { set => addressTextView.Text = value; }
 
@@ -183,7 +401,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     }
                 }
 
-                readonly AppCompatTextView addressTextView;
+            readonly AppCompatTextView addressTextView;
                 readonly AppCompatTextView nameTextView;
 
                 public RecentAddressViewHolder(View itemView) : base(itemView)
@@ -192,7 +410,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     nameTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_recipients_name);
                 }
             }
-        }
 
     }
+
 }

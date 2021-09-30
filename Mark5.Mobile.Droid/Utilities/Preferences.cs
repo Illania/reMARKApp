@@ -278,6 +278,13 @@ namespace Mark5.Mobile.Droid.Utilities
 
         #endregion
 
+        #region Recent Address swipe actions
+        public enum RecentAddressSwipeAction
+        {         
+            Delete = 1
+        }
+        #endregion
+
         #region Folders favorites
 
         public bool SyncFavoritesEnabled

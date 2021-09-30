@@ -322,6 +322,7 @@
 		<Compile Include="Utilities\AttachmentsUtilities.cs" />
 		<Compile Include="Ui\ViewControllers\TransitionViewController.cs" />
 		<Compile Include="Utilities\Extensions\DateTimeExtensions.cs" />
+		<Compile Include="Utilities\RecentAddressSwipeAction.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

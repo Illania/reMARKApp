@@ -399,7 +399,7 @@ namespace Mark5.Mobile.Common.Manager
                     Token = Token,
                     RecentAddresses = recentAddresses.WhereNotNull().Select(ra => ra.Convert()).ToList()
                 };
-                var result = await AppServiceProxy.DeleteRecentAddressesAsync(parameters);
+                await AppServiceProxy.DeleteRecentAddressesAsync(parameters);
 
                 return recentAddresses;
             }
