@@ -383,6 +383,30 @@ namespace Mark5.Mobile.Common.Manager
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
+        public async Task<List<RecentAddress>> DeleteRecentAddressesAsync(List<RecentAddress> recentAddresses, SourceType sourceType = SourceType.Auto)
+        {
+            if(recentAddresses == null)
+                recentAddresses = new List<RecentAddress>();
+
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
+            {
+
+                var parameters = new DataContract.DeleteRecentAddressesParameters
+                {
+                    Token = Token,
+                    RecentAddresses = recentAddresses.WhereNotNull().Select(ra => ra.Convert()).ToList()
+                };
+                var result = await AppServiceProxy.DeleteRecentAddressesAsync(parameters);
+
+                return recentAddresses;
+            }
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
+
         public async Task<List<Category>> GetAllCategoriesAsync(SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)

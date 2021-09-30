@@ -141,11 +141,76 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             DismissViewController(true, null);
         }
 
+        void OnSwipeActionClick(EmailSwipeAction swipeAction, NSIndexPath indexPath, RecentAddress ra, UITableView tableView)
+        {
+
+
+            var popoverDelegate = new PopoverPresentationControllerDelegate(tableView, tableView.CellAt(indexPath));
+
+
+            switch (swipeAction.Action)
+            {
+
+
+                case EmailSwipeAction.SwipeAction.Delete:
+                    Delete(ra, popoverDelegate);
+                    break;
+
+
+            }
+        }
+
         void ExitEditItem_Clicked(object sender, EventArgs e)
         {
             tcs.SetResult(null);
             DismissViewController(true, null);
         }
+
+
+        void Delete(RecentAddress ra, UIPopoverPresentationControllerDelegate d) =>
+            Delete(new List<RecentAddress> { ra }, d);
+
+        async void Delete(List<RecentAddress> recentAddresses, UIPopoverPresentationControllerDelegate d)
+        {
+            var result = await Dialogs.ShowDestructiveActionSheetAsync(this, Localization.GetString("delete"), d, Localization.GetString("confirm_deletion"));
+            if (!result)
+            {
+                return;
+            }
+
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("deleting___"));
+
+            try
+            {
+                CommonConfig.Logger.Info($"Attempting to delete recent addresses");
+                await Managers.DocumentsManager.DeleteRecentAddressesAsync(recentAddresses);
+
+                RemoveRecentAddressesFromList(recentAddresses.Select(s => s.Id));
+
+                dismissAction();
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Error while deleting recent addresses", ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
+            }
+        }
+
+        void RemoveRecentAddressesFromList(IEnumerable<int> ids)
+        {
+            BeginInvokeOnMainThread(() =>
+            {
+          
+                    var dataSource = ((DataSource)TableView.Source) as DataSource;
+                    dataSource?.RemoveItems(ids);
+               
+                ((DataSource)TableView.Source).RemoveItems(ids);
+   
+            });
+        }
+
 
         class DataSource : UITableViewSource
         {
@@ -215,6 +280,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
 
+            public void RemoveItems(IEnumerable<int> documentIds)
+            {
+                var indices = items.Select((d, i) => new { d, i })
+                                   .Where(x => documentIds.Contains(x.d.Id))
+                                   .Select(x => x.i)
+                                   .OrderByDescending(i => i)
+                                   .ToArray();
+
+                foreach (var i in indices)
+                    items.RemoveAt(i);
+
+                tableViewWeakReference.Unwrap()?.BeginUpdates();
+
+                if (!items.Any())
+                    tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Automatic);
+                else
+                {
+                    var indexPaths = indices.Select(i => NSIndexPath.FromRowSection(i, 0)).ToArray();
+                    tableViewWeakReference.Unwrap()?.DeleteRows(indexPaths, UITableViewRowAnimation.Automatic);
+                }
+
+                tableViewWeakReference.Unwrap()?.EndUpdates();
+            }
+
             public void Reset()
             {
                 loading = true;
@@ -227,6 +316,126 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
                 tableViewWeakReference.Unwrap()?.EndUpdates();
             }
+
+            #region Swipe related
+
+            class SwipeActionUIWrapper
+            {
+                public UITableViewRowAction Action { get; set; }
+                public bool Disabled;
+            }
+
+            UIContextualAction BuildLeadingContextualAction(UITableView tableView, NSIndexPath indexPath)
+            {
+                if (indexPath == null)
+                    return null;
+
+                var ra = items[indexPath.Row];
+
+                EmailSwipeAction leadingAction = new EmailSwipeAction(EmailSwipeAction.SwipeAction.Delete);
+
+                string title = "delete";
+
+                var contextualAction = UIContextualAction.FromContextualActionStyle(UIContextualActionStyle.Normal, title, (someAction, view, success) =>
+                {
+                    viewControllerWeakReference.Unwrap()?.OnSwipeActionClick(leadingAction, indexPath, ra , tableView);
+                });
+
+                contextualAction.BackgroundColor = Theme.LightBrown;
+                return contextualAction;
+            }
+
+            public override UISwipeActionsConfiguration GetLeadingSwipeActionsConfiguration(UITableView tableView, NSIndexPath indexPath)
+            {
+                var leadingSwipe = UISwipeActionsConfiguration.FromActions(new UIContextualAction[] { BuildLeadingContextualAction(tableView, indexPath) });
+
+                leadingSwipe.PerformsFirstActionWithFullSwipe = true;
+
+                var actions = leadingSwipe.Actions[0];
+                if (!leadingSwipe.Actions.Any(a => a != null))
+                    return null;
+
+                return leadingSwipe;
+            }
+
+
+
+            public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
+            {
+                if (indexPath == null)
+                {
+                    CommonConfig.Logger.Warning($"IndexPath in DocumentListViewController.EditActionsForRow() was null.");
+                    return null;
+                }
+
+                var actionWrappers = new List<SwipeActionUIWrapper>();
+
+                if (indexPath.Row < 0 || indexPath.Row >= items.Count)
+                    return actionWrappers.Select(a => a.Action).ToArray();
+
+                var ra = items[indexPath.Row];
+
+                if (ra == null)
+                {
+                    CommonConfig.Logger.Warning($"DocumentPreview in DocumentListViewController.EditActionsForRow() was null");
+                    return null;
+                }
+
+                List<EmailSwipeAction> trailingSwipeActions = new List<EmailSwipeAction> { new EmailSwipeAction(EmailSwipeAction.SwipeAction.Delete) };
+
+                foreach (EmailSwipeAction swipeAction in trailingSwipeActions)
+                {
+                    SwipeActionUIWrapper actionWrapper = new SwipeActionUIWrapper();
+
+                    switch (swipeAction.Action)
+                    {
+                        case EmailSwipeAction.SwipeAction.Delete:
+                            actionWrapper.Action = UITableViewRowAction.Create(
+                                UITableViewRowActionStyle.Default,
+                               "delete",
+                                (a, ip) =>
+                                {
+                                    viewControllerWeakReference.Unwrap()?.OnSwipeActionClick(swipeAction, indexPath, ra, tableView);
+                                });
+
+                            break;
+
+                        default:
+                            break;
+                    }
+
+                    actionWrappers.Add(actionWrapper);
+                }
+
+                for (int i = 0; i < actionWrappers.Count; i++)
+                {
+                    if (actionWrappers[i].Disabled)
+                    {
+                        actionWrappers[i].Action.BackgroundColor = Theme.LightGray;
+                    }
+                    else
+                    {
+                        if (i == 0)
+                        {
+                            actionWrappers[i].Action.BackgroundColor = Theme.Brown;
+                        }
+                        else if (i == 1)
+                        {
+                            actionWrappers[i].Action.BackgroundColor = Theme.DarkBlue;
+                        }
+                        else
+                        {
+                            actionWrappers[i].Action.BackgroundColor = Theme.DarkerBlue;
+                        }
+                    }
+                }
+
+                UITableViewRowAction[] returnActions = actionWrappers.Select(a => a.Action).ToArray();
+
+                return returnActions;
+            }
+            #endregion
+
         }
     }
 }
