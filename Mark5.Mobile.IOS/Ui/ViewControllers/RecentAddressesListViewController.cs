@@ -141,7 +141,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             DismissViewController(true, null);
         }
 
-        void OnSwipeActionClick(EmailSwipeAction swipeAction, NSIndexPath indexPath, RecentAddress ra, UITableView tableView)
+        void OnSwipeActionClick(RecentAddressSwipeAction swipeAction, NSIndexPath indexPath, RecentAddress ra, UITableView tableView)
         {
 
 
@@ -152,7 +152,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
 
 
-                case EmailSwipeAction.SwipeAction.Delete:
+                case RecentAddressSwipeAction.SwipeAction.Delete:
                     Delete(ra, popoverDelegate);
                     break;
 
@@ -332,7 +332,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var ra = items[indexPath.Row];
 
-                EmailSwipeAction leadingAction = new EmailSwipeAction(EmailSwipeAction.SwipeAction.Delete);
+                RecentAddressSwipeAction leadingAction = new RecentAddressSwipeAction(RecentAddressSwipeAction.SwipeAction.Delete);
 
                 string title = "delete";
 
@@ -381,15 +381,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return null;
                 }
 
-                List<EmailSwipeAction> trailingSwipeActions = new List<EmailSwipeAction> { new EmailSwipeAction(EmailSwipeAction.SwipeAction.Delete) };
+                List<RecentAddressSwipeAction> trailingSwipeActions = new List<RecentAddressSwipeAction> { new RecentAddressSwipeAction(RecentAddressSwipeAction.SwipeAction.Delete) };
 
-                foreach (EmailSwipeAction swipeAction in trailingSwipeActions)
+                foreach (RecentAddressSwipeAction swipeAction in trailingSwipeActions)
                 {
                     SwipeActionUIWrapper actionWrapper = new SwipeActionUIWrapper();
 
                     switch (swipeAction.Action)
                     {
-                        case EmailSwipeAction.SwipeAction.Delete:
+                        case RecentAddressSwipeAction.SwipeAction.Delete:
                             actionWrapper.Action = UITableViewRowAction.Create(
                                 UITableViewRowActionStyle.Default,
                                "delete",
@@ -397,7 +397,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                                 {
                                     viewControllerWeakReference.Unwrap()?.OnSwipeActionClick(swipeAction, indexPath, ra, tableView);
                                 });
-
                             break;
 
                         default:
