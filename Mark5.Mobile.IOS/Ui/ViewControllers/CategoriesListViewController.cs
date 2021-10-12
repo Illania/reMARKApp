@@ -19,8 +19,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
     public class CategoriesListViewController : AbstractTableViewController, IUISearchResultsUpdating
     {
         BusinessEntityPreview BusinessEntityPreview { get; set; }
-        List<Category> categories = new List<Category>();
         List<Category> allCategories = new List<Category>();
+        List<Category> selectedCategories = new List<Category>();
+        List<Category> availableCategories = new List<Category>();
+        List<Category> favoriteCategories = new List<Category>();
         UIBarButtonItem cancelBtnItem;
         UIBarButtonItem saveBtnItem;
         UISearchController searchController;
@@ -33,12 +35,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             BusinessEntityPreview = businessEntityPreview;
             if (businessEntityPreview is DocumentPreview documentPreview)
             {
-                categories.AddRange(documentPreview.Categories);
+                selectedCategories.AddRange(documentPreview.Categories);
             }
 
             if (businessEntityPreview is ContactPreview contactPreview)
             {
-                categories.AddRange(contactPreview.Categories);
+                selectedCategories.AddRange(contactPreview.Categories);
             }
         }
 
@@ -143,14 +145,38 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 saveBtnItem.Clicked -= SaveBtnItem_Clicked;
         }
         #endregion
-
+        
         public async Task RefreshDataAsync()
+        {
+            try
+            {
+               availableCategories = BusinessEntityPreview is DocumentPreview documentPreview
+                    ? await Managers.DocumentsManager.GetAllCategoriesAsync()
+                    : await Managers.ContactsManager.GetAllCategoriesAsync();
+                var favoriteCategoriesIds = await Managers.CommonActionsManager.GetFavoriteCategories();
+                if(favoriteCategoriesIds != null)
+                    favoriteCategories = availableCategories.Where(c => c != null && favoriteCategoriesIds.Contains(c.Id)).ToList();
+
+            }
+            catch (Exception ex)
+            {
+                await Dialogs.ShowErrorAlertAsync(this, ex);
+            }
+
+            ReloadTable();
+        }
+
+        public async Task RefreshFavorites()
         {
             try
             {
                 allCategories = BusinessEntityPreview is DocumentPreview documentPreview
                     ? await Managers.DocumentsManager.GetAllCategoriesAsync()
                     : await Managers.ContactsManager.GetAllCategoriesAsync();
+                var favoriteCategoriesIds = await Managers.CommonActionsManager.GetFavoriteCategories();
+                if (favoriteCategoriesIds != null)
+                    favoriteCategories = allCategories.Where(c => c != null && favoriteCategoriesIds.Contains(c.Id)).ToList();
+
             }
             catch (Exception ex)
             {
@@ -162,16 +188,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void ReloadTable()
         {
-            var availableCategories = new List<Category>();
+            
+            selectedCategories.Sort((x, y) => string.Compare(x.Name, y.Name, true));
+            ((DataSource)TableView.Source).SetItems(DataSource.Section.Selected, selectedCategories);
 
-            categories.Sort((x, y) => string.Compare(x.Name, y.Name, true));
+            favoriteCategories.Sort((x, y) => string.Compare(x.Name, y.Name, true));
+            ((DataSource)TableView.Source).SetItems(DataSource.Section.Favorite, favoriteCategories);
 
-            ((DataSource)TableView.Source).SetItems(DataSource.Section.Selected, categories);
-            availableCategories = allCategories.Where(x => !categories.Contains(x)).ToList();
-
-            availableCategories.Sort((x, y) => string.Compare(x.Name, y.Name, true));
-
-            ((DataSource)TableView.Source).SetItems(DataSource.Section.Available, availableCategories);
+            var _availableCategories = new List<Category>();
+            _availableCategories = availableCategories.Where(x => !selectedCategories.Contains(x)).ToList();
+            _availableCategories.Sort((x, y) => string.Compare(x.Name, y.Name, true));
+            ((DataSource)TableView.Source).SetItems(DataSource.Section.Available, _availableCategories);
 
             if (searchController != null)
                 searchController.Active = false;
@@ -184,20 +211,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (category == null)
                 return;
 
-            if (categories.Contains(category))
+            if (selectedCategories.Contains(category))
             {
-                categories.Remove(category);
+                selectedCategories.Remove(category);
             }
             else
             {
-                categories.Add(category);
+                selectedCategories.Add(category);
             }
         }
 
         List<Category> GetAvailableCategories()
         {
-            ((DataSource)TableView.Source).SetItems(DataSource.Section.Selected, categories);
-            return allCategories.Where(x => !categories.Contains(x)).ToList();
+            ((DataSource)TableView.Source).SetItems(DataSource.Section.Selected, selectedCategories);
+            return availableCategories.Where(x => !selectedCategories.Contains(x)).ToList();
         }
 
         #region Search related
@@ -268,7 +295,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var searchResultCategories = new List<Category>();
 
-                searchResultCategories = allCategories.Where(x => x.Name.ToLower().Contains(searchText.ToLower()) && !categories.Contains(x)).ToList();
+                searchResultCategories = availableCategories.Where(x => x.Name.ToLower().Contains(searchText.ToLower()) && !selectedCategories.Contains(x)).ToList();
 
                 if (cancellationToken.IsCancellationRequested)
                     return;
@@ -285,8 +312,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         #region Navigation bar related
         async void CancelBtnItem_Clicked(object sender, EventArgs e)
         {
-            if (BusinessEntityPreview is DocumentPreview documentPreview && categories.SequenceEqual(documentPreview.Categories)
-              || BusinessEntityPreview is ContactPreview contactPreview && categories.SequenceEqual(contactPreview.Categories))
+            if (BusinessEntityPreview is DocumentPreview documentPreview && selectedCategories.SequenceEqual(documentPreview.Categories)
+              || BusinessEntityPreview is ContactPreview contactPreview && selectedCategories.SequenceEqual(contactPreview.Categories))
             {
                 DismissViewController(true, null);
             }
@@ -308,10 +335,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             try
             {
                 if (BusinessEntityPreview is DocumentPreview documentPreview)
-                    await Managers.DocumentsManager.SetCategoriesAsync(documentPreview, categories);
+                    await Managers.DocumentsManager.SetCategoriesAsync(documentPreview, selectedCategories);
 
                 if (BusinessEntityPreview is ContactPreview contactPreview)
-                    await Managers.ContactsManager.SetCategoriesAsync(contactPreview, categories);
+                    await Managers.ContactsManager.SetCategoriesAsync(contactPreview, selectedCategories);
                 dismissAction();
                 DismissViewController(true, null);
             }
@@ -326,13 +353,76 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         }
         #endregion
 
+        #region Swipe related
+
+
+        void OnSwipeActionClick(CategorySwipeAction swipeAction, NSIndexPath indexPath, Category category, UITableView tableView)
+        {
+
+            switch (swipeAction.Action)
+            {
+
+
+                case CategorySwipeAction.SwipeAction.AddToFavorites:
+                    AddToFavorites(category);
+                    break;
+
+                case CategorySwipeAction.SwipeAction.RemoveFromFavorites:
+                    RemoveFromFavorites(category);
+                    break;
+
+            }
+        }
+
+        async void AddToFavorites(Category category)
+        {
+            try
+            {
+                CommonConfig.Logger.Info($"Attempting to add category with id={category.Id} to favorites");
+                await Managers.CommonActionsManager.AddFavoriteCategory(category.Id);
+
+                await RefreshFavorites();
+
+            }
+            catch (Exception ex)
+            {
+
+                CommonConfig.Logger.Error($"Error while adding category to favorites", ex);
+
+            }
+        }
+
+        async void RemoveFromFavorites(Category category)
+        {
+            try
+            {
+                CommonConfig.Logger.Info($"Attempting to remove category with id={category.Id} from favorites");
+                await Managers.CommonActionsManager.RemoveFavoriteCategory(category.Id);
+
+                await RefreshFavorites();
+
+            }
+            catch (Exception ex)
+            {
+
+                CommonConfig.Logger.Error($"Error while removing category from favorites", ex);
+
+            }
+        }
+
+
+
+
+        #endregion
+
         #region DataSource
         class DataSource : UITableViewSource
         {
             public static class Section
             {
                 public static readonly nint Selected = 0;
-                public static readonly nint Available = 1;
+                public static readonly nint Favorite = 1;
+                public static readonly nint Available = 2;
             }
 
             readonly Dictionary<nint, List<Category>> items;
@@ -349,11 +439,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 tableViewWeakReference = tableView.Wrap();
                 viewControllerWeakReference = categoriesListViewController.Wrap();
 
-                loading = new[] { true, true };
+                loading = new[] { true, true, true };
 
                 items = new Dictionary<nint, List<Category>>
                 {
                     [Section.Selected] = new List<Category>(),
+                    [Section.Favorite] = new List<Category>(),
                     [Section.Available] = new List<Category>()
                 };
             }
@@ -397,6 +488,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     }
                 }
 
+                if (section == Section.Favorite)
+                {
+                    if (items[Section.Favorite].Contains(category))
+                    {
+                        if(items[Section.Available].Contains(category))
+                            items[Section.Available].Remove(category);
+                        items[Section.Selected].Add(category);
+                        items[Section.Selected].Sort((x, y) => String.Compare(x.Name, y.Name, true));
+                        return items[Section.Selected].IndexOf(category);
+                    }
+                }
+
                 if (section == Section.Selected)
                 {
                     if (items[Section.Selected].Contains(category))
@@ -419,8 +522,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var newIndex = MoveCategory(indexPath.LongSection, category);
                 viewControllerWeakReference.Unwrap()?.MoveCategory(category);
 
-                tableView.DeleteRows(new NSIndexPath[] { NSIndexPath.Create(indexPath.LongSection, indexPath.Row) }, UITableViewRowAnimation.Middle);                
+                var shouldInsertToSelected = !items[Section.Selected].Contains(category);
+                if (indexPath.LongSection == Section.Selected)
+                    tableView.DeleteRows(new NSIndexPath[] { NSIndexPath.Create(indexPath.LongSection, indexPath.Row) }, UITableViewRowAnimation.Middle);
+                else if(shouldInsertToSelected && indexPath.Section == Section.Available)
+                    tableView.DeleteRows(new NSIndexPath[] { NSIndexPath.Create(Section.Available, indexPath.Row) }, UITableViewRowAnimation.Middle);
 
+                //if we move from selected to available
                 if (indexPath.LongSection == Section.Selected)
                 {
                     _ = viewControllerWeakReference.Unwrap()?.GetAvailableCategories();
@@ -433,6 +541,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         tableView.InsertRows(new NSIndexPath[] { NSIndexPath.Create(Section.Available, newIndex) }, UITableViewRowAnimation.Middle);
                     }
                 }
+                //if we move from availbale to selected
                 else
                 {
                     var count = items[Section.Selected].Count;
@@ -440,7 +549,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     {
                         tableView.ReloadSections(NSIndexSet.FromIndex(Section.Selected), UITableViewRowAnimation.Middle);
                     }
-                    else
+                    else if (shouldInsertToSelected)
                     {
                         tableView.InsertRows(new NSIndexPath[] { NSIndexPath.Create(Section.Selected, newIndex) }, UITableViewRowAnimation.Middle);
                     }
@@ -476,6 +585,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 tableViewWeakReference.Unwrap()?.BeginUpdates();
                 tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(Section.Available), UITableViewRowAnimation.Fade);
                 tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(Section.Selected), UITableViewRowAnimation.Fade);
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(Section.Favorite), UITableViewRowAnimation.Fade);
                 tableViewWeakReference.Unwrap()?.EndUpdates();
             }
 
@@ -491,10 +601,143 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (section == Section.Selected)
                     return Localization.GetString("categories_added");
 
+                if (section == Section.Favorite)
+                    return Localization.GetString("favorites");
+
                 return "";
             }
 
             public override void WillDisplayHeaderView(UITableView tableView, UIView headerView, nint section) => headerView.ApplyTheme();
+
+
+
+            #region Swipe related
+
+            class SwipeActionUIWrapper
+            {
+                public UITableViewRowAction Action { get; set; }
+                public bool Disabled;
+            }
+
+            UIContextualAction BuildLeadingContextualAction(UITableView tableView, NSIndexPath indexPath)
+            {
+                if (indexPath == null)
+                    return null;
+
+                Category category = null;
+
+                if(indexPath.Section == Section.Available)
+                {
+                    category = items[Section.Available][indexPath.Row];
+
+                    CategorySwipeAction leadingAction = new CategorySwipeAction(CategorySwipeAction.SwipeAction.AddToFavorites);
+
+                    string title = Localization.GetString("add_to_favorites");
+
+                    var contextualAction = UIContextualAction.FromContextualActionStyle(UIContextualActionStyle.Normal, title, (someAction, view, success) =>
+                    {
+                        viewControllerWeakReference.Unwrap()?.OnSwipeActionClick(leadingAction, indexPath, category, tableView);
+                    });
+
+                    contextualAction.BackgroundColor = Theme.LightBrown;
+                    return contextualAction;
+                }
+
+                if (indexPath.Section == Section.Favorite)
+                {
+                    category = items[Section.Available][indexPath.Row];
+
+                    CategorySwipeAction leadingAction = new CategorySwipeAction(CategorySwipeAction.SwipeAction.RemoveFromFavorites);
+
+                    string title = Localization.GetString("remove_from_favorites");
+
+                    var contextualAction = UIContextualAction.FromContextualActionStyle(UIContextualActionStyle.Normal, title, (someAction, view, success) =>
+                    {
+                        viewControllerWeakReference.Unwrap()?.OnSwipeActionClick(leadingAction, indexPath, category, tableView);
+                    });
+
+                    contextualAction.BackgroundColor = Theme.LightBrown;
+                    return contextualAction;
+                }
+
+                return null;
+
+            }
+
+            public override UISwipeActionsConfiguration GetLeadingSwipeActionsConfiguration(UITableView tableView, NSIndexPath indexPath)
+            {
+                var leadingSwipe = UISwipeActionsConfiguration.FromActions(new UIContextualAction[] { BuildLeadingContextualAction(tableView, indexPath) });
+
+                leadingSwipe.PerformsFirstActionWithFullSwipe = true;
+
+                var actions = leadingSwipe.Actions[0];
+                if (!leadingSwipe.Actions.Any(a => a != null))
+                    return null;
+
+                return leadingSwipe;
+            }
+
+
+
+            public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
+            {
+               
+                if (indexPath == null)
+                {
+                    CommonConfig.Logger.Warning($"IndexPath in DocumentListViewController.EditActionsForRow() was null.");
+                    return null;
+                }
+
+
+                var actionWrappers = new List<SwipeActionUIWrapper>();
+                UITableViewRowAction[] returnActions = actionWrappers.Select(a => a.Action).ToArray();
+
+                if (indexPath.Row < 0 || indexPath.Row >= items.Count)
+                    return actionWrappers.Select(a => a.Action).ToArray();
+
+                if (indexPath.Section == Section.Available)
+                {
+                    var category = items[Section.Available][indexPath.Row];
+                    if (category == null)
+                    {
+                        CommonConfig.Logger.Warning($"Category in CategoryListViewController.EditActionsForRow() was null");
+                        return null;
+                    }
+                    SwipeActionUIWrapper actionWrapper = new SwipeActionUIWrapper();
+                    var swipeAction = new CategorySwipeAction(CategorySwipeAction.SwipeAction.AddToFavorites);
+                    actionWrapper.Action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("add_to_favorites"),
+                    (a, ip) =>
+                    {
+                        viewControllerWeakReference.Unwrap()?.OnSwipeActionClick(swipeAction, indexPath, category, tableView);
+                    });
+                    actionWrapper.Action.BackgroundColor = Theme.Brown;
+                    returnActions = new List<SwipeActionUIWrapper>() { actionWrapper }.Select(a => a.Action).ToArray();
+
+                }
+
+                else if (indexPath.Section == Section.Favorite)
+                {
+                    var category = items[Section.Favorite][indexPath.Row];
+                    if (category == null)
+                    {
+                        CommonConfig.Logger.Warning($"Category in CategoryListViewController.EditActionsForRow() was null");
+                        return null;
+                    }
+                    SwipeActionUIWrapper actionWrapper = new SwipeActionUIWrapper();
+                    var swipeAction = new CategorySwipeAction(CategorySwipeAction.SwipeAction.RemoveFromFavorites);
+                    actionWrapper.Action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default, Localization.GetString("remove_from_favorites"),
+                    (a, ip) =>
+                    {
+                        viewControllerWeakReference.Unwrap()?.OnSwipeActionClick(swipeAction, indexPath, category, tableView);
+                    });
+                    actionWrapper.Action.BackgroundColor = Theme.Brown;
+                    returnActions = new List<SwipeActionUIWrapper>() { actionWrapper }.Select(a => a.Action).ToArray();
+                }
+
+                return returnActions;
+            }
+            #endregion
+
 
         }
 

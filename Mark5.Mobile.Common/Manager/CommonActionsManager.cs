@@ -316,5 +316,73 @@ namespace Mark5.Mobile.Common.Manager
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
+
+        public async Task<List<int>> GetFavoriteCategories(SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
+            {
+                var result = await AppServiceProxy.GetFavoriteCategoriesAsync(new DataContract.GetFavoriteCategoriesParameters
+                {
+                    Token = Token
+                });
+
+                return result.FavoriteCategoriesIds;
+            }
+
+            if (sourceType == SourceType.Local)
+                throw new ReMarkException(ErrorConstants.Codes.InvalidSourceType);
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
+
+        public async Task AddFavoriteCategory(int categoryId, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
+            {
+                await AppServiceProxy.AddFavoriteCategoryAsync(new DataContract.AddFavoriteCategoryParameters
+                {
+                    Token = Token,
+                    CategoryId = categoryId
+                });
+
+                return;
+            }
+
+            if (sourceType == SourceType.Local)
+                throw new ReMarkException(ErrorConstants.Codes.InvalidSourceType);
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
+
+        public async Task RemoveFavoriteCategory(int categoryId, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
+            {
+                await AppServiceProxy.RemoveFavoriteCategoryAsync(new DataContract.RemoveFavoriteCategoryParameters
+                {
+                    Token = Token,
+                    CategoryId = categoryId
+                });
+
+                return;
+            }
+
+            if (sourceType == SourceType.Local)
+                throw new ReMarkException(ErrorConstants.Codes.InvalidSourceType);
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
+
+
+
     }
 }
