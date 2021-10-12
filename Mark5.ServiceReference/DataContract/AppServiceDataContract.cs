@@ -2302,6 +2302,43 @@ namespace Mark5.ServiceReference.DataContract
     {
     }
 
+
+    [DataContract(Name = "AddFavoriteCategoryResult", Namespace = "com.nordic-it.appservice.v3")]
+    public class AddFavoriteCategoryResult
+    {
+    }
+
+    [DataContract(Name = "RemoveFavoriteCategoryResult", Namespace = "com.nordic-it.appservice.v3")]
+    public class RemoveFavoriteCategoryResult
+    {
+    }
+
+    [DataContract(Name = "GetFavoriteCategoriesResult", Namespace = "com.nordic-it.appservice.v3")]
+    public class GetFavoriteCategoriesResult
+    {
+        [DataMember(Name = "FavoriteCategoriesIds", Order = 0)]
+        public List<int> FavoriteCategoriesIds { get; set; } = new List<int>();
+    }
+
+    [DataContract(Name = "AddFavoriteCategoryParameters", Namespace = "com.nordic-it.appservice.v3")]
+    public class AddFavoriteCategoryParameters : AbstractParameters
+    {
+        [DataMember(Name = "CategoryId", Order = 0)]
+        public int CategoryId { get; set; } = -1;
+    }
+
+    [DataContract(Name = "RemoveFavoriteCategoryParameters", Namespace = "com.nordic-it.appservice.v3")]
+    public class RemoveFavoriteCategoryParameters : AbstractParameters
+    {
+        [DataMember(Name = "CategoryId", Order = 0)]
+        public int CategoryId { get; set; } = -1;
+    }
+
+    [DataContract(Name = "GetFavoriteCategoriesParameters", Namespace = "com.nordic-it.appservice.v3")]
+    public class GetFavoriteCategoriesParameters : AbstractParameters
+    {
+    }
+
     [DataContract(Name = "GetObjectActionsParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class GetObjectActionsParameters : AbstractParameters
     {

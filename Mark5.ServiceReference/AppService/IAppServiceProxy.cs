@@ -137,6 +137,12 @@ namespace Mark5.ServiceReference.AppService
 
         Task<SetCategoriesResult> SetCategoriesAsync(SetCategoriesParameters parameters, CancellationToken ct = default(CancellationToken));
 
+        Task<GetFavoriteCategoriesResult> GetFavoriteCategoriesAsync(GetFavoriteCategoriesParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<AddFavoriteCategoryResult> AddFavoriteCategoryAsync(AddFavoriteCategoryParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<RemoveFavoriteCategoryResult> RemoveFavoriteCategoryAsync(RemoveFavoriteCategoryParameters parameters, CancellationToken ct = default(CancellationToken));
+
         Task<GetObjectActionsResult> GetObjectActionsAsync(GetObjectActionsParameters parameters, CancellationToken ct = default(CancellationToken));
 
         Task<GetObjectLinksResult> GetObjectLinksAsync(GetObjectLinksParameters parameters, CancellationToken ct = default(CancellationToken));

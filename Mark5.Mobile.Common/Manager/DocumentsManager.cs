@@ -782,7 +782,6 @@ namespace Mark5.Mobile.Common.Manager
                 });
 
                 document.Id = result.Id;
-                document.Guid = result.Guid;
                 documentPreview.Id = result.Id;
                 documentPreview.Guid = result.Guid;
                 documentPreview.ReferenceNumber = result.ReferenceNumber;

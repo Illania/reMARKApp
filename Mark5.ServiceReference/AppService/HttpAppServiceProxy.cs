@@ -411,6 +411,21 @@ namespace Mark5.ServiceReference.AppService
             return await InvokeAsync<SetCategoriesResult, SetCategoriesParameters>("SetCategories", parameters, ct);
         }
 
+        public async Task<GetFavoriteCategoriesResult> GetFavoriteCategoriesAsync(GetFavoriteCategoriesParameters parameters, CancellationToken ct = default(CancellationToken))
+        {
+            return await InvokeAsync<GetFavoriteCategoriesResult, GetFavoriteCategoriesParameters>("GetFavoriteCategories", parameters, ct);
+        }
+
+        public async Task<AddFavoriteCategoryResult> AddFavoriteCategoryAsync(AddFavoriteCategoryParameters parameters, CancellationToken ct = default(CancellationToken))
+        {
+            return await InvokeAsync<AddFavoriteCategoryResult, AddFavoriteCategoryParameters>("AddFavoriteCategory", parameters, ct);
+        }
+
+        public async Task<RemoveFavoriteCategoryResult> RemoveFavoriteCategoryAsync(RemoveFavoriteCategoryParameters parameters, CancellationToken ct = default(CancellationToken))
+        {
+            return await InvokeAsync<RemoveFavoriteCategoryResult, RemoveFavoriteCategoryParameters>("RemoveFavoriteCategory", parameters, ct);
+        }
+
         public async Task<GetObjectActionsResult> GetObjectActionsAsync(GetObjectActionsParameters parameters, CancellationToken ct = default(CancellationToken))
         {
             return await InvokeAsync<GetObjectActionsResult, GetObjectActionsParameters>("GetObjectActions", parameters, ct);

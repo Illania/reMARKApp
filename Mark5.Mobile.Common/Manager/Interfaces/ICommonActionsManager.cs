@@ -29,5 +29,11 @@ namespace Mark5.Mobile.Common.Manager
         Task RemoveFromFolder(List<IBusinessEntity> businessEntities, Folder folder, SourceType sourceType = SourceType.Auto);
 
         Task Delete(List<IBusinessEntity> businessEntities, SourceType sourceType = SourceType.Auto);
+
+        Task<List<int>> GetFavoriteCategories(SourceType sourceType = SourceType.Auto);
+
+        Task AddFavoriteCategory(int categoryId, SourceType sourceType = SourceType.Auto);
+
+        Task RemoveFavoriteCategory(int categoryId, SourceType sourceType = SourceType.Auto);
     }
 }
