@@ -265,7 +265,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         public override Task UpdateDocument()
         {
-            DocumentPreview.Addresses.RemoveAll(a => a?.AddressType == AddressType);
+            if (DocumentPreview == null)
+                return;
+
+            DocumentPreview?.Addresses?.RemoveAll(a => a?.AddressType == AddressType);
+
             InvokeOnMainThread(() =>
             {
                 foreach (var da in GetEmails())
@@ -282,7 +286,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
                         if (systemUser != null)
                         {
-                            DocumentPreview.Addresses.Add(new DocumentAddress
+                            DocumentPreview?.Addresses?.Add(new DocumentAddress
                             {
                                 Address = systemUser.Guid.ToString(),
                                 AddressType = AddressType,
@@ -295,6 +299,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             });
 
             return Task.CompletedTask;
+            
         }
 
         #endregion
