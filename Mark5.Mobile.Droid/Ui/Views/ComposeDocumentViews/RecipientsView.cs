@@ -249,7 +249,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public override async Task UpdateDocument()
         {
-            DocumentPreview.Addresses.RemoveAll(a => a.AddressType == AddressType);
+            DocumentPreview?.Addresses?.RemoveAll(a => a.AddressType == AddressType);
 
             await AsyncHelpers.RunOnUiThreadAsync((Activity)Context, () =>
             {
@@ -267,7 +267,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
                         if (systemUser != null)
                         {
-                            DocumentPreview.Addresses.Add(new DocumentAddress
+                            DocumentPreview?.Addresses?.Add(new DocumentAddress
                             {
                                 Address = systemUser.Guid.ToString(),
                                 Name = systemUser.Username,
