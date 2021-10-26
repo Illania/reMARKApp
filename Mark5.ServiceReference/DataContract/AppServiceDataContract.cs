@@ -556,6 +556,12 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "TransmitStatus", Order = 1)]
         public TransmitStatus TransmitStatus { get; set; }
+
+        [DataMember(Name = "Lines", Order = 2)]
+        public List<Line> Lines { get; set; } = new List<Line>();
+
+        [DataMember(Name = "CreatorGuid", Order = 2)]
+        public Guid CreatorGuid { get; set; }
     }
 
     [DataContract(Name = "DocumentAddress", Namespace = "com.nordic-it.appservice.v3")]
@@ -2603,6 +2609,51 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "UseForFrom", Order = 1)]
         public UseForFrom UseForFrom { get; set; }
+
+        /// <summary>List of row appearances depends on incoming line</summary>
+        [DataMember(Name = "LineAppearances", Order = 2)]
+        public List<OriginatorAppearance> LineAppearances { get; set; } = new List<OriginatorAppearance>();
+
+        /// <summary>List of row appearances depends on document creator</summary>
+        [DataMember(Name = "UserAppearances", Order = 2)]
+        public List<OriginatorAppearance> UserAppearances { get; set; } = new List<OriginatorAppearance>();
+
+        [DataMember(Name = "DefaultAppearance", Order = 2)]
+        /// <summary>Default row appearance</summary>
+        public OriginatorAppearance DefaultAppearance { get; set; } = new OriginatorAppearance();
+
+    }
+
+    [DataContract(Name = "OriginatorAppearance", Namespace = "com.nordic-it.appservice.v3")]
+    public class OriginatorAppearance
+    {
+        [DataMember(Name = "Enable", Order = 0)]
+        public bool Enable { get; set; }
+
+        [DataMember(Name = "OriginatorGid", Order = 0)]
+        public Guid OriginatorGid { get; set; }
+
+        [DataMember(Name = "OriginatorName", Order = 0)]
+        public string OriginatorName { get; set; }
+
+        [DataMember(Name = "BackgroundColor", Order = 0)]
+        public int BackgroundColor { get; set; }
+
+        [DataMember(Name = "FontColor", Order = 0)]
+        public int FontColor { get; set; } = -16777216;
+
+        [DataMember(Name = "UnreadFontColor", Order = 0)]
+        public int UnreadFontColor { get; set; } = -16777216;
+
+        [DataMember(Name = "FontColorEnable", Order = 0)]
+        public bool FontColorEnable { get; set; }
+
+        [DataMember(Name = "UnreadFontColorEnable", Order = 0)]
+        public bool UnreadFontColorEnable { get; set; }
+
+        [DataMember(Name = "OriginatorColumnOnly", Order = 0)]
+        public bool OriginatorColumnOnly { get; set; }
+
     }
 
     [DataContract(Name = "ContactsModuleInfo", Namespace = "com.nordic-it.appservice.v3")]

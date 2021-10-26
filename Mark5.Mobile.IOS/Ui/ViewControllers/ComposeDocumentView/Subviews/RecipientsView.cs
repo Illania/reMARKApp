@@ -265,8 +265,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         public override Task UpdateDocument()
         {
-            if (DocumentPreview == null)
-                return;
 
             DocumentPreview?.Addresses?.RemoveAll(a => a?.AddressType == AddressType);
 

@@ -1,6 +1,8 @@
+using System.Drawing;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Foundation;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
@@ -8,6 +10,7 @@ using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
 using Mark5.Mobile.IOS.Utilities.Extensions;
 using UIKit;
+using Xamarin.Essentials;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
 {
@@ -31,6 +34,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         readonly bool unreadIndicatorMe = PlatformConfig.Preferences.UnreadIndicatorMe;
         readonly bool showCreatorOutgoing = PlatformConfig.Preferences.ShowCreatorOutgoing;
+        readonly bool useMessageListAppearance = PlatformConfig.Preferences.UseMessageListAppearance;
 
         public DocumentsTableViewCell(NSString reuseIdentifier)
             : base(UITableViewCellStyle.Default, reuseIdentifier)
@@ -147,6 +151,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                     UserInteractionEnabled = false,
                     TranslatesAutoresizingMaskIntoConstraints = false,
                     BackgroundColor = UIColor.Clear,
+                    
                 };
                 bottomLabel.TextContainer.MaximumNumberOfLines = 3;
                 bottomLabel.TextContainer.LineFragmentPadding = 0f;
@@ -277,6 +282,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 InitializeCommentsIndicator(dp);
                 InitializePriorityIndicator(dp);
             }
+            if (useMessageListAppearance)
+                InitializeMesageListAppearance(dp);
         }
 
         void InitializeCategories(DocumentPreview dp)
@@ -395,11 +402,52 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             directionIndicatorImageView.Image = image;
         }
 
+        void InitializeMesageListAppearance(DocumentPreview dp)
+        {
+            //apply default appearance
+            var defaultAppearance = ServerConfig.SystemSettings.DocumentsModuleInfo.DefaultAppearance;
+            var daReadColor = Color.FromArgb(defaultAppearance.FontColor).ToPlatformColor();
+            var daUnreadColor = Color.FromArgb(defaultAppearance.UnreadFontColor).ToPlatformColor();
+            if (defaultAppearance.FontColorEnable)
+                bottomLabel.TextColor = Color.FromArgb(defaultAppearance.FontColor).ToPlatformColor();
+            if(defaultAppearance.UnreadFontColorEnable)
+                bottomLabel.TextColor = dp.IsReadByCurrent ? daReadColor : daUnreadColor;          
+
+            //if row appearance depends from line use line appearance           
+            var lineAppearance = ServerConfig.SystemSettings.DocumentsModuleInfo.LineAppearances.FirstOrDefault(la => dp.Lines.Any(l => l.Guid == la.OriginatorGid));
+            if (lineAppearance != null && lineAppearance.Enable)
+            {
+                var laReadColor = Color.FromArgb(lineAppearance.FontColor).ToPlatformColor();
+                var laUnreadColor = Color.FromArgb(lineAppearance.UnreadFontColor).ToPlatformColor();
+                var laBgColor = Color.FromArgb(lineAppearance.BackgroundColor).ToPlatformColor();
+                bottomLabel.BackgroundColor = laBgColor;
+                if (defaultAppearance.FontColorEnable)
+                    bottomLabel.TextColor = Color.FromArgb(defaultAppearance.FontColor).ToPlatformColor();
+                if (defaultAppearance.UnreadFontColorEnable)
+                    bottomLabel.TextColor = dp.IsReadByCurrent ? laReadColor : laUnreadColor;
+
+            }
+
+            //if row appearance depends from user use user appearance           
+            var userAppearance = ServerConfig.SystemSettings.DocumentsModuleInfo.UserAppearances.FirstOrDefault(la => dp.CreatorGuid == la.OriginatorGid);
+            if (userAppearance != null && userAppearance.Enable)
+            {
+                var uaReadColor = Color.FromArgb(lineAppearance.FontColor).ToPlatformColor();
+                var uaUnreadColor = Color.FromArgb(lineAppearance.UnreadFontColor).ToPlatformColor();
+                var uaBgColor = Color.FromArgb(lineAppearance.BackgroundColor).ToPlatformColor();
+                bottomLabel.BackgroundColor = uaBgColor;
+                if (defaultAppearance.FontColorEnable)
+                    bottomLabel.TextColor = Color.FromArgb(defaultAppearance.FontColor).ToPlatformColor();
+                if (defaultAppearance.UnreadFontColorEnable)
+                    bottomLabel.TextColor = dp.IsReadByCurrent ? uaReadColor : uaUnreadColor;
+
+            }
+        }
+
         void InitializeUnreadIndicator(DocumentPreview dp)
         {
             if (unreadIndicatorImageView == null)
                 return;
-
             var show = unreadIndicatorMe ? !dp.IsReadByCurrent : !dp.IsReadByAnyone;
             unreadIndicatorImageView.Alpha = show ? 1f : 0f;
         }
