@@ -302,8 +302,12 @@ namespace Mark5.Mobile.Common.Model.Converters
                 OnSendToSystemUser = dmi.OnSendToSystemUser.ConvertEnum<OnSendToSystemUser>(),
                 Permissions = dmi.Permissions?.Convert(),
                 WorktrayEnabled = dmi.WorktrayEnabled,
-                UseForFrom = dmi.UseForFrom.ConvertEnum<UseForFrom>()
+                UseForFrom = dmi.UseForFrom.ConvertEnum<UseForFrom>(),
+                LineAppearances = dmi.LineAppearances.Select(la => la.Convert()).ToList(),
+                UserAppearances = dmi.UserAppearances.Select(ua => ua.Convert()).ToList(),
+                DefaultAppearance = dmi.DefaultAppearance.Convert()
             };
+
             if (dmi.AttachmentKeywords != null)
                 result.AttachmentKeywords.AddRange(dmi.AttachmentKeywords.Where(s => !string.IsNullOrWhiteSpace(s)));
             if (dmi.ExtraFieldInfos != null)
@@ -315,6 +319,22 @@ namespace Mark5.Mobile.Common.Model.Converters
             if (dmi.ReplyAbbreviations != null)
                 result.ReplyAbbreviations.AddRange(dmi.ReplyAbbreviations.Where(s => !string.IsNullOrWhiteSpace(s)));
             return result;
+        }
+
+        public static OriginatorAppearance Convert(this DataContract.OriginatorAppearance originatorAppearance)
+        {
+            return new OriginatorAppearance
+            {
+                Enable = originatorAppearance.Enable,
+                OriginatorGid = originatorAppearance.OriginatorGid,
+                OriginatorName = originatorAppearance.OriginatorName,
+                BackgroundColor = originatorAppearance.BackgroundColor,
+                FontColor = originatorAppearance.FontColor,
+                UnreadFontColor = originatorAppearance.UnreadFontColor,
+                FontColorEnable = originatorAppearance.FontColorEnable,
+                UnreadFontColorEnable = originatorAppearance.UnreadFontColorEnable,
+                OriginatorColumnOnly = originatorAppearance.OriginatorColumnOnly
+            };
         }
 
         public static DocumentsModulePermissions Convert(this DataContract.DocumentsModulePermissions dmp)
@@ -359,6 +379,8 @@ namespace Mark5.Mobile.Common.Model.Converters
                 CreatorId = dp.CreatorId,
                 Creator = dp.Creator,
                 TransmitStatus = dp.TransmitStatus.ConvertEnum<TransmitStatus>(),
+                Lines = dp.Lines.Select(l=>l.Convert()).ToList(),
+                CreatorGuid = dp.CreatorGuid
             };
             if (dp.Addresses != null)
                 result.Addresses.AddRange(dp.Addresses.WhereNotNull().Select(Convert));
@@ -787,7 +809,9 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Categories = dp.Categories.Select(c => c.Convert()).ToList(),
                 DateReceived = DateTime.UtcNow,
                 CreatorId = dp.CreatorId,
-                Creator = dp.Creator
+                Creator = dp.Creator,
+                Lines = dp.Lines.Select(l => l.Convert()).ToList(),
+                CreatorGuid = dp.CreatorGuid
             };
         }
 

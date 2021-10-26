@@ -31,6 +31,20 @@ namespace Mark5.Mobile.Common.Model
             set => addresses = value;
         }
 
+        List<Line> lines;
+
+        [Ignore]
+        public List<Line> Lines
+        {
+            get
+            {
+                if (lines == null)
+                    lines = new List<Line>();
+                return lines;
+            }
+            set => lines = value;
+        }
+
         [Column("Subject")]
         public string Subject { get; set; }
 
@@ -74,6 +88,9 @@ namespace Mark5.Mobile.Common.Model
 
         [Column("CreatorId")]
         public int CreatorId { get; set; }
+
+        [Ignore]
+        public Guid CreatorGuid { get; set; }
 
         [Column("Creator")]
         public string Creator { get; set; }

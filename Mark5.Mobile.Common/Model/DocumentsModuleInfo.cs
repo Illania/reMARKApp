@@ -93,5 +93,12 @@ namespace Mark5.Mobile.Common.Model
         public bool? WorktrayEnabled { get; set; }
 
         public UseForFrom UseForFrom { get; set; } = UseForFrom.LicenseName;
+
+        public List<OriginatorAppearance> LineAppearances { get; set; } = new List<OriginatorAppearance>();
+
+        public List<OriginatorAppearance> UserAppearances { get; set; } = new List<OriginatorAppearance>();
+
+        public OriginatorAppearance DefaultAppearance { get; set; } = new OriginatorAppearance();
+
     }
 }

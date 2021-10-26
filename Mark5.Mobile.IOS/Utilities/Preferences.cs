@@ -34,6 +34,7 @@ namespace Mark5.Mobile.IOS.Utilities
             public const string ConfirmRemoveSwipe = "ConfirmRemoveSwipe";
             public const string HideReadNotificationsKey = "HideReadNotifications";
             public const string UseSmartLinks = "UseSmartLinks";
+            public const string UseMessageListAppearance = "UseMessageListAppearance";
 
             public const string ComposePriorityEnabledKey = "ComposePriorityEnabled";
             public const string RemoveLineKey = "RemoveLine";
@@ -123,6 +124,9 @@ namespace Mark5.Mobile.IOS.Utilities
                 },
                 {
                     new NSString(Keys.UseSmartLinks), NSNumber.FromBoolean(false)
+                },
+                {
+                    new NSString(Keys.UseMessageListAppearance), NSNumber.FromBoolean(false)
                 },
                 {
                     new NSString(Keys.ComposePriorityEnabledKey), NSNumber.FromBoolean(false)
@@ -235,6 +239,8 @@ namespace Mark5.Mobile.IOS.Utilities
         public bool HideReadNotifications => ud.BoolForKey(Keys.HideReadNotificationsKey);
 
         public bool UseSmartLinks => ud.BoolForKey(Keys.UseSmartLinks);
+
+        public bool UseMessageListAppearance => ud.BoolForKey(Keys.UseMessageListAppearance);
 
         public bool ComposePriorityEnabled => ud.BoolForKey(Keys.ComposePriorityEnabledKey);
 
