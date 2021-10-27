@@ -92,11 +92,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             [Obsolete]
             public override bool ShouldOverrideUrlLoading(WebView view, string url)
             {
-                if (!Uri.IsWellFormedUriString(url, UriKind.Absolute))
-                    return true;
-
                 if (url.StartsWith("mailto", StringComparison.InvariantCultureIgnoreCase))
-                    MailToLinkClicked(this, url);
+                {
+                    MailToLinkClicked(this, url);   
+                }
+                else if (!Uri.IsWellFormedUriString(url, UriKind.Absolute))
+                    return true;
                 else
                 {
                     OpenUrl(view, url);
