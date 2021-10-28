@@ -39,8 +39,12 @@ namespace Mark5.Mobile.IOS.Ui.Common
         const string DefaultLightBoldFontName = "Avenir-Medium";
 
         const float DefaultFontSize = 16f;
+        const float DefaultFontXSmallSize = 8f;
+        const float DefaultFontSmallSize = 10f;
 
         public static UIFont DefaultFont => UIFont.FromName(DefaultFontName, DefaultFontSize);
+        public static UIFont DefaultLightFontXSmall => UIFont.FromName(DefaultLightFontName, DefaultFontXSmallSize);
+        public static UIFont DefaultLightFontSmall => UIFont.FromName(DefaultLightFontName, DefaultFontSmallSize);
         public static UIFont DefaultBoldFont => UIFont.FromName(DefaultBoldFontName, DefaultFontSize);
         public static UIFont DefaultLightFont => UIFont.FromName(DefaultLightFontName, DefaultFontSize);
         public static UIFont DefaultActionsFont => UIFont.FromName(DefaultFontName, 14f);
