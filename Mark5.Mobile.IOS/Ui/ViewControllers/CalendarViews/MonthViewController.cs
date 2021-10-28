@@ -1,4 +1,5 @@
 ﻿using System;
+using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
@@ -25,6 +26,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             Coordinator.MonthViewLoaded();
 
             schedule = new MonthSchedule();
+
             View.BackgroundColor = UIColor.White;
             View.AddSubview(schedule);
             View.AddConstraints(new NSLayoutConstraint[] {
@@ -37,6 +39,36 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             InitializeNavigationBar();
 
             MoveToDate(NSDate.Now);
+        }
+
+
+
+        public override void ViewWillTransitionToSize(CGSize toSize, IUIViewControllerTransitionCoordinator coordinator)
+        {
+            base.ViewWillTransitionToSize(toSize, coordinator);
+
+            UpdateMonthViewOnRotation();
+        }
+
+        
+
+        private void UpdateMonthViewOnRotation()
+        {
+            if (schedule is not MonthSchedule monthSchedule)
+                return;
+
+            if (UIDevice.CurrentDevice.Orientation.IsLandscape())
+            {
+
+               monthSchedule.SetHorizontalOrientationSettings();
+
+            }
+            else
+            {
+                monthSchedule.SetVerticallOrientationSettings();
+
+            }
+
         }
 
         public override void ViewWillAppear(bool animated)
@@ -217,10 +249,72 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         public MonthSchedule()
         {
             TranslatesAutoresizingMaskIntoConstraints = false;
-
             FirstDayOfWeek = 2;
             ScheduleView = SFScheduleView.SFScheduleViewMonth;
             EnableNavigation = true;
+
+
+            if (UIDevice.CurrentDevice.Orientation.IsLandscape())
+            {
+
+                SetHorizontalOrientationSettings();
+
+            }
+            else
+            {
+
+                SetVerticallOrientationSettings();
+
+            }
+            MinDisplayDate = new DateTime(2010, 1, 1).ToNSDate(DateTimeKind.Local);
+        }
+
+        public void SetHorizontalOrientationSettings()
+        {
+            SFMonthCellStyle monthCellStyle = new SFMonthCellStyle
+            {
+                TextStyle = Theme.DefaultLightFontXSmall,
+            };
+            MonthCellStyle = monthCellStyle;
+            DayHeaderStyle = new SFViewHeaderStyle { DayTextStyle = Theme.DefaultLightFontSmall };
+            HeaderHeight = 20f;
+
+            MonthViewSettings = new MonthViewSettings
+            {
+                
+                ShowAgendaView = true,
+                ShowAppointmentsInline = false,
+                TodayBackgroundColor = Theme.LightBlue,
+                SelectionIndicatorColor = Theme.DarkBlue,
+                SelectionTextColor = Theme.White,
+                AgendaViewHeight = 30f,
+                AgendaViewStyle = new AgendaViewStyle
+                {
+
+                    SubjectTextStyle = Theme.DefaultLightFontSmall,
+                    TimeTextStyle = Theme.DefaultLightFontSmall,
+                    DateTextColor = Theme.DarkGray,
+                    DateTextStyle = Theme.DefaultLightFontSmall,
+                    HeaderHeight = 10f
+                }
+            };
+
+            HeaderStyle = new HeaderStyle
+            {
+                TextColor = Theme.DarkerBlue,
+                TextStyle = Theme.DefaultLightFontSmall,
+            };
+
+            DayHeaderStyle = new SFViewHeaderStyle
+            {
+                DayTextColor = Theme.DarkerBlue,
+                DateTextStyle = Theme.DefaultLightFontSmall,
+            };
+        }
+
+        public void SetVerticallOrientationSettings()
+        {
+            MonthCellStyle = null;
 
             MonthViewSettings = new MonthViewSettings
             {
@@ -239,6 +333,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 }
             };
 
+      
             HeaderStyle = new HeaderStyle
             {
                 TextColor = Theme.DarkerBlue,
@@ -249,7 +344,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 DayTextColor = Theme.DarkerBlue,
                 DayTextStyle = Theme.DefaultLightFont
             };
-            MinDisplayDate = new DateTime(2010, 1, 1).ToNSDate(DateTimeKind.Local);
         }
+
     }
 }
