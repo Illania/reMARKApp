@@ -97,7 +97,8 @@ namespace Mark5.Mobile.Common.Manager
         Task CancelSendDocument(List<DocumentPreview> documentPreviews, SourceType sourceType = SourceType.Auto);
 
         Task ForceSendDocument(List<DocumentPreview> documentPreviews, SourceType sourceType = SourceType.Auto);
-       
+
+        Task<string> GetNewDocumentReferenceNumber(DocumentPreview documentPreview, SourceType sourceType = SourceType.Auto);
 
     }
 }

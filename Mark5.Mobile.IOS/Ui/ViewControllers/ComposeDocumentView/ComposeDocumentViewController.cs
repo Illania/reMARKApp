@@ -1193,7 +1193,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async Task ProcessAndInsertTemplate(Template template)
         {
-            ProcessTemplate(template, previousDocumentPreview);
+            await ProcessTemplate(template, previousDocumentPreview);
 
             var type = string.Empty;
             var content = string.Empty;
@@ -1559,7 +1559,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             return false;
         }
 
-        static void ProcessTemplate(Template template, DocumentPreview documentPreview)
+        static async Task ProcessTemplate(Template template, DocumentPreview documentPreview)
         {
             var templateContent = template.Content;
 
@@ -1571,6 +1571,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             if (documentPreview?.Addresses != null)
                 fromNameString = documentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.From).Select(da => da.Name).FirstOrDefault() ?? string.Empty;
 
+            if (templateContent.Contains("REF"))
+            {
+                var docRef = await Managers.DocumentsManager.GetNewDocumentReferenceNumber(documentPreview);
+                documentPreview.ReferenceNumber = docRef;
+            }
+
+
             if (template.ContentType == ContentType.Html)
             {
                 templateContent = templateContent.Replace("&lt;FROMNAME&gt;", fromNameString);
@@ -1581,6 +1588,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 templateContent = templateContent.Replace("&lt;SOURCETEXT&gt;", string.Empty);
                 templateContent = templateContent.Replace("&lt;COMPANYNAME&gt;", string.Empty);
                 templateContent = templateContent.Replace("&lt;FROMNAMEWITHCOMPANY&gt;", string.Empty);
+
+                templateContent = templateContent.Replace("&lt;REF&gt;", documentPreview.ReferenceNumber);
             }
             else
             {
@@ -1592,6 +1601,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 templateContent = templateContent.Replace("<SOURCETEXT>", string.Empty);
                 templateContent = templateContent.Replace("<COMPANYNAME>", string.Empty);
                 templateContent = templateContent.Replace("<FROMNAMEWITHCOMPANY>", string.Empty);
+
+                templateContent = templateContent.Replace("<REF>", documentPreview.ReferenceNumber);
             }
 
             template.Content = templateContent;
