@@ -448,6 +448,23 @@ namespace Mark5.ServiceReference.DataContract
         public Template Template { get; set; }
     }
 
+    [DataContract(Name = "GetNewDocumentReferenceNumberResult", Namespace = "com.nordic-it.appservice.v3")]
+    public class GetNewDocumentReferenceNumberResult 
+    {
+        [DataMember(Name = "ReferenceNumber", Order = 0)]
+        public string ReferenceNumber { get; set; }
+
+    }
+
+    [DataContract(Name = "GetNewDocumentReferenceNumberParameters", Namespace = "com.nordic-it.appservice.v3")]
+    public class GetNewDocumentReferenceNumberParameters : AbstractParameters
+    {
+        [DataMember(Name = "DocDirection", Order = 0)]
+        public DocumentDirection DocDirection { get; set; }
+
+    }
+
+
     [DataContract(Name = "GetLinesParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class GetLinesParameters : AbstractParameters
     {

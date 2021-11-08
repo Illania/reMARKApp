@@ -734,6 +734,27 @@ namespace Mark5.Mobile.Common.Manager
 
         }
 
+        public async Task<string> GetNewDocumentReferenceNumber(DocumentPreview documentPreview, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
+            {
+                var result = await AppServiceProxy.GetNewDocumentReferenceNumberAsync(new DataContract.GetNewDocumentReferenceNumberParameters
+                {
+                    Token = Token,
+                    DocDirection = DataContract.DocumentDirection.Outgoing
+                });
+
+                return result.ReferenceNumber;
+            }
+            else if (sourceType == SourceType.Local)
+                throw new ReMarkException(ErrorConstants.Codes.InvalidSourceType);
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
+
         #region SetReadStatus specific
 
         internal async Task SetRemoteReadStatusAsync(bool isRead, params int[] ids)

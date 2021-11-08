@@ -53,6 +53,8 @@ namespace Mark5.ServiceReference.AppService
 
         Task<ReplyToCalendarInvitationResult> ReplyToCalendarInvitationAsync(ReplyToCalendarInvitationParameters parameters, CancellationToken ct = default(CancellationToken));
 
+        Task<GetNewDocumentReferenceNumberResult> GetNewDocumentReferenceNumberAsync(GetNewDocumentReferenceNumberParameters parameters, CancellationToken ct = default);
+
         #endregion
 
         #region Contacts module

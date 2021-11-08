@@ -505,5 +505,11 @@ namespace Mark5.ServiceReference.AppService
         {
             return await InvokeAsync<ForceSendDocumentResult, ForceSendDocumentParameters>("ForceSendDocument", parameters, ct);
         }
+
+        public async Task<GetNewDocumentReferenceNumberResult> GetNewDocumentReferenceNumberAsync(GetNewDocumentReferenceNumberParameters parameters, CancellationToken ct = default)
+        {
+            return await InvokeAsync<GetNewDocumentReferenceNumberResult, GetNewDocumentReferenceNumberParameters>("GetNewDocumentReferenceNumber", parameters, ct);
+        }
+        
     }
 }

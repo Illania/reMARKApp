@@ -1302,7 +1302,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         async Task ApplyTemplate(Template template, bool initializing)
         {
-            ProcessTemplate(template, documentPreview);
+            await ProcessTemplate(template, documentPreview);
 
             await contentView.InsertTemplate(template, initializing);
 
@@ -1316,7 +1316,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 template.Attachments.ForEach(attachmentsView.AddAttachment);
         }
 
-        static void ProcessTemplate(Template template, DocumentPreview documentPreview)
+        static async Task ProcessTemplate(Template template, DocumentPreview documentPreview)
         {
             var templateContent = template.Content;
 
@@ -1328,6 +1328,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (documentPreview?.Addresses != null)
                 fromNameString = documentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.From).Select(da => da.Name).FirstOrDefault() ?? string.Empty;
 
+            if(templateContent.Contains("REF"))
+            {
+                var docRef = await Managers.DocumentsManager.GetNewDocumentReferenceNumber(documentPreview);
+                documentPreview.ReferenceNumber = docRef;
+            }
+
+
             if (template.ContentType == ContentType.Html)
             {
                 templateContent = templateContent.Replace("&lt;FROMNAME&gt;", fromNameString);
@@ -1338,6 +1345,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 templateContent = templateContent.Replace("&lt;SOURCETEXT&gt;", string.Empty);
                 templateContent = templateContent.Replace("&lt;COMPANYNAME&gt;", string.Empty);
                 templateContent = templateContent.Replace("&lt;FROMNAMEWITHCOMPANY&gt;", string.Empty);
+
+                templateContent = templateContent.Replace("&lt;REF&gt;", documentPreview.ReferenceNumber);
             }
             else
             {
@@ -1349,6 +1358,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 templateContent = templateContent.Replace("<SOURCETEXT>", string.Empty);
                 templateContent = templateContent.Replace("<COMPANYNAME>", string.Empty);
                 templateContent = templateContent.Replace("<FROMNAMEWITHCOMPANY>", string.Empty);
+
+                templateContent = templateContent.Replace("<REF>", documentPreview.ReferenceNumber);
             }
 
             template.Content = templateContent;
