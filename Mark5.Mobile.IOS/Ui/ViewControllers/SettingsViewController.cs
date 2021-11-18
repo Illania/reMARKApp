@@ -40,6 +40,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         const string UseTemplateKey = "UseTemplate";
         const string VersionKey = "version";
         const string EmailSwipeActionsKey = "EmailSwipeActions";
+        const string PresetCategoryKey = "PresetCategory";
         const string SyncFavoriteFoldersKey = "SyncFavoriteFolders";
         const string SyncFavoriteFoldersGroupKey = "SyncFavoriteFoldersGroup";
         const string ConnectionDiagnosticsKey = "ConnectionDiagnostics";
@@ -139,6 +140,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var swipeActionVC = new SwipeActionViewController();
                 NavigationController.PushViewController(swipeActionVC, true);
+                return;
+            }
+
+
+            if (specifier.Key == PresetCategoryKey)
+            {
+                var presetVC = new PresetCategoryViewController();
+                NavigationController.PushViewController(presetVC, true);
                 return;
             }
 
@@ -256,6 +265,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return cell;
             }
 
+            if (specifier.Key == PresetCategoryKey)
+            {
+                var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
+                cell.TextLabel.Text = specifier.Title;
+                cell.DetailTextLabel.Text = "";
+                cell.DetailTextLabel.TextColor = Theme.DarkGray;
+                return cell;
+            }
             return null;
         }
 

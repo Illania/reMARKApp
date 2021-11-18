@@ -66,6 +66,8 @@ namespace Mark5.Mobile.IOS.Utilities
             public const string CallerIdentificationEnabledKey = "CallerIdentificationEnabled";
 
             public const string SyncFavoriteFoldersKey = "SyncFavoriteFolders";
+
+            public const string PresetCategoryIdKey = "PresetCategoryId";
         }
 
         readonly NSUserDefaults ud;
@@ -178,6 +180,9 @@ namespace Mark5.Mobile.IOS.Utilities
                 },
                 {
                     new NSString(Keys.SyncFavoriteFoldersKey), NSNumber.FromBoolean(false)
+                },
+                 {
+                    new NSString(Keys.PresetCategoryIdKey), NSNumber.FromInt16(1)
                 },
 
             };
@@ -310,6 +315,16 @@ namespace Mark5.Mobile.IOS.Utilities
             set
             {
                 ud.SetString(value, Keys.AzureApplicationProxyBearerToken);
+                ud.Synchronize();
+            }
+        }
+
+        public int PresetCategoryId
+        {
+            get => (int)ud.IntForKey(Keys.PresetCategoryIdKey);
+            set
+            {
+                ud.SetInt(value, Keys.PresetCategoryIdKey);
                 ud.Synchronize();
             }
         }

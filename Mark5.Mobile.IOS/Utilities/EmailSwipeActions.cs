@@ -18,7 +18,8 @@ namespace Mark5.Mobile.IOS.Utilities
             MoveToFolder,
             SetPriority,
             RemoveFromFolder,
-            Delete
+            Delete,
+            SetPresetCategory
         }
 
         public SwipeAction Action { get; set; }
@@ -41,7 +42,8 @@ namespace Mark5.Mobile.IOS.Utilities
             new EmailSwipeAction(SwipeAction.MoveToFolder),
             new EmailSwipeAction(SwipeAction.SetPriority),
             new EmailSwipeAction(SwipeAction.RemoveFromFolder),
-            new EmailSwipeAction(SwipeAction.Delete)
+            new EmailSwipeAction(SwipeAction.Delete),
+            new EmailSwipeAction(SwipeAction.SetPresetCategory),
         });
 
         public string GetName() {
@@ -74,6 +76,9 @@ namespace Mark5.Mobile.IOS.Utilities
 
                 case EmailSwipeAction.SwipeAction.RemoveFromFolder:
                     return Localization.GetString("delete_from_folder");
+
+                case EmailSwipeAction.SwipeAction.SetPresetCategory:
+                    return Localization.GetString("set_preset_category");
 
                 default:
                     CommonConfig.Logger.Error($"Missing implementation for case : {action.ToString()}");

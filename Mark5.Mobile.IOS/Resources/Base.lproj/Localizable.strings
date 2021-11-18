@@ -444,6 +444,7 @@
 "send_report_with_mark5_content" = "Do you want to send the generated report with reMARK? 
 Please note that these reports are not monitored 24/7 and will be available to developers only. If you need direct assistance, contact Nordic IT Support.";
 "set_priority" = "Set priority";
+"set_preset_category" = "Set preset category";
 "setting_priority___" = "Setting priority...";
 "settings" = "Settings";
 "server_unreachable" = "Server Unreachable";
