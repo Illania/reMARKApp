@@ -1324,6 +1324,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     case EmailSwipeAction.SwipeAction.SetPriority:
                         ShowPriorityActionSheet(documentPreview, tableView, indexPath);
                         break;
+                    case EmailSwipeAction.SwipeAction.SetPresetCategory:
+                        AssignPresetCategory(documentPreview);
+                        break;
                     case EmailSwipeAction.SwipeAction.Delete:
                         Delete(documentPreview, popoverDelegate);
                         break;
@@ -1338,6 +1341,38 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         break;
                 }
             }
+        }
+
+        Category presetCategory;
+
+        async void AssignPresetCategory(DocumentPreview documentPreview)
+        {
+
+            if(presetCategory == null)
+            {
+                var categories = await Managers.DocumentsManager.GetAllCategoriesAsync();
+                    presetCategory = categories.Where(c => c.Id == PlatformConfig.Preferences.PresetCategoryId).FirstOrDefault();
+                    if (presetCategory == null)
+                        return;
+
+            }
+
+            CommonConfig.Logger.Info($"Attempting to assign preset category [documentPreview.Id={documentPreview.Id}]...");
+
+            try
+            {
+                await Managers.DocumentsManager.SetCategoriesAsync(documentPreview, new List<Category> { presetCategory });
+
+                ((DataSource)TableView.Source).UpdateItems(new List<int> { documentPreview.Id });
+                ((DataSource)((UITableViewController)searchController?.SearchResultsController)?.TableView?.Source)?.UpdateItems(new List<int> { documentPreview.Id });
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Assigning preset category for [documentPreview.Id={documentPreview.Id}] failed", ex);
+
+                await Dialogs.ShowErrorAlertAsync(this, ex);
+            }
+            
         }
 
         string SwipeActionTitle(EmailSwipeAction.SwipeAction swipeAction, DocumentPreview documentPreview)
@@ -1362,8 +1397,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return Localization.GetString("move_to_folder");
                 case EmailSwipeAction.SwipeAction.RemoveFromFolder:
                     return Localization.GetString("delete_from_folder");
+                case EmailSwipeAction.SwipeAction.SetPresetCategory:
+                    return Localization.GetString("set_preset_category");
                 default:
-                    CommonConfig.Logger.Error($"Missing implementation for EmailSwipeAction : {swipeAction.ToString()}");
+                    CommonConfig.Logger.Error($"Missing implementation for EmailSwipeAction : {swipeAction}");
                     return "";
             }
         }

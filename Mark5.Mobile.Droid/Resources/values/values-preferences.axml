@@ -41,6 +41,7 @@
         <item>Priorities</item>
         <item>Remove from folder</item>
         <item>Delete</item>
+        <item>Set preset category</item>
         <item>More</item>
     </string-array>
     <string-array name="pref_email_swipe_actions_entries_without_more">
@@ -52,6 +53,7 @@
         <item>Priorities</item>
         <item>Remove from folder</item>
         <item>Delete</item>
+        <item>Set preset category</item>
     </string-array>
     <string-array name="pref_email_swipe_actions_entryvalues">
         <item>1</item>
@@ -63,6 +65,7 @@
         <item>7</item>
         <item>8</item>
         <item>9</item>
+        <item>10</item>
     </string-array>
     <string-array name="pref_sending_delay_entries">
         <item>None</item>
@@ -85,6 +88,7 @@
     <bool name="pref_documents_show_time_older_emails_default">false</bool>
     <bool name="pref_documents_sort_by_date_default">false</bool>
     <string name="pref_sending_delay_default">0</string>
+    <string name="pref_preset_category_default">0</string>
     <bool name="pref_remember_last_user_delay_settings_default">false</bool>
     <bool name="pref_reply_with_attachments_default">false</bool>
     <bool name="pref_documents_read_indicator_me_default">true</bool>

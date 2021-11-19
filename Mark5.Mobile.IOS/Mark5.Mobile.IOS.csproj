@@ -324,6 +324,7 @@
 		<Compile Include="Utilities\Extensions\DateTimeExtensions.cs" />
 		<Compile Include="Utilities\RecentAddressSwipeAction.cs" />
 		<Compile Include="Utilities\CategorySwipeAction.cs" />
+		<Compile Include="Ui\ViewControllers\PresetCategoryViewController.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

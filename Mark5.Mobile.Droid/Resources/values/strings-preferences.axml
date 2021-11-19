@@ -196,6 +196,9 @@
     <string name="pref_key_swipe_options">pref_key_swipe_options</string>
     <string name="pref_swipe_options_summary">Customize swipe options to take quick action on emails in your inbox.</string>
     <string name="pref_swipe_options_title">Swipe options</string>
+    <string name="pref_key_set_preset_category">pref_key_set_preset_category</string>
+    <string name="pref_set_preset_category_summary">Select preset category to be used for quick category assigning.</string>
+    <string name="pref_set_preset_category_title">Preset category</string>
     <string name="pref_key_sync_favorites_enabled">pref_key_sync_favorites_enabled</string>
     <string name="pref_sync_favorites_title">Favorites synchronisation</string>
     <bool name="pref_key_sync_favorites_value">false</bool>

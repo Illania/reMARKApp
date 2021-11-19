@@ -147,6 +147,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 };
             }
 
+            var setPresetCategory = FindPreference(GetString(Resource.String.pref_key_set_preset_category));
+            if (setPresetCategory != null)
+            {
+                setPresetCategory.PreferenceClick += (object sender, Preference.PreferenceClickEventArgs e) =>
+                {
+                    PresetCategoryFragment presetFragment;
+                    string presetFragmentTag;
+                    var fragmentTransaction = Activity.SupportFragmentManager.BeginTransaction();
+                    (presetFragment, presetFragmentTag) = PresetCategoryFragment.NewInstance();
+                    fragmentTransaction.Replace(Resource.Id.fragment_container, presetFragment,presetFragmentTag);
+                    fragmentTransaction.AddToBackStack(null);
+                    fragmentTransaction.Commit();
+                };
+            }
+
             var checkBox = (CheckBoxPreference)FindPreference(GetString(Resource.String.pref_key_sync_favorites_enabled));
             if (checkBox != null)
             {

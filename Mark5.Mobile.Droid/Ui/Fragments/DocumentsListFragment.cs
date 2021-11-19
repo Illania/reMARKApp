@@ -838,6 +838,46 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         }
 
+        Category presetCategory;
+
+        async void AssignPresetCategory(DocumentPreview documentPreview)
+        {
+
+            if (presetCategory == null)
+            {
+                var categories = await Managers.DocumentsManager.GetAllCategoriesAsync();
+                presetCategory = categories.Where(c => c.Id == PlatformConfig.Preferences.PresetCategoryId).FirstOrDefault();
+                if (presetCategory == null)
+                    return;
+
+            }
+
+            CommonConfig.Logger.Info($"Attempting to assign preset category [documentPreview.Id={documentPreview.Id}]...");
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.marking_as_unread, Resource.String.please_wait);
+
+            try
+            {
+                await Managers.DocumentsManager.SetCategoriesAsync(documentPreview, new List<Category> { presetCategory });
+
+                adapter.RefreshItems(new List<DocumentPreview> { documentPreview });
+                searchAdapter.RefreshItems(new List<DocumentPreview> { documentPreview });
+                dismissAction();
+                actionMode?.Finish();
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Assigning preset category for [documentPreview.Id={documentPreview.Id}] failed", ex);
+
+
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+
+            }
+
+        }
+
+
         void SelectDeselectAll()
         {
             if (actionMode == null) 
@@ -1722,6 +1762,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         return context.Resources.GetString(Resource.String.copy_to_folder);
                     case Preferences.EmailSwipeAction.Priorities:
                         return context.Resources.GetString(Resource.String.priority);
+                    case Preferences.EmailSwipeAction.PresetCategory:
+                        return context.Resources.GetString(Resource.String.set_preset_category);
                     default:
                         return "Forgot case ?";
                 }

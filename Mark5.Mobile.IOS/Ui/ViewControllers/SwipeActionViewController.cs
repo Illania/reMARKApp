@@ -694,6 +694,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }));
 
             eas.AddAction(UIAlertAction.Create(
+               Localization.GetString("set_preset_category"),
+               UIAlertActionStyle.Default,
+               a =>
+               {
+                   SetAction(senderBtn.Tag, EmailSwipeAction.SwipeAction.SetPresetCategory);
+               }));
+
+            eas.AddAction(UIAlertAction.Create(
                 Localization.GetString("delete_from_folder"),
                 UIAlertActionStyle.Default,
                 a =>

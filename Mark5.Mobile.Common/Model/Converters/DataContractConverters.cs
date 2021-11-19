@@ -379,7 +379,7 @@ namespace Mark5.Mobile.Common.Model.Converters
                 CreatorId = dp.CreatorId,
                 Creator = dp.Creator,
                 TransmitStatus = dp.TransmitStatus.ConvertEnum<TransmitStatus>(),
-                Lines = dp.Lines.Select(l=>l.Convert()).ToList(),
+                Lines = dp.Lines?.Select(l=>l.Convert()).ToList(),
                 CreatorGuid = dp.CreatorGuid
             };
             if (dp.Addresses != null)
