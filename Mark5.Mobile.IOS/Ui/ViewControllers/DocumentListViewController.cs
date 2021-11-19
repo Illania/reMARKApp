@@ -1342,9 +1342,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
             }
         }
+
         Category presetCategory;
-
-
 
         async void AssignPresetCategory(DocumentPreview documentPreview)
         {

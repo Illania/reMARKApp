@@ -44,6 +44,7 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public bool ReplyWithAttachments => sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_reply_with_attachments), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_reply_with_attachments_default));
 
+       
         #endregion
 
         #region Caller Identification
@@ -170,7 +171,20 @@ namespace Mark5.Mobile.Droid.Utilities
                 e.Commit();
             }
         }
-       
+
+
+        public int PresetCategoryId
+        {
+
+            get => sp.GetInt(Application.Context.GetString(Resource.String.pref_key_set_preset_category), 0);
+            set
+            {
+                var e = sp.Edit();
+                e.PutInt(Application.Context.GetString(Resource.String.pref_key_set_preset_category), value);
+                e.Commit();
+            }
+        }
+           
         public int LastUserSendingDelay
         {
             get => sp.GetInt(Application.Context.GetString(Resource.String.pref_key_last_user_sending_delay), 0);
@@ -212,7 +226,8 @@ namespace Mark5.Mobile.Droid.Utilities
             Priorities = 6,
             RemoveFromFolder = 7,
             Delete = 8,
-            More = 9
+            More = 9,
+            PresetCategory = 10
         }
 
         public EmailSwipeAction EmailLeadingSwipeAction
@@ -247,7 +262,6 @@ namespace Mark5.Mobile.Droid.Utilities
                 e.Commit();
             }
         }
-
 
 
         public List<EmailSwipeAction> GetAllAvailableActions()

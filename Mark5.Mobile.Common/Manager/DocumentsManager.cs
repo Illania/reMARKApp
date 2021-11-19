@@ -593,7 +593,6 @@ namespace Mark5.Mobile.Common.Manager
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-
         public async Task<List<string>> GetAttachmentsAsync(Document document)
         {
             var attachmentList = new List<string>();
