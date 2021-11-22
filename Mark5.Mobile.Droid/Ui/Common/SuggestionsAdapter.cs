@@ -70,7 +70,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             var colorSelection = new Color(ContextCompat.GetColor(parent.Context, Resource.Color.darkblue));
 
             var start = addressPreview.IndexOf(ActualConstraint, StringComparison.CurrentCultureIgnoreCase);
-            var end = start + ActualConstraint.Length;
+            var end = start + ActualConstraint.Length - 1;
 
             var addressSpannable = new SpannableStringBuilder(addressPreview);
 
