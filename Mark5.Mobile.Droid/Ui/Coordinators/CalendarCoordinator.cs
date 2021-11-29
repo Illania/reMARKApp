@@ -21,6 +21,7 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
         readonly FragmentManager fragmentManager;
 
         MonthCalendarFragment monthCalendarFragment;
+        WeekCalendarFragment weekCalendarFragment;
 
         Action dismissAction;
 
@@ -122,11 +123,12 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
 
         public bool DateDoubleTapped(Calendar calendar)
         {
-            var (fragment, tag) = WeekCalendarFragment.NewInstance(calendar);
+            string tag;
+            (weekCalendarFragment, tag) = WeekCalendarFragment.NewInstance(calendar);
 
             fragmentManager.BeginTransaction()
                .SetCustomAnimations(Resource.Animation.fade_in, Resource.Animation.fade_out)
-               .Add(Resource.Id.fragment_container, fragment, tag)
+               .Add(Resource.Id.fragment_container, weekCalendarFragment, tag)
                .AddToBackStack(tag)
                .Commit();
 
@@ -222,6 +224,7 @@ namespace Mark5.Mobile.Droid.Ui.Coordinators
         void UiCache_SourceUpdated(object sender, EventArgs e)
         {
             monthCalendarFragment?.UpdateSource();
+            weekCalendarFragment?.UpdateSource();
         }
 
         #endregion
