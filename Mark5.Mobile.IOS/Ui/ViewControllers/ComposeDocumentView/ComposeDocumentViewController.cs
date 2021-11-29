@@ -703,14 +703,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 autoSaveWorkingCopyWorker.Stop();
                 await autoSaveWorkingCopyWorker.Finished();
             }
-
             bool sent;
             if (!(e is SendButtonClickedEventArgs sendButtonClickedEventArgs))
                 return;
             if (sendButtonClickedEventArgs.Delayed == false)
                 sent = await SendDocument();
             else
-                sent = await SendDocumentWithDelay(sendButtonClickedEventArgs.UsePicker);
+                sent = await SendDocumentWithDelay(sender, sendButtonClickedEventArgs.UsePicker);
 
             if (!sent)
                 return;
@@ -943,7 +942,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             return await SaveAndQueueWorkingCopy();
         }
 
-        async Task<bool> SendDocumentWithDelay(bool usePicker = true)
+        async Task<bool> SendDocumentWithDelay(object sender, bool usePicker = true)
         {
             var result = await CheckDocument();
             if (!result)
@@ -959,7 +958,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     pickedDateTime = pickedDateTime.AddSeconds(sendingDelay);
                 }  
                 else
-                    pickedDateTime = await GetDelaySendDateTimeFromPicker();
+                    pickedDateTime = await GetDelaySendDateTimeFromPicker(sender);
 
                 if (pickedDateTime.Equals(DateTime.MinValue))
                     return false;
@@ -973,7 +972,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             }
         }
 
-        private async Task<DateTime> GetDelaySendDateTimeFromPicker()
+        private async Task<DateTime> GetDelaySendDateTimeFromPicker(object sender)
         {
             var options = new[]
            {
@@ -981,7 +980,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 Localization.GetString("send_email_after")
             };
 
-            var choice = await Dialogs.ShowListActionSheetAsync(this, options);
+            var choice = await Dialogs.ShowListActionSheetAsync(this, options, (UIView)sender);
 
             var pickedDateTime = DateTime.Now.ToUniversalTime();
 
