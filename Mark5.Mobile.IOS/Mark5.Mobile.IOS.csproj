@@ -835,14 +835,14 @@
 		<ImageAsset Include="Assets_icons.xcassets\Nav-search.imageset\nav-search-1.pdf" />
 		<ImageAsset Include="Assets_icons.xcassets\Delayed.imageset\Contents.json" />
 		<ImageAsset Include="Assets_icons.xcassets\Delayed.imageset\timer.pdf" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_2.imageset\onboarding_2.pdf" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_3.imageset\onboarding_3-1.pdf" />
 		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_1.imageset\Contents.json" />
 		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_1.imageset\Page01.pdf" />
 		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_4.imageset\Contents.json" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_4.imageset\onboarding_4.pdf" />
 		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_5.imageset\Contents.json" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_5.imageset\onboarding_5.pdf" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_2.imageset\1.pdf" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_3.imageset\2.pdf" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_4.imageset\3.pdf" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_5.imageset\4.pdf" />
 	</ItemGroup>
 	<ItemGroup>
 		<BundleResource Include="Resources\Base.lproj\Localizable.strings" />

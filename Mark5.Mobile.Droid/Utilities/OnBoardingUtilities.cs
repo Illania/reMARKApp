@@ -92,8 +92,13 @@ namespace Mark5.Mobile.Droid.Utilities
             {
                 new OnBoardingPageModel("Welcome to reMARK", "We have made a few changes in the reMARK app. Press next to see what has changed.",
                      Resource.Drawable.onboarding_1),
-                new OnBoardingPageModel("Delayed send", "Now you can send emails with a delay or at the specified time",
-                     Resource.Drawable.onboarding_2)
+                new OnBoardingPageModel("Azure Application Proxy with AD pre-authentication", "Now you can use Active Directory pre-authentication to login to reMARK through Azure Application Proxy.",
+                     Resource.Drawable.onboarding_2),
+                new OnBoardingPageModel("Share options support", "Now you can share images, files and text from other applications to reMARK app.",
+                     Resource.Drawable.onboarding_3),
+                new OnBoardingPageModel("Possibility to include attachments in replies", "Now it is possible to include source email attachments in replies to that email.",
+                     Resource.Drawable.onboarding_4)
+
             };
         }
 
