@@ -192,6 +192,11 @@ namespace Mark5.Mobile.Common.Manager
             await CopyToUserWorktray(businessEntities.Select(bi => bi.Id).ToList(), businessEntities.First().ObjectType, systemUsers, comment, sourceType);
         }
 
+        public async Task CopyToUserWorktray(List<IBusinessEntity> businessEntities, List<int> systemUsersIds, string comment = null, SourceType sourceType = SourceType.Auto)
+        {
+            await CopyToUserWorktray(businessEntities.Select(bi => bi.Id).ToList(), businessEntities.First().ObjectType, systemUsersIds, comment, sourceType);
+        }
+
         public async Task CopyToUserWorktray(List<int> ids, ObjectType objectType, List<SystemUser> systemUsers, string comment = null, SourceType sourceType = SourceType.Auto)
         {
             CommonConfig.UsageAnalytics.LogEvent(new CopyToUserWorktrayEvent(objectType.ToModuleType(), ids.Count));
@@ -207,6 +212,33 @@ namespace Mark5.Mobile.Common.Manager
                     ObjectIds = ids.ToArray(),
                     ObjectType = objectType.ConvertEnum<DataContract.ObjectType>(),
                     UserIds = systemUsers.Select(su => su.Id).ToArray(),
+                    Comment = comment
+                });
+
+                return;
+            }
+
+            if (sourceType == SourceType.Local)
+                throw new ReMarkException(ErrorConstants.Codes.InvalidSourceType);
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
+
+        public async Task CopyToUserWorktray(List<int> ids, ObjectType objectType, List<int> systemUsersIds, string comment = null, SourceType sourceType = SourceType.Auto)
+        {
+            CommonConfig.UsageAnalytics.LogEvent(new CopyToUserWorktrayEvent(objectType.ToModuleType(), ids.Count));
+
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
+            {
+                await AppServiceProxy.CopyToWorktrayAsync(new DataContract.CopyToWorktrayParameters
+                {
+                    Token = Token,
+                    ObjectIds = ids.ToArray(),
+                    ObjectType = objectType.ConvertEnum<DataContract.ObjectType>(),
+                    UserIds = systemUsersIds.ToArray(),
                     Comment = comment
                 });
 

@@ -93,6 +93,7 @@
     <string name="deleting">Deleting...</string>
     <string name="deleting_comment">Deleting comment</string>
     <string name="deleting_from_folder">Removing from folder...</string>
+    <string name="departments">Departments</string>
     <string name="description">Description</string>
     <string name="diagnostics_progress_text">Performing Diagnostics</string>
     <string name="diagnostics_stable">Stable</string>
@@ -524,6 +525,7 @@
     <string name="updating_categories">Updating Categories</string>
     <string name="username">Username</string>
     <string name="username_invalid">Username is not valid</string>
+    <string name="users">Users</string>
     <string name="use_pincode">Use pincode</string>
     <string name="vat">VAT</string>
     <string name="warning">Warning</string>

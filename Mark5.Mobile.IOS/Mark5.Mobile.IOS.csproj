@@ -325,6 +325,8 @@
 		<Compile Include="Utilities\RecentAddressSwipeAction.cs" />
 		<Compile Include="Utilities\CategorySwipeAction.cs" />
 		<Compile Include="Ui\ViewControllers\PresetCategoryViewController.cs" />
+		<Compile Include="Ui\ViewControllers\CopyToDepartmentWorktrayViewController.cs" />
+		<Compile Include="Ui\ViewControllers\CopyToUserWorktrayViewController %28copy%29.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
