@@ -53,7 +53,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 var be = Serializer.Deserialize<List<int>>(Intent.Extras.GetString(IdsIntentKey));
                 var ot = (ObjectType)Intent.Extras.GetInt(ObjectTypeIntentKey);
                 var ft = SupportFragmentManager.BeginTransaction();
-                var (dlf, tag) = CopyToUserWorktrayFragment.NewInstance(be, ot);
+                var (dlf, tag) = CopyToWorktrayFragment.NewInstance(be, ot);
                 ft.Replace(Resource.Id.fragment_container, dlf, tag);
                 ft.Commit();
 

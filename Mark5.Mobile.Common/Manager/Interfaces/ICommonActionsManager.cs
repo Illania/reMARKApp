@@ -24,8 +24,12 @@ namespace Mark5.Mobile.Common.Manager
 
         Task CopyToUserWorktray(List<IBusinessEntity> businessEntities, List<SystemUser> systemUsers, string comment = null, SourceType sourceType = SourceType.Auto);
 
+        Task CopyToUserWorktray(List<IBusinessEntity> businessEntities, List<int> systemUsersIds, string comment = null, SourceType sourceType = SourceType.Auto);
+
         Task CopyToUserWorktray(List<int> businessEntitiesIds, ObjectType objectType, List<SystemUser> systemUsers, string comment = null, SourceType sourceType = SourceType.Auto);
 
+        Task CopyToUserWorktray(List<int> ids, ObjectType objectType, List<int> systemUsersIds, string comment = null, SourceType sourceType = SourceType.Auto);
+      
         Task RemoveFromFolder(List<IBusinessEntity> businessEntities, Folder folder, SourceType sourceType = SourceType.Auto);
 
         Task Delete(List<IBusinessEntity> businessEntities, SourceType sourceType = SourceType.Auto);

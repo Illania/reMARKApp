@@ -510,7 +510,7 @@
     <Compile Include="Ui\Fragments\ContactFragment.cs" />
     <Compile Include="Ui\Fragments\ContactsSearchCriteriaFragment.cs" />
     <Compile Include="Ui\Fragments\ContactsSearchResultsFragment.cs" />
-    <Compile Include="Ui\Fragments\CopyToUserWorktrayFragment.cs" />
+    <Compile Include="Ui\Fragments\CopyToWorktrayFragment.cs" />
     <Compile Include="Ui\Fragments\DocumentFragment.cs" />
     <Compile Include="Ui\Fragments\DocumentsListFragment.cs" />
     <Compile Include="Ui\Fragments\DocumentsSearchCriteriaFragment.cs" />
@@ -721,6 +721,8 @@
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Utilities\Extensions\DateTimeExtensions.cs" />
     <Compile Include="Ui\Fragments\CategoriesListFragment.cs" />
+    <Compile Include="Ui\Fragments\CopyToUserWorktrayFragment.cs" />
+    <Compile Include="Ui\Fragments\CopyToDepartmentWorktrayFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

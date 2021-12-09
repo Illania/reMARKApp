@@ -114,6 +114,7 @@
 "deleting_comment___" = "Deleting comment...";
 "deleting_from_folder___" = "Removing from folder...";
 "department" = "Department";
+"departments"= "Departments";
 "description" = "Description"; 
 "disable_sync" = "Disable\nsync";
 "disable_notifications" = "Don't\nnotify";
@@ -492,6 +493,7 @@ Please note that these reports are not monitored 24/7 and will be available to d
 "updating_config___" = "Updating configuration...";
 "urgent" = "Urgent";
 "username" = "Username";
+"users" = "Users";
 "use_passcode" = "Use Passcode";
 "vat" = "VAT";
 "warning" = "Warning";
