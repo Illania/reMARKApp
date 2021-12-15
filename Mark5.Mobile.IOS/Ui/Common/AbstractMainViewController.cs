@@ -35,7 +35,9 @@ namespace Mark5.Mobile.IOS.Ui.Common
         UIButton moduleNavigationButton;
 
         UIView searchButtonContainer;
+        UIView createButtonContainer;
         UIButton searchButton;
+        UIButton createButton;
 
         TinyMessageSubscriptionToken reMarkNav;
 
@@ -141,6 +143,37 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 searchButton.BottomAnchor.ConstraintEqualTo(searchButtonContainer.BottomAnchor),
             });
 
+            createButtonContainer = new TouchTransparentView
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+
+            View.AddSubview(createButtonContainer);
+            View.AddConstraints(new[]
+            {
+                createButtonContainer.HeightAnchor.ConstraintEqualTo(65f),
+                createButtonContainer.WidthAnchor.ConstraintEqualTo(55f),
+                createButtonContainer.RightAnchor.ConstraintEqualTo(View.RightAnchor, 0),
+                createButtonContainer.BottomAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.BottomAnchor : BottomLayoutGuide.GetTopAnchor(), 2),
+            });
+
+            createButton = new UIButton
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                ClipsToBounds = true,
+                ImageEdgeInsets = new UIEdgeInsets(15f, 15f, 15f, 15f)
+            };
+
+            createButton.SetImage(UIImage.FromBundle("Compose").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+            createButtonContainer.AddSubview(createButton);
+            createButtonContainer.AddConstraints(new[]
+            {
+                createButton.HeightAnchor.ConstraintEqualTo(55f),
+                createButton.WidthAnchor.ConstraintEqualTo(55f),
+                createButton.CenterXAnchor.ConstraintEqualTo(createButtonContainer.CenterXAnchor),
+                createButton.BottomAnchor.ConstraintEqualTo(createButtonContainer.BottomAnchor),
+            });
+
             CustomizableViewControllers = null;
 
             CommonConfig.MessengerHub.Publish(new NavigationModuleChangedMessage(this, new NavigationModule(CurrentNavigationModuleType)));
@@ -154,8 +187,20 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             moduleNavigationButton.TouchUpInside += ModuleNavigationButton_TouchUpInside;
             searchButton.TouchUpInside += SearchButton_TouchUpInside;
+            createButton.TouchUpInside += CreateButton_TouchUpInside;
 
             CustomizableViewControllers = null;
+        }
+
+        private void CreateButton_TouchUpInside(object sender, EventArgs e)
+        {
+  
+            var vc = new ComposeDocumentViewController
+            {
+                DocumentCreationModeFlag = DocumentCreationModeFlag.New
+            };
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+            
         }
 
         public override void ViewDidAppear(bool animated)
@@ -176,6 +221,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             moduleNavigationButton.TouchUpInside -= ModuleNavigationButton_TouchUpInside;
             searchButton.TouchUpInside -= SearchButton_TouchUpInside;
+            createButton.TouchUpInside -= CreateButton_TouchUpInside;
 
         }
 
@@ -183,12 +229,14 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             navigationButtonContainer.Hidden = hidden;
             searchButtonContainer.Hidden = hidden;
+            createButtonContainer.Hidden = hidden;
         }
 
         public void SetBottomNavigationButtonsAlpha(float val)
         {
             moduleNavigationButton.Alpha = val;
             searchButton.Alpha = val;
+            createButton.Alpha = val;
         }
 
         public override void ViewDidLayoutSubviews()
@@ -196,6 +244,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             base.ViewDidLayoutSubviews();
             View.BringSubviewToFront(navigationButtonContainer);
             View.BringSubviewToFront(searchButtonContainer);
+            View.BringSubviewToFront(createButtonContainer);
         }
 
         protected void CreateDocumentFromSharingOptions()

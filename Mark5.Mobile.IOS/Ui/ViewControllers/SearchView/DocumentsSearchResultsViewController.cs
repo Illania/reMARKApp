@@ -687,6 +687,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
 
             bool loading = true;
 
+
+
             public DataSource(DocumentsSearchResultsViewController viewController, UITableView tableView, bool compactList)
             {
                 viewControllerWeakReference = viewController.Wrap();
@@ -707,24 +709,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 }
 
                 var dp = Items[indexPath.Row];
-
                 if (dp.Direction == DocumentDirection.External)
                 {
                     var cell = tableView.DequeueReusableCell(DocumentsTableViewCell.ExternalId) as DocumentsTableViewCell ?? new DocumentsTableViewCell(DocumentsTableViewCell.ExternalId);
-                    cell.Initialize(dp);
+                    cell.Initialize(dp,  -1);
                     return cell;
                 }
 
                 if (compactList)
                 {
                     var cell = tableView.DequeueReusableCell(DocumentsTableViewCell.CompactId) as DocumentsTableViewCell ?? new DocumentsTableViewCell(DocumentsTableViewCell.CompactId);
-                    cell.Initialize(dp);
+                    cell.Initialize(dp, -1);
                     return cell;
                 }
                 else
                 {
                     var cell = tableView.DequeueReusableCell(DocumentsTableViewCell.DefaultId) as DocumentsTableViewCell ?? new DocumentsTableViewCell(DocumentsTableViewCell.DefaultId);
-                    cell.Initialize(dp);
+                    cell.Initialize(dp, -1);
                     return cell;
                 }
             }

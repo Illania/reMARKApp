@@ -243,7 +243,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var dp = items[indexPath.Section][indexPath.Row];
 
                 var cell = tableView.DequeueReusableCell(DocumentsTableViewCell.UploadId) as DocumentsTableViewCell ?? new DocumentsTableViewCell(DocumentsTableViewCell.UploadId);
-                cell.Initialize(dp.DocumentPreview);
+                cell.Initialize(dp.DocumentPreview, -1);
 
                 cell.SelectionStyle = indexPath.Section == Section.Failed
                     ? UITableViewCellSelectionStyle.Default

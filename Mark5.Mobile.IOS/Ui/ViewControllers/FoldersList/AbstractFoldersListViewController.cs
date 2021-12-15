@@ -36,7 +36,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         protected readonly bool DisableSearch;
 
         protected UIBarButtonItem EditModeItem;
-        protected UIBarButtonItem ComposeDocumentItem;
         protected UIBarButtonItem CreateContactItem;
         protected UIBarButtonItem CreateShortcodeItem;
 
@@ -162,7 +161,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             UnsubscribeFromMessages();
 
             EditModeItem = null;
-            ComposeDocumentItem = null;
             CreateContactItem = null;
             CreateShortcodeItem = null;
 
@@ -218,11 +216,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 if (ParentFolder.Module == ModuleType.Documents)
                 {
-                    ComposeDocumentItem = new UIBarButtonItem
-                    {
-                        Image = UIImage.FromBundle("Create")
-                    };
-                    NavigationItem.SetRightBarButtonItem(ComposeDocumentItem, false);
 
                     if (IsRootOfFoldersList)
                     {
@@ -312,8 +305,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         protected virtual void InitializeHandlers()
         {
-            if (ComposeDocumentItem != null)
-                ComposeDocumentItem.Clicked += ComposeDocumentItem_Clicked;
 
             if (EditModeItem != null)
                 EditModeItem.Clicked += EditModeItem_Clicked;
@@ -329,8 +320,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         protected virtual void DeinitializeHandlers()
         {
-            if (ComposeDocumentItem != null)
-                ComposeDocumentItem.Clicked -= ComposeDocumentItem_Clicked;
 
             if (EditModeItem != null)
                 EditModeItem.Clicked -= EditModeItem_Clicked;

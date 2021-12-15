@@ -262,7 +262,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             }
         }
 
-        public void Initialize(DocumentPreview dp)
+        public void Initialize(DocumentPreview dp, int folderId)
         {
             if (ReuseIdentifier == DefaultId || ReuseIdentifier == CompactId || ReuseIdentifier == ExternalId)
                 InitializeCategories(dp);
@@ -408,6 +408,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             var defaultAppearance = ServerConfig.SystemSettings.DocumentsModuleInfo.DefaultAppearance;
             var daReadColor = Color.FromArgb(defaultAppearance.FontColor).ToPlatformColor();
             var daUnreadColor = Color.FromArgb(defaultAppearance.UnreadFontColor).ToPlatformColor();
+
             if (defaultAppearance.FontColorEnable)
                 bottomLabel.TextColor = Color.FromArgb(defaultAppearance.FontColor).ToPlatformColor();
             if(defaultAppearance.UnreadFontColorEnable)
@@ -442,6 +443,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                     bottomLabel.TextColor = dp.IsReadByCurrent ? uaReadColor : uaUnreadColor;
 
             }
+ 
         }
 
         void InitializeUnreadIndicator(DocumentPreview dp)
