@@ -712,20 +712,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 if (dp.Direction == DocumentDirection.External)
                 {
                     var cell = tableView.DequeueReusableCell(DocumentsTableViewCell.ExternalId) as DocumentsTableViewCell ?? new DocumentsTableViewCell(DocumentsTableViewCell.ExternalId);
-                    cell.Initialize(dp,  -1);
+                    cell.Initialize(dp);
                     return cell;
                 }
 
                 if (compactList)
                 {
                     var cell = tableView.DequeueReusableCell(DocumentsTableViewCell.CompactId) as DocumentsTableViewCell ?? new DocumentsTableViewCell(DocumentsTableViewCell.CompactId);
-                    cell.Initialize(dp, -1);
+                    cell.Initialize(dp);
                     return cell;
                 }
                 else
                 {
                     var cell = tableView.DequeueReusableCell(DocumentsTableViewCell.DefaultId) as DocumentsTableViewCell ?? new DocumentsTableViewCell(DocumentsTableViewCell.DefaultId);
-                    cell.Initialize(dp, -1);
+                    cell.Initialize(dp);
                     return cell;
                 }
             }

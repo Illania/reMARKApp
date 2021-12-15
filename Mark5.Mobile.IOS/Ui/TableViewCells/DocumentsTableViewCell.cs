@@ -262,7 +262,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             }
         }
 
-        public void Initialize(DocumentPreview dp, int folderId)
+        public void Initialize(DocumentPreview dp)
         {
             if (ReuseIdentifier == DefaultId || ReuseIdentifier == CompactId || ReuseIdentifier == ExternalId)
                 InitializeCategories(dp);

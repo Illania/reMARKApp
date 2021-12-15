@@ -1660,7 +1660,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (dp.Direction == DocumentDirection.External)
                 {
                     var cell = tableView.DequeueReusableCell(DocumentsTableViewCell.ExternalId) as DocumentsTableViewCell ?? new DocumentsTableViewCell(DocumentsTableViewCell.ExternalId);
-                    cell.Initialize(dp, folderId );
+                    cell.Initialize(dp);
                     InitializeBookmarkAppearance(dp, folderId, cell);
                     return cell;
                 }
@@ -1668,14 +1668,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (compactList)
                 {
                     var cell = tableView.DequeueReusableCell(DocumentsTableViewCell.CompactId) as DocumentsTableViewCell ?? new DocumentsTableViewCell(DocumentsTableViewCell.CompactId);
-                    cell.Initialize(dp, folderId );
+                    cell.Initialize(dp);
                     InitializeBookmarkAppearance(dp, folderId, cell);
                     return cell;
                 }
                 else
                 {
                     var cell = tableView.DequeueReusableCell(DocumentsTableViewCell.DefaultId) as DocumentsTableViewCell ?? new DocumentsTableViewCell(DocumentsTableViewCell.DefaultId);
-                    cell.Initialize(dp, folderId);
+                    cell.Initialize(dp);
                     InitializeBookmarkAppearance(dp, folderId, cell);
                     return cell;
                 }
