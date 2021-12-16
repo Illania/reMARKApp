@@ -184,10 +184,10 @@ namespace Mark5.Mobile.IOS.Utilities
                 {
                     new NSString(Keys.SyncFavoriteFoldersKey), NSNumber.FromBoolean(false)
                 },
-                 {
+                {
                     new NSString(Keys.PresetCategoryIdKey), NSNumber.FromInt16(1)
                 },
-                 {
+                {
                     new NSString(Keys.BookmarksForFolders), new NSDictionary()
                 },
 
@@ -355,7 +355,6 @@ namespace Mark5.Mobile.IOS.Utilities
             }
         }
 
-
         #region Bookmarks
 
         public bool HasBookmarkForFolder(int folderId, int docId)
@@ -363,8 +362,7 @@ namespace Mark5.Mobile.IOS.Utilities
             var hasBookmark = BookmarksForFolders.Contains(new KeyValuePair<string, string>(folderId.ToString(), docId.ToString()));
             return hasBookmark;
         }
-
-     
+ 
         public void SetBookmarkForFolder(int folderId, int docId)
         {
             var newBookmarks = BookmarksForFolders;
@@ -384,7 +382,7 @@ namespace Mark5.Mobile.IOS.Utilities
                 return Convert.ToInt32(BookmarksForFolders[folderId.ToString()]);
         }
 
-        public void RemoveBookmarkForFolder(int folderId, int docId)
+        public void RemoveBookmarkForFolder(int folderId)
         {
             var newBookmarks = BookmarksForFolders;
             if (BookmarksForFolders.ContainsKey(folderId.ToString()))
@@ -393,7 +391,6 @@ namespace Mark5.Mobile.IOS.Utilities
             BookmarksForFolders = newBookmarks;
         }
            
-
         public Dictionary<string,string> BookmarksForFolders
         {
             get
@@ -412,7 +409,6 @@ namespace Mark5.Mobile.IOS.Utilities
         }
 
         #endregion
-
 
 
         #region EmailSwipeActions

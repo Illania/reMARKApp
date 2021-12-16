@@ -226,8 +226,9 @@ namespace Mark5.Mobile.Droid.Utilities
             Priorities = 6,
             RemoveFromFolder = 7,
             Delete = 8,
-            More = 9,
-            PresetCategory = 10
+            PresetCategory = 9,
+            AddBookmark = 10,
+            More = 11
         }
 
         public EmailSwipeAction EmailLeadingSwipeAction
@@ -263,14 +264,13 @@ namespace Mark5.Mobile.Droid.Utilities
             }
         }
 
-
         public List<EmailSwipeAction> GetAllAvailableActions()
         {
             var arr = Application.Context.Resources.GetStringArray(Resource.Array.pref_email_swipe_actions_entryvalues).ToList();
             var selectArr = arr.Select(x => (EmailSwipeAction)Enum.Parse(typeof(EmailSwipeAction), x));
             return selectArr.ToList();
         }
-
+      
         public List<EmailSwipeAction> GetAvailableSwipeActions()
         {
             var exceptLeading = GetAllAvailableActions().Where(x =>
@@ -288,6 +288,71 @@ namespace Mark5.Mobile.Droid.Utilities
         {
             EmailLeadingSwipeAction = EmailSwipeAction.Categories;
             EmailTrailingSwipeAction = EmailSwipeAction.CopyToWorkTray;
+        }
+
+        #endregion
+
+        #region Bookmarks
+
+        public Dictionary<int, int> BookmarksForFolders
+        {
+            get
+            {
+                var pref = sp.GetStringSet(Application.Context.GetString(Resource.String.pref_key_bookmarks), new List<string>());
+                var dict = new Dictionary<int, int>();
+                foreach (var keyValue in pref)
+                {
+                    var splitString = keyValue.Split(":");
+                    dict.Add(Convert.ToInt32(splitString[0]), Convert.ToInt32(splitString[1]));
+                }
+                return dict;
+            }
+
+            set
+            {
+                var e = sp.Edit();
+                var bookmarkList = new List<string>();
+                foreach (var keyValue in value)
+                {
+                    bookmarkList.Add(string.Join(":", new List<string> { keyValue.Key.ToString(), keyValue.Value.ToString() }));
+                }
+                e.PutStringSet(Application.Context.GetString(Resource.String.pref_key_bookmarks), bookmarkList);
+                e.Commit();
+            }
+        }
+
+        public bool HasBookmarkForFolder(int folderId, int docId)
+        {
+            var hasBookmark = BookmarksForFolders.Contains(new KeyValuePair<int, int>(folderId, docId));
+            return hasBookmark;
+        }
+
+        public void SetBookmarkForFolder(int folderId, int docId)
+        {
+            var newBookmarks = BookmarksForFolders;
+            if (!BookmarksForFolders.ContainsKey(folderId))
+                newBookmarks.Add(folderId, docId);
+            else
+                newBookmarks[folderId] = docId;
+
+            BookmarksForFolders = newBookmarks;
+        }
+
+        public int GetBookmarkForFolder(int folderId)
+        {
+            if (!BookmarksForFolders.ContainsKey(folderId))
+                return -1;
+            else
+                return Convert.ToInt32(BookmarksForFolders[folderId]);
+        }
+
+        public void RemoveBookmarkForFolder(int folderId)
+        {
+            var newBookmarks = BookmarksForFolders;
+            if (BookmarksForFolders.ContainsKey(folderId))
+                newBookmarks.Remove(folderId);
+
+            BookmarksForFolders = newBookmarks;
         }
 
         #endregion

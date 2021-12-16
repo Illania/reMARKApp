@@ -137,6 +137,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
 
             adapter = new DocumentsListAdapter(Activity, recyclerView, async (startId) => await RefreshData(startId));
+            adapter.FolderId = Folder.Id;
             adapter.ItemClicked += Adapter_ItemClicked;
             adapter.ItemLongClicked += Adapter_ItemLongClicked;
             adapter.RegisterAdapterDataObserver(new LambdaEmptyAdapterObserver(() =>
@@ -147,6 +148,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 emptyView.Visibility = adapter.ItemCount < 1 ? ViewStates.Visible : ViewStates.Gone;
                 recyclerView.Visibility = adapter.ItemCount > 0 ? ViewStates.Visible : ViewStates.Gone;
                 menu?.FindItem(Resource.Id.action_filter)?.SetEnabled(adapter.ItemCount > 0);
+                
             }));
             recyclerView.SetAdapter(adapter);
 
@@ -271,6 +273,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var searchItem = menu.Add(Menu.None, 10, Menu.None, Resource.String.search);
             searchItem.SetIcon(Resource.Drawable.action_search_server);
             searchItem.SetShowAsAction(ShowAsAction.Always);
+
+            var bookmarkItem = menu.Add(Menu.None, 11, Menu.None, Resource.String.search);
+            bookmarkItem.SetIcon(Resource.Drawable.ic_bookmark);
+            bookmarkItem.SetShowAsAction(ShowAsAction.Always);
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
@@ -280,10 +286,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 StartActivity(SearchActivity.CreateIntent(Context, ModuleType.Documents));
                 return true;
             }
+            if(item.ItemId == 11)
+            {
+                GoToBookmark();
+                return true;
+            }
 
             return base.OnOptionsItemSelected(item);
         }
 
+        
         #endregion
 
         #region Actions
@@ -297,6 +309,64 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             StartActivity(ComposeDocumentActivity.CreateIntent(Context, DocumentCreationModeFlag.New, CopyToNewOption.None));
+        }
+
+        public void GoToBookmark()
+        {
+            var bookmarkForFolderId = PlatformConfig.Preferences.GetBookmarkForFolder(Folder.Id);
+            if (bookmarkForFolderId > 0)
+            {
+                var index = adapter.Items.FindIndex(dp => dp.Id == bookmarkForFolderId);
+
+                if (index >= 0)
+                {
+                    recyclerView.SmoothScrollToPosition(index);
+                }
+            }
+
+        }
+
+        async void AddBookmark(DocumentPreview documentPreview)
+        {
+
+            CommonConfig.Logger.Info($"Attempting to add bookmark for folder Id= {Folder.Id} [documentPreview.Id={documentPreview.Id}]...");
+
+            try
+            {
+                var previousBookmarkedDocId = PlatformConfig.Preferences.GetBookmarkForFolder(Folder.Id);
+                var itemsToUpdate = new List<int> { documentPreview.Id };
+                if (previousBookmarkedDocId > 0)
+                    itemsToUpdate.Add(previousBookmarkedDocId);
+                PlatformConfig.Preferences.SetBookmarkForFolder(Folder.Id, documentPreview.Id);
+                adapter.RefreshItems(itemsToUpdate);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Adding bookmark for folder Id= {Folder.Id} [documentPreview.Id={documentPreview.Id}] failed", ex);
+
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+
+            }
+
+        }
+
+        async void RemoveBookmark(DocumentPreview documentPreview)
+        {
+
+            CommonConfig.Logger.Info($"Attempting to remove bookmark for folder Id= {Folder.Id} [documentPreview.Id={documentPreview.Id}]...");
+
+            try
+            {
+                PlatformConfig.Preferences.RemoveBookmarkForFolder(Folder.Id);
+                adapter.RefreshItems(new List<int> { documentPreview.Id });
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Removing bookmark for folder Id= {Folder.Id} [documentPreview.Id={documentPreview.Id}] failed", ex);
+
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+            }
+
         }
 
         #endregion
@@ -652,7 +722,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-
         async void ForceSend(List<DocumentPreview> items)
         {
             var delayedItems = items.Where(i => i.TransmitStatus == TransmitStatus.Delayed).ToList();
@@ -721,7 +790,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
             }
         }
-
 
         async void MarkAsRead(List<DocumentPreview> items)
         {
@@ -876,7 +944,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
         }
-
 
         void SelectDeselectAll()
         {
@@ -1219,6 +1286,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public int SelectedItemCount => selectedDocumentsInView.Count;
 
             public bool EnableLoadMore { get; set; }
+            public int FolderId { get; set; }
 
             public event EventHandler<DocumentPreview> ItemClicked = delegate { };
             public event EventHandler<DocumentPreview> ItemLongClicked = delegate { };
@@ -1314,13 +1382,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     }
 
                     dpvh.Selected = selectedDocumentsInView.ContainsKey(dp.Id);
+                    InitializeBookmarkAppearance(dp, FolderId, dpvh);
+
                 }
                 else if (holder is ExternalDocumentPreviewViewHolder)
                 {
                     var edpvh = holder as ExternalDocumentPreviewViewHolder;
 
                     edpvh.SwipedDirection = position == swipedPosition ? swipedDirection : 0;
-
                     edpvh.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, dp)));
                     edpvh.ItemView.SetOnLongClickListener(new ActionOnLongClickListener(() => ItemLongClicked(this, dp)));
 
@@ -1335,6 +1404,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     edpvh.PriorityLowIndicator = dp.Priority == Priority.Low;
 
                     edpvh.Selected = selectedDocumentsInView.ContainsKey(dp.Id);
+                    InitializeBookmarkAppearance(dp, FolderId, edpvh);
                 }
 
                 if (recyclerView != null && loadMoreAction != null && position == ItemCount - 1 && EnableLoadMore)
@@ -1344,6 +1414,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     loadMoreAction(dp.Id);
                 }
             }
+
+            void InitializeBookmarkAppearance(DocumentPreview dp, int folderId, DocumentPreviewViewHolder cell)
+            {
+                if (PlatformConfig.Preferences.HasBookmarkForFolder(folderId, dp.Id))
+                    cell.ItemView.SetBackgroundColor(new Color(ContextCompat.GetColor(context, Resource.Color.brown)));
+                else
+                    cell.ItemView.SetBackgroundColor(new Color(ContextCompat.GetColor(context, Resource.Color.white)));
+            }
+
+            void InitializeBookmarkAppearance(DocumentPreview dp, int folderId, ExternalDocumentPreviewViewHolder cell)
+            {
+                if (PlatformConfig.Preferences.HasBookmarkForFolder(folderId, dp.Id))
+                    cell.ItemView.SetBackgroundColor(new Color(ContextCompat.GetColor(context, Resource.Color.brown)));
+                else
+                    cell.ItemView.SetBackgroundColor(new Color(ContextCompat.GetColor(context, Resource.Color.white)));
+            }
+
 
             public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
             {
@@ -1405,6 +1492,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 foreach (var item in items)
                 {
                     var position = GetPosition(item);
+                    if (position >= 0)
+                        NotifyItemChanged(position);
+                }
+            }
+
+            public void RefreshItems(List<int> itemsIds)
+            {
+                foreach (var itemId in itemsIds)
+                {
+                    var position = GetPosition(itemId);
                     if (position >= 0)
                         NotifyItemChanged(position);
                 }
@@ -1710,6 +1807,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                             fragment.StartActivity(CopyMoveToFolderListActivity.CreateIntent(context, CopyMoveToFolderListActivity.ModeType.Move, ModuleType.Documents,
                                                                                              new List<DocumentPreview> { adapter.Items[adapterPosition] }.Cast<IBusinessEntity>().ToList(), folder));
                             break;
+                        case Preferences.EmailSwipeAction.AddBookmark:
+                            if (!PlatformConfig.Preferences.HasBookmarkForFolder(folder.Id, adapter.Items[adapterPosition].Id))
+                                fragment.AddBookmark(adapter.Items[adapterPosition]);
+                            else
+                                fragment.RemoveBookmark(adapter.Items[adapterPosition]);
+                            break;
                     }
                 }
 
@@ -1764,6 +1867,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         return context.Resources.GetString(Resource.String.priority);
                     case Preferences.EmailSwipeAction.PresetCategory:
                         return context.Resources.GetString(Resource.String.set_preset_category);
+                    case Preferences.EmailSwipeAction.AddBookmark:
+                        if (!PlatformConfig.Preferences.HasBookmarkForFolder(folder.Id, adapter.Items[position].Id))
+                            return context.Resources.GetString(Resource.String.add_bookmark);
+                        else
+                            return context.Resources.GetString(Resource.String.remove_bookmark);
                     default:
                         return "Forgot case ?";
                 }
@@ -1772,6 +1880,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class DocumentPreviewViewHolder : RecyclerView.ViewHolder
         {
+            public int FolderId { get; set; }
+
             public string Recipent { set => recipentTextView.Text = value; }
 
             public string Date { set => dateTextView.Text = value; }
@@ -1921,6 +2031,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         class ExternalDocumentPreviewViewHolder : RecyclerView.ViewHolder
         {
+            public int FolderId { get; set; }
+
             public string Name { set => nameTextView.Text = value; }
 
             public string Date { set => dateTextView.Text = value; }

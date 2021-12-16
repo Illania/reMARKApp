@@ -42,6 +42,7 @@
         <item>Remove from folder</item>
         <item>Delete</item>
         <item>Set preset category</item>
+        <item>Add bookmark</item>
         <item>More</item>
     </string-array>
     <string-array name="pref_email_swipe_actions_entries_without_more">
@@ -54,6 +55,7 @@
         <item>Remove from folder</item>
         <item>Delete</item>
         <item>Set preset category</item>
+        <item>Add bookmark</item>
     </string-array>
     <string-array name="pref_email_swipe_actions_entryvalues">
         <item>1</item>
@@ -66,6 +68,7 @@
         <item>8</item>
         <item>9</item>
         <item>10</item>
+        <item>11</item>
     </string-array>
     <string-array name="pref_sending_delay_entries">
         <item>None</item>
