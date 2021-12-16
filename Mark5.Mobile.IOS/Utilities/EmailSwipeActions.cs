@@ -19,7 +19,8 @@ namespace Mark5.Mobile.IOS.Utilities
             SetPriority,
             RemoveFromFolder,
             Delete,
-            SetPresetCategory
+            SetPresetCategory,
+            AddBookmark
         }
 
         public SwipeAction Action { get; set; }
@@ -44,6 +45,7 @@ namespace Mark5.Mobile.IOS.Utilities
             new EmailSwipeAction(SwipeAction.RemoveFromFolder),
             new EmailSwipeAction(SwipeAction.Delete),
             new EmailSwipeAction(SwipeAction.SetPresetCategory),
+            new EmailSwipeAction(SwipeAction.AddBookmark)
         });
 
         public string GetName() {
@@ -79,6 +81,9 @@ namespace Mark5.Mobile.IOS.Utilities
 
                 case EmailSwipeAction.SwipeAction.SetPresetCategory:
                     return Localization.GetString("set_preset_category");
+
+                case EmailSwipeAction.SwipeAction.AddBookmark:
+                    return Localization.GetString("add_bookmark");
 
                 default:
                     CommonConfig.Logger.Error($"Missing implementation for case : {action.ToString()}");

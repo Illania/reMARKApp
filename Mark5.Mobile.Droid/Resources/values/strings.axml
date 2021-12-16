@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-        <string name="accept">Accept</string>
+    <string name="accept">Accept</string>
     <string name="accepted">Accepted</string>
     <string name="account">Account</string>
     <string name="add_attachment">Add attachment</string>
     <string name="add_appointment">Add appointment</string>
+    <string name="add_bookmark">Add bookmark</string>
     <string name="add_comment_hint">Insert new comment</string>
     <string name="add_tite">Add title</string>
     <string name="add_location">Add location</string>
@@ -83,7 +84,7 @@
     <string name="company">Company</string>
     <string name="department">Department</string>
     <string name="date">Date:</string>
-        <string name="decline">Decline</string>
+    <string name="decline">Decline</string>
     <string name="declined">Declined</string>
     <string name="delayed_send_queued">Delayed send queued</string>
     <string name="delete">Delete</string>
@@ -375,6 +376,7 @@
     <string name="reset">Reset</string>
     <string name="related_contacts">Related</string>
     <string name="remove">Remove</string>
+    <string name="remove_bookmark">Remove bookmark</string>
     <string name="remove_favorites">Remove from favourites</string>
     <string name="remove_offline">Disable sync</string>
     <string name="reply">Reply</string>

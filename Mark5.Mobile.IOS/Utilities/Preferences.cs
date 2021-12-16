@@ -2,6 +2,7 @@ using Mark5.Mobile.Common.Model;
 using System.Collections.Generic;
 using Foundation;
 using System.Linq;
+using System;
 
 namespace Mark5.Mobile.IOS.Utilities
 {
@@ -68,6 +69,8 @@ namespace Mark5.Mobile.IOS.Utilities
             public const string SyncFavoriteFoldersKey = "SyncFavoriteFolders";
 
             public const string PresetCategoryIdKey = "PresetCategoryId";
+
+            public const string BookmarksForFolders= "BookmarksForFolders";
         }
 
         readonly NSUserDefaults ud;
@@ -181,8 +184,11 @@ namespace Mark5.Mobile.IOS.Utilities
                 {
                     new NSString(Keys.SyncFavoriteFoldersKey), NSNumber.FromBoolean(false)
                 },
-                 {
+                {
                     new NSString(Keys.PresetCategoryIdKey), NSNumber.FromInt16(1)
+                },
+                {
+                    new NSString(Keys.BookmarksForFolders), new NSDictionary()
                 },
 
             };
@@ -348,6 +354,62 @@ namespace Mark5.Mobile.IOS.Utilities
                 ud.Synchronize();
             }
         }
+
+        #region Bookmarks
+
+        public bool HasBookmarkForFolder(int folderId, int docId)
+        {
+            var hasBookmark = BookmarksForFolders.Contains(new KeyValuePair<string, string>(folderId.ToString(), docId.ToString()));
+            return hasBookmark;
+        }
+ 
+        public void SetBookmarkForFolder(int folderId, int docId)
+        {
+            var newBookmarks = BookmarksForFolders;
+            if (!BookmarksForFolders.ContainsKey(folderId.ToString()))
+                newBookmarks.Add(folderId.ToString(), docId.ToString());
+            else
+                newBookmarks[folderId.ToString()] = docId.ToString();
+
+            BookmarksForFolders = newBookmarks;
+        }
+
+        public int GetBookmarkForFolder(int folderId)
+        {
+            if (!BookmarksForFolders.ContainsKey(folderId.ToString()))
+                return -1;
+            else
+                return Convert.ToInt32(BookmarksForFolders[folderId.ToString()]);
+        }
+
+        public void RemoveBookmarkForFolder(int folderId)
+        {
+            var newBookmarks = BookmarksForFolders;
+            if (BookmarksForFolders.ContainsKey(folderId.ToString()))
+                newBookmarks.Remove(folderId.ToString());
+
+            BookmarksForFolders = newBookmarks;
+        }
+           
+        public Dictionary<string,string> BookmarksForFolders
+        {
+            get
+            {
+                var udActions = ud.DictionaryForKey(Keys.BookmarksForFolders)
+                    .ToDictionary(k=> k.Key.ToString(), k => k.Value.ToString());
+                return udActions;
+            }
+
+            set
+            {
+                ud.SetValueForKey(NSDictionary.FromObjectsAndKeys(value.Values.ToArray(), value.Keys.ToArray()),
+                    new NSString(Keys.BookmarksForFolders));
+                ud.Synchronize();
+            }
+        }
+
+        #endregion
+
 
         #region EmailSwipeActions
 

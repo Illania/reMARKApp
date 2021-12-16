@@ -5,6 +5,7 @@
 "area" = "Area";
 "access_disabled" = "Your device does not have access enabled. Please contact your system administrator and restart the reMARK app.";
 "add" = "Add";
+"add_bookmark"= "Add bookmark";
 "add_to" = "add to";
 "add_cc" = "add cc";
 "add_bcc" = "add bcc";
@@ -357,6 +358,7 @@
 "public" = "Public";
 "read_by" = "Read by";
 "reference_number" = "Reference number";
+"remove_bookmark"= "Remove bookmark";
 "remove_from_favorites" = "Remove from\nfavorites";
 "reminder" = "Reminder";
 "reply" = "Reply";

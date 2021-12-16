@@ -110,6 +110,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     return Context.GetString(Resource.String.priority);
                 case Preferences.EmailSwipeAction.RemoveFromFolder:
                     return Context.GetString(Resource.String.remove_from_folder);
+                case Preferences.EmailSwipeAction.PresetCategory:
+                    return Context.GetString(Resource.String.set_preset_category);
+                case Preferences.EmailSwipeAction.AddBookmark:
+                    return Context.GetString(Resource.String.add_bookmark);
                 default:
                     return "";
             }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,6 +22,7 @@ using Mark5.Mobile.IOS.Utilities;
 using Mark5.Mobile.IOS.Utilities.Extensions;
 using TinyMessenger;
 using UIKit;
+using Xamarin.Essentials;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
@@ -30,7 +32,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public Folder Folder { get; set; }
 
-        UIBarButtonItem composeDocumentItem;
+        UIBarButtonItem goToBookmarkItem;
         UIBarButtonItem selectAllItem;
         UIBarButtonItem exitEditItem;
         UIBarButtonItem editItem;
@@ -197,7 +199,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.Recycle();
 
-            composeDocumentItem = null;
+            goToBookmarkItem = null;
             selectAllItem = null;
             exitEditItem = null;
             editItem = null;
@@ -234,11 +236,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeNavigationBar()
         {
-            composeDocumentItem = new UIBarButtonItem
+
+            goToBookmarkItem = new UIBarButtonItem
             {
-                Image = UIImage.FromBundle("Create")
+                Image = UIImage.FromBundle("Bookmark")
             };
-            NavigationItem.SetRightBarButtonItem(composeDocumentItem, false);
+            NavigationItem.SetRightBarButtonItem(goToBookmarkItem, false);
 
             selectAllItem = new UIBarButtonItem
             {
@@ -325,10 +328,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
 
         void InitializeHandlers()
-        {
-            
-            if (composeDocumentItem != null)
-                composeDocumentItem.Clicked += ComposeDocumentItem_Clicked;
+        {        
+
+            if (goToBookmarkItem != null)
+                goToBookmarkItem.Clicked += GoToBookmarkItem_Clicked;
 
             if (exitEditItem != null)
                 exitEditItem.Clicked += ExitEditItem_Clicked;
@@ -343,10 +346,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 RefreshControl.ValueChanged += RefreshControl_ValueChanged;
         }
 
+        private void GoToBookmarkItem_Clicked(object sender, EventArgs e)
+        {
+            var bookmarkForFolderId = PlatformConfig.Preferences.GetBookmarkForFolder(Folder.Id);
+            if (bookmarkForFolderId > 0)
+            {
+                var index = ((DataSource)TableView.Source).Items.FindIndex(dp => dp.Id == bookmarkForFolderId);
+
+                if (index >= 0)
+                {
+                    TableView.SelectRow(NSIndexPath.FromRowSection(index, 0), true, UITableViewScrollPosition.None);
+                    TableView.ScrollToRow(NSIndexPath.FromRowSection(index, 0), UITableViewScrollPosition.None, true);
+                }
+            }
+
+
+        }
+
         void DeinitializeHandlers()
         {
-            if (composeDocumentItem != null)
-                composeDocumentItem.Clicked -= ComposeDocumentItem_Clicked;
 
             if (exitEditItem != null)
                 exitEditItem.Clicked -= ExitEditItem_Clicked;
@@ -1327,6 +1345,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     case EmailSwipeAction.SwipeAction.SetPresetCategory:
                         AssignPresetCategory(documentPreview);
                         break;
+                    case EmailSwipeAction.SwipeAction.AddBookmark:
+                        if (!PlatformConfig.Preferences.HasBookmarkForFolder(Folder.Id, documentPreview.Id))
+                            AddBookmark(documentPreview);
+                        else
+                            RemoveBookmark(documentPreview);
+                        break;
                     case EmailSwipeAction.SwipeAction.Delete:
                         Delete(documentPreview, popoverDelegate);
                         break;
@@ -1375,6 +1399,49 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             
         }
 
+        async void AddBookmark(DocumentPreview documentPreview)
+        {
+            
+            CommonConfig.Logger.Info($"Attempting to add bookmark for folder Id= {Folder.Id} [documentPreview.Id={documentPreview.Id}]...");
+
+            try
+            {
+                var previousBookmarkedDocId = PlatformConfig.Preferences.GetBookmarkForFolder(Folder.Id);
+                var itemsToUpdate = new List<int> { documentPreview.Id };
+                if (previousBookmarkedDocId > 0)
+                    itemsToUpdate.Add(previousBookmarkedDocId);
+                PlatformConfig.Preferences.SetBookmarkForFolder(Folder.Id, documentPreview.Id);
+                ((DataSource)TableView.Source).UpdateItems(itemsToUpdate);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Adding bookmark for folder Id= {Folder.Id} [documentPreview.Id={documentPreview.Id}] failed", ex);
+
+                await Dialogs.ShowErrorAlertAsync(this, ex);
+            }
+
+        }
+
+        async void RemoveBookmark(DocumentPreview documentPreview)
+        {
+
+            CommonConfig.Logger.Info($"Attempting to remove bookmark for folder Id= {Folder.Id} [documentPreview.Id={documentPreview.Id}]...");
+
+            try
+            {
+                PlatformConfig.Preferences.RemoveBookmarkForFolder(Folder.Id, documentPreview.Id);
+                ((DataSource)TableView.Source).UpdateItems(new List<int> { documentPreview.Id });
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Removing bookmark for folder Id= {Folder.Id} [documentPreview.Id={documentPreview.Id}] failed", ex);
+
+                await Dialogs.ShowErrorAlertAsync(this, ex);
+            }
+
+        }
+
+
         string SwipeActionTitle(EmailSwipeAction.SwipeAction swipeAction, DocumentPreview documentPreview)
         {
             switch (swipeAction)
@@ -1399,6 +1466,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return Localization.GetString("delete_from_folder");
                 case EmailSwipeAction.SwipeAction.SetPresetCategory:
                     return Localization.GetString("set_preset_category");
+                case EmailSwipeAction.SwipeAction.AddBookmark:
+                    if(!PlatformConfig.Preferences.HasBookmarkForFolder(Folder.Id, documentPreview.Id))
+                        return Localization.GetString("add_bookmark");
+                    else
+                        return Localization.GetString("remove_bookmark");
                 default:
                     CommonConfig.Logger.Error($"Missing implementation for EmailSwipeAction : {swipeAction}");
                     return "";
@@ -1427,7 +1499,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void EndEditing()
         {
             TableView.SetEditing(false, true);
-            NavigationItem.SetRightBarButtonItems(new[] { composeDocumentItem }, false);
+            NavigationItem.SetRightBarButtonItems(new[] { goToBookmarkItem }, false);
             NavigationItem.SetLeftBarButtonItem(NavigationItem.BackBarButtonItem, true);
         }
 
@@ -1577,6 +1649,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var dp = Items[indexPath.Row];
 
+                var folderId = viewControllerWeakReference.Unwrap()?.Folder.Id ?? -1;
+
                 if (LoadMoreEnabled && dp.Id == Items.Last().Id)
                 {
                     CommonConfig.UsageAnalytics.LogEvent(new GetMoreDocumentsEvent());
@@ -1587,6 +1661,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     var cell = tableView.DequeueReusableCell(DocumentsTableViewCell.ExternalId) as DocumentsTableViewCell ?? new DocumentsTableViewCell(DocumentsTableViewCell.ExternalId);
                     cell.Initialize(dp);
+                    InitializeBookmarkAppearance(dp, folderId, cell);
                     return cell;
                 }
 
@@ -1594,14 +1669,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     var cell = tableView.DequeueReusableCell(DocumentsTableViewCell.CompactId) as DocumentsTableViewCell ?? new DocumentsTableViewCell(DocumentsTableViewCell.CompactId);
                     cell.Initialize(dp);
+                    InitializeBookmarkAppearance(dp, folderId, cell);
                     return cell;
                 }
                 else
                 {
                     var cell = tableView.DequeueReusableCell(DocumentsTableViewCell.DefaultId) as DocumentsTableViewCell ?? new DocumentsTableViewCell(DocumentsTableViewCell.DefaultId);
                     cell.Initialize(dp);
+                    InitializeBookmarkAppearance(dp, folderId, cell);
                     return cell;
                 }
+            }
+
+            void InitializeBookmarkAppearance(DocumentPreview dp, int folderId, DocumentsTableViewCell cell)
+            {
+                if (PlatformConfig.Preferences.HasBookmarkForFolder(folderId, dp.Id))
+                    cell.BackgroundColor = Theme.Bookmark;
+                else
+                    cell.BackgroundColor = UIColor.Clear;
             }
 
             public override nint RowsInSection(UITableView tableview, nint section)

@@ -687,6 +687,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
 
             bool loading = true;
 
+
+
             public DataSource(DocumentsSearchResultsViewController viewController, UITableView tableView, bool compactList)
             {
                 viewControllerWeakReference = viewController.Wrap();
@@ -707,7 +709,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 }
 
                 var dp = Items[indexPath.Row];
-
                 if (dp.Direction == DocumentDirection.External)
                 {
                     var cell = tableView.DequeueReusableCell(DocumentsTableViewCell.ExternalId) as DocumentsTableViewCell ?? new DocumentsTableViewCell(DocumentsTableViewCell.ExternalId);

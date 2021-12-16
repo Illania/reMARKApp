@@ -326,7 +326,7 @@
 		<Compile Include="Utilities\CategorySwipeAction.cs" />
 		<Compile Include="Ui\ViewControllers\PresetCategoryViewController.cs" />
 		<Compile Include="Ui\ViewControllers\CopyToDepartmentWorktrayViewController.cs" />
-		<Compile Include="Ui\ViewControllers\CopyToUserWorktrayViewController %28copy%29.cs" />
+		<Compile Include="Ui\ViewControllers\CopyToUserWorktrayViewController.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
@@ -645,8 +645,6 @@
 		<ImageAsset Include="Assets_icons.xcassets\Contacts.imageset\contacts%402x.png" />
 		<ImageAsset Include="Assets_icons.xcassets\Contacts.imageset\contacts%403x.png" />
 		<ImageAsset Include="Assets_icons.xcassets\Create.imageset\Contents.json" />
-		<ImageAsset Include="Assets_icons.xcassets\Create.imageset\create%402x.png" />
-		<ImageAsset Include="Assets_icons.xcassets\Create.imageset\create%403x.png" />
 		<ImageAsset Include="Assets_icons.xcassets\Documents-Filled.imageset\Contents.json" />
 		<ImageAsset Include="Assets_icons.xcassets\Documents-Filled.imageset\documents-filled%402x.png" />
 		<ImageAsset Include="Assets_icons.xcassets\Documents-Filled.imageset\documents-filled%403x.png" />
@@ -845,6 +843,13 @@
 		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_3.imageset\2.pdf" />
 		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_4.imageset\3.pdf" />
 		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_5.imageset\4.pdf" />
+		<ImageAsset Include="Assets_icons.xcassets\Bookmark.imageset\bookmark.pdf" />
+		<ImageAsset Include="Assets_icons.xcassets\Bookmark.imageset\Contents.json" />
+		<ImageAsset Include="Assets_icons.xcassets\Image.imageset\Contents.json" />
+		<ImageAsset Include="Assets_icons.xcassets\Image.imageset\NewEmail.pdf" />
+		<ImageAsset Include="Assets_icons.xcassets\Create.imageset\create.pdf" />
+		<ImageAsset Include="Assets_icons.xcassets\Compose.imageset\Contents.json" />
+		<ImageAsset Include="Assets_icons.xcassets\Compose.imageset\compose.pdf" />
 	</ItemGroup>
 	<ItemGroup>
 		<BundleResource Include="Resources\Base.lproj\Localizable.strings" />
@@ -970,6 +975,8 @@
 	  <Folder Include="Assets_onboarding.xcassets\onboarding_1.imageset\" />
 	  <Folder Include="Assets_onboarding.xcassets\onboarding_4.imageset\" />
 	  <Folder Include="Assets_onboarding.xcassets\onboarding_5.imageset\" />
+	  <Folder Include="Assets_icons.xcassets\Bookmark.imageset\" />
+	  <Folder Include="Assets_icons.xcassets\Compose.imageset\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 	<Import Project="..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets" Condition="Exists('..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets')" />

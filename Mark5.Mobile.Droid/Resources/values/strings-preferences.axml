@@ -223,4 +223,5 @@
     <string name="pref_sending_delay_summary">Delay before sending email. Applied to all send emails automatically.</string>
     <string name="pref_key_sending_delay">pref_key_sending_delay</string>
     <string name="pref_key_last_user_sending_delay">pref_key_last_user_sending_delay</string>
+    <string name="pref_key_bookmarks">pref_key_bookmarks</string>
 </resources>
