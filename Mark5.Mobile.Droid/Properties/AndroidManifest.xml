@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.nordic_it.mark5.android" android:versionName="5.9" android:versionCode="535">
-	<uses-sdk android:minSdkVersion="22" android:targetSdkVersion="29" />
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.nordic_it.mark5.android" android:versionName="5.10" android:versionCode="541">
+	<uses-sdk android:minSdkVersion="22" android:targetSdkVersion="30" />
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 	<uses-permission android:name="android.permission.BLUETOOTH" />
@@ -14,6 +14,7 @@
 	<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 	<uses-permission android:name="android.permission.READ_PHONE_STATE" />
 	<uses-permission android:name="android.permission.USE_FINGERPRINT" />
+	<uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"/> 
 	<permission android:name="${applicationId}.permission.C2D_MESSAGE" android:protectionLevel="signature" />
 	<uses-permission android:name="android.permission.GET_ACCOUNTS" />
 	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
