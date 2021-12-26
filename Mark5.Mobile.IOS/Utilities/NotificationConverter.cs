@@ -30,6 +30,7 @@ namespace Mark5.Mobile.IOS.Utilities
                 var folderId = custom["folderId"] as NSNumber;
                 var objectId = custom["objectId"] as NSNumber;
                 var objectType = custom["objectType"] as NSString;
+                var isRead = custom["isRead"] as NSString;
 
                 var reference = new DateTime(2001, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
@@ -42,7 +43,7 @@ namespace Mark5.Mobile.IOS.Utilities
                 n.ObjectId = objectId.Int32Value;
                 n.ObjectType = (ObjectType) Enum.Parse(typeof(ObjectType), objectType);
 
-                n.IsRead = false;
+                n.IsRead = System.Convert.ToBoolean(isRead);
                 n.IsSilent = false;
                 n.RemindOnTimestamp = -1;
 

@@ -505,6 +505,11 @@ namespace Mark5.Mobile.IOS
                      }
 
                      Window.RootViewController.PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+
+
+                    Integration.DecreaseNotificationBadge();
+                    Managers.NotificationsManager?.SetNotificationReadStatusAsync(PlatformConfig.Preferences.PushNotificationToken, new List<Guid> { n.Guid }, true);
+                    
                  }
              }
              catch (Exception ex)

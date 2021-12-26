@@ -2061,6 +2061,25 @@ namespace Mark5.ServiceReference.DataContract
     {
     }
 
+    [DataContract(Name = "SetNotificationReadStatusResult", Namespace = "com.nordic-it.appservice.v3")]
+    public class SetNotificationReadStatusResult
+    {
+    }
+
+    [DataContract(Name = "SetNotificationReadStatusParameters", Namespace = "com.nordic-it.appservice.v3")]
+    public class SetNotificationReadStatusParameters : AbstractParameters
+    {
+        [DataMember(Name = "PushToken", Order = 0)]
+        public string PushToken { get; set; }
+
+        [DataMember(Name = "Guids", Order = 0)]
+        public List<Guid> Guids { get; set; } = new List<Guid>();
+
+        [DataMember(Name = "IsRead", Order = 0)]
+        public bool IsRead { get; set; }
+    }
+
+
     [DataContract(Name = "GetFoldersNotificationsParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class GetFoldersNotificationsParameters : AbstractParameters
     {
@@ -2204,6 +2223,9 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "IsSilent", Order = 0)]
         public bool IsSilent { get; set; }
+
+        [DataMember(Name = "IsRead", Order = 1)]
+        public bool IsRead { get; set; }
     }
 
     [DataContract(Name = "EventType", Namespace = "com.nordic-it.appservice.v3")]

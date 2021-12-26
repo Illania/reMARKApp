@@ -39,5 +39,7 @@ namespace Mark5.Mobile.Common.Manager
         Task MarkAsRead(Notification notification);
 
         Task MarkAllAsRead();
+
+        Task SetNotificationReadStatusAsync(string pushToken, List<Guid> notificationGuids, bool isRead, SourceType sourceType = SourceType.Auto);
     }
 }

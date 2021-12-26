@@ -125,6 +125,8 @@ namespace Mark5.ServiceReference.AppService
 
         Task<ClearAllNotificationsResult> ClearAllNotificationsAsync(ClearAllNotificationsParameters parameters, CancellationToken ct = default(CancellationToken));
 
+        Task<SetNotificationReadStatusResult> SetNotificationReadStatusAsync(SetNotificationReadStatusParameters parameters, CancellationToken ct = default(CancellationToken));
+
         #endregion
 
         #region Common

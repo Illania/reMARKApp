@@ -15,6 +15,8 @@ namespace Mark5.Mobile.Common.DataAccess
 
         Task MarkAsRead(Guid notificationGuid);
 
+        Task MarkAsRead(List<Guid> notificationGuids);
+
         Task MarkAsRead(Notification notification);
 
         Task MarkAllAsRead();
