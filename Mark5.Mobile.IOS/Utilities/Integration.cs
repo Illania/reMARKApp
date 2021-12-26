@@ -29,6 +29,16 @@ namespace Mark5.Mobile.IOS.Utilities
             UIApplication.SharedApplication.ApplicationIconBadgeNumber = 0;
         }
 
+        public static void DecreaseNotificationBadge()
+        {
+            if (UIApplication.SharedApplication.ApplicationIconBadgeNumber != 0)
+            {
+                UIApplication.SharedApplication.ApplicationIconBadgeNumber--;
+
+            }
+                
+        }
+
         #endregion
 
         #region iPhone/iPad recognition

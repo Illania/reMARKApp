@@ -351,6 +351,11 @@ namespace Mark5.ServiceReference.AppService
             return await InvokeAsync<GetNotificationsResult, GetNotificationsParameters>("GetNotifications", parameters, ct);
         }
 
+        public async Task<SetNotificationReadStatusResult> SetNotificationReadStatusAsync(SetNotificationReadStatusParameters parameters, CancellationToken ct = default(CancellationToken))
+        {
+            return await InvokeAsync<SetNotificationReadStatusResult, SetNotificationReadStatusParameters>("SetNotificationReadStatus", parameters, ct);
+        }
+
         public async Task<SetFoldersNotificationsResult> SetFoldersNotificationsAsync(SetFoldersNotificationsParameters parameters, CancellationToken ct = default(CancellationToken))
         {
             return await InvokeAsync<SetFoldersNotificationsResult, SetFoldersNotificationsParameters>("SetFoldersNotifications", parameters, ct);

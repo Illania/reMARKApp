@@ -130,6 +130,31 @@ namespace Mark5.Mobile.Common.Manager
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
+        public async Task SetNotificationReadStatusAsync(string pushToken, List<Guid> notificationGuids, bool isRead, SourceType sourceType = SourceType.Auto)
+        {
+            if (string.IsNullOrEmpty(pushToken))
+                return;
+
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
+            {
+                var result = await AppServiceProxy.SetNotificationReadStatusAsync(new DataContract.SetNotificationReadStatusParameters
+                {
+                    Token = Token,
+                    PushToken = pushToken,
+                    Guids = notificationGuids,
+                    IsRead = isRead
+                });
+
+               
+                await notificationsDataAccess.MarkAsRead(notificationGuids);
+            }
+            else
+                throw new ArgumentException("Invalid sourceType provided.");
+        }
+
         public async Task<Dictionary<ModuleType, List<Folder>>> GetFoldersNotificationsAsync(DeviceType deviceType, string pushToken, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)

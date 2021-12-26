@@ -93,6 +93,25 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
+        public async Task MarkAsRead(List<Guid> notificationGuids)
+        {
+            try
+            {
+                await systemDatabase.RunInConnectionAsync(c =>
+                {
+                    c.InsertOrReplaceAll(notificationGuids.Select(r => new ReadNotificationInfo
+                    {
+                        NotificationGuid = r
+                    }));
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error getting notifications.", ex);
+            }
+        }
+
+
         public async Task MarkAsRead(Notification notification)
         {
             try

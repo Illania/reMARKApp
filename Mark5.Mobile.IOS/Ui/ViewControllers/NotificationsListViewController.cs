@@ -208,7 +208,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
-                await Managers.NotificationsManager.MarkAllAsRead();
+ 
+                await Managers.NotificationsManager?.SetNotificationReadStatusAsync(PlatformConfig.Preferences.PushNotificationToken,
+                    (((DataSource)TableView.Source)?.Items.Select(n=>n.Guid)).ToList(), true);
+                Integration.ClearNotificationBadge();
+
                 RefreshData();
             }
             catch (Exception ex)
@@ -243,7 +247,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 markAsReadItem.Enabled = notifications.Any(n => !n.IsRead);
 
-                Integration.ClearNotificationBadge();
             }
             catch (Exception ex)
             {
@@ -266,7 +269,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             CommonConfig.UsageAnalytics.LogEvent(new NotificationClickedEvent(notification.ObjectType.Module()));
 
-            await Managers.NotificationsManager.MarkAsRead(notification);
+            if(!notification.IsRead)
+                Integration.DecreaseNotificationBadge();
+
+            Managers.NotificationsManager?.SetNotificationReadStatusAsync(PlatformConfig.Preferences.PushNotificationToken, new List<Guid> { notification.Guid }, true);
+            RefreshData();
             TableView.ReloadRows(new[] { row }, UITableViewRowAnimation.Fade);
 
             switch (notification.ObjectType)
@@ -291,13 +298,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         class DataSource : UITableViewSource
         {
-            public bool Empty => items.Count < 1;
+            public bool Empty => Items.Count < 1;
 
             readonly WeakReference<NotificationsListViewController> viewControllerWeakReference;
             readonly WeakReference<UITableView> tableViewWeakReference;
 
             bool loading = true;
-            readonly List<Notification> items = new List<Notification>();
+            public List<Notification> Items { get; set; } = new List<Notification>();
 
             public DataSource(NotificationsListViewController viewController, UITableView tableView)
             {
@@ -317,7 +324,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return emptyCell;
                 }
 
-                var n = items[indexPath.Row];
+                var n = Items[indexPath.Row];
 
                 var reuseIdentifier = n.Type == EventType.NewObjectCreated ? NotificationsTableViewCell.NewObjectCreatedId : NotificationsTableViewCell.DefaultId;
 
@@ -329,7 +336,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
-                var n = items[indexPath.Row];
+                var n = Items[indexPath.Row];
                 viewControllerWeakReference.Unwrap()?.NotificationSelected(n, indexPath);
             }
 
@@ -338,19 +345,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (loading || Empty)
                     return 1;
 
-                return items.Count;
+                return Items.Count;
             }
 
             public void SetItems(List<Notification> notifications, Func<Notification, bool> filter = null)
             {
                 loading = false;
 
-                items.Clear();
+                Items.Clear();
 
                 if (filter == null)
-                    items.AddRange(notifications);
+                    Items.AddRange(notifications);
                 else
-                    items.AddRange(notifications.Where(filter).ToList());
+                    Items.AddRange(notifications.Where(filter).ToList());
 
                 tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
@@ -359,7 +366,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 loading = true;
 
-                items.Clear();
+                Items.Clear();
                 tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
         }
