@@ -279,6 +279,7 @@
 "never" = "Never";
 "network_interface" = "Network interface: ";
 "new_document" = "New email";
+"new_contact" = "New contact";
 "no" = "No";
 "none" = "None";
 "no_addresses" = "No addresses";

@@ -15,6 +15,13 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 {
+    public delegate void RecipientClickEventHandler(object sender, RecipientClickEventArgs e);
+
+    public class RecipientClickEventArgs : EventArgs
+    {
+        public string Recipient { get; set; }
+    }
+
     public class RecipentsView : DocumentView
     {
         TableLayout compactLayout;
@@ -40,6 +47,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
         AppCompatTextView dateReceivedValue;
         AppCompatTextView creatorValue;
         AppCompatButton showHideButton;
+        
+        public RecipientClickEventHandler RecipientClickHandler;
 
         readonly List<TableRow> extraFieldsTableRows = new List<TableRow>();
 
@@ -92,7 +101,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
             tableRowFrom.AddView(fromLabel);
             fromValue = new AppCompatTextView(Context);
-            fromValue.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
+            fromValue.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryBlue);
+            
+            fromValue.Clickable = true;
+            fromValue.Click += FromValue_Click;
 
             fromValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
             tableRowFrom.AddView(fromValue);
@@ -163,6 +175,15 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
             compactLayout.SetColumnStretchable(1, true);
             compactLayout.SetColumnShrinkable(1, true);
+        }
+
+        private void FromValue_Click(object sender, EventArgs e)
+        {
+            if(!string.IsNullOrEmpty(fromValue.Text))
+                if (RecipientClickHandler != null)
+                {
+                    RecipientClickHandler(this, new RecipientClickEventArgs { Recipient = fromValue.Text });
+                }
         }
 
         void InitializeExtendedView()
