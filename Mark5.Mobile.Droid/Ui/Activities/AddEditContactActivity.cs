@@ -22,11 +22,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         public const string ContactTypeIntentKey = "ContactType_8d9839f0-c47b-481e-ac20-e9a88376a3ec";
         public const string FolderIntentKey = "Folder_bc8c6624-5166-42b0-a899-221b4ae0afbb";
         public const string FolderIdIntentKey = "FolderId_96dc24c9-94a5-4871-bfae-f3b31ca90915";
+        public const string PreconfiguredAddressIntentKey = "PreconfiguredAddress_96dc24c9-94a5-4871-bfae-f3b31ca90111";
 
         Toolbar toolbar;
 
         public static Intent CreateIntent(Context context, Contact contact = null, int? contactId = null, ContactPreview contactPreview = null, int? contactCreationModeFlag = null,
-                                   ContactPreview parentContactPreview = null, int? contactType = null, Folder folder = null, int? folderId = null)
+                                   ContactPreview parentContactPreview = null, int? contactType = null, Folder folder = null, int? folderId = null, DocumentAddress preconfiguredAddress = null)
         {
             var intent = new Intent(context, typeof(AddEditContactActivity));
 
@@ -54,6 +55,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             if (folderId != null)
                 intent.PutExtra(FolderIdIntentKey, folderId.Value);
 
+            if (preconfiguredAddress != null)
+                intent.PutExtra(PreconfiguredAddressIntentKey, Serializer.Serialize(preconfiguredAddress));
+
             return intent;
         }
 
@@ -80,6 +84,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 Contact contact = null;
                 ContactCreationModeFlag? creationModeFlag = null;
                 ContactType? contactType = null;
+                DocumentAddress preconfiguredAddress = null;
 
                 if (Intent.HasExtra(ContactIdIntentKey))
                     contactId = Intent.Extras.GetInt(ContactIdIntentKey);
@@ -97,12 +102,15 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     contact = Serializer.Deserialize<Contact>(Intent.Extras.GetString(ContactIntentKey));
 
                 if (Intent.HasExtra(ContactCreationModeFlagIntentKey))
-                    creationModeFlag = (ContactCreationModeFlag)Intent.Extras.GetInt(ContactCreationModeFlagIntentKey);
+                    creationModeFlag = (ContactCreationModeFlag)Intent.Extras.GetInt(ContactCreationModeFlagIntentKey); 
 
                 if (Intent.HasExtra(ContactTypeIntentKey))
                     contactType = (ContactType)Intent.Extras.GetInt(ContactTypeIntentKey);
 
-                var (cf, tag) = AddEditContactFragment.NewInstance(contact, contactPreview, contactId, contactType, creationModeFlag, parentContactPreview, parentPreselected);
+                if (Intent.HasExtra(PreconfiguredAddressIntentKey))
+                    preconfiguredAddress = Serializer.Deserialize<DocumentAddress>(Intent.Extras.GetString(PreconfiguredAddressIntentKey));
+
+                var (cf, tag) = AddEditContactFragment.NewInstance(contact, contactPreview, contactId, contactType, creationModeFlag, parentContactPreview, parentPreselected,preconfiguredAddress);
 
                 var ft = SupportFragmentManager.BeginTransaction();
                 ft.Replace(Resource.Id.fragment_container, cf, tag);

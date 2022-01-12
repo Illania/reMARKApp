@@ -28,6 +28,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public ContactCreationModeFlag CreationModeFlag { get; set; }
         public ContactPreview ParentContactPreview { get; set; }
         public bool ParentPreselected { get; set; }
+        public DocumentAddress PreconfiguredEmailAddress { get; set; }
 
         UIBarButtonItem saveButtonItem;
         UIBarButtonItem cancelButtonItem;
@@ -150,6 +151,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             TableView.Editing = true;
             TableView.AllowsSelectionDuringEditing = true;
             TableView.CellLayoutMarginsFollowReadableWidth = true;
+
         }
 
         void InitializeHandlers()
@@ -241,6 +243,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 Contact = new Contact();
                 ContactPreview = new ContactPreview { Type = ContactType };
+                Contact.CommunicationAddresses?.Add(new CommunicationAddress(PreconfiguredEmailAddress.Address, CommunicationAddressType.Email));
+
+                if (ContactPreview.Type == ContactType.Person)
+                    Contact.FirstName = PreconfiguredEmailAddress.Name;
+                else
+                    ContactPreview.Name = PreconfiguredEmailAddress.Name;
             }
 
             ds.Refresh(Contact, ContactPreview, ParentContactPreview, CreationModeFlag, ParentPreselected);

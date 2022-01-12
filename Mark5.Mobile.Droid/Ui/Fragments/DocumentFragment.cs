@@ -207,7 +207,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             linearLayout.AddView(new SubjectView(Context));
             linearLayout.AddView(new Divider(Context));
-            linearLayout.AddView(new RecipentsView(Context));
+            linearLayout.AddView(new RecipentsView(Context) { RecipientClickHandler = FromValue_Click });
             linearLayout.AddView(new Divider(Context));
             linearLayout.AddView(new PriorityView(Context));
             linearLayout.AddView(new Divider(Context));
@@ -264,6 +264,80 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                                                                    preconfiguredEmailAddresses: preconfiguredEmailAddresses));
         }
 
+        private async void FromValue_Click(object sender, RecipientClickEventArgs e)
+        {
+            var result = await Dialogs.ShowListDialog(Context, Resource.String.select_action, new string[] {
+                Context.GetString(Resource.String.new_document),
+                Context.GetString(Resource.String.new_contact)
+            }, true);
+            if (result >= 0)
+            {
+                if(result == 0)
+                    await PresentComposeViewWithPreconfiguredFields( preconfiguredToAddresses: new string[] { e.Recipient });
+                if (result == 1)
+                    await PresentContactViewWithPreconfiguredFields(e.Recipient);
+            }
+
+        }
+
+        public DocumentAddress GetEmail(string email) => Validator.ContainsValidEmails(email, out List<DocumentAddress> addresses)
+                                                         ? addresses.First()
+                                                         : new DocumentAddress();
+
+
+        async Task PresentComposeViewWithPreconfiguredFields(string subject = null, string body = null,
+            string[] preconfiguredToAddresses = null, string[] preconfiguredCcAddresses = null, string[] preconfiguredBccAddresses = null)
+        {
+            var preconfiguredAddresses = new Dictionary<DocumentAddressType, string[]>
+            {
+                { DocumentAddressType.To, preconfiguredToAddresses }
+            };
+
+            if (preconfiguredCcAddresses != null)
+                preconfiguredAddresses.Add(DocumentAddressType.Cc, preconfiguredCcAddresses);
+
+            if (preconfiguredBccAddresses != null)
+                preconfiguredAddresses.Add(DocumentAddressType.Bcc, preconfiguredBccAddresses);
+
+
+
+            StartActivity(ComposeDocumentActivity.CreateIntent(Context,
+                                                                     DocumentCreationModeFlag.New,
+                                                                     CopyToNewOption.None,
+                                                                     preconfiguredContent: body,
+                                                                     preconfiguredSubject: subject,
+                                                                     preconfiguredEmailAddresses: preconfiguredAddresses));
+        }
+
+        async Task PresentContactViewWithPreconfiguredFields(string preconfiguredEmailAddress)
+        {
+            var choice = await Dialogs.ShowListDialog(Context, Resource.String.select_action, new[] {
+                Context.GetString(Resource.String.add_company),
+                Context.GetString(Resource.String.add_department),
+                Context.GetString(Resource.String.add_person)
+            }, true);
+
+            if (choice < 0)
+                return;
+
+            ContactType type = ContactType.None;
+            switch (choice)
+            {
+                case 0:
+                    type = ContactType.Company;
+                    break;
+                case 1:
+                    type = ContactType.Department;
+                    break;
+                case 2:
+                    type = ContactType.Person;
+                    break;
+            }
+
+            StartActivity(AddEditContactActivity.CreateIntent(Context, contactCreationModeFlag: (int)ContactCreationModeFlag.New,
+                contactType: (int)type, preconfiguredAddress: GetEmail(preconfiguredEmailAddress)));
+
+        }
 
         public override void OnViewCreated(View view, Bundle savedInstanceState)
         {
@@ -1119,4 +1193,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public static int CategoriesRequest = 2;
         }
     }
+
+   
 }

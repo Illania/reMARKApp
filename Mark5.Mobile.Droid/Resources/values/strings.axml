@@ -4,6 +4,10 @@
     <string name="accepted">Accepted</string>
     <string name="account">Account</string>
     <string name="add_attachment">Add attachment</string>
+    <string name="add_company">Add company</string>
+    <string name="add_contact">Add contact</string>
+    <string name="add_department">Add department</string>
+    <string name="add_person">Add person</string>
     <string name="add_appointment">Add appointment</string>
     <string name="add_bookmark">Add bookmark</string>
     <string name="add_comment_hint">Insert new comment</string>
@@ -300,6 +304,7 @@
     <string name="must_save_persons_companies_offline_title">Contacts must be saved offline.</string>
     <string name="must_save_persons_companies_offline_content">For caller identification to work, the contacts that should be identified should be saved offline.</string>
     <string name="network_interface">Network interface:</string>
+    <string name="new_contact">New contact</string>
     <string name="new_document">New email</string>
     <string name="no">No</string>
     <string name="no_addresses">No addresses</string>
@@ -458,6 +463,7 @@
     <string name="search_shortcodes">Search mailing lists</string>
     <string name="search_shortcodes_result">Result</string>
     <string name="select">Select</string>
+    <string name="select_action">Select action</string>
     <string name="select_all">Select all</string>
     <string name="deselect_all">Deselect all</string>
     <string name="select_email_address">Select email address</string>

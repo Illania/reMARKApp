@@ -686,20 +686,38 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        
 
-        void HeaderView_RecipientTapped(object sender, RecipientTappedEventArgs e)
+        async void HeaderView_RecipientTapped(object sender, RecipientTappedEventArgs e)
         {
-            PresentComposeViewWithPreconfiguredFields(preconfiguredToAddresses: new string[] { e.Recipent });
+            await ShowMenuForRecipientTappedAction(sender, e.Recipent);
+        }
+
+        async Task ShowMenuForRecipientTappedAction(object sender, string recipient )
+        {
+            var d = new PopoverPresentationControllerDelegate(doneButtonItem);
+            var source = await Dialogs.ShowListActionSheetAsync(this, new[] { Localization.GetString("new_document"), Localization.GetString("new_contact") }, d);
+            if (source < 0)
+                return;
+
+            if (source == 0)
+            {
+                PresentComposeViewWithPreconfiguredFields(preconfiguredToAddresses: new string[] { recipient });
+            }
+
+            if (source == 1)
+            {
+                PresentContactViewWithPreconfiguredFields(recipient);
+            }
+
         }
 
         void PresentComposeViewWithPreconfiguredFields(string subject = null, string body = null,
             string[] preconfiguredToAddresses = null, string[] preconfiguredCcAddresses = null, string[] preconfiguredBccAddresses = null)
         {
             var preconfiguredAddresses = new Dictionary<DocumentAddressType, string[]>
-                {
-                    { DocumentAddressType.To, preconfiguredToAddresses }
-                };
+            {
+                { DocumentAddressType.To, preconfiguredToAddresses }
+            };
 
             if (preconfiguredCcAddresses != null)
                 preconfiguredAddresses.Add(DocumentAddressType.Cc, preconfiguredCcAddresses);
@@ -717,6 +735,45 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
+
+
+        public DocumentAddress GetEmail(string email) => Validator.ContainsValidEmails(email, out List<DocumentAddress> addresses)
+                                                           ? addresses.First()
+                                                           : new DocumentAddress();
+
+        async void PresentContactViewWithPreconfiguredFields(string preconfiguredEmailAddress)
+        {
+            var choice = await Dialogs.ShowListActionSheetAsync(this, new[] {
+                Localization.GetString("add_company"),
+                Localization.GetString("add_department"),
+                Localization.GetString("add_person") });
+
+            if (choice < 0)
+                return;
+
+            ContactType type = ContactType.None;
+            switch (choice)
+            {
+                case 0:
+                    type = ContactType.Company;
+                    break;
+                case 1:
+                    type = ContactType.Department;
+                    break;
+                case 2:
+                    type = ContactType.Person;
+                    break;
+            }
+
+            var vc = new AddEditContactViewController
+            {
+                CreationModeFlag = ContactCreationModeFlag.New,
+                ContactType = type,
+                PreconfiguredEmailAddress = GetEmail(preconfiguredEmailAddress)
+            };
+            PresentViewController(new NavigationController(vc),true, null);
+
+         }
 
         protected override void OnWebViewLoaded()
         {

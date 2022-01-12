@@ -32,6 +32,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         const string CreationModeFlagBundleKey = "CreationModeFlag_ab9071da-34f6-45fc-9a03-a0b348814dcd";
         const string ParentContactPreviewBundleKey = "ParentContactPreview_a2a2d7c1-b571-4aef-8f7e-7c4348ba8c47";
         const string ParentPreselectedBundleKey = "ParentPreselected_6a214835-2ade-4503-a9b0-163046ac394e";
+        const string PreconfiguredAddressBundleKey = "PreconfiguredAddress_6a214835-2ade-4503-a9b0-163046ac1111";
 
         Contact contact;
         ContactPreview contactPreview;
@@ -40,6 +41,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         ContactCreationModeFlag creationModeFlag;
         ContactPreview parentContactPreview;
         bool parentPreselected;
+        DocumentAddress preconfiguredEmailAddress { get; set; }
 
         LinearLayoutCompat linearLayout;
         LinearLayoutCompat secondaryLinearLayout;
@@ -61,7 +63,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         Action dismissAction;
 
         public static (AddEditContactFragment fragment, string tag) NewInstance(Contact contact, ContactPreview contactPreview, int? contactId, ContactType? contactType, ContactCreationModeFlag? creationModeFlag,
-                                                                                ContactPreview parentContactPreview, bool? parentPreselected)
+                                                                                ContactPreview parentContactPreview, bool? parentPreselected, DocumentAddress preconfiguredAddress)
         {
             if (parentPreselected != null)
                 CommonConfig.UsageAnalytics.LogEvent(new OpenAddSubContactEvent());
@@ -95,6 +97,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (parentPreselected != null)
                 args.PutBoolean(ParentPreselectedBundleKey, parentPreselected.Value);
+
+            if (preconfiguredAddress != null)
+                args.PutString(PreconfiguredAddressBundleKey, Serializer.Serialize(preconfiguredAddress));
 
             var fragment = new AddEditContactFragment();
             fragment.Arguments = args;
@@ -134,6 +139,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 parentContactPreview = Serializer.Deserialize<ContactPreview>(savedInstanceState.GetString(ParentContactPreviewBundleKey));
             else if (Arguments.ContainsKey(ParentContactPreviewBundleKey))
                 parentContactPreview = Serializer.Deserialize<ContactPreview>(Arguments.GetString(ParentContactPreviewBundleKey));
+
+            if (savedInstanceState?.ContainsKey(PreconfiguredAddressBundleKey) == true)
+                preconfiguredEmailAddress = Serializer.Deserialize<DocumentAddress>(savedInstanceState.GetString(PreconfiguredAddressBundleKey));
+            else if (Arguments.ContainsKey(PreconfiguredAddressBundleKey))
+                preconfiguredEmailAddress = Serializer.Deserialize<DocumentAddress>(Arguments.GetString(PreconfiguredAddressBundleKey));
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -160,10 +170,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             subviews.Clear();
             secondarySubviews.Clear();
 
-            showMoreButton = new AppCompatButton(Context);
-            showMoreButton.LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
+            showMoreButton = new AppCompatButton(Context)
             {
-                Gravity = (int)GravityFlags.CenterHorizontal
+                LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
+                {
+                    Gravity = (int)GravityFlags.CenterHorizontal
+                }
             };
             var typedArray = Context.ObtainStyledAttributes(new int[]
             {
@@ -396,8 +408,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (creationModeFlag == ContactCreationModeFlag.New)
             {
                 contact = new Contact();
-                contactPreview = new ContactPreview();
-                contactPreview.Type = contactType;
+                contactPreview = new ContactPreview
+                {
+                    Type = contactType
+                };
+               
+                contact.CommunicationAddresses?.Add(new CommunicationAddress(preconfiguredEmailAddress.Address, CommunicationAddressType.Email));
+
+                if (contactPreview.Type == ContactType.Person)
+                    contact.FirstName = preconfiguredEmailAddress.Name;
+                else
+                    contactPreview.Name = preconfiguredEmailAddress.Name;
+
+
+
                 RefreshView();
                 return;
             }
