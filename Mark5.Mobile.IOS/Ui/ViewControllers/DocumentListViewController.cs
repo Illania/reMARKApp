@@ -1429,7 +1429,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
-                PlatformConfig.Preferences.RemoveBookmarkForFolder(Folder.Id, documentPreview.Id);
+                PlatformConfig.Preferences.RemoveBookmarkForFolder(Folder.Id);
                 ((DataSource)TableView.Source).UpdateItems(new List<int> { documentPreview.Id });
             }
             catch (Exception ex)

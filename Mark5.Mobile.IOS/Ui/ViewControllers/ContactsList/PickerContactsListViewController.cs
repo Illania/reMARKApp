@@ -40,22 +40,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                 var ds = (DataSource)tableView.Source;
                 var cell = tableView.CellAt(ds.FindItemIndexPath(contactPreview));
 
-                var emailAddresses = contact.CommunicationAddresses.Where(ca => ca.Type == CommunicationAddressType.Email).Select(ca => ca.Address).ToArray();
-                if (emailAddresses.Any())
+                //show list of linked contacts
+                if (contact.PrimaryPerson != null || contact.Children.Any())
                 {
-                    var index = await Dialogs.ShowListActionSheetAsync(this, emailAddresses, tableView, cell);
-                    if (index < 0)
-                        return;
-
-                    var address = emailAddresses[index];
-
-                    tcs.SetResult(new Recipient(contactPreview.Name, address, RecipientType.Contact, contactPreview.Id));
-                    DisableSearchController();
-                    DismissViewController(true, null);
+                    var vc = new LinkedEmailListViewController { Folder = Folder, Contact = contact, ContactPreview = contactPreview };
+                    PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
                 }
                 else
-                    await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("no_email_addresses_title"), Localization.GetString("no_email_addresses_content"));
-            }
+                   await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("no_email_addresses_title"), Localization.GetString("no_email_addresses_content"));
+
+                }
             catch (Exception ex)
             {
                 dismissAction();

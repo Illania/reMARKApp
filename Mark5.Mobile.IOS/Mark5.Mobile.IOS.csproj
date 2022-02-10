@@ -327,6 +327,7 @@
 		<Compile Include="Ui\ViewControllers\PresetCategoryViewController.cs" />
 		<Compile Include="Ui\ViewControllers\CopyToDepartmentWorktrayViewController.cs" />
 		<Compile Include="Ui\ViewControllers\CopyToUserWorktrayViewController.cs" />
+		<Compile Include="Ui\ViewControllers\LinkedEmailListViewController.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

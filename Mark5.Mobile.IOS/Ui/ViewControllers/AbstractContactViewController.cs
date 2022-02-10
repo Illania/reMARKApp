@@ -1,6 +1,5 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using CoreGraphics;
@@ -14,8 +13,6 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
-using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
-using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Utilities;
 using Mark5.Mobile.IOS.Utilities.Extensions;
 using TinyMessenger;
@@ -23,41 +20,56 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    public class ContactViewController : AbstractTableViewController, ISecondaryViewController, IUIViewControllerRestoration
+    public abstract class AbstractContactViewController : AbstractTableViewController, ISecondaryViewController, IUIViewControllerRestoration
     {
-        public bool Empty => folderId == null && folder == null && contactId == null && contactPreview == null && contact == null;
+        public bool Empty => FolderId == null && Folder == null && ContactId == null && ContactPreview == null && Contact == null;
 
-        int? folderId;
-        Folder folder;
+        protected int? FolderId;
+        protected Folder Folder;
 
-        int? contactId;
-        ContactPreview contactPreview;
-        Contact contact;
+        protected int? ContactId;
+        protected ContactPreview ContactPreview;
+        protected Contact Contact;
+
+        protected bool HideDoneButton;
+
+        protected UIBarButtonItem FileToButton;
+        protected UIBarButtonItem ActionsLinksButton;
+        protected UIBarButtonItem EditButtonItem;
+        protected UIButton EmailButton;
+        protected UIButton MobileButton;
+        protected UIButton SmsButton;
+        protected UIButton MapButton;
 
         bool refreshDataOnAppear;
-        bool hideDoneButton;
-        bool hideNavigationButtons;
 
         UIView headerView;
         UILabel nameLabel;
         UILabel nameSubLabel;
-        UIButton emailButton;
-        UIButton mobileButton;
-        UIButton smsButton;
-        UIButton mapButton;
 
         UIBarButtonItem assignCategoryButton;
-        UIBarButtonItem fileToButton;
         UIBarButtonItem commentsButton;
-        UIBarButtonItem actionsLinksButton;
         UIBarButtonItem doneButtonItem;
-        UIBarButtonItem editButtonItem;
 
         CancellationTokenSource cts;
 
         TinyMessageSubscriptionToken contactChangedToken;
 
-        public ContactViewController()
+        protected abstract void EmailButton_TouchUpInside(object sender, EventArgs e);
+        protected abstract void MobileButton_TouchUpInside(object sender, EventArgs e);
+        protected abstract void SmsButton_TouchUpInside(object sender, EventArgs e);
+        protected abstract void MapButton_TouchUpInside(object sender, EventArgs e);
+        protected abstract void EditButtonItem_Clicked(object sender, EventArgs e);
+        protected abstract void AssignCategoryButton_Clicked(object sender, EventArgs e);
+        protected abstract void FileToButton_Clicked(object sender, EventArgs e);
+        protected abstract void CommentsButton_Clicked(object sender, EventArgs e);
+        protected abstract void ActionsLinksButton_Clicked(object sender, EventArgs e);
+        protected abstract void DoneButtonItem_Clicked(object sender, EventArgs e);
+        protected abstract void CommunicationAddressClicked(UITableView tv, UITableViewCell cell, CommunicationAddress ca);
+        protected abstract void LinkedContactClicked(ContactPreview contactPreview);
+        protected abstract void PhysicalAddressClicked(UITableView tv, UITableViewCell cell, PhysicalAddress pa);
+
+        public AbstractContactViewController()
             : base(UITableViewStyle.Grouped)
         {
             HidesBottomBarWhenPushed = true;
@@ -75,7 +87,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidLoad();
 
-            RestorationIdentifier = nameof(ContactViewController);
+            RestorationIdentifier = nameof(AbstractContactViewController);
             RestorationClass = Class;
         }
 
@@ -135,8 +147,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.Recycle();
 
             doneButtonItem = null;
-            fileToButton = null;
-            editButtonItem = null;
+            FileToButton = null;
+            EditButtonItem = null;
 
             TableView.GestureRecognizers.ForEach(TableView.RemoveGestureRecognizer);
             ((DataSource)TableView.Source)?.Clear();
@@ -208,77 +220,77 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 buttonsView.CenterXAnchor.ConstraintEqualTo(headerView.CenterXAnchor)
             });
 
-            emailButton = new UIButton
+            EmailButton = new UIButton
             {
                 Enabled = false,
                 Alpha = 0f,
                 TintColor = Theme.DarkerBlue,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
-            emailButton.SetImage(UIImage.FromBundle("Email-Large").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
-            buttonsView.AddSubview(emailButton);
+            EmailButton.SetImage(UIImage.FromBundle("Email-Large").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+            buttonsView.AddSubview(EmailButton);
             buttonsView.AddConstraints(new[]
             {
-                emailButton.TopAnchor.ConstraintEqualTo(buttonsView.TopAnchor),
-                emailButton.LeftAnchor.ConstraintEqualTo(buttonsView.LeftAnchor),
-                emailButton.BottomAnchor.ConstraintEqualTo(buttonsView.BottomAnchor),
-                emailButton.HeightAnchor.ConstraintEqualTo(60f),
-                emailButton.WidthAnchor.ConstraintEqualTo(40f)
+                EmailButton.TopAnchor.ConstraintEqualTo(buttonsView.TopAnchor),
+                EmailButton.LeftAnchor.ConstraintEqualTo(buttonsView.LeftAnchor),
+                EmailButton.BottomAnchor.ConstraintEqualTo(buttonsView.BottomAnchor),
+                EmailButton.HeightAnchor.ConstraintEqualTo(60f),
+                EmailButton.WidthAnchor.ConstraintEqualTo(40f)
             });
 
-            mobileButton = new UIButton
+            MobileButton = new UIButton
             {
                 Enabled = false,
                 Alpha = 0f,
                 TintColor = Theme.DarkerBlue,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
-            mobileButton.SetImage(UIImage.FromBundle("Mobile-Large").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
-            buttonsView.AddSubview(mobileButton);
+            MobileButton.SetImage(UIImage.FromBundle("Mobile-Large").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+            buttonsView.AddSubview(MobileButton);
             buttonsView.AddConstraints(new[]
             {
-                mobileButton.TopAnchor.ConstraintEqualTo(buttonsView.TopAnchor),
-                mobileButton.LeftAnchor.ConstraintEqualTo(emailButton.RightAnchor,15f),
-                mobileButton.BottomAnchor.ConstraintEqualTo(buttonsView.BottomAnchor),
-                mobileButton.HeightAnchor.ConstraintEqualTo(60f),
-                mobileButton.WidthAnchor.ConstraintEqualTo(40f)
+                MobileButton.TopAnchor.ConstraintEqualTo(buttonsView.TopAnchor),
+                MobileButton.LeftAnchor.ConstraintEqualTo(EmailButton.RightAnchor,15f),
+                MobileButton.BottomAnchor.ConstraintEqualTo(buttonsView.BottomAnchor),
+                MobileButton.HeightAnchor.ConstraintEqualTo(60f),
+                MobileButton.WidthAnchor.ConstraintEqualTo(40f)
             });
 
-            smsButton= new UIButton
+            SmsButton = new UIButton
             {
                 Enabled = false,
                 Alpha = 0f,
                 TintColor = Theme.DarkerBlue,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
-            smsButton.SetImage(UIImage.FromBundle("Sms-Large").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
-            buttonsView.AddSubview(smsButton);
+            SmsButton.SetImage(UIImage.FromBundle("Sms-Large").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+            buttonsView.AddSubview(SmsButton);
             buttonsView.AddConstraints(new[]
             {
-                smsButton.TopAnchor.ConstraintEqualTo(buttonsView.TopAnchor),
-                smsButton.LeftAnchor.ConstraintEqualTo(mobileButton.RightAnchor,15f),
-                smsButton.BottomAnchor.ConstraintEqualTo(buttonsView.BottomAnchor),
-                smsButton.HeightAnchor.ConstraintEqualTo(60f),
-                smsButton.WidthAnchor.ConstraintEqualTo(40f)
+                SmsButton.TopAnchor.ConstraintEqualTo(buttonsView.TopAnchor),
+                SmsButton.LeftAnchor.ConstraintEqualTo(MobileButton.RightAnchor,15f),
+                SmsButton.BottomAnchor.ConstraintEqualTo(buttonsView.BottomAnchor),
+                SmsButton.HeightAnchor.ConstraintEqualTo(60f),
+                SmsButton.WidthAnchor.ConstraintEqualTo(40f)
             });
 
-            mapButton= new UIButton
+            MapButton = new UIButton
             {
                 Enabled = false,
                 Alpha = 0f,
                 TintColor = Theme.DarkerBlue,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
-            mapButton.SetImage(UIImage.FromBundle("Map-Large").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
-            buttonsView.AddSubview(mapButton);
+            MapButton.SetImage(UIImage.FromBundle("Map-Large").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+            buttonsView.AddSubview(MapButton);
             buttonsView.AddConstraints(new[]
             {
-                mapButton.TopAnchor.ConstraintEqualTo(buttonsView.TopAnchor),
-                mapButton.LeftAnchor.ConstraintEqualTo(smsButton.RightAnchor,15f),
-                mapButton.RightAnchor.ConstraintEqualTo(buttonsView.RightAnchor),
-                mapButton.BottomAnchor.ConstraintEqualTo(buttonsView.BottomAnchor),
-                mapButton.HeightAnchor.ConstraintEqualTo(60f),
-                mapButton.WidthAnchor.ConstraintEqualTo(40f)
+                MapButton.TopAnchor.ConstraintEqualTo(buttonsView.TopAnchor),
+                MapButton.LeftAnchor.ConstraintEqualTo(SmsButton.RightAnchor,15f),
+                MapButton.RightAnchor.ConstraintEqualTo(buttonsView.RightAnchor),
+                MapButton.BottomAnchor.ConstraintEqualTo(buttonsView.BottomAnchor),
+                MapButton.HeightAnchor.ConstraintEqualTo(60f),
+                MapButton.WidthAnchor.ConstraintEqualTo(40f)
             });
 
             TableView.TableHeaderView = headerView;
@@ -291,7 +303,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         Enabled = false
                     },
                     new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
-                    fileToButton = new UIBarButtonItem
+                    FileToButton = new UIBarButtonItem
                     {
                         Image = UIImage.FromBundle("Worktray"),
                         Enabled = false
@@ -303,7 +315,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         Enabled = false
                     },
                     new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
-                    actionsLinksButton = new UIBarButtonItem
+                    ActionsLinksButton = new UIBarButtonItem
                     {
                         Image = UIImage.FromBundle("Actions"),
                         Enabled = false
@@ -317,8 +329,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             else
             {
                 NavigationController.ToolbarHidden = true;
-                if (!hideNavigationButtons)
-                    NavigationItem.SetLeftBarButtonItems(buttons, false);
+                NavigationItem.SetLeftBarButtonItems(buttons, false);
             }
         }
 
@@ -328,15 +339,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 if (ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed || ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.EditAllowed)
                 {
-                    editButtonItem = new UIBarButtonItem
+                    EditButtonItem = new UIBarButtonItem
                     {
                         Image = UIImage.FromBundle("Edit"),
                         Enabled = false
                     };
-                    NavigationItem.SetRightBarButtonItem(editButtonItem, false);
+                    NavigationItem.SetRightBarButtonItem(EditButtonItem, false);
                 }
             }
-            else if (!hideDoneButton)
+            else if (!HideDoneButton)
             {
                 doneButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
                 NavigationItem.SetRightBarButtonItem(doneButtonItem, false);
@@ -345,74 +356,73 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeHandlers()
         {
-            if (emailButton != null)
-                emailButton.TouchUpInside += EmailButton_TouchUpInside;
+            if (EmailButton != null)
+                EmailButton.TouchUpInside += EmailButton_TouchUpInside;
 
-            if (mobileButton != null)
-                mobileButton.TouchUpInside += MobileButton_TouchUpInside;
+            if (MobileButton != null)
+                MobileButton.TouchUpInside += MobileButton_TouchUpInside;
 
-            if (smsButton != null)
-                smsButton.TouchUpInside += SmsButton_TouchUpInside;
+            if (SmsButton != null)
+                SmsButton.TouchUpInside += SmsButton_TouchUpInside;
 
-            if (mapButton!= null)
-                mapButton.TouchUpInside += MapButton_TouchUpInside;
+            if (MapButton != null)
+                MapButton.TouchUpInside += MapButton_TouchUpInside;
 
             if (assignCategoryButton != null)
                 assignCategoryButton.Clicked += AssignCategoryButton_Clicked;
 
-            if (fileToButton != null)
-                fileToButton.Clicked += FileToButton_Clicked;
+            if (FileToButton != null)
+                FileToButton.Clicked += FileToButton_Clicked;
 
             if (commentsButton != null)
                 commentsButton.Clicked += CommentsButton_Clicked;
 
-            if (actionsLinksButton != null)
-                actionsLinksButton.Clicked += ActionsLinksButton_Clicked;
+            if (ActionsLinksButton != null)
+                ActionsLinksButton.Clicked += ActionsLinksButton_Clicked;
 
             if (doneButtonItem != null)
                 doneButtonItem.Clicked += DoneButtonItem_Clicked;
 
-            if (editButtonItem != null)
-                editButtonItem.Clicked += EditButtonItem_Clicked;
+            if (EditButtonItem != null)
+                EditButtonItem.Clicked += EditButtonItem_Clicked;
         }
 
         void DeinitializeHandlers()
         {
-            if (emailButton != null)
-                emailButton.TouchUpInside -= EmailButton_TouchUpInside;
+            if (EmailButton != null)
+                EmailButton.TouchUpInside -= EmailButton_TouchUpInside;
 
-            if (mobileButton != null)
-                mobileButton.TouchUpInside -= MobileButton_TouchUpInside;
+            if (MobileButton != null)
+                MobileButton.TouchUpInside -= MobileButton_TouchUpInside;
 
-            if (smsButton != null)
-                smsButton.TouchUpInside -= SmsButton_TouchUpInside;
+            if (SmsButton != null)
+                SmsButton.TouchUpInside -= SmsButton_TouchUpInside;
 
-            if (mapButton != null)
-                mapButton.TouchUpInside -= MapButton_TouchUpInside;
+            if (MapButton != null)
+                MapButton.TouchUpInside -= MapButton_TouchUpInside;
 
             if (assignCategoryButton != null)
                 assignCategoryButton.Clicked -= AssignCategoryButton_Clicked;
 
-            if (fileToButton != null)
-                fileToButton.Clicked -= FileToButton_Clicked;
+            if (FileToButton != null)
+                FileToButton.Clicked -= FileToButton_Clicked;
 
             if (commentsButton != null)
                 commentsButton.Clicked -= CommentsButton_Clicked;
 
-            if (actionsLinksButton != null)
-                actionsLinksButton.Clicked -= ActionsLinksButton_Clicked;
+            if (ActionsLinksButton != null)
+                ActionsLinksButton.Clicked -= ActionsLinksButton_Clicked;
 
             if (doneButtonItem != null)
                 doneButtonItem.Clicked -= DoneButtonItem_Clicked;
 
-            if (editButtonItem != null)
-                editButtonItem.Clicked -= EditButtonItem_Clicked;
+            if (EditButtonItem != null)
+                EditButtonItem.Clicked -= EditButtonItem_Clicked;
         }
-
 
         void SubscribeToMessages()
         {
-            contactChangedToken = CommonConfig.MessengerHub.Subscribe<EntityChangedMessage>(HandleContactChangedMessage, m => m.ObjectType == ObjectType.Contact && contactPreview?.Id == m.EntityId);
+            contactChangedToken = CommonConfig.MessengerHub.Subscribe<EntityChangedMessage>(HandleContactChangedMessage, m => m.ObjectType == ObjectType.Contact && ContactPreview?.Id == m.EntityId);
         }
 
         void UnsubscribeFromMessages()
@@ -424,13 +434,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void RefreshAllOnAppear()
         {
-            contactId = contactPreview.Id;
-            contactPreview = null;
+            ((DataSource)TableView.Source)?.Clear();
+            ContactId = ContactPreview.Id;
+            ContactPreview = null;
 
             if (SplitViewController == null || SplitViewController.Collapsed)
                 refreshDataOnAppear = true;
             else
-                RefreshData(true);
+                RefreshData();
         }
 
         void RowLongPressed(UILongPressGestureRecognizer gr)
@@ -451,343 +462,72 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 row.OnLongClicked(this.Wrap(), TableView, cell, indexPath);
         }
 
-        private void EmailButton_TouchUpInside(object sender, EventArgs e)
-        {
-            CommonConfig.UsageAnalytics.LogEvent(new ContactFastActionEvent(ContactActionChoice.Email));
-
-            var primaryEmail = contact.CommunicationAddresses.FirstOrDefault(ca => ca.Type == CommunicationAddressType.Email && ca.IsPrimary);
-            if (primaryEmail == null)
-                return;
-
-            var vc = new ComposeDocumentViewController
-            {
-                DocumentCreationModeFlag = DocumentCreationModeFlag.New,
-                PreconfiguredEmailAddresses = new Dictionary<DocumentAddressType, string[]>
-                {
-                    { DocumentAddressType.To, new [] { primaryEmail.Address } }
-                }
-            };
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-        }
-
-
-        private async void MobileButton_TouchUpInside(object sender, EventArgs e)
-        {
-            CommonConfig.UsageAnalytics.LogEvent(new ContactFastActionEvent(ContactActionChoice.Call));
-
-            var formattedNumbers = contact.CommunicationAddresses.Where(ca => (ca.Type == CommunicationAddressType.Mobile || ca.Type == CommunicationAddressType.Phone) && ca.IsPrimary)
-                                          .Select(ca => AddressFormatter.FormatCommunicationAddress(ca)).ToArray();
-            if (formattedNumbers.Length == 0)
-                return;
-
-            if (formattedNumbers.Length == 1)
-            {
-                Integration.Call(this, (UIButton)sender, formattedNumbers[0]);
-                return;
-            }
-
-            var selectedItem = await Dialogs.ShowListActionSheetAsync(this, formattedNumbers, (UIButton)sender);
-            if (selectedItem < 0)
-                return;
-
-            Integration.Call(this, (UIButton)sender, formattedNumbers[selectedItem]);
-        }
-
-        private void SmsButton_TouchUpInside(object sender, EventArgs e)
-        {
-            CommonConfig.UsageAnalytics.LogEvent(new ContactFastActionEvent(ContactActionChoice.Text));
-
-            var communicationAddresses = contact.CommunicationAddresses.FirstOrDefault(ca => ca.Type == CommunicationAddressType.Mobile && ca.IsPrimary);
-            if (communicationAddresses == null)
-                return;
-
-            Integration.Text(this, (UIButton)sender, AddressFormatter.FormatCommunicationAddress(communicationAddresses));
-        }
-
-
-        private async void MapButton_TouchUpInside(object sender, EventArgs e)
-        {
-            CommonConfig.UsageAnalytics.LogEvent(new ContactFastActionEvent(ContactActionChoice.Map));
-
-            var physicalAddress = contact.PhysicalAddresses.ToArray();
-            if (physicalAddress.Length == 0)
-                return;
-
-            if (physicalAddress.Length == 1)
-            {
-                Integration.ShowOnMap(this, (UIButton)sender, physicalAddress[0]);
-                return;
-            }
-
-            var selectedItem = await Dialogs.ShowListActionSheetAsync(this, physicalAddress.Select(pa => pa.Type.Name).ToArray(), (UIButton)sender);
-            if (selectedItem < 0)
-                return;
-
-            Integration.ShowOnMap(this, (UIButton)sender, physicalAddress[selectedItem]);
-        }
-
-        async void EditButtonItem_Clicked(object sender, EventArgs e)
-        {
-            var listString = new List<string> { };
-
-            if (ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.EditAllowed)
-                listString.Add(Localization.GetString("edit_contact"));
-
-            if (ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed
-                && contactPreview.Type == ContactType.Company)
-                listString.Add(Localization.GetString("add_department"));
-            if (ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed
-                && (contactPreview.Type == ContactType.Company || contactPreview.Type == ContactType.Department))
-                listString.Add(Localization.GetString("add_person"));
-
-            var index = await Dialogs.ShowListActionSheetAsync(this, listString.ToArray(), editButtonItem);
-            if (index < 0)
-                return;
-
-            var selectedString = listString[index];
-
-            if (selectedString == Localization.GetString("edit_contact"))
-            {
-                var vc = new AddEditContactViewController
-                {
-                    ContactType = contactPreview.Type,
-                    ContactPreview = contactPreview,
-                    Contact = contact,
-                    CreationModeFlag = ContactCreationModeFlag.Edit
-                };
-                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-
-                var contactUpdated = await vc.Result;
-
-                if (contactUpdated)
-                    RefreshData(true);
-                  
-            }
-            else
-            {
-                var type = selectedString == Localization.GetString("add_person") ? ContactType.Person : ContactType.Department;
-                var vc = new AddEditContactViewController
-                {
-                    ContactType = type,
-                    ParentContactPreview = contactPreview,
-                    ParentPreselected = true,
-                    CreationModeFlag = ContactCreationModeFlag.New,
-                };
-                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-            }
-        }
-
-        void AssignCategoryButton_Clicked(object sender, EventArgs e)
-        {
-            PresentViewController(new NavigationController(new CategoriesListViewController(contactPreview), UIModalPresentationStyle.PageSheet), true, null);
-        }
-
-        void FileToButton_Clicked(object sender, EventArgs e)
-        {
-            var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
-
-            if (ServerConfig.SystemSettings.ContactsModuleInfo.WorktrayEnabled ?? true)
-            {
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_worktray"),
-                                                   UIAlertActionStyle.Default,
-                                                   a =>
-                {
-                    var vc = new CopyToWorktrayViewController { BusinessEntities = new List<IBusinessEntity> { contact } };
-                    PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-                }));
-            }
-
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("copy_to_folder"),
-                                               UIAlertActionStyle.Default,
-                                               a =>
-            {
-                var vc = new CopyMoveToFolderListViewController(ModuleType.Contacts, new List<IBusinessEntity> { contactPreview });
-                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-            }));
-
-            if (folder?.InternalType == FolderInternalType.FilterView || folder?.InternalType == FolderInternalType.Static || folder?.InternalType == FolderInternalType.Worktray)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"),
-                                                   UIAlertActionStyle.Default,
-                                                   a =>
-            {
-                var vc = new CopyMoveToFolderListViewController(ModuleType.Contacts, new List<IBusinessEntity> { contactPreview }, folder);
-                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-            }));
-
-            if (folder?.InternalType == FolderInternalType.FilterView || folder?.InternalType == FolderInternalType.Static || folder?.InternalType == FolderInternalType.Worktray)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, RemoveFromFolder));
-
-            if (ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.DeleteAllowed)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, Delete));
-
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
-
-            if (eas.PopoverPresentationController != null)
-                eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
-
-            PresentViewController(eas, true, null);
-        }
-
-        void CommentsButton_Clicked(object sender, EventArgs e)
-        {
-            var vc = new CommentsListViewController { Entity = contact };
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-        }
-
-        async void ActionsLinksButton_Clicked(object sender, EventArgs e)
-        {
-            var actionLinksListString = new[]
-            {
-                Localization.GetString("history"),
-                Localization.GetString("overview")
-            };
-
-            var result = await Dialogs.ShowListActionSheetAsync(this, actionLinksListString, actionsLinksButton);
-            if (result < 0)
-                return;
-
-            UIViewController vc = null;
-            switch (result)
-            {
-                case 0:
-                    vc = new ObjectActionsListViewController(contact);
-                    break;
-                case 1:
-                    vc = new ObjectLinksListViewController(contact);
-                    break;
-            }
-
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-        }
-
-        void DoneButtonItem_Clicked(object sender, EventArgs e) => DismissViewController(true, null);
-
-        async void CommunicationAddressClicked(UITableView tv, UITableViewCell cell, CommunicationAddress ca)
-        {
-            if (ca.Type == CommunicationAddressType.Email)
-            {
-                CommonConfig.UsageAnalytics.LogEvent(new ContactActionEvent(ContactActionChoice.Email));
-
-                var vc = new ComposeDocumentViewController
-                {
-                    DocumentCreationModeFlag = DocumentCreationModeFlag.New,
-                    PreconfiguredEmailAddresses = new Dictionary<DocumentAddressType, string[]>
-                    {
-                        { DocumentAddressType.To, new [] { ca.Address } }
-                    }
-                };
-                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-            }
-
-            if (ca.Type == CommunicationAddressType.Phone)
-            {
-                CommonConfig.UsageAnalytics.LogEvent(new ContactActionEvent(ContactActionChoice.Call));
-                Integration.Call(this, tv, cell, ca.Address);
-            }
-
-            if (ca.Type == CommunicationAddressType.Mobile)
-            {
-                var choices = new string[] { Localization.GetString("call"), Localization.GetString("send_text") };
-                var result = await Dialogs.ShowListActionSheetAsync(this, choices, tv, cell);
-
-                if (result == 0)
-                {
-                    CommonConfig.UsageAnalytics.LogEvent(new ContactActionEvent(ContactActionChoice.Call));
-                    Integration.Call(this, tv, cell, ca.Address);
-                }
-                if (result == 1)
-                {
-                    CommonConfig.UsageAnalytics.LogEvent(new ContactActionEvent(ContactActionChoice.Text));
-                    Integration.Text(this, tv, cell, ca.Address);
-                }
-            }
-
-        }
-
-        public void LinkedContactClicked(ContactPreview contactPreview)
-        {
-            CommonConfig.UsageAnalytics.LogEvent(new ContactNavigateSubContactEvent());
-
-            var vc = new ContactViewController();
-            vc.SetData(contactPreview, false);
-            vc.SetRefreshDataOnAppear();
-            PresentViewController(new NavigationController(vc), true, null);
-        }
-
-        void PhysicalAddressClicked(UITableView tv, UITableViewCell cell, PhysicalAddress pa)
-        {
-            CommonConfig.UsageAnalytics.LogEvent(new ContactActionEvent(ContactActionChoice.Map));
-            Integration.ShowOnMap(this, tv, cell, pa);
-        }
-
         public void WebPageClicked(UITableView tableView, UITableViewCell cell, string webPageAddress) => Integration.OpenUrl(this, tableView, cell, webPageAddress);
+
         public void CopyToClipboard(UITableView tableView, UITableViewCell cell, string text) => Integration.CopyToClipboard(this, tableView, cell, text);
 
         public void SetData(int folderId, int contactId)
         {
             CommonConfig.UsageAnalytics.LogEvent(new OpenContactEvent());
 
-            folder = null;
-            contactPreview = null;
-            contact = null;
+            Folder = null;
+            ContactPreview = null;
+            Contact = null;
 
-            this.folderId = folderId;
-            this.contactId = contactId;
+            FolderId = folderId;
+            ContactId = contactId;
         }
 
-        public void SetData(Folder folder, ContactPreview contactPreview)
+        public void SetData(Folder folder, ContactPreview contactPreview, bool hideDoneButton = false)
         {
             CommonConfig.UsageAnalytics.LogEvent(new OpenContactEvent());
 
-            folderId = null;
-            contactId = null;
-            contact = null;
+            FolderId = null;
+            ContactId = null;
+            Contact = null;
 
-            this.folder = folder;
-            this.contactPreview = contactPreview;
+            Folder = folder;
+            ContactPreview = contactPreview;
+            HideDoneButton = hideDoneButton;
         }
 
-        public void SetData(ContactPreview contactPreview, bool hideDoneButton, bool hideNavigationButtons = false)
+        public void SetData(ContactPreview contactPreview, bool hideDoneButton)
         {
             CommonConfig.UsageAnalytics.LogEvent(new OpenContactEvent());
 
-            folderId = null;
-            folder = null;
-            contactId = null;
-            contact = null;
+            FolderId = null;
+            Folder = null;
+            ContactId = null;
+            Contact = null;
 
-            this.hideDoneButton = hideDoneButton;
-            this.contactPreview = contactPreview;
-            this.hideNavigationButtons = hideNavigationButtons;
+            HideDoneButton = hideDoneButton;
+            ContactPreview = contactPreview;
         }
 
         public void SetData(int contactId)
         {
             CommonConfig.UsageAnalytics.LogEvent(new OpenContactEvent());
 
-            folderId = null;
-            folder = null;
-            contactPreview = null;
-            contact = null;
+            FolderId = null;
+            Folder = null;
+            ContactPreview = null;
+            Contact = null;
 
-            this.contactId = contactId;
+            ContactId = contactId;
         }
 
-        public bool IsShowingContactWithId(int contactId) => contactPreview?.Id == contactId || this.contactId == contactId;
+        public bool IsShowingContactWithId(int contactId) => ContactPreview?.Id == contactId || ContactId == contactId;
 
-        public async void RefreshData(bool forceClean = false)
+        public async void RefreshData()
         {
-            if (forceClean)
-                ((DataSource)TableView.Source)?.Clear();
-
             cts?.Cancel();
             cts = new CancellationTokenSource();
             var token = cts.Token;
 
-            var folderId = this.folderId;
-            var folder = this.folder;
-            var contactId = this.contactId;
-            var contactPreview = this.contactPreview;
+            var folderId = FolderId;
+            var folder = Folder;
+            var contactId = ContactId;
+            var contactPreview = ContactPreview;
 
             CommonConfig.Logger.Info("Loading contact...");
 
@@ -801,88 +541,80 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     var swp = await Managers.ContactsManager.GetContactWithPreviewAsync(folder?.Id ?? folderId, contactId.Value);
 
-                    this.contactPreview = swp.ContactPreview;
-                    contact = swp.Contact;
+                    ContactPreview = swp.ContactPreview;
+                    Contact = swp.Contact;
                 }
 
                 if (folder != null && contactPreview != null)
-                    contact = await Managers.ContactsManager.GetContactAsync(folder, contactPreview.Id);
+                    Contact = await Managers.ContactsManager.GetContactAsync(folder, contactPreview.Id);
 
                 if (folderId == null && folder == null && contactPreview != null)
-                    contact = await Managers.ContactsManager.GetContactAsync(-1, contactPreview.Id);
+                    Contact = await Managers.ContactsManager.GetContactAsync(-1, contactPreview.Id);
 
                 if (folderId == null && folder == null && contactPreview == null)
                 {
                     var swp = await Managers.ContactsManager.GetContactWithPreviewAsync(-1, contactId.Value);
-                    this.contactPreview = swp.ContactPreview;
-                    contact = swp.Contact;
+                    ContactPreview = swp.ContactPreview;
+                    Contact = swp.Contact;
                 }
 
-                contact.CommunicationAddresses = contact.CommunicationAddresses.OrderBy(ca => ca.Address).ToList();
+                Contact.CommunicationAddresses = Contact.CommunicationAddresses.OrderBy(ca => ca.Address).ToList();
 
                 if (token.IsCancellationRequested)
                     return;
 
-                if (this.contactPreview.Type == ContactType.Person)
+                if (ContactPreview.Type == ContactType.Person)
                 {
-                    nameLabel.Text = this.contactPreview.Name;
-                    if (!string.IsNullOrEmpty(this.contactPreview.CompanyName) && !string.IsNullOrEmpty(contact.Position))
+                    nameLabel.Text = ContactPreview.Name;
+                    if (!string.IsNullOrEmpty(ContactPreview.CompanyName) && !string.IsNullOrEmpty(Contact.Position))
                     {
-                        nameSubLabel.Text = $"{contact.Position} @ {this.contactPreview.CompanyName}";
+                        nameSubLabel.Text = $"{Contact.Position} @ {ContactPreview.CompanyName}";
                     }
                     else
                     {
                         string subtitle = string.Empty;
-                        subtitle += contact.Position;
-                        subtitle += this.contactPreview.CompanyName;
+                        subtitle += Contact.Position;
+                        subtitle += ContactPreview.CompanyName;
 
                         nameSubLabel.Text = subtitle;
                     }
 
                 }
-                else if (this.contactPreview.Type == ContactType.Department)
+                else if (ContactPreview.Type == ContactType.Department)
                 {
-                    nameLabel.Text = this.contactPreview.Name;
-                    nameSubLabel.Text = this.contactPreview.CompanyName;
+                    nameLabel.Text = ContactPreview.Name;
+                    nameSubLabel.Text = ContactPreview.CompanyName;
                 }
                 else
                 {
-                    nameLabel.Text = this.contactPreview.Name;
+                    nameLabel.Text = ContactPreview.Name;
                     nameSubLabel.Text = string.Empty;
                 }
 
-                emailButton.Enabled = contact.CommunicationAddresses.Any(ca => ca.Type == CommunicationAddressType.Email && ca.IsPrimary);
-                mobileButton.Enabled = contact.CommunicationAddresses.Any(ca => (ca.Type == CommunicationAddressType.Mobile || ca.Type == CommunicationAddressType.Phone) && ca.IsPrimary);
-                smsButton.Enabled = contact.CommunicationAddresses.Any(ca => ca.Type == CommunicationAddressType.Mobile && ca.IsPrimary);
-                mapButton.Enabled = contact.PhysicalAddresses.Any();
-
-                emailButton.Alpha = 1f;
-                mobileButton.Alpha = 1f;
-                smsButton.Alpha = 1f;
-                mapButton.Alpha = 1f;
+                SetAlphaForHeaderButtons();
 
                 if (assignCategoryButton != null)
                     assignCategoryButton.Enabled = true;
 
-                if (fileToButton != null)
-                    fileToButton.Enabled = true;
+                if (FileToButton != null)
+                    FileToButton.Enabled = true;
 
                 if (commentsButton != null)
-                    commentsButton.Enabled = contact != null;
+                    commentsButton.Enabled = Contact != null;
 
-                if (actionsLinksButton != null)
-                    actionsLinksButton.Enabled = true;
+                if (ActionsLinksButton != null)
+                    ActionsLinksButton.Enabled = true;
 
-                if (editButtonItem != null)
+                if (EditButtonItem != null)
                 {
-                    editButtonItem.Enabled = true;
-                    NavigationItem.SetRightBarButtonItem(editButtonItem, false);
+                    EditButtonItem.Enabled = true;
+                    NavigationItem.SetRightBarButtonItem(EditButtonItem, false);
                 }
 
                 if (doneButtonItem != null)
                     NavigationItem.SetRightBarButtonItem(doneButtonItem, false);
 
-                ds.EndRefresh(this.contactPreview, contact);
+                ds.EndRefresh(ContactPreview, Contact);
             }
             catch (Exception ex)
             {
@@ -911,103 +643,52 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             cts?.Cancel();
 
-            folderId = null;
-            folder = null;
-            contactId = null;
-            contactPreview = null;
-            contact = null;
+            FolderId = null;
+            Folder = null;
+            ContactId = null;
+            ContactPreview = null;
+            Contact = null;
 
             nameLabel.Text = string.Empty;
             nameSubLabel.Text = string.Empty;
 
-            emailButton.Alpha = 0f;
-            mobileButton.Alpha = 0f;
-            smsButton.Alpha = 0f;
-            mapButton.Alpha = 0f;
-            emailButton.Enabled = false;
-            mobileButton.Enabled = false;
-            smsButton.Enabled = false;
-            mapButton.Enabled = false;
+            EmailButton.Alpha = 0f;
+            MobileButton.Alpha = 0f;
+            SmsButton.Alpha = 0f;
+            MapButton.Alpha = 0f;
+            EmailButton.Enabled = false;
+            MobileButton.Enabled = false;
+            SmsButton.Enabled = false;
+            MapButton.Enabled = false;
 
             if (assignCategoryButton != null)
                 assignCategoryButton.Enabled = false;
 
-            if (fileToButton != null)
-                fileToButton.Enabled = false;
+            if (FileToButton != null)
+                FileToButton.Enabled = false;
 
             if (commentsButton != null)
                 commentsButton.Enabled = false;
 
-            if (actionsLinksButton != null)
-                actionsLinksButton.Enabled = false;
+            if (ActionsLinksButton != null)
+                ActionsLinksButton.Enabled = false;
 
             NavigationItem.SetRightBarButtonItem(null, false);
 
             ((DataSource)TableView.Source)?.Clear();
         }
 
-        async void RemoveFromFolder(UIAlertAction a)
+        protected virtual void SetAlphaForHeaderButtons()
         {
-            var d = new PopoverPresentationControllerDelegate(fileToButton);
-            var result = await Dialogs.ShowDestructiveActionSheetAsync(this, Localization.GetString("delete_from_folder"), d);
-            if (!result)
-                return;
+            EmailButton.Enabled = Contact.CommunicationAddresses.Any(ca => ca.Type == CommunicationAddressType.Email && ca.IsPrimary);
+            MobileButton.Enabled = Contact.CommunicationAddresses.Any(ca => (ca.Type == CommunicationAddressType.Mobile || ca.Type == CommunicationAddressType.Phone) && ca.IsPrimary);
+            SmsButton.Enabled = Contact.CommunicationAddresses.Any(ca => ca.Type == CommunicationAddressType.Mobile && ca.IsPrimary);
+            MapButton.Enabled = Contact.PhysicalAddresses.Any();
 
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("deleting_from_folder___"));
-
-            try
-            {
-                CommonConfig.Logger.Info($"Attempting to remove contact from folder [contactId={contact.Id}, folderId={folder.Id}]");
-
-                await Managers.CommonActionsManager.RemoveFromFolder(new List<IBusinessEntity> { contact }, folder);
-
-                CommonConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this, ObjectType.Contact, folder.Id, new List<int> { contact.Id }));
-
-                dismissAction();
-
-                if (SplitViewController != null && !SplitViewController.Collapsed)
-                    ClearData();
-                else
-                    NavigationController?.PopViewController(true);
-            }
-            catch (Exception ex)
-            {
-                dismissAction();
-
-                CommonConfig.Logger.Error($"Error while removing contact from folder [contactId={contact.Id}, folderId={folder.Id}]", ex);
-                await Dialogs.ShowErrorAlertAsync(this, ex);
-            }
-        }
-
-        async void Delete(UIAlertAction a)
-        {
-            var d = new PopoverPresentationControllerDelegate(fileToButton);
-            var result = await Dialogs.ShowDestructiveActionSheetAsync(this, Localization.GetString("delete"), d);
-            if (!result)
-                return;
-
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("deleting___"));
-
-            try
-            {
-                CommonConfig.Logger.Info($"Attempting to delete contact [contactId={contact.Id}]");
-
-                await Managers.CommonActionsManager.Delete(new List<IBusinessEntity> { contact });
-
-                dismissAction();
-
-                if (SplitViewController != null && !SplitViewController.Collapsed)
-                    ClearData();
-                else
-                    NavigationController?.PopViewController(true);
-            }
-            catch (Exception ex)
-            {
-                dismissAction();
-
-                CommonConfig.Logger.Error($"Error while deleting contact [contactId={contact.Id}]", ex);
-                await Dialogs.ShowErrorAlertAsync(this, ex);
-            }
+            EmailButton.Alpha = 1f;
+            MobileButton.Alpha = 1f;
+            SmsButton.Alpha = 1f;
+            MapButton.Alpha = 1f;
         }
 
         void UpdateTitle(bool show)
@@ -1016,9 +697,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             NavigationItem.Title = title;
         }
 
-        class DataSource : UITableViewSource
+        protected class DataSource : UITableViewSource
         {
-            readonly WeakReference<ContactViewController> viewControllerWeakReference;
+            readonly WeakReference<AbstractContactViewController> viewControllerWeakReference;
             readonly WeakReference<UITableView> tableViewWeakReference;
 
             bool empty = true;
@@ -1026,7 +707,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             readonly SectionCollection sections = new SectionCollection();
 
-            public DataSource(ContactViewController viewController, UITableView tableView)
+            public DataSource(AbstractContactViewController viewController, UITableView tableView)
             {
                 viewControllerWeakReference = viewController.Wrap();
                 tableViewWeakReference = tableView.Wrap();
@@ -1347,8 +1028,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 public virtual string Id => ContactInfoTableViewCell.DefaultId;
                 public virtual UITableViewCell CreateCell() => new ContactInfoTableViewCell();
                 public abstract void Bind(UITableViewCell cell);
-                public virtual void OnClicked(WeakReference<ContactViewController> viewControllerWeakReference, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath) { }
-                public virtual void OnLongClicked(WeakReference<ContactViewController> viewControllerWeakReference, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath) { }
+                public virtual void OnClicked(WeakReference<AbstractContactViewController> viewControllerWeakReference, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath) { }
+                public virtual void OnLongClicked(WeakReference<AbstractContactViewController> viewControllerWeakReference, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath) { }
             }
 
             public class DescriptionRow : AbstractRow
@@ -1368,7 +1049,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     cic.Initialize(Localization.GetString("description").ToUpper(), ContactPreview.Description, true);
                 }
 
-                public override void OnLongClicked(WeakReference<ContactViewController> viewControllerWeakReference, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
+                public override void OnLongClicked(WeakReference<AbstractContactViewController> viewControllerWeakReference, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
                 {
                     viewControllerWeakReference.Unwrap()?.CopyToClipboard(tableView, cell, ContactPreview.Description);
                 }
@@ -1411,12 +1092,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     catcv.Initialize(ca);
                 }
 
-                public override void OnClicked(WeakReference<ContactViewController> viewControllerWeakReference, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
+                public override void OnClicked(WeakReference<AbstractContactViewController> viewControllerWeakReference, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
                 {
                     viewControllerWeakReference.Unwrap()?.CommunicationAddressClicked(tableView, cell, weakCommunicationAddress.Unwrap());
                 }
 
-                public override void OnLongClicked(WeakReference<ContactViewController> viewControllerWeakReference, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
+                public override void OnLongClicked(WeakReference<AbstractContactViewController> viewControllerWeakReference, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
                 {
                     if (cell is CommunicationAddressTableViewCell caCell)
                         viewControllerWeakReference.Unwrap()?.CopyToClipboard(tableView, cell, caCell.Content);
@@ -1443,12 +1124,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     patvc.Initialize(weakPhysicalAddress.Unwrap());
                 }
 
-                public override void OnClicked(WeakReference<ContactViewController> viewControllerWeakReference, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
+                public override void OnClicked(WeakReference<AbstractContactViewController> viewControllerWeakReference, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
                 {
                     viewControllerWeakReference.Unwrap()?.PhysicalAddressClicked(tableView, cell, weakPhysicalAddress.Unwrap());
                 }
 
-                public override void OnLongClicked(WeakReference<ContactViewController> viewControllerWeakReference, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
+                public override void OnLongClicked(WeakReference<AbstractContactViewController> viewControllerWeakReference, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
                 {
                     if (cell is PhysicalAddressTableViewCell paCell)
                         viewControllerWeakReference.Unwrap()?.CopyToClipboard(tableView, cell, paCell.Content);
@@ -1487,7 +1168,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     cic.Initialize(type.ToUpper(), cp.Name);
                 }
 
-                public override void OnClicked(WeakReference<ContactViewController> viewControllerWeakReference, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
+                public override void OnClicked(WeakReference<AbstractContactViewController> viewControllerWeakReference, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
                 {
                     viewControllerWeakReference?.Unwrap().LinkedContactClicked(weakLinkedContactPreview.Unwrap());
                 }
@@ -1510,12 +1191,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     cic.Initialize(Localization.GetString("webpage").ToUpper(), Contact.WebPageAddress);
                 }
 
-                public override void OnClicked(WeakReference<ContactViewController> viewControllerWeakReference, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
+                public override void OnClicked(WeakReference<AbstractContactViewController> viewControllerWeakReference, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
                 {
                     viewControllerWeakReference.Unwrap()?.WebPageClicked(tableView, cell, Contact.WebPageAddress);
                 }
 
-                public override void OnLongClicked(WeakReference<ContactViewController> viewControllerWeakReference, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
+                public override void OnLongClicked(WeakReference<AbstractContactViewController> viewControllerWeakReference, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
                 {
                     viewControllerWeakReference.Unwrap()?.CopyToClipboard(tableView, cell, Contact.WebPageAddress);
                 }
@@ -1559,7 +1240,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     cic.Initialize(Localization.GetString("account").ToUpper(), Contact.Account);
                 }
 
-                public override void OnLongClicked(WeakReference<ContactViewController> viewControllerWeakReference, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
+                public override void OnLongClicked(WeakReference<AbstractContactViewController> viewControllerWeakReference, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
                 {
                     viewControllerWeakReference.Unwrap()?.CopyToClipboard(tableView, cell, Contact.Account);
                 }
@@ -1582,7 +1263,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     cic.Initialize(Localization.GetString("ledger").ToUpper(), Contact.Ledger);
                 }
 
-                public override void OnLongClicked(WeakReference<ContactViewController> viewControllerWeakReference, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
+                public override void OnLongClicked(WeakReference<AbstractContactViewController> viewControllerWeakReference, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
                 {
                     viewControllerWeakReference.Unwrap()?.CopyToClipboard(tableView, cell, Contact.Ledger);
                 }
@@ -1605,7 +1286,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     cic.Initialize(Localization.GetString("vat").ToUpper(), Contact.Vat);
                 }
 
-                public override void OnLongClicked(WeakReference<ContactViewController> viewControllerWeakReference, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
+                public override void OnLongClicked(WeakReference<AbstractContactViewController> viewControllerWeakReference, UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
                 {
                     viewControllerWeakReference.Unwrap()?.CopyToClipboard(tableView, cell, Contact.Vat);
                 }
@@ -1654,16 +1335,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             coder.Encode(PresentingViewController != null, "doNotRestore");
 
-            if (folderId.HasValue)
-                coder.Encode(folderId.Value, "folderId");
-            if (folder != null)
-                coder.Encode(Serializer.SerializeToByteArray(folder.ShallowCopy()), "folder");
-            if (contactId.HasValue)
-                coder.Encode(contactId.Value, "contactId");
-            if (contactPreview != null)
-                coder.Encode(Serializer.SerializeToByteArray(contactPreview), "contactPreview");
-            if (contact != null)
-                coder.Encode(Serializer.SerializeToByteArray(contact), "contact");
+            if (FolderId.HasValue)
+                coder.Encode(FolderId.Value, "folderId");
+            if (Folder != null)
+                coder.Encode(Serializer.SerializeToByteArray(Folder.ShallowCopy()), "folder");
+            if (ContactId.HasValue)
+                coder.Encode(ContactId.Value, "contactId");
+            if (ContactPreview != null)
+                coder.Encode(Serializer.SerializeToByteArray(ContactPreview), "contactPreview");
+            if (Contact != null)
+                coder.Encode(Serializer.SerializeToByteArray(Contact), "contact");
         }
 
         public override void DecodeRestorableState(NSCoder coder)
@@ -1671,26 +1352,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.DecodeRestorableState(coder);
 
             if (coder.ContainsKey("folderId"))
-                folderId = coder.DecodeInt("folderId");
-            if (folder != null)
-                folder = Serializer.DeserializeFromByteArray<Folder>(coder.DecodeBytes("folder"));
+                FolderId = coder.DecodeInt("folderId");
+            if (Folder != null)
+                Folder = Serializer.DeserializeFromByteArray<Folder>(coder.DecodeBytes("folder"));
             if (coder.ContainsKey("contactId"))
-                contactId = coder.DecodeInt("contactId");
+                ContactId = coder.DecodeInt("contactId");
             if (coder.ContainsKey("contactPreview"))
-                contactPreview = Serializer.DeserializeFromByteArray<ContactPreview>(coder.DecodeBytes("contactPreview"));
+                ContactPreview = Serializer.DeserializeFromByteArray<ContactPreview>(coder.DecodeBytes("contactPreview"));
             if (coder.ContainsKey("contact"))
-                contact = Serializer.DeserializeFromByteArray<Contact>(coder.DecodeBytes("contact"));
+                Contact = Serializer.DeserializeFromByteArray<Contact>(coder.DecodeBytes("contact"));
 
             refreshDataOnAppear = true;
-        }
-
-        [Export("viewControllerWithRestorationIdentifierPath:coder:")]
-        public static UIViewController Restore(string[] identifierComponents, NSCoder coder)
-        {
-            if (coder.DecodeBool("doNotRestore"))
-                return null;
-
-            return new ContactViewController();
         }
     }
 }
