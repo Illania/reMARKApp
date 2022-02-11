@@ -75,6 +75,8 @@
 "connecting___" = "Connecting...";
 "connection_status" = "Connection status";
 "contacts" = "Contacts";
+"contacts_list" = "contacts list";
+"contacts_list_empty"= "Contacts list empty";
 "continue" = "Continue";
 "contact_picker_recent_addresses" = "Recent addresses";
 "contact_picker_contacts" = "Contacts";

@@ -41,35 +41,36 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected override async void Adapter_ItemClicked(object sender, ContactPreview contactPreview)
         {
-            dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.loading_contact, Resource.String.please_wait);
+
+            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("loading_contact___"));
 
             try
             {
                 var contact = await Managers.ContactsManager.GetContactAsync(Folder, contactPreview.Id);
                 dismissAction();
 
-                var emailAddresses = contact.CommunicationAddresses.Where(ca => ca.Type == CommunicationAddressType.Email).Select(ca => ca.Address).ToList();
-                if (emailAddresses.Any())
-                {
-                    var emailAddress = await Dialogs.ShowSingleSelectDialogAsync(Context, Resource.String.select_email_address, emailAddresses);
-                    if (emailAddress == null)
-                        return;
+                var ds = (DataSource)tableView.Source;
+                var cell = tableView.CellAt(ds.FindItemIndexPath(contactPreview));
 
-                    var data = new Intent();
-                    data.PutExtra(PickerContactsListActivity.RecipientResultKey, Serializer.Serialize(new Recipient(contactPreview.Name, emailAddress, RecipientType.Contact, contactPreview.Id)));
-                    Activity.SetResult(Android.App.Result.Ok, data);
-                    Activity?.Finish();
+                //show list of linked contacts
+                if (contact.PrimaryPerson != null || contact.Children.Any())
+                {
+                    var vc = new LinkedEmailListFragment { Folder = Folder, Contact = contact, ContactPreview = contactPreview };
+                    PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
                 }
                 else
-                {
-                    await Dialogs.ShowConfirmDialogAsync(Context, Resource.String.no_email_addresses_title, Resource.String.no_email_addresses_content);
-                }
+                    await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("no_email_addresses_title"), Localization.GetString("no_email_addresses_content"));
+
             }
             catch (Exception ex)
             {
                 dismissAction();
                 CommonConfig.Logger.Error($"Error while retrieving contact [FolderId = {Folder?.Id}, ContactId = {contactPreview.Id}]");
-                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
+            }
+            finally
+            {
+                tableView.DeselectRow(tableView.IndexPathForSelectedRow, true);
             }
         }
 

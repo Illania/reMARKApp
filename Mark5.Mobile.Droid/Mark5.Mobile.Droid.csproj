@@ -723,6 +723,7 @@
     <Compile Include="Ui\Fragments\CategoriesListFragment.cs" />
     <Compile Include="Ui\Fragments\CopyToUserWorktrayFragment.cs" />
     <Compile Include="Ui\Fragments\CopyToDepartmentWorktrayFragment.cs" />
+    <Compile Include="Ui\Fragments\PhonebookContactsListFragment %28copy%29.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
