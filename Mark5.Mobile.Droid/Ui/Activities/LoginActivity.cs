@@ -11,12 +11,12 @@ using Android.OS;
 using Android.Support.Design.Widget;
 using Android.Support.V7.Widget;
 using Android.Views;
+using Mark5.Mobile.Classes.AuthService;
+using Mark5.Mobile.Classes.Azure;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
-using Mark5.Mobile.Common.Azure;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Model.Azure;
 using Mark5.Mobile.Common.Service;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Service;
@@ -268,7 +268,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     var azureAppProxyAuthService = new AzureAppProxyAuthService(azureAppProxyInfo.AppClientId, azureAppProxyInfo.ApplicationProxyClientId);
                     accessToken = await azureAppProxyAuthService.Authenticate(this);
                     PlatformConfig.Preferences.AzureApplicationProxyBearerToken = accessToken;
-                    ci = await authenticator.AuthenticateWithAzureAsync(azureUser, sslMode, hostname, port, token, accessToken);
+                    ci = await authenticator.AuthenticateWithAzureAsync(azureUser, sslMode, hostname, port, token, accessToken, azureAppProxyInfo);
                 }
                 else
                 {

@@ -1,10 +1,13 @@
-﻿namespace Mark5.Mobile.Common.Model
+﻿using Mark5.Mobile.Classes.Azure;
+
+namespace Mark5.Mobile.Common.Model
 {
     public class ConnectionInfo
     {
         public string Token { get; set; }
         public string AzureUserId { get; set; }
         public string AzureAppProxyBearerToken { get; set; }
+        public AzureApplicationProxyInfo AzureApplicationProxyInfo { get; set; }
         public string Username { get; set; }
         public string Hostname { get; set; }
         public string Port { get; set; }
@@ -17,7 +20,10 @@
         {
             return $"[ConnectionInfo: Token={Token}, Username={Username}, Hostname={Hostname}, Port={Port}, " +
                 $"SslMode={SslMode}, DeviceType={DeviceType}, FriendlyDeviceName={FriendlyDeviceName}, InstallationId={InstallationId}]," +
-                $"AzureAppProxyBearerToken={AzureAppProxyBearerToken}";
+                $"AzureAppProxyBearerToken={AzureAppProxyBearerToken}," +
+                $"Azure Application Proxy Enabled = {AzureApplicationProxyInfo.IsEnabled} " +
+                $"Azure Application Client Id = {AzureApplicationProxyInfo.AppClientId} " +
+                $"Azure Application Proxy Client Id = {AzureApplicationProxyInfo.ApplicationProxyClientId}";
         }
     }
 }

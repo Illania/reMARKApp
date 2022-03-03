@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Identity.Client;
 using Xamarin.Essentials;
 
-namespace Mark5.Mobile.Common.Azure
+namespace Mark5.Mobile.Classes.AuthService
 {
     public class AzureAppProxyAuthService
     {
@@ -62,9 +62,9 @@ namespace Mark5.Mobile.Common.Azure
                     account = accounts.FirstOrDefault();
                     authResult = await pca.AcquireTokenSilent(scopes, account).ExecuteAsync();
                 }
-                catch (MsalUiRequiredException)
+                catch (MsalUiRequiredException me)
                 {
-                    //The login needs to be interactive, nothing to do
+                    Console.WriteLine(me.Message);
                 }
             }
 

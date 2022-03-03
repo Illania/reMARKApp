@@ -38,7 +38,8 @@ namespace Mark5.Mobile.Common.Testers
                                                           CommonConfig.HttpClientHandler,
                                                           null,
                                                           null,
-                                                          ci.AzureAppProxyBearerToken);
+                                                          ci.AzureAppProxyBearerToken,
+                                                          ci.AzureApplicationProxyInfo);
 
                 var policy = Policy.Handle<Exception>().WaitAndRetryAsync(attempts, attempt => TimeSpan.FromMilliseconds(timeOut), (exception, calculatedWaitDuration) =>
                 {
@@ -69,7 +70,9 @@ namespace Mark5.Mobile.Common.Testers
                                                           ci.Port,
                                                           CommonConfig.HttpClientHandler,
                                                           null,
-                                                          null);
+                                                          null,
+                                                          ci.AzureAppProxyBearerToken,
+                                                          ci.AzureApplicationProxyInfo);
 
                 var stopWatch = Stopwatch.StartNew();
                 var result = await proxy.TestAsync(new DataContract.TestParameters());

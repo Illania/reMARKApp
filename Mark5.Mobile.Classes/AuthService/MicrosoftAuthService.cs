@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using Mark5.Mobile.Common.Model.Azure;
+using Mark5.Mobile.Classes.Azure;
 using Microsoft.Graph;
 using Microsoft.Identity.Client;
 using Newtonsoft.Json;
 using Xamarin.Essentials;
 
-namespace Mark5.Mobile.Common.Azure
+namespace Mark5.Mobile.Classes.AuthService
 {
     public class MicrosoftAuthService
     {
