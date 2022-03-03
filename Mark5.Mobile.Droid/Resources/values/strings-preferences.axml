@@ -183,6 +183,9 @@
     <string name="pref_search_partial_word_title">Partial word search</string>
     <string name="push_notification_token">push_notification_token</string>
     <string name="azure_application_proxy_token">azure_application_proxy_token</string>
+     <string name="azure_application_proxy_enabled">azure_application_proxy_enabled</string>
+     <string name="azure_application_proxy_app_client_id">azure_application_app_client_id</string>
+     <string name="azure_application_proxy_app_proxy_id">azure_application_proxy_app_proxy_id</string>
     <string name="ssl_off">Disabled</string>
     <string name="ssl_on">Enabled</string>
     <string name="ssl_self_signed">Enabled (allow self-signed)</string>

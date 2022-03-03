@@ -1,5 +1,5 @@
-﻿namespace Mark5.Mobile.Common.Model.Azure
-{
+﻿namespace Mark5.Mobile.Classes.Azure
+{ 
     public class AzureUser
     {
         public string Id { get; set; }

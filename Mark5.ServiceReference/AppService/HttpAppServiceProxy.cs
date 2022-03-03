@@ -8,9 +8,12 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
+using Mark5.Mobile.Classes.AuthService;
+using Mark5.Mobile.Classes.Azure;
 using Mark5.ServiceReference.DataContract;
 using Mark5.ServiceReference.Exceptions;
 using Mark5.ServiceReference.Utilities;
+using JwtDecoder = Mark5.Mobile.Classes.JwtDecoder;
 
 namespace Mark5.ServiceReference.AppService
 {
@@ -22,15 +25,19 @@ namespace Mark5.ServiceReference.AppService
         readonly Action onStartTransmission;
         readonly Action onStopTransmission;
         readonly string requestUri;
-        readonly string bearerToken;
+        string bearerToken;
+        readonly AzureApplicationProxyInfo azureApplicationProxyInfo;
+        
 
-        public HttpAppServiceProxy(bool ssl, string hostname, string port, Func<HttpMessageHandler> httpClientHandler, Action onStartTransmission, Action onStopTransmission,
-            string bearerToken)
+        public HttpAppServiceProxy(bool ssl, string hostname, string port, Func<HttpMessageHandler> httpClientHandler,
+            Action onStartTransmission, Action onStopTransmission,
+            string bearerToken, AzureApplicationProxyInfo azureApplicationProxyInfo)
         {
             this.httpClientHandler = httpClientHandler;
             this.onStartTransmission = onStartTransmission;
             this.onStopTransmission = onStopTransmission;
             this.bearerToken = bearerToken;
+            this.azureApplicationProxyInfo = azureApplicationProxyInfo;
 
             var usePort = !string.IsNullOrEmpty(port);
           
@@ -41,6 +48,7 @@ namespace Mark5.ServiceReference.AppService
                                            bool checkXmlCharacters = true) where R : class where P : class
         {
             HttpStatusCode statusCode = 0;
+            var useBearerToken = !string.IsNullOrEmpty(bearerToken);
             try
             {
                 onStartTransmission?.Invoke();
@@ -50,8 +58,7 @@ namespace Mark5.ServiceReference.AppService
                     Timeout = TimeSpan.FromSeconds(useShortTimeout ? Config.HttpClientShortTimeoutSeconds : Config.HttpClientTimeoutSeconds)
                 })
                 {
-                    var req = CreateRequest(soapAction, parameters, checkXmlCharacters, bearerToken);
-                    var useBearerToken = !string.IsNullOrEmpty(bearerToken);
+                    var req = CreateRequest(soapAction, parameters, checkXmlCharacters, bearerToken);              
                     var res = useBearerToken ? await c.SendAsync(req) : await c.SendAsync(req, ct);
                     statusCode = res.StatusCode;
                     return await ProcessResponse<R>(soapAction, res);
@@ -65,7 +72,30 @@ namespace Mark5.ServiceReference.AppService
                     throw new HttpAppServiceException(statusCode, te.Message, te);
                 }
 
-                throw new HttpAppServiceException(statusCode, ex.Message, ex);
+                if (azureApplicationProxyInfo != null && azureApplicationProxyInfo.IsEnabled
+                 && !string.IsNullOrEmpty(azureApplicationProxyInfo.AppClientId)
+                 && !string.IsNullOrEmpty(azureApplicationProxyInfo.ApplicationProxyClientId)
+                 && JwtDecoder.Decoder.IsExpired(bearerToken))
+                {
+
+                    var azureAppProxyAuthService = new AzureAppProxyAuthService(azureApplicationProxyInfo.AppClientId,
+                        azureApplicationProxyInfo.ApplicationProxyClientId);
+                    bearerToken = await azureAppProxyAuthService.Authenticate(this, false);
+
+                    using (var c = new HttpClient(httpClientHandler())
+                    {
+                        Timeout = TimeSpan.FromSeconds(useShortTimeout ? Config.HttpClientShortTimeoutSeconds : Config.HttpClientTimeoutSeconds)
+                    })
+                    {
+                        var req = CreateRequest(soapAction, parameters, checkXmlCharacters, bearerToken);
+                        var res = useBearerToken ? await c.SendAsync(req) : await c.SendAsync(req, ct);
+                        statusCode = res.StatusCode;
+                        return await ProcessResponse<R>(soapAction, res);
+                    } 
+                }
+
+                else
+                    throw new HttpAppServiceException(statusCode, ex.Message, ex);
             }
             finally
             {

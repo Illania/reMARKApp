@@ -1,4 +1,6 @@
-﻿namespace Mark5.Mobile.Common.Model.Azure
+﻿using System;
+
+namespace Mark5.Mobile.Classes.Azure
 {
     public class AzureApplicationProxyInfo
     {

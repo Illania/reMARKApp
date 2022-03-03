@@ -173,6 +173,7 @@ namespace Mark5.Mobile.Droid.Utilities
         }
 
 
+
         public int PresetCategoryId
         {
 
@@ -185,6 +186,41 @@ namespace Mark5.Mobile.Droid.Utilities
             }
         }
            
+
+        public string AzureApplicationProxyAppClientId
+        {
+            get => sp.GetString(Application.Context.GetString(Resource.String.azure_application_proxy_app_client_id), string.Empty);
+            set
+            {
+                var e = sp.Edit();
+                e.PutString(Application.Context.GetString(Resource.String.azure_application_proxy_app_client_id), value);
+                e.Commit();
+            }
+        }
+
+        public string AzureApplicationProxyAppProxyId
+        {
+            get => sp.GetString(Application.Context.GetString(Resource.String.azure_application_proxy_app_proxy_id), string.Empty);
+            set
+            {
+                var e = sp.Edit();
+                e.PutString(Application.Context.GetString(Resource.String.azure_application_proxy_app_proxy_id), value);
+                e.Commit();
+            }
+        }
+
+        public string AzureApplicationProxyEnabled
+        {
+            get => sp.GetString(Application.Context.GetString(Resource.String.azure_application_proxy_enabled), string.Empty);
+            set
+            {
+                var e = sp.Edit();
+                e.PutString(Application.Context.GetString(Resource.String.azure_application_proxy_enabled), value);
+                e.Commit();
+            }
+        }
+
+
         public int LastUserSendingDelay
         {
             get => sp.GetInt(Application.Context.GetString(Resource.String.pref_key_last_user_sending_delay), 0);

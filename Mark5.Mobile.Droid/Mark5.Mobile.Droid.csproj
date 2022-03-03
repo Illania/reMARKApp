@@ -1268,6 +1268,10 @@
       <Project>{03F5EB27-28E4-4309-962C-628C73475478}</Project>
       <Name>MaterialDialogs</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Mark5.Mobile.Classes\Mark5.Mobile.Classes.csproj">
+      <Project>{5EC51557-DB1D-4018-8C1F-E3170626B074}</Project>
+      <Name>Mark5.Mobile.Classes</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <AndroidAsset Include="Assets\blank.html" />

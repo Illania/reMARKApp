@@ -9,10 +9,10 @@ using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
-using Mark5.Mobile.Common.Azure;
+using Mark5.Mobile.Classes.AuthService;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Model.Azure;
+using Mark5.Mobile.Classes.Azure;
 using Mark5.Mobile.Common.Service;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Service;
@@ -617,8 +617,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     azureAppProxyAuthService = new AzureAppProxyAuthService(azureAppProxyInfo.AppClientId, azureAppProxyInfo.ApplicationProxyClientId);
                     accessToken = await azureAppProxyAuthService.Authenticate(this);
-                    PlatformConfig.Preferences.AzureApplicationProxyBearerToken = accessToken;
-                    ci = await authenticator.AuthenticateWithAzureAsync(azureUser, sslMode, hostname, port, token, accessToken);
+                    PlatformConfig.Preferences.AzureApplicationProxyBearerToken = accessToken;                    ci = await authenticator.AuthenticateWithAzureAsync(azureUser, sslMode, hostname, port, token, accessToken, azureAppProxyInfo);
                 }
                 else
                 {

@@ -10,6 +10,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj" />
+    <ProjectReference Include="..\Mark5.Mobile.Classes\Mark5.Mobile.Classes.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="AppService\AppServiceClient.AppServiceClientChannel.cs" />
