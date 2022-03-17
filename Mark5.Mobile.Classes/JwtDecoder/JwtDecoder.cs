@@ -79,9 +79,10 @@ namespace Mark5.Mobile.Classes.JwtDecoder
 
             bool isExpired = expiration != null;
 
+
             if (expiration != null)
             {
-                isExpired = DateTimeHelpers.FromUnixTime((long)expiration) > DateTime.Now;
+                isExpired = DateTimeHelpers.FromUnixTime((long)expiration) < DateTime.UtcNow;
             }
 
             return isExpired;

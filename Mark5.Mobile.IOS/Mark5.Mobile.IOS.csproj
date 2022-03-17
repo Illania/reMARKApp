@@ -84,7 +84,7 @@
 		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
 		<LangVersion>9.0</LangVersion>
 		<MtouchLink>SdkOnly</MtouchLink>
-		<CodesignProvision>reMark iOS 2021 Distribution</CodesignProvision>
+		<CodesignProvision>Apple Distribution 2022 Mark5.Mobile</CodesignProvision>
 	</PropertyGroup>
 	<ItemGroup>
 		<Compile Include="Properties\AssemblyInfo.cs" />

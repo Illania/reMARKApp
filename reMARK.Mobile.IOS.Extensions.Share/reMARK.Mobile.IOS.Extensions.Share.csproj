@@ -46,7 +46,7 @@
     <MtouchArch>ARMv7, ARM64</MtouchArch>
     <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
     <MtouchVerbosity></MtouchVerbosity>
-    <CodesignProvision>reMARK Share Extension Distribution</CodesignProvision>
+    <CodesignProvision>Apple Distribution 2022 reMark Share Extension</CodesignProvision>
     <LangVersion>default</LangVersion>
     <MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
   </PropertyGroup>

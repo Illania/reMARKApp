@@ -353,10 +353,10 @@ namespace Mark5.Mobile.IOS.Utilities
 
         public string AzureApplicationProxyAppProxyId
         {
-            get => ud.StringForKey(Keys.AzureApplicationProxyAppClientId);
+            get => ud.StringForKey(Keys.AzureApplicationProxyAppProxyId);
             set
             {
-                ud.SetString(value, Keys.AzureApplicationProxyAppClientId);
+                ud.SetString(value, Keys.AzureApplicationProxyAppProxyId);
                 ud.Synchronize();
             }
         }

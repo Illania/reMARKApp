@@ -71,7 +71,12 @@ namespace Mark5.ServiceReference.AppService
                     var te = new TimeoutException("Request timed out.");
                     throw new HttpAppServiceException(statusCode, te.Message, te);
                 }
-
+#if DEBUG
+                Console.WriteLine("_________________________________________________________");
+                Console.WriteLine(azureApplicationProxyInfo.ToString());
+                Console.WriteLine($"Bearer: {bearerToken}, /n IsExpired: {JwtDecoder.Decoder.IsExpired(bearerToken)}");
+                Console.WriteLine("_________________________________________________________");
+#endif
                 if (azureApplicationProxyInfo != null && azureApplicationProxyInfo.IsEnabled
                  && !string.IsNullOrEmpty(azureApplicationProxyInfo.AppClientId)
                  && !string.IsNullOrEmpty(azureApplicationProxyInfo.ApplicationProxyClientId)
