@@ -91,7 +91,13 @@ namespace Mark5.Mobile.Droid
 
                         PlatformConfig.SSLCertificateVerificationManager.DisableSelfSignedCertificates();
 
-                        Managers.Initialize(ci, PlatformConfig.Preferences.AzureApplicationProxyBearerToken);
+                        Managers.Initialize(ci, PlatformConfig.Preferences.AzureApplicationProxyBearerToken,
+                            new Classes.Azure.AzureApplicationProxyInfo()
+                            {
+                                AppClientId = PlatformConfig.Preferences.AzureApplicationProxyAppClientId,
+                                ApplicationProxyClientId = PlatformConfig.Preferences.AzureApplicationProxyAppProxyId,
+                                IsEnabled = PlatformConfig.Preferences.AzureApplicationProxyEnabled
+                            });
                         Managers.DocumentsManager.MaxToFetch = PlatformConfig.Preferences.DocumentsToDownload;
                         Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
                         Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;

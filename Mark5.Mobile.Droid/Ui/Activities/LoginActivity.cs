@@ -242,6 +242,10 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
                 var azureAppProxyInfo = await microsoftAuthService.GetAzureApplicationProxyInfo();
 
+                PlatformConfig.Preferences.AzureApplicationProxyAppProxyId = azureAppProxyInfo.ApplicationProxyClientId;
+                PlatformConfig.Preferences.AzureApplicationProxyAppClientId = azureAppProxyInfo.AppClientId;
+                PlatformConfig.Preferences.AzureApplicationProxyEnabled = azureAppProxyInfo.IsEnabled;
+
                 //We assume that all the connection details are correct (no need to validate or confirm hostname, port, SSL)
                 var azureUserId = azureUser.Id;
                 var hostname = endpointInfo.Hostname;
@@ -368,7 +372,8 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             return errors;
         }
 
-        async Task InitializeApplication(ConnectionInfo ci, CancellationToken token, string appToken = "")
+        async Task InitializeApplication(ConnectionInfo ci, CancellationToken token, string appToken = "",
+            AzureApplicationProxyInfo applicationProxyInfo = null)
         {
             if (token.IsCancellationRequested && string.IsNullOrEmpty(appToken))
             {
@@ -383,7 +388,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             CommonConfig.Logger.Info($"Initializing {nameof(Managers)}...");
 
-            Managers.Initialize(ci, appToken);
+            Managers.Initialize(ci, appToken, applicationProxyInfo);
             Managers.DocumentsManager.MaxToFetch = PlatformConfig.Preferences.DocumentsToDownload;
             Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
             Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
