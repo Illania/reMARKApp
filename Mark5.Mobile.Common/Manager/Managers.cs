@@ -1,4 +1,5 @@
 ﻿using System;
+using Mark5.Mobile.Classes.Azure;
 using Mark5.Mobile.Common.DataAccess;
 using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Model;
@@ -22,7 +23,7 @@ namespace Mark5.Mobile.Common.Manager
         public static ICleanUpManager CleanUpManager { get; private set; }
         internal static IActionsManager ActionsManager { get; private set; }
 
-        public static void Initialize(ConnectionInfo connectionInfo, string appToken = "")
+        public static void Initialize(ConnectionInfo connectionInfo, string appToken = "", AzureApplicationProxyInfo azureAppProxyInfo =  null)
         {
             ActiveConnectionInfo = connectionInfo ?? throw new ArgumentNullException(nameof(connectionInfo));
 
@@ -32,7 +33,9 @@ namespace Mark5.Mobile.Common.Manager
                                                                 CommonConfig.HttpClientHandler,
                                                                 CommonConfig.OnStartTransmission,
                                                                 CommonConfig.OnStopTransmission,
-                                                                appToken);
+                                                                appToken,
+                                                                azureAppProxyInfo);
+
             var fileTransferServiceProxy = FileTransferServiceProxyFactory.Create(connectionInfo.SslMode != SslMode.Off,
                                                                                   connectionInfo.Hostname,
                                                                                   connectionInfo.Port,

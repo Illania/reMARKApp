@@ -209,13 +209,13 @@ namespace Mark5.Mobile.Droid.Utilities
             }
         }
 
-        public string AzureApplicationProxyEnabled
+        public bool AzureApplicationProxyEnabled
         {
-            get => sp.GetString(Application.Context.GetString(Resource.String.azure_application_proxy_enabled), string.Empty);
+            get => sp.GetBoolean(Application.Context.GetString(Resource.String.azure_application_proxy_enabled), false);
             set
             {
                 var e = sp.Edit();
-                e.PutString(Application.Context.GetString(Resource.String.azure_application_proxy_enabled), value);
+                e.PutBoolean(Application.Context.GetString(Resource.String.azure_application_proxy_enabled), value);
                 e.Commit();
             }
         }

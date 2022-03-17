@@ -593,6 +593,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var azureAppProxyInfo = await microsoftAuthService.GetAzureApplicationProxyInfo();
 
+                PlatformConfig.Preferences.AzureApplicationProxyAppProxyId = azureAppProxyInfo.ApplicationProxyClientId;
+                PlatformConfig.Preferences.AzureApplicationProxyAppClientId = azureAppProxyInfo.AppClientId;
+                PlatformConfig.Preferences.AzureApplicationProxyEnabled = azureAppProxyInfo.IsEnabled;
+
                 //We assume that all the connection details are correct (no need to validate or confirm hostname, port, SSL)
                 var azureUserId = azureUser.Id;
                 var hostname = endpointInfo.Hostname;
@@ -617,14 +621,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     azureAppProxyAuthService = new AzureAppProxyAuthService(azureAppProxyInfo.AppClientId, azureAppProxyInfo.ApplicationProxyClientId);
                     accessToken = await azureAppProxyAuthService.Authenticate(this);
-                    PlatformConfig.Preferences.AzureApplicationProxyBearerToken = accessToken;                    ci = await authenticator.AuthenticateWithAzureAsync(azureUser, sslMode, hostname, port, token, accessToken, azureAppProxyInfo);
+                    PlatformConfig.Preferences.AzureApplicationProxyBearerToken = accessToken;
+                    ci = await authenticator.AuthenticateWithAzureAsync(azureUser, sslMode, hostname, port, token, accessToken, azureAppProxyInfo);
                 }
                 else
                 {
                     ci = await authenticator.AuthenticateWithAzureAsync(azureUser, sslMode, hostname, port, token);
                 }
                 
-                await InitializeApplication(ci, token, accessToken);
+                await InitializeApplication(ci, token, accessToken, azureAppProxyInfo);
             }
             catch (Exception ex)
             {
@@ -776,7 +781,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             return !errors;
         }
 
-        async Task InitializeApplication(ConnectionInfo ci, CancellationToken token, string appToken = "")
+        async Task InitializeApplication(ConnectionInfo ci, CancellationToken token, string appToken = "",
+            AzureApplicationProxyInfo applicationProxyInfo = null)
         {
             if (token.IsCancellationRequested && string.IsNullOrEmpty(appToken))
             {
@@ -791,7 +797,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             CommonConfig.Logger.Info($"Initializing {nameof(Managers)}...");
 
-            Managers.Initialize(ci, appToken);
+            Managers.Initialize(ci, appToken, applicationProxyInfo);
             Managers.DocumentsManager.MaxToFetch = PlatformConfig.Preferences.DocumentsToDownload;
             Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
             Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
@@ -816,21 +822,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             CommonConfig.Logger.Info($"Registering {nameof(ReachabilityReceiver)}...");
             PlatformConfig.ReachabilityReceiver.Register();
 
-            using var loggerFactory = new LoggerFactory().AddSentry(o =>
-            {
-                o.DiagnosticLevel = SentryLevel.Debug;
-                o.Dsn = "https://7005b8e24f4b45d68b5c1d789da957ed@o588553.ingest.sentry.io/5779906";
-                o.Release = $"{CommonConfig.DeviceInfoProvider.GetAppVersionString()}";
-                o.MinimumEventLevel = Microsoft.Extensions.Logging.LogLevel.Information;
-                o.ConfigureScope(s => {
-                    s.SetTag("RootScope", "sent with all events");
-                    s.SetTag("DeviceName", ci.FriendlyDeviceName);
-                    s.SetTag("ServerName", $"{ci.Hostname}:{ci.Port}");
-                    s.SetTag("SslEnabled", $"{ci.SslMode}");
-                    s.User = new User { Username = ci.Username };
-                });
-            });
-            CommonConfig.Sentry = loggerFactory.CreateLogger("base");
+            InitializeSentry(ci);
 
             CommonConfig.Logger.Info($"Logged in - will present {nameof(AbstractMainViewController)}");
 
@@ -930,6 +922,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         #endregion
 
         #region Helper methods
+
+        void InitializeSentry(ConnectionInfo ci)
+        {
+            using var loggerFactory = new LoggerFactory().AddSentry(o =>
+            {
+                o.DiagnosticLevel = SentryLevel.Debug;
+                o.Dsn = "https://7005b8e24f4b45d68b5c1d789da957ed@o588553.ingest.sentry.io/5779906";
+                o.Release = $"{CommonConfig.DeviceInfoProvider.GetAppVersionString()}";
+                o.MinimumEventLevel = Microsoft.Extensions.Logging.LogLevel.Information;
+                o.ConfigureScope(s => {
+                    s.SetTag("RootScope", "sent with all events");
+                    s.SetTag("DeviceName", ci.FriendlyDeviceName);
+                    s.SetTag("ServerName", $"{ci.Hostname}:{ci.Port}");
+                    s.SetTag("SslEnabled", $"{ci.SslMode}");
+                    s.User = new User { Username = ci.Username };
+                });
+            });
+            CommonConfig.Sentry = loggerFactory.CreateLogger("base");
+        }
 
         void ValidateForm()
         {

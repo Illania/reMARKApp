@@ -58,6 +58,9 @@ namespace Mark5.Mobile.IOS.Utilities
 
             public const string AzureHubRegistrationId = "AzureHubRegistrationId";
             public const string AzureApplicationProxyBearerToken = "AzureApplicationProxyBearerToken";
+            public const string AzureApplicationProxyAppClientId = "AzureApplicationProxyAppClientId";
+            public const string AzureApplicationProxyAppProxyId = "AzureApplicationProxyAppProxyId";
+            public const string AzureApplicationProxyEnabled = "AzureApplicationProxyEnabled";
 
             public const string ResetOnLaunchKey = "ResetOnLaunch";
 
@@ -315,15 +318,6 @@ namespace Mark5.Mobile.IOS.Utilities
             }
         }
 
-        public string AzureApplicationProxyBearerToken
-        {
-            get => ud.StringForKey(Keys.AzureApplicationProxyBearerToken);
-            set
-            {
-                ud.SetString(value, Keys.AzureApplicationProxyBearerToken);
-                ud.Synchronize();
-            }
-        }
 
         public int PresetCategoryId
         {
@@ -334,6 +328,50 @@ namespace Mark5.Mobile.IOS.Utilities
                 ud.Synchronize();
             }
         }
+
+        #region Azure Application Proxy Settings
+
+        public string AzureApplicationProxyBearerToken
+        {
+            get => ud.StringForKey(Keys.AzureApplicationProxyBearerToken);
+            set
+            {
+                ud.SetString(value, Keys.AzureApplicationProxyBearerToken);
+                ud.Synchronize();
+            }
+        }
+
+        public string AzureApplicationProxyAppClientId
+        {
+            get => ud.StringForKey(Keys.AzureApplicationProxyAppClientId);
+            set
+            {
+                ud.SetString(value, Keys.AzureApplicationProxyAppClientId);
+                ud.Synchronize();
+            }
+        }
+
+        public string AzureApplicationProxyAppProxyId
+        {
+            get => ud.StringForKey(Keys.AzureApplicationProxyAppProxyId);
+            set
+            {
+                ud.SetString(value, Keys.AzureApplicationProxyAppProxyId);
+                ud.Synchronize();
+            }
+        }
+
+        public bool AzureApplicationProxyEnabled
+        {
+            get => ud.BoolForKey(Keys.AzureApplicationProxyEnabled);
+            set
+            {
+                ud.SetBool(value, Keys.AzureApplicationProxyEnabled);
+                ud.Synchronize();
+            }
+        }
+
+        #endregion
 
         public bool ResetOnLaunch
         {
