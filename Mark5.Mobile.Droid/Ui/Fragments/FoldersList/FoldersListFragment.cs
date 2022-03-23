@@ -24,11 +24,15 @@ using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 using TinyMessenger;
 using Android.Widget;
+using System.Threading;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
     public class FoldersListFragment : BaseFragment, ActionMode.ICallback, IMenuItemOnActionExpandListener, Android.Support.V7.Widget.SearchView.IOnQueryTextListener
     {
+        const int AutoRefreshIntervalMs = 15 * 1000; // 15 seconds
+        AutoRefreshWorker autoRefreshWorker;
+
         protected const string RemoteFolderBundleKey = "RemoteFolder_551ec209-d787-4a8e-b4ba-99313741ddd1";
         protected const string HideSearchBundleKey = "HideSearch_694b0906-42a6-4c04-9892-238c920f7c74";
         protected const string HideFabBundleKey = "HideFab_35efe47d-6c24-4374-afe4-74713393d00a";
@@ -49,6 +53,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         protected List<Section> AvailableSections;
         protected bool SearchEnabled;
         protected readonly Handler SearchHandler = new Handler();
+
+        bool refreshing;
 
         IMenu menu;
         ActionMode actionMode;
@@ -143,10 +149,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (RecyclerView.GetAdapter() != Adapter)
                     return;
 
+                Activity.RunOnUiThread(() =>
+                {
+                    emptyView.Visibility = Adapter.ItemCount < 1 ? ViewStates.Visible : ViewStates.Gone;
+                    RecyclerView.Visibility = Adapter.ItemCount > 0 ? ViewStates.Visible : ViewStates.Gone;
+                    menu?.FindItem(Resource.Id.action_filter)?.SetEnabled(Adapter.ItemCount > 0);
+                });
 
-                emptyView.Visibility = Adapter.ItemCount < 1 ? ViewStates.Visible : ViewStates.Gone;
-                RecyclerView.Visibility = Adapter.ItemCount > 0 ? ViewStates.Visible : ViewStates.Gone;
-                menu?.FindItem(Resource.Id.action_filter)?.SetEnabled(Adapter.ItemCount > 0);
             }));
             Adapter.ExpandIconClicked += Adapter_ExpandClicked;
             Adapter.ItemClicked += Adapter_ItemClicked;
@@ -241,6 +250,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             RefreshData();
 
             Managers.DocumentsManager.NotifyPendingAndFailedCountChanged().FireAndForget();
+
+            CommonConfig.Logger.Info($"Starting automatic refresh...");
+
+            autoRefreshWorker?.Stop();
+            autoRefreshWorker = new AutoRefreshWorker(AutoRefreshData, AutoRefreshIntervalMs);
+            autoRefreshWorker.Start();
+
+            CommonConfig.Logger.Info($"Started automatic refresh");
         }
 
         public override void OnSaveInstanceState(Bundle outState)
@@ -273,6 +290,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             base.OnPause();
 
             CommonConfig.Logger.Info($"Pausing {nameof(FoldersListFragment)} [folder.id={RemoteFolder?.Id}, folder.name={RemoteFolder?.Name}]...");
+
+            CommonConfig.Logger.Info($"Stopping automatic refresh...");
+
+            autoRefreshWorker?.Stop();
+
+            CommonConfig.Logger.Info($"Stopped automatic refresh");
         }
 
         public override void OnDestroy()
@@ -445,8 +468,32 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         async void RefreshData(bool forceRefresh = false)
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
         {
-            CommonConfig.Logger.Info($"Refreshing...");
+            if (refreshing)
+                return;
 
+            refreshing = true;
+            CommonConfig.Logger.Info($"Refreshing folders started");
+            try
+            { 
+                await RefreshFolders(forceRefresh);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Refreshing folders failed", ex);
+
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+            }
+            finally
+            {
+                refreshing = false;
+                CommonConfig.Logger.Info($"Refreshing folders finished");
+            }
+
+            refreshing = false;
+        }
+
+        async Task RefreshFolders(bool forceRefresh = false)
+        {
             if (!RemoteFolder.HasSubFolders)
                 return;
 
@@ -456,7 +503,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 await Task.Delay(300); // Let the animation finish
             }
-            
+
             if (AvailableSections.Contains(Section.Remote))
                 await RefreshRemote(forceRefresh);
 
@@ -466,7 +513,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (AvailableSections.Contains(Section.Local))
                 RefreshLocal();
 
-            if(forceRefresh)
+            if (forceRefresh)
                 RefreshLayout.Post(() => RefreshLayout.Refreshing = false);
 
             RestoreSelection();
@@ -552,6 +599,36 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             outgoingDocumentCountChangedToken?.Dispose();
         }
         #endregion
+
+        async Task AutoRefreshData()
+        {
+            try
+            {
+                CommonConfig.Logger.Debug($"Attempting automatic refresh [!isAdded={!IsAdded}, isDetached={IsDetached}, isRemoving={IsRemoving}, refreshing={refreshing}]...");
+
+                if (!IsAdded || IsDetached || IsRemoving)
+                    return;
+                if (refreshing)
+                    return;
+
+                refreshing = true;
+
+                CommonConfig.Logger.Debug($"Automatic refresh running...");
+
+                await RefreshFolders(true);
+
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Automatic refresh failed", ex);
+            }
+            finally
+            {
+                refreshing = false;
+
+                CommonConfig.Logger.Debug($"Automatic refresh finished");
+            }
+        }
 
         #region List item event handlers
 
@@ -1489,7 +1566,54 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         }
 
         #endregion
+
+        class AutoRefreshWorker
+        {
+            CancellationTokenSource cts;
+
+            readonly Func<Task> work;
+            readonly Func<DocumentPreview> firstOrDefaultItem;
+            readonly int intervalMs;
+
+            readonly object lockObj = new object();
+
+            public AutoRefreshWorker(Func<Task> work, int intervalMs)
+            {
+                this.work = work;
+                this.intervalMs = intervalMs;
+            }
+
+            public void Start()
+            {
+                lock (lockObj)
+                {
+                    cts?.Cancel();
+                    cts = new CancellationTokenSource();
+                    Task.Run(async () =>
+                    {
+                        while (true)
+                        {
+                            await Task.Delay(intervalMs);
+                            if (cts.IsCancellationRequested)
+                                break;
+
+                            if(work != null)
+                                await work();
+                        }
+                    });
+                }
+            }
+
+            public void Stop()
+            {
+                lock (lockObj)
+                {
+                    cts?.Cancel();
+                }
+            }
+        }
     }
+
 
     public enum Section
     {
