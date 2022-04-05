@@ -232,8 +232,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             button.SetTitleColor(Theme.DarkBlue, UIControlState.Normal);
             button.ContentEdgeInsets = new UIEdgeInsets(0.1f, 0.1f, 0.1f, 2.0f);
             button.BackgroundColor = Theme.Clear;
-            button.TitleLabel.Font = Theme.DefaultBoldFont;
-
+            button.TitleLabel.Font = Theme.DefaultBoldFont.CustomFont();
+            button.TitleLabel.AdjustsFontForContentSizeCategory = true;
             return button;
         }
 

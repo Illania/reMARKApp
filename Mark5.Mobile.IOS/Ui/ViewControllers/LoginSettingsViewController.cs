@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using CoreGraphics;
@@ -140,7 +140,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             var size = new NSString(footerText).GetBoundingRect(new CGSize(width, nfloat.MaxValue),
                                                                 NSStringDrawingOptions.UsesLineFragmentOrigin,
-                                                                new UIStringAttributes { Font = Theme.DefaultFont },
+                                                                new UIStringAttributes { Font = Theme.DefaultFont.CustomFont() },
                                                                 null);
 
             return size.Height + 10f;

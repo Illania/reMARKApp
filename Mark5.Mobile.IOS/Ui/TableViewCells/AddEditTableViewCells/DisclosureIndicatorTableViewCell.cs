@@ -9,8 +9,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
     {
         public static readonly NSString Key = new NSString("DisclosureIndicatorTableViewCell");
 
-        protected UILabel TitleLabel { get; set; }
-        protected UILabel ContentLabel { get; set; }
+        protected UILabelScalable TitleLabel { get; set; }
+        protected UILabelScalable ContentLabel { get; set; }
 
         NSLayoutConstraint leftContentConstraint;
 
@@ -21,20 +21,20 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
         {
             SelectionStyle = UITableViewCellSelectionStyle.Default;
 
-            TitleLabel = new UILabel
+            TitleLabel = new UILabelScalable
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TextColor = Theme.DarkBlue,
             };
             TitleLabel.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             TitleLabel.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             ContentView.AddSubview(TitleLabel);
 
-            ContentLabel = new UILabel
+            ContentLabel = new UILabelScalable
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 Lines = 0,
             };
             ContentView.AddSubview(ContentLabel);

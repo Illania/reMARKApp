@@ -427,7 +427,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         private class AppointmentOrganizerView : UIStackView, IAppointmentView
         {
-            UILabel label;
+            UILabelScalable label;
 
             public AppointmentOrganizerView()
             {
@@ -456,25 +456,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                     TranslatesAutoresizingMaskIntoConstraints = false
                 };
 
-                UILabel title = new UILabel()
+                UILabelScalable title = new UILabelScalable()
                 {
                     Text = "Organizer",
                     TextAlignment = UITextAlignment.Left,
                     TranslatesAutoresizingMaskIntoConstraints = false,
                     LineBreakMode = UILineBreakMode.WordWrap,
                     Lines = 0,
-                    Font = Theme.AppointmentDefaultFont,
+                    Font = Theme.AppointmentDefaultFont.CustomFont().CustomFont(),
                     TextColor = Theme.DarkGray,
                 };
 
-                label = new UILabel()
+                label = new UILabelScalable()
                 {
                     Text = "",
                     TextAlignment = UITextAlignment.Right,
                     TranslatesAutoresizingMaskIntoConstraints = false,
                     LineBreakMode = UILineBreakMode.WordWrap,
                     Lines = 0,
-                    Font = Theme.AppointmentDefaultFont,
+                    Font = Theme.AppointmentDefaultFont.CustomFont().CustomFont(),
                     TextColor = Theme.Black
                 };
 
@@ -488,7 +488,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         private class AppointmentReminderView : UIStackView, IAppointmentView
         {
-            UILabel label;
+            UILabelScalable label;
 
             public AppointmentReminderView()
             {
@@ -512,21 +512,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                     TranslatesAutoresizingMaskIntoConstraints = false
                 };
 
-                UILabel title = new UILabel()
+                UILabelScalable title = new UILabelScalable()
                 {
                     Text = "Reminder",
                     TranslatesAutoresizingMaskIntoConstraints = false,
                     LineBreakMode = UILineBreakMode.WordWrap,
-                    Font = Theme.AppointmentDefaultFont,
+                    Font = Theme.AppointmentDefaultFont.CustomFont().CustomFont(),
                     TextColor = Theme.DarkGray,
                 };
 
-                label = new UILabel()
+                label = new UILabelScalable()
                 {
                     TextAlignment = UITextAlignment.Right,
                     TranslatesAutoresizingMaskIntoConstraints = false,
                     LineBreakMode = UILineBreakMode.WordWrap,
-                    Font = Theme.AppointmentDefaultFont,
+                    Font = Theme.AppointmentDefaultFont.CustomFont().CustomFont(),
                     TextColor = Theme.Black
                 };
 
@@ -571,11 +571,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             }
         }
 
-        private class AppointmentSubjectView : UILabel, IAppointmentView
+        private class AppointmentSubjectView : UILabelScalable, IAppointmentView
         {
             public AppointmentSubjectView()
             {
-                Font = Theme.AppointmentTitleFont;
+                Font = Theme.AppointmentTitleFont.CustomFont();
                 TextColor = Theme.DarkerBlue;
                 LineBreakMode = UILineBreakMode.WordWrap;
                 Lines = 0;
@@ -590,11 +590,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             }
         }
 
-        private class AppointmentDateView : UILabel, IAppointmentView
+        private class AppointmentDateView : UILabelScalable, IAppointmentView
         {
             public AppointmentDateView()
             {
-                Font = Theme.AppointmentDefaultFont;
+                Font = Theme.AppointmentDefaultFont.CustomFont().CustomFont();
                 TextColor = Theme.DarkGray;
                 LineBreakMode = UILineBreakMode.WordWrap;
                 Lines = 0;
@@ -636,13 +636,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             }
         }
 
-        private class AppointmentLocationView : UILabel, IAppointmentView
+        private class AppointmentLocationView : UILabelScalable, IAppointmentView
         {
             public event EventHandler LocationClicked = delegate { };
 
             public AppointmentLocationView()
             {
-                Font = Theme.AppointmentDefaultFont;
+                Font = Theme.AppointmentDefaultFont.CustomFont().CustomFont();
                 TextColor = Theme.DarkBlue;
                 LineBreakMode = UILineBreakMode.WordWrap;
                 TextAlignment = UITextAlignment.Left;
@@ -670,11 +670,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             }
         }
 
-        private class AppointmentDescriptionView : UITextView, IAppointmentView
+        private class AppointmentDescriptionView : UITextViewScalable, IAppointmentView
         {
             public AppointmentDescriptionView()
             {
-                Font = Theme.AppointmentDefaultFont;
+                Font = Theme.AppointmentDefaultFont.CustomFont().CustomFont();
                 TextColor = Theme.Black;
                 DataDetectorTypes = UIDataDetectorType.Link | UIDataDetectorType.Address | UIDataDetectorType.PhoneNumber;
                 TextAlignment = UITextAlignment.Left;
@@ -701,8 +701,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         class AppointmentCalendarView : UIStackView, IAppointmentView
         {
             UIView colorView;
-            UILabel label;
-            UILabel title;
+            UILabelScalable label;
+            UILabelScalable title;
 
             public AppointmentCalendarView()
             {
@@ -731,20 +731,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 colorView.BackgroundColor = Theme.Black;
                 colorView.Layer.CornerRadius = 5;
 
-                title = new UILabel()
+                title = new UILabelScalable()
                 {
                     TranslatesAutoresizingMaskIntoConstraints = false,
                     Text = "Calendar",
                     TextAlignment = UITextAlignment.Left,
                     Lines = 1,
-                    Font = Theme.AppointmentDefaultFont,
+                    Font = Theme.AppointmentDefaultFont.CustomFont().CustomFont(),
                     TextColor = Theme.DarkGray,
                 };
 
-                label = new UILabel
+                label = new UILabelScalable
                 {
                     TranslatesAutoresizingMaskIntoConstraints = false,
-                    Font = Theme.AppointmentDefaultFont,
+                    Font = Theme.AppointmentDefaultFont.CustomFont().CustomFont(),
                     Lines = 1,
                     Text = ""
                 };
@@ -854,8 +854,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             class Header : UIView, IAppointmentView
             {
                 UIImageView arrowImage;
-                UILabel countLabel;
-                UILabel title;
+                UILabelScalable countLabel;
+                UILabelScalable title;
 
                 public Header()
                 {
@@ -892,22 +892,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
                     AddSubview(arrowImage);
 
-                    title = new UILabel()
+                    title = new UILabelScalable()
                     {
                         Text = "Participants",
                         TextAlignment = UITextAlignment.Left,
                         TranslatesAutoresizingMaskIntoConstraints = false,
                         LineBreakMode = UILineBreakMode.WordWrap,
                         Lines = 0,
-                        Font = Theme.AppointmentDefaultFont,
+                        Font = Theme.AppointmentDefaultFont.CustomFont().CustomFont(),
                         TextColor = Theme.DarkGray,
                     };
 
                     AddSubview(title);
 
-                    countLabel = new UILabel
+                    countLabel = new UILabelScalable
                     {
-                        Font = Theme.AppointmentDefaultFont,
+                        Font = Theme.AppointmentDefaultFont.CustomFont().CustomFont(),
                         TextColor = Theme.Black,
                         Lines = 1,
                         TranslatesAutoresizingMaskIntoConstraints = false,
@@ -936,7 +936,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
             class ParticipantView : UIView
             {
-                UILabel label;
+                UILabelScalable label;
                 UIImageView statusImage;
 
                 public ParticipantView()
@@ -974,14 +974,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
                     AddSubview(statusImage);
 
-                    label = new UILabel()
+                    label = new UILabelScalable()
                     {
                         Text = "",
                         TextAlignment = UITextAlignment.Left,
                         TranslatesAutoresizingMaskIntoConstraints = false,
                         LineBreakMode = UILineBreakMode.WordWrap,
                         Lines = 0,
-                        Font = Theme.CalendarTimeLightFont,
+                        Font = Theme.CalendarTimeLightFont.CustomFont(),
                         TextColor = Theme.DarkGray,
                     };
 

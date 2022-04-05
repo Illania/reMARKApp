@@ -14,8 +14,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
         public Action<string> ContentEditedAction;
         public Action NumbersOfLineChangedAction;
 
-        readonly UITextView textView;
-        readonly UILabel titleLabel;
+        readonly UITextViewScalable textView;
+        readonly UILabelScalable titleLabel;
 
         bool hasPlaceholder;
         string placeholderText;
@@ -27,19 +27,19 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
         {
             SelectionStyle = UITableViewCellSelectionStyle.None;
 
-            titleLabel = new UILabel
+            titleLabel = new UILabelScalable
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                Font = Theme.DefaultFont.WithRelativeSize(1),
+                Font = Theme.DefaultFont.CustomFont().WithRelativeSize(1),
                 UserInteractionEnabled = true,
             };
             titleLabel.AddGestureRecognizer(new UITapGestureRecognizer(HandlTitleTap));
             ContentView.AddSubview(titleLabel);
 
-            textView = new UITextView
+            textView = new UITextViewScalable
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 Editable = true,
                 ScrollEnabled = false
             };
@@ -65,7 +65,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
         }
 
         [Export("textView:shouldChangeTextInRange:replacementText:")]
-        public bool ShouldChangeText(UITextView textView, NSRange range, string text)
+        public bool ShouldChangeText(UITextViewScalable textView, NSRange range, string text)
         {
             if (textView.TextContainer.MaximumNumberOfLines == 1)
                 return !text.Contains(Environment.NewLine);
@@ -76,7 +76,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
         }
 
         [Export("textViewDidChange:")]
-        public void Changed(UITextView textView)
+        public void Changed(UITextViewScalable textView)
         {
             ContentEditedAction?.Invoke(textView.Text);
 
@@ -87,7 +87,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
         }
 
         [Export("textViewDidBeginEditing:")]
-        public void DidBeginEditing(UITextView textView)
+        public void DidBeginEditing(UITextViewScalable textView)
         {
             if (hasPlaceholder)
             {
@@ -101,7 +101,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
         }
 
         [Export("textViewDidEndEditing:")]
-        public void DidEndEditing(UITextView textView)
+        public void DidEndEditing(UITextViewScalable textView)
         {
             if (hasPlaceholder)
             {

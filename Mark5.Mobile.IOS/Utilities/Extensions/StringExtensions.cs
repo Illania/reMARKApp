@@ -8,7 +8,7 @@ namespace Mark5.Mobile.IOS.Utilities
     {
         public static NSAttributedString ToNSAttributedString(this string str, UIFont font = null)
         {
-            font ??= Theme.DefaultFont;
+            font ??= Theme.DefaultFont.CustomFont();
             var attrstr = new NSMutableAttributedString(str);
 
             if (font != null)

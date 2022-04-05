@@ -8,7 +8,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
     {
         public static readonly NSString DefaultId = new NSString(nameof(EmptyTableViewCell));
 
-        readonly UITextView label;
+        readonly UITextViewScalable label;
 
         public EmptyTableViewCell()
             : base(UITableViewCellStyle.Default, DefaultId)
@@ -19,9 +19,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             SelectionStyle = UITableViewCellSelectionStyle.None;
             Accessory = UITableViewCellAccessory.None;
 
-            label = new UITextView
+            label = new UITextViewScalable
             {
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TextColor = Theme.DarkGray,
                 TextAlignment = UITextAlignment.Center,
                 TranslatesAutoresizingMaskIntoConstraints = false,

@@ -188,19 +188,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         {
             BackgroundColor = Theme.DarkerBlue,
             TextColor = UIColor.White,
-            TextStyle = Theme.DefaultLightFont,
+            TextStyle = Theme.DefaultLightFont.CustomFont(),
             TextPosition = UITextAlignment.Center
         };
 
         readonly SFViewHeaderStyle viewHeaderStyle = new SFViewHeaderStyle
         {
             BackgroundColor = Theme.DarkerBlue,
-            DateTextStyle = Theme.DefaultLightFont,
+            DateTextStyle = Theme.DefaultLightFont.CustomFont(),
             DateTextColor = UIColor.White,
             CurrentDateTextColor = UIColor.White,
             CurrentDayTextColor = UIColor.White,
             DayTextColor = UIColor.White,
-            DayTextStyle = Theme.DefaultLightFont
+            DayTextStyle = Theme.DefaultLightFont.CustomFont()
         };
 
         readonly DayViewSettings dayViewSettings = new DayViewSettings
@@ -216,9 +216,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         readonly SFViewHeaderStyle workWeekDayHeader = new SFViewHeaderStyle()
         {
             DayTextColor = UIColor.White,
-            DayTextStyle = Theme.DefaultLightFont,
+            DayTextStyle = Theme.DefaultLightFont.CustomFont(),
             DateTextColor = UIColor.White,
-            DateTextStyle = Theme.DefaultLightFont,
+            DateTextStyle = Theme.DefaultLightFont.CustomFont(),
             BackgroundColor = Theme.DarkerBlue,
             CurrentDayTextColor = UIColor.White
         };

@@ -6,17 +6,17 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
 {
     public class ToggleTableViewCell : AddEditTableViewCell
     {
-        readonly UILabel title;
+        readonly UILabelScalable title;
         readonly UISwitch toggleSwitch;
 
         public ToggleTableViewCell(UITableViewCellStyle style, string reuseIdentifier) : base(style, reuseIdentifier)
         {
             SelectionStyle = UITableViewCellSelectionStyle.None;
 
-            title = new UILabel
+            title = new UILabelScalable
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 Text = string.Empty,
             };
             ContentView.Add(title);

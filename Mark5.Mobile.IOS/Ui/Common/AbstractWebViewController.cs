@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using CoreGraphics;
 using Foundation;
@@ -205,6 +206,69 @@ namespace Mark5.Mobile.IOS.Ui.Common
             keyboardDisShowNotification = UIKeyboard.Notifications.ObserveDidShow(HandleKeyboardDidShow);
         }
 
+        public override void TraitCollectionDidChange(UITraitCollection previousTraitCollection)
+        {
+            base.TraitCollectionDidChange(previousTraitCollection);
+
+            ReloadWebView(TraitCollection);
+            //View.ReloadInputViews();
+        }
+
+        public async void ReloadWebView(UITraitCollection traitCollection)
+        {
+            var scaledFont = Theme.DefaultFont.CustomFont(traitCollection);
+            var htmlString = await GetContent();
+
+            ApplyFontToHtmlString(scaledFont, htmlString);
+
+        }
+
+        public void ApplyFontToHtmlString(UIFont font, string htmlString)
+        {
+            var htmlTemplate = new HtmlDocument();
+            htmlTemplate.LoadHtml(htmlString);
+
+            var prePlainTextNode = htmlTemplate.DocumentNode.SelectSingleNode("//pre[@id='plaintext']");
+
+            if (prePlainTextNode == null)
+                return;
+
+            var styles = prePlainTextNode.GetAttributeValue("style", null);
+
+            if (!string.IsNullOrWhiteSpace(styles)) //&& (styles.ToUpper().Contains("FONT-FAMILY:") || styles.ToUpper().Contains("FONT-SIZE:")))
+            {
+                prePlainTextNode.Attributes["style"].Remove();
+
+                string[] splitter = { ";" };
+                string[] styleClasses = styles.Split(splitter, StringSplitOptions.None);
+
+                StringBuilder sbStyles = new StringBuilder($"font-family:{font.FamilyName}; font-size:{font.PointSize}pt;");
+
+                if (null != styleClasses && styleClasses.Length > 0)
+                {
+                    foreach (var item in styleClasses)
+                    {
+                        if (!string.IsNullOrWhiteSpace(item) && !item.ToUpper().Contains("FONT-FAMILY:")
+                            && !item.ToUpper().Contains("FONT-SIZE:") && !item.ToUpper().Contains("FONT:"))
+                        {
+                            // Add existing styles except font size and font family styles.
+                            sbStyles.Append(item.Trim());
+                            sbStyles.Append(";");
+                        }
+                    }
+                }
+
+                prePlainTextNode.SetAttributeValue("style", sbStyles.ToString());
+            }
+            else
+            {
+                prePlainTextNode.SetAttributeValue("style", $"font-family:{font.FamilyName}; font-size:{font.PointSize}pt;");
+            }
+
+            webView?.LoadHtmlString(htmlTemplate.DocumentNode.InnerHtml, NSBundle.MainBundle.BundleUrl);
+
+        }
+
         public override void ViewDidLayoutSubviews()
         {
             base.ViewDidLayoutSubviews();
@@ -372,6 +436,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             webView?.StopLoading();
             webView?.LoadHtmlString(text, null);
+          
         }
 
         protected void LoadNoContentString()

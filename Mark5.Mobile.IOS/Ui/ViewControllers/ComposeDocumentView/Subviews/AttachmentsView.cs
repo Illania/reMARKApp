@@ -17,7 +17,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         List<AttachmentDescription> attachmentDescriptionsInView = new List<AttachmentDescription>();
         List<FileDescription> fileDescriptionsInView = new List<FileDescription>();
 
-        UILabel titleLabel;
+        UILabelScalable titleLabel;
         UIStackView stackView;
 
         public event EventHandler<TappedEventArgs> Tapped = delegate { };
@@ -32,10 +32,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         {
             ContainerView.BackgroundColor = Theme.White;
 
-            titleLabel = new UILabel
+            titleLabel = new UILabelScalable
             {
                 Text = Localization.GetString("attachments") + ":",
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TextColor = Theme.DarkGray,
                 Opaque = false,
                 TranslatesAutoresizingMaskIntoConstraints = false
@@ -240,7 +240,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
                 filenameButton = new UIButton(UIButtonType.System);
                 filenameButton.TranslatesAutoresizingMaskIntoConstraints = false;
-                filenameButton.TitleLabel.Font = Theme.DefaultFont;
+                filenameButton.TitleLabel.Font = Theme.DefaultFont.CustomFont();
                 filenameButton.SetTitle(AttachmentDescription.Name + " (" + UI.PrettyFileSize(AttachmentDescription.SizeInBytes) + ")", UIControlState.Normal);
                 filenameButton.HorizontalAlignment = UIControlContentHorizontalAlignment.Left;
                 filenameButton.Opaque = false;
@@ -288,7 +288,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
                 filenameButton = new UIButton(UIButtonType.System);
                 filenameButton.TranslatesAutoresizingMaskIntoConstraints = false;
-                filenameButton.TitleLabel.Font = Theme.DefaultFont;
+                filenameButton.TitleLabel.Font = Theme.DefaultFont.CustomFont();
                 filenameButton.SetTitle(FileDescription.Name + " (" + UI.PrettyFileSize(FileDescription.SizeInBytes) + ")", UIControlState.Normal);
                 filenameButton.HorizontalAlignment = UIControlContentHorizontalAlignment.Left;
                 filenameButton.Opaque = false;

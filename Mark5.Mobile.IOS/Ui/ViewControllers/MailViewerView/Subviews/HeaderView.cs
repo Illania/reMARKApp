@@ -180,6 +180,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
             var button = new UIButton
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
+                
             };
             button.SetTitle(Localization.GetString("show_more"), UIControlState.Normal);
             button.TouchUpInside += ShowMoreButton_TouchUpInside;
@@ -189,7 +190,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
             button.SetTitleColor(Theme.DarkBlue, UIControlState.Normal);
             button.ContentEdgeInsets = new UIEdgeInsets(0.1f, 0.1f, 0.1f, 2.0f);
             button.BackgroundColor = Theme.Clear;
-            button.TitleLabel.Font = Theme.DefaultBoldFont;
+            button.TitleLabel.Font = Theme.DefaultBoldFont.CustomFont();
+            button.TitleLabel.AdjustsFontForContentSizeCategory = true;
 
             return button;
         }
@@ -212,8 +214,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
 
                 showMoreButton.TrailingAnchor.ConstraintEqualTo(container.TrailingAnchor, -HorizontalMargin),
                 showMoreButton.TopAnchor.ConstraintEqualTo(dateView.TopAnchor),
-                showMoreButton.LeadingAnchor.ConstraintEqualTo(dateView.TrailingAnchor),
-                showMoreButton.CenterYAnchor.ConstraintEqualTo(dateView.CenterYAnchor),
+                //showMoreButton.LeadingAnchor.ConstraintEqualTo(dateView.TrailingAnchor),
+                //showMoreButton.CenterYAnchor.ConstraintEqualTo(dateView.CenterYAnchor),
 
                 firstSeparator.TopAnchor.ConstraintEqualTo(dateView.BottomAnchor),
                 firstSeparator.BottomAnchor.ConstraintEqualTo(container.BottomAnchor, -VerticalMargin),

@@ -6,8 +6,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 {
     public abstract class TextSubView : DocumentSubView
     {
-        UILabel label;
-        protected UITextView TextView;
+        UILabelScalable label;
+        protected UITextViewScalable TextView;
 
         protected TextSubView(string labelText)
         {
@@ -16,10 +16,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
         void Initialize(string labelText)
         {
-            label = new UILabel
+            label = new UILabelScalable
             {
                 Text = labelText + ":",
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TextColor = Theme.DarkGray,
                 Opaque = false,
                 TranslatesAutoresizingMaskIntoConstraints = false
@@ -34,10 +34,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 label.LeftAnchor.ConstraintEqualTo(ContainerView.LeftAnchor, HorizontalMargin)
             });
 
-            TextView = new UITextView
+            TextView = new UITextViewScalable
             {
                 BackgroundColor = Theme.Clear,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 Editable = false,
                 Opaque = false,
                 AutocapitalizationType = UITextAutocapitalizationType.Sentences,

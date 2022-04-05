@@ -48,7 +48,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
             dateTextField = new UITextField
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 BorderStyle = UITextBorderStyle.None,
                 InputView = datePicker,
                 InputAccessoryView = datePickerToolbar,

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -39,8 +39,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         bool hideNavigationButtons;
 
         UIView headerView;
-        UILabel nameLabel;
-        UILabel nameSubLabel;
+        UILabelScalable nameLabel;
+        UILabelScalable nameSubLabel;
         UIButton emailButton;
         UIButton mobileButton;
         UIButton smsButton;
@@ -163,9 +163,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 BackgroundColor = Theme.White
             };
 
-            nameLabel = new UILabel
+            nameLabel = new UILabelScalable
             {
-                Font = Theme.DefaultFont.WithRelativeSize(6f),
+                Font = Theme.DefaultFont.CustomFont().WithRelativeSize(6f),
                 TextColor = Theme.DarkerBlue,
                 TextAlignment = UITextAlignment.Center,
                 Lines = 1,
@@ -180,9 +180,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 nameLabel.HeightAnchor.ConstraintEqualTo(25f)
             });
 
-            nameSubLabel = new UILabel
+            nameSubLabel = new UILabelScalable
             {
-                Font = Theme.DefaultFont.WithRelativeSize(-2f),
+                Font = Theme.DefaultFont.CustomFont().WithRelativeSize(-2f),
                 TextColor = Theme.DarkerBlue,
                 TextAlignment = UITextAlignment.Center,
                 Lines = 1,

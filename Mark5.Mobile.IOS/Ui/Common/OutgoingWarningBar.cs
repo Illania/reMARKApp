@@ -11,7 +11,7 @@ using Mark5.Mobile.Common.Model.HubMessages;
 
 namespace Mark5.Mobile.IOS.Ui.Common
 {
-    public class OutgoingWarningBar : UILabel
+    public class OutgoingWarningBar : UILabelScalable
     {
         const double AnimationDuration = .25d;
         const float VisibleHeight = 20f;
@@ -41,7 +41,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             Layer.ZPosition = float.MaxValue;
             TextAlignment = UITextAlignment.Center;
-            Font = Theme.DefaultFont.WithSize(12f);
+            Font = Theme.DefaultFont.CustomFont().WithSize(12f);
         }
 
         public override void MovedToSuperview()

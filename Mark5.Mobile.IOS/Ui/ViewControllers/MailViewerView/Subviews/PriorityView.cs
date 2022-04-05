@@ -6,15 +6,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
 {
     public class PriorityView : MailViewerSubview
     {
-        UILabel label;
-        UITextView textView;
+        UILabelScalable label;
+        UITextViewScalable textView;
 
         public PriorityView()
         {
-            label = new UILabel
+            label = new UILabelScalable
             {
                 Text = Localization.GetString("priority") + ":",
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TextColor = Theme.DarkGray,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
@@ -28,9 +28,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
                 label.LeftAnchor.ConstraintEqualTo(ContainerView.LeftAnchor, HorizontalMargin)
             });
 
-            textView = new UITextView
+            textView = new UITextViewScalable
             {
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 Editable = false,
                 AutocapitalizationType = UITextAutocapitalizationType.Sentences,
                 AutocorrectionType = UITextAutocorrectionType.Yes,

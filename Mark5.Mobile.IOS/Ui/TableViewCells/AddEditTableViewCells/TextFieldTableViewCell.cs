@@ -22,7 +22,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
             textField = new UITextField
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 BorderStyle = UITextBorderStyle.None
             };
             textField.EditingChanged += TextField_EditingChanged;

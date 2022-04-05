@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
@@ -11,8 +11,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
     {
         public event EventHandler Edited = delegate { };
 
-        UILabel label;
-        UITextView textView;
+        UILabelScalable label;
+        UITextViewScalable textView;
 
         public string Subject { get => textView.Text; set => textView.Text = value; }
 
@@ -25,10 +25,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         void Initialize()
         {
-            label = new UILabel
+            label = new UILabelScalable
             {
                 Text = Localization.GetString("subject"),
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TextColor = Theme.DarkGray,
                 Opaque = false,
                 TranslatesAutoresizingMaskIntoConstraints = false
@@ -43,10 +43,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 label.LeftAnchor.ConstraintEqualTo(ContainerView.LeftAnchor, HorizontalMargin)
             });
 
-            textView = new UITextView
+            textView = new UITextViewScalable
             {
                 BackgroundColor = UIColor.Clear,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 Opaque = false,
                 AutocapitalizationType = UITextAutocapitalizationType.Sentences,
                 AutocorrectionType = UITextAutocorrectionType.Yes,

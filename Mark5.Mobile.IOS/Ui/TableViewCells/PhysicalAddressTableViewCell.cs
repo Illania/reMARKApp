@@ -14,8 +14,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
     {
         public static readonly NSString DefaultId = new NSString(nameof(PhysicalAddressTableViewCell));
 
-        readonly UILabel topLabel;
-        readonly UITextView bottomTextView;
+        readonly UILabelScalable topLabel;
+        readonly UITextViewScalable bottomTextView;
         readonly UIImageView iconImage;
 
         public string Content => bottomTextView?.Text;
@@ -26,16 +26,16 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             SelectionStyle = UITableViewCellSelectionStyle.Default;
             Accessory = UITableViewCellAccessory.None;
 
-            topLabel = new UILabel
+            topLabel = new UILabelScalable
             {
                 Text = Localization.GetString("address").ToUpper(),
-                Font = Theme.DefaultFont.WithRelativeSize(-2f),
+                Font = Theme.DefaultFont.CustomFont().WithRelativeSize(-2f),
                 TextColor = Theme.DarkGray,
                 Lines = 1,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
 
-            bottomTextView = new UITextView
+            bottomTextView = new UITextViewScalable
             {
                 Selectable = false,
                 Editable = false,

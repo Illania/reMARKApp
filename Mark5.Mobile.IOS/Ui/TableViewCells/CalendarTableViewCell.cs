@@ -13,7 +13,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         public int CalendarId { get; private set; }
 
         readonly UIView colorView;
-        readonly UILabel label;
+        readonly UILabelScalable label;
 
         public CalendarTableViewCell()
             : base(UITableViewCellStyle.Default, DefaultId)
@@ -26,9 +26,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             };
             colorView.Layer.CornerRadius = 5;
 
-            label = new UILabel
+            label = new UILabelScalable
             {
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 Lines = 1,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };

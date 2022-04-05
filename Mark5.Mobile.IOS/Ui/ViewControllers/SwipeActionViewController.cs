@@ -100,9 +100,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 scrollView.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor)
             });
 
-            UILabel topLabel = new UILabel()
+            UILabelScalable topLabel = new UILabelScalable()
             {
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TextColor = Theme.DarkGray,
                 LineBreakMode = UILineBreakMode.WordWrap,
                 Lines = 0,
@@ -191,7 +191,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             button.SetTitleColor(Theme.White, UIControlState.Normal);
             button.TitleLabel.Lines = 0;
             button.TitleLabel.AdjustsFontSizeToFitWidth = false;
-            button.TitleLabel.Font = Theme.DefaultActionsFont;
+            button.TitleLabel.Font = Theme.DefaultActionsFont.CustomFont();
             button.TitleLabel.TextAlignment = UITextAlignment.Center;
             button.TitleLabel.LineBreakMode = UILineBreakMode.WordWrap;
 
@@ -213,10 +213,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             leadingMarginWidthAnchor.SetIdentifier("leadingMarginWidth");
             leadingMarginWidthAnchor.Active = true;
 
-            UILabel topLabel = new UILabel
+            UILabelScalable topLabel = new UILabelScalable
             {
                 Text = "Anne Mortensen",
-                Font = Theme.DefaultBoldFont,
+                Font = Theme.DefaultBoldFont.CustomFont(),
                 TextColor = Theme.LightGray,
                 Lines = 1,
                 TranslatesAutoresizingMaskIntoConstraints = false
@@ -230,10 +230,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 topLabel.HeightAnchor.ConstraintGreaterThanOrEqualTo(Theme.MinimumLabelSize),
             });
 
-            UILabel dateLabel = new UILabel
+            UILabelScalable dateLabel = new UILabelScalable
             {
                 Text = "9.35, today",
-                Font = Theme.DefaultLightFont.WithRelativeSize(-2f),
+                Font = Theme.DefaultLightFont.CustomFont().WithRelativeSize(-2f),
                 TextColor = Theme.LightGray,
                 Lines = 1,
                 TranslatesAutoresizingMaskIntoConstraints = false
@@ -249,10 +249,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 dateLabel.CenterYAnchor.ConstraintEqualTo(topLabel.CenterYAnchor)
             });
 
-            UILabel middleLabel = new UILabel
+            UILabelScalable middleLabel = new UILabelScalable
             {
                 Text = "Hvad skal du lave til nytår?",
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TextColor = Theme.LightGray,
                 Lines = 1,
                 TranslatesAutoresizingMaskIntoConstraints = false
@@ -266,10 +266,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 middleLabel.TrailingAnchor.ConstraintEqualTo(container.ReadableContentGuide.TrailingAnchor),
             });
 
-            UITextView bottomLabel = new UITextView
+            UITextViewScalable bottomLabel = new UITextViewScalable
             {
                 Text = "Hej Anne nytår står for døren så jeg ville høre hvad dine planer er. Vi tænker at tage på musling og spise en masse...",
-                Font = Theme.DefaultFont.WithRelativeSize(-2f),
+                Font = Theme.DefaultFont.CustomFont().WithRelativeSize(-2f),
                 TextColor = Theme.LightGray,
                 Selectable = false,
                 Editable = false,
@@ -397,9 +397,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 BackgroundColor = Theme.White
             };
 
-            UILabel titleLbl = new UILabel()
+            UILabelScalable titleLbl = new UILabelScalable()
             {
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TextColor = Theme.DarkBlue,
                 Lines = 1,
                 BackgroundColor = Theme.Clear,
@@ -477,9 +477,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 BackgroundColor = Theme.White
             };
 
-            UILabel titleLbl = new UILabel()
+            UILabelScalable titleLbl = new UILabelScalable()
             {
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TextColor = Theme.DarkBlue,
                 Lines = 1,
                 BackgroundColor = Theme.Clear,
@@ -572,9 +572,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 BackgroundColor = Theme.White
             };
 
-            UILabel titleLbl = new UILabel()
+            UILabelScalable titleLbl = new UILabelScalable()
             {
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TextColor = Theme.DarkBlue,
                 Lines = 1,
                 BackgroundColor = Theme.Clear,

@@ -13,7 +13,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
     {
         const int columnSize = 2;
 
-        UILabel titleLabel;
+        UILabelScalable titleLabel;
         UIStackView stackView;
         UIScrollView scrollView;
 
@@ -23,10 +23,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
         {
             ContainerView.BackgroundColor = Theme.White;
 
-            titleLabel = new UILabel
+            titleLabel = new UILabelScalable
             {
                 Text = Localization.GetString("attachments") + ":",
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TextColor = Theme.DarkGray,
                 Opaque = false,
                 TranslatesAutoresizingMaskIntoConstraints = false
@@ -158,7 +158,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
                 ContentEdgeInsets = new UIEdgeInsets(3.5f, 7.5f, 3.5f, 7.5f),
                 BackgroundColor = Theme.Gray,
             };
-            attachmentButton.TitleLabel.Font = Theme.DefaultFont;
+            attachmentButton.TitleLabel.Font = Theme.DefaultFont.CustomFont();
             attachmentButton.Layer.CornerRadius = 5f;
             attachmentButton.SetTitle(attachment.Name + " (" + UI.PrettyFileSize(attachment.Size) + ")", UIControlState.Normal);
             attachmentButton.SetContentHuggingPriority((float)UILayoutPriority.DefaultHigh, UILayoutConstraintAxis.Vertical);

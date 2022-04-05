@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,8 +22,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         public event EventHandler Edited = delegate { };
         public event EventHandler ActionSheetWillAppear = delegate { };
 
-        UILabel label;
-        UILabel selectedLineLabel;
+        UILabelScalable label;
+        UILabelScalable selectedLineLabel;
 
         readonly UIViewController viewController;
         readonly Line defaultOutgoingLine;
@@ -43,10 +43,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         void Initialize()
         {
-            label = new UILabel()
+            label = new UILabelScalable()
             {
                 Text = Localization.GetString("line") + ": ",
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TextColor = Theme.DarkGray,
                 Opaque = false,
                 Lines = 0,
@@ -63,10 +63,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 label.BottomAnchor.ConstraintEqualTo(ContainerView.BottomAnchor, -VerticalMargin)
             });
 
-            selectedLineLabel = new UILabel()
+            selectedLineLabel = new UILabelScalable()
             {
                 Text = selectedLine == null ? defaultMessage : selectedLine.Name,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 Opaque = false,
                 Lines = 1,
                 UserInteractionEnabled = true,

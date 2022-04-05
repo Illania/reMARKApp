@@ -1,4 +1,4 @@
-using Foundation;
+﻿using Foundation;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
@@ -12,9 +12,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
     {
         public static readonly NSString DefaultId = new NSString(nameof(ObjectActionsTableViewCell));
 
-        readonly UILabel usernameLabel;
-        readonly UILabel dateLabel;
-        readonly UITextView descriptionTextView;
+        readonly UILabelScalable usernameLabel;
+        readonly UILabelScalable dateLabel;
+        readonly UITextViewScalable descriptionTextView;
 
         public ObjectActionsTableViewCell()
             : base(UITableViewCellStyle.Default, DefaultId)
@@ -22,16 +22,16 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             SelectionStyle = UITableViewCellSelectionStyle.None;
             Accessory = UITableViewCellAccessory.None;
 
-            usernameLabel = new UILabel
+            usernameLabel = new UILabelScalable
             {
-                Font = Theme.DefaultBoldFont,
+                Font = Theme.DefaultBoldFont.CustomFont(),
                 Lines = 1,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
 
-            dateLabel = new UILabel
+            dateLabel = new UILabelScalable
             {
-                Font = Theme.DefaultLightFont.WithRelativeSize(-2f),
+                Font = Theme.DefaultLightFont.CustomFont().WithRelativeSize(-2f),
                 TextColor = Theme.DarkGray,
                 Lines = 1,
                 TranslatesAutoresizingMaskIntoConstraints = false,
@@ -39,7 +39,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             dateLabel.SetContentCompressionResistancePriority(1000f, UILayoutConstraintAxis.Horizontal);
             dateLabel.SetContentHuggingPriority(1000f, UILayoutConstraintAxis.Horizontal);
 
-            descriptionTextView = new UITextView
+            descriptionTextView = new UITextViewScalable
             {
                 Selectable = false,
                 Editable = false,

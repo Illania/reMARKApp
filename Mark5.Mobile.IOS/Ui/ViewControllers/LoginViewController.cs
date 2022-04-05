@@ -23,6 +23,7 @@ using Microsoft.Extensions.Logging;
 using Sentry;
 using UIKit;
 using UserNotifications;
+using Xamarin.Essentials;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
@@ -55,7 +56,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UITextField hostnameTextField;
         UITextField passwordTextField;
         UITextField portTextField;
-        UILabel orLabel;
+        UILabelScalable orLabel;
         UIButton showPasswordButton;
         UIButton loginButton;
         UIButton loginWithMicrosoftButton;
@@ -189,7 +190,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             });
 
             settingsButton = new UIButton();
-            settingsButton.TitleLabel.Font = Theme.DefaultBoldFont;
+            settingsButton.TitleLabel.Font = Theme.DefaultBoldFont.CustomFont().CustomFont();
             settingsButton.SetTitle(Localization.GetString("settings"), UIControlState.Normal);
             settingsButton.SetTitleColor(Theme.DarkBlue, UIControlState.Normal);
             settingsButton.TranslatesAutoresizingMaskIntoConstraints = false;
@@ -225,7 +226,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             usernameTextField = new UITextField
             {
                 BorderStyle = UITextBorderStyle.RoundedRect,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TextColor = Theme.White,
                 TintColor = Theme.White,
                 AutocorrectionType = UITextAutocorrectionType.No,
@@ -249,7 +250,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             passwordTextField = new UITextField
             {
                 BorderStyle = UITextBorderStyle.RoundedRect,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TextColor = Theme.White,
                 TintColor = Theme.White,
                 AutocapitalizationType = UITextAutocapitalizationType.None,
@@ -286,7 +287,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             hostnameTextField = new UITextField
             {
                 BorderStyle = UITextBorderStyle.RoundedRect,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TextColor = Theme.White,
                 TintColor = Theme.White,
                 AutocapitalizationType = UITextAutocapitalizationType.None,
@@ -310,7 +311,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             portTextField = new UITextField
             {
                 BorderStyle = UITextBorderStyle.RoundedRect,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TextColor = Theme.White,
                 TintColor = Theme.White,
                 AutocapitalizationType = UITextAutocapitalizationType.None,
@@ -333,7 +334,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             });
 
             loginButton = new UIButton { Enabled = false, Alpha = 0 };
-            loginButton.TitleLabel.Font = Theme.DefaultBoldFont;
+            loginButton.TitleLabel.Font = Theme.DefaultBoldFont.CustomFont();
             loginButton.TranslatesAutoresizingMaskIntoConstraints = false;
             loginButton.SetTitle(Localization.GetString("login"), UIControlState.Normal);
             loginButton.SetTitleColor(Theme.DarkBlue, UIControlState.Normal);
@@ -347,10 +348,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 loginButton.HeightAnchor.ConstraintEqualTo(LoginButtonHeight),
             });
 
-            orLabel = new UILabel
+            orLabel = new UILabelScalable
             {
                 Text = "or",
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 TextColor = Theme.DarkBlue,
                 TextAlignment = UITextAlignment.Center,

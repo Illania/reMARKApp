@@ -55,10 +55,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
             {
                 TranslatesAutoresizingMaskIntoConstraints = false;
 
-                var label = new UILabel
+                var label = new UILabelScalable
                 {
                     TranslatesAutoresizingMaskIntoConstraints = false,
-                    Font = Theme.DefaultFont,
+                    Font = Theme.DefaultFont.CustomFont(),
                     TextColor = Theme.DarkGray,
                     Text = "Starts",
                 };

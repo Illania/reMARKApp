@@ -15,7 +15,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
         readonly UITextField addressTextField;
         readonly UITextField descriptionTextField;
         readonly UISwitch preferrableSwitch;
-        readonly UILabel preferrableLabel;
+        readonly UILabelScalable preferrableLabel;
 
         public Action SelectedAsPrimaryAction;
         public Action AddressChangedAction;
@@ -27,7 +27,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
             addressTextField = new UITextField
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 Placeholder = Localization.GetString("address"),
                 AutocapitalizationType = UITextAutocapitalizationType.None,
                 AutocorrectionType = UITextAutocorrectionType.No,
@@ -41,7 +41,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
             descriptionTextField = new UITextField
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 Placeholder = Localization.GetString("description"),
             };
             descriptionTextField.EditingChanged += DescriptionTextField_EditingChanged;
@@ -50,10 +50,10 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
             var horizontalSeparator2 = GetHorizontalSeparator();
             ContentView.AddSubview(horizontalSeparator2);
 
-            preferrableLabel = new UILabel
+            preferrableLabel = new UILabelScalable
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 Text = Localization.GetString("preferrable"),
             };
             ContentView.Add(preferrableLabel);

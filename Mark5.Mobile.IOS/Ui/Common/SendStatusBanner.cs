@@ -203,7 +203,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         class BannerView : UIView
         {
-            readonly UILabel bannerLabel;
+            readonly UILabelScalable bannerLabel;
 
             public BannerView()
             {
@@ -211,7 +211,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 ClipsToBounds = false;
                 Layer.CornerRadius = 10;
 
-                bannerLabel = new UILabel
+                bannerLabel = new UILabelScalable
                 {
                     TranslatesAutoresizingMaskIntoConstraints = false,
                     TextColor = UIColor.White

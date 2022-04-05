@@ -115,7 +115,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
 
             SearchButton.SetTitle(Localization.GetString("search").ToUpper(), UIControlState.Normal);
             SearchButton.SetTitleColor(Theme.DarkBlue, UIControlState.Normal);
-            SearchButton.TitleLabel.Font = Theme.DefaultLightFont;
+            SearchButton.TitleLabel.Font = Theme.DefaultLightFont.CustomFont();
             SearchButton.Layer.CornerRadius = 4f;
             View.AddSubview(SearchButton);
             View.AddConstraints(new[]
@@ -305,7 +305,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             protected static readonly UIColor ActiveTextColor = Theme.DarkerBlue;
             protected static readonly UIColor InactiveBackgroundColor = Theme.DarkBlue;
             protected static readonly UIColor ActiveBackgroundColor = Theme.LightBlue;
-            protected static readonly UIFont Font = Theme.DefaultFont;
+            protected static readonly UIFont Font = Theme.DefaultFont.CustomFont();
 
             public event EventHandler Activated;
 
@@ -321,7 +321,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
 
             protected abstract void UpdateRow();
 
-            protected void SetLabelActive(UILabel label, bool active)
+            protected void SetLabelActive(UILabelScalable label, bool active)
             {
                 TransitionNotify(label, AnimationLength, UIViewAnimationOptions.TransitionCrossDissolve, () =>
                 {

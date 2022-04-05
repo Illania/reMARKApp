@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using Foundation;
 using Mark5.Mobile.Common.Model;
@@ -15,10 +15,10 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         public static readonly NSString DefaultId = new NSString(nameof(NotificationsTableViewCell));
         public static readonly NSString NewObjectCreatedId = new NSString(nameof(NotificationsTableViewCell) + "_NewObjectCreated");
 
-        readonly UILabel topLabel;
-        readonly UILabel bottomLabel;
-        readonly UILabel titleLabel;
-        readonly UILabel dateReceivedLabel;
+        readonly UILabelScalable topLabel;
+        readonly UILabelScalable bottomLabel;
+        readonly UILabelScalable titleLabel;
+        readonly UILabelScalable dateReceivedLabel;
         readonly UIImageView readImageView;
         readonly UIImageView iconImageView;
         readonly UIImageView directionIndicatorImageView;
@@ -32,9 +32,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
             if (reuseIdentifier == DefaultId || reuseIdentifier == NewObjectCreatedId)
             {
-                bottomLabel = new UILabel
+                bottomLabel = new UILabelScalable
                 {
-                    Font = Theme.DefaultLightFont.WithRelativeSize(-2f),
+                    Font = Theme.DefaultLightFont.CustomFont().WithRelativeSize(-2f),
                     TextColor = Theme.Black,
                     TextAlignment = UITextAlignment.Left,
                     Lines = 1,
@@ -42,9 +42,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 };
                 ContentView.Add(bottomLabel);
 
-                titleLabel = new UILabel
+                titleLabel = new UILabelScalable
                 {
-                    Font = Theme.DefaultFont,
+                    Font = Theme.DefaultFont.CustomFont(),
                     TextColor = Theme.Black,
                     TextAlignment = UITextAlignment.Left,
                     Lines = 1,
@@ -53,9 +53,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 titleLabel.SetContentHuggingPriority((float)UILayoutPriority.DefaultLow, UILayoutConstraintAxis.Horizontal);
                 ContentView.Add(titleLabel);
 
-                dateReceivedLabel = new UILabel
+                dateReceivedLabel = new UILabelScalable
                 {
-                    Font = Theme.DefaultLightFont.WithRelativeSize(-2f),
+                    Font = Theme.DefaultLightFont.CustomFont().WithRelativeSize(-2f),
                     TextColor = Theme.Black,
                     TextAlignment = UITextAlignment.Left,
                     Lines = 1,
@@ -118,9 +118,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
             if (reuseIdentifier == DefaultId)
             {
-                topLabel = new UILabel
+                topLabel = new UILabelScalable
                 {
-                    Font = Theme.DefaultBoldFont,
+                    Font = Theme.DefaultBoldFont.CustomFont(),
                     TextColor = Theme.Black,
                     TextAlignment = UITextAlignment.Left,
                     Lines = 1,
@@ -184,14 +184,14 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
             if (ReuseIdentifier == NewObjectCreatedId)
             {
-                titleLabel.Font = Theme.DefaultBoldFont;
+                titleLabel.Font = Theme.DefaultBoldFont.CustomFont();
 
                 titleLabel.Text = splitMessage.ElementAtOrDefault(0);
                 bottomLabel.Text = splitMessage.ElementAtOrDefault(1);
             }
             else if (ReuseIdentifier == DefaultId)
             {
-                titleLabel.Font = Theme.DefaultFont;
+                titleLabel.Font = Theme.DefaultFont.CustomFont();
 
                 titleLabel.Text = notification.Title;
                 topLabel.Text = splitMessage.ElementAtOrDefault(0);

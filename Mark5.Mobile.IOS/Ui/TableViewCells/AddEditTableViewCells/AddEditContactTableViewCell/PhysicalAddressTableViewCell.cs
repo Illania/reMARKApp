@@ -58,7 +58,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
             addressTextField = new UITextField
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 Placeholder = Localization.GetString("address"),
                 AutocorrectionType = UITextAutocorrectionType.No,
             };
@@ -71,7 +71,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
             zipTextField = new UITextField
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 Placeholder = Localization.GetString("zip") + " ",
             };
             zipTextField.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
@@ -84,7 +84,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
             areaTextField = new UITextField
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 Placeholder = Localization.GetString("area"),
                 AutocorrectionType = UITextAutocorrectionType.No,
             };
@@ -97,7 +97,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
             countryTextField = new UITextField
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TintColor = Theme.Clear,
                 Text = Localization.GetString("country"),
                 InputView = countryPicker,
@@ -117,7 +117,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
             cityTextField = new UITextField
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 Placeholder = Localization.GetString("city"),
                 AutocorrectionType = UITextAutocorrectionType.No,
             };

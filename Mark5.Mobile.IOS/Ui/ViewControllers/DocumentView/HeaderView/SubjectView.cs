@@ -11,7 +11,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
     public class SubjectView : DocumentSubView, IAnimating
     {
         bool expanded;
-        UITextView subjectTextView;
+        UITextViewScalable subjectTextView;
 
         public event EventHandler BeginAnimating = delegate { };
         public event EventHandler Animating = delegate { };
@@ -19,11 +19,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
         public SubjectView()
         {
-            subjectTextView = new UITextView
+            subjectTextView = new UITextViewScalable
             {
                 BackgroundColor = Theme.Clear,
                 TextColor = Theme.DarkerBlue,
-                Font = Theme.DefaultLightBoldFont.WithRelativeSize(4f),
+                Font = Theme.DefaultFont.CustomFont().WithRelativeSize(4f),
                 Opaque = false,
                 ClipsToBounds = false,
                 TranslatesAutoresizingMaskIntoConstraints = false,

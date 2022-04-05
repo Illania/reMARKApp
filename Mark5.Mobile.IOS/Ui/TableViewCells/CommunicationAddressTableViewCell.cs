@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using Foundation;
 using Mark5.Mobile.Common.Model;
@@ -13,9 +13,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         public static readonly NSString DefaultId = new NSString(nameof(CommunicationAddressTableViewCell));
         public static readonly NSString CompactId = new NSString(nameof(CommunicationAddressTableViewCell) + "_Compact");
 
-        readonly UILabel topLabel;
-        readonly UILabel middleLabel;
-        readonly UILabel bottomLabel;
+        readonly UILabelScalable topLabel;
+        readonly UILabelScalable middleLabel;
+        readonly UILabelScalable bottomLabel;
         readonly UIImageView iconImage;
 
         public string Content => middleLabel?.Text;
@@ -26,17 +26,17 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             SelectionStyle = UITableViewCellSelectionStyle.Default;
             Accessory = UITableViewCellAccessory.None;
 
-            topLabel = new UILabel
+            topLabel = new UILabelScalable
             {
-                Font = Theme.DefaultFont.WithRelativeSize(-2f),
+                Font = Theme.DefaultFont.CustomFont().WithRelativeSize(-2f),
                 TextColor = Theme.DarkGray,
                 Lines = 1,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
 
-            middleLabel = new UILabel
+            middleLabel = new UILabelScalable
             {
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 Lines = 1,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
@@ -53,9 +53,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
             if (ReuseIdentifier == DefaultId)
             {
-                bottomLabel = new UILabel
+                bottomLabel = new UILabelScalable
                 {
-                    Font = Theme.DefaultFont.WithRelativeSize(-1f),
+                    Font = Theme.DefaultFont.CustomFont().WithRelativeSize(-1f),
                     TextColor = Theme.DarkGray,
                     Lines = 1,
                     TranslatesAutoresizingMaskIntoConstraints = false

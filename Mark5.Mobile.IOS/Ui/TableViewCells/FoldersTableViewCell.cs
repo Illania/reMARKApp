@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using Foundation;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
@@ -17,8 +17,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         readonly UIImageView subscribedIndicatorImage;
         readonly UIImageView offlineIndicatorImage;
 
-        readonly UILabel nameLabel;
-        readonly UILabel documentCount;
+        readonly UILabelScalable nameLabel;
+        readonly UILabelScalable documentCount;
         readonly UIButton expandButton;
 
         readonly NSLayoutConstraint offlineIndicatorWidthConstraint;
@@ -65,19 +65,19 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             };
             ContentView.Add(offlineIndicatorImage);
 
-            nameLabel = new UILabel
+            nameLabel = new UILabelScalable
             {
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TextColor = Theme.Black,
                 Lines = 2,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
             ContentView.Add(nameLabel);
 
-            documentCount = new UILabel
+            documentCount = new UILabelScalable
             {
                 TextAlignment = UITextAlignment.Right,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TextColor = Theme.Black,
                 Lines = 1,
                 TranslatesAutoresizingMaskIntoConstraints = false

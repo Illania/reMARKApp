@@ -142,7 +142,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             field = new UITextField
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 BorderStyle = UITextBorderStyle.RoundedRect
             };
 

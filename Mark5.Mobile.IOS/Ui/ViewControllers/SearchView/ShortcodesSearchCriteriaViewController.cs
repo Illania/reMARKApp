@@ -110,7 +110,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
         class NameSearchView : AbstractShortcodesSearchView
         {
             readonly UIView view;
-            readonly UILabel label;
+            readonly UILabelScalable label;
             readonly UITextField text;
 
             public NameSearchView()
@@ -124,7 +124,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 view.Layer.MasksToBounds = true;
                 view.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
 
-                label = new UILabel
+                label = new UILabelScalable
                 {
                     Text = Localization.GetString("search_name"),
                     TextColor = LabelTextColor,
@@ -208,7 +208,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
         class DescritpionSearchView : AbstractShortcodesSearchView
         {
             readonly UIView view;
-            readonly UILabel label;
+            readonly UILabelScalable label;
             readonly UITextField text;
 
             public DescritpionSearchView()
@@ -222,7 +222,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 view.Layer.MasksToBounds = true;
                 view.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
 
-                label = new UILabel
+                label = new UILabelScalable
                 {
                     Text = Localization.GetString("search_search_description"),
                     TextColor = LabelTextColor,
@@ -307,7 +307,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
         class AddressSearchView : AbstractShortcodesSearchView
         {
             readonly UIView view;
-            readonly UILabel label;
+            readonly UILabelScalable label;
             readonly UITextField text;
 
             public AddressSearchView()
@@ -321,7 +321,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 view.Layer.MasksToBounds = true;
                 view.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
 
-                label = new UILabel
+                label = new UILabelScalable
                 {
                     Text = Localization.GetString("search_emails"),
                     TextColor = LabelTextColor,

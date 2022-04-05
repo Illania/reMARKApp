@@ -67,7 +67,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Enabled = true
             };
-            cancelButton.TitleLabel.Font = Theme.DefaultBoldFont;
+            cancelButton.TitleLabel.Font = Theme.DefaultBoldFont.CustomFont();
             cancelButton.SetTitle(Localization.GetString("cancel"), UIControlState.Normal);
             cancelButton.SetTitleColor(Theme.DarkBlue, UIControlState.Normal);
             cancelButton.TitleLabel.Lines = 0;
@@ -79,7 +79,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Enabled = true
             };
-            okButton.TitleLabel.Font = Theme.DefaultFont;
+            okButton.TitleLabel.Font = Theme.DefaultFont.CustomFont();
             okButton.SetTitle(Localization.GetString("ok"), UIControlState.Normal);
             okButton.SetTitleColor(Theme.DarkBlue, UIControlState.Normal);
             okButton.TitleLabel.Lines = 0;

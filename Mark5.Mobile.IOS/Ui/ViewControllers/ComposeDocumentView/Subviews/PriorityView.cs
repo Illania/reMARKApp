@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Foundation;
@@ -19,8 +19,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         readonly WeakReference<UIViewController> weakViewController;
 
-        UILabel label;
-        UILabel selectedPriorityLabel;
+        UILabelScalable label;
+        UILabelScalable selectedPriorityLabel;
 
         public PriorityView(UIViewController viewController)
         {
@@ -30,10 +30,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         void Initialize()
         {
-            label = new UILabel
+            label = new UILabelScalable
             {
                 Text = Localization.GetString("priority") + ": ",
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TextColor = Theme.DarkGray,
                 Opaque = false,
                 Lines = 0,
@@ -49,11 +49,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 label.LeftAnchor.ConstraintEqualTo(ContainerView.LeftAnchor, HorizontalMargin)
             });
 
-            selectedPriorityLabel = new UILabel
+            selectedPriorityLabel = new UILabelScalable
             {
                 BackgroundColor = UIColor.Clear,
                 Text = UI.PrettyPriorityString(selectedPriority),
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 Opaque = false,
                 Lines = 1,
                 UserInteractionEnabled = true,

@@ -140,8 +140,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
     class OnBoardingPageViewController : AbstractViewController
     {
-        UILabel titleLabel;
-        UITextView descriptionTextView;
+        UILabelScalable titleLabel;
+        UITextViewScalable descriptionTextView;
         UIImageView headlineImage;
         LOTAnimationView animationView = null;
 
@@ -204,22 +204,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 topView = headlineImage;
             }
 
-            titleLabel = new UILabel
+            titleLabel = new UILabelScalable
             {
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
             titleLabel.TextAlignment = UITextAlignment.Center;
             titleLabel.Text = pageModel.Title;
             titleLabel.TextColor = Theme.DarkBlue;
-            titleLabel.Font = Theme.DefaultBoldFont.WithSize(24);
+            titleLabel.Font = Theme.DefaultBoldFont.CustomFont().WithSize(24);
             titleLabel.Lines = 0;
 
-            descriptionTextView = new UITextView
+            descriptionTextView = new UITextViewScalable
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
             };
             descriptionTextView.Text = pageModel.Content;
-            descriptionTextView.Font = Theme.DefaultFont.WithSize(18);
+            descriptionTextView.Font = Theme.DefaultFont.CustomFont().WithSize(18);
             descriptionTextView.TextColor = Theme.DarkBlue;
             descriptionTextView.TextAlignment = UITextAlignment.Justified;
             descriptionTextView.BackgroundColor = UIColor.Clear;
@@ -234,7 +234,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             };
             nextDoneButton.SetTitle(!isLast ? "NEXT" : "DONE", UIControlState.Normal);
             nextDoneButton.SetTitleColor(UIColor.White, UIControlState.Normal);
-            nextDoneButton.TitleLabel.Font = Theme.DefaultBoldFont.WithSize(18);
+            nextDoneButton.TitleLabel.Font = Theme.DefaultBoldFont.CustomFont().WithSize(18);
             nextDoneButton.TitleLabel.TextAlignment = UITextAlignment.Center;
             nextDoneButton.Layer.CornerRadius = 15.5f;
             nextDoneButton.BackgroundColor = Theme.DarkBlue;

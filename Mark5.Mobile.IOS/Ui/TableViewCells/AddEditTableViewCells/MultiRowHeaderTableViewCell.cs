@@ -8,17 +8,17 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
     {
         public static readonly NSString Key = new NSString("MultiRowHeaderTableViewCell");
 
-        readonly UILabel titleLabel;
+        readonly UILabelScalable titleLabel;
 
         public MultiRowHeaderTableViewCell()
             : base(UITableViewCellStyle.Default, Key)
         {
             SelectionStyle = UITableViewCellSelectionStyle.Default;
 
-            titleLabel = new UILabel
+            titleLabel = new UILabelScalable
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TextColor = Theme.DarkBlue,
             };
             ContentView.AddSubview(titleLabel);

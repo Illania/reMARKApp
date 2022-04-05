@@ -27,7 +27,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         UIButton closeButton;
         UIView closeButtonContainer;
         UIView seperatorView;
-        UILabel titleLabel;
+        UILabelScalable titleLabel;
 
         ReMarkNavigationButton searchBtn;
         ReMarkNavigationButton contactsBtn;
@@ -76,9 +76,9 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             seperatorView.Layer.CornerRadius = 1.5f;
 
-            titleLabel = new UILabel
+            titleLabel = new UILabelScalable
             {
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TextColor = Theme.DarkerBlue,
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Text = "Choose",
@@ -254,12 +254,12 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 ImageEdgeInsets = new UIEdgeInsets(15f, 15f, 15f, 15f)
             };
 
-            readonly UILabel Title = new UILabel
+            readonly UILabelScalable Title = new UILabelScalable
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 TextColor = Theme.DarkBlue,
                 TextAlignment = UITextAlignment.Center,
-                Font = Theme.DefaultLightFont,
+                Font = Theme.DefaultLightFont.CustomFont(),
                 MinimumScaleFactor = 0.6f
             };
 

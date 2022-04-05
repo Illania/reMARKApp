@@ -328,6 +328,8 @@
 		<Compile Include="Ui\ViewControllers\CopyToDepartmentWorktrayViewController.cs" />
 		<Compile Include="Ui\ViewControllers\CopyToUserWorktrayViewController.cs" />
 		<Compile Include="Ui\ViewControllers\LinkedEmailListViewController.cs" />
+		<Compile Include="Ui\Common\UITextViewScalable.cs" />
+		<Compile Include="Ui\Common\UILabelScalable.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

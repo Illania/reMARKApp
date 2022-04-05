@@ -1,4 +1,4 @@
-using System.Drawing;
+﻿using System.Drawing;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Foundation;
@@ -27,10 +27,10 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         readonly UIImageView priorityIndicatorImageView;
         readonly UIImageView attachmentsIndicatorImageView;
         readonly UIImageView commentsIndicatorImageView;
-        readonly UILabel topLabel;
-        readonly UILabel dateLabel;
-        readonly UILabel middleLabel;
-        readonly UITextView bottomLabel;
+        readonly UILabelScalable topLabel;
+        readonly UILabelScalable dateLabel;
+        readonly UILabelScalable middleLabel;
+        readonly UITextViewScalable bottomLabel;
 
         readonly bool unreadIndicatorMe = PlatformConfig.Preferences.UnreadIndicatorMe;
         readonly bool showCreatorOutgoing = PlatformConfig.Preferences.ShowCreatorOutgoing;
@@ -79,12 +79,13 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 });
             }
 
-            topLabel = new UILabel
+            topLabel = new UILabelScalable
             {
-                Font = Theme.DefaultBoldFont,
+                Font = Theme.DefaultBoldFont.CustomFont(),
                 Lines = 1,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
+            
 
             ContentView.AddSubview(topLabel);
             ContentView.AddConstraints(new[]
@@ -96,9 +97,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
             if (reuseIdentifier == DefaultId || reuseIdentifier == CompactId || reuseIdentifier == ExternalId)
             {
-                dateLabel = new UILabel
+                dateLabel = new UILabelScalable
                 {
-                    Font = Theme.DefaultLightFont.WithRelativeSize(-2f),
+                    Font = Theme.DefaultLightFont.CustomFont().WithRelativeSize(-2f),
                     TextColor = Theme.DarkGray,
                     Lines = 1,
                     TranslatesAutoresizingMaskIntoConstraints = false
@@ -122,9 +123,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 });
             }
 
-            middleLabel = new UILabel
+            middleLabel = new UILabelScalable
             {
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 Lines = 1,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
@@ -139,9 +140,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
             if (reuseIdentifier == DefaultId)
             {
-                bottomLabel = new UITextView
+                bottomLabel = new UITextViewScalable
                 {
-                    Font = Theme.DefaultFont.WithRelativeSize(-2f),
+                    Font = Theme.DefaultFont.CustomFont().WithRelativeSize(-2f),
                     TextColor = Theme.DarkGray,
                     Selectable = false,
                     Editable = false,
@@ -359,7 +360,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             bottomLabel.Text = !string.IsNullOrWhiteSpace(dp.Preview) ? Regex.Replace(dp.Preview, @"\r\n?|\n", "  ", RegexOptions.Multiline) : Localization.GetString("no_content");
         }
 
-        void InitializeDirectionIndicator(DocumentPreview dp)
+            void InitializeDirectionIndicator(DocumentPreview dp)
         {
             if (directionIndicatorImageView == null)
                 return;

@@ -9,8 +9,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
     {
         public static readonly NSString DefaultId = new NSString(nameof(ObjectLinksTableViewCell));
 
-        readonly UILabel descriptionLabel;
-        readonly UITextView typeDescription;
+        readonly UILabelScalable descriptionLabel;
+        readonly UITextViewScalable typeDescription;
 
         public ObjectLinksTableViewCell()
             : base(UITableViewCellStyle.Default, DefaultId)
@@ -18,14 +18,14 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             SelectionStyle = UITableViewCellSelectionStyle.Default;
             Accessory = UITableViewCellAccessory.None;
 
-            descriptionLabel = new UILabel
+            descriptionLabel = new UILabelScalable
             {
-                Font = Theme.DefaultBoldFont,
+                Font = Theme.DefaultBoldFont.CustomFont(),
                 Lines = 1,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
 
-            typeDescription = new UITextView
+            typeDescription = new UITextViewScalable
             {
                 Selectable = false,
                 BackgroundColor = UIColor.Clear,

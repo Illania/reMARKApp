@@ -1,4 +1,5 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
 using CoreGraphics;
 using Foundation;
 using Mark5.Mobile.Common;
@@ -9,8 +10,83 @@ using WebKit;
 
 namespace Mark5.Mobile.IOS.Ui.Common
 {
+  
+    public static class UIFontExtensions{
+
+      
+        public static UIFont CustomFont(this UIFont font, UITraitCollection traitCollection = null)
+        {
+            try
+            {
+                var textStyle = //Theme.CustomFonts[font];
+                                UIFontDescriptor.PreferredBody.TextStyle;
+
+                var scaledFont = font;
+
+                if(traitCollection != null)
+                    scaledFont = UIFontMetrics.GetMetrics(textStyle).GetScaledFont(font, traitCollection);
+                else
+                    scaledFont = UIFontMetrics.GetMetrics(textStyle).GetScaledFont(font);
+
+                return scaledFont;
+            }
+            catch (Exception)
+            {
+                return font;
+            }
+              
+        }
+
+    }
+
     public static class Theme
     {
+        public readonly static Dictionary<UIFont, string> CustomFonts = new()
+        {
+            {
+                UIFont.FromName(Theme.DefaultLightFontName, 28f),
+                UIFontDescriptor.PreferredTitle1.TextStyle
+            },   //AppointmentTitleFont.CustomFont()
+            {
+                UIFont.FromName(Theme.DefaultFontName, 22f),
+                UIFontDescriptor.PreferredTitle2.TextStyle
+            },
+            {
+                UIFont.FromName(Theme.DefaultFontName, 18f),
+                UIFontDescriptor.PreferredTitle3.TextStyle
+            },        //AppointmentDefaultFont.CustomFont().CustomFont()
+            {
+                UIFont.FromName(Theme.DefaultBoldFontName, 16f),
+                UIFontDescriptor.PreferredHeadline.TextStyle
+            },  //DefaultBoldFont.CustomFont()Name
+            {
+                UIFont.FromName(Theme.DefaultFontName, 16f),
+                UIFontDescriptor.PreferredBody.TextStyle
+            },          //DefaultFont.CustomFont()
+            {
+                UIFont.FromName(Theme.DefaultLightFontName, 16f),
+                UIFontDescriptor.PreferredCallout.TextStyle
+            },  //DefaultLightFont.CustomFont()
+            {
+                UIFont.FromName(Theme.DefaultFontName, 14f),
+                UIFontDescriptor.PreferredSubheadline.TextStyle
+            },   //DefaultActionsFont.CustomFont()
+            {
+                UIFont.FromName(Theme.DefaultLightFontName, 14f),
+                UIFontDescriptor.PreferredFootnote.TextStyle
+            }, //CalendarTimeLightFont.CustomFont()
+            {
+                UIFont.FromName(Theme.DefaultLightFontName, 12f),
+                UIFontDescriptor.PreferredCaption1.TextStyle
+            },
+            {
+                UIFont.FromName(Theme.DefaultLightFontName, 11f),
+                UIFontDescriptor.PreferredCaption2.TextStyle
+            }
+        };
+
+         
+
         public static UIColor TintColor => DarkerBlue;
 
         #region Nordic IT Colors
@@ -34,26 +110,24 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         #region Fonts
 
-        const string DefaultFontName = "Avenir-Book";
-        const string DefaultBoldFontName = "Avenir-Black";
-        const string DefaultLightFontName = "Avenir-Light";
-        const string DefaultLightBoldFontName = "Avenir-Medium";
-
-        const float DefaultFontSize = 16f;
+        //not scalable fonts
         const float DefaultFontXSmallSize = 8f;
         const float DefaultFontSmallSize = 10f;
+        public static UIFont CalendarFontXSmall => UIFont.FromName(DefaultLightFontName, DefaultFontXSmallSize);
+        public static UIFont CalendarFontSmall => UIFont.FromName(DefaultLightFontName, DefaultFontSmallSize);
 
-        public static UIFont DefaultFont => UIFont.FromName(DefaultFontName, DefaultFontSize);
-        public static UIFont DefaultLightFontXSmall => UIFont.FromName(DefaultLightFontName, DefaultFontXSmallSize);
-        public static UIFont DefaultLightFontSmall => UIFont.FromName(DefaultLightFontName, DefaultFontSmallSize);
-        public static UIFont DefaultBoldFont => UIFont.FromName(DefaultBoldFontName, DefaultFontSize);
-        public static UIFont DefaultLightFont => UIFont.FromName(DefaultLightFontName, DefaultFontSize);
-        public static UIFont DefaultActionsFont => UIFont.FromName(DefaultFontName, 14f);
-        public static UIFont DefaultLightBoldFont => UIFont.FromName(DefaultLightBoldFontName, DefaultFontSize);
+        public const string DefaultFontName = "Avenir-Book";
+        public const string DefaultBoldFontName = "Avenir-Black";
+        public const string DefaultLightFontName = "Avenir-Light";
 
         public static UIFont AppointmentTitleFont => UIFont.FromName(DefaultLightFontName, 28f);
-        public static UIFont AppointmentDefaultFont => UIFont.FromName(DefaultFontName, DefaultFontSize + 2);
+        public static UIFont AppointmentDefaultFont => UIFont.FromName(DefaultFontName, 18f);
+        public static UIFont DefaultBoldFont => UIFont.FromName(DefaultBoldFontName, 16f);
+        public static UIFont DefaultFont => UIFont.FromName(DefaultFontName, 16f);
+        public static UIFont DefaultLightFont => UIFont.FromName(DefaultLightFontName, 16f);
+        public static UIFont DefaultActionsFont => UIFont.FromName(DefaultFontName, 14f);
         public static UIFont CalendarTimeLightFont => UIFont.FromName(DefaultLightFontName, 14f);
+
 
         #endregion
 
@@ -73,7 +147,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             UINavigationBar.Appearance.TitleTextAttributes = new UIStringAttributes
             {
                 ForegroundColor = DarkerBlue,
-                Font = DefaultFont.WithRelativeSize(1f)
+                Font = DefaultFont.CustomFont().WithRelativeSize(1f)
             };
 
             if (Integration.IsRunningAtLeast(11))
@@ -81,12 +155,12 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 UINavigationBar.Appearance.LargeTitleTextAttributes = new UIStringAttributes
                 {
                     ForegroundColor = DarkerBlue,
-                    Font = DefaultFont.WithRelativeSize(12f)
+                    Font = DefaultFont.CustomFont().WithRelativeSize(12f)
                 };
                 UINavigationBar.AppearanceWhenContainedIn(typeof(DarkNavigationController)).LargeTitleTextAttributes = new UIStringAttributes
                 {
                     ForegroundColor = LightGray,
-                    Font = DefaultFont.WithRelativeSize(12f)
+                    Font = DefaultFont.CustomFont().WithRelativeSize(12f)
                 };
             }
 
@@ -95,43 +169,43 @@ namespace Mark5.Mobile.IOS.Ui.Common
             UINavigationBar.AppearanceWhenContainedIn(typeof(DarkNavigationController)).TitleTextAttributes = new UIStringAttributes
             {
                 ForegroundColor = LightGray,
-                Font = DefaultFont.WithRelativeSize(1f)
+                Font = DefaultFont.CustomFont().WithRelativeSize(1f)
             };
 
             UIBarButtonItem.Appearance.SetTitleTextAttributes(new UITextAttributes
             {
-                Font = DefaultFont
+                Font = DefaultFont.CustomFont()
             }, UIControlState.Normal);
             UIBarButtonItem.Appearance.SetTitleTextAttributes(new UITextAttributes
             {
-                Font = DefaultFont
+                Font = DefaultFont.CustomFont()
             }, UIControlState.Highlighted);
             UIBarButtonItem.Appearance.SetTitleTextAttributes(new UITextAttributes
             {
                 TextColor = DarkGray,
-                Font = DefaultFont
+                Font = DefaultFont.CustomFont()
             }, UIControlState.Disabled);
 
             UITabBarItem.Appearance.SetTitleTextAttributes(new UITextAttributes
             {
-                Font = DefaultFont.WithRelativeSize(-5f)
+                Font = DefaultFont.CustomFont().WithRelativeSize(-5f)
             }, UIControlState.Normal);
 
             UISegmentedControl.Appearance.TintColor = DarkerBlue;
             UISegmentedControl.Appearance.SetTitleTextAttributes(new UITextAttributes
             {
-                Font = DefaultFont.WithRelativeSize(-4f)
+                Font = DefaultFont.CustomFont().WithRelativeSize(-4f)
             }, UIControlState.Normal);
 
             UISegmentedControl.AppearanceWhenContainedIn(typeof(DarkNavigationController)).TintColor = DarkBlue;
             UISegmentedControl.AppearanceWhenContainedIn(typeof(DarkNavigationController)).SetTitleTextAttributes(new UITextAttributes
             {
-                Font = DefaultFont.WithRelativeSize(-4f),
+                Font = DefaultFont.CustomFont().WithRelativeSize(-4f),
                 TextColor = White
             }, UIControlState.Normal);
             UISegmentedControl.AppearanceWhenContainedIn(typeof(DarkNavigationController)).SetTitleTextAttributes(new UITextAttributes
             {
-                Font = DefaultFont.WithRelativeSize(-4f),
+                Font = DefaultFont.CustomFont().WithRelativeSize(-4f),
                 TextColor = White
             }, UIControlState.Selected);
 
@@ -157,25 +231,25 @@ namespace Mark5.Mobile.IOS.Ui.Common
                         return;
                     var text = header.TextLabel?.Text ?? string.Empty;
                     header.TextLabel.Text = null;
-                    header.TextLabel.AttributedText = new NSAttributedString(text, new UIStringAttributes { Font = DefaultLightFont, ForegroundColor = DarkerBlue });
+                    header.TextLabel.AttributedText = new NSAttributedString(text, new UIStringAttributes { Font = DefaultLightFont.CustomFont(), ForegroundColor = DarkerBlue });
                     return;
                 }
 
                 if (view is UIButton button)
                 {
-                    button.TitleLabel.Font = DefaultFont;
+                    button.TitleLabel.Font = DefaultFont.CustomFont();
                     return;
                 }
 
                 if (view is UITextField textField)
                 {
-                    textField.Font = DefaultFont;
+                    textField.Font = DefaultFont.CustomFont();
                     return;
                 }
 
-                if (view is UITextView textView)
+                if (view is UITextViewScalable textView)
                 {
-                    textView.Font = DefaultFont;
+                    textView.Font = DefaultFont.CustomFont();
                     return;
                 }
             }

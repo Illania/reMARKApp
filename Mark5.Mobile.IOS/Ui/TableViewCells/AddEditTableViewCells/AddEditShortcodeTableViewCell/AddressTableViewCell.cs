@@ -16,7 +16,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
         readonly UITextField addressTextField;
         readonly UITextField nameTextField;
         readonly UITextField attentionTextField;
-        readonly UILabel typeLabel;
+        readonly UILabelScalable typeLabel;
 
         public Action AddressChangedAction;
 
@@ -27,7 +27,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
             addressTextField = new UITextField
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 Placeholder = Localization.GetString("address"),
                 AutocapitalizationType = UITextAutocapitalizationType.None,
                 AutocorrectionType = UITextAutocorrectionType.No,
@@ -41,7 +41,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
             nameTextField = new UITextField
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 Placeholder = Localization.GetString("name"),
             };
             nameTextField.EditingChanged += NameTextField_EditingChanged;
@@ -53,15 +53,15 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
             attentionTextField = new UITextField
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 Placeholder = Localization.GetString("attention"),
             };
             attentionTextField.EditingChanged += AttentionTextField_EditingChanged; ;
             ContentView.Add(attentionTextField);
 
-            typeLabel = new UILabel
+            typeLabel = new UILabelScalable
             {
-                Font = Theme.DefaultFont.WithSize(11f),
+                Font = Theme.DefaultFont.CustomFont().WithSize(11f),
                 TextColor = Theme.White,
                 TextAlignment = UITextAlignment.Center,
                 TranslatesAutoresizingMaskIntoConstraints = false

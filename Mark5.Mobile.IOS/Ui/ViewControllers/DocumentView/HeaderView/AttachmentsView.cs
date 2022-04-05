@@ -13,7 +13,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
     {
         const int columnSize = 2;
 
-        UILabel titleLabel;
+        UILabelScalable titleLabel;
         UIStackView stackView;
         UIScrollView scrollView;
 
@@ -23,10 +23,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         {
             ContainerView.BackgroundColor = Theme.White;
 
-            titleLabel = new UILabel
+            titleLabel = new UILabelScalable
             {
                 Text = Localization.GetString("attachments") + ":",
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TextColor = Theme.DarkGray,
                 Opaque = false,
                 TranslatesAutoresizingMaskIntoConstraints = false
@@ -167,7 +167,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 ContentEdgeInsets = new UIEdgeInsets(3.5f, 7.5f, 3.5f, 7.5f),
                 BackgroundColor = Theme.Gray,
             };
-            attachmentButton.TitleLabel.Font = Theme.DefaultFont;
+            attachmentButton.TitleLabel.Font = Theme.DefaultFont.CustomFont();
             attachmentButton.Layer.CornerRadius = 5f;
             attachmentButton.SetTitle(Truncate(Attachment.Name, 25) + " (" + UI.PrettyFileSize(Attachment.SizeInBytes) + ")", UIControlState.Normal);
             attachmentButton.SetContentHuggingPriority((float)UILayoutPriority.DefaultHigh, UILayoutConstraintAxis.Vertical);
