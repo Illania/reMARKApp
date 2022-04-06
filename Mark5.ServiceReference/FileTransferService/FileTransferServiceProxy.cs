@@ -7,6 +7,8 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Mark5.Mobile.Classes.AuthService;
+using Mark5.Mobile.Classes.Azure;
 using Mark5.ServiceReference.DataContract;
 using Mark5.ServiceReference.Exceptions;
 using Newtonsoft.Json;
@@ -38,16 +40,22 @@ namespace Mark5.ServiceReference.FileTransferService
         readonly Func<HttpMessageHandler> httpClientHandler;
         readonly Action onStartTransmission;
         readonly Action onStopTransmission;
+        string bearerToken;
+        readonly AzureApplicationProxyInfo azureApplicationProxyInfo;
 
         Version currentServiceVersion;
 
-        public FileTransferServiceProxy(bool ssl, string hostname, string port, Func<HttpMessageHandler> httpClientHandler, Action onStartTransmission, Action onStopTransmission)
+        public FileTransferServiceProxy(bool ssl, string hostname, string port, Func<HttpMessageHandler> httpClientHandler,
+            Action onStartTransmission, Action onStopTransmission,
+            string bearerToken, AzureApplicationProxyInfo azureApplicationProxyInfo)
         {
             this.httpClientHandler = httpClientHandler;
             this.onStartTransmission = onStartTransmission;
             this.onStopTransmission = onStopTransmission;
-            var usePort = !string.IsNullOrEmpty(port);
+            this.bearerToken = bearerToken;
+            this.azureApplicationProxyInfo = azureApplicationProxyInfo;
 
+            var usePort = !string.IsNullOrEmpty(port);
             endpointUrl = $"{(ssl ? "https" : "http")}://{hostname}{(usePort ? (":" + port) : "")}/fts3";
         }
 
@@ -56,6 +64,7 @@ namespace Mark5.ServiceReference.FileTransferService
             try
             {
                 onStartTransmission?.Invoke();
+                var useBearerToken = !string.IsNullOrEmpty(bearerToken);
 
                 using (var client = new HttpClient(httpClientHandler())
                 {
@@ -65,7 +74,7 @@ namespace Mark5.ServiceReference.FileTransferService
                     var uri = new Uri(endpointUrl).AppendPathSegments(Segments.Version);
                     var request = new HttpRequestMessage(HttpMethod.Get, uri);
                     request.Headers.Add(Headers.Token, req.Token);
-                    var res = await client.SendAsync(request, ct);
+                    var res = useBearerToken ? await client.SendAsync(request) : await client.SendAsync(request, ct);
                     var version = JsonConvert.DeserializeObject<Version>(await res.Content.ReadAsStringAsync());
 
                     return new GetServiceVersionResponse
@@ -78,9 +87,44 @@ namespace Mark5.ServiceReference.FileTransferService
             {
                 throw;
             }
-            catch (Exception ex)
+            catch (Exception ex) when (!(ex is FileTransferServiceException))
             {
-                throw new FileTransferServiceException(ex);
+#if DEBUG
+                Console.WriteLine("_________________________________________________________");
+                Console.WriteLine(azureApplicationProxyInfo.ToString());
+                Console.WriteLine($"Bearer: {bearerToken}, /n IsExpired: {Mobile.Classes.JwtDecoder.Decoder.IsExpired(bearerToken)}");
+                Console.WriteLine("_________________________________________________________");
+#endif
+                if (azureApplicationProxyInfo != null && azureApplicationProxyInfo.IsEnabled
+                 && !string.IsNullOrEmpty(azureApplicationProxyInfo.AppClientId)
+                 && !string.IsNullOrEmpty(azureApplicationProxyInfo.ApplicationProxyClientId)
+                 && Mobile.Classes.JwtDecoder.Decoder.IsExpired(bearerToken))
+                {
+
+                    var azureAppProxyAuthService = new AzureAppProxyAuthService(azureApplicationProxyInfo.AppClientId,
+                        azureApplicationProxyInfo.ApplicationProxyClientId);
+                    bearerToken = await azureAppProxyAuthService.Authenticate(this, false);
+
+                    using (var client = new HttpClient(httpClientHandler())
+                    {
+                        Timeout = TimeSpan.FromSeconds(Config.HttpClientTimeoutSeconds)
+                    })
+                    {
+                        var uri = new Uri(endpointUrl).AppendPathSegments(Segments.Version);
+                        var request = new HttpRequestMessage(HttpMethod.Get, uri);
+                        request.Headers.Add(Headers.Token, req.Token);
+                        var res = await client.SendAsync(request);
+                        var version = JsonConvert.DeserializeObject<Version>(await res.Content.ReadAsStringAsync());
+
+                        return new GetServiceVersionResponse
+                        {
+                            Version = version
+                        };
+                    }
+                }
+
+                else
+                    throw new FileTransferServiceException(ex.Message);
             }
             finally
             {
