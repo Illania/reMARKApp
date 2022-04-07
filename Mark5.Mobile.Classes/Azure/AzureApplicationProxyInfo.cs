@@ -12,5 +12,21 @@ namespace Mark5.Mobile.Classes.Azure
         {
             return $"AppClientId = {AppClientId}, ApplicationProxyCClientId = {ApplicationProxyClientId}, IsEnabled = {IsEnabled}";
         }
+
+        /// <summary>
+        /// Checks if Proxy is Enabled and Client IDs are filled
+        /// </summary>
+        /// <returns>
+        /// true - if Proxy is Enabled and Client IDs are filed
+        /// false - in all other cases
+        /// </returns>
+        public bool IsValid()
+        {
+            if (IsEnabled && !string.IsNullOrEmpty(AppClientId) && !string.IsNullOrEmpty(ApplicationProxyClientId))
+                return true;
+            else
+                return false;
+        }
+
     }
 }
