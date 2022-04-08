@@ -4,9 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Mark5.Mobile.Classes.AuthService;
+using Mark5.Mobile.Classes.Azure;
 using Mark5.ServiceReference.DataContract;
 using Mark5.ServiceReference.Exceptions;
 using Newtonsoft.Json;
@@ -38,25 +41,76 @@ namespace Mark5.ServiceReference.FileTransferService
         readonly Func<HttpMessageHandler> httpClientHandler;
         readonly Action onStartTransmission;
         readonly Action onStopTransmission;
+        string bearerToken;
+        readonly AzureApplicationProxyInfo azureApplicationProxyInfo;
 
         Version currentServiceVersion;
 
-        public FileTransferServiceProxy(bool ssl, string hostname, string port, Func<HttpMessageHandler> httpClientHandler, Action onStartTransmission, Action onStopTransmission)
+        public FileTransferServiceProxy(bool ssl, string hostname, string port, Func<HttpMessageHandler> httpClientHandler,
+            Action onStartTransmission, Action onStopTransmission,
+            string bearerToken, AzureApplicationProxyInfo azureApplicationProxyInfo)
         {
             this.httpClientHandler = httpClientHandler;
             this.onStartTransmission = onStartTransmission;
             this.onStopTransmission = onStopTransmission;
-            var usePort = !string.IsNullOrEmpty(port);
+            this.bearerToken = bearerToken;
+            this.azureApplicationProxyInfo = azureApplicationProxyInfo;
 
+            var usePort = !string.IsNullOrEmpty(port);
             endpointUrl = $"{(ssl ? "https" : "http")}://{hostname}{(usePort ? (":" + port) : "")}/fts3";
         }
 
-        public async Task<GetServiceVersionResponse> GetServiceVersionAsync(GetServiceVersionRequest req, CancellationToken ct = default(CancellationToken))
+        private bool IsAzureTokenExpired()
+        {
+            if (azureApplicationProxyInfo != null && azureApplicationProxyInfo.IsValid()
+                 && Mobile.Classes.JwtDecoder.Decoder.IsExpired(bearerToken))
+                return true;
+            else
+                return false;
+        }
+
+        private async Task UpdateBearerToken()
+        {
+            var azureAppProxyAuthService = new AzureAppProxyAuthService(azureApplicationProxyInfo.AppClientId,
+                azureApplicationProxyInfo.ApplicationProxyClientId);
+            bearerToken = await azureAppProxyAuthService.Authenticate(this, false);
+        }
+
+        private bool UseBearerToken()
+        {
+            return !string.IsNullOrEmpty(bearerToken);
+        }
+
+        public async Task<GetServiceVersionResponse> GetServiceVersionAsync(GetServiceVersionRequest req,
+            CancellationToken ct = default(CancellationToken))
         {
             try
             {
                 onStartTransmission?.Invoke();
+                return await GetServiceVersion(req, ct);
+            }
+            catch (OperationCanceledException)
+            { 
+                throw;
+            }
+            catch (Exception ex) when (!(ex is FileTransferServiceException))
+            {
+                if (IsAzureTokenExpired())
+                {
+                    await UpdateBearerToken();
+                    return await GetServiceVersion(req, ct);
+                }
 
+                else
+                    throw new FileTransferServiceException(ex.Message);
+            }
+            finally
+            {
+                onStopTransmission?.Invoke();
+            }
+
+            async Task<GetServiceVersionResponse> GetServiceVersion(GetServiceVersionRequest req_, CancellationToken ct_)
+            {
                 using (var client = new HttpClient(httpClientHandler())
                 {
                     Timeout = TimeSpan.FromSeconds(Config.HttpClientTimeoutSeconds)
@@ -64,8 +118,10 @@ namespace Mark5.ServiceReference.FileTransferService
                 {
                     var uri = new Uri(endpointUrl).AppendPathSegments(Segments.Version);
                     var request = new HttpRequestMessage(HttpMethod.Get, uri);
-                    request.Headers.Add(Headers.Token, req.Token);
-                    var res = await client.SendAsync(request, ct);
+                    if (!string.IsNullOrEmpty(bearerToken))
+                        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+                    request.Headers.Add(Headers.Token, req_.Token);
+                    var res = UseBearerToken() ? await client.SendAsync(request) : await client.SendAsync(request, ct_);
                     var version = JsonConvert.DeserializeObject<Version>(await res.Content.ReadAsStringAsync());
 
                     return new GetServiceVersionResponse
@@ -74,21 +130,10 @@ namespace Mark5.ServiceReference.FileTransferService
                     };
                 }
             }
-            catch (OperationCanceledException)
-            {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                throw new FileTransferServiceException(ex);
-            }
-            finally
-            {
-                onStopTransmission?.Invoke();
-            }
         }
 
-        public async Task<GetAttachmentResponse> GetAttachmentAsync(GetAttachmentRequest req, Func<Stream, Task> saveHandler, CancellationToken ct = default(CancellationToken))
+        public async Task<GetAttachmentResponse> GetAttachmentAsync(GetAttachmentRequest req, Func<Stream, Task> saveHandler,
+            CancellationToken ct = default(CancellationToken))
         {
             try
             {
@@ -107,48 +152,22 @@ namespace Mark5.ServiceReference.FileTransferService
                 try
                 {
                     onStartTransmission?.Invoke();
-
-                    using (var client = new HttpClient(httpClientHandler())
-                    {
-                        Timeout = TimeSpan.FromSeconds(Config.HttpClientTimeoutSeconds)
-                    })
-                    {
-                        var path = $"{endpointUrl}/{Segments.Attachment}/{req.Id}&documentId={req.DocumentId}";
-
-                        var request = new HttpRequestMessage(HttpMethod.Get, path);
-                        request.Headers.Add(Headers.Token, req.Token);
-                        var res = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
-
-                        if (res.StatusCode != HttpStatusCode.OK)
-                            throw new HttpRequestException($"Invalid server response: {res.StatusCode}.");
-
-                        var result = new GetAttachmentResponse();
-
-                        IEnumerable<string> headers;
-
-                        if (res.Headers.TryGetValues(Headers.Filename, out headers))
-                            result.Filename = headers.FirstOrDefault();
-
-                        if (res.Headers.TryGetValues(Headers.Extension, out headers))
-                            result.Extension = headers.FirstOrDefault();
-
-                        if (res.Headers.TryGetValues(Headers.ContentLength, out headers))
-                            result.Size = Convert.ToInt32(headers.FirstOrDefault() ?? "- 1");
-
-                        if (res.Headers.TryGetValues(Headers.Md5, out headers))
-                            result.Md5 = headers.FirstOrDefault();
-
-                        using (var stream = await res.Content.ReadAsStreamAsync())
-                        {
-                            await saveHandler(stream);
-                        }
-
-                        return result;
-                    }
+                    return await GetAttachmentV300(req, saveHandler, ct);
                 }
                 catch (OperationCanceledException)
                 {
                     throw;
+                }
+                catch (Exception ex) when (!(ex is FileTransferServiceException))
+                {
+                    if (IsAzureTokenExpired())
+                    {
+                        await UpdateBearerToken();
+                        return await GetAttachmentV300(req, saveHandler, ct);
+                    }
+
+                    else
+                        throw new FileTransferServiceException(ex.Message);
                 }
                 catch (Exception ex)
                 {
@@ -164,51 +183,22 @@ namespace Mark5.ServiceReference.FileTransferService
                 {
                     onStartTransmission?.Invoke();
 
-                    using (var client = new HttpClient(httpClientHandler())
-                    {
-                        Timeout = TimeSpan.FromSeconds(Config.HttpClientTimeoutSeconds)
-                    })
-                    {
-                        var path = $"{endpointUrl}/{Segments.Attachment}/{req.Id}&documentId={req.DocumentId}";
-
-                        var request = new HttpRequestMessage(HttpMethod.Get, path);
-                        request.Headers.Add(Headers.Token, req.Token);
-                        var res = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
-
-                        if (res.StatusCode != HttpStatusCode.OK)
-                            return null;
-
-                        var result = new GetAttachmentResponse();
-
-                        IEnumerable<string> headers;
-
-                        if (res.Headers.TryGetValues(Headers.Filename, out headers))
-                            result.Filename = headers.FirstOrDefault().Base64Decode();
-
-                        if (res.Headers.TryGetValues(Headers.Extension, out headers))
-                            result.Extension = headers.FirstOrDefault().Base64Decode();
-
-                        if (res.Headers.TryGetValues(Headers.ContentLength, out headers))
-                            result.Size = Convert.ToInt32(headers.FirstOrDefault() ?? "- 1");
-
-                        if (res.Headers.TryGetValues(Headers.Md5, out headers))
-                            result.Md5 = headers.FirstOrDefault();
-
-                        using (var stream = await res.Content.ReadAsStreamAsync())
-                        {
-                            await saveHandler(stream);
-                        }
-
-                        return result;
-                    }
+                    return await GetAttachmentV301(req, saveHandler, ct);
                 }
                 catch (OperationCanceledException)
                 {
                     throw;
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (!(ex is FileTransferServiceException))
                 {
-                    throw new FileTransferServiceException(ex);
+                    if (IsAzureTokenExpired())
+                    {
+                        await UpdateBearerToken();
+                        return await GetAttachmentV301(req, saveHandler, ct);
+                    }
+
+                    else
+                        throw new FileTransferServiceException(ex.Message);
                 }
                 finally
                 {
@@ -216,9 +206,100 @@ namespace Mark5.ServiceReference.FileTransferService
                 }
 
             throw new FileTransferServiceException($"Unsupported service version {currentServiceVersion}");
+
+            async Task<GetAttachmentResponse> GetAttachmentV300(GetAttachmentRequest req_, Func<Stream, Task> saveHandler_, CancellationToken ct_)
+            {
+                using (var client = new HttpClient(httpClientHandler())
+                {
+                    Timeout = TimeSpan.FromSeconds(Config.HttpClientTimeoutSeconds)
+                })
+                {
+                    var path = $"{endpointUrl}/{Segments.Attachment}/{req_.Id}&documentId={req_.DocumentId}";
+
+                    var request = new HttpRequestMessage(HttpMethod.Get, path);
+                    if (!string.IsNullOrEmpty(bearerToken))
+                        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+                    request.Headers.Add(Headers.Token, req_.Token);
+                    var res = UseBearerToken()
+                        ? await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead)
+                        : await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct_);
+
+                    if (res.StatusCode != HttpStatusCode.OK)
+                        throw new HttpRequestException($"Invalid server response: {res.StatusCode}.");
+
+                    var result = new GetAttachmentResponse();
+
+                    IEnumerable<string> headers;
+
+                    if (res.Headers.TryGetValues(Headers.Filename, out headers))
+                        result.Filename = headers.FirstOrDefault();
+
+                    if (res.Headers.TryGetValues(Headers.Extension, out headers))
+                        result.Extension = headers.FirstOrDefault();
+
+                    if (res.Headers.TryGetValues(Headers.ContentLength, out headers))
+                        result.Size = Convert.ToInt32(headers.FirstOrDefault() ?? "- 1");
+
+                    if (res.Headers.TryGetValues(Headers.Md5, out headers))
+                        result.Md5 = headers.FirstOrDefault();
+
+                    using (var stream = await res.Content.ReadAsStreamAsync())
+                    {
+                        await saveHandler_(stream);
+                    }
+
+                    return result;
+                }
+            }
+
+            async Task<GetAttachmentResponse> GetAttachmentV301(GetAttachmentRequest req_, Func<Stream, Task> saveHandler_, CancellationToken ct_)
+            {
+                using (var client = new HttpClient(httpClientHandler())
+                {
+                    Timeout = TimeSpan.FromSeconds(Config.HttpClientTimeoutSeconds)
+                })
+                {
+                    var path = $"{endpointUrl}/{Segments.Attachment}/{req_.Id}&documentId={req_.DocumentId}";
+
+                    var request = new HttpRequestMessage(HttpMethod.Get, path);
+                    if (!string.IsNullOrEmpty(bearerToken))
+                        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+                    request.Headers.Add(Headers.Token, req_.Token);
+                    var res = UseBearerToken()
+                       ? await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead)
+                       : await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct_);
+
+                    if (res.StatusCode != HttpStatusCode.OK)
+                        return null;
+
+                    var result = new GetAttachmentResponse();
+
+                    IEnumerable<string> headers;
+
+                    if (res.Headers.TryGetValues(Headers.Filename, out headers))
+                        result.Filename = headers.FirstOrDefault().Base64Decode();
+
+                    if (res.Headers.TryGetValues(Headers.Extension, out headers))
+                        result.Extension = headers.FirstOrDefault().Base64Decode();
+
+                    if (res.Headers.TryGetValues(Headers.ContentLength, out headers))
+                        result.Size = Convert.ToInt32(headers.FirstOrDefault() ?? "- 1");
+
+                    if (res.Headers.TryGetValues(Headers.Md5, out headers))
+                        result.Md5 = headers.FirstOrDefault();
+
+                    using (var stream = await res.Content.ReadAsStreamAsync())
+                    {
+                        await saveHandler_(stream);
+                    }
+
+                    return result;
+                }
+            }
         }
 
-        public async Task<UploadTemporaryAttachmentResponse> UploadTemporaryAttachmentAsync(UploadTemporaryAttachmentRequest req, CancellationToken ct = default(CancellationToken))
+        public async Task<UploadTemporaryAttachmentResponse> UploadTemporaryAttachmentAsync(UploadTemporaryAttachmentRequest req,
+            CancellationToken ct = default(CancellationToken))
         {
             try
             {
@@ -237,42 +318,22 @@ namespace Mark5.ServiceReference.FileTransferService
                 try
                 {
                     onStartTransmission?.Invoke();
-
-                    using (var client = new HttpClient(httpClientHandler())
-                    {
-                        Timeout = TimeSpan.FromSeconds(Config.HttpClientTimeoutSeconds)
-                    })
-                    {
-                        req.Stream.Position = 0;
-
-                        var uri = new Uri(endpointUrl).AppendPathSegments(Segments.Temporary, Segments.Attachment);
-                        var request = new HttpRequestMessage(HttpMethod.Post, uri);
-                        request.Headers.Add(Headers.Token, req.Token);
-                        request.Headers.Add(Headers.Filename, req.Filename);
-                        request.Headers.Add(Headers.Extension, req.Extension);
-                        request.Content = new StreamContent(req.Stream);
-                        var res = await client.SendAsync(request, ct);
-
-                        Guid guid;
-                        using (var tr = new StreamReader(await res.Content.ReadAsStreamAsync()))
-                        using (var jr = new JsonTextReader(tr))
-                        {
-                            guid = JsonSerializer.Create().Deserialize<Guid>(jr);
-                        }
-
-                        return new UploadTemporaryAttachmentResponse
-                        {
-                            Guid = guid
-                        };
-                    }
+                    return await UploadTemporaryAttachmentV300(req, ct);
                 }
                 catch (OperationCanceledException)
                 {
                     throw;
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (!(ex is FileTransferServiceException))
                 {
-                    throw new FileTransferServiceException(ex);
+                    if (IsAzureTokenExpired())
+                    {
+                        await UpdateBearerToken();
+                        return await UploadTemporaryAttachmentV300(req, ct);
+                    }
+
+                    else
+                        throw new FileTransferServiceException(ex.Message);
                 }
                 finally
                 {
@@ -283,42 +344,22 @@ namespace Mark5.ServiceReference.FileTransferService
                 try
                 {
                     onStartTransmission?.Invoke();
-
-                    using (var client = new HttpClient(httpClientHandler())
-                    {
-                        Timeout = TimeSpan.FromSeconds(Config.HttpClientTimeoutSeconds)
-                    })
-                    {
-                        req.Stream.Position = 0;
-
-                        var uri = new Uri(endpointUrl).AppendPathSegments(Segments.Temporary, Segments.Attachment);
-                        var request = new HttpRequestMessage(HttpMethod.Post, uri);
-                        request.Headers.Add(Headers.Token, req.Token);
-                        request.Headers.Add(Headers.Filename, req.Filename.Base64Encode());
-                        request.Headers.Add(Headers.Extension, req.Extension.Base64Encode());
-                        request.Content = new StreamContent(req.Stream);
-                        var res = await client.SendAsync(request, ct);
-
-                        Guid guid;
-                        using (var tr = new StreamReader(await res.Content.ReadAsStreamAsync()))
-                        using (var jr = new JsonTextReader(tr))
-                        {
-                            guid = JsonSerializer.Create().Deserialize<Guid>(jr);
-                        }
-
-                        return new UploadTemporaryAttachmentResponse
-                        {
-                            Guid = guid
-                        };
-                    }
+                    return await UploadTemporaryAttachmentV301(req, ct);
                 }
                 catch (OperationCanceledException)
                 {
                     throw;
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (!(ex is FileTransferServiceException))
                 {
-                    throw new FileTransferServiceException(ex);
+                    if (IsAzureTokenExpired())
+                    {
+                        await UpdateBearerToken();
+                        return await UploadTemporaryAttachmentV301(req, ct);
+                    }
+
+                    else
+                        throw new FileTransferServiceException(ex.Message);
                 }
                 finally
                 {
@@ -326,6 +367,76 @@ namespace Mark5.ServiceReference.FileTransferService
                 }
 
             throw new FileTransferServiceException($"Unsupported service version {currentServiceVersion}");
+
+            async Task<UploadTemporaryAttachmentResponse> UploadTemporaryAttachmentV300(UploadTemporaryAttachmentRequest req_, CancellationToken ct_)
+            {
+                using (var client = new HttpClient(httpClientHandler())
+                {
+                    Timeout = TimeSpan.FromSeconds(Config.HttpClientTimeoutSeconds)
+                })
+                {
+                    req.Stream.Position = 0;
+
+                    var uri = new Uri(endpointUrl).AppendPathSegments(Segments.Temporary, Segments.Attachment);
+                    var request = new HttpRequestMessage(HttpMethod.Post, uri);
+                    if (!string.IsNullOrEmpty(bearerToken))
+                        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+                    request.Headers.Add(Headers.Token, req_.Token);
+                    request.Headers.Add(Headers.Filename, req_.Filename);
+                    request.Headers.Add(Headers.Extension, req_.Extension);
+                    request.Content = new StreamContent(req_.Stream);
+                    var res = UseBearerToken()
+                       ? await client.SendAsync(request)
+                       : await client.SendAsync(request, ct_);
+
+                    Guid guid;
+                    using (var tr = new StreamReader(await res.Content.ReadAsStreamAsync()))
+                    using (var jr = new JsonTextReader(tr))
+                    {
+                        guid = JsonSerializer.Create().Deserialize<Guid>(jr);
+                    }
+
+                    return new UploadTemporaryAttachmentResponse
+                    {
+                        Guid = guid
+                    };
+                }
+            }
+
+            async Task<UploadTemporaryAttachmentResponse> UploadTemporaryAttachmentV301(UploadTemporaryAttachmentRequest req_, CancellationToken ct_)
+            {
+                using (var client = new HttpClient(httpClientHandler())
+                {
+                    Timeout = TimeSpan.FromSeconds(Config.HttpClientTimeoutSeconds)
+                })
+                {
+                    req.Stream.Position = 0;
+
+                    var uri = new Uri(endpointUrl).AppendPathSegments(Segments.Temporary, Segments.Attachment);
+                    var request = new HttpRequestMessage(HttpMethod.Post, uri);
+                    if (!string.IsNullOrEmpty(bearerToken))
+                        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+                    request.Headers.Add(Headers.Token, req_.Token);
+                    request.Headers.Add(Headers.Filename, req_.Filename.Base64Encode());
+                    request.Headers.Add(Headers.Extension, req_.Extension.Base64Encode());
+                    request.Content = new StreamContent(req_.Stream);
+                    var res = UseBearerToken()
+                     ? await client.SendAsync(request)
+                     : await client.SendAsync(request, ct_);
+
+                    Guid guid;
+                    using (var tr = new StreamReader(await res.Content.ReadAsStreamAsync()))
+                    using (var jr = new JsonTextReader(tr))
+                    {
+                        guid = JsonSerializer.Create().Deserialize<Guid>(jr);
+                    }
+
+                    return new UploadTemporaryAttachmentResponse
+                    {
+                        Guid = guid
+                    };
+                }
+            }
         }
     }
 

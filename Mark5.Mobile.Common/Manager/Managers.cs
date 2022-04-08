@@ -41,7 +41,9 @@ namespace Mark5.Mobile.Common.Manager
                                                                                   connectionInfo.Port,
                                                                                   CommonConfig.HttpClientHandler,
                                                                                   CommonConfig.OnStartTransmission,
-                                                                                  CommonConfig.OnStopTransmission);
+                                                                                  CommonConfig.OnStopTransmission,
+                                                                                  appToken,
+                                                                                  azureAppProxyInfo);
 
             var foldersDataAccess = new FoldersDataAccess(DatabaseConnectionProvider.DatabaseForModuleType);
             var documentsDataAccess = new DocumentsDataAccess(DatabaseConnectionProvider.DocumentsDatabase);

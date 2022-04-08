@@ -42,7 +42,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         protected override async void Adapter_ItemClicked(object sender, ContactPreview contactPreview)
         {
 
-            
         }
 
         protected override void Adapter_ItemLongClicked(object sender, ContactPreview contactPreview)
