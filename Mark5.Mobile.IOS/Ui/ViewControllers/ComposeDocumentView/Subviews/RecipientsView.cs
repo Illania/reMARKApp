@@ -30,7 +30,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         public bool SuggestionOverlayActive;
 
         protected bool CollapseExpandAnimationEnabled = true;
-        protected UILabel Label;
+        protected UILabelScalable Label;
         protected CustomUITextView TextView;
 
         bool expanded;
@@ -52,10 +52,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
 
         void Initialize(bool hideAddButton)
         {
-            Label = new UILabel
+            Label = new UILabelScalable
             {
                 Text = GetTitleFromAddressType(),
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TextColor = Theme.DarkGray,
                 Opaque = false,
                 TranslatesAutoresizingMaskIntoConstraints = false
@@ -71,7 +71,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             });
 
             var textStorage = new NSTextStorage();
-            textStorage.AddAttribute(UIStringAttributeKey.Font, Theme.DefaultFont, new NSRange(0, 0));
+            textStorage.AddAttribute(UIStringAttributeKey.Font, Theme.DefaultFont.CustomFont(), new NSRange(0, 0));
 
             var layoutManager = new NSLayoutManager();
             textStorage.AddLayoutManager(layoutManager);
@@ -79,11 +79,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             var textContainer = new NSTextContainer();
             layoutManager.AddTextContainer(textContainer);
 
-            UIButton addButton = null;
+            UIButtonScalable addButton = null;
 
             if (!hideAddButton)
             {
-                addButton = new UIButton();
+                addButton = new UIButtonScalable();
                 addButton.SetImage(UIImage.FromBundle("Add").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
                 addButton.BackgroundColor = Theme.Clear;
                 addButton.TranslatesAutoresizingMaskIntoConstraints = false;
@@ -106,7 +106,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 BackgroundColor = UIColor.Clear,
                 AutocapitalizationType = UITextAutocapitalizationType.None,
                 AutocorrectionType = UITextAutocorrectionType.No,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 Opaque = false,
                 TextContainerInset = UIEdgeInsets.Zero,
                 ClipsToBounds = false,
@@ -458,7 +458,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         {
             TextView.TextStorage.BeginEditing();
 
-            TextView.TextStorage.AddAttribute(UIStringAttributeKey.Font, Theme.DefaultFont, new NSRange(0, TextView.Text.Length));
+            TextView.TextStorage.AddAttribute(UIStringAttributeKey.Font, Theme.DefaultFont.CustomFont(), new NSRange(0, TextView.Text.Length));
             TextView.TextStorage.RemoveAttribute(UIStringAttributeKey.ForegroundColor, new NSRange(0, TextView.Text.Length));
 
             var emailMatches = Validator.ExtractValidEmails(TextView.Text);
@@ -767,7 +767,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         #endregion
     }
 
-    public class CustomUITextView : UITextView
+    public class CustomUITextView : UITextViewScalable
     {
         public event EventHandler WillDeleteBackward = delegate { };
         public event EventHandler<int> DeletedBackward = delegate { };

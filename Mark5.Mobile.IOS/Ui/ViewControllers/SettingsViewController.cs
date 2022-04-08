@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -93,7 +93,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             
             var text = footer.TextLabel.Text ?? string.Empty;
             footer.TextLabel.Text = null;
-            footer.TextLabel.AttributedText = new NSAttributedString(text, new UIStringAttributes { Font = Theme.DefaultFont.WithRelativeSize(-2f) });
+            footer.TextLabel.AttributedText = new NSAttributedString(text, new UIStringAttributes { Font = Theme.DefaultFont.CustomFont().WithRelativeSize(-2f) });
             
         }
 
@@ -107,7 +107,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var width = tableView.Frame.Width - tableView.LayoutMargins.Left - tableView.LayoutMargins.Right;
             var size = new NSString(footerText).GetBoundingRect(new CGSize(width, nfloat.MaxValue),
                                                                 NSStringDrawingOptions.UsesLineFragmentOrigin,
-                                                                new UIStringAttributes { Font = Theme.DefaultFont.WithRelativeSize(-2f) },
+                                                                new UIStringAttributes { Font = Theme.DefaultFont.CustomFont().WithRelativeSize(-2f) },
                                                                 null);
 
             return size.Height + 10f;
@@ -118,9 +118,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             var cell = base.GetCell(tableView, indexPath);
 
             if (cell.TextLabel != null)
-                cell.TextLabel.Font = Theme.DefaultFont;
+                cell.TextLabel.Font = Theme.DefaultFont.CustomFont();
             if (cell.DetailTextLabel != null)
-                cell.DetailTextLabel.Font = Theme.DefaultLightFont;
+                cell.DetailTextLabel.Font = Theme.DefaultLightFont.CustomFont();
 
             return cell;
         }
@@ -490,9 +490,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var cell = base.GetCell(tableView, indexPath);
 
                 if (cell.TextLabel != null)
-                    cell.TextLabel.Font = Theme.DefaultFont;
+                    cell.TextLabel.Font = Theme.DefaultFont.CustomFont();
                 if (cell.DetailTextLabel != null)
-                    cell.DetailTextLabel.Font = Theme.DefaultLightFont;
+                    cell.DetailTextLabel.Font = Theme.DefaultLightFont.CustomFont();
 
                 return cell;
             }

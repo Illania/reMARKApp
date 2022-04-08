@@ -23,6 +23,7 @@ using Microsoft.Extensions.Logging;
 using Sentry;
 using UIKit;
 using UserNotifications;
+using Xamarin.Essentials;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
@@ -49,16 +50,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         LOTAnimationView animationView;
 
-        UIButton settingsButton;
+        UIButtonScalable settingsButton;
 
-        UITextField usernameTextField;
-        UITextField hostnameTextField;
-        UITextField passwordTextField;
-        UITextField portTextField;
-        UILabel orLabel;
-        UIButton showPasswordButton;
-        UIButton loginButton;
-        UIButton loginWithMicrosoftButton;
+        UITextFieldScalable usernameTextField;
+        UITextFieldScalable hostnameTextField;
+        UITextFieldScalable passwordTextField;
+        UITextFieldScalable portTextField;
+        UILabelScalable orLabel;
+        UIButtonScalable showPasswordButton;
+        UIButtonScalable loginButton;
+        UIButtonScalable loginWithMicrosoftButton;
 
         NSLayoutConstraint containerCenter;
 
@@ -188,8 +189,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 animationView.HeightAnchor.ConstraintEqualTo(animationView.WidthAnchor),
             });
 
-            settingsButton = new UIButton();
-            settingsButton.TitleLabel.Font = Theme.DefaultBoldFont;
+            settingsButton = new UIButtonScalable();
+            settingsButton.TitleLabel.Font = Theme.DefaultBoldFont.CustomFont().CustomFont();
             settingsButton.SetTitle(Localization.GetString("settings"), UIControlState.Normal);
             settingsButton.SetTitleColor(Theme.DarkBlue, UIControlState.Normal);
             settingsButton.TranslatesAutoresizingMaskIntoConstraints = false;
@@ -222,10 +223,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 ForegroundColor = Theme.LightGray
             };
 
-            usernameTextField = new UITextField
+            usernameTextField = new UITextFieldScalable
             {
                 BorderStyle = UITextBorderStyle.RoundedRect,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TextColor = Theme.White,
                 TintColor = Theme.White,
                 AutocorrectionType = UITextAutocorrectionType.No,
@@ -246,10 +247,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 usernameTextField.HeightAnchor.ConstraintEqualTo(TextFieldHeight)
             });
 
-            passwordTextField = new UITextField
+            passwordTextField = new UITextFieldScalable
             {
                 BorderStyle = UITextBorderStyle.RoundedRect,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TextColor = Theme.White,
                 TintColor = Theme.White,
                 AutocapitalizationType = UITextAutocapitalizationType.None,
@@ -272,7 +273,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 passwordTextField.HeightAnchor.ConstraintEqualTo(TextFieldHeight)
             });
 
-            showPasswordButton = new UIButton()
+            showPasswordButton = new UIButtonScalable()
             {
                 Frame = new CGRect(0, 0, 30, 30),
             };
@@ -283,10 +284,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             passwordTextField.RightViewMode = UITextFieldViewMode.Always;
             passwordTextField.RightView = showPasswordButton;
 
-            hostnameTextField = new UITextField
+            hostnameTextField = new UITextFieldScalable
             {
                 BorderStyle = UITextBorderStyle.RoundedRect,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TextColor = Theme.White,
                 TintColor = Theme.White,
                 AutocapitalizationType = UITextAutocapitalizationType.None,
@@ -307,10 +308,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 hostnameTextField.HeightAnchor.ConstraintEqualTo(TextFieldHeight)
             });
 
-            portTextField = new UITextField
+            portTextField = new UITextFieldScalable
             {
                 BorderStyle = UITextBorderStyle.RoundedRect,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TextColor = Theme.White,
                 TintColor = Theme.White,
                 AutocapitalizationType = UITextAutocapitalizationType.None,
@@ -332,8 +333,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 portTextField.HeightAnchor.ConstraintEqualTo(TextFieldHeight)
             });
 
-            loginButton = new UIButton { Enabled = false, Alpha = 0 };
-            loginButton.TitleLabel.Font = Theme.DefaultBoldFont;
+            loginButton = new UIButtonScalable { Enabled = false, Alpha = 0 };
+            loginButton.TitleLabel.Font = Theme.DefaultBoldFont.CustomFont();
             loginButton.TranslatesAutoresizingMaskIntoConstraints = false;
             loginButton.SetTitle(Localization.GetString("login"), UIControlState.Normal);
             loginButton.SetTitleColor(Theme.DarkBlue, UIControlState.Normal);
@@ -347,10 +348,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 loginButton.HeightAnchor.ConstraintEqualTo(LoginButtonHeight),
             });
 
-            orLabel = new UILabel
+            orLabel = new UILabelScalable
             {
                 Text = "or",
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 TextColor = Theme.DarkBlue,
                 TextAlignment = UITextAlignment.Center,
@@ -364,7 +365,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 orLabel.WidthAnchor.ConstraintEqualTo(LoginButtonWidth),
             });
 
-            loginWithMicrosoftButton = new UIButton { Alpha = 0, Enabled = true };
+            loginWithMicrosoftButton = new UIButtonScalable { Alpha = 0, Enabled = true };
             loginWithMicrosoftButton.SetImage(UIImage.FromBundle("AzureLogin"), UIControlState.Normal);
             loginWithMicrosoftButton.TranslatesAutoresizingMaskIntoConstraints = false;
 

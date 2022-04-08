@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using CoreAnimation;
@@ -32,12 +32,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
         readonly DocumentAddressType addressType;
         readonly float buttonSize = 20f;
-        readonly UIFont addressesFont = Theme.DefaultFont;
+        readonly UIFont addressesFont = Theme.DefaultFont.CustomFont();
         readonly uint partiallyExpandedLines = 3;
 
-        UILabel titleLabel;
-        UITextView textView;
-        UIButton expandButton;
+        UILabelScalable titleLabel;
+        UITextViewScalable textView;
+        UIButtonScalable expandButton;
 
         State currentState;
         CADisplayLink displayLink;
@@ -50,10 +50,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         {
             this.addressType = addressType;
 
-            titleLabel = new UILabel
+            titleLabel = new UILabelScalable
             {
                 Text = GetTitle() + ":",
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TextColor = Theme.DarkGray,
                 Opaque = false,
                 TranslatesAutoresizingMaskIntoConstraints = false,
@@ -74,7 +74,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             var textContainer = new NSTextContainer();
             layoutManager.AddTextContainer(textContainer);
 
-            textView = new UITextView(CGRect.Empty, textContainer)
+            textView = new UITextViewScalable(CGRect.Empty, textContainer)
             {
                 BackgroundColor = Theme.Clear,
                 Editable = false,

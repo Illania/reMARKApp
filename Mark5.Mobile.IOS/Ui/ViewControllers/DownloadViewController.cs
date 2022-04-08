@@ -60,14 +60,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UIView progressView;
         UIView finishedView;
 
-        UIButton startButton;
-        UILabel lastDownloadedLabel;
+        UIButtonScalable startButton;
+        UILabelScalable lastDownloadedLabel;
         UIActivityIndicatorView progressPreparingIndicator;
         UIProgressView progressIndicator;
-        UILabel progressLabel;
-        UIButton cancelButton;
-        UILabel downloadedLabel;
-        UIButton closeButton;
+        UILabelScalable progressLabel;
+        UIButtonScalable cancelButton;
+        UILabelScalable downloadedLabel;
+        UIButtonScalable closeButton;
 
         Stopwatch sw;
         CancellationTokenSource cts;
@@ -233,7 +233,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 downView.BottomAnchor.ConstraintEqualTo(startView.BottomAnchor)
             });
 
-            startButton = new UIButton
+            startButton = new UIButtonScalable
             {
                 TintColor = Theme.LightGray,
                 BackgroundColor = Theme.DarkBlue,
@@ -241,7 +241,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 ClipsToBounds = true
             };
-            startButton.TitleLabel.Font = Theme.DefaultLightFont;
+            startButton.TitleLabel.Font = Theme.DefaultLightFont.CustomFont();
             startButton.Layer.CornerRadius = 7.5f;
 
             switch (Folder.Module)
@@ -264,10 +264,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 startButton.CenterYAnchor.ConstraintEqualTo(downView.CenterYAnchor)
             });
 
-            lastDownloadedLabel = new UILabel
+            lastDownloadedLabel = new UILabelScalable
             {
                 TintColor = Theme.LightGray,
-                Font = Theme.DefaultLightFont.WithRelativeSize(-2f),
+                Font = Theme.DefaultLightFont.CustomFont().WithRelativeSize(-2f),
                 TextAlignment = UITextAlignment.Center,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
@@ -337,10 +337,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 warningImage.CenterYAnchor.ConstraintEqualTo(infoView.CenterYAnchor, -40f)
             });
 
-            var warningInfoLabel = new UILabel
+            var warningInfoLabel = new UILabelScalable
             {
                 TextColor = Theme.LightGray,
-                Font = Theme.DefaultLightFont.WithRelativeSize(-2f),
+                Font = Theme.DefaultLightFont.CustomFont().WithRelativeSize(-2f),
                 TextAlignment = UITextAlignment.Center,
                 Text = Localization.GetString("dont_close_app"),
                 Lines = 6,
@@ -395,10 +395,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 progressIndicator.CenterYAnchor.ConstraintEqualTo(progressPreparingIndicator.CenterYAnchor)
             });
 
-            progressLabel = new UILabel
+            progressLabel = new UILabelScalable
             {
                 TintColor = Theme.DarkBlue,
-                Font = Theme.DefaultLightFont.WithRelativeSize(-2f),
+                Font = Theme.DefaultLightFont.CustomFont().WithRelativeSize(-2f),
                 TextAlignment = UITextAlignment.Center,
                 TranslatesAutoresizingMaskIntoConstraints = false,
             };
@@ -410,7 +410,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 progressLabel.CenterXAnchor.ConstraintEqualTo(downView.CenterXAnchor)
             });
 
-            cancelButton = new UIButton
+            cancelButton = new UIButtonScalable
             {
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
@@ -478,7 +478,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 downView.BottomAnchor.ConstraintEqualTo(finishedView.BottomAnchor)
             });
 
-            closeButton = new UIButton
+            closeButton = new UIButtonScalable
             {
                 TintColor = Theme.LightGray,
                 BackgroundColor = Theme.DarkBlue,
@@ -486,7 +486,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 ClipsToBounds = true
             };
-            closeButton.TitleLabel.Font = Theme.DefaultLightFont;
+            closeButton.TitleLabel.Font = Theme.DefaultLightFont.CustomFont();
             closeButton.Layer.CornerRadius = 7.5f;
             closeButton.SetTitle(Localization.GetString("continue"), UIControlState.Normal);
             downView.AddSubview(closeButton);
@@ -496,11 +496,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 closeButton.CenterYAnchor.ConstraintEqualTo(downView.CenterYAnchor)
             });
 
-            downloadedLabel = new UILabel
+            downloadedLabel = new UILabelScalable
             {
                 TintColor = Theme.LightGray,
                 Lines = 2,
-                Font = Theme.DefaultLightFont.WithRelativeSize(-2f),
+                Font = Theme.DefaultLightFont.CustomFont().WithRelativeSize(-2f),
                 TextAlignment = UITextAlignment.Center,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
@@ -717,13 +717,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void CancelButton_TouchUpInside(object sender, EventArgs e)
         {
-            ((UIButton)sender).Enabled = false;
+            ((UIButtonScalable)sender).Enabled = false;
 
             var result = await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("warning"), Localization.GetString("download_interrupt_warning"));
             if (result)
                 cts?.Cancel();
             else
-                ((UIButton)sender).Enabled = true;
+                ((UIButtonScalable)sender).Enabled = true;
         }
 
         void CloseButton_TouchUpInside(object sender, EventArgs e) => DismissViewController(true, null);

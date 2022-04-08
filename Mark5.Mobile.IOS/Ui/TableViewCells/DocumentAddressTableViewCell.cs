@@ -12,9 +12,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         public static readonly NSString DefaultId = new NSString(nameof(DocumentAddressTableViewCell));
         public static readonly NSString CompactId = new NSString(nameof(DocumentAddressTableViewCell) + "_Compact");
 
-        readonly UILabel typeLabel;
-        readonly UILabel topLabel;
-        readonly UILabel bottomLabel;
+        readonly UILabelScalable typeLabel;
+        readonly UILabelScalable topLabel;
+        readonly UILabelScalable bottomLabel;
         readonly UIImageView iconImage;
 
         public string Content => topLabel?.Text;
@@ -25,9 +25,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             SelectionStyle = UITableViewCellSelectionStyle.Default;
             Accessory = UITableViewCellAccessory.None;
 
-            typeLabel = new UILabel
+            typeLabel = new UILabelScalable
             {
-                Font = Theme.DefaultFont.WithSize(11f),
+                Font = Theme.DefaultFont.CustomFont().WithSize(11f),
                 TextColor = Theme.White,
                 TextAlignment = UITextAlignment.Center,
                 TranslatesAutoresizingMaskIntoConstraints = false
@@ -35,9 +35,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             typeLabel.Layer.BackgroundColor = Theme.DarkGray.CGColor;
             typeLabel.Layer.CornerRadius = 3f;
 
-            topLabel = new UILabel
+            topLabel = new UILabelScalable
             {
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 Lines = 1,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
@@ -54,9 +54,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
             if (ReuseIdentifier == DefaultId)
             {
-                bottomLabel = new UILabel
+                bottomLabel = new UILabelScalable
                 {
-                    Font = Theme.DefaultFont.WithRelativeSize(-2f),
+                    Font = Theme.DefaultFont.CustomFont().WithRelativeSize(-2f),
                     TextColor = Theme.DarkGray,
                     Lines = 1,
                     TranslatesAutoresizingMaskIntoConstraints = false

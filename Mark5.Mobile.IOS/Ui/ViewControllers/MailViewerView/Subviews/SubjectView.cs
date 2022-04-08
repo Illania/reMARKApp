@@ -6,15 +6,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
 {
     public class SubjectView : MailViewerSubview
     {
-        UILabel subjectLabel;
+        UILabelScalable subjectLabel;
 
         public SubjectView()
         {
-            subjectLabel = new UILabel
+            subjectLabel = new UILabelScalable
             {
                 BackgroundColor = Theme.Clear,
                 TextColor = Theme.DarkerBlue,
-                Font = Theme.DefaultLightBoldFont.WithRelativeSize(4f),
+                Font = Theme.DefaultFont.CustomFont().WithRelativeSize(4f),
                 Opaque = false,
                 ClipsToBounds = false,
                 TranslatesAutoresizingMaskIntoConstraints = false

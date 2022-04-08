@@ -124,7 +124,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             }
         }
 
-        UILabel badge;
+        UILabelScalable badge;
         string badgeValue;
         UIColor badgeBackgroundColor;
         UIColor badgeTextColor;
@@ -136,7 +136,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         bool shouldHideBadgeAtZero;
         bool shouldAnimateBadge;
 
-        public BadgeBarButtonItem(UIButton customButton)
+        public BadgeBarButtonItem(UIButtonScalable customButton)
         {
             CustomView = customButton;
             if (CustomView != null)
@@ -167,7 +167,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             }
             else if (badge == null)
             {
-                badge = new UILabel(new CGRect(BadgeOriginX, BadgeOriginY, 20, 20))
+                badge = new UILabelScalable(new CGRect(BadgeOriginX, BadgeOriginY, 20, 20))
                 {
                     TextColor = BadgeTextColor,
                     BackgroundColor = BadgeBackgroundColor,
@@ -251,9 +251,9 @@ namespace Mark5.Mobile.IOS.Ui.Common
                     });
         }
 
-        static UILabel DuplicateLabel(UILabel labelToCopy)
+        static UILabelScalable DuplicateLabel(UILabelScalable labelToCopy)
         {
-            var duplicateLabel = new UILabel(labelToCopy.Frame)
+            var duplicateLabel = new UILabelScalable(labelToCopy.Frame)
             {
                 Text = labelToCopy.Text,
                 Font = labelToCopy.Font

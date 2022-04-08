@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using Foundation;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
@@ -13,7 +13,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         public static readonly NSString DefaultId = new NSString(nameof(ContactsTableViewCell));
 
         readonly UIStackView categoriesStackView;
-        readonly UILabel label;
+        readonly UILabelScalable label;
 
         public ContactsTableViewCell()
             : base(UITableViewCellStyle.Default, DefaultId)
@@ -37,9 +37,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
 
-            label = new UILabel
+            label = new UILabelScalable
             {
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 Lines = 1,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };

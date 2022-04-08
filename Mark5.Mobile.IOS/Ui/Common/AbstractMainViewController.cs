@@ -32,12 +32,12 @@ namespace Mark5.Mobile.IOS.Ui.Common
         protected NavigationController SettingsNavigationController;
 
         UIView navigationButtonContainer;
-        UIButton moduleNavigationButton;
+        UIButtonScalable moduleNavigationButton;
 
         UIView searchButtonContainer;
         UIView createButtonContainer;
-        UIButton searchButton;
-        UIButton createButton;
+        UIButtonScalable searchButton;
+        UIButtonScalable createButton;
 
         TinyMessageSubscriptionToken reMarkNav;
 
@@ -90,7 +90,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 navigationButtonContainer.BottomAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.BottomAnchor : BottomLayoutGuide.GetTopAnchor(), 2),
             });
 
-            moduleNavigationButton = new UIButton
+            moduleNavigationButton = new UIButtonScalable
             {
                 TintColor = Theme.White,
                 BackgroundColor = Theme.DarkBlue,
@@ -126,7 +126,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 searchButtonContainer.BottomAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.BottomAnchor : BottomLayoutGuide.GetTopAnchor(), 2),
             });
 
-            searchButton = new UIButton
+            searchButton = new UIButtonScalable
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 ClipsToBounds = true,
@@ -157,7 +157,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 createButtonContainer.BottomAnchor.ConstraintEqualTo(Integration.IsRunningAtLeast(11) ? View.SafeAreaLayoutGuide.BottomAnchor : BottomLayoutGuide.GetTopAnchor(), 2),
             });
 
-            createButton = new UIButton
+            createButton = new UIButtonScalable
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 ClipsToBounds = true,

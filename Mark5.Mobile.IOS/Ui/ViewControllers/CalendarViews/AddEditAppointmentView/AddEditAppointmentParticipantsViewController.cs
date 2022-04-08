@@ -23,8 +23,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 
         UIBarButtonItem addParticipantsItem;
 
-        UITextField field;
-        UIButton addButton;
+        UITextFieldScalable field;
+        UIButtonScalable addButton;
 
         AddEditAppointmentViewModel viewModel;
         SuggestionsListView suggestionsListView;
@@ -139,16 +139,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         {
             var headerView = new UIView { TranslatesAutoresizingMaskIntoConstraints = false };
 
-            field = new UITextField
+            field = new UITextFieldScalable
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 BorderStyle = UITextBorderStyle.RoundedRect
             };
 
             field.EditingChanged += Field_EditingChanged;
 
-            addButton = new UIButton(UIButtonType.System)
+            addButton = new UIButtonScalable(UIButtonType.System)
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
             };

@@ -6,19 +6,19 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
     public class AppointmentDisclosureTableViewCell : AddEditTableViewCell
     {
         public static readonly string Key = "AppointmentDisclosureTableViewCell";
-        protected UIButton ChevronButton;
-        protected UILabel Title;
-        protected UILabel Label;
-        protected UITextView HiddenTextView;
+        protected UIButtonScalable ChevronButton;
+        protected UILabelScalable Title;
+        protected UILabelScalable Label;
+        protected UITextViewScalable HiddenTextView;
 
         public AppointmentDisclosureTableViewCell() : base(UITableViewCellStyle.Default, Key)
         {
             SelectionStyle = UITableViewCellSelectionStyle.Default;
 
-            Title = new UILabel
+            Title = new UILabelScalable
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TextColor = Theme.Black,
             };
 
@@ -28,11 +28,11 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
 
             ContentView.AddSubview(Title);
 
-            Label = new UILabel
+            Label = new UILabelScalable
             {
                 ClipsToBounds = true,
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TextColor = Theme.DarkGray,
                 UserInteractionEnabled = false,
                 TextAlignment = UITextAlignment.Natural,
@@ -51,7 +51,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
             ChevronButton.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
             ContentView.AddSubview(ChevronButton);
 
-            HiddenTextView = new UITextView { TranslatesAutoresizingMaskIntoConstraints = false };
+            HiddenTextView = new UITextViewScalable { TranslatesAutoresizingMaskIntoConstraints = false };
             HiddenTextView.Hidden = true;
             ContentView.Add(HiddenTextView);
 

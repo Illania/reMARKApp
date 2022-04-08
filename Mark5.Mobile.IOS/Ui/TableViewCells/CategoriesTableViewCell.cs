@@ -13,7 +13,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         public int CategoryId { get; private set; }
 
         readonly UIView colorView;
-        readonly UILabel label;
+        readonly UILabelScalable label;
 
         public CategoriesTableViewCell()
             : base(UITableViewCellStyle.Default, DefaultId)
@@ -29,9 +29,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             colorView.Layer.BorderWidth = .7f;
             colorView.Layer.CornerRadius = 10f;
 
-            label = new UILabel
+            label = new UILabelScalable
             {
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 Lines = 1,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };

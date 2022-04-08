@@ -36,12 +36,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
 
         readonly Type addressType;
         readonly float buttonSize = 20f;
-        readonly UIFont addressesFont = Theme.DefaultFont;
+        readonly UIFont addressesFont = Theme.DefaultFont.CustomFont();
         readonly uint partiallyExpandedLines = 3;
 
-        UILabel titleLabel;
-        UITextView textView;
-        UIButton expandButton;
+        UILabelScalable titleLabel;
+        UITextViewScalable textView;
+        UIButtonScalable expandButton;
 
 
         State currentState;
@@ -53,10 +53,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
         {
             this.addressType = addressType;
 
-            titleLabel = new UILabel
+            titleLabel = new UILabelScalable
             {
                 Text = GetTitle() + ":",
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TextColor = Theme.DarkGray,
                 Opaque = false,
                 TranslatesAutoresizingMaskIntoConstraints = false,
@@ -77,7 +77,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
             var textContainer = new NSTextContainer();
             layoutManager.AddTextContainer(textContainer);
 
-            textView = new UITextView(CGRect.Empty, textContainer)
+            textView = new UITextViewScalable(CGRect.Empty, textContainer)
             {
                 BackgroundColor = Theme.Clear,
                 Editable = false,
@@ -234,7 +234,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
             {
                 textView.TextStorage.BeginEditing();
                 textView.TextStorage.SetString(GetValue().ToNSAttributedString());
-                textView.TextStorage.AddAttribute(UIStringAttributeKey.Font, Theme.DefaultFont, new NSRange(0, textView.Text.Length));
+                textView.TextStorage.AddAttribute(UIStringAttributeKey.Font, Theme.DefaultFont.CustomFont(), new NSRange(0, textView.Text.Length));
                 textView.TextStorage.EndEditing();
             }
         }

@@ -24,10 +24,10 @@ namespace Mark5.Mobile.IOS.Ui.Common
         nint searcBtnTag = 6;
         nint titleTag = 7;
 
-        UIButton closeButton;
+        UIButtonScalable closeButton;
         UIView closeButtonContainer;
         UIView seperatorView;
-        UILabel titleLabel;
+        UILabelScalable titleLabel;
 
         ReMarkNavigationButton searchBtn;
         ReMarkNavigationButton contactsBtn;
@@ -44,7 +44,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             this.currentModule = currentModule;
 
-            closeButton = new UIButton
+            closeButton = new UIButtonScalable
             {
                 TintColor = Theme.White,
                 BackgroundColor = Theme.DarkBlue,
@@ -76,9 +76,9 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             seperatorView.Layer.CornerRadius = 1.5f;
 
-            titleLabel = new UILabel
+            titleLabel = new UILabelScalable
             {
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TextColor = Theme.DarkerBlue,
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Text = "Choose",
@@ -245,7 +245,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 }
             }
 
-            readonly UIButton Button = new UIButton
+            readonly UIButtonScalable Button = new UIButtonScalable
             {
                 TintColor = Theme.White,
                 BackgroundColor = Theme.White,
@@ -254,12 +254,12 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 ImageEdgeInsets = new UIEdgeInsets(15f, 15f, 15f, 15f)
             };
 
-            readonly UILabel Title = new UILabel
+            readonly UILabelScalable Title = new UILabelScalable
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 TextColor = Theme.DarkBlue,
                 TextAlignment = UITextAlignment.Center,
-                Font = Theme.DefaultLightFont,
+                Font = Theme.DefaultLightFont.CustomFont(),
                 MinimumScaleFactor = 0.6f
             };
 

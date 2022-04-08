@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -58,7 +58,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         UIBarButtonItem flagButton;
         UIBarButtonItem fileToButton;
-        UIButton commentsButton;
+        UIButtonScalable commentsButton;
         BadgeBarButtonItem commentsBadgeButton;
         UIBarButtonItem replyActionsButton;
         UIBarButtonItem userActionsButton;
@@ -218,7 +218,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitToolbar()
         {
-            commentsButton = new UIButton
+            commentsButton = new UIButtonScalable
             {
                 Frame = new CoreGraphics.CGRect(0f, 0f, 25f, 25f),
                 Enabled = false,

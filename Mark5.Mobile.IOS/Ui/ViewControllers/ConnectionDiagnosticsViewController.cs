@@ -10,8 +10,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
     public class ConnectionDiagnosticsViewController : AbstractViewController
     {
-        private UILabel deviceStatusDescription;
-        private UILabel serviceStatusDescription;
+        private UILabelScalable deviceStatusDescription;
+        private UILabelScalable serviceStatusDescription;
 
         public override void LoadView()
         {
@@ -39,9 +39,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             View.AddSubview(scrollView);
 
-            UILabel deviceStatusTitle = new UILabel
+            UILabelScalable deviceStatusTitle = new UILabelScalable
             {
-                Font = Theme.DefaultLightBoldFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TextColor = Theme.DarkerBlue,
                 LineBreakMode = UILineBreakMode.WordWrap,
                 Lines = 0,
@@ -60,9 +60,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             scrollView.AddSubview(deviceStatusTitle);
 
-            deviceStatusDescription = new UILabel
+            deviceStatusDescription = new UILabelScalable
             {
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TextColor = Theme.DarkBlue,
                 LineBreakMode = UILineBreakMode.WordWrap,
                 Lines = 0,
@@ -81,9 +81,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             scrollView.AddSubview(deviceStatusDescription);
 
-            UILabel serviceStatusTitle = new UILabel()
+            UILabelScalable serviceStatusTitle = new UILabelScalable()
             {
-                Font = Theme.DefaultLightBoldFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TextColor = Theme.DarkerBlue,
                 LineBreakMode = UILineBreakMode.WordWrap,
                 Lines = 0,
@@ -102,9 +102,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             scrollView.AddSubview(serviceStatusTitle);
 
-            serviceStatusDescription = new UILabel()
+            serviceStatusDescription = new UILabelScalable()
             {
-                Font = Theme.DefaultLightFont,
+                Font = Theme.DefaultLightFont.CustomFont(),
                 TextColor = Theme.DarkBlue,
                 LineBreakMode = UILineBreakMode.WordWrap,
                 Lines = 0,
@@ -122,7 +122,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             scrollView.AddSubview(serviceStatusDescription);
 
-            UIButton refreshButton = new UIButton
+            UIButtonScalable refreshButton = new UIButtonScalable
             {
                 TintColor = Theme.DarkerBlue,
                 BackgroundColor = UIColor.GroupTableViewBackgroundColor,
@@ -134,7 +134,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             refreshButton.SetTitle(Localization.GetString("diagnostics_refresh").ToUpper(), UIControlState.Normal);
             refreshButton.SetTitleColor(Theme.DarkBlue, UIControlState.Normal);
             refreshButton.SetTitleColor(Theme.DarkGray, UIControlState.Highlighted);
-            refreshButton.TitleLabel.Font = Theme.DefaultFont;
+            refreshButton.TitleLabel.Font = Theme.DefaultFont.CustomFont();
             refreshButton.Layer.CornerRadius = 4f;
             refreshButton.TouchUpInside += RefreshButton_TouchUpInside;
             refreshButton.Layer.BorderWidth = 1f;

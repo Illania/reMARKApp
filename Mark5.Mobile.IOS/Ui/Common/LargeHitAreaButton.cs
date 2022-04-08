@@ -3,7 +3,7 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.Common
 {
-    public class LargeHitAreaButton : UIButton
+    public class LargeHitAreaButton : UIButtonScalable
     {
         public int HitAreaMargin { get; set; } = 5;
 

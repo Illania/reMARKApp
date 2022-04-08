@@ -8,7 +8,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 {
     public class DateView : DocumentSubView
     {
-        UILabel dateLabel;
+        UILabelScalable dateLabel;
         UIImageView priorityIndicatorImageView;
         private NSLayoutConstraint priorityImageWidthConstraint;
         private NSLayoutConstraint dateLabelLeftPaddingConstraint;
@@ -22,10 +22,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         {
             priorityIndicatorImageView = new UIImageView
             {
-                ContentMode = UIViewContentMode.ScaleToFill,
-                Image = UIImage.FromBundle("Priority-Low").ImageWithRenderingMode(UIImageRenderingMode.AlwaysOriginal),
-                TranslatesAutoresizingMaskIntoConstraints = false
+                ContentMode = UIViewContentMode.ScaleAspectFill,
+                Image = UIImage.FromBundle("Priority-Low").ImageWithRenderingMode(UIImageRenderingMode.AlwaysOriginal).CreateResizableImage(
+                  new UIEdgeInsets(ContainerView.Bounds.Top,ContainerView.Bounds.Left, ContainerView.Bounds.Bottom, ContainerView.Bounds.Top-ContainerView.Bounds.Bottom), UIImageResizingMode.Stretch),
+                TranslatesAutoresizingMaskIntoConstraints = false,
             };
+           
 
             ContainerView.Add(priorityIndicatorImageView);
             priorityImageWidthConstraint = priorityIndicatorImageView.WidthAnchor.ConstraintEqualTo(16f);
@@ -34,16 +36,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                     priorityIndicatorImageView.TopAnchor.ConstraintEqualTo(ContainerView.TopAnchor, VerticalMargin),
                     priorityIndicatorImageView.LeftAnchor.ConstraintEqualTo(ContainerView.LeftAnchor, HorizontalMargin),
                     priorityIndicatorImageView.BottomAnchor.ConstraintEqualTo(ContainerView.BottomAnchor, -VerticalMargin),
-                    priorityImageWidthConstraint,
-                    priorityIndicatorImageView.HeightAnchor.ConstraintEqualTo(16f),
-                });
+                    priorityImageWidthConstraint
+                    //priorityIndicatorImageView.HeightAnchor.ConstraintEqualTo(16f),
+            });
 
-            dateLabel = new UILabel
+            dateLabel = new UILabelScalable
             {
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TextColor = Theme.DarkGray,
                 Opaque = false,
-                TranslatesAutoresizingMaskIntoConstraints = false
+                TranslatesAutoresizingMaskIntoConstraints = false,
             };
             dateLabel.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
             dateLabel.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
@@ -79,9 +81,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                 return;
 
             if (DocumentPreview.Priority == Priority.Urgent)
-                priorityIndicatorImageView.Image = UIImage.FromBundle("Priority-High").ImageWithRenderingMode(UIImageRenderingMode.AlwaysOriginal);
+                priorityIndicatorImageView.Image = UIImage.FromBundle("Priority-High").ImageWithRenderingMode(UIImageRenderingMode.AlwaysOriginal).CreateResizableImage(
+                     new UIEdgeInsets(ContainerView.Bounds.Top, ContainerView.Bounds.Left, ContainerView.Bounds.Bottom, ContainerView.Bounds.Top - ContainerView.Bounds.Bottom),
+                     UIImageResizingMode.Stretch);
+
+
             else
-                priorityIndicatorImageView.Image = UIImage.FromBundle("Priority-Low").ImageWithRenderingMode(UIImageRenderingMode.AlwaysOriginal);
+                priorityIndicatorImageView.Image = UIImage.FromBundle("Priority-Low").ImageWithRenderingMode(UIImageRenderingMode.AlwaysOriginal).CreateResizableImage(
+                     new UIEdgeInsets(ContainerView.Bounds.Top, ContainerView.Bounds.Left, ContainerView.Bounds.Bottom, ContainerView.Bounds.Top - ContainerView.Bounds.Bottom),
+                     UIImageResizingMode.Stretch);
 
             if (!(DocumentPreview.Priority == Priority.Low || DocumentPreview.Priority == Priority.Urgent))
             {

@@ -50,7 +50,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         SeparatorSubView firstSeparator;
         SeparatorSubView secondSeparator;
 
-        UIButton showMoreButton;
+        UIButtonScalable showMoreButton;
 
         UIView subHeaderView;
         UIView bottomView;
@@ -218,9 +218,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             }
         }
 
-        UIButton CreateShowMoreButton()
+        UIButtonScalable CreateShowMoreButton()
         {
-            var button = new UIButton
+            var button = new UIButtonScalable
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
             };
@@ -232,8 +232,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             button.SetTitleColor(Theme.DarkBlue, UIControlState.Normal);
             button.ContentEdgeInsets = new UIEdgeInsets(0.1f, 0.1f, 0.1f, 2.0f);
             button.BackgroundColor = Theme.Clear;
-            button.TitleLabel.Font = Theme.DefaultBoldFont;
-
+            button.TitleLabel.Font = Theme.DefaultBoldFont.CustomFont();
             return button;
         }
 

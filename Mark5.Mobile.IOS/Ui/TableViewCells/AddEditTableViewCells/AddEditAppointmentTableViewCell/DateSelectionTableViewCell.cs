@@ -18,8 +18,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
         UIDatePickerStyled datePicker;
 
         public Action<DateTimeChangeEvent> DateChanged = delegate { };
-        public UITextField DateTextField;
-        public UILabel Label;
+        public UITextFieldScalable DateTextField;
+        public UILabelScalable Label;
 
         public DateSelectioTableViewCell(Action<DateTimeChangeEvent> dateChanged, DateRowType rowType) : base(UITableViewCellStyle.Default, Key)
         {
@@ -27,10 +27,10 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
             SelectionStyle = UITableViewCellSelectionStyle.Default;
             DateChanged += dateChanged;
 
-            Label = new UILabel
+            Label = new UILabelScalable
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                Font = Theme.DefaultFont
+                Font = Theme.DefaultFont.CustomFont()
             };
             ContentView.Add(Label);
 
@@ -55,9 +55,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
                 }
             };
 
-            DateTextField = new UITextField
+            DateTextField = new UITextFieldScalable
             {
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TintColor = Theme.Clear,
                 TextAlignment = UITextAlignment.Right,
                 InputView = datePicker,
@@ -86,7 +86,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
         public void SetDateOnly(DateTime dateTime)
         {
             UIStringAttributes attributes = new UIStringAttributes(new NSDictionary(
-                UIStringAttributeKey.Font, Theme.DefaultFont,
+                UIStringAttributeKey.Font, Theme.DefaultFont.CustomFont(),
                 UIStringAttributeKey.StrikethroughStyle, NSUnderlineStyle.None
             ));
 
@@ -103,7 +103,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
         public void SetDateAndTime(DateTime dateTime)
         {
             UIStringAttributes attributes = new UIStringAttributes(new NSDictionary(
-                UIStringAttributeKey.Font, Theme.DefaultFont,
+                UIStringAttributeKey.Font, Theme.DefaultFont.CustomFont(),
                 UIStringAttributeKey.StrikethroughStyle, NSUnderlineStyle.None
             ));
 

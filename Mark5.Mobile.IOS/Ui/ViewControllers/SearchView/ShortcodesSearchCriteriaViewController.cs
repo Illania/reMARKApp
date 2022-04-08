@@ -110,8 +110,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
         class NameSearchView : AbstractShortcodesSearchView
         {
             readonly UIView view;
-            readonly UILabel label;
-            readonly UITextField text;
+            readonly UILabelScalable label;
+            readonly UITextFieldScalable text;
 
             public NameSearchView()
             {
@@ -124,7 +124,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 view.Layer.MasksToBounds = true;
                 view.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
 
-                label = new UILabel
+                label = new UILabelScalable
                 {
                     Text = Localization.GetString("search_name"),
                     TextColor = LabelTextColor,
@@ -137,7 +137,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     AdjustsFontSizeToFitWidth = true
                 };
 
-                text = new UITextField
+                text = new UITextFieldScalable
                 {
                     AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"), new UIStringAttributes
                     {
@@ -185,20 +185,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             }
 
             [Export("textFieldDidChange:")]
-            void TextFieldDidChange(UITextField textField)
+            void TextFieldDidChange(UITextFieldScalable textField)
             {
                 Criteria.Name = textField.Text;
             }
 
             [Export("textFieldShouldReturn:")]
-            bool TextFieldShouldReturn(UITextField textField)
+            bool TextFieldShouldReturn(UITextFieldScalable textField)
             {
                 textField.ResignFirstResponder();
                 return true;
             }
 
             [Export("textFieldDidEndEditing:")]
-            void TextFieldDidEndEditing(UITextField textField)
+            void TextFieldDidEndEditing(UITextFieldScalable textField)
             {
                 text.ResignFirstResponder();
                 text.UserInteractionEnabled = false;
@@ -208,8 +208,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
         class DescritpionSearchView : AbstractShortcodesSearchView
         {
             readonly UIView view;
-            readonly UILabel label;
-            readonly UITextField text;
+            readonly UILabelScalable label;
+            readonly UITextFieldScalable text;
 
             public DescritpionSearchView()
             {
@@ -222,7 +222,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 view.Layer.MasksToBounds = true;
                 view.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
 
-                label = new UILabel
+                label = new UILabelScalable
                 {
                     Text = Localization.GetString("search_search_description"),
                     TextColor = LabelTextColor,
@@ -235,7 +235,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     AdjustsFontSizeToFitWidth = true
                 };
 
-                text = new UITextField
+                text = new UITextFieldScalable
                 {
                     AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"), new UIStringAttributes
                     {
@@ -283,21 +283,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             }
 
             [Export("textFieldDidChange:")]
-            void TextFieldDidChange(UITextField textField)
+            void TextFieldDidChange(UITextFieldScalable textField)
             {
                 Criteria.Description = textField.Text;
             }
 
 
             [Export("textFieldShouldReturn:")]
-            bool TextFieldShouldReturn(UITextField textField)
+            bool TextFieldShouldReturn(UITextFieldScalable textField)
             {
                 textField.ResignFirstResponder();
                 return true;
             }
 
             [Export("textFieldDidEndEditing:")]
-            void TextFieldDidEndEditing(UITextField textField)
+            void TextFieldDidEndEditing(UITextFieldScalable textField)
             {
                 text.ResignFirstResponder();
                 text.UserInteractionEnabled = false;
@@ -307,8 +307,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
         class AddressSearchView : AbstractShortcodesSearchView
         {
             readonly UIView view;
-            readonly UILabel label;
-            readonly UITextField text;
+            readonly UILabelScalable label;
+            readonly UITextFieldScalable text;
 
             public AddressSearchView()
             {
@@ -321,7 +321,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 view.Layer.MasksToBounds = true;
                 view.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
 
-                label = new UILabel
+                label = new UILabelScalable
                 {
                     Text = Localization.GetString("search_emails"),
                     TextColor = LabelTextColor,
@@ -334,7 +334,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     AdjustsFontSizeToFitWidth = true
                 };
 
-                text = new UITextField
+                text = new UITextFieldScalable
                 {
                     AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"), new UIStringAttributes
                     {
@@ -382,21 +382,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             }
 
             [Export("textFieldDidChange:")]
-            void TextFieldDidChange(UITextField textField)
+            void TextFieldDidChange(UITextFieldScalable textField)
             {
                 Criteria.Address = textField.Text;
             }
 
 
             [Export("textFieldShouldReturn:")]
-            bool TextFieldShouldReturn(UITextField textField)
+            bool TextFieldShouldReturn(UITextFieldScalable textField)
             {
                 textField.ResignFirstResponder();
                 return true;
             }
 
             [Export("textFieldDidEndEditing:")]
-            void TextFieldDidEndEditing(UITextField textField)
+            void TextFieldDidEndEditing(UITextFieldScalable textField)
             {
                 text.ResignFirstResponder();
                 text.UserInteractionEnabled = false;

@@ -17,7 +17,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         List<AttachmentDescription> attachmentDescriptionsInView = new List<AttachmentDescription>();
         List<FileDescription> fileDescriptionsInView = new List<FileDescription>();
 
-        UILabel titleLabel;
+        UILabelScalable titleLabel;
         UIStackView stackView;
 
         public event EventHandler<TappedEventArgs> Tapped = delegate { };
@@ -32,10 +32,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
         {
             ContainerView.BackgroundColor = Theme.White;
 
-            titleLabel = new UILabel
+            titleLabel = new UILabelScalable
             {
                 Text = Localization.GetString("attachments") + ":",
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TextColor = Theme.DarkGray,
                 Opaque = false,
                 TranslatesAutoresizingMaskIntoConstraints = false
@@ -218,8 +218,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             readonly Action<AttachmentDescription> attachmentClickedAction;
             readonly Action<AttachmentDescription> deleteAttachmentClickedAction;
 
-            UIButton filenameButton;
-            UIButton deleteButton;
+            UIButtonScalable filenameButton;
+            UIButtonScalable deleteButton;
 
             public AttachmentsSubView(AttachmentDescription attachmentDescription, Action<AttachmentDescription> attachmentClickedAction, Action<AttachmentDescription> deleteAttachmentClickedAction)
             {
@@ -238,16 +238,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 Distribution = UIStackViewDistribution.Fill;
                 Axis = UILayoutConstraintAxis.Horizontal;
 
-                filenameButton = new UIButton(UIButtonType.System);
+                filenameButton = new UIButtonScalable(UIButtonType.System);
                 filenameButton.TranslatesAutoresizingMaskIntoConstraints = false;
-                filenameButton.TitleLabel.Font = Theme.DefaultFont;
+                filenameButton.TitleLabel.Font = Theme.DefaultFont.CustomFont();
                 filenameButton.SetTitle(AttachmentDescription.Name + " (" + UI.PrettyFileSize(AttachmentDescription.SizeInBytes) + ")", UIControlState.Normal);
                 filenameButton.HorizontalAlignment = UIControlContentHorizontalAlignment.Left;
                 filenameButton.Opaque = false;
                 filenameButton.TouchUpInside += (sender, e) => attachmentClickedAction(AttachmentDescription);
                 AddArrangedSubview(filenameButton);
 
-                deleteButton = new UIButton();
+                deleteButton = new UIButtonScalable();
                 deleteButton.SetImage(UIImage.FromBundle("Remove").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
                 deleteButton.BackgroundColor = Theme.Clear;
                 deleteButton.TranslatesAutoresizingMaskIntoConstraints = false;
@@ -266,8 +266,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             readonly Action<FileDescription> fileDescriptionClickedAction;
             readonly Action<FileDescription> deleteFileDescriptionClickedAction;
 
-            UIButton filenameButton;
-            UIButton deleteButton;
+            UIButtonScalable filenameButton;
+            UIButtonScalable deleteButton;
 
             public FileDescriptionSubView(FileDescription fileDescription, Action<FileDescription> fileDescriptionClickedAction, Action<FileDescription> deleteFileDescriptionClickedAction)
             {
@@ -286,16 +286,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 Distribution = UIStackViewDistribution.Fill;
                 Axis = UILayoutConstraintAxis.Horizontal;
 
-                filenameButton = new UIButton(UIButtonType.System);
+                filenameButton = new UIButtonScalable(UIButtonType.System);
                 filenameButton.TranslatesAutoresizingMaskIntoConstraints = false;
-                filenameButton.TitleLabel.Font = Theme.DefaultFont;
+                filenameButton.TitleLabel.Font = Theme.DefaultFont.CustomFont();
                 filenameButton.SetTitle(FileDescription.Name + " (" + UI.PrettyFileSize(FileDescription.SizeInBytes) + ")", UIControlState.Normal);
                 filenameButton.HorizontalAlignment = UIControlContentHorizontalAlignment.Left;
                 filenameButton.Opaque = false;
                 filenameButton.TouchUpInside += (sender, e) => fileDescriptionClickedAction(FileDescription);
                 AddArrangedSubview(filenameButton);
 
-                deleteButton = new UIButton();
+                deleteButton = new UIButtonScalable();
                 deleteButton.SetImage(UIImage.FromBundle("Remove").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
                 deleteButton.BackgroundColor = Theme.Clear;
                 deleteButton.TranslatesAutoresizingMaskIntoConstraints = false;

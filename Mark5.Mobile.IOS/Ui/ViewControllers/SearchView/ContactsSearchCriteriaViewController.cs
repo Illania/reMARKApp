@@ -113,13 +113,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
 
         class ContactTypesSearchView : AbstractContactsSearchView
         {
-            readonly UILabel personView;
-            readonly UILabel departmentView;
-            readonly UILabel companyView;
+            readonly UILabelScalable personView;
+            readonly UILabelScalable departmentView;
+            readonly UILabelScalable companyView;
 
             public ContactTypesSearchView()
             {
-                personView = new UILabel
+                personView = new UILabelScalable
                 {
                     Text = Localization.GetString("search_person").ToUpper(),
                     TextColor = InactiveTextColor,
@@ -136,7 +136,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 personView.Layer.MasksToBounds = true;
                 AddArrangedSubview(personView);
 
-                departmentView = new UILabel
+                departmentView = new UILabelScalable
                 {
                     Text = Localization.GetString("search_department").ToUpper(),
                     TextColor = InactiveTextColor,
@@ -153,7 +153,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 departmentView.Layer.MasksToBounds = true;
                 AddArrangedSubview(departmentView);
 
-                companyView = new UILabel
+                companyView = new UILabelScalable
                 {
                     Text = Localization.GetString("search_company").ToUpper(),
                     TextColor = InactiveTextColor,
@@ -212,8 +212,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
         class NameSearchView : AbstractContactsSearchView
         {
             readonly UIView view;
-            readonly UILabel label;
-            readonly UITextField text;
+            readonly UILabelScalable label;
+            readonly UITextFieldScalable text;
 
             public NameSearchView()
             {
@@ -226,7 +226,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 view.Layer.MasksToBounds = true;
                 view.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
 
-                label = new UILabel
+                label = new UILabelScalable
                 {
                     Text = Localization.GetString("search_name"),
                     TextColor = LabelTextColor,
@@ -239,7 +239,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     AdjustsFontSizeToFitWidth = true
                 };
 
-                text = new UITextField
+                text = new UITextFieldScalable
                 {
                     AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"), new UIStringAttributes
                     {
@@ -287,21 +287,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             }
 
             [Export("textFieldDidChange:")]
-            void TextFieldDidChange(UITextField textField)
+            void TextFieldDidChange(UITextFieldScalable textField)
             {
                 Criteria.Name = textField.Text;
             }
 
 
             [Export("textFieldShouldReturn:")]
-            bool TextFieldShouldReturn(UITextField textField)
+            bool TextFieldShouldReturn(UITextFieldScalable textField)
             {
                 textField.ResignFirstResponder();
                 return true;
             }
 
             [Export("textFieldDidEndEditing:")]
-            void TextFieldDidEndEditing(UITextField textField)
+            void TextFieldDidEndEditing(UITextFieldScalable textField)
             {
                 text.ResignFirstResponder();
                 text.UserInteractionEnabled = false;
@@ -311,8 +311,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
         class AddressSearchView : AbstractContactsSearchView
         {
             readonly UIView view;
-            readonly UILabel label;
-            readonly UITextField text;
+            readonly UILabelScalable label;
+            readonly UITextFieldScalable text;
 
             public AddressSearchView()
             {
@@ -325,7 +325,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 view.Layer.MasksToBounds = true;
                 view.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
 
-                label = new UILabel
+                label = new UILabelScalable
                 {
                     Text = Localization.GetString("search_email_number_etc"),
                     TextColor = LabelTextColor,
@@ -338,7 +338,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     AdjustsFontSizeToFitWidth = true
                 };
 
-                text = new UITextField
+                text = new UITextFieldScalable
                 {
                     AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"), new UIStringAttributes
                     {
@@ -386,21 +386,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             }
 
             [Export("textFieldDidChange:")]
-            void TextFieldDidChange(UITextField textField)
+            void TextFieldDidChange(UITextFieldScalable textField)
             {
                 Criteria.ComAddress = textField.Text;
             }
 
 
             [Export("textFieldShouldReturn:")]
-            bool TextFieldShouldReturn(UITextField textField)
+            bool TextFieldShouldReturn(UITextFieldScalable textField)
             {
                 textField.ResignFirstResponder();
                 return true;
             }
 
             [Export("textFieldDidEndEditing:")]
-            void TextFieldDidEndEditing(UITextField textField)
+            void TextFieldDidEndEditing(UITextFieldScalable textField)
             {
                 text.ResignFirstResponder();
                 text.UserInteractionEnabled = false;
@@ -410,14 +410,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
         class ShortIdDescriptionPhysicalAddressView : AbstractContactsSearchView
         {
             readonly UIView shortIdView;
-            readonly UILabel shortIdLabel;
-            readonly UITextField shortIdTextField;
+            readonly UILabelScalable shortIdLabel;
+            readonly UITextFieldScalable shortIdTextField;
             readonly UIView descriptionView;
-            readonly UILabel descriptionLabel;
-            readonly UITextField descriptionTextField;
+            readonly UILabelScalable descriptionLabel;
+            readonly UITextFieldScalable descriptionTextField;
             readonly UIView physicalAddressView;
-            readonly UILabel physicalAddressLabel;
-            readonly UITextField physicalAddressTextField;
+            readonly UILabelScalable physicalAddressLabel;
+            readonly UITextFieldScalable physicalAddressTextField;
 
             public ShortIdDescriptionPhysicalAddressView()
             {
@@ -430,7 +430,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 shortIdView.Layer.MasksToBounds = true;
                 shortIdView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
 
-                shortIdLabel = new UILabel
+                shortIdLabel = new UILabelScalable
                 {
                     Text = Localization.GetString("search_short_id"),
                     TextColor = LabelTextColor,
@@ -443,7 +443,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     AdjustsFontSizeToFitWidth = true
                 };
 
-                shortIdTextField = new UITextField
+                shortIdTextField = new UITextFieldScalable
                 {
                     AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"), new UIStringAttributes
                     {
@@ -483,7 +483,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 descriptionView.Layer.MasksToBounds = true;
                 descriptionView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
 
-                descriptionLabel = new UILabel
+                descriptionLabel = new UILabelScalable
                 {
                     Text = Localization.GetString("search_description"),
                     TextColor = LabelTextColor,
@@ -496,7 +496,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     AdjustsFontSizeToFitWidth = true
                 };
 
-                descriptionTextField = new UITextField
+                descriptionTextField = new UITextFieldScalable
                 {
                     AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"), new UIStringAttributes
                     {
@@ -536,7 +536,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 physicalAddressView.Layer.MasksToBounds = true;
                 physicalAddressView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
 
-                physicalAddressLabel = new UILabel
+                physicalAddressLabel = new UILabelScalable
                 {
                     Text = Localization.GetString("search_physical_address"),
                     TextColor = LabelTextColor,
@@ -549,7 +549,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     AdjustsFontSizeToFitWidth = true
                 };
 
-                physicalAddressTextField = new UITextField
+                physicalAddressTextField = new UITextFieldScalable
                 {
                     AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"),
                         new UIStringAttributes
@@ -636,7 +636,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             }
 
             [Export("textFieldDidChange:")]
-            void TextFieldDidChange(UITextField textField)
+            void TextFieldDidChange(UITextFieldScalable textField)
             {
                 if (textField == shortIdTextField)
                     Criteria.ShortId = textField.Text;
@@ -647,7 +647,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             }
 
             [Export("textFieldShouldReturn:")]
-            bool TextFieldShouldReturn(UITextField textField)
+            bool TextFieldShouldReturn(UITextFieldScalable textField)
             {
                 textField.ResignFirstResponder();
                 return true;
@@ -655,7 +655,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
 
 
             [Export("textFieldDidEndEditing:")]
-            void TextFieldDidEndEditing(UITextField textField)
+            void TextFieldDidEndEditing(UITextFieldScalable textField)
             {
                 if (textField == shortIdTextField)
                     AnimateNotify(AnimationLength,
@@ -703,11 +703,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             readonly WeakReference<UIViewController> parentViewControllerWeakReference;
 
             readonly UIView countryView;
-            readonly UILabel countryLabel;
-            readonly UITextField countryValue;
+            readonly UILabelScalable countryLabel;
+            readonly UITextFieldScalable countryValue;
             readonly UIView categoriesView;
-            readonly UILabel categoriesLabel;
-            readonly UILabel categoriesValue;
+            readonly UILabelScalable categoriesLabel;
+            readonly UILabelScalable categoriesValue;
 
             readonly UIToolbar countryPickerToolbar;
             readonly Source countrySource;
@@ -742,7 +742,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     }
                 };
 
-                countryLabel = new UILabel
+                countryLabel = new UILabelScalable
                 {
                     Text = Localization.GetString("search_country"),
                     TextColor = LabelTextColor,
@@ -761,7 +761,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     Delegate = countrySource
                 };
 
-                countryValue = new UITextField
+                countryValue = new UITextFieldScalable
                 {
                     TextColor = InactiveTextColor,
                     Font = Font,
@@ -797,7 +797,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 categoriesView.Layer.MasksToBounds = true;
                 categoriesView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
 
-                categoriesLabel = new UILabel
+                categoriesLabel = new UILabelScalable
                 {
                     Text = Localization.GetString("search_categories"),
                     TextColor = LabelTextColor,
@@ -810,7 +810,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     AdjustsFontSizeToFitWidth = true
                 };
 
-                categoriesValue = new UILabel
+                categoriesValue = new UILabelScalable
                 {
                     TextColor = InactiveTextColor,
                     Font = Font,

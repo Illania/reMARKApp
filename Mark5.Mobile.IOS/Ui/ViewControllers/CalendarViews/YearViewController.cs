@@ -93,7 +93,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         {
             e.YearCell = new SFYearCell
             {
-                FontAttribute = Theme.DefaultLightFont,
+                FontAttribute = Theme.DefaultLightFont.CustomFont(),
                 MonthBackgroundColor = UIColor.White,
                 DateTextColor = UIColor.White
             };

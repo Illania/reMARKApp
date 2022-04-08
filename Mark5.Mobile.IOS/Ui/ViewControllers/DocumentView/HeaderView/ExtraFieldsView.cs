@@ -53,9 +53,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             {
                 var text = new NSMutableAttributedString(efi.Key.Name + ": " + efi.Value);
                 text.AddAttribute(UIStringAttributeKey.ForegroundColor, Theme.DarkGray, new NSRange(0, efi.Key.Name.Length + 1));
-                var label = new UILabel
+                var label = new UILabelScalable
                 {
-                    Font = Theme.DefaultFont,
+                    Font = Theme.DefaultFont.CustomFont(),
                     Opaque = false,
                     TranslatesAutoresizingMaskIntoConstraints = false
                 };

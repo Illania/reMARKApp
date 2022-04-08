@@ -12,7 +12,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         public int CategoryId { get; private set; }
 
-        UILabel label;
+        UILabelScalable label;
         UIImageView statusImage;
 
         public ParticipantsTableViewCell()
@@ -33,14 +33,14 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
             ContentView.AddSubview(statusImage);
 
-            label = new UILabel()
+            label = new UILabelScalable()
             {
                 Text = "",
                 TextAlignment = UITextAlignment.Left,
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 LineBreakMode = UILineBreakMode.WordWrap,
                 Lines = 0,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TextColor = Theme.DarkGray,
             };
 

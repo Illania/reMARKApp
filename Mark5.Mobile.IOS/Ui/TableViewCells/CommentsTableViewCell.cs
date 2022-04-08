@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
@@ -14,9 +14,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
     {
         public static readonly NSString DefaultId = new NSString(nameof(CommentsTableViewCell));
 
-        readonly UILabel authorLabel;
-        readonly UILabel dateLabel;
-        readonly UITextView commentTextView;
+        readonly UILabelScalable authorLabel;
+        readonly UILabelScalable dateLabel;
+        readonly UITextViewScalable commentTextView;
 
         public CommentsTableViewCell()
             : base(UITableViewCellStyle.Default, DefaultId)
@@ -24,16 +24,16 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             SelectionStyle = UITableViewCellSelectionStyle.None;
             Accessory = UITableViewCellAccessory.None;
 
-            authorLabel = new UILabel
+            authorLabel = new UILabelScalable
             {
-                Font = Theme.DefaultBoldFont,
+                Font = Theme.DefaultBoldFont.CustomFont(),
                 Lines = 1,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
 
-            dateLabel = new UILabel
+            dateLabel = new UILabelScalable
             {
-                Font = Theme.DefaultFont.WithRelativeSize(-2f),
+                Font = Theme.DefaultFont.CustomFont().WithRelativeSize(-2f),
                 TextColor = Theme.DarkGray,
                 Lines = 1,
                 TranslatesAutoresizingMaskIntoConstraints = false
@@ -41,7 +41,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             dateLabel.SetContentHuggingPriority(1000f, UILayoutConstraintAxis.Horizontal);
             dateLabel.SetContentCompressionResistancePriority(1000f, UILayoutConstraintAxis.Horizontal);
 
-            commentTextView = new UITextView
+            commentTextView = new UITextViewScalable
             {
                 Selectable = false,
                 Editable = false,

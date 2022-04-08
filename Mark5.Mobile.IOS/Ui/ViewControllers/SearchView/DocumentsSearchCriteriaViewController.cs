@@ -133,14 +133,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
 
         class DocumentDirectionSearchView : AbstractDocumentsSearchView
         {
-            readonly UILabel allView;
-            readonly UILabel inboxView;
-            readonly UILabel outboxView;
-            readonly UILabel draftView;
+            readonly UILabelScalable allView;
+            readonly UILabelScalable inboxView;
+            readonly UILabelScalable outboxView;
+            readonly UILabelScalable draftView;
 
             public DocumentDirectionSearchView()
             {
-                allView = new UILabel
+                allView = new UILabelScalable
                 {
                     Text = Localization.GetString("search_all").ToUpper(),
                     TextColor = InactiveTextColor,
@@ -157,7 +157,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 allView.Layer.MasksToBounds = true;
                 AddArrangedSubview(allView);
 
-                inboxView = new UILabel
+                inboxView = new UILabelScalable
                 {
                     Text = Localization.GetString("search_incoming").ToUpper(),
                     TextColor = InactiveTextColor,
@@ -174,7 +174,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 inboxView.Layer.MasksToBounds = true;
                 AddArrangedSubview(inboxView);
 
-                outboxView = new UILabel
+                outboxView = new UILabelScalable
                 {
                     Text = Localization.GetString("search_outgoing").ToUpper(),
                     TextColor = InactiveTextColor,
@@ -191,7 +191,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 outboxView.Layer.MasksToBounds = true;
                 AddArrangedSubview(outboxView);
 
-                draftView = new UILabel
+                draftView = new UILabelScalable
                 {
                     Text = Localization.GetString("search_draft").ToUpper(),
                     TextColor = InactiveTextColor,
@@ -265,10 +265,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
 
         class MessageSubjectView : AbstractDocumentsSearchView
         {
-            readonly UILabel titleLabel;
+            readonly UILabelScalable titleLabel;
             readonly UIView valueTextFieldAccessoryView;
             readonly UISegmentedControl valueTextFieldSegmentedControl;
-            readonly UITextField valueTextField;
+            readonly UITextFieldScalable valueTextField;
 
             public MessageSubjectView()
             {
@@ -289,7 +289,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     UserInteractionEnabled = false
                 };
 
-                titleLabel = new UILabel
+                titleLabel = new UILabelScalable
                 {
                     TextColor = LabelTextColor,
                     Font = Font,
@@ -321,7 +321,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     valueTextFieldSegmentedControl.HeightAnchor.ConstraintLessThanOrEqualTo(valueTextFieldAccessoryView.HeightAnchor, 1f, -5f)
                 });
 
-                valueTextField = new UITextField
+                valueTextField = new UITextFieldScalable
                 {
                     AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"), new UIStringAttributes
                     {
@@ -409,7 +409,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             }
 
             [Export("textFieldShouldBeginEditing:")]
-            bool TextFieldShouldBeginEditing(UITextField textField)
+            bool TextFieldShouldBeginEditing(UITextFieldScalable textField)
             {
                 switch (Criteria.SubjectMessageClause)
                 {
@@ -428,20 +428,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             }
 
             [Export("textFieldDidChange:")]
-            void TextFieldDidChange(UITextField textField)
+            void TextFieldDidChange(UITextFieldScalable textField)
             {
                 Criteria.SubjectMessageField = textField.Text;
             }
 
             [Export("textFieldShouldReturn:")]
-            bool TextFieldShouldReturn(UITextField textField)
+            bool TextFieldShouldReturn(UITextFieldScalable textField)
             {
                 textField.ResignFirstResponder();
                 return true;
             }
 
             [Export("textFieldDidEndEditing:")]
-            void TextFieldDidEndEditing(UITextField textField)
+            void TextFieldDidEndEditing(UITextFieldScalable textField)
             {
                 textField.UserInteractionEnabled = false;
             }
@@ -449,10 +449,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
 
         class FromToView : AbstractDocumentsSearchView
         {
-            readonly UILabel titleLabel;
+            readonly UILabelScalable titleLabel;
             readonly UIView valueTextFieldAccessoryView;
             readonly UISegmentedControl valueTextFieldSegmentedControl;
-            readonly UITextField valueTextField;
+            readonly UITextFieldScalable valueTextField;
 
             public FromToView()
             {
@@ -472,7 +472,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     UserInteractionEnabled = false
                 };
 
-                titleLabel = new UILabel
+                titleLabel = new UILabelScalable
                 {
                     TextColor = LabelTextColor,
                     Font = Font,
@@ -504,7 +504,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     valueTextFieldSegmentedControl.HeightAnchor.ConstraintLessThanOrEqualTo(valueTextFieldAccessoryView.HeightAnchor, 1f, -5f)
                 });
 
-                valueTextField = new UITextField
+                valueTextField = new UITextFieldScalable
                 {
                     AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_address"), new UIStringAttributes
                     {
@@ -592,7 +592,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             }
 
             [Export("textFieldShouldBeginEditing:")]
-            bool TextFieldShouldBeginEditing(UITextField textField)
+            bool TextFieldShouldBeginEditing(UITextFieldScalable textField)
             {
                 switch (Criteria.FromToClause)
                 {
@@ -611,20 +611,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             }
 
             [Export("textFieldDidChange:")]
-            void TextFieldDidChange(UITextField textField)
+            void TextFieldDidChange(UITextFieldScalable textField)
             {
                 Criteria.FromToField = textField.Text;
             }
 
             [Export("textFieldShouldReturn:")]
-            bool TextFieldShouldReturn(UITextField textField)
+            bool TextFieldShouldReturn(UITextFieldScalable textField)
             {
                 textField.ResignFirstResponder();
                 return true;
             }
 
             [Export("textFieldDidEndEditing:")]
-            void TextFieldDidEndEditing(UITextField textField)
+            void TextFieldDidEndEditing(UITextFieldScalable textField)
             {
                 textField.UserInteractionEnabled = false;
             }
@@ -633,11 +633,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
         class DateRangeView : AbstractDocumentsSearchView
         {
             readonly UIView fromView;
-            readonly UILabel fromLabel;
-            readonly UITextField fromValue;
+            readonly UILabelScalable fromLabel;
+            readonly UITextFieldScalable fromValue;
             readonly UIView toView;
-            readonly UILabel toLabel;
-            readonly UITextField toValue;
+            readonly UILabelScalable toLabel;
+            readonly UITextFieldScalable toValue;
 
             readonly UIToolbar fromDatePickerToolbar;
             readonly UIBarButtonItem fromDateCancelButton;
@@ -665,7 +665,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 };
                 fromView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
 
-                fromLabel = new UILabel
+                fromLabel = new UILabelScalable
                 {
                     Text = Localization.GetString("search_from_date"),
                     TextColor = LabelTextColor,
@@ -695,7 +695,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     Mode = UIDatePickerMode.Date
                 };
 
-                fromValue = new UITextField
+                fromValue = new UITextFieldScalable
                 {
                     TextColor = InactiveTextColor,
                     Font = Font,
@@ -734,7 +734,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 };
                 toView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
 
-                toLabel = new UILabel
+                toLabel = new UILabelScalable
                 {
                     Text = Localization.GetString("search_to_date"),
                     TextColor = LabelTextColor,
@@ -764,7 +764,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     Mode = UIDatePickerMode.Date
                 };
 
-                toValue = new UITextField
+                toValue = new UITextFieldScalable
                 {
                     TextColor = InactiveTextColor,
                     Font = Font,
@@ -959,14 +959,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             readonly WeakReference<UIViewController> parentViewControllerWeakReference;
 
             readonly UIView lineView;
-            readonly UILabel lineLabel;
-            readonly UILabel lineValue;
+            readonly UILabelScalable lineLabel;
+            readonly UILabelScalable lineValue;
             readonly UIView categoriesView;
-            readonly UILabel categoriesLabel;
-            readonly UILabel categoriesValue;
+            readonly UILabelScalable categoriesLabel;
+            readonly UILabelScalable categoriesValue;
             readonly UIView priorityView;
-            readonly UILabel priorityLabel;
-            readonly UILabel priorityValue;
+            readonly UILabelScalable priorityLabel;
+            readonly UILabelScalable priorityValue;
 
             public LineCategoriesPriorityNameView(UIViewController parentViewController)
             {
@@ -981,7 +981,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 lineView.Layer.MasksToBounds = true;
                 lineView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
 
-                lineLabel = new UILabel
+                lineLabel = new UILabelScalable
                 {
                     Text = Localization.GetString("search_lines"),
                     TextColor = LabelTextColor,
@@ -993,7 +993,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     AdjustsFontSizeToFitWidth = true
                 };
 
-                lineValue = new UILabel
+                lineValue = new UILabelScalable
                 {
                     TextColor = InactiveTextColor,
                     Font = Font,
@@ -1029,7 +1029,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 categoriesView.Layer.MasksToBounds = true;
                 categoriesView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
 
-                categoriesLabel = new UILabel
+                categoriesLabel = new UILabelScalable
                 {
                     Text = Localization.GetString("search_categories"),
                     TextColor = LabelTextColor,
@@ -1042,7 +1042,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     AdjustsFontSizeToFitWidth = true
                 };
 
-                categoriesValue = new UILabel
+                categoriesValue = new UILabelScalable
                 {
                     TextColor = InactiveTextColor,
                     Font = Font,
@@ -1079,7 +1079,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 priorityView.Layer.MasksToBounds = true;
                 priorityView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
 
-                priorityLabel = new UILabel
+                priorityLabel = new UILabelScalable
                 {
                     Text = Localization.GetString("search_priority"),
                     TextColor = LabelTextColor,
@@ -1092,7 +1092,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     AdjustsFontSizeToFitWidth = true
                 };
 
-                priorityValue = new UILabel
+                priorityValue = new UILabelScalable
                 {
                     TextColor = InactiveTextColor,
                     Font = Font,
@@ -1211,14 +1211,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
         class ReferenceCommentsAttachmentNameView : AbstractDocumentsSearchView
         {
             readonly UIView referenceView;
-            readonly UILabel referenceLabel;
-            readonly UITextField referenceTextField;
+            readonly UILabelScalable referenceLabel;
+            readonly UITextFieldScalable referenceTextField;
             readonly UIView commentView;
-            readonly UILabel commentLabel;
-            readonly UITextField commentTextField;
+            readonly UILabelScalable commentLabel;
+            readonly UITextFieldScalable commentTextField;
             readonly UIView attachmentNameView;
-            readonly UILabel attachmentNameLabel;
-            readonly UITextField attachmentNameTextField;
+            readonly UILabelScalable attachmentNameLabel;
+            readonly UITextFieldScalable attachmentNameTextField;
 
             public ReferenceCommentsAttachmentNameView()
             {
@@ -1231,7 +1231,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 referenceView.Layer.MasksToBounds = true;
                 referenceView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
 
-                referenceLabel = new UILabel
+                referenceLabel = new UILabelScalable
                 {
                     Text = Localization.GetString("search_ref"),
                     TextColor = LabelTextColor,
@@ -1244,7 +1244,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     AdjustsFontSizeToFitWidth = true
                 };
 
-                referenceTextField = new UITextField
+                referenceTextField = new UITextFieldScalable
                 {
                     AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"), new UIStringAttributes
                     {
@@ -1284,7 +1284,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 commentView.Layer.MasksToBounds = true;
                 commentView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
 
-                commentLabel = new UILabel
+                commentLabel = new UILabelScalable
                 {
                     Text = Localization.GetString("search_comments"),
                     TextColor = LabelTextColor,
@@ -1297,7 +1297,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     AdjustsFontSizeToFitWidth = true
                 };
 
-                commentTextField = new UITextField
+                commentTextField = new UITextFieldScalable
                 {
                     AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"), new UIStringAttributes
                     {
@@ -1337,7 +1337,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 attachmentNameView.Layer.MasksToBounds = true;
                 attachmentNameView.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
 
-                attachmentNameLabel = new UILabel
+                attachmentNameLabel = new UILabelScalable
                 {
                     Text = Localization.GetString("search_attachments"),
                     TextColor = LabelTextColor,
@@ -1350,7 +1350,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     AdjustsFontSizeToFitWidth = true
                 };
 
-                attachmentNameTextField = new UITextField
+                attachmentNameTextField = new UITextFieldScalable
                 {
                     AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"), new UIStringAttributes
                     {
@@ -1436,7 +1436,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             }
 
             [Export("textFieldDidChange:")]
-            void TextFieldDidChange(UITextField textField)
+            void TextFieldDidChange(UITextFieldScalable textField)
             {
                 if (textField == referenceTextField)
                     Criteria.Reference = textField.Text;
@@ -1447,14 +1447,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             }
 
             [Export("textFieldShouldReturn:")]
-            bool TextFieldShouldReturn(UITextField textField)
+            bool TextFieldShouldReturn(UITextFieldScalable textField)
             {
                 textField.ResignFirstResponder();
                 return true;
             }
 
             [Export("textFieldDidEndEditing:")]
-            void TextFieldDidEndEditing(UITextField textField)
+            void TextFieldDidEndEditing(UITextFieldScalable textField)
             {
                 if (textField == referenceTextField)
                     AnimateNotify(AnimationLength,
@@ -1500,8 +1500,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
         class ExtraFieldsView : AbstractDocumentsSearchView
         {
             readonly UIView view;
-            readonly UILabel label;
-            readonly UITextField text;
+            readonly UILabelScalable label;
+            readonly UITextFieldScalable text;
 
             public ExtraFieldsView()
             {
@@ -1514,7 +1514,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 view.Layer.MasksToBounds = true;
                 view.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
 
-                label = new UILabel
+                label = new UILabelScalable
                 {
                     Text = Localization.GetString("search_extra_fields"),
                     TextColor = LabelTextColor,
@@ -1527,7 +1527,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     AdjustsFontSizeToFitWidth = true
                 };
 
-                text = new UITextField
+                text = new UITextFieldScalable
                 {
                     AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"), new UIStringAttributes
                     {
@@ -1575,21 +1575,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             }
 
             [Export("textFieldDidChange:")]
-            void TextFieldDidChange(UITextField textField)
+            void TextFieldDidChange(UITextFieldScalable textField)
             {
                 Criteria.ExtraFields = textField.Text;
             }
 
 
             [Export("textFieldShouldReturn:")]
-            bool TextFieldShouldReturn(UITextField textField)
+            bool TextFieldShouldReturn(UITextFieldScalable textField)
             {
                 textField.ResignFirstResponder();
                 return true;
             }
 
             [Export("textFieldDidEndEditing:")]
-            void TextFieldDidEndEditing(UITextField textField)
+            void TextFieldDidEndEditing(UITextFieldScalable textField)
             {
                 text.ResignFirstResponder();
                 text.UserInteractionEnabled = false;
@@ -1598,12 +1598,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
 
         class AttachmentsUnreadSearchView : AbstractDocumentsSearchView
         {
-            readonly UILabel attachmentsView;
-            readonly UILabel unreadView;
+            readonly UILabelScalable attachmentsView;
+            readonly UILabelScalable unreadView;
 
             public AttachmentsUnreadSearchView()
             {
-                attachmentsView = new UILabel
+                attachmentsView = new UILabelScalable
                 {
                     Text = Localization.GetString("search_with_attachments").ToUpper(),
                     TextColor = InactiveTextColor,
@@ -1620,7 +1620,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 attachmentsView.Layer.MasksToBounds = true;
                 AddArrangedSubview(attachmentsView);
 
-                unreadView = new UILabel
+                unreadView = new UILabelScalable
                 {
                     Text = Localization.GetString("search_unread").ToUpper(),
                     TextColor = InactiveTextColor,
@@ -1658,13 +1658,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
 
         class HandledSearchView : AbstractDocumentsSearchView
         {
-            readonly UILabel allView;
-            readonly UILabel handledView;
-            readonly UILabel unhadledView;
+            readonly UILabelScalable allView;
+            readonly UILabelScalable handledView;
+            readonly UILabelScalable unhadledView;
 
             public HandledSearchView()
             {
-                allView = new UILabel
+                allView = new UILabelScalable
                 {
                     Text = Localization.GetString("search_all").ToUpper(),
                     TextColor = InactiveTextColor,
@@ -1681,7 +1681,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 allView.Layer.MasksToBounds = true;
                 AddArrangedSubview(allView);
 
-                handledView = new UILabel
+                handledView = new UILabelScalable
                 {
                     Text = Localization.GetString("search_handled").ToUpper(),
                     TextColor = InactiveTextColor,
@@ -1698,7 +1698,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 handledView.Layer.MasksToBounds = true;
                 AddArrangedSubview(handledView);
 
-                unhadledView = new UILabel
+                unhadledView = new UILabelScalable
                 {
                     Text = Localization.GetString("search_unhandled").ToUpper(),
                     TextColor = InactiveTextColor,

@@ -17,7 +17,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             remove => contentTextView.Changed -= value;
         }
 
-        readonly UITextView contentTextView;
+        readonly UITextViewScalable contentTextView;
 
         public EditTextViewCell()
             : base(UITableViewCellStyle.Default, Key)
@@ -25,7 +25,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             SelectionStyle = UITableViewCellSelectionStyle.Default;
             Accessory = UITableViewCellAccessory.None;
 
-            contentTextView = new UITextView
+            contentTextView = new UITextViewScalable
             {
                 ScrollEnabled = false,
                 ClipsToBounds = false,

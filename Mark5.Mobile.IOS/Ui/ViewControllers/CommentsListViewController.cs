@@ -27,9 +27,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         UITableView tableView;
         UIView commentView;
-        UIButton addCommentButton;
+        UIButtonScalable addCommentButton;
         UIScrollView commentTextScrollView;
-        UITextView commentTextView;
+        UITextViewScalable commentTextView;
 
         NSLayoutConstraint commentViewBottomConstraint;
         NSLayoutConstraint commentTextScrollViewHeightConstraint;
@@ -189,7 +189,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 borderView.HeightAnchor.ConstraintEqualTo(.75f)
             });
 
-            addCommentButton = new UIButton(UIButtonType.System)
+            addCommentButton = new UIButtonScalable(UIButtonType.System)
             {
                 Enabled = false,
                 TranslatesAutoresizingMaskIntoConstraints = false
@@ -227,7 +227,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 addCommentButton.CenterYAnchor.ConstraintEqualTo(commentTextScrollView.CenterYAnchor)
             });
 
-            commentTextView = new UITextView
+            commentTextView = new UITextViewScalable
             {
                 AutocapitalizationType = UITextAutocapitalizationType.Sentences,
                 AutocorrectionType = UITextAutocorrectionType.Yes,
@@ -385,14 +385,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         #region IUITextViewDelegate
 
         [Export("textViewDidChange:")]
-        public void Changed(UITextView textView)
+        public void Changed(UITextViewScalable textView)
         {
             UpdateAddCommentEnabled();
             UpdateCommentTextViewHeight();
         }
 
         [Export("textViewDidEndEditing:")]
-        public void EditingEnded(UITextView textView)
+        public void EditingEnded(UITextViewScalable textView)
         {
             UpdateAddCommentEnabled();
             UpdateCommentTextViewHeight();

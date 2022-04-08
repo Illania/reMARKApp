@@ -10,8 +10,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         #region Properties
         public static readonly NSString DefaultId = new("FoldersSearchResultsTableViewCell");
 
-        readonly UILabel folderNameLabel;
-        readonly UILabel folderPathLabel;
+        readonly UILabelScalable folderNameLabel;
+        readonly UILabelScalable folderPathLabel;
         readonly UIImageView folderIconImage;
         #endregion
 
@@ -27,18 +27,18 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             };
             ContentView.Add(folderIconImage);
 
-            folderNameLabel = new UILabel
+            folderNameLabel = new UILabelScalable
             {
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TextColor = Theme.Black,
                 Lines = 1,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
             ContentView.Add(folderNameLabel);
 
-            folderPathLabel = new UILabel
+            folderPathLabel = new UILabelScalable
             {
-                Font = Theme.DefaultLightFont,
+                Font = Theme.DefaultLightFont.CustomFont(),
                 TextColor = Theme.DarkGray,
                 Lines = 1,
                 TranslatesAutoresizingMaskIntoConstraints = false

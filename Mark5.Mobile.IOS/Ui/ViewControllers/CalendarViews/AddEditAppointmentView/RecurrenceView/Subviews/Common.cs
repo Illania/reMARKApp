@@ -41,13 +41,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
         void SetViewModel(RecurrenceInfo ri);
     }
 
-    abstract class BaseField : UITextField
+    abstract class BaseField : UITextFieldScalable
     {
         const float insetVal = 4f;
 
         public BaseField(bool editable = false)
         {
-            Font = Theme.DefaultFont;
+            Font = Theme.DefaultFont.CustomFont();
             TranslatesAutoresizingMaskIntoConstraints = false;
             Layer.BorderColor = Theme.DarkerBlue.CGColor;
             Layer.BorderWidth = 1f;
@@ -316,12 +316,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
         }
     }
 
-    class TextLabel : UILabel
+    class TextLabel : UILabelScalable
     {
         public TextLabel()
         {
             TranslatesAutoresizingMaskIntoConstraints = false;
-            Font = Theme.DefaultFont;
+            Font = Theme.DefaultFont.CustomFont();
             HeightAnchor.ConstraintGreaterThanOrEqualTo(30f).Active = true;
         }
     }

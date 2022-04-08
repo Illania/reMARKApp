@@ -12,10 +12,10 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
 
         protected CommunicationAddress address;
 
-        readonly UITextField addressTextField;
-        readonly UITextField descriptionTextField;
+        readonly UITextFieldScalable addressTextField;
+        readonly UITextFieldScalable descriptionTextField;
         readonly UISwitch preferrableSwitch;
-        readonly UILabel preferrableLabel;
+        readonly UILabelScalable preferrableLabel;
 
         public Action SelectedAsPrimaryAction;
         public Action AddressChangedAction;
@@ -24,10 +24,10 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
         {
             SelectionStyle = UITableViewCellSelectionStyle.None;
 
-            addressTextField = new UITextField
+            addressTextField = new UITextFieldScalable
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 Placeholder = Localization.GetString("address"),
                 AutocapitalizationType = UITextAutocapitalizationType.None,
                 AutocorrectionType = UITextAutocorrectionType.No,
@@ -38,10 +38,10 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
             var horizontalSeparator = GetHorizontalSeparator();
             ContentView.AddSubview(horizontalSeparator);
 
-            descriptionTextField = new UITextField
+            descriptionTextField = new UITextFieldScalable
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 Placeholder = Localization.GetString("description"),
             };
             descriptionTextField.EditingChanged += DescriptionTextField_EditingChanged;
@@ -50,10 +50,10 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
             var horizontalSeparator2 = GetHorizontalSeparator();
             ContentView.AddSubview(horizontalSeparator2);
 
-            preferrableLabel = new UILabel
+            preferrableLabel = new UILabelScalable
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 Text = Localization.GetString("preferrable"),
             };
             ContentView.Add(preferrableLabel);

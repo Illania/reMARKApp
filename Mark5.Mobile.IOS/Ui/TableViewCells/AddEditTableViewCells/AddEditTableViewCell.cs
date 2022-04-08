@@ -45,9 +45,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
             return separator;
         }
 
-        protected UIButton GetChevron()
+        protected UIButtonScalable GetChevron()
         {
-            var chevronButton = new UIButton();
+            var chevronButton = new UIButtonScalable();
 
             var disclosureCell = new UITableViewCell
             {

@@ -17,12 +17,12 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
 
         protected CommunicationAddress address;
 
-        readonly UITextField numberTextField;
-        readonly UITextField descriptionTextField;
-        readonly UIButton chevronButton;
-        readonly UITextField prefixTextField;
+        readonly UITextFieldScalable numberTextField;
+        readonly UITextFieldScalable descriptionTextField;
+        readonly UIButtonScalable chevronButton;
+        readonly UITextFieldScalable prefixTextField;
         readonly UISwitch preferrableSwitch;
-        readonly UILabel preferrableLabel;
+        readonly UILabelScalable preferrableLabel;
 
         readonly UIToolbar countryPickerToolbar;
         readonly UIPickerView countryPicker;
@@ -62,10 +62,10 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
                 }
             };
 
-            prefixTextField = new UITextField
+            prefixTextField = new UITextFieldScalable
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 TintColor = Theme.Clear,
                 Text = Localization.GetString("prefix"),
                 InputView = countryPicker,
@@ -83,10 +83,10 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
             var verticalSeparator = GetVerticalSeparator();
             ContentView.AddSubview(verticalSeparator);
 
-            numberTextField = new UITextField
+            numberTextField = new UITextFieldScalable
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 Placeholder = Localization.GetString("number"),
                 AutocapitalizationType = UITextAutocapitalizationType.None,
                 AutocorrectionType = UITextAutocorrectionType.No,
@@ -97,10 +97,10 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
             var horizontalSeparator = GetHorizontalSeparator();
             ContentView.AddSubview(horizontalSeparator);
 
-            descriptionTextField = new UITextField
+            descriptionTextField = new UITextFieldScalable
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 Placeholder = Localization.GetString("description"),
             };
             descriptionTextField.EditingChanged += DescriptionTextField_EditingChanged;
@@ -109,10 +109,10 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
             var horizontalSeparator2 = GetHorizontalSeparator();
             ContentView.AddSubview(horizontalSeparator2);
 
-            preferrableLabel = new UILabel
+            preferrableLabel = new UILabelScalable
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 Text = Localization.GetString("preferrable"),
             };
             ContentView.Add(preferrableLabel);

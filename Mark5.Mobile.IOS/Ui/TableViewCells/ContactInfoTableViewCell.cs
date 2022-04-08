@@ -9,8 +9,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
     {
         public static readonly NSString DefaultId = new NSString(nameof(ContactInfoTableViewCell));
 
-        readonly UILabel topLabel;
-        readonly UITextView bottomTextView;
+        readonly UILabelScalable topLabel;
+        readonly UITextViewScalable bottomTextView;
 
         public ContactInfoTableViewCell()
             : base(UITableViewCellStyle.Default, DefaultId)
@@ -18,15 +18,15 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             SelectionStyle = UITableViewCellSelectionStyle.Default;
             Accessory = UITableViewCellAccessory.None;
 
-            topLabel = new UILabel
+            topLabel = new UILabelScalable
             {
-                Font = Theme.DefaultFont.WithRelativeSize(-2f),
+                Font = Theme.DefaultFont.CustomFont().WithRelativeSize(-2f),
                 TextColor = Theme.DarkGray,
                 Lines = 1,
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
 
-            bottomTextView = new UITextView
+            bottomTextView = new UITextViewScalable
             {
                 Editable = false,
                 ScrollEnabled = false,

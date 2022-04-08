@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -39,12 +39,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         bool hideNavigationButtons;
 
         UIView headerView;
-        UILabel nameLabel;
-        UILabel nameSubLabel;
-        UIButton emailButton;
-        UIButton mobileButton;
-        UIButton smsButton;
-        UIButton mapButton;
+        UILabelScalable nameLabel;
+        UILabelScalable nameSubLabel;
+        UIButtonScalable emailButton;
+        UIButtonScalable mobileButton;
+        UIButtonScalable smsButton;
+        UIButtonScalable mapButton;
 
         UIBarButtonItem assignCategoryButton;
         UIBarButtonItem fileToButton;
@@ -163,9 +163,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 BackgroundColor = Theme.White
             };
 
-            nameLabel = new UILabel
+            nameLabel = new UILabelScalable
             {
-                Font = Theme.DefaultFont.WithRelativeSize(6f),
+                Font = Theme.DefaultFont.CustomFont().WithRelativeSize(6f),
                 TextColor = Theme.DarkerBlue,
                 TextAlignment = UITextAlignment.Center,
                 Lines = 1,
@@ -180,9 +180,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 nameLabel.HeightAnchor.ConstraintEqualTo(25f)
             });
 
-            nameSubLabel = new UILabel
+            nameSubLabel = new UILabelScalable
             {
-                Font = Theme.DefaultFont.WithRelativeSize(-2f),
+                Font = Theme.DefaultFont.CustomFont().WithRelativeSize(-2f),
                 TextColor = Theme.DarkerBlue,
                 TextAlignment = UITextAlignment.Center,
                 Lines = 1,
@@ -208,7 +208,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 buttonsView.CenterXAnchor.ConstraintEqualTo(headerView.CenterXAnchor)
             });
 
-            emailButton = new UIButton
+            emailButton = new UIButtonScalable
             {
                 Enabled = false,
                 Alpha = 0f,
@@ -226,7 +226,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 emailButton.WidthAnchor.ConstraintEqualTo(40f)
             });
 
-            mobileButton = new UIButton
+            mobileButton = new UIButtonScalable
             {
                 Enabled = false,
                 Alpha = 0f,
@@ -244,7 +244,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 mobileButton.WidthAnchor.ConstraintEqualTo(40f)
             });
 
-            smsButton= new UIButton
+            smsButton= new UIButtonScalable
             {
                 Enabled = false,
                 Alpha = 0f,
@@ -262,7 +262,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 smsButton.WidthAnchor.ConstraintEqualTo(40f)
             });
 
-            mapButton= new UIButton
+            mapButton= new UIButtonScalable
             {
                 Enabled = false,
                 Alpha = 0f,
@@ -482,15 +482,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (formattedNumbers.Length == 1)
             {
-                Integration.Call(this, (UIButton)sender, formattedNumbers[0]);
+                Integration.Call(this, (UIButtonScalable)sender, formattedNumbers[0]);
                 return;
             }
 
-            var selectedItem = await Dialogs.ShowListActionSheetAsync(this, formattedNumbers, (UIButton)sender);
+            var selectedItem = await Dialogs.ShowListActionSheetAsync(this, formattedNumbers, (UIButtonScalable)sender);
             if (selectedItem < 0)
                 return;
 
-            Integration.Call(this, (UIButton)sender, formattedNumbers[selectedItem]);
+            Integration.Call(this, (UIButtonScalable)sender, formattedNumbers[selectedItem]);
         }
 
         private void SmsButton_TouchUpInside(object sender, EventArgs e)
@@ -501,7 +501,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (communicationAddresses == null)
                 return;
 
-            Integration.Text(this, (UIButton)sender, AddressFormatter.FormatCommunicationAddress(communicationAddresses));
+            Integration.Text(this, (UIButtonScalable)sender, AddressFormatter.FormatCommunicationAddress(communicationAddresses));
         }
 
 
@@ -515,15 +515,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (physicalAddress.Length == 1)
             {
-                Integration.ShowOnMap(this, (UIButton)sender, physicalAddress[0]);
+                Integration.ShowOnMap(this, (UIButtonScalable)sender, physicalAddress[0]);
                 return;
             }
 
-            var selectedItem = await Dialogs.ShowListActionSheetAsync(this, physicalAddress.Select(pa => pa.Type.Name).ToArray(), (UIButton)sender);
+            var selectedItem = await Dialogs.ShowListActionSheetAsync(this, physicalAddress.Select(pa => pa.Type.Name).ToArray(), (UIButtonScalable)sender);
             if (selectedItem < 0)
                 return;
 
-            Integration.ShowOnMap(this, (UIButton)sender, physicalAddress[selectedItem]);
+            Integration.ShowOnMap(this, (UIButtonScalable)sender, physicalAddress[selectedItem]);
         }
 
         async void EditButtonItem_Clicked(object sender, EventArgs e)

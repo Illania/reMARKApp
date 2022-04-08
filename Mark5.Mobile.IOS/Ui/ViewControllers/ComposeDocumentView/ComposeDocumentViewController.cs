@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -58,7 +58,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         UIBarButtonItem cancelButtonItem;
         UIBarButtonItem insertButtonItem;
         UIBarButtonItem sendButtonItem;
-        UIButton sendButton;
+        UIButtonScalable sendButton;
         UILongPressGestureRecognizer sendButtonLongPressGestureRecognizer;
 
         UIStackView headerStackView;
@@ -200,7 +200,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             if (ServerConfig.SystemSettings?.SystemInfo?.DelaySendAvailable == true)
             {
-                sendButton = new UIButton
+                sendButton = new UIButtonScalable
                 {
                     TranslatesAutoresizingMaskIntoConstraints = false,
                     Opaque = false,
@@ -209,7 +209,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                 sendButton.SetTitleColor(Theme.DarkBlue, UIControlState.Normal);
                 sendButton.SetTitle(Localization.GetString("send"), UIControlState.Normal);
-                sendButton.Font = Theme.DefaultFont;
+                sendButton.Font = Theme.DefaultFont.CustomFont();
 
 
                 sendButtonItem = new UIBarButtonItem

@@ -273,10 +273,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         {
             SFMonthCellStyle monthCellStyle = new SFMonthCellStyle
             {
-                TextStyle = Theme.DefaultLightFontXSmall,
+                TextStyle = Theme.CalendarFontXSmall,
             };
             MonthCellStyle = monthCellStyle;
-            DayHeaderStyle = new SFViewHeaderStyle { DayTextStyle = Theme.DefaultLightFontSmall };
+            DayHeaderStyle = new SFViewHeaderStyle { DayTextStyle = Theme.CalendarFontSmall };
             HeaderHeight = 20f;
 
             MonthViewSettings = new MonthViewSettings
@@ -291,10 +291,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 AgendaViewStyle = new AgendaViewStyle
                 {
 
-                    SubjectTextStyle = Theme.DefaultLightFontSmall,
-                    TimeTextStyle = Theme.DefaultLightFontSmall,
+                    SubjectTextStyle = Theme.CalendarFontSmall,
+                    TimeTextStyle = Theme.CalendarFontSmall,
                     DateTextColor = Theme.DarkGray,
-                    DateTextStyle = Theme.DefaultLightFontSmall,
+                    DateTextStyle = Theme.CalendarFontSmall,
                     HeaderHeight = 10f
                 }
             };
@@ -302,13 +302,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             HeaderStyle = new HeaderStyle
             {
                 TextColor = Theme.DarkerBlue,
-                TextStyle = Theme.DefaultLightFontSmall,
+                TextStyle = Theme.CalendarFontSmall,
             };
 
             DayHeaderStyle = new SFViewHeaderStyle
             {
                 DayTextColor = Theme.DarkerBlue,
-                DateTextStyle = Theme.DefaultLightFontSmall,
+                DateTextStyle = Theme.CalendarFontSmall,
             };
         }
 
@@ -325,10 +325,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 SelectionTextColor = Theme.White,
                 AgendaViewStyle = new AgendaViewStyle
                 {
-                    SubjectTextStyle = Theme.DefaultBoldFont,
-                    TimeTextStyle = Theme.CalendarTimeLightFont,
+                    SubjectTextStyle = Theme.DefaultBoldFont.CustomFont(),
+                    TimeTextStyle = Theme.CalendarTimeLightFont.CustomFont(),
                     DateTextColor = Theme.DarkGray,
-                    DateTextStyle = Theme.DefaultLightFont,
+                    DateTextStyle = Theme.DefaultLightFont.CustomFont(),
                     HeaderHeight = 50f,
                 }
             };
@@ -342,7 +342,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             DayHeaderStyle = new SFViewHeaderStyle
             {
                 DayTextColor = Theme.DarkerBlue,
-                DayTextStyle = Theme.DefaultLightFont
+                DayTextStyle = Theme.DefaultLightFont.CustomFont()
             };
         }
 

@@ -19,8 +19,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         readonly ParticipantStatus userStatus;
 
         UIView viewsContainer;
-        UITextView messageView;
-        UILabel lineLabel;
+        UITextViewScalable messageView;
+        UILabelScalable lineLabel;
 
         ReplyButton acceptButton;
         ReplyButton tentativeButton;
@@ -141,12 +141,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             return container;
         }
 
-        private UITextView InitializeMessageView()
+        private UITextViewScalable InitializeMessageView()
         {
-            UITextView textView = new UITextView
+            UITextViewScalable textView = new UITextViewScalable
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                Font = Theme.DefaultLightFont,
+                Font = Theme.DefaultLightFont.CustomFont(),
                 TextColor = Theme.DarkGray,
                 AutocapitalizationType = UITextAutocapitalizationType.None,
                 AutocorrectionType = UITextAutocorrectionType.No,
@@ -168,11 +168,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
 
-            lineLabel = new UILabel()
+            lineLabel = new UILabelScalable()
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Lines = 1,
-                Font = Theme.DefaultLightFont,
+                Font = Theme.DefaultLightFont.CustomFont(),
                 TextColor = Theme.DarkerBlue,
                 TextAlignment = UITextAlignment.Left,
                 Text = "",
@@ -252,7 +252,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         private void MessageView_StartedEnded(object sender, EventArgs e)
         {
-            var field = (UITextView)sender;
+            var field = (UITextViewScalable)sender;
 
             if (field.Text.Equals(Localization.GetString("add_message")))
             {
@@ -334,7 +334,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         #endregion
     }
 
-    public class ReplyButton : UIButton
+    public class ReplyButton : UIButtonScalable
     {
         readonly ParticipantStatus participantStatus;
 
@@ -347,7 +347,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             SetTitle(GetTitle(), UIControlState.Normal);
             SetTitleColor(Theme.DarkerBlue, UIControlState.Normal);
             SetTitleColor(Theme.DarkGray, UIControlState.Disabled);
-            Font = Theme.DefaultBoldFont;
+            Font = Theme.DefaultBoldFont.CustomFont();
             BackgroundColor = Theme.White;
             TouchUpInside += (sender, e) => ButtonTapped(sender, participantStatus);
         }

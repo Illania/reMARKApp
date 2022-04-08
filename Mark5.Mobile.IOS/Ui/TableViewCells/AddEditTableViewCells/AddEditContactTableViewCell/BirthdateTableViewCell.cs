@@ -16,7 +16,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
 
         Contact contact;
 
-        readonly UITextField dateTextField;
+        readonly UITextFieldScalable dateTextField;
         readonly UIToolbar datePickerToolbar;
         readonly UIBarButtonItem dateDoneButton;
         readonly UIDatePickerStyled datePicker;
@@ -45,10 +45,10 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
                 MaximumDate = NSDate.Now
             };
 
-            dateTextField = new UITextField
+            dateTextField = new UITextFieldScalable
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
-                Font = Theme.DefaultFont,
+                Font = Theme.DefaultFont.CustomFont(),
                 BorderStyle = UITextBorderStyle.None,
                 InputView = datePicker,
                 InputAccessoryView = datePickerToolbar,

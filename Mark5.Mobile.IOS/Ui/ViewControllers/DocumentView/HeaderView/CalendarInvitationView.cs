@@ -9,9 +9,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 {
     public class CalendarInvitationView : DocumentSubView
     {
-        readonly UILabel summaryLabel;
-        readonly UILabel whenLabel;
-        readonly UIButton respondButton;
+        readonly UILabelScalable summaryLabel;
+        readonly UILabelScalable whenLabel;
+        readonly UIButtonScalable respondButton;
 
         public event EventHandler AppointmentReplyTapped = delegate { };
 
@@ -19,9 +19,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         {
             BackgroundColor = Theme.White;
 
-            summaryLabel = new UILabel
+            summaryLabel = new UILabelScalable
             {
-                Font = Theme.DefaultBoldFont,
+                Font = Theme.DefaultBoldFont.CustomFont(),
                 TextColor = Theme.DarkerBlue,
                 Opaque = true,
                 TranslatesAutoresizingMaskIntoConstraints = false,
@@ -29,9 +29,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             };
             ContainerView.AddSubview(summaryLabel);
 
-            whenLabel = new UILabel
+            whenLabel = new UILabelScalable
             {
-                Font = Theme.DefaultLightFont,
+                Font = Theme.DefaultLightFont.CustomFont(),
                 TextColor = Theme.DarkBlue,
                 Opaque = true,
                 TranslatesAutoresizingMaskIntoConstraints = false,
@@ -39,7 +39,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             };
             ContainerView.AddSubview(whenLabel);
 
-            respondButton = new UIButton()
+            respondButton = new UIButtonScalable()
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 ContentEdgeInsets = new UIEdgeInsets(10f, 10f, 10f, 10f),
@@ -48,7 +48,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             respondButton.SetTitleColor(Theme.DarkerBlue, UIControlState.Normal);
             respondButton.TitleLabel.Lines = 0;
             respondButton.TitleLabel.AdjustsFontSizeToFitWidth = false;
-            respondButton.TitleLabel.Font = Theme.DefaultLightBoldFont;
+            respondButton.TitleLabel.Font = Theme.DefaultFont.CustomFont();
             respondButton.TitleLabel.TextAlignment = UITextAlignment.Center;
             respondButton.TitleLabel.LineBreakMode = UILineBreakMode.WordWrap;
             respondButton.TouchUpInside += RespondBtn_TouchUpInside;

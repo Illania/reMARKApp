@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Mark5.Mobile.Common;
@@ -20,7 +20,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
         // Buttons for iPad only
         UIBarButtonItem flagButton;
         UIBarButtonItem fileToButton;
-        UIButton commentsButton;
+        UIButtonScalable commentsButton;
         BadgeBarButtonItem commentsBadgeButton;
         UIBarButtonItem replyActionsButton;
         UIBarButtonItem userActionsButton;
@@ -450,7 +450,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
 
             fileToButton.Clicked += FileToButton_Clicked;
 
-            commentsButton = new UIButton
+            commentsButton = new UIButtonScalable
             {
                 Frame = new CoreGraphics.CGRect(0f, 0f, 25f, 25f),
                 Enabled = enabled,
