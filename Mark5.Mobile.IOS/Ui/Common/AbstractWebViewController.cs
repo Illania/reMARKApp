@@ -210,11 +210,10 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             base.TraitCollectionDidChange(previousTraitCollection);
 
-            ReloadWebView(TraitCollection);
-            //View.ReloadInputViews();
+            AdjustFontForTraitCollection(TraitCollection);
         }
 
-        public async void ReloadWebView(UITraitCollection traitCollection)
+        public async void AdjustFontForTraitCollection(UITraitCollection traitCollection)
         {
             var scaledFont = Theme.DefaultFont.CustomFont(traitCollection);
             var htmlString = await GetContent();
@@ -235,14 +234,14 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             var styles = prePlainTextNode.GetAttributeValue("style", null);
 
-            if (!string.IsNullOrWhiteSpace(styles)) //&& (styles.ToUpper().Contains("FONT-FAMILY:") || styles.ToUpper().Contains("FONT-SIZE:")))
+            if (!string.IsNullOrWhiteSpace(styles))
             {
                 prePlainTextNode.Attributes["style"].Remove();
 
                 string[] splitter = { ";" };
                 string[] styleClasses = styles.Split(splitter, StringSplitOptions.None);
 
-                StringBuilder sbStyles = new StringBuilder($"font-family:{font.FamilyName}; font-size:{font.PointSize}pt;");
+                StringBuilder sbStyles = new($"font-family:{font.FamilyName}; font-size:{font.PointSize}pt;");
 
                 if (null != styleClasses && styleClasses.Length > 0)
                 {
@@ -251,7 +250,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                         if (!string.IsNullOrWhiteSpace(item) && !item.ToUpper().Contains("FONT-FAMILY:")
                             && !item.ToUpper().Contains("FONT-SIZE:") && !item.ToUpper().Contains("FONT:"))
                         {
-                            // Add existing styles except font size and font family styles.
+   
                             sbStyles.Append(item.Trim());
                             sbStyles.Append(";");
                         }
@@ -436,6 +435,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
             webView?.StopLoading();
             webView?.LoadHtmlString(text, null);
+            ApplyFontToHtmlString(Theme.DefaultFont.CustomFont(TraitCollection), text);
           
         }
 
