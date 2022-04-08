@@ -24,7 +24,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         nint searcBtnTag = 6;
         nint titleTag = 7;
 
-        UIButton closeButton;
+        UIButtonScalable closeButton;
         UIView closeButtonContainer;
         UIView seperatorView;
         UILabelScalable titleLabel;
@@ -44,7 +44,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             this.currentModule = currentModule;
 
-            closeButton = new UIButton
+            closeButton = new UIButtonScalable
             {
                 TintColor = Theme.White,
                 BackgroundColor = Theme.DarkBlue,
@@ -245,7 +245,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 }
             }
 
-            readonly UIButton Button = new UIButton
+            readonly UIButtonScalable Button = new UIButtonScalable
             {
                 TintColor = Theme.White,
                 BackgroundColor = Theme.White,

@@ -141,7 +141,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
         readonly WeakReference<AttachmentsView> viewWeakReference;
         readonly Attachment attachment;
 
-        UIButton attachmentButton;
+        UIButtonScalable attachmentButton;
 
         public AttachmentsSubView(AttachmentsView attachmentsView, Attachment attachment)
         {
@@ -150,7 +150,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
 
             TranslatesAutoresizingMaskIntoConstraints = false;
 
-            attachmentButton = new UIButton(UIButtonType.RoundedRect)
+            attachmentButton = new UIButtonScalable(UIButtonType.RoundedRect)
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 HorizontalAlignment = UIControlContentHorizontalAlignment.Left,

@@ -17,10 +17,10 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
 
         protected CommunicationAddress address;
 
-        readonly UITextField numberTextField;
-        readonly UITextField descriptionTextField;
-        readonly UIButton chevronButton;
-        readonly UITextField prefixTextField;
+        readonly UITextFieldScalable numberTextField;
+        readonly UITextFieldScalable descriptionTextField;
+        readonly UIButtonScalable chevronButton;
+        readonly UITextFieldScalable prefixTextField;
         readonly UISwitch preferrableSwitch;
         readonly UILabelScalable preferrableLabel;
 
@@ -62,7 +62,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
                 }
             };
 
-            prefixTextField = new UITextField
+            prefixTextField = new UITextFieldScalable
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Font = Theme.DefaultFont.CustomFont(),
@@ -83,7 +83,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
             var verticalSeparator = GetVerticalSeparator();
             ContentView.AddSubview(verticalSeparator);
 
-            numberTextField = new UITextField
+            numberTextField = new UITextFieldScalable
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Font = Theme.DefaultFont.CustomFont(),
@@ -97,7 +97,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
             var horizontalSeparator = GetHorizontalSeparator();
             ContentView.AddSubview(horizontalSeparator);
 
-            descriptionTextField = new UITextField
+            descriptionTextField = new UITextFieldScalable
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Font = Theme.DefaultFont.CustomFont(),

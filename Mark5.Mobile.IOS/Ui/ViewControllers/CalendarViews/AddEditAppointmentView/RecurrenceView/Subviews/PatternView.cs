@@ -700,7 +700,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
 
             RadioButton radioButton1;
             RadioButton radioButton2;
-            UITextField dayTextField;
+            UITextFieldScalable dayTextField;
 
             ExtendedWeekDayPicker weekDayField;
             WeekOfMonthPicker weekOfMonthField;

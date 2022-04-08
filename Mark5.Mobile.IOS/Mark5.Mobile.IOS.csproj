@@ -328,8 +328,10 @@
 		<Compile Include="Ui\ViewControllers\CopyToDepartmentWorktrayViewController.cs" />
 		<Compile Include="Ui\ViewControllers\CopyToUserWorktrayViewController.cs" />
 		<Compile Include="Ui\ViewControllers\LinkedEmailListViewController.cs" />
-		<Compile Include="Ui\Common\UITextViewScalable.cs" />
-		<Compile Include="Ui\Common\UILabelScalable.cs" />
+		<Compile Include="Ui\Common\Scalable controls\UILabelScalable.cs" />
+		<Compile Include="Ui\Common\Scalable controls\UITextFieldScalable.cs" />
+		<Compile Include="Ui\Common\Scalable controls\UITextViewScalable.cs" />
+		<Compile Include="Ui\Common\Scalable controls\UIButtonScalable.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
@@ -984,6 +986,7 @@
 	  <Folder Include="Assets_onboarding.xcassets\onboarding_5.imageset\" />
 	  <Folder Include="Assets_icons.xcassets\Bookmark.imageset\" />
 	  <Folder Include="Assets_icons.xcassets\Compose.imageset\" />
+	  <Folder Include="Ui\Common\Scalable controls\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 	<Import Project="..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets" Condition="Exists('..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets')" />

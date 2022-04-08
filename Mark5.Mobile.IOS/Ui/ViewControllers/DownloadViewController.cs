@@ -60,14 +60,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UIView progressView;
         UIView finishedView;
 
-        UIButton startButton;
+        UIButtonScalable startButton;
         UILabelScalable lastDownloadedLabel;
         UIActivityIndicatorView progressPreparingIndicator;
         UIProgressView progressIndicator;
         UILabelScalable progressLabel;
-        UIButton cancelButton;
+        UIButtonScalable cancelButton;
         UILabelScalable downloadedLabel;
-        UIButton closeButton;
+        UIButtonScalable closeButton;
 
         Stopwatch sw;
         CancellationTokenSource cts;
@@ -233,7 +233,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 downView.BottomAnchor.ConstraintEqualTo(startView.BottomAnchor)
             });
 
-            startButton = new UIButton
+            startButton = new UIButtonScalable
             {
                 TintColor = Theme.LightGray,
                 BackgroundColor = Theme.DarkBlue,
@@ -410,7 +410,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 progressLabel.CenterXAnchor.ConstraintEqualTo(downView.CenterXAnchor)
             });
 
-            cancelButton = new UIButton
+            cancelButton = new UIButtonScalable
             {
                 TranslatesAutoresizingMaskIntoConstraints = false
             };
@@ -478,7 +478,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 downView.BottomAnchor.ConstraintEqualTo(finishedView.BottomAnchor)
             });
 
-            closeButton = new UIButton
+            closeButton = new UIButtonScalable
             {
                 TintColor = Theme.LightGray,
                 BackgroundColor = Theme.DarkBlue,
@@ -717,13 +717,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void CancelButton_TouchUpInside(object sender, EventArgs e)
         {
-            ((UIButton)sender).Enabled = false;
+            ((UIButtonScalable)sender).Enabled = false;
 
             var result = await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("warning"), Localization.GetString("download_interrupt_warning"));
             if (result)
                 cts?.Cancel();
             else
-                ((UIButton)sender).Enabled = true;
+                ((UIButtonScalable)sender).Enabled = true;
         }
 
         void CloseButton_TouchUpInside(object sender, EventArgs e) => DismissViewController(true, null);

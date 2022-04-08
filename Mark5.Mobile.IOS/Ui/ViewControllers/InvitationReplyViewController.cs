@@ -334,7 +334,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         #endregion
     }
 
-    public class ReplyButton : UIButton
+    public class ReplyButton : UIButtonScalable
     {
         readonly ParticipantStatus participantStatus;
 

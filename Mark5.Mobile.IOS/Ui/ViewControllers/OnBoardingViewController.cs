@@ -145,7 +145,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         UIImageView headlineImage;
         LOTAnimationView animationView = null;
 
-        UIButton nextDoneButton;
+        UIButtonScalable nextDoneButton;
 
         readonly OnBoardingPageModel pageModel;
         readonly bool isLast;
@@ -227,7 +227,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             descriptionTextView.ScrollRangeToVisible(new Foundation.NSRange(0, 0));
 
-            nextDoneButton = new UIButton(UIButtonType.System)
+            nextDoneButton = new UIButtonScalable(UIButtonType.System)
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 ContentEdgeInsets = new UIEdgeInsets(5, 25f, 5f, 25f)

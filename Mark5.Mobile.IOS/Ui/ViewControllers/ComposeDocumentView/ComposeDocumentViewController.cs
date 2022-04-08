@@ -58,7 +58,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         UIBarButtonItem cancelButtonItem;
         UIBarButtonItem insertButtonItem;
         UIBarButtonItem sendButtonItem;
-        UIButton sendButton;
+        UIButtonScalable sendButton;
         UILongPressGestureRecognizer sendButtonLongPressGestureRecognizer;
 
         UIStackView headerStackView;
@@ -200,7 +200,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             if (ServerConfig.SystemSettings?.SystemInfo?.DelaySendAvailable == true)
             {
-                sendButton = new UIButton
+                sendButton = new UIButtonScalable
                 {
                     TranslatesAutoresizingMaskIntoConstraints = false,
                     Opaque = false,

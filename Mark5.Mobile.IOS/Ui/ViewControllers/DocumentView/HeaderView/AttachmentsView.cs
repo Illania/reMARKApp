@@ -144,7 +144,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         public AttachmentDescription Attachment { get; }
 
         WeakReference<AttachmentsView> viewWeakReference;
-        UIButton attachmentButton;
+        UIButtonScalable attachmentButton;
 
         public AttachmentsSubView(AttachmentsView view, AttachmentDescription attachmentDescription)
         {
@@ -159,7 +159,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             Opaque = false;
             TranslatesAutoresizingMaskIntoConstraints = false;
 
-            attachmentButton = new UIButton(UIButtonType.RoundedRect)
+            attachmentButton = new UIButtonScalable(UIButtonType.RoundedRect)
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 HorizontalAlignment = UIControlContentHorizontalAlignment.Left,

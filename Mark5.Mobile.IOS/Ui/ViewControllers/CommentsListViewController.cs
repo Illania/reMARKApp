@@ -27,7 +27,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         UITableView tableView;
         UIView commentView;
-        UIButton addCommentButton;
+        UIButtonScalable addCommentButton;
         UIScrollView commentTextScrollView;
         UITextViewScalable commentTextView;
 
@@ -189,7 +189,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 borderView.HeightAnchor.ConstraintEqualTo(.75f)
             });
 
-            addCommentButton = new UIButton(UIButtonType.System)
+            addCommentButton = new UIButtonScalable(UIButtonType.System)
             {
                 Enabled = false,
                 TranslatesAutoresizingMaskIntoConstraints = false

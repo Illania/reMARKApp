@@ -40,7 +40,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         UIView headerView;
         UILabelScalable nameLabel;
-        UIButton button1;
+        UIButtonScalable button1;
 
         UIBarButtonItem fileToButton;
         UIBarButtonItem doneButtonItem;
@@ -185,7 +185,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 buttonsView.CenterXAnchor.ConstraintEqualTo(headerView.CenterXAnchor)
             });
 
-            button1 = new UIButton
+            button1 = new UIButtonScalable
             {
                 Enabled = false,
                 Alpha = 0f,

@@ -6,7 +6,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
     public class AppointmentDisclosureTableViewCell : AddEditTableViewCell
     {
         public static readonly string Key = "AppointmentDisclosureTableViewCell";
-        protected UIButton ChevronButton;
+        protected UIButtonScalable ChevronButton;
         protected UILabelScalable Title;
         protected UILabelScalable Label;
         protected UITextViewScalable HiddenTextView;

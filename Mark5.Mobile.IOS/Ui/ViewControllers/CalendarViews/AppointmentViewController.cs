@@ -841,7 +841,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 ShowParticipantsClicked(this, EventArgs.Empty);
             }
 
-            class SendInvitationsButton : UIButton
+            class SendInvitationsButton : UIButtonScalable
             {
                 public SendInvitationsButton()
                 {

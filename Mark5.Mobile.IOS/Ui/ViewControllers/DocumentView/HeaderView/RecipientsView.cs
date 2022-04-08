@@ -37,7 +37,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
         UILabelScalable titleLabel;
         UITextViewScalable textView;
-        UIButton expandButton;
+        UIButtonScalable expandButton;
 
         State currentState;
         CADisplayLink displayLink;

@@ -19,7 +19,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
 
         readonly UILabelScalable nameLabel;
         readonly UILabelScalable documentCount;
-        readonly UIButton expandButton;
+        readonly UIButtonScalable expandButton;
 
         readonly NSLayoutConstraint offlineIndicatorWidthConstraint;
         readonly NSLayoutConstraint offlineIndicatorLeadingConstraint;

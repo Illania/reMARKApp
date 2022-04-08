@@ -12,14 +12,14 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
 
         public Action<string> ContentEdited;
 
-        readonly UITextField textField;
+        readonly UITextFieldScalable textField;
 
         public TextFieldTableViewCell()
             : base(UITableViewCellStyle.Default, Key)
         {
             SelectionStyle = UITableViewCellSelectionStyle.None;
 
-            textField = new UITextField
+            textField = new UITextFieldScalable
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Font = Theme.DefaultFont.CustomFont(),

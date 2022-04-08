@@ -235,13 +235,13 @@ namespace Mark5.Mobile.IOS.Ui.Common
                     return;
                 }
 
-                if (view is UIButton button)
+                if (view is UIButtonScalable button)
                 {
                     button.TitleLabel.Font = DefaultFont.CustomFont();
                     return;
                 }
 
-                if (view is UITextField textField)
+                if (view is UITextFieldScalable textField)
                 {
                     textField.Font = DefaultFont.CustomFont();
                     return;

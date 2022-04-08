@@ -15,8 +15,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         protected UIDatePicker datePicker;
         protected UIView containerView;
-        UIButton okButton;
-        UIButton cancelButton;
+        UIButtonScalable okButton;
+        UIButtonScalable cancelButton;
         UIView verticalLine;
         UIView horizontalLine;
 
@@ -61,7 +61,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 MinimumDate = NSDate.Now
             };
 
-            cancelButton = new UIButton
+            cancelButton = new UIButtonScalable
             {
                 ContentEdgeInsets = new UIEdgeInsets(7f, 7f, 7f, 7f),
                 TranslatesAutoresizingMaskIntoConstraints = false,
@@ -73,7 +73,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             cancelButton.TitleLabel.Lines = 0;
             cancelButton.TitleLabel.LineBreakMode = UILineBreakMode.WordWrap;
 
-            okButton = new UIButton
+            okButton = new UIButtonScalable
             {
                 ContentEdgeInsets = new UIEdgeInsets(7f, 7f, 7f, 7f),
                 TranslatesAutoresizingMaskIntoConstraints = false,

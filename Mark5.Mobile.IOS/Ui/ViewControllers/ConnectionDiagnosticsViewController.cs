@@ -122,7 +122,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             scrollView.AddSubview(serviceStatusDescription);
 
-            UIButton refreshButton = new UIButton
+            UIButtonScalable refreshButton = new UIButtonScalable
             {
                 TintColor = Theme.DarkerBlue,
                 BackgroundColor = UIColor.GroupTableViewBackgroundColor,

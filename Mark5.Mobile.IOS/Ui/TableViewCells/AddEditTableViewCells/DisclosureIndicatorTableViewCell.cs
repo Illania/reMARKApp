@@ -14,7 +14,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
 
         NSLayoutConstraint leftContentConstraint;
 
-        readonly UIButton chevronButton;
+        readonly UIButtonScalable chevronButton;
 
         public DisclosureIndicatorTableViewCell()
             : base(UITableViewCellStyle.Default, Key)

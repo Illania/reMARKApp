@@ -16,12 +16,12 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
 
         protected PhysicalAddress address;
 
-        readonly UITextField cityTextField;
-        readonly UITextField addressTextField;
-        readonly UITextField zipTextField;
-        readonly UITextField areaTextField;
-        readonly UIButton chevronButton;
-        readonly UITextField countryTextField;
+        readonly UITextFieldScalable cityTextField;
+        readonly UITextFieldScalable addressTextField;
+        readonly UITextFieldScalable zipTextField;
+        readonly UITextFieldScalable areaTextField;
+        readonly UIButtonScalable chevronButton;
+        readonly UITextFieldScalable countryTextField;
 
         readonly UIToolbar countryPickerToolbar;
         readonly UIPickerView countryPicker;
@@ -55,7 +55,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
                 }
             };
 
-            addressTextField = new UITextField
+            addressTextField = new UITextFieldScalable
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Font = Theme.DefaultFont.CustomFont(),
@@ -68,7 +68,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
             var horizontalSeparator = GetHorizontalSeparator();
             ContentView.AddSubview(horizontalSeparator);
 
-            zipTextField = new UITextField
+            zipTextField = new UITextFieldScalable
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Font = Theme.DefaultFont.CustomFont(),
@@ -81,7 +81,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
             var verticalSeparator = GetVerticalSeparator();
             ContentView.AddSubview(verticalSeparator);
 
-            areaTextField = new UITextField
+            areaTextField = new UITextFieldScalable
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Font = Theme.DefaultFont.CustomFont(),
@@ -94,7 +94,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
             var horizontalSeparator2 = GetHorizontalSeparator();
             ContentView.AddSubview(horizontalSeparator2);
 
-            countryTextField = new UITextField
+            countryTextField = new UITextFieldScalable
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Font = Theme.DefaultFont.CustomFont(),
@@ -114,7 +114,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
             var verticalSeparator2 = GetVerticalSeparator();
             ContentView.AddSubview(verticalSeparator2);
 
-            cityTextField = new UITextField
+            cityTextField = new UITextFieldScalable
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Font = Theme.DefaultFont.CustomFont(),

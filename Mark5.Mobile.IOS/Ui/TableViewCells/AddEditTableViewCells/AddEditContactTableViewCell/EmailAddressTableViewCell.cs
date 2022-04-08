@@ -12,8 +12,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
 
         protected CommunicationAddress address;
 
-        readonly UITextField addressTextField;
-        readonly UITextField descriptionTextField;
+        readonly UITextFieldScalable addressTextField;
+        readonly UITextFieldScalable descriptionTextField;
         readonly UISwitch preferrableSwitch;
         readonly UILabelScalable preferrableLabel;
 
@@ -24,7 +24,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
         {
             SelectionStyle = UITableViewCellSelectionStyle.None;
 
-            addressTextField = new UITextField
+            addressTextField = new UITextFieldScalable
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Font = Theme.DefaultFont.CustomFont(),
@@ -38,7 +38,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
             var horizontalSeparator = GetHorizontalSeparator();
             ContentView.AddSubview(horizontalSeparator);
 
-            descriptionTextField = new UITextField
+            descriptionTextField = new UITextFieldScalable
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Font = Theme.DefaultFont.CustomFont(),

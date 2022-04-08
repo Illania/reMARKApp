@@ -213,7 +213,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
         {
             readonly UIView view;
             readonly UILabelScalable label;
-            readonly UITextField text;
+            readonly UITextFieldScalable text;
 
             public NameSearchView()
             {
@@ -239,7 +239,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     AdjustsFontSizeToFitWidth = true
                 };
 
-                text = new UITextField
+                text = new UITextFieldScalable
                 {
                     AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"), new UIStringAttributes
                     {
@@ -287,21 +287,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             }
 
             [Export("textFieldDidChange:")]
-            void TextFieldDidChange(UITextField textField)
+            void TextFieldDidChange(UITextFieldScalable textField)
             {
                 Criteria.Name = textField.Text;
             }
 
 
             [Export("textFieldShouldReturn:")]
-            bool TextFieldShouldReturn(UITextField textField)
+            bool TextFieldShouldReturn(UITextFieldScalable textField)
             {
                 textField.ResignFirstResponder();
                 return true;
             }
 
             [Export("textFieldDidEndEditing:")]
-            void TextFieldDidEndEditing(UITextField textField)
+            void TextFieldDidEndEditing(UITextFieldScalable textField)
             {
                 text.ResignFirstResponder();
                 text.UserInteractionEnabled = false;
@@ -312,7 +312,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
         {
             readonly UIView view;
             readonly UILabelScalable label;
-            readonly UITextField text;
+            readonly UITextFieldScalable text;
 
             public AddressSearchView()
             {
@@ -338,7 +338,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     AdjustsFontSizeToFitWidth = true
                 };
 
-                text = new UITextField
+                text = new UITextFieldScalable
                 {
                     AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"), new UIStringAttributes
                     {
@@ -386,21 +386,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             }
 
             [Export("textFieldDidChange:")]
-            void TextFieldDidChange(UITextField textField)
+            void TextFieldDidChange(UITextFieldScalable textField)
             {
                 Criteria.ComAddress = textField.Text;
             }
 
 
             [Export("textFieldShouldReturn:")]
-            bool TextFieldShouldReturn(UITextField textField)
+            bool TextFieldShouldReturn(UITextFieldScalable textField)
             {
                 textField.ResignFirstResponder();
                 return true;
             }
 
             [Export("textFieldDidEndEditing:")]
-            void TextFieldDidEndEditing(UITextField textField)
+            void TextFieldDidEndEditing(UITextFieldScalable textField)
             {
                 text.ResignFirstResponder();
                 text.UserInteractionEnabled = false;
@@ -411,13 +411,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
         {
             readonly UIView shortIdView;
             readonly UILabelScalable shortIdLabel;
-            readonly UITextField shortIdTextField;
+            readonly UITextFieldScalable shortIdTextField;
             readonly UIView descriptionView;
             readonly UILabelScalable descriptionLabel;
-            readonly UITextField descriptionTextField;
+            readonly UITextFieldScalable descriptionTextField;
             readonly UIView physicalAddressView;
             readonly UILabelScalable physicalAddressLabel;
-            readonly UITextField physicalAddressTextField;
+            readonly UITextFieldScalable physicalAddressTextField;
 
             public ShortIdDescriptionPhysicalAddressView()
             {
@@ -443,7 +443,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     AdjustsFontSizeToFitWidth = true
                 };
 
-                shortIdTextField = new UITextField
+                shortIdTextField = new UITextFieldScalable
                 {
                     AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"), new UIStringAttributes
                     {
@@ -496,7 +496,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     AdjustsFontSizeToFitWidth = true
                 };
 
-                descriptionTextField = new UITextField
+                descriptionTextField = new UITextFieldScalable
                 {
                     AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"), new UIStringAttributes
                     {
@@ -549,7 +549,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     AdjustsFontSizeToFitWidth = true
                 };
 
-                physicalAddressTextField = new UITextField
+                physicalAddressTextField = new UITextFieldScalable
                 {
                     AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"),
                         new UIStringAttributes
@@ -636,7 +636,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             }
 
             [Export("textFieldDidChange:")]
-            void TextFieldDidChange(UITextField textField)
+            void TextFieldDidChange(UITextFieldScalable textField)
             {
                 if (textField == shortIdTextField)
                     Criteria.ShortId = textField.Text;
@@ -647,7 +647,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             }
 
             [Export("textFieldShouldReturn:")]
-            bool TextFieldShouldReturn(UITextField textField)
+            bool TextFieldShouldReturn(UITextFieldScalable textField)
             {
                 textField.ResignFirstResponder();
                 return true;
@@ -655,7 +655,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
 
 
             [Export("textFieldDidEndEditing:")]
-            void TextFieldDidEndEditing(UITextField textField)
+            void TextFieldDidEndEditing(UITextFieldScalable textField)
             {
                 if (textField == shortIdTextField)
                     AnimateNotify(AnimationLength,
@@ -704,7 +704,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
 
             readonly UIView countryView;
             readonly UILabelScalable countryLabel;
-            readonly UITextField countryValue;
+            readonly UITextFieldScalable countryValue;
             readonly UIView categoriesView;
             readonly UILabelScalable categoriesLabel;
             readonly UILabelScalable categoriesValue;
@@ -761,7 +761,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     Delegate = countrySource
                 };
 
-                countryValue = new UITextField
+                countryValue = new UITextFieldScalable
                 {
                     TextColor = InactiveTextColor,
                     Font = Font,

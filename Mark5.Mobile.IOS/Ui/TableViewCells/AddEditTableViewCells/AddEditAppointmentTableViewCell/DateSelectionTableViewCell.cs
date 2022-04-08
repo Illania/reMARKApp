@@ -18,7 +18,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
         UIDatePickerStyled datePicker;
 
         public Action<DateTimeChangeEvent> DateChanged = delegate { };
-        public UITextField DateTextField;
+        public UITextFieldScalable DateTextField;
         public UILabelScalable Label;
 
         public DateSelectioTableViewCell(Action<DateTimeChangeEvent> dateChanged, DateRowType rowType) : base(UITableViewCellStyle.Default, Key)
@@ -55,7 +55,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
                 }
             };
 
-            DateTextField = new UITextField
+            DateTextField = new UITextFieldScalable
             {
                 Font = Theme.DefaultFont.CustomFont(),
                 TintColor = Theme.Clear,

@@ -11,7 +11,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
     {
         readonly UILabelScalable summaryLabel;
         readonly UILabelScalable whenLabel;
-        readonly UIButton respondButton;
+        readonly UIButtonScalable respondButton;
 
         public event EventHandler AppointmentReplyTapped = delegate { };
 
@@ -39,7 +39,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             };
             ContainerView.AddSubview(whenLabel);
 
-            respondButton = new UIButton()
+            respondButton = new UIButtonScalable()
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 ContentEdgeInsets = new UIEdgeInsets(10f, 10f, 10f, 10f),

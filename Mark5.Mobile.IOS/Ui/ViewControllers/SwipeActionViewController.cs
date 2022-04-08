@@ -17,9 +17,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         const float swipeContainerHeight = 160f;
         const float swipeActionBtnWidth = 80f;
 
-        UIButton leadingSwipeButton;
-        UIButton middleSwipeButton;
-        UIButton lastSwipeButton;
+        UIButtonScalable leadingSwipeButton;
+        UIButtonScalable middleSwipeButton;
+        UIButtonScalable lastSwipeButton;
 
         static nint leadingBtnTag = 0;
         static nint trailingMiddleBtnTag = 1;
@@ -179,9 +179,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             return background;
         }
 
-        UIButton BuildActionSelectionButton()
+        UIButtonScalable BuildActionSelectionButton()
         {
-            var button = new UIButton()
+            var button = new UIButtonScalable()
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 ContentEdgeInsets = new UIEdgeInsets(5f, 5f, 5f, 5f),
@@ -334,7 +334,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void BuildMaskButton(UIView containerView, nint tag)
         {
 
-            UIButton maskBtn = new UIButton()
+            UIButtonScalable maskBtn = new UIButtonScalable()
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 UserInteractionEnabled = true,
@@ -361,7 +361,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void BuildDefaultsButton(UIScrollView scrollView, UIView topView)
         {
-            UIButton defaultsBtn = new UIButton()
+            UIButtonScalable defaultsBtn = new UIButtonScalable()
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 BackgroundColor = Theme.White,
@@ -471,7 +471,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         UIView BuildTrailingSwipeLastAction()
         {
-            UIButton containerView = new UIButton()
+            UIButtonScalable containerView = new UIButtonScalable()
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 BackgroundColor = Theme.White
@@ -651,7 +651,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
 
-            UIButton senderBtn = (UIButton)sender;
+            UIButtonScalable senderBtn = (UIButtonScalable)sender;
 
             eas.AddAction(UIAlertAction.Create(
                 Localization.GetString("mark_as_read_unread"),
@@ -726,7 +726,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     DismissViewController(true, null);
                 }));
 
-            UIButton senRef = (UIButton)sender;
+            UIButtonScalable senRef = (UIButtonScalable)sender;
 
             if (eas.PopoverPresentationController != null)
             {

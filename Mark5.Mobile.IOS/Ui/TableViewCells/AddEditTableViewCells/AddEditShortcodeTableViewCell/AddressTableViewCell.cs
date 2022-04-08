@@ -13,9 +13,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
 
         protected DocumentAddress address;
 
-        readonly UITextField addressTextField;
-        readonly UITextField nameTextField;
-        readonly UITextField attentionTextField;
+        readonly UITextFieldScalable addressTextField;
+        readonly UITextFieldScalable nameTextField;
+        readonly UITextFieldScalable attentionTextField;
         readonly UILabelScalable typeLabel;
 
         public Action AddressChangedAction;
@@ -24,7 +24,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
         {
             SelectionStyle = UITableViewCellSelectionStyle.None;
 
-            addressTextField = new UITextField
+            addressTextField = new UITextFieldScalable
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Font = Theme.DefaultFont.CustomFont(),
@@ -38,7 +38,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
             var horizontalSeparator = GetHorizontalSeparator();
             ContentView.AddSubview(horizontalSeparator);
 
-            nameTextField = new UITextField
+            nameTextField = new UITextFieldScalable
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Font = Theme.DefaultFont.CustomFont(),
@@ -50,7 +50,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
             var horizontalSeparator2 = GetHorizontalSeparator();
             ContentView.AddSubview(horizontalSeparator2);
 
-            attentionTextField = new UITextField
+            attentionTextField = new UITextFieldScalable
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 Font = Theme.DefaultFont.CustomFont(),

@@ -79,11 +79,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
             var textContainer = new NSTextContainer();
             layoutManager.AddTextContainer(textContainer);
 
-            UIButton addButton = null;
+            UIButtonScalable addButton = null;
 
             if (!hideAddButton)
             {
-                addButton = new UIButton();
+                addButton = new UIButtonScalable();
                 addButton.SetImage(UIImage.FromBundle("Add").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
                 addButton.BackgroundColor = Theme.Clear;
                 addButton.TranslatesAutoresizingMaskIntoConstraints = false;

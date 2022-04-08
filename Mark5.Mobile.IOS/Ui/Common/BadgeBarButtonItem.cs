@@ -136,7 +136,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         bool shouldHideBadgeAtZero;
         bool shouldAnimateBadge;
 
-        public BadgeBarButtonItem(UIButton customButton)
+        public BadgeBarButtonItem(UIButtonScalable customButton)
         {
             CustomView = customButton;
             if (CustomView != null)

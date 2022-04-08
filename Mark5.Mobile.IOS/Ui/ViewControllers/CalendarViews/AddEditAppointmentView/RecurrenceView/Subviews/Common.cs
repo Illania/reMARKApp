@@ -41,7 +41,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView
         void SetViewModel(RecurrenceInfo ri);
     }
 
-    abstract class BaseField : UITextField
+    abstract class BaseField : UITextFieldScalable
     {
         const float insetVal = 4f;
 

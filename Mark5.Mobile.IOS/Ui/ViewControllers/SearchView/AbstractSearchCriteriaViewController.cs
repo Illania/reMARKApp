@@ -21,7 +21,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
 
         UIScrollView scrollView;
         protected UIStackView StackView;
-        protected UIButton SearchButton;
+        protected UIButtonScalable SearchButton;
 
         NSLayoutConstraint searchButtonBottomConstraint1;
         NSLayoutConstraint searchButtonBottomConstraint2;
@@ -104,7 +104,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                });
             }
 
-            SearchButton = new UIButton
+            SearchButton = new UIButtonScalable
             {
                 TintColor = Theme.DarkerBlue,
                 BackgroundColor = Theme.LightBlue,

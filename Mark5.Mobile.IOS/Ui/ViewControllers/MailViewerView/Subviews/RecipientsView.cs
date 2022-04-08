@@ -41,7 +41,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView.Subviews
 
         UILabelScalable titleLabel;
         UITextViewScalable textView;
-        UIButton expandButton;
+        UIButtonScalable expandButton;
 
 
         State currentState;

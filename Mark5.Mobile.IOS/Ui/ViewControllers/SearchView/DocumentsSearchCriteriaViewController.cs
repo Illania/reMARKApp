@@ -268,7 +268,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             readonly UILabelScalable titleLabel;
             readonly UIView valueTextFieldAccessoryView;
             readonly UISegmentedControl valueTextFieldSegmentedControl;
-            readonly UITextField valueTextField;
+            readonly UITextFieldScalable valueTextField;
 
             public MessageSubjectView()
             {
@@ -321,7 +321,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     valueTextFieldSegmentedControl.HeightAnchor.ConstraintLessThanOrEqualTo(valueTextFieldAccessoryView.HeightAnchor, 1f, -5f)
                 });
 
-                valueTextField = new UITextField
+                valueTextField = new UITextFieldScalable
                 {
                     AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_search_text"), new UIStringAttributes
                     {
@@ -409,7 +409,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             }
 
             [Export("textFieldShouldBeginEditing:")]
-            bool TextFieldShouldBeginEditing(UITextField textField)
+            bool TextFieldShouldBeginEditing(UITextFieldScalable textField)
             {
                 switch (Criteria.SubjectMessageClause)
                 {
@@ -428,20 +428,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             }
 
             [Export("textFieldDidChange:")]
-            void TextFieldDidChange(UITextField textField)
+            void TextFieldDidChange(UITextFieldScalable textField)
             {
                 Criteria.SubjectMessageField = textField.Text;
             }
 
             [Export("textFieldShouldReturn:")]
-            bool TextFieldShouldReturn(UITextField textField)
+            bool TextFieldShouldReturn(UITextFieldScalable textField)
             {
                 textField.ResignFirstResponder();
                 return true;
             }
 
             [Export("textFieldDidEndEditing:")]
-            void TextFieldDidEndEditing(UITextField textField)
+            void TextFieldDidEndEditing(UITextFieldScalable textField)
             {
                 textField.UserInteractionEnabled = false;
             }
@@ -452,7 +452,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             readonly UILabelScalable titleLabel;
             readonly UIView valueTextFieldAccessoryView;
             readonly UISegmentedControl valueTextFieldSegmentedControl;
-            readonly UITextField valueTextField;
+            readonly UITextFieldScalable valueTextField;
 
             public FromToView()
             {
@@ -504,7 +504,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     valueTextFieldSegmentedControl.HeightAnchor.ConstraintLessThanOrEqualTo(valueTextFieldAccessoryView.HeightAnchor, 1f, -5f)
                 });
 
-                valueTextField = new UITextField
+                valueTextField = new UITextFieldScalable
                 {
                     AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_enter_address"), new UIStringAttributes
                     {
@@ -592,7 +592,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             }
 
             [Export("textFieldShouldBeginEditing:")]
-            bool TextFieldShouldBeginEditing(UITextField textField)
+            bool TextFieldShouldBeginEditing(UITextFieldScalable textField)
             {
                 switch (Criteria.FromToClause)
                 {
@@ -611,20 +611,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             }
 
             [Export("textFieldDidChange:")]
-            void TextFieldDidChange(UITextField textField)
+            void TextFieldDidChange(UITextFieldScalable textField)
             {
                 Criteria.FromToField = textField.Text;
             }
 
             [Export("textFieldShouldReturn:")]
-            bool TextFieldShouldReturn(UITextField textField)
+            bool TextFieldShouldReturn(UITextFieldScalable textField)
             {
                 textField.ResignFirstResponder();
                 return true;
             }
 
             [Export("textFieldDidEndEditing:")]
-            void TextFieldDidEndEditing(UITextField textField)
+            void TextFieldDidEndEditing(UITextFieldScalable textField)
             {
                 textField.UserInteractionEnabled = false;
             }
@@ -634,10 +634,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
         {
             readonly UIView fromView;
             readonly UILabelScalable fromLabel;
-            readonly UITextField fromValue;
+            readonly UITextFieldScalable fromValue;
             readonly UIView toView;
             readonly UILabelScalable toLabel;
-            readonly UITextField toValue;
+            readonly UITextFieldScalable toValue;
 
             readonly UIToolbar fromDatePickerToolbar;
             readonly UIBarButtonItem fromDateCancelButton;
@@ -695,7 +695,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     Mode = UIDatePickerMode.Date
                 };
 
-                fromValue = new UITextField
+                fromValue = new UITextFieldScalable
                 {
                     TextColor = InactiveTextColor,
                     Font = Font,
@@ -764,7 +764,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     Mode = UIDatePickerMode.Date
                 };
 
-                toValue = new UITextField
+                toValue = new UITextFieldScalable
                 {
                     TextColor = InactiveTextColor,
                     Font = Font,
@@ -1212,13 +1212,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
         {
             readonly UIView referenceView;
             readonly UILabelScalable referenceLabel;
-            readonly UITextField referenceTextField;
+            readonly UITextFieldScalable referenceTextField;
             readonly UIView commentView;
             readonly UILabelScalable commentLabel;
-            readonly UITextField commentTextField;
+            readonly UITextFieldScalable commentTextField;
             readonly UIView attachmentNameView;
             readonly UILabelScalable attachmentNameLabel;
-            readonly UITextField attachmentNameTextField;
+            readonly UITextFieldScalable attachmentNameTextField;
 
             public ReferenceCommentsAttachmentNameView()
             {
@@ -1244,7 +1244,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     AdjustsFontSizeToFitWidth = true
                 };
 
-                referenceTextField = new UITextField
+                referenceTextField = new UITextFieldScalable
                 {
                     AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"), new UIStringAttributes
                     {
@@ -1297,7 +1297,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     AdjustsFontSizeToFitWidth = true
                 };
 
-                commentTextField = new UITextField
+                commentTextField = new UITextFieldScalable
                 {
                     AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"), new UIStringAttributes
                     {
@@ -1350,7 +1350,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     AdjustsFontSizeToFitWidth = true
                 };
 
-                attachmentNameTextField = new UITextField
+                attachmentNameTextField = new UITextFieldScalable
                 {
                     AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"), new UIStringAttributes
                     {
@@ -1436,7 +1436,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             }
 
             [Export("textFieldDidChange:")]
-            void TextFieldDidChange(UITextField textField)
+            void TextFieldDidChange(UITextFieldScalable textField)
             {
                 if (textField == referenceTextField)
                     Criteria.Reference = textField.Text;
@@ -1447,14 +1447,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             }
 
             [Export("textFieldShouldReturn:")]
-            bool TextFieldShouldReturn(UITextField textField)
+            bool TextFieldShouldReturn(UITextFieldScalable textField)
             {
                 textField.ResignFirstResponder();
                 return true;
             }
 
             [Export("textFieldDidEndEditing:")]
-            void TextFieldDidEndEditing(UITextField textField)
+            void TextFieldDidEndEditing(UITextFieldScalable textField)
             {
                 if (textField == referenceTextField)
                     AnimateNotify(AnimationLength,
@@ -1501,7 +1501,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
         {
             readonly UIView view;
             readonly UILabelScalable label;
-            readonly UITextField text;
+            readonly UITextFieldScalable text;
 
             public ExtraFieldsView()
             {
@@ -1527,7 +1527,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     AdjustsFontSizeToFitWidth = true
                 };
 
-                text = new UITextField
+                text = new UITextFieldScalable
                 {
                     AttributedPlaceholder = new NSAttributedString(Localization.GetString("search_type"), new UIStringAttributes
                     {
@@ -1575,21 +1575,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             }
 
             [Export("textFieldDidChange:")]
-            void TextFieldDidChange(UITextField textField)
+            void TextFieldDidChange(UITextFieldScalable textField)
             {
                 Criteria.ExtraFields = textField.Text;
             }
 
 
             [Export("textFieldShouldReturn:")]
-            bool TextFieldShouldReturn(UITextField textField)
+            bool TextFieldShouldReturn(UITextFieldScalable textField)
             {
                 textField.ResignFirstResponder();
                 return true;
             }
 
             [Export("textFieldDidEndEditing:")]
-            void TextFieldDidEndEditing(UITextField textField)
+            void TextFieldDidEndEditing(UITextFieldScalable textField)
             {
                 text.ResignFirstResponder();
                 text.UserInteractionEnabled = false;
