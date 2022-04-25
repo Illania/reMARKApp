@@ -81,7 +81,7 @@
     <MtouchArch>ARM64</MtouchArch>
     <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
     <MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
-    <CodesignProvision>reMARK App CallID 2021 Development</CodesignProvision>
+    <CodesignProvision>reMARK CallID 2022 Dev</CodesignProvision>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

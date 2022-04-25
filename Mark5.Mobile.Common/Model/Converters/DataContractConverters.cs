@@ -130,6 +130,16 @@ namespace Mark5.Mobile.Common.Model.Converters
             };
         }
 
+        public static ExtraField Convert(this DataContract.ExtraFieldInfo extraFieldInfo)
+        {
+            return new ExtraField
+            {
+                FieldId = extraFieldInfo.Id,
+                FieldName = extraFieldInfo.Name,
+                Enabled = extraFieldInfo.Enabled
+            };
+        }
+
         public static Comment Convert(this DataContract.Comment c)
         {
             return new Comment
@@ -823,6 +833,16 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Name = c.Name,
                 Description = c.Description,
                 HexColor = c.HexColor
+            };
+        }
+
+        public static DataContract.ExtraFieldInfo Convert(this ExtraField extraField)
+        {
+            return new DataContract.ExtraFieldInfo
+            {
+                Id = extraField.FieldId,
+                Name = extraField.FieldName,
+                Enabled = extraField.Enabled
             };
         }
 

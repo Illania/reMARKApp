@@ -24,6 +24,7 @@
 "add_message" = "Add message (optional)";
 "adding_contact___" = "Adding contact...";
 "adding_comment___" = "Adding comment...";
+"adding_extraField___" = "Adding extra field...";
 "adding_shortcode___" = "Adding mailing list...";
 "address" = "Address";
 "all_day" = "All-day";
@@ -115,6 +116,7 @@
 "delete_all_events_in_series" = "Delete all events in series";
 "deleting___" = "Deleting...";
 "deleting_comment___" = "Deleting comment...";
+"deleting_extraField___" = "Deleting extra field...";
 "deleting_from_folder___" = "Removing from folder...";
 "department" = "Department";
 "departments"= "Departments";
@@ -211,6 +213,7 @@
 "error_while_sending_document" = "Error while sending email";
 "error_argumentexception_title" = "Argument exception";
 "existing_photo" = "Add existing photo";
+"extra_fields" = "Extra fields";
 "failed" = "Failed";
 "failed_send_document_notification_content" = "One or more emails could not be sent. Please check Outgoing folder for details.";
 "failed_send_document_notification_title" = "Failed to send messages";
@@ -287,6 +290,7 @@
 "no_addresses" = "No addresses";
 "no_categories" = "No categories";
 "no_comments" = "No comments";
+"no_extra_fields" = "No extra fields";
 "no_contacts_found" = "No contacts were found";
 "no_content" = "This email has no content";
 "no_description" = "No description";

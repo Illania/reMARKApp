@@ -386,6 +386,64 @@ namespace Mark5.Mobile.Common.Utilities
         }
     }
 
+    internal class AddExtraFieldEvent : AnalyticsEvent
+    {
+        public AddExtraFieldEvent(ModuleType module)
+            : base(module, "add_extra_field")
+        {
+        }
+    }
+
+    internal class UpdateExtraFieldEvent : AnalyticsEvent
+    {
+        public UpdateExtraFieldEvent(ModuleType module)
+            : base(module, "update_extra_field")
+        {
+        }
+    }
+
+    internal class DeleteExtraFieldEvent : AnalyticsEvent
+    {
+        public DeleteExtraFieldEvent(ModuleType module)
+            : base(module, "delete_extra_field")
+        {
+        }
+    }
+
+    internal class GetExtraFieldsEvent : AnalyticsEvent
+    {
+        public GetExtraFieldsEvent(ModuleType module)
+            : base(module, "get_extra_fields")
+        {
+        }
+    }
+
+    internal class GetDocumentExtraFieldEvent : AnalyticsEvent
+    {
+        public GetDocumentExtraFieldEvent(ModuleType module)
+            : base(module, "get_document_extra_field")
+        {
+        }
+    }
+
+    internal class DeleteDocumentExtraFieldEvent : AnalyticsEvent
+    {
+        public DeleteDocumentExtraFieldEvent(ModuleType module)
+            : base(module, "delete_document_extra_field")
+        {
+        }
+    }
+
+    internal class AssignDocumentExtraFieldEvent : AnalyticsEvent
+    {
+        public AssignDocumentExtraFieldEvent(ModuleType module)
+            : base(module, "assign_document_extra_field")
+        {
+        }
+    }
+
+
+
     #endregion
 
     #region Compose opening events

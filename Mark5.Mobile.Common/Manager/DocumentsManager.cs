@@ -18,6 +18,8 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.ServiceReference.AppService;
 using Mark5.ServiceReference.FileTransferService;
 using DataContract = Mark5.ServiceReference.DataContract;
+using ModuleType = Mark5.Mobile.Common.Model.ModuleType;
+using DocumentPreview = Mark5.Mobile.Common.Model.DocumentPreview;
 
 namespace Mark5.Mobile.Common.Manager
 {
@@ -899,8 +901,178 @@ namespace Mark5.Mobile.Common.Manager
                 CommonConfig.Logger.Error("Error while counting pending and failed outgoing documents", ex);
             }
         }
-
         #endregion
 
+        #region Extra fields
+
+        public async Task<ExtraField> AddExtraFieldAsync(string name, SourceType sourceType = SourceType.Auto)
+        {
+            CommonConfig.UsageAnalytics.LogEvent(new AddExtraFieldEvent(ModuleType.Documents));
+
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
+            {
+                var result = await AppServiceProxy.AddExtraFieldAsync(new DataContract.AddExtraFieldParameters
+                {
+                    Token = Token,
+                    Name = name
+                });
+                return result.ExtraFieldInfo.Convert();
+            }
+
+            if (sourceType == SourceType.Local)
+                throw new ReMarkException(ErrorConstants.Codes.InvalidSourceType);
+
+            throw new ArgumentException("Invalid sourceType provided");
+        }
+
+        public async Task DeleteExtraFieldAsync(int extraFieldId, SourceType sourceType = SourceType.Auto)
+        {
+            CommonConfig.UsageAnalytics.LogEvent(new DeleteExtraFieldEvent(ModuleType.Documents));
+
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
+            {
+                await AppServiceProxy.DeleteExtraFieldAsync(new DataContract.DeleteExtraFieldParameters
+                {
+                    Token = Token,
+                    ExtraFieldId = extraFieldId
+                });
+                return;
+            }
+
+            if (sourceType == SourceType.Local)
+                throw new ReMarkException(ErrorConstants.Codes.InvalidSourceType);
+
+            throw new ArgumentException("Invalid sourceType provided");
+        }
+
+        public async Task UpdateExtraFieldsAsync(List<ExtraField> extraFields, SourceType sourceType = SourceType.Auto)
+        {
+            CommonConfig.UsageAnalytics.LogEvent(new UpdateExtraFieldEvent(ModuleType.Documents));
+
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
+            {
+                await AppServiceProxy.UpdateExtraFieldsAsync(new DataContract.UpdateExtraFieldsParameters
+                {
+                    Token = Token,
+                    ExtraFieldInfoList = new List<DataContract.ExtraFieldInfo>(extraFields.Select(ef=>ef.Convert()))
+                });
+                return;
+            }
+
+            if (sourceType == SourceType.Local)
+                throw new ReMarkException(ErrorConstants.Codes.InvalidSourceType);
+
+            throw new ArgumentException("Invalid sourceType provided");
+        }
+
+        public async Task<List<ExtraField>> GetExtraFieldsAsync(SourceType sourceType = SourceType.Auto)
+        {
+            CommonConfig.UsageAnalytics.LogEvent(new GetExtraFieldsEvent(ModuleType.Documents));
+
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+            
+            if (sourceType == SourceType.Remote)
+            {
+
+                var result = await AppServiceProxy.GetExtraFieldsAsync(new DataContract.GetExtraFieldsParameters()
+                {
+                    Token = Token
+                });
+                var extraFields = result?.ExtraFields?.WhereNotNull().Select(extraField => extraField.Convert()).ToList();
+                return extraFields ?? new List<ExtraField>();
+
+            }
+
+            if (sourceType == SourceType.Local)
+                throw new ReMarkException(ErrorConstants.Codes.InvalidSourceType);
+
+            throw new ArgumentException("Invalid sourceType provided");
+        }
+
+        public async Task<string> GetDocumentExtraFieldAsync(int docId, int fieldId, SourceType sourceType = SourceType.Auto)
+        {
+            CommonConfig.UsageAnalytics.LogEvent(new GetDocumentExtraFieldEvent(ModuleType.Documents));
+
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
+            {
+                var result = await AppServiceProxy.GetDocumentExtraFieldAsync(new DataContract.GetDocumentExtraFieldParameters()
+                {
+                    Token = Token,
+                    DocumentId = docId,
+                    FieldId = fieldId
+                });
+
+                return result.ExtraFieldValue;
+            }
+
+            if (sourceType == SourceType.Local)
+                throw new ReMarkException(ErrorConstants.Codes.InvalidSourceType);
+
+            throw new ArgumentException("Invalid sourceType provided");
+        }
+
+        public async Task AssignDocumentExtraFieldAsync(int docId, int fieldId, string fieldValue, SourceType sourceType = SourceType.Auto)
+        {
+            CommonConfig.UsageAnalytics.LogEvent(new AssignDocumentExtraFieldEvent(ModuleType.Documents));
+
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
+            {
+                var result = await AppServiceProxy.AssignDocumentExtraFieldAsync(new DataContract.AssignDocumentExtraFieldParameters
+                {
+                    Token = Token,
+                    DocumentId = docId,
+                    ExtraFieldId = fieldId,
+                    ExtraFieldValue = fieldValue
+                });
+                return;
+            }
+
+            if (sourceType == SourceType.Local)
+                throw new ReMarkException(ErrorConstants.Codes.InvalidSourceType);
+
+            throw new ArgumentException("Invalid sourceType provided");
+        }
+
+        public async Task DeleteDocumentExtraFieldAsync(int docId, int fieldId, SourceType sourceType = SourceType.Auto)
+        {
+            CommonConfig.UsageAnalytics.LogEvent(new DeleteDocumentExtraFieldEvent(ModuleType.Documents));
+
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
+            {
+                var result = await AppServiceProxy.DeleteDocumentExtraFieldAsync(new DataContract.DeleteDocumentExtraFieldParameters
+                {
+                    Token = Token,
+                    DocumentId = docId,
+                    FieldId = fieldId
+                });
+                return;
+            }
+
+            if (sourceType == SourceType.Local)
+                throw new ReMarkException(ErrorConstants.Codes.InvalidSourceType);
+
+            throw new ArgumentException("Invalid sourceType provided");
+        }
+
+        #endregion
     }
 }

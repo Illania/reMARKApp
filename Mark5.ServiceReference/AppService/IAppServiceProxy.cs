@@ -186,5 +186,20 @@ namespace Mark5.ServiceReference.AppService
         Task<UpdateFavoriteFoldersResult> UpdateFavoriteFolders(UpdateFavoriteFoldersParameters parameters, CancellationToken ct = default(CancellationToken));
 
         #endregion
+
+        Task<AddExtraFieldResult> AddExtraFieldAsync(AddExtraFieldParameters parameters, CancellationToken ct = default);
+
+        Task<DeleteExtraFieldResult> DeleteExtraFieldAsync(DeleteExtraFieldParameters parameters, CancellationToken ct = default);
+
+        Task<UpdateExtraFieldsResult> UpdateExtraFieldsAsync(UpdateExtraFieldsParameters parameters, CancellationToken ct = default);
+
+        Task<GetExtraFieldsResult> GetExtraFieldsAsync(GetExtraFieldsParameters parameters, CancellationToken ct = default);
+
+        Task<GetDocumentExtraFieldResult> GetDocumentExtraFieldAsync(GetDocumentExtraFieldParameters parameters, CancellationToken ct = default);
+
+        Task<AssignDocumentExtraFieldResult> AssignDocumentExtraFieldAsync(AssignDocumentExtraFieldParameters parameters, CancellationToken ct = default);
+
+        Task<DeleteDocumentExtraFieldResult> DeleteDocumentExtraFieldAsync(DeleteDocumentExtraFieldParameters parameters, CancellationToken ct = default);
+        
     }
 }

@@ -31,6 +31,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         const string AuthorizationIntervalKey = "AuthorizationInterval";
         const string LocalTemplateKey = "localTemplate";
         const string LogoutKey = "logout";
+        const string ManageExtraFieldsKey = "ManageExtraFields";
         const string OpenSettingsAppKey = "openSettingsApp";
         const string SendFeedbackKey = "sendFeedback";
         const string ServerAddressKey = "serverAddress";
@@ -143,6 +144,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return;
             }
 
+            if (specifier.Key == ManageExtraFieldsKey)
+            {
+                var extraFieldsVC = new ExtraFieldsViewController();
+                PresentViewController(new NavigationController(extraFieldsVC, UIModalPresentationStyle.PageSheet), true, null);
+                return;
+            }
 
             if (specifier.Key == PresetCategoryKey)
             {
@@ -265,6 +272,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return cell;
             }
 
+            if (specifier.Key == ManageExtraFieldsKey)
+            {
+                var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
+                cell.TextLabel.Text = specifier.Title;
+                cell.DetailTextLabel.Text = "";
+                cell.DetailTextLabel.TextColor = Theme.DarkGray;
+                return cell;
+            }
             if (specifier.Key == PresetCategoryKey)
             {
                 var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");

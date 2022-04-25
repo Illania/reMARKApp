@@ -64,7 +64,7 @@
 		<RunCodeAnalysis>true</RunCodeAnalysis>
 		<MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
 		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
-		<CodesignProvision>reMARK App 2021 Development</CodesignProvision>
+		<CodesignProvision>reMARK 2022 Dev</CodesignProvision>
 		<LangVersion>9.0</LangVersion>
 		<MtouchLink>SdkOnly</MtouchLink>
 	</PropertyGroup>
@@ -109,6 +109,7 @@
 		<Compile Include="Ui\Common\Theme.cs" />
 		<Compile Include="Ui\TableViewCells\CategoriesTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\CommentsTableViewCell.cs" />
+		<Compile Include="Ui\TableViewCells\ExtraFieldsTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\CommunicationAddressTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\ContactInfoTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\ContactsTableViewCell.cs" />
@@ -332,6 +333,7 @@
 		<Compile Include="Ui\Common\Scalable controls\UITextFieldScalable.cs" />
 		<Compile Include="Ui\Common\Scalable controls\UITextViewScalable.cs" />
 		<Compile Include="Ui\Common\Scalable controls\UIButtonScalable.cs" />
+		<Compile Include="Ui\ViewControllers\ExtraFieldsViewController.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

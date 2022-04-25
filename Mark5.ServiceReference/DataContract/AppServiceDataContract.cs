@@ -202,7 +202,6 @@ namespace Mark5.ServiceReference.DataContract
     #endregion
 
     #region Documents
-
     [DataContract(Name = "GetDocumentPreviewsParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class GetDocumentPreviewsParameters : AbstractParameters
     {
@@ -670,6 +669,123 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "FromAddress", Order = 0)]
         public string FromAddress { get; set; }
+    }
+
+
+    [DataContract(Name = "ExtraFieldInfo", Namespace = "com.nordic-it.appservice.v3")]
+    public class ExtraFieldInfo
+    {
+        [DataMember(Name = "Enabled", Order = 0)]
+        public bool Enabled { get; set; }
+
+        [DataMember(Name = "Name", Order = 0)]
+        public string Name { get; set; }
+
+        [DataMember(Name = "Id", Order = 0)]
+        public int Id { get; set; } = -1;
+    }
+
+
+    [DataContract(Name = "AddExtraFieldParameters", Namespace = "com.nordic-it.appservice.v3")]
+    public class AddExtraFieldParameters : AbstractParameters
+    {
+        [DataMember(Name = "Name", Order = 0)]
+        public string Name { get; set; }
+    }
+
+    [DataContract(Name = "AddExtraFieldResult", Namespace = "com.nordic-it.appservice.v3")]
+    public class AddExtraFieldResult
+    {
+        [DataMember(Name = "ExtraFieldInfo", Order = 0)]
+        public ExtraFieldInfo ExtraFieldInfo { get; set; }
+    }
+
+    [DataContract(Name = "DeleteExtraFieldParameters", Namespace = "com.nordic-it.appservice.v3")]
+    public class DeleteExtraFieldParameters : AbstractParameters
+    {
+        [DataMember(Name = "ExtraFieldId", Order = 0)]
+        public int ExtraFieldId { get; set; }
+    }
+
+    [DataContract(Name = "DeleteExtraFieldResult", Namespace = "com.nordic-it.appservice.v3")]
+    public class DeleteExtraFieldResult 
+    {
+    }
+
+    [DataContract(Name = "UpdateExtraFieldsParameters", Namespace = "com.nordic-it.appservice.v3")]
+    public class UpdateExtraFieldsParameters : AbstractParameters
+    {
+        [DataMember(Name = "ExtraFieldInfoList", Order = 0)]
+        public List<ExtraFieldInfo> ExtraFieldInfoList { get; set; }
+
+    }
+
+    [DataContract(Name = "UpdateExtraFieldsResult", Namespace = "com.nordic-it.appservice.v3")]
+    public class UpdateExtraFieldsResult 
+    {
+    }
+
+
+    [DataContract(Name = "GetExtraFieldsParameters", Namespace = "com.nordic-it.appservice.v3")]
+    public class GetExtraFieldsParameters : AbstractParameters
+    {
+    }
+
+    [DataContract(Name = "GetExtraFieldsResult", Namespace = "com.nordic-it.appservice.v3")]
+    public class GetExtraFieldsResult
+    {
+        [DataMember(Name = "ExtraFields", Order = 0)]
+        public List<ExtraFieldInfo> ExtraFields { get; set; } = new List<ExtraFieldInfo>();
+    }
+
+    [DataContract(Name = "GetDocumentExtraFieldParameters", Namespace = "com.nordic-it.appservice.v3")]
+    public class GetDocumentExtraFieldParameters : AbstractParameters
+    {
+        [DataMember(Name = "DocumentId", Order = 0)]
+        public int DocumentId { get; set; }
+
+        [DataMember(Name = "FieldId", Order = 0)]
+        public int FieldId { get; set; }
+    }
+
+    [DataContract(Name = "GetDocumentExtraFieldResult", Namespace = "com.nordic-it.appservice.v3")]
+    public class GetDocumentExtraFieldResult
+    {
+        [DataMember(Name = "ExtraFieldValue", Order = 0)]
+        public string ExtraFieldValue { get; set; }
+    }
+
+    [DataContract(Name = "DeleteDocumentExtraFieldParameters", Namespace = "com.nordic-it.appservice.v3")]
+    public class DeleteDocumentExtraFieldParameters : AbstractParameters
+    {
+        [DataMember(Name = "DocumentId", Order = 0)]
+        public int DocumentId { get; set; }
+
+        [DataMember(Name = "FieldId", Order = 0)]
+        public int FieldId { get; set; }
+    }
+
+    [DataContract(Name = "DeleteDocumentExtraFieldResult", Namespace = "com.nordic-it.appservice.v3")]
+    public class DeleteDocumentExtraFieldResult 
+    {
+    }
+
+    [DataContract(Name = "AssignDocumentExtraFieldParameters", Namespace = "com.nordic-it.appservice.v3")]
+    public class AssignDocumentExtraFieldParameters : AbstractParameters
+    {
+        [DataMember(Name = "DocumentId", Order = 0)]
+        public int DocumentId { get; set; }
+
+        [DataMember(Name = "ExtraFieldId", Order = 0)]
+        public int ExtraFieldId { get; set; }
+
+        [DataMember(Name = "ExtraFieldValue", Order = 0)]
+        public string ExtraFieldValue { get; set; }
+    }
+
+    [DataContract(Name = "AssignDocumentExtraFieldResult", Namespace = "com.nordic-it.appservice.v3")]
+    public class AssignDocumentExtraFieldResult
+    {
     }
 
     [DataContract(Name = "TemplatePreview", Namespace = "com.nordic-it.appservice.v3")]
