@@ -561,7 +561,12 @@ namespace Mark5.ServiceReference.AppService
         {
             return await InvokeAsync<UpdateExtraFieldsResult, UpdateExtraFieldsParameters>("UpdateExtraFields", parameters, ct);
         }
-     
+
+        public async Task<UpdateExtraFieldResult> UpdateExtraFieldAsync(UpdateExtraFieldParameters parameters, CancellationToken ct = default)
+        {
+            return await InvokeAsync<UpdateExtraFieldResult, UpdateExtraFieldParameters>("UpdateExtraField", parameters, ct);
+        }
+
         public async Task<GetExtraFieldsResult> GetExtraFieldsAsync(GetExtraFieldsParameters parameters, CancellationToken ct = default)
         {
             return await InvokeAsync<GetExtraFieldsResult, GetExtraFieldsParameters>("GetExtraFields", parameters, ct);

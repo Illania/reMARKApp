@@ -193,6 +193,8 @@ namespace Mark5.ServiceReference.AppService
 
         Task<UpdateExtraFieldsResult> UpdateExtraFieldsAsync(UpdateExtraFieldsParameters parameters, CancellationToken ct = default);
 
+        Task<UpdateExtraFieldResult> UpdateExtraFieldAsync(UpdateExtraFieldParameters parameters, CancellationToken ct = default);
+
         Task<GetExtraFieldsResult> GetExtraFieldsAsync(GetExtraFieldsParameters parameters, CancellationToken ct = default);
 
         Task<GetDocumentExtraFieldResult> GetDocumentExtraFieldAsync(GetDocumentExtraFieldParameters parameters, CancellationToken ct = default);

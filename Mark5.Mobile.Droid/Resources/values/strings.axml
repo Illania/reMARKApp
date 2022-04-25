@@ -11,6 +11,7 @@
     <string name="add_appointment">Add appointment</string>
     <string name="add_bookmark">Add bookmark</string>
     <string name="add_comment_hint">Insert new comment</string>
+    <string name="add_extra_field_hint">Insert new extra field</string>
     <string name="add_tite">Add title</string>
     <string name="add_location">Add location</string>
     <string name="add_message">Add message</string>
@@ -18,6 +19,7 @@
     <string name="add_favorites">Add to favourites</string>
     <string name="add_offline">Enable sync</string>
     <string name="adding_comment">Adding comment</string>
+    <string name="adding_extra_field">Adding extra field</string>
     <string name="adding_appointment">Adding appointment...</string>
     <string-array name="attachment_clicked_options">
         <item>Open attachment</item>
@@ -44,6 +46,7 @@
     <string name="calendars">Calendars</string>
     <string name="cannot_edit_comment_content">This comment cannot be edited anymore</string>
     <string name="cannot_edit_comment_title">Cannot edit comment</string>
+    <string name="cannot_edit_extra_field_title">Cannot edit extra field</string>
     <string name="cannot_open_attachment_without_ext">Attachments without extensions cannot be opened</string>
     <string name="categories">Categories</string>
     <string name="categories_added">Categories added</string>
@@ -53,10 +56,13 @@
     <string name="changes_not_saved_description">Current changes are not saved and will be discarded"</string>
     <string name="close_drawer">Close navigation drawer</string>
     <string name="comments">Comments</string>
+    <string name="extra_fields">Extra fields</string>
     <string name="confirm">Confirm</string>
     <string name="confirm_change_draft">Do you want save the changes?</string>
     <string name="confirm_comment_deletion_content">Are you sure you want to delete the comment?</string>
     <string name="confirm_comment_deletion_title">Delete comment</string>
+    <string name="confirm_extra_field_deletion_content">Are you sure you want to delete the extra field?</string>
+    <string name="confirm_extra_field_deletion_title">Delete extra field</string>
     <string name="confirm_copy_to_folder">Copy</string>
     <string name="confirm_delay_send_title">Confirm delayed send</string>
     <string name="confirm_delay_send_content">The mail will be sent at:\n {0}\nDo you wish to proceed?</string>
@@ -97,6 +103,7 @@
     <string name="delete_from_folder_are_you_sure">Are you sure you want to remove selected from folder?</string>
     <string name="deleting">Deleting...</string>
     <string name="deleting_comment">Deleting comment</string>
+    <string name="deleting_extra_field">Deleting extra field</string>
     <string name="deleting_from_folder">Removing from folder...</string>
     <string name="departments">Departments</string>
     <string name="description">Description</string>
@@ -139,7 +146,9 @@
     <string name="edit">Edit</string>
     <string name="edit_appointment">Edit Appointment</string>
     <string name="edit_comment_message">Edit comment message</string>
+    <string name="edit_extra_field_message">Edit extra field</string>
     <string name="editing_comment">Editing comment</string>
+    <string name="editing_extra_field">Editing extra field</string>
     <string name="editing_appointment">Editing appointment...</string>
     <string name="edit_contact_edit_loading">Editing contact...</string>
     <string name="edit_contact_add_loading">Creating contact...</string>
@@ -313,6 +322,7 @@
     <string name="no_contacts_found">No contacts found</string>
     <string name="no_content">No content</string>
     <string name="no_comments">There are no comments</string>
+    <string name="no_extra_fields">There are no extra fields</string>
     <string name="no_email_addresses_title">No email addresses</string>
     <string name="no_email_addresses_content">The selected contact does not have email addresses</string>
     <string name="no_lines_error_title">No mailboxes set for user</string>

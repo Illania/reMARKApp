@@ -725,6 +725,19 @@ namespace Mark5.ServiceReference.DataContract
     {
     }
 
+    [DataContract(Name = "UpdateExtraFieldParameters", Namespace = "com.nordic-it.appservice.v3")]
+    public class UpdateExtraFieldParameters : AbstractParameters
+    {
+        [DataMember(Name = "ExtraFieldInfo", Order = 0)]
+        public ExtraFieldInfo ExtraFieldInfo { get; set; }
+
+    }
+
+    [DataContract(Name = "UpdateExtraFieldResult", Namespace = "com.nordic-it.appservice.v3")]
+    public class UpdateExtraFieldResult
+    {
+    }
+
 
     [DataContract(Name = "GetExtraFieldsParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class GetExtraFieldsParameters : AbstractParameters

@@ -18,7 +18,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
     public class ExtraFieldsViewController : AbstractViewController, IUITextViewDelegate
     {
         const float MinTextViewHeight = 38f; // 1 line
-        const float MaxTextViewHeight = 125.5f; // 5 lines
+        const float MaxCommentTextViewHeight = 125.5f; // 5 lines
         bool refreshing;
         UIBarButtonItem doneButtonItem;
 
@@ -352,7 +352,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Actions
 
-        void DeleteExtraField(ExtraField extraField)
+        void DeleteExtraField(Comment extraField)
         {
             TableView.Editing = false;
 
@@ -429,7 +429,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             var requiredHeight = extraFieldTextView.SizeThatFits(new CGSize(extraFieldTextView.ContentSize.Width,
                 nfloat.MaxValue)).Height;
-            var targetHeight = Math.Min(Math.Max(requiredHeight, MinTextViewHeight), MaxTextViewHeight);
+            var targetHeight = Math.Min(Math.Max(requiredHeight, MinTextViewHeight), MaxCommentTextViewHeight);
 
             extraFieldTextScrollViewHeightConstraint.Constant = (nfloat)targetHeight;
             extraFieldTextScrollView.ScrollEnabled = requiredHeight > targetHeight;
@@ -459,7 +459,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         class DataSource : UITableViewSource
         {
             public bool Empty => !Items.Any();
-            public List<ExtraField> Items { get; } = new List<ExtraField>();
+            public List<Comment> Items { get; } = new List<Comment>();
 
             readonly WeakReference<ExtraFieldsViewController> viewControllerWeakReference;
             readonly WeakReference<UITableView> tableViewWeakReference;
@@ -519,7 +519,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return actions.ToArray();
             }
 
-            public void SetItems(List<ExtraField> extraFields)
+            public void SetItems(List<Comment> extraFields)
             {
                 loading = false;
 
@@ -536,7 +536,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
 
-            public void AddExtraField(ExtraField extraField)
+            public void AddExtraField(Comment extraField)
             {
                 Items.Add(extraField);
 
@@ -546,7 +546,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     tableViewWeakReference.Unwrap()?.InsertRows(new[] { NSIndexPath.FromRowSection(Items.Count - 1, 0) }, UITableViewRowAnimation.Fade);
             }
 
-            public void RemoveExtraField(ExtraField extraField)
+            public void RemoveExtraField(Comment extraField)
             {
                 var position = Items.FindIndex(c => c.FieldId == extraField.FieldId);
                 if (position >= 0)

@@ -107,14 +107,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
         }
 
-        private async void ValueTextField_ValueChanged(object sender, System.EventArgs e)
-        {
-            var fieldValue = ((UITextFieldScalable)sender).Text;
-            var fieldId = ((UITextFieldScalable)sender).Tag;
-            var docId = Document.Id;
-            await Managers.DocumentsManager.AssignDocumentExtraFieldAsync(docId, (int)fieldId, fieldValue);
-        }
-
         public override void UpdateVisibility()
         {
             if (Document == null)

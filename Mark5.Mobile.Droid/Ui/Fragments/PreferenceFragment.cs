@@ -20,6 +20,7 @@ using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Service;
+using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 using TinyIoC;
@@ -144,6 +145,26 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     fragmentTransaction.Replace(Resource.Id.fragment_container, swipeActionsFragment, swipeActionsFragmentTag);
                     fragmentTransaction.AddToBackStack(null);
                     fragmentTransaction.Commit();
+                };
+            }
+
+            var extraFieldsOptions = FindPreference(GetString(Resource.String.pref_key_extra_fields_options));
+            if (extraFieldsOptions != null)
+            {
+                extraFieldsOptions.PreferenceClick += (object sender, Preference.PreferenceClickEventArgs e) =>
+                {
+
+                    StartActivity(ExtraFieldsListActivity.CreateIntent(Context));
+
+
+                  /* ExtraFieldsListFragment extraFieldsListFragment;
+                    string extraFieldsFragmentTag;
+                    var fragmentTransaction = Activity.SupportFragmentManager.BeginTransaction();
+                    (extraFieldsListFragment, extraFieldsFragmentTag) = ExtraFieldsListFragment.NewInstance();
+                    fragmentTransaction.Replace(Resource.Id.fragment_container, extraFieldsListFragment, extraFieldsFragmentTag);
+                    fragmentTransaction.AddToBackStack(null);
+                    fragmentTransaction.Commit();*/
+ 
                 };
             }
 

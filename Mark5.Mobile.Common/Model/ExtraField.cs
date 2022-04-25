@@ -1,6 +1,8 @@
-﻿namespace Mark5.Mobile.Common.Model
+﻿using System;
+
+namespace Mark5.Mobile.Common.Model
 {
-    public class ExtraField : ICopiable<ExtraField>
+    public class ExtraField : ICopiable<ExtraField>, IEquatable<ExtraField>, IComparable<ExtraField>
     {
         public int FieldId { get; set; } = -1;
         public string FieldName { get; set; } = string.Empty;
@@ -20,6 +22,22 @@
         public ExtraField DeepCopy()
         {
             return ShallowCopy();
+        }
+
+        public bool Equals(ExtraField obj)
+        {
+            if (obj == null) return false;
+            if (!(obj is ExtraField objAsPart)) return false;
+            else return Equals(objAsPart);
+        }
+
+        public int CompareTo(ExtraField compareExtraField)
+        {
+            if (compareExtraField == null)
+                return 1;
+
+            else
+                return this.FieldName.CompareTo(compareExtraField.FieldName);
         }
     }
 }

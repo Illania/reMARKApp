@@ -11,7 +11,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
     {
         public static readonly NSString DefaultId = new NSString(nameof(ExtraFieldsTableViewCell));
 
-        ExtraField extraField = null;
+        Comment extraField = null;
         readonly UILabelScalable title;
         readonly UISwitch toggleSwitch;
 
@@ -55,7 +55,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             });
         }
 
-        public void Initialize(ExtraField extraField)
+        public void Initialize(Comment extraField)
         {
             title.Text = extraField.FieldName;
             toggleSwitch.On = extraField.Enabled;

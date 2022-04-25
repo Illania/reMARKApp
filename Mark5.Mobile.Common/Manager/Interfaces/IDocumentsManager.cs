@@ -104,8 +104,6 @@ namespace Mark5.Mobile.Common.Manager
 
         Task DeleteExtraFieldAsync(int extraFieldId, SourceType sourceType = SourceType.Auto);
 
-        Task UpdateExtraFieldAsync(ExtraField extraField, SourceType sourceType = SourceType.Auto);
-
         Task<List<ExtraField>> GetExtraFieldsAsync(SourceType sourceType = SourceType.Auto);
 
         Task<string> GetDocumentExtraFieldAsync(int docId, int fieldId, SourceType sourceType = SourceType.Auto);
@@ -115,6 +113,8 @@ namespace Mark5.Mobile.Common.Manager
         Task DeleteDocumentExtraFieldAsync(int docId, int fieldId, SourceType sourceType = SourceType.Auto);
 
         Task UpdateExtraFieldsAsync(List<ExtraField> extraFields, SourceType sourceType = SourceType.Auto);
+
+        Task UpdateExtraFieldAsync(ExtraField extraField, SourceType sourceType = SourceType.Auto);
 
     }
 }
