@@ -202,6 +202,9 @@ namespace Mark5.ServiceReference.AppService
         Task<AssignDocumentExtraFieldResult> AssignDocumentExtraFieldAsync(AssignDocumentExtraFieldParameters parameters, CancellationToken ct = default);
 
         Task<DeleteDocumentExtraFieldResult> DeleteDocumentExtraFieldAsync(DeleteDocumentExtraFieldParameters parameters, CancellationToken ct = default);
-        
+
+        Task<GetDocumentExtraFieldsResult> GetDocumentExtraFieldsAsync(GetDocumentExtraFieldsParameters parameters, CancellationToken ct = default);
+
+
     }
 }

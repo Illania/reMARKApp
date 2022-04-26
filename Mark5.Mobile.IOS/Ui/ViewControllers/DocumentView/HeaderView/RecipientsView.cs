@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using CoreAnimation;
 using CoreGraphics;
 using Foundation;
@@ -215,7 +216,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             RecipientTapped?.Invoke(this, new RecipientTappedEventArgs(tappedRecipent));
         }
 
-        public override void RefreshView()
+        public override async Task RefreshView()
         {
             if (DocumentPreview != null)
             {

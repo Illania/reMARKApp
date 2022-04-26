@@ -685,6 +685,22 @@ namespace Mark5.ServiceReference.DataContract
         public int Id { get; set; } = -1;
     }
 
+    [DataContract(Name = "GetDocumentExtraFieldsParameters", Namespace = "com.nordic-it.appservice.v3")]
+    public class GetDocumentExtraFieldsParameters : AbstractParameters
+    {
+        [DataMember(Name = "DocumentId", Order = 0)]
+        public int DocumentId { get; set; }
+
+    }
+
+    [DataContract(Name = "GetDocumentExtraFieldsResult", Namespace = "com.nordic-it.appservice.v3")]
+    public class GetDocumentExtraFieldsResult
+    {
+        [DataMember(Name = "DocumentExtraFields", Order = 0)]
+        public Dictionary<DocumentExtraFieldInfo, string> DocumentExtraFields { get; set; } = new Dictionary<DocumentExtraFieldInfo, string>();
+
+    }
+
 
     [DataContract(Name = "AddExtraFieldParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class AddExtraFieldParameters : AbstractParameters

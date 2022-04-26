@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
@@ -77,7 +78,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             AppointmentReplyTapped(this, new EventArgs());
         }
 
-        public override void RefreshView()
+        public override async Task RefreshView()
         {
             var invitation = Document?.Invitations?.FirstOrDefault();
 

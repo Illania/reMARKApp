@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
 
@@ -37,7 +38,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             AddConstraints(constraints);
         }
 
-        public override void RefreshView()
+        public override async Task RefreshView()
         {
         }
 

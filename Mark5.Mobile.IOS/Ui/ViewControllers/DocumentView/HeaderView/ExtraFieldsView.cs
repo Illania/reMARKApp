@@ -1,8 +1,12 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
+using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.Converters;
 using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
 
@@ -11,7 +15,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
     public class ExtraFieldsView : DocumentSubView
     {
         UIStackView stackView;
-
+        Dictionary<DocumentExtraFieldInfo, string> documentExtraFields;
         public ExtraFieldsView()
         {
             stackView = new UIStackView
@@ -44,60 +48,80 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             }
         }
 
-        public override void RefreshView()
+        public override async Task RefreshView()
         {
             if (Document == null)
                 return;
 
             stackView.ArrangedSubviews.ForEach(v => v.RemoveFromSuperview());
 
-            foreach (var efi in Document.ExtraFields)
+
+            DocumentExtraFieldInfoEqualityComparer docComparer = new();
+
+            var assignedExtraFields = await Managers.DocumentsManager.GetDocumentExtraFieldsAsync(Document.Id);
+            var availableExtraFields = await Managers.DocumentsManager.GetExtraFieldsAsync();
+            documentExtraFields = assignedExtraFields
+                .Where(kv => kv.Key != null)
+                .OrderBy(kv => kv.Key.Name)
+                .ToDictionary(pair => pair.Key, pair => pair.Value, docComparer);
+
+            foreach (var ex in availableExtraFields.Select(ex => ex.ToDocumentExtraFieldInfo()))
             {
-                var stackViewHorizontal = new UIStackView
+                if (!documentExtraFields.ContainsKey(ex))
+                    documentExtraFields.Add(ex, string.Empty);
+            }
+
+            if (Document != null)
+            {
+                foreach (var efi in documentExtraFields)
                 {
-                    Opaque = false,
-                    Axis = UILayoutConstraintAxis.Horizontal,
-                    Alignment = UIStackViewAlignment.FirstBaseline,
-                    Distribution = UIStackViewDistribution.Fill,
-                    Spacing = InnerMargin,
-                    TranslatesAutoresizingMaskIntoConstraints = false
-                };
-                var labelText = new NSMutableAttributedString(efi.Key.Name + ": ");
-                var valueText = new NSMutableAttributedString(efi.Value);
-                labelText.AddAttribute(UIStringAttributeKey.ForegroundColor, Theme.DarkGray, new NSRange(0, efi.Key.Name.Length + 1));
-  
 
-                var label = new UILabelScalable
-                {
-                    Font = Theme.DefaultFont.CustomFont(),
-                    Opaque = false,
-                    TranslatesAutoresizingMaskIntoConstraints = false,
-                    Tag = efi.Key.Id,
-                    
-                };
+                    var stackViewHorizontal = new UIStackView
+                    {
+                        Opaque = false,
+                        Axis = UILayoutConstraintAxis.Horizontal,
+                        Alignment = UIStackViewAlignment.FirstBaseline,
+                        Distribution = UIStackViewDistribution.Fill,
+                        Spacing = InnerMargin,
+                        TranslatesAutoresizingMaskIntoConstraints = false
+                    };
 
-                label.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
-                label.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
-                label.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+                    var labelText = new NSMutableAttributedString(efi.Key.Name + ": ");
+                    var valueText = new NSMutableAttributedString(efi.Value);
+                    labelText.AddAttribute(UIStringAttributeKey.ForegroundColor, Theme.DarkGray, new NSRange(0, efi.Key.Name.Length + 1));
 
-                var valueTextField = new UITextFieldScalable
-                {
-                    Font = Theme.DefaultFont.CustomFont(),
-                    Opaque = false,
-                    TranslatesAutoresizingMaskIntoConstraints = false,
-                    Tag = efi.Key.Id,
-                    TextAlignment = UITextAlignment.Left
-                };
-                valueTextField.EditingDidEnd += ValueTextField_EditingDidEnd;
+                    var label = new UILabelScalable
+                    {
+                        Font = Theme.DefaultFont.CustomFont(),
+                        Opaque = false,
+                        TranslatesAutoresizingMaskIntoConstraints = false,
+                        Tag = efi.Key.Id,
 
-                valueTextField.UserInteractionEnabled = ServerConfig.SystemSettings.SystemInfo.ExtraFieldsEditingAvailable;
+                    };
 
-                label.AttributedText = labelText;
-                valueTextField.AttributedText = valueText;
+                    label.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+                    label.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+                    label.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
 
-                stackViewHorizontal.AddArrangedSubview(label);
-                stackViewHorizontal.AddArrangedSubview(valueTextField);
-                stackView.AddArrangedSubview(stackViewHorizontal);
+                    var valueTextField = new UITextFieldScalable
+                    {
+                        Font = Theme.DefaultFont.CustomFont(),
+                        Opaque = false,
+                        TranslatesAutoresizingMaskIntoConstraints = false,
+                        Tag = efi.Key.Id,
+                        TextAlignment = UITextAlignment.Left
+                    };
+                    valueTextField.EditingDidEnd += ValueTextField_EditingDidEnd;
+
+                    valueTextField.UserInteractionEnabled = ServerConfig.SystemSettings.SystemInfo.ExtraFieldsEditingAvailable;
+
+                    label.AttributedText = labelText;
+                    valueTextField.AttributedText = valueText;
+
+                    stackViewHorizontal.AddArrangedSubview(label);
+                    stackViewHorizontal.AddArrangedSubview(valueTextField);
+                    stackView.AddArrangedSubview(stackViewHorizontal);
+                }
             }
         }
 
@@ -112,13 +136,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
         public override void UpdateVisibility()
         {
-            if (Document == null)
+           if (Document == null)
            {
                 Hidden = true;
                 return;
             }
 
-            Hidden = !Document.ExtraFields.Any();
+            Hidden = !documentExtraFields.Any();
         }
     }
 }

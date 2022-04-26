@@ -140,6 +140,7 @@ namespace Mark5.Mobile.Common.Model.Converters
             };
         }
 
+ 
         public static Comment Convert(this DataContract.Comment c)
         {
             return new Comment
@@ -296,6 +297,15 @@ namespace Mark5.Mobile.Common.Model.Converters
             {
                 Id = defi.Id,
                 Name = defi.Name
+            };
+        }
+
+        public static DocumentExtraFieldInfo ToDocumentExtraFieldInfo(this ExtraField extraField)
+        {
+            return new DocumentExtraFieldInfo
+            {
+                Id = extraField.FieldId,
+                Name = extraField.FieldName
             };
         }
 
@@ -845,6 +855,7 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Enabled = extraField.Enabled
             };
         }
+    
 
         public static DataContract.Contact Convert(this Contact c)
         {

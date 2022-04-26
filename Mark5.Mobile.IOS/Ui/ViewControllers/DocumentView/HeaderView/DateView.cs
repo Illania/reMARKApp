@@ -3,6 +3,7 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 using Mark5.Mobile.Common.Model;
+using System.Threading.Tasks;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 {
@@ -62,7 +63,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
         }
 
-        public override void RefreshView()
+        public override async Task RefreshView()
         {
             if (DocumentPreview != null)
             {

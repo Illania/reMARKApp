@@ -1,4 +1,5 @@
-﻿using Mark5.Mobile.Common.Model;
+﻿using System.Threading.Tasks;
+using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
 
@@ -11,7 +12,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         {
         }
 
-        public override void RefreshView()
+        public override async Task RefreshView()
         {
             if (DocumentPreview != null)
                 TextView.Text = UI.PrettyPriorityString(DocumentPreview.Priority);
