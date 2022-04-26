@@ -426,6 +426,14 @@ namespace Mark5.Mobile.Common.Utilities
         }
     }
 
+    internal class GetDocumentExtraFieldsEvent : AnalyticsEvent
+    {
+        public GetDocumentExtraFieldsEvent(ModuleType module)
+            : base(module, "get_document_extra_fields")
+        {
+        }
+    }
+
     internal class DeleteDocumentExtraFieldEvent : AnalyticsEvent
     {
         public DeleteDocumentExtraFieldEvent(ModuleType module)

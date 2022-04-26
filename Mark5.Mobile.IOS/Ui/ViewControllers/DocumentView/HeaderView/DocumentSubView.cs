@@ -1,4 +1,5 @@
-﻿using Mark5.Mobile.Common.Model;
+﻿using System.Threading.Tasks;
+using Mark5.Mobile.Common.Model;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
@@ -32,7 +33,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             AddArrangedSubview(ContainerView);
         }
 
-        public abstract void RefreshView();
+        public abstract Task RefreshView();
 
         public abstract void UpdateVisibility();
     }

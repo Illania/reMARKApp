@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Mark5.Mobile.IOS.Ui.Common;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
@@ -10,7 +11,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         {
         }
 
-        public override void RefreshView()
+        public override async Task RefreshView()
         {
             if (DocumentPreview != null)
                 TextView.Text = DocumentPreview.ReferenceNumber;

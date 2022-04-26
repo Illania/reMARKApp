@@ -355,7 +355,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
         #region Public methods
 
-        public void RefreshHeader()
+        public async void RefreshHeader()
         {
             DeinitializeHandlers();
             InitializeHandlers();
@@ -364,7 +364,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             {
                 view.Document = Document;
                 view.DocumentPreview = DocumentPreview;
-                view.RefreshView();
+                await view.RefreshView();
             }
 
             PrepareContent();

@@ -11,6 +11,7 @@ using Android.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.Converters;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
@@ -317,7 +318,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             return Task.CompletedTask;
         }
 
-        void RefreshViewContent()
+        async void RefreshViewContent()
         {
             if (DocumentPreview != null && Document != null)
             {
@@ -382,9 +383,24 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 extraFieldsTableRows.ForEach(extendedLayout.RemoveView);
                 extraFieldsTableRows.Clear();
 
+                DocumentExtraFieldInfoEqualityComparer docComparer = new DocumentExtraFieldInfoEqualityComparer();
+
+                var assignedExtraFields = await Managers.DocumentsManager.GetDocumentExtraFieldsAsync(Document.Id);
+                var availableExtraFields = await Managers.DocumentsManager.GetExtraFieldsAsync();
+                var documentExtraFields = assignedExtraFields
+                    .Where(kv => kv.Key != null)
+                    .OrderBy(kv => kv.Key.Name)
+                    .ToDictionary(pair => pair.Key, pair => pair.Value, docComparer);
+
+                foreach (var ex in availableExtraFields.Select(ex => ex.ToDocumentExtraFieldInfo()))
+                {
+                    if(!documentExtraFields.ContainsKey(ex))
+                        documentExtraFields.Add(ex, string.Empty);
+                }
+
                 if (Document != null)
                 {
-                    foreach (var extraField in Document.ExtraFields.Where(kv => kv.Key != null && !string.IsNullOrWhiteSpace(kv.Value)).OrderBy(kv => kv.Key.Name))
+                    foreach (var extraField in documentExtraFields)
                     {
                         var tableRowExtraField = new TableRow(Context);
                         tableRowExtraField.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
@@ -450,7 +466,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
         private async void ExtraFieldValue_AfterTextChanged(object sender, Android.Text.AfterTextChangedEventArgs e)
         {
-            var fieldValue = ((AppCompatEditText)sender).Text;
+           var fieldValue = ((AppCompatEditText)sender).Text;
             var fieldId = ((AppCompatEditText)sender).Tag;
             var docId = Document.Id;
             await Managers.DocumentsManager.AssignDocumentExtraFieldAsync(docId, (int)fieldId, fieldValue);

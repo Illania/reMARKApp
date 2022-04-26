@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using CoreAnimation;
 using Foundation;
 using Mark5.Mobile.IOS.Ui.Common;
@@ -54,7 +55,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             }
         }
 
-        public override void RefreshView()
+        public override async Task RefreshView()
         {
             if (DocumentPreview != null)
                 subjectTextView.Text = DocumentPreview.Subject;

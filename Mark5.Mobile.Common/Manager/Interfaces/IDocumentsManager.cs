@@ -108,6 +108,8 @@ namespace Mark5.Mobile.Common.Manager
 
         Task<string> GetDocumentExtraFieldAsync(int docId, int fieldId, SourceType sourceType = SourceType.Auto);
 
+        Task<Dictionary<DocumentExtraFieldInfo, string>> GetDocumentExtraFieldsAsync(int docId, SourceType sourceType = SourceType.Auto);
+
         Task AssignDocumentExtraFieldAsync(int docId, int fieldId, string fieldValue, SourceType sourceType = SourceType.Auto);
 
         Task DeleteDocumentExtraFieldAsync(int docId, int fieldId, SourceType sourceType = SourceType.Auto);

@@ -1047,6 +1047,30 @@ namespace Mark5.Mobile.Common.Manager
             throw new ArgumentException("Invalid sourceType provided");
         }
 
+        public async Task<Dictionary<DocumentExtraFieldInfo, string>> GetDocumentExtraFieldsAsync(int docId, SourceType sourceType = SourceType.Auto)
+        {
+            CommonConfig.UsageAnalytics.LogEvent(new GetDocumentExtraFieldEvent(ModuleType.Documents));
+
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
+            {
+                var result = await AppServiceProxy.GetDocumentExtraFieldsAsync(new DataContract.GetDocumentExtraFieldsParameters()
+                {
+                    Token = Token,
+                    DocumentId = docId
+                });
+                var documentExtraFields = result.DocumentExtraFields.ToDictionary(pair => pair.Key.Convert(), pair => pair.Value);
+                return documentExtraFields;
+            }
+
+            if (sourceType == SourceType.Local)
+                throw new ReMarkException(ErrorConstants.Codes.InvalidSourceType);
+
+            throw new ArgumentException("Invalid sourceType provided");
+        }
+
         public async Task AssignDocumentExtraFieldAsync(int docId, int fieldId, string fieldValue, SourceType sourceType = SourceType.Auto)
         {
             CommonConfig.UsageAnalytics.LogEvent(new AssignDocumentExtraFieldEvent(ModuleType.Documents));

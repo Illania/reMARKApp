@@ -577,6 +577,11 @@ namespace Mark5.ServiceReference.AppService
             return await InvokeAsync<GetDocumentExtraFieldResult, GetDocumentExtraFieldParameters>("GetDocumentExtraField", parameters, ct);
         }
 
+        public async Task<GetDocumentExtraFieldsResult> GetDocumentExtraFieldsAsync(GetDocumentExtraFieldsParameters parameters, CancellationToken ct = default)
+        {
+            return await InvokeAsync<GetDocumentExtraFieldsResult, GetDocumentExtraFieldsParameters>("GetDocumentExtraFields", parameters, ct);
+        }
+
         public async Task<AssignDocumentExtraFieldResult> AssignDocumentExtraFieldAsync(AssignDocumentExtraFieldParameters parameters, CancellationToken ct = default)
         {
             return await InvokeAsync<AssignDocumentExtraFieldResult, AssignDocumentExtraFieldParameters>("AssignDocumentExtraField", parameters, ct);
