@@ -20,6 +20,7 @@ using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Service;
+using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 using TinyIoC;
@@ -147,6 +148,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 };
             }
 
+            var extraFieldsOptions = FindPreference(GetString(Resource.String.pref_key_extra_fields_options));
+            if (extraFieldsOptions != null)
+            {
+                extraFieldsOptions.PreferenceClick += ExtraFieldsOptions_PreferenceClick;
+            }
+
             var setPresetCategory = FindPreference(GetString(Resource.String.pref_key_set_preset_category));
             if (setPresetCategory != null)
             {
@@ -178,6 +185,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var screen = (PreferenceScreen)FindPreference(GetString(Resource.String.pref_sync_favorites));
                 if (screen != null)
                     PreferenceScreen.RemovePreference(screen);
+            }
+        }
+
+        private async void ExtraFieldsOptions_PreferenceClick(object sender, Preference.PreferenceClickEventArgs e)
+        {
+            if (ServerConfig.SystemSettings.SystemInfo.ExtraFieldsEditingAvailable)
+            {
+                StartActivity(ExtraFieldsListActivity.CreateIntent(Context));
+                return;
+            }
+            else
+            {
+                await Dialogs.ShowConfirmDialogAsync(Context, Resource.String.extra_fields_alert_not_available_title,
+                                                        Resource.String.extra_fields_alert_not_available_content);
+                return;
             }
         }
 

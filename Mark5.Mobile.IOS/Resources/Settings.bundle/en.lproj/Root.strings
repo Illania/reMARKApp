@@ -41,6 +41,7 @@
 "local_template" = "Local template";
 "local_template_short" = "Local";
 "logout" = "Log out";
+"manage_extra_fields" = "Extra fields";
 "mark_as_read_delay_seconds" = "Mark as read after";
 "me" = "Me";
 "open_settings_app" = "Open Settings app";

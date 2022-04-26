@@ -82,7 +82,7 @@
     <MtouchArch>ARM64</MtouchArch>
     <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
     <MtouchVerbosity></MtouchVerbosity>
-    <CodesignProvision>reMARK Share Extension Development</CodesignProvision>
+    <CodesignProvision>reMARK Share 2022 Dev</CodesignProvision>
     <LangVersion>default</LangVersion>
     <MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
   </PropertyGroup>

@@ -8,6 +8,8 @@ using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
+using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
@@ -393,13 +395,19 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                         extraFieldLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
 
                         tableRowExtraField.AddView(extraFieldLabel);
-                        var extraFieldValue = new AppCompatTextView(Context)
+                        var extraFieldValue = new AppCompatEditText(Context)
                         {
-                            Text = extraField.Value
+                            Text = extraField.Value,
+                            Tag = extraField.Key.Id,
+                            Background = null
+                           
                         };
                         extraFieldValue.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
-
+                        if (!ServerConfig.SystemSettings.SystemInfo.ExtraFieldsEditingAvailable)
+                            extraFieldValue.InputType = Android.Text.InputTypes.Null;
+                        extraFieldValue.SetTextIsSelectable(true);
                         extraFieldValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
+                        extraFieldValue.AfterTextChanged += ExtraFieldValue_AfterTextChanged;
                         tableRowExtraField.AddView(extraFieldValue);
                         extraFieldsTableRows.Add(tableRowExtraField);
                         extendedLayout.AddView(tableRowExtraField, extendedLayout.ChildCount - 1);
@@ -438,6 +446,14 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 extraFieldsTableRows.ForEach(extendedLayout.RemoveView);
                 extraFieldsTableRows.Clear();
             }
+        }
+
+        private async void ExtraFieldValue_AfterTextChanged(object sender, Android.Text.AfterTextChangedEventArgs e)
+        {
+            var fieldValue = ((AppCompatEditText)sender).Text;
+            var fieldId = ((AppCompatEditText)sender).Tag;
+            var docId = Document.Id;
+            await Managers.DocumentsManager.AssignDocumentExtraFieldAsync(docId, (int)fieldId, fieldValue);
         }
     }
 }

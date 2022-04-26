@@ -100,5 +100,21 @@ namespace Mark5.Mobile.Common.Manager
 
         Task<string> GetNewDocumentReferenceNumber(DocumentPreview documentPreview, SourceType sourceType = SourceType.Auto);
 
+        Task<ExtraField> AddExtraFieldAsync(string name, SourceType sourceType = SourceType.Auto);
+
+        Task DeleteExtraFieldAsync(int extraFieldId, SourceType sourceType = SourceType.Auto);
+
+        Task<List<ExtraField>> GetExtraFieldsAsync(SourceType sourceType = SourceType.Auto);
+
+        Task<string> GetDocumentExtraFieldAsync(int docId, int fieldId, SourceType sourceType = SourceType.Auto);
+
+        Task AssignDocumentExtraFieldAsync(int docId, int fieldId, string fieldValue, SourceType sourceType = SourceType.Auto);
+
+        Task DeleteDocumentExtraFieldAsync(int docId, int fieldId, SourceType sourceType = SourceType.Auto);
+
+        Task UpdateExtraFieldsAsync(List<ExtraField> extraFields, SourceType sourceType = SourceType.Auto);
+
+        Task UpdateExtraFieldAsync(ExtraField extraField, SourceType sourceType = SourceType.Auto);
+
     }
 }

@@ -264,6 +264,14 @@
 		</dict>
 		<dict>
 			<key>Type</key>
+			<string>PSMultiValueSpecifier</string>
+			<key>Key</key>
+			<string>ManageExtraFields</string>
+			<key>Title</key>
+			<string>manage_extra_fields</string>
+		</dict>
+		<dict>
+			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 			<key>Title</key>
 			<string>large_attachment_warning</string>

@@ -179,7 +179,30 @@ namespace Mark5.ServiceReference.Exceptions
         [EnumMember(Value = "RemoveFavoriteFoldersError")] RemoveFavoriteFoldersError = 3004,
 
         [EnumMember(Value = "CancelSendDocumentError")] CancelSendDocumentError = 3005,
-        [EnumMember(Value = "ForceSendDocumentError")]ForceSendDocumentError = 3006
+        [EnumMember(Value = "ForceSendDocumentError")]ForceSendDocumentError = 3006,
+
+        [EnumMember(Value = "AddExtraFieldError")]
+        AddExtraFieldError = 1214,
+
+        [EnumMember(Value = "DeleteExtraFieldError")]
+        DeleteExtraFieldError = 1215,
+
+        [EnumMember(Value = "UpdateExtraFieldError")]
+        UpdateExtraFieldError = 1216,
+
+        [EnumMember(Value = "GetExtraFieldsError")]
+        GetExtraFieldsError = 1217,
+
+        [EnumMember(Value = "GetDocumentExtraFieldError")]
+        GetDocumentExtraFieldError = 1218,
+
+        [EnumMember(Value = "AssignDocumentExtraFieldError")]
+        AssignDocumentExtraFieldError = 1219,
+
+        [EnumMember(Value = "DeleteDocumentExtraFieldError")]
+        DeleteDocumentExtraFieldError = 1223,
+
+
     }
 
     #endregion

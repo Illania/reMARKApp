@@ -71,15 +71,11 @@ namespace Mark5.ServiceReference.AppService
                     var te = new TimeoutException("Request timed out.");
                     throw new HttpAppServiceException(statusCode, te.Message, te);
                 }
-#if DEBUG
-                Console.WriteLine("_________________________________________________________");
-                Console.WriteLine(azureApplicationProxyInfo.ToString());
-                Console.WriteLine($"Bearer: {bearerToken}, /n IsExpired: {JwtDecoder.Decoder.IsExpired(bearerToken)}");
-                Console.WriteLine("_________________________________________________________");
-#endif
+
                 if (azureApplicationProxyInfo != null && azureApplicationProxyInfo.IsEnabled
                  && !string.IsNullOrEmpty(azureApplicationProxyInfo.AppClientId)
                  && !string.IsNullOrEmpty(azureApplicationProxyInfo.ApplicationProxyClientId)
+                 && !string.IsNullOrEmpty(bearerToken)
                  && JwtDecoder.Decoder.IsExpired(bearerToken))
                 {
 
@@ -551,5 +547,45 @@ namespace Mark5.ServiceReference.AppService
             return await InvokeAsync<GetNewDocumentReferenceNumberResult, GetNewDocumentReferenceNumberParameters>("GetNewDocumentReferenceNumber", parameters, ct);
         }
         
+        public async Task<AddExtraFieldResult> AddExtraFieldAsync(AddExtraFieldParameters parameters, CancellationToken ct = default)
+        {
+            return await InvokeAsync<AddExtraFieldResult, AddExtraFieldParameters>("AddExtraField", parameters, ct);
+        }
+
+        public async Task<DeleteExtraFieldResult> DeleteExtraFieldAsync(DeleteExtraFieldParameters parameters, CancellationToken ct = default)
+        {
+            return await InvokeAsync<DeleteExtraFieldResult, DeleteExtraFieldParameters>("DeleteExtraField", parameters, ct);
+        }
+
+        public async Task<UpdateExtraFieldsResult> UpdateExtraFieldsAsync(UpdateExtraFieldsParameters parameters, CancellationToken ct = default)
+        {
+            return await InvokeAsync<UpdateExtraFieldsResult, UpdateExtraFieldsParameters>("UpdateExtraFields", parameters, ct);
+        }
+
+        public async Task<UpdateExtraFieldResult> UpdateExtraFieldAsync(UpdateExtraFieldParameters parameters, CancellationToken ct = default)
+        {
+            return await InvokeAsync<UpdateExtraFieldResult, UpdateExtraFieldParameters>("UpdateExtraField", parameters, ct);
+        }
+
+        public async Task<GetExtraFieldsResult> GetExtraFieldsAsync(GetExtraFieldsParameters parameters, CancellationToken ct = default)
+        {
+            return await InvokeAsync<GetExtraFieldsResult, GetExtraFieldsParameters>("GetExtraFields", parameters, ct);
+        }
+
+        public async Task<GetDocumentExtraFieldResult> GetDocumentExtraFieldAsync(GetDocumentExtraFieldParameters parameters, CancellationToken ct = default)
+        {
+            return await InvokeAsync<GetDocumentExtraFieldResult, GetDocumentExtraFieldParameters>("GetDocumentExtraField", parameters, ct);
+        }
+
+        public async Task<AssignDocumentExtraFieldResult> AssignDocumentExtraFieldAsync(AssignDocumentExtraFieldParameters parameters, CancellationToken ct = default)
+        {
+            return await InvokeAsync<AssignDocumentExtraFieldResult, AssignDocumentExtraFieldParameters>("AssignDocumentExtraField", parameters, ct);
+        }
+
+        public async Task<DeleteDocumentExtraFieldResult> DeleteDocumentExtraFieldAsync(DeleteDocumentExtraFieldParameters parameters, CancellationToken ct = default)
+        {
+            return await InvokeAsync<DeleteDocumentExtraFieldResult, DeleteDocumentExtraFieldParameters>("DeleteDocumentExtraField", parameters, ct);
+        }
+
     }
 }

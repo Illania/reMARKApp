@@ -505,7 +505,7 @@
     <Compile Include="Ui\Common\LambdaEmptyAdapterObserver.cs" />
     <Compile Include="Ui\Common\SmoothActionBarDrawerToggle.cs" />
     <Compile Include="Ui\Common\ViewUtilities.cs" />
-    <Compile Include="Ui\Fragments\CommentsListFragment.cs" />
+    <Compile Include="Ui\Fragments\ExtraFieldsListFragment.cs" />
     <Compile Include="Ui\Fragments\ComposeDocumentFragment.cs" />
     <Compile Include="Ui\Fragments\ContactFragment.cs" />
     <Compile Include="Ui\Fragments\ContactsSearchCriteriaFragment.cs" />
@@ -723,6 +723,9 @@
     <Compile Include="Ui\Fragments\CategoriesListFragment.cs" />
     <Compile Include="Ui\Fragments\CopyToUserWorktrayFragment.cs" />
     <Compile Include="Ui\Fragments\CopyToDepartmentWorktrayFragment.cs" />
+    <Compile Include="Ui\Fragments\ExtraFieldsListFragment.cs" />
+    <Compile Include="UI\Fragments\CommentsListFragment.cs" />
+    <Compile Include="Ui\Activities\ExtraFieldsListActivity.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -1242,6 +1245,14 @@
       <Generator></Generator>
     </AndroidResource>
     <AndroidResource Include="Resources\drawable\ic_bookmark.xml">
+      <SubType></SubType>
+      <Generator></Generator>
+    </AndroidResource>
+    <AndroidResource Include="Resources\layout\list_extra_fields.axml">
+      <SubType></SubType>
+      <Generator></Generator>
+    </AndroidResource>
+    <AndroidResource Include="Resources\layout\list_item_extra_fields.axml">
       <SubType></SubType>
       <Generator></Generator>
     </AndroidResource>

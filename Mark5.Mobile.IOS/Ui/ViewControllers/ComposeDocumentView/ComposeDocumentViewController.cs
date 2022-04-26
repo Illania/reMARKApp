@@ -986,9 +986,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             if (choice == 0)
             {
-                var dp = new DatePickerDialogViewController();
-                dp.ModalPresentationStyle = UIModalPresentationStyle.OverCurrentContext;
-                dp.ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve;
+                var dp = new DatePickerDialogViewController
+                {
+                    ModalPresentationStyle = UIModalPresentationStyle.OverCurrentContext,
+                    ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve
+                };
                 PresentViewController(dp, false, null);
 
                 pickedDateTime = await dp.Result;
