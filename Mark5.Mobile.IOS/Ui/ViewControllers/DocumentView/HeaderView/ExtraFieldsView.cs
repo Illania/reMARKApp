@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Foundation;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.IOS.Ui.Common;
@@ -87,8 +88,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                     Tag = efi.Key.Id,
                     TextAlignment = UITextAlignment.Left
                 };
-                valueTextField.EditingDidEnd += ValueTextField_EditingDidEnd; ;
-                
+                valueTextField.EditingDidEnd += ValueTextField_EditingDidEnd;
+
+                valueTextField.UserInteractionEnabled = ServerConfig.SystemSettings.SystemInfo.ExtraFieldsEditingAvailable;
+
                 label.AttributedText = labelText;
                 valueTextField.AttributedText = valueText;
 

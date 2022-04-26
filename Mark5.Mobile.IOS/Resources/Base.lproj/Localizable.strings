@@ -61,6 +61,8 @@
 "city" = "City";
 "confirm_delayed_send_title" = "Confirm delayed send";
 "confirm_delayed_send_content" = "The mail will be sent at:\n {0}\nDo you wish to proceed?";
+"confirm_extra_field_update_title" = "Confirm extra field update";
+"confirm_extra_field_content" = "The name of the extra field will be changed to:\n {0}\nDo you wish to proceed?";
 "country" = "Country";
 "clear_contacts_cache_summary" = "Do you want to remove cached contacts?";
 "clear_contacts_cache_title" = "Clear contacts cache";
@@ -174,9 +176,10 @@
 "edit_contact_edit_department" = "Edit department";
 "editing_contact___" = "Editing contact...";
 "editing_shortcode___" = "Editing mailing list...";
+"editing_extra_field___" = "Editing extra field...";
 "edit_shortcode_create" = "New mailing list";
 "edit_shortcode_edit" = "Edit mailing list";
-"edit_message" = "Edit message";
+"edit_message" = "Edit message"; 
 "edit_not_possible" = "Comments can be edited maximum one minute after creation";
 "edit_original_email" = "Edit original email";
 "edit_this_event_only" = "Edit this event only";
@@ -214,6 +217,8 @@
 "error_argumentexception_title" = "Argument exception";
 "existing_photo" = "Add existing photo";
 "extra_fields" = "Extra fields";
+"extra_fields_alert_not_available_title" = "Extra fields editing not available";
+"extra_fields_alert_not_available_content" = "To use extra fields editing functionality please update reMARK App Service API to version 4.4 or higher";
 "failed" = "Failed";
 "failed_send_document_notification_content" = "One or more emails could not be sent. Please check Outgoing folder for details.";
 "failed_send_document_notification_title" = "Failed to send messages";

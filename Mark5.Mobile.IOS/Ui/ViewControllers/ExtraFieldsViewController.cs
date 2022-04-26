@@ -352,7 +352,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Actions
 
-        void DeleteExtraField(Comment extraField)
+        void DeleteExtraField(ExtraField extraField)
         {
             TableView.Editing = false;
 
@@ -374,6 +374,33 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 else
                     ((DataSource)TableView.Source).RemoveExtraField(extraField);
             }, TaskScheduler.FromCurrentSynchronizationContext());
+        }
+
+        async void EditExtraField(ExtraField extraField)
+        {
+            TableView.Editing = false;
+
+            try
+            {
+                var dp = new StringEditorViewController
+                {
+                    ModalPresentationStyle = UIModalPresentationStyle.OverCurrentContext,
+                    ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve
+                };
+                PresentViewController(dp, false, null);
+
+                var newName = await dp.Result;
+                var updatedExtraField = new ExtraField { FieldId = extraField.FieldId, FieldName = newName, Enabled = extraField.Enabled };
+                await Managers.DocumentsManager.UpdateExtraFieldAsync(updatedExtraField);
+                ((DataSource)TableView.Source).UpdateItem(updatedExtraField);
+            }
+            catch(Exception ex)
+            {
+                CommonConfig.Logger.Error($"Failed to update extra field [Id={extraField.FieldId}] "
+                                             , ex.InnerException);
+                await Dialogs.ShowErrorAlertAsync(this, ex.InnerException);
+            }
+                
         }
 
         #endregion
@@ -459,7 +486,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         class DataSource : UITableViewSource
         {
             public bool Empty => !Items.Any();
-            public List<Comment> Items { get; } = new List<Comment>();
+            public List<ExtraField> Items { get; } = new List<ExtraField>();
 
             readonly WeakReference<ExtraFieldsViewController> viewControllerWeakReference;
             readonly WeakReference<UITableView> tableViewWeakReference;
@@ -512,20 +539,35 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var deleteAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Destructive,
                                                                 Localization.GetString("delete"),
                                                                 (a, ip) => viewControllerWeakReference.Unwrap()?.DeleteExtraField(extraField));
+
+                var editAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Destructive,
+                                                                Localization.GetString("edit"),
+                                                                (a, ip) => viewControllerWeakReference.Unwrap()?.EditExtraField(extraField));
                 deleteAction.BackgroundColor = Theme.DarkerBlue;
+                editAction.BackgroundColor = Theme.DarkBlue;
                 actions.Add(deleteAction);
+                actions.Add(editAction);
                 
 
                 return actions.ToArray();
             }
 
-            public void SetItems(List<Comment> extraFields)
+            public void SetItems(List<ExtraField> extraFields)
             {
                 loading = false;
 
                 Items.Clear();
                 Items.AddRange(extraFields);
                 tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+            }
+
+            public void UpdateItem(ExtraField extraField)
+            {
+                var indexPath = Items.FindIndex(c => c.FieldId == extraField.FieldId);
+    
+                Items[indexPath] = extraField;
+                tableViewWeakReference.Unwrap()?.ReloadRows(new[] { NSIndexPath.FromRowSection(indexPath, 0) }, UITableViewRowAnimation.Fade);
+
             }
 
             public void Reset()
@@ -536,7 +578,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
 
-            public void AddExtraField(Comment extraField)
+            public void AddExtraField(ExtraField extraField)
             {
                 Items.Add(extraField);
 
@@ -546,7 +588,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     tableViewWeakReference.Unwrap()?.InsertRows(new[] { NSIndexPath.FromRowSection(Items.Count - 1, 0) }, UITableViewRowAnimation.Fade);
             }
 
-            public void RemoveExtraField(Comment extraField)
+            public void RemoveExtraField(ExtraField extraField)
             {
                 var position = Items.FindIndex(c => c.FieldId == extraField.FieldId);
                 if (position >= 0)

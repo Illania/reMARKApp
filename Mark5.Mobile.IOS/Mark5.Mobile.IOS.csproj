@@ -334,6 +334,7 @@
 		<Compile Include="Ui\Common\Scalable controls\UITextViewScalable.cs" />
 		<Compile Include="Ui\Common\Scalable controls\UIButtonScalable.cs" />
 		<Compile Include="Ui\ViewControllers\ExtraFieldsViewController.cs" />
+		<Compile Include="Ui\ViewControllers\StringEditorViewController.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

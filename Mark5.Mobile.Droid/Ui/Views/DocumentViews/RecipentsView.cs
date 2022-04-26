@@ -8,6 +8,7 @@ using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
@@ -402,6 +403,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                            
                         };
                         extraFieldValue.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
+                        if (!ServerConfig.SystemSettings.SystemInfo.ExtraFieldsEditingAvailable)
+                            extraFieldValue.InputType = Android.Text.InputTypes.Null;
                         extraFieldValue.SetTextIsSelectable(true);
                         extraFieldValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
                         extraFieldValue.AfterTextChanged += ExtraFieldValue_AfterTextChanged;

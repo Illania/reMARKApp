@@ -146,9 +146,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (specifier.Key == ManageExtraFieldsKey)
             {
-                var extraFieldsVC = new ExtraFieldsViewController();
-                PresentViewController(new NavigationController(extraFieldsVC, UIModalPresentationStyle.PageSheet), true, null);
-                return;
+                if (ServerConfig.SystemSettings.SystemInfo.ExtraFieldsEditingAvailable)
+                {
+                    var extraFieldsVC = new ExtraFieldsViewController();
+                    PresentViewController(new NavigationController(extraFieldsVC, UIModalPresentationStyle.PageSheet), true, null);
+                    return;
+                }
+                else
+                {
+                    await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("extra_fields_alert_not_available_title"),
+                                                            Localization.GetString("extra_fields_alert_not_available_content"));
+                    return;
+                }
+
             }
 
             if (specifier.Key == PresetCategoryKey)
