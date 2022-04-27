@@ -383,58 +383,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 extraFieldsTableRows.ForEach(extendedLayout.RemoveView);
                 extraFieldsTableRows.Clear();
 
-                DocumentExtraFieldInfoEqualityComparer docComparer = new DocumentExtraFieldInfoEqualityComparer();
-
-                var assignedExtraFields = await Managers.DocumentsManager.GetDocumentExtraFieldsAsync(Document.Id);
-                var availableExtraFields = await Managers.DocumentsManager.GetExtraFieldsAsync();
-                var documentExtraFields = assignedExtraFields
-                    .Where(kv => kv.Key != null)
-                    .OrderBy(kv => kv.Key.Name)
-                    .ToDictionary(pair => pair.Key, pair => pair.Value, docComparer);
-
-                foreach (var ex in availableExtraFields.Select(ex => ex.ToDocumentExtraFieldInfo()))
-                {
-                    if(!documentExtraFields.ContainsKey(ex))
-                        documentExtraFields.Add(ex, string.Empty);
-                }
-
-                if (Document != null)
-                {
-                    foreach (var extraField in documentExtraFields)
-                    {
-                        var tableRowExtraField = new TableRow(Context);
-                        tableRowExtraField.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
-                        var extraFieldLabel = new AppCompatTextView(Context)
-                        {
-                            Text = extraField.Key.Name + ":"
-                        };
-                        extraFieldLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
-
-                        tableRowExtraField.AddView(extraFieldLabel);
-                        var extraFieldValue = new AppCompatEditText(Context)
-                        {
-                            Text = extraField.Value,
-                            Tag = extraField.Key.Id,
-                            Background = null
-                           
-                        };
-                        extraFieldValue.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
-                        if (!ServerConfig.SystemSettings.SystemInfo.ExtraFieldsEditingAvailable)
-                            extraFieldValue.InputType = Android.Text.InputTypes.Null;
-                        extraFieldValue.SetTextIsSelectable(true);
-                        extraFieldValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
-                        extraFieldValue.AfterTextChanged += ExtraFieldValue_AfterTextChanged;
-                        tableRowExtraField.AddView(extraFieldValue);
-                        extraFieldsTableRows.Add(tableRowExtraField);
-                        extendedLayout.AddView(tableRowExtraField, extendedLayout.ChildCount - 1);
-                    }
-                }
+                if (ServerConfig.SystemSettings.SystemInfo.ExtraFieldsEditingAvailable)
+                    await AddEditableExtraFields();
                 else
-                {
-                    extraFieldsTableRows.ForEach(extendedLayout.RemoveView);
-                    extraFieldsTableRows.Clear();
-                }
-            }
+                    AddReadonlyExtraFields();
             else
             {
                 tableRowLine.Visibility = ViewStates.Gone;
@@ -459,6 +411,94 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 dateReceivedValue.Text = string.Empty;
                 creatorValue.Text = string.Empty;
 
+                extraFieldsTableRows.ForEach(extendedLayout.RemoveView);
+                extraFieldsTableRows.Clear();
+            }
+        }
+
+        private void AddReadonlyExtraFields()
+        {
+            if (Document != null)
+            {
+                foreach (var extraField in Document.ExtraFields.Where(kv => kv.Key != null && !string.IsNullOrWhiteSpace(kv.Value)).OrderBy(kv => kv.Key.Name))
+                {
+                    var tableRowExtraField = new TableRow(Context);
+                    tableRowExtraField.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
+                    var extraFieldLabel = new AppCompatTextView(Context)
+                    {
+                        Text = extraField.Key.Name + ":"
+                    };
+                    extraFieldLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
+
+                    tableRowExtraField.AddView(extraFieldLabel);
+                    var extraFieldValue = new AppCompatTextView(Context)
+                    {
+                        Text = extraField.Value
+                    };
+                    extraFieldValue.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
+                    extraFieldValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
+                    tableRowExtraField.AddView(extraFieldValue);
+                    extraFieldsTableRows.Add(tableRowExtraField);
+                    extendedLayout.AddView(tableRowExtraField, extendedLayout.ChildCount - 1);
+                }
+            }
+            else
+            {
+                extraFieldsTableRows.ForEach(extendedLayout.RemoveView);
+                extraFieldsTableRows.Clear();
+            }
+        }
+
+        private async Task AddEditableExtraFields()
+        {
+            DocumentExtraFieldInfoEqualityComparer docComparer = new DocumentExtraFieldInfoEqualityComparer();
+
+            var assignedExtraFields = await Managers.DocumentsManager.GetDocumentExtraFieldsAsync(Document.Id);
+            var availableExtraFields = await Managers.DocumentsManager.GetExtraFieldsAsync();
+            var documentExtraFields = assignedExtraFields
+                .Where(kv => kv.Key != null)
+                .OrderBy(kv => kv.Key.Name)
+                .ToDictionary(pair => pair.Key, pair => pair.Value, docComparer);
+
+            foreach (var ex in availableExtraFields.Select(ex => ex.ToDocumentExtraFieldInfo()))
+            {
+                if (!documentExtraFields.ContainsKey(ex))
+                    documentExtraFields.Add(ex, string.Empty);
+            }
+
+            if (Document != null)
+            {
+                foreach (var extraField in documentExtraFields)
+                {
+                    var tableRowExtraField = new TableRow(Context);
+                    tableRowExtraField.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
+                    var extraFieldLabel = new AppCompatTextView(Context)
+                    {
+                        Text = extraField.Key.Name + ":"
+                    };
+                    extraFieldLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
+
+                    tableRowExtraField.AddView(extraFieldLabel);
+                    var extraFieldValue = new AppCompatEditText(Context)
+                    {
+                        Text = extraField.Value,
+                        Tag = extraField.Key.Id,
+                        Background = null
+
+                    };
+                    extraFieldValue.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
+                    if (!ServerConfig.SystemSettings.SystemInfo.ExtraFieldsEditingAvailable)
+                        extraFieldValue.InputType = Android.Text.InputTypes.Null;
+                    extraFieldValue.SetTextIsSelectable(true);
+                    extraFieldValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
+                    extraFieldValue.AfterTextChanged += ExtraFieldValue_AfterTextChanged;
+                    tableRowExtraField.AddView(extraFieldValue);
+                    extraFieldsTableRows.Add(tableRowExtraField);
+                    extendedLayout.AddView(tableRowExtraField, extendedLayout.ChildCount - 1);
+                }
+            }
+            else
+            {
                 extraFieldsTableRows.ForEach(extendedLayout.RemoveView);
                 extraFieldsTableRows.Clear();
             }

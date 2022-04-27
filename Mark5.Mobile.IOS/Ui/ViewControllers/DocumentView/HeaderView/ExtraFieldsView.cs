@@ -55,7 +55,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
             stackView.ArrangedSubviews.ForEach(v => v.RemoveFromSuperview());
 
+            if (ServerConfig.SystemSettings.SystemInfo.ExtraFieldsEditingAvailable)
+                await AddEditableExtraFields();
+            else
+                AddReadonlyExtraFields();
 
+        }
+
+        private async Task AddEditableExtraFields()
+        {
             DocumentExtraFieldInfoEqualityComparer docComparer = new();
 
             var assignedExtraFields = await Managers.DocumentsManager.GetDocumentExtraFieldsAsync(Document.Id);
@@ -113,7 +121,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                     };
                     valueTextField.EditingDidEnd += ValueTextField_EditingDidEnd;
 
-                    valueTextField.UserInteractionEnabled = ServerConfig.SystemSettings.SystemInfo.ExtraFieldsEditingAvailable;
+                    valueTextField.UserInteractionEnabled = true;
 
                     label.AttributedText = labelText;
                     valueTextField.AttributedText = valueText;
@@ -122,6 +130,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
                     stackViewHorizontal.AddArrangedSubview(valueTextField);
                     stackView.AddArrangedSubview(stackViewHorizontal);
                 }
+            }
+        }
+
+        private void AddReadonlyExtraFields()
+        {
+            foreach (var efi in Document.ExtraFields)
+            {
+                var text = new NSMutableAttributedString(efi.Key.Name + ": " + efi.Value);
+                text.AddAttribute(UIStringAttributeKey.ForegroundColor, Theme.DarkGray, new NSRange(0, efi.Key.Name.Length + 1));
+                
+
+                var label = new UILabelScalable
+                {
+                    Font = Theme.DefaultFont.CustomFont(),
+                    Opaque = false,
+                    TranslatesAutoresizingMaskIntoConstraints = false
+                };
+                label.AttributedText = text;
+                stackView.AddArrangedSubview(label);      
             }
         }
 
