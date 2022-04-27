@@ -8,12 +8,14 @@ using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
+using Java.Lang;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
+using Exception = System.Exception;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -188,7 +190,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             if (item.ItemId == MenuItemActions.DeleteExtraField)
-                Dialogs.ShowYesNoDialog(Context, Resource.String.confirm_extra_field_deletion_title, Resource.String.confirm_extra_field_deletion_content, () => DeleteExtraField(ExtraField),
+                Dialogs.ShowYesNoDialog(Context, Resource.String.confirm_extra_field_deletion_title, Resource.String.confirm_extra_field_deletion_content,
+                    () => DeleteExtraField(ExtraField),
                     null, Resource.String.confirm, Resource.String.cancel);
 
             return true;
@@ -235,6 +238,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             dismissAction();
             adapter.RemoveItem(extraField);
+            adapter.SortItems();
         }
 
         async void EditExtraField(ExtraField extraField, string newFieldName)
@@ -261,6 +265,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             dismissAction();
             adapter.EditItem(newExtraField);
+            adapter.SortItems();
         }
 
         void AddExtraFieldEditText_TextChanged(object sender, Android.Text.TextChangedEventArgs e)
@@ -279,6 +284,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 extraField = await Managers.DocumentsManager.AddExtraFieldAsync(newExtraFieldName);
             
                 adapter.AppendItem(extraField);
+                adapter.SortItems();
                 recyclerView.SmoothScrollToPosition(adapter.ItemCount);
                 addExtraFieldEditText.Text = string.Empty;
             }
@@ -347,6 +353,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public void SortItems()
             {
                 Items.Sort();
+                NotifyItemRangeChanged(0, Items.Count);
             }
 
             public void AppendItem(ExtraField item)
@@ -412,7 +419,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (ExtraField != null)
                 {
                     ExtraField.Enabled = e.IsChecked;
-                    Adapter.EditItem(ExtraField);
+                    enabledSwitch.Post(new Runnable(() =>
+                    {
+                        Adapter.EditItem(ExtraField);
+                    })); 
                 }
             }
 
