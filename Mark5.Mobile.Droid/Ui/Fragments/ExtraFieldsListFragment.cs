@@ -378,6 +378,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (position >= 0)
                 {
                     Items[position].FieldName = item.FieldName;
+                    Items[position].Enabled = item.Enabled;
                     NotifyItemChanged(position);
                 }
             }
