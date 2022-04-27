@@ -387,6 +387,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                     await AddEditableExtraFields();
                 else
                     AddReadonlyExtraFields();
+            }
             else
             {
                 tableRowLine.Visibility = ViewStates.Gone;
