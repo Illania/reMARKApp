@@ -290,9 +290,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
-                var extraFields = await Managers.DocumentsManager.GetExtraFieldsAsync();
-                var sortedFields = extraFields.OrderBy(x => x.FieldName).ToList();
-                ((DataSource)TableView.Source).SetItems(sortedFields);
+                var extraFields = await Managers.DocumentsManager.GetExtraFieldsAsync();         
+                ((DataSource)TableView.Source).SetItems(extraFields);
+                ((DataSource)TableView.Source).SortItems();
 
             }
             catch (Exception ex)
@@ -330,6 +330,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 var newField = await Managers.DocumentsManager.AddExtraFieldAsync(extraFieldTextView.Text);
 
                 ((DataSource)TableView.Source).AddExtraField(newField);
+                ((DataSource)TableView.Source).SortItems();
                 extraFieldTextView.Text = null;
                 extraFieldTextView.EndEditing(true);
 
@@ -352,28 +353,34 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Actions
 
-        void DeleteExtraField(ExtraField extraField)
+        async void DeleteExtraField(ExtraField extraField)
         {
             TableView.Editing = false;
 
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("deleting_extra_field___"));
+            try
+            {
 
-            Task.Run(async () =>
-            {
+                var deleteConfirmed = await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("confirm_extra_field_deletion_title"),
+                                                                      string.Format(Localization.GetString("confirm_extra_field_deletion_content")));
+                if (!deleteConfirmed)
+                    return;
+
+                var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("deleting_extra_field___"));
                 await Managers.DocumentsManager.DeleteExtraFieldAsync(extraField.FieldId);
-            }).ContinueWith(async t =>
-            {
                 dismissAction();
 
-                if (t.IsFaulted)
-                {
-                    CommonConfig.Logger.Error($"Failed to delete extra field [Id={extraField.FieldId}] "
-                                              , t.Exception.InnerException);
-                    await Dialogs.ShowErrorAlertAsync(this, t.Exception.InnerException);
-                }
-                else
-                    ((DataSource)TableView.Source).RemoveExtraField(extraField);
-            }, TaskScheduler.FromCurrentSynchronizationContext());
+                ((DataSource)TableView.Source).RemoveExtraField(extraField);
+                ((DataSource)TableView.Source).SortItems();
+
+            }
+            catch (OperationCanceledException) { }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Failed to delete extra field [Id={extraField.FieldId}] "
+                                             , ex.InnerException);
+                await Dialogs.ShowErrorAlertAsync(this, ex.InnerException);
+            }
+          
         }
 
         async void EditExtraField(ExtraField extraField)
@@ -391,9 +398,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var newName = await dp.Result;
                 var updatedExtraField = new ExtraField { FieldId = extraField.FieldId, FieldName = newName, Enabled = extraField.Enabled };
+
+                var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("editing_extra_field___"));
                 await Managers.DocumentsManager.UpdateExtraFieldAsync(updatedExtraField);
+                dismissAction();
+
                 ((DataSource)TableView.Source).UpdateItem(updatedExtraField);
+                ((DataSource)TableView.Source).SortItems();
             }
+            catch (OperationCanceledException) { }
             catch(Exception ex)
             {
                 CommonConfig.Logger.Error($"Failed to update extra field [Id={extraField.FieldId}] "
@@ -600,6 +613,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     else
                         tableViewWeakReference.Unwrap()?.DeleteRows(new[] { NSIndexPath.FromRowSection(position, 0) }, UITableViewRowAnimation.Fade);
                 }
+            }
+
+            public void SortItems()
+            {
+                Items.Sort();
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
             }
         }
 
