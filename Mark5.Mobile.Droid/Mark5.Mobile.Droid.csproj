@@ -1279,7 +1279,7 @@
       <Name>MaterialDialogs</Name>
     </ProjectReference>
     <ProjectReference Include="..\Mark5.Mobile.Classes\Mark5.Mobile.Classes.csproj">
-      <Project>{5EC51557-DB1D-4018-8C1F-E3170626B074}</Project>
+      <Project>{C561E483-51C4-4FCF-BB61-24B920C3FC03}</Project>
       <Name>Mark5.Mobile.Classes</Name>
     </ProjectReference>
   </ItemGroup>

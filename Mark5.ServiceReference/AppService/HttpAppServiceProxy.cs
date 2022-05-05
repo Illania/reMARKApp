@@ -14,6 +14,7 @@ using Mark5.ServiceReference.DataContract;
 using Mark5.ServiceReference.Exceptions;
 using Mark5.ServiceReference.Utilities;
 using JwtDecoder = Mark5.Mobile.Classes.JwtDecoder;
+using Mark5.Mobile.Classes;
 
 namespace Mark5.ServiceReference.AppService
 {
@@ -27,12 +28,13 @@ namespace Mark5.ServiceReference.AppService
         readonly string requestUri;
         string bearerToken;
         readonly AzureApplicationProxyInfo azureApplicationProxyInfo;
-        
+
 
         public HttpAppServiceProxy(bool ssl, string hostname, string port, Func<HttpMessageHandler> httpClientHandler,
             Action onStartTransmission, Action onStopTransmission,
             string bearerToken, AzureApplicationProxyInfo azureApplicationProxyInfo)
         {
+     
             this.httpClientHandler = httpClientHandler;
             this.onStartTransmission = onStartTransmission;
             this.onStopTransmission = onStopTransmission;
@@ -40,15 +42,28 @@ namespace Mark5.ServiceReference.AppService
             this.azureApplicationProxyInfo = azureApplicationProxyInfo;
 
             var usePort = !string.IsNullOrEmpty(port);
-          
-            requestUri = $"{(ssl ? "https" : "http")}://{hostname}{(usePort ? (":" + port) : "" )}/app3";
+
+            requestUri = $"{(ssl ? "https" : "http")}://{hostname}{(usePort ? (":" + port) : "")}/app3";
+
+            if (!string.IsNullOrEmpty(bearerToken))
+            {
+                AzureSettings.AccessToken = bearerToken;
+                AzureSettings.AppClientId = azureApplicationProxyInfo.AppClientId ?? string.Empty;
+                AzureSettings.AppProxyId = azureApplicationProxyInfo.ApplicationProxyClientId ?? string.Empty;
+                AzureSettings.IsEnabled = azureApplicationProxyInfo.IsEnabled;
+            }
+            
         }
 
+
+      
         async Task<R> InvokeAsync<R, P>(string soapAction, P parameters, CancellationToken ct, bool useShortTimeout = false,
                                            bool checkXmlCharacters = true) where R : class where P : class
         {
             HttpStatusCode statusCode = 0;
             var useBearerToken = !string.IsNullOrEmpty(bearerToken);
+           
+    
             try
             {
                 onStartTransmission?.Invoke();
@@ -76,12 +91,18 @@ namespace Mark5.ServiceReference.AppService
                  && !string.IsNullOrEmpty(azureApplicationProxyInfo.AppClientId)
                  && !string.IsNullOrEmpty(azureApplicationProxyInfo.ApplicationProxyClientId)
                  && !string.IsNullOrEmpty(bearerToken)
-                 && JwtDecoder.Decoder.IsExpired(bearerToken))
+                 && AzureSettings.IsTokenExpired())
                 {
 
                     var azureAppProxyAuthService = new AzureAppProxyAuthService(azureApplicationProxyInfo.AppClientId,
                         azureApplicationProxyInfo.ApplicationProxyClientId);
                     bearerToken = await azureAppProxyAuthService.Authenticate(this, false);
+
+                    if (!string.IsNullOrEmpty(bearerToken))
+                    {
+                        AzureSettings.RefreshToken = bearerToken;
+                        AzureSettings.RefreshTokenLastUpdated = DateTime.Now.ToLocalTime();
+                    }
 
                     using (var c = new HttpClient(httpClientHandler())
                     {
