@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Foundation;
+using Mark5.Mobile.Classes;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -130,7 +131,8 @@ namespace Mark5.Mobile.IOS.Utilities
             sb.AppendLine("Installation ID: " + Managers.ActiveConnectionInfo?.InstallationId);
             sb.AppendLine("APNS Token: " + PlatformConfig.Preferences.PushNotificationToken);
             sb.AppendLine("Azure Notifications Hubs registration Id: " + PlatformConfig.Preferences.AzureHubRegistrationId);
-            sb.AppendLine("Azure Application Proxy Bearer Token: " + PlatformConfig.Preferences.AzureApplicationProxyBearerToken);
+            sb.AppendLine("Azure Application Proxy Settings: ");
+            sb.AppendLine($"{AzureSettings.GetInfo()}");
             sb.AppendLine();
 
             sb.AppendLine("===== Server information =====");

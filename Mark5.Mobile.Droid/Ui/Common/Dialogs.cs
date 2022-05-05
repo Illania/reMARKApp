@@ -480,6 +480,24 @@ namespace Mark5.Mobile.Droid.Ui.Common
             builder.Show();
         }
 
+        public static void ShowEditTextViewDialog(Context context, int titleId, string text, Action<string> positiveAction, Action negativeAction = null,
+           int positiveTextId = Resource.String.yes, int negativeTextId = Resource.String.no)
+        {
+            var editTextView = new AppCompatTextView(context);
+            editTextView.Text = text;
+            editTextView.SetTextIsSelectable(true);
+            var builder = new MaterialDialog.Builder(context);
+            builder.CustomView(editTextView, true);
+            builder.Title(titleId);
+            builder.PositiveText(positiveTextId);
+            builder.NegativeText(negativeTextId);
+            builder.OnPositive(new SingleButtonCallback(() => positiveAction(editTextView.Text)));
+            if (negativeAction != null)
+                builder.OnNegative(new SingleButtonCallback(negativeAction));
+            builder.Cancelable(false);
+            builder.Show();
+        }
+
         public static void ShowConfirmDialog(Context context, int titleId, int contentId, Action action = null)
         {
             var builder = new MaterialDialog.Builder(context);

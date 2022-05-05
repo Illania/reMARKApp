@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using Android.App;
 using Android.Content;
@@ -9,11 +7,11 @@ using Android.OS;
 using Android.Support.V4.Content.PM;
 using Firebase;
 using Firebase.Iid;
+using Mark5.Mobile.Classes;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
-using Mark5.Mobile.Droid.Service;
 using Mark5.Mobile.Droid.Ui.Activities;
 using ME.Pushy.Sdk;
 
@@ -109,7 +107,8 @@ namespace Mark5.Mobile.Droid.Utilities
                 sb.AppendLine("Pushy token: " + PlatformConfig.Preferences.PushNotificationToken ?? string.Empty);
             else
                 sb.AppendLine("Firebase Instance ID: " + FirebaseInstanceId.Instance?.Token);
-            sb.AppendLine("Azure Application Proxy Bearer Token: " + PlatformConfig.Preferences.AzureApplicationProxyBearerToken);
+            sb.AppendLine("Azure Application Proxy Settings: ");
+            sb.AppendLine($"{AzureSettings.GetInfo()}");
             sb.AppendLine();
 
             sb.AppendLine("===== Preferences =====");
