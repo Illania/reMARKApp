@@ -279,7 +279,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                     ci = await authenticator.AuthenticateWithAzureAsync(azureUser, sslMode, hostname, port, token);
                 }
 
-                await InitializeApplication(ci, token, accessToken);
+                await InitializeApplication(ci, token, accessToken, azureAppProxyInfo);
             }
             catch (Exception ex)
             {
