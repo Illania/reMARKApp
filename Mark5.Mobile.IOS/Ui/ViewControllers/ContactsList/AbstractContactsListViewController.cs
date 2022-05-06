@@ -873,7 +873,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             }
 
             public override string[] SectionIndexTitles(UITableView tableView) => items.SelectMany(i => i)
-                                                                                       .Select(cp => cp.Name.SafeSubstring(0, 1).ToUpper())
+                                                                                       .Select(cp => cp.Name.SafeSubstring(0, 1)
+                                                                                       .ToUpper())
                                                                                        .Distinct()
                                                                                        .ToArray();
 
