@@ -276,7 +276,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             readonly string emptyText;
 
             bool loading = true;
-            readonly List<List<Recipient>> items = new List<List<Recipient>>();
+            readonly List<List<Recipient>> items = new();
 
             public DataSource(PhonebookContactsListViewController viewController, UITableView tableView, string emptyText)
             {
