@@ -43,6 +43,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         PriorityView priorityView;
         OriginatorView originatorView;
         CreatorView creatorView;
+        WorktrayCommentView worktrayCommentView;
         ExtraFieldsView extraFieldsView;
         AttachmentsView attachmentsListView;
         CalendarInvitationView calendarInvitationView;
@@ -98,6 +99,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             subViews.Add(priorityView = new PriorityView());
             subViews.Add(originatorView = new OriginatorView());
             subViews.Add(creatorView = new CreatorView());
+            subViews.Add(worktrayCommentView = new WorktrayCommentView());
             subViews.Add(extraFieldsView = new ExtraFieldsView());
             subViews.Add(attachmentsListView = new AttachmentsView());
             subViews.Add(calendarInvitationView = new CalendarInvitationView());
@@ -125,6 +127,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             contentView.AddArrangedSubview(referenceNumberView);
             contentView.AddArrangedSubview(creatorView);
             contentView.AddArrangedSubview(originatorView);
+            contentView.AddArrangedSubview(worktrayCommentView);
             contentView.AddArrangedSubview(extraFieldsView);
             contentView.AddArrangedSubview(bottomView);
             contentView.AddArrangedSubview(attachmentsListView);
@@ -146,6 +149,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             hiddenViews.Add(referenceNumberView);
             hiddenViews.Add(creatorView);
             hiddenViews.Add(originatorView);
+            hiddenViews.Add(worktrayCommentView);
             hiddenViews.Add(extraFieldsView);
 
             hiddenViews.ForEach(v =>

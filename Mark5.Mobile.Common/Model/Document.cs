@@ -125,6 +125,9 @@ namespace Mark5.Mobile.Common.Model
         [Column("IsEncrypted")]
         public bool IsEncrypted { get; set; }
 
+        [Column("WorktrayComment")]
+        public string WorktrayComment { get; set; }
+
         #region Serialization
 
         [Column("LinesString")]

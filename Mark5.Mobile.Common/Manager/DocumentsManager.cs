@@ -1003,7 +1003,7 @@ namespace Mark5.Mobile.Common.Manager
 
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
-            
+
             if (sourceType == SourceType.Remote)
             {
 
@@ -1011,7 +1011,7 @@ namespace Mark5.Mobile.Common.Manager
                 {
                     Token = Token
                 });
-                var extraFields = result?.ExtraFields?.WhereNotNull().Select(extraField => extraField.Convert()).ToList();
+                var extraFields = result?.ExtraFields?.Where(ef => ef != null && ef.Enabled).Select(extraField => extraField.Convert()).ToList();
                 return extraFields ?? new List<ExtraField>();
 
             }
