@@ -515,6 +515,9 @@ namespace Mark5.ServiceReference.DataContract
         [DataMember(Name = "IsEncrypted", Order = 0)]
         public bool IsEncrypted { get; set; }
 
+        [DataMember(Name = "WorktrayComment", Order = 1)]
+        public string WorktrayComment { get; set; }
+
         [DataMember(Name = "Invitations", Order = 2)]
         public List<CalendarInvitation> Invitations = new List<CalendarInvitation>();
     }

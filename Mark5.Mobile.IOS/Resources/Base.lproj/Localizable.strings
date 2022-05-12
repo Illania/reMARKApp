@@ -517,6 +517,7 @@ Please note that these reports are not monitored 24/7 and will be available to d
 "webpage" = "Webpage";
 "week" = "Week";
 "whats_new" = "What\'s new";
+"worktray_comment" = "Worktray comment.";
 "wrong_hostname_summary" = "You need to provide valid hostname.";
 "wrong_hostname_title" = "Wrong hostname";
 "wrong_password_summary" = "You need to provide valid password.";

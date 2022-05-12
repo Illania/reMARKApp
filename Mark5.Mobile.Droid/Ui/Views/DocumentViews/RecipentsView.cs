@@ -37,6 +37,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
         TableRow tableRowBcc;
         TableRow tableRowReplyTo;
         TableRow tableRowReadBy;
+        TableRow tableRowWorktrayComment;
         TableRow tableRowDateReceived;
         TableRow tableRowCreator;
         AppCompatTextView lineValue;
@@ -47,6 +48,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
         AppCompatTextView bccValue;
         AppCompatTextView replyToValue;
         AppCompatTextView readByValue;
+        AppCompatTextView worktrayCommentValue;
         AppCompatTextView dateReceivedValue;
         AppCompatTextView creatorValue;
         AppCompatButton showHideButton;
@@ -163,6 +165,24 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             readByValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
             tableRowReadBy.AddView(readByValue);
             compactLayout.AddView(tableRowReadBy);
+
+
+            // Worktray comment
+            tableRowWorktrayComment = new TableRow(Context);
+            tableRowWorktrayComment.SetPadding(DistanceNone, DistanceSmall, DistanceNone, DistanceNone);
+            var worktrayCommentLabel = new AppCompatTextView(Context)
+            {
+                Text = Context.GetString(Resource.String.worktray_comment)
+            };
+            worktrayCommentLabel.SetTextAppearanceCompat(Context, Resource.Style.fontPrimaryLight);
+
+            tableRowWorktrayComment.AddView(worktrayCommentLabel);
+            worktrayCommentValue = new AppCompatTextView(Context);
+            worktrayCommentValue.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
+
+            worktrayCommentValue.SetPadding(DistanceNormal, DistanceNone, DistanceNone, DistanceNone);
+            tableRowWorktrayComment.AddView(worktrayCommentValue);
+            compactLayout.AddView(tableRowWorktrayComment);
 
             // Show button
             showHideButton = new AppCompatButton(Context, null, Resource.Style.Widget_AppCompat_Button_Borderless_Colored)
@@ -372,6 +392,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 tableRowReadBy.Visibility = string.IsNullOrWhiteSpace(readByText) ? ViewStates.Gone : ViewStates.Visible;
                 readByValue.Text = readByText;
 
+                var worktrayCommentText = Document.WorktrayComment;
+                tableRowWorktrayComment.Visibility = string.IsNullOrWhiteSpace(worktrayCommentText) ? ViewStates.Gone : ViewStates.Visible;
+                worktrayCommentValue.Text = worktrayCommentText;
+
                 var processedDateReceivedTimestamp = DocumentPreview.DateReceivedTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds();
                 tableRowDateReceived.Visibility = DocumentPreview.DateReceivedTimestamp < 0 ? ViewStates.Gone : ViewStates.Visible;
                 dateReceivedValue.Text = processedDateReceivedTimestamp.FormatUserTimestampAsTimeAndDateString(Context);
@@ -409,6 +433,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 bccValue.Text = string.Empty;
                 replyToValue.Text = string.Empty;
                 readByValue.Text = string.Empty;
+                worktrayCommentValue.Text = string.Empty;
                 dateReceivedValue.Text = string.Empty;
                 creatorValue.Text = string.Empty;
 

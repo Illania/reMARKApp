@@ -255,7 +255,8 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Guid = d.Guid,
                 HtmlBody = d.HtmlBody,
                 PlainTextBody = d.PlainTextBody,
-                IsEncrypted = d.IsEncrypted
+                IsEncrypted = d.IsEncrypted,
+                WorktrayComment = d.WorktrayComment
             };
             if (d.Lines != null)
                 result.Lines.AddRange(d.Lines.WhereNotNull().Select(Convert));
@@ -805,6 +806,7 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Comments = doc.Comments.Select(Convert).ToList(),
                 ExtraFields = doc.ExtraFields.ToDictionary(kv => kv.Key.Convert(), kv => kv.Value),
                 IsEncrypted = doc.IsEncrypted,
+                WorktrayComment = doc.WorktrayComment,
                 Invitations = doc.Invitations?.Select(Convert).ToList(),
             };
         }
