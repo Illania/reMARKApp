@@ -726,6 +726,10 @@
     <Compile Include="Ui\Fragments\ExtraFieldsListFragment.cs" />
     <Compile Include="UI\Fragments\CommentsListFragment.cs" />
     <Compile Include="Ui\Activities\ExtraFieldsListActivity.cs" />
+    <Compile Include="Ui\Activities\ExternalDocumentFoldersListActivity.cs" />
+    <Compile Include="Ui\Activities\ExternalDocumentListActivity.cs" />
+    <Compile Include="Ui\Fragments\ExternalDocumentFoldersListFragment.cs" />
+    <Compile Include="Ui\Fragments\ExternalDocumentsListFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -1279,7 +1283,7 @@
       <Name>MaterialDialogs</Name>
     </ProjectReference>
     <ProjectReference Include="..\Mark5.Mobile.Classes\Mark5.Mobile.Classes.csproj">
-      <Project>{C561E483-51C4-4FCF-BB61-24B920C3FC03}</Project>
+      <Project>{5EC51557-DB1D-4018-8C1F-E3170626B074}</Project>
       <Name>Mark5.Mobile.Classes</Name>
     </ProjectReference>
   </ItemGroup>

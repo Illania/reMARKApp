@@ -567,7 +567,8 @@ namespace Mark5.Mobile.Common.Manager
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task<string> GetAttachmentAsync(AttachmentDescription attachmentDescription, Document document, bool checkMD5 = false, SourceType sourceType = SourceType.Auto)
+        public async Task<string> GetAttachmentAsync(AttachmentDescription attachmentDescription, Document document,
+            bool checkMD5 = false, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
@@ -593,6 +594,17 @@ namespace Mark5.Mobile.Common.Manager
             }
 
             throw new ArgumentException("Invalid sourceType provided.");
+        }
+
+
+        public async Task<string> GetAttachmentAsync(AttachmentDescription attachmentDescription, int documentId,
+            bool checkMD5 = false, SourceType sourceType = SourceType.Auto)
+        {
+            var doc = new Document
+            {
+                Id = documentId
+            };
+            return await GetAttachmentAsync(attachmentDescription, doc, checkMD5, sourceType);
         }
 
         public async Task<List<string>> GetAttachmentsAsync(Document document)

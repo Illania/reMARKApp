@@ -616,10 +616,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             if(!Integration.IsiOSApplicationOnMac())
             {
                 var source = await Dialogs.ShowListActionSheetAsync(this, new[] {
-                Localization.GetString("insert_template"),
-                Localization.GetString("take_photo"),
-                Localization.GetString("existing_photo"),
-                Localization.GetString("browse_files") }, d);
+                    Localization.GetString("insert_template"),
+                    Localization.GetString("take_photo"),
+                    Localization.GetString("existing_photo"),
+                    Localization.GetString("browse_files"),
+                    Localization.GetString("browse_external_remark_files") }, d);
 
                 if (source < 0)
                     return;
@@ -646,6 +647,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 {
                     CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.Local));
                     InsertFile(d, (UIBarButtonItem)sender);
+                }
+
+                if (source == 4)
+                {
+                    CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.External));
+                    await InsertExternalAttachment();
                 }
             }
             else
@@ -831,7 +838,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                     if (e.AttachmentDescription != null)
                     {
-                        path = await Managers.DocumentsManager.GetAttachmentAsync(e.AttachmentDescription, previousDocument, false, SourceType.Local);
+             
+                        path = e.AttachmentDescription.DocumentId == -1
+                           ? await Managers.DocumentsManager.GetAttachmentAsync(e.AttachmentDescription, previousDocument, false, SourceType.Local)
+                           : await Managers.DocumentsManager.GetAttachmentAsync(e.AttachmentDescription, e.AttachmentDescription.DocumentId, false,
+                           SourceType.Local);
 
                         if (string.IsNullOrWhiteSpace(path))
                         {
@@ -843,7 +854,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                                 return;
                             }
 
-                            path = await Managers.DocumentsManager.GetAttachmentAsync(e.AttachmentDescription, previousDocument, false, SourceType.Remote);
+                            path = e.AttachmentDescription.DocumentId == -1
+                                ? await Managers.DocumentsManager.GetAttachmentAsync(e.AttachmentDescription, previousDocument, false, SourceType.Remote)
+                                : await Managers.DocumentsManager.GetAttachmentAsync(e.AttachmentDescription, e.AttachmentDescription.DocumentId, false,
+                                SourceType.Remote);
                         }
                     }
 
@@ -865,8 +879,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Failed to view attachment [document.Id={document.Id}, previousDocumentId={previousDocument.Id}, e.AttachmentDescription.Name={e.AttachmentDescription?.Name}, e.FileDescription.Name={e.FileDescription?.Name}]", ex);
-
+                CommonConfig.Logger.Error($"Failed to view attachment [document.Id={document.Id}, previousDocumentId={previousDocument?.Id}, " +
+                    $"e.AttachmentDescription.Name={e.AttachmentDescription?.Name}, e.FileDescription.Name={e.FileDescription?.Name}]", ex);
+                
                 dismissAction();
                 await Dialogs.ShowErrorAlertAsync(this, ex);
             }
@@ -1208,6 +1223,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             if (template.Attachments.Any())
                 attachmentsView?.AddAttachmenstFromTemplate(template);
+        }
+
+        async Task InsertExternalAttachment()
+        {
+            var ad = new ExternalDocumentFoldersListViewController();
+            PresentViewController(new NavigationController(ad, UIModalPresentationStyle.PageSheet), true, null);
+
+            var attachmentDescs = await ad.Result;
+            if (attachmentDescs == null)
+                return;
+
+            attachmentsView.AddAttachmentDescriptions(attachmentDescs);
         }
 
         #endregion

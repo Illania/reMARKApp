@@ -336,6 +336,8 @@
 		<Compile Include="Ui\ViewControllers\ExtraFieldsViewController.cs" />
 		<Compile Include="Ui\ViewControllers\StringEditorViewController.cs" />
 		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\WorktrayCommentView.cs" />
+		<Compile Include="Ui\ViewControllers\ExternalDocumentsListViewController.cs" />
+		<Compile Include="ExternalDocumentFoldersListViewController.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

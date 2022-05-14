@@ -38,6 +38,7 @@
 "big_attachment_warning" = "This attachment is {0} large. Do you still want to download this file?";
 "birthdate" = "Birthdate";
 "browse_files" = "Browse files...";
+"browse_external_remark_files" = "Browse external reMark files";
 "calendar" = "Calendar";
 "calendars" = "Calendars";
 "call" = "Call";
@@ -218,6 +219,7 @@
 "error_while_sending_document" = "Error while sending email";
 "error_argumentexception_title" = "Argument exception";
 "existing_photo" = "Add existing photo";
+"external_documents" = "External documents";
 "extra_fields" = "Extra fields";
 "extra_fields_alert_not_available_title" = "Extra fields editing not available";
 "extra_fields_alert_not_available_content" = "To use extra fields editing functionality please update reMARK App Service API to version 4.4 or higher";

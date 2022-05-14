@@ -104,6 +104,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
                 AddAttachment(attachmentDescription);
         }
 
+        public void AddAttachmentDescriptions(List<AttachmentDescription> attachmentDescriptions)
+        {
+            foreach (var desc in attachmentDescriptions)
+            {
+                AddAttachmentDescription(desc);
+            }
+        }
+
+        public void AddAttachmentDescription(AttachmentDescription attachmentDescription)
+        {
+            attachmentDescriptionsInView.Add(attachmentDescription);
+
+            var fdsv = new AttachmentsSubView(attachmentDescription,
+                                                  ad => Tapped(this, new TappedEventArgs(ad, null)),
+                                                  ad => DeleteTapped(this, new DeleteTappedEventArgs(ad, null)));
+            stackView.AddArrangedSubview(fdsv);
+
+            UpdateVisibility();
+        }
+
         public override Task UpdateDocument()
         {
             var remoteAttachments = attachmentDescriptionsInView.ToArray();

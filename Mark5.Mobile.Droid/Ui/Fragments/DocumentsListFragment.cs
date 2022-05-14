@@ -41,15 +41,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         readonly Handler searchHandler = new Handler();
 
-        const string FolderBundleKey = "Folder_5ab3effc-9a60-4b26-805e-72a0c3527b0d";
+        protected const string FolderBundleKey = "Folder_5ab3effc-9a60-4b26-805e-72a0c3527b0d";
         const string SelectedDocumentPreviewsKey = "SelectedDocumentPreviews_9d33e0b7-9791-4ee9-82bd-73af5c0b5716";
         const string FirstRowIdKey = "FirstRowId_ab73aa33-930f-4139-94b1-b7828d5f4de7";
-        const string LastRowIdKey = "LastRowId_a92f8e84-7274-48e3-9296-3d52a9b3231c";
+        const string LastRowIdKey = "LastRowId_a92f8e84-7274-48e3-9296-3d52a9b3231c"; 
+        protected const string HideSearchBundleKey = "HideSearchBundle_4ec1a10c-f9e5-43f8-8e73-c555f7679b43";
+        protected const string OnlyShowExternalDocumentsBundleKey = "OnlyShowExternalDocuments_119623bc-74c6-4763-898a-319ea8fc9591";
+
 
         const int AutoRefreshIntervalMs = 5 * 1000; // 5 seconds
 
         bool refreshing;
         bool selectEnabled = true;
+
+        protected List<DocumentPreview> savedSelectedDocumentPreviews;
 
         IMenu menu;
         CoordinatorLayout coordinatorLayout;
@@ -68,7 +73,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         int savedFirstRowId = -1;
         int savedLastRowId = -1;
-        List<DocumentPreview> savedSelectedDocumentPreviews;
+
+        bool hideSearch;
+        bool onlyShowExternalDocuments;
 
         AutoRefreshWorker autoRefreshWorker;
 
@@ -81,8 +88,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (folder != null)
                 args.PutString(FolderBundleKey, Serializer.Serialize(folder));
 
-            var fragment = new DocumentsListFragment();
-            fragment.Arguments = args;
+            var fragment = new DocumentsListFragment
+            {
+                Arguments = args
+            };
 
             var tag = $"{nameof(DocumentsListFragment)} [folder.id={folder.Id}, folder.name={folder.Name}]";
 
@@ -104,6 +113,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (savedInstanceState?.ContainsKey(LastRowIdKey) == true)
                 savedLastRowId = savedInstanceState.GetInt(LastRowIdKey);
+
+            if (Arguments.ContainsKey(HideSearchBundleKey))
+                hideSearch = Arguments.GetBoolean(HideSearchBundleKey);
+
+            if (Arguments.ContainsKey(OnlyShowExternalDocumentsBundleKey))
+                onlyShowExternalDocuments = Arguments.GetBoolean(OnlyShowExternalDocumentsBundleKey);
         }
 
         #region Fragment overrides
@@ -165,6 +180,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             fab.SetImageResource(Resource.Drawable.action_new);
             fab.SetOnClickListener(new ActionOnClickListener(ComposeDocument));
             fab.Visibility = ViewStates.Visible;
+
+            HasOptionsMenu = true;
 
             HasOptionsMenu = true;
 
@@ -270,13 +287,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             searchView.QueryHint = GetString(Resource.String.filter);
             searchView.SetOnQueryTextListener(this);
 
-            var searchItem = menu.Add(Menu.None, 10, Menu.None, Resource.String.search);
-            searchItem.SetIcon(Resource.Drawable.action_search_server);
-            searchItem.SetShowAsAction(ShowAsAction.Always);
+            if (!hideSearch)
+            {
+                var searchItem = menu.Add(Menu.None, 10, Menu.None, Resource.String.search);
+                searchItem.SetIcon(Resource.Drawable.action_search_server);
+                searchItem.SetShowAsAction(ShowAsAction.Always);
+            }
 
             var bookmarkItem = menu.Add(Menu.None, 11, Menu.None, Resource.String.search);
             bookmarkItem.SetIcon(Resource.Drawable.ic_bookmark);
-            bookmarkItem.SetShowAsAction(ShowAsAction.Always);
+            bookmarkItem.SetShowAsAction(ShowAsAction.Always); 
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
@@ -443,6 +463,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     documentPreviews = await Managers.DocumentsManager.GetDocumentPreviewsAsync(Folder, startId, endId);
                 }
+
+                if (onlyShowExternalDocuments)
+                    documentPreviews = documentPreviews.FindAll((DocumentPreview dp) => dp.Direction == DocumentDirection.External);
+
                 adapter.EnableLoadMore = documentPreviews.Count >= PlatformConfig.Preferences.DocumentsToDownload;
                 CommonConfig.Logger.Info($"Enable load more documents set to {adapter.EnableLoadMore}");
 
@@ -489,7 +513,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Adapter callbacks
 
-        void Adapter_ItemClicked(object sender, DocumentPreview documentPreview)
+        protected virtual async void Adapter_ItemClicked(object sender, DocumentPreview documentPreview)
         {
             if (actionMode == null)
             {
@@ -529,7 +553,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        void Adapter_ItemLongClicked(object sender, DocumentPreview documentPreview)
+        protected void Adapter_ItemLongClicked(object sender, DocumentPreview documentPreview)
         {
             if (actionMode == null)
                 actionMode = Activity.StartActionMode(this);
