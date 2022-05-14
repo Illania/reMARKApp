@@ -729,7 +729,6 @@
     <Compile Include="Ui\Activities\ExternalDocumentFoldersListActivity.cs" />
     <Compile Include="Ui\Activities\ExternalDocumentListActivity.cs" />
     <Compile Include="Ui\Fragments\ExternalDocumentFoldersListFragment.cs" />
-    <Compile Include="Ui\AbstractDocumentsListFragment.cs" />
     <Compile Include="Ui\Fragments\ExternalDocumentsListFragment.cs" />
   </ItemGroup>
   <ItemGroup>

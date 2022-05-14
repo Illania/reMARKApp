@@ -11,7 +11,7 @@ using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class ExternalDocumentsListFragment : AbstractDocumentsListFragment
+    public class ExternalDocumentsListFragment : DocumentsListFragment
     {
         public static (ExternalDocumentsListFragment fragment, string tag) NewInstance(Folder folder)
         {
