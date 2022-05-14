@@ -38,6 +38,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         protected readonly bool DisableRowActions;
         protected readonly bool DisableNavigationBarActions;
         protected readonly bool DisableSearch;
+        protected readonly bool OnlyShowRemoteSection;
 
         protected UIBarButtonItem EditModeItem;
         protected UIBarButtonItem CreateContactItem;
@@ -54,7 +55,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         #endregion
 
         #region Constructors
-        protected AbstractFoldersListViewController(ModuleType module, bool disableRowActions, bool disableNavigationBarActions, bool disableSearch)
+        protected AbstractFoldersListViewController(ModuleType module, bool disableRowActions, bool disableNavigationBarActions, bool disableSearch, bool onlyShowRemoteSection = false)
             : base(UITableViewStyle.Grouped)
         {
             IsRootOfFoldersList = true;
@@ -62,9 +63,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             DisableRowActions = disableRowActions;
             DisableNavigationBarActions = disableNavigationBarActions;
             DisableSearch = disableSearch;
+            OnlyShowRemoteSection = onlyShowRemoteSection;
         }
 
-        protected AbstractFoldersListViewController(Folder folder, bool disableRowActions, bool disableNavigationBarActions, bool disableSearch)
+        protected AbstractFoldersListViewController(Folder folder, bool disableRowActions, bool disableNavigationBarActions, bool disableSearch, bool onlyShowRemoteSection = false)
             : base(UITableViewStyle.Plain)
         {
             IsRootOfFoldersList = false;
@@ -215,7 +217,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
             try
             {
-                if (IsRootOfFoldersList)
+                if (IsRootOfFoldersList && !OnlyShowRemoteSection)
                     switch (ParentFolder.Module)
                     {
                         case ModuleType.Documents:
@@ -292,8 +294,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         protected virtual void InitializeView()
         {
             RefreshControl = new UIRefreshControl();
-
-            TableView.Source = IsRootOfFoldersList
+            TableView.Source = (IsRootOfFoldersList && !OnlyShowRemoteSection)
                 ? new GrouppedDataSource(this, TableView, ParentFolder.Module, DisableRowActions)
                 : new DataSource(this, TableView, ParentFolder.Module, DisableRowActions);
             TableView.RowHeight = UITableView.AutomaticDimension;
@@ -538,7 +539,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     remoteFolders = await Managers.FoldersManager.GetFoldersAsync(ParentFolder);
             }
 
-            if (IsRootOfFoldersList)
+            if (IsRootOfFoldersList && !OnlyShowRemoteSection)
             {
 
 
@@ -650,7 +651,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         async void RefreshFoldersInfo()
         {
-            if (IsRootOfFoldersList)
+            if (IsRootOfFoldersList && !OnlyShowRemoteSection)
             {
                 var gds = (GrouppedDataSource)TableView.Source;
                 var ids = gds.ItemsIds;

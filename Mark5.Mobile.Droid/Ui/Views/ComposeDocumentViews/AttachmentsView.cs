@@ -100,6 +100,26 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             UpdateVisibility();
         }
 
+        public void AddAttachmentDescriptions(List<AttachmentDescription> attachmentDescriptions)
+        {
+            foreach (var desc in attachmentDescriptions)
+            {
+                AddAttachmentDescription(desc);
+            }
+        }
+
+        public void AddAttachmentDescription(AttachmentDescription attachmentDescription)
+        {
+            attachmentDescriptions.Add(attachmentDescription);
+
+            var av = new AttachmentView(Context, attachmentDescription, null, DistanceLarge, DistanceNormal);
+            av.Click += Attachment_Click;
+            container.AddView(av);
+
+            UpdateVisibility();
+        }
+
+
         public void RemoveAttachment(object senderView, AttachmentDescription attachment)
         {
             attachmentDescriptions.Remove(attachment);

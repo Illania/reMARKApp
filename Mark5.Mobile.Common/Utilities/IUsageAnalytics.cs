@@ -41,7 +41,8 @@ namespace Mark5.Mobile.Common.Utilities
     {
         TakePhoto,
         PickPhoto,
-        Local
+        Local,
+        External
     }
 
     public enum TemplateType

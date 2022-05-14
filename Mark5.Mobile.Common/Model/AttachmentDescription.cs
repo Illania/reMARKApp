@@ -44,5 +44,8 @@ namespace Mark5.Mobile.Common.Model
         public long SizeInBytes { get; set; }
 
         public bool FromTemplate { get; set; }
+
+        public int DocumentId { get; set; } = -1; 
+
     }
 }

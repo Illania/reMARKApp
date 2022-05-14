@@ -31,6 +31,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         const int AutoRefreshIntervalMs = 5 * 1000;
 
         public Folder Folder { get; set; }
+        public bool DisableRowActions { get; set; }
+        public bool OnlyShowExternalDocuments { get; set; }
 
         UIBarButtonItem goToBookmarkItem;
         UIBarButtonItem selectAllItem;
@@ -39,6 +41,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         bool refreshing;
         bool selectAllEnabled;
+        
 
         UISearchController searchController;
         CancellationTokenSource searchCancellationTokenSource;
@@ -234,7 +237,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Initialize/deinitialize
 
-        void InitializeNavigationBar()
+        protected virtual void InitializeNavigationBar()
         {
 
             goToBookmarkItem = new UIBarButtonItem
@@ -243,20 +246,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             };
             NavigationItem.SetRightBarButtonItem(goToBookmarkItem, false);
 
-            selectAllItem = new UIBarButtonItem
+            if (!DisableRowActions)
             {
-                Image = UIImage.FromBundle("SelectAll")
-            };
+                selectAllItem = new UIBarButtonItem
+                {
+                    Image = UIImage.FromBundle("SelectAll")
+                };
 
-            exitEditItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
-            editItem = new UIBarButtonItem(UIBarButtonSystemItem.Edit);
+                exitEditItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
+                editItem = new UIBarButtonItem(UIBarButtonSystemItem.Edit);
+            }
         }
 
         void InitializeView()
         {
             RefreshControl = new UIRefreshControl();
-
-            TableView.Source = new DataSource(this, TableView, Localization.GetString("folder_empty"), PlatformConfig.Preferences.CompactDocumentsList);
+            TableView.Source = new DataSource(this, TableView, Localization.GetString("folder_empty"), PlatformConfig.Preferences.CompactDocumentsList, DisableRowActions);
             TableView.RefreshControl = RefreshControl;
             TableView.AllowsMultipleSelectionDuringEditing = true;
             TableView.RowHeight = UITableView.AutomaticDimension;
@@ -268,9 +273,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void InitializeSearchBar()
         {
             DefinesPresentationContext = true;
-
+          
             var searchResultsController = new UITableViewController();
-            var searchResultsDataSource = new DataSource(this, searchResultsController.TableView, Localization.GetString("no_matching_documents"), PlatformConfig.Preferences.CompactDocumentsList);
+            var searchResultsDataSource = new DataSource(this, searchResultsController.TableView, Localization.GetString("no_matching_documents"),
+                PlatformConfig.Preferences.CompactDocumentsList, DisableRowActions);
+            searchResultsController.TableView.Source = searchResultsDataSource;
             searchResultsController.TableView.Source = searchResultsDataSource;
             searchResultsController.TableView.EstimatedRowHeight = 60f;
             searchResultsController.TableView.RowHeight = UITableView.AutomaticDimension;
@@ -562,7 +569,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (forceClear)
                     ((DataSource)TableView.Source)?.Reset();
 
-                var documentPreviews = await Managers.DocumentsManager.GetDocumentPreviewsAsync(Folder, startId, endId);
+                var documentPreviews = await Managers.DocumentsManager.GetDocumentPreviewsAsync(Folder, endId: endId);
+
+                if (OnlyShowExternalDocuments)
+                {
+                    documentPreviews = documentPreviews.FindAll((DocumentPreview dp) => dp.Direction == DocumentDirection.External);
+                }
+      
                 ((DataSource)TableView.Source).LoadMoreEnabled = documentPreviews.Count >= PlatformConfig.Preferences.DocumentsToDownload;
                 CommonConfig.Logger.Info($"Enable load more documents set to {((DataSource)TableView.Source).LoadMoreEnabled}");
 
@@ -639,7 +652,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region List handlers
 
-        void DocumentSelected(DocumentPreview documentPreview)
+        protected virtual void DocumentSelected(DocumentPreview documentPreview)
         {
             if (SplitViewController != null && !SplitViewController.Collapsed)
             {
@@ -681,7 +694,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void DocumentPreviewLongPressed(UILongPressGestureRecognizer recognizer)
         {
-            if (TableView.Editing || ((DataSource)TableView.Source).Empty)
+            if (TableView.Editing || ((DataSource)TableView.Source).Empty || DisableRowActions)
                 return;
 
             StartEditing();
@@ -1624,15 +1637,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             readonly WeakReference<UITableView> tableViewWeakReference;
             readonly string emptyText;
             readonly bool compactList;
+            readonly bool disableRowActions;
 
             bool loading = true;
 
-            public DataSource(DocumentsListViewController viewController, UITableView tableView, string emptyText, bool compactList)
+            public DataSource(DocumentsListViewController viewController, UITableView tableView, string emptyText, bool compactList,
+                bool? disableRowActions = null)
             {
                 viewControllerWeakReference = viewController.Wrap();
                 tableViewWeakReference = tableView.Wrap();
                 this.emptyText = emptyText;
                 this.compactList = compactList;
+                this.disableRowActions = disableRowActions.Value;
             }
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
@@ -1696,7 +1712,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
             {
-                return loading || Empty ? false : true;
+                if (loading || Empty || disableRowActions)
+                    return false;
+
+                return true;
             }
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)

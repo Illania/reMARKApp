@@ -305,6 +305,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 focusedRecipientView.AddRecipient(recipient.Name, recipient.Address);
                 UpdateSendButtonState();
             }
+            if (requestCode == RequestCodes.RemarkAttachmentRequestCode && resultCode == (int)Result.Ok)
+            {
+                var attachments = Serializer.Deserialize<List<AttachmentDescription>>(data.GetStringExtra(ExternalDocumentFoldersListActivity.AttachmentResultKey));
+                if (attachments != null)
+                    HandleAddExternalAttachment(attachments);
+            }
             if (requestCode == RequestCodes.PhonebookRequestCode && resultCode == (int)Result.Ok)
             {
                 var recipient = Serializer.Deserialize<Recipient>(data.GetStringExtra(PhonebookContactsListActivity.RecipientResultKey));
@@ -486,6 +492,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         static class RequestCodes
         {
             public const int AttachmentRequestCode = 111;
+            public const int RemarkAttachmentRequestCode = 112;
             public const int RecentAddressesRequestCode = 222;
             public const int ContactsRequestCode = 333;
             public const int InternalContactsRequestCode = 334;
@@ -574,30 +581,36 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 string path = null;
 
-                if (e.AttachmentDescription != null)
-                {
-                    path = await Managers.DocumentsManager.GetAttachmentAsync(e.AttachmentDescription, previousDocument, false, SourceType.Local);
-
-                    if (string.IsNullOrWhiteSpace(path))
-                    {
-                        if (e.AttachmentDescription.SizeInBytes > LargeAttachmentSizeInBytes &&
-                            PlatformConfig.Preferences.LargeAttachmentWarning &&
-                            Integration.IsConnectedToMeteredConnection() &&
-                            !await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.warning, Resource.String.large_attachment))
-                        {
-                            dismissAction();
-                            return;
-                        }
-
-                        path = await Managers.DocumentsManager.GetAttachmentAsync(e.AttachmentDescription, previousDocument, false, SourceType.Remote);
-                    }
-                }
-
-                if (e.FileDescription != null)
-                    path = e.FileDescription.Path;
-
                 try
                 {
+                    if (e.AttachmentDescription != null)
+                    {
+                        path = e.AttachmentDescription.DocumentId == -1
+                            ? await Managers.DocumentsManager.GetAttachmentAsync(e.AttachmentDescription, previousDocument, false, SourceType.Local)
+                            : await Managers.DocumentsManager.GetAttachmentAsync(e.AttachmentDescription, e.AttachmentDescription.DocumentId, false,
+                            SourceType.Local);
+
+                        if (string.IsNullOrWhiteSpace(path))
+                        {
+                            if (e.AttachmentDescription.SizeInBytes > LargeAttachmentSizeInBytes &&
+                                PlatformConfig.Preferences.LargeAttachmentWarning &&
+                                Integration.IsConnectedToMeteredConnection() &&
+                                !await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.warning, Resource.String.large_attachment))
+                            {
+                                dismissAction();
+                                return;
+                            }
+
+                            path = e.AttachmentDescription.DocumentId == -1
+                                ? await Managers.DocumentsManager.GetAttachmentAsync(e.AttachmentDescription, previousDocument, false, SourceType.Remote)
+                                : await Managers.DocumentsManager.GetAttachmentAsync(e.AttachmentDescription, e.AttachmentDescription.DocumentId, false,
+                                SourceType.Remote);
+                        }
+                    }
+
+                    if (e.FileDescription != null)
+                        path = e.FileDescription.Path;
+
                     if (string.IsNullOrWhiteSpace(path))
                         throw new Exception("Unable to open attachment");
 
@@ -1061,6 +1074,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
+        void HandleAddExternalAttachment(List<AttachmentDescription> attachments)
+        {
+            attachmentsView.AddAttachmentDescriptions(attachments);
+        }
+
         private async Task HandleOneAttachment(Uri uri)
         {
             IFile file = null;
@@ -1131,14 +1149,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.AddAttachment)
             {
+                Dialogs.ShowListDialog(Context, Resource.String.add_attachment_from, Resource.Array.add_attachment_options, true, (choice) =>
+                {
+                    if (choice == 0) //Mark5 external documents
+                        StartActivityForResult(ExternalDocumentFoldersListActivity.CreateIntent(Context), RequestCodes.RemarkAttachmentRequestCode);
+                    else if (choice == 1) //Device files
+                        AddAttachmentFromDevice();
+                }, null);
+
                 CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.Local));
-                AddAttachment();
             }
 
             return true;
         }
 
-        void AddAttachment()
+        void AddAttachmentFromDevice()
         {
             var intent = new Intent(Intent.ActionGetContent);
             intent.SetType("*/*");

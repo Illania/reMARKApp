@@ -4,6 +4,7 @@
     <string name="accepted">Accepted</string>
     <string name="account">Account</string>
     <string name="add_attachment">Add attachment</string>
+    <string name="add_attachment_from">Add attachment from</string>
     <string name="add_company">Add company</string>
     <string name="add_contact">Add contact</string>
     <string name="add_department">Add department</string>
@@ -222,6 +223,7 @@
     <string name="edit_shortcode_address">Address</string>
     <string name="edit_shortcode_description">Description</string>
     <string name="edit_shortcode_add_from_contact_question">Add the address from a contact?</string>
+    <string name="external_documents">External documents</string>
     <string name="parent_contact_selector_invalid_person_title">Cannot select person</string>
     <string name="parent_contact_selector_invalid_department_title">Cannot select department</string>
     <string name="parent_contact_selector_invalid_person_content">Only department or company can be selected</string>
