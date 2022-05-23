@@ -13,7 +13,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         readonly TaskCompletionSource<List<AttachmentDescription>> tcs = new TaskCompletionSource<List<AttachmentDescription>>();
         public Task<List<AttachmentDescription>> Result => tcs.Task;
 
-        protected override async void DocumentSelected(DocumentPreview documentPreview)
+        public override async void DocumentSelected(DocumentPreview documentPreview)
         {
             try
             {

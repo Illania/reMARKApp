@@ -608,7 +608,7 @@ new Lazy<ProgressHUD>(() => { return new ProgressHUD(UIScreen.MainScreen.Bounds)
 
 #if !SV_APP_EXTENSIONS
                         var vc = UIApplication.SharedApplication.KeyWindow.RootViewController;
-                        vc.SetNeedsStatusBarAppearanceUpdate();
+                        vc?.SetNeedsStatusBarAppearanceUpdate();
 #endif
 
                         completionHandler?.Invoke();
