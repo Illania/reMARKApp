@@ -24,11 +24,12 @@
 		<MtouchLink>SdkOnly</MtouchLink>
 		<MtouchDebug>true</MtouchDebug>
 		<RunCodeAnalysis>true</RunCodeAnalysis>
-		<CodesignKey>iPhone Developer</CodesignKey>
+		<CodesignKey>Apple Development: Lars Hansen (TUYUES9KMZ)</CodesignKey>
 		<MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
 		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
 		<LangVersion>9.0</LangVersion>
 		<CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
+		<CodesignProvision>reMARK 2022 Dev</CodesignProvision>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
 		<DebugType>none</DebugType>
@@ -338,6 +339,8 @@
 		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\WorktrayCommentView.cs" />
 		<Compile Include="Ui\ViewControllers\ExternalDocumentsListViewController.cs" />
 		<Compile Include="ExternalDocumentFoldersListViewController.cs" />
+		<Compile Include="Ui\ViewControllers\SearchResultsController.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentListDataSource.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

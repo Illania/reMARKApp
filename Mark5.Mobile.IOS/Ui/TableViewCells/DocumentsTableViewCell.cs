@@ -360,7 +360,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             bottomLabel.Text = !string.IsNullOrWhiteSpace(dp.Preview) ? Regex.Replace(dp.Preview, @"\r\n?|\n", "  ", RegexOptions.Multiline) : Localization.GetString("no_content");
         }
 
-            void InitializeDirectionIndicator(DocumentPreview dp)
+        void InitializeDirectionIndicator(DocumentPreview dp)
         {
             if (directionIndicatorImageView == null)
                 return;
