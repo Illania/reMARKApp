@@ -20,6 +20,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
     {
         public List<IBusinessEntity> BusinessEntities { get; set; }
 
+        readonly TaskCompletionSource<bool> tcs = new();
+        public Task<bool> Result => tcs.Task;
+
         UIBarButtonItem cancelItem;
         UIBarButtonItem doneItem;
 
@@ -190,6 +193,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void CancelItem_Clicked(object sender, EventArgs e)
         {
+            tcs.SetResult(false);
             DismissViewController(true, null);
         }
 
@@ -232,7 +236,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     await Dialogs.ShowErrorAlertAsync(this, ex);
                 }
             }
-
+            tcs.SetResult(true);
             DismissViewController(true, null);
         }
 

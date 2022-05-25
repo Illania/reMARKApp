@@ -77,7 +77,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             DismissViewController(true, null);
         }
 
-        protected override async void FolderExpand(Folder folder)
+        protected override async Task FolderExpand(Folder folder)
         {
             var vc = new ExternalDocumentFoldersListViewController(folder);
             NavigationController.PushViewController(vc, true);

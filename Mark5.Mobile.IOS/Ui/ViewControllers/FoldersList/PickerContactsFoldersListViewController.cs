@@ -90,9 +90,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             }
         }
 
-        protected override async void FolderExpand(Folder folder)
+        protected override async Task FolderExpand(Folder folder)
         {
-            base.FolderExpand(folder);
+            await base.FolderExpand(folder);
 
             var vc = new PickerContactsFoldersListViewController(folder);
             NavigationController.PushViewController(vc, true);

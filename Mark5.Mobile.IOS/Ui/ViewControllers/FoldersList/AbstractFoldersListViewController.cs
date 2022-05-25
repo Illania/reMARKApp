@@ -744,7 +744,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         {
         }
 
-        protected virtual void FolderExpand(Folder folder)
+        protected async virtual Task FolderExpand(Folder folder)
         {
             if (folder == null)
                 return;
@@ -1319,7 +1319,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 viewControllerWeakReference?.Unwrap().FolderDeselected(f);
             }
 
-            void ExpandCollapse(UITapGestureRecognizer g)
+            async void ExpandCollapse(UITapGestureRecognizer g)
             {
                 var viewLocation = g.View.Bounds.Location;
                 var location = tableViewWeakReference.Unwrap()?.ConvertPointFromView(viewLocation, g.View);
@@ -1335,7 +1335,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 if (viewControllerWeakReference.Unwrap()?.ShouldDisableFolder(f) ?? false)
                     return;
 
-                viewControllerWeakReference.Unwrap()?.FolderExpand(f);
+                await viewControllerWeakReference.Unwrap()?.FolderExpand(f);
             }
 
             public override string TitleForHeader(UITableView tableView, nint section)
@@ -1700,7 +1700,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 viewControllerWeakReference.Unwrap()?.FolderDeselected(f);
             }
 
-            void ExpandCollapse(UITapGestureRecognizer g)
+           async void ExpandCollapse(UITapGestureRecognizer g)
             {
                 var viewLocation = g.View.Bounds.Location;
                 var location = tableViewWeakReference.Unwrap()?.ConvertPointFromView(viewLocation, g.View);
@@ -1716,7 +1716,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 if (viewControllerWeakReference.Unwrap()?.ShouldDisableFolder(f) ?? false)
                     return;
 
-                viewControllerWeakReference.Unwrap()?.FolderExpand(f);
+                await viewControllerWeakReference.Unwrap()?.FolderExpand(f);
             }
 
             public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)

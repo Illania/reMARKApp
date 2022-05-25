@@ -721,7 +721,43 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             if (!sent)
                 return;
 
-            DismissViewController(true, null);
+            
+            if (PlatformConfig.Preferences.OpenFileToFolderDialog == true)
+                await ShowFileToFolderMenu(sender);
+           
+
+            DismissViewController(true, null); 
+        }
+
+        async Task ShowFileToFolderMenu(object sender)
+        {
+            var d = new PopoverPresentationControllerDelegate((UIButton)sender);
+            var source = await Dialogs.ShowListActionSheetAsync(this, new[] {
+                Localization.GetString("copy_to_folder"),
+                Localization.GetString("copy_to_user_worktray"),
+                Localization.GetString("copy_to_department_worktray")}
+            , d);
+
+            if (source < 0)
+                return;
+
+            if (source == 0)
+            {
+                await this.CopyToFolderAsync(documentPreview);
+                DismissViewController(true, null);
+            }
+
+            if (source == 1)
+            {
+                await this.CopyToUserWorktrayAsync(documentPreview);
+                DismissViewController(true, null);
+            }
+
+            if (source == 2)
+            {
+                await this.CopyToDepartmentWorktrayAsync(documentPreview);
+                DismissViewController(true, null);
+            }
         }
 
         void Subview_Edited(object sender, EventArgs e)
@@ -747,8 +783,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             if (suggestionsListView == null)
             {
-                suggestionsListView = new SuggestionsListView(this, includeShortcodes: true);
-                suggestionsListView.SystemUsersDepartments = systemUserDepartments;
+                suggestionsListView = new SuggestionsListView(this, includeShortcodes: true)
+                {
+                    SystemUsersDepartments = systemUserDepartments
+                };
 
                 View.AddSubview(suggestionsListView);
                 View.AddConstraints(new[]
@@ -1417,6 +1455,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         {
             if (sender is UIImagePickerController controller)
             {
+
                 controller.DismissViewController(true, null);
             }
         }

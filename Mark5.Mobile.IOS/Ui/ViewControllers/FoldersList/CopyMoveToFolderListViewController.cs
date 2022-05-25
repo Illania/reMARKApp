@@ -12,7 +12,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 {
     public class CopyMoveToFolderListViewController : AbstractFoldersListViewController
     {
-        protected override bool LoadRemoteFromCache => true;
+        readonly TaskCompletionSource<bool> tcs = new();
+        public Task<bool> Result => tcs.Task;
 
         readonly List<IBusinessEntity> businessEntities;
         readonly Folder fromFolder;
@@ -92,14 +93,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             if (TableView?.IndexPathForSelectedRow != null)
                 TableView.DeselectRow(TableView.IndexPathForSelectedRow, true);
+
+            tcs.SetResult(true);
         }
 
-        protected override void FolderExpand(Folder folder)
+        protected async override Task FolderExpand(Folder folder)
         {
-            base.FolderExpand(folder);
+            await base.FolderExpand(folder);
 
             var vc = new CopyMoveToFolderListViewController(folder, businessEntities, fromFolder);
             NavigationController.PushViewController(vc, true);
+            await vc?.Result;
+            tcs.SetResult(true);
         }
 
         protected override bool ShouldDisableFolder(Folder folder)
@@ -113,7 +118,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             return false;
         }
 
-        void CancelModeItem_Clicked(object sender, EventArgs e) => DismissViewController(true, null);
+        void CancelModeItem_Clicked(object sender, EventArgs e)
+        {
+            tcs.SetResult(false);
+            DismissViewController(true, null);
+        }
 
         async Task CopyBusinessEntityToFolder(Folder folder)
         {
@@ -121,7 +130,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             if (confirmed < 0)
                 return;
 
-            CommonConfig.Logger.Info($"Copying business entities to folder [businessEntities.Count={businessEntities?.Count}, businessEntities.Type={businessEntities?.First().ObjectType}, folder.Id={folder?.Id}]");
+            CommonConfig.Logger.Info($"Copying business entities to folder [businessEntities.Count={businessEntities?.Count}, " +
+                $"businessEntities.Type={businessEntities?.First().ObjectType}, folder.Id={folder?.Id}]");
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("copying___"));
 
             try
@@ -131,10 +141,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Error while copying business entities to folder [businessEntities.Count={businessEntities?.Count}, businessEntities.Type={businessEntities?.First().ObjectType}, folder.Id={folder?.Id}]", ex);
+                CommonConfig.Logger.Error($"Error while copying business entities to folder [businessEntities.Count={businessEntities?.Count}, " +
+                    $"businessEntities.Type={businessEntities?.First().ObjectType}, folder.Id={folder?.Id}]", ex);
 
                 dismissAction();
                 await Dialogs.ShowErrorAlertAsync(this, ex);
+                tcs.SetResult(false);
             }
             finally
             {
@@ -148,7 +160,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             if (confirmed < 0)
                 return;
 
-            CommonConfig.Logger.Info($"Moving business entities to folder [businessEntities.Count={businessEntities?.Count}, businessEntities.Type={businessEntities?.First().ObjectType}, folder.Id={folder?.Id}]");
+            CommonConfig.Logger.Info($"Moving business entities to folder [businessEntities.Count={businessEntities?.Count}, " +
+                $"businessEntities.Type={businessEntities?.First().ObjectType}, folder.Id={folder?.Id}]");
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("moving___"));
 
             try
@@ -158,10 +171,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Error while moving business entities to folder [businessEntities.Count={businessEntities?.Count}, businessEntities.Type={businessEntities?.First().ObjectType}, folder.Id={folder?.Id}]", ex);
+                CommonConfig.Logger.Error($"Error while moving business entities to folder [businessEntities.Count={businessEntities?.Count}, " +
+                    $"businessEntities.Type={businessEntities?.First().ObjectType}, folder.Id={folder?.Id}]", ex);
 
                 dismissAction();
                 await Dialogs.ShowErrorAlertAsync(this, ex);
+                tcs.SetResult(false);
             }
             finally
             {

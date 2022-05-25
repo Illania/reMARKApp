@@ -297,7 +297,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                                                    UIAlertActionStyle.Default,
                                                    a =>
                 {
-                    CopyToWorktray(selectedShortcodes);
+                    this.CopyToWorktray((IBusinessEntity)selectedShortcodes);
                     EndEditing();
                 }));
             }
@@ -306,7 +306,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                 UIAlertActionStyle.Default,
                 a =>
                 {
-                    CopyToFolder(selectedShortcodes);
+                    this.CopyToFolder((IBusinessEntity)selectedShortcodes);
                     EndEditing();
                 }));
 
@@ -315,7 +315,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                     UIAlertActionStyle.Default,
                     a =>
                     {
-                        MoveToFolder(selectedShortcodes);
+                        this.MoveToFolder((IBusinessEntity)selectedShortcodes, Folder);
                         EndEditing();
                     }));
 
@@ -472,7 +472,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                 UIAlertActionStyle.Default,
                 a =>
                 {
-                    CopyToFolder(selectedShortcode);
+                    this.CopyToFolder(selectedShortcode);
                     EndEditing();
                 }));
 
@@ -481,7 +481,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                     UIAlertActionStyle.Default,
                     a =>
                     {
-                        MoveToFolder(selectedShortcode);
+                        this.MoveToFolder(selectedShortcode, Folder);
                         EndEditing();
                     }));
 
@@ -567,36 +567,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                 CommonConfig.Logger.Error($"Error while deleting shortcodes", ex);
                 await Dialogs.ShowErrorAlertAsync(this, ex);
             }
-        }
-
-        void CopyToWorktray(ShortcodePreview shortcodePreview) =>
-            CopyToWorktray(new List<ShortcodePreview> { shortcodePreview });
-
-        void CopyToWorktray(List<ShortcodePreview> shortcodePreviews)
-        {
-            var vc = new CopyToWorktrayViewController
-            {
-                BusinessEntities = shortcodePreviews.Cast<IBusinessEntity>().ToList()
-            };
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-        }
-
-        void CopyToFolder(ShortcodePreview shortcodePreview) =>
-            CopyToFolder(new List<ShortcodePreview> { shortcodePreview });
-
-        void CopyToFolder(List<ShortcodePreview> shortcodePreviews)
-        {
-            var vc = new CopyMoveToFolderListViewController(ModuleType.Shortcodes, shortcodePreviews.Cast<IBusinessEntity>().ToList());
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-        }
-
-        void MoveToFolder(ShortcodePreview shortcodePreview) =>
-            MoveToFolder(new List<ShortcodePreview> { shortcodePreview });
-
-        void MoveToFolder(List<ShortcodePreview> shortcodePreviews)
-        {
-            var vc = new CopyMoveToFolderListViewController(ModuleType.Shortcodes, shortcodePreviews.Cast<IBusinessEntity>().ToList(), Folder);
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         #endregion

@@ -86,9 +86,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 tcs.SetResult(result);
         }
 
-        protected override async void FolderExpand(Folder folder)
+        protected override async Task FolderExpand(Folder folder)
         {
-            base.FolderExpand(folder);
+            await base.FolderExpand(folder);
 
             var vc = new PickerShortcodesFoldersListViewController(folder);
             NavigationController.PushViewController(vc, true);

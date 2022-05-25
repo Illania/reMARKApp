@@ -264,6 +264,16 @@
 		</dict>
 		<dict>
 			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>open_file_to_folder_dialog</string>
+			<key>Key</key>
+			<string>OpenFileToFolderDialog</string>
+			<key>DefaultValue</key>
+			<false/>
+		</dict>
+		<dict>
+			<key>Type</key>
 			<string>PSMultiValueSpecifier</string>
 			<key>Key</key>
 			<string>ManageExtraFields</string>

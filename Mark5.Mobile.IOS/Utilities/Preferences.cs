@@ -29,6 +29,7 @@ namespace Mark5.Mobile.IOS.Utilities
             public const string SendingDelay = "SendingDelay";
             public const string RememberLastUserDelaySettings = "RememberLastUserDelaySettings";
             public const string ReplyWithAttachments = "ReplyWithAttachments";
+            public const string OpenFileToFolderDialog = "OpenFileToFolderDialog";
             public const string LastUserSendingDelay = "LastUserSendingDelay";
             public const string ShowTimeForOldEmails = "ShowTimeForOldEmails";
             public const string SortByDate = "SortByDate";
@@ -117,6 +118,9 @@ namespace Mark5.Mobile.IOS.Utilities
                 },
                 {
                     new NSString(Keys.RememberLastUserDelaySettings), NSNumber.FromBoolean(false)
+                },
+                {
+                    new NSString(Keys.ReplyWithAttachments), NSNumber.FromBoolean(false)
                 },
                 {
                     new NSString(Keys.ReplyWithAttachments), NSNumber.FromBoolean(false)
@@ -237,6 +241,8 @@ namespace Mark5.Mobile.IOS.Utilities
         public bool RememberLastUserDelaySettings => ud.BoolForKey(Keys.RememberLastUserDelaySettings);
 
         public bool ReplyWithAttachments => ud.BoolForKey(Keys.ReplyWithAttachments);
+
+        public bool OpenFileToFolderDialog => ud.BoolForKey(Keys.OpenFileToFolderDialog);
 
         public int LastUserSendingDelay
         {
