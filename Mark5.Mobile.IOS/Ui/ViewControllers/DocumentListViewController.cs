@@ -481,7 +481,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                                                    UIAlertActionStyle.Default,
                                                    a =>
                 {
-                    CopyToWorktray(selectedDocuments);
+                    this.CopyToWorktray((IBusinessEntity)selectedDocuments);
                     EndEditing(TableView);
                 }));
             }
@@ -490,7 +490,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 UIAlertActionStyle.Default,
                 a =>
                 {
-                    CopyToFolder(selectedDocuments);
+                    this.CopyToFolder((IBusinessEntity)selectedDocuments);
                     EndEditing(TableView);
                 }));
 
@@ -499,7 +499,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     UIAlertActionStyle.Default,
                     a =>
                     {
-                        MoveToFolder(selectedDocuments);
+                        this.MoveToFolder((IBusinessEntity)selectedDocuments, Folder);
                         EndEditing(TableView);
                     }));
 
@@ -616,7 +616,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                                                    UIAlertActionStyle.Default,
                                                    a =>
                                                    {
-                                                       CopyToWorktray(selectedDocuments);
+                                                       this.CopyToWorktray((IBusinessEntity)selectedDocuments);
                                                        EndEditing(TableView);
                                                    }));
             }
@@ -625,7 +625,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 UIAlertActionStyle.Default,
                 a =>
                 {
-                    CopyToFolder(selectedDocuments);
+                    this.CopyToFolder((IBusinessEntity)selectedDocuments);
                     EndEditing(TableView);
                 }));
 
@@ -634,7 +634,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     UIAlertActionStyle.Default,
                     a =>
                     {
-                        MoveToFolder(selectedDocuments);
+                        this.MoveToFolder((IBusinessEntity)selectedDocuments, Folder);
                         EndEditing(TableView);
                     }));
 
@@ -1053,39 +1053,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(new NavigationController(new CategoriesListViewController(selectedDocument), UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        public void CopyToFolder(DocumentPreview selectedDocument) =>
-            CopyToFolder(new List<DocumentPreview> { selectedDocument });
-
-        public void CopyToFolder(List<DocumentPreview> selectedDocument)
-        {
-            var vc = new CopyMoveToFolderListViewController(ModuleType.Documents, selectedDocument.Cast<IBusinessEntity>().ToList());
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-        }
-
-        public void MoveToFolder(DocumentPreview selectedDocument) =>
-            MoveToFolder(new List<DocumentPreview> { selectedDocument });
-
-        public void MoveToFolder(List<DocumentPreview> selectedDocument)
-        {
-            var vc = new CopyMoveToFolderListViewController(ModuleType.Documents, selectedDocument.Cast<IBusinessEntity>().ToList(), Folder)
-            {
-                ModalPresentationStyle = UIModalPresentationStyle.PageSheet
-            };
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-        }
-
-        public void CopyToWorktray(DocumentPreview selectedDocument) =>
-            CopyToWorktray(new List<DocumentPreview> { selectedDocument });
-
-        public void CopyToWorktray(List<DocumentPreview> selectedDocuments)
-        {
-            var vc = new CopyToWorktrayViewController
-            {
-                BusinessEntities = selectedDocuments.Cast<IBusinessEntity>().ToList()
-            };
-            vc.ModalPresentationStyle = UIModalPresentationStyle.PageSheet;
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-        }
 
         public void MarkAsRead(DocumentPreview documentPreview) =>
             MarkAsRead(new List<DocumentPreview> { documentPreview });
@@ -1426,14 +1393,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         }
                         break;
                     case EmailSwipeAction.SwipeAction.CopyToWorkTray:
-                        CopyToWorktray(documentPreview);
+                        this.CopyToWorktray(documentPreview);
                         EndEditing(TableView);
                         break;
                     case EmailSwipeAction.SwipeAction.More:
                         ShowMoreActionSheet(indexPath, documentPreview, folder);
                         break;
                     case EmailSwipeAction.SwipeAction.CopyToFolder:
-                        CopyToFolder(documentPreview);
+                        this.CopyToFolder(documentPreview);
                         EndEditing(TableView);
                         break;
                     case EmailSwipeAction.SwipeAction.Categories:
@@ -1456,7 +1423,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         Delete(documentPreview, popoverDelegate);
                         break;
                     case EmailSwipeAction.SwipeAction.MoveToFolder:
-                        MoveToFolder(documentPreview);
+                        this.MoveToFolder(documentPreview, Folder);
                         break;
                     case EmailSwipeAction.SwipeAction.RemoveFromFolder:
                         RemoveFromFolder(documentPreview, popoverDelegate);

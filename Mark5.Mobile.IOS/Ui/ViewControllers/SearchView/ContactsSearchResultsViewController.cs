@@ -205,7 +205,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                                                    UIAlertActionStyle.Default,
                                                    a =>
                 {
-                    CopyToWorktray(selectedContacts);
+                    this.CopyToWorktray((IBusinessEntity)selectedContacts);
                     EndEditing();
                 }));
             }
@@ -214,7 +214,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 UIAlertActionStyle.Default,
                 a =>
                 {
-                    CopyToFolder(selectedContacts);
+                    this.CopyToFolder((IBusinessEntity)selectedContacts);
                     EndEditing();
                 }));
 
@@ -332,7 +332,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                                                    UIAlertActionStyle.Default,
                                                    a =>
                 {
-                    CopyToWorktray(selectedContact);
+                    this.CopyToWorktray(selectedContact);
                     EndEditing();
                 }));
             }
@@ -341,7 +341,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 UIAlertActionStyle.Default,
                 a =>
                 {
-                    CopyToFolder(selectedContact);
+                    this.CopyToFolder(selectedContact);
                     EndEditing();
                 }));
 
@@ -355,27 +355,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
 
             exitEditItem.Enabled = false;
             PresentViewController(eas, true, null);
-        }
-
-        void CopyToWorktray(ContactPreview selectedContact) =>
-            CopyToWorktray(new List<ContactPreview> { selectedContact });
-
-        void CopyToWorktray(List<ContactPreview> selectedContacts)
-        {
-            var vc = new CopyToWorktrayViewController
-            {
-                BusinessEntities = selectedContacts.Cast<IBusinessEntity>().ToList()
-            };
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-        }
-
-        void CopyToFolder(ContactPreview selecteContact) =>
-            CopyToFolder(new List<ContactPreview> { selecteContact });
-
-        void CopyToFolder(List<ContactPreview> selectedContacts)
-        {
-            var vc = new CopyMoveToFolderListViewController(ModuleType.Contacts, selectedContacts.Cast<IBusinessEntity>().ToList());
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         void Delete(ContactPreview selectedContact, UIPopoverPresentationControllerDelegate d) =>

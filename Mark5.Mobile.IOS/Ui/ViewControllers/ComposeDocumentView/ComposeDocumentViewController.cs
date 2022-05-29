@@ -41,6 +41,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         public int? PreviousDocumentFolderId { get; set; }
         public int? PreviousDocumentId { get; set; }
         public string PreconfiguredContent { get; set; }
+        public FileToFolderParameters FileToFolderParameters { get; set; }
         public Dictionary<DocumentAddressType, string[]> PreconfiguredEmailAddresses { get; set; }
         public string PreconfiguredSubject { get; set; }
 
@@ -386,6 +387,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     CopyToNewOption = wc.CopyToNewOption;
                     PreviousDocumentFolderId = wc.PreviousDocumentFolderId;
                     PreviousDocumentId = wc.PreviousDocumentId;
+                    FileToFolderParameters = wc.FileToFolderParameters;
                     PreviousDocumentDirection = wc.PreviousDocumentDirection;
                     documentPreview = wc.DocumentPreview;
                     document = wc.Document;
@@ -710,8 +712,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 autoSaveWorkingCopyWorker.Stop();
                 await autoSaveWorkingCopyWorker.Finished();
             }
+
+            if (PlatformConfig.Preferences.OpenFileToFolderDialog == true)
+                await ShowFileToFolderMenu(sender);
+
             bool sent;
-            if (!(e is SendButtonClickedEventArgs sendButtonClickedEventArgs))
+            if (e is not SendButtonClickedEventArgs sendButtonClickedEventArgs)
                 return;
             if (sendButtonClickedEventArgs.Delayed == false)
                 sent = await SendDocument();
@@ -721,7 +727,40 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             if (!sent)
                 return;
 
-            DismissViewController(true, null);
+            DismissViewController(true, null); 
+        }
+
+        async Task ShowFileToFolderMenu(object sender)
+        {
+            var d = new PopoverPresentationControllerDelegate((UIButton)sender);
+            var source = await Dialogs.ShowListActionSheetAsync(this, new[] {
+                Localization.GetString("copy_to_folder"),
+                Localization.GetString("copy_to_user_worktray"),
+                Localization.GetString("copy_to_department_worktray")}
+            , d);
+
+            if (source < 0)
+                return;
+
+            FileToFolderParameters = new FileToFolderParameters();
+
+            if (source == 0)
+            {
+                FileToFolderParameters.FileToFolderType = FileToFolderType.CopyToFolder;
+                FileToFolderParameters.FileToFolderId = await this.CopyToFolderAsync(documentPreview, true); 
+            }
+
+            if (source == 1)
+            {
+                FileToFolderParameters.FileToFolderType = FileToFolderType.CopyToWorktray;
+                FileToFolderParameters.CopyToWorktrayForUsers = await this.CopyToUserWorktrayAsync(documentPreview);
+            }
+
+            if (source == 2)
+            {
+                FileToFolderParameters.FileToFolderType = FileToFolderType.CopyToWorktray;
+                FileToFolderParameters.CopyToWorktrayForUsers = await this.CopyToDepartmentWorktrayAsync(documentPreview);
+            }
         }
 
         void Subview_Edited(object sender, EventArgs e)
@@ -747,8 +786,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             if (suggestionsListView == null)
             {
-                suggestionsListView = new SuggestionsListView(this, includeShortcodes: true);
-                suggestionsListView.SystemUsersDepartments = systemUserDepartments;
+                suggestionsListView = new SuggestionsListView(this, includeShortcodes: true)
+                {
+                    SystemUsersDepartments = systemUserDepartments
+                };
 
                 View.AddSubview(suggestionsListView);
                 View.AddConstraints(new[]
@@ -1051,6 +1092,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     CopyToNewOption = CopyToNewOption,
                     PreviousDocumentFolderId = PreviousDocumentFolderId,
                     PreviousDocumentId = PreviousDocumentId,
+                    FileToFolderParameters = FileToFolderParameters,
                     PreviousDocumentDirection = PreviousDocumentDirection,
                     DocumentPreview = documentPreview,
                     Document = document,
@@ -1103,6 +1145,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     CopyToNewOption = CopyToNewOption,
                     PreviousDocumentFolderId = PreviousDocumentFolderId,
                     PreviousDocumentId = PreviousDocumentId,
+                    FileToFolderParameters = FileToFolderParameters,
                     PreviousDocumentDirection = PreviousDocumentDirection,
                     DocumentPreview = documentPreview,
                     Document = document
@@ -1417,6 +1460,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         {
             if (sender is UIImagePickerController controller)
             {
+
                 controller.DismissViewController(true, null);
             }
         }
@@ -1551,6 +1595,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     CopyToNewOption = CopyToNewOption,
                     PreviousDocumentFolderId = PreviousDocumentFolderId,
                     PreviousDocumentId = PreviousDocumentId,
+                    FileToFolderParameters = FileToFolderParameters,
                     PreviousDocumentDirection = PreviousDocumentDirection,
                     DocumentPreview = documentPreview,
                     Document = document

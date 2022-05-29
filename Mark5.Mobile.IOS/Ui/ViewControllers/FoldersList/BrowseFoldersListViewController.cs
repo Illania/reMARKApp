@@ -5,7 +5,7 @@ using Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList;
 using UIKit;
 using Mark5.Mobile.IOS.Ui.Common;
-
+using System.Threading.Tasks;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 {
@@ -82,9 +82,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             }
         }
 
-        protected override void FolderExpand(Folder folder)
+        protected async override Task FolderExpand(Folder folder)
         {
-            base.FolderExpand(folder);
+            await base.FolderExpand(folder);
 
             var vc = new BrowseFoldersListViewController(folder);
             NavigationController.PushViewController(vc, true);

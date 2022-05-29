@@ -156,6 +156,12 @@ namespace Mark5.Mobile.Common.Model
         Company = 3,
     }
 
+    public enum FileToFolderType
+    {
+        CopyToFolder = 0,
+        CopyToWorktray = 1
+    }
+
     #endregion
 
     #region Shortcodes

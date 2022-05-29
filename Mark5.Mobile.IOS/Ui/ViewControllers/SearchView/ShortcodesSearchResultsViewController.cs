@@ -219,7 +219,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 UIAlertActionStyle.Default,
                 a =>
                 {
-                    CopyToFolder(selectedShortcodes);
+                    this.CopyToFolder((IBusinessEntity)selectedShortcodes);
                     EndEditing();
                 }));
 
@@ -376,7 +376,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 UIAlertActionStyle.Default,
                 a =>
                 {
-                    CopyToFolder(selectedShortcode);
+                    this.CopyToFolder(selectedShortcode);
                     EndEditing();
                 }));
 
@@ -437,15 +437,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 CommonConfig.Logger.Error($"Error while deleting shortcodes", ex);
                 await Dialogs.ShowErrorAlertAsync(this, ex);
             }
-        }
-
-        void CopyToFolder(ShortcodePreview shortcodePreview) =>
-            CopyToFolder(new List<ShortcodePreview> { shortcodePreview });
-
-        void CopyToFolder(List<ShortcodePreview> shortcodePreviews)
-        {
-            var vc = new CopyMoveToFolderListViewController(ModuleType.Shortcodes, shortcodePreviews.Cast<IBusinessEntity>().ToList());
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         void RemoveShortcodesFromList(IEnumerable<int> ids)

@@ -341,6 +341,7 @@
 		<Compile Include="ExternalDocumentFoldersListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\SearchResultsController.cs" />
 		<Compile Include="Ui\ViewControllers\DocumentListDataSource.cs" />
+		<Compile Include="Utilities\FileToFolderActions.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

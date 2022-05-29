@@ -95,6 +95,8 @@
 "copy_to_clipboard" = "Copy to clipboard";
 "copy_to_folder" = "Copy to folder";
 "copy_to_worktray" = "Copy to To-do list";
+"copy_to_user_worktray" = "Copy to user To-do list";
+"copy_to_department_worktray" = "Copy to department To-do list";
 "copy_to_new" = "Copy to new";
 "copy_to_new_addresses" = "Addresses";
 "copy_to_new_content" = "Content";

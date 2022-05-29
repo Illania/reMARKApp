@@ -18,10 +18,12 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     {
         public const string IdsIntentKey = "IdsIntentKey";
         public const string ObjectTypeIntentKey = "ObjectTypeIntentKey";
+        const string DelayedCopyIntentKey = "DelayedCopy_ed011f46-e180-462c-9d49-5dc047f3c328";
+        public static string SelectedUsersResultKey = "SelectedUsers_ed011f46-e180-462c-9d49-5dc047f3c327";
 
         Toolbar toolbar;
 
-        public static Intent CreateIntent(Context context, List<IBusinessEntity> be)
+        public static Intent CreateIntent(Context context, List<IBusinessEntity> be, bool? delayedCopy = false)
         {
             var ids = be.Select(b => b.Id).ToList();
             var ot = be.First().ObjectType;
@@ -29,6 +31,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             var intent = new Intent(context, typeof(CopyToUserWorktrayActivity));
             intent.PutExtra(IdsIntentKey, Serializer.Serialize(ids));
             intent.PutExtra(ObjectTypeIntentKey, (int)ot);
+            intent.PutExtra(DelayedCopyIntentKey, delayedCopy.Value);
 
             return intent;
         }
@@ -52,8 +55,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             {
                 var be = Serializer.Deserialize<List<int>>(Intent.Extras.GetString(IdsIntentKey));
                 var ot = (ObjectType)Intent.Extras.GetInt(ObjectTypeIntentKey);
+                var delayedCopy = Intent.Extras.GetBoolean(DelayedCopyIntentKey); 
                 var ft = SupportFragmentManager.BeginTransaction();
-                var (dlf, tag) = CopyToWorktrayFragment.NewInstance(be, ot);
+                var (dlf, tag) = CopyToWorktrayFragment.NewInstance(be, ot, delayedCopy);
                 ft.Replace(Resource.Id.fragment_container, dlf, tag);
                 ft.Commit();
 

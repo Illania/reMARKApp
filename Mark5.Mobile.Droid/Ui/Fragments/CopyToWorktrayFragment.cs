@@ -24,9 +24,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         const string SelectedTabKey = "SelectedTab_8224d3cf-48b2-48d4-92e9-c36ecc8476bb";
         const string IdsIntentKey = "IdsIntentKey";
         const string ObjectTypeIntentKey = "ObjectTypeIntentKey";
+        const string DelayedCopyBundleKey = "DelayedCopy_ed011f46-e180-462c-9d49-5dc047f3c325";
 
         List<int> businessEntitiesIds;
         ObjectType objectType;
+        bool delayedCopy; 
 
         Folder remoteFolder;
 
@@ -40,7 +42,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return new CopyToWorktrayFragment();
         }
 
-        public static (CopyToWorktrayFragment fragment, string tag) NewInstance(List<int> ids, ObjectType ot)
+        public static (CopyToWorktrayFragment fragment, string tag) NewInstance(List<int> ids, ObjectType ot, bool? delayedCopy = false)
         {
             var args = new Bundle();
 
@@ -48,6 +50,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 args.PutString(IdsIntentKey, Serializer.Serialize(ids));
 
             args.PutInt(ObjectTypeIntentKey, (int)ot);
+
+            if (delayedCopy != null)
+                args.PutBoolean(DelayedCopyBundleKey, delayedCopy.Value);
 
             var fragment = new CopyToWorktrayFragment();
             fragment.Arguments = args;
@@ -67,6 +72,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             objectType = (ObjectType)Arguments.GetInt(ObjectTypeIntentKey);
 
+            if (Arguments.ContainsKey(DelayedCopyBundleKey))
+                delayedCopy = Arguments.GetBoolean(DelayedCopyBundleKey);
 
             if (savedInstanceState?.ContainsKey(SelectedTabKey) == true)
                 savedCurrentPageIndex = savedInstanceState.GetInt(SelectedTabKey);
@@ -84,7 +91,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             pager.OffscreenPageLimit = 1;
             pager.AddOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
             pager.AddOnPageChangeListener(this);
-            pager.Adapter = new PagerAdapter(ChildFragmentManager, businessEntitiesIds, objectType);
+            pager.Adapter = new PagerAdapter(ChildFragmentManager, businessEntitiesIds, objectType, delayedCopy);
 
 
             tabLayout.TabSelected += (sender, e) => pager.CurrentItem = e.Tab.Position;
@@ -143,12 +150,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             List<int> businessEntitiesIds;
             ObjectType objectType;
+            bool delayedCopy;
 
-            public PagerAdapter(FragmentManager fm, List<int> businessEntitiesIds,  ObjectType objectType)
+            public PagerAdapter(FragmentManager fm, List<int> businessEntitiesIds,  ObjectType objectType, bool delayedCopy)
                 : base(fm)
             {
                 this.objectType = objectType;
                 this.businessEntitiesIds = businessEntitiesIds;
+                this.delayedCopy = delayedCopy;
             }
 
             public override Fragment GetItem(int position)
@@ -157,9 +166,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     case 0:
                         //Item1 is the fragment
-                        return CopyToUserWorktrayFragment.NewInstance(businessEntitiesIds,objectType).fragment;
+                        return CopyToUserWorktrayFragment.NewInstance(businessEntitiesIds,objectType,delayedCopy).fragment;
                     case 1:
-                        return CopyToDepartmentWorktrayFragment.NewInstance(businessEntitiesIds,objectType).fragment;
+                        return CopyToDepartmentWorktrayFragment.NewInstance(businessEntitiesIds,objectType, delayedCopy).fragment;
                     default:
                         return null;
                 }

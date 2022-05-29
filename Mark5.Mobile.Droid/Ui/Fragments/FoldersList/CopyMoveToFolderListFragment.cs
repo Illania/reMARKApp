@@ -2,12 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Android.Content;
 using Android.OS;
 using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
@@ -18,15 +20,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         const string ObjectTypeIntentKey = "ObjectTypeIntentKey";
         const string FromFolderBundleKey = "FromFolder_8dc816f4-08b8-428d-9cce-1c481c460df5";
         const string ActionTypeBundleKey = "ActionType_ed011f46-e180-462c-9d49-5dc047f3c324";
+        const string DelayedCopyBundleKey = "DelayedCopy_ed011f46-e180-462c-9d49-5dc047f3c325";
 
         List<int> businessEntitiesIds;
         ObjectType objectType;
         Folder fromFolder;
         ActionType actionType;
+        bool delayedCopy;
 
         Action dismissAction;
 
-        public static (CopyMoveToFolderListFragment fragment, string tag) NewInstance(Folder remoteFolder, List<int> ids, ObjectType ot, Folder fromFolder = null, ActionType? actionType = null, bool? loadRemoteFromCache = null)
+        public static (CopyMoveToFolderListFragment fragment, string tag) NewInstance(Folder remoteFolder, List<int> ids, ObjectType ot,
+            Folder fromFolder = null, ActionType? actionType = null, bool? loadRemoteFromCache = null, bool? delayedCopy = false)
         {
             var args = new Bundle();
 
@@ -44,6 +49,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (loadRemoteFromCache != null)
                 args.PutBoolean(LoadRemoteFromCacheBundleKey, loadRemoteFromCache.Value);
+
+            if (delayedCopy != null)
+                args.PutBoolean(DelayedCopyBundleKey, delayedCopy.Value);
 
             args.PutInt(ObjectTypeIntentKey, (int)ot);
 
@@ -69,6 +77,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (Arguments.ContainsKey(ActionTypeBundleKey))
                 actionType = (ActionType)Arguments.GetInt(ActionTypeBundleKey);
+
+            if (Arguments.ContainsKey(DelayedCopyBundleKey))
+                delayedCopy = Arguments.GetBoolean(DelayedCopyBundleKey);
 
             return base.OnCreateView(inflater, container, savedInstanceState);
         }
@@ -110,11 +121,26 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (position < 0)
                 return;
 
+            
             var toFolder = CurrentAdapter.GetItemAtPosition(position).Folder;
-            if (actionType == ActionType.Copy)
-                await CopyBusinessEntityToFolder(toFolder);
+
+            if(delayedCopy == false)
+            {
+                if (actionType == ActionType.Copy)
+                    await CopyBusinessEntityToFolder(toFolder);
+                else
+                    await MoveBusinessEntityToFolder(toFolder);
+            }
             else
-                await MoveBusinessEntityToFolder(toFolder);
+            {
+                dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.copying_to_folder, Resource.String.please_wait);
+                var data = new Intent();
+                data.PutExtra(CopyMoveToFolderListActivity.SelectedFolderIdResultKey, Serializer.Serialize(toFolder.Id));
+                Activity.SetResult(Android.App.Result.Ok, data);
+                dismissAction();
+                Activity?.Finish();
+                
+            }  
         }
 
         protected override void Adapter_ItemLongClicked(object sender, int position)

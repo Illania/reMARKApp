@@ -301,7 +301,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                                                    UIAlertActionStyle.Default,
                                                    a =>
                 {
-                    CopyToWorktray(selectedContacts);
+                    this.CopyToWorktray((IBusinessEntity)selectedContacts);
                     EndEditing();
                 }));
             }
@@ -310,7 +310,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                 UIAlertActionStyle.Default,
                 a =>
                 {
-                    CopyToFolder(selectedContacts);
+                    this.CopyToFolder((IBusinessEntity)selectedContacts);
                     EndEditing();
                 }));
 
@@ -319,7 +319,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                     UIAlertActionStyle.Default,
                     a =>
                     {
-                        MoveToFolder(selectedContacts);
+                        this.MoveToFolder((IBusinessEntity)selectedContacts, Folder);
                         EndEditing();
                     }));
 
@@ -483,7 +483,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                 UIAlertActionStyle.Default,
                 a =>
                 {
-                    CopyToFolder(selectedContact);
+                    this.CopyToFolder(selectedContact);
                     EndEditing();
                 }));
 
@@ -492,7 +492,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                     UIAlertActionStyle.Default,
                     a =>
                     {
-                        MoveToFolder(selectedContact);
+                        this.MoveToFolder(selectedContact, Folder);
                         EndEditing();
                     }));
 
@@ -578,28 +578,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                 CommonConfig.Logger.Error($"Error while deleting contacts", ex);
                 await Dialogs.ShowErrorAlertAsync(this, ex);
             }
-        }
-
-        void CopyToWorktray(ContactPreview selectedContact) =>
-            CopyToWorktray(new List<ContactPreview> { selectedContact });
-
-        void CopyToWorktray(List<ContactPreview> selectedContacts)
-        {
-            var vc = new CopyToWorktrayViewController
-            {
-                BusinessEntities = selectedContacts.Cast<IBusinessEntity>().ToList()
-            };
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-        }
-
-        void CopyToFolder(ContactPreview selecteContact) =>
-            CopyToFolder(new List<ContactPreview> { selecteContact });
-
-        void CopyToFolder(List<ContactPreview> selectedContacts)
-        {
-            var vc = new CopyMoveToFolderListViewController(ModuleType.Contacts, selectedContacts.Cast<IBusinessEntity>().ToList());
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-        }
+        }     
 
         void ShowCategories(ContactPreview selectedContact)
         {
@@ -607,15 +586,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        void MoveToFolder(ContactPreview selectedContact) =>
-            MoveToFolder(new List<ContactPreview> { selectedContact });
-
-        void MoveToFolder(List<ContactPreview> selectedContacts)
-        {
-            var vc = new CopyMoveToFolderListViewController(ModuleType.Contacts, selectedContacts.Cast<IBusinessEntity>().ToList(), Folder);
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-        }
-
+        
         #endregion
 
         #region Searching

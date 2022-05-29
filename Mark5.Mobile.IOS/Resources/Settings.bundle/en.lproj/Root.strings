@@ -44,6 +44,7 @@
 "manage_extra_fields" = "Extra fields";
 "mark_as_read_delay_seconds" = "Mark as read after";
 "me" = "Me";
+"open_file_to_folder_dialog" = "Open file to folder dialog after sending email";
 "open_settings_app" = "Open Settings app";
 "partial_word_search" = "Partial word search";
 "plain" = "Plain Text";

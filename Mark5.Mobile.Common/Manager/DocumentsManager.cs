@@ -791,7 +791,7 @@ namespace Mark5.Mobile.Common.Manager
 
         internal async Task SendDocumentAsync(Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag,
             int precedingDocumentId, int precedingDocumentFolderId, long sendOnTimestamp, bool confirmRead, bool confirmDelivery,
-            List<Guid> temporaryAttachmentGuids, SourceType sourceType = SourceType.Auto)
+            List<Guid> temporaryAttachmentGuids, FileToFolderParameters fileToFolderParameters = null, SourceType sourceType = SourceType.Auto)
         {
             CommonConfig.UsageAnalytics.LogEvent(new DocumentSentEvent(flag));
 
@@ -820,7 +820,7 @@ namespace Mark5.Mobile.Common.Manager
                 documentPreview.Guid = result.Guid;
                 documentPreview.ReferenceNumber = result.ReferenceNumber;
 
-                await ExecutePostSendActionsAsync(document, documentPreview, flag, precedingDocumentId, precedingDocumentFolderId);
+                await ExecutePostSendActionsAsync(document, documentPreview, flag, precedingDocumentId, precedingDocumentFolderId, fileToFolderParameters);
 
                 return;
             }
@@ -831,7 +831,7 @@ namespace Mark5.Mobile.Common.Manager
             throw new ArgumentException("Invalid sourceType provided");
         }
 
-        async Task ExecutePostSendActionsAsync(Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId)
+        async Task ExecutePostSendActionsAsync(Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag, int precedingDocumentId, int precedingDocumentFolderId, FileToFolderParameters fileToFolderParameters)
         {
             if (precedingDocumentId > 0)
             {
@@ -865,6 +865,28 @@ namespace Mark5.Mobile.Common.Manager
                 catch (Exception ex)
                 {
                     CommonConfig.Logger.Error("Error while setting previous document as read", ex);
+                }
+            }
+            if(fileToFolderParameters != null)
+            {
+                try
+                {
+                    switch(fileToFolderParameters.FileToFolderType)
+                    {
+                        case FileToFolderType.CopyToFolder:
+                            await Managers.CommonActionsManager.CopyToFolder(new List<int> { documentPreview.Id }, documentPreview.ObjectType, fileToFolderParameters.FileToFolderId ?? -1);
+                            break;
+                        case FileToFolderType.CopyToWorktray:
+                            await Managers.CommonActionsManager.CopyToUserWorktray(new List<int> { documentPreview.Id }, documentPreview.ObjectType, fileToFolderParameters.CopyToWorktrayForUsers);
+                            break;
+                        default:
+                            break;
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error($"Error while filing document with id={documentPreview.Id} to folder", ex);
                 }
             }
         }

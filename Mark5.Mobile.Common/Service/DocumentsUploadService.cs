@@ -131,6 +131,7 @@ namespace Mark5.Mobile.Common.Service
                                                                     info.ConfirmRead,
                                                                     info.ConfirmDelivery,
                                                                     uploadedAttachmentsGuids,
+                                                                    info.FileToFolderParameters,
                                                                     SourceType.Remote);
 
                             if (info.SendOnTimestamp < 0)

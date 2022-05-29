@@ -44,7 +44,8 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public bool ReplyWithAttachments => sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_reply_with_attachments), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_reply_with_attachments_default));
 
-       
+        public bool OpenFileToFolderDialog => sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_reply_with_attachments), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_reply_with_attachments_default));
+
         #endregion
 
         #region Caller Identification
