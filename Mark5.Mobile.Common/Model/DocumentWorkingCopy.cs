@@ -6,6 +6,7 @@
         public CopyToNewOption CopyToNewOption { get; set; }
         public int? PreviousDocumentId { get; set; }
         public int? PreviousDocumentFolderId { get; set; }
+        public FileToFolderParameters FileToFolderParameters{ get; set; }
         public DocumentDirection PreviousDocumentDirection { get; set; }
         public long SendOnTimestamp { get; set; } = -1;
         public bool ConfirmRead { get; set; }

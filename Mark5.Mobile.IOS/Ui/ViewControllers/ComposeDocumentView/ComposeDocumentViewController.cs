@@ -41,6 +41,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         public int? PreviousDocumentFolderId { get; set; }
         public int? PreviousDocumentId { get; set; }
         public string PreconfiguredContent { get; set; }
+        public FileToFolderParameters FileToFolderParameters { get; set; }
         public Dictionary<DocumentAddressType, string[]> PreconfiguredEmailAddresses { get; set; }
         public string PreconfiguredSubject { get; set; }
 
@@ -386,6 +387,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     CopyToNewOption = wc.CopyToNewOption;
                     PreviousDocumentFolderId = wc.PreviousDocumentFolderId;
                     PreviousDocumentId = wc.PreviousDocumentId;
+                    FileToFolderParameters = wc.FileToFolderParameters;
                     PreviousDocumentDirection = wc.PreviousDocumentDirection;
                     documentPreview = wc.DocumentPreview;
                     document = wc.Document;
@@ -710,8 +712,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 autoSaveWorkingCopyWorker.Stop();
                 await autoSaveWorkingCopyWorker.Finished();
             }
+
+            if (PlatformConfig.Preferences.OpenFileToFolderDialog == true)
+                await ShowFileToFolderMenu(sender);
+
             bool sent;
-            if (!(e is SendButtonClickedEventArgs sendButtonClickedEventArgs))
+            if (e is not SendButtonClickedEventArgs sendButtonClickedEventArgs)
                 return;
             if (sendButtonClickedEventArgs.Delayed == false)
                 sent = await SendDocument();
@@ -720,11 +726,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             if (!sent)
                 return;
-
-            
-            if (PlatformConfig.Preferences.OpenFileToFolderDialog == true)
-                await ShowFileToFolderMenu(sender);
-           
 
             DismissViewController(true, null); 
         }
@@ -741,22 +742,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             if (source < 0)
                 return;
 
+            FileToFolderParameters = new FileToFolderParameters();
+
             if (source == 0)
             {
-                await this.CopyToFolderAsync(documentPreview);
-                DismissViewController(true, null);
+                FileToFolderParameters.FileToFolderType = FileToFolderType.CopyToFolder;
+                FileToFolderParameters.FileToFolderId = await this.CopyToFolderAsync(documentPreview, true); 
             }
 
             if (source == 1)
             {
-                await this.CopyToUserWorktrayAsync(documentPreview);
-                DismissViewController(true, null);
+                FileToFolderParameters.FileToFolderType = FileToFolderType.CopyToWorktray;
+                FileToFolderParameters.CopyToWorktrayForUsers = await this.CopyToUserWorktrayAsync(documentPreview);
             }
 
             if (source == 2)
             {
-                await this.CopyToDepartmentWorktrayAsync(documentPreview);
-                DismissViewController(true, null);
+                FileToFolderParameters.FileToFolderType = FileToFolderType.CopyToWorktray;
+                FileToFolderParameters.CopyToWorktrayForUsers = await this.CopyToDepartmentWorktrayAsync(documentPreview);
             }
         }
 
@@ -1089,6 +1092,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     CopyToNewOption = CopyToNewOption,
                     PreviousDocumentFolderId = PreviousDocumentFolderId,
                     PreviousDocumentId = PreviousDocumentId,
+                    FileToFolderParameters = FileToFolderParameters,
                     PreviousDocumentDirection = PreviousDocumentDirection,
                     DocumentPreview = documentPreview,
                     Document = document,
@@ -1141,6 +1145,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     CopyToNewOption = CopyToNewOption,
                     PreviousDocumentFolderId = PreviousDocumentFolderId,
                     PreviousDocumentId = PreviousDocumentId,
+                    FileToFolderParameters = FileToFolderParameters,
                     PreviousDocumentDirection = PreviousDocumentDirection,
                     DocumentPreview = documentPreview,
                     Document = document
@@ -1590,6 +1595,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     CopyToNewOption = CopyToNewOption,
                     PreviousDocumentFolderId = PreviousDocumentFolderId,
                     PreviousDocumentId = PreviousDocumentId,
+                    FileToFolderParameters = FileToFolderParameters,
                     PreviousDocumentDirection = PreviousDocumentDirection,
                     DocumentPreview = documentPreview,
                     Document = document

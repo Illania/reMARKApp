@@ -19,13 +19,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
     public class CopyToUserWorktrayViewController : AbstractTableViewController, IUISearchResultsUpdating
     {
         public List<IBusinessEntity> BusinessEntities { get; set; }
+        public bool DelayedCopy { get; set; } = false;
 
-        readonly TaskCompletionSource<bool> tcs = new();
-        public Task<bool> Result => tcs.Task;
+        readonly TaskCompletionSource<List<int>> tcs = new();
+        public Task<List<int>> Result => tcs.Task;
 
         UIBarButtonItem cancelItem;
         UIBarButtonItem doneItem;
-
+        
         UISearchController searchController;
         CancellationTokenSource searchCancellationTokenSource;
         readonly List<CancellationTokenSource> searchCancellationTokenSourceList = new List<CancellationTokenSource>();
@@ -193,7 +194,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void CancelItem_Clicked(object sender, EventArgs e)
         {
-            tcs.SetResult(false);
+            tcs.SetResult(null);
             DismissViewController(true, null);
         }
 
@@ -202,6 +203,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (((DataSource)TableView.Source).IsOwnSelected)
             {
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("copying_to_own_worktray___"));
+
+                if (DelayedCopy == true)
+                {
+                    dismissAction();
+                    tcs.SetResult(new List<int>{ServerConfig.SystemSettings.UserInfo.User.Id});
+                    DismissViewController(true, null);
+                }
 
                 try
                 {
@@ -222,6 +230,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("copying_to_worktray___"));
 
+                if (DelayedCopy == true)
+                {
+                    dismissAction();
+                    tcs.SetResult(selectedUsers.Select(u=>u.Id).ToList());
+                    DismissViewController(true, null);
+                }
+
                 try
                 {
                     await Managers.CommonActionsManager.CopyToUserWorktray(BusinessEntities, selectedUsers);
@@ -236,7 +251,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 }
             }
 
-            tcs.SetResult(true);
+            tcs.SetResult(selectedUsers.Select(u => u.Id).ToList());
             DismissViewController(true, null);
         }
 

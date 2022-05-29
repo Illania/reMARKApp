@@ -12,19 +12,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 {
     public class CopyMoveToFolderListViewController : AbstractFoldersListViewController
     {
-        readonly TaskCompletionSource<bool> tcs = new();
-        public Task<bool> Result => tcs.Task;
+        readonly TaskCompletionSource<int?> tcs = new();
+        public Task<int?> Result => tcs.Task;
 
         readonly List<IBusinessEntity> businessEntities;
         readonly Folder fromFolder;
+        readonly bool delayedCopy = false;
 
         UIBarButtonItem cancelModeItem;
 
-        public CopyMoveToFolderListViewController(ModuleType module, List<IBusinessEntity> businessEntities, Folder fromFolder = null)
+        public CopyMoveToFolderListViewController(ModuleType module, List<IBusinessEntity> businessEntities, Folder fromFolder = null, bool delayedCopy = false)
             : base(module, true, true, true)
         {
             this.businessEntities = businessEntities;
             this.fromFolder = fromFolder;
+            this.delayedCopy = delayedCopy;
         }
 
         protected CopyMoveToFolderListViewController(Folder folder, List<IBusinessEntity> businessEntities, Folder fromFolder = null)
@@ -86,6 +88,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         protected override async void FolderSelected(Folder folder, bool isFromFavorite)
         {
+            if (delayedCopy == true)
+            { 
+                tcs.SetResult(folder.Id);
+                return;
+            }
+
             if (fromFolder == null)
                 await CopyBusinessEntityToFolder(folder);
             else
@@ -94,7 +102,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             if (TableView?.IndexPathForSelectedRow != null)
                 TableView.DeselectRow(TableView.IndexPathForSelectedRow, true);
 
-            tcs.SetResult(true);
+            tcs.SetResult(folder.Id);
         }
 
         protected async override Task FolderExpand(Folder folder)
@@ -103,8 +111,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             var vc = new CopyMoveToFolderListViewController(folder, businessEntities, fromFolder);
             NavigationController.PushViewController(vc, true);
-            await vc?.Result;
-            tcs.SetResult(true);
+            await vc.Result;
+            tcs.SetResult(vc.Result.Result);
         }
 
         protected override bool ShouldDisableFolder(Folder folder)
@@ -120,7 +128,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         void CancelModeItem_Clicked(object sender, EventArgs e)
         {
-            tcs.SetResult(false);
+            tcs.SetResult(null);
             DismissViewController(true, null);
         }
 
@@ -146,7 +154,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 dismissAction();
                 await Dialogs.ShowErrorAlertAsync(this, ex);
-                tcs.SetResult(false);
+                tcs.SetResult(null);
             }
             finally
             {
@@ -176,7 +184,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 dismissAction();
                 await Dialogs.ShowErrorAlertAsync(this, ex);
-                tcs.SetResult(false);
+                tcs.SetResult(null);
             }
             finally
             {

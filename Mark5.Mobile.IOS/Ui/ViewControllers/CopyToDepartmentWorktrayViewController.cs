@@ -19,9 +19,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
     public class CopyToDepartmentWorktrayViewController : AbstractTableViewController, IUISearchResultsUpdating
     {
         public List<IBusinessEntity> BusinessEntities { get; set; }
+        public bool DelayedCopy { get; set; } = false;
 
-        readonly TaskCompletionSource<bool> tcs = new();
-        public Task<bool> Result => tcs.Task;
+        readonly TaskCompletionSource<List<int>> tcs = new();
+        public Task<List<int>> Result => tcs.Task;
 
         UIBarButtonItem cancelItem;
         UIBarButtonItem doneItem;
@@ -193,7 +194,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void CancelItem_Clicked(object sender, EventArgs e)
         {
-            tcs.SetResult(false);
+            tcs.SetResult(null);
             DismissViewController(true, null);
         }
 
@@ -218,13 +219,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
 
             var selectedDepartments = ((DataSource)TableView.Source).SelectedItems;
+            var systemUserIds = selectedDepartments.SelectMany(s => s.UserIds).ToList() ?? new List<int>();
+        
             if (selectedDepartments.Count > 0)
             {
                 var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("copying_to_worktray___"));
 
+                if (DelayedCopy == true)
+                {
+                    dismissAction();
+                    tcs.SetResult(systemUserIds);
+                    DismissViewController(true, null);
+                }
+              
                 try
                 {
-                    var systemUserIds = selectedDepartments.SelectMany(s => s.UserIds).ToList() ?? new List<int>();
+                   
                     await Managers.CommonActionsManager.CopyToUserWorktray(BusinessEntities, systemUserIds);
                     dismissAction();
                 }
@@ -236,7 +246,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     await Dialogs.ShowErrorAlertAsync(this, ex);
                 }
             }
-            tcs.SetResult(true);
+            tcs.SetResult(systemUserIds);
             DismissViewController(true, null);
         }
 

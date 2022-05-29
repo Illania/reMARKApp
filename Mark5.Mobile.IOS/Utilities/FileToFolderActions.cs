@@ -22,14 +22,18 @@ namespace Mark5.Mobile.IOS.Utilities
             vc.PresentViewController(new NavigationController(copyVc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        public static async Task CopyToFolderAsync(this UIViewController vc, IBusinessEntity businessEntity) =>
-           await CopyToFolderAsync(vc, new List<IBusinessEntity> { businessEntity });
-
-        public static async Task CopyToFolderAsync(this UIViewController vc, List<IBusinessEntity> businessEntities)
+        public static async Task<int?> CopyToFolderAsync(this UIViewController vc, IBusinessEntity businessEntity, bool delayedCopy = false)
         {
-            var copyVc = new CopyMoveToFolderListViewController(GetModuleType(businessEntities), businessEntities);
+            var folderId = await CopyToFolderAsync(vc, new List<IBusinessEntity> { businessEntity }, delayedCopy);
+            return folderId;
+        }
+
+        public static async Task<int?> CopyToFolderAsync(this UIViewController vc, List<IBusinessEntity> businessEntities, bool delayedCopy = false)
+        {
+            var copyVc = new CopyMoveToFolderListViewController(GetModuleType(businessEntities), businessEntities, null, delayedCopy);
             vc.PresentViewController(new NavigationController(copyVc, UIModalPresentationStyle.PageSheet), true, null);
-            await copyVc.Result;
+            var folderId = await copyVc.Result;
+            return folderId;
         }
         #endregion
 
@@ -70,36 +74,38 @@ namespace Mark5.Mobile.IOS.Utilities
             vc.PresentViewController(new NavigationController(copyVc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        public static async Task CopyToUserWorktrayAsync(this UIViewController vc, IBusinessEntity businessEntity) =>
-           await CopyToUserWorktrayAsync(vc, new List<IBusinessEntity> { businessEntity });
+        public static async Task<List<int>> CopyToUserWorktrayAsync(this UIViewController vc, IBusinessEntity businessEntity, bool delayedCopy = false) =>
+           await CopyToUserWorktrayAsync(vc, new List<IBusinessEntity> { businessEntity }, delayedCopy);
 
-        public static async Task CopyToUserWorktrayAsync(this UIViewController vc, List<IBusinessEntity> businessEntities)
+        public static async Task<List<int>> CopyToUserWorktrayAsync(this UIViewController vc, List<IBusinessEntity> businessEntities, bool delayedCopy = false)
         {
             var copyVc = new CopyToUserWorktrayViewController
             {
                 BusinessEntities = businessEntities,
-                ModalPresentationStyle = UIModalPresentationStyle.PageSheet
-
+                ModalPresentationStyle = UIModalPresentationStyle.PageSheet,
+                DelayedCopy = delayedCopy
             };
 
             vc.PresentViewController(new NavigationController(copyVc, UIModalPresentationStyle.PageSheet), true, null);
-            await copyVc.Result;
+            var selectedUsers = await copyVc.Result;
+            return selectedUsers;
         }
 
-        public static async Task CopyToDepartmentWorktrayAsync(this UIViewController vc, IBusinessEntity businessEntity) =>
-           await CopyToDepartmentWorktrayAsync(vc, new List<IBusinessEntity> { businessEntity });
+        public static async Task<List<int>> CopyToDepartmentWorktrayAsync(this UIViewController vc, IBusinessEntity businessEntity, bool delayedCopy = false) =>
+           await CopyToDepartmentWorktrayAsync(vc, new List<IBusinessEntity> { businessEntity }, delayedCopy);
 
-        public static async Task CopyToDepartmentWorktrayAsync(this UIViewController vc, List<IBusinessEntity> businessEntities)
+        public static async Task<List<int>> CopyToDepartmentWorktrayAsync(this UIViewController vc, List<IBusinessEntity> businessEntities, bool delayedCopy = false)
         {
             var copyVc = new CopyToDepartmentWorktrayViewController
             {
                 BusinessEntities = businessEntities,
-                ModalPresentationStyle = UIModalPresentationStyle.PageSheet
-
+                ModalPresentationStyle = UIModalPresentationStyle.PageSheet,
+                DelayedCopy = delayedCopy
             };
 
             vc.PresentViewController(new NavigationController(copyVc, UIModalPresentationStyle.PageSheet), true, null);
-            await copyVc.Result;
+            var selectedUsers = await copyVc.Result;
+            return selectedUsers;
         }
         #endregion
 

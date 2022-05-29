@@ -14,6 +14,8 @@ using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
+using Android.Content;
+using Mark5.Mobile.Droid.Ui.Activities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -26,9 +28,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         const string IdsIntentKey = "IdsIntentKey";
         const string ObjectTypeIntentKey = "ObjectTypeIntentKey";
         const string SelectedSystemUsersKey = "SelectedSystemUsers_f2f7fa81-a3c0-4b3d-9b24-c2ecd360ae92";
+        const string DelayedCopyBundleKey = "DelayedCopy_ed011f46-e180-462c-9d49-5dc047f3c326";
 
         List<int> businessEntitiesIds;
         ObjectType objectType;
+        bool delayedCopy;
 
         CopyToUserWorktrayAdapter CurrentAdapter => (CopyToUserWorktrayAdapter)recyclerView.GetAdapter();
 
@@ -41,7 +45,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         Action dismissAction;
 
-        public static (CopyToUserWorktrayFragment fragment, string tag) NewInstance(List<int> ids, ObjectType ot)
+        public static (CopyToUserWorktrayFragment fragment, string tag) NewInstance(List<int> ids, ObjectType ot, bool? delayedCopy = false)
         {
             var args = new Bundle();
 
@@ -49,6 +53,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 args.PutString(IdsIntentKey, Serializer.Serialize(ids));
 
             args.PutInt(ObjectTypeIntentKey, (int)ot);
+
+            if (delayedCopy != null)
+                args.PutBoolean(DelayedCopyBundleKey, delayedCopy.Value);
 
             var fragment = new CopyToUserWorktrayFragment();
             fragment.Arguments = args;
@@ -68,6 +75,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 businessEntitiesIds = Serializer.Deserialize<List<int>>(Arguments.GetString(IdsIntentKey));
 
             objectType = (ObjectType)Arguments.GetInt(ObjectTypeIntentKey);
+
+            if (Arguments.ContainsKey(DelayedCopyBundleKey))
+                delayedCopy = Arguments.GetBoolean(DelayedCopyBundleKey);
 
             if (savedInstanceState?.ContainsKey(SelectedSystemUsersKey) == true)
             {
@@ -111,9 +121,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 try
                 {
-                    await Managers.CommonActionsManager.CopyToUserWorktray(businessEntitiesIds, objectType, selectedSystemUsers.Values.ToList());
-
-                    Activity?.OnBackPressed();
+                    if (delayedCopy == false)
+                    {
+                        await Managers.CommonActionsManager.CopyToUserWorktray(businessEntitiesIds, objectType, selectedSystemUsers.Values.ToList());
+                        Activity?.OnBackPressed();
+                    }
+                    else
+                    {
+                        var data = new Intent();
+                        data.PutExtra(CopyToUserWorktrayActivity.SelectedUsersResultKey, Serializer.Serialize(selectedSystemUsers.Values.Select
+                            (u=>u.Id).ToList()));
+                        Activity.SetResult(Android.App.Result.Ok, data);
+                        Activity?.OnBackPressed();
+                    }
                 }
                 catch (Exception ex)
                 {

@@ -244,6 +244,7 @@
     <string name="extra_fields_alert_not_available_content">To use extra fields editing functionality please update reMARK App Service API to version 4.4 or higher</string>
     <string name="failed_send_document_notification_content">One or more emails could not be sent. Please check Outgoing folder for details.</string>
     <string name="failed_send_document_notification_title">Failed to send emails</string>
+    <string name="file_to_folder">File to folder</string>
     <string name="fingerprint_success">Fingerprint recognised</string>
     <string name="fingerprint_try_again">Fingerprint not recognised. Try again</string>
     <string name="fingerprint_description">Confirm fingerprint to continue</string>

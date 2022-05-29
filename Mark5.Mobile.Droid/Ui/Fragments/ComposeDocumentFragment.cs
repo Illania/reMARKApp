@@ -51,10 +51,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         DocumentDirection previousDocumentDirection;
         int? previousDocumentFolderId;
         int? previousDocumentId;
+        FileToFolderParameters fileToFolderParameters;
         Dictionary<DocumentAddressType, string[]> preconfiguredEmailAddresses;
         string preconfiguredContent;
         string preconfiguredSubject;
         List<System.Uri> preconfiguredAttachmentList;
+        bool saveDraft = false;
 
         bool restoreWorkingCopy;
 
@@ -349,6 +351,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var template = Serializer.Deserialize<TemplatePreview>(data.GetStringExtra(TemplatesListActivity.TemplatePreviewResultKey));
                 await GetTemplate(template, true);
             }
+            if (requestCode == RequestCodes.CopyToFolderRequestCode && resultCode == (int)Result.Ok)
+            {
+                fileToFolderParameters.FileToFolderId = Serializer.Deserialize<int>(data.GetStringExtra(CopyMoveToFolderListActivity.SelectedFolderIdResultKey));
+                await SaveAndQueueWorkingCopyToUpload();
+                Activity?.Finish();
+            }
+            if (requestCode == RequestCodes.CopyToWorktrayRequestCode && resultCode == (int)Result.Ok)
+            {
+                fileToFolderParameters.CopyToWorktrayForUsers = Serializer.Deserialize<List<int>>(data.GetStringExtra(CopyToUserWorktrayActivity.SelectedUsersResultKey));
+                await SaveAndQueueWorkingCopyToUpload();
+                Activity?.Finish();
+            }
+
+
+
         }
 
         async Task RetrieveAndAddShortcode(int shortcodeId, int folderId)
@@ -399,6 +416,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         previousDocumentFolderId = wc.PreviousDocumentFolderId;
                         previousDocumentId = wc.PreviousDocumentId;
                         previousDocumentDirection = wc.PreviousDocumentDirection;
+                        fileToFolderParameters = wc.FileToFolderParameters;
                         documentPreview = wc.DocumentPreview;
                         document = wc.Document;
                     }
@@ -500,7 +518,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public const int PhonebookRequestCode = 555;
             public const int TemplatePreviewRequestCode = 666;
             public const int TemplatePreviewInitialRequestCode = 777;
-
+            public const int CopyToFolderRequestCode = 880;
+            public const int CopyToWorktrayRequestCode = 881;
         }
 
         #region Subviews event handlers
@@ -765,9 +784,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public void AskIfShouldSave()
         {
             if (previousDocumentDirection == DocumentDirection.Draft)
-                Dialogs.ShowYesNoDialog(Context, Resource.String.save_draft, Resource.String.confirm_change_draft, () => SendDocument(true), DeleteAutoSavedDocumentAndClose);
+                Dialogs.ShowYesNoDialog(Context, Resource.String.save_draft, Resource.String.confirm_change_draft, () => { saveDraft = true; SendDocument(); }, DeleteAutoSavedDocumentAndClose);
             else
-                Dialogs.ShowYesNoDialog(Context, Resource.String.save_draft, Resource.String.confirm_save_as_draft, () => SendDocument(true), DeleteAutoSavedDocumentAndClose, cancelable: true);
+                Dialogs.ShowYesNoDialog(Context, Resource.String.save_draft, Resource.String.confirm_save_as_draft, () => { saveDraft = true; SendDocument(); }, DeleteAutoSavedDocumentAndClose, cancelable: true);
         }
 
         public async void DeleteAutoSavedDocumentAndClose()
@@ -795,7 +814,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 SendDocument();
         }
 
-        void SendDocument(bool saveDraft = false)
+        void SendDocument()
         {
             fab.Enabled = false;
 
@@ -804,7 +823,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             async void sendAction()
             {
-                dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, saveDraft ? Resource.String.saving_draft : Resource.String.sending_document, Resource.String.please_wait);
 
                 foreach (var subView in subViews)
                     await subView.UpdateDocument();
@@ -817,31 +835,27 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     await autoSaveWorkingCopyWorker.Finished();
                 }
 
-                await Managers.DocumentsManager.SaveDocumentWorkingCopyAsync(new DocumentWorkingCopy
+                if (PlatformConfig.Preferences.OpenFileToFolderDialog == true)
                 {
-                    DocumentCreationModeFlag = documentCreationModeFlag,
-                    CopyToNewOption = copyToNewOption,
-                    PreviousDocumentFolderId = previousDocumentFolderId,
-                    PreviousDocumentId = previousDocumentId,
-                    PreviousDocumentDirection = previousDocumentDirection,
-                    DocumentPreview = documentPreview,
-                    Document = document
-                });
+                    var option = await Dialogs.ShowListDialog(Context, Resource.String.file_to_folder, Resource.Array.file_to_folder_options, true);
+                    fileToFolderParameters = new FileToFolderParameters();
 
-                try
-                {
-                    await Managers.DocumentsManager.QueueWorkingCopyToUpload();
+                    if (option == 0)
+                    {
+                        fileToFolderParameters.FileToFolderType = FileToFolderType.CopyToFolder;
+                        StartActivityForResult(CopyMoveToFolderListActivity.CreateIntent(Context, CopyMoveToFolderListActivity.ModeType.Copy, ModuleType.Documents,
+                            new List<IBusinessEntity> { documentPreview }, delayedCopy: true), RequestCodes.CopyToFolderRequestCode);
+                    }
+                    if (option == 1)
+                    {
+                        fileToFolderParameters.FileToFolderType = FileToFolderType.CopyToWorktray;
+                        StartActivityForResult(CopyToUserWorktrayActivity.CreateIntent(Context,
+                            new List<IBusinessEntity> { documentPreview }, delayedCopy: true), RequestCodes.CopyToWorktrayRequestCode);
+                    }
+                    return;
                 }
-                catch (Exception ex)
-                {
-                    dismissAction();
+                await SaveAndQueueWorkingCopyToUpload();
 
-                    CommonConfig.Logger.Error($"Failed to queue document for upload [saveDraft={saveDraft}, restoreWorkingCopy={restoreWorkingCopy}, documentCreationModeFlag={documentCreationModeFlag}, copyToNewOption={copyToNewOption}, previousDocumentFolderId={previousDocumentFolderId}, previousDocumentId={previousDocumentId}]", ex.InnerException);
-                    await Dialogs.ShowErrorDialogAsync(Activity, ex.InnerException ?? ex);
-                    fab.Enabled = true;
-                }
-
-                dismissAction();
                 Activity?.Finish();
             }
 
@@ -866,6 +880,38 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             else
                 sendAction();
+        }
+
+        private async Task SaveAndQueueWorkingCopyToUpload()
+        {
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, saveDraft ? Resource.String.saving_draft : Resource.String.sending_document, Resource.String.please_wait);
+
+            await Managers.DocumentsManager.SaveDocumentWorkingCopyAsync(new DocumentWorkingCopy
+            {
+                DocumentCreationModeFlag = documentCreationModeFlag,
+                CopyToNewOption = copyToNewOption,
+                PreviousDocumentFolderId = previousDocumentFolderId,
+                PreviousDocumentId = previousDocumentId,
+                PreviousDocumentDirection = previousDocumentDirection,
+                FileToFolderParameters = fileToFolderParameters,
+                DocumentPreview = documentPreview,
+                Document = document
+            });
+
+            try
+            {
+                await Managers.DocumentsManager.QueueWorkingCopyToUpload();
+            }
+            catch (Exception ex)
+            {
+                dismissAction();
+
+                CommonConfig.Logger.Error($"Failed to queue document for upload [saveDraft={saveDraft}, restoreWorkingCopy={restoreWorkingCopy}, documentCreationModeFlag={documentCreationModeFlag}, copyToNewOption={copyToNewOption}, previousDocumentFolderId={previousDocumentFolderId}, previousDocumentId={previousDocumentId}]", ex.InnerException);
+                await Dialogs.ShowErrorDialogAsync(Activity, ex.InnerException ?? ex);
+                fab.Enabled = true;
+            }
+
+            dismissAction();
         }
 
         void SendDocumentWithDelay(bool usePicker = true)
@@ -1004,6 +1050,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 PreviousDocumentFolderId = previousDocumentFolderId,
                 PreviousDocumentId = previousDocumentId,
                 PreviousDocumentDirection = previousDocumentDirection,
+                FileToFolderParameters = fileToFolderParameters,
                 DocumentPreview = documentPreview,
                 Document = document,
                 SendOnTimestamp = timestamp
@@ -1062,6 +1109,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     PreviousDocumentFolderId = previousDocumentFolderId,
                     PreviousDocumentId = previousDocumentId,
                     PreviousDocumentDirection = previousDocumentDirection,
+                    FileToFolderParameters = fileToFolderParameters,
                     DocumentPreview = documentPreview,
                     Document = document
                 });
@@ -1156,7 +1204,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     else if (choice == 1) //Device files
                         AddAttachmentFromDevice();
                 }, null);
-
+                 
                 CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.Local));
             }
 

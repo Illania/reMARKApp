@@ -367,6 +367,7 @@ namespace Mark5.Mobile.Common.Storage
                 DocumentCreationModeFlag = documentWorkingCopy.DocumentCreationModeFlag,
                 PreviousDocumentFolderId = documentWorkingCopy.PreviousDocumentFolderId,
                 PreviousDocumentId = documentWorkingCopy.PreviousDocumentId,
+                FileToFolderParameters = documentWorkingCopy.FileToFolderParameters,
                 ConfirmDelivery = documentWorkingCopy.ConfirmDelivery,
                 ConfirmRead = documentWorkingCopy.ConfirmRead,
                 SendOnTimestamp = documentWorkingCopy.SendOnTimestamp,

@@ -718,7 +718,6 @@
     <Compile Include="Service\Reachability\ReachabilityMonitor.cs" />
     <Compile Include="Service\PushNotifications\IPushNotificationsRegistrator.cs" />
     <Compile Include="TinyIoC.cs" />
-    <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Utilities\Extensions\DateTimeExtensions.cs" />
     <Compile Include="Ui\Fragments\CategoriesListFragment.cs" />
     <Compile Include="Ui\Fragments\CopyToUserWorktrayFragment.cs" />
@@ -730,6 +729,7 @@
     <Compile Include="Ui\Activities\ExternalDocumentListActivity.cs" />
     <Compile Include="Ui\Fragments\ExternalDocumentFoldersListFragment.cs" />
     <Compile Include="Ui\Fragments\ExternalDocumentsListFragment.cs" />
+    <Compile Include="Resources\Resource.designer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
