@@ -26,6 +26,7 @@ namespace Mark5.Mobile.IOS.Utilities
             public const string MarkAsReadDelaySecondsKey = "MarkAsReadDelaySeconds";
             public const string DocumentBodyRequestTypeKey = "DocumentBodyRequestType";
             public const string LargeAttachmentWarningKey = "LargeAttachmentWarning";
+            public const string EnableMoveToFolder = "EnableMoveToFolder";
             public const string SendingDelay = "SendingDelay";
             public const string RememberLastUserDelaySettings = "RememberLastUserDelaySettings";
             public const string ReplyWithAttachments = "ReplyWithAttachments";
@@ -197,6 +198,9 @@ namespace Mark5.Mobile.IOS.Utilities
                 {
                     new NSString(Keys.BookmarksForFolders), new NSDictionary()
                 },
+                {
+                    new NSString(Keys.EnableMoveToFolder), NSNumber.FromBoolean(true)
+                },
 
             };
 
@@ -235,6 +239,8 @@ namespace Mark5.Mobile.IOS.Utilities
         public bool CompactDocumentsList => ud.BoolForKey(Keys.CompactDocumentsListKey);
 
         public bool LargeAttachmentWarning => ud.BoolForKey(Keys.LargeAttachmentWarningKey);
+
+        public bool EnableMoveToFolder => ud.BoolForKey(Keys.EnableMoveToFolder);
 
         public int SendingDelay => (int)ud.IntForKey(Keys.SendingDelay);
 
@@ -511,7 +517,7 @@ namespace Mark5.Mobile.IOS.Utilities
 
         public List<EmailSwipeAction> GetAvailableSwipeActions()
         {
-            var exceptLeading = EmailSwipeAction.GetAllAvailableActions.Where(all => !EmailLeadingSwipeActions.Any(leading => leading.Action == all.Action));
+            var exceptLeading = EmailSwipeAction.GetAllAvailableActions().Where(all => !EmailLeadingSwipeActions.Any(leading => leading.Action == all.Action));
             var exceptTrailing = exceptLeading.Where(leading => !EmailTrailingSwipeActions.Any(trailing => trailing.Action == leading.Action));
             return exceptTrailing.ToList();
         }

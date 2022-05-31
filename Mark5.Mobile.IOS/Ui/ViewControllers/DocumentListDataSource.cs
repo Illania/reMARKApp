@@ -247,6 +247,8 @@ namespace Mark5.Mobile.IOS.Ui
             var documentPreview = Items[indexPath.Row];
 
             EmailSwipeAction leadingAction = PlatformConfig.Preferences.EmailLeadingSwipeActions.First();
+            if (leadingAction.Action == EmailSwipeAction.SwipeAction.MoveToFolder && !PlatformConfig.Preferences.EnableMoveToFolder)
+                return null;
 
             var folder = viewControllerWeakReference.Unwrap()?.Folder;
 
@@ -297,6 +299,13 @@ namespace Mark5.Mobile.IOS.Ui
             }
 
             List<EmailSwipeAction> trailingSwipeActions = PlatformConfig.Preferences.EmailTrailingSwipeActions;
+            var actionsToRemove = new List<EmailSwipeAction>();
+            foreach (var action in trailingSwipeActions)
+            {
+                if (action.Action == EmailSwipeAction.SwipeAction.MoveToFolder && !PlatformConfig.Preferences.EnableMoveToFolder)
+                    actionsToRemove.Add(action);
+            }
+            trailingSwipeActions = trailingSwipeActions.Except(actionsToRemove.ToList()).ToList();
 
             trailingSwipeActions.Reverse();
             var folder = viewControllerWeakReference.Unwrap()?.Folder;

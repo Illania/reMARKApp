@@ -38,6 +38,7 @@
 "html" = "HTML";
 "large_attachment_warning" = "Large attachment warning";
 "large_attachment_warning_desc" = "Show warning when trying to download large attachment over cellular connection.";
+"enable_move_to_folder" = "Enable move to folder";
 "local_template" = "Local template";
 "local_template_short" = "Local";
 "logout" = "Log out";
