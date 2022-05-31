@@ -247,7 +247,7 @@ namespace Mark5.Mobile.IOS.Ui
             var documentPreview = Items[indexPath.Row];
 
             EmailSwipeAction leadingAction = PlatformConfig.Preferences.EmailLeadingSwipeActions.First();
-            if (leadingAction.Action == EmailSwipeAction.SwipeAction.MoveToFolder && !PlatformConfig.Preferences.EnableMoveToFolder)
+            if (!CheckActionEnabled(leadingAction))
                 return null;
 
             var folder = viewControllerWeakReference.Unwrap()?.Folder;
@@ -263,6 +263,9 @@ namespace Mark5.Mobile.IOS.Ui
 
             return contextualAction;
         }
+
+        private bool CheckActionEnabled(EmailSwipeAction emailSwipeAction)
+            => emailSwipeAction.Action != EmailSwipeAction.SwipeAction.MoveToFolder || PlatformConfig.Preferences.EnableMoveToFolder;
 
         public override UISwipeActionsConfiguration GetLeadingSwipeActionsConfiguration(UITableView tableView, NSIndexPath indexPath)
         {
@@ -298,15 +301,7 @@ namespace Mark5.Mobile.IOS.Ui
                 return null;
             }
 
-            List<EmailSwipeAction> trailingSwipeActions = PlatformConfig.Preferences.EmailTrailingSwipeActions;
-            var actionsToRemove = new List<EmailSwipeAction>();
-            foreach (var action in trailingSwipeActions)
-            {
-                if (action.Action == EmailSwipeAction.SwipeAction.MoveToFolder && !PlatformConfig.Preferences.EnableMoveToFolder)
-                    actionsToRemove.Add(action);
-            }
-            trailingSwipeActions = trailingSwipeActions.Except(actionsToRemove.ToList()).ToList();
-
+            var trailingSwipeActions = FilterActions(PlatformConfig.Preferences.EmailTrailingSwipeActions);
             trailingSwipeActions.Reverse();
             var folder = viewControllerWeakReference.Unwrap()?.Folder;
 
@@ -452,6 +447,17 @@ namespace Mark5.Mobile.IOS.Ui
             UITableViewRowAction[] returnActions = actionWrappers.Select(a => a.Action).ToArray();
 
             return returnActions;
+        }
+
+        private List<EmailSwipeAction> FilterActions(List<EmailSwipeAction> emailSwipeActions)
+        {
+            var actionsToRemove = new List<EmailSwipeAction>();
+            foreach (var action in emailSwipeActions)
+            {
+                if (action.Action == EmailSwipeAction.SwipeAction.MoveToFolder && !PlatformConfig.Preferences.EnableMoveToFolder)
+                    actionsToRemove.Add(action);
+            }
+            return emailSwipeActions.Except(actionsToRemove.ToList()).ToList();
         }
         #endregion
     }
