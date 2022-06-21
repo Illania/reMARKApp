@@ -245,7 +245,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 Contact = new Contact();
                 ContactPreview = new ContactPreview { Type = ContactType };
-                if(PreconfiguredEmailAddress != null)
+                if (PreconfiguredEmailAddress != null)
                 {
                     Contact.CommunicationAddresses?.Add(new CommunicationAddress(PreconfiguredEmailAddress.Address, CommunicationAddressType.Email));
 
@@ -254,7 +254,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     else
                         ContactPreview.Name = PreconfiguredEmailAddress.Name;
                 }
-                
             }
 
             ds.Refresh(Contact, ContactPreview, ParentContactPreview, CreationModeFlag, ParentPreselected);

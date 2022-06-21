@@ -22,7 +22,6 @@ namespace Mark5.Mobile.IOS.Service
 			foreach (var item in items)
 			{
 				AddOrUpdateContactToIndex(item);
-
 			}
 		}
 
@@ -40,26 +39,22 @@ namespace Mark5.Mobile.IOS.Service
 					try
 					{
 						await Managers.ContactsManager.GetContactAsync(-1, Convert.ToInt32(foundItem.UniqueIdentifier));
-
 					}
-					catch (Exception ex)
-					{
+					catch (Exception)
+                    {
 						DeleteContactFromIndex(foundItem);
 					}
-
-				}
-			}
-
-			void HandleError(NSError error)
-			{
-				if (error != null)
-				{
-					CommonConfig.Logger.Error($"Failed deleting contact item (Id={item.Id}) from  Spotlight search index. Error: {error}");
 				}
 			}
 
 			foreach (var item in items)
-            {
+			{
+				void HandleError(NSError error)
+				{
+					if (error != null)
+						CommonConfig.Logger.Error($"Failed deleting contact item (Id={item.Id}) from  Spotlight search index. Error: {error}");
+				}
+
 				var queryString = @$"identifier == ""{item.Id}""";
 
 				var searchQuery = new CSSearchQuery(queryString, null)
@@ -69,7 +64,7 @@ namespace Mark5.Mobile.IOS.Service
 				};
 
 				searchQuery?.Start();
-		}
+			}
 			
         }
 
@@ -81,7 +76,6 @@ namespace Mark5.Mobile.IOS.Service
 		{
 			foreach(var item in items)
             {
-			
 				var queryString = @$"identifier == ""{item.Id}""";
 
 				var searchQuery = new CSSearchQuery(queryString, null)
@@ -92,18 +86,14 @@ namespace Mark5.Mobile.IOS.Service
 
 				void DeleteItems(CSSearchableItem[] foundItems)
 				{
-
 					foreach (var foundItem in foundItems)
-							DeleteContactFromIndex(foundItem);
-
+						DeleteContactFromIndex(foundItem);
 				}
 
 				void HandleError(NSError error)
 				{
 					if (error != null)
-					{
 						CommonConfig.Logger.Error($"Failed deleting contact item (Id={item.Id}) from  Spotlight search index. Error: {error}");
-					}
 				}
 
 				searchQuery?.Start();
@@ -112,7 +102,6 @@ namespace Mark5.Mobile.IOS.Service
 
 		void AddOrUpdateContactToIndex(ContactPreview item)
 		{
-
 			var queryString = @$"identifier == ""{item.Id}""";
 			var found = false;
 			var searchQuery = new CSSearchQuery(queryString, null)
@@ -129,27 +118,22 @@ namespace Mark5.Mobile.IOS.Service
 					DeleteContactFromIndex(foundItem);
 					AddContactToIndex(item);
 				}
-				
 			}
 
 			void HandleError(NSError error)
 			{
-				if(found == false)
+				if (found == false)
 					AddContactToIndex(item);
 
 				if (error != null)
-				{
 					CommonConfig.Logger.Error($"Failed indexing contact item (Id={item.Id}) for  Spotlight search. Error: {error}");
-				}
 			}
 
 			searchQuery?.Start();
-
 		}
 
 		void AddContactToIndex(ContactPreview item)
 		{
-
 			// Create attributes to describe item
 			var attributes = new CSSearchableItemAttributeSet(UTType.Text)
 			{
@@ -188,6 +172,5 @@ namespace Mark5.Mobile.IOS.Service
 				}
 			});
 		}
-
 	}
 }

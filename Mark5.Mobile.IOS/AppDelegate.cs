@@ -54,7 +54,6 @@ namespace Mark5.Mobile.IOS
         private bool isLoggedIn = false;
         public SpotlightSearchManager SpotlightSearchManager { get; private set; }
 
-
         public override bool WillFinishLaunching(UIApplication application, NSDictionary launchOptions)
         {
             try
