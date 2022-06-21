@@ -54,7 +54,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
 
                     var option = await Dialogs.ShowSingleSelectDialogAsync(Context, 
-                                                                           Resource.String.swipe_actions_dialog_title,PlatformConfig.Preferences.GetEnabledActions(), 
+                                                                           Resource.String.swipe_actions_dialog_title,
+                                                                           PlatformConfig.Preferences.GetEnabledActions(), 
                                                                            PlatformConfig.Preferences.EmailLeadingSwipeAction, 
                                                                            null,
                                                                            (action) => { return GetActionTitle(action); });

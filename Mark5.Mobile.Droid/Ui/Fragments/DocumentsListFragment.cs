@@ -1719,7 +1719,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (dX > 0) //Swiping to right
                 {
                     Preferences.EmailSwipeAction action = PlatformConfig.Preferences.EmailLeadingSwipeAction;
-                    if (!CheckActionIsEnabled(action))
+                    if (!CheckActionEnabled(action))
                         return;
 
                     int bgColor = SwipeActionAllowed(action) ? Resource.Color.brown : Resource.Color.lightgray;
@@ -1739,7 +1739,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 else if (dX < 0)
                 {
                     Preferences.EmailSwipeAction action = PlatformConfig.Preferences.EmailTrailingSwipeAction;
-                    if (!CheckActionIsEnabled(action))
+                    if (!CheckActionEnabled(action))
                         return;
 
                     int bgColor = SwipeActionAllowed(action) ? Resource.Color.darkblue : Resource.Color.lightgray;
@@ -1775,17 +1775,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 switch (direction)
                 {
                     case ItemTouchHelper.Left:
-                        if (CheckActionIsEnabled(PlatformConfig.Preferences.EmailTrailingSwipeAction))
+                        if (CheckActionEnabled(PlatformConfig.Preferences.EmailTrailingSwipeAction))
                             SwipeActionSelected(PlatformConfig.Preferences.EmailTrailingSwipeAction, viewHolder.AdapterPosition);
                         break;
                     case ItemTouchHelper.Right:
-                        if (CheckActionIsEnabled(PlatformConfig.Preferences.EmailLeadingSwipeAction))
+                        if (CheckActionEnabled(PlatformConfig.Preferences.EmailLeadingSwipeAction))
                             SwipeActionSelected(PlatformConfig.Preferences.EmailLeadingSwipeAction, viewHolder.AdapterPosition);
                         break;
                 }
             }
 
-            private bool CheckActionIsEnabled(Preferences.EmailSwipeAction swipeAction)
+            private bool CheckActionEnabled(Preferences.EmailSwipeAction swipeAction)
             {
                 if (swipeAction == Preferences.EmailSwipeAction.MoveToFolder)
                     return PlatformConfig.Preferences.EnableMoveToFolder;
