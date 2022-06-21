@@ -14,7 +14,6 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Extensions;
-using Mark5.Mobile.Common.Job;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.HubMessages;
@@ -29,7 +28,6 @@ using Mark5.Mobile.IOS.Service;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers;
 using Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews;
-using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 using Mark5.Mobile.IOS.Utilities;
 using Microsoft.AppCenter;
 using Microsoft.AppCenter.Crashes;
@@ -39,6 +37,8 @@ using TinyIoC;
 using TinyMessenger;
 using UIKit;
 using UserNotifications;
+using CoreSpotlight;
+using Mark5.Mobile.Common.Job;
 
 namespace Mark5.Mobile.IOS
 {
@@ -52,6 +52,7 @@ namespace Mark5.Mobile.IOS
 
         public override UIWindow Window { get; set; }
         private bool isLoggedIn = false;
+        public SpotlightSearchManager SpotlightSearchManager { get; private set; }
 
 
         public override bool WillFinishLaunching(UIApplication application, NSDictionary launchOptions)
@@ -165,10 +166,51 @@ namespace Mark5.Mobile.IOS
                     return true;
                 }
             } 
-               
-         
             
             AuthenticationContinuationHelper.SetAuthenticationContinuationEventArgs(url);
+            return true;
+        }
+
+        public override bool ContinueUserActivity(UIApplication application, NSUserActivity userActivity,
+            UIApplicationRestorationHandler completionHandler)
+        {
+            switch (userActivity.ActivityType)
+            {
+                default:
+                    //Spotlight item click handler
+                    if (userActivity.ActivityType == CSSearchableItem.ActionType.ToString())
+                    {
+                        var uniqueIdentifier = (NSString)(userActivity.UserInfo?["kCSSearchableItemActivityIdentifier"]);
+                        var uuid = Convert.ToInt32(uniqueIdentifier.ToString());
+                        ContactPreview contactPreview = null;
+                        Task.Run(async () =>
+                        {
+                            try
+                            {
+                                var contact = await Managers.ContactsManager.GetContactWithPreviewAsync(-1, uuid);
+                                contactPreview = contact?.ContactPreview;
+                                if (contactPreview != null)
+                                {
+                                    BeginInvokeOnMainThread(() =>
+                                    {
+                                        var vc = new ContactViewController();
+                                        vc.SetData(contactPreview.Id);
+                                        vc.SetRefreshDataOnAppear();
+                                        Window.RootViewController.PresentViewController(new NavigationController(vc,
+                                            UIModalPresentationStyle.PageSheet), true, null);
+
+                                    });
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                CommonConfig.Logger.Error("Error while loading contact from spotlight search.", ex);
+                            }
+                        });
+                    }
+                    break;
+            }
+
             return true;
         }
 
@@ -708,7 +750,8 @@ namespace Mark5.Mobile.IOS
                 PlatformConfig.SSLCertificateVerificationManager = new SSLCertificateVerificationManager();
                 PlatformConfig.Preferences = preferences;
                 PlatformConfig.ReachabilityReceiver = new ReachabilityReceiver();
-
+                TinyIoCContainer.Current.Register<ISpotlightSearchManager>(new SpotlightSearchManager());
+ 
                 UNUserNotificationCenter.Current.Delegate = this;
             })
             .Wait();
@@ -752,7 +795,7 @@ namespace Mark5.Mobile.IOS
                 Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
                 Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
                 Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
-
+              
                 if (PlatformConfig.Preferences.ClearCache)
                 {
                     CommonConfig.UsageAnalytics.LogEvent(new SettingsCacheCleanUpEvent());

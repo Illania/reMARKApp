@@ -494,7 +494,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var parentId = parentContactPreview != null ? parentContactPreview.Id : -1;
 
-                await Managers.ContactsManager.CreteOrUpdateContactAsync(contact, contactPreview, parentId);
+                await Managers.ContactsManager.CreateOrUpdateContactAsync(contact, contactPreview, parentId);
 
                 dismissAction();
 

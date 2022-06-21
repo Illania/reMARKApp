@@ -12,10 +12,12 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.Extensions;
+using Mark5.Mobile.IOS.Service;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Utilities;
+using TinyIoC;
 using TinyMessenger;
 using UIKit;
 
@@ -403,6 +405,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                     {
                         ((DataSource)TableView.Source).AppendItems(cps);
                     });
+                    var spotlightSearchManager = TinyIoCContainer.Current.Resolve<ISpotlightSearchManager>();
+                    spotlightSearchManager.AddOrUpdateContactsToIndex(cps);
+                    spotlightSearchManager.RemoveDeletedContactsFromIndex(cps);
                 },
                 () =>
                 {
@@ -565,6 +570,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
                 await Managers.CommonActionsManager.Delete(selectedContacts.Cast<IBusinessEntity>().ToList());
 
+                var spotlightSearchManager = TinyIoCContainer.Current.Resolve<ISpotlightSearchManager>();
+                spotlightSearchManager.DeleteContactsFromIndex(selectedContacts);
+          
                 RemoveContactsFromList(selectedContacts.Select(s => s.Id));
                 EndEditing();
 

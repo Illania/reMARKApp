@@ -9,10 +9,12 @@ using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.Extensions;
+using Mark5.Mobile.IOS.Service;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Utilities;
+using TinyIoC;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
@@ -243,12 +245,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 Contact = new Contact();
                 ContactPreview = new ContactPreview { Type = ContactType };
-                Contact.CommunicationAddresses?.Add(new CommunicationAddress(PreconfiguredEmailAddress.Address, CommunicationAddressType.Email));
+                if(PreconfiguredEmailAddress != null)
+                {
+                    Contact.CommunicationAddresses?.Add(new CommunicationAddress(PreconfiguredEmailAddress.Address, CommunicationAddressType.Email));
 
-                if (ContactPreview.Type == ContactType.Person)
-                    Contact.FirstName = PreconfiguredEmailAddress.Name;
-                else
-                    ContactPreview.Name = PreconfiguredEmailAddress.Name;
+                    if (ContactPreview.Type == ContactType.Person)
+                        Contact.FirstName = PreconfiguredEmailAddress.Name;
+                    else
+                        ContactPreview.Name = PreconfiguredEmailAddress.Name;
+                }
+                
             }
 
             ds.Refresh(Contact, ContactPreview, ParentContactPreview, CreationModeFlag, ParentPreselected);
@@ -326,7 +332,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 TableView.EndEditing(true);
                 var parentId = ParentContactPreview == null ? -1 : ParentContactPreview.Id;
-                await Managers.ContactsManager.CreteOrUpdateContactAsync(Contact, ContactPreview, parentId);
+                await Managers.ContactsManager.CreateOrUpdateContactAsync(Contact, ContactPreview, parentId);
+
+                var spotlightSearchManager = TinyIoCContainer.Current.Resolve<ISpotlightSearchManager>();
+                spotlightSearchManager.AddOrUpdateContactsToIndex(new List<ContactPreview> { ContactPreview });
 
                 dismissAction();
                 DismissViewController(true, null);
