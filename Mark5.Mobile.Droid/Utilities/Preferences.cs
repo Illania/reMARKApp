@@ -34,7 +34,7 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public bool LargeAttachmentWarning => sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_documents_large_attachment_warn), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_documents_large_attachment_warn_default));
 
-        public bool EnableMoveToFolder => sp.GetBoolean(Application.Context.GetString(Resource.String.pref_documents_enable_move_to_folder), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_documents_large_attachment_warn_default));
+        public bool EnableMoveToFolder => sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_documents_enable_move_to_folder), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_documents_enable_move_to_folder_default));
 
         public DocumentBodyTypeRequest DocumentBodyRequestType => sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_documents_download_as_plaintext), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_documents_download_as_plaintext_default)) ? DocumentBodyTypeRequest.PlainTextOnly : DocumentBodyTypeRequest.HtmlOnly;
 
@@ -309,7 +309,15 @@ namespace Mark5.Mobile.Droid.Utilities
             var selectArr = arr.Select(x => (EmailSwipeAction)Enum.Parse(typeof(EmailSwipeAction), x));
             return selectArr.ToList();
         }
-      
+
+        public List<EmailSwipeAction> GetEnabledActions()
+        {
+            var allAvailableActions = GetAllAvailableActions();
+            if (allAvailableActions.Contains(EmailSwipeAction.MoveToFolder) && !PlatformConfig.Preferences.EnableMoveToFolder)
+                allAvailableActions.Remove(EmailSwipeAction.MoveToFolder);
+            return allAvailableActions;
+        }
+
         public List<EmailSwipeAction> GetAvailableSwipeActions()
         {
             var exceptLeading = GetAllAvailableActions().Where(x =>
