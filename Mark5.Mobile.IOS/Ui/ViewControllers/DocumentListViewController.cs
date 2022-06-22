@@ -494,14 +494,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     EndEditing(TableView);
                 }));
 
-            if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
+            if (PlatformConfig.Preferences.EnableMoveToFolder
+                && (Folder.InternalType == FolderInternalType.FilterView
+                || Folder.InternalType == FolderInternalType.Static
+                || Folder.InternalType == FolderInternalType.Worktray))
+            {
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"),
-                    UIAlertActionStyle.Default,
-                    a =>
-                    {
-                        this.MoveToFolder((IBusinessEntity)selectedDocuments, Folder);
-                        EndEditing(TableView);
-                    }));
+                      UIAlertActionStyle.Default,
+                      a =>
+                      {
+                          this.MoveToFolder((IBusinessEntity)selectedDocuments, Folder);
+                          EndEditing(TableView);
+                      }));
+            }
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"), UIAlertActionStyle.Default, a => ShowPriorityActionSheet(selectedDocuments, (UIBarButtonItem)sender)));
 
