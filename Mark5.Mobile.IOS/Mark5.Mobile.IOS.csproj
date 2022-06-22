@@ -342,6 +342,8 @@
 		<Compile Include="Ui\ViewControllers\SearchResultsController.cs" />
 		<Compile Include="Ui\ViewControllers\DocumentListDataSource.cs" />
 		<Compile Include="Utilities\FileToFolderActions.cs" />
+		<Compile Include="Service\ISpotlightSearchManager.cs" />
+		<Compile Include="Service\SpotlightSearchManager.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
