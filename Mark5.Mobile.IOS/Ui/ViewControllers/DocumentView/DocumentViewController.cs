@@ -918,14 +918,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
                 }));
 
-            if (folder?.InternalType == FolderInternalType.FilterView || folder?.InternalType == FolderInternalType.Static || folder?.InternalType == FolderInternalType.Worktray)
+            if (PlatformConfig.Preferences.EnableMoveToFolder &&
+                (folder?.InternalType == FolderInternalType.FilterView
+                || folder?.InternalType == FolderInternalType.Static
+                || folder?.InternalType == FolderInternalType.Worktray))
+            {
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("move_to_folder"),
-                    UIAlertActionStyle.Default,
-                    a =>
-                    {
-                        var vc = new CopyMoveToFolderListViewController(ModuleType.Documents, new List<IBusinessEntity> { document }, folder);
-                        PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-                    }));
+                      UIAlertActionStyle.Default,
+                      a =>
+                      {
+                          var vc = new CopyMoveToFolderListViewController(ModuleType.Documents, new List<IBusinessEntity> { document }, folder);
+                          PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+                      }));
+            }
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"), UIAlertActionStyle.Default, a => ShowPriorityActionSheet((UIBarButtonItem)sender)));
 

@@ -51,8 +51,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var leftSwipeContainer = rootView.FindViewById(Resource.Id.left_swipe_container);
             if(leftSwipeContainer != null) {
                 leftSwipeContainer.Click += async (object sender, System.EventArgs e) => {
+
+
                     var option = await Dialogs.ShowSingleSelectDialogAsync(Context, 
-                                                                           Resource.String.swipe_actions_dialog_title,PlatformConfig.Preferences.GetAllAvailableActions(), 
+                                                                           Resource.String.swipe_actions_dialog_title,
+                                                                           PlatformConfig.Preferences.GetEnabledActions(), 
                                                                            PlatformConfig.Preferences.EmailLeadingSwipeAction, 
                                                                            null,
                                                                            (action) => { return GetActionTitle(action); });
@@ -68,7 +71,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 rigthSwipeContainer.Click += async (object sender, System.EventArgs e) => {
                     var option = await Dialogs.ShowSingleSelectDialogAsync(Context, 
                                                                            Resource.String.swipe_actions_dialog_title,
-                                                                           PlatformConfig.Preferences.GetAllAvailableActions(),
+                                                                           PlatformConfig.Preferences.GetEnabledActions(),
                                                                            PlatformConfig.Preferences.EmailTrailingSwipeAction,
                                                                            null,
                                                                            (action) => { return GetActionTitle(action); });

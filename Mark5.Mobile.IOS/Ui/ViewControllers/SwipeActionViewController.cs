@@ -676,14 +676,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     SetAction(senderBtn.Tag, EmailSwipeAction.SwipeAction.CopyToFolder);
                 }));
 
-
-            eas.AddAction(UIAlertAction.Create(
-                Localization.GetString("move_to_folder"),
-                UIAlertActionStyle.Default,
-                a =>
-                {
-                    SetAction(senderBtn.Tag, EmailSwipeAction.SwipeAction.MoveToFolder);
-                }));
+            if (PlatformConfig.Preferences.EnableMoveToFolder)
+            {
+                eas.AddAction(UIAlertAction.Create(
+                    Localization.GetString("move_to_folder"),
+                    UIAlertActionStyle.Default,
+                    a =>
+                    {
+                        SetAction(senderBtn.Tag, EmailSwipeAction.SwipeAction.MoveToFolder);
+                    }));
+            }
 
             eas.AddAction(UIAlertAction.Create(
                 Localization.GetString("set_priority"),

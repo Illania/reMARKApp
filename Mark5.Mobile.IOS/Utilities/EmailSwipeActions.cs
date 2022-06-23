@@ -35,18 +35,22 @@ namespace Mark5.Mobile.IOS.Utilities
             Action = ParseStringToSwipeAction(action);
         }
 
-        public static List<EmailSwipeAction> GetAllAvailableActions = new List<EmailSwipeAction>(new EmailSwipeAction[] {
-            new EmailSwipeAction(SwipeAction.MarkAsRead),
-            new EmailSwipeAction(SwipeAction.CopyToWorkTray),
-            new EmailSwipeAction(SwipeAction.CopyToFolder),
-            new EmailSwipeAction(SwipeAction.Categories),
-            new EmailSwipeAction(SwipeAction.MoveToFolder),
-            new EmailSwipeAction(SwipeAction.SetPriority),
-            new EmailSwipeAction(SwipeAction.RemoveFromFolder),
-            new EmailSwipeAction(SwipeAction.Delete),
-            new EmailSwipeAction(SwipeAction.SetPresetCategory),
-            new EmailSwipeAction(SwipeAction.AddBookmark)
-        });
+        public static List<EmailSwipeAction> GetAllAvailableActions()
+        {
+            List<EmailSwipeAction> list = new List<EmailSwipeAction>();
+            list.Add(new EmailSwipeAction(SwipeAction.MarkAsRead));
+            list.Add(new EmailSwipeAction(SwipeAction.CopyToWorkTray));
+            list.Add(new EmailSwipeAction(SwipeAction.CopyToFolder));
+            list.Add(new EmailSwipeAction(SwipeAction.Categories));
+            if (PlatformConfig.Preferences.EnableMoveToFolder)
+                list.Add(new EmailSwipeAction(SwipeAction.MoveToFolder));
+            list.Add(new EmailSwipeAction(SwipeAction.SetPriority));
+            list.Add(new EmailSwipeAction(SwipeAction.RemoveFromFolder));
+            list.Add(new EmailSwipeAction(SwipeAction.Delete));
+            list.Add(new EmailSwipeAction(SwipeAction.SetPresetCategory));
+            list.Add(new EmailSwipeAction(SwipeAction.AddBookmark));
+            return list;
+        }
 
         public string GetName() {
             return GetLocalizedName(Action);

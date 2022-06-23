@@ -611,8 +611,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             menu.Add(MenuItemGroup.Actions, MenuItemActions.CopyToFolder, MenuItemActions.CopyToFolder, Resource.String.copy_to_folder);
 
-            if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
+            if (PlatformConfig.Preferences.EnableMoveToFolder &&
+                (Folder.InternalType == FolderInternalType.FilterView
+                || Folder.InternalType == FolderInternalType.Static
+                || Folder.InternalType == FolderInternalType.Worktray))
+            {
                 menu.Add(MenuItemGroup.Actions, MenuItemActions.MoveToFolder, MenuItemActions.MoveToFolder, Resource.String.move_to_folder);
+            }
 
             menu.Add(MenuItemGroup.Actions, MenuItemActions.SetPriority, MenuItemActions.SetPriority, Resource.String.set_priority);
 
@@ -1714,6 +1719,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (dX > 0) //Swiping to right
                 {
                     Preferences.EmailSwipeAction action = PlatformConfig.Preferences.EmailLeadingSwipeAction;
+                    if (!CheckActionEnabled(action))
+                        return;
+
                     int bgColor = SwipeActionAllowed(action) ? Resource.Color.brown : Resource.Color.lightgray;
                     leftBackground = new ColorDrawable(new Color(ContextCompat.GetColor(context, bgColor)));
                     string text = GetSwipeActionTitle(action, viewHolder.AdapterPosition);
@@ -1731,6 +1739,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 else if (dX < 0)
                 {
                     Preferences.EmailSwipeAction action = PlatformConfig.Preferences.EmailTrailingSwipeAction;
+                    if (!CheckActionEnabled(action))
+                        return;
+
                     int bgColor = SwipeActionAllowed(action) ? Resource.Color.darkblue : Resource.Color.lightgray;
                     rightBackground = new ColorDrawable(new Color(ContextCompat.GetColor(context, bgColor)));
                     string text = GetSwipeActionTitle(action, viewHolder.AdapterPosition);
@@ -1761,14 +1772,25 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public override void OnSwiped(RecyclerView.ViewHolder viewHolder, int direction)
             {
                 ResetViewHolder(viewHolder, direction);
-                if (direction == ItemTouchHelper.Left)
+                switch (direction)
                 {
-                    SwipeActionSelected(PlatformConfig.Preferences.EmailTrailingSwipeAction, viewHolder.AdapterPosition);
+                    case ItemTouchHelper.Left:
+                        if (CheckActionEnabled(PlatformConfig.Preferences.EmailTrailingSwipeAction))
+                            SwipeActionSelected(PlatformConfig.Preferences.EmailTrailingSwipeAction, viewHolder.AdapterPosition);
+                        break;
+                    case ItemTouchHelper.Right:
+                        if (CheckActionEnabled(PlatformConfig.Preferences.EmailLeadingSwipeAction))
+                            SwipeActionSelected(PlatformConfig.Preferences.EmailLeadingSwipeAction, viewHolder.AdapterPosition);
+                        break;
                 }
-                else if (direction == ItemTouchHelper.Right)
-                {
-                    SwipeActionSelected(PlatformConfig.Preferences.EmailLeadingSwipeAction, viewHolder.AdapterPosition);
-                }
+            }
+
+            private bool CheckActionEnabled(Preferences.EmailSwipeAction swipeAction)
+            {
+                if (swipeAction == Preferences.EmailSwipeAction.MoveToFolder)
+                    return PlatformConfig.Preferences.EnableMoveToFolder;
+
+                return true;
             }
 
             void ResetViewHolder(RecyclerView.ViewHolder viewHolder, int direction)
