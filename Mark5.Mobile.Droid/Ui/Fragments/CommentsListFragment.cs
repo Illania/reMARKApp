@@ -173,6 +173,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             var comment = adapter.GetSelectedItem();
 
+            if (item.ItemId == MenuItemActions.CopyComment)
+            {
+                var cm = (ClipboardManager)Context.GetSystemService(Context.ClipboardService);
+                cm.PrimaryClip = ClipData.NewPlainText(comment.Content, comment.Content);
+                return true;
+            }
+
             if (item.ItemId == MenuItemActions.EditComment)
             {
                 var isEditable = DateTime.UtcNow.Subtract(comment.DateAddedTimestamp.ConvertTimestampMillisecondsToDateTime()).TotalSeconds <= SecondsToEdit;
@@ -196,6 +203,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var comment = adapter.GetSelectedItem();
             var isEditable = DateTime.UtcNow.Subtract(comment.DateAddedTimestamp.ConvertTimestampMillisecondsToDateTime()).TotalSeconds <= SecondsToEdit;
 
+            menu.Add(Menu.None, MenuItemActions.CopyComment, MenuItemActions.CopyComment, Resource.String.copy);
+
             if (isEditable)
                 menu.Add(Menu.None, MenuItemActions.EditComment, MenuItemActions.EditComment, Resource.String.edit);
 
@@ -204,8 +213,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         static class MenuItemActions
         {
-            public const int EditComment = 10;
-            public const int DeleteComment = 20;
+            public const int CopyComment = 10;
+            public const int EditComment = 20;
+            public const int DeleteComment = 30;
         }
 
         #endregion

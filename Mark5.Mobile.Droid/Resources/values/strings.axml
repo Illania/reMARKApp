@@ -74,6 +74,7 @@
     <string name="contacts">Contacts</string>
     <string name="continue_work">Continue</string>
     <string name="copied_to_clipboard">Copied to clipboard</string>
+    <string name="copy">Copy</string>
     <string name="copy_to_folder">Copy to folder</string>
     <string name="copy_to_worktray">Copy to To-do list</string>
     <string name="copy_to_worktray_multiline">Copy to\ntTo-do list</string>
