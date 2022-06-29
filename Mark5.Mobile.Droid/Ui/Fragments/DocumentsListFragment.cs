@@ -1486,7 +1486,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 {
                     Items.Sort();
                     foreach (var item in items)
-                        Items.AddSorted(item);
+                        if (!Items.Exists(k => k.Id == item.Id))
+                            Items.AddSorted(item);
                 }
                 else
                     Items.InsertRange(0, items);
@@ -1506,7 +1507,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var count = Items.Count;
                 Items.Sort();
                 foreach (var item in items)
-                    Items.AddSorted(item);
+                    if (!Items.Exists(k => k.Id == item.Id))
+                        Items.AddSorted(item);
                 NotifyItemRangeInserted(count, items.Count);
             }
 
