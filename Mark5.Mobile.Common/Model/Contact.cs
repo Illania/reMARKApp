@@ -39,7 +39,7 @@ namespace Mark5.Mobile.Common.Model
         public long BirthDateTimestamp { get; set; } = -1;
 
         [Column("Ledger")]
-        public string Ledger { get; set; }
+        public string Ledger { get; set; } = string.Empty;
 
         [Ignore]
         public ContactPreview PrimaryPerson { get; set; }
