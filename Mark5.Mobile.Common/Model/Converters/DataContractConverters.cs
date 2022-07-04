@@ -261,9 +261,9 @@ namespace Mark5.Mobile.Common.Model.Converters
             if (d.Lines != null)
                 result.Lines.AddRange(d.Lines.WhereNotNull().Select(Convert));
             if (d.ReadByUserIds != null)
-                result.ReadByUserIds.AddRange(d.ReadByUserIds);
+                result.ReadByUserIds.AddRange(d.ReadByUserIds.Where(id=> id > 0));
             if (d.ReadByUserNames != null)
-                result.ReadByUserNames = d.ReadByUserNames.Where(kv => !string.IsNullOrWhiteSpace(kv.Value)).ToDictionary(kv => kv.Key, kv => kv.Value);
+                result.ReadByUserNames = d.ReadByUserNames.Where(kv => !string.IsNullOrWhiteSpace(kv.Value) && kv.Key > 0).ToDictionary(kv => kv.Key, kv => kv.Value);
             if (d.Attachments != null)
                 result.Attachments.AddRange(d.Attachments.WhereNotNull().Select(Convert));
             if (d.Comments != null)
