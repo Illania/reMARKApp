@@ -1389,7 +1389,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 template.Attachments.ForEach(attachmentsView.AddAttachment);
         }
 
-        static async Task ProcessTemplate(Template template, DocumentPreview documentPreview)
+        async Task ProcessTemplate(Template template, DocumentPreview documentPreview)
         {
             var templateContent = template.Content;
 
@@ -1404,7 +1404,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if(templateContent.Contains("REF"))
             {
                 var docRef = await Managers.DocumentsManager.GetNewDocumentReferenceNumber(documentPreview);
-                documentPreview.ReferenceNumber = docRef;
+                this.documentPreview.ReferenceNumber = docRef;
             }
 
 
@@ -1419,7 +1419,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 templateContent = templateContent.Replace("&lt;COMPANYNAME&gt;", string.Empty);
                 templateContent = templateContent.Replace("&lt;FROMNAMEWITHCOMPANY&gt;", string.Empty);
 
-                templateContent = templateContent.Replace("&lt;REF&gt;", documentPreview.ReferenceNumber);
+                templateContent = templateContent.Replace("&lt;REF&gt;", this.documentPreview.ReferenceNumber);
             }
             else
             {
@@ -1432,7 +1432,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 templateContent = templateContent.Replace("<COMPANYNAME>", string.Empty);
                 templateContent = templateContent.Replace("<FROMNAMEWITHCOMPANY>", string.Empty);
 
-                templateContent = templateContent.Replace("<REF>", documentPreview.ReferenceNumber);
+                templateContent = templateContent.Replace("<REF>", this.documentPreview.ReferenceNumber);
             }
 
             template.Content = templateContent;
