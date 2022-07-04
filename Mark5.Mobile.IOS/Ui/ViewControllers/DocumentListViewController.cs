@@ -128,7 +128,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             CommonConfig.Logger.Info($"Starting automatic refresh...");
 
             autoRefreshWorker?.Stop();
-            autoRefreshWorker = new AutoRefreshWorker(AutoRefreshData, () => { return ((DocumentListDataSource)TableView.Source).Items.FirstOrDefault(); }, AutoRefreshIntervalMs);
+            autoRefreshWorker = new AutoRefreshWorker(AutoRefreshData, () => { return ((DocumentListDataSource)TableView.Source).Items.Aggregate((i1, i2) => i1.Id > i2.Id ? i1 : i2); }, AutoRefreshIntervalMs);
             autoRefreshWorker.Start();
 
             if (Integration.IsRunningAtLeast(11))

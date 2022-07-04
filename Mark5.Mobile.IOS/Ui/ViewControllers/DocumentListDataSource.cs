@@ -143,8 +143,9 @@ namespace Mark5.Mobile.IOS.Ui
                 if (PlatformConfig.Preferences.SortByDate)
                 {
                     Items.Sort();
-                    foreach (var i in documentPreviews)
-                        Items.AddSorted(i);
+                    foreach (var dp in documentPreviews)
+                        if(!Items.Exists(k=> k.Id == dp.Id))
+                            Items.AddSorted(dp);
                 }
                 else
                     Items.InsertRange(0, documentPreviews);
@@ -168,7 +169,8 @@ namespace Mark5.Mobile.IOS.Ui
             loading = false;
             Items.Sort();
             foreach (var documentPreview in documentPreviews)
-                Items.AddSorted(documentPreview);
+                if (!Items.Exists(k => k.Id == documentPreview.Id))
+                    Items.AddSorted(documentPreview);
             tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
         }
 
