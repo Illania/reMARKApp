@@ -362,6 +362,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
+        private void CopyCommentText(Comment comment)
+        {
+            UIPasteboard.General.String = comment.Content;
+        }
+
         #endregion
 
         #region Keyboard handling
@@ -501,6 +506,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     deleteAction.BackgroundColor = Theme.DarkerBlue;
                     actions.Add(deleteAction);
                 }
+
+                var copyAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Destructive,
+                                                               Localization.GetString("copy"),
+                                                               (a, ip) => viewControllerWeakReference.Unwrap()?.CopyCommentText(comment));
+                copyAction.BackgroundColor = Theme.DarkBlue;
+                actions.Add(copyAction);
 
                 return actions.ToArray();
             }
