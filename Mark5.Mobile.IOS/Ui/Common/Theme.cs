@@ -164,26 +164,29 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 };
             }
 
-            UINavigationBar.AppearanceWhenContainedIn(typeof(DarkNavigationController)).TintColor = LightGray;
+            UINavigationBar.AppearanceWhenContainedIn(typeof(DarkNavigationController)).TintColor = DarkerBlue;
             UINavigationBar.AppearanceWhenContainedIn(typeof(DarkNavigationController)).SetBackgroundImage(SolidColorImage(DarkerBlue), UIBarMetrics.Default);
             UINavigationBar.AppearanceWhenContainedIn(typeof(DarkNavigationController)).TitleTextAttributes = new UIStringAttributes
             {
-                ForegroundColor = LightGray,
-                Font = DefaultFont.CustomFont().WithRelativeSize(1f)
+                ForegroundColor = DarkerBlue,
+                Font = DefaultBoldFont.CustomFont().WithRelativeSize(1f)
             };
 
             UIBarButtonItem.Appearance.SetTitleTextAttributes(new UITextAttributes
             {
-                Font = DefaultFont.CustomFont()
+                Font = DefaultBoldFont.CustomFont(),
+                TextColor = DarkerBlue
             }, UIControlState.Normal);
+
             UIBarButtonItem.Appearance.SetTitleTextAttributes(new UITextAttributes
             {
-                Font = DefaultFont.CustomFont()
+                Font = DefaultBoldFont.CustomFont()
             }, UIControlState.Highlighted);
+
             UIBarButtonItem.Appearance.SetTitleTextAttributes(new UITextAttributes
             {
                 TextColor = DarkGray,
-                Font = DefaultFont.CustomFont()
+                Font = DefaultBoldFont.CustomFont()
             }, UIControlState.Disabled);
 
             UITabBarItem.Appearance.SetTitleTextAttributes(new UITextAttributes
