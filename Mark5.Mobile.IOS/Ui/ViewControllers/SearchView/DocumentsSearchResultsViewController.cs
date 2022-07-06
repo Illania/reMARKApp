@@ -28,6 +28,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
         UIBarButtonItem editItem;
         UIBarButtonItem closeItem;
         UIBarButtonItem closeLeftButton;
+        UIBarButtonItem backBarButton;
 
         TinyMessageSubscriptionToken readStatusChangedToken;
         TinyMessageSubscriptionToken commentsCountChangedToken;
@@ -153,6 +154,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             {
                 Title = Localization.GetString("close")
             };
+
+            backBarButton = new UIBarButtonItem();
+            backBarButton.SetTitleTextAttributes(new UITextAttributes() { TextColor = Theme.DarkerBlue }, UIControlState.Normal);
+            NavigationItem.BackBarButtonItem = backBarButton;
 
             if (!Integration.IsRunningAtLeast(13) && Integration.IsIPad())
                 NavigationItem.SetRightBarButtonItem(closeItem, false);
@@ -644,8 +649,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
         void EndEditing()
         {
             TableView.SetEditing(false, true);
-            NavigationItem.SetLeftBarButtonItem(NavigationItem.BackBarButtonItem, true);
             NavigationItem.SetRightBarButtonItem(null, true);
+            NavigationItem.SetLeftBarButtonItem(null, true);
+            NavigationItem.HidesBackButton = false;
+            NavigationItem.BackBarButtonItem = backBarButton;
 
             if (!Integration.IsRunningAtLeast(13) && Integration.IsIPad())
                 NavigationItem.SetRightBarButtonItem(closeItem, false);
