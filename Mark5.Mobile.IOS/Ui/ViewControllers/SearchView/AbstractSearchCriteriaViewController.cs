@@ -46,12 +46,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             {
                 Title = Localization.GetString("close")
             };
+            closeItem.SetTitleTextAttributes(new UITextAttributes() { TextColor = UIColor.White }, UIControlState.Normal);
             NavigationItem.SetLeftBarButtonItem(closeItem, false);
 
             resetItem = new UIBarButtonItem
             {
                 Title = Localization.GetString("reset")
             };
+            resetItem.SetTitleTextAttributes(new UITextAttributes() { TextColor = UIColor.White }, UIControlState.Normal);
             NavigationItem.SetRightBarButtonItem(resetItem, false);
 
             scrollView = new UIScrollView

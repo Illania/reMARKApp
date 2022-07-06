@@ -210,7 +210,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                 sendButton.SetTitleColor(Theme.DarkBlue, UIControlState.Normal);
                 sendButton.SetTitle(Localization.GetString("send"), UIControlState.Normal);
-                sendButton.Font = Theme.DefaultFont.CustomFont();
+                sendButton.Font = Theme.DefaultBoldFont.CustomFont();
 
 
                 sendButtonItem = new UIBarButtonItem
