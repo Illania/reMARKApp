@@ -14,7 +14,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         public override void Stop() { }
 
-        public async Task AddOrEditAppointment(AddEditAppointmentViewModel vm, AppointmentChangeType appointmentChangeType)
+        public async Task<int> AddOrEditAppointment(AddEditAppointmentViewModel vm, AppointmentChangeType appointmentChangeType, bool close = true)
         {
             var ca = vm.ConvertToModel(appointmentChangeType);
 
@@ -24,10 +24,12 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             {
                 CommonConfig.Logger.Info($"Adding or editing appointment: AppointmentId = {ca.Id}, CalendarId = {ca.CalendarId} ");
 
-                await Managers.CalendarManager.CreateOrUpdateCalendarAppointmentAsync(ca.CalendarId, ca, appointmentChangeType);
+                var id = await Managers.CalendarManager.CreateOrUpdateCalendarAppointmentAsync(ca.CalendarId, ca, appointmentChangeType);
 
                 view.StopEditingLoading();
-                view.CloseView();
+                if(close)
+                    view.CloseView();
+                return id;
             }
             catch (Exception ex)
             {
@@ -36,6 +38,8 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 view.StopEditingLoading();
 
                 await view.ShowEditingError(ex);
+
+                return 0;
             }
         }
 
@@ -74,6 +78,31 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 view.CloseView();
             }
         }
+
+        public async Task SendInvitationsClicked(LineViewModel lvm, int appointmentId)
+        {
+            view.ShowSendInvitationsDialog();
+
+            try
+            {
+                CommonConfig.Logger.Info($"Sending invitations for appointment with ID = {appointmentId}");
+
+                await Managers.CalendarManager.SendCalendarAppointmentInvitationsAsync(appointmentId, lvm.Guid);
+
+                view.CloseDialog();
+
+              
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Error while sending invitations for appointment with ID = {appointmentId} with line with GUID = {lvm.Guid}", ex);
+
+                view.CloseDialog();
+                await view.ShowSendInvitationError(ex);
+            }
+
+        }
+       
 
         public void LoadCalendarsList()
         {
@@ -284,7 +313,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         Task LoadEmptyAppointment(DateTime startDate);
         Task LoadAppointment(int calendarId, int appointmentId, int recurrenceIndex, AppointmentChangeType changeType);
         void LoadCalendarsList();
-        Task AddOrEditAppointment(AddEditAppointmentViewModel vm, AppointmentChangeType appointmentChangeType);
+        Task<int> AddOrEditAppointment(AddEditAppointmentViewModel vm, AppointmentChangeType appointmentChangeType, bool close);
     }
 
     public interface IAddEditAppointmentView : IView
@@ -298,8 +327,13 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         void StopLoading();
         Task ShowLoadError(Exception ex);
 
+        void ShowSendInvitationsDialog();
+        Task ShowSendInvitationError(Exception ex);
+        void CloseDialog();
+
         void ShowEditingLoading();
         void StopEditingLoading();
         Task ShowEditingError(Exception ex);
+        
     }
 }

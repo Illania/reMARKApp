@@ -13,6 +13,8 @@ using Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells;
 using Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppointmentTableViewCell;
 using Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView;
 using static Mark5.Mobile.IOS.Model.DateTimeChangeEvent;
+using Mark5.Mobile.Common.Manager;
+using Mark5.Mobile.Common;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 {
@@ -150,7 +152,34 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             var isValid = ((DataSource)TableView.Source).IsFormCorrect();
             viewModel.RecurrenceIndex = RecurrenceIndex;
             if (isValid)
-                await presenter.AddOrEditAppointment(viewModel, AppointmentChangeType);
+            {
+                var id = await presenter.AddOrEditAppointment(viewModel, AppointmentChangeType, false);
+
+                //ask if user wants to send invitations immediately
+                if (viewModel.Participants.Count > 0)
+                {
+                    var sendInvitations = await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("confirm_send_invitations_title"),
+                        Localization.GetString("confirm_send_invitations_content"));
+                    if (!sendInvitations)
+                    {
+                        CloseView();
+                        return;
+                    }
+                       
+                    var appointment = await Managers.CalendarManager.GetCalendarAppointmentAsync(viewModel.Calendar.Id, id, -1, SourceType.Remote);
+                    var lineViewModels = ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Select(LineViewModel.ConvertToViewModel).ToList();
+                    var lineNames = lineViewModels.Select(l => l.Name).ToArray();
+
+                    var result = await Dialogs.ShowListActionSheetWithTitleAsync(this, lineNames, TableView, Localization.GetString("select_line"));
+
+                    if (result >= 0)
+                        await presenter.SendInvitationsClicked(lineViewModels[result], id);
+
+                    CloseView();
+                }
+                else
+                    CloseView();              
+            }
             else
                 await Dialogs.ShowConfirmAlertAsync(this, "Cannot Save Event", "The start date must be before the end date");
         }
@@ -170,6 +199,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         }
 
         public async Task ShowLoadError(Exception ex)
+        {
+            await Dialogs.ShowErrorAlertAsync(this, ex);
+        }
+
+
+        public async Task ShowSendInvitationError(Exception ex)
         {
             await Dialogs.ShowErrorAlertAsync(this, ex);
         }
@@ -208,6 +243,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
         public void StopEditingLoading()
         {
             progressDialogDismissal?.Invoke();
+        }
+
+        public void CloseDialog()
+        {
+            progressDialogDismissal?.Invoke();
+        }
+
+        public void ShowSendInvitationsDialog()
+        {
+            progressDialogDismissal = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("sending_inviations__"));
         }
 
         #endregion
