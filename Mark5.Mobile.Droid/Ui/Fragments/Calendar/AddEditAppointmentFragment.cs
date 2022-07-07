@@ -15,6 +15,7 @@ using Mark5.Mobile.Common.Presenters.CalendarModule;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.CalendarViews.AddEditAppointmentViews;
 using CalendarView = Mark5.Mobile.Droid.Ui.Views.CalendarViews.AddEditAppointmentViews.CalendarView;
+using Mark5.Mobile.Common.Manager;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 {
@@ -204,7 +205,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             if (item.ItemId == MenuItemActions.SaveAppointment)
             {
                 viewModel.RecurrenceIndex = recurrenceIndex;
-                AddOrEditAppointment();
+                SaveAppointment();
                 return true;
             }
 
@@ -248,9 +249,32 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             endDateView.RefreshView();
         }
 
-        async void AddOrEditAppointment()
+        async void SaveAppointment()
         {
-            await presenter.AddOrEditAppointment(viewModel, (AppointmentChangeType)appointmentChangeType);
+            var id = await presenter.AddOrEditAppointment(viewModel, (AppointmentChangeType)appointmentChangeType, false);
+
+            //ask if user wants to send invitations immediately
+            if (viewModel.Participants.Count > 0)
+            {
+                var sendInvitations =  await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.confirm_send_invitations_title,
+                 Resource.String.confirm_send_invitations_content);
+                if (!sendInvitations)
+                {
+                    CloseView();
+                    return;
+                }
+
+                var appointment = await Managers.CalendarManager.GetCalendarAppointmentAsync(viewModel.Calendar.Id, id, -1, SourceType.Remote);
+                var lineViewModels = ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Select(LineViewModel.ConvertToViewModel).ToList();
+                var lineNames = lineViewModels.Select(l => l.Name).ToArray();
+                var result = await Dialogs.ShowListDialog(Context, Resource.String.select_a_line, lineNames, true);
+                if (result >= 0)
+                    await presenter.SendInvitationsClicked(lineViewModels[result], id);
+
+                CloseView();
+            }
+            else
+                CloseView();        
         }
 
         async void ReocurrenceClicked()
@@ -390,6 +414,23 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
         public Task ShowEditingError(Exception ex)
         {
             return Dialogs.ShowErrorDialogAsync(Context, ex);
+        }
+
+        public void CloseDialog()
+        {
+            dismissAction?.Invoke();
+            progressBar.Visibility = ViewStates.Gone;
+            scrollView.Visibility = ViewStates.Visible;
+        }
+
+        public void ShowSendInvitationsDialog()
+        {
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.sending_invitations, Resource.String.please_wait);
+        }
+
+        public async Task ShowSendInvitationError(Exception ex)
+        {
+            await Dialogs.ShowErrorDialogAsync(Context, ex);
         }
 
         #endregion

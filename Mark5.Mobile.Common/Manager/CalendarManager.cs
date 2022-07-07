@@ -90,7 +90,7 @@ namespace Mark5.Mobile.Common.Manager
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task<bool> CreateOrUpdateCalendarAppointmentAsync(int calendarId, CalendarAppointment calendarAppointment, AppointmentChangeType appointmentChangeType, SourceType sourceType = SourceType.Auto)
+        public async Task<int> CreateOrUpdateCalendarAppointmentAsync(int calendarId, CalendarAppointment calendarAppointment, AppointmentChangeType appointmentChangeType, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
@@ -115,7 +115,7 @@ namespace Mark5.Mobile.Common.Manager
                 else
                     CommonConfig.MessengerHub.Publish(new EntityAddedMessage(this, ObjectType.CalendarAppointment, calendarAppointment.Id));
 
-                return result.Updated;
+                return result.Id;
             }
 
             if (sourceType == SourceType.Local)
