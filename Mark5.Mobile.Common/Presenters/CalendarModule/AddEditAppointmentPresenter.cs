@@ -45,8 +45,9 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         public Task LoadEmptyAppointment(DateTime startDate)
         {
-            var preselectedCalendar = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars.First(c => !c.Shared)
-                ?? ServerConfig.SystemSettings.CalendarModuleInfo.Calendars.First();
+            var preselectedCalendar = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars.First(c => !c.Shared
+                    && !c.Owner.Equals(Guid.Empty) && ServerConfig.SystemSettings.UserInfo.User.Guid.Equals(c.Owner))
+                        ?? ServerConfig.SystemSettings.CalendarModuleInfo.Calendars.First();
 
             view.ShowAppointment(new AddEditAppointmentViewModel(startDate, ServerConfig.SystemSettings.UserInfo.User.Id)
             {

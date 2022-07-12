@@ -222,7 +222,11 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             {
                 calendarsList.ForEach(c => calendarsSelectedState.Add(c.Id, false));
 
-                var preselected = calendarsList.FirstOrDefault(c => !c.Shared) ?? calendarsList.FirstOrDefault();
+                var preselected =
+                    calendarsList.FirstOrDefault(c =>
+                        !c.Shared && !c.Owner.Equals(Guid.Empty) && ServerConfig.SystemSettings.UserInfo.User.Guid.Equals(c.Owner))
+                            ?? calendarsList.FirstOrDefault();
+
                 if (preselected != null)
                     calendarsSelectedState[preselected.Id] = true;
             }
@@ -317,7 +321,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 Id = ca.Id,
                 Name = ca.Name,
                 HexColor = ca.ColorHex,
-                Shared = ca.Shared,
+                Shared = ca.Shared
             };
         }
     }
