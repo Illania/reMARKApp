@@ -38,6 +38,8 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public DocumentBodyTypeRequest DocumentBodyRequestType => sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_documents_download_as_plaintext), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_documents_download_as_plaintext_default)) ? DocumentBodyTypeRequest.PlainTextOnly : DocumentBodyTypeRequest.HtmlOnly;
 
+        public bool UseMessageListAppearance => sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_use_message_list_appearance), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_use_message_list_appearance_default));
+
         public bool ConfirmationRemoveSwipe => sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_documents_confirm_remove), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_documents_confirm_remove_default));
 
         public int SendingDelay => int.Parse(sp.GetString(Application.Context.GetString(Resource.String.pref_key_sending_delay), Application.Context.Resources.GetString(Resource.String.pref_sending_delay_default)));
