@@ -94,7 +94,9 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         {
             if (this.calendarsSelectedState.Count == calendarsSelectedState.Count
                 && calendarsSelectedState.All((arg) => this.calendarsSelectedState[arg.Key] == arg.Value))
+            {
                 return;
+            }
 
             this.calendarsSelectedState.Clear();
             foreach (var k in calendarsSelectedState)
@@ -125,9 +127,15 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         void SubscribeToMessages()
         {
-            deletedAppointmentToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedMessage>(HandleDeletedAppointment, m => m.ObjectType == ObjectType.CalendarAppointment);
-            addedAppointmentToken = CommonConfig.MessengerHub.Subscribe<EntityAddedMessage>(HandleAddedAppointment, m => m.ObjectType == ObjectType.CalendarAppointment);
-            editedAppointmentToken = CommonConfig.MessengerHub.Subscribe<EntityChangedMessage>(HandleEditedAppointment, m => m.ObjectType == ObjectType.CalendarAppointment);
+            deletedAppointmentToken =
+                CommonConfig.MessengerHub.Subscribe<EntityRemovedMessage>(HandleDeletedAppointment,
+                    m => m.ObjectType == ObjectType.CalendarAppointment);
+            addedAppointmentToken =
+                CommonConfig.MessengerHub.Subscribe<EntityAddedMessage>(HandleAddedAppointment,
+                    m => m.ObjectType == ObjectType.CalendarAppointment);
+            editedAppointmentToken =
+                CommonConfig.MessengerHub.Subscribe<EntityChangedMessage>(HandleEditedAppointment,
+                    m => m.ObjectType == ObjectType.CalendarAppointment);
         }
 
         void UnsubscribeFromMessages()
@@ -161,19 +169,17 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         private void Cache_RetrievalError(object sender, Exception e)
         {
-            if (!shownRetrievalError)
-            {
-                firstLoad = false;
-                shownRetrievalError = true;
-                view.StopLoading();
-                view.ShowError(e);
-            }
+            if (shownRetrievalError)
+                return;
+            
+            firstLoad = false;
+            shownRetrievalError = true;
+            view.StopLoading();
+            view.ShowError(e);
         }
 
-        List<AppointmentPreviewViewModel> ConvertToViewModels(CalendarAppointment ca)
-        {
-            return AppointmentPreviewViewModel.ConvertToViewModels(ca, calendarsColor);
-        }
+        private List<AppointmentPreviewViewModel> ConvertToViewModels(CalendarAppointment ca)
+            => AppointmentPreviewViewModel.ConvertToViewModels(ca, calendarsColor);
 
         #endregion
 
@@ -208,15 +214,19 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         void UpdateCalendarsInView()
         {
-            view.CalendarsSelected(calendarsList.Where(c => calendarsSelectedState[c.Id]).Select(CalendarViewModel.ConvertToViewModel).ToList());
+            view.CalendarsSelected(calendarsList
+                .Where(c => calendarsSelectedState[c.Id])
+                .Select(CalendarViewModel.ConvertToViewModel).ToList());
         }
 
         void LoadPreferences()
         {
             if (Preferences.ContainsKey(SelectedCalendarsPreferencesKey))
             {
-                var selectedCalendarsId = Serializer.Deserialize<List<int>>(Preferences.Get(SelectedCalendarsPreferencesKey, string.Empty));
-                calendarsList.ForEach(c => calendarsSelectedState.Add(c.Id, selectedCalendarsId.Contains(c.Id)));
+                var selectedCalendarsId =
+                    Serializer.Deserialize<List<int>>(Preferences.Get(SelectedCalendarsPreferencesKey, string.Empty));
+                calendarsList.ForEach(
+                    c => calendarsSelectedState.Add(c.Id, selectedCalendarsId.Contains(c.Id)));
             }
             else
             {
@@ -235,7 +245,6 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
         void UpdatePreferences()
         {
             var selectedCalendarsId = calendarsSelectedState.Where(ca => ca.Value).Select(ca => ca.Key).ToList();
-
             Preferences.Set(SelectedCalendarsPreferencesKey, Serializer.Serialize(selectedCalendarsId));
         }
 
@@ -273,7 +282,8 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             return appViewModels;
         }
 
-        static AppointmentPreviewViewModel ConvertToViewModel(CalendarAppointment ca, CalendarAppointmentOccurrence cao, Dictionary<int, string> calendarColors)
+        static AppointmentPreviewViewModel ConvertToViewModel(CalendarAppointment ca,
+            CalendarAppointmentOccurrence cao, Dictionary<int, string> calendarColors)
         {
             var apv = new AppointmentPreviewViewModel
             {
@@ -303,7 +313,8 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         public override string ToString()
         {
-            return string.Format("[AppViewModel: Id={0}, CalendarId={1}, Start={2}, End={3}, Subject={4}, AllDay={5}]", Id, CalendarId, Start, End, Subject, AllDay);
+            return string.Format("[AppViewModel: Id={0}, CalendarId={1}, Start={2}, End={3}, Subject={4}, AllDay={5}]",
+                Id, CalendarId, Start, End, Subject, AllDay);
         }
     }
 

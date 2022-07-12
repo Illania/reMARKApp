@@ -23,22 +23,19 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             try
             {
                 CommonConfig.Logger.Info($"Adding or editing appointment: AppointmentId = {ca.Id}, CalendarId = {ca.CalendarId} ");
-
                 var id = await Managers.CalendarManager.CreateOrUpdateCalendarAppointmentAsync(ca.CalendarId, ca, appointmentChangeType);
-
                 view.StopEditingLoading();
-                if(close)
+
+                if (close)
                     view.CloseView();
+
                 return id;
             }
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error($"Error while adding or editing appointment: AppointmentId = {ca.Id}, CalendarId = {ca.CalendarId} ", ex);
-
                 view.StopEditingLoading();
-
                 await view.ShowEditingError(ex);
-
                 return 0;
             }
         }
@@ -66,16 +63,15 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                 if (ServerConfig.SystemSettings?.SystemInfo?.ChangeSingleOccurrenceAvailable != true)
                     recurrenceIndex = -1;
                 
-                var appointment = await Managers.CalendarManager.GetCalendarAppointmentAsync(calendarId, appointmentId, recurrenceIndex, SourceType.Local);
+                var appointment = await Managers.CalendarManager
+                    .GetCalendarAppointmentAsync(calendarId, appointmentId, recurrenceIndex, SourceType.Local);
 
                 view.ShowAppointment(AddEditAppointmentViewModel.ConvertToViewModel(appointment, recurrenceIndex, changeType));
             }
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error($"Error while getting appointment with ID = {appointmentId}", ex);
-
                 await view.ShowLoadError(ex);
-
                 view.CloseView();
             }
         }
@@ -87,17 +83,13 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             try
             {
                 CommonConfig.Logger.Info($"Sending invitations for appointment with ID = {appointmentId}");
-
                 await Managers.CalendarManager.SendCalendarAppointmentInvitationsAsync(appointmentId, lvm.Guid);
-
                 view.CloseDialog();
-
-              
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Error while sending invitations for appointment with ID = {appointmentId} with line with GUID = {lvm.Guid}", ex);
-
+                CommonConfig.Logger.Error($"Error while sending invitations for appointment with ID = " +
+                    $"{appointmentId} with line with GUID = {lvm.Guid}", ex);
                 view.CloseDialog();
                 await view.ShowSendInvitationError(ex);
             }
@@ -107,7 +99,8 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
 
         public void LoadCalendarsList()
         {
-            var calendars = ServerConfig.SystemSettings.CalendarModuleInfo.Calendars.Select(CalendarViewModel.ConvertToViewModel);
+            var calendars =
+                ServerConfig.SystemSettings.CalendarModuleInfo.Calendars.Select(CalendarViewModel.ConvertToViewModel);
             view.UpdateCalendarsList(calendars.ToList());
         }
     }
@@ -186,7 +179,9 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             if (appModel.AllDay)
             {
                 appModel.Start = occurrence.AllDayStartDate;
-                appModel.End = occurrence.StartDate.Date == occurrence.EndDate.Date ? occurrence.AllDayEndDate : occurrence.AllDayEndDate.AddDays(-1);
+                appModel.End = occurrence.StartDate.Date == occurrence.EndDate.Date
+                    ? occurrence.AllDayEndDate
+                    : occurrence.AllDayEndDate.AddDays(-1);
                 //Same not as for the appointment presenter
             }
             else
@@ -226,10 +221,12 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             if (ReminderTimeBeforeStart >= 0)
                 ca.ReminderAlertDate = Start.AddSeconds(-ReminderTimeBeforeStart);
 
+            //This is done to have the same endDate as in the service.
             if (RecurrenceInfo?.Range == RecurrenceRange.EndByDate)
-            {   //This is done to have the same endDate as in the service.
+            {   
                 var recEnd = RecurrenceInfo.EndDate;
-                ca.RecurrenceInfo.EndDate = new DateTime(recEnd.Year, recEnd.Month, recEnd.Day, End.Hour, End.Minute, End.Second, DateTimeKind.Utc);
+                ca.RecurrenceInfo.EndDate =
+                    new DateTime(recEnd.Year, recEnd.Month, recEnd.Day, End.Hour, End.Minute, End.Second, DateTimeKind.Utc);
             }
 
             if (Id < 0)
@@ -248,7 +245,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                     EndDate = Start.Date == End.Date ? endAllDay : endAllDay.AddDays(1),
                 };
 
-                if (appointmentChangeType == AppointmentChangeType.Occurence && RecurrenceIndex > -1 && RecurrenceInfo!=null)
+                if (appointmentChangeType == AppointmentChangeType.Occurence && RecurrenceIndex > -1 && RecurrenceInfo != null)
                 {
                     var startAllDay_ = DateTime.SpecifyKind(RecurrenceInfo.StartDate.Date, DateTimeKind.Utc);
                     var endAllDay_ = DateTime.SpecifyKind(RecurrenceInfo.EndDate.Date, DateTimeKind.Utc);
@@ -269,7 +266,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
                     EndDate = End,
                 };
 
-                if (appointmentChangeType == AppointmentChangeType.Occurence && RecurrenceIndex > -1 && RecurrenceInfo!=null)
+                if (appointmentChangeType == AppointmentChangeType.Occurence && RecurrenceIndex > -1 && RecurrenceInfo != null)
                 {
                     initialOccurrence = new CalendarAppointmentOccurrence
                     {
