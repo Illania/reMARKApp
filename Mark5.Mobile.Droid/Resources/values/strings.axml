@@ -17,7 +17,7 @@
     <string name="add_location">Add location</string>
     <string name="add_message">Add message</string>
         <string name="add_message_optional">Add message (optional)</string>
-    <string name="add_favorites">Add to favourites</string>
+    <string name="add_favorites">Add to favorites</string>
     <string name="add_offline">Enable sync</string>
     <string name="adding_comment">Adding comment</string>
     <string name="adding_extra_field">Adding extra field</string>

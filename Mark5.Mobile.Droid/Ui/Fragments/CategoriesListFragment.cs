@@ -6,9 +6,13 @@ using Android.Content;
 using Android.Graphics;
 using Android.Graphics.Drawables;
 using Android.OS;
+using Android.Support.V4.Content;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
+using Android.Support.V7.Widget.Helper;
+using Android.Text;
+using Android.Util;
 using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
@@ -38,11 +42,18 @@ namespace Mark5.Mobile.Droid
         CategoriesListAdapter ListAdapter;
         TinyMessageSubscriptionToken CategoriesEditedToken;
         CategoriesListAdapter CurrentAdapter => SearchEnabled ? SearchAdapter : ListAdapter;
-        List<Category> originalCategories = new List<Category>();
+
+        List<Category> originalCategories = new List<Category>(); // just to check if should save
         List<Category> selectedCategories = new List<Category>();
         List<Category> allCategories = new List<Category>();
         List<Category> availableCategories = new List<Category>();
+        List<Category> favoriteCategories = new List<Category>();
+        List<int> favoriteCategoriesIds = new List<int>();
+
         List<Section> Sections { get; set; }
+        
+        SwipeHelperCallback swipeHelperCallback;
+        ItemTouchHelper itemTouchHelper;
 
         Action dismissAction;
 
@@ -128,7 +139,7 @@ namespace Mark5.Mobile.Droid
             base.OnResume();
             CommonConfig.Logger.Info($"Refreshing {nameof(CategoriesListFragment)} [businessEntity.id={BusinessEntityPreview?.Id}, businessEntity.objectType={BusinessEntityPreview?.ObjectType}]");
             SetDefaultSections();
-            GetData();
+            RefreshDataAsync();
         }
 
         public override void OnDestroy()
@@ -146,11 +157,11 @@ namespace Mark5.Mobile.Droid
         protected virtual void SetDefaultSections()
         {
             CommonConfig.Logger.Info("Setting sections");
-            Sections = new List<Section> { Section.Selected, Section.Available };
+            Sections = new List<Section> { Section.Selected, Section.Favorite, Section.Available };
             ListAdapter.SetSections(Sections);
         }
 
-        async void GetData()
+        async void RefreshDataAsync()
         {
             RefreshLayout.Post(() => RefreshLayout.Refreshing = true);
 
@@ -161,6 +172,9 @@ namespace Mark5.Mobile.Droid
                     selectedCategories.AddRange(documentPreview.Categories);
                     originalCategories.AddRange(documentPreview.Categories);
                     allCategories = await Managers.DocumentsManager.GetAllCategoriesAsync(Restored ? SourceType.Local : SourceType.Auto);
+                    favoriteCategoriesIds = await Managers.CommonActionsManager.GetFavoriteCategories();
+                    if (favoriteCategoriesIds != null)
+                        favoriteCategories = availableCategories.Except(selectedCategories).Where(c => c != null && favoriteCategoriesIds.Contains(c.Id)).ToList();
                     break;
                 case ObjectType.Contact:
                     allCategories = await Managers.ContactsManager.GetAllCategoriesAsync(Restored ? SourceType.Local : SourceType.Auto);
@@ -172,16 +186,29 @@ namespace Mark5.Mobile.Droid
                     throw new ArgumentException("The business entity provided does not have categories in the model");
             }
 
-            availableCategories = allCategories.Where(x => !selectedCategories.Contains(x)).ToList();
-
-            ListAdapter.SetSectionData(selectedCategories, Section.Selected);
-            ListAdapter.SetSectionData(availableCategories, Section.Available);
+            ReloadTable();
 
             RefreshLayout.Post(() =>
             {
                 RefreshLayout.Refreshing = false;
                 RefreshLayout.Enabled = false;
             });
+        }
+
+        public void ReloadTable()
+        {
+
+            selectedCategories.Sort((x, y) => string.Compare(x.Name, y.Name, true));
+            ListAdapter.SetSectionData(selectedCategories, Section.Selected);
+
+            favoriteCategories.Sort((x, y) => string.Compare(x.Name, y.Name, true));
+            ListAdapter.SetSectionData(favoriteCategories, Section.Favorite);
+
+            var _availableCategories = new List<Category>();
+            _availableCategories = availableCategories.Except(selectedCategories.Union(favoriteCategories)).ToList();
+            _availableCategories.Sort((x, y) => string.Compare(x.Name, y.Name, true));
+            ListAdapter.SetSectionData(_availableCategories, Section.Available);
+
         }
 
         void SubscribeToMessages()
@@ -258,12 +285,14 @@ namespace Mark5.Mobile.Droid
             }
         }
 
+        public bool IsFavorite(Category category) => favoriteCategoriesIds.Contains(category.Id);
+
         protected virtual void Adapter_ItemClicked(object sender, int position)
         {
             var (category, section) = CurrentAdapter.GetItemAtPosition(position);
             MoveCategory(section, category);
 
-            if (CurrentAdapter is SearchCategoriesAdapter adapter)
+            if (CurrentAdapter is SearchCategoriesAdapter)
             {
                 CloseSearch();
                 var filterItem = menu?.FindItem(Resource.Id.action_filter);
@@ -275,15 +304,27 @@ namespace Mark5.Mobile.Droid
             }
             else
             {
-                if (section == Section.Available)
+                var itemAlreadySelected = CurrentAdapter.ItemExists(section, category);
+                var shouldInsertToSelected = !itemAlreadySelected;
+
+                //if we move from Selected to Available or Favorite
+                if (section == Section.Selected)
+                {
+                    CurrentAdapter.RemoveItem(section, category);
+                    var sectionWhereToMove = IsFavorite(category) ? Section.Favorite : Section.Available;
+                    CurrentAdapter.AppendItem(sectionWhereToMove, category);
+                }
+                //if we move from Available to Selected
+                else if (shouldInsertToSelected && section == Section.Available)
                 {
                     CurrentAdapter.RemoveItem(section, category);
                     CurrentAdapter.AppendItem(Section.Selected, category);
                 }
-                else
+                //if we move from Favorite to Selected
+                else if (shouldInsertToSelected && section == Section.Favorite)
                 {
                     CurrentAdapter.RemoveItem(section, category);
-                    CurrentAdapter.AppendItem(Section.Available, category);
+                    CurrentAdapter.AppendItem(Section.Selected, category);
                 }
             }
         }
@@ -295,16 +336,93 @@ namespace Mark5.Mobile.Droid
 
             if (section == Section.Available || section == Section.None)
             {
-                selectedCategories.Add(category);
-                availableCategories.Remove(category);
+                if(availableCategories.Contains(category))
+                {
+                    availableCategories.Remove(category);
+                    selectedCategories.Add(category);
+                    selectedCategories.Sort((x, y) => string.Compare(x.Name, y.Name, true));
+                }
+            }
+
+            if (section == Section.Favorite || section == Section.None)
+            {
+                if (favoriteCategories.Contains(category))
+                {
+                    favoriteCategories.Remove(category);
+                    selectedCategories.Add(category);
+                    selectedCategories.Sort((x, y) => string.Compare(x.Name, y.Name, true));
+                }
             }
 
             if (section == Section.Selected)
             {
-                selectedCategories.Remove(category);
-                availableCategories.Add(category);
+
+                if(selectedCategories.Contains(category))
+                {
+                    selectedCategories.Remove(category);
+                    var listWhereToAdd = IsFavorite(category) ? favoriteCategories : availableCategories;
+                    listWhereToAdd.Add(category);
+                    listWhereToAdd.Sort((x, y) => string.Compare(x.Name, y.Name, true));
+                }          
             }
         }
+
+        async void AddToFavorites(Category category)
+        {
+            try
+            {
+                CommonConfig.Logger.Info($"Attempting to add category with id={category.Id} to favorites");
+                await Managers.CommonActionsManager.AddFavoriteCategory(category.Id);
+
+                await RefreshFavorites();
+
+            }
+            catch (Exception ex)
+            {
+
+                CommonConfig.Logger.Error($"Error while adding category to favorites", ex);
+
+            }
+        }
+
+        async void RemoveFromFavorites(Category category)
+        {
+            try
+            {
+                CommonConfig.Logger.Info($"Attempting to remove category with id={category.Id} from favorites");
+                await Managers.CommonActionsManager.RemoveFavoriteCategory(category.Id);
+
+                await RefreshFavorites();
+
+            }
+            catch (Exception ex)
+            {
+
+                CommonConfig.Logger.Error($"Error while removing category from favorites", ex);
+
+            }
+        }
+  
+        public async Task RefreshFavorites()
+        {
+            try
+            {
+                allCategories = BusinessEntityPreview is DocumentPreview documentPreview
+                    ? await Managers.DocumentsManager.GetAllCategoriesAsync()
+                    : await Managers.ContactsManager.GetAllCategoriesAsync();
+                var favoriteCategoriesIds = await Managers.CommonActionsManager.GetFavoriteCategories();
+                if (favoriteCategoriesIds != null)
+                    favoriteCategories = allCategories.Except(selectedCategories).Where(c => c != null && favoriteCategoriesIds.Contains(c.Id)).ToList();
+
+            }
+            catch (Exception ex)
+            {
+                await Dialogs.ShowErrorDialogAsync(Context, ex);
+            }
+
+            ReloadTable();
+        }
+
 
         #region ActionBar related
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
@@ -455,7 +573,7 @@ namespace Mark5.Mobile.Droid
 
             public override int GetItemViewType(int position)
             {
-                return SectionsPositionToSection().ContainsKey(position) ? ViewType.SectionView : ViewType.CategotyView;
+                return SectionsPositionToSection().ContainsKey(position) ? ViewType.SectionView : ViewType.CategoryView;
             }
 
             public (Category Category, Section Section) GetItemAtPosition(int position)
@@ -503,7 +621,7 @@ namespace Mark5.Mobile.Droid
 
             public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
             {
-                if (viewType == ViewType.CategotyView)
+                if (viewType == ViewType.CategoryView)
                 {
                     var itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.list_item_categories, parent, false);
                     var viewHolder = new CategoryViewHolder(itemView);
@@ -561,6 +679,12 @@ namespace Mark5.Mobile.Droid
                     }
 
                 return position;
+            }
+
+
+            public bool ItemExists(Section section, Category category)
+            {
+                return categoriesInSection[section].Contains(category);
             }
 
             public void RemoveItem(Section section, Category category)
@@ -723,17 +847,169 @@ namespace Mark5.Mobile.Droid
 
         static class ViewType
         {
-            internal static readonly int CategotyView = 0;
+            internal static readonly int CategoryView = 0;
             internal static readonly int SectionView = 1;
         }
 
         public enum Section
         {
             Selected,
+            Favorite,
             Available,
             None
         }
 
         #endregion
+
+        class SwipeHelperCallback : ItemTouchHelper.Callback
+        {
+            public bool Enabled { get; set; } = true;
+
+            readonly Context context;
+            readonly CategoriesListAdapter adapter;
+            readonly CategoriesListFragment fragment;
+            readonly SwipeRefreshLayout refreshLayout;
+            Drawable rightBackground;
+
+            public SwipeHelperCallback(Context context, CategoriesListFragment fragment, CategoriesListAdapter adapter,
+                SwipeRefreshLayout refreshLayout)
+            {
+                this.context = context;
+                this.fragment = fragment;
+                this.adapter = adapter;
+                this.refreshLayout = refreshLayout;
+            }
+
+            public override int GetMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder)
+            {
+                if (!Enabled)
+                    return MakeMovementFlags(0, 0);
+
+                return MakeMovementFlags(0, ItemTouchHelper.Left | ItemTouchHelper.Right);
+            }
+
+            public override bool OnMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target)
+            {
+                return false;
+            }
+
+            public override void OnSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState)
+            {
+                base.OnSelectedChanged(viewHolder, actionState);
+
+                refreshLayout.Enabled = actionState == ItemTouchHelper.ActionStateIdle;
+            }
+
+            public override void OnChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, bool isCurrentlyActive)
+            {
+
+                if (actionState != ItemTouchHelper.ActionStateSwipe || viewHolder.AdapterPosition == -1) //Sometimes it gets called for viewHolders that are already gone
+                    return;
+
+                var itemView = viewHolder.ItemView;
+                var itemViewHeight = itemView.Bottom - itemView.Top;
+
+                var paint = new TextPaint
+                {
+                    TextSize = (int)TypedValue.ApplyDimension(ComplexUnitType.Sp, 14, Android.App.Application.Context.Resources.DisplayMetrics),
+                    Color = Color.White,
+                    TextAlign = Paint.Align.Left
+                };
+                paint.SetTypeface(Typeface.Create(Typeface.Default, TypefaceStyle.Normal));
+
+                var iconMargin = Conversion.ConvertDpToPixels(30);
+
+                var baseline = -paint.Ascent();
+                var textHeight = (int)(baseline + paint.Descent() + 0.5f);
+
+                if (dX < 0)
+                {
+                    var (category, section) = adapter.GetItemAtPosition(viewHolder.AdapterPosition);
+                    var action = section == Section.Available ? Preferences.CategoriesSwipeAction.AddToFavorites : Preferences.CategoriesSwipeAction.RemoveFromFavorites;
+                    int bgColor = Resource.Color.darkblue;
+                    rightBackground = new ColorDrawable(new Color(ContextCompat.GetColor(context, bgColor)));
+                    string text = GetSwipeActionTitle(action);
+                    rightBackground.SetBounds(itemView.Right + (int)dX, itemView.Top, itemView.Right, itemView.Bottom);
+                    rightBackground.Draw(c);
+                    var textLayout = new StaticLayout(text, paint, c.Width, Layout.Alignment.AlignNormal, 1, 0, false);
+                    var iconWidth = text.Split(new string[]
+                            {
+                            "\n"
+                            },
+                            StringSplitOptions.None)
+                        .Select(s => (int)(paint.MeasureText(s) + 0.5f))
+                        .Max();
+
+                    var textRight = itemView.Right - iconMargin;
+                    var textLeft = textRight - iconWidth;
+                    var textTop = itemView.Top + (itemViewHeight - textHeight) / 2;
+
+                    c.Save();
+                    c.Translate(textLeft, textTop);
+                    textLayout.Draw(c);
+                    c.Restore();
+                }
+
+                base.OnChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+            }
+
+
+            public override void OnSwiped(RecyclerView.ViewHolder viewHolder, int direction)
+            {
+                ResetViewHolder(viewHolder, direction);
+                if (direction == ItemTouchHelper.Left)
+                {
+                    SwipeActionSelected(Preferences.CategoriesSwipeAction.AddToFavorites, viewHolder.AdapterPosition);
+                }
+            }
+
+            void ResetViewHolder(RecyclerView.ViewHolder viewHolder, int direction)
+            {
+                var position = viewHolder.AdapterPosition;
+                var view = viewHolder.ItemView;
+
+                viewHolder.ItemView.TranslationX = 0;
+                viewHolder.ItemView.TranslationY = 0;
+
+                adapter.NotifyItemChanged(position);
+            }
+
+            async void SwipeActionSelected(Preferences.CategoriesSwipeAction action, int adapterPosition)
+            {
+                CommonConfig.UsageAnalytics.LogEvent(new SwipeActionUsedEvent());
+
+
+                switch (action)
+                {
+                    case Preferences.CategoriesSwipeAction.AddToFavorites:
+                        fragment.AddToFavorites(adapter.GetItemAtPosition(adapterPosition).Category);
+                        break;
+                    case Preferences.CategoriesSwipeAction.RemoveFromFavorites:
+                        fragment.RemoveFromFavorites(adapter.GetItemAtPosition(adapterPosition).Category);
+                        break;
+                }
+                       
+
+            }
+
+            string GetSwipeActionTitle(Preferences.CategoriesSwipeAction action)
+            {
+                switch (action)
+                {
+                    case Preferences.CategoriesSwipeAction.AddToFavorites:
+                        return context.Resources.GetString(Resource.String.add_favorites);
+                    case Preferences.CategoriesSwipeAction.RemoveFromFavorites:
+                        return context.Resources.GetString(Resource.String.remove_favorites);
+                    default:
+                        return "Forgot case ?";
+                }
+            }
+
+
+        }
+
+      
     }
+
+
 }

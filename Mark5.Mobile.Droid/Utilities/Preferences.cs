@@ -411,6 +411,14 @@ namespace Mark5.Mobile.Droid.Utilities
         }
         #endregion
 
+        #region Categories swipe actions
+        public enum CategoriesSwipeAction
+        {
+            AddToFavorites,
+            RemoveFromFavorites
+        }
+        #endregion
+
         #region Folders favorites
 
         public bool SyncFavoritesEnabled
