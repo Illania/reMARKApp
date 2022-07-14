@@ -314,7 +314,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.dialog_update_config_title, Resource.String.please_wait);
                 Task.Run(async () =>
                 {
-                    TinyIoCContainer.Current.Resolve<IPushNotificationsRegistrator>().DeleteToken();
 
                     try
                     {

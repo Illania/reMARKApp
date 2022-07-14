@@ -84,6 +84,9 @@
     <string name="pref_documents_download_as_plaintext_summary_off">Email content will be downloaded in HTML format.</string>
     <string name="pref_documents_download_as_plaintext_summary_on">Email content will be downloaded in plain text format.</string>
     <string name="pref_documents_download_as_plaintext_title">View emails in plain text</string>
+    <string name="pref_use_message_list_appearance_title">Use message list appearance</string>
+    <string name="pref_use_message_list_appearance_summary_on">Email list will have custom appearance according to reMARK user settings</string>
+    <string name="pref_use_message_list_appearance_summary_off">Email list will have default appearancce</string>
     <string name="pref_documents_enable_move_to_folder_title">Enable move to folder</string>
     <string name="pref_documents_enable_move_to_folder_summary">Enable or disable Move to folder action</string>
     <string name="pref_documents_large_attachment_warn_summary_off">Do not show warning before downloading large attachment over metered connections</string>
@@ -102,7 +105,7 @@
     <string name="pref_documents_use_server_timezone_summary_on">Dates will be shown according to server\'s timezone.</string>
     <string name="pref_documents_show_creator_outgoing_title">Show creator on outgoing emails</string>
     <string name="pref_documents_show_creator_outgoing_summary_off">The recipients\'s addresses will be shown in the preview of outgoing emails.</string>
-    <string name="pref_documents_show_creator_outgoing_summary_on">The creator will be shown in preview of outgoing emails.</string>
+    <string name="pref_documents_show_creator_outgoing_summary_on">The creator will be shown in preview of outgoing emails.</string> 
     <string name="pref_key_about_privacy_policy">pref_key_about_privacy_policy</string>
     <string name="pref_key_about_send_feedback">pref_key_advanced_send_feedback</string>
     <string name="pref_key_about_version">pref_key_about_version</string>
@@ -169,6 +172,7 @@
     <string name="pref_key_search_partial_word">pref_key_search_partial_word</string>
     <string name="pref_key_email_leading_swipe_action">pref_key_email_leading_swipe_action</string>
     <string name="pref_key_email_trailing_swipe_action">pref_key_email_trailing_swipe_action</string>
+    <string name="pref_key_use_message_list_appearance">pref_key_use_message_list_appearance</string>
     <string name="pref_notification_hide_read_summary_off">Do not hide read notifications in the list</string>
     <string name="pref_notification_hide_read_summary_on">Do not show read notifications in the list</string>
     <string name="pref_notification_hide_read_title">Hide read notifications</string>

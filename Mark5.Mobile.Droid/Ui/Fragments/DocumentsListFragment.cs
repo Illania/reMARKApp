@@ -1312,6 +1312,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public List<DocumentPreview> SelectedItems => selectedDocumentsInView.Values.ToList();
 
+            readonly bool useMessageListAppearance = PlatformConfig.Preferences.UseMessageListAppearance;
+
             public int SelectedItemCount => selectedDocumentsInView.Count;
 
             public bool EnableLoadMore { get; set; }
@@ -1411,6 +1413,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     }
 
                     dpvh.Selected = selectedDocumentsInView.ContainsKey(dp.Id);
+                    if (useMessageListAppearance)
+                        InitializeMessageListAppearance(dp, dpvh);
                     InitializeBookmarkAppearance(dp, FolderId, dpvh);
 
                 }
@@ -1433,6 +1437,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     edpvh.PriorityLowIndicator = dp.Priority == Priority.Low;
 
                     edpvh.Selected = selectedDocumentsInView.ContainsKey(dp.Id);
+
+                    if (useMessageListAppearance)
+                        InitializeMessageListAppearance(dp, edpvh);
+
                     InitializeBookmarkAppearance(dp, FolderId, edpvh);
                 }
 
@@ -1444,21 +1452,106 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
 
+            void InitializeMessageListAppearance(DocumentPreview dp, DocumentPreviewViewHolder cell)
+            {
+                //apply default appearance
+                var defaultAppearance = ServerConfig.SystemSettings.DocumentsModuleInfo.DefaultAppearance;
+                var daReadColor = new Color(defaultAppearance.FontColor);
+                var daUnreadColor = new Color(defaultAppearance.UnreadFontColor);
+
+                if (defaultAppearance.FontColorEnable)
+                    cell.SetTextColor(daReadColor);
+       
+                if (defaultAppearance.UnreadFontColorEnable)
+                    cell.SetTextColor(dp.IsReadByCurrent ? daReadColor : daUnreadColor);
+
+                //if row appearance depends from line use line appearance           
+                var lineAppearance = ServerConfig.SystemSettings.DocumentsModuleInfo.LineAppearances.FirstOrDefault(la => dp.Lines.Any(l => l.Guid == la.OriginatorGid));
+                if (lineAppearance != null && lineAppearance.Enable)
+                {
+                    var laReadColor = new Color(lineAppearance.FontColor); 
+                    var laUnreadColor = new Color(lineAppearance.UnreadFontColor);
+                    var laBgColor = new Color(lineAppearance.BackgroundColor);
+                    cell.ItemView.SetBackgroundColor(laBgColor);
+                    if (defaultAppearance.FontColorEnable)
+                        cell.SetTextColor(laReadColor);
+                    if (defaultAppearance.UnreadFontColorEnable)
+                        cell.SetTextColor(dp.IsReadByCurrent ? laReadColor : laUnreadColor);
+
+                }
+
+                //if row appearance depends from user use user appearance           
+                var userAppearance = ServerConfig.SystemSettings.DocumentsModuleInfo.UserAppearances.FirstOrDefault(la => dp.CreatorGuid == la.OriginatorGid);
+                if (userAppearance != null && userAppearance.Enable)
+                {
+                    var uaReadColor = new Color(userAppearance.FontColor);
+                    var uaUnreadColor = new Color(userAppearance.UnreadFontColor);
+                    var uaBgColor = new Color(userAppearance.BackgroundColor);
+                    cell.ItemView.SetBackgroundColor(uaBgColor);
+                    if (defaultAppearance.FontColorEnable)
+                        cell.SetTextColor(uaReadColor);
+                    if (defaultAppearance.UnreadFontColorEnable)
+                        cell.SetTextColor(dp.IsReadByCurrent ? uaReadColor : uaUnreadColor);
+                }
+            }
+
+            void InitializeMessageListAppearance(DocumentPreview dp, ExternalDocumentPreviewViewHolder cell)
+            {
+                //apply default appearance
+                var defaultAppearance = ServerConfig.SystemSettings.DocumentsModuleInfo.DefaultAppearance;
+                var daReadColor = new Color(defaultAppearance.FontColor);
+                var daUnreadColor = new Color(defaultAppearance.UnreadFontColor);
+
+                if (defaultAppearance.FontColorEnable)
+                    cell.SetTextColor(daReadColor);
+
+                if (defaultAppearance.UnreadFontColorEnable)
+                    cell.SetTextColor(dp.IsReadByCurrent ? daReadColor : daUnreadColor);
+
+                //if row appearance depends from line use line appearance           
+                var lineAppearance = ServerConfig.SystemSettings.DocumentsModuleInfo.LineAppearances.FirstOrDefault(la => dp.Lines.Any(l => l.Guid == la.OriginatorGid));
+                if (lineAppearance != null && lineAppearance.Enable)
+                {
+                    var laReadColor = new Color(lineAppearance.FontColor);
+                    var laUnreadColor = new Color(lineAppearance.UnreadFontColor);
+                    var laBgColor = new Color(lineAppearance.BackgroundColor);
+                    cell.ItemView.SetBackgroundColor(laBgColor);
+                    if (defaultAppearance.FontColorEnable)
+                        cell.SetTextColor(laReadColor);
+                    if (defaultAppearance.UnreadFontColorEnable)
+                        cell.SetTextColor(dp.IsReadByCurrent ? laReadColor : laUnreadColor);
+
+                }
+
+                //if row appearance depends from user use user appearance           
+                var userAppearance = ServerConfig.SystemSettings.DocumentsModuleInfo.UserAppearances.FirstOrDefault(la => dp.CreatorGuid == la.OriginatorGid);
+                if (userAppearance != null && userAppearance.Enable)
+                {
+                    var uaReadColor = new Color(userAppearance.FontColor);
+                    var uaUnreadColor = new Color(userAppearance.UnreadFontColor);
+                    var uaBgColor = new Color(userAppearance.BackgroundColor);
+                    cell.ItemView.SetBackgroundColor(uaBgColor);
+                    if (defaultAppearance.FontColorEnable)
+                        cell.SetTextColor(uaReadColor);
+                    if (defaultAppearance.UnreadFontColorEnable)
+                        cell.SetTextColor(dp.IsReadByCurrent ? uaReadColor : uaUnreadColor);
+                }
+            }
+
             void InitializeBookmarkAppearance(DocumentPreview dp, int folderId, DocumentPreviewViewHolder cell)
             {
                 if (PlatformConfig.Preferences.HasBookmarkForFolder(folderId, dp.Id))
                     cell.ItemView.SetBackgroundColor(new Color(ContextCompat.GetColor(context, Resource.Color.brown)));
-                else
-                    cell.ItemView.SetBackgroundColor(new Color(ContextCompat.GetColor(context, Resource.Color.white)));
+
             }
 
             void InitializeBookmarkAppearance(DocumentPreview dp, int folderId, ExternalDocumentPreviewViewHolder cell)
             {
                 if (PlatformConfig.Preferences.HasBookmarkForFolder(folderId, dp.Id))
                     cell.ItemView.SetBackgroundColor(new Color(ContextCompat.GetColor(context, Resource.Color.brown)));
-                else
-                    cell.ItemView.SetBackgroundColor(new Color(ContextCompat.GetColor(context, Resource.Color.white)));
             }
+
+            
 
 
             public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
@@ -2030,6 +2123,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
 
+            public void SetTextColor(Color color)
+            {
+                recipentTextView.SetTextColor(color);
+                subjectTextView.SetTextColor(color);
+                previewTextView.SetTextColor(color);
+            }
+
             readonly AppCompatTextView recipentTextView;
             readonly AppCompatTextView dateTextView;
             readonly AppCompatTextView subjectTextView;
@@ -2134,6 +2234,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         itemContent.Visibility = ViewStates.Visible;
                     }
                 }
+            }
+
+            public void SetTextColor(Color color)
+            {
+                nameTextView.SetTextColor(color);
+                previewTextView.SetTextColor(color);
             }
 
             readonly AppCompatTextView nameTextView;

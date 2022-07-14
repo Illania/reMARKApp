@@ -284,7 +284,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 InitializePriorityIndicator(dp);
             }
             if (useMessageListAppearance)
-                InitializeMesageListAppearance(dp);
+                InitializeMessageListAppearance(dp);
         }
 
         void InitializeCategories(DocumentPreview dp)
@@ -403,7 +403,12 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             directionIndicatorImageView.Image = image;
         }
 
-        void InitializeMesageListAppearance(DocumentPreview dp)
+        void SetTextColor(UIColor color)
+        {
+            bottomLabel.TextColor = topLabel.TextColor = middleLabel.TextColor = color;
+        }
+
+        void InitializeMessageListAppearance(DocumentPreview dp)
         {
             //apply default appearance
             var defaultAppearance = ServerConfig.SystemSettings.DocumentsModuleInfo.DefaultAppearance;
@@ -411,9 +416,9 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             var daUnreadColor = Color.FromArgb(defaultAppearance.UnreadFontColor).ToPlatformColor();
 
             if (defaultAppearance.FontColorEnable)
-                bottomLabel.TextColor = Color.FromArgb(defaultAppearance.FontColor).ToPlatformColor();
+                SetTextColor(daReadColor);
             if(defaultAppearance.UnreadFontColorEnable)
-                bottomLabel.TextColor = dp.IsReadByCurrent ? daReadColor : daUnreadColor;          
+                SetTextColor(dp.IsReadByCurrent ? daReadColor : daUnreadColor);          
 
             //if row appearance depends from line use line appearance           
             var lineAppearance = ServerConfig.SystemSettings.DocumentsModuleInfo.LineAppearances.FirstOrDefault(la => dp.Lines.Any(l => l.Guid == la.OriginatorGid));
@@ -422,11 +427,11 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
                 var laReadColor = Color.FromArgb(lineAppearance.FontColor).ToPlatformColor();
                 var laUnreadColor = Color.FromArgb(lineAppearance.UnreadFontColor).ToPlatformColor();
                 var laBgColor = Color.FromArgb(lineAppearance.BackgroundColor).ToPlatformColor();
-                bottomLabel.BackgroundColor = laBgColor;
+                BackgroundColor = laBgColor;
                 if (defaultAppearance.FontColorEnable)
-                    bottomLabel.TextColor = Color.FromArgb(defaultAppearance.FontColor).ToPlatformColor();
+                    SetTextColor(laReadColor);
                 if (defaultAppearance.UnreadFontColorEnable)
-                    bottomLabel.TextColor = dp.IsReadByCurrent ? laReadColor : laUnreadColor;
+                    SetTextColor(dp.IsReadByCurrent ? laReadColor : laUnreadColor);
 
             }
 
@@ -434,15 +439,14 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
             var userAppearance = ServerConfig.SystemSettings.DocumentsModuleInfo.UserAppearances.FirstOrDefault(la => dp.CreatorGuid == la.OriginatorGid);
             if (userAppearance != null && userAppearance.Enable)
             {
-                var uaReadColor = Color.FromArgb(lineAppearance.FontColor).ToPlatformColor();
-                var uaUnreadColor = Color.FromArgb(lineAppearance.UnreadFontColor).ToPlatformColor();
-                var uaBgColor = Color.FromArgb(lineAppearance.BackgroundColor).ToPlatformColor();
-                bottomLabel.BackgroundColor = uaBgColor;
+                var uaReadColor = Color.FromArgb(userAppearance.FontColor).ToPlatformColor();
+                var uaUnreadColor = Color.FromArgb(userAppearance.UnreadFontColor).ToPlatformColor();
+                var uaBgColor = Color.FromArgb(userAppearance.BackgroundColor).ToPlatformColor();
+                BackgroundColor = uaBgColor;
                 if (defaultAppearance.FontColorEnable)
-                    bottomLabel.TextColor = Color.FromArgb(defaultAppearance.FontColor).ToPlatformColor();
+                    SetTextColor(uaReadColor);
                 if (defaultAppearance.UnreadFontColorEnable)
-                    bottomLabel.TextColor = dp.IsReadByCurrent ? uaReadColor : uaUnreadColor;
-
+                    SetTextColor(dp.IsReadByCurrent ? uaReadColor : uaUnreadColor);
             }
  
         }
