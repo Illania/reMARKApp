@@ -257,6 +257,7 @@
     <string name="fingerprint_use_pin">Pin</string>
     <string name="filter">Filter...</string>
     <string name="folder_favorites">Favorites</string>
+    <string name="favorite">Favorite</string>
     <string name="folder_local">Local folders</string>
     <string name="folder_offline_message">This folder is saved offline. You can make the folder online again or redownload its contents.</string>
     <string name="folder_offline_go_online">Go online</string>

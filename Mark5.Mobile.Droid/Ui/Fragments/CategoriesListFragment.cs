@@ -119,6 +119,9 @@ namespace Mark5.Mobile.Droid
 
             RecyclerView.SetAdapter(ListAdapter);
 
+            swipeHelperCallback = new SwipeHelperCallback(Context, this, ListAdapter, RefreshLayout);
+            itemTouchHelper = new ItemTouchHelper(swipeHelperCallback);
+            itemTouchHelper.AttachToRecyclerView(RecyclerView);
             HasOptionsMenu = true;
 
             return rootView;
@@ -171,13 +174,10 @@ namespace Mark5.Mobile.Droid
                     var documentPreview = BusinessEntityPreview as DocumentPreview;
                     selectedCategories.AddRange(documentPreview.Categories);
                     originalCategories.AddRange(documentPreview.Categories);
-                    allCategories = await Managers.DocumentsManager.GetAllCategoriesAsync(Restored ? SourceType.Local : SourceType.Auto);
-                    favoriteCategoriesIds = await Managers.CommonActionsManager.GetFavoriteCategories();
-                    if (favoriteCategoriesIds != null)
-                        favoriteCategories = availableCategories.Except(selectedCategories).Where(c => c != null && favoriteCategoriesIds.Contains(c.Id)).ToList();
+                    availableCategories = await Managers.DocumentsManager.GetAllCategoriesAsync(Restored ? SourceType.Local : SourceType.Auto);
                     break;
                 case ObjectType.Contact:
-                    allCategories = await Managers.ContactsManager.GetAllCategoriesAsync(Restored ? SourceType.Local : SourceType.Auto);
+                    availableCategories = await Managers.ContactsManager.GetAllCategoriesAsync(Restored ? SourceType.Local : SourceType.Auto);
                     var contactPreview = BusinessEntityPreview as ContactPreview;
                     selectedCategories.AddRange(contactPreview.Categories);
                     originalCategories.AddRange(contactPreview.Categories);
@@ -185,6 +185,10 @@ namespace Mark5.Mobile.Droid
                 default:
                     throw new ArgumentException("The business entity provided does not have categories in the model");
             }
+
+            favoriteCategoriesIds = await Managers.CommonActionsManager.GetFavoriteCategories();
+            if (favoriteCategoriesIds != null)
+                favoriteCategories = availableCategories.Except(selectedCategories).Where(c => c != null && favoriteCategoriesIds.Contains(c.Id)).ToList();
 
             ReloadTable();
 
@@ -256,6 +260,10 @@ namespace Mark5.Mobile.Droid
                         throw new ArgumentException("Invalid BusinessEntityPreview!");
                 }
                 dismissAction();
+
+                var data = new Intent();
+                data.PutExtra(CategoriesListActivity.CategoriesResultKey, Serializer.Serialize(selectedCategories));
+                Activity.SetResult(Android.App.Result.Ok, data);
                 Activity?.Finish();
             }
             catch (Exception ex)
@@ -304,7 +312,7 @@ namespace Mark5.Mobile.Droid
             }
             else
             {
-                var itemAlreadySelected = CurrentAdapter.ItemExists(section, category);
+                var itemAlreadySelected = CurrentAdapter.ItemExists(Section.Selected, category);
                 var shouldInsertToSelected = !itemAlreadySelected;
 
                 //if we move from Selected to Available or Favorite
@@ -529,7 +537,7 @@ namespace Mark5.Mobile.Droid
                     viewHolder.Description = category.Description;
                     viewHolder.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, position)));
 
-                    viewHolder.CheckMark.Visibility = (section == Section.Available || section == Section.None) ? ViewStates.Gone : ViewStates.Visible;
+                    viewHolder.CheckMark.Visibility = (section == Section.Selected) ? ViewStates.Visible : ViewStates.Gone;
                 }
                 else
                 {
@@ -548,6 +556,10 @@ namespace Mark5.Mobile.Droid
                             case Section.Selected:
                                 title = context.GetString(Resource.String.categories_added);
                                 break;
+                            case Section.Favorite:
+                                title = context.GetString(Resource.String.favorite);
+                                break;
+                           
                         }
 
                         sh.SectionTitle.Text = title;
@@ -732,11 +744,12 @@ namespace Mark5.Mobile.Droid
             {
                 if (string.IsNullOrWhiteSpace(newText))
                 {
-                    SearchAdapter.RefreshSearch(availableCategories, newText);
+                    SearchAdapter.RefreshSearch(availableCategories.Union(favoriteCategories).ToList(), newText);
                 }
                 else
                 {
-                    List<Category> searchResultCategories = allCategories.Where(x => x.Name.ToLower().Contains(newText.ToLower()) && !selectedCategories.Contains(x)).ToList();
+                    List<Category> searchResultCategories = availableCategories.Union(favoriteCategories).Where(x => x.Name.ToLower().Contains(newText.ToLower())
+                    && !selectedCategories.Contains(x)).ToList();
 
                     SearchAdapter.RefreshSearch(searchResultCategories, newText);
                 }
@@ -959,7 +972,9 @@ namespace Mark5.Mobile.Droid
                 ResetViewHolder(viewHolder, direction);
                 if (direction == ItemTouchHelper.Left)
                 {
-                    SwipeActionSelected(Preferences.CategoriesSwipeAction.AddToFavorites, viewHolder.AdapterPosition);
+                    var (_, section) = adapter.GetItemAtPosition(viewHolder.AdapterPosition);
+                    var action = section == Section.Available ? Preferences.CategoriesSwipeAction.AddToFavorites : Preferences.CategoriesSwipeAction.RemoveFromFavorites;
+                    SwipeActionSelected(action, viewHolder.AdapterPosition);
                 }
             }
 

@@ -222,12 +222,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        List<Category> GetAvailableCategories()
-        {
-            ((DataSource)TableView.Source).SetItems(DataSource.Section.Selected, selectedCategories);
-            return availableCategories.Except(selectedCategories.Union(favoriteCategories)).ToList();
-        }
-
         #region Search related
         protected virtual void InitializeSearchBar()
         {
