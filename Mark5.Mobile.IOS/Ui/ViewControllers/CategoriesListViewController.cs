@@ -19,10 +19,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
     public class CategoriesListViewController : AbstractTableViewController, IUISearchResultsUpdating
     {
         BusinessEntityPreview BusinessEntityPreview { get; set; }
-        List<Category> allCategories = new List<Category>();
-        List<Category> selectedCategories = new List<Category>();
-        List<Category> availableCategories = new List<Category>();
-        List<Category> favoriteCategories = new List<Category>();
+        List<Category> allCategories = new();
+        List<Category> selectedCategories = new();
+        List<Category> availableCategories = new();
+        List<Category> favoriteCategories = new();
+        List<int> favoriteCategoriesIds = new();
         UIBarButtonItem cancelBtnItem;
         UIBarButtonItem saveBtnItem;
         UISearchController searchController;
@@ -153,9 +154,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                availableCategories = BusinessEntityPreview is DocumentPreview documentPreview
                     ? await Managers.DocumentsManager.GetAllCategoriesAsync()
                     : await Managers.ContactsManager.GetAllCategoriesAsync();
-                var favoriteCategoriesIds = await Managers.CommonActionsManager.GetFavoriteCategories();
+                favoriteCategoriesIds = await Managers.CommonActionsManager.GetFavoriteCategories();
                 if(favoriteCategoriesIds != null)
-                    favoriteCategories = availableCategories.Where(c => c != null && favoriteCategoriesIds.Contains(c.Id)).ToList();
+                    favoriteCategories = availableCategories.Except(selectedCategories).Where(c => c != null && favoriteCategoriesIds.Contains(c.Id)).ToList();
 
             }
             catch (Exception ex)
@@ -175,7 +176,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     : await Managers.ContactsManager.GetAllCategoriesAsync();
                 var favoriteCategoriesIds = await Managers.CommonActionsManager.GetFavoriteCategories();
                 if (favoriteCategoriesIds != null)
-                    favoriteCategories = allCategories.Where(c => c != null && favoriteCategoriesIds.Contains(c.Id)).ToList();
+                    favoriteCategories = allCategories.Except(selectedCategories).Where(c => c != null && favoriteCategoriesIds.Contains(c.Id)).ToList();
 
             }
             catch (Exception ex)
@@ -196,7 +197,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             ((DataSource)TableView.Source).SetItems(DataSource.Section.Favorite, favoriteCategories);
 
             var _availableCategories = new List<Category>();
-            _availableCategories = availableCategories.Where(x => !selectedCategories.Contains(x)).ToList();
+            _availableCategories = availableCategories.Except(selectedCategories.Union(favoriteCategories)).ToList();
             _availableCategories.Sort((x, y) => string.Compare(x.Name, y.Name, true));
             ((DataSource)TableView.Source).SetItems(DataSource.Section.Available, _availableCategories);
 
@@ -219,12 +220,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 selectedCategories.Add(category);
             }
-        }
-
-        List<Category> GetAvailableCategories()
-        {
-            ((DataSource)TableView.Source).SetItems(DataSource.Section.Selected, selectedCategories);
-            return availableCategories.Where(x => !selectedCategories.Contains(x)).ToList();
         }
 
         #region Search related
@@ -295,7 +290,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 var searchResultCategories = new List<Category>();
 
-                searchResultCategories = availableCategories.Where(x => x.Name.ToLower().Contains(searchText.ToLower()) && !selectedCategories.Contains(x)).ToList();
+                searchResultCategories = availableCategories.Union(favoriteCategories).Where(x => x.Name.ToLower().Contains(searchText.ToLower()) && !selectedCategories.Contains(x)).ToList();
 
                 if (cancellationToken.IsCancellationRequested)
                     return;
@@ -410,7 +405,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-
+        public bool IsFavorite(Category category) => favoriteCategoriesIds.Contains(category.Id);
 
 
         #endregion
@@ -483,7 +478,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     {
                         items[Section.Available].Remove(category);
                         items[Section.Selected].Add(category);
-                        items[Section.Selected].Sort((x, y) => String.Compare(x.Name, y.Name, true));
+                        items[Section.Selected].Sort((x, y) => string.Compare(x.Name, y.Name, true));
                         return items[Section.Selected].IndexOf(category);
                     }
                 }
@@ -492,10 +487,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     if (items[Section.Favorite].Contains(category))
                     {
-                        if(items[Section.Available].Contains(category))
-                            items[Section.Available].Remove(category);
+                        items[Section.Favorite].Remove(category);
                         items[Section.Selected].Add(category);
-                        items[Section.Selected].Sort((x, y) => String.Compare(x.Name, y.Name, true));
+                        items[Section.Selected].Sort((x, y) => string.Compare(x.Name, y.Name, true));
                         return items[Section.Selected].IndexOf(category);
                     }
                 }
@@ -505,9 +499,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     if (items[Section.Selected].Contains(category))
                     {
                         items[Section.Selected].Remove(category);
-                        items[Section.Available].Add(category);
-                        items[Section.Available].Sort((x, y) => String.Compare(x.Name, y.Name, true));
-                        return items[Section.Available].IndexOf(category);
+                        var sectionWhereToAdd = viewControllerWeakReference.Unwrap().IsFavorite(category) ? Section.Favorite : Section.Available;
+                        items[sectionWhereToAdd].Add(category);
+                        items[sectionWhereToAdd].Sort((x, y) => string.Compare(x.Name, y.Name, true));
+                        return items[sectionWhereToAdd].IndexOf(category);
                     }
                 }
 
@@ -516,47 +511,62 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
-                tableView.AllowsSelection = false; // to prevent exceptions when 'quickly' tapping rows
-                tableView.BeginUpdates();
-                var category = items[indexPath.LongSection][indexPath.Row];
-                var newIndex = MoveCategory(indexPath.LongSection, category);
-                viewControllerWeakReference.Unwrap()?.MoveCategory(category);
-
-                var shouldInsertToSelected = !items[Section.Selected].Contains(category);
-                if (indexPath.LongSection == Section.Selected)
-                    tableView.DeleteRows(new NSIndexPath[] { NSIndexPath.Create(indexPath.LongSection, indexPath.Row) }, UITableViewRowAnimation.Middle);
-                else if(shouldInsertToSelected && indexPath.Section == Section.Available)
-                    tableView.DeleteRows(new NSIndexPath[] { NSIndexPath.Create(Section.Available, indexPath.Row) }, UITableViewRowAnimation.Middle);
-
-                //if we move from selected to available
-                if (indexPath.LongSection == Section.Selected)
+                try
                 {
-                    _ = viewControllerWeakReference.Unwrap()?.GetAvailableCategories();
-                    if (items[Section.Available].Count <= 1)
+                    tableView.AllowsSelection = false; // to prevent exceptions when 'quickly' tapping rows
+                    tableView.BeginUpdates();
+                    var category = items[indexPath.LongSection][indexPath.Row];
+
+                    var itemAlreadySelected = items[Section.Selected].Contains(category);
+                    var shouldInsertToSelected = !itemAlreadySelected;
+                    if (indexPath.LongSection == Section.Selected)
+                        tableView.DeleteRows(new NSIndexPath[] { NSIndexPath.Create(indexPath.LongSection, indexPath.Row) }, UITableViewRowAnimation.Middle);
+                    else if (shouldInsertToSelected && indexPath.Section == Section.Available)
+                        tableView.DeleteRows(new NSIndexPath[] { NSIndexPath.Create(Section.Available, indexPath.Row) }, UITableViewRowAnimation.Middle);
+                    else if (shouldInsertToSelected && indexPath.Section == Section.Favorite)
+                        tableView.DeleteRows(new NSIndexPath[] { NSIndexPath.Create(Section.Favorite, indexPath.Row) }, UITableViewRowAnimation.Middle);
+
+                    var newIndex = MoveCategory(indexPath.LongSection, category);
+                    viewControllerWeakReference.Unwrap()?.MoveCategory(category);
+
+                    
+                    //if we move from selected to available or favorite
+                    if (indexPath.LongSection == Section.Selected)
                     {
-                        tableView.ReloadSections(NSIndexSet.FromIndex(Section.Available), UITableViewRowAnimation.Middle);
+                        //update available categories
+                        //_ = viewControllerWeakReference.Unwrap()?.GetAvailableCategories();
+                        var sectionWhereToMove = viewControllerWeakReference.Unwrap().IsFavorite(category) ? Section.Favorite : Section.Available;
+                        if (items[sectionWhereToMove].Count <= 1)
+                        {
+                            tableView.ReloadSections(NSIndexSet.FromIndex(sectionWhereToMove), UITableViewRowAnimation.Middle);
+                        }
+                        else
+                        {
+                            tableView.InsertRows(new NSIndexPath[] { NSIndexPath.Create(sectionWhereToMove, newIndex) }, UITableViewRowAnimation.Middle);
+                        }
                     }
+                    //if we move from availble to selected
                     else
                     {
-                        tableView.InsertRows(new NSIndexPath[] { NSIndexPath.Create(Section.Available, newIndex) }, UITableViewRowAnimation.Middle);
+                        if (items[Section.Selected].Count <= 1)
+                        {
+                            tableView.ReloadSections(NSIndexSet.FromIndex(Section.Selected), UITableViewRowAnimation.Middle);
+                        }
+                        else if (shouldInsertToSelected)
+                        {
+                            tableView.InsertRows(new NSIndexPath[] { NSIndexPath.Create(Section.Selected, newIndex) }, UITableViewRowAnimation.Middle);
+                        }
                     }
-                }
-                //if we move from availbale to selected
-                else
-                {
-                    var count = items[Section.Selected].Count;
-                    if (count <= 1)
-                    {
-                        tableView.ReloadSections(NSIndexSet.FromIndex(Section.Selected), UITableViewRowAnimation.Middle);
-                    }
-                    else if (shouldInsertToSelected)
-                    {
-                        tableView.InsertRows(new NSIndexPath[] { NSIndexPath.Create(Section.Selected, newIndex) }, UITableViewRowAnimation.Middle);
-                    }
-                }
 
-                tableView.EndUpdates();
-                tableView.AllowsSelection = true;
+                    tableView.EndUpdates();
+                    tableView.AllowsSelection = true;
+
+                }
+                catch(Exception ex)
+                {
+                    CommonConfig.Logger.Error($"Cant update categories list", ex);
+                }
+               
             }
 
             public override nint RowsInSection(UITableView tableview, nint section)

@@ -17,7 +17,7 @@
     <string name="add_location">Add location</string>
     <string name="add_message">Add message</string>
         <string name="add_message_optional">Add message (optional)</string>
-    <string name="add_favorites">Add to favourites</string>
+    <string name="add_favorites">Add to favorites</string>
     <string name="add_offline">Enable sync</string>
     <string name="adding_comment">Adding comment</string>
     <string name="adding_extra_field">Adding extra field</string>
@@ -257,6 +257,7 @@
     <string name="fingerprint_use_pin">Pin</string>
     <string name="filter">Filter...</string>
     <string name="folder_favorites">Favorites</string>
+    <string name="favorite">Favorite</string>
     <string name="folder_local">Local folders</string>
     <string name="folder_offline_message">This folder is saved offline. You can make the folder online again or redownload its contents.</string>
     <string name="folder_offline_go_online">Go online</string>
