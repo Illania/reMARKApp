@@ -40,7 +40,6 @@ namespace Mark5.Mobile.Droid
     
         List<Category> availableCategories = new List<Category>();
         List<Section> Sections { get; set; }
-
         Action dismissAction;
 
         public static (PresetCategoryFragment fragment, string tag) NewInstance()
@@ -63,8 +62,6 @@ namespace Mark5.Mobile.Droid
             base.OnCreate(savedInstanceState);
             if (Arguments.ContainsKey(BusinessEntityPreviewBundleKey))
                 BusinessEntityPreview = Serializer.Deserialize<BusinessEntityPreview>(Arguments.GetString(BusinessEntityPreviewBundleKey));
-
-            SubscribeToMessages();
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -113,21 +110,26 @@ namespace Mark5.Mobile.Droid
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.categories);
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = null;
 
-            CommonConfig.Logger.Info($"Created {nameof(PresetCategoryFragment)} [businessEntity.id={BusinessEntityPreview?.Id}, businessEntity.objectType={BusinessEntityPreview?.ObjectType}]");
+            CommonConfig.Logger.Info($"Created {nameof(PresetCategoryFragment)} [businessEntity.id={BusinessEntityPreview?.Id}, businessEntity.objectType={BusinessEntityPreview?.ObjectType}]");      
         }
 
-        public override void OnResume()
+        public override async void OnResume()
         {
             base.OnResume();
             CommonConfig.Logger.Info($"Refreshing {nameof(PresetCategoryFragment)} [businessEntity.id={BusinessEntityPreview?.Id}, businessEntity.objectType={BusinessEntityPreview?.ObjectType}]");
             SetDefaultSections();
-            GetData();
+            await GetData();
+
+            if (PlatformConfig.Preferences.PresetCategoryId > 0)
+            {
+                ListAdapter.SelectRowForCategory(PlatformConfig.Preferences.PresetCategoryId);
+            }
         }
 
         public override void OnDestroy()
         {
             base.OnDestroy();
-            UnsubscribeFromMessages();
+
         }
 
         public override void OnDestroyView()
@@ -143,7 +145,7 @@ namespace Mark5.Mobile.Droid
             ListAdapter.SetSections(Sections);
         }
 
-        async void GetData()
+        async Task GetData()
         {
             RefreshLayout.Post(() => RefreshLayout.Refreshing = true);
 
@@ -158,39 +160,6 @@ namespace Mark5.Mobile.Droid
             });
         }
 
-        void SubscribeToMessages()
-        {
-            CategoriesEditedToken = CommonConfig.MessengerHub.Subscribe<EntityCategoriesChangedMessage>(
-                HandleCategoriesChanged, (arg) => arg.EntityId == BusinessEntityPreview?.Id
-                 && arg.ObjectType == BusinessEntityPreview?.ObjectType
-            );
-        }
-
-        void UnsubscribeFromMessages()
-        {
-            CategoriesEditedToken?.Dispose();
-        }
-
-
-       
-        void HandleCategoriesChanged(EntityCategoriesChangedMessage obj)
-        {
-            switch (BusinessEntityPreview.ObjectType)
-            {
-                case ObjectType.Document:
-                    var documentPreview = BusinessEntityPreview as DocumentPreview;
-                    documentPreview.Categories.Clear();
-                    documentPreview.Categories.AddRange(obj.Categories);
-                    break;
-                case ObjectType.Contact:
-                    var contactPreview = BusinessEntityPreview as ContactPreview;
-                    contactPreview.Categories.Clear();
-                    contactPreview.Categories.AddRange(obj.Categories);
-                    break;
-                default:
-                    throw new ArgumentException("The business entity provided does not have categories in the model");
-            }
-        }
 
         protected virtual void Adapter_ItemClicked(object sender, int position)
         {
@@ -207,10 +176,16 @@ namespace Mark5.Mobile.Droid
                     filterItem.CollapseActionView();
                 }
             }
-            else
+            
+            if (CurrentAdapter.SelectedBefore != position)
             {
+                CurrentAdapter.ClearSelections();
+                CurrentAdapter.SelectRow(position);
                 PlatformConfig.Preferences.PresetCategoryId = category.Id;
+                CurrentAdapter.SelectedBefore = position;
+
             }
+            
         }
 
        
@@ -272,6 +247,7 @@ namespace Mark5.Mobile.Droid
 
             protected List<Section> sectionsInView = new List<Section>();
             protected Dictionary<Section, List<Category>> categoriesInSection = new Dictionary<Section, List<Category>>();
+            protected Dictionary<Section, List<Category>> categoriesInSectionUnsorted = new Dictionary<Section, List<Category>>();
 
             public List<int> SelectedItemPositions => selectedItemPositions.ToList();
 
@@ -279,6 +255,7 @@ namespace Mark5.Mobile.Droid
             readonly HashSet<int> selectedItemPositions = new HashSet<int>();
 
             readonly Context context;
+            public int SelectedBefore;
 
             readonly int sectionHeight = Conversion.ConvertDpToPixels(56);
 
@@ -302,8 +279,13 @@ namespace Mark5.Mobile.Droid
                     viewHolder.HexColor = category.HexColor;
                     viewHolder.Description = category.Description;
                     viewHolder.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, position)));
-
-                    viewHolder.CheckMark.Visibility = (category.Id ==  PlatformConfig.Preferences.PresetCategoryId) ? ViewStates.Visible : ViewStates.Gone;
+                    if (category.Id == PlatformConfig.Preferences.PresetCategoryId)
+                    {
+                        viewHolder.CheckMark.Visibility = ViewStates.Visible;
+                        SelectedBefore = position;                     
+                    }
+                    else
+                        viewHolder.CheckMark.Visibility = ViewStates.Gone;
                 }
                 else
                 {
@@ -343,6 +325,19 @@ namespace Mark5.Mobile.Droid
                 selectedItemPositions.Clear();
                 foreach (var position in selectedItemPositionsCopy)
                     NotifyItemChanged(position);
+            }
+
+            public void SelectRow(int position)
+            {
+                selectedItemPositions.Add(position);
+                NotifyItemChanged(position);
+            }
+
+            public void SelectRowForCategory(int categoryId)
+            {
+                var rowToSelect = GetPositionUnsorted(Section.Available, categoryId) + 2;
+                selectedItemPositions.Add(rowToSelect);
+                NotifyItemChanged(rowToSelect);
             }
 
             public override int GetItemViewType(int position)
@@ -417,7 +412,7 @@ namespace Mark5.Mobile.Droid
             public void SetSections(List<Section> sections)
             {
                 sectionsInView = sections;
-                sectionsInView.ForEach(s => categoriesInSection[s] = new List<Category>());
+                sectionsInView.ForEach(s => { categoriesInSection[s] = new List<Category>(); categoriesInSectionUnsorted[s] = new List<Category>(); });
                 NotifyDataSetChanged();
             }
 
@@ -434,6 +429,13 @@ namespace Mark5.Mobile.Droid
                 }
 
                 var newItemCount = categories.Count;
+
+                if (categoriesInSectionUnsorted.ContainsKey(section))
+                {
+                    categoriesInSectionUnsorted[section].Clear();
+                    categoriesInSectionUnsorted[section].AddRange(categories);
+                }
+
                 categories.Sort((c1, c2) => String.Compare(c1.Name, c2.Name, true));
                 categoriesInSection[section].AddRange(categories);
                 NotifyItemRangeInserted(sectionPosition + offset, newItemCount);
@@ -447,6 +449,21 @@ namespace Mark5.Mobile.Droid
                 for (var i = 0; i < categoriesInSection[section].Count; i++)
 
                     if (categoriesInSection[section][i].Id == categoryId)
+                    {
+                        position = i;
+                        break;
+                    }
+
+                return position;
+            }
+
+
+            int GetPositionUnsorted(Section section, int categoryId)
+            {
+                var position = -1;
+                for (var i = 0; i < categoriesInSectionUnsorted[section].Count; i++)
+
+                    if (categoriesInSectionUnsorted[section][i].Id == categoryId)
                     {
                         position = i;
                         break;

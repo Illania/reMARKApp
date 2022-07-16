@@ -1944,6 +1944,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         case Preferences.EmailSwipeAction.Priorities:
                             fragment.SetPriority(new List<DocumentPreview>() { adapter.Items[adapterPosition] });
                             break;
+                        case Preferences.EmailSwipeAction.PresetCategory:
+                            fragment.AssignPresetCategory(adapter.Items[adapterPosition]);
+                            break;
                         case Preferences.EmailSwipeAction.MoveToFolder:
                             fragment.StartActivity(CopyMoveToFolderListActivity.CreateIntent(context, CopyMoveToFolderListActivity.ModeType.Move, ModuleType.Documents,
                                                                                              new List<DocumentPreview> { adapter.Items[adapterPosition] }.Cast<IBusinessEntity>().ToList(), folder));
