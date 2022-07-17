@@ -65,5 +65,14 @@ namespace Mark5.Mobile.Common.Model
         {
             return $"[ContactPreview: Id={Id}, RowId={RowId}, Name={Name}]";
         }
+
+        public override bool Equals(object contactPreview)
+        {
+            if (!(contactPreview is ContactPreview cp))
+                return false;
+            return cp.Id == Id;
+        }
+            
+          
     }
 }
