@@ -341,6 +341,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
             var vc = new PickerContactsFoldersListViewController();
             PresentViewController(new NavigationController(vc), true, null);
             var pa = await vc.Result;
+            DismissViewController(true, null);
             AddRecipients(pa);
         }
 

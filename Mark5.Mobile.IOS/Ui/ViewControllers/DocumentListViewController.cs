@@ -481,7 +481,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                                                    UIAlertActionStyle.Default,
                                                    a =>
                 {
-                    this.CopyToWorktray((IBusinessEntity)selectedDocuments);
+                    this.CopyToWorktray(selectedDocuments.Select(be => (IBusinessEntity)be).ToList());
                     EndEditing(TableView);
                 }));
             }
@@ -490,7 +490,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 UIAlertActionStyle.Default,
                 a =>
                 {
-                    this.CopyToFolder((IBusinessEntity)selectedDocuments);
+                    this.CopyToFolder(selectedDocuments.Select(be => (IBusinessEntity)be).ToList());
                     EndEditing(TableView);
                 }));
 
@@ -503,7 +503,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                       UIAlertActionStyle.Default,
                       a =>
                       {
-                          this.MoveToFolder((IBusinessEntity)selectedDocuments, Folder);
+                          this.MoveToFolder(selectedDocuments.Select(be => (IBusinessEntity)be).ToList(), Folder);
                           EndEditing(TableView);
                       }));
             }
@@ -621,7 +621,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                                                    UIAlertActionStyle.Default,
                                                    a =>
                                                    {
-                                                       this.CopyToWorktray((IBusinessEntity)selectedDocuments);
+                                                       this.CopyToWorktray(selectedDocuments.Select(be => (IBusinessEntity)be).ToList());
                                                        EndEditing(TableView);
                                                    }));
             }
@@ -630,7 +630,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 UIAlertActionStyle.Default,
                 a =>
                 {
-                    this.CopyToFolder((IBusinessEntity)selectedDocuments);
+                    this.CopyToFolder(selectedDocuments.Select(be => (IBusinessEntity)be).ToList());
                     EndEditing(TableView);
                 }));
 
@@ -639,7 +639,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     UIAlertActionStyle.Default,
                     a =>
                     {
-                        this.MoveToFolder((IBusinessEntity)selectedDocuments, Folder);
+                        this.MoveToFolder(selectedDocuments.Select(be => (IBusinessEntity)be).ToList(), Folder);
                         EndEditing(TableView);
                     }));
 

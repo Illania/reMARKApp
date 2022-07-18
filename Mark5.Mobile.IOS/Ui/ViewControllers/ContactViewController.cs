@@ -429,8 +429,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (SplitViewController == null || SplitViewController.Collapsed)
                 refreshDataOnAppear = true;
-            else
-                RefreshData(true);
+
+            RefreshData(true);
         }
 
         void RowLongPressed(UILongPressGestureRecognizer gr)
@@ -1277,7 +1277,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     var cps = Contact.Children.Where(cp => cp.Type == ContactType.Person).OrderBy(cp => cp.Name);
                     foreach (var cp in cps)
-                        Rows.Add(new LinkedContactRow(ContactPreview, Contact, cp));
+                        if(!cp.Equals(Contact.PrimaryPerson))
+                            Rows.Add(new LinkedContactRow(ContactPreview, Contact, cp));
 
                     cps = Contact.Children.Where(cp => cp.Type == ContactType.Department).OrderBy(cp => cp.Name);
                     foreach (var cp in cps)

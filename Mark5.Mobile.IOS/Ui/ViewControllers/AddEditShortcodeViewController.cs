@@ -253,10 +253,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var vc = new PickerContactsFoldersListViewController();
                 PresentViewController(new NavigationController(vc), true, null);
-
                 var pa = await vc.Result;
                 DismissViewController(true, null);
-
                 if (pa != null)
                     return new DocumentAddress { Address = pa.Address };
 
@@ -616,6 +614,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 public async void HeaderCellClicked(UITableViewCell cell, NSIndexPath indexPath)
                 {
                     var result = await DataSource.HeaderCellClicked(cell);
+                    
                     if (result != null)
                         AddNewRow(indexPath, result);
                 }

@@ -12,6 +12,7 @@ using Mark5.Mobile.Common.Extensions;
 using UIKit;
 using Foundation;
 using Mark5.Mobile.IOS.Utilities;
+using System.Collections.Generic;
 
 namespace Mark5.Mobile.IOS.Ui
 {
@@ -119,7 +120,9 @@ namespace Mark5.Mobile.IOS.Ui
                                                    UIAlertActionStyle.Default,
                                                    a =>
                                                    {
-                                                       DocumentListViewController.CopyToWorktray((IBusinessEntity)selectedDocuments);
+
+                                                       DocumentListViewController.CopyToWorktray(
+                                                          selectedDocuments.Select(be => (IBusinessEntity)be).ToList());
                                                        EndEditing();
                                                    }));
             }
@@ -128,7 +131,7 @@ namespace Mark5.Mobile.IOS.Ui
                 UIAlertActionStyle.Default,
                 a =>
                 {
-                    DocumentListViewController.CopyToFolder((IBusinessEntity)selectedDocuments);
+                    DocumentListViewController.CopyToFolder(selectedDocuments.Select(be => (IBusinessEntity)be).ToList());
                     EndEditing();
                 }));
 
@@ -137,7 +140,7 @@ namespace Mark5.Mobile.IOS.Ui
                     UIAlertActionStyle.Default,
                     a =>
                     {
-                        DocumentListViewController.MoveToFolder((IBusinessEntity)selectedDocuments, DocumentListViewController.Folder);
+                        DocumentListViewController.MoveToFolder(selectedDocuments.Select(be => (IBusinessEntity)be).ToList(), DocumentListViewController.Folder);
                         EndEditing();
                     }));
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Common;
@@ -38,18 +37,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                 dismissAction();
 
                 var ds = (DataSource)tableView.Source;
-                var cell = tableView.CellAt(ds.FindItemIndexPath(contactPreview));
+                var cell = tableView.CellAt(ds.FindItemIndexPath(contactPreview) );
 
-                //show list of linked contacts
-                if (contact.PrimaryPerson != null || contact.Children.Any())
+                var vc = new ContactEmailAddressesViewController();
+                vc.SetData(Folder, contactPreview);
+                NavigationController.PushViewController(vc, true);
+
+                var result = await vc.Result;
+                if (result != null)
                 {
-                    var vc = new LinkedEmailListViewController { Folder = Folder, Contact = contact, ContactPreview = contactPreview };
-                    PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+                    if (!tcs.TrySetResult(result))
+                        CommonConfig.Logger.Error("Result was already set!");    
                 }
-                else
-                   await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("no_email_addresses_title"), Localization.GetString("no_email_addresses_content"));
+                NavigationController.PopViewController(true); 
 
-                }
+            }
             catch (Exception ex)
             {
                 dismissAction();

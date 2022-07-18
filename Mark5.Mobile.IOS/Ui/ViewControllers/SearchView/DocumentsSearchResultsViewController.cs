@@ -259,7 +259,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                                                    UIAlertActionStyle.Default,
                                                    a =>
                 {
-                    this.CopyToWorktray((IBusinessEntity)selectedDocuments);
+                    this.CopyToWorktray(selectedDocuments.Select(be => (IBusinessEntity)be).ToList());
                     EndEditing();
                 }));
             }
