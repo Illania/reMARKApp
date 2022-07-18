@@ -114,7 +114,8 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Guid = cr.Guid,
                 Id = cr.Id,
                 Name = cr.Name,
-                Shared = cr.Shared
+                Shared = cr.Shared,
+                Owner = cr.Owner
             };
         }
 
@@ -955,7 +956,8 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Guid = cr.Guid,
                 Id = cr.Id,
                 Name = cr.Name,
-                Shared = cr.Shared
+                Shared = cr.Shared,
+                Owner = cr.Owner
             };
         }
 

@@ -10,5 +10,6 @@ namespace Mark5.Mobile.Common.Model
         public string Name { get; set; }
         public string ColorHex { get; set; }
         public bool Shared { get; set; }
+        public Guid Owner { get; set; }
     }
 }

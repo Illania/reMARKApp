@@ -1429,6 +1429,9 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "Shared", Order = 0)]
         public bool Shared { get; set; }
+
+        [DataMember(Name = "Owner", Order = 0)]
+        public Guid Owner { get; set; }
     }
 
     [DataContract(Name = "CalendarAppointment", Namespace = "com.nordic-it.appservice.v3")]
