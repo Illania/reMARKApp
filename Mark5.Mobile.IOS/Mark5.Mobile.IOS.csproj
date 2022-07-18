@@ -126,7 +126,6 @@
 		<Compile Include="Ui\TableViewCells\ShortcodesTableViewCell.cs" />
 		<Compile Include="Ui\TableViewCells\WaitTableViewCell.cs" />
 		<Compile Include="Ui\ViewControllers\CommentsListViewController.cs" />
-		<Compile Include="Ui\ViewControllers\ContactViewController.cs" />
 		<Compile Include="Ui\ViewControllers\ContactsSplitViewController.cs" />
 		<Compile Include="Ui\ViewControllers\CopyToWorktrayViewController.cs" />
 		<Compile Include="Ui\ViewControllers\DocumentListViewController.cs" />
@@ -344,6 +343,8 @@
 		<Compile Include="Utilities\FileToFolderActions.cs" />
 		<Compile Include="Service\ISpotlightSearchManager.cs" />
 		<Compile Include="Service\SpotlightSearchManager.cs" />
+		<Compile Include="Ui\ViewControllers\ContactViewController.cs" />
+	    <Compile Include="Ui\ViewControllers\ContactEmailAddressesViewController.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
@@ -623,6 +624,7 @@
 		<None Include="Resources\html\fonts\opensans.ttf" />
 		<None Include="Resources\html\fonts\tahoma.ttf" />
 		<None Include="Resources\html\fonts\trebuchetms.ttf" />
+
 	</ItemGroup>
 	<ItemGroup>
 		<InterfaceDefinition Include="LaunchScreen.storyboard" />

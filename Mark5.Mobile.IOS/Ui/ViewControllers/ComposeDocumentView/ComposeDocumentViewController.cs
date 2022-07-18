@@ -1328,11 +1328,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             CommonConfig.UsageAnalytics.LogEvent(new ComposeContactPickerEvent(ContactPickerChoice.Contacts));
 
             var vc = new PickerContactsFoldersListViewController();
-            PresentViewController(new NavigationController(vc), true, null);
+            NavigationController.PushViewController(vc, true);
 
             var pa = await vc.Result;
             if (pa != null)
                 recipientsView.AddRecipent(pa.Name, pa.Address);
+            
         }
 
         async Task DoOpenInternalContacts(RecipientsView recipientsView)

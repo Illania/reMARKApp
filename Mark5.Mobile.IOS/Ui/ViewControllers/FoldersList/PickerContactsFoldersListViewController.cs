@@ -80,14 +80,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             {
                 Folder = folder,
             };
+
             NavigationController.PushViewController(vc, true);
 
             var result = await vc.Result;
             if (result != null)
-            {
-                if (!tcs.TrySetResult(result))
-                    CommonConfig.Logger.Error("Result was already set!");
-            }
+                tcs.TrySetResult(result);
+
+            NavigationController.PopViewController(true);
         }
 
         protected override async Task FolderExpand(Folder folder)
@@ -95,11 +95,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             await base.FolderExpand(folder);
 
             var vc = new PickerContactsFoldersListViewController(folder);
+
             NavigationController.PushViewController(vc, true);
 
             var result = await vc.Result;
             if (result != null)
-                tcs.SetResult(result);
+                tcs.TrySetResult(result);
+
+            NavigationController.PopViewController(true); 
+
         }
     }
 }

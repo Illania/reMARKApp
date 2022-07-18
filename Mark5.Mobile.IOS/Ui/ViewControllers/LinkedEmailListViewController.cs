@@ -18,7 +18,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
     public class LinkedEmailListViewController : AbstractTableViewController, IUISearchResultsUpdating
     {
-        readonly TaskCompletionSource<Recipient> tcs = new TaskCompletionSource<Recipient>();
+        readonly TaskCompletionSource<Recipient> tcs = new();
         public Task<Recipient> Result => tcs.Task;
 
         public Folder Folder { get; set; }
@@ -29,7 +29,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         UISearchController searchController;
         CancellationTokenSource searchCancellationTokenSource;
-        readonly List<CancellationTokenSource> searchCancellationTokenSourceList = new List<CancellationTokenSource>();
+        readonly List<CancellationTokenSource> searchCancellationTokenSourceList = new();
 
         public override void LoadView()
         {
@@ -54,14 +54,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InitializeHandlers();
         }
 
-        public override void ViewDidAppear(bool animated)
+        public override async void ViewDidAppear(bool animated)
         {
             base.ViewDidAppear(animated);
 
             CommonConfig.Logger.Info("Appeared");
 
             if (((DataSource)TableView.Source).Empty)
-                RefreshData();
+                await RefreshData();
 
 
             if (Integration.IsRunningAtLeast(11))
@@ -127,14 +127,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void InitializeNavigationBar()
         {
             NavigationItem.Title = ContactPreview.Name + Localization.GetString("contacts_list");
-
             exitItem = new UIBarButtonItem(UIBarButtonSystemItem.Cancel);
             NavigationItem.SetLeftBarButtonItem(exitItem, true);
         }
 
         void InitializeView()
         {
-            TableView.Source = new DataSource(this, TableView, Localization.GetString("contacts_list_empty"));
+            TableView.Source = new DataSource(this, TableView);
             TableView.RowHeight = UITableView.AutomaticDimension;
             TableView.EstimatedRowHeight = 20f;
         }
@@ -144,7 +143,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             DefinesPresentationContext = true;
 
             var searchResultsController = new UITableViewController();
-            var searchResultsDataSource = new DataSource(this, searchResultsController.TableView, Localization.GetString("no_contacts_found"));
+            var searchResultsDataSource = new DataSource(this, searchResultsController.TableView);
             searchResultsController.TableView.Source = searchResultsDataSource;
             searchResultsController.TableView.EstimatedRowHeight = 20f;
             searchResultsController.TableView.RowHeight = UITableView.AutomaticDimension;
@@ -171,29 +170,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 exitItem.Clicked -= ExitItem_Clicked;
         }
 
-        void RefreshData()
-        {
-            Task.Run(() =>
-            {
-                return Contact.Children.Union(new List<ContactPreview> { Contact.PrimaryPerson }).ToList().OrderBy(c=> c.Type);
-            }).ContinueWith(async t =>
-            {
-                if (t.IsFaulted)
-                {
-                    var ex = t.Exception.InnerException;
-                    CommonConfig.Logger.Error($"Error while retrieving contacts", ex);
-                    await Dialogs.ShowErrorAlertAsync(this, ex);
-                    tcs.SetResult(null);
-                    return;
-                }
-
-                if (t.Result == null)
-                {
-                    tcs.SetResult(null);
-                }
-                else
-                    ((DataSource)TableView.Source).SetItems(t.Result.OrderBy(c => c.Name).ToList());
-            }, TaskScheduler.FromCurrentSynchronizationContext());
+        async Task RefreshData()
+        { 
+            if(Contact == null)
+                Contact = await Managers.ContactsManager.GetContactAsync(Folder, ContactPreview.Id);
+            if (Contact.CommunicationAddresses.Any())
+                ((DataSource)TableView.Source).SetItems(Contact.CommunicationAddresses);
         }
 
         void ExitItem_Clicked(object sender, EventArgs e)
@@ -202,25 +184,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             DismissViewController(true, null);
         }
 
-        public async void LinkedContactSelected(ContactPreview cp, UITableViewCell cell)
+        public void EmailAddressSelected(CommunicationAddress ca)
         {
-            var contact = await Managers.ContactsManager.GetContactAsync(Folder, cp.Id);
-            var emailAddresses = contact.CommunicationAddresses.Where(ca => ca.Type == CommunicationAddressType.Email).Select(ca => ca.Address).ToArray();
-            if (emailAddresses.Any())
-            {
-                var index = await Dialogs.ShowListActionSheetAsync(this, emailAddresses, TableView, cell);
-                if (index < 0)
-                    return;
-
-                var address = emailAddresses[index];
-
-                tcs.SetResult(new Recipient(ContactPreview.Name, address, RecipientType.Contact, ContactPreview.Id));
-                DismissViewController(true, null);
-            }
-            else
-                await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("no_email_addresses_title"), Localization.GetString("no_email_addresses_content"));
-
+            tcs.SetResult(new Recipient(ContactPreview.Name, ca.Address, RecipientType.Contact, ContactPreview.Id));
+            var vc = NavigationController?.PopToRootViewController(false);
+            DismissViewController(true, null);
         }
+
 
         void IUISearchResultsUpdating.UpdateSearchResultsForSearchController(UISearchController searchController)
         {
@@ -246,11 +216,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 searchCancellationTokenSource = new CancellationTokenSource();
                 searchCancellationTokenSourceList.Add(searchCancellationTokenSource);
 
-                DoSearchContacts(searchText, searchCancellationTokenSource.Token);
+                DoSearchAddress(searchText, searchCancellationTokenSource.Token);
             }
         }
 
-        async void DoSearchContacts(string searchText, CancellationToken ct)
+        async void DoSearchAddress(string searchText, CancellationToken ct)
         {
             var tableViewController = searchController?.SearchResultsController as UITableViewController;
             var dataSource = tableViewController?.TableView?.Source as DataSource;
@@ -262,39 +232,38 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return;
 
             var ds = (DataSource)TableView.Source;
-            var filteredContacts = ds.Items.Where(cp => MatchesQuery(cp, searchText)).ToList();
+            var filteredAddresses = ds.Items.Where(cp => MatchesQuery(cp, searchText)).ToList();
 
             if (ct.IsCancellationRequested)
                 return;
 
-            dataSource?.SetItems(filteredContacts);
+            dataSource?.SetItems(filteredAddresses);
         }
 
-        static bool MatchesQuery(ContactPreview cp, string query)
+        static bool MatchesQuery(CommunicationAddress ca, string query)
         {
-            if (cp.Name?.ContainsCaseInsensitive(query) ?? false)
+            if (ca.Address?.ContainsCaseInsensitive(query) ?? false)
                 return true;
 
             return false;
         }
 
+
+
         class DataSource : UITableViewSource
         {
-            public bool Empty => !items.SelectMany(v => v).Any();
-            public List<ContactPreview> Items => items.SelectMany(v => v).ToList();
+            public bool Empty => !Items.Any();
 
             readonly WeakReference<LinkedEmailListViewController> viewControllerWeakReference;
             readonly WeakReference<UITableView> tableViewWeakReference;
-            readonly string emptyText;
 
             bool loading = true;
-            readonly List<List<ContactPreview>> items = new List<List<ContactPreview>>();
+            public List<CommunicationAddress> Items = new();
 
-            public DataSource(LinkedEmailListViewController viewController, UITableView tableView, string emptyText)
+            public DataSource(LinkedEmailListViewController viewController, UITableView tableView)
             {
                 viewControllerWeakReference = viewController.Wrap();
                 tableViewWeakReference = tableView.Wrap();
-                this.emptyText = emptyText;
             }
 
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
@@ -305,32 +274,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (Empty)
                 {
                     var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.DefaultId) as EmptyTableViewCell ?? new EmptyTableViewCell();
-                    emptyCell.Initialize(emptyText);
+                    emptyCell.Initialize(Localization.GetString("recent_addresses_empty"));
                     return emptyCell;
                 }
 
-                var cp = items[indexPath.Section][indexPath.Row];
-                string type;
-                if (cp.Type == ContactType.Person)
-                    type = Localization.GetString("person");
-                else if (cp.Type == ContactType.Department)
-                    type = Localization.GetString("department");
-                else
-                    type = Localization.GetString("company");
-                var cell = tableView.DequeueReusableCell(ContactInfoTableViewCell.DefaultId) as ContactInfoTableViewCell ?? new ContactInfoTableViewCell();
-                cell.Accessory = UITableViewCellAccessory.DisclosureIndicator;
-                cell.SelectionStyle = UITableViewCellSelectionStyle.Default;
-                cell.Initialize(type.ToUpper(), cp.Name);
+                var ca = Items[indexPath.Row];
+                var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateDefault("cell");
+                cell.TextLabel.Text = ca.Address;
                 return cell;
- 
-            }
 
-            public override nint NumberOfSections(UITableView tableView)
-            {
-                if (loading || Empty)
-                    return 1;
-
-                return items.Count;
             }
 
             public override nint RowsInSection(UITableView tableview, nint section)
@@ -338,48 +290,40 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (loading || Empty)
                     return 1;
 
-                return items[(int)section].Count;
+                return Items.Count;
             }
 
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
-                var cp = items[indexPath.Section][indexPath.Row];
-                viewControllerWeakReference.Unwrap()?.LinkedContactSelected(cp, tableView.CellAt(indexPath));
+                var ca = Items[indexPath.Row];
+                viewControllerWeakReference.Unwrap()?.EmailAddressSelected(ca);
             }
 
-            public override string[] SectionIndexTitles(UITableView tableView) => items.Select(i => i.First()?.Name.SafeSubstring(0, 1).ToUpper())
-                                                                                       .ToArray();
-
-            public void SetItems(List<ContactPreview> phonebookContacts)
+            public void SetItems(List<CommunicationAddress> ca)
             {
                 loading = false;
 
-                items.Clear();
-                items.AddRange(phonebookContacts.GroupBy(cp => cp.Name.SafeSubstring(0, 1)).Select(s => s.ToList()));
+                Items.AddRange(ca);
 
-                var sectionsCount = items.Count;
-
-                tableViewWeakReference.Unwrap()?.BeginUpdates();
                 tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
-                if (sectionsCount > 1)
-                    tableViewWeakReference.Unwrap()?.InsertSections(NSIndexSet.FromNSRange(new NSRange(1, sectionsCount - 1)), UITableViewRowAnimation.Fade);
-                tableViewWeakReference.Unwrap()?.EndUpdates();
             }
+
 
             public void Reset()
             {
                 loading = true;
 
-                var sectionsCount = tableViewWeakReference.Unwrap()?.NumberOfSections() ?? 0;
+                var count = Items.Count;
 
-                items.Clear();
+                Items.Clear();
 
                 tableViewWeakReference.Unwrap()?.BeginUpdates();
-                if (sectionsCount > 1)
-                    tableViewWeakReference.Unwrap()?.DeleteSections(NSIndexSet.FromNSRange(new NSRange(1, sectionsCount - 1)), UITableViewRowAnimation.Fade);
                 tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
                 tableViewWeakReference.Unwrap()?.EndUpdates();
             }
         }
+
+
+         
     }
 }
