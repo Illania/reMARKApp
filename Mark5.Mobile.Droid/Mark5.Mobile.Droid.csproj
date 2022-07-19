@@ -730,6 +730,10 @@
     <Compile Include="Ui\Fragments\ExternalDocumentFoldersListFragment.cs" />
     <Compile Include="Ui\Fragments\ExternalDocumentsListFragment.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
+    <Compile Include="UI\Fragments\ContactEmailAddressesFragment.cs" />
+    <Compile Include="UI\Fragments\LinkedEmailListFragment.cs" />
+    <Compile Include="Ui\Activities\ContactEmailAddressesActivity.cs" />
+    <Compile Include="Ui\Activities\LinkedEmailListActivity.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -1260,6 +1264,7 @@
       <SubType></SubType>
       <Generator></Generator>
     </AndroidResource>
+    <AndroidResource Include="Resources\layout\linear_layout_contact_email_addresses.axml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FastScrollRecycler\FastScrollRecycler.csproj">

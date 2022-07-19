@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Linq;
-using Android.Content;
 using Android.OS;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
@@ -41,8 +39,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected override async void Adapter_ItemClicked(object sender, ContactPreview contactPreview)
         {
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, Resource.String.loading_contact, Resource.String.please_wait);
 
+            try
+            {
+                Activity.StartActivityForResult(ContactEmailAddressesActivity.CreateIntent(Context, folder: Folder, contactPreview: contactPreview), PickerContactsListActivity.ContactEmailAddressesRequestCode);
+            }
+            catch (Exception ex)
+            { 
+                dismissAction();
+                CommonConfig.Logger.Error($"Error while retrieving contact [FolderId = {Folder?.Id}, ContactId = {contactPreview.Id}]");
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+            }
+            dismissAction();
         }
+       
 
         protected override void Adapter_ItemLongClicked(object sender, ContactPreview contactPreview)
         {

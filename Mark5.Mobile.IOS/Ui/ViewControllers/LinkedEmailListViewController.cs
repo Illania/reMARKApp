@@ -126,7 +126,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeNavigationBar()
         {
-            NavigationItem.Title = ContactPreview.Name + Localization.GetString("contacts_list");
+            NavigationItem.Title = ContactPreview.Name + " " + Localization.GetString("contacts_list");
             exitItem = new UIBarButtonItem(UIBarButtonSystemItem.Cancel);
             NavigationItem.SetLeftBarButtonItem(exitItem, true);
         }

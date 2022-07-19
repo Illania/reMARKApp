@@ -12,6 +12,7 @@ using Android.Views;
 using FastScrollRecycler;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
+using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
@@ -28,15 +29,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public ContactPreview ContactPreview { get; set; }
 
         RecyclerView recyclerView;
-        PhonebookContactsListAdapter adapter;
-        PhonebookContactsListAdapter searchAdapter;
+        LinkedEmailListAdapter adapter;
+        LinkedEmailListAdapter searchAdapter;
         SearchView searchView;
         IMenu menu;
 
-        public static (LinkedEmailListFragment fragment, string tag) NewInstance()
+        public static (LinkedEmailListFragment fragment, string tag) NewInstance(Folder folder = null, Contact contact = null, ContactPreview contactPreview = null)
         {
-            var fragment = new LinkedEmailListFragment ListFragment();
-            var tag = $"{nameof(LinkedEmailListFragment ListFragment)}";
+            var fragment = new LinkedEmailListFragment();
+            var tag = $"{nameof(LinkedEmailListFragment)}";
 
             return (fragment, tag);
         }
@@ -57,7 +58,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             recyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
             recyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
 
-            adapter = new PhonebookContactsListAdapter();
+            adapter = new LinkedEmailListAdapter();
             adapter.ItemClicked += Adapter_ItemClicked;
             adapter.RegisterAdapterDataObserver(new LambdaEmptyAdapterObserver(() =>
             {
@@ -87,50 +88,29 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info($"Created {nameof(LinkedEmailListFragment)}");
         }
 
-        public override void OnResume()
+        public override async void OnResume()
         {
             base.OnResume();
 
             if (adapter.ItemCount < 1)
             {
                 CommonConfig.Logger.Info($"Refreshing {nameof(PhonebookContactsListFragment)}");
-                RefreshView();
+                await RefreshView();
             }
         }
 
-        void RefreshView()
+        async Task RefreshView()
         {
-            List<Recipient> contacts = null;
-
-            Task.Run(() =>
-              {
-                  contacts = CommonConfig.Phonebook.GetPhonebookContacts();
-              }).ContinueWith(async t =>
-               {
-                   if (t.IsFaulted)
-                   {
-                       var ex = t.Exception.InnerException;
-                       CommonConfig.Logger.Error($"Error while retrieving phonebook contacts", ex);
-                       await Dialogs.ShowErrorDialogAsync(Activity, ex);
-                   }
-
-                   if (contacts == null)
-                   {
-                       await Dialogs.ShowConfirmDialogAsync(Activity, Resource.String.phonebook_contacts_no_access_title,
-                                                            Resource.String.phonebook_contacts_no_access_content);
-                       Activity?.Finish();
-                   }
-                   else
-                   {
-                       adapter.SetItems(contacts.OrderBy(c => c.Name.SafeSubstring(0, 1)));
-                   }
-               }, TaskScheduler.FromCurrentSynchronizationContext());
+                if (Contact == null)
+                    Contact = await Managers.ContactsManager.GetContactAsync(Folder, ContactPreview.Id);
+                if (Contact.CommunicationAddresses.Any())
+                    adapter.SetItems(Contact.CommunicationAddresses.OrderBy(c => c.Address.SafeSubstring(0, 1)));
         }
 
-        void Adapter_ItemClicked(object sender, Recipient r)
+        void Adapter_ItemClicked(object sender, CommunicationAddress ca)
         {
             var intent = new Intent();
-            intent.PutExtra(PhonebookContactsListActivity.RecipientResultKey, Serializer.Serialize(r));
+            intent.PutExtra(LinkedEmailListActivity.RecipientResultKey, Serializer.Serialize(ca));
             Activity.SetResult(Result.Ok, intent);
             Activity?.Finish();
         }
@@ -194,21 +174,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return false;
         }
 
-        static bool MatchesQuery(Recipient recipient, string query)
+        static bool MatchesQuery(CommunicationAddress ca, string query)
         {
-            if (recipient.Address?.ContainsCaseInsensitive(query) ?? false)
-                return true;
-
-            if (recipient.Name?.ContainsCaseInsensitive(query) ?? false)
-                return true;
-
-            if (recipient.AddressDescription?.ContainsCaseInsensitive(query) ?? false)
-                return true;
-
-            if (recipient.ContactDescription?.ContainsCaseInsensitive(query) ?? false)
-                return true;
-
-            if (recipient.ShortId?.ContainsCaseInsensitive(query) ?? false)
+            if (ca.Address?.ContainsCaseInsensitive(query) ?? false)
                 return true;
 
             return false;
@@ -216,31 +184,29 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #endregion
 
-        class LinkedEmailListFragment ListAdapter : RecyclerView.Adapter, ISectionedAdapter
+        class LinkedEmailListAdapter : RecyclerView.Adapter, ISectionedAdapter
         {
             public override int ItemCount => Items.Count;
-            public List<Recipient> Items { get; } = new List<Recipient>();
+            public List<CommunicationAddress> Items { get; } = new List<CommunicationAddress>();
 
-            public event EventHandler<Recipient> ItemClicked = delegate { };
+            public event EventHandler<CommunicationAddress> ItemClicked = delegate { };
 
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
-                var viewHolder = holder as LinkedEmailViewHolder;
+                var viewHolder = holder as LinkedEmailListViewHolder;
                 var recipient = Items[position];
 
                 viewHolder.ItemView.SetOnClickListener(new ActionOnClickListener(() => ItemClicked(this, recipient)));
-
                 viewHolder.Address = recipient.Address;
-                viewHolder.Name = recipient.Name;
             }
 
             public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
             {
                 var itemView = LayoutInflater.FromContext(parent.Context).Inflate(Resource.Layout.list_item_recipients, parent, false);
-                return new LinkedEmailViewHolder(itemView);
+                return new LinkedEmailListViewHolder(itemView);
             }
 
-            public void SetItems(IEnumerable<Recipient> recipients)
+            public void SetItems(IEnumerable<CommunicationAddress> recipients)
             {
                 Items.Clear();
                 Items.AddRange(recipients);
@@ -255,13 +221,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 NotifyItemRangeRemoved(0, size);
             }
 
-            public void ReplaceItems(List<Recipient> items)
+            public void ReplaceItems(List<CommunicationAddress> items)
             {
                 Clear();
                 AppendItems(items);
             }
 
-            public void AppendItems(List<Recipient> items)
+            public void AppendItems(List<CommunicationAddress> items)
             {
                 var count = Items.Count;
                 Items.AddRange(items);
@@ -270,36 +236,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             string ISectionedAdapter.GetSectionName(int position)
             {
-                return Items[position].Name?.SafeSubstring(0, 1)?.ToUpper() ?? "";
+                return Items[position].Address?.SafeSubstring(0, 1)?.ToUpper() ?? "";
             }
 
             class LinkedEmailListViewHolder : RecyclerView.ViewHolder
             {
                 public string Address { set => addressTextView.Text = value; }
-
-                public string Name
-                {
-                    set
-                    {
-                        if (string.IsNullOrEmpty(value))
-                        {
-                            nameTextView.Visibility = ViewStates.Gone;
-                        }
-                        else
-                        {
-                            nameTextView.Visibility = ViewStates.Visible;
-                            nameTextView.Text = value;
-                        }
-                    }
-                }
-
                 readonly AppCompatTextView addressTextView;
-                readonly AppCompatTextView nameTextView;
-
                 public LinkedEmailListViewHolder(View itemView) : base(itemView)
                 {
                     addressTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_recipients_address);
-                    nameTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_recipients_name);
                 }
             }
         }
