@@ -16,6 +16,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
     {
         public const string RecipientResultKey = "RecipientResult_ecf8b6fd-8908-4330-aef4-d6724b1a97b2";
         public const string FolderIntentKey = "FromFolderIntent_3a68d401-f581-4094-b526-4478cc43d3f4";
+        public const int ContactEmailAddressesRequestCode = 999;
 
         Toolbar toolbar;
 
@@ -64,6 +65,19 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             base.Finish();
 
             OverridePendingTransition(Resource.Animation.enter_from_left_half, Resource.Animation.exit_to_right);
+        }
+
+        protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
+        {
+            if (requestCode == ContactEmailAddressesRequestCode && resultCode == Result.Ok && data.HasExtra(ContactEmailAddressesActivity.RecipientResultKey))
+            {
+                var recipientString = data.GetStringExtra(ContactEmailAddressesActivity.RecipientResultKey);
+
+                var resultIntent = new Intent();
+                resultIntent.PutExtra(RecipientResultKey, recipientString);
+                SetResult(Result.Ok, resultIntent);
+                Finish();
+            }
         }
     }
 }

@@ -29,16 +29,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
         protected async override void ContactSelected(UITableView tableView, NSIndexPath indexPath, ContactPreview contactPreview)
         {
-            var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("loading_contact___"));
-
             try
             {
-                var contact = await Managers.ContactsManager.GetContactAsync(Folder, contactPreview.Id);
-                dismissAction();
-
-                var ds = (DataSource)tableView.Source;
-                var cell = tableView.CellAt(ds.FindItemIndexPath(contactPreview) );
-
                 var vc = new ContactEmailAddressesViewController();
                 vc.SetData(Folder, contactPreview);
                 NavigationController.PushViewController(vc, true);
@@ -54,8 +46,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
             }
             catch (Exception ex)
             {
-                dismissAction();
-                CommonConfig.Logger.Error($"Error while retrieving contact [FolderId = {Folder?.Id}, ContactId = {contactPreview.Id}]");
+                CommonConfig.Logger.Error($"Error while retrieving contact email addresses [FolderId = {Folder?.Id}, ContactId = {contactPreview.Id}]");
                 await Dialogs.ShowErrorAlertAsync(this, ex);
             }
             finally
