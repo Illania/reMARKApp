@@ -26,7 +26,7 @@ using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-    [Activity(Label = "reMARK Mail Viewer", ScreenOrientation = ScreenOrientation.Portrait, Exported = true)]
+    [Activity(Label = "reMARK Mail Viewer", ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize, Exported = true)]
     [IntentFilter(new[] { Intent.ActionView, Intent.ActionSend },
                   Categories = new[] { Intent.CategoryDefault },
                   DataMimeTypes = new[] { "application/octet-stream", "message/rfc822" })]

@@ -11,7 +11,7 @@ using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-    [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
+     [Activity(ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize )]
     public class DownloadActivity : BaseAppCompatActivity
     {
         public const string FolderIntentKey = "FolderIntent_07bbbc0a-5453-4557-881f-2599cfb99a9e";

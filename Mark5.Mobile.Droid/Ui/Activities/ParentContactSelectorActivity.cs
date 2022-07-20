@@ -12,7 +12,7 @@ using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-    [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
+     [Activity(ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize )]
     public class ParentContactSelectorActivity : BaseAppCompatActivity
     {
         public const string ParentContactResultKey = "ParentContactResult_7b800032-5a7b-412a-bad5-0a07858fb689";

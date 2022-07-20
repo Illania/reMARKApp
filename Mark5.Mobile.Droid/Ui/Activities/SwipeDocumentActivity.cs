@@ -16,7 +16,7 @@ using Newtonsoft.Json;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-    [Android.App.Activity(ScreenOrientation = ScreenOrientation.Portrait)]
+    [Android.App.Activity(ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize)]
     public class SwipeDocumentActivity : BaseAppCompatActivity, ViewPager.IOnPageChangeListener
     {
         public const string FolderIdIntentKey = "FolderId_4bd29db4-c529-48a2-bf8f-8f1a96ed60b5";

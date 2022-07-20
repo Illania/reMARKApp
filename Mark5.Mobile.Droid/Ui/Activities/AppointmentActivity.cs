@@ -10,7 +10,7 @@ using Mark5.Mobile.Droid.Ui.Fragments.Calendar;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-    [Activity(ScreenOrientation = ScreenOrientation.Portrait, ParentActivity = typeof(MainActivity))]
+    [Activity(ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize, ParentActivity = typeof(MainActivity))]
     public class AppointmentActivity : BaseAppCompatActivity
     {
         const string CalendarIdKey = "calendarId";

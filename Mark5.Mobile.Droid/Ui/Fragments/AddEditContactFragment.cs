@@ -413,12 +413,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     Type = contactType
                 };
                
-                contact.CommunicationAddresses?.Add(new CommunicationAddress(preconfiguredEmailAddress.Address, CommunicationAddressType.Email));
+                contact.CommunicationAddresses?.Add(new CommunicationAddress(preconfiguredEmailAddress?.Address, CommunicationAddressType.Email));
 
                 if (contactPreview.Type == ContactType.Person)
-                    contact.FirstName = preconfiguredEmailAddress.Name;
+                    contact.FirstName = preconfiguredEmailAddress?.Name;
                 else
-                    contactPreview.Name = preconfiguredEmailAddress.Name;
+                    contactPreview.Name = preconfiguredEmailAddress?.Name;
 
 
 

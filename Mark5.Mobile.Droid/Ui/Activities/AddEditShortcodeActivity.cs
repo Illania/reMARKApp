@@ -12,7 +12,7 @@ using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-    [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
+     [Activity(ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize )]
     public class AddEditShortcodeActivity : BaseAppCompatActivity
     {
         public const string ShortcodePreviewIntentKey = "ShortcodePreview_eb091227-f038-4f33-89c9-49f5286df976";
