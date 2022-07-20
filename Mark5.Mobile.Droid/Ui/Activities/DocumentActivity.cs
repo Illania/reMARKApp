@@ -12,7 +12,7 @@ using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-    [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
+     [Activity(ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize )]
     public class DocumentActivity : BaseAppCompatActivity
     {
         public const string FailedDocumentToUploadGuidIntentKey = "FailedDocumentToUploadGuid_d76eb08a-1873-49f2-8e91-b6bc80417ccf";

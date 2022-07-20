@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Android.App;
 using Android.Content;
@@ -13,7 +13,7 @@ using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-    [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
+     [Activity(ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize )]
     public class ComposeDocumentActivity : BaseAppCompatActivity
     {
         const string DocumentCreationModeFlagIntentKey = "DocumentCreationModeFlag_290d1383-175d-4e2d-8f5e-ca899baff3f7";

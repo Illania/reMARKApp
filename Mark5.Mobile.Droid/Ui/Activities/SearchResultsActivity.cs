@@ -1,4 +1,4 @@
-using Android.App;
+﻿using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
@@ -13,7 +13,7 @@ using TinyMessenger;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-    [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
+     [Activity(ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize )]
     public class SearchResultsActivity : BaseAppCompatActivity
     {
         public const string ModuleIntentKey = "Module_fb7022b2-d795-4a22-8f94-052397d50b17";

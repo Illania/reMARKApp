@@ -9,7 +9,7 @@ using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-    [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
+     [Activity(ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize )]
     public class RecentAddressesListActivity : BaseAppCompatActivity
     {
         public const string RecipientResultKey = "RecipietnResult_73d232bb-d317-48bc-b497-8c490a31e4d3";

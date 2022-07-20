@@ -11,7 +11,7 @@ using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-    [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
+     [Activity(ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize )]
     public class PickerContactsListActivity : BaseAppCompatActivity
     {
         public const string RecipientResultKey = "RecipientResult_ecf8b6fd-8908-4330-aef4-d6724b1a97b2";

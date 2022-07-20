@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
@@ -12,7 +12,7 @@ using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-    [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
+     [Activity(ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize )]
     public class ContactActivity : BaseAppCompatActivity
     {
         public const string FolderIdIntentKey = "FolderId_35678826-1e66-4e81-9f6a-68b758712338";

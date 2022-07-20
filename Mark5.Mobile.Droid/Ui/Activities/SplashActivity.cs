@@ -34,7 +34,7 @@ using TinyIoC;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-    [Activity(MainLauncher = true, Icon = "@mipmap/ic_icon", Theme = "@style/mark5Splash", ScreenOrientation = ScreenOrientation.Portrait,
+    [Activity(MainLauncher = true, Icon = "@mipmap/ic_icon", Theme = "@style/mark5Splash", ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize,
         NoHistory = true, ResizeableActivity = true, Name = "com.nordic_it.mark5.android.SplashActivity")]
     public class SplashActivity : AppCompatActivity
     {

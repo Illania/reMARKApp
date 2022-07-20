@@ -11,7 +11,7 @@ using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-    [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
+     [Activity(ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize )]
     public class ExternalDocumentsListActivity : BaseAppCompatActivity
     {
         public const string AttachmentResultKey = "bd52c99b-6fd5-400e-a63f-24e02e44ca11";

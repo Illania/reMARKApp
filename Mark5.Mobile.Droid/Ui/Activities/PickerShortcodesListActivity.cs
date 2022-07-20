@@ -11,7 +11,7 @@ using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-    [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
+     [Activity(ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize )]
     public class PickerShortcodesListActivity : BaseAppCompatActivity
     {
         public const string ShortcodeIdResultKey = "ShortcodeResult_6c50b825-28f6-4143-93b5-9d209d365b25";

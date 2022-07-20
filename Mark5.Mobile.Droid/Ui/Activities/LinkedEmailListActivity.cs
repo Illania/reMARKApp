@@ -11,7 +11,7 @@ using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-    [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
+     [Activity(ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize )]
     public class LinkedEmailListActivity : BaseAppCompatActivity
     {
         public const string RecipientResultKey = "RecipientResult_30f359c2-8e26-4149-979a-80fd76d7d119";

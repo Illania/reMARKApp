@@ -11,7 +11,7 @@ using Mark5.Mobile.Droid.Ui.Fragments.FoldersList;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-    [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
+     [Activity(ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize )]
     public class ExternalDocumentFoldersListActivity : BaseAppCompatActivity
     {
         public const string AttachmentResultKey = "7cfb7f4a-6eae-412c-af55-acdb73cb20cc";

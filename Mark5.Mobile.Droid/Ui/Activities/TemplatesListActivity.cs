@@ -9,7 +9,7 @@ using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-    [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
+     [Activity(ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize )]
     public class TemplatesListActivity : BaseAppCompatActivity
     {
         public const string TemplatePreviewResultKey = "TemplatePreviewResult_92796943-fe6c-44d1-a999-1d19286a97f6";

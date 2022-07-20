@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Linq;
+using Android.App;
 using Android.Content;
+using Android.Content.PM;
+using Android.Content.Res;
 using Android.Graphics;
 using Android.OS;
 using Android.Support.V4.Content;
@@ -8,10 +11,14 @@ using Android.Support.V7.App;
 using Android.Views;
 using Com.Syncfusion.Schedule;
 using Com.Syncfusion.Schedule.Enums;
+using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
+using static Android.Content.Res.Resources;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 {
+
+    [Activity(ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize)]
     public class MonthCalendarFragment : BaseCalendarFragment, IMenuItemOnMenuItemClickListener
     {
         public static (MonthCalendarFragment fragment, string tag) NewInstance()
@@ -24,6 +31,21 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             fragment.Arguments = args;
 
             return (fragment, tag);
+        }
+
+        public override void OnConfigurationChanged(Configuration newConfig)
+        {
+            base.OnConfigurationChanged(newConfig);
+
+            // Checks the orientation of the screen
+            if (newConfig.Orientation == Orientation.Landscape)
+            {
+                ((MonthSchedule)schedule).SetHorizontalOrientationSettings();
+            }
+            else if (newConfig.Orientation == Orientation.Portrait)
+            {
+                ((MonthSchedule)schedule).SetVerticalOrientationSettings();
+            }
         }
 
         protected override void SetSchedule()
@@ -165,7 +187,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             {
                 cellStyle = new CellStyle
                 {
-                    BackgroundColor = whiteColor,
+                    BackgroundColor = darkGrayColor,
                     TextColor = darkerBlueColor,
                 };
             }
@@ -173,12 +195,32 @@ namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
             {
                 cellStyle = new CellStyle
                 {
-                    BackgroundColor = whiteColor,
+                    BackgroundColor = darkGrayColor,
                     TextColor = darkerBlueColor,
                 };
             }
+            e.CellStyle = cellStyle;       
+        }
 
-            e.CellStyle = cellStyle;
+        public void SetHorizontalOrientationSettings()
+        {
+            MonthCellStyle monthCellStyle = new MonthCellStyle
+            {
+                TextSize = 8f
+            };
+            MonthCellStyle = monthCellStyle;
+            HeaderHeight = 20f;
+
+        }
+
+        public void SetVerticalOrientationSettings()
+        {
+            MonthCellStyle monthCellStyle = new MonthCellStyle
+            {
+                TextSize = 16f
+            };
+            MonthCellStyle = monthCellStyle;
+            HeaderHeight = 50f;
         }
 
     }

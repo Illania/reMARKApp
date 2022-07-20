@@ -11,7 +11,7 @@ using Mark5.Mobile.Droid.Ui.Fragments;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-    [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
+     [Activity(ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize )]
     public class ParentContactSelectorFoldersListActivity : BaseAppCompatActivity
     {
         public const string ParentContactResultKey = "RecipientResult_7638a4cd-f12f-4e8a-8862-98fd9fa208bc";

@@ -1,4 +1,4 @@
-using Android.App;
+﻿using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
@@ -13,7 +13,7 @@ using TinyMessenger;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-    [Activity(ScreenOrientation = ScreenOrientation.Portrait)]
+     [Activity(ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize )]
     public class ContactsListActivity : BaseAppCompatActivity
     {
         public const string FolderIntentKey = "Folder_fc733ef0-68cb-4412-9255-cf128602f176";
