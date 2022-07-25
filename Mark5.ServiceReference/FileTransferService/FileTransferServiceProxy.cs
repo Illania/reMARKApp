@@ -60,10 +60,10 @@ namespace Mark5.ServiceReference.FileTransferService
             endpointUrl = $"{(ssl ? "https" : "http")}://{hostname}{(usePort ? (":" + port) : "")}/fts3";
         }
 
-        private bool IsAzureTokenExpired()
+        private bool IsTokenCloseToExpire()
         {
             if (azureApplicationProxyInfo != null && azureApplicationProxyInfo.IsValid()
-                 && Mobile.Classes.JwtDecoder.Decoder.IsExpired(bearerToken))
+                 && Mobile.Classes.JwtDecoder.Decoder.IsCloseToExpire(bearerToken))
                 return true;
             else
                 return false;
@@ -87,22 +87,14 @@ namespace Mark5.ServiceReference.FileTransferService
             try
             {
                 onStartTransmission?.Invoke();
+                if (IsTokenCloseToExpire())
+                    await UpdateBearerToken();
+
                 return await GetServiceVersion(req, ct);
             }
             catch (OperationCanceledException)
             { 
                 throw;
-            }
-            catch (Exception ex) when (!(ex is FileTransferServiceException))
-            {
-                if (IsAzureTokenExpired())
-                {
-                    await UpdateBearerToken();
-                    return await GetServiceVersion(req, ct);
-                }
-
-                else
-                    throw new FileTransferServiceException(ex.Message);
             }
             finally
             {
@@ -152,22 +144,15 @@ namespace Mark5.ServiceReference.FileTransferService
                 try
                 {
                     onStartTransmission?.Invoke();
+
+                    if (IsTokenCloseToExpire())
+                        await UpdateBearerToken();
+
                     return await GetAttachmentV300(req, saveHandler, ct);
                 }
                 catch (OperationCanceledException)
                 {
                     throw;
-                }
-                catch (Exception ex) when (!(ex is FileTransferServiceException))
-                {
-                    if (IsAzureTokenExpired())
-                    {
-                        await UpdateBearerToken();
-                        return await GetAttachmentV300(req, saveHandler, ct);
-                    }
-
-                    else
-                        throw new FileTransferServiceException(ex.Message);
                 }
                 catch (Exception ex)
                 {
@@ -183,22 +168,14 @@ namespace Mark5.ServiceReference.FileTransferService
                 {
                     onStartTransmission?.Invoke();
 
+                    if (IsTokenCloseToExpire())
+                        await UpdateBearerToken();
+
                     return await GetAttachmentV301(req, saveHandler, ct);
                 }
                 catch (OperationCanceledException)
                 {
                     throw;
-                }
-                catch (Exception ex) when (!(ex is FileTransferServiceException))
-                {
-                    if (IsAzureTokenExpired())
-                    {
-                        await UpdateBearerToken();
-                        return await GetAttachmentV301(req, saveHandler, ct);
-                    }
-
-                    else
-                        throw new FileTransferServiceException(ex.Message);
                 }
                 finally
                 {
@@ -318,22 +295,15 @@ namespace Mark5.ServiceReference.FileTransferService
                 try
                 {
                     onStartTransmission?.Invoke();
+
+                    if (IsTokenCloseToExpire())
+                        await UpdateBearerToken();
+
                     return await UploadTemporaryAttachmentV300(req, ct);
                 }
                 catch (OperationCanceledException)
                 {
                     throw;
-                }
-                catch (Exception ex) when (!(ex is FileTransferServiceException))
-                {
-                    if (IsAzureTokenExpired())
-                    {
-                        await UpdateBearerToken();
-                        return await UploadTemporaryAttachmentV300(req, ct);
-                    }
-
-                    else
-                        throw new FileTransferServiceException(ex.Message);
                 }
                 finally
                 {
@@ -344,22 +314,15 @@ namespace Mark5.ServiceReference.FileTransferService
                 try
                 {
                     onStartTransmission?.Invoke();
+
+                    if (IsTokenCloseToExpire())
+                        await UpdateBearerToken();
+
                     return await UploadTemporaryAttachmentV301(req, ct);
                 }
                 catch (OperationCanceledException)
                 {
                     throw;
-                }
-                catch (Exception ex) when (!(ex is FileTransferServiceException))
-                {
-                    if (IsAzureTokenExpired())
-                    {
-                        await UpdateBearerToken();
-                        return await UploadTemporaryAttachmentV301(req, ct);
-                    }
-
-                    else
-                        throw new FileTransferServiceException(ex.Message);
                 }
                 finally
                 {

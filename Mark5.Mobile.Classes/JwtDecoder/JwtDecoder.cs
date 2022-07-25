@@ -72,20 +72,21 @@ namespace Mark5.Mobile.Classes.JwtDecoder
         /// </summary>
         /// <returns><c>true</c>, if expired, <c>false</c> otherwise.</returns>
         /// <param name="token">Token.</param>
-        public static bool IsExpired(string token)
+        public static bool IsCloseToExpire(string token)
         {
-            var tokenDecoded = DecodeToken(token);
-            var expiration = JsonConvert.DeserializeObject<JwtExpiration>(tokenDecoded.Payload).Expiration;
+            var (_, Payload, _) = DecodeToken(token);
+            var expiration = JsonConvert.DeserializeObject<JwtExpiration>(Payload).Expiration;
 
-            bool isExpired = expiration != null;
+            bool isCloseToExpire = expiration != null;
 
 
+            //We consider a token close to expire if it is going to expire in 10 minutes
             if (expiration != null)
             {
-                isExpired = DateTimeHelpers.FromUnixTime((long)expiration) < DateTime.UtcNow;
+                isCloseToExpire = DateTimeHelpers.FromUnixTime((long)expiration) < DateTime.UtcNow.AddMinutes(10);
             }
 
-            return isExpired;
+            return isCloseToExpire;
         }
     }
 

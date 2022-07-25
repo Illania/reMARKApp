@@ -1051,7 +1051,7 @@ namespace Mark5.Mobile.Common.Manager
             }
 
             if (sourceType == SourceType.Local)
-                throw new ReMarkException(ErrorConstants.Codes.InvalidSourceType);
+                return new List<ExtraField>();
 
             throw new ArgumentException("Invalid sourceType provided");
         }
@@ -1100,7 +1100,7 @@ namespace Mark5.Mobile.Common.Manager
             }
 
             if (sourceType == SourceType.Local)
-                throw new ReMarkException(ErrorConstants.Codes.InvalidSourceType);
+                return new Dictionary<DocumentExtraFieldInfo, string>();
 
             throw new ArgumentException("Invalid sourceType provided");
         }
