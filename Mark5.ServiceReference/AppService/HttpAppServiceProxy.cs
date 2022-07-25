@@ -62,22 +62,37 @@ namespace Mark5.ServiceReference.AppService
         {
             HttpStatusCode statusCode = 0;
             var useBearerToken = !string.IsNullOrEmpty(bearerToken);
-           
+
+            async Task<R> CreateRequestAsync()
+            {
+                using var c = new HttpClient(httpClientHandler())
+                {
+                    Timeout = TimeSpan.FromSeconds(useShortTimeout ? Config.HttpClientShortTimeoutSeconds : Config.HttpClientTimeoutSeconds)
+                };
+                var req = CreateRequest(soapAction, parameters, checkXmlCharacters, bearerToken);
+                var res = useBearerToken ? await c.SendAsync(req) : await c.SendAsync(req, ct);
+                statusCode = res.StatusCode;
+                return await ProcessResponse<R>(soapAction, res);
+            }
     
             try
             {
                 onStartTransmission?.Invoke();
 
-                using (var c = new HttpClient(httpClientHandler())
+                if (ShouldRefreshBearerToken(azureApplicationProxyInfo, bearerToken))
                 {
-                    Timeout = TimeSpan.FromSeconds(useShortTimeout ? Config.HttpClientShortTimeoutSeconds : Config.HttpClientTimeoutSeconds)
-                })
-                {
-                    var req = CreateRequest(soapAction, parameters, checkXmlCharacters, bearerToken);              
-                    var res = useBearerToken ? await c.SendAsync(req) : await c.SendAsync(req, ct);
-                    statusCode = res.StatusCode;
-                    return await ProcessResponse<R>(soapAction, res);
+                    var azureAppProxyAuthService = new AzureAppProxyAuthService(azureApplicationProxyInfo.AppClientId,
+                       azureApplicationProxyInfo.ApplicationProxyClientId);
+                    bearerToken = await azureAppProxyAuthService.Authenticate(this, false);
+
+                    if (!string.IsNullOrEmpty(bearerToken))
+                    {
+                        AzureSettings.AccessToken = bearerToken;
+                        AzureSettings.AccessTokenLastUpdated = DateTime.Now.ToLocalTime();
+                    }
                 }
+                return await CreateRequestAsync();
+               
             }
             catch (Exception ex) when (!(ex is HttpAppServiceException))
             {
@@ -87,43 +102,20 @@ namespace Mark5.ServiceReference.AppService
                     throw new HttpAppServiceException(statusCode, te.Message, te);
                 }
 
-                if (azureApplicationProxyInfo != null && azureApplicationProxyInfo.IsEnabled
-                 && !string.IsNullOrEmpty(azureApplicationProxyInfo.AppClientId)
-                 && !string.IsNullOrEmpty(azureApplicationProxyInfo.ApplicationProxyClientId)
-                 && !string.IsNullOrEmpty(bearerToken)
-                 && AzureSettings.IsTokenExpired())
-                {
-
-                    var azureAppProxyAuthService = new AzureAppProxyAuthService(azureApplicationProxyInfo.AppClientId,
-                        azureApplicationProxyInfo.ApplicationProxyClientId);
-                    bearerToken = await azureAppProxyAuthService.Authenticate(this, false);
-
-                    if (!string.IsNullOrEmpty(bearerToken))
-                    {
-                        AzureSettings.RefreshToken = bearerToken;
-                        AzureSettings.RefreshTokenLastUpdated = DateTime.Now.ToLocalTime();
-                    }
-
-                    using (var c = new HttpClient(httpClientHandler())
-                    {
-                        Timeout = TimeSpan.FromSeconds(useShortTimeout ? Config.HttpClientShortTimeoutSeconds : Config.HttpClientTimeoutSeconds)
-                    })
-                    {
-                        var req = CreateRequest(soapAction, parameters, checkXmlCharacters, bearerToken);
-                        var res = useBearerToken ? await c.SendAsync(req) : await c.SendAsync(req, ct);
-                        statusCode = res.StatusCode;
-                        return await ProcessResponse<R>(soapAction, res);
-                    } 
-                }
-
-                else
-                    throw new HttpAppServiceException(statusCode, ex.Message, ex);
+               throw new HttpAppServiceException(statusCode, ex.Message, ex);
             }
             finally
             {
                 onStopTransmission?.Invoke();
             }
         }
+
+        bool ShouldRefreshBearerToken(AzureApplicationProxyInfo azureApplicationProxyInfo, string bearerToken)
+        {
+            return azureApplicationProxyInfo != null && azureApplicationProxyInfo.IsValid()
+                     && !string.IsNullOrEmpty(bearerToken) && AzureSettings.IsTokenCloseToExpire();
+        }
+
 
         HttpRequestMessage CreateRequest<P>(string soapAction, P parameters, bool checkXmlCharacters = true, string bearerToken = "") where P : class
         {

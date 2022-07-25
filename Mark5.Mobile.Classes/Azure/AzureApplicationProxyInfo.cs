@@ -10,7 +10,7 @@ namespace Mark5.Mobile.Classes.Azure
 
         public override string ToString()
         {
-            return $"AppClientId = {AppClientId}, ApplicationProxyCClientId = {ApplicationProxyClientId}, IsEnabled = {IsEnabled}";
+            return $"AppClientId = {AppClientId}, ApplicationProxyClientId = {ApplicationProxyClientId}, IsEnabled = {IsEnabled}";
         }
 
         /// <summary>
