@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Mark5.Mobile.Common.DataAccess;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Common.Model.Actions;
 using Mark5.Mobile.Common.Model.Converters;
 using Mark5.Mobile.Common.Model.Exceptions;
 using Mark5.Mobile.Common.Model.HubMessages;
@@ -21,6 +22,8 @@ namespace Mark5.Mobile.Common.Manager
         readonly IContactsDataAccess contactsDataAccess;
         readonly IShortcodesDataAccess shortcodesDataAccess;
         readonly ICalendarDataAccess calendarDataAccess;
+
+        IActionsManager ActionsManager => Managers.ActionsManager;
 
         public CommonActionsManager(ConnectionInfo connectionInfo, IAppServiceProxy appServiceProxy, IDocumentsDataAccess documentsDataAccess, IContactsDataAccess contactsDataAccess, IShortcodesDataAccess shortcodesDataAccess, ICalendarDataAccess calendarDataAccess)
             : base(connectionInfo, appServiceProxy)
@@ -91,22 +94,48 @@ namespace Mark5.Mobile.Common.Manager
 
             if (sourceType == SourceType.Remote)
             {
-                await AppServiceProxy.FileToFolderAsync(new DataContract.FileToFolderParameters
-                {
-                    Token = Token,
-                    ObjectIds = ids.ToArray(),
-                    ObjectType = objectType.ConvertEnum<DataContract.ObjectType>(),
-                    ToFolderId = folderId,
-                    Move = false
-                });
-
-                return;
+                await CopyToFolderRemoteAsync(ids, folderId, objectType);
             }
 
-            if (sourceType == SourceType.Local)
-                throw new ReMarkException(ErrorConstants.Codes.InvalidSourceType);
+            else if (sourceType == SourceType.Local)
+            {
+                await ActionsManager.QueueActionAsync(CopyToFolderAction.Create(folderId, objectType, ids.ToArray()));  
+            }
 
-            throw new ArgumentException("Invalid sourceType provided.");
+            else
+                throw new ArgumentException("Invalid sourceType provided.");
+
+            await CopyToFolderLocalAsync(ids, folderId, objectType);
+            return;
+        }
+
+
+        internal async Task CopyToFolderRemoteAsync(List<int> ids,  int folderId, ObjectType objectType)
+        {
+            await AppServiceProxy.FileToFolderAsync(new DataContract.FileToFolderParameters
+            {
+                Token = Token,
+                ObjectIds = ids.ToArray(),
+                ObjectType = objectType.ConvertEnum<DataContract.ObjectType>(),
+                ToFolderId = folderId,
+                Move = false
+            });
+        }
+
+        internal async Task CopyToFolderLocalAsync(List<int> ids, int folderId, ObjectType objectType)
+        {
+            switch (objectType)
+            {
+                case ObjectType.Document:
+                    await documentsDataAccess.CopyToFolder(folderId, ids);
+                    break;
+                case ObjectType.Contact:
+                    await contactsDataAccess.CopyToFolder(folderId, ids);
+                    break;
+                case ObjectType.Shortcode:
+                    await shortcodesDataAccess.CopyToFolder(folderId, ids);
+                    break;
+            }
         }
 
         public async Task MoveToFolder(List<IBusinessEntity> businessEntities, Folder fromFolder, Folder toFolder, SourceType sourceType = SourceType.Auto)
@@ -123,38 +152,54 @@ namespace Mark5.Mobile.Common.Manager
 
             if (sourceType == SourceType.Remote)
             {
-                await AppServiceProxy.FileToFolderAsync(new DataContract.FileToFolderParameters
-                {
-                    Token = Token,
-                    ObjectIds = beIds.ToArray(),
-                    ObjectType = ot.ConvertEnum<DataContract.ObjectType>(),
-                    FromFolderId = fromFolder.Id,
-                    ToFolderId = toFolder.Id,
-                    Move = true
-                });
-
-                switch (ot)
-                {
-                    case ObjectType.Document:
-                        await documentsDataAccess.RemoveFromFolderAsync(beIds, fromFolder.Id);
-                        break;
-                    case ObjectType.Contact:
-                        await contactsDataAccess.RemoveFromFolderAsync(beIds, fromFolder.Id);
-                        break;
-                    case ObjectType.Shortcode:
-                        await shortcodesDataAccess.RemoveFromFolderAsync(beIds, fromFolder.Id);
-                        break;
-                }
-
-                CommonConfig.MessengerHub.Publish(new EntityMovedFromFolderMessage(this, ot, fromFolder.Id, beIds.ToList()));
-
-                return;
+                await MoveToFolderRemoteAsync(beIds, fromFolder.Id, toFolder.Id, ot);
             }
 
-            if (sourceType == SourceType.Local)
-                throw new ReMarkException(ErrorConstants.Codes.InvalidSourceType);
+            else if (sourceType == SourceType.Local)
+            {
+                await ActionsManager.QueueActionAsync(MoveToFolderAction.Create(fromFolder.Id, toFolder.Id, ot, beIds.ToArray()));
+            }
 
-            throw new ArgumentException("Invalid sourceType provided.");
+            else
+                throw new ArgumentException("Invalid sourceType provided.");
+
+            await MoveToFolderLocalAsync(beIds, fromFolder.Id, toFolder.Id, ot);
+            CommonConfig.MessengerHub.Publish(new EntityMovedFromFolderMessage(this, ot, fromFolder.Id, beIds.ToList()));
+
+            return;
+        }
+
+
+        internal async Task MoveToFolderRemoteAsync(List<int> ids, int fromFolderId, int toFolderId, ObjectType objectType)
+        {
+            await AppServiceProxy.FileToFolderAsync(new DataContract.FileToFolderParameters
+            {
+                Token = Token,
+                ObjectIds = ids.ToArray(),
+                ObjectType = objectType.ConvertEnum<DataContract.ObjectType>(),
+                FromFolderId = fromFolderId,
+                ToFolderId = toFolderId,
+                Move = true
+            });
+        }
+
+        internal async Task MoveToFolderLocalAsync(List<int> ids, int fromFolderId, int toFolderId, ObjectType objectType)
+        {
+            switch (objectType)
+            {
+                case ObjectType.Document:
+                    await documentsDataAccess.CopyToFolder(toFolderId, ids);
+                    await documentsDataAccess.RemoveFromFolderAsync(ids, fromFolderId);
+                    break;
+                case ObjectType.Contact:
+                    await contactsDataAccess.CopyToFolder(toFolderId, ids);
+                    await contactsDataAccess.RemoveFromFolderAsync(ids, fromFolderId);
+                    break;
+                case ObjectType.Shortcode:
+                    await shortcodesDataAccess.CopyToFolder(toFolderId, ids);
+                    await shortcodesDataAccess.RemoveFromFolderAsync(ids, fromFolderId);
+                    break;
+            }
         }
 
         public async Task CopyToWorktray(List<IBusinessEntity> businessEntities, SourceType sourceType = SourceType.Auto)
@@ -171,20 +216,48 @@ namespace Mark5.Mobile.Common.Manager
 
             if (sourceType == SourceType.Remote)
             {
-                await AppServiceProxy.CopyToWorktrayAsync(new DataContract.CopyToWorktrayParameters
-                {
-                    Token = Token,
-                    ObjectIds = ids.ToArray(),
-                    ObjectType = objectType.ConvertEnum<DataContract.ObjectType>(),
-                });
-
-                return;
+                await CopyToWorktrayRemoteAsync(ids, objectType);
             }
 
-            if (sourceType == SourceType.Local)
-                throw new ReMarkException(ErrorConstants.Codes.InvalidSourceType);
+            else if (sourceType == SourceType.Local)
+            {
+                await ActionsManager.QueueActionAsync(CopyToWorktrayAction.Create(objectType, ids.ToArray()));
+            }
 
-            throw new ArgumentException("Invalid sourceType provided.");
+            else
+                throw new ArgumentException("Invalid sourceType provided.");
+
+            await CopyToWorktrayLocalAsync(ids, objectType);
+            return;
+        }
+    
+
+        internal async Task CopyToWorktrayRemoteAsync(List<int> ids, ObjectType objectType)
+        {
+            await AppServiceProxy.CopyToWorktrayAsync(new DataContract.CopyToWorktrayParameters
+            {
+                Token = Token,
+                ObjectIds = ids.ToArray(),
+                ObjectType = objectType.ConvertEnum<DataContract.ObjectType>(),
+            });
+        }
+
+        internal async Task CopyToWorktrayLocalAsync(List<int> ids, ObjectType objectType)
+        {
+            var worktrayId = SystemFoldersInfo.Int_WorktrayRoot;
+
+            switch (objectType)
+            {
+                case ObjectType.Document:
+                    await documentsDataAccess.CopyToFolder(worktrayId, ids);
+                    break;
+                case ObjectType.Contact:
+                    await contactsDataAccess.CopyToFolder(worktrayId, ids);
+                    break;
+                case ObjectType.Shortcode:
+                    await shortcodesDataAccess.CopyToFolder(worktrayId, ids);
+                    break;
+            }
         }
 
         public async Task CopyToUserWorktray(List<IBusinessEntity> businessEntities, List<SystemUser> systemUsers, string comment = null, SourceType sourceType = SourceType.Auto)
@@ -258,46 +331,57 @@ namespace Mark5.Mobile.Common.Manager
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
 
+            var ids = businessEntities.Select(b => b.Id).ToList();
+            var folderId = folder.Id;
+            var objectType = businessEntities.First().ObjectType;
+
             if (sourceType == SourceType.Remote)
-            {
-                await AppServiceProxy.RemoveFromFolderAsync(new DataContract.RemoveFromFolderParameters
-                {
-                    Token = Token,
-                    ObjectIds = businessEntities.Select(be => be.Id).ToArray(),
-                    ObjectType = businessEntities.First().ObjectType.ConvertEnum<DataContract.ObjectType>(),
-                    FolderId = folder.Id
-                });
-
-                var documentPreviews = businessEntities.OfType<DocumentPreview>();
-                if (documentPreviews.Any())
-                    await documentsDataAccess.RemoveFromFolderAsync(documentPreviews.ToList(), folder);
-                var documents = businessEntities.OfType<Document>();
-                if (documents.Any())
-                    await documentsDataAccess.RemoveFromFolderAsync(documents.ToList(), folder);
-                var contactPreviews = businessEntities.OfType<ContactPreview>();
-                if (contactPreviews.Any())
-                    await contactsDataAccess.RemoveFromFolderAsync(contactPreviews.ToList(), folder);
-                var contacts = businessEntities.OfType<Contact>();
-                if (contacts.Any())
-                    await contactsDataAccess.RemoveFromFolderAsync(contacts.ToList(), folder);
-                var shortcodePreviews = businessEntities.OfType<ShortcodePreview>();
-                if (shortcodePreviews.Any())
-                    await shortcodesDataAccess.RemoveFromFolderAsync(shortcodePreviews.ToList(), folder);
-                var shortcodes = businessEntities.OfType<Shortcode>();
-                if (shortcodes.Any())
-                    await shortcodesDataAccess.RemoveFromFolderAsync(shortcodes.ToList(), folder);
-
-                CommonConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this, businessEntities.First().ObjectType, folder.Id,
-                                                                                     businessEntities.Select(b => b.Id).ToList()));
-
-                return;
+            { 
+                await RemoveFromFolderRemoteAsync(ids, folderId, objectType);
             }
 
-            if (sourceType == SourceType.Local)
-                throw new ReMarkException(ErrorConstants.Codes.InvalidSourceType);
+            else if (sourceType == SourceType.Local)
+            {
+                await ActionsManager.QueueActionAsync(RemoveFromFolderAction.Create(folder.Id, businessEntities.First().ObjectType, businessEntities.Select(dp => dp.Id).ToArray())); 
+            }
 
-            throw new ArgumentException("Invalid sourceType provided.");
+            else
+                throw new ArgumentException("Invalid sourceType provided.");
+
+            await RemoveFromFolderLocalAsync(ids, folderId, objectType);
+
+            CommonConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this, businessEntities.First().ObjectType, folder.Id,
+                                                                                 businessEntities.Select(b => b.Id).ToList()));
+            return;
         }
+
+        internal async Task RemoveFromFolderRemoteAsync(List<int> ids, int folderId, ObjectType objectType)
+        {
+            await AppServiceProxy.RemoveFromFolderAsync(new DataContract.RemoveFromFolderParameters
+            {
+                Token = Token,
+                ObjectIds = ids.ToArray(),
+                ObjectType = objectType.ConvertEnum<DataContract.ObjectType>(),
+                FolderId = folderId
+            });
+        }
+
+        internal async Task RemoveFromFolderLocalAsync(List<int> ids, int folderId, ObjectType objectType)
+        {
+            switch(objectType)
+            {
+                case ObjectType.Document:
+                    await documentsDataAccess.RemoveFromFolderAsync(ids, folderId);
+                    break;
+                case ObjectType.Contact:
+                    await contactsDataAccess.RemoveFromFolderAsync(ids, folderId);
+                    break;
+                case ObjectType.Shortcode:
+                    await shortcodesDataAccess.RemoveFromFolderAsync(ids, folderId);
+                    break;
+            }
+        }
+
 
         public async Task Delete(List<IBusinessEntity> businessEntities, SourceType sourceType = SourceType.Auto)
         {
@@ -306,48 +390,56 @@ namespace Mark5.Mobile.Common.Manager
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
 
+            var ids = businessEntities.Select(be => be.Id).ToList();
+            var objectType = businessEntities.First().ObjectType;
+
             if (sourceType == SourceType.Remote)
             {
-                await AppServiceProxy.DeleteAsync(new DataContract.DeleteParameters
-                {
-                    Token = Token,
-                    ObjectIds = businessEntities.Select(be => be.Id).ToArray(),
-                    ObjectType = businessEntities.First().ObjectType.ConvertEnum<DataContract.ObjectType>()
-                });
-
-                var documentPreviews = businessEntities.OfType<DocumentPreview>();
-                if (documentPreviews.Any())
-                    await documentsDataAccess.DeleteAsync(documentPreviews.ToList());
-                var documents = businessEntities.OfType<Document>();
-                if (documents.Any())
-                    await documentsDataAccess.DeleteAsync(documents.ToList());
-                var contactPreviews = businessEntities.OfType<ContactPreview>();
-                if (contactPreviews.Any())
-                    await contactsDataAccess.DeleteAsync(contactPreviews.ToList());
-                var contacts = businessEntities.OfType<Contact>();
-                if (contacts.Any())
-                    await contactsDataAccess.DeleteAsync(contacts.ToList());
-                var shortcodePreviews = businessEntities.OfType<ShortcodePreview>();
-                if (shortcodePreviews.Any())
-                    await shortcodesDataAccess.DeleteAsync(shortcodePreviews.ToList());
-                var shortcodes = businessEntities.OfType<Shortcode>();
-                if (shortcodes.Any())
-                    await shortcodesDataAccess.DeleteAsync(shortcodes.ToList());
-                var appointments = businessEntities.OfType<CalendarAppointment>();
-                if (appointments.Any())
-                    await calendarDataAccess.DeleteAsync(appointments.ToList());
-
-                CommonConfig.MessengerHub.Publish(new EntityRemovedMessage(this,
-                                                                           businessEntities.First().ObjectType, businessEntities.Select(b => b.Id).ToList()));
-
-                return;
+                await DeleteRemoteAsync(ids, objectType);
             }
 
-            if (sourceType == SourceType.Local)
-                throw new ReMarkException(ErrorConstants.Codes.InvalidSourceType);
+            else if (sourceType == SourceType.Local)
+            {
+                await ActionsManager.QueueActionAsync(DeleteAction.Create(businessEntities.First().ObjectType, businessEntities.Select(dp => dp.Id).ToArray()));
+            }
 
-            throw new ArgumentException("Invalid sourceType provided.");
+            else
+                throw new ArgumentException("Invalid sourceType provided.");
+
+            await DeleteLocalAsync(ids, objectType);
+
+            CommonConfig.MessengerHub.Publish(new EntityRemovedMessage(this,
+                                                                       businessEntities.First().ObjectType, businessEntities.Select(b => b.Id).ToList()));
+            return;
+
         }
+
+        internal async Task DeleteRemoteAsync(List<int> ids, ObjectType objectType)
+        {
+            await AppServiceProxy.DeleteAsync(new DataContract.DeleteParameters
+            {
+                Token = Token,
+                ObjectIds = ids.ToArray(),
+                ObjectType = objectType.ConvertEnum<DataContract.ObjectType>()
+            });
+        }
+
+        internal async Task DeleteLocalAsync(List<int> ids, ObjectType objectType)
+        {
+            switch (objectType)
+            {
+                case ObjectType.Document:
+                    await documentsDataAccess.DeleteAsync(ids);
+                    break;
+                case ObjectType.Contact:
+                    await contactsDataAccess.DeleteAsync(ids);
+                    break;
+                case ObjectType.Shortcode:
+                    await shortcodesDataAccess.DeleteAsync(ids);
+                    break;
+            }
+        }
+
 
         public async Task<List<int>> GetFavoriteCategories(SourceType sourceType = SourceType.Auto)
         {

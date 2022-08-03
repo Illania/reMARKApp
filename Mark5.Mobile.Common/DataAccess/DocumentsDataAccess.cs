@@ -399,7 +399,7 @@ namespace Mark5.Mobile.Common.DataAccess
             await DeleteAsync(ids);
         }
 
-        async Task DeleteAsync(List<int> ids)
+        public async Task DeleteAsync(List<int> ids)
         {
             try
             {
@@ -415,6 +415,26 @@ namespace Mark5.Mobile.Common.DataAccess
                 throw new DataAccessException("Error deleting documents.", ex);
             }
         }
+
+        public async Task CopyToFolder(int folderId, List<int> documentIds)
+        {
+            try
+            {
+                await documentsDatabase.RunInConnectionAsync(c =>
+                {
+                    c.InsertOrReplaceAll(documentIds.Select(dp => new FolderDocumentLink
+                    {
+                        FolderId = folderId,
+                        DocumentId = dp
+                    }));
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException($"Error filing document previews to folder with Id={folderId}.", ex);
+            }
+        }
+
 
         public async Task SaveTemplatePreviewsAsync(List<TemplatePreview> templatePreviews)
         {

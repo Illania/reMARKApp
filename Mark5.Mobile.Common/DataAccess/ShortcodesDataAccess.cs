@@ -215,7 +215,7 @@ namespace Mark5.Mobile.Common.DataAccess
             await DeleteAsync(ids);
         }
 
-        async Task DeleteAsync(List<int> ids)
+        public async Task DeleteAsync(List<int> ids)
         {
             try
             {
@@ -229,6 +229,25 @@ namespace Mark5.Mobile.Common.DataAccess
             catch (Exception ex) when (!(ex is DataAccessException))
             {
                 throw new DataAccessException("Error deleting shortcodes.", ex);
+            }
+        }
+
+        public async Task CopyToFolder(int folderId, List<int> shortcodeIds)
+        {
+            try
+            {
+                await shortcodesDatabase.RunInConnectionAsync(c =>
+                {
+                    c.InsertOrReplaceAll(shortcodeIds.Select(sp => new FolderShortcodeLink
+                    {
+                        FolderId = folderId,
+                        ShortcodeId = sp
+                    }));
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException($"Error filing shoortcode previews to folder with Id={folderId}.", ex);
             }
         }
 

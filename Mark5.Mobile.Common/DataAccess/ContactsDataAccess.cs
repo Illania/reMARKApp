@@ -242,7 +242,7 @@ namespace Mark5.Mobile.Common.DataAccess
             await DeleteAsync(ids);
         }
 
-        async Task DeleteAsync(List<int> ids)
+        public async Task DeleteAsync(List<int> ids)
         {
             try
             {
@@ -257,6 +257,25 @@ namespace Mark5.Mobile.Common.DataAccess
             catch (Exception ex) when (!(ex is DataAccessException))
             {
                 throw new DataAccessException("Error deleting contacts.", ex);
+            }
+        }
+
+        public async Task CopyToFolder(int folderId, List<int> contactIds)
+        {
+            try
+            {
+                await contactsDatabase.RunInConnectionAsync(c =>
+                {
+                    c.InsertOrReplaceAll(contactIds.Select(cp => new FolderContactLink
+                    {
+                        FolderId = folderId,
+                        ContactId = cp
+                    }));
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException($"Error filing contact previews to folder with Id={folderId}.", ex);
             }
         }
 

@@ -43,6 +43,10 @@ namespace Mark5.Mobile.Common.DataAccess
 
         Task DeleteAsync(List<Document> documents);
 
+        Task DeleteAsync(List<int> ids);
+
+        Task CopyToFolder(int folderId, List<int> documentIds);
+
         Task SaveTemplatePreviewsAsync(List<TemplatePreview> templatePreviews);
 
         Task<List<TemplatePreview>> GetTemplatePreviewsAsync();

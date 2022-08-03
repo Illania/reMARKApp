@@ -31,6 +31,10 @@ namespace Mark5.Mobile.Common.DataAccess
 
         Task DeleteAsync(List<Shortcode> shortocode);
 
+        Task DeleteAsync(List<int> ids);
+
+        Task CopyToFolder(int folderId, List<int> documentIds);
+
         Task RemoveOrphans();
 
         Task DeleteAllAsync();

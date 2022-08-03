@@ -31,6 +31,10 @@ namespace Mark5.Mobile.Common.DataAccess
 
         Task DeleteAsync(List<Contact> contacts);
 
+        Task DeleteAsync(List<int> ids);
+
+        Task CopyToFolder(int folderId, List<int> documentIds);
+
         Task SaveAllCategories(List<Category> categories);
 
         Task<List<Category>> GetAllCategoriesAsync();
