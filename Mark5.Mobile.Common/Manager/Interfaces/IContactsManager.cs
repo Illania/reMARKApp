@@ -27,8 +27,6 @@ namespace Mark5.Mobile.Common.Manager
 
         Task<List<Category>> GetAllCategoriesAsync(SourceType sourceType = SourceType.Auto);
 
-        Task SetCategoriesAsync(ContactPreview documentPreview, List<Category> categories, SourceType sourceType = SourceType.Auto);
-
         Task<Comment> AddComment(Contact contact, string content, SourceType sourceType = SourceType.Auto);
 
         Task<bool> EditComment(Contact contact, Comment comment, SourceType sourceType = SourceType.Auto);

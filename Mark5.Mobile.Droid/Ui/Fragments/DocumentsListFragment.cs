@@ -954,7 +954,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             try
             {
-                await Managers.DocumentsManager.SetCategoriesAsync(documentPreview, new List<Category> { presetCategory });
+                await Managers.CommonActionsManager.SetCategoriesAsync(documentPreview, new List<Category> { presetCategory });
 
                 adapter.RefreshItems(new List<DocumentPreview> { documentPreview });
                 searchAdapter.RefreshItems(new List<DocumentPreview> { documentPreview });

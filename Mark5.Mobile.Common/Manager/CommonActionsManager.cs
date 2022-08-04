@@ -506,7 +506,68 @@ namespace Mark5.Mobile.Common.Manager
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
+        public async Task SetCategoriesAsync(IBusinessEntity businessEntity, List<Category> categories, SourceType sourceType = SourceType.Auto)
+        {
+            if (!(businessEntity is ICategorizable categorizableEntity))
+                return;
 
+            CommonConfig.UsageAnalytics.LogEvent(new SetCategoriesEvent(businessEntity.ModuleType, 1));
+
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
+            {
+                await SetCategoriesRemoteAsync(businessEntity.Id, categories.Select(c => c.Id).ToArray(), businessEntity.ObjectType);
+
+            }
+            else if (sourceType == SourceType.Local)
+                await ActionsManager.QueueActionAsync(SetCategoriesAction.Create(categories, businessEntity.Id, businessEntity.ObjectType));
+            else
+                throw new ArgumentException("Invalid sourceType provided.");
+
+            UpdateBusinessEntityCategories(businessEntity, categories);
+
+            await SetCategoriesLocalAsync(businessEntity.Id, categories, businessEntity.ObjectType);
+
+            CommonConfig.MessengerHub.Publish(new EntityCategoriesChangedMessage(this, businessEntity.ObjectType, businessEntity.Id, categorizableEntity.Categories.ToList()));
+
+            return;
+            
+        }
+
+        internal async Task SetCategoriesRemoteAsync(int objectId, int[] categoryIds, ObjectType objectType)
+        {
+            await AppServiceProxy.SetCategoriesAsync(new DataContract.SetCategoriesParameters
+            {
+                Token = Token,
+                ObjectId = objectId,
+                ObjectType = objectType.ConvertEnum<DataContract.ObjectType>(),
+                CategoryIds = categoryIds
+            }); 
+        }
+
+        internal async Task SetCategoriesLocalAsync(int entityId, List<Category> categories, ObjectType objectType)
+        {
+           
+            switch (objectType)
+            {
+                case ObjectType.Document:
+                    await documentsDataAccess.SetCategoriesAsync(entityId, categories);
+                    break;
+                case ObjectType.Contact:
+                    await contactsDataAccess.SetCategoriesAsync(entityId, categories);
+                    break;
+            }
+        }
+
+        internal void UpdateBusinessEntityCategories(IBusinessEntity businessEntity, List<Category> categories)
+        {
+            if (!(businessEntity is ICategorizable categorizable))
+                return;
+            categorizable.Categories.Clear();
+            categorizable.Categories.AddRange(categories);
+        }
 
     }
 }

@@ -226,39 +226,6 @@ namespace Mark5.Mobile.Common.Manager
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task SetCategoriesAsync(ContactPreview contactPreview, List<Category> categories, SourceType sourceType = SourceType.Auto)
-        {
-            CommonConfig.UsageAnalytics.LogEvent(new SetCategoriesEvent(ModuleType.Contacts, 1));
-
-            if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
-
-            if (sourceType == SourceType.Remote)
-            {
-                await AppServiceProxy.SetCategoriesAsync(new DataContract.SetCategoriesParameters
-                {
-                    Token = Token,
-                    ObjectId = contactPreview.Id,
-                    ObjectType = DataContract.ObjectType.Contact,
-                    CategoryIds = categories.Select(c => c.Id).ToArray()
-                });
-
-                contactPreview.Categories.Clear();
-                contactPreview.Categories.AddRange(categories);
-
-                await contactsDataAccess.SetCategoriesAsync(contactPreview, categories);
-
-                CommonConfig.MessengerHub.Publish(new EntityCategoriesChangedMessage(this, ObjectType.Contact, contactPreview.Id, contactPreview.Categories.ToList()));
-
-                return;
-            }
-
-            if (sourceType == SourceType.Local)
-                throw new ReMarkException(ErrorConstants.Codes.InvalidSourceType);
-
-            throw new ArgumentException("Invalid sourceType provided.");
-        }
-
         public async Task<Comment> AddComment(Contact contact, string content, SourceType sourceType = SourceType.Auto)
         {
             CommonConfig.UsageAnalytics.LogEvent(new AddCommentEvent(ModuleType.Contacts));

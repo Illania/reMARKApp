@@ -8,7 +8,7 @@ namespace Mark5.Mobile.Common.Service
     public class ActionSyncService : AbstractService, IActionSyncService
     {
         public ActionSyncService()
-            : base(15 * 1000)
+            : base(5 * 1000)
         {
         }
 

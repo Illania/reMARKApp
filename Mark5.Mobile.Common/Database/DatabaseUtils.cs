@@ -53,6 +53,7 @@ namespace Mark5.Mobile.Common.Database
             await DatabaseConnectionProvider.ActionsDatabase.RunInConnectionAsync(c =>
             {
                 c.CreateTable<SetReadStatusAction>();
+                c.CreateTable<SetCategoriesAction>();
                 c.CreateTable<CopyToFolderAction>();
                 c.CreateTable<MoveToFolderAction>();
                 c.CreateTable<CopyToWorktrayAction>();
@@ -107,6 +108,7 @@ namespace Mark5.Mobile.Common.Database
             await DatabaseConnectionProvider.ActionsDatabase.RunInConnectionAsync(c =>
             {
                 c.DeleteAll<SetReadStatusAction>();
+                c.DeleteAll<SetCategoriesAction>();
                 c.DeleteAll<CopyToFolderAction>();
                 c.DeleteAll<MoveToFolderAction>();
                 c.DeleteAll<CopyToWorktrayAction>();

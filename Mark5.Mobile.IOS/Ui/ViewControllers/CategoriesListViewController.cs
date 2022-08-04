@@ -330,10 +330,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             try
             {
                 if (BusinessEntityPreview is DocumentPreview documentPreview)
-                    await Managers.DocumentsManager.SetCategoriesAsync(documentPreview, selectedCategories);
+                    await Managers.CommonActionsManager.SetCategoriesAsync(documentPreview, selectedCategories);
 
                 if (BusinessEntityPreview is ContactPreview contactPreview)
-                    await Managers.ContactsManager.SetCategoriesAsync(contactPreview, selectedCategories);
+                    await Managers.CommonActionsManager.SetCategoriesAsync(contactPreview, selectedCategories);
                 dismissAction();
                 DismissViewController(true, null);
             }

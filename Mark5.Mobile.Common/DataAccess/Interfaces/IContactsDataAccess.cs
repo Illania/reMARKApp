@@ -39,7 +39,7 @@ namespace Mark5.Mobile.Common.DataAccess
 
         Task<List<Category>> GetAllCategoriesAsync();
 
-        Task SetCategoriesAsync(ContactPreview contactPreview, List<Category> categories);
+        Task SetCategoriesAsync(int contactId, List<Category> categories);
 
         Task AddCommentAsync(Contact contact, Comment comment);
 

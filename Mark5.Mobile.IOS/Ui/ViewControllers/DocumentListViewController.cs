@@ -1462,7 +1462,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
-                await Managers.DocumentsManager.SetCategoriesAsync(documentPreview, new List<Category> { presetCategory });
+                await Managers.CommonActionsManager.SetCategoriesAsync(documentPreview, new List<Category> { presetCategory });
 
                 ((DocumentListDataSource)TableView.Source).UpdateItems(new List<int> { documentPreview.Id });
                 ((DocumentListDataSource)((UITableViewController)searchController?.SearchResultsController)?.TableView?.Source)?.UpdateItems(new List<int> { documentPreview.Id });

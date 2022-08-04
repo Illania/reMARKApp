@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.DataAccess;
 using Mark5.Mobile.Common.Model;
@@ -27,6 +28,9 @@ namespace Mark5.Mobile.Common.Manager
                 case ActionType.SetReadStatus:
                     await actionsDataAccess.SaveActionAsync(action as SetReadStatusAction);
                     break;
+                case ActionType.SetCategories:
+                    await actionsDataAccess.SaveActionAsync(action as SetCategoriesAction);
+                    break;
                 case ActionType.CopyToFolder:
                     await actionsDataAccess.SaveActionAsync(action as CopyToFolderAction);
                     break;
@@ -52,6 +56,8 @@ namespace Mark5.Mobile.Common.Manager
 
             if (types == null || types.Contains(ActionType.SetReadStatus))
                 actions.AddRange(await actionsDataAccess.GetActionsAsync<SetReadStatusAction>());
+            if (types == null || types.Contains(ActionType.SetCategories))
+                actions.AddRange(await actionsDataAccess.GetActionsAsync<SetCategoriesAction>());
             if (types == null || types.Contains(ActionType.CopyToFolder))
                 actions.AddRange(await actionsDataAccess.GetActionsAsync<CopyToFolderAction>());
             if (types == null || types.Contains(ActionType.MoveToFolder))
@@ -71,6 +77,9 @@ namespace Mark5.Mobile.Common.Manager
             {
                 case ActionType.SetReadStatus:
                     await actionsDataAccess.DeleteActionAsync<SetReadStatusAction>(action.Guid);
+                    break;
+                case ActionType.SetCategories:
+                    await actionsDataAccess.DeleteActionAsync<SetCategoriesAction>(action.Guid);
                     break;
                 case ActionType.CopyToFolder:
                     await actionsDataAccess.DeleteActionAsync<CopyToFolderAction>(action.Guid);
@@ -104,6 +113,10 @@ namespace Mark5.Mobile.Common.Manager
                     var sra = action as SetReadStatusAction;
                     await documentsManager.SetRemoteReadStatusAsync(sra.ReadStatus, sra.DocumentIds.ToArray());
                     break;
+                case ActionType.SetCategories:
+                    var sca = action as SetCategoriesAction;
+                    await commonActionsManager.SetCategoriesRemoteAsync(sca.ObjectId, sca.Categories.Select(c=>c.Id).ToArray(), sca.ObjectType);
+                    break;
                 case ActionType.RemoveFromFolder:
                     var rfa = action as RemoveFromFolderAction;
                     await commonActionsManager.RemoveFromFolderRemoteAsync(rfa.DocumentIds, rfa.FolderId, rfa.ObjectType);
@@ -134,6 +147,10 @@ namespace Mark5.Mobile.Common.Manager
                 case ActionType.SetReadStatus:
                     var sra = action as SetReadStatusAction;
                     await documentsManager.SetLocalReadStatusAsync(!sra.ReadStatus, sra.DocumentIds.ToArray());
+                    break;
+                case ActionType.SetCategories:
+                    var sca = action as SetCategoriesAction;
+                    await commonActionsManager.SetCategoriesLocalAsync(sca.ObjectId, sca.Categories, sca.ObjectType);
                     break;
                 case ActionType.RemoveFromFolder:
                     var rfa = action as RemoveFromFolderAction;

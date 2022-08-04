@@ -39,5 +39,7 @@ namespace Mark5.Mobile.Common.Manager
         Task AddFavoriteCategory(int categoryId, SourceType sourceType = SourceType.Auto);
 
         Task RemoveFavoriteCategory(int categoryId, SourceType sourceType = SourceType.Auto);
+
+        Task SetCategoriesAsync(IBusinessEntity businessEntity, List<Category> categories, SourceType sourceType = SourceType.Auto);
     }
 }
