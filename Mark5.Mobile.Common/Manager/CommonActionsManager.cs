@@ -21,23 +21,28 @@ namespace Mark5.Mobile.Common.Manager
         readonly IDocumentsDataAccess documentsDataAccess;
         readonly IContactsDataAccess contactsDataAccess;
         readonly IShortcodesDataAccess shortcodesDataAccess;
-        readonly ICalendarDataAccess calendarDataAccess;
 
         IActionsManager ActionsManager => Managers.ActionsManager;
 
-        public CommonActionsManager(ConnectionInfo connectionInfo, IAppServiceProxy appServiceProxy, IDocumentsDataAccess documentsDataAccess, IContactsDataAccess contactsDataAccess, IShortcodesDataAccess shortcodesDataAccess, ICalendarDataAccess calendarDataAccess)
+        public CommonActionsManager(ConnectionInfo connectionInfo, IAppServiceProxy appServiceProxy,
+            IDocumentsDataAccess documentsDataAccess, IContactsDataAccess contactsDataAccess,
+            IShortcodesDataAccess shortcodesDataAccess)
             : base(connectionInfo, appServiceProxy)
         {
             this.documentsDataAccess = documentsDataAccess;
             this.contactsDataAccess = contactsDataAccess;
             this.shortcodesDataAccess = shortcodesDataAccess;
-            this.calendarDataAccess = calendarDataAccess;
         }
 
-        public async Task<List<ObjectAction>> GetObjectActionsAsync(IBusinessEntity businessEntity, SourceType sourceType = SourceType.Auto)
+        public async Task<List<ObjectAction>> GetObjectActionsAsync(IBusinessEntity businessEntity,
+            SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+            {
+                sourceType = CommonConfig.Reachability.IsReachable
+                    ? SourceType.Remote
+                    : SourceType.Local;
+            }
 
             if (sourceType == SourceType.Remote)
             {
@@ -57,10 +62,15 @@ namespace Mark5.Mobile.Common.Manager
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task<List<ObjectLink>> GetObjectLinksAsync(IBusinessEntity businessEntity, SourceType sourceType = SourceType.Auto)
+        public async Task<List<ObjectLink>> GetObjectLinksAsync(IBusinessEntity businessEntity,
+            SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+            {
+                sourceType = CommonConfig.Reachability.IsReachable
+                    ? SourceType.Remote
+                    : SourceType.Local;
+            }
 
             if (sourceType == SourceType.Remote)
             {
@@ -80,35 +90,38 @@ namespace Mark5.Mobile.Common.Manager
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task CopyToFolder(List<IBusinessEntity> businessEntities, Folder folder, SourceType sourceType = SourceType.Auto)
+        public async Task CopyToFolder(List<IBusinessEntity> businessEntities,
+            Folder folder, SourceType sourceType = SourceType.Auto)
         {
-            await CopyToFolder(businessEntities.Select(bi => bi.Id).ToList(), businessEntities.First().ObjectType, folder.Id, sourceType);
+            await CopyToFolder(businessEntities.Select(bi => bi.Id).ToList(),
+                businessEntities.First().ObjectType, folder.Id, sourceType);
         }
 
         public async Task CopyToFolder(List<int> ids, ObjectType objectType, int folderId, SourceType sourceType = SourceType.Auto)
         {
-            CommonConfig.UsageAnalytics.LogEvent(new CopyToFolderEvent(objectType.ToModuleType(), ids.Count));
+            CommonConfig.UsageAnalytics.LogEvent(
+                new CopyToFolderEvent(objectType.ToModuleType(), ids.Count));
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+            {
+                sourceType = CommonConfig.Reachability.IsReachable
+                    ? SourceType.Remote
+                    : SourceType.Local;
+            }
 
             if (sourceType == SourceType.Remote)
-            {
                 await CopyToFolderRemoteAsync(ids, folderId, objectType);
-            }
-
             else if (sourceType == SourceType.Local)
             {
-                await ActionsManager.QueueActionAsync(CopyToFolderAction.Create(folderId, objectType, ids.ToArray()));  
+                await ActionsManager.QueueActionAsync(
+                      CopyToFolderAction.Create(folderId, objectType, ids.ToArray()));
             }
-
             else
                 throw new ArgumentException("Invalid sourceType provided.");
 
             await CopyToFolderLocalAsync(ids, folderId, objectType);
             return;
         }
-
 
         internal async Task CopyToFolderRemoteAsync(List<int> ids,  int folderId, ObjectType objectType)
         {
@@ -138,28 +151,32 @@ namespace Mark5.Mobile.Common.Manager
             }
         }
 
-        public async Task MoveToFolder(List<IBusinessEntity> businessEntities, Folder fromFolder, Folder toFolder, SourceType sourceType = SourceType.Auto)
+        public async Task MoveToFolder(List<IBusinessEntity> businessEntities, Folder fromFolder,
+            Folder toFolder, SourceType sourceType = SourceType.Auto)
         {
-            await MoveToFolder(businessEntities.Select(bi => bi.Id).ToList(), businessEntities.First().ObjectType, fromFolder, toFolder, sourceType);
+            await MoveToFolder(businessEntities.Select(bi => bi.Id).ToList(),
+                businessEntities.First().ObjectType, fromFolder, toFolder, sourceType);
         }
 
         public async Task MoveToFolder(List<int> beIds, ObjectType ot, Folder fromFolder, Folder toFolder, SourceType sourceType = SourceType.Auto)
         {
-            CommonConfig.UsageAnalytics.LogEvent(new MoveToFolderEvent(fromFolder.Module, beIds.Count));
+            CommonConfig.UsageAnalytics.LogEvent(
+                new MoveToFolderEvent(fromFolder.Module, beIds.Count));
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+            {
+                sourceType = CommonConfig.Reachability.IsReachable
+                    ? SourceType.Remote
+                    : SourceType.Local;
+            }
 
             if (sourceType == SourceType.Remote)
-            {
                 await MoveToFolderRemoteAsync(beIds, fromFolder.Id, toFolder.Id, ot);
-            }
-
             else if (sourceType == SourceType.Local)
             {
-                await ActionsManager.QueueActionAsync(MoveToFolderAction.Create(fromFolder.Id, toFolder.Id, ot, beIds.ToArray()));
+                await ActionsManager.QueueActionAsync(
+                      MoveToFolderAction.Create(fromFolder.Id, toFolder.Id, ot, beIds.ToArray()));
             }
-
             else
                 throw new ArgumentException("Invalid sourceType provided.");
 
@@ -204,26 +221,29 @@ namespace Mark5.Mobile.Common.Manager
 
         public async Task CopyToWorktray(List<IBusinessEntity> businessEntities, SourceType sourceType = SourceType.Auto)
         {
-            await CopyToWorktray(businessEntities.Select(bi => bi.Id).ToList(), businessEntities.First().ObjectType, sourceType);
+            await CopyToWorktray(businessEntities.Select(bi => bi.Id).ToList(),
+                businessEntities.First().ObjectType, sourceType);
         }
 
         public async Task CopyToWorktray(List<int> ids, ObjectType objectType, SourceType sourceType = SourceType.Auto)
         {
-            CommonConfig.UsageAnalytics.LogEvent(new CopyToWorktrayEvent(objectType.ToModuleType(), ids.Count));
+            CommonConfig.UsageAnalytics.LogEvent(
+                new CopyToWorktrayEvent(objectType.ToModuleType(), ids.Count));
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+            {
+                sourceType = CommonConfig.Reachability.IsReachable
+                    ? SourceType.Remote
+                    : SourceType.Local;
+            }
 
             if (sourceType == SourceType.Remote)
-            {
                 await CopyToWorktrayRemoteAsync(ids, objectType);
-            }
-
             else if (sourceType == SourceType.Local)
             {
-                await ActionsManager.QueueActionAsync(CopyToWorktrayAction.Create(objectType, ids.ToArray()));
+                await ActionsManager.QueueActionAsync(
+                      CopyToWorktrayAction.Create(objectType, ids.ToArray()));
             }
-
             else
                 throw new ArgumentException("Invalid sourceType provided.");
 
@@ -231,7 +251,6 @@ namespace Mark5.Mobile.Common.Manager
             return;
         }
     
-
         internal async Task CopyToWorktrayRemoteAsync(List<int> ids, ObjectType objectType)
         {
             await AppServiceProxy.CopyToWorktrayAsync(new DataContract.CopyToWorktrayParameters
@@ -260,22 +279,32 @@ namespace Mark5.Mobile.Common.Manager
             }
         }
 
-        public async Task CopyToUserWorktray(List<IBusinessEntity> businessEntities, List<SystemUser> systemUsers, string comment = null, SourceType sourceType = SourceType.Auto)
+        public async Task CopyToUserWorktray(List<IBusinessEntity> businessEntities,
+            List<SystemUser> systemUsers, string comment = null, SourceType sourceType = SourceType.Auto)
         {
-            await CopyToUserWorktray(businessEntities.Select(bi => bi.Id).ToList(), businessEntities.First().ObjectType, systemUsers, comment, sourceType);
+            await CopyToUserWorktray(businessEntities.Select(bi => bi.Id).ToList(),
+                businessEntities.First().ObjectType, systemUsers, comment, sourceType);
         }
 
-        public async Task CopyToUserWorktray(List<IBusinessEntity> businessEntities, List<int> systemUsersIds, string comment = null, SourceType sourceType = SourceType.Auto)
+        public async Task CopyToUserWorktray(List<IBusinessEntity> businessEntities,
+            List<int> systemUsersIds, string comment = null, SourceType sourceType = SourceType.Auto)
         {
-            await CopyToUserWorktray(businessEntities.Select(bi => bi.Id).ToList(), businessEntities.First().ObjectType, systemUsersIds, comment, sourceType);
+            await CopyToUserWorktray(businessEntities.Select(bi => bi.Id).ToList(),
+                businessEntities.First().ObjectType, systemUsersIds, comment, sourceType);
         }
 
-        public async Task CopyToUserWorktray(List<int> ids, ObjectType objectType, List<SystemUser> systemUsers, string comment = null, SourceType sourceType = SourceType.Auto)
+        public async Task CopyToUserWorktray(List<int> ids, ObjectType objectType, List<SystemUser> systemUsers,
+            string comment = null, SourceType sourceType = SourceType.Auto)
         {
-            CommonConfig.UsageAnalytics.LogEvent(new CopyToUserWorktrayEvent(objectType.ToModuleType(), ids.Count));
+            CommonConfig.UsageAnalytics.LogEvent(
+                new CopyToUserWorktrayEvent(objectType.ToModuleType(), ids.Count));
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+            {
+                sourceType = CommonConfig.Reachability.IsReachable
+                      ? SourceType.Remote
+                      : SourceType.Local;
+            }
 
             if (sourceType == SourceType.Remote)
             {
@@ -297,12 +326,18 @@ namespace Mark5.Mobile.Common.Manager
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task CopyToUserWorktray(List<int> ids, ObjectType objectType, List<int> systemUsersIds, string comment = null, SourceType sourceType = SourceType.Auto)
+        public async Task CopyToUserWorktray(List<int> ids, ObjectType objectType, List<int> systemUsersIds,
+            string comment = null, SourceType sourceType = SourceType.Auto)
         {
-            CommonConfig.UsageAnalytics.LogEvent(new CopyToUserWorktrayEvent(objectType.ToModuleType(), ids.Count));
+            CommonConfig.UsageAnalytics.LogEvent(
+                new CopyToUserWorktrayEvent(objectType.ToModuleType(), ids.Count));
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+            {
+                sourceType = CommonConfig.Reachability.IsReachable
+                    ? SourceType.Remote
+                    : SourceType.Local;
+            }
 
             if (sourceType == SourceType.Remote)
             {
@@ -324,34 +359,41 @@ namespace Mark5.Mobile.Common.Manager
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task RemoveFromFolder(List<IBusinessEntity> businessEntities, Folder folder, SourceType sourceType = SourceType.Auto)
+        public async Task RemoveFromFolder(List<IBusinessEntity> businessEntities,
+            Folder folder, SourceType sourceType = SourceType.Auto)
         {
-            CommonConfig.UsageAnalytics.LogEvent(new DeleteFromFolderEvent(folder.Module, businessEntities.Count));
+            CommonConfig.UsageAnalytics.LogEvent(
+                new DeleteFromFolderEvent(folder.Module, businessEntities.Count));
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+            {
+                sourceType = CommonConfig.Reachability.IsReachable
+                    ? SourceType.Remote
+                    : SourceType.Local;
+            }
 
             var ids = businessEntities.Select(b => b.Id).ToList();
             var folderId = folder.Id;
             var objectType = businessEntities.First().ObjectType;
 
             if (sourceType == SourceType.Remote)
-            { 
                 await RemoveFromFolderRemoteAsync(ids, folderId, objectType);
-            }
-
             else if (sourceType == SourceType.Local)
             {
-                await ActionsManager.QueueActionAsync(RemoveFromFolderAction.Create(folder.Id, businessEntities.First().ObjectType, businessEntities.Select(dp => dp.Id).ToArray())); 
+                await ActionsManager.QueueActionAsync(RemoveFromFolderAction
+                      .Create(folder.Id, businessEntities.First().ObjectType,
+                      businessEntities.Select(dp => dp.Id).ToArray()));
             }
-
             else
                 throw new ArgumentException("Invalid sourceType provided.");
 
             await RemoveFromFolderLocalAsync(ids, folderId, objectType);
 
-            CommonConfig.MessengerHub.Publish(new EntityRemovedFromFolderMessage(this, businessEntities.First().ObjectType, folder.Id,
-                                                                                 businessEntities.Select(b => b.Id).ToList()));
+            CommonConfig.MessengerHub.Publish(
+                new EntityRemovedFromFolderMessage(
+                    this, businessEntities.First().ObjectType,
+                    folder.Id, businessEntities.Select(b => b.Id).ToList()));
+
             return;
         }
 
@@ -382,36 +424,40 @@ namespace Mark5.Mobile.Common.Manager
             }
         }
 
-
         public async Task Delete(List<IBusinessEntity> businessEntities, SourceType sourceType = SourceType.Auto)
         {
-            CommonConfig.UsageAnalytics.LogEvent(new DeleteEvent(businessEntities.First().ModuleType, businessEntities.Count));
+            CommonConfig.UsageAnalytics.LogEvent(
+                new DeleteEvent(businessEntities.First().ModuleType, businessEntities.Count));
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+            {
+                sourceType = CommonConfig.Reachability.IsReachable
+                    ? SourceType.Remote
+                    : SourceType.Local;
+            }
 
             var ids = businessEntities.Select(be => be.Id).ToList();
             var objectType = businessEntities.First().ObjectType;
 
             if (sourceType == SourceType.Remote)
-            {
                 await DeleteRemoteAsync(ids, objectType);
-            }
-
             else if (sourceType == SourceType.Local)
             {
-                await ActionsManager.QueueActionAsync(DeleteAction.Create(businessEntities.First().ObjectType, businessEntities.Select(dp => dp.Id).ToArray()));
+                await ActionsManager.QueueActionAsync(
+                    DeleteAction.Create(businessEntities.First().ObjectType,
+                    businessEntities.Select(dp => dp.Id).ToArray()));
             }
-
             else
                 throw new ArgumentException("Invalid sourceType provided.");
 
             await DeleteLocalAsync(ids, objectType);
 
-            CommonConfig.MessengerHub.Publish(new EntityRemovedMessage(this,
-                                                                       businessEntities.First().ObjectType, businessEntities.Select(b => b.Id).ToList()));
-            return;
+            CommonConfig.MessengerHub.Publish(
+                new EntityRemovedMessage(
+                    this, businessEntities.First().ObjectType,
+                    businessEntities.Select(b => b.Id).ToList()));
 
+            return;
         }
 
         internal async Task DeleteRemoteAsync(List<int> ids, ObjectType objectType)
@@ -440,18 +486,22 @@ namespace Mark5.Mobile.Common.Manager
             }
         }
 
-
         public async Task<List<int>> GetFavoriteCategories(SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+            {
+                sourceType = CommonConfig.Reachability.IsReachable
+                    ? SourceType.Remote
+                    : SourceType.Local;
+            }
 
             if (sourceType == SourceType.Remote)
             {
-                var result = await AppServiceProxy.GetFavoriteCategoriesAsync(new DataContract.GetFavoriteCategoriesParameters
-                {
-                    Token = Token
-                });
+                var result = await AppServiceProxy.GetFavoriteCategoriesAsync
+                    (new DataContract.GetFavoriteCategoriesParameters
+                    {
+                        Token = Token
+                    });
 
                 return result.FavoriteCategoriesIds;
             }
@@ -465,15 +515,20 @@ namespace Mark5.Mobile.Common.Manager
         public async Task AddFavoriteCategory(int categoryId, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+            {
+                sourceType = CommonConfig.Reachability.IsReachable
+                    ? SourceType.Remote
+                    : SourceType.Local;
+            }
 
             if (sourceType == SourceType.Remote)
             {
-                await AppServiceProxy.AddFavoriteCategoryAsync(new DataContract.AddFavoriteCategoryParameters
-                {
-                    Token = Token,
-                    CategoryId = categoryId
-                });
+                await AppServiceProxy.AddFavoriteCategoryAsync(
+                    new DataContract.AddFavoriteCategoryParameters
+                    {
+                        Token = Token,
+                        CategoryId = categoryId
+                    });
 
                 return;
             }
@@ -487,15 +542,20 @@ namespace Mark5.Mobile.Common.Manager
         public async Task RemoveFavoriteCategory(int categoryId, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+            {
+                sourceType = CommonConfig.Reachability.IsReachable
+                    ? SourceType.Remote
+                    : SourceType.Local;
+            }
 
             if (sourceType == SourceType.Remote)
             {
-                await AppServiceProxy.RemoveFavoriteCategoryAsync(new DataContract.RemoveFavoriteCategoryParameters
-                {
-                    Token = Token,
-                    CategoryId = categoryId
-                });
+                await AppServiceProxy.RemoveFavoriteCategoryAsync(
+                    new DataContract.RemoveFavoriteCategoryParameters
+                    {
+                        Token = Token,
+                        CategoryId = categoryId
+                    });
 
                 return;
             }
@@ -505,8 +565,5 @@ namespace Mark5.Mobile.Common.Manager
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
-
-
-
     }
 }

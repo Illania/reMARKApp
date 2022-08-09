@@ -43,7 +43,7 @@ namespace Mark5.Mobile.Common.DataAccess
 
         Task DeleteAsync(List<Document> documents);
 
-        Task DeleteAsync(List<int> ids);
+        Task DeleteAsync(List<int> documentIds);
 
         Task CopyToFolder(int folderId, List<int> documentIds);
 

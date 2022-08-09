@@ -215,15 +215,15 @@ namespace Mark5.Mobile.Common.DataAccess
             await DeleteAsync(ids);
         }
 
-        public async Task DeleteAsync(List<int> ids)
+        public async Task DeleteAsync(List<int> shortocodesIds)
         {
             try
             {
                 await shortcodesDatabase.RunInConnectionAsync(c =>
                 {
-                    c.Table<FolderShortcodeLink>().Delete(fsl => ids.Contains(fsl.ShortcodeId));
-                    c.Table<ShortcodePreview>().Delete(sp => ids.Contains(sp.Id));
-                    c.Table<Shortcode>().Delete(s => ids.Contains(s.Id));
+                    c.Table<FolderShortcodeLink>().Delete(fsl => shortocodesIds.Contains(fsl.ShortcodeId));
+                    c.Table<ShortcodePreview>().Delete(sp => shortocodesIds.Contains(sp.Id));
+                    c.Table<Shortcode>().Delete(s => shortocodesIds.Contains(s.Id));
                 });
             }
             catch (Exception ex) when (!(ex is DataAccessException))
@@ -232,13 +232,13 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-        public async Task CopyToFolder(int folderId, List<int> shortcodeIds)
+        public async Task CopyToFolder(int folderId, List<int> shortcodesIds)
         {
             try
             {
                 await shortcodesDatabase.RunInConnectionAsync(c =>
                 {
-                    c.InsertOrReplaceAll(shortcodeIds.Select(sp => new FolderShortcodeLink
+                    c.InsertOrReplaceAll(shortcodesIds.Select(sp => new FolderShortcodeLink
                     {
                         FolderId = folderId,
                         ShortcodeId = sp
@@ -247,7 +247,7 @@ namespace Mark5.Mobile.Common.DataAccess
             }
             catch (Exception ex) when (!(ex is DataAccessException))
             {
-                throw new DataAccessException($"Error filing shoortcode previews to folder with Id={folderId}.", ex);
+                throw new DataAccessException($"Error filing shortcode previews to folder with Id={folderId}.", ex);
             }
         }
 

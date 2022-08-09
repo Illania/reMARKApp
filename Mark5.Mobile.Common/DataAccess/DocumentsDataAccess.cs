@@ -399,15 +399,15 @@ namespace Mark5.Mobile.Common.DataAccess
             await DeleteAsync(ids);
         }
 
-        public async Task DeleteAsync(List<int> ids)
+        public async Task DeleteAsync(List<int> documentIds)
         {
             try
             {
                 await documentsDatabase.RunInConnectionAsync(c =>
                 {
-                    c.Table<FolderDocumentLink>().Delete(fdl => ids.Contains(fdl.DocumentId));
-                    c.Table<DocumentPreview>().Delete(dp => ids.Contains(dp.Id));
-                    c.Table<Document>().Delete(d => ids.Contains(d.Id));
+                    c.Table<FolderDocumentLink>().Delete(fdl => documentIds.Contains(fdl.DocumentId));
+                    c.Table<DocumentPreview>().Delete(dp => documentIds.Contains(dp.Id));
+                    c.Table<Document>().Delete(d => documentIds.Contains(d.Id));
                 });
             }
             catch (Exception ex) when (!(ex is DataAccessException))

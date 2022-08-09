@@ -242,16 +242,16 @@ namespace Mark5.Mobile.Common.DataAccess
             await DeleteAsync(ids);
         }
 
-        public async Task DeleteAsync(List<int> ids)
+        public async Task DeleteAsync(List<int> contactsIds)
         {
             try
             {
                 await contactsDatabase.RunInConnectionAsync(c =>
                 {
-                    c.Table<FolderContactLink>().Delete(fcl => ids.Contains(fcl.ContactId));
-                    c.Table<ContactPreview>().Delete(cp => ids.Contains(cp.Id));
-                    c.Table<Contact>().Delete(ct => ids.Contains(ct.Id));
-                    c.Table<ContactCommunicationAddress>().Delete(ca => ids.Contains(ca.ContactId));
+                    c.Table<FolderContactLink>().Delete(fcl => contactsIds.Contains(fcl.ContactId));
+                    c.Table<ContactPreview>().Delete(cp => contactsIds.Contains(cp.Id));
+                    c.Table<Contact>().Delete(ct => contactsIds.Contains(ct.Id));
+                    c.Table<ContactCommunicationAddress>().Delete(ca => contactsIds.Contains(ca.ContactId));
                 });
             }
             catch (Exception ex) when (!(ex is DataAccessException))

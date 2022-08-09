@@ -156,9 +156,6 @@ namespace Mark5.Mobile.Common.Manager
                     await commonActionsManager.CopyToWorktrayLocalAsync(cwa.DocumentIds, cwa.ObjectType);
                     break;
             }
-           
         }
     }
 }
-
-
