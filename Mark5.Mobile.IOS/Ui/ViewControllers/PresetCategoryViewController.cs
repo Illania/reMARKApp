@@ -281,11 +281,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 cell.Accessory = UITableViewCellAccessory.None;
 
 
-                if(items[indexPath.LongSection][indexPath.Row].Id == PlatformConfig.Preferences.PresetCategoryId)
+                if (items[indexPath.LongSection][indexPath.Row].Id == PlatformConfig.Preferences.PresetCategoryId)
                 {
                     cell.Accessory = UITableViewCellAccessory.Checkmark;
                     selectedBefore = indexPath;
                 }
+                else cell.Accessory = UITableViewCellAccessory.None;
+
                 return cell;
             }
 
@@ -301,26 +303,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (indexPath != null)
                 {
 
-                    UITableViewCell cellNow = tableView.CellAt(indexPath);//currently selected
-                    UITableViewCell cellOld = tableView.CellAt(selectedBefore); //previous                     
+                    UITableViewCell cellNow = tableView.CellAt(indexPath);//currently selected cell
 
-
-                    if (selectedBefore != indexPath)
+                    if (selectedBefore != null)
                     {
+                        UITableViewCell cellOld = tableView.CellAt(selectedBefore);
+                        if (selectedBefore != indexPath && cellOld!=null)
+                        {
 
-                        cellOld.Accessory = UITableViewCellAccessory.None;
-                        tableView.DeselectRow(selectedBefore, true);
-
-                        cellNow.Accessory = UITableViewCellAccessory.Checkmark;
-                        selectedBefore = indexPath;
-
-                        PlatformConfig.Preferences.PresetCategoryId = category.Id;
-
+                            cellOld.Accessory = UITableViewCellAccessory.None;
+                            tableView.DeselectRow(selectedBefore, true);
+                        }
                     }
 
+                     cellNow.Accessory = UITableViewCellAccessory.Checkmark;
+                     selectedBefore = indexPath;
+
+                     PlatformConfig.Preferences.PresetCategoryId = category.Id;
                 }
-
-
 
                 tableView.EndUpdates();
                 tableView.AllowsSelection = true;
