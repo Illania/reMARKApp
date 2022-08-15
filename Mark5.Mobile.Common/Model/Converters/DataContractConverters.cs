@@ -324,9 +324,9 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Permissions = dmi.Permissions?.Convert(),
                 WorktrayEnabled = dmi.WorktrayEnabled,
                 UseForFrom = dmi.UseForFrom.ConvertEnum<UseForFrom>(),
-                LineAppearances = dmi.LineAppearances.Select(la => la.Convert()).ToList(),
-                UserAppearances = dmi.UserAppearances.Select(ua => ua.Convert()).ToList(),
-                DefaultAppearance = dmi.DefaultAppearance.Convert()
+                LineAppearances = dmi.LineAppearances?.Select(la => la.Convert()).ToList(),
+                UserAppearances = dmi.UserAppearances?.Select(ua => ua.Convert()).ToList(),
+                DefaultAppearance = dmi.DefaultAppearance?.Convert()
             };
 
             if (dmi.AttachmentKeywords != null)
