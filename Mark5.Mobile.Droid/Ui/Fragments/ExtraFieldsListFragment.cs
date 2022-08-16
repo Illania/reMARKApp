@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Android.Content;
 using Android.OS;
 using Android.Support.V4.Widget;
@@ -12,9 +10,7 @@ using Java.Lang;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
-using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
-using Mark5.Mobile.Droid.Utilities;
 using Exception = System.Exception;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
@@ -22,6 +18,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
     public class ExtraFieldsListFragment : BaseFragment
     {
         public List<ExtraField> ExtraFields => adapter.Items;
+        public bool IsEditingAvailable = false;
 
         const string ExtraFieldNameTextKey = "ExtraFieldName_d70c2cb7-bb9c-495f-9bc9-c3616f18d7bb";
 
@@ -32,6 +29,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         SwipeRefreshLayout RefreshLayout;
         AppCompatEditText addExtraFieldEditText;
         AppCompatImageButton addExtraFieldButton;
+        View divider;
+        LinearLayoutCompat extraFieldView;
 
         string savedExtraFieldText;
 
@@ -78,7 +77,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             recyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
             RegisterForContextMenu(recyclerView);
 
-            adapter = new ExtraFieldsListAdapter(Context, CreateContextMenu);
+            adapter = new ExtraFieldsListAdapter(Context, CreateContextMenu) { Fragment = this };
             adapter.RegisterAdapterDataObserver(new LambdaEmptyAdapterObserver(() =>
             {
                 if (recyclerView.GetAdapter() != adapter)
@@ -89,6 +88,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }));
             recyclerView.SetAdapter(adapter);
 
+
+            divider = rootView.FindViewById<View>(Resource.Id.divider);
+            extraFieldView = rootView.FindViewById<LinearLayoutCompat>(Resource.Id.extra_field_view);
+
             addExtraFieldEditText = rootView.FindViewById<AppCompatEditText>(Resource.Id.add_extra_field_edit_text);
             addExtraFieldEditText.Hint = Resources.GetString(Resource.String.add_extra_field_hint);
             addExtraFieldEditText.TextChanged += AddExtraFieldEditText_TextChanged;
@@ -96,6 +99,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             addExtraFieldButton = rootView.FindViewById<AppCompatImageButton>(Resource.Id.add_extra_field_button);
             addExtraFieldButton.Enabled = false;
             addExtraFieldButton.Click += AddExtraFieldButton_Click;
+
+            addExtraFieldButton.Visibility = addExtraFieldEditText.Visibility = extraFieldView.Visibility = divider.Visibility =
+                IsEditingAvailable ? ViewStates.Visible : ViewStates.Invisible;
+    
 
             HasOptionsMenu = true;
 
@@ -313,6 +320,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public int SelectedPosition { get; set; }
 
+            public ExtraFieldsListFragment Fragment { get; set; }
+
             readonly Action<IContextMenu, View, IContextMenuContextMenuInfo> action;
             readonly Context context;
 
@@ -329,10 +338,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     return;
 
                 var extraField = Items[position];
-
-                cvh.ItemView.SetOnCreateContextMenuListener(new ActionOnCreateContextMenuListener(action));
+                if(Fragment.IsEditingAvailable)
+                    cvh.ItemView.SetOnCreateContextMenuListener(new ActionOnCreateContextMenuListener(action));
                 cvh.FieldName= extraField.FieldName;
-                cvh.Enabled = extraField.Enabled;
+                //cvh.Enabled = extraField.Enabled;
                 cvh.ExtraField = extraField;
                 cvh.Adapter = this;
             }
