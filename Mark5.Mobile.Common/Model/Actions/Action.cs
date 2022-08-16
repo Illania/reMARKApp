@@ -115,7 +115,7 @@ namespace Mark5.Mobile.Common.Model.Actions
         { }
 
         private MoveToFolderAction(List<int> documentIds, int fromFolderId, int toFolderId, ObjectType objectType)
-            : base(ActionType.CopyToFolder, objectType)
+            : base(ActionType.MoveToFolder, objectType)
         {
             FromFolderId = fromFolderId;
             ToFolderId = toFolderId;
