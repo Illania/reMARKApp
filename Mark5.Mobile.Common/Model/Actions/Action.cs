@@ -59,7 +59,6 @@ namespace Mark5.Mobile.Common.Model.Actions
     [Table("SetCategoriesAction")]
     public class SetCategoriesAction : Action
     {
-
         [Ignore]
         public List<Category> Categories { get; private set; }
 
@@ -67,24 +66,29 @@ namespace Mark5.Mobile.Common.Model.Actions
         public int ObjectId { get; set; }
 
         [Column("CategoryString")]
-        public string CategoriesString { get => Serializer.Serialize(Categories); set => Categories = Serializer.Deserialize<List<Category>>(value); }
+        public string CategoriesString
+        {
+            get => Serializer.Serialize(Categories);
+            set => Categories = Serializer.Deserialize<List<Category>>(value);
+        }
 
         public SetCategoriesAction() : base(ActionType.SetCategories, ObjectType.Document)
         { }
 
-        private SetCategoriesAction(List<Category> categories, int objectId, ObjectType objectType)
+        private SetCategoriesAction(List<Category> categories, int objectId,
+            ObjectType objectType)
             : base(ActionType.SetCategories, objectType)
         {
             Categories = categories;
             ObjectId = objectId;
         }
 
-        public static SetCategoriesAction Create(List<Category> categories, int objectId, ObjectType objectType)
+        public static SetCategoriesAction Create(List<Category> categories,
+            int objectId, ObjectType objectType)
         {
             return new SetCategoriesAction(categories, objectId, objectType);
         }
     }
-
 
     [Table("CopyToFolderAction")]
     public class CopyToFolderAction : Action

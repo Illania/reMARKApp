@@ -23,7 +23,5 @@ namespace Mark5.Mobile.Common.Model
                     throw new InvalidOperationException("The provided enum type doesn't exist!");
             }
         }
-
     }
-   
 }
