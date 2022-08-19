@@ -45,7 +45,7 @@ namespace Mark5.Mobile.Common.Service
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error("Unexpected error in action task!", ex);
+                CommonConfig.Logger.Error("Unexpected error in service reachability check task!", ex);
             }
 
             CommonConfig.Logger.Info("Stopped service reachability check task...");
