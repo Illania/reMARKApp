@@ -16,10 +16,12 @@ namespace Mark5.Mobile.Common.Service
         SemaphoreSlim mainSemaphore = new SemaphoreSlim(0);
 
         private readonly int autoRunPeriod;
+        private readonly bool trackReachability;
 
-        protected AbstractService(int autoRunPeriod)
+        protected AbstractService(int autoRunPeriod, bool trackReachability = true)
         {
             this.autoRunPeriod = autoRunPeriod;
+            this.trackReachability = trackReachability;
         }
 
         public bool IsRunning()
@@ -37,13 +39,15 @@ namespace Mark5.Mobile.Common.Service
                 if (workerTask != null)
                     return;
 
-                CommonConfig.Reachability.ReachabilityRefreshed -= ReachabilityRefreshed;
-                CommonConfig.Reachability.ReachabilityRefreshed += ReachabilityRefreshed;
-
+                if(trackReachability)
+                {
+                    CommonConfig.Reachability.ReachabilityRefreshed -= ReachabilityRefreshed;
+                    CommonConfig.Reachability.ReachabilityRefreshed += ReachabilityRefreshed;
+                    if (!CommonConfig.Reachability.IsReachable)
+                        return;
+                }
+               
                 if (Managers.ActiveConnectionInfo == null)
-                    return;
-
-                if (!CommonConfig.Reachability.IsReachable)
                     return;
 
                 workerTaskCts?.Cancel();
@@ -60,7 +64,7 @@ namespace Mark5.Mobile.Common.Service
                 workerTask = null;
                 workerTaskCts?.Cancel();
 
-                if (!allowRestart)
+                if (!allowRestart && trackReachability)
                     CommonConfig.Reachability.ReachabilityRefreshed -= ReachabilityRefreshed;
             }
         }

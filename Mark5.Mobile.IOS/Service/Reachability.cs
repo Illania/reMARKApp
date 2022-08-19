@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Http;
+using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common;
@@ -41,6 +42,11 @@ namespace Mark5.Mobile.IOS.Service
 
                 return instance;
             }
+        }
+
+        public void RefreshServiceReachability(bool isReachable)
+        {
+            ReachabilityRefreshed(this, new ReachabilityRefreshedEventArgs(true, isReachable));
         }
 
         public async Task<bool> Refresh(ReachabilityMode mode = ReachabilityMode.NetworkAvailability | ReachabilityMode.Service, bool testOnly = false)

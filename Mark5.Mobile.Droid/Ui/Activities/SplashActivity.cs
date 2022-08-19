@@ -361,6 +361,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 Services.DocumentPreviewsDownloadService?.Start();
                 Services.DocumentsDownloadService?.Start();
                 Services.ActionSyncService?.Start();
+                Services.ServiceReachabilityService?.Start();
 
                 DeviceReminderWorker.Schedule();
 
