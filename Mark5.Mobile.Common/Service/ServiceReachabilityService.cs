@@ -9,7 +9,9 @@ namespace Mark5.Mobile.Common.Service
 {
     public class ServiceReachabilityService : AbstractService, IServiceReachabilityService
     {
+
         public ServiceReachabilityService() : base(3 * 1000, false) { }
+        private volatile bool _isReachable = false;
 
         protected override async Task Work(CancellationToken ct)
         {
@@ -38,8 +40,11 @@ namespace Mark5.Mobile.Common.Service
                         }
                    
                         var isReachable = await RetryServiceConnect();
-                       
-                        CommonConfig.Reachability.RefreshServiceReachability(isReachable);
+
+                       if(isReachable != _isReachable)
+                            CommonConfig.Reachability.RefreshServiceReachability(isReachable);
+
+                        _isReachable = isReachable;
                     }
                 }
             }
