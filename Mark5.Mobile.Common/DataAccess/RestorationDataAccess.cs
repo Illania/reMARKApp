@@ -69,7 +69,7 @@ namespace Mark5.Mobile.Common.DataAccess
             }
             catch (Exception ex) when (!(ex is DataAccessException))
             {
-                throw new DataAccessException("Error while saving deleted contacts.", ex);
+                throw new DataAccessException("Error while saving deleted objects.", ex);
             }
         }
 
