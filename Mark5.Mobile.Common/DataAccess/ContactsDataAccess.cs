@@ -3,20 +3,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.DataAccess.Exceptions;
+using Mark5.Mobile.Common.DataAccess.Interfaces;
 using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Containers;
 using Mark5.Mobile.Common.Model.Links;
+using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.Common.DataAccess
 {
-    class ContactsDataAccess : IContactsDataAccess
+    class ContactsDataAccess : IContactsDataAccess, ICommonActionsDataAccess
     {
         readonly DatabaseConnectionProvider contactsDatabase;
 
-        public ContactsDataAccess(DatabaseConnectionProvider contactsDatabase)
+        readonly IRestorationDataAccess restorationDataAccess;
+
+        public ContactsDataAccess(DatabaseConnectionProvider contactsDatabase, IRestorationDataAccess restorationDataAccess)
         {
             this.contactsDatabase = contactsDatabase;
+            this.restorationDataAccess = restorationDataAccess;
         }
 
         public async Task SaveContactPreviewsAsync(Folder folder, List<ContactPreview> contactPreviews, bool clean)
@@ -193,16 +198,79 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-        public async Task RemoveFromFolderAsync(List<ContactPreview> contactPreviews, Folder folder)
+        public async Task RemoveFromFolderAsync(List<ContactPreview> contactPreviews, int folderId, bool saveBeforeDeletion = false)
         {
-            var ids = contactPreviews.Select(cp => cp.Id).Distinct().ToList();
-            await RemoveFromFolderAsync(ids, folder.Id);
+            try
+            {
+                var deletedPreviews = new List<ContactPreview>();
+                await contactsDatabase.RunInConnectionAsync(c =>
+                {
+                    foreach (var cp in contactPreviews)
+                    {
+                        var id = cp.Id;
+                        var linksCount = c.Table<FolderDocumentLink>().Count(fdl => fdl.DocumentId == id);
+                        if (linksCount == 1)
+                        {
+                            if (saveBeforeDeletion)
+                            {
+                                deletedPreviews.Add(cp);
+                            }
+                            c.Table<ContactPreview>().Delete(dp => dp.Id == id);
+                            c.Table<Contact>().Delete(d => d.Id == id);
+                        }
+                        c.Table<FolderContactLink>().Delete(fdl => fdl.ContactId == id && fdl.FolderId == folderId);
+                    }
+                });
+
+                if (deletedPreviews.Any())
+                    await SaveDeletedObjectsAsync(deletedPreviews);
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error removing contacts from folder.", ex);
+            }
         }
 
-        public async Task RemoveFromFolderAsync(List<Contact> contacts, Folder folder)
+        public async Task RemoveFromFolderAsync(List<Contact> contacts, int folderId, bool saveBeforeDeletion = false)
         {
-            var ids = contacts.Select(c => c.Id).Distinct().ToList();
-            await RemoveFromFolderAsync(ids, folder.Id);
+            try
+            {
+                var deletedContactsToSave = new List<Contact>();
+                await contactsDatabase.RunInConnectionAsync(c =>
+                {
+                    foreach (var contact in contacts)
+                    {
+                        var id = contact.Id;
+                        var linksCount = c.Table<FolderContactLink>().Count(fdl => fdl.ContactId == id);
+                        if (linksCount == 1)
+                        {
+                            if (saveBeforeDeletion)
+                            {
+                                deletedContactsToSave.Add(contact);
+                            }
+                            c.Table<ContactPreview>().Delete(dp => dp.Id == id);
+                            c.Table<Contact>().Delete(d => d.Id == id);
+                        }
+                        c.Table<FolderContactLink>().Delete(fdl => fdl.ContactId == id && fdl.FolderId == folderId);
+                    }
+                });
+
+                if (deletedContactsToSave.Any())
+                    await SaveDeletedObjectsAsync(deletedContactsToSave);
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error removing contacts from folder.", ex);
+            }
+        }
+
+        public async Task RemoveFromFolderAsync(List<IBusinessEntity> businessEntities, int folderId, bool saveBeforeDeletion = false)
+        {
+            if (businessEntities.FirstOrDefault() is Contact contact)
+                await RemoveFromFolderAsync(businessEntities.Select(be => (Contact)be).ToList(), folderId, saveBeforeDeletion);
+
+            else if (businessEntities.FirstOrDefault() is ContactPreview contactPreview)
+                await RemoveFromFolderAsync(businessEntities.Select(be => (ContactPreview)be).ToList(), folderId, saveBeforeDeletion);
         }
 
         public async Task RemoveFromFolderAsync(List<int> ids, int folderId)
@@ -230,14 +298,22 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-        public async Task DeleteAsync(List<ContactPreview> contactPreviews)
+        public async Task DeleteAsync(List<ContactPreview> contactPreviews, bool saveBeforeDeletion = false)
         {
+            if (saveBeforeDeletion)
+            {
+                await ((IRestorable)this).SaveDeletedObjectsAsync(contactPreviews);
+            }
             var ids = contactPreviews.Select(cp => cp.Id).Distinct().ToList();
             await DeleteAsync(ids);
         }
 
-        public async Task DeleteAsync(List<Contact> contacts)
+        public async Task DeleteAsync(List<Contact> contacts, bool saveBeforeDeletion = false)
         {
+            if (saveBeforeDeletion)
+            {
+                await ((IRestorable)this).SaveDeletedObjectsAsync(contacts);
+            }
             var ids = contacts.Select(c => c.Id).Distinct().ToList();
             await DeleteAsync(ids);
         }
@@ -260,7 +336,16 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-        public async Task CopyToFolder(int folderId, List<int> contactIds)
+        public async Task DeleteAsync(List<IBusinessEntity> businessEntities, bool saveBeforeDeletion = false)
+        {
+            if (businessEntities.FirstOrDefault() is Contact contact)
+                await DeleteAsync(businessEntities.Select(be => (Contact)be).ToList(), saveBeforeDeletion);
+
+            else if (businessEntities.FirstOrDefault() is ContactPreview contactPreview)
+                await DeleteAsync(businessEntities.Select(be => (ContactPreview)be).ToList(), saveBeforeDeletion);
+        }
+
+        public async Task CopyToFolderAsync(int folderId, List<int> contactIds)
         {
             try
             {
@@ -517,5 +602,78 @@ namespace Mark5.Mobile.Common.DataAccess
                 c.DeleteAll<ContactCommunicationAddress>();
             });
         }
+
+        public async Task<List<int>> GetLinkedFoldersIds(int contactId)
+        {
+            try
+            {
+                List<int> linkedFoldersId = null;
+
+                await contactsDatabase.RunInConnectionAsync(c =>
+                {
+                    var query = $"select {nameof(FolderContactLink.FolderId)} " + $"from {nameof(FolderContactLink)} "
+                    + $"where {nameof(FolderContactLink.ContactId)} = {contactId} ";
+
+                    var result = c.Query<int>(query);
+
+                    if (result == null || result.Count < 1)
+                        throw new DataNotFoundException($"Linked folders for contact {contactId} could not be found.");
+
+                    linkedFoldersId = result;
+                });
+
+                return linkedFoldersId;
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException($"Error getting linked folders for contact {contactId}.", ex);
+            }
+        }
+
+
+        #region IRestorable
+
+        public async Task RestoreDeletedObjectsAsync(List<int> ids)
+        {
+            try
+            {
+                var deletedContactPreviews = await restorationDataAccess.GetDeletedObjectsAsync(ids, DeletedObjectType.ContactPreview);
+                var contactPreviews = deletedContactPreviews.Select(dd => Serializer.Deserialize<ContactPreview>(dd.SerializedObject)).ToList();
+
+                var deletedContacts = await restorationDataAccess.GetDeletedObjectsAsync(ids, DeletedObjectType.Contact);
+                var contacts = deletedContacts.Select(dd => Serializer.Deserialize<Contact>(dd.SerializedObject)).ToList();
+
+                await contactsDatabase.RunInConnectionAsync(c =>
+                {
+                    c.InsertOrReplaceAll(contactPreviews);
+                    c.InsertOrReplaceAll(contacts);
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error while restoring deleted contacts.", ex);
+            }
+        }
+
+        public async Task SaveDeletedObjectsAsync<T>(List<T> businessEntities) where T : IBusinessEntity
+        {
+            try
+            {
+                await restorationDataAccess.SaveDeletedObjects(businessEntities);
+
+                foreach (var be in businessEntities)
+                {
+                    var linkedFoldersIds = await GetLinkedFoldersIds(be.Id);
+                    await restorationDataAccess.SaveDeletedObjectLinkedFolders(be.Id, linkedFoldersIds);
+                }
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error while saving deleted contacts.", ex);
+            }
+        }
+
+        #endregion
+
     }
 }

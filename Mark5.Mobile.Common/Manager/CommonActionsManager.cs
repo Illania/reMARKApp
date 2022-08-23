@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.DataAccess;
+using Mark5.Mobile.Common.DataAccess.Interfaces;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Actions;
@@ -137,18 +138,10 @@ namespace Mark5.Mobile.Common.Manager
 
         internal async Task CopyToFolderLocalAsync(List<int> ids, int folderId, ObjectType objectType)
         {
-            switch (objectType)
-            {
-                case ObjectType.Document:
-                    await documentsDataAccess.CopyToFolder(folderId, ids);
-                    break;
-                case ObjectType.Contact:
-                    await contactsDataAccess.CopyToFolder(folderId, ids);
-                    break;
-                case ObjectType.Shortcode:
-                    await shortcodesDataAccess.CopyToFolder(folderId, ids);
-                    break;
-            }
+            var commonActionsDataAccess = GetCommonActionsDataAccess(objectType);
+            if (commonActionsDataAccess is not ICopiable copiable)
+                return;
+            await copiable.CopyToFolderAsync(folderId, ids);
         }
 
         public async Task MoveToFolder(List<IBusinessEntity> businessEntities, Folder fromFolder,
@@ -202,21 +195,9 @@ namespace Mark5.Mobile.Common.Manager
 
         internal async Task MoveToFolderLocalAsync(List<int> ids, int fromFolderId, int toFolderId, ObjectType objectType)
         {
-            switch (objectType)
-            {
-                case ObjectType.Document:
-                    await documentsDataAccess.CopyToFolder(toFolderId, ids);
-                    await documentsDataAccess.RemoveFromFolderAsync(ids, fromFolderId);
-                    break;
-                case ObjectType.Contact:
-                    await contactsDataAccess.CopyToFolder(toFolderId, ids);
-                    await contactsDataAccess.RemoveFromFolderAsync(ids, fromFolderId);
-                    break;
-                case ObjectType.Shortcode:
-                    await shortcodesDataAccess.CopyToFolder(toFolderId, ids);
-                    await shortcodesDataAccess.RemoveFromFolderAsync(ids, fromFolderId);
-                    break;
-            }
+            var commonActionsDataAccess = GetCommonActionsDataAccess(objectType);
+            await commonActionsDataAccess.CopyToFolderAsync(toFolderId, ids);
+            await commonActionsDataAccess.RemoveFromFolderAsync(ids, fromFolderId);        
         }
 
         public async Task CopyToWorktray(List<IBusinessEntity> businessEntities, SourceType sourceType = SourceType.Auto)
@@ -264,19 +245,10 @@ namespace Mark5.Mobile.Common.Manager
         internal async Task CopyToWorktrayLocalAsync(List<int> ids, ObjectType objectType)
         {
             var worktrayId = SystemFoldersInfo.Int_WorktrayRoot;
-
-            switch (objectType)
-            {
-                case ObjectType.Document:
-                    await documentsDataAccess.CopyToFolder(worktrayId, ids);
-                    break;
-                case ObjectType.Contact:
-                    await contactsDataAccess.CopyToFolder(worktrayId, ids);
-                    break;
-                case ObjectType.Shortcode:
-                    await shortcodesDataAccess.CopyToFolder(worktrayId, ids);
-                    break;
-            }
+            var commonActionsDataAccess = GetCommonActionsDataAccess(objectType);
+            if (!(commonActionsDataAccess is ICopiable copiable))
+                return;
+            await copiable.CopyToFolderAsync(worktrayId, ids);   
         }
 
         public async Task CopyToUserWorktray(List<IBusinessEntity> businessEntities,
@@ -387,7 +359,7 @@ namespace Mark5.Mobile.Common.Manager
             else
                 throw new ArgumentException("Invalid sourceType provided.");
 
-            await RemoveFromFolderLocalAsync(ids, folderId, objectType);
+            await RemoveFromFolderLocalAsync(businessEntities, folderId, objectType);
 
             CommonConfig.MessengerHub.Publish(
                 new EntityRemovedFromFolderMessage(
@@ -408,20 +380,21 @@ namespace Mark5.Mobile.Common.Manager
             });
         }
 
+        internal async Task RemoveFromFolderLocalAsync(List<IBusinessEntity> businessEntities, int folderId, ObjectType objectType)
+        {
+            var commonActionsDataAccess = GetCommonActionsDataAccess(objectType);
+            if (commonActionsDataAccess is not IRemovable removable)
+                return;
+            await removable.RemoveFromFolderAsync(businessEntities, folderId, true);
+        }
+
+
         internal async Task RemoveFromFolderLocalAsync(List<int> ids, int folderId, ObjectType objectType)
         {
-            switch(objectType)
-            {
-                case ObjectType.Document:
-                    await documentsDataAccess.RemoveFromFolderAsync(ids, folderId);
-                    break;
-                case ObjectType.Contact:
-                    await contactsDataAccess.RemoveFromFolderAsync(ids, folderId);
-                    break;
-                case ObjectType.Shortcode:
-                    await shortcodesDataAccess.RemoveFromFolderAsync(ids, folderId);
-                    break;
-            }
+            var commonActionsDataAccess = GetCommonActionsDataAccess(objectType);
+            if (commonActionsDataAccess is not IRemovable removable)
+                return;
+            await removable.RemoveFromFolderAsync(ids, folderId);
         }
 
         public async Task Delete(List<IBusinessEntity> businessEntities, SourceType sourceType = SourceType.Auto)
@@ -450,7 +423,7 @@ namespace Mark5.Mobile.Common.Manager
             else
                 throw new ArgumentException("Invalid sourceType provided.");
 
-            await DeleteLocalAsync(ids, objectType);
+            await DeleteLocalAsync(businessEntities, objectType);
 
             CommonConfig.MessengerHub.Publish(
                 new EntityRemovedMessage(
@@ -470,21 +443,39 @@ namespace Mark5.Mobile.Common.Manager
             });
         }
 
-        internal async Task DeleteLocalAsync(List<int> ids, ObjectType objectType)
+        internal async Task DeleteLocalAsync(List<IBusinessEntity> businessEntities, ObjectType objectType)
+        {
+
+            var commonActionsDataAccess = GetCommonActionsDataAccess(objectType);
+            if (commonActionsDataAccess is not IDeletable deletable)
+                return;
+            await deletable.DeleteAsync(businessEntities, true);
+        }
+
+        public async Task RestoreDeletedObjectsLocalAsync(List<int> ids, ObjectType objectType)
+        {
+            var commonActionsDataAccess = GetCommonActionsDataAccess(objectType);
+            if (commonActionsDataAccess is not IRestorable restorable)
+                return;
+            await restorable.RestoreDeletedObjectsAsync(ids);            
+        }
+
+
+        private ICommonActionsDataAccess GetCommonActionsDataAccess(ObjectType objectType)
         {
             switch (objectType)
             {
                 case ObjectType.Document:
-                    await documentsDataAccess.DeleteAsync(ids);
-                    break;
+                    return (ICommonActionsDataAccess)documentsDataAccess;
                 case ObjectType.Contact:
-                    await contactsDataAccess.DeleteAsync(ids);
-                    break;
+                    return (ICommonActionsDataAccess)contactsDataAccess;
                 case ObjectType.Shortcode:
-                    await shortcodesDataAccess.DeleteAsync(ids);
-                    break;
+                    return (ICommonActionsDataAccess)shortcodesDataAccess;
+                default:
+                    throw new ArgumentException($"Object type {objectType} doesn't implement ICommonActionsDataAccess");
             }
         }
+
 
         public async Task<List<int>> GetFavoriteCategories(SourceType sourceType = SourceType.Auto)
         {

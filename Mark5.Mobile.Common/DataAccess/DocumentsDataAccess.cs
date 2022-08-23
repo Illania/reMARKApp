@@ -7,16 +7,20 @@ using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Links;
 using Mark5.Mobile.Common.Model.Containers;
+using Mark5.Mobile.Common.Utilities;
+using Mark5.Mobile.Common.DataAccess.Interfaces;
 
 namespace Mark5.Mobile.Common.DataAccess
 {
-    class DocumentsDataAccess : IDocumentsDataAccess
+    class DocumentsDataAccess : IDocumentsDataAccess, ICommonActionsDataAccess
     {
         readonly DatabaseConnectionProvider documentsDatabase;
+        readonly IRestorationDataAccess restorationDataAccess;
 
-        public DocumentsDataAccess(DatabaseConnectionProvider documentsDatabase)
+        public DocumentsDataAccess(DatabaseConnectionProvider documentsDatabase, IRestorationDataAccess restorationDataAccess)
         {
             this.documentsDatabase = documentsDatabase;
+            this.restorationDataAccess = restorationDataAccess;
         }
 
         public async Task SaveDocumentPreviewsAsync(int folderId, List<DocumentPreview> documentPreviews, bool clean)
@@ -351,16 +355,70 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-        public async Task RemoveFromFolderAsync(List<DocumentPreview> documentPreviews, Folder folder)
+        public async Task RemoveFromFolderAsync(List<DocumentPreview> documentPreviews, int folderId, bool saveBeforeDeletion = false)
         {
-            var ids = documentPreviews.Select(dp => dp.Id).Distinct().ToList();
-            await RemoveFromFolderAsync(ids, folder.Id);
+            try
+            {
+                var deletedPreviews = new List<DocumentPreview>();
+                await documentsDatabase.RunInConnectionAsync(c =>
+                {
+                    foreach (var dp in documentPreviews)
+                    {
+                        var id = dp.Id;
+                        var linksCount = c.Table<FolderDocumentLink>().Count(fdl => fdl.DocumentId == id);
+                        if (linksCount == 1)
+                        {
+                            if (saveBeforeDeletion)
+                            {
+                                deletedPreviews.Add(dp);
+                            }
+                            c.Table<DocumentPreview>().Delete(dp => dp.Id == id);
+                            c.Table<Document>().Delete(d => d.Id == id);
+                        }
+                        c.Table<FolderDocumentLink>().Delete(fdl => fdl.DocumentId == id && fdl.FolderId == folderId);
+                    }
+                });
+
+                if (deletedPreviews.Any())
+                    await SaveDeletedObjectsAsync(deletedPreviews);
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error removing documents from folder.", ex);
+            }
         }
 
-        public async Task RemoveFromFolderAsync(List<Document> documents, Folder folder)
+        public async Task RemoveFromFolderAsync(List<Document> documents, int folderId, bool saveBeforeDeletion = false)
         {
-            var ids = documents.Select(d => d.Id).Distinct().ToList();
-            await RemoveFromFolderAsync(ids, folder.Id);
+            try
+            {
+                var deletedDocumentsToSave = new List<Document>();
+                await documentsDatabase.RunInConnectionAsync(c =>
+                {
+                    foreach (var document in documents)
+                    {
+                        var id = document.Id;
+                        var linksCount = c.Table<FolderDocumentLink>().Count(fdl => fdl.DocumentId == id);
+                        if (linksCount == 1)
+                        {
+                            if (saveBeforeDeletion)
+                            {
+                                deletedDocumentsToSave.Add(document);
+                            }
+                            c.Table<DocumentPreview>().Delete(dp => dp.Id == id);
+                            c.Table<Document>().Delete(d => d.Id == id);
+                        }
+                        c.Table<FolderDocumentLink>().Delete(fdl => fdl.DocumentId == id && fdl.FolderId == folderId);
+                    }
+                });
+
+                if (deletedDocumentsToSave.Any())
+                    await SaveDeletedObjectsAsync(deletedDocumentsToSave);
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error removing documents from folder.", ex);
+            }
         }
 
         public async Task RemoveFromFolderAsync(List<int> ids, int folderId)
@@ -387,14 +445,41 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-        public async Task DeleteAsync(List<DocumentPreview> documentPreviews)
+        public async Task RemoveFromFolderAsync(List<IBusinessEntity> businessEntities,int folderId, bool saveBeforeDeletion = false)
         {
+            if (businessEntities.FirstOrDefault() is Document document)
+                await RemoveFromFolderAsync(businessEntities.Select(be => (Document)be).ToList(), folderId, saveBeforeDeletion);
+
+            else if (businessEntities.FirstOrDefault() is DocumentPreview documentPreview)
+                await RemoveFromFolderAsync(businessEntities.Select(be => (DocumentPreview)be).ToList(), folderId, saveBeforeDeletion);
+        }
+
+        public async Task DeleteAsync(List<IBusinessEntity> businessEntities, bool saveBeforeDeletion = false)
+        {
+            if (businessEntities.FirstOrDefault() is Document document)
+                await DeleteAsync(businessEntities.Select(be => (Document)be).ToList(), saveBeforeDeletion);
+
+            else if(businessEntities.FirstOrDefault() is DocumentPreview documentPreview)
+                await DeleteAsync(businessEntities.Select(be => (DocumentPreview)be).ToList(), saveBeforeDeletion);
+        }
+
+        public async Task DeleteAsync(List<DocumentPreview> documentPreviews, bool saveBeforeDeletion = false)
+        {
+            if (saveBeforeDeletion)
+            {
+                await SaveDeletedObjectsAsync(documentPreviews);
+            }
             var ids = documentPreviews.Select(dp => dp.Id).Distinct().ToList();
             await DeleteAsync(ids);
         }
 
-        public async Task DeleteAsync(List<Document> documents)
+        public async Task DeleteAsync(List<Document> documents, bool saveBeforeDeletion = false)
         {
+
+            if (saveBeforeDeletion)
+            {
+                await SaveDeletedObjectsAsync(documents);
+            }
             var ids = documents.Select(d => d.Id).Distinct().ToList();
             await DeleteAsync(ids);
         }
@@ -404,7 +489,7 @@ namespace Mark5.Mobile.Common.DataAccess
             try
             {
                 await documentsDatabase.RunInConnectionAsync(c =>
-                {
+                {         
                     c.Table<FolderDocumentLink>().Delete(fdl => documentIds.Contains(fdl.DocumentId));
                     c.Table<DocumentPreview>().Delete(dp => documentIds.Contains(dp.Id));
                     c.Table<Document>().Delete(d => documentIds.Contains(d.Id));
@@ -416,7 +501,7 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-        public async Task CopyToFolder(int folderId, List<int> documentIds)
+        public async Task CopyToFolderAsync(int folderId, List<int> documentIds)
         {
             try
             {
@@ -434,7 +519,6 @@ namespace Mark5.Mobile.Common.DataAccess
                 throw new DataAccessException($"Error filing document previews to folder with Id={folderId}.", ex);
             }
         }
-
 
         public async Task SaveTemplatePreviewsAsync(List<TemplatePreview> templatePreviews)
         {
@@ -815,5 +899,77 @@ namespace Mark5.Mobile.Common.DataAccess
                 throw new DataAccessException("Error removing orphan documents and document previews.", ex);
             }
         }
+
+        public async Task<List<int>> GetLinkedFoldersIds(int documentId)
+        {
+            try
+            {
+                List<int> linkedFoldersId = null;
+
+                await documentsDatabase.RunInConnectionAsync(c =>
+                {
+                    var query = $"select {nameof(FolderDocumentLink.FolderId)} " + $"from {nameof(FolderDocumentLink)} "
+                    + $"where {nameof(FolderDocumentLink.DocumentId)} = {documentId} ";
+
+                    var result = c.Query<int>(query);
+
+                    if (result == null || result.Count < 1)
+                        throw new DataNotFoundException($"Linked folders for document {documentId} could not be found.");
+
+                    linkedFoldersId = result;
+                });
+
+                return linkedFoldersId;
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException($"Error getting linked folders for document {documentId}.", ex);
+            }
+        }
+
+        #region IRestorable
+
+        public async Task RestoreDeletedObjectsAsync(List<int> ids)
+        {
+            try
+            {
+                var deletedDocumentPreviews = await restorationDataAccess.GetDeletedObjectsAsync(ids, DeletedObjectType.DocumentPreview);
+                var documentPreviews = deletedDocumentPreviews.Select(dd => Serializer.Deserialize<DocumentPreview>(dd.SerializedObject)).ToList();
+
+                var deletedDocuments = await restorationDataAccess.GetDeletedObjectsAsync(ids, DeletedObjectType.Document);
+                var documents = deletedDocuments.Select(dd => Serializer.Deserialize<Document>(dd.SerializedObject)).ToList();
+
+                await documentsDatabase.RunInConnectionAsync(c =>
+                {
+                    c.InsertOrReplaceAll(documentPreviews);
+                    c.InsertOrReplaceAll(documents);
+                });
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error while restoring deleted documents.", ex);
+            }
+        }
+
+        public async Task SaveDeletedObjectsAsync<T>(List<T> businessEntities) where T : IBusinessEntity
+        {
+            try
+            {
+                await restorationDataAccess.SaveDeletedObjects(businessEntities);
+
+                foreach (var be in businessEntities)
+                {
+                    var linkedFoldersIds = await GetLinkedFoldersIds(be.Id);
+                    await restorationDataAccess.SaveDeletedObjectLinkedFolders(be.Id, linkedFoldersIds);
+                }
+            }
+            catch (Exception ex) when (!(ex is DataAccessException))
+            {
+                throw new DataAccessException("Error while saving deleted documents.", ex);
+            }
+        }
+
+        #endregion
+
     }
 }

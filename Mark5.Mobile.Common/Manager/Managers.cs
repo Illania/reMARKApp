@@ -46,9 +46,10 @@ namespace Mark5.Mobile.Common.Manager
                                                                                   azureAppProxyInfo);
 
             var foldersDataAccess = new FoldersDataAccess(DatabaseConnectionProvider.DatabaseForModuleType);
-            var documentsDataAccess = new DocumentsDataAccess(DatabaseConnectionProvider.DocumentsDatabase);
-            var contactsDataAccess = new ContactsDataAccess(DatabaseConnectionProvider.ContactsDatabase);
-            var shortcodesDataAccess = new ShortcodesDataAccess(DatabaseConnectionProvider.ShortcodesDatabase);
+            var restorationDataAccess = new RestorationDataAccess(DatabaseConnectionProvider.SystemDatabase);
+            var documentsDataAccess = new DocumentsDataAccess(DatabaseConnectionProvider.DocumentsDatabase, restorationDataAccess);
+            var contactsDataAccess = new ContactsDataAccess(DatabaseConnectionProvider.ContactsDatabase, restorationDataAccess);
+            var shortcodesDataAccess = new ShortcodesDataAccess(DatabaseConnectionProvider.ShortcodesDatabase, restorationDataAccess);
             var calendarDataAccess = new CalendarDataAccess(DatabaseConnectionProvider.CalendarDatabase);
             var notificationsDataAccess = new NotificationsDataAccess(DatabaseConnectionProvider.SystemDatabase);
             var actionsDataAccess = new ActionsDataAccess(DatabaseConnectionProvider.ActionsDatabase);

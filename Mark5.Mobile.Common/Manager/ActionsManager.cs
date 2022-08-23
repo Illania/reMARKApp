@@ -137,23 +137,24 @@ namespace Mark5.Mobile.Common.Manager
                     break;
                 case ActionType.RemoveFromFolder:
                     var rfa = action as RemoveFromFolderAction;
-                    await commonActionsManager.RemoveFromFolderLocalAsync(rfa.DocumentIds, rfa.FolderId, rfa.ObjectType);
+                    await commonActionsManager.RestoreDeletedObjectsLocalAsync(rfa.DocumentIds, rfa.ObjectType);
+                    await commonActionsManager.CopyToFolderLocalAsync(rfa.DocumentIds, rfa.FolderId, rfa.ObjectType);
                     break;
                 case ActionType.Delete:
                     var da = action as DeleteAction;
-                    await commonActionsManager.DeleteLocalAsync(da.DocumentIds, da.ObjectType);
+                    await commonActionsManager.RestoreDeletedObjectsLocalAsync(da.DocumentIds, da.ObjectType);
                     break;
                 case ActionType.CopyToFolder:
                     var cfa = action as CopyToFolderAction;
-                    await commonActionsManager.CopyToFolderLocalAsync(cfa.DocumentIds, cfa.FolderId, cfa.ObjectType);
+                    await commonActionsManager.RemoveFromFolderLocalAsync(cfa.DocumentIds, cfa.FolderId, cfa.ObjectType);
                     break;
                 case ActionType.MoveToFolder:
                     var mfa = action as MoveToFolderAction;
-                    await commonActionsManager.MoveToFolderLocalAsync(mfa.DocumentIds, mfa.FromFolderId, mfa.ToFolderId, mfa.ObjectType);
+                    await commonActionsManager.MoveToFolderLocalAsync(mfa.DocumentIds, mfa.ToFolderId, mfa.FromFolderId, mfa.ObjectType);
                     break;
                 case ActionType.CopyToWorktray:
                     var cwa = action as CopyToWorktrayAction;
-                    await commonActionsManager.CopyToWorktrayLocalAsync(cwa.DocumentIds, cwa.ObjectType);
+                    await commonActionsManager.RemoveFromFolderLocalAsync(cwa.DocumentIds, SystemFoldersInfo.Int_WorktrayRoot, cwa.ObjectType);
                     break;
             }
         }

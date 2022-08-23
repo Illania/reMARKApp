@@ -33,19 +33,15 @@ namespace Mark5.Mobile.Common.DataAccess
 
         Task SetReadStatusAsync(List<int> documentIds, bool readStatus);
 
-        Task RemoveFromFolderAsync(List<DocumentPreview> documentPreviews, Folder folder);
+        Task RemoveFromFolderAsync(List<DocumentPreview> documentPreviews, int folderId, bool saveBeforeDeletion = false);
 
-        Task RemoveFromFolderAsync(List<Document> documents, Folder folder);
+        Task RemoveFromFolderAsync(List<Document> documents, int folderId, bool saveBeforeDeletion = false);
 
-        Task RemoveFromFolderAsync(List<int> docIds, int folderId);
+        Task DeleteAsync(List<DocumentPreview> documentPreviews, bool saveBeforeDeletion = false);
 
-        Task DeleteAsync(List<DocumentPreview> documentPreviews);
-
-        Task DeleteAsync(List<Document> documents);
+        Task DeleteAsync(List<Document> documents, bool saveBeforeDeletion = false);
 
         Task DeleteAsync(List<int> documentIds);
-
-        Task CopyToFolder(int folderId, List<int> documentIds);
 
         Task SaveTemplatePreviewsAsync(List<TemplatePreview> templatePreviews);
 
@@ -78,5 +74,6 @@ namespace Mark5.Mobile.Common.DataAccess
         Task<int[]> GetNonCachedDocumentIdsAsync(int[] folderIds, int limit = -1);
 
         Task RemoveOrphans();
+ 
     }
 }
