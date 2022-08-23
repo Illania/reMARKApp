@@ -481,6 +481,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
             var assignedExtraFields = await Managers.DocumentsManager.GetDocumentExtraFieldsAsync(Document.Id);
             var availableExtraFields = await Managers.DocumentsManager.GetExtraFieldsAsync();
+            availableExtraFields = availableExtraFields.Where(ef => PlatformConfig.Preferences.IsExtraFieldEnabled(ef.FieldId)).ToList();
             var documentExtraFields = assignedExtraFields
                 .Where(kv => kv.Key != null)
                 .OrderBy(kv => kv.Key.Name)

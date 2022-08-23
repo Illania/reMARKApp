@@ -333,17 +333,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
-                var cvh = holder as ExtraFieldViewHolder;
-                if (cvh == null)
+                if (!(holder is ExtraFieldViewHolder cvh))
                     return;
 
                 var extraField = Items[position];
                 if(Fragment.IsEditingAvailable)
                     cvh.ItemView.SetOnCreateContextMenuListener(new ActionOnCreateContextMenuListener(action));
                 cvh.FieldName= extraField.FieldName;
-                //cvh.Enabled = extraField.Enabled;
                 cvh.ExtraField = extraField;
                 cvh.Adapter = this;
+                cvh.SetEnabled(PlatformConfig.Preferences.IsExtraFieldEnabled(extraField.FieldId));
             }
 
             public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
@@ -411,7 +410,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             public ExtraField ExtraField { get; set; }
             public string FieldName { set => fieldNameTextView.Text = value; }
-            public bool Enabled { set => enabledSwitch.Checked = value;}
+
 
             public ExtraFieldViewHolder(View itemView)
                 : base(itemView)
@@ -419,20 +418,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 fieldNameTextView = itemView.FindViewById<AppCompatTextView>(Resource.Id.list_item_extra_field_name);
                 enabledSwitch = itemView.FindViewById<SwitchCompat>(Resource.Id.list_item_extra_field_enabled);
-
                 enabledSwitch.CheckedChange += EnabledSwitch_CheckedChange;
                
+            }
+
+            public void SetEnabled(bool enabled)
+            {
+                enabledSwitch.Checked = enabled;
             }
 
             private void EnabledSwitch_CheckedChange(object sender, Android.Widget.CompoundButton.CheckedChangeEventArgs e)
             {
                 if (ExtraField != null)
                 {
-                    ExtraField.Enabled = e.IsChecked;
-                    enabledSwitch.Post(new Runnable(() =>
-                    {
-                        Adapter.EditItem(ExtraField);
-                    })); 
+                    PlatformConfig.Preferences.SetExtraFieldEnabled(ExtraField.FieldId, e.IsChecked);
                 }
             }
 

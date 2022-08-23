@@ -3,6 +3,7 @@ using Foundation;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
+using Mark5.Mobile.IOS.Utilities;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells
@@ -58,14 +59,14 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells
         public void Initialize(ExtraField extraField)
         {
             title.Text = extraField.FieldName;
-            toggleSwitch.On = extraField.Enabled;
+            toggleSwitch.On = PlatformConfig.Preferences.IsExtraFieldEnabled(extraField.FieldId);
             this.extraField = extraField;
             
         }
 
         public virtual async void Toggle_ValueChanged(object sender, EventArgs e)
         {
-            extraField.Enabled = toggleSwitch.On; 
+            PlatformConfig.Preferences.SetExtraFieldEnabled(extraField.FieldId, toggleSwitch.On); 
         }
 
         public void SetTitle(string title)

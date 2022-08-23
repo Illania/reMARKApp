@@ -483,6 +483,27 @@ namespace Mark5.Mobile.IOS.Utilities
                 ud.Synchronize();
             }
         }
+
+        public bool IsExtraFieldEnabled(int extraFieldId)
+        {
+            var extraFieldKey = extraFieldId.ToString();
+            if (ExtraFieldsSettings.ContainsKey(extraFieldKey))
+                return Convert.ToBoolean(ExtraFieldsSettings[extraFieldKey]);
+            else
+                return false;
+        }
+
+        public void SetExtraFieldEnabled(int extraFieldId, bool enabled)
+        {
+            var newExtraFieldsSettings = ExtraFieldsSettings;
+            var extraFieldKey = extraFieldId.ToString();
+            if (!ExtraFieldsSettings.ContainsKey(extraFieldKey))
+                newExtraFieldsSettings.Add(extraFieldKey, enabled.ToString());
+            else
+                newExtraFieldsSettings[extraFieldKey] = enabled.ToString();
+            ExtraFieldsSettings = newExtraFieldsSettings;
+        }
+
         #endregion
 
         #region EmailSwipeActions
