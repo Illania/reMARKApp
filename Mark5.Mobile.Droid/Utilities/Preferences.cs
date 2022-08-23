@@ -406,6 +406,56 @@ namespace Mark5.Mobile.Droid.Utilities
 
         #endregion
 
+        #region ExtraFieldsSettings
+
+        public Dictionary<int, bool> ExtraFieldsSettings
+        {
+            get
+            {
+                var pref = sp.GetStringSet(Application.Context.GetString(Resource.String.pref_key_extra_fields_settings), new List<string>());
+                var dict = new Dictionary<int, bool>();
+                foreach (var keyValue in pref)
+                {
+                    var splitString = keyValue.Split(":");
+                    dict.Add(Convert.ToInt32(splitString[0]), Convert.ToBoolean(splitString[1]));
+                }
+                return dict;
+            }
+
+            set
+            {
+                var e = sp.Edit();
+                var extraFieldsSettingsList = new List<string>();
+                foreach (var keyValue in value)
+                {
+                    extraFieldsSettingsList.Add(string.Join(":", new List<string> { keyValue.Key.ToString(), keyValue.Value.ToString() }));
+                }
+                e.PutStringSet(Application.Context.GetString(Resource.String.pref_key_extra_fields_settings), extraFieldsSettingsList);
+                e.Commit();
+            }
+        }
+
+        public bool IsExtraFieldEnabled(int extraFieldId)
+        {
+            if (!ExtraFieldsSettings.ContainsKey(extraFieldId))
+                return false;
+            else
+                return Convert.ToBoolean(ExtraFieldsSettings[extraFieldId]);
+        }
+
+        public void SetExtraFieldEnabled(int extraFieldId, bool enabled)
+        {
+            var newExtraFieldSettings = ExtraFieldsSettings;
+            if (!ExtraFieldsSettings.ContainsKey(extraFieldId))
+               newExtraFieldSettings.Add(extraFieldId, enabled);
+            else
+                newExtraFieldSettings[extraFieldId] = enabled;
+
+            ExtraFieldsSettings = newExtraFieldSettings;
+        }
+        #endregion
+
+
         #region Recent Address swipe actions
         public enum RecentAddressSwipeAction
         {         
