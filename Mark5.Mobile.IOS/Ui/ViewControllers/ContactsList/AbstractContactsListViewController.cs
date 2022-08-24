@@ -303,7 +303,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                                                    UIAlertActionStyle.Default,
                                                    a =>
                 {
-                    this.CopyToWorktray((IBusinessEntity)selectedContacts);
+                    this.CopyToWorktray(selectedContacts.Cast<IBusinessEntity>().ToList());
                     EndEditing();
                 }));
             }
@@ -312,7 +312,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                 UIAlertActionStyle.Default,
                 a =>
                 {
-                    this.CopyToFolder((IBusinessEntity)selectedContacts);
+                    this.CopyToFolder(selectedContacts.Cast<IBusinessEntity>().ToList());
                     EndEditing();
                 }));
 
@@ -321,7 +321,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                     UIAlertActionStyle.Default,
                     a =>
                     {
-                        this.MoveToFolder((IBusinessEntity)selectedContacts, Folder);
+                        this.MoveToFolder(selectedContacts.Cast<IBusinessEntity>().ToList(), Folder);
                         EndEditing();
                     }));
 
@@ -889,7 +889,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
                 var contactPreview = items[indexPath.Section][indexPath.Row];
 
-                if (ServerConfig.SystemSettings.ContactsModuleInfo.WorktrayEnabled ?? true)
+               if (ServerConfig.SystemSettings.ContactsModuleInfo.WorktrayEnabled ?? true)
                 {
                     var copyToWorktrayAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
                                                                            Localization.GetString("copy_to_worktray_ml"),
@@ -900,7 +900,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                     });
                     copyToWorktrayAction.BackgroundColor = Theme.DarkBlue;
                     actions.Add(copyToWorktrayAction);
-                }
+               }
 
                 var moreAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
                                                              Localization.GetString("more"),
