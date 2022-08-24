@@ -46,6 +46,7 @@ namespace Mark5.Mobile.IOS.Service
 
         public void RefreshServiceReachability(bool isReachable)
         {
+            IsReachable = isReachable;
             ReachabilityRefreshed(this, new ReachabilityRefreshedEventArgs(true, isReachable));
         }
 
