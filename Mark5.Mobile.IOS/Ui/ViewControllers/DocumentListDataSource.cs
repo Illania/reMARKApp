@@ -92,6 +92,8 @@ namespace Mark5.Mobile.IOS.Ui
         {
             if (PlatformConfig.Preferences.HasBookmarkForFolder(folderId, dp.Id))
                 cell.BackgroundColor = Theme.Bookmark;
+            else
+                cell.BackgroundColor = Theme.White;
         }
 
         public override nint RowsInSection(UITableView tableview, nint section)
