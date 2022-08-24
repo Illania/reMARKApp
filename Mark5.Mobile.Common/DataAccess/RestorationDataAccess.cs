@@ -23,21 +23,18 @@ namespace Mark5.Mobile.Common.DataAccess
         {
             try
             {
-                List<DeletedObject> deletedObjects = null;
+                var deletedObjects = new List<DeletedObject>();
 
                 await systemDatabase.RunInConnectionAsync(c =>
                 {
                     var query = $"select * " + $"from {nameof(DeletedObject)} " +
-                    $@"where {nameof(DeletedObject.Id)} in ({string.Join(",", ids).TrimEnd(',')}) " +
-                    $@"and {nameof(DeletedObject.ObjectType)} = {type} ";
-                    query += $"order by {nameof(DeletedObject.Id)} desc ";
+                    $@"where {nameof(DeletedObject.DeletedObjectId)} in ({string.Join(",", ids).TrimEnd(',')}) " +
+                    $"and {nameof(DeletedObject.ObjectType)} = {(int)type} " + 
+                    $"order by {nameof(DeletedObject.Id)} desc ";
 
                     if (maxItems > 0)
                         query += $"limit {maxItems - 1} ";
                     var result = c.Query<DeletedObject>(query);
-
-                    if (result == null || result.Count < 1)
-                        throw new DataNotFoundException("Deleted objects could not be found.");
 
                     deletedObjects = result;
                 });
