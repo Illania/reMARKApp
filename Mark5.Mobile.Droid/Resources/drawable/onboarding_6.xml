@@ -1,0 +1,815 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Aps>
+	<Group>
+		<Page Width="500" Height="500" PaperTray="0">
+			<Canvas>
+				<Canvas>
+					<Clip>
+						<Path FillMode="Winding">
+							<PathFigure IsClosed="True">
+								<PolyLine LineColor="#FF000000">
+									<Point X="0" Y="500" />
+									<Point X="0" Y="0" />
+								</PolyLine>
+								<PolyLine LineColor="#FF000000">
+									<Point X="0" Y="0" />
+									<Point X="500" Y="0" />
+								</PolyLine>
+								<PolyLine LineColor="#FF000000">
+									<Point X="500" Y="0" />
+									<Point X="500" Y="500" />
+								</PolyLine>
+								<PolyLine LineColor="#FF000000">
+									<Point X="500" Y="500" />
+									<Point X="0" Y="500" />
+								</PolyLine>
+							</PathFigure>
+						</Path>
+					</Clip>
+					<Path FillMode="Winding" RenderTransform="1 0 0 -1 0 500">
+						<Brush>
+							<SolidBrush Color="#FFE1E1E1" />
+						</Brush>
+						<Pen Alignment="Center" DashCap="Flat" DashOffset="0" DashStyle="Solid" EndCap="Flat" LineJoin="Miter" MiterLimit="10" StartCap="Flat" Width="1.2048193">
+							<Brush>
+								<SolidBrush Color="#FFFFFFFF" />
+							</Brush>
+						</Pen>
+						<PathFigure IsClosed="True">
+							<PolyLine LineColor="#FF000000">
+								<Point X="17.674698" Y="506.02652" />
+								<Point X="17.674698" Y="506.02652" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="17.674698" Y="506.02652" />
+								<Point X="481.53012" Y="506.02652" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="481.53012" Y="506.02652" />
+								<Point X="481.53012" Y="-6.021698" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="481.53012" Y="-6.021698" />
+								<Point X="17.674698" Y="-6.021698" />
+							</PolyLine>
+						</PathFigure>
+					</Path>
+					<Path FillMode="Alternate" RenderTransform="1 0 0 -1 0 500">
+						<Brush>
+							<SolidBrush Color="#FFFFFFFF" />
+						</Brush>
+						<Pen Alignment="Center" DashCap="Flat" DashOffset="0" DashStyle="Solid" EndCap="Flat" LineJoin="Miter" MiterLimit="10" StartCap="Flat" Width="1.6064258">
+							<Brush>
+								<SolidBrush Color="#FFFFFFFF" />
+							</Brush>
+						</Pen>
+						<PathFigure IsClosed="True">
+							<PolyLine LineColor="#FF000000">
+								<Point X="236.91086" Y="269.2554" />
+								<Point X="236.91086" Y="269.2554" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="236.91086" Y="269.2554" />
+								<Point X="236.91086" Y="148.59033" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="236.91086" Y="148.59033" />
+								<Point X="411.20364" Y="148.59033" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="411.20364" Y="148.59033" />
+								<Point X="411.20364" Y="255.20964" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="411.20364" Y="255.20964" />
+								<Point X="304.35904" Y="255.20964" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="304.35904" Y="255.20964" />
+								<Point X="282.1265" Y="277.44214" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="282.1265" Y="277.44214" />
+								<Point X="236.91086" Y="277.44214" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="236.91086" Y="277.44214" />
+								<Point X="236.91086" Y="269.2554" />
+							</PolyLine>
+						</PathFigure>
+					</Path>
+					<Path FillMode="Winding" RenderTransform="1 0 0 -1 0 500">
+						<Brush>
+							<SolidBrush Color="#FF203B61" />
+						</Brush>
+						<Pen Alignment="Center" DashCap="Flat" DashOffset="0" DashStyle="Solid" EndCap="Flat" LineJoin="Miter" MiterLimit="10" StartCap="Flat" Width="1.6064258">
+							<Brush>
+								<SolidBrush Color="#FFFFFFFF" />
+							</Brush>
+						</Pen>
+						<PathFigure IsClosed="True">
+							<PolyLine LineColor="#FF000000">
+								<Point X="238.71687" Y="150.39758" />
+								<Point X="238.71687" Y="150.39758" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="238.71687" Y="150.39758" />
+								<Point X="238.71687" Y="150.39758" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="238.71687" Y="150.39758" />
+								<Point X="409.3964" Y="150.39758" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="409.3964" Y="150.39758" />
+								<Point X="409.3964" Y="150.39758" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="409.3964" Y="150.39758" />
+								<Point X="409.3964" Y="253.4012" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="409.3964" Y="253.4012" />
+								<Point X="409.3964" Y="253.4012" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="409.3964" Y="253.4012" />
+								<Point X="303.61084" Y="253.4012" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="303.61084" Y="253.4012" />
+								<Point X="281.3783" Y="275.63373" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="281.3783" Y="275.63373" />
+								<Point X="281.3783" Y="275.63373" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="281.3783" Y="275.63373" />
+								<Point X="238.71687" Y="275.63373" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="238.71687" Y="275.63373" />
+								<Point X="238.71687" Y="275.63373" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="238.71687" Y="275.63373" />
+								<Point X="238.71687" Y="150.39758" />
+							</PolyLine>
+						</PathFigure>
+						<PathFigure IsClosed="True">
+							<PolyLine LineColor="#FF000000">
+								<Point X="413.01086" Y="146.78311" />
+								<Point X="413.01086" Y="146.78311" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="413.01086" Y="146.78311" />
+								<Point X="413.01086" Y="146.78311" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="413.01086" Y="146.78311" />
+								<Point X="235.1024" Y="146.78311" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="235.1024" Y="146.78311" />
+								<Point X="235.1024" Y="146.78311" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="235.1024" Y="146.78311" />
+								<Point X="235.1024" Y="279.2494" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="235.1024" Y="279.2494" />
+								<Point X="235.1024" Y="279.2494" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="235.1024" Y="279.2494" />
+								<Point X="282.8747" Y="279.2494" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="282.8747" Y="279.2494" />
+								<Point X="305.1072" Y="257.01685" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="305.1072" Y="257.01685" />
+								<Point X="305.1072" Y="257.01685" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="305.1072" Y="257.01685" />
+								<Point X="413.01083" Y="257.01685" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="413.01083" Y="257.01685" />
+								<Point X="413.01083" Y="257.01685" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="413.01083" Y="257.01685" />
+								<Point X="413.01083" Y="146.78311" />
+							</PolyLine>
+						</PathFigure>
+					</Path>
+					<Path FillMode="Winding" RenderTransform="1 0 0 -1 0 500">
+						<Brush>
+							<SolidBrush Color="#FF203B61" />
+						</Brush>
+						<Pen Alignment="Center" DashCap="Flat" DashOffset="0" DashStyle="Solid" EndCap="Flat" LineJoin="Miter" MiterLimit="10" StartCap="Flat" Width="1.6064258">
+							<Brush>
+								<SolidBrush Color="#FFFFFFFF" />
+							</Brush>
+						</Pen>
+						<PathFigure IsClosed="True">
+							<Bezier CurveColor="#FF000000">
+								<StartPoint X="254.92894" Y="312.81085" />
+								<ControlPoint1 X="235.9916" Y="341.71445" />
+								<ControlPoint2 X="214.61809" Y="319.77228" />
+								<EndPoint X="214.61809" Y="319.77228" />
+							</Bezier>
+							<PolyLine LineColor="#FF000000">
+								<Point X="214.61809" Y="319.77228" />
+								<Point X="214.61809" Y="319.77228" />
+							</PolyLine>
+							<Bezier CurveColor="#FF000000">
+								<StartPoint X="214.61809" Y="319.77228" />
+								<ControlPoint1 X="214.61809" Y="319.77228" />
+								<ControlPoint2 X="232.8964" Y="323.40118" />
+								<EndPoint X="243.45665" Y="307.28192" />
+							</Bezier>
+							<PolyLine LineColor="#FF000000">
+								<Point X="243.45665" Y="307.28192" />
+								<Point X="243.45665" Y="307.28192" />
+							</PolyLine>
+							<Bezier CurveColor="#FF000000">
+								<StartPoint X="243.45665" Y="307.28192" />
+								<ControlPoint1 X="254.01929" Y="291.16266" />
+								<ControlPoint2 X="254.92894" Y="312.81085" />
+								<EndPoint X="254.92894" Y="312.81085" />
+							</Bezier>
+						</PathFigure>
+					</Path>
+					<Path FillMode="Alternate" RenderTransform="1 0 0 -1 0 500">
+						<Brush>
+							<SolidBrush Color="#FF203B61" />
+						</Brush>
+						<Pen Alignment="Center" DashCap="Flat" DashOffset="0" DashStyle="Solid" EndCap="Flat" LineJoin="Miter" MiterLimit="10" StartCap="Flat" Width="1.6064258">
+							<Brush>
+								<SolidBrush Color="#FFFFFFFF" />
+							</Brush>
+						</Pen>
+						<PathFigure IsClosed="True">
+							<PolyLine LineColor="#FF000000">
+								<Point X="261.85544" Y="319.44214" />
+								<Point X="261.85544" Y="319.44214" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="261.85544" Y="319.44214" />
+								<Point X="257.2964" Y="297.56024" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="257.2964" Y="297.56024" />
+								<Point X="235.447" Y="302.11206" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="235.447" Y="302.11206" />
+								<Point X="261.85544" Y="319.44214" />
+							</PolyLine>
+						</PathFigure>
+					</Path>
+					<Path FillMode="Winding" RenderTransform="1 0 0 -1 0 500">
+						<Brush>
+							<SolidBrush Color="#FFE1E1E1" />
+						</Brush>
+						<Pen Alignment="Center" DashCap="Flat" DashOffset="0" DashStyle="Solid" EndCap="Flat" LineJoin="Miter" MiterLimit="10" StartCap="Flat" Width="1.2048193">
+							<Brush>
+								<SolidBrush Color="#FFFFFFFF" />
+							</Brush>
+						</Pen>
+						<PathFigure IsClosed="True">
+							<PolyLine LineColor="#FF000000">
+								<Point X="255.75664" Y="229.08432" />
+								<Point X="255.75664" Y="229.08432" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="255.75664" Y="229.08432" />
+								<Point X="287.71927" Y="229.08432" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="287.71927" Y="229.08432" />
+								<Point X="287.71927" Y="210.24457" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="287.71927" Y="210.24457" />
+								<Point X="255.75664" Y="210.24457" />
+							</PolyLine>
+						</PathFigure>
+					</Path>
+					<Path FillMode="Alternate" RenderTransform="1 0 0 -1 0 500">
+						<Brush>
+							<SolidBrush Color="#FFE1E1E1" />
+						</Brush>
+						<Pen Alignment="Center" DashCap="Flat" DashOffset="0" DashStyle="Solid" EndCap="Flat" LineJoin="Miter" MiterLimit="10" StartCap="Flat" Width="1.6064258">
+							<Brush>
+								<SolidBrush Color="#FFFFFFFF" />
+							</Brush>
+						</Pen>
+						<PathFigure IsClosed="True">
+							<PolyLine LineColor="#FF000000">
+								<Point X="287.7205" Y="210.24457" />
+								<Point X="287.7205" Y="210.24457" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="287.7205" Y="210.24457" />
+								<Point X="255.75664" Y="210.24457" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="255.75664" Y="210.24457" />
+								<Point X="255.75664" Y="229.08432" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="255.75664" Y="229.08432" />
+								<Point X="271.74817" Y="219.51807" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="271.74817" Y="219.51807" />
+								<Point X="287.7205" Y="229.08432" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="287.7205" Y="229.08432" />
+								<Point X="287.7205" Y="210.24457" />
+							</PolyLine>
+						</PathFigure>
+					</Path>
+					<Path FillMode="Winding" RenderTransform="1 0 0 -1 0 500">
+						<Brush>
+							<SolidBrush Color="#FFFFFFFF" />
+						</Brush>
+						<Pen Alignment="Center" DashCap="Flat" DashOffset="0" DashStyle="Solid" EndCap="Flat" LineJoin="Miter" MiterLimit="10" StartCap="Flat" Width="1.2048193">
+							<Brush>
+								<SolidBrush Color="#FFFFFFFF" />
+							</Brush>
+						</Pen>
+						<PathFigure IsClosed="True">
+							<PolyLine LineColor="#FF000000">
+								<Point X="88" Y="351.41565" />
+								<Point X="88" Y="351.41565" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="88" Y="351.41565" />
+								<Point X="199.5952" Y="351.41565" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="199.5952" Y="351.41565" />
+								<Point X="199.5952" Y="285.641" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="199.5952" Y="285.641" />
+								<Point X="88" Y="285.641" />
+							</PolyLine>
+						</PathFigure>
+					</Path>
+					<Path FillMode="Winding" RenderTransform="1 0 0 -1 0 500">
+						<Brush>
+							<SolidBrush Color="#FF203B61" />
+						</Brush>
+						<Pen Alignment="Center" DashCap="Flat" DashOffset="0" DashStyle="Solid" EndCap="Flat" LineJoin="Miter" MiterLimit="10" StartCap="Flat" Width="1.6064258">
+							<Brush>
+								<SolidBrush Color="#FFFFFFFF" />
+							</Brush>
+						</Pen>
+						<PathFigure IsClosed="True">
+							<PolyLine LineColor="#FF000000">
+								<Point X="88.60242" Y="286.24216" />
+								<Point X="88.60242" Y="286.24216" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="88.60242" Y="286.24216" />
+								<Point X="88.60242" Y="286.24216" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="88.60242" Y="286.24216" />
+								<Point X="198.99158" Y="286.24216" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="198.99158" Y="286.24216" />
+								<Point X="198.99158" Y="286.24216" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="198.99158" Y="286.24216" />
+								<Point X="198.99158" Y="350.81323" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="198.99158" Y="350.81323" />
+								<Point X="198.99158" Y="350.81323" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="198.99158" Y="350.81323" />
+								<Point X="88.60242" Y="350.81323" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="88.60242" Y="350.81323" />
+								<Point X="88.60242" Y="350.81323" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="88.60242" Y="350.81323" />
+								<Point X="88.60242" Y="286.24216" />
+							</PolyLine>
+						</PathFigure>
+						<PathFigure IsClosed="True">
+							<PolyLine LineColor="#FF000000">
+								<Point X="200.1964" Y="285.03735" />
+								<Point X="200.1964" Y="285.03735" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="200.1964" Y="285.03735" />
+								<Point X="200.1964" Y="285.03735" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="200.1964" Y="285.03735" />
+								<Point X="87.39759" Y="285.03735" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="87.39759" Y="285.03735" />
+								<Point X="87.39759" Y="285.03735" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="87.39759" Y="285.03735" />
+								<Point X="87.39759" Y="352.01807" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="87.39759" Y="352.01807" />
+								<Point X="87.39759" Y="352.01807" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="87.39759" Y="352.01807" />
+								<Point X="200.1964" Y="352.01807" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="200.1964" Y="352.01807" />
+								<Point X="200.1964" Y="352.01807" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="200.1964" Y="352.01807" />
+								<Point X="200.1964" Y="285.03735" />
+							</PolyLine>
+						</PathFigure>
+					</Path>
+					<Path FillMode="Alternate" RenderTransform="1 0 0 -1 0 500">
+						<Brush>
+							<SolidBrush Color="#FF203B61" />
+						</Brush>
+						<Pen Alignment="Center" DashCap="Flat" DashOffset="0" DashStyle="Solid" EndCap="Flat" LineJoin="Miter" MiterLimit="10" StartCap="Flat" Width="1.6064258">
+							<Brush>
+								<SolidBrush Color="#FFFFFFFF" />
+							</Brush>
+						</Pen>
+						<PathFigure IsClosed="True">
+							<PolyLine LineColor="#FF000000">
+								<Point X="199.5952" Y="285.63974" />
+								<Point X="199.5952" Y="285.63974" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="199.5952" Y="285.63974" />
+								<Point X="88" Y="285.63974" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="88" Y="285.63974" />
+								<Point X="88" Y="351.41565" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="88" Y="351.41565" />
+								<Point X="143.83012" Y="318.01447" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="143.83012" Y="318.01447" />
+								<Point X="199.5952" Y="351.41565" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="199.5952" Y="351.41565" />
+								<Point X="199.5952" Y="285.63974" />
+							</PolyLine>
+						</PathFigure>
+					</Path>
+					<Path FillMode="Winding" RenderTransform="1 0 0 -1 0 500">
+						<Brush>
+							<SolidBrush Color="#FFE1E1E1" />
+						</Brush>
+						<Pen Alignment="Center" DashCap="Flat" DashOffset="0" DashStyle="Solid" EndCap="Flat" LineJoin="Miter" MiterLimit="10" StartCap="Flat" Width="1.2048193">
+							<Brush>
+								<SolidBrush Color="#FFFFFFFF" />
+							</Brush>
+						</Pen>
+						<PathFigure IsClosed="True">
+							<PolyLine LineColor="#FF000000">
+								<Point X="309.96747" Y="229.08432" />
+								<Point X="309.96747" Y="229.08432" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="309.96747" Y="229.08432" />
+								<Point X="341.93008" Y="229.08432" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="341.93008" Y="229.08432" />
+								<Point X="341.93008" Y="210.24457" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="341.93008" Y="210.24457" />
+								<Point X="309.96747" Y="210.24457" />
+							</PolyLine>
+						</PathFigure>
+					</Path>
+					<Path FillMode="Alternate" RenderTransform="1 0 0 -1 0 500">
+						<Brush>
+							<SolidBrush Color="#FFE1E1E1" />
+						</Brush>
+						<Pen Alignment="Center" DashCap="Flat" DashOffset="0" DashStyle="Solid" EndCap="Flat" LineJoin="Miter" MiterLimit="10" StartCap="Flat" Width="1.6064258">
+							<Brush>
+								<SolidBrush Color="#FFFFFFFF" />
+							</Brush>
+						</Pen>
+						<PathFigure IsClosed="True">
+							<PolyLine LineColor="#FF000000">
+								<Point X="341.93134" Y="210.24457" />
+								<Point X="341.93134" Y="210.24457" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="341.93134" Y="210.24457" />
+								<Point X="309.96747" Y="210.24457" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="309.96747" Y="210.24457" />
+								<Point X="309.96747" Y="229.08432" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="309.96747" Y="229.08432" />
+								<Point X="325.95905" Y="219.51807" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="325.95905" Y="219.51807" />
+								<Point X="341.93134" Y="229.08432" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="341.93134" Y="229.08432" />
+								<Point X="341.93134" Y="210.24457" />
+							</PolyLine>
+						</PathFigure>
+					</Path>
+					<Path FillMode="Winding" RenderTransform="1 0 0 -1 0 500">
+						<Brush>
+							<SolidBrush Color="#FFE1E1E1" />
+						</Brush>
+						<Pen Alignment="Center" DashCap="Flat" DashOffset="0" DashStyle="Solid" EndCap="Flat" LineJoin="Miter" MiterLimit="10" StartCap="Flat" Width="1.2048193">
+							<Brush>
+								<SolidBrush Color="#FFFFFFFF" />
+							</Brush>
+						</Pen>
+						<PathFigure IsClosed="True">
+							<PolyLine LineColor="#FF000000">
+								<Point X="361.75058" Y="229.08432" />
+								<Point X="361.75058" Y="229.08432" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="361.75058" Y="229.08432" />
+								<Point X="393.71323" Y="229.08432" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="393.71323" Y="229.08432" />
+								<Point X="393.71323" Y="210.24457" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="393.71323" Y="210.24457" />
+								<Point X="361.75058" Y="210.24457" />
+							</PolyLine>
+						</PathFigure>
+					</Path>
+					<Path FillMode="Alternate" RenderTransform="1 0 0 -1 0 500">
+						<Brush>
+							<SolidBrush Color="#FFE1E1E1" />
+						</Brush>
+						<Pen Alignment="Center" DashCap="Flat" DashOffset="0" DashStyle="Solid" EndCap="Flat" LineJoin="Miter" MiterLimit="10" StartCap="Flat" Width="1.6064258">
+							<Brush>
+								<SolidBrush Color="#FFFFFFFF" />
+							</Brush>
+						</Pen>
+						<PathFigure IsClosed="True">
+							<PolyLine LineColor="#FF000000">
+								<Point X="393.7133" Y="210.24457" />
+								<Point X="393.7133" Y="210.24457" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="393.7133" Y="210.24457" />
+								<Point X="361.75058" Y="210.24457" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="361.75058" Y="210.24457" />
+								<Point X="361.75058" Y="229.08432" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="361.75058" Y="229.08432" />
+								<Point X="377.74094" Y="219.51807" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="377.74094" Y="219.51807" />
+								<Point X="393.7133" Y="229.08432" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="393.7133" Y="229.08432" />
+								<Point X="393.7133" Y="210.24457" />
+							</PolyLine>
+						</PathFigure>
+					</Path>
+					<Path FillMode="Winding" RenderTransform="1 0 0 -1 0 500">
+						<Brush>
+							<SolidBrush Color="#FFE1E1E1" />
+						</Brush>
+						<Pen Alignment="Center" DashCap="Flat" DashOffset="0" DashStyle="Solid" EndCap="Flat" LineJoin="Miter" MiterLimit="10" StartCap="Flat" Width="1.2048193">
+							<Brush>
+								<SolidBrush Color="#FFFFFFFF" />
+							</Brush>
+						</Pen>
+						<PathFigure IsClosed="True">
+							<PolyLine LineColor="#FF000000">
+								<Point X="361.75058" Y="190.1578" />
+								<Point X="361.75058" Y="190.1578" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="361.75058" Y="190.1578" />
+								<Point X="393.71323" Y="190.1578" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="393.71323" Y="190.1578" />
+								<Point X="393.71323" Y="171.31805" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="393.71323" Y="171.31805" />
+								<Point X="361.75058" Y="171.31805" />
+							</PolyLine>
+						</PathFigure>
+					</Path>
+					<Path FillMode="Alternate" RenderTransform="1 0 0 -1 0 500">
+						<Brush>
+							<SolidBrush Color="#FFE1E1E1" />
+						</Brush>
+						<Pen Alignment="Center" DashCap="Flat" DashOffset="0" DashStyle="Solid" EndCap="Flat" LineJoin="Miter" MiterLimit="10" StartCap="Flat" Width="1.6064258">
+							<Brush>
+								<SolidBrush Color="#FFFFFFFF" />
+							</Brush>
+						</Pen>
+						<PathFigure IsClosed="True">
+							<PolyLine LineColor="#FF000000">
+								<Point X="393.7133" Y="171.31808" />
+								<Point X="393.7133" Y="171.31808" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="393.7133" Y="171.31808" />
+								<Point X="361.75058" Y="171.31808" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="361.75058" Y="171.31808" />
+								<Point X="361.75058" Y="190.1578" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="361.75058" Y="190.1578" />
+								<Point X="377.74094" Y="180.59036" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="377.74094" Y="180.59036" />
+								<Point X="393.7133" Y="190.1578" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="393.7133" Y="190.1578" />
+								<Point X="393.7133" Y="171.31808" />
+							</PolyLine>
+						</PathFigure>
+					</Path>
+					<Path FillMode="Winding" RenderTransform="1 0 0 -1 0 500">
+						<Brush>
+							<SolidBrush Color="#FFE1E1E1" />
+						</Brush>
+						<Pen Alignment="Center" DashCap="Flat" DashOffset="0" DashStyle="Solid" EndCap="Flat" LineJoin="Miter" MiterLimit="10" StartCap="Flat" Width="1.2048193">
+							<Brush>
+								<SolidBrush Color="#FFFFFFFF" />
+							</Brush>
+						</Pen>
+						<PathFigure IsClosed="True">
+							<PolyLine LineColor="#FF000000">
+								<Point X="255.75664" Y="190.1578" />
+								<Point X="255.75664" Y="190.1578" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="255.75664" Y="190.1578" />
+								<Point X="287.71927" Y="190.1578" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="287.71927" Y="190.1578" />
+								<Point X="287.71927" Y="171.31805" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="287.71927" Y="171.31805" />
+								<Point X="255.75664" Y="171.31805" />
+							</PolyLine>
+						</PathFigure>
+					</Path>
+					<Path FillMode="Alternate" RenderTransform="1 0 0 -1 0 500">
+						<Brush>
+							<SolidBrush Color="#FFE1E1E1" />
+						</Brush>
+						<Pen Alignment="Center" DashCap="Flat" DashOffset="0" DashStyle="Solid" EndCap="Flat" LineJoin="Miter" MiterLimit="10" StartCap="Flat" Width="1.6064258">
+							<Brush>
+								<SolidBrush Color="#FFFFFFFF" />
+							</Brush>
+						</Pen>
+						<PathFigure IsClosed="True">
+							<PolyLine LineColor="#FF000000">
+								<Point X="287.7205" Y="171.31808" />
+								<Point X="287.7205" Y="171.31808" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="287.7205" Y="171.31808" />
+								<Point X="255.75664" Y="171.31808" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="255.75664" Y="171.31808" />
+								<Point X="255.75664" Y="190.1578" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="255.75664" Y="190.1578" />
+								<Point X="271.74817" Y="180.59036" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="271.74817" Y="180.59036" />
+								<Point X="287.7205" Y="190.1578" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="287.7205" Y="190.1578" />
+								<Point X="287.7205" Y="171.31808" />
+							</PolyLine>
+						</PathFigure>
+					</Path>
+					<Path FillMode="Winding" RenderTransform="1 0 0 -1 0 500">
+						<Brush>
+							<SolidBrush Color="#FFE1E1E1" />
+						</Brush>
+						<Pen Alignment="Center" DashCap="Flat" DashOffset="0" DashStyle="Solid" EndCap="Flat" LineJoin="Miter" MiterLimit="10" StartCap="Flat" Width="1.2048193">
+							<Brush>
+								<SolidBrush Color="#FFFFFFFF" />
+							</Brush>
+						</Pen>
+						<PathFigure IsClosed="True">
+							<PolyLine LineColor="#FF000000">
+								<Point X="309.96747" Y="190.1578" />
+								<Point X="309.96747" Y="190.1578" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="309.96747" Y="190.1578" />
+								<Point X="341.93008" Y="190.1578" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="341.93008" Y="190.1578" />
+								<Point X="341.93008" Y="171.31805" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="341.93008" Y="171.31805" />
+								<Point X="309.96747" Y="171.31805" />
+							</PolyLine>
+						</PathFigure>
+					</Path>
+					<Path FillMode="Alternate" RenderTransform="1 0 0 -1 0 500">
+						<Brush>
+							<SolidBrush Color="#FFE1E1E1" />
+						</Brush>
+						<Pen Alignment="Center" DashCap="Flat" DashOffset="0" DashStyle="Solid" EndCap="Flat" LineJoin="Miter" MiterLimit="10" StartCap="Flat" Width="1.6064258">
+							<Brush>
+								<SolidBrush Color="#FFFFFFFF" />
+							</Brush>
+						</Pen>
+						<PathFigure IsClosed="True">
+							<PolyLine LineColor="#FF000000">
+								<Point X="341.93134" Y="171.31808" />
+								<Point X="341.93134" Y="171.31808" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="341.93134" Y="171.31808" />
+								<Point X="309.96747" Y="171.31808" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="309.96747" Y="171.31808" />
+								<Point X="309.96747" Y="190.1578" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="309.96747" Y="190.1578" />
+								<Point X="325.95905" Y="180.59036" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="325.95905" Y="180.59036" />
+								<Point X="341.93134" Y="190.1578" />
+							</PolyLine>
+							<PolyLine LineColor="#FF000000">
+								<Point X="341.93134" Y="190.1578" />
+								<Point X="341.93134" Y="171.31808" />
+							</PolyLine>
+						</PathFigure>
+					</Path>
+				</Canvas>
+			</Canvas>
+		</Page>
+	</Group>
+</Aps>

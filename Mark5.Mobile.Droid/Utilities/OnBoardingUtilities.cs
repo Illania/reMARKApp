@@ -90,14 +90,41 @@ namespace Mark5.Mobile.Droid.Utilities
         {
             return new List<OnBoardingPageModel>
             {
-                new OnBoardingPageModel("Welcome to reMARK", "We have made a few changes in the reMARK app. Press next to see what has changed.",
+                new OnBoardingPageModel("Welcome to reMARK",
+                "We have made a few changes in the reMARK app. Press next to see what has changed.",
                      Resource.Drawable.onboarding_1),
-                new OnBoardingPageModel("Azure Application Proxy with AD pre-authentication", "Now you can use Active Directory pre-authentication to login to reMARK through Azure Application Proxy.",
+
+                new OnBoardingPageModel("Favorite categories",
+                "Now you can assign favorite categories for quick access.",
                      Resource.Drawable.onboarding_2),
-                new OnBoardingPageModel("Share options support", "Now you can share images, files and text from other applications to reMARK app.",
+
+                new OnBoardingPageModel("Message list appearance",
+                "Now you can use different font and cell colors to highlight email by criteria.",
                      Resource.Drawable.onboarding_3),
-                new OnBoardingPageModel("Possibility to include attachments in replies", "Now it is possible to include source email attachments in replies to that email.",
-                     Resource.Drawable.onboarding_4)
+
+                new OnBoardingPageModel("Extra fields management",
+                "Now you can manage extra fields values and their visibility.",
+                     Resource.Drawable.onboarding_4),
+
+                new OnBoardingPageModel("Bookmarks for emails",
+                "Now you can assign a bookmark in each emails folder.",
+                     Resource.Drawable.onboarding_5),
+
+                new OnBoardingPageModel("File to folder after sending email",
+                "Now you can file an email to a folder immediately after sending it.",
+                     Resource.Drawable.onboarding_6),
+
+                new OnBoardingPageModel("Attach external documnets",
+                "Now you can aadd a reMARK external document as an attachment.",
+                     Resource.Drawable.onboarding_7),
+
+                new OnBoardingPageModel("Copy to department todo list",
+                "Now you can copy an email either to a user or to a department todo list.",
+                     Resource.Drawable.onboarding_8),
+
+                new OnBoardingPageModel("Add a contact from an email header",
+                "Now you can add a new contact iby clicking on an email recepient field.",
+                     Resource.Drawable.onboarding_9)
 
             };
         }
