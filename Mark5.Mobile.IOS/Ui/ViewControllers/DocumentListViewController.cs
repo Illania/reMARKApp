@@ -539,7 +539,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                   }));
             }
 
+            if (selectedDocuments.Count == 1)
+            {
+                if (!PlatformConfig.Preferences.HasBookmarkForFolder(Folder.Id, selectedDocuments.FirstOrDefault().Id))
+                {
+                   eas.AddAction(UIAlertAction.Create(
+                                    Localization.GetString("add_bookmark"),
+                                    UIAlertActionStyle.Default,
+                                    a => AddBookmark(selectedDocuments.FirstOrDefault())));
+                        
+                }
+                else
+                {
+                    eas.AddAction(UIAlertAction.Create(
+                                       Localization.GetString("remove_bookmark"),
+                                       UIAlertActionStyle.Default,
+                                       a => RemoveBookmark(selectedDocuments.FirstOrDefault())));
+                }
 
+                eas.AddAction(UIAlertAction.Create(
+                                 Localization.GetString("set_preset_category"),
+                                 UIAlertActionStyle.Default,
+                                 a => AssignPresetCategory(selectedDocuments.FirstOrDefault())));
+            }
+              
             eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => exitEditItem.Enabled = true));
 
             if (eas.PopoverPresentationController != null)

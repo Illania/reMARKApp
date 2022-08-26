@@ -351,6 +351,26 @@ namespace Mark5.Mobile.IOS.Ui
                             });
                         actionWrapper.Disabled = !DocumentsListViewController.SwipeActionAllowed(swipeAction.Action, documentPreview, folder);
                         break;
+                    case EmailSwipeAction.SwipeAction.AddBookmark:
+                        actionWrapper.Action = UITableViewRowAction.Create(
+                            UITableViewRowActionStyle.Default,
+                            viewControllerWeakReference.Unwrap()?.SwipeActionTitle(swipeAction.Action, documentPreview),
+                            (a, ip) =>
+                            {
+                                viewControllerWeakReference.Unwrap()?.OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView);
+                            });
+                        actionWrapper.Disabled = !DocumentsListViewController.SwipeActionAllowed(swipeAction.Action, documentPreview, folder);
+                        break;
+                    case EmailSwipeAction.SwipeAction.SetPresetCategory:
+                        actionWrapper.Action = UITableViewRowAction.Create(
+                            UITableViewRowActionStyle.Default,
+                            viewControllerWeakReference.Unwrap()?.SwipeActionTitle(swipeAction.Action, documentPreview),
+                            (a, ip) =>
+                            {
+                                viewControllerWeakReference.Unwrap()?.OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView);
+                            });
+                        actionWrapper.Disabled = !DocumentsListViewController.SwipeActionAllowed(swipeAction.Action, documentPreview, folder);
+                        break;
                     case EmailSwipeAction.SwipeAction.More:
                         actionWrapper.Action = UITableViewRowAction.Create(
                             UITableViewRowActionStyle.Default,

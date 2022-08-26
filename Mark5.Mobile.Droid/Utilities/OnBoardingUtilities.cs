@@ -47,18 +47,24 @@ namespace Mark5.Mobile.Droid.Utilities
 
         static bool ApplicationHasBeenUpdated(Context context)
         {
-            var currentVersionCode = float.Parse(context.PackageManager.GetPackageInfo(context.PackageName, 0).VersionName);
-            var storedVersionCode = PreferenceManager.GetDefaultSharedPreferences(context).GetFloat(appVersionKey, 0);
+            var currentVersionCode = context.PackageManager.GetPackageInfo(context.PackageName, 0).VersionName;
+            var storedVersionCode = "0.0.0";
 
-            return currentVersionCode > storedVersionCode;
+            try
+            {
+                storedVersionCode = PreferenceManager.GetDefaultSharedPreferences(context).GetString(appVersionKey, "0.0.0");
+            }
+            catch(Java.Lang.ClassCastException){}
+
+            return new Version(currentVersionCode) > new Version(storedVersionCode);
         }
 
         static void SaveAppVersionName(Context context)
         {
-            var currentVersionCode = float.Parse(context.PackageManager.GetPackageInfo(context.PackageName, 0).VersionName);
+            var currentVersionCode = context.PackageManager.GetPackageInfo(context.PackageName, 0).VersionName;
             var prefManager = PreferenceManager.GetDefaultSharedPreferences(context);
             var editor = prefManager.Edit();
-            editor.PutFloat(appVersionKey, currentVersionCode);
+            editor.PutString(appVersionKey, currentVersionCode);
             editor.Commit();
         }
 
@@ -90,14 +96,41 @@ namespace Mark5.Mobile.Droid.Utilities
         {
             return new List<OnBoardingPageModel>
             {
-                new OnBoardingPageModel("Welcome to reMARK", "We have made a few changes in the reMARK app. Press next to see what has changed.",
+                new OnBoardingPageModel("Welcome to reMARK",
+                "We have made a few changes in the reMARK app. Press next to see what has changed.",
                      Resource.Drawable.onboarding_1),
-                new OnBoardingPageModel("Azure Application Proxy with AD pre-authentication", "Now you can use Active Directory pre-authentication to login to reMARK through Azure Application Proxy.",
+
+                new OnBoardingPageModel("Favorite categories",
+                "Now you can set favorite categories for quick assignment.",
                      Resource.Drawable.onboarding_2),
-                new OnBoardingPageModel("Share options support", "Now you can share images, files and text from other applications to reMARK app.",
+
+                new OnBoardingPageModel("Message list appearance",
+                "Now you can use different font and cell colors to highlight email by different criterias.",
                      Resource.Drawable.onboarding_3),
-                new OnBoardingPageModel("Possibility to include attachments in replies", "Now it is possible to include source email attachments in replies to that email.",
-                     Resource.Drawable.onboarding_4)
+
+                new OnBoardingPageModel("Extra fields management",
+                "Now you can manage extra fields values and switch on/off their visibility.",
+                     Resource.Drawable.onboarding_4),
+
+                new OnBoardingPageModel("Bookmarks for emails",
+                "Now you can assign a bookmark for each email folder.",
+                     Resource.Drawable.onboarding_5),
+
+                new OnBoardingPageModel("File to folder after sending email",
+                "Now you can file an email to a folder immediately after sending it.",
+                     Resource.Drawable.onboarding_6),
+
+                new OnBoardingPageModel("Attach external documnets",
+                "Now you can add a reMARK external document as an attachment.",
+                     Resource.Drawable.onboarding_7),
+
+                new OnBoardingPageModel("Copy to department todo list",
+                "Now you can copy an email either to a user or to a department todo list.",
+                     Resource.Drawable.onboarding_8),
+
+                new OnBoardingPageModel("Add a contact from an email header",
+                "Now you can add a new contact by clicking on an email recipient field.",
+                     Resource.Drawable.onboarding_9)
 
             };
         }

@@ -1231,23 +1231,11 @@
       <SubType></SubType>
       <Generator></Generator>
     </AndroidResource>
-    <AndroidResource Include="Resources\drawable\onboarding_2.xml">
-      <SubType></SubType>
-      <Generator></Generator>
-    </AndroidResource>
     <AndroidResource Include="Resources\drawable\timer.xml">
       <SubType></SubType>
       <Generator></Generator>
     </AndroidResource>
     <AndroidResource Include="Resources\drawable\checkmark.xml">
-      <SubType></SubType>
-      <Generator></Generator>
-    </AndroidResource>
-    <AndroidResource Include="Resources\drawable\onboarding_3.xml">
-      <SubType></SubType>
-      <Generator></Generator>
-    </AndroidResource>
-    <AndroidResource Include="Resources\drawable\onboarding_4.xml">
       <SubType></SubType>
       <Generator></Generator>
     </AndroidResource>
@@ -1265,6 +1253,38 @@
     </AndroidResource>
     <AndroidResource Include="Resources\layout\linear_layout_contact_email_addresses.axml" />
     <AndroidResource Include="Resources\values\strings-preferences.axml" />
+    <AndroidResource Include="Resources\drawable\onboarding_9.xml">
+      <SubType></SubType>
+      <Generator></Generator>
+    </AndroidResource>
+    <AndroidResource Include="Resources\drawable\onboarding_8.xml">
+      <SubType></SubType>
+      <Generator></Generator>
+    </AndroidResource>
+    <AndroidResource Include="Resources\drawable\onboarding_7.xml">
+      <SubType></SubType>
+      <Generator></Generator>
+    </AndroidResource>
+    <AndroidResource Include="Resources\drawable\onboarding_6.xml">
+      <SubType></SubType>
+      <Generator></Generator>
+    </AndroidResource>
+    <AndroidResource Include="Resources\drawable\onboarding_5.xml">
+      <SubType></SubType>
+      <Generator></Generator>
+    </AndroidResource>
+    <AndroidResource Include="Resources\drawable\onboarding_2.xml">
+      <SubType></SubType>
+      <Generator></Generator>
+    </AndroidResource>
+    <AndroidResource Include="Resources\drawable\onboarding_4.xml">
+      <SubType></SubType>
+      <Generator></Generator>
+    </AndroidResource>
+    <AndroidResource Include="Resources\drawable\onboarding_3.xml">
+      <SubType></SubType>
+      <Generator></Generator>
+    </AndroidResource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FastScrollRecycler\FastScrollRecycler.csproj">
