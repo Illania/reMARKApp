@@ -74,6 +74,5 @@ namespace Mark5.Mobile.Common.DataAccess
         Task<int[]> GetNonCachedDocumentIdsAsync(int[] folderIds, int limit = -1);
 
         Task RemoveOrphans();
- 
     }
 }

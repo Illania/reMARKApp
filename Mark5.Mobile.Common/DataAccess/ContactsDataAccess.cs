@@ -18,7 +18,8 @@ namespace Mark5.Mobile.Common.DataAccess
 
         readonly IRestorationDataAccess restorationDataAccess;
 
-        public ContactsDataAccess(DatabaseConnectionProvider contactsDatabase, IRestorationDataAccess restorationDataAccess)
+        public ContactsDataAccess(DatabaseConnectionProvider contactsDatabase, 
+            IRestorationDataAccess restorationDataAccess)
         {
             this.contactsDatabase = contactsDatabase;
             this.restorationDataAccess = restorationDataAccess;
@@ -32,6 +33,7 @@ namespace Mark5.Mobile.Common.DataAccess
                 {
                     if (clean)
                         c.Table<FolderContactLink>().Delete(fdl => fdl.FolderId == folder.Id);
+                    
                     c.InsertOrReplaceAll(contactPreviews.Select(cp => new FolderContactLink
                     {
                         FolderId = folder.Id,
@@ -105,9 +107,14 @@ namespace Mark5.Mobile.Common.DataAccess
                 {
                     c.InsertOrReplace(contact);
 
-                    c.Table<ContactCommunicationAddress>().Delete(ca => ca.ContactId == contact.Id);
+                    c.Table<ContactCommunicationAddress>().Delete(
+                        ca => ca.ContactId == contact.Id);
 
-                    var contactCommunicationAddresses = contact.CommunicationAddresses.Select(ca => new ContactCommunicationAddress(contact.Id, ca.Address, ca.Type, ca.Description, ca.IsPrimary));
+                    var contactCommunicationAddresses 
+                        = contact.CommunicationAddresses.Select(ca => 
+                            new ContactCommunicationAddress(
+                                contact.Id, ca.Address, ca.Type, ca.Description, ca.IsPrimary));
+                    
                     c.InsertAll(contactCommunicationAddresses);
                 });
             }
@@ -152,10 +159,12 @@ namespace Mark5.Mobile.Common.DataAccess
                     c.InsertOrReplace(container.Contact);
                     c.Table<ContactCommunicationAddress>().Delete(ca => ca.ContactId == container.Contact.Id);
 
-                    var contactCommunicationAddresses = container.Contact.CommunicationAddresses.Select(ca => new ContactCommunicationAddress(container.Contact.Id, ca.Address, ca.Type, ca.Description, ca.IsPrimary));
+                    var contactCommunicationAddresses = 
+                        container.Contact.CommunicationAddresses.Select(ca => 
+                            new ContactCommunicationAddress(
+                                container.Contact.Id, ca.Address, ca.Type, ca.Description, ca.IsPrimary));
+                    
                     c.InsertAll(contactCommunicationAddresses);
-
-
                     c.InsertOrReplace(container.ContactPreview);
                 });
             }
@@ -198,7 +207,8 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-        public async Task RemoveFromFolderAsync(List<ContactPreview> contactPreviews, int folderId, bool saveBeforeDeletion = false)
+        public async Task RemoveFromFolderAsync(List<ContactPreview> contactPreviews, int folderId, 
+            bool saveBeforeDeletion = false)
         {
             try
             {
@@ -208,7 +218,8 @@ namespace Mark5.Mobile.Common.DataAccess
                     foreach (var cp in contactPreviews)
                     {
                         var id = cp.Id;
-                        var linksCount = c.Table<FolderDocumentLink>().Count(fdl => fdl.DocumentId == id);
+                        var linksCount = c.Table<FolderDocumentLink>().Count(fdl => 
+                            fdl.DocumentId == id);
                         if (linksCount == 1)
                         {
                             if (saveBeforeDeletion)
@@ -218,7 +229,8 @@ namespace Mark5.Mobile.Common.DataAccess
                             c.Table<ContactPreview>().Delete(dp => dp.Id == id);
                             c.Table<Contact>().Delete(d => d.Id == id);
                         }
-                        c.Table<FolderContactLink>().Delete(fdl => fdl.ContactId == id && fdl.FolderId == folderId);
+                        c.Table<FolderContactLink>().Delete(
+                            fdl => fdl.ContactId == id && fdl.FolderId == folderId);
                     }
                 });
 
@@ -266,11 +278,17 @@ namespace Mark5.Mobile.Common.DataAccess
 
         public async Task RemoveFromFolderAsync(List<IBusinessEntity> businessEntities, int folderId, bool saveBeforeDeletion = false)
         {
-            if (businessEntities.FirstOrDefault() is Contact contact)
-                await RemoveFromFolderAsync(businessEntities.Select(be => (Contact)be).ToList(), folderId, saveBeforeDeletion);
-
-            else if (businessEntities.FirstOrDefault() is ContactPreview contactPreview)
-                await RemoveFromFolderAsync(businessEntities.Select(be => (ContactPreview)be).ToList(), folderId, saveBeforeDeletion);
+            switch (businessEntities.FirstOrDefault())
+            {
+                case Contact:
+                    await RemoveFromFolderAsync(businessEntities.Select(be => 
+                        (Contact)be).ToList(), folderId, saveBeforeDeletion);
+                    break;
+                case ContactPreview:
+                    await RemoveFromFolderAsync(businessEntities.Select(be => 
+                        (ContactPreview)be).ToList(), folderId, saveBeforeDeletion);
+                    break;
+            }
         }
 
         public async Task RemoveFromFolderAsync(List<int> ids, int folderId)
@@ -301,9 +319,8 @@ namespace Mark5.Mobile.Common.DataAccess
         public async Task DeleteAsync(List<ContactPreview> contactPreviews, bool saveBeforeDeletion = false)
         {
             if (saveBeforeDeletion)
-            {
                 await ((IRestorable)this).SaveDeletedObjectsAsync(contactPreviews);
-            }
+            
             var ids = contactPreviews.Select(cp => cp.Id).Distinct().ToList();
             await DeleteAsync(ids);
         }
@@ -311,9 +328,8 @@ namespace Mark5.Mobile.Common.DataAccess
         public async Task DeleteAsync(List<Contact> contacts, bool saveBeforeDeletion = false)
         {
             if (saveBeforeDeletion)
-            {
                 await ((IRestorable)this).SaveDeletedObjectsAsync(contacts);
-            }
+            
             var ids = contacts.Select(c => c.Id).Distinct().ToList();
             await DeleteAsync(ids);
         }
@@ -338,11 +354,17 @@ namespace Mark5.Mobile.Common.DataAccess
 
         public async Task DeleteAsync(List<IBusinessEntity> businessEntities, bool saveBeforeDeletion = false)
         {
-            if (businessEntities.FirstOrDefault() is Contact contact)
-                await DeleteAsync(businessEntities.Select(be => (Contact)be).ToList(), saveBeforeDeletion);
-
-            else if (businessEntities.FirstOrDefault() is ContactPreview contactPreview)
-                await DeleteAsync(businessEntities.Select(be => (ContactPreview)be).ToList(), saveBeforeDeletion);
+            switch (businessEntities.FirstOrDefault())
+            {
+                case Contact:
+                    await DeleteAsync(businessEntities.Select(be => 
+                        (Contact)be).ToList(), saveBeforeDeletion);
+                    break;
+                case ContactPreview:
+                    await DeleteAsync(businessEntities.Select(be => 
+                        (ContactPreview)be).ToList(), saveBeforeDeletion);
+                    break;
+            }
         }
 
         public async Task CopyToFolderAsync(int folderId, List<int> contactIds)
@@ -385,7 +407,6 @@ namespace Mark5.Mobile.Common.DataAccess
             try
             {
                 List<Category> categories = null;
-
                 await contactsDatabase.RunInConnectionAsync(c => { categories = c.Table<Category>().ToList(); });
 
                 return categories;
@@ -487,7 +508,7 @@ namespace Mark5.Mobile.Common.DataAccess
             }
             catch (Exception ex) when (!(ex is DataAccessException))
             {
-                throw new DataAccessException("Error editting comment.", ex);
+                throw new DataAccessException("Error editing comment.", ex);
             }
         }
 
