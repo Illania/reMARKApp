@@ -704,6 +704,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                }));
 
             eas.AddAction(UIAlertAction.Create(
+               Localization.GetString("add_bookmark"),
+               UIAlertActionStyle.Default,
+               a =>
+               {
+                   SetAction(senderBtn.Tag, EmailSwipeAction.SwipeAction.AddBookmark);
+               }));
+
+            eas.AddAction(UIAlertAction.Create(
                 Localization.GetString("delete_from_folder"),
                 UIAlertActionStyle.Default,
                 a =>

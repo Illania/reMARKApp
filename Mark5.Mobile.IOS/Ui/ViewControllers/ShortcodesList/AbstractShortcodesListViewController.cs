@@ -297,7 +297,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                                                    UIAlertActionStyle.Default,
                                                    a =>
                 {
-                    this.CopyToWorktray(selectedShortcodes.Select(be => (IBusinessEntity)be).ToList());
+                    this.CopyToWorktray(selectedShortcodes.Cast<IBusinessEntity>().ToList());
                     EndEditing();
                 }));
             }
@@ -306,7 +306,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                 UIAlertActionStyle.Default,
                 a =>
                 {
-                    this.CopyToFolder(selectedShortcodes.Select(be => (IBusinessEntity)be).ToList());
+                    this.CopyToFolder(selectedShortcodes.Cast<IBusinessEntity>().ToList());
                     EndEditing();
                 }));
 
@@ -315,7 +315,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
                     UIAlertActionStyle.Default,
                     a =>
                     {
-                        this.MoveToFolder(selectedShortcodes.Select(be => (IBusinessEntity)be).ToList(), Folder);
+                        this.MoveToFolder(selectedShortcodes.Cast<IBusinessEntity>().ToList(), Folder);
                         EndEditing();
                     }));
 

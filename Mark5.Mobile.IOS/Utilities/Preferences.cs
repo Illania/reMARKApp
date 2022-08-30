@@ -76,6 +76,8 @@ namespace Mark5.Mobile.IOS.Utilities
             public const string PresetCategoryIdKey = "PresetCategoryId";
 
             public const string BookmarksForFolders= "BookmarksForFolders";
+
+            public const string ExtraFieldsSettings = "ExtraFieldsSettings";
         }
 
         readonly NSUserDefaults ud;
@@ -201,6 +203,9 @@ namespace Mark5.Mobile.IOS.Utilities
                 {
                     new NSString(Keys.EnableMoveToFolder), NSNumber.FromBoolean(true)
                 },
+                {
+                    new NSString(Keys.ExtraFieldsSettings), new NSDictionary()
+                }
 
             };
 
@@ -460,6 +465,46 @@ namespace Mark5.Mobile.IOS.Utilities
 
         #endregion
 
+        #region ExtraFieldsSettings
+
+        public Dictionary<string, string> ExtraFieldsSettings
+        {
+            get
+            {
+                var efSettings = ud.DictionaryForKey(Keys.ExtraFieldsSettings)
+                    .ToDictionary(k => k.Key.ToString(), (k => k.Value.ToString()));
+                return efSettings;
+            }
+
+            set
+            {
+                ud.SetValueForKey(NSDictionary.FromObjectsAndKeys(value.Values.ToArray(), value.Keys.ToArray()),
+                    new NSString(Keys.ExtraFieldsSettings));
+                ud.Synchronize();
+            }
+        }
+
+        public bool IsExtraFieldEnabled(int extraFieldId)
+        {
+            var extraFieldKey = extraFieldId.ToString();
+            if (ExtraFieldsSettings.ContainsKey(extraFieldKey))
+                return Convert.ToBoolean(ExtraFieldsSettings[extraFieldKey]);
+            else
+                return false;
+        }
+
+        public void SetExtraFieldEnabled(int extraFieldId, bool enabled)
+        {
+            var newExtraFieldsSettings = ExtraFieldsSettings;
+            var extraFieldKey = extraFieldId.ToString();
+            if (!ExtraFieldsSettings.ContainsKey(extraFieldKey))
+                newExtraFieldsSettings.Add(extraFieldKey, enabled.ToString());
+            else
+                newExtraFieldsSettings[extraFieldKey] = enabled.ToString();
+            ExtraFieldsSettings = newExtraFieldsSettings;
+        }
+
+        #endregion
 
         #region EmailSwipeActions
 
