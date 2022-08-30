@@ -19,7 +19,8 @@ namespace Mark5.Mobile.Common.DataAccess
             this.systemDatabase = systemDatabase;
         }
 
-        public async Task<List<DeletedObject>> GetDeletedObjectsAsync(List<int> ids, DeletedObjectType type, int maxItems = 500)
+        public async Task<List<DeletedObject>> GetDeletedObjectsAsync(List<int> ids, 
+            DeletedObjectType type, int maxItems = 500)
         {
             try
             {
@@ -43,7 +44,7 @@ namespace Mark5.Mobile.Common.DataAccess
             }
             catch (Exception ex) when (!(ex is DataAccessException))
             {
-                throw new DataAccessException("Error getting deleted objects.", ex);
+                throw new DataAccessException("Error while getting deleted objects.", ex);
             }
         }
 
@@ -111,22 +112,5 @@ namespace Mark5.Mobile.Common.DataAccess
                     throw new ArgumentException("Object type is not supported");
             }
         }
-
-        DeletedObjectType GetDeletedObjectType(ModuleType moduleType, bool isPreview)
-        {
-            switch (moduleType)
-            {
-                case ModuleType.Documents:
-                    return isPreview ? DeletedObjectType.DocumentPreview : DeletedObjectType.Document;
-                case ModuleType.Contacts:
-                    return isPreview ? DeletedObjectType.ContactPreview : DeletedObjectType.Contact;
-                case ModuleType.Shortcodes:
-                    return isPreview ? DeletedObjectType.ShortcodePreview : DeletedObjectType.Shortcode;
-                default:
-                    throw new ArgumentException("Object type is not supported");
-            }
-        }
-
-
     }
 }

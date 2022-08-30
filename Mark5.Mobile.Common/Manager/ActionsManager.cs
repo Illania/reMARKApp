@@ -106,7 +106,8 @@ namespace Mark5.Mobile.Common.Manager
                     break;
                 case ActionType.RemoveFromFolder:
                     var rfa = action as RemoveFromFolderAction;
-                    await commonActionsManager.RemoveFromFolderRemoteAsync(rfa.DocumentIds, rfa.FolderId, rfa.ObjectType);
+                    await commonActionsManager.RemoveFromFolderRemoteAsync(rfa.DocumentIds, 
+                        rfa.FolderId, rfa.ObjectType);
                     break;
                 case ActionType.Delete:
                     var da = action as DeleteAction;
@@ -118,7 +119,8 @@ namespace Mark5.Mobile.Common.Manager
                     break;
                 case ActionType.MoveToFolder:
                     var mfa = action as MoveToFolderAction;
-                    await commonActionsManager.MoveToFolderRemoteAsync(mfa.DocumentIds, mfa.FromFolderId, mfa.ToFolderId, mfa.ObjectType);
+                    await commonActionsManager.MoveToFolderRemoteAsync(mfa.DocumentIds, mfa.FromFolderId, 
+                        mfa.ToFolderId, mfa.ObjectType);
                     break;
                 case ActionType.CopyToWorktray:
                     var cwa = action as CopyToWorktrayAction;
@@ -146,15 +148,18 @@ namespace Mark5.Mobile.Common.Manager
                     break;
                 case ActionType.CopyToFolder:
                     var cfa = action as CopyToFolderAction;
-                    await commonActionsManager.RemoveFromFolderLocalAsync(cfa.DocumentIds, cfa.FolderId, cfa.ObjectType);
+                    await commonActionsManager.RemoveFromFolderLocalAsync(cfa.DocumentIds, cfa.FolderId, 
+                        cfa.ObjectType);
                     break;
                 case ActionType.MoveToFolder:
                     var mfa = action as MoveToFolderAction;
-                    await commonActionsManager.MoveToFolderLocalAsync(mfa.DocumentIds, mfa.ToFolderId, mfa.FromFolderId, mfa.ObjectType);
+                    await commonActionsManager.MoveToFolderLocalAsync(mfa.DocumentIds, mfa.ToFolderId, 
+                        mfa.FromFolderId, mfa.ObjectType);
                     break;
                 case ActionType.CopyToWorktray:
                     var cwa = action as CopyToWorktrayAction;
-                    await commonActionsManager.RemoveFromFolderLocalAsync(cwa.DocumentIds, SystemFoldersInfo.Int_WorktrayRoot, cwa.ObjectType);
+                    await commonActionsManager.RemoveFromFolderLocalAsync(cwa.DocumentIds, 
+                        SystemFoldersInfo.Int_WorktrayRoot, cwa.ObjectType);
                     break;
             }
         }

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using Mark5.Mobile.Common.Utilities;
-using SQLite;
+﻿using SQLite;
 
 namespace Mark5.Mobile.Common.Model
 {
@@ -22,7 +20,6 @@ namespace Mark5.Mobile.Common.Model
 
         [Column("SerializedObject")]
         public string SerializedObject { get; set; }
-
     }
 
     public enum DeletedObjectType

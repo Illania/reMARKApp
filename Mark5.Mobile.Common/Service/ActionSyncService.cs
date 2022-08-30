@@ -45,7 +45,6 @@ namespace Mark5.Mobile.Common.Service
                     {
                         try
                         {
-                            throw new Exception("test undo");
                             await handler.Execute(action);
                         }
                         catch (Exception ex)

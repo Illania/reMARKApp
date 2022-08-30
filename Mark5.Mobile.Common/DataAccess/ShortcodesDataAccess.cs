@@ -17,7 +17,8 @@ namespace Mark5.Mobile.Common.DataAccess
         readonly DatabaseConnectionProvider shortcodesDatabase;
         readonly IRestorationDataAccess restorationDataAccess;
 
-        public ShortcodesDataAccess(DatabaseConnectionProvider shortcodesDatabase, IRestorationDataAccess restorationDataAccess)
+        public ShortcodesDataAccess(DatabaseConnectionProvider shortcodesDatabase, 
+            IRestorationDataAccess restorationDataAccess)
         {
             this.shortcodesDatabase = shortcodesDatabase;
             this.restorationDataAccess = restorationDataAccess;
@@ -181,17 +182,18 @@ namespace Mark5.Mobile.Common.DataAccess
                     foreach (var sc in shortcodePreviews)
                     {
                         var id = sc.Id;
-                        var linksCount = c.Table<FolderShortcodeLink>().Count(fdl => fdl.ShortcodeId == id);
+                        var linksCount = c.Table<FolderShortcodeLink>().Count(fdl =>
+                            fdl.ShortcodeId == id);
                         if (linksCount == 1)
                         {
                             if (saveBeforeDeletion)
-                            {
                                 deletedPreviews.Add(sc);
-                            }
+                            
                             c.Table<ShortcodePreview>().Delete(dp => dp.Id == id);
                             c.Table<Shortcode>().Delete(d => d.Id == id);
                         }
-                        c.Table<FolderShortcodeLink>().Delete(fdl => fdl.ShortcodeId == id && fdl.FolderId == folderId);
+                        c.Table<FolderShortcodeLink>().Delete(fdl => 
+                            fdl.ShortcodeId == id && fdl.FolderId == folderId);
                     }
                 });
 
@@ -214,17 +216,18 @@ namespace Mark5.Mobile.Common.DataAccess
                     foreach (var shortcode in shortcodes)
                     {
                         var id = shortcode.Id;
-                        var linksCount = c.Table<FolderShortcodeLink>().Count(fdl => fdl.ShortcodeId == id);
+                        var linksCount = c.Table<FolderShortcodeLink>().Count(fdl => 
+                            fdl.ShortcodeId == id);
                         if (linksCount == 1)
                         {
                             if (saveBeforeDeletion)
-                            {
                                 deletedShortcodesToSave.Add(shortcode);
-                            }
+                            
                             c.Table<ShortcodePreview>().Delete(dp => dp.Id == id);
                             c.Table<Shortcode>().Delete(d => d.Id == id);
                         }
-                        c.Table<FolderShortcodeLink>().Delete(fdl => fdl.ShortcodeId == id && fdl.FolderId == folderId);
+                        c.Table<FolderShortcodeLink>().Delete(fdl => 
+                            fdl.ShortcodeId == id && fdl.FolderId == folderId);
                     }
                 });
 
@@ -239,11 +242,17 @@ namespace Mark5.Mobile.Common.DataAccess
 
         public async Task RemoveFromFolderAsync(List<IBusinessEntity> businessEntities, int folderId, bool saveBeforeDeletion = false)
         {
-            if (businessEntities.FirstOrDefault() is Shortcode shortcode)
-                await RemoveFromFolderAsync(businessEntities.Select(be => (Shortcode)be).ToList(), folderId, saveBeforeDeletion);
-
-            else if (businessEntities.FirstOrDefault() is ShortcodePreview shortcodePreview)
-                await RemoveFromFolderAsync(businessEntities.Select(be => (ShortcodePreview)be).ToList(), folderId, saveBeforeDeletion);
+            switch (businessEntities.FirstOrDefault())
+            {
+                case Shortcode:
+                    await RemoveFromFolderAsync(businessEntities.Select(be => 
+                        (Shortcode)be).ToList(), folderId, saveBeforeDeletion);
+                    break;
+                case ShortcodePreview:
+                    await RemoveFromFolderAsync(businessEntities.Select(be => 
+                        (ShortcodePreview)be).ToList(), folderId, saveBeforeDeletion);
+                    break;
+            }
         }
 
         public async Task RemoveFromFolderAsync(List<int> ids, int folderId)
@@ -254,13 +263,15 @@ namespace Mark5.Mobile.Common.DataAccess
                 {
                     foreach (var id in ids)
                     {
-                        var linksCount = c.Table<FolderShortcodeLink>().Count(fdl => fdl.ShortcodeId == id);
+                        var linksCount = c.Table<FolderShortcodeLink>().Count(fdl => 
+                            fdl.ShortcodeId == id);
                         if (linksCount == 1)
                         {
                             c.Table<ShortcodePreview>().Delete(sp => sp.Id == id);
                             c.Table<Shortcode>().Delete(s => s.Id == id);
                         }
-                        c.Table<FolderShortcodeLink>().Delete(fsl => fsl.ShortcodeId == id && fsl.FolderId == folderId);
+                        c.Table<FolderShortcodeLink>().Delete(fsl => 
+                            fsl.ShortcodeId == id && fsl.FolderId == folderId);
                     }
                 });
             }
@@ -273,9 +284,8 @@ namespace Mark5.Mobile.Common.DataAccess
         public async Task DeleteAsync(List<ShortcodePreview> shortcodePreviews, bool saveBeforeDeletion = false)
         {
             if (saveBeforeDeletion)
-            {
                 await ((IRestorable)this).SaveDeletedObjectsAsync(shortcodePreviews);
-            }
+            
             var ids = shortcodePreviews.Select(sp => sp.Id).Distinct().ToList();
             await DeleteAsync(ids);
         }
@@ -283,22 +293,22 @@ namespace Mark5.Mobile.Common.DataAccess
         public async Task DeleteAsync(List<Shortcode> shortcodes, bool saveBeforeDeletion = false)
         {
             if (saveBeforeDeletion)
-            {
                 await ((IRestorable)this).SaveDeletedObjectsAsync(shortcodes);
-            }
+            
             var ids = shortcodes.Select(s => s.Id).Distinct().ToList();
             await DeleteAsync(ids);
         }
 
-        public async Task DeleteAsync(List<int> shortocodesIds)
+        public async Task DeleteAsync(List<int> shortcodesIds)
         {
             try
             {
                 await shortcodesDatabase.RunInConnectionAsync(c =>
                 {
-                    c.Table<FolderShortcodeLink>().Delete(fsl => shortocodesIds.Contains(fsl.ShortcodeId));
-                    c.Table<ShortcodePreview>().Delete(sp => shortocodesIds.Contains(sp.Id));
-                    c.Table<Shortcode>().Delete(s => shortocodesIds.Contains(s.Id));
+                    c.Table<FolderShortcodeLink>().Delete(fsl => 
+                        shortcodesIds.Contains(fsl.ShortcodeId));
+                    c.Table<ShortcodePreview>().Delete(sp => shortcodesIds.Contains(sp.Id));
+                    c.Table<Shortcode>().Delete(s => shortcodesIds.Contains(s.Id));
                 });
             }
             catch (Exception ex) when (!(ex is DataAccessException))
@@ -309,11 +319,17 @@ namespace Mark5.Mobile.Common.DataAccess
 
         public async Task DeleteAsync(List<IBusinessEntity> businessEntities, bool saveBeforeDeletion = false)
         {
-            if (businessEntities.FirstOrDefault() is Shortcode shortcode)
-                await DeleteAsync(businessEntities.Select(be => (Shortcode)be).ToList(), saveBeforeDeletion);
-
-            else if (businessEntities.FirstOrDefault() is ShortcodePreview shortcodePreview)
-                await DeleteAsync(businessEntities.Select(be => (ShortcodePreview)be).ToList(), saveBeforeDeletion);
+            switch (businessEntities.FirstOrDefault())
+            {
+                case Shortcode:
+                    await DeleteAsync(businessEntities.Select(be => 
+                        (Shortcode)be).ToList(), saveBeforeDeletion);
+                    break;
+                case ShortcodePreview:
+                    await DeleteAsync(businessEntities.Select(be => 
+                        (ShortcodePreview)be).ToList(), saveBeforeDeletion);
+                    break;
+            }
         }
 
         public async Task CopyToFolderAsync(int folderId, List<int> shortcodesIds)
@@ -394,7 +410,6 @@ namespace Mark5.Mobile.Common.DataAccess
                     suggestions = result;
                 });
 
-
                 return suggestions;
             }
             catch
@@ -403,7 +418,7 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-        public async Task<List<int>> GetLinkedFoldersIds(int shortcodeId)
+        private async Task<List<int>> GetLinkedFoldersIds(int shortcodeId)
         {
             try
             {
@@ -417,7 +432,7 @@ namespace Mark5.Mobile.Common.DataAccess
                     var result = c.Query<int>(query);
 
                     if (result == null || result.Count < 1)
-                        throw new DataNotFoundException($"Linked folders for shortccode {shortcodeId} could not be found.");
+                        throw new DataNotFoundException($"Linked folders for shortcode {shortcodeId} could not be found.");
 
                     linkedFoldersId = result;
                 });
@@ -436,11 +451,15 @@ namespace Mark5.Mobile.Common.DataAccess
         {
             try
             {
-                var deletedShortcodePreviews = await restorationDataAccess.GetDeletedObjectsAsync(ids, DeletedObjectType.ShortcodePreview);
-                var shortcodePreviews = deletedShortcodePreviews.Select(dd => Serializer.Deserialize<ShortcodePreview>(dd.SerializedObject)).ToList();
+                var deletedShortcodePreviews = await restorationDataAccess
+                    .GetDeletedObjectsAsync(ids, DeletedObjectType.ShortcodePreview);
+                var shortcodePreviews = deletedShortcodePreviews
+                    .Select(dd => Serializer.Deserialize<ShortcodePreview>(dd.SerializedObject)).ToList();
 
-                var deletedShortcodes = await restorationDataAccess.GetDeletedObjectsAsync(ids, DeletedObjectType.Shortcode);
-                var shortcodes = deletedShortcodes.Select(dd => Serializer.Deserialize<Shortcode>(dd.SerializedObject)).ToList();
+                var deletedShortcodes = await restorationDataAccess
+                    .GetDeletedObjectsAsync(ids, DeletedObjectType.Shortcode);
+                var shortcodes = deletedShortcodes
+                    .Select(dd => Serializer.Deserialize<Shortcode>(dd.SerializedObject)).ToList();
 
                 await shortcodesDatabase.RunInConnectionAsync(c =>
                 {
@@ -473,7 +492,5 @@ namespace Mark5.Mobile.Common.DataAccess
         }
 
         #endregion
-
-
     }
 }

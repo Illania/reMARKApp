@@ -17,7 +17,8 @@ namespace Mark5.Mobile.Common.DataAccess
         readonly DatabaseConnectionProvider documentsDatabase;
         readonly IRestorationDataAccess restorationDataAccess;
 
-        public DocumentsDataAccess(DatabaseConnectionProvider documentsDatabase, IRestorationDataAccess restorationDataAccess)
+        public DocumentsDataAccess(DatabaseConnectionProvider documentsDatabase, 
+            IRestorationDataAccess restorationDataAccess)
         {
             this.documentsDatabase = documentsDatabase;
             this.restorationDataAccess = restorationDataAccess;
@@ -99,21 +100,16 @@ namespace Mark5.Mobile.Common.DataAccess
         {
             try
             {
-                var documentIds = new List<int>(maxItems * 2 + 1)
-                {
-                };
+                var documentIds = new List<int>(maxItems * 2 + 1);
 
                 await documentsDatabase.RunInConnectionAsync(c =>
                 {
                     var query = $"select {nameof(FolderDocumentLink.DocumentId)} as '{nameof(IdValue.Id)}' " + $"from {nameof(FolderDocumentLink)} " +
                         $"where {nameof(FolderDocumentLink.FolderId)} = {folderId} ";
 
-                    string getPreviousQuery;
-                    string getNextQuery;
-
                     if (getPrevious)
                     {
-                        getPreviousQuery = query + $" and  {nameof(FolderDocumentLink.DocumentId)} > \"{documentId}\" ";
+                        var getPreviousQuery = query + $" and  {nameof(FolderDocumentLink.DocumentId)} > \"{documentId}\" ";
                         getPreviousQuery += $"order by {nameof(FolderDocumentLink.DocumentId)} asc ";
                         getPreviousQuery += $"limit {maxItems} ";
                         var previous = c.Query<IdValue>(getPreviousQuery).Select(v => v.Id).Reverse();
@@ -121,14 +117,15 @@ namespace Mark5.Mobile.Common.DataAccess
                         if (getNext)
                             documentIds.Add(documentId);
                     }
-                    if (getNext)
-                    {
-                        getNextQuery = query + $" and  {nameof(FolderDocumentLink.DocumentId)} < \"{documentId}\" ";
-                        getNextQuery += $"order by {nameof(FolderDocumentLink.DocumentId)} desc ";
-                        getNextQuery += $"limit {maxItems} ";
-                        var next = c.Query<IdValue>(getNextQuery).Select(v => v.Id);
-                        documentIds.AddRange(next);
-                    }
+
+                    if (!getNext) 
+                        return;
+                    
+                    var getNextQuery = query + $" and  {nameof(FolderDocumentLink.DocumentId)} < \"{documentId}\" ";
+                    getNextQuery += $"order by {nameof(FolderDocumentLink.DocumentId)} desc ";
+                    getNextQuery += $"limit {maxItems} ";
+                    var next = c.Query<IdValue>(getNextQuery).Select(v => v.Id);
+                    documentIds.AddRange(next);
                 });
 
                 return documentIds;
@@ -355,7 +352,8 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-        public async Task RemoveFromFolderAsync(List<DocumentPreview> documentPreviews, int folderId, bool saveBeforeDeletion = false)
+        public async Task RemoveFromFolderAsync(List<DocumentPreview> documentPreviews, 
+            int folderId, bool saveBeforeDeletion = false)
         {
             try
             {
@@ -365,17 +363,19 @@ namespace Mark5.Mobile.Common.DataAccess
                     foreach (var dp in documentPreviews)
                     {
                         var id = dp.Id;
-                        var linksCount = c.Table<FolderDocumentLink>().Count(fdl => fdl.DocumentId == id);
+                        var linksCount = c.Table<FolderDocumentLink>()
+                            .Count(fdl => fdl.DocumentId == id);
+                        
                         if (linksCount == 1)
                         {
                             if (saveBeforeDeletion)
-                            {
                                 deletedPreviews.Add(dp);
-                            }
+                            
                             c.Table<DocumentPreview>().Delete(dp => dp.Id == id);
                             c.Table<Document>().Delete(d => d.Id == id);
                         }
-                        c.Table<FolderDocumentLink>().Delete(fdl => fdl.DocumentId == id && fdl.FolderId == folderId);
+                        c.Table<FolderDocumentLink>().Delete(fdl => 
+                            fdl.DocumentId == id && fdl.FolderId == folderId);
                     }
                 });
 
@@ -388,7 +388,8 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-        public async Task RemoveFromFolderAsync(List<Document> documents, int folderId, bool saveBeforeDeletion = false)
+        public async Task RemoveFromFolderAsync(List<Document> documents, 
+            int folderId, bool saveBeforeDeletion = false)
         {
             try
             {
@@ -402,13 +403,13 @@ namespace Mark5.Mobile.Common.DataAccess
                         if (linksCount == 1)
                         {
                             if (saveBeforeDeletion)
-                            {
                                 deletedDocumentsToSave.Add(document);
-                            }
+                            
                             c.Table<DocumentPreview>().Delete(dp => dp.Id == id);
                             c.Table<Document>().Delete(d => d.Id == id);
                         }
-                        c.Table<FolderDocumentLink>().Delete(fdl => fdl.DocumentId == id && fdl.FolderId == folderId);
+                        c.Table<FolderDocumentLink>().Delete(fdl => 
+                            fdl.DocumentId == id && fdl.FolderId == folderId);
                     }
                 });
 
@@ -429,13 +430,15 @@ namespace Mark5.Mobile.Common.DataAccess
                 {
                     foreach (var id in ids)
                     {
-                        var linksCount = c.Table<FolderDocumentLink>().Count(fdl => fdl.DocumentId == id);
+                        var linksCount = c.Table<FolderDocumentLink>()
+                            .Count(fdl => fdl.DocumentId == id);
                         if (linksCount == 1)
                         {
                             c.Table<DocumentPreview>().Delete(dp => dp.Id == id);
                             c.Table<Document>().Delete(d => d.Id == id);
                         }
-                        c.Table<FolderDocumentLink>().Delete(fdl => fdl.DocumentId == id && fdl.FolderId == folderId);
+                        c.Table<FolderDocumentLink>().Delete(fdl => 
+                            fdl.DocumentId == id && fdl.FolderId == folderId);
                     }
                 });
             }
@@ -445,41 +448,51 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-        public async Task RemoveFromFolderAsync(List<IBusinessEntity> businessEntities,int folderId, bool saveBeforeDeletion = false)
+        public async Task RemoveFromFolderAsync(List<IBusinessEntity> businessEntities,
+            int folderId, bool saveBeforeDeletion = false)
         {
-            if (businessEntities.FirstOrDefault() is Document document)
-                await RemoveFromFolderAsync(businessEntities.Select(be => (Document)be).ToList(), folderId, saveBeforeDeletion);
-
-            else if (businessEntities.FirstOrDefault() is DocumentPreview documentPreview)
-                await RemoveFromFolderAsync(businessEntities.Select(be => (DocumentPreview)be).ToList(), folderId, saveBeforeDeletion);
+            switch (businessEntities.FirstOrDefault())
+            {
+                case Document:
+                    await RemoveFromFolderAsync(businessEntities.Select(be => 
+                        (Document)be).ToList(), folderId, saveBeforeDeletion);
+                    break;
+                case DocumentPreview:
+                    await RemoveFromFolderAsync(businessEntities.Select(be => 
+                        (DocumentPreview)be).ToList(), folderId, saveBeforeDeletion);
+                    break;
+            }
         }
 
         public async Task DeleteAsync(List<IBusinessEntity> businessEntities, bool saveBeforeDeletion = false)
         {
-            if (businessEntities.FirstOrDefault() is Document document)
-                await DeleteAsync(businessEntities.Select(be => (Document)be).ToList(), saveBeforeDeletion);
-
-            else if(businessEntities.FirstOrDefault() is DocumentPreview documentPreview)
-                await DeleteAsync(businessEntities.Select(be => (DocumentPreview)be).ToList(), saveBeforeDeletion);
+            switch (businessEntities.FirstOrDefault())
+            {
+                case Document:
+                    await DeleteAsync(businessEntities.Select(be => 
+                        (Document)be).ToList(), saveBeforeDeletion);
+                    break;
+                case DocumentPreview:
+                    await DeleteAsync(businessEntities.Select(be => 
+                        (DocumentPreview)be).ToList(), saveBeforeDeletion);
+                    break;
+            }
         }
 
         public async Task DeleteAsync(List<DocumentPreview> documentPreviews, bool saveBeforeDeletion = false)
         {
             if (saveBeforeDeletion)
-            {
                 await SaveDeletedObjectsAsync(documentPreviews);
-            }
+            
             var ids = documentPreviews.Select(dp => dp.Id).Distinct().ToList();
             await DeleteAsync(ids);
         }
 
         public async Task DeleteAsync(List<Document> documents, bool saveBeforeDeletion = false)
         {
-
             if (saveBeforeDeletion)
-            {
                 await SaveDeletedObjectsAsync(documents);
-            }
+            
             var ids = documents.Select(d => d.Id).Distinct().ToList();
             await DeleteAsync(ids);
         }
@@ -900,7 +913,7 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-        public async Task<List<int>> GetLinkedFoldersIds(int documentId)
+        private async Task<List<int>> GetLinkedFoldersIds(int documentId)
         {
             try
             {
@@ -970,6 +983,5 @@ namespace Mark5.Mobile.Common.DataAccess
         }
 
         #endregion
-
     }
 }

@@ -14,7 +14,8 @@ namespace Mark5.Mobile.Common.Utilities
 
         void OnPause();
 
-        Task<bool> Refresh(ReachabilityMode mode = ReachabilityMode.NetworkAvailability | ReachabilityMode.Service, bool testOnly = false);
+        Task<bool> Refresh(ReachabilityMode mode = 
+            ReachabilityMode.NetworkAvailability | ReachabilityMode.Service, bool testOnly = false);
 
         void RefreshServiceReachability(bool isReachable);
 
@@ -25,7 +26,6 @@ namespace Mark5.Mobile.Common.Utilities
         bool IsMobileDataEnabled();
 
         Task<bool> CheckWithServiceConnection();
-
     }
 
     public class ReachabilityRefreshedEventArgs : EventArgs

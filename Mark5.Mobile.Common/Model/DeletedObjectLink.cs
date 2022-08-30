@@ -21,9 +21,7 @@ namespace Mark5.Mobile.Common.Model
 
         [Column("SerializedObject")]
         public string SerializedObject { get; set; }
-
     }
-
 }
 
   

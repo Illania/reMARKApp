@@ -98,7 +98,8 @@ namespace Mark5.Mobile.Common.Manager
                 businessEntities.First().ObjectType, folder.Id, sourceType);
         }
 
-        public async Task CopyToFolder(List<int> ids, ObjectType objectType, int folderId, SourceType sourceType = SourceType.Auto)
+        public async Task CopyToFolder(List<int> ids, ObjectType objectType, 
+            int folderId, SourceType sourceType = SourceType.Auto)
         {
             CommonConfig.UsageAnalytics.LogEvent(
                 new CopyToFolderEvent(objectType.ToModuleType(), ids.Count));
@@ -151,7 +152,8 @@ namespace Mark5.Mobile.Common.Manager
                 businessEntities.First().ObjectType, fromFolder, toFolder, sourceType);
         }
 
-        public async Task MoveToFolder(List<int> beIds, ObjectType ot, Folder fromFolder, Folder toFolder, SourceType sourceType = SourceType.Auto)
+        public async Task MoveToFolder(List<int> beIds, ObjectType ot, Folder fromFolder, 
+            Folder toFolder, SourceType sourceType = SourceType.Auto)
         {
             CommonConfig.UsageAnalytics.LogEvent(
                 new MoveToFolderEvent(fromFolder.Module, beIds.Count));
@@ -174,13 +176,12 @@ namespace Mark5.Mobile.Common.Manager
                 throw new ArgumentException("Invalid sourceType provided.");
 
             await MoveToFolderLocalAsync(beIds, fromFolder.Id, toFolder.Id, ot);
-            CommonConfig.MessengerHub.Publish(new EntityMovedFromFolderMessage(this, ot, fromFolder.Id, beIds.ToList()));
-
-            return;
+            CommonConfig.MessengerHub.Publish(
+                new EntityMovedFromFolderMessage(this, ot, fromFolder.Id, beIds.ToList()));
         }
-
-
-        internal async Task MoveToFolderRemoteAsync(List<int> ids, int fromFolderId, int toFolderId, ObjectType objectType)
+        
+        internal async Task MoveToFolderRemoteAsync(List<int> ids, int fromFolderId, 
+            int toFolderId, ObjectType objectType)
         {
             await AppServiceProxy.FileToFolderAsync(new DataContract.FileToFolderParameters
             {
@@ -193,20 +194,23 @@ namespace Mark5.Mobile.Common.Manager
             });
         }
 
-        internal async Task MoveToFolderLocalAsync(List<int> ids, int fromFolderId, int toFolderId, ObjectType objectType)
+        internal async Task MoveToFolderLocalAsync(List<int> ids, int fromFolderId, 
+            int toFolderId, ObjectType objectType)
         {
             var commonActionsDataAccess = GetCommonActionsDataAccess(objectType);
             await commonActionsDataAccess.CopyToFolderAsync(toFolderId, ids);
             await commonActionsDataAccess.RemoveFromFolderAsync(ids, fromFolderId);        
         }
 
-        public async Task CopyToWorktray(List<IBusinessEntity> businessEntities, SourceType sourceType = SourceType.Auto)
+        public async Task CopyToWorktray(List<IBusinessEntity> businessEntities, 
+            SourceType sourceType = SourceType.Auto)
         {
             await CopyToWorktray(businessEntities.Select(bi => bi.Id).ToList(),
                 businessEntities.First().ObjectType, sourceType);
         }
 
-        public async Task CopyToWorktray(List<int> ids, ObjectType objectType, SourceType sourceType = SourceType.Auto)
+        public async Task CopyToWorktray(List<int> ids, ObjectType objectType, 
+            SourceType sourceType = SourceType.Auto)
         {
             CommonConfig.UsageAnalytics.LogEvent(
                 new CopyToWorktrayEvent(objectType.ToModuleType(), ids.Count));
@@ -229,7 +233,6 @@ namespace Mark5.Mobile.Common.Manager
                 throw new ArgumentException("Invalid sourceType provided.");
 
             await CopyToWorktrayLocalAsync(ids, objectType);
-            return;
         }
     
         internal async Task CopyToWorktrayRemoteAsync(List<int> ids, ObjectType objectType)
@@ -365,8 +368,6 @@ namespace Mark5.Mobile.Common.Manager
                 new EntityRemovedFromFolderMessage(
                     this, businessEntities.First().ObjectType,
                     folder.Id, businessEntities.Select(b => b.Id).ToList()));
-
-            return;
         }
 
         internal async Task RemoveFromFolderRemoteAsync(List<int> ids, int folderId, ObjectType objectType)
@@ -387,7 +388,6 @@ namespace Mark5.Mobile.Common.Manager
                 return;
             await removable.RemoveFromFolderAsync(businessEntities, folderId, true);
         }
-
 
         internal async Task RemoveFromFolderLocalAsync(List<int> ids, int folderId, ObjectType objectType)
         {
@@ -429,8 +429,6 @@ namespace Mark5.Mobile.Common.Manager
                 new EntityRemovedMessage(
                     this, businessEntities.First().ObjectType,
                     businessEntities.Select(b => b.Id).ToList()));
-
-            return;
         }
 
         internal async Task DeleteRemoteAsync(List<int> ids, ObjectType objectType)
@@ -460,7 +458,6 @@ namespace Mark5.Mobile.Common.Manager
             await restorable.RestoreDeletedObjectsAsync(ids);            
         }
 
-
         private ICommonActionsDataAccess GetCommonActionsDataAccess(ObjectType objectType)
         {
             switch (objectType)
@@ -475,7 +472,6 @@ namespace Mark5.Mobile.Common.Manager
                     throw new ArgumentException($"Object type {objectType} doesn't implement ICommonActionsDataAccess");
             }
         }
-
 
         public async Task<List<int>> GetFavoriteCategories(SourceType sourceType = SourceType.Auto)
         {

@@ -7,6 +7,5 @@
         public static IDocumentsDownloadService DocumentsDownloadService { get; set; } = new DocumentsDownloadService();
         public static IActionSyncService ActionSyncService { get; set; } = new ActionSyncService();
         public static IServiceReachabilityService ServiceReachabilityService { get; set; } = new ServiceReachabilityService();
-
     }
 }
