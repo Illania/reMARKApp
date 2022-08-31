@@ -10,6 +10,8 @@ namespace Mark5.Mobile.Common.Model.Actions
     {
         public ActionType Type { get; }
 
+        public ObjectType ObjectType { get; }
+
         [Column("Guid")]
         [PrimaryKey]
         public Guid Guid { get; set; }
@@ -17,9 +19,10 @@ namespace Mark5.Mobile.Common.Model.Actions
         [Column("Date")]
         public DateTime CreatedDate { get; set; }
 
-        protected Action(ActionType type)
+        protected Action(ActionType type, ObjectType objectType)
         {
             Type = type;
+            ObjectType = objectType;
             Guid = Guid.NewGuid();
             CreatedDate = DateTime.UtcNow;
         }
@@ -35,13 +38,17 @@ namespace Mark5.Mobile.Common.Model.Actions
         public List<int> DocumentIds { get; private set; }
 
         [Column("DocumentIdsString")]
-        public string DocumentIdsString { get => Serializer.Serialize(DocumentIds); set => DocumentIds = Serializer.Deserialize<List<int>>(value); }
+        public string DocumentIdsString
+        {
+            get => Serializer.Serialize(DocumentIds);
+            set => DocumentIds = Serializer.Deserialize<List<int>>(value);
+        }
 
-        public SetReadStatusAction() : base(ActionType.SetReadStatus)
+        public SetReadStatusAction() : base(ActionType.SetReadStatus, ObjectType.Document)
         { }
 
         private SetReadStatusAction(bool readStatus, List<int> documentIds)
-            : base(ActionType.SetReadStatus)
+            : base(ActionType.SetReadStatus, ObjectType.Document)
         {
             ReadStatus = readStatus;
             DocumentIds = documentIds;
@@ -53,8 +60,170 @@ namespace Mark5.Mobile.Common.Model.Actions
         }
     }
 
+    [Table("CopyToFolderAction")]
+    public class CopyToFolderAction : Action
+    {
+        [Column("FolderId")]
+        public int FolderId { get; set; }
+
+        [Ignore]
+        public List<int> DocumentIds { get; private set; }
+
+        [Column("DocumentIdsString")]
+        public string DocumentIdsString
+        {
+            get => Serializer.Serialize(DocumentIds);
+            set => DocumentIds = Serializer.Deserialize<List<int>>(value);
+        }
+
+        public CopyToFolderAction() : base(ActionType.CopyToFolder, ObjectType.Document)
+        { }
+
+        private CopyToFolderAction(List<int> documentIds, int folderId, ObjectType objectType)
+            : base(ActionType.CopyToFolder, objectType)
+        {
+            FolderId = folderId;
+            DocumentIds = documentIds;
+        }
+
+        public static CopyToFolderAction Create(int folderId, ObjectType objectType, params int[] documentIds)
+        {
+            return new CopyToFolderAction(documentIds.ToList(), folderId, objectType);
+        }
+    }
+
+    [Table("MoveToFolderAction")]
+    public class MoveToFolderAction : Action
+    {
+        [Column("FromFolderId")]
+        public int FromFolderId { get; set; }
+
+        [Column("ToFolderId")]
+        public int ToFolderId { get; set; }
+
+        [Ignore]
+        public List<int> DocumentIds { get; private set; }
+
+        [Column("DocumentIdsString")]
+        public string DocumentIdsString
+        {
+            get => Serializer.Serialize(DocumentIds);
+            set => DocumentIds = Serializer.Deserialize<List<int>>(value);
+        }
+
+        public MoveToFolderAction() : base(ActionType.MoveToFolder, ObjectType.Document)
+        { }
+
+        private MoveToFolderAction(List<int> documentIds, int fromFolderId, int toFolderId, ObjectType objectType)
+            : base(ActionType.MoveToFolder, objectType)
+        {
+            FromFolderId = fromFolderId;
+            ToFolderId = toFolderId;
+            DocumentIds = documentIds;
+        }
+
+        public static MoveToFolderAction Create(int fromFolderId, int toFolderId,
+            ObjectType objectType, params int[] documentIds)
+        {
+            return new MoveToFolderAction(documentIds.ToList(), fromFolderId, toFolderId, objectType);
+        }
+    }
+
+    [Table("CopyToWorktrayAction")]
+    public class CopyToWorktrayAction : Action
+    {
+        [Ignore]
+        public List<int> DocumentIds { get; private set; }
+
+        [Column("DocumentIdsString")]
+        public string DocumentIdsString
+        {
+            get => Serializer.Serialize(DocumentIds);
+            set => DocumentIds = Serializer.Deserialize<List<int>>(value);
+        }
+
+        public CopyToWorktrayAction() : base(ActionType.CopyToWorktray, ObjectType.Document)
+        { }
+
+        private CopyToWorktrayAction(List<int> documentIds, ObjectType objectType)
+            : base(ActionType.CopyToWorktray, objectType)
+        {
+            DocumentIds = documentIds;
+        }
+
+        public static CopyToWorktrayAction Create(ObjectType objectType, params int[] documentIds)
+        {
+            return new CopyToWorktrayAction(documentIds.ToList(), objectType);
+        }
+    }
+
+    [Table("RemoveFromFolderAction")]
+    public class RemoveFromFolderAction : Action
+    {
+        [Column("FolderId")]
+        public int FolderId { get; set; }
+
+        [Ignore]
+        public List<int> DocumentIds { get; private set; }
+
+        [Column("DocumentIdsString")]
+        public string DocumentIdsString
+        {
+            get => Serializer.Serialize(DocumentIds);
+            set => DocumentIds = Serializer.Deserialize<List<int>>(value);
+        }
+
+        public RemoveFromFolderAction() : base(ActionType.RemoveFromFolder, ObjectType.Document)
+        { }
+
+        private RemoveFromFolderAction(List<int> documentIds, int folderId, ObjectType objectType)
+            : base(ActionType.RemoveFromFolder, objectType)
+        {
+            DocumentIds = documentIds;
+            FolderId = folderId;
+        }
+
+        public static RemoveFromFolderAction Create(int folderId, ObjectType objectType, params int[] documentIds)
+        {
+            return new RemoveFromFolderAction(documentIds.ToList(), folderId, objectType);
+        }
+    }
+
+    [Table("DeleteAction")]
+    public class DeleteAction : Action
+    {
+        [Ignore]
+        public List<int> DocumentIds { get; private set; }
+
+        [Column("DocumentIdsString")]
+        public string DocumentIdsString
+        {
+            get => Serializer.Serialize(DocumentIds);
+            set => DocumentIds = Serializer.Deserialize<List<int>>(value);
+        }
+
+        public DeleteAction() : base(ActionType.Delete, ObjectType.Document)
+        { }
+
+        private DeleteAction(List<int> documentIds, ObjectType objectType)
+            : base(ActionType.Delete, objectType)
+        {
+            DocumentIds = documentIds;
+        }
+
+        public static DeleteAction Create(ObjectType objectType, params int[] documentIds)
+        {
+            return new DeleteAction(documentIds.ToList(), objectType);
+        }
+    }
+
     public enum ActionType
     {
-        SetReadStatus
+        SetReadStatus,
+        CopyToFolder,
+        MoveToFolder,
+        CopyToWorktray,
+        RemoveFromFolder,
+        Delete
     }
 }

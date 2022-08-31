@@ -21,21 +21,20 @@ namespace Mark5.Mobile.Common.DataAccess
 
         Task<ShortcodeContainer> GetShortcodeWithPreviewAsync(int shortcodeId);
 
-        Task RemoveFromFolderAsync(List<ShortcodePreview> shortcodePreviews, Folder folder);
+        Task RemoveFromFolderAsync(List<ShortcodePreview> shortcodePreviews, int folderId, bool saveBeforeDeletion = false);
 
-        Task RemoveFromFolderAsync(List<Shortcode> shortocode, Folder folder);
+        Task RemoveFromFolderAsync(List<Shortcode> shortocode, int folderId, bool saveBeforeDeletion = false);
 
-        Task RemoveFromFolderAsync(List<int> shIds, int folderId);
+        Task DeleteAsync(List<ShortcodePreview> shortcodePreviews, bool saveBeforeDeletion = false);
 
-        Task DeleteAsync(List<ShortcodePreview> shortcodePreviews);
+        Task DeleteAsync(List<Shortcode> shortocode, bool saveBeforeDeletion = false);
 
-        Task DeleteAsync(List<Shortcode> shortocode);
+        Task DeleteAsync(List<int> shortocodesIds);
 
         Task RemoveOrphans();
 
         Task DeleteAllAsync();
 
         Task<List<Recipient>> GetSuggestions(string phrase);
-
     }
 }

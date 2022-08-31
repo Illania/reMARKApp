@@ -814,6 +814,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             Services.DocumentsUploadService.Start();
             Services.DocumentPreviewsDownloadService.Start();
             Services.DocumentsDownloadService.Start();
+            Services.ServiceReachabilityService.Start();
 
             LocalNotificationsListener.Initialize();
 

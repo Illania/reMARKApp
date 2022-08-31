@@ -14,14 +14,14 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView;
-using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Utilities;
 using TinyMessenger;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    public class DocumentsListViewController : AbstractTableViewController, IPrimaryViewController, IUISearchResultsUpdating, IUIViewControllerRestoration
+    public class DocumentsListViewController : AbstractTableViewController, IPrimaryViewController, 
+        IUISearchResultsUpdating, IUIViewControllerRestoration
     {
         const int AutoRefreshIntervalMs = 5 * 1000;
 
@@ -38,7 +38,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         bool refreshing;
         bool selectAllEnabled;
         
-
         UISearchController searchController;
         CancellationTokenSource searchCancellationTokenSource;
         readonly List<CancellationTokenSource> searchCancellationTokenSourceList = new List<CancellationTokenSource>();
@@ -128,22 +127,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             CommonConfig.Logger.Info($"Starting automatic refresh...");
 
             autoRefreshWorker?.Stop();
-            autoRefreshWorker = new AutoRefreshWorker(AutoRefreshData, () => { return ((DocumentListDataSource)TableView.Source).Items.Aggregate((i1, i2) => i1.Id > i2.Id ? i1 : i2); }, AutoRefreshIntervalMs);
+            autoRefreshWorker = new AutoRefreshWorker(AutoRefreshData, () => {
+                var items = ((DocumentListDataSource)TableView.Source).Items;
+                return items.Any() 
+                    ? items.Aggregate((i1, i2) => i1.Id > i2.Id ? i1 : i2) 
+                    : items.FirstOrDefault();
+            },
+                AutoRefreshIntervalMs);
             autoRefreshWorker.Start();
 
-            if (Integration.IsRunningAtLeast(11))
+            if (!Integration.IsRunningAtLeast(11)) 
+                return;
+            
+            NSOperationQueue.MainQueue.AddOperation(() =>
             {
-                NSOperationQueue.MainQueue.AddOperation(() =>
-                {
-                    var ni = NavigationItem;
+                var ni = NavigationItem;
 
-                    if (ParentViewController != null && ParentViewController is UIViewController && !(ParentViewController is UINavigationController))
-                        ni = ParentViewController?.NavigationItem;
+                if (ParentViewController is UIViewController && !(ParentViewController is UINavigationController))
+                    ni = ParentViewController?.NavigationItem;
 
-                    if (ni.SearchController == null)
-                        ni.SearchController = searchController;
-                });
-            }
+                if (ni.SearchController == null)
+                    ni.SearchController = searchController;
+            });
         }
 
         public override void ViewWillDisappear(bool animated)
