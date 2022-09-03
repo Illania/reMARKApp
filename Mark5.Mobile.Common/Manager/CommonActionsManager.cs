@@ -554,11 +554,12 @@ namespace Mark5.Mobile.Common.Manager
         }
 
         public async Task SetCategoriesAsync(IBusinessEntity businessEntity,
-            List<Category> categories, SourceType sourceType = SourceType.Auto)
+            List<Category> newCategories, SourceType sourceType = SourceType.Auto)
         {
-            if (!(businessEntity is ICategorizable categorizableEntity))
+            if (businessEntity is not ICategorizable categorizableEntity)
                 return;
 
+            var oldCategories = categorizableEntity.Categories;
             CommonConfig.UsageAnalytics.LogEvent(
                 new SetCategoriesEvent(businessEntity.ModuleType, 1));
 
@@ -572,20 +573,20 @@ namespace Mark5.Mobile.Common.Manager
             if (sourceType == SourceType.Remote)
             {
                 await SetCategoriesRemoteAsync(businessEntity.Id,
-                    categories.Select(c => c.Id).ToArray(), businessEntity.ObjectType);
+                    newCategories.Select(c => c.Id).ToArray(), businessEntity.ObjectType);
             }
             else if (sourceType == SourceType.Local)
             {
                 await ActionsManager.QueueActionAsync(
                     SetCategoriesAction.Create(
-                        categories, businessEntity.Id, businessEntity.ObjectType));
+                        newCategories, oldCategories, businessEntity.Id, businessEntity.ObjectType));
             }
             else
                 throw new ArgumentException("Invalid sourceType provided.");
 
-            UpdateBusinessEntityCategories(businessEntity, categories);
+            UpdateBusinessEntityCategories(businessEntity, newCategories);
 
-            await SetCategoriesLocalAsync(businessEntity.Id, categories,
+            await SetCategoriesLocalAsync(businessEntity.Id, newCategories,
                 businessEntity.ObjectType);
 
             CommonConfig.MessengerHub.Publish(

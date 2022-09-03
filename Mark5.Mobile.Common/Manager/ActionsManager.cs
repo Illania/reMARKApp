@@ -117,7 +117,7 @@ namespace Mark5.Mobile.Common.Manager
                 case ActionType.SetCategories:
                     var sca = action as SetCategoriesAction;
                     await commonActionsManager.SetCategoriesRemoteAsync(sca.ObjectId,
-                        sca.Categories.Select(c => c.Id).ToArray(), sca.ObjectType);
+                        sca.NewCategories.Select(c => c.Id).ToArray(), sca.ObjectType);
                     break;
                 case ActionType.RemoveFromFolder:
                     var rfa = action as RemoveFromFolderAction;
@@ -154,7 +154,7 @@ namespace Mark5.Mobile.Common.Manager
                     break;
                 case ActionType.SetCategories:
                     var sca = action as SetCategoriesAction;
-                    await commonActionsManager.SetCategoriesLocalAsync(sca.ObjectId, sca.Categories, sca.ObjectType);
+                    await commonActionsManager.SetCategoriesLocalAsync(sca.ObjectId, sca.OldCategories, sca.ObjectType);
                     break;
                 case ActionType.RemoveFromFolder:
                     var rfa = action as RemoveFromFolderAction;
