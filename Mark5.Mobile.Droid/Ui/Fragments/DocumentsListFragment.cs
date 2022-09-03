@@ -630,6 +630,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || CurrentAdapter.SelectedItems.All(dp => dp.Direction == DocumentDirection.Draft))
                 menu.Add(MenuItemGroup.Actions, MenuItemActions.Delete, MenuItemActions.Delete, Resource.String.delete);
 
+            if (CurrentAdapter.SelectedItemCount == 1)
+                menu.Add(MenuItemGroup.Actions, MenuItemActions.AddRemoveBookmark, MenuItemActions.AddRemoveBookmark,
+                 PlatformConfig.Preferences.HasBookmarkForFolder(Folder.Id, CurrentAdapter.SelectedItems.FirstOrDefault().Id)
+                 ? Resource.String.remove_bookmark
+                 : Resource.String.add_bookmark);
+
+            if (CurrentAdapter.SelectedItemCount == 1)
+                menu.Add(MenuItemGroup.Actions, MenuItemActions.SetPresetCategory, MenuItemActions.SetPresetCategory, Resource.String.set_preset_category);
+
             menu.SetGroupEnabled(MenuItemGroup.Actions, CurrentAdapter.SelectedItems.Any());
 
             return true;
@@ -715,7 +724,24 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return true;
             }
 
+            if(item.ItemId == MenuItemActions.AddRemoveBookmark)
+            {
+                if (!PlatformConfig.Preferences.HasBookmarkForFolder(Folder.Id, CurrentAdapter.SelectedItems.First().Id))
+                    AddBookmark(CurrentAdapter.SelectedItems.First());
+                else
+                    RemoveBookmark(CurrentAdapter.SelectedItems.First());
+                return true;
+            }
+
+
+            if (item.ItemId == MenuItemActions.SetPresetCategory)
+            {
+                AssignPresetCategory(CurrentAdapter.SelectedItems.First());
+                return true;
+            }
+
             return base.OnOptionsItemSelected(item);
+
         }
 
         void ActionMode.ICallback.OnDestroyActionMode(ActionMode mode)
@@ -950,14 +976,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             CommonConfig.Logger.Info($"Attempting to assign preset category [documentPreview.Id={documentPreview.Id}]...");
-            dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.marking_as_unread, Resource.String.please_wait);
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.set_preset_category, Resource.String.please_wait);
 
             try
             {
                 await Managers.CommonActionsManager.SetCategoriesAsync(documentPreview, new List<Category> { presetCategory });
 
-                adapter.RefreshItems(new List<DocumentPreview> { documentPreview });
-                searchAdapter.RefreshItems(new List<DocumentPreview> { documentPreview });
                 dismissAction();
                 actionMode?.Finish();
             }
@@ -1056,6 +1080,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public const int Delete = 61;
             public const int SendNow = 70;
             public const int CancelSend = 71;
+            public const int AddRemoveBookmark = 72;
+            public const int SetPresetCategory = 73;
         }
 
         static class MenuItemGroup
@@ -1205,6 +1231,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var dp = adapter.Items[position];
                 dp.Categories.Clear();
                 dp.Categories.AddRange(m.Categories);
+                adapter.NotifyDataSetChanged();
             }
 
             position = searchAdapter.GetPosition(m.EntityId);
@@ -1214,6 +1241,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var dp = searchAdapter.Items[position];
                 dp.Categories.Clear();
                 dp.Categories.AddRange(m.Categories);
+                searchAdapter.NotifyDataSetChanged();
             }
         }
 
@@ -1542,13 +1570,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 if (PlatformConfig.Preferences.HasBookmarkForFolder(folderId, dp.Id))
                     cell.ItemView.SetBackgroundColor(new Color(ContextCompat.GetColor(context, Resource.Color.brown)));
-
+                else
+                    cell.ItemView.SetBackgroundColor(new Color(ContextCompat.GetColor(context, Resource.Color.white)));
             }
 
             void InitializeBookmarkAppearance(DocumentPreview dp, int folderId, ExternalDocumentPreviewViewHolder cell)
             {
                 if (PlatformConfig.Preferences.HasBookmarkForFolder(folderId, dp.Id))
                     cell.ItemView.SetBackgroundColor(new Color(ContextCompat.GetColor(context, Resource.Color.brown)));
+                else
+                    cell.ItemView.SetBackgroundColor(new Color(ContextCompat.GetColor(context, Resource.Color.white)));
             }
 
             

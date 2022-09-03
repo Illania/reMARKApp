@@ -38,7 +38,11 @@ namespace Mark5.Mobile.Common.Model.Actions
         public List<int> DocumentIds { get; private set; }
 
         [Column("DocumentIdsString")]
-        public string DocumentIdsString { get => Serializer.Serialize(DocumentIds); set => DocumentIds = Serializer.Deserialize<List<int>>(value); }
+        public string DocumentIdsString
+        {
+            get => Serializer.Serialize(DocumentIds);
+            set => DocumentIds = Serializer.Deserialize<List<int>>(value);
+        }
 
         public SetReadStatusAction() : base(ActionType.SetReadStatus, ObjectType.Document)
         { }
@@ -56,6 +60,7 @@ namespace Mark5.Mobile.Common.Model.Actions
         }
     }
 
+<<<<<<< HEAD
     [Table("SetCategoriesAction")]
     public class SetCategoriesAction : Action
     {
@@ -90,6 +95,8 @@ namespace Mark5.Mobile.Common.Model.Actions
         }
     }
 
+=======
+>>>>>>> master_new
     [Table("CopyToFolderAction")]
     public class CopyToFolderAction : Action
     {
@@ -100,7 +107,11 @@ namespace Mark5.Mobile.Common.Model.Actions
         public List<int> DocumentIds { get; private set; }
 
         [Column("DocumentIdsString")]
-        public string DocumentIdsString { get => Serializer.Serialize(DocumentIds); set => DocumentIds = Serializer.Deserialize<List<int>>(value); }
+        public string DocumentIdsString
+        {
+            get => Serializer.Serialize(DocumentIds);
+            set => DocumentIds = Serializer.Deserialize<List<int>>(value);
+        }
 
         public CopyToFolderAction() : base(ActionType.CopyToFolder, ObjectType.Document)
         { }
@@ -118,7 +129,6 @@ namespace Mark5.Mobile.Common.Model.Actions
         }
     }
 
-
     [Table("MoveToFolderAction")]
     public class MoveToFolderAction : Action
     {
@@ -132,35 +142,42 @@ namespace Mark5.Mobile.Common.Model.Actions
         public List<int> DocumentIds { get; private set; }
 
         [Column("DocumentIdsString")]
-        public string DocumentIdsString { get => Serializer.Serialize(DocumentIds); set => DocumentIds = Serializer.Deserialize<List<int>>(value); }
+        public string DocumentIdsString
+        {
+            get => Serializer.Serialize(DocumentIds);
+            set => DocumentIds = Serializer.Deserialize<List<int>>(value);
+        }
 
         public MoveToFolderAction() : base(ActionType.MoveToFolder, ObjectType.Document)
         { }
 
         private MoveToFolderAction(List<int> documentIds, int fromFolderId, int toFolderId, ObjectType objectType)
-            : base(ActionType.CopyToFolder, objectType)
+            : base(ActionType.MoveToFolder, objectType)
         {
             FromFolderId = fromFolderId;
             ToFolderId = toFolderId;
             DocumentIds = documentIds;
         }
 
-        public static MoveToFolderAction Create(int fromFolderId, int toFolderId, ObjectType objectType, params int[] documentIds)
+        public static MoveToFolderAction Create(int fromFolderId, int toFolderId,
+            ObjectType objectType, params int[] documentIds)
         {
             return new MoveToFolderAction(documentIds.ToList(), fromFolderId, toFolderId, objectType);
         }
     }
 
-
     [Table("CopyToWorktrayAction")]
     public class CopyToWorktrayAction : Action
     {
-
         [Ignore]
         public List<int> DocumentIds { get; private set; }
 
         [Column("DocumentIdsString")]
-        public string DocumentIdsString { get => Serializer.Serialize(DocumentIds); set => DocumentIds = Serializer.Deserialize<List<int>>(value); }
+        public string DocumentIdsString
+        {
+            get => Serializer.Serialize(DocumentIds);
+            set => DocumentIds = Serializer.Deserialize<List<int>>(value);
+        }
 
         public CopyToWorktrayAction() : base(ActionType.CopyToWorktray, ObjectType.Document)
         { }
@@ -177,11 +194,9 @@ namespace Mark5.Mobile.Common.Model.Actions
         }
     }
 
-
     [Table("RemoveFromFolderAction")]
     public class RemoveFromFolderAction : Action
     {
-
         [Column("FolderId")]
         public int FolderId { get; set; }
 
@@ -189,7 +204,11 @@ namespace Mark5.Mobile.Common.Model.Actions
         public List<int> DocumentIds { get; private set; }
 
         [Column("DocumentIdsString")]
-        public string DocumentIdsString { get => Serializer.Serialize(DocumentIds); set => DocumentIds = Serializer.Deserialize<List<int>>(value); }
+        public string DocumentIdsString
+        {
+            get => Serializer.Serialize(DocumentIds);
+            set => DocumentIds = Serializer.Deserialize<List<int>>(value);
+        }
 
         public RemoveFromFolderAction() : base(ActionType.RemoveFromFolder, ObjectType.Document)
         { }
@@ -210,12 +229,15 @@ namespace Mark5.Mobile.Common.Model.Actions
     [Table("DeleteAction")]
     public class DeleteAction : Action
     {
-
         [Ignore]
         public List<int> DocumentIds { get; private set; }
 
         [Column("DocumentIdsString")]
-        public string DocumentIdsString { get => Serializer.Serialize(DocumentIds); set => DocumentIds = Serializer.Deserialize<List<int>>(value); }
+        public string DocumentIdsString
+        {
+            get => Serializer.Serialize(DocumentIds);
+            set => DocumentIds = Serializer.Deserialize<List<int>>(value);
+        }
 
         public DeleteAction() : base(ActionType.Delete, ObjectType.Document)
         { }
@@ -231,8 +253,6 @@ namespace Mark5.Mobile.Common.Model.Actions
             return new DeleteAction(documentIds.ToList(), objectType);
         }
     }
-
-
 
     public enum ActionType
     {

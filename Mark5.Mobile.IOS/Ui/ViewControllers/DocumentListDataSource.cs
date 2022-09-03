@@ -92,6 +92,8 @@ namespace Mark5.Mobile.IOS.Ui
         {
             if (PlatformConfig.Preferences.HasBookmarkForFolder(folderId, dp.Id))
                 cell.BackgroundColor = Theme.Bookmark;
+            else
+                cell.BackgroundColor = Theme.White;
         }
 
         public override nint RowsInSection(UITableView tableview, nint section)
@@ -340,6 +342,26 @@ namespace Mark5.Mobile.IOS.Ui
                         }
                         break;
                     case EmailSwipeAction.SwipeAction.CopyToWorkTray:
+                        actionWrapper.Action = UITableViewRowAction.Create(
+                            UITableViewRowActionStyle.Default,
+                            viewControllerWeakReference.Unwrap()?.SwipeActionTitle(swipeAction.Action, documentPreview),
+                            (a, ip) =>
+                            {
+                                viewControllerWeakReference.Unwrap()?.OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView);
+                            });
+                        actionWrapper.Disabled = !DocumentsListViewController.SwipeActionAllowed(swipeAction.Action, documentPreview, folder);
+                        break;
+                    case EmailSwipeAction.SwipeAction.AddBookmark:
+                        actionWrapper.Action = UITableViewRowAction.Create(
+                            UITableViewRowActionStyle.Default,
+                            viewControllerWeakReference.Unwrap()?.SwipeActionTitle(swipeAction.Action, documentPreview),
+                            (a, ip) =>
+                            {
+                                viewControllerWeakReference.Unwrap()?.OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView);
+                            });
+                        actionWrapper.Disabled = !DocumentsListViewController.SwipeActionAllowed(swipeAction.Action, documentPreview, folder);
+                        break;
+                    case EmailSwipeAction.SwipeAction.SetPresetCategory:
                         actionWrapper.Action = UITableViewRowAction.Create(
                             UITableViewRowActionStyle.Default,
                             viewControllerWeakReference.Unwrap()?.SwipeActionTitle(swipeAction.Action, documentPreview),

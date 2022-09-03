@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 using Android.App;
@@ -405,7 +403,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             Services.DocumentsUploadService?.Start();
             Services.DocumentPreviewsDownloadService?.Start();
             Services.DocumentsDownloadService?.Start();
-            Services.ActionSyncService?.Start();
+            Services.ServiceReachabilityService?.Start();
             DeviceReminderWorker.Schedule();
 
             CommonConfig.Logger.Info($"Refreshing reachability status...");

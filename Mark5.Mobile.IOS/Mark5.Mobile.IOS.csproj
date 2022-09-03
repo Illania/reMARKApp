@@ -337,7 +337,6 @@
 		<Compile Include="Ui\ViewControllers\StringEditorViewController.cs" />
 		<Compile Include="Ui\ViewControllers\DocumentView\HeaderView\WorktrayCommentView.cs" />
 		<Compile Include="Ui\ViewControllers\ExternalDocumentsListViewController.cs" />
-		<Compile Include="ExternalDocumentFoldersListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\SearchResultsController.cs" />
 		<Compile Include="Ui\ViewControllers\DocumentListDataSource.cs" />
 		<Compile Include="Utilities\FileToFolderActions.cs" />
@@ -345,6 +344,7 @@
 		<Compile Include="Service\SpotlightSearchManager.cs" />
 		<Compile Include="Ui\ViewControllers\ContactViewController.cs" />
 	    <Compile Include="Ui\ViewControllers\ContactEmailAddressesViewController.cs" />
+	    <Compile Include="Ui\ViewControllers\ExternalDocumentFoldersListViewController.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
@@ -390,7 +390,7 @@
 		  <HintPath>..\packages\Xamarin.Firebase.iOS.CloudMessaging.3.1.2\lib\Xamarin.iOS10\Firebase.CloudMessaging.dll</HintPath>
 		</Reference>
 		<Reference Include="Polly">
-		  <HintPath>..\packages\Polly.7.2.1\lib\netstandard2.0\Polly.dll</HintPath>
+		  <HintPath>..\packages\Polly.7.2.3\lib\netstandard2.0\Polly.dll</HintPath>
 		</Reference>
 		<Reference Include="Microsoft.AppCenter">
 		  <HintPath>..\packages\Microsoft.AppCenter.4.1.0\lib\Xamarin.iOS10\Microsoft.AppCenter.dll</HintPath>
@@ -862,10 +862,6 @@
 		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_1.imageset\Page01.pdf" />
 		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_4.imageset\Contents.json" />
 		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_5.imageset\Contents.json" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_2.imageset\1.pdf" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_3.imageset\2.pdf" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_4.imageset\3.pdf" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_5.imageset\4.pdf" />
 		<ImageAsset Include="Assets_icons.xcassets\Bookmark.imageset\bookmark.pdf" />
 		<ImageAsset Include="Assets_icons.xcassets\Bookmark.imageset\Contents.json" />
 		<ImageAsset Include="Assets_icons.xcassets\Image.imageset\Contents.json" />
@@ -873,6 +869,20 @@
 		<ImageAsset Include="Assets_icons.xcassets\Create.imageset\create.pdf" />
 		<ImageAsset Include="Assets_icons.xcassets\Compose.imageset\Contents.json" />
 		<ImageAsset Include="Assets_icons.xcassets\Compose.imageset\compose.pdf" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_2.imageset\onboarding_2.pdf" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_3.imageset\onboarding_3.pdf" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_4.imageset\onboarding_4.pdf" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_5.imageset\onboarding_5.pdf" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_9.imageset\Contents.json" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_8.imageset\Contents.json" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_7.imageset\Contents.json" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_6.imageset\Contents.json" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_10.imageset\Contents.json" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_6.imageset\onboarding_6.pdf" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_9.imageset\onboarding_9.pdf" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_10.imageset\onboarding_10.pdf" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_7.imageset\onboarding_7.pdf" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_8.imageset\onboarding_8.pdf" />
 	</ItemGroup>
 	<ItemGroup>
 		<BundleResource Include="Resources\Base.lproj\Localizable.strings" />
@@ -1001,6 +1011,11 @@
 	  <Folder Include="Assets_icons.xcassets\Bookmark.imageset\" />
 	  <Folder Include="Assets_icons.xcassets\Compose.imageset\" />
 	  <Folder Include="Ui\Common\Scalable controls\" />
+	  <Folder Include="Assets_onboarding.xcassets\onboarding_9.imageset\" />
+	  <Folder Include="Assets_onboarding.xcassets\onboarding_8.imageset\" />
+	  <Folder Include="Assets_onboarding.xcassets\onboarding_7.imageset\" />
+	  <Folder Include="Assets_onboarding.xcassets\onboarding_6.imageset\" />
+	  <Folder Include="Assets_onboarding.xcassets\onboarding_10.imageset\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 	<Import Project="..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets" Condition="Exists('..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets')" />

@@ -303,7 +303,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                                                    UIAlertActionStyle.Default,
                                                    a =>
                 {
-                    this.CopyToWorktray(selectedContacts.Select(be => (IBusinessEntity)be).ToList());
+                    this.CopyToWorktray(selectedContacts.Cast<IBusinessEntity>().ToList());
                     EndEditing();
                 }));
             }
@@ -312,7 +312,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                 UIAlertActionStyle.Default,
                 a =>
                 {
-                    this.CopyToFolder(selectedContacts.Select(be => (IBusinessEntity)be).ToList());
+                    this.CopyToFolder(selectedContacts.Cast<IBusinessEntity>().ToList());
                     EndEditing();
                 }));
 
@@ -321,7 +321,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                     UIAlertActionStyle.Default,
                     a =>
                     {
-                        this.MoveToFolder(selectedContacts.Select(be => (IBusinessEntity)be).ToList(), Folder);
+                        this.MoveToFolder(selectedContacts.Cast<IBusinessEntity>().ToList(), Folder);
                         EndEditing();
                     }));
 

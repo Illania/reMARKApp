@@ -37,17 +37,17 @@ namespace Mark5.Mobile.IOS.Utilities
         static bool ApplicationHasBeenUpdated()
         {
             var userDefaults = NSUserDefaults.StandardUserDefaults;
-            var currentVersionName = float.Parse(NSBundle.MainBundle.InfoDictionary.ValueForKey(new NSString("CFBundleShortVersionString")).ToString());
-            var storedVersionName = userDefaults.FloatForKey(appVersionKey);
+            var currentVersionName = NSBundle.MainBundle.InfoDictionary.ValueForKey(new NSString("CFBundleShortVersionString")).ToString();
+            var storedVersionName = userDefaults.StringForKey(appVersionKey) ?? "0.0.0";
 
-            return currentVersionName > storedVersionName;
+            return new Version(currentVersionName) > new Version(storedVersionName);
         }
 
         static void SaveAppVersionCode()
         {
-            var currentVersionName = float.Parse(NSBundle.MainBundle.InfoDictionary.ValueForKey(new NSString("CFBundleShortVersionString")).ToString());
+            var currentVersionName = NSBundle.MainBundle.InfoDictionary.ValueForKey(new NSString("CFBundleShortVersionString")).ToString();
             var userDefaults = NSUserDefaults.StandardUserDefaults;
-            userDefaults.SetFloat(currentVersionName, appVersionKey);
+            userDefaults.SetString(currentVersionName, appVersionKey);
             userDefaults.Synchronize();
         }
     }

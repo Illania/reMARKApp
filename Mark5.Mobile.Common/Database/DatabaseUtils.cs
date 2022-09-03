@@ -49,6 +49,8 @@ namespace Mark5.Mobile.Common.Database
             {
                 c.CreateTable<Notification>();
                 c.CreateTable<ReadNotificationInfo>();
+                c.CreateTable<DeletedObject>();
+                c.CreateTable<DeletedObjectLink>();
             });
             await DatabaseConnectionProvider.ActionsDatabase.RunInConnectionAsync(c =>
             {
@@ -104,6 +106,8 @@ namespace Mark5.Mobile.Common.Database
             {
                 c.DeleteAll<Notification>();
                 c.DeleteAll<ReadNotificationInfo>();
+                c.CreateTable<DeletedObject>();
+                c.CreateTable<DeletedObjectLink>(); 
             });
             await DatabaseConnectionProvider.ActionsDatabase.RunInConnectionAsync(c =>
             {

@@ -20,6 +20,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         const float MinTextViewHeight = 38f; // 1 line
         const float MaxCommentTextViewHeight = 125.5f; // 5 lines
         bool refreshing;
+        public bool IsEditingAvailable = false;
         UIBarButtonItem doneButtonItem;
 
         UITableView TableView;
@@ -39,7 +40,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             InitializeNavigationBar();
             InitializeView();
-            InitializeEditView();
+
+            if (IsEditingAvailable)
+                InitializeEditView();
         }
 
         public override void ViewWillAppear(bool animated)
@@ -92,11 +95,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             ((DataSource)TableView.Source)?.Reset();
             TableView = null;
-            extraFieldView = null;
-            extraFieldTextScrollView = null;
-            extraFieldTextView.Delegate = null;
-            extraFieldTextView = null;
-            extraFieldViewBottomConstraint = null;
+
+            if (extraFieldView != null)
+                extraFieldView = null;
+
+            if (extraFieldTextScrollView != null)
+                extraFieldTextScrollView = null;
+
+            if (extraFieldViewBottomConstraint != null) 
+                extraFieldViewBottomConstraint = null;
+
+            if (extraFieldTextView != null)
+            {
+                extraFieldTextView.Delegate = null;
+                extraFieldTextView = null;
+            }
         }
 
         protected override void Dispose(bool disposing)
@@ -251,7 +264,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (addExtraFieldButton != null)
                 addExtraFieldButton.TouchUpInside += AddExtraField_TouchUpInside;
 
-            if (extraFieldTextView.InputAccessoryView is KeyboardObserverInputAccessoryView keyboardObserverInputAccessoryView)
+            if (extraFieldTextView?.InputAccessoryView is KeyboardObserverInputAccessoryView keyboardObserverInputAccessoryView)
                 keyboardObserverInputAccessoryView.KeyboardChanged += KeyboardObserverInputAccessoryView_KeyboardChanged;
 
             TableView.RefreshControl.ValueChanged += RefreshControl_ValueChanged;
@@ -266,7 +279,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (addExtraFieldButton != null)
                 addExtraFieldButton.TouchUpInside -= AddExtraField_TouchUpInside;
 
-            if (extraFieldTextView.InputAccessoryView is KeyboardObserverInputAccessoryView keyboardObserverInputAccessoryView)
+            if (extraFieldTextView != null && extraFieldTextView.InputAccessoryView is KeyboardObserverInputAccessoryView keyboardObserverInputAccessoryView)
                 keyboardObserverInputAccessoryView.KeyboardChanged -= KeyboardObserverInputAccessoryView_KeyboardChanged;
 
             TableView.RefreshControl.ValueChanged -= RefreshControl_ValueChanged;
@@ -290,7 +303,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
-                var extraFields = await Managers.DocumentsManager.GetExtraFieldsAsync();         
+                var extraFields = await Managers.DocumentsManager.GetExtraFieldsAsync();
                 ((DataSource)TableView.Source).SetItems(extraFields);
                 ((DataSource)TableView.Source).SortItems();
 
@@ -380,7 +393,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                                              , ex.InnerException);
                 await Dialogs.ShowErrorAlertAsync(this, ex.InnerException);
             }
-          
+
         }
 
         async void EditExtraField(ExtraField extraField)
@@ -407,13 +420,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 ((DataSource)TableView.Source).SortItems();
             }
             catch (OperationCanceledException) { }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 CommonConfig.Logger.Error($"Failed to update extra field [Id={extraField.FieldId}] "
                                              , ex.InnerException);
                 await Dialogs.ShowErrorAlertAsync(this, ex.InnerException);
             }
-                
+
         }
 
         #endregion
@@ -458,13 +471,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void UpdateAddExtraFieldEnabled()
         {
+            if (addExtraFieldButton == null)
+                return;
             addExtraFieldButton.Enabled = !string.IsNullOrEmpty(extraFieldTextView.Text);
         }
 
 
         void UpdateExtraFieldTextViewHeight()
         {
-            if (NavigationController == null)
+            if (NavigationController == null || extraFieldTextView == null)
                 return;
 
             var requiredHeight = extraFieldTextView.SizeThatFits(new CGSize(extraFieldTextView.ContentSize.Width,
@@ -541,6 +556,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
             {
+                if (!(viewControllerWeakReference.Unwrap().IsEditingAvailable))
+                    return null;
+
                 var actions = new List<UITableViewRowAction>();
 
                 if (indexPath.Row < 0 || indexPath.Row >= Items.Count)
