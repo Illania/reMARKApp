@@ -60,7 +60,6 @@ namespace Mark5.Mobile.Common.Model.Actions
         }
     }
 
-<<<<<<< HEAD
     [Table("SetCategoriesAction")]
     public class SetCategoriesAction : Action
     {
@@ -95,8 +94,6 @@ namespace Mark5.Mobile.Common.Model.Actions
         }
     }
 
-=======
->>>>>>> master_new
     [Table("CopyToFolderAction")]
     public class CopyToFolderAction : Action
     {
