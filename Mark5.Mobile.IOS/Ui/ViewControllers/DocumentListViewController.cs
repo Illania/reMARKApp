@@ -1482,12 +1482,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             }
 
+            var oldCategories = documentPreview.Categories;
+            var newCategories = oldCategories.Union(new List<Category>(){ presetCategory }).ToList();
             CommonConfig.Logger.Info($"Attempting to assign preset category [documentPreview.Id={documentPreview.Id}]...");
 
             try
             {
-                await Managers.CommonActionsManager.SetCategoriesAsync(documentPreview, new List<Category> { presetCategory });
-
+                await Managers.CommonActionsManager.SetCategoriesAsync(documentPreview, newCategories);
                 ((DocumentListDataSource)TableView.Source).UpdateItems(new List<int> { documentPreview.Id });
                 ((DocumentListDataSource)((UITableViewController)searchController?.SearchResultsController)?.TableView?.Source)?.UpdateItems(new List<int> { documentPreview.Id });
             }

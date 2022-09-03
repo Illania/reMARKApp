@@ -975,12 +975,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             }
 
+
+            var oldCategories = documentPreview.Categories;
+            var newCategories = oldCategories.Union(new List<Category>() { presetCategory }).ToList();
+
             CommonConfig.Logger.Info($"Attempting to assign preset category [documentPreview.Id={documentPreview.Id}]...");
             dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.set_preset_category, Resource.String.please_wait);
 
             try
             {
-                await Managers.CommonActionsManager.SetCategoriesAsync(documentPreview, new List<Category> { presetCategory });
+                await Managers.CommonActionsManager.SetCategoriesAsync(documentPreview, newCategories);
 
                 dismissAction();
                 actionMode?.Finish();
