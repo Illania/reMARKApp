@@ -1472,33 +1472,33 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void AssignPresetCategory(DocumentPreview documentPreview)
         {
-
-            if(presetCategory == null)
+            if (presetCategory == null)
             {
                 var categories = await Managers.DocumentsManager.GetAllCategoriesAsync();
-                    presetCategory = categories.Where(c => c.Id == PlatformConfig.Preferences.PresetCategoryId).FirstOrDefault();
-                    if (presetCategory == null)
-                        return;
-
+                presetCategory = categories.FirstOrDefault(c => c.Id == PlatformConfig.Preferences.PresetCategoryId);
+                if (presetCategory == null)
+                    return;
             }
 
             var oldCategories = documentPreview.Categories;
-            var newCategories = oldCategories.Union(new List<Category>(){ presetCategory }).ToList();
-            CommonConfig.Logger.Info($"Attempting to assign preset category [documentPreview.Id={documentPreview.Id}]...");
+            var newCategories = oldCategories.Union(new List<Category> { presetCategory }).ToList();
+            CommonConfig.Logger.Info($"Attempting to assign preset category " +
+                                     $"[documentPreview.Id={documentPreview.Id}]...");
 
             try
             {
                 await Managers.CommonActionsManager.SetCategoriesAsync(documentPreview, newCategories);
-                ((DocumentListDataSource)TableView.Source).UpdateItems(new List<int> { documentPreview.Id });
-                ((DocumentListDataSource)((UITableViewController)searchController?.SearchResultsController)?.TableView?.Source)?.UpdateItems(new List<int> { documentPreview.Id });
+                ((DocumentListDataSource)TableView.Source)
+                    .UpdateItems(new List<int> { documentPreview.Id });
+                ((DocumentListDataSource)((UITableViewController)searchController?.SearchResultsController)
+                    ?.TableView.Source)?.UpdateItems(new List<int> { documentPreview.Id });
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Assigning preset category for [documentPreview.Id={documentPreview.Id}] failed", ex);
-
+                CommonConfig.Logger.Error($"Assigning preset category for " +
+                                          $"[documentPreview.Id={documentPreview.Id}] failed", ex);
                 await Dialogs.ShowErrorAlertAsync(this, ex);
             }
-            
         }
 
         async void AddBookmark(DocumentPreview documentPreview)

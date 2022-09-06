@@ -418,5 +418,4 @@ namespace Mark5.Mobile.Common.Model
     }
 
     #endregion
-
 }

@@ -122,7 +122,6 @@ namespace Mark5.Mobile.Common.Manager
                 throw new ArgumentException("Invalid sourceType provided.");
 
             await CopyToFolderLocalAsync(ids, folderId, objectType);
-            return;
         }
 
         internal async Task CopyToFolderRemoteAsync(List<int> ids,  int folderId, ObjectType objectType)
@@ -593,8 +592,6 @@ namespace Mark5.Mobile.Common.Manager
                 new EntityCategoriesChangedMessage(
                     this, businessEntity.ObjectType,
                     businessEntity.Id, categorizableEntity.Categories.ToList()));
-
-            return;
         }
 
         internal async Task SetCategoriesRemoteAsync(int objectId, int[] categoryIds, ObjectType objectType)
@@ -623,7 +620,7 @@ namespace Mark5.Mobile.Common.Manager
 
         internal void UpdateBusinessEntityCategories(IBusinessEntity businessEntity, List<Category> categories)
         {
-            if (!(businessEntity is ICategorizable categorizable))
+            if (businessEntity is not ICategorizable categorizable)
                 return;
 
             categorizable.Categories.Clear();
