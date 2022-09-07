@@ -5,7 +5,7 @@ using SQLite;
 namespace Mark5.Mobile.Common.Model
 {
     [Table("ContactPreview")]
-    public class ContactPreview : BusinessEntityPreview
+    public class ContactPreview : BusinessEntityPreview, ICategorizable
     {
         [Ignore]
         public override ObjectType ObjectType => ObjectType.Contact;

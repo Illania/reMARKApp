@@ -122,7 +122,6 @@ namespace Mark5.Mobile.Common.Manager
                 throw new ArgumentException("Invalid sourceType provided.");
 
             await CopyToFolderLocalAsync(ids, folderId, objectType);
-            return;
         }
 
         internal async Task CopyToFolderRemoteAsync(List<int> ids,  int folderId, ObjectType objectType)
@@ -551,6 +550,81 @@ namespace Mark5.Mobile.Common.Manager
                 throw new ReMarkException(ErrorConstants.Codes.InvalidSourceType);
 
             throw new ArgumentException("Invalid sourceType provided.");
+        }
+
+        public async Task SetCategoriesAsync(IBusinessEntity businessEntity,
+            List<Category> newCategories, SourceType sourceType = SourceType.Auto)
+        {
+            if (businessEntity is not ICategorizable categorizableEntity)
+                return;
+
+            var oldCategories = categorizableEntity.Categories;
+            CommonConfig.UsageAnalytics.LogEvent(
+                new SetCategoriesEvent(businessEntity.ModuleType, 1));
+
+            if (sourceType == SourceType.Auto)
+            {
+                sourceType = CommonConfig.Reachability.IsReachable
+                    ? SourceType.Remote
+                    : SourceType.Local;
+            }
+
+            if (sourceType == SourceType.Remote)
+            {
+                await SetCategoriesRemoteAsync(businessEntity.Id,
+                    newCategories.Select(c => c.Id).ToArray(), businessEntity.ObjectType);
+            }
+            else if (sourceType == SourceType.Local)
+            {
+                await ActionsManager.QueueActionAsync(
+                    SetCategoriesAction.Create(
+                        newCategories, oldCategories, businessEntity.Id, businessEntity.ObjectType));
+            }
+            else
+                throw new ArgumentException("Invalid sourceType provided.");
+
+            UpdateBusinessEntityCategories(businessEntity, newCategories);
+
+            await SetCategoriesLocalAsync(businessEntity.Id, newCategories,
+                businessEntity.ObjectType);
+
+            CommonConfig.MessengerHub.Publish(
+                new EntityCategoriesChangedMessage(
+                    this, businessEntity.ObjectType,
+                    businessEntity.Id, categorizableEntity.Categories.ToList()));
+        }
+
+        internal async Task SetCategoriesRemoteAsync(int objectId, int[] categoryIds, ObjectType objectType)
+        {
+            await AppServiceProxy.SetCategoriesAsync(new DataContract.SetCategoriesParameters
+            {
+                Token = Token,
+                ObjectId = objectId,
+                ObjectType = objectType.ConvertEnum<DataContract.ObjectType>(),
+                CategoryIds = categoryIds
+            }); 
+        }
+
+        internal async Task SetCategoriesLocalAsync(int entityId, List<Category> categories, ObjectType objectType)
+        {
+            switch (objectType)
+            {
+                case ObjectType.Document:
+                    await documentsDataAccess.SetCategoriesAsync(entityId, categories);
+                    break;
+                case ObjectType.Contact:
+                    await contactsDataAccess.SetCategoriesAsync(entityId, categories);
+                    break;
+            }
+        }
+
+        internal void UpdateBusinessEntityCategories(IBusinessEntity businessEntity, List<Category> categories)
+        {
+            if (businessEntity is not ICategorizable categorizable)
+                return;
+
+            categorizable.Categories.Clear();
+            categorizable.Categories.AddRange(categories);
         }
     }
 }

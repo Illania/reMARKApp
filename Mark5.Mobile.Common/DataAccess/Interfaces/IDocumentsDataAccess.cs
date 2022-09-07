@@ -63,7 +63,7 @@ namespace Mark5.Mobile.Common.DataAccess
 
         Task<List<Category>> GetAllCategoriesAsync();
 
-        Task SetCategoriesAsync(DocumentPreview documentPreview, List<Category> categories);
+        Task SetCategoriesAsync(int documentId, List<Category> categories);
 
         Task AddCommentAsync(Document document, Comment comment);
 

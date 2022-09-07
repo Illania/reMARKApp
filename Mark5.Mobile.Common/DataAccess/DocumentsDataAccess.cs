@@ -728,7 +728,7 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-        public async Task SetCategoriesAsync(DocumentPreview documentPreview, List<Category> categories)
+        public async Task SetCategoriesAsync(int documentId, List<Category> categories)
         {
             try
             {
@@ -740,7 +740,7 @@ namespace Mark5.Mobile.Common.DataAccess
                         {
                             Categories = categories
                         }.CategoriesString);
-                    cmd.Bind("@documentPreviewId", documentPreview.Id);
+                    cmd.Bind("@documentPreviewId", documentId);
                     cmd.ExecuteNonQuery();
                 });
             }

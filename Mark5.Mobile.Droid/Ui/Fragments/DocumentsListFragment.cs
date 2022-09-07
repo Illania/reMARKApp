@@ -67,6 +67,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         ActionMode actionMode;
         SearchView searchView;
         FloatingActionButton fab;
+        Category presetCategory;
 
         bool shouldNotifyAdapter;
         bool shouldNotifySearchAdapter;
@@ -961,41 +962,37 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         }
 
-        Category presetCategory;
-
         async void AssignPresetCategory(DocumentPreview documentPreview)
         {
-
             if (presetCategory == null)
             {
                 var categories = await Managers.DocumentsManager.GetAllCategoriesAsync();
-                presetCategory = categories.Where(c => c.Id == PlatformConfig.Preferences.PresetCategoryId).FirstOrDefault();
+                presetCategory = categories.FirstOrDefault(
+                    c => c.Id == PlatformConfig.Preferences.PresetCategoryId);
                 if (presetCategory == null)
                     return;
-
             }
+            
+            var oldCategories = documentPreview.Categories;
+            var newCategories = oldCategories.Union(new List<Category> { presetCategory }).ToList();
 
             CommonConfig.Logger.Info($"Attempting to assign preset category [documentPreview.Id={documentPreview.Id}]...");
-            dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.set_preset_category, Resource.String.please_wait);
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, 
+                Resource.String.set_preset_category, Resource.String.please_wait);
 
             try
             {
-                await Managers.DocumentsManager.SetCategoriesAsync(documentPreview, new List<Category> { presetCategory });
-
+                await Managers.CommonActionsManager.SetCategoriesAsync(documentPreview, newCategories);
                 dismissAction();
                 actionMode?.Finish();
             }
             catch (Exception ex)
             {
                 dismissAction();
-
-                CommonConfig.Logger.Error($"Assigning preset category for [documentPreview.Id={documentPreview.Id}] failed", ex);
-
-
+                CommonConfig.Logger.Error($"Assigning preset category for " +
+                                          $"[documentPreview.Id={documentPreview.Id}] failed", ex);
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
-
             }
-
         }
 
         void SelectDeselectAll()

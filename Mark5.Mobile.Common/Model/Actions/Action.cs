@@ -60,6 +60,51 @@ namespace Mark5.Mobile.Common.Model.Actions
         }
     }
 
+    [Table("SetCategoriesAction")]
+    public class SetCategoriesAction : Action
+    {
+        [Ignore]
+        public List<Category> NewCategories { get; private set; }
+
+        [Ignore]
+        public List<Category> OldCategories { get; private set; }
+
+        [Column("ObjectId")]
+        public int ObjectId { get; set; }
+
+        [Column("NewCategoryString")]
+        public string NewCategoriesString
+        {
+            get => Serializer.Serialize(NewCategories);
+            set => NewCategories = Serializer.Deserialize<List<Category>>(value);
+        }
+
+        [Column("OldCategoryString")]
+        public string OldCategoriesString
+        {
+            get => Serializer.Serialize(OldCategories);
+            set => OldCategories = Serializer.Deserialize<List<Category>>(value);
+        }
+
+        public SetCategoriesAction() : base(ActionType.SetCategories, ObjectType.Document)
+        { }
+
+        private SetCategoriesAction(List<Category> newCategories, List<Category> oldCategories, int objectId,
+            ObjectType objectType)
+            : base(ActionType.SetCategories, objectType)
+        {
+            NewCategories = newCategories;
+            OldCategories = oldCategories;
+            ObjectId = objectId;
+        }
+
+        public static SetCategoriesAction Create(List<Category> newCategories, List<Category> oldCategories,
+            int objectId, ObjectType objectType)
+        {
+            return new SetCategoriesAction(newCategories, oldCategories, objectId, objectType);
+        }
+    }
+
     [Table("CopyToFolderAction")]
     public class CopyToFolderAction : Action
     {
@@ -220,10 +265,11 @@ namespace Mark5.Mobile.Common.Model.Actions
     public enum ActionType
     {
         SetReadStatus,
+        SetCategories,
         CopyToFolder,
-        MoveToFolder,
         CopyToWorktray,
+        MoveToFolder,
         RemoveFromFolder,
-        Delete
+        Delete  
     }
 }

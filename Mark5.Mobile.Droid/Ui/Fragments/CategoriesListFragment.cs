@@ -250,11 +250,11 @@ namespace Mark5.Mobile.Droid
                 {
                     case ObjectType.Document:
                         var documentPreview = BusinessEntityPreview as DocumentPreview;
-                        await Managers.DocumentsManager.SetCategoriesAsync(documentPreview, selectedCategories);
+                        await Managers.CommonActionsManager.SetCategoriesAsync(documentPreview, selectedCategories);
                         break;
                     case ObjectType.Contact:
                         var contactPreview = BusinessEntityPreview as ContactPreview;
-                        await Managers.ContactsManager.SetCategoriesAsync(contactPreview, selectedCategories);
+                        await Managers.CommonActionsManager.SetCategoriesAsync(contactPreview, selectedCategories);
                         break;
                     default:
                         throw new ArgumentException("Invalid BusinessEntityPreview!");

@@ -417,7 +417,7 @@ namespace Mark5.Mobile.Common.DataAccess
             }
         }
 
-        public async Task SetCategoriesAsync(ContactPreview contactPreview, List<Category> categories)
+        public async Task SetCategoriesAsync(int contactId, List<Category> categories)
         {
             try
             {
@@ -429,7 +429,7 @@ namespace Mark5.Mobile.Common.DataAccess
                         {
                             Categories = categories
                         }.CategoriesString);
-                    cmd.Bind("@contactPreviewId", contactPreview.Id);
+                    cmd.Bind("@contactPreviewId", contactId);
                     cmd.ExecuteNonQuery();
                 });
             }
