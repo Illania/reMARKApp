@@ -15,7 +15,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
     public class ExtraFieldsView : DocumentSubView
     {
         UIStackView stackView;
-        Dictionary<DocumentExtraFieldInfo, string> documentExtraFields;
+        Dictionary<DocumentExtraFieldInfo, string> documentExtraFields = new();
         public ExtraFieldsView()
         {
             stackView = new UIStackView
