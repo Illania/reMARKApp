@@ -1633,6 +1633,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             return false;
         }
 
+        async Task AssignNewDocumentReferenceNumber()
+        {
+            try
+            {
+                var docRef = await Managers.DocumentsManager.GetNewDocumentReferenceNumber(documentPreview);
+                documentPreview.ReferenceNumber = docRef;
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Can't get new document reference number from server: ", ex);
+            }
+        }
+
         async Task ProcessTemplate(Template template, DocumentPreview documentPreview)
         {
             var templateContent = template.Content;
@@ -1645,12 +1658,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             if (documentPreview?.Addresses != null)
                 fromNameString = documentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.From).Select(da => da.Name).FirstOrDefault() ?? string.Empty;
 
-            if (templateContent.Contains("REF"))
-            {
-                var docRef = await Managers.DocumentsManager.GetNewDocumentReferenceNumber(documentPreview);
-                this.documentPreview.ReferenceNumber = docRef;
-            }
-
+            await AssignNewDocumentReferenceNumber();
 
             if (template.ContentType == ContentType.Html)
             {
