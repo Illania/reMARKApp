@@ -208,11 +208,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
- 
-                await Managers.NotificationsManager?.SetNotificationReadStatusAsync(PlatformConfig.Preferences.PushNotificationToken,
-                    (((DataSource)TableView.Source)?.Items.Select(n=>n.Guid)).ToList(), true);
+                if (ServerConfig.SystemSettings?.SystemInfo?.SetNotificationReadStatusAvailable != true)
+                    await Managers.NotificationsManager.MarkAllAsRead(); 
+                else
+                {
+                    await Managers.NotificationsManager?.SetNotificationReadStatusAsync(PlatformConfig.Preferences.PushNotificationToken,
+                                     (((DataSource)TableView.Source)?.Items.Select(n => n.Guid)).ToList(), true);
+                }
                 Integration.ClearNotificationBadge();
-
                 RefreshData();
             }
             catch (Exception ex)
@@ -247,6 +250,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 markAsReadItem.Enabled = notifications.Any(n => !n.IsRead);
 
+                if (ServerConfig.SystemSettings?.SystemInfo?.SetNotificationReadStatusAvailable != true)
+                    Integration.ClearNotificationBadge();
+
             }
             catch (Exception ex)
             {
@@ -269,11 +275,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             CommonConfig.UsageAnalytics.LogEvent(new NotificationClickedEvent(notification.ObjectType.Module()));
 
-            if(!notification.IsRead)
-                Integration.DecreaseNotificationBadge();
+            if (ServerConfig.SystemSettings?.SystemInfo?.SetNotificationReadStatusAvailable != true)
+                await Managers.NotificationsManager.MarkAsRead(notification);
+            else
+            {
+                if (!notification.IsRead)
+                    Integration.DecreaseNotificationBadge();
 
-            Managers.NotificationsManager?.SetNotificationReadStatusAsync(PlatformConfig.Preferences.PushNotificationToken, new List<Guid> { notification.Guid }, true);
-            RefreshData();
+                Managers.NotificationsManager?.SetNotificationReadStatusAsync(PlatformConfig.Preferences.PushNotificationToken, new List<Guid> { notification.Guid }, true);
+                RefreshData();
+            }
+            
             TableView.ReloadRows(new[] { row }, UITableViewRowAnimation.Fade);
 
             switch (notification.ObjectType)
