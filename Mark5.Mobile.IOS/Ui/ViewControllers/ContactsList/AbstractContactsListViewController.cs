@@ -589,9 +589,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
         }     
 
         void ShowCategories(ContactPreview selectedContact)
-        {
-            var vc = new CategoriesListViewController(selectedContact);
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+        {            
+            if (!ServerConfig.SystemSettings.SystemInfo.FavoriteCategoriesAvailable)
+            {
+                var vcOld = new CategoriesListOldViewController(selectedContact);
+                PresentViewController(new NavigationController(vcOld, UIModalPresentationStyle.PageSheet), true, null);
+            }
+            else
+            {
+                var vc = new CategoriesListViewController(selectedContact);
+                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+            } 
         }
 
         

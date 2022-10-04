@@ -579,7 +579,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void AssignCategoryButton_Clicked(object sender, EventArgs e)
         {
-            PresentViewController(new NavigationController(new CategoriesListViewController(contactPreview), UIModalPresentationStyle.PageSheet), true, null);
+            if (!ServerConfig.SystemSettings.SystemInfo.FavoriteCategoriesAvailable)
+            {
+                PresentViewController(new NavigationController(
+                    new CategoriesListOldViewController(contactPreview), UIModalPresentationStyle.PageSheet), true, null);
+
+            }
+            else
+            {
+                PresentViewController(new NavigationController(
+                    new CategoriesListViewController(contactPreview), UIModalPresentationStyle.PageSheet), true, null);
+            }
         }
 
         void FileToButton_Clicked(object sender, EventArgs e)

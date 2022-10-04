@@ -1083,7 +1083,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void ShowCategories(DocumentPreview selectedDocument)
         {
-            PresentViewController(new NavigationController(new CategoriesListViewController(selectedDocument), UIModalPresentationStyle.PageSheet), true, null);
+            if (!ServerConfig.SystemSettings.SystemInfo.FavoriteCategoriesAvailable)
+            {
+                PresentViewController(new NavigationController(
+                    new CategoriesListOldViewController(selectedDocument), UIModalPresentationStyle.PageSheet), true, null);
+
+            }
+            else
+            {
+                PresentViewController(new NavigationController(
+                    new CategoriesListViewController(selectedDocument), UIModalPresentationStyle.PageSheet), true, null);
+            }
         }
 
 

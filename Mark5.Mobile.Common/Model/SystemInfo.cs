@@ -26,6 +26,7 @@ namespace Mark5.Mobile.Common.Model
         public bool NewPushNotificationsSystemAvailable => ServiceVersionGreaterThanOrEqual(4, 0, 0) || SystemVersionGreaterThanOrEqual(1, 37, 13);
 
         public bool ExtraFieldsEditingAvailable => ServiceVersionGreaterThanOrEqual(4, 4, 0);
+        public bool FavoriteCategoriesAvailable => ServiceVersionGreaterThanOrEqual(4, 4, 0);
 
         List<ModuleType> availableModules;
         public List<ModuleType> AvailableModules
