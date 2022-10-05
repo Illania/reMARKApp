@@ -999,8 +999,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void DoAssignCategory()
         {
-            var vc = new CategoriesListViewController(documentPreview);
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+            if (!ServerConfig.SystemSettings.SystemInfo.FavoriteCategoriesAvailable)
+            {
+                var vcOld = new CategoriesListOldViewController(documentPreview);
+                PresentViewController(new NavigationController(vcOld, UIModalPresentationStyle.PageSheet), true, null);
+            }
+            else
+            {
+                var vc = new CategoriesListViewController(documentPreview);
+                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+            }
         }
 
         async void UserActionsButton_Clicked(object sender, EventArgs e)
