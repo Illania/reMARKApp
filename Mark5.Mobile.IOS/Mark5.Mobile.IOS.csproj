@@ -572,6 +572,9 @@
 		<Reference Include="Microsoft.Extensions.DependencyInjection">
 		  <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.5.0.0\lib\netstandard2.1\Microsoft.Extensions.DependencyInjection.dll</HintPath>
 		</Reference>
+		<Reference Include="MoreLinq">
+		  <HintPath>..\packages\morelinq.3.3.2\lib\netstandard2.0\MoreLinq.dll</HintPath>
+		</Reference>
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Mark5.Mobile.Common\Mark5.Mobile.Common.csproj">

@@ -129,9 +129,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             autoRefreshWorker?.Stop();
             autoRefreshWorker = new AutoRefreshWorker(AutoRefreshData, () => {
                 var items = ((DocumentListDataSource)TableView.Source).Items;
+                
                 return items.Any() 
-                    ? items.Aggregate((i1, i2) => i1.Id > i2.Id ? i1 : i2) 
-                    : items.FirstOrDefault();
+                    ? MoreLinq.MoreEnumerable.MaxBy(items, i=> i.Id).FirstOrDefault()
+                    : default;
             },
                 AutoRefreshIntervalMs);
             autoRefreshWorker.Start();
