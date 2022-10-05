@@ -737,7 +737,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (forceClear)
                     ((DocumentListDataSource)TableView.Source)?.Reset();
 
-                var documentPreviews = await Managers.DocumentsManager.GetDocumentPreviewsAsync(Folder, endId: endId);
+                var documentPreviews = await Managers.DocumentsManager.GetDocumentPreviewsAsync(Folder, startId, endId);
+
 
                 if (OnlyShowExternalDocuments)
                 {
