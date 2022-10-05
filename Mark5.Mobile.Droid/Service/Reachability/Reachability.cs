@@ -259,5 +259,11 @@ namespace Mark5.Mobile.Droid.Service
 
             return cm.GetNetworkCapabilities(cm.ActiveNetwork).HasTransport(Android.Net.TransportType.Cellular);
         }
+
+        public void RefreshServiceReachability(bool isReachable)
+        {
+            IsReachable = isReachable;
+            ReachabilityRefreshed(this, new ReachabilityRefreshedEventArgs(true, isReachable));
+        }
     }
 }
