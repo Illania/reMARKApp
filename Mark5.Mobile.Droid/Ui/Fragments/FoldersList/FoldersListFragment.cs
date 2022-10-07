@@ -251,13 +251,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             Managers.DocumentsManager.NotifyPendingAndFailedCountChanged().FireAndForget();
 
-            CommonConfig.Logger.Info($"Starting automatic refresh...");
+            //CommonConfig.Logger.Info($"Starting automatic refresh...");
 
-            autoRefreshWorker?.Stop();
-            autoRefreshWorker = new AutoRefreshWorker(AutoRefreshData, AutoRefreshIntervalMs);
-            autoRefreshWorker.Start();
+            //autoRefreshWorker?.Stop();
+            //autoRefreshWorker = new AutoRefreshWorker(AutoRefreshData, AutoRefreshIntervalMs);
+            //autoRefreshWorker.Start();
 
-            CommonConfig.Logger.Info($"Started automatic refresh");
+            //CommonConfig.Logger.Info($"Started automatic refresh");
         }
 
         public override void OnSaveInstanceState(Bundle outState)
@@ -293,7 +293,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             CommonConfig.Logger.Info($"Stopping automatic refresh...");
 
-            autoRefreshWorker?.Stop();
+            //autoRefreshWorker?.Stop();
 
             CommonConfig.Logger.Info($"Stopped automatic refresh");
         }
