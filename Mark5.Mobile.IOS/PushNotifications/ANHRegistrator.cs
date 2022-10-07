@@ -31,13 +31,12 @@ namespace Mark5.Mobile.IOS.PushNotifications
 
                 var policyResult = await retryPolicy.ExecuteAndCaptureAsync(async () =>
                 {
-                    throw new TaskCanceledException();
                     var registrations = await notificationHubClient.GetRegistrationsByChannelAsync(tokenString, 100);
                     return registrations.ToList();
                 });
 
                 if(policyResult.FinalException!=null)
-                    CommonConfig.Logger.Error($"Could not get Azure Hub registrations for token:{policyResult.FinalException.Message}");
+                    CommonConfig.Logger.Error($"Could not get Azure Hub registrations for token:{tokenString}. Error: {policyResult.FinalException.Message}");
 
                 return new List<RegistrationDescription>();
 
@@ -72,11 +71,14 @@ namespace Mark5.Mobile.IOS.PushNotifications
                                          CommonConfig.Logger.Info($"Attempting to delete Azure Hub registrations for Id:{savedRegistrationId}. Attempt #{attemptNumber}");
                                      });
 
-                                await retryPolicy.ExecuteAsync(async () =>
+                                var policyResult = await retryPolicy.ExecuteAndCaptureAsync(async () =>
                                 {
-
                                     await notificationHubClient.DeleteRegistrationAsync(registration);
                                 });
+
+                                if (policyResult.FinalException != null)
+                                    CommonConfig.Logger.Error($"Could not delete Azure Hub registrations for Id:{savedRegistrationId}. Error: {policyResult.FinalException.Message}");
+
                             }
 
                             await DeleteRegistrations();

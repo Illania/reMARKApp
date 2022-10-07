@@ -64,7 +64,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
     {
         public int LoadTimeoutMiliseconds { get; set; } = 2500;
 
-        protected bool IsLoading => webView?.I=sLoading ?? false;
+        protected bool IsLoading => webView?.IsLoading ?? false;
         protected bool IsRefreshing { get; private set; }
 
         UIActivityIndicatorView loadIndicatorView;
