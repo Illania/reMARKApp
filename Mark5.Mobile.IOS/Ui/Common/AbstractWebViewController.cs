@@ -215,11 +215,18 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         public async void AdjustFontForTraitCollection(UITraitCollection traitCollection)
         {
-            var scaledFont = Theme.DefaultFont.CustomFont(traitCollection);
-            var htmlString = await GetContent();
+            try
+            {
+                var scaledFont = Theme.DefaultFont.CustomFont(traitCollection);
+                var htmlString = await GetContent();
 
-            ApplyFontToHtmlString(scaledFont, htmlString);
-
+                ApplyFontToHtmlString(scaledFont, htmlString);
+            }
+            catch(Exception ex)
+            {
+                CommonConfig.Logger.Error($"Could not apply font to document content...: {ex.Message}");
+            }
+          
         }
 
         public void ApplyFontToHtmlString(UIFont font, string htmlString)

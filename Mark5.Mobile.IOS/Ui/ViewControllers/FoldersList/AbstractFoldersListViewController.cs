@@ -123,11 +123,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             else if (TableView?.Source as GrouppedDataSource != null)
                 QuickRefreshData();
 
-            CommonConfig.Logger.Info($"Starting automatic refresh...");
+            //CommonConfig.Logger.Info($"Starting automatic refresh...");
 
-            autoRefreshWorker?.Stop();
-            autoRefreshWorker = new AutoRefreshWorker(AutoRefreshData, AutoRefreshIntervalMs);
-            autoRefreshWorker.Start();
+            //autoRefreshWorker?.Stop();
+            //autoRefreshWorker = new AutoRefreshWorker(AutoRefreshData, AutoRefreshIntervalMs);
+            //autoRefreshWorker.Start();
 
             if (Integration.IsRunningAtLeast(11))
             {
@@ -150,9 +150,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             DeinitializeHandlers();
 
-            autoRefreshWorker?.Stop();
-            autoRefreshWorker?.Dispose();
-            autoRefreshWorker = null;
+            //autoRefreshWorker?.Stop();
+            //autoRefreshWorker?.Dispose();
+            //autoRefreshWorker = null;
 
             if (NavigationController != null && NavigationController.NavigationBarHidden)
                 NavigationController.SetNavigationBarHidden(false, true);
@@ -166,8 +166,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             CommonConfig.Logger.Warning("Received memory warning!");
 
 
-            autoRefreshWorker?.Stop();
-            autoRefreshWorker = null;
+            //autoRefreshWorker?.Stop();
+            //autoRefreshWorker = null;
 
             (TableView.Source as DataSource)?.Reset();
             (TableView.Source as GrouppedDataSource)?.Reset();
@@ -182,8 +182,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             UnsubscribeFromMessages();
 
-            autoRefreshWorker?.Stop();
-            autoRefreshWorker = null;
+            //autoRefreshWorker?.Stop();
+            //autoRefreshWorker = null;
 
             EditModeItem = null;
             CreateContactItem = null;

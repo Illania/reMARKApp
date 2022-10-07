@@ -124,14 +124,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (((DocumentListDataSource)TableView.Source).Empty)
                 await RefreshData();
 
+
             CommonConfig.Logger.Info($"Starting automatic refresh...");
 
             autoRefreshWorker?.Stop();
             autoRefreshWorker = new AutoRefreshWorker(AutoRefreshData, () => {
-                var items = ((DocumentListDataSource)TableView.Source).Items;
-                return items.Any() 
-                    ? items.Aggregate((i1, i2) => i1.Id > i2.Id ? i1 : i2) 
-                    : items.FirstOrDefault();
+                var items = ((DocumentListDataSource)TableView.Source).Items.ToArray();
+
+                return items.Any()
+                    ? MoreLinq.MoreEnumerable.MaxBy(items, i => i.Id).FirstOrDefault()
+                    : default;
             },
                 AutoRefreshIntervalMs);
             autoRefreshWorker.Start();
@@ -155,7 +157,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillDisappear(animated);
 
-            DeinitializeHandlers();
+            DeinitializeHandlers();         
 
             autoRefreshWorker?.Stop();
             autoRefreshWorker?.Dispose();

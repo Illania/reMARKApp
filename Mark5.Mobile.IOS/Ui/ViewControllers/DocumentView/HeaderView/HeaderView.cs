@@ -364,7 +364,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             DeinitializeHandlers();
             InitializeHandlers();
 
-            foreach (var view in subViews)
+            foreach (var view in subViews.ToList())
             {
                 view.Document = Document;
                 view.DocumentPreview = DocumentPreview;
