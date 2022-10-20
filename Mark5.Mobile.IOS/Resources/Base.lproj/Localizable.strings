@@ -127,6 +127,8 @@
 "deleting_comment___" = "Deleting comment...";
 "deleting_extraField___" = "Deleting extra field...";
 "deleting_from_folder___" = "Removing from folder...";
+"delivery_report" = "Delivery report";
+"destinations_list_empty"= "Destinations list empty";
 "department" = "Department";
 "departments"= "Departments";
 "description" = "Description"; 

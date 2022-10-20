@@ -410,6 +410,47 @@ namespace Mark5.Mobile.Common.Model.Converters
             return result;
         }
 
+        public static Transmit Convert(this DataContract.Transmit transmit)
+        {
+            var result = new Transmit
+            {
+                Destinations = transmit.Destinations.Select(d => d.Convert()).ToList(),
+                DocGuid = transmit.DocGuid,
+                Priority = transmit.Priority.ConvertEnum<Priority>(),
+                Status = transmit.Status.ConvertEnum<TransmitStatus>(),
+            };
+            return result;
+        }
+
+        public static TransmitDestination Convert(this DataContract.TransmitDestination transmitDestination)
+        {
+            var result = new TransmitDestination
+            {
+                Address = transmitDestination.Address,
+                LinkType = transmitDestination.LinkType.ConvertEnum<ComAddressLinkType>(),
+                Status = transmitDestination.Status.Convert()
+            };
+            return result;
+        }
+
+        public static DestinationStatus Convert(this DataContract.DestinationStatus destinationStatus)
+        {
+            var result = new DestinationStatus
+            {
+                Attempts = destinationStatus.Attempts,
+                LastConnectAttempt = destinationStatus.LastConnectAttempt,
+                LastMessage = destinationStatus.LastMessage,
+                StatusDetail = destinationStatus.StatusDetail.ConvertEnum<DestinationStatusDetail>(),
+                TimeStart = destinationStatus.TimeStart,
+                TimeEnd = destinationStatus.TimeEnd,
+                WasSentByLine = destinationStatus.WasSentByLine,
+                WasSentByLineName = destinationStatus.WasSentByLineName
+            };
+            return result;
+        }
+
+
+
         public static Folder Convert(this DataContract.Folder f)
         {
             var result = new Folder

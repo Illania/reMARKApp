@@ -346,6 +346,8 @@
 	    <Compile Include="Ui\ViewControllers\ContactEmailAddressesViewController.cs" />
 	    <Compile Include="Ui\ViewControllers\ExternalDocumentFoldersListViewController.cs" />
 	    <Compile Include="Ui\ViewControllers\CategoriesListOldViewController.cs" />
+	    <Compile Include="Ui\ViewControllers\DeliveryReportViewController.cs" />
+	    <Compile Include="Ui\ViewControllers\TransmitDestinationsViewController.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

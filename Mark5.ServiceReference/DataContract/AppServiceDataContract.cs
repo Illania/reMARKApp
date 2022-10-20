@@ -820,6 +820,145 @@ namespace Mark5.ServiceReference.DataContract
     {
     }
 
+    [DataContract(Name = "GetTransmitInfoParameters", Namespace = "com.nordic-it.appservice.v3")]
+    public class GetTransmitInfoParameters : AbstractParameters
+    {
+        [DataMember(Name = "DocumentId", Order = 0)]
+        public int DocumentId { get; set; } = -1;
+
+        [DataMember(Name = "ArchiveDbId", Order = 0)]
+        public int ArchiveDbId { get; set; }
+
+    }
+
+    [DataContract(Name = "GetTransmitInfoResult", Namespace = "com.nordic-it.appservice.v3")]
+    public class GetTransmitInfoResult
+    {
+        [DataMember(Name = "TransmitList", Order = 0)]
+        public List<Transmit> TransmitList { get; set; } = new List<Transmit>();
+    }
+
+    [DataContract(Name = "Transmit", Namespace = "com.nordic-it.appservice.v3")]
+    public class Transmit
+    {
+        [DataMember(Name = "Status", Order = 0)]
+        public TransmitStatus Status{ get; set; }
+        
+        [DataMember(Name = "DocGuid", Order = 0)]
+        public Guid DocGuid { get; set; }
+
+        [DataMember(Name = "Priority", Order = 0)]
+        public Priority Priority { get; set; }
+
+        [DataMember(Name = "Destinations", Order = 0)]
+        public List<TransmitDestination> Destinations { get; set; }
+    }
+
+    [DataContract(Name = "TransmitDestination", Namespace = "com.nordic-it.appservice.v3")]
+    public class TransmitDestination
+    {
+        [DataMember(Name = "Address", Order = 0)]
+        public string Address { get; set; }
+
+        [DataMember(Name = "LinkType", Order = 0)]
+        public ComAddressLinkType LinkType { get; set; }
+
+
+        [DataMember(Name = "Status", Order = 0)]
+        public DestinationStatus Status { get; set; }
+    }
+
+
+    [DataContract(Name = "DestinationStatus", Namespace = "com.nordic-it.appservice.v3")]
+    public class DestinationStatus
+    {
+        [DataMember(Name = "Attempts", Order = 0)]
+        public int Attempts { get; set; }
+
+        [DataMember(Name = "LastMessage", Order = 0)]
+        public string LastMessage { get; set; }
+
+        [DataMember(Name = "LastConnectAttempt", Order = 0)]
+        public DateTime LastConnectAttempt { get; set; }
+
+        [DataMember(Name = "StatusDetail", Order = 0)]
+        public DestinationStatusDetail StatusDetail { get; set; }
+
+        [DataMember(Name = "TimeStart", Order = 0)]
+        public  DateTime TimeStart { get; set; }
+
+        [DataMember(Name = "TimeEnd", Order = 0)]
+        public DateTime TimeEnd { get; set; }
+
+        [DataMember(Name = "WasSentByLine", Order = 0)]
+        public Guid WasSentByLine{ get; set; }
+
+        [DataMember(Name = "WasSentByLineName", Order = 0)]
+        public string WasSentByLineName { get; set; }
+
+    }
+
+    [DataContract(Name = "DestinationStatusDetail", Namespace = "com.nordic-it.appservice.v3")]
+    public enum DestinationStatusDetail
+    {
+        [EnumMember(Value = "None")]
+        None = -1,
+
+        /// <summary>First status when document is sent to destination and nobody proccess it</summary>
+        [EnumMember(Value = "InTransmit")]
+        InTransmit = 0,
+
+        /// <summary>Task controller processed destination</summary>
+        [EnumMember(Value = "InTaskController")]
+        InTaskController = 1,
+
+        /// <summary>Send controller processed destination</summary>
+        [EnumMember(Value = "InSendController")]
+        InSendController = 2,
+
+        /// <summary>Destination is in driver queue to send out</summary>
+        [EnumMember(Value = "InDriver")]
+        InDriver = 3,
+
+        /// <summary>Destination is sending by driver</summary>
+        [EnumMember(Value = "InDriverSend")]
+        InDriverSend = 4,
+
+        /// <summary>Unexpected error happened</summary>
+        [EnumMember(Value = "SystemError")]
+        SystemError = 5,
+
+        /// <summary>Destination was canceled</summary>
+        [EnumMember(Value = "Cancelled")]
+        Cancelled = 6,
+
+        /// <summary>Destination requested to cancel</summary>
+        [EnumMember(Value = "CancelRequested")]
+        CancelRequested = 7,
+
+        /// <summary>The destination transmit was sent and received approval was received</summary>
+        [EnumMember(Value = "DeliveryAccepted")]
+        DeliveryAccepted = 8,
+
+        /// <summary>Destination was sent, but later non delivery report received.  Final status. </summary>
+        [EnumMember(Value = "FailedBounced")]
+        FailedBounced = 9,
+
+        /// <summary>Delivery confirmation was received</summary>
+        [EnumMember(Value = "Delivered")]
+        Delivered = 10
+    }
+
+    [DataContract(Name = "ComAddressLinkType", Namespace = "com.nordic-it.appservice.v3")]
+    public enum ComAddressLinkType
+    {
+        [EnumMember(Value = "None")] None = -1,
+        [EnumMember(Value = "To")] To = 0,
+        [EnumMember(Value = "From")] From = 1,
+        [EnumMember(Value = "Cc")] Cc = 2,
+        [EnumMember(Value = "Bcc")] Bcc = 3
+    }
+
     [DataContract(Name = "TemplatePreview", Namespace = "com.nordic-it.appservice.v3")]
     public class TemplatePreview
     {
@@ -864,6 +1003,7 @@ namespace Mark5.ServiceReference.DataContract
         public List<AttachmentDescription> Attachments { get; set; } = new List<AttachmentDescription>();
     }
 
+
     [DataContract(Name = "DocumentCreationModeFlag", Namespace = "com.nordic-it.appservice.v3")]
     [Flags]
     public enum DocumentCreationModeFlag
@@ -888,6 +1028,7 @@ namespace Mark5.ServiceReference.DataContract
         [EnumMember(Value = "Urgent")] Urgent = 4,
         [EnumMember(Value = "System")] System = 5,
     }
+
 
     [DataContract(Name = "DocumentDirection", Namespace = "com.nordic-it.appservice.v3")]
     public enum DocumentDirection
@@ -3198,5 +3339,6 @@ namespace Mark5.ServiceReference.DataContract
     }
 
     #endregion
+
 }
 

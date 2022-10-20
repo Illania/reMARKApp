@@ -422,7 +422,9 @@ namespace Mark5.Mobile.IOS.Ui
                         actionWrapper.Action = UITableViewRowAction.Create(
                             UITableViewRowActionStyle.Default,
                             viewControllerWeakReference.Unwrap()?.SwipeActionTitle(swipeAction.Action, documentPreview),
-                            (a, ip) => { viewControllerWeakReference.Unwrap()?.OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView); });
+                            (a, ip) => {
+                                viewControllerWeakReference.Unwrap()?.OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView);
+                            });
 
                         actionWrapper.Disabled = !DocumentsListViewController.SwipeActionAllowed(swipeAction.Action, documentPreview, folder);
                         break;
@@ -436,6 +438,16 @@ namespace Mark5.Mobile.IOS.Ui
                             });
                         actionWrapper.Disabled = !DocumentsListViewController.SwipeActionAllowed(swipeAction.Action, documentPreview, folder);
                         break;
+                    case EmailSwipeAction.SwipeAction.DeliveryReport:
+                        actionWrapper.Action = UITableViewRowAction.Create(
+                            UITableViewRowActionStyle.Default,
+                            viewControllerWeakReference.Unwrap()?.SwipeActionTitle(swipeAction.Action, documentPreview),
+                            (a, ip) => {
+                                viewControllerWeakReference.Unwrap()?.OnSwipeActionClick(swipeAction, indexPath, documentPreview, folder, tableView);
+                            });
+                        actionWrapper.Disabled = !DocumentsListViewController.SwipeActionAllowed(swipeAction.Action, documentPreview, folder);
+                        break;
+           
                     default:
                         break;
                 }

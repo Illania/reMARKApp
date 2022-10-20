@@ -55,6 +55,8 @@ namespace Mark5.ServiceReference.AppService
 
         Task<GetNewDocumentReferenceNumberResult> GetNewDocumentReferenceNumberAsync(GetNewDocumentReferenceNumberParameters parameters, CancellationToken ct = default);
 
+        Task<GetTransmitInfoResult> GetDocumentTransmitInfoAsync(GetTransmitInfoParameters parameters, CancellationToken ct = default);
+
         #endregion
 
         #region Contacts module

@@ -605,5 +605,10 @@ namespace Mark5.ServiceReference.AppService
             return await InvokeAsync<DeleteDocumentExtraFieldResult, DeleteDocumentExtraFieldParameters>("DeleteDocumentExtraField", parameters, ct);
         }
 
+        public async Task<GetTransmitInfoResult> GetDocumentTransmitInfoAsync(GetTransmitInfoParameters parameters, CancellationToken ct = default)
+        {
+            return await InvokeAsync<GetTransmitInfoResult, GetTransmitInfoParameters>("GetTransmitInfo", parameters, ct);
+        }
+
     }
 }
