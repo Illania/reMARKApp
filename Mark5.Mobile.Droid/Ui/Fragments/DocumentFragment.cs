@@ -452,6 +452,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             menu.Add(Menu.None, MenuItemActions.CopyToNew, MenuItemActions.CopyToNew, Resource.String.copy_to_new);
 
+            if (ServerConfig.SystemSettings.SystemInfo.IsDeliveryReportAvailableAvailable)
+                menu.Add(Menu.None, MenuItemActions.DeliveryReport, MenuItemActions.DeliveryReport, Resource.String.delivery_report);
+
         }
 
         public override async void OnPrepareOptionsMenu(IMenu menu)
@@ -576,6 +579,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (item.ItemId == MenuItemActions.CopyToNew)
             {
                 CopyToNew();
+                return true;
+            }
+
+            if (item.ItemId == MenuItemActions.DeliveryReport)
+            {
+                StartActivity(TransmitDestinationsListActivity.CreateIntent(Context, DocumentPreview.Id, DocumentPreview.ReferenceNumber));
                 return true;
             }
 
@@ -1190,6 +1199,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public const int Links = 90;
             public const int DeleteFromFolder = 100;
             public const int Delete = 101;
+            public const int DeliveryReport = 102;
         }
 
         static class RequestCodes

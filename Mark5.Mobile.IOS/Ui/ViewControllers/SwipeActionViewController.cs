@@ -687,6 +687,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     }));
             }
 
+            if(ServerConfig.SystemSettings.SystemInfo.IsDeliveryReportAvailableAvailable)
+            {
+                eas.AddAction(UIAlertAction.Create(
+                    Localization.GetString("delivery_report"),
+                    UIAlertActionStyle.Default,
+                    a =>
+                    {
+                        SetAction(senderBtn.Tag, EmailSwipeAction.SwipeAction.DeliveryReport);
+                    }));
+            }
+
             eas.AddAction(UIAlertAction.Create(
                 Localization.GetString("set_priority"),
                 UIAlertActionStyle.Default,

@@ -118,5 +118,7 @@ namespace Mark5.Mobile.Common.Manager
 
         Task UpdateExtraFieldAsync(ExtraField extraField, SourceType sourceType = SourceType.Auto);
 
+        Task<List<Transmit>> GetDocumentTransmitInfoAsync(int documentId, SourceType sourceType = SourceType.Auto);
+
     }
 }

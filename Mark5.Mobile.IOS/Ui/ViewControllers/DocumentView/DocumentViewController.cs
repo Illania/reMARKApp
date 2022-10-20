@@ -9,6 +9,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.HubMessages;
+using Mark5.Mobile.Common.Reports;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Model;
@@ -18,12 +19,10 @@ using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
-using Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView;
 using Mark5.Mobile.IOS.Utilities;
 using TinyMessenger;
 using UIKit;
 using WebKit;
-using Xamarin.Essentials;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
@@ -781,6 +780,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             DocumentPageViewControllerDelegate?.AddViewControllerToCache(this);
         }
 
+
         #endregion
 
         #region Toolbar event handlers
@@ -1038,13 +1038,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        void CommentsButton_Clicked(object sender, EventArgs e)
+        async void CommentsButton_Clicked(object sender, EventArgs e)
         {
-            var vc = new CommentsListViewController
-            {
-                Entity = document
-            };
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+             var vc = new CommentsListViewController
+             {
+                 Entity = document
+             };
+             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         void DoRespond(DocumentCreationModeFlag creationModeFlag)

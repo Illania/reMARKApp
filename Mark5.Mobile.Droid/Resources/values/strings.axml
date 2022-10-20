@@ -109,6 +109,7 @@
     <string name="deleting_comment">Deleting comment</string>
     <string name="deleting_extra_field">Deleting extra field</string>
     <string name="deleting_from_folder">Removing from folder...</string>
+    <string name="delivery_report">Delivery report</string>
     <string name="departments">Departments</string>
     <string name="description">Description</string>
     <string name="diagnostics_progress_text">Performing Diagnostics</string>
@@ -544,6 +545,7 @@
     <string name="time_remaining_minutes_zero">Time remaining: less than one minute</string>
     <string name="to">To</string>
     <string name="to_prefix">to</string>
+     <string name="transmit_destinations">Transmit destinations</string>
     <string name="today">Today</string>
     <string name="type_search_query">Search query</string>
     <string name="unavailable">Unavailable</string>

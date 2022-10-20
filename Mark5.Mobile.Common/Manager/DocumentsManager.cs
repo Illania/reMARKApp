@@ -79,6 +79,31 @@ namespace Mark5.Mobile.Common.Manager
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
+        public async Task<List<Transmit>> GetDocumentTransmitInfoAsync(int documentId, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
+            {
+                var result = await AppServiceProxy.GetDocumentTransmitInfoAsync(new DataContract.GetTransmitInfoParameters
+                {
+                    Token = Token,
+                    DocumentId = documentId,
+                    ArchiveDbId = 0
+                });
+
+                var transmitList = result.TransmitList.Select(transmit => transmit.Convert()).ToList();
+
+                return transmitList;
+            }
+
+            else if (sourceType == SourceType.Local)
+                throw new ReMarkException(ErrorConstants.Codes.InvalidSourceType);
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
+
         public async Task<List<int>> GetNeighbourDocumentsIdAsync(Folder folder, int documentId, bool getPrevious, bool getNext, int maxItems = 30)
         {
             return await documentsDataAccess.GetNeighbourDocumentsIdAsync(folder.Id, documentId, getPrevious, getNext, maxItems);

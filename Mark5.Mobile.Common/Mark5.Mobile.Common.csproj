@@ -41,10 +41,15 @@
     <Folder Include="Storage\AppFileStorage\Interface\" />
     <Folder Include="Storage\AppFileStorage\Enum\" />
     <Folder Include="Storage\AppFileStorage\Utils\" />
+    <Folder Include="Reports\" />
+    <Folder Include="HtmlTags\" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Presenters\CalendarModule\AppointmentPresenter.cs.orig" />
     <None Remove="JWTDecoder.Xamarin" />
+    <None Remove="HtmlTags" />
+    <None Remove="Reports\" />
+    <None Remove="HtmlTags\" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51" />

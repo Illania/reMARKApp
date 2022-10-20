@@ -124,6 +124,7 @@ namespace Mark5.ServiceReference.Exceptions
         [EnumMember(Value = "GetTemplatesError")] GetTemplatesError = 1220,
         [EnumMember(Value = "GetTemplateError")] GetTemplateError = 1221,
         [EnumMember(Value = "GetDefaultTemplateError")] GetDefaultTemplateError = 1222,
+        [EnumMember(Value = "GetDocumentTransmitInfoError")]GetDocumentTransmitInfoError = 1224,
         [EnumMember(Value = "DocumentAlreadySentError")] DocumentAlreadySentError = 1230,
 
         [EnumMember(Value = "GetContactsError")] GetContactsError = 1300,
