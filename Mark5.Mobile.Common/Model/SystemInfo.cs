@@ -27,6 +27,7 @@ namespace Mark5.Mobile.Common.Model
 
         public bool ExtraFieldsEditingAvailable => ServiceVersionGreaterThanOrEqual(4, 4, 0);
         public bool FavoriteCategoriesAvailable => ServiceVersionGreaterThanOrEqual(4, 4, 0);
+        public bool RecentAddressDeleteAvailable => ServiceVersionGreaterThanOrEqual(4, 4, 0);
 
         public bool IsDeliveryReportAvailableAvailable => ServiceVersionGreaterThanOrEqual(4, 5, 0);
 

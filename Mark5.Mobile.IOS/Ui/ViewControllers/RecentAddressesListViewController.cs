@@ -362,6 +362,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
             {
+                if (!ServerConfig.SystemSettings.SystemInfo.RecentAddressDeleteAvailable)
+                    return null;
+
                 if (indexPath == null)
                 {
                     CommonConfig.Logger.Warning($"IndexPath in DocumentListViewController.EditActionsForRow() was null.");

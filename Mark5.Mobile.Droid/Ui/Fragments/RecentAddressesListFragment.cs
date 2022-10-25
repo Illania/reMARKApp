@@ -280,6 +280,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public override void OnChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, bool isCurrentlyActive)
             {
 
+                if (!ServerConfig.SystemSettings.SystemInfo.RecentAddressDeleteAvailable)
+                    return;
+
                 if (actionState != ItemTouchHelper.ActionStateSwipe || viewHolder.AdapterPosition == -1) //Sometimes it gets called for viewHolders that are already gone
                     return;
 
@@ -330,6 +333,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnSwiped(RecyclerView.ViewHolder viewHolder, int direction)
         {
+            if (!ServerConfig.SystemSettings.SystemInfo.RecentAddressDeleteAvailable)
+                return;
             ResetViewHolder(viewHolder, direction);
             if (direction == ItemTouchHelper.Left)
             {
