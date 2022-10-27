@@ -7,6 +7,7 @@ using Android.Graphics;
 using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
@@ -111,7 +112,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
         {
             var invitation = Document?.Invitations?.FirstOrDefault();
 
-            if (invitation == null || DocumentPreview?.Direction == DocumentDirection.Outgoing)
+            if (invitation == null || DocumentPreview?.Direction == DocumentDirection.Outgoing || !ServerConfig.SystemSettings.SystemInfo.CalendarModuleAvailable)
             {
                 Visibility = ViewStates.Gone;
                 return Task.CompletedTask;

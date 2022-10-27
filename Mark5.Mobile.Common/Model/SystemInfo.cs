@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Mark5.Mobile.Common.Manager;
 using Newtonsoft.Json;
 
 namespace Mark5.Mobile.Common.Model
@@ -8,6 +10,7 @@ namespace Mark5.Mobile.Common.Model
     {
         public Version SystemVersion { get; set; }
         public Version ServiceVersion { get; set; }
+        public bool CalendarModuleInstalled { get; set; }
         public string ServerTimeZoneInfoSerialized { get; set; }
         public string CustomerName { get; set; }
         public Guid CustomerGuid { get; set; }
@@ -29,7 +32,21 @@ namespace Mark5.Mobile.Common.Model
         public bool FavoriteCategoriesAvailable => ServiceVersionGreaterThanOrEqual(4, 4, 0);
         public bool RecentAddressDeleteAvailable => ServiceVersionGreaterThanOrEqual(4, 4, 0);
 
-        public bool IsDeliveryReportAvailableAvailable => ServiceVersionGreaterThanOrEqual(4, 5, 0);
+        public bool DeliveryReportAvailable => ServiceVersionGreaterThanOrEqual(4, 5, 0);
+
+
+        public bool CalendarModuleAvailable       
+        {
+
+            get{
+
+                if (!SystemVersionGreaterThanOrEqual(1, 35, 12))
+                    return false;
+                else
+                    return ServiceVersionGreaterThanOrEqual(4, 5, 0) && CalendarModuleInstalled;
+            }
+
+        }
 
         List<ModuleType> availableModules;
         public List<ModuleType> AvailableModules
@@ -75,5 +92,6 @@ namespace Mark5.Mobile.Common.Model
             return new Version(major, minor, build) <= SystemVersion;
         }
 
-    }
+
+}
 }
