@@ -99,9 +99,9 @@ namespace Mark5.Mobile.Common.Model.Converters
         {
             var result = new CalendarModuleInfo
             {
-                Permissions = cmi.Permissions?.Convert()
+                Permissions = cmi?.Permissions?.Convert()
             };
-            if (cmi.Calendars != null)
+            if (cmi?.Calendars != null)
                 result.Calendars.AddRange(cmi.Calendars.WhereNotNull().Select(Convert));
             return result;
         }
@@ -697,7 +697,8 @@ namespace Mark5.Mobile.Common.Model.Converters
                 CustomerName = si.CustomerName,
                 CustomerGuid = si.CustomerGuid,
                 ServerTimeZoneInfoSerialized = si.ServerTimeZoneInfoSerialized,
-                NotificationsInChina = si.NotificationsInChina
+                NotificationsInChina = si.NotificationsInChina,
+                CalendarModuleInstalled = si.AvailableModules.Contains(DataContract.ModuleType.Calendar)
 
             };
             if (si.AvailableModules != null)

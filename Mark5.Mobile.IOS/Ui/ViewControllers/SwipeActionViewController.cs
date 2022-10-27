@@ -687,7 +687,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     }));
             }
 
-            if(ServerConfig.SystemSettings.SystemInfo.IsDeliveryReportAvailableAvailable)
+            if(ServerConfig.SystemSettings.SystemInfo.DeliveryReportAvailable)
             {
                 eas.AddAction(UIAlertAction.Create(
                     Localization.GetString("delivery_report"),

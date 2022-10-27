@@ -53,7 +53,7 @@ namespace Mark5.Mobile.IOS.Utilities
             if (PlatformConfig.Preferences.EnableMoveToFolder)
                 list.Add(new EmailSwipeAction(SwipeAction.MoveToFolder));
 
-            if (ServerConfig.SystemSettings.SystemInfo.IsDeliveryReportAvailableAvailable)
+            if (ServerConfig.SystemSettings.SystemInfo.DeliveryReportAvailable)
                 list.Add(new EmailSwipeAction(SwipeAction.DeliveryReport));
             return list;
         }

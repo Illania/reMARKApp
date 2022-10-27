@@ -14,7 +14,7 @@ namespace Mark5.Mobile.Common.Job
     {
         public async Task Run()
         {
-            if (ServerConfig.SystemSettings?.SystemInfo.SystemVersion < new Version(1, 35, 12))
+            if (!ServerConfig.SystemSettings.SystemInfo.CalendarModuleAvailable)
                 return;
 
             try
