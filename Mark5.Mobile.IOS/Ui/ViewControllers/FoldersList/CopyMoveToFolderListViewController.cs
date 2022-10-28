@@ -103,7 +103,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             if (TableView?.IndexPathForSelectedRow != null)
                 TableView.DeselectRow(TableView.IndexPathForSelectedRow, true);
             if(done)
-                tcs.SetResult(folder.Id);
+            {
+                tcs.TrySetResult(folder.Id);
+                DismissViewController(true, null);
+            }
+                
         }
 
         protected async override Task FolderExpand(Folder folder)
