@@ -6,7 +6,8 @@ using Mark5.Mobile.Droid.Ui.Coordinators;
 using Com.Syncfusion.Schedule;
 using System.Linq;
 using Android.Graphics;
-using Android.Support.Design.Widget;
+using AndroidX.CoordinatorLayout.Widget;
+using Google.Android.Material.FloatingActionButton;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 {

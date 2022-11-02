@@ -2,12 +2,12 @@
 using Android.Views;
 using Android.Content;
 using Android.Graphics;
-using Android.Support.V4.Content;
 using Com.Syncfusion.Schedule;
 using Com.Syncfusion.Schedule.Enums;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Utilities;
 using System;
+using AndroidX.Core.Content;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 {

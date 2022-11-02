@@ -5,13 +5,13 @@ using Android.Animation;
 using Android.Content;
 using Android.Graphics;
 using Android.Graphics.Drawables;
-using Android.Support.V4.Content;
-using Android.Support.V4.Graphics.Drawable;
-using Android.Support.V7.Content.Res;
-using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Views.InputMethods;
 using Android.Widget;
+using AndroidX.AppCompat.Content.Res;
+using AndroidX.AppCompat.Widget;
+using AndroidX.Core.Content;
+using AndroidX.Core.Graphics.Drawable;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Presenters.CalendarModule;
 using Mark5.Mobile.Common.Utilities;
@@ -37,7 +37,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AddEditAppointmentViews
 
             LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
             {
-                Gravity = (int)GravityFlags.CenterVertical
+                Gravity = (GravityFlags)(int)GravityFlags.CenterVertical
             };
             SetPadding(0, verticalPadding, 0, verticalPadding);
             SetBackgroundColor(Color.Transparent);
@@ -52,7 +52,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AddEditAppointmentViews
             var verticalPadding = Conversion.ConvertDpToPixels(4);
             LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent, 1)
             {
-                Gravity = (int)GravityFlags.CenterVertical
+                Gravity = (GravityFlags)(int)GravityFlags.CenterVertical
             };
             SetPadding(0, verticalPadding, 0, verticalPadding);
             SetBackgroundColor(Color.Transparent);
@@ -70,7 +70,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AddEditAppointmentViews
 
             LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent, 1)
             {
-                Gravity = (int)GravityFlags.CenterVertical,
+                Gravity = (GravityFlags)(int)GravityFlags.CenterVertical,
             };
             SetPadding(0, verticalPadding, 0, verticalPadding);
             SetBackgroundColor(Color.Transparent);
@@ -112,7 +112,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AddEditAppointmentViews
             {
                 LayoutParameters = new LayoutParams(iconSize, iconSize)
                 {
-                    Gravity = (int)GravityFlags.Left | (int)GravityFlags.Top,
+                    Gravity = (GravityFlags)((int)GravityFlags.Left | (int)GravityFlags.Top),
                     RightMargin = DistanceLarge,
                     TopMargin = Conversion.ConvertDpToPixels(4), //To balance the padding around text fields
                 },
@@ -216,7 +216,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AddEditAppointmentViews
             allDayText.Text = "All day";
             allDayText.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent, 1)
             {
-                Gravity = (int)GravityFlags.Left | (int)GravityFlags.CenterVertical,
+                Gravity = (GravityFlags)((int)GravityFlags.Left | (int)GravityFlags.CenterVertical),
             };
 
             AddView(allDayText);
@@ -226,7 +226,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AddEditAppointmentViews
                 Gravity = GravityFlags.Right,
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
                 {
-                    Gravity = (int)GravityFlags.Right | (int)GravityFlags.CenterVertical,
+                    Gravity = (GravityFlags)((int)GravityFlags.Right | (int)GravityFlags.CenterVertical),
                     RightMargin = 0,
                 },
                 SwitchPadding = 0,
@@ -326,7 +326,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AddEditAppointmentViews
             DateTextView = new BasicTextView(context);
             DateTextView.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent, 1)
             {
-                Gravity = (int)GravityFlags.CenterVertical | (int)GravityFlags.Left
+                Gravity = (GravityFlags)((int)GravityFlags.CenterVertical | (int)GravityFlags.Left)
             };
 
             DateTextView.Click += DateClicked;
@@ -338,7 +338,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AddEditAppointmentViews
                 Gravity = GravityFlags.Right,
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent)
                 {
-                    Gravity = (int)GravityFlags.CenterVertical | (int)GravityFlags.Right
+                    Gravity = (GravityFlags)((int)GravityFlags.CenterVertical | (int)GravityFlags.Right)
                 },
             };
 
@@ -392,7 +392,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AddEditAppointmentViews
             {
                 LayoutParameters = new LayoutParams(Conversion.ConvertDpToPixels(10), Conversion.ConvertDpToPixels(10))
                 {
-                    Gravity = (int)GravityFlags.CenterVertical,
+                    Gravity = (GravityFlags)(int)GravityFlags.CenterVertical,
                     RightMargin = DistanceNormal,
                 }
             };

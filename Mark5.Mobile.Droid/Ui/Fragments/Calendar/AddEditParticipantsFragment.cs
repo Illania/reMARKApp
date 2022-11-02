@@ -6,15 +6,16 @@ using Android.App;
 using Android.Views;
 using Android.Content;
 using Android.Graphics;
-using Android.Support.V4.Content;
-using Android.Support.V7.App;
-using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Presenters.CalendarModule;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Activities;
+using AndroidX.RecyclerView.Widget;
+using AndroidX.AppCompat.Widget;
+using AndroidX.AppCompat.App;
+using AndroidX.Core.Content;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 {

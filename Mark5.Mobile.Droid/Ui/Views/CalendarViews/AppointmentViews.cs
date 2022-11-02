@@ -5,11 +5,11 @@ using Android.Content;
 using Android.Content.Res;
 using Android.Graphics;
 using Android.Graphics.Drawables;
-using Android.Support.V4.Content;
-using Android.Support.V4.Graphics.Drawable;
-using Android.Support.V7.Content.Res;
-using Android.Support.V7.Widget;
 using Android.Views;
+using AndroidX.AppCompat.Content.Res;
+using AndroidX.AppCompat.Widget;
+using AndroidX.Core.Content;
+using AndroidX.Core.Graphics.Drawable;
 using Mark5.Mobile.Common.Presenters.CalendarModule;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
@@ -22,7 +22,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AppointmentViews
         {
             LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
             {
-                Gravity = (int)GravityFlags.CenterVertical
+                Gravity = (GravityFlags)(int)GravityFlags.CenterVertical
             };
             SetBackgroundColor(Color.Transparent);
             this.SetTextAppearanceCompat(context, Resource.Style.viewAppointmentText);
@@ -35,7 +35,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AppointmentViews
         {
             LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
             {
-                Gravity = (int)GravityFlags.CenterVertical
+                Gravity = (GravityFlags)(int)GravityFlags.CenterVertical
             };
             SetBackgroundColor(Color.Transparent);
             this.SetTextAppearanceCompat(context, Resource.Style.viewAppointmentSubText);
@@ -48,7 +48,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AppointmentViews
         {
             LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent, 1)
             {
-                Gravity = (int)GravityFlags.CenterVertical,
+                Gravity = (GravityFlags)(int)GravityFlags.CenterVertical,
             };
             SetBackgroundColor(Color.Transparent);
             this.SetTextAppearanceCompat(context, Resource.Style.viewAppointmentTitle);
@@ -83,7 +83,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AppointmentViews
                 {
                     LayoutParameters = new LayoutParams(iconSize, iconSize)
                     {
-                        Gravity = (int)GravityFlags.Left | (int)GravityFlags.Top,
+                        Gravity = (GravityFlags)((int)GravityFlags.Left | (int)GravityFlags.Top),
                         RightMargin = DistanceLarge,
                         TopMargin = Conversion.ConvertDpToPixels(4),
                     },
@@ -237,7 +237,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AppointmentViews
             {
                 LayoutParameters = new LayoutParams(Conversion.ConvertDpToPixels(10), Conversion.ConvertDpToPixels(10))
                 {
-                    Gravity = (int)GravityFlags.CenterVertical,
+                    Gravity = (GravityFlags)(int)GravityFlags.CenterVertical,
                     RightMargin = DistanceNormal,
                 }
             };
@@ -335,7 +335,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AppointmentViews
                     Clickable = false,
                     LayoutParameters = new LayoutParams(Conversion.ConvertDpToPixels(20), Conversion.ConvertDpToPixels(20))
                     {
-                        Gravity = (int)GravityFlags.CenterVertical | (int)GravityFlags.Left
+                        Gravity = (GravityFlags)((int)GravityFlags.CenterVertical | (int)GravityFlags.Left)
                     }
                 };
 
@@ -350,7 +350,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.CalendarViews.AppointmentViews
                     Gravity = GravityFlags.Left,
                     LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
                     {
-                        Gravity = (int)GravityFlags.CenterVertical
+                        Gravity = (GravityFlags)(int)GravityFlags.CenterVertical
                     }
                 };
 

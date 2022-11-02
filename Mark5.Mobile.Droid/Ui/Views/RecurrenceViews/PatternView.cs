@@ -1,8 +1,8 @@
 ﻿using System;
 using Android.App;
 using Android.Content;
-using Android.Support.V7.Widget;
 using Android.Views;
+using AndroidX.AppCompat.Widget;
 using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews

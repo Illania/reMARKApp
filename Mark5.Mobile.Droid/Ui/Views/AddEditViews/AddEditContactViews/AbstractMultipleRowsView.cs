@@ -4,9 +4,9 @@ using System.Linq;
 using Android.Animation;
 using Android.Content;
 using Android.Graphics;
-using Android.Support.V4.Content;
-using Android.Support.V7.Widget;
 using Android.Views;
+using AndroidX.AppCompat.Widget;
+using AndroidX.Core.Content;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 
@@ -50,7 +50,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEditContactViews
             titleEditText.Click += AddButton_Click;
             var hintEditTextLp = new LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1.0f)
             {
-                Gravity = (int)GravityFlags.CenterVertical,
+                Gravity = (GravityFlags)(int)GravityFlags.CenterVertical,
             };
 
             topLayout.AddView(titleEditText, hintEditTextLp);
@@ -59,7 +59,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEditContactViews
             titleTextView.SetText(titleResourceId);
             var titleTextViewLp = new LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1.0f)
             {
-                Gravity = (int)GravityFlags.CenterVertical,
+                Gravity = (GravityFlags)(int)GravityFlags.CenterVertical,
                 RightMargin = DistanceNormal,
             };
             titleTextView.Visibility = ViewStates.Gone;
@@ -123,7 +123,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEditContactViews
             {
                 TopMargin = addButton ? 0 : DistanceSmall,
                 LeftMargin = DistanceNormal,
-                Gravity = addButton ? (int)GravityFlags.CenterVertical : (int)GravityFlags.Top,
+                Gravity = (GravityFlags)(addButton ? (int)GravityFlags.CenterVertical : (int)GravityFlags.Top),
             };
             button.LayoutParameters = addButtonLp;
             return button;

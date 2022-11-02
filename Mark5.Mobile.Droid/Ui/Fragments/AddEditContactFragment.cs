@@ -4,14 +4,15 @@ using System.Linq;
 using Android.Content;
 using Android.Graphics;
 using Android.OS;
-using Android.Support.Design.Widget;
-using Android.Support.V4.App;
-using Android.Support.V4.Content;
-using Android.Support.V4.Widget;
-using Android.Support.V7.App;
-using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
+using AndroidX.AppCompat.App;
+using AndroidX.AppCompat.Widget;
+using AndroidX.CoordinatorLayout.Widget;
+using AndroidX.Core.Content;
+using AndroidX.Core.Widget;
+using AndroidX.Fragment.App;
+using Google.Android.Material.FloatingActionButton;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -174,7 +175,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
                 {
-                    Gravity = (int)GravityFlags.CenterHorizontal
+                    Gravity = (GravityFlags)(int)GravityFlags.CenterHorizontal
                 }
             };
             var typedArray = Context.ObtainStyledAttributes(new int[]

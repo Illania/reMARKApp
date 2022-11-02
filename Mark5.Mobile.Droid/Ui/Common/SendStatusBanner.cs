@@ -2,8 +2,9 @@
 using System.Collections.Concurrent;
 using Android.Content;
 using Android.OS;
-using Android.Support.Design.Widget;
-using Android.Support.V4.Content;
+using AndroidX.CoordinatorLayout.Widget;
+using AndroidX.Core.Content;
+using Google.Android.Material.Snackbar;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model.HubMessages;
 using TinyMessenger;

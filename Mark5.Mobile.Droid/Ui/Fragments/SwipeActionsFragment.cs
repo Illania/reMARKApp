@@ -1,15 +1,15 @@
 ﻿using Android.Content;
 using Android.OS;
-using Android.Support.V7.App;
 using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
-using Android.Support.V7.Preferences;
 using Android.Widget;
-using Android.Support.V7.Widget;
 using Mark5.Mobile.Common.Utilities;
+using AndroidX.AppCompat.Widget;
+using AndroidX.AppCompat.App;
+using AndroidX.Preference;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {

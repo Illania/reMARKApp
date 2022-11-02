@@ -1,12 +1,12 @@
 ﻿using Android.Graphics;
-using Android.Support.V4.Content;
-using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Views.InputMethods;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 using System;
 using Android.Content;
+using AndroidX.AppCompat.Widget;
+using AndroidX.Core.Content;
 
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
@@ -27,7 +27,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             {
                 LayoutParameters = new LayoutParams(searchIconSize, searchIconSize)
                 {
-                    Gravity = (int) GravityFlags.Bottom,
+                    Gravity = (GravityFlags)(int) GravityFlags.Bottom,
                     RightMargin = DistanceLarge,
                 }
             };
@@ -49,7 +49,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
                 Orientation = Horizontal,
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
                 {
-                    Gravity = (int) GravityFlags.Start,
+                    Gravity = (GravityFlags)(int) GravityFlags.Start,
                 }
             };
             topRightLayout.DescendantFocusability = DescendantFocusability.BeforeDescendants;
@@ -61,7 +61,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent)
                 {
-                    Gravity = (int) GravityFlags.Start,
+                    Gravity = (GravityFlags)(int) GravityFlags.Start,
                 }
             };
             TopTextView.Text = context.GetString(topTextResId);
@@ -73,7 +73,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             {
                 LayoutParameters = new LayoutParams(0, ViewGroup.LayoutParams.WrapContent)
                 {
-                    Gravity = (int) GravityFlags.End,
+                    Gravity = (GravityFlags)(int) GravityFlags.End,
                     Weight = 1.0f,
                     LeftMargin = Conversion.ConvertDpToPixels(2),
                 }
@@ -89,7 +89,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             BottomEditText = LayoutInflater.From(context).Inflate(Resource.Layout.search_edit_text_layout, null).FindViewById<AppCompatEditText>(Resource.Id.search_edit_text);
             BottomEditText.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
             {
-                Gravity = (int) GravityFlags.End,
+                Gravity = (GravityFlags)(int) GravityFlags.End,
             };
             BottomEditText.SetPadding(0, 0, 0, 0);
             BottomEditText.SetBackgroundColor(Color.Transparent);

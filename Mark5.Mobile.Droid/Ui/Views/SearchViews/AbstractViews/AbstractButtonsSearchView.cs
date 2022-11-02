@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Globalization;
 using Android.Content;
-using Android.Support.V4.Content;
-using Android.Support.V7.Widget;
 using Android.Text;
 using Android.Views;
+using AndroidX.AppCompat.Widget;
+using AndroidX.Core.Content;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 
