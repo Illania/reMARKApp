@@ -4,13 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <com.airbnb.lottie.LottieAnimationView
+    <com.airbnb.android.lottie.LottieAnimationView
         android:id="@+id/animation_view"
         android:layout_width="280dp"
         android:layout_height="280dp"
         app:lottie_fileName="splash.json"
         android:layout_centerInParent="true"
-        android:alpha="0"/>
+        android:alpha="0px"/>
     <ProgressBar
         android:id="@+id/progress_bar"
         android:layout_width="wrap_content"

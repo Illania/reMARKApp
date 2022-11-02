@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <android.support.v7.widget.AppCompatTextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/swipe_actions_info"
         android:text="@string/swipe_actions_info"
         android:textAppearance="@style/fontSmall"
@@ -16,7 +16,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true" />
-    <android.support.v7.widget.AppCompatTextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/swipe_actions_lbl_right"
         android:text="@string/swipe_actions_right_title"
         android:textAppearance="@style/searchListTitleSelected"
@@ -37,7 +37,7 @@
         android:clickable="true"
         android:layout_marginRight="25dp"
         android:layout_height="90dp">
-        <android.support.v7.widget.AppCompatTextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/swipe_action_left_btn"
             android:layout_width="80dp"
             android:textSize="12sp"
@@ -53,7 +53,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent" />
     </LinearLayout>
-    <android.support.v7.widget.AppCompatTextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/swipe_actions_lbl_left"
         android:text="@string/swipe_actions_left_title"
         android:textAppearance="@style/searchListTitleSelected"
@@ -79,7 +79,7 @@
             layout="@layout/mock_email"
             android:layout_width="0dp"
             android:layout_height="fill_parent" />
-        <android.support.v7.widget.AppCompatTextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:layout_weight="0"
             android:layout_width="80dp"
             android:id="@+id/swipe_action_right_btn"
@@ -89,7 +89,7 @@
             android:background="@color/darkblue"
             android:layout_height="match_parent" />
     </LinearLayout>
-    <android.support.v7.widget.AppCompatButton
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/swipe_defaults_btn"
         android:clickable="true"
         android:textAlignment="center"
