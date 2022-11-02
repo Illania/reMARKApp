@@ -8,12 +8,6 @@ using Android.Content;
 using Android.Graphics;
 using Android.Graphics.Drawables;
 using Android.OS;
-using Android.Support.Design.Widget;
-using Android.Support.V4.Content;
-using Android.Support.V4.Widget;
-using Android.Support.V7.App;
-using Android.Support.V7.Widget;
-using Android.Support.V7.Widget.Helper;
 using Android.Text;
 using Android.Util;
 using Android.Views;
@@ -30,6 +24,14 @@ using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 using Android.Content.Res;
+using AndroidX.CoordinatorLayout.Widget;
+using AndroidX.SwipeRefreshLayout.Widget;
+using AndroidX.RecyclerView.Widget;
+using AndroidX.AppCompat.Widget;
+using Google.Android.Material.FloatingActionButton;
+using AndroidX.AppCompat.App;
+using Google.Android.Material.Snackbar;
+using AndroidX.Core.Content;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {

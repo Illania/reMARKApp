@@ -7,12 +7,13 @@ using Android.Content;
 using Android.Graphics;
 using Android.OS;
 using Android.Provider;
-using Android.Support.Design.Widget;
-using Android.Support.V4.Widget;
-using Android.Support.V7.App;
-using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
+using AndroidX.AppCompat.App;
+using AndroidX.AppCompat.Widget;
+using AndroidX.Core.Content;
+using AndroidX.Core.Widget;
+using Google.Android.Material.FloatingActionButton;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -633,7 +634,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     if (string.IsNullOrWhiteSpace(path))
                         throw new Exception("Unable to open attachment");
 
-                    var uri = Android.Support.V4.Content.FileProvider.GetUriForFile(Context, Context.PackageName + ".fileprovider", new Java.IO.File(path));
+                    var uri = FileProvider.GetUriForFile(Context, Context.PackageName + ".fileprovider", new Java.IO.File(path));
                     var mimeType = MimeTypeMap.GetMimeType(System.IO.Path.GetExtension(path));
 
                     var openFileIntent = new Intent(Intent.ActionView);

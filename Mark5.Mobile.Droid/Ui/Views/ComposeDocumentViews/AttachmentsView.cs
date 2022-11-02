@@ -4,10 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Android.Content;
 using Android.Graphics;
-using Android.Support.V4.Content;
-using Android.Support.V7.Widget;
 using Android.Text;
 using Android.Views;
+using AndroidX.AppCompat.Widget;
+using AndroidX.Core.Content;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Model;
 using Mark5.Mobile.Droid.Ui.Common;
@@ -207,7 +207,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                     LayoutParameters = new LayoutParams(imageSize, imageSize)
                     {
                         RightMargin = innerMargin,
-                        Gravity = (int)GravityFlags.Center
+                        Gravity = (GravityFlags)(int)GravityFlags.Center
                     }
                 };
                 image.SetImageResource(Resource.Drawable.attachment);
@@ -218,7 +218,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 {
                     LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
                     {
-                        Gravity = (int)GravityFlags.Center
+                        Gravity = (GravityFlags)(int)GravityFlags.Center
                     },
                     Ellipsize = TextUtils.TruncateAt.End,
                 };
@@ -231,7 +231,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
                 {
                     LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
                     {
-                        Gravity = (int)GravityFlags.Center
+                        Gravity = (GravityFlags)(int)GravityFlags.Center
                     }
                 };
                 size.SetSingleLine(true);

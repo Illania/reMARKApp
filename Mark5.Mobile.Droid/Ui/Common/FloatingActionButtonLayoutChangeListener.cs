@@ -1,5 +1,6 @@
-﻿using Android.Support.Design.Widget;
-using Android.Views;
+﻿using Android.Views;
+using AndroidX.CoordinatorLayout.Widget;
+using Google.Android.Material.FloatingActionButton;
 
 namespace Mark5.Mobile.Droid.Ui.Common
 {

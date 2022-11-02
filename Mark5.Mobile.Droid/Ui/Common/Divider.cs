@@ -1,8 +1,8 @@
 using Android.Content;
 using Android.Graphics;
-using Android.Support.V4.Content;
 using Android.Views;
-using Android.Support.V7.Widget;
+using AndroidX.AppCompat.Widget;
+using AndroidX.Core.Content;
 using Mark5.Mobile.Droid.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Views.Common

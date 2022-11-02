@@ -9,11 +9,9 @@ using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Provider;
-using Android.Support.V7.App;
-using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
-using Com.Airbnb.Lottie;
+using AndroidX.AppCompat.App;
 using Java.IO;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
@@ -31,6 +29,8 @@ using Mark5.Mobile.Droid.Utilities.Workers;
 using Microsoft.AppCenter;
 using Microsoft.AppCenter.Crashes;
 using TinyIoC;
+using Com.Airbnb.Lottie;
+using AndroidX.AppCompat.Widget;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {

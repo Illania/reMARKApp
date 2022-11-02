@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using MaterialDialogs;
 using Android.Content;
-using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common.DataAccess.Exceptions;
@@ -14,6 +13,7 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Utilities;
 using Mark5.ServiceReference.Exceptions;
 using Mark5.Mobile.Common.Authenticator;
+using AndroidX.AppCompat.Widget;
 
 namespace Mark5.Mobile.Droid.Ui.Common
 {

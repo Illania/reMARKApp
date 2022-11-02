@@ -7,9 +7,6 @@ using Android.Content;
 using Android.Graphics;
 using Android.Graphics.Drawables;
 using Android.OS;
-using Android.Support.V4.Widget;
-using Android.Support.V7.App;
-using Android.Support.V7.Widget;
 using Android.Views;
 using FastScrollRecycler;
 using Mark5.Mobile.Common;
@@ -20,6 +17,10 @@ using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 using Mark5.Mobile.Common.Model.HubMessages;
+using AndroidX.SwipeRefreshLayout.Widget;
+using AndroidX.RecyclerView.Widget;
+using AndroidX.AppCompat.App;
+using AndroidX.AppCompat.Widget;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {

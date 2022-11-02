@@ -7,9 +7,10 @@ using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Provider;
-using Android.Support.V4.App;
-using Android.Support.V4.Content;
-using Android.Support.V7.Widget;
+using Android.Widget;
+using AndroidX.AppCompat.Widget;
+using AndroidX.Core.App;
+using AndroidX.Core.Content;
 using HtmlAgilityPack;
 using MailBee;
 using MailBee.Mime;
@@ -23,6 +24,7 @@ using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
 using Mark5.Mobile.Droid.Ui.Views.MailViewerViews;
 using Mark5.Mobile.Droid.Utilities;
+using Toolbar = AndroidX.AppCompat.Widget.Toolbar;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {

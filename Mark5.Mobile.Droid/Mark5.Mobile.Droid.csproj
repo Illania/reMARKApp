@@ -542,6 +542,12 @@
     <Reference Include="Microsoft.Identity.Client">
       <HintPath>..\packages\Microsoft.Identity.Client.4.16.0\lib\monoandroid10.0\Microsoft.Identity.Client.dll</HintPath>
     </Reference>
+    <Reference Include="Square.OkIO">
+      <HintPath>..\packages\Square.OkIO.1.17.4\lib\monoandroid44\Square.OkIO.dll</HintPath>
+    </Reference>
+    <Reference Include="Lottie.Android">
+      <HintPath>..\packages\Com.Airbnb.Android.Lottie.4.2.2\lib\monoandroid10.0\Lottie.Android.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
