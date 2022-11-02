@@ -2,7 +2,7 @@
 using Android;
 using Android.Net;
 using Android.Provider;
-using Android.Support.V4.Content;
+using AndroidX.Core.Content;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 

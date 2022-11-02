@@ -2,7 +2,7 @@
 using Android.Bluetooth;
 using Android.OS;
 using Android.Provider;
-using Android.Support.V4.Content.PM;
+using AndroidX.Core.Content.PM;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 

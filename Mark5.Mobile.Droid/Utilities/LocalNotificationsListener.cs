@@ -1,12 +1,12 @@
 using System;
-using Android.Support.V4.App;
-using Android.Support.V4.Content;
 using Android.App;
 using Android.Content;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.HubMessages;
+using AndroidX.Core.App;
+using AndroidX.Core.Content;
 
 namespace Mark5.Mobile.Droid.Utilities
 {

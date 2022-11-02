@@ -4,7 +4,7 @@ using Android.App;
 using Android.Content;
 using Android.Net;
 using Android.OS;
-using Android.Support.V4.Content.PM;
+using AndroidX.Core.Content.PM;
 using Firebase;
 using Firebase.Iid;
 using Mark5.Mobile.Classes;

@@ -1,6 +1,6 @@
 ﻿using System;
 using Android.Runtime;
-using Android.Support.V4.App;
+using AndroidX.Fragment.App;
 
 namespace Mark5.Mobile.Droid.Ui.Common
 {
@@ -13,6 +13,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             get; private set;
         }
 
+        [Obsolete]
         public override bool UserVisibleHint
         {
             get => base.UserVisibleHint;
@@ -37,6 +38,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             InitializeFragment();
         }
 
+        [Obsolete]
         void InitializeFragment()
         {
             UserVisibleHint = false;

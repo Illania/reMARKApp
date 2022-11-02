@@ -4,7 +4,8 @@ using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
-using Android.Support.V7.Widget;
+using AndroidX.AppCompat.View;
+using AndroidX.AppCompat.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
@@ -194,7 +195,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             base.OnActionModeFinished(mode);
         }
 
-        public override void OnSupportActionModeFinished(Android.Support.V7.View.ActionMode mode)
+        public override void OnSupportActionModeFinished(ActionMode mode)
         {
             cdf?.OnActionModeFinished();
             base.OnSupportActionModeFinished(mode);

@@ -452,7 +452,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             menu.Add(Menu.None, MenuItemActions.CopyToNew, MenuItemActions.CopyToNew, Resource.String.copy_to_new);
 
-            if (ServerConfig.SystemSettings.SystemInfo.IsDeliveryReportAvailableAvailable)
+            if (ServerConfig.SystemSettings.SystemInfo.DeliveryReportAvailable)
                 menu.Add(Menu.None, MenuItemActions.DeliveryReport, MenuItemActions.DeliveryReport, Resource.String.delivery_report);
 
         }
