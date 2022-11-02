@@ -10,7 +10,7 @@
         android:layout_height="280dp"
         app:lottie_fileName="splash.json"
         android:layout_centerInParent="true"
-        android:alpha="0.0"/>
+        android:alpha="0"/>
     <ProgressBar
         android:id="@+id/progress_bar"
         android:layout_width="wrap_content"
@@ -19,8 +19,8 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="100.0dp"
         android:theme="@style/mark5progressbarlight" />
-    <android.support.v7.widget.AppCompatButton
-        android:id="@+id/splash_login_button"
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/login_button"
         android:text="@string/log_in"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

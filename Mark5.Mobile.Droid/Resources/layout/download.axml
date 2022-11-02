@@ -27,7 +27,7 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:background="@color/white">
-            <android.support.v7.widget.AppCompatButton
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/start_button"
                 android:text="@string/download"
                 android:layout_width="wrap_content"
@@ -35,7 +35,7 @@
                 android:layout_centerInParent="true"
                 android:textColor="@color/white"
                 style="@style/mark5colorbutton" />
-            <android.support.v7.widget.AppCompatTextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/last_downloaded_on_text_view"
                 android:textAppearance="@style/fontPrimaryLight"
                 android:gravity="center"
@@ -70,7 +70,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_above="@id/progress_placeholder"
                 app:srcCompat="@drawable/icon_download_warning" />
-            <android.support.v7.widget.AppCompatTextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:text="@string/dont_close_app"
                 android:textAppearance="@style/fontSmallLight"
                 android:textColor="@color/lightgray"
@@ -87,7 +87,7 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:background="@color/white">
-            <android.support.v7.widget.AppCompatTextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/progress_status"
                 android:text="@string/preparing"
                 android:textAppearance="@style/fontSmall"
@@ -108,7 +108,7 @@
                 android:layout_marginBottom="10dp"
                 android:layout_above="@id/progress_status"
                 style="@style/mark5progressbarhorizontaldark" />
-            <android.support.v7.widget.AppCompatButton
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/cancel_button"
                 android:text="@string/cancel"
                 android:layout_width="wrap_content"
@@ -142,7 +142,7 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:background="@color/white">
-            <android.support.v7.widget.AppCompatButton
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/close_button"
                 android:text="@string/continue_work"
                 android:layout_width="wrap_content"
@@ -150,7 +150,7 @@
                 android:layout_centerInParent="true"
                 android:textColor="@color/white"
                 style="@style/mark5colorbutton" />
-            <android.support.v7.widget.AppCompatTextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/downloaded"
                 android:textAppearance="@style/fontPrimaryLight"
                 android:gravity="center"
