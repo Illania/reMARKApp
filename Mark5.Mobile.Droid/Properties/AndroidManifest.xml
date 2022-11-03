@@ -31,7 +31,7 @@
 		<meta-data android:name="android.max_aspect" android:value="2.1" />
 		<meta-data android:name="com.google.firebase.messaging.default_notification_icon" android:resource="@mipmap/ic_icon" />
 		<meta-data android:name="com.google.firebase.messaging.default_notification_color" android:resource="@color/darkerblue" />
-		<provider android:name="android.support.v4.content.FileProvider" android:authorities="${applicationId}.fileprovider" android:grantUriPermissions="true" android:exported="false">
+		<provider android:name="androidx.core.content.FileProvider" android:authorities="${applicationId}.fileprovider" android:grantUriPermissions="true" android:exported="false">
 			<meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/filepaths" />
 		</provider>
 		<!-- Firebase Declarations -->
