@@ -8,7 +8,6 @@ using Android.Graphics;
 using Android.Graphics.Drawables;
 using Android.OS;
 using Android.Views;
-using FastScrollRecycler;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -226,8 +225,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region RecyclerView Adapter/ViewHolder
 
-        class DocumentSearchResultsAdapter : RecyclerView.Adapter, ISectionedAdapter
-        {
+        class DocumentSearchResultsAdapter : RecyclerView.Adapter
+        { 
             public override int ItemCount => Items.Count;
 
             public List<DocumentPreview> Items { get; } = new List<DocumentPreview>(1000);
@@ -329,19 +328,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     }
 
                 return position;
-            }
-
-            string ISectionedAdapter.GetSectionName(int position)
-            {
-                var vh = recyclerView.FindViewHolderForAdapterPosition(position);
-
-                if (vh is DocumentPreviewViewHolder dpvh)
-                    return dpvh.BubbleDate;
-
-                if (vh is ExternalDocumentPreviewViewHolder edpvh)
-                    return edpvh.BubbleDate;
-
-                return string.Empty;
             }
 
             public static class ViewType

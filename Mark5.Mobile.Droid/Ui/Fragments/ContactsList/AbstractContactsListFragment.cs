@@ -12,7 +12,6 @@ using AndroidX.AppCompat.App;
 using AndroidX.AppCompat.Widget;
 using AndroidX.RecyclerView.Widget;
 using AndroidX.SwipeRefreshLayout.Widget;
-using FastScrollRecycler;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.DataAccess.Exceptions;
 using Mark5.Mobile.Common.Extensions;
@@ -691,7 +690,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region RecyclerView Adapter/ViewHolder
 
-        protected class ContactsListAdapter : RecyclerView.Adapter, ISectionedAdapter
+        protected class ContactsListAdapter : RecyclerView.Adapter
         {
             public override int ItemCount => Items.Count;
 
@@ -840,10 +839,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return position;
             }
 
-            string ISectionedAdapter.GetSectionName(int position)
-            {
-                return Items[position].Name?.SafeSubstring(0, 1)?.ToUpper() ?? "";
-            }
         }
 
         class ContactPreviewViewHolder : RecyclerView.ViewHolder

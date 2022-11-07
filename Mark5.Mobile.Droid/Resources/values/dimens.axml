@@ -8,4 +8,13 @@
 	<dimen name="activity_vertical_margin">16dp</dimen>
 	<dimen name="fab_margin">16dp</dimen>
 	<dimen name="connection_bar_height">24dp</dimen>
+
+	<!--For Some AlertDialogs -->
+	<dimen name="md_content_padding_bottom">8dp</dimen>
+	<dimen name="md_content_padding_top">8dp</dimen>
+    <dimen name="md_dialog_frame_margin">24dp</dimen>
+	<dimen name="md_title_frame_margin_bottom">12dp</dimen>
+    <dimen name="md_title_textsize">20sp</dimen>
+    <dimen name="md_content_textsize">16sp</dimen>
+    <dimen name="md_button_textsize">14sp</dimen>
 </resources>

@@ -377,6 +377,9 @@
     <Reference Include="Xamarin.AndroidX.Wear">
       <HintPath>..\packages\Xamarin.AndroidX.Wear.1.2.0.5\lib\monoandroid12.0\Xamarin.AndroidX.Wear.dll</HintPath>
     </Reference>
+     <Reference Include="Xamarin.AndroidX.Work.Runtime">
+      <HintPath>..\packages\Xamarin.AndroidX.Work.Runtime.2.7.1.5\lib\monoandroid12.0\Xamarin.AndroidX.Work.Runtime.dll</HintPath>
+    </Reference>
     <Reference Include="Xamarin.AndroidX.DocumentFile">
       <HintPath>..\packages\Xamarin.AndroidX.DocumentFile.1.0.1.15\lib\monoandroid12.0\Xamarin.AndroidX.DocumentFile.dll</HintPath>
     </Reference>
@@ -547,6 +550,30 @@
     </Reference>
     <Reference Include="Lottie.Android">
       <HintPath>..\packages\Com.Airbnb.Android.Lottie.4.2.2\lib\monoandroid10.0\Lottie.Android.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.AndroidX.Lifecycle.LiveData">
+      <HintPath>..\packages\Xamarin.AndroidX.Lifecycle.LiveData.2.5.1.1\lib\monoandroid12.0\Xamarin.AndroidX.Lifecycle.LiveData.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.AndroidX.Lifecycle.Service">
+      <HintPath>..\packages\Xamarin.AndroidX.Lifecycle.Service.2.5.1.1\lib\monoandroid12.0\Xamarin.AndroidX.Lifecycle.Service.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.AndroidX.Room.Common">
+      <HintPath>..\packages\Xamarin.AndroidX.Room.Common.2.4.3.1\lib\monoandroid12.0\Xamarin.AndroidX.Room.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.AndroidX.Sqlite">
+      <HintPath>..\packages\Xamarin.AndroidX.Sqlite.2.2.0.3\lib\monoandroid12.0\Xamarin.AndroidX.Sqlite.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.AndroidX.Sqlite.Framework">
+      <HintPath>..\packages\Xamarin.AndroidX.Sqlite.Framework.2.2.0.3\lib\monoandroid12.0\Xamarin.AndroidX.Sqlite.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.AndroidX.Room.Runtime">
+      <HintPath>..\packages\Xamarin.AndroidX.Room.Runtime.2.4.3.1\lib\monoandroid12.0\Xamarin.AndroidX.Room.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.AndroidX.CardView">
+      <HintPath>..\packages\Xamarin.AndroidX.CardView.1.0.0.17\lib\monoandroid12.0\Xamarin.AndroidX.CardView.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Google.Android.Material">
+      <HintPath>..\packages\Xamarin.Google.Android.Material.1.0.0.1\lib\monoandroid90\Xamarin.Google.Android.Material.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -1409,12 +1436,12 @@
       <SubType></SubType>
       <Generator></Generator>
     </Compile>
+    <AndroidResource Include="Resources\layout\progress_dialog.xml">
+      <SubType></SubType>
+      <Generator></Generator>
+    </AndroidResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FastScrollRecycler\FastScrollRecycler.csproj">
-      <Project>{F36FC024-B7D6-4512-BF4C-AEC8B0C93CE2}</Project>
-      <Name>FastScrollRecycler</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Mark5.Mobile.Common\Mark5.Mobile.Common.csproj">
       <Project>{A7F40F0E-DEF1-4CA5-BEE9-E611DF20FC3D}</Project>
       <Name>Mark5.Mobile.Common</Name>
@@ -1426,10 +1453,6 @@
     <ProjectReference Include="..\TinyMessenger\TinyMessenger.csproj">
       <Project>{A54356BD-9CC4-4DE0-A8DC-9B2D9D6ED288}</Project>
       <Name>TinyMessenger</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\MaterialDialogs\MaterialDialogs.csproj">
-      <Project>{03F5EB27-28E4-4309-962C-628C73475478}</Project>
-      <Name>MaterialDialogs</Name>
     </ProjectReference>
     <ProjectReference Include="..\Mark5.Mobile.Classes\Mark5.Mobile.Classes.csproj">
       <Project>{5EC51557-DB1D-4018-8C1F-E3170626B074}</Project>
@@ -1542,4 +1565,13 @@
   <Import Project="..\packages\Xamarin.AndroidX.Fragment.Ktx.1.5.3.1\build\monoandroid12.0\Xamarin.AndroidX.Fragment.Ktx.targets" Condition="Exists('..\packages\Xamarin.AndroidX.Fragment.Ktx.1.5.3.1\build\monoandroid12.0\Xamarin.AndroidX.Fragment.Ktx.targets')" />
   <Import Project="..\packages\Xamarin.AndroidX.Preference.1.2.0.3\build\monoandroid12.0\Xamarin.AndroidX.Preference.targets" Condition="Exists('..\packages\Xamarin.AndroidX.Preference.1.2.0.3\build\monoandroid12.0\Xamarin.AndroidX.Preference.targets')" />
   <Import Project="..\packages\Xamarin.AndroidX.Legacy.Preference.V14.1.0.0.15\build\monoandroid12.0\Xamarin.AndroidX.Legacy.Preference.V14.targets" Condition="Exists('..\packages\Xamarin.AndroidX.Legacy.Preference.V14.1.0.0.15\build\monoandroid12.0\Xamarin.AndroidX.Legacy.Preference.V14.targets')" />
+  <Import Project="..\packages\Xamarin.AndroidX.Lifecycle.LiveData.2.5.1.1\build\monoandroid12.0\Xamarin.AndroidX.Lifecycle.LiveData.targets" Condition="Exists('..\packages\Xamarin.AndroidX.Lifecycle.LiveData.2.5.1.1\build\monoandroid12.0\Xamarin.AndroidX.Lifecycle.LiveData.targets')" />
+  <Import Project="..\packages\Xamarin.AndroidX.Lifecycle.Service.2.5.1.1\build\monoandroid12.0\Xamarin.AndroidX.Lifecycle.Service.targets" Condition="Exists('..\packages\Xamarin.AndroidX.Lifecycle.Service.2.5.1.1\build\monoandroid12.0\Xamarin.AndroidX.Lifecycle.Service.targets')" />
+  <Import Project="..\packages\Xamarin.AndroidX.Room.Common.2.4.3.1\build\monoandroid12.0\Xamarin.AndroidX.Room.Common.targets" Condition="Exists('..\packages\Xamarin.AndroidX.Room.Common.2.4.3.1\build\monoandroid12.0\Xamarin.AndroidX.Room.Common.targets')" />
+  <Import Project="..\packages\Xamarin.AndroidX.Sqlite.2.2.0.3\build\monoandroid12.0\Xamarin.AndroidX.Sqlite.targets" Condition="Exists('..\packages\Xamarin.AndroidX.Sqlite.2.2.0.3\build\monoandroid12.0\Xamarin.AndroidX.Sqlite.targets')" />
+  <Import Project="..\packages\Xamarin.AndroidX.Sqlite.Framework.2.2.0.3\build\monoandroid12.0\Xamarin.AndroidX.Sqlite.Framework.targets" Condition="Exists('..\packages\Xamarin.AndroidX.Sqlite.Framework.2.2.0.3\build\monoandroid12.0\Xamarin.AndroidX.Sqlite.Framework.targets')" />
+  <Import Project="..\packages\Xamarin.AndroidX.Room.Runtime.2.4.3.1\build\monoandroid12.0\Xamarin.AndroidX.Room.Runtime.targets" Condition="Exists('..\packages\Xamarin.AndroidX.Room.Runtime.2.4.3.1\build\monoandroid12.0\Xamarin.AndroidX.Room.Runtime.targets')" />
+  <Import Project="..\packages\Xamarin.AndroidX.Work.Runtime.2.7.1.5\build\monoandroid12.0\Xamarin.AndroidX.Work.Runtime.targets" Condition="Exists('..\packages\Xamarin.AndroidX.Work.Runtime.2.7.1.5\build\monoandroid12.0\Xamarin.AndroidX.Work.Runtime.targets')" />
+  <Import Project="..\packages\Xamarin.Google.Android.Material.1.0.0.1\build\monoandroid90\Xamarin.Google.Android.Material.targets" Condition="Exists('..\packages\Xamarin.Google.Android.Material.1.0.0.1\build\monoandroid90\Xamarin.Google.Android.Material.targets')" />
+  <Import Project="..\packages\Xamarin.AndroidX.CardView.1.0.0.17\build\monoandroid12.0\Xamarin.AndroidX.CardView.targets" Condition="Exists('..\packages\Xamarin.AndroidX.CardView.1.0.0.17\build\monoandroid12.0\Xamarin.AndroidX.CardView.targets')" />
 </Project>

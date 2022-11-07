@@ -945,15 +945,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         return;
  
                     }
-  
+
                     var sendConfirmed = await Dialogs.ShowYesNoDialogAsync(Context, Resources.GetString(Resource.String.confirm_delay_send_title),
-                                                                           String.Format(Resources.GetString(Resource.String.confirm_delay_send_content), dateFormat.Format(dateToPrint) + ", " + timeFormat.Format(dateToPrint)),
-                                                                           centerTitle: true, centerContent: true);
+                                                                            String.Format(Resources.GetString(Resource.String.confirm_delay_send_content),
+                                                                            dateFormat.Format(dateToPrint) + ", " + timeFormat.Format(dateToPrint)),
+                                                                            centerTitle: true, centerContent: true);
 
                     if (sendConfirmed)
                     {
                         if (PlatformConfig.Preferences.RememberLastUserDelaySettings)
-                            PlatformConfig.Preferences.LastUserSendingDelay = LastPickedUserSendingDelay.pickedHours * 3600 + LastPickedUserSendingDelay.pickedMinutes * 60;
+                            PlatformConfig.Preferences.LastUserSendingDelay = LastPickedUserSendingDelay.pickedHours * 3600
+                                + LastPickedUserSendingDelay.pickedMinutes * 60;
 
                         SaveAndQueueWorkingCopy(false, pickedDateMilliseconds);
                     }    

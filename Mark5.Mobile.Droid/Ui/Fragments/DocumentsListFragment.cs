@@ -11,7 +11,6 @@ using Android.OS;
 using Android.Text;
 using Android.Util;
 using Android.Views;
-using FastScrollRecycler;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
@@ -1331,7 +1330,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region RecyclerView Adapter/ViewHolder
 
-        protected class DocumentsListAdapter : RecyclerView.Adapter, ISectionedAdapter
+        protected class DocumentsListAdapter : RecyclerView.Adapter
         {
             public override int ItemCount => Items.Count;
 
@@ -1752,24 +1751,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public void ResetSwipedState()
             {
                 swipedPosition = null;
-            }
-
-            string ISectionedAdapter.GetSectionName(int position)
-            {
-                var vh = recyclerView?.FindViewHolderForAdapterPosition(position);
-
-                if (vh != null)
-                {
-                    var dpvh = vh as DocumentPreviewViewHolder;
-                    if (dpvh != null)
-                        return dpvh.BubbleDate;
-
-                    var edpvh = vh as ExternalDocumentPreviewViewHolder;
-                    if (edpvh != null)
-                        return edpvh.BubbleDate;
-                }
-
-                return string.Empty;
             }
 
             public static class ViewType

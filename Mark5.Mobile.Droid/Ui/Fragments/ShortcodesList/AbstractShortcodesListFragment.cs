@@ -11,7 +11,6 @@ using AndroidX.AppCompat.App;
 using AndroidX.AppCompat.Widget;
 using AndroidX.RecyclerView.Widget;
 using AndroidX.SwipeRefreshLayout.Widget;
-using FastScrollRecycler;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.DataAccess.Exceptions;
 using Mark5.Mobile.Common.Extensions;
@@ -642,7 +641,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region RecyclerView Adapter/ViewHolder
 
-        protected class ShortcodesListAdapter : RecyclerView.Adapter, ISectionedAdapter
+        protected class ShortcodesListAdapter : RecyclerView.Adapter
         {
             public List<ShortcodePreview> Items { get; } = new List<ShortcodePreview>(1000);
 
@@ -781,10 +780,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return GetPosition(shortcodePreview.Id);
             }
 
-            string ISectionedAdapter.GetSectionName(int position)
-            {
-                return Items[position].Name?.SafeSubstring(0, 1)?.ToUpper() ?? "";
-            }
         }
 
         class ShortcodePreviewViewHolder : RecyclerView.ViewHolder

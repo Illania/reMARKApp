@@ -10,7 +10,6 @@ using AndroidX.AppCompat.App;
 using AndroidX.AppCompat.Widget;
 using AndroidX.RecyclerView.Widget;
 using AndroidX.SwipeRefreshLayout.Widget;
-using FastScrollRecycler;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
@@ -185,7 +184,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #endregion
 
-        class LinkedEmailListAdapter : RecyclerView.Adapter, ISectionedAdapter
+        class LinkedEmailListAdapter : RecyclerView.Adapter
         {
             public override int ItemCount => Items.Count;
             public List<CommunicationAddress> Items { get; } = new List<CommunicationAddress>();
@@ -233,11 +232,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var count = Items.Count;
                 Items.AddRange(items);
                 NotifyItemRangeInserted(count, items.Count);
-            }
-
-            string ISectionedAdapter.GetSectionName(int position)
-            {
-                return Items[position].Address?.SafeSubstring(0, 1)?.ToUpper() ?? "";
             }
 
             class LinkedEmailListViewHolder : RecyclerView.ViewHolder

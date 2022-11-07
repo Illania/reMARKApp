@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Android.OS;
 using Android.Views;
-using FastScrollRecycler;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Extensions;
@@ -337,7 +336,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region RecyclerView Adapter/ViewHolder
 
-        class CopyToUserWorktrayAdapter : RecyclerView.Adapter, ISectionedAdapter
+        class CopyToUserWorktrayAdapter : RecyclerView.Adapter
         {
             readonly Dictionary<int, SystemUser> selectedSystemUsersInView;
 
@@ -407,10 +406,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return position;
             }
 
-            string ISectionedAdapter.GetSectionName(int position)
-            {
-                return Items[position].Username?.SafeSubstring(0, 1)?.ToUpper() ?? "";
-            }
         }
 
         class UserViewHolder : RecyclerView.ViewHolder

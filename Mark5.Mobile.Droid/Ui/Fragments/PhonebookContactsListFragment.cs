@@ -10,7 +10,6 @@ using AndroidX.AppCompat.App;
 using AndroidX.AppCompat.Widget;
 using AndroidX.RecyclerView.Widget;
 using AndroidX.SwipeRefreshLayout.Widget;
-using FastScrollRecycler;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Model;
@@ -213,8 +212,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #endregion
 
-        class PhonebookContactsListAdapter : RecyclerView.Adapter, ISectionedAdapter
-        {
+        class PhonebookContactsListAdapter : RecyclerView.Adapter
+        { 
             public override int ItemCount => Items.Count;
             public List<Recipient> Items { get; } = new List<Recipient>();
 
@@ -263,11 +262,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var count = Items.Count;
                 Items.AddRange(items);
                 NotifyItemRangeInserted(count, items.Count);
-            }
-
-            string ISectionedAdapter.GetSectionName(int position)
-            {
-                return Items[position].Name?.SafeSubstring(0, 1)?.ToUpper() ?? "";
             }
 
             class PhonebookContactViewHolder : RecyclerView.ViewHolder
