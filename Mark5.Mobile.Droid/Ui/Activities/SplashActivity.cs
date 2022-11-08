@@ -26,11 +26,10 @@ using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 using Mark5.Mobile.Droid.Utilities.DeviceReminder;
 using Mark5.Mobile.Droid.Utilities.Workers;
-using Microsoft.AppCenter;
 using Microsoft.AppCenter.Crashes;
 using TinyIoC;
-using Com.Airbnb.Lottie;
 using AndroidX.AppCompat.Widget;
+using Com.Airbnb.Lottie;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
@@ -272,13 +271,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 RunOnUiThread(() =>
                 {
                     var animationView = FindViewById<LottieAnimationView>(Resource.Id.animation_view);
-
+               
                     if (animationView != null)
                     {
                         animationView.Progress = 1;
                         animationView.Animate().Alpha(1f).SetDuration(200);
                     }
-
+               
                 });
 
                 CommonConfig.Logger.Info("Updating file system storage...");

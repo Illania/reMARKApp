@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Mark5.Mobile.Droid.Service
 {
-    [Service]
+    [Service(Exported = true)]
     [IntentFilter(new[] { "com.google.firebase.MESSAGING_EVENT" })]
     public class FirebaseMessagingService : Firebase.Messaging.FirebaseMessagingService
     {
