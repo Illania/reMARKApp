@@ -11,7 +11,7 @@ using Mark5.Mobile.Droid.Ui.Activities;
 
 namespace Mark5.Mobile.Droid.Utilities.DeviceReminder
 {
-    [BroadcastReceiver(Enabled = true)]
+    [BroadcastReceiver(Enabled = false, Exported = true)]
     [IntentFilter(new[] { DeviceReminderNotificationManager.ReminderAction })]
     public class DeviceReminderBroadcastReceiver : BroadcastReceiver
     {

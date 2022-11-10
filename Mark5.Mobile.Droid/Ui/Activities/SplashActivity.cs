@@ -30,11 +30,20 @@ using Microsoft.AppCenter.Crashes;
 using TinyIoC;
 using AndroidX.AppCompat.Widget;
 using Com.Airbnb.Lottie;
+using System.Diagnostics;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-    [Activity(MainLauncher = true, Icon = "@mipmap/ic_icon", Theme = "@style/mark5Splash", ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize,
+    [Activity(MainLauncher = true, Icon = "@mipmap/ic_icon", Theme = "@style/mark5Splash", 
+        ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize,
+        Exported = true,
         NoHistory = true, ResizeableActivity = true, Name = "com.nordic_it.mark5.android.SplashActivity")]
+
+
+    [IntentFilter(new[] { Intent.ActionView, Intent.ActionSend, Intent.ActionSendMultiple },
+                  Categories = new[] { Intent.CategoryDefault },
+                  DataMimeTypes = new[] { "application/octet-stream", "text/x-vcard", "image/*", "message/rfc822" })]
+
     public class SplashActivity : AppCompatActivity
     {
         const string CalendarIdKey = "calendarId";
@@ -247,9 +256,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 report => { return new[] { ErrorAttachmentLog.AttachmentWithText(SystemReportCollector.CreateLogCatReport(), "deviceLogs.txt") }; };
             AppCenter.Start(Config.AppCenterId, typeof(Crashes));
 
-            Firebase.Analytics.FirebaseAnalytics.GetInstance(this).SetAnalyticsCollectionEnabled(PlatformConfig.Preferences.EnableReporting);
+            //Firebase.Analytics.FirebaseAnalytics.GetInstance(this).SetAnalyticsCollectionEnabled(PlatformConfig.Preferences.EnableReporting);
 #else
-            Firebase.Analytics.FirebaseAnalytics.GetInstance(this).SetAnalyticsCollectionEnabled(false);
+            //Firebase.Analytics.FirebaseAnalytics.GetInstance(this).SetAnalyticsCollectionEnabled(false);
 #endif
 
             Task.Run(async () =>

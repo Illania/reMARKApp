@@ -46,7 +46,7 @@
     </NoWarn>
     <AndroidDexTool>d8</AndroidDexTool>
     <LangVersion>8.0</LangVersion>
-    <AndroidEnableMultiDex>true</AndroidEnableMultiDex>
+    <AndroidEnableMultiDex>false</AndroidEnableMultiDex>
     <AndroidLinkMode>None</AndroidLinkMode>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -605,16 +605,25 @@
       <HintPath>..\packages\Xamarin.AndroidX.ConstraintLayout.Core.1.0.4.2\lib\monoandroid12.0\Xamarin.AndroidX.ConstraintLayout.Core.dll</HintPath>
     </Reference>
         <Reference Include="Xamarin.GooglePlayServices.Measurement.Base">
-          <HintPath>..\packages\Xamarin.GooglePlayServices.Measurement.Base.71.1630.4\lib\monoandroid90\Xamarin.GooglePlayServices.Measurement.Base.dll</HintPath>
-        </Reference>
-        <Reference Include="Xamarin.Firebase.Analytics.Impl">
-          <HintPath>..\packages\Xamarin.Firebase.Analytics.Impl.71.1630.4\lib\monoandroid90\Xamarin.Firebase.Analytics.Impl.dll</HintPath>
+          <HintPath>..\packages\Xamarin.GooglePlayServices.Measurement.Base.121.1.1\lib\monoandroid12.0\Xamarin.GooglePlayServices.Measurement.Base.dll</HintPath>
         </Reference>
         <Reference Include="Xamarin.GooglePlayServices.Measurement.Api">
-          <HintPath>..\packages\Xamarin.GooglePlayServices.Measurement.Api.71.1630.4\lib\monoandroid90\Xamarin.GooglePlayServices.Measurement.Api.dll</HintPath>
+          <HintPath>..\packages\Xamarin.GooglePlayServices.Measurement.Api.121.1.1\lib\monoandroid12.0\Xamarin.GooglePlayServices.Measurement.Api.dll</HintPath>
         </Reference>
         <Reference Include="Xamarin.Firebase.Analytics">
-          <HintPath>..\packages\Xamarin.Firebase.Analytics.71.1630.4\lib\monoandroid90\Xamarin.Firebase.Analytics.dll</HintPath>
+          <HintPath>..\packages\Xamarin.Firebase.Analytics.121.1.1\lib\monoandroid12.0\Xamarin.Firebase.Analytics.dll</HintPath>
+        </Reference>
+        <Reference Include="Xamarin.GooglePlayServices.Measurement.Sdk.Api">
+          <HintPath>..\packages\Xamarin.GooglePlayServices.Measurement.Sdk.Api.121.1.1\lib\monoandroid12.0\Xamarin.GooglePlayServices.Measurement.Sdk.Api.dll</HintPath>
+        </Reference>
+        <Reference Include="Xamarin.GooglePlayServices.Measurement.Impl">
+          <HintPath>..\packages\Xamarin.GooglePlayServices.Measurement.Impl.121.1.1\lib\monoandroid12.0\Xamarin.GooglePlayServices.Measurement.Impl.dll</HintPath>
+        </Reference>
+        <Reference Include="Xamarin.GooglePlayServices.Measurement">
+          <HintPath>..\packages\Xamarin.GooglePlayServices.Measurement.121.1.1\lib\monoandroid12.0\Xamarin.GooglePlayServices.Measurement.dll</HintPath>
+        </Reference>
+        <Reference Include="Xamarin.GooglePlayServices.Measurement.Sdk">
+          <HintPath>..\packages\Xamarin.GooglePlayServices.Measurement.Sdk.121.1.1\lib\monoandroid12.0\Xamarin.GooglePlayServices.Measurement.Sdk.dll</HintPath>
         </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -1613,9 +1622,12 @@
   <Import Project="..\packages\Xamarin.Google.Android.Material.1.0.0.1\build\monoandroid90\Xamarin.Google.Android.Material.targets" Condition="Exists('..\packages\Xamarin.Google.Android.Material.1.0.0.1\build\monoandroid90\Xamarin.Google.Android.Material.targets')" />
   <Import Project="..\packages\Xamarin.Firebase.Messaging.123.0.8\build\MonoAndroid12.0\Xamarin.Firebase.Messaging.targets" Condition="Exists('..\packages\Xamarin.Firebase.Messaging.123.0.8\build\MonoAndroid12.0\Xamarin.Firebase.Messaging.targets')" />
   <Import Project="..\packages\Xamarin.Firebase.Iid.121.1.0.7\build\MonoAndroid12.0\Xamarin.Firebase.Iid.targets" Condition="Exists('..\packages\Xamarin.Firebase.Iid.121.1.0.7\build\MonoAndroid12.0\Xamarin.Firebase.Iid.targets')" />
-  <Import Project="..\packages\Xamarin.GooglePlayServices.Measurement.Base.71.1630.4\build\MonoAndroid90\Xamarin.GooglePlayServices.Measurement.Base.targets" Condition="Exists('..\packages\Xamarin.GooglePlayServices.Measurement.Base.71.1630.4\build\MonoAndroid90\Xamarin.GooglePlayServices.Measurement.Base.targets')" />
-  <Import Project="..\packages\Xamarin.Firebase.Analytics.Impl.71.1630.4\build\MonoAndroid90\Xamarin.Firebase.Analytics.Impl.targets" Condition="Exists('..\packages\Xamarin.Firebase.Analytics.Impl.71.1630.4\build\MonoAndroid90\Xamarin.Firebase.Analytics.Impl.targets')" />
-  <Import Project="..\packages\Xamarin.GooglePlayServices.Measurement.Api.71.1630.4\build\MonoAndroid90\Xamarin.GooglePlayServices.Measurement.Api.targets" Condition="Exists('..\packages\Xamarin.GooglePlayServices.Measurement.Api.71.1630.4\build\MonoAndroid90\Xamarin.GooglePlayServices.Measurement.Api.targets')" />
-  <Import Project="..\packages\Xamarin.Firebase.Analytics.71.1630.4\build\MonoAndroid90\Xamarin.Firebase.Analytics.targets" Condition="Exists('..\packages\Xamarin.Firebase.Analytics.71.1630.4\build\MonoAndroid90\Xamarin.Firebase.Analytics.targets')" />
   <Import Project="..\packages\Xamarin.AndroidX.AppCompat.1.5.1.1\build\monoandroid12.0\Xamarin.AndroidX.AppCompat.targets" Condition="Exists('..\packages\Xamarin.AndroidX.AppCompat.1.5.1.1\build\monoandroid12.0\Xamarin.AndroidX.AppCompat.targets')" />
+  <Import Project="..\packages\Xamarin.GooglePlayServices.Measurement.Base.121.1.1\build\MonoAndroid12.0\Xamarin.GooglePlayServices.Measurement.Base.targets" Condition="Exists('..\packages\Xamarin.GooglePlayServices.Measurement.Base.121.1.1\build\MonoAndroid12.0\Xamarin.GooglePlayServices.Measurement.Base.targets')" />
+  <Import Project="..\packages\Xamarin.GooglePlayServices.Measurement.Sdk.Api.121.1.1\build\MonoAndroid12.0\Xamarin.GooglePlayServices.Measurement.Sdk.Api.targets" Condition="Exists('..\packages\Xamarin.GooglePlayServices.Measurement.Sdk.Api.121.1.1\build\MonoAndroid12.0\Xamarin.GooglePlayServices.Measurement.Sdk.Api.targets')" />
+  <Import Project="..\packages\Xamarin.GooglePlayServices.Measurement.Impl.121.1.1\build\MonoAndroid12.0\Xamarin.GooglePlayServices.Measurement.Impl.targets" Condition="Exists('..\packages\Xamarin.GooglePlayServices.Measurement.Impl.121.1.1\build\MonoAndroid12.0\Xamarin.GooglePlayServices.Measurement.Impl.targets')" />
+  <Import Project="..\packages\Xamarin.GooglePlayServices.Measurement.121.1.1\build\MonoAndroid12.0\Xamarin.GooglePlayServices.Measurement.targets" Condition="Exists('..\packages\Xamarin.GooglePlayServices.Measurement.121.1.1\build\MonoAndroid12.0\Xamarin.GooglePlayServices.Measurement.targets')" />
+  <Import Project="..\packages\Xamarin.GooglePlayServices.Measurement.Sdk.121.1.1\build\MonoAndroid12.0\Xamarin.GooglePlayServices.Measurement.Sdk.targets" Condition="Exists('..\packages\Xamarin.GooglePlayServices.Measurement.Sdk.121.1.1\build\MonoAndroid12.0\Xamarin.GooglePlayServices.Measurement.Sdk.targets')" />
+  <Import Project="..\packages\Xamarin.GooglePlayServices.Measurement.Api.121.1.1\build\MonoAndroid12.0\Xamarin.GooglePlayServices.Measurement.Api.targets" Condition="Exists('..\packages\Xamarin.GooglePlayServices.Measurement.Api.121.1.1\build\MonoAndroid12.0\Xamarin.GooglePlayServices.Measurement.Api.targets')" />
+  <Import Project="..\packages\Xamarin.Firebase.Analytics.121.1.1\build\MonoAndroid12.0\Xamarin.Firebase.Analytics.targets" Condition="Exists('..\packages\Xamarin.Firebase.Analytics.121.1.1\build\MonoAndroid12.0\Xamarin.Firebase.Analytics.targets')" />
  </Project>
