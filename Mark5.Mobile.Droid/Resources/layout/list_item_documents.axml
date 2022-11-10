@@ -43,7 +43,7 @@
                 android:src="@drawable/outgoing"
                 android:tint="@color/darkblue"
                 android:visibility="gone" />
-            <androidx.support.v7.widget.AppCompatImageView
+            <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/list_item_document_direction_delayed"
                 android:layout_width="16dp"
                 android:layout_height="16dp"
@@ -67,7 +67,7 @@
                 android:src="@drawable/partially_sent"
                 android:tint="@color/darkgray"
                 android:visibility="gone" />
-            <androidx.appcompat.AppCompatImageView
+            <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/list_item_document_direction_draft"
                 android:layout_width="16dp"
                 android:layout_height="16dp"
