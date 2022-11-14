@@ -1,5 +1,4 @@
 ﻿using Android.App;
-using Android.Bluetooth;
 using Android.OS;
 using Android.Provider;
 using AndroidX.Core.Content.PM;
@@ -22,7 +21,7 @@ namespace Mark5.Mobile.Droid.Utilities
 
         public string GetDeviceName()
         {
-            return $"{Build.Manufacturer} {Build.Model} - {BluetoothAdapter.DefaultAdapter?.Name}";
+            return $"{Build.Manufacturer} {Build.Model}";
         }
 
         public string GetAppVersionString()
