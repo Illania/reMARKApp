@@ -20,6 +20,7 @@ using AndroidX.SwipeRefreshLayout.Widget;
 using AndroidX.RecyclerView.Widget;
 using AndroidX.AppCompat.App;
 using AndroidX.AppCompat.Widget;
+using static Com.Simplecityapps.Recyclerview_fastscroll.Views.FastScrollRecyclerView;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -225,7 +226,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region RecyclerView Adapter/ViewHolder
 
-        class DocumentSearchResultsAdapter : RecyclerView.Adapter
+        class DocumentSearchResultsAdapter : RecyclerView.Adapter, ISectionedAdapter
         { 
             public override int ItemCount => Items.Count;
 
@@ -308,6 +309,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
 
                 return null;
+            }
+
+            string ISectionedAdapter.GetSectionName(int position)
+            {
+                var vh = recyclerView.FindViewHolderForAdapterPosition(position);
+
+                if (vh is DocumentPreviewViewHolder dpvh)
+                    return dpvh.BubbleDate;
+
+                if (vh is ExternalDocumentPreviewViewHolder edpvh)
+                    return edpvh.BubbleDate;
+
+                return string.Empty;
             }
 
             public void AppendItems(List<DocumentPreview> items)

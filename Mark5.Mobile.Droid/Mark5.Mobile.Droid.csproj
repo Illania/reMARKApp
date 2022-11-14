@@ -625,6 +625,9 @@
         <Reference Include="Xamarin.GooglePlayServices.Measurement.Sdk">
           <HintPath>..\packages\Xamarin.GooglePlayServices.Measurement.Sdk.121.1.1\lib\monoandroid12.0\Xamarin.GooglePlayServices.Measurement.Sdk.dll</HintPath>
         </Reference>
+        <Reference Include="Xamarin.RecyclerView.FastScroll">
+          <HintPath>..\packages\Xamarin.RecyclerView.FastScroll.2.0.1\lib\monoandroid90\Xamarin.RecyclerView.FastScroll.dll</HintPath>
+        </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -923,6 +926,7 @@
     <Compile Include="Ui\Activities\DeliveryReportActivity.cs" />
     <Compile Include="Ui\Activities\TransmitDestinationsListActivity.cs" />
     <Compile Include="Ui\Fragments\TransmitDestinationsListFragment.cs" />
+    <Compile Include="Ui\Common\FastScrollRecyclerView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\AboutAssets.txt" />

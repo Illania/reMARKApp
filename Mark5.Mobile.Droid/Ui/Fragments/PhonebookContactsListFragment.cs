@@ -16,6 +16,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
+using static Com.Simplecityapps.Recyclerview_fastscroll.Views.FastScrollRecyclerView;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -212,7 +213,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #endregion
 
-        class PhonebookContactsListAdapter : RecyclerView.Adapter
+        class PhonebookContactsListAdapter : RecyclerView.Adapter, ISectionedAdapter
         { 
             public override int ItemCount => Items.Count;
             public List<Recipient> Items { get; } = new List<Recipient>();
@@ -234,6 +235,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var itemView = LayoutInflater.FromContext(parent.Context).Inflate(Resource.Layout.list_item_recipients, parent, false);
                 return new PhonebookContactViewHolder(itemView);
+            }
+
+            string ISectionedAdapter.GetSectionName(int position)
+            {
+                return Items[position].Name?.SafeSubstring(0, 1)?.ToUpper() ?? "";
             }
 
             public void SetItems(IEnumerable<Recipient> recipients)

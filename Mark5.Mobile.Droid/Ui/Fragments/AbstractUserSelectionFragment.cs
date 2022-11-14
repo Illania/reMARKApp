@@ -14,6 +14,7 @@ using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
+using static Com.Simplecityapps.Recyclerview_fastscroll.Views.FastScrollRecyclerView;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -293,7 +294,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region RecyclerView Adapter/ViewHolder
 
-        protected class UserSelectionAdapter : RecyclerView.Adapter
+        protected class UserSelectionAdapter : RecyclerView.Adapter, ISectionedAdapter
         {
             readonly Dictionary<int, SystemUser> selectedSystemUsersInView;
 
@@ -327,6 +328,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.list_item_system_user, parent, false);
                 return new UserViewHolder(itemView);
+            }
+
+            string ISectionedAdapter.GetSectionName(int position)
+            {
+                return Items[position].Username?.SafeSubstring(0, 1)?.ToUpper() ?? "";
             }
 
             public void SetItems(List<SystemUser> items)

@@ -18,6 +18,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
+using static Com.Simplecityapps.Recyclerview_fastscroll.Views.FastScrollRecyclerView;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -184,7 +185,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region RecyclerView Adapter/ViewHolder
 
-        class ContactSearchResultsAdapter : RecyclerView.Adapter
+        class ContactSearchResultsAdapter : RecyclerView.Adapter, ISectionedAdapter
         {
             public List<ContactPreview> Items { get; } = new List<ContactPreview>(1000);
 
@@ -215,6 +216,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.list_item_contacts, parent, false);
                 return new ContactPreviewViewHolder(itemView);
+            }
+
+            string ISectionedAdapter.GetSectionName(int position)
+            {
+                return Items[position].Name?.SafeSubstring(0, 1)?.ToUpper() ?? "";
             }
 
             public void AppendItems(List<ContactPreview> items)

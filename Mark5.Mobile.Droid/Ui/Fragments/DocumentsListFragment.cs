@@ -31,6 +31,8 @@ using Google.Android.Material.FloatingActionButton;
 using AndroidX.AppCompat.App;
 using Google.Android.Material.Snackbar;
 using AndroidX.Core.Content;
+using static Com.Simplecityapps.Recyclerview_fastscroll.Views.FastScroller;
+using static Com.Simplecityapps.Recyclerview_fastscroll.Views.FastScrollRecyclerView;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -1330,7 +1332,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region RecyclerView Adapter/ViewHolder
 
-        protected class DocumentsListAdapter : RecyclerView.Adapter
+        protected class DocumentsListAdapter : RecyclerView.Adapter, ISectionedAdapter
         {
             public override int ItemCount => Items.Count;
 
@@ -1374,6 +1376,25 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public override int GetItemViewType(int position)
             {
                 return Items[position].Direction == DocumentDirection.External ? ViewType.ExternalDocumentView : ViewType.DocumentView;
+            }
+
+
+            string ISectionedAdapter.GetSectionName(int position)
+            {
+                var vh = recyclerView?.FindViewHolderForAdapterPosition(position);
+
+                if (vh != null)
+                {
+                    var dpvh = vh as DocumentPreviewViewHolder;
+                    if (dpvh != null)
+                        return dpvh.BubbleDate;
+
+                    var edpvh = vh as ExternalDocumentPreviewViewHolder;
+                    if (edpvh != null)
+                        return edpvh.BubbleDate;
+                }
+
+                return string.Empty;
             }
 
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)

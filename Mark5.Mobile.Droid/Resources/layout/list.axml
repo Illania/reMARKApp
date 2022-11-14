@@ -9,12 +9,18 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_view"
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"/>
+        <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
+        android:id="@id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbarSize="12dp"
+        app:fastScrollPopupBgColor="@color/darkblue"
+        app:fastScrollPopupTextColor="@color/lightgray"
+        app:fastScrollThumbColor="@color/darkblue"
+        app:fastScrollTrackColor="@color/lightgray"
+        app:fastScrollPopupBackgroundSize="60dp"
+        app:fastScrollPopupTextSize="28dp"
+        app:fastScrollPopupPosition="adjacent"/>
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/empty_view"
             android:layout_width="match_parent"
