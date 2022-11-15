@@ -20,7 +20,7 @@ using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
-using static Com.Simplecityapps.Recyclerview_fastscroll.Views.FastScrollRecyclerView;
+using FastScrollRecycler;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {

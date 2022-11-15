@@ -31,8 +31,7 @@ using Google.Android.Material.FloatingActionButton;
 using AndroidX.AppCompat.App;
 using Google.Android.Material.Snackbar;
 using AndroidX.Core.Content;
-using static Com.Simplecityapps.Recyclerview_fastscroll.Views.FastScroller;
-using static Com.Simplecityapps.Recyclerview_fastscroll.Views.FastScrollRecyclerView;
+using FastScrollRecycler;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {

@@ -1,0 +1,1 @@
+﻿[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Code Notifications", "XA0001:Find issues with Android API usage")]

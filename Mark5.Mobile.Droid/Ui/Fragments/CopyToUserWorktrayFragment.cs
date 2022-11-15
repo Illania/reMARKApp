@@ -16,7 +16,7 @@ using AndroidX.AppCompat.Widget;
 using AndroidX.SwipeRefreshLayout.Widget;
 using AndroidX.RecyclerView.Widget;
 using AndroidX.AppCompat.App;
-using static Com.Simplecityapps.Recyclerview_fastscroll.Views.FastScrollRecyclerView;
+using FastScrollRecycler;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
