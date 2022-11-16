@@ -9,11 +9,9 @@ using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Provider;
-using Android.Support.V7.App;
-using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
-using Com.Airbnb.Lottie;
+using AndroidX.AppCompat.App;
 using Java.IO;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
@@ -28,14 +26,24 @@ using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 using Mark5.Mobile.Droid.Utilities.DeviceReminder;
 using Mark5.Mobile.Droid.Utilities.Workers;
-using Microsoft.AppCenter;
 using Microsoft.AppCenter.Crashes;
 using TinyIoC;
+using AndroidX.AppCompat.Widget;
+using Com.Airbnb.Lottie;
+using System.Diagnostics;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-    [Activity(MainLauncher = true, Icon = "@mipmap/ic_icon", Theme = "@style/mark5Splash", ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize,
+    [Activity(MainLauncher = true, Icon = "@mipmap/ic_icon", Theme = "@style/mark5Splash", 
+        ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize,
+        Exported = true,
         NoHistory = true, ResizeableActivity = true, Name = "com.nordic_it.mark5.android.SplashActivity")]
+
+
+    [IntentFilter(new[] { Intent.ActionView, Intent.ActionSend, Intent.ActionSendMultiple },
+                  Categories = new[] { Intent.CategoryDefault },
+                  DataMimeTypes = new[] { "application/octet-stream", "text/x-vcard", "image/*", "message/rfc822" })]
+
     public class SplashActivity : AppCompatActivity
     {
         const string CalendarIdKey = "calendarId";
@@ -248,9 +256,9 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 report => { return new[] { ErrorAttachmentLog.AttachmentWithText(SystemReportCollector.CreateLogCatReport(), "deviceLogs.txt") }; };
             AppCenter.Start(Config.AppCenterId, typeof(Crashes));
 
-            Firebase.Analytics.FirebaseAnalytics.GetInstance(this).SetAnalyticsCollectionEnabled(PlatformConfig.Preferences.EnableReporting);
+            //Firebase.Analytics.FirebaseAnalytics.GetInstance(this).SetAnalyticsCollectionEnabled(PlatformConfig.Preferences.EnableReporting);
 #else
-            Firebase.Analytics.FirebaseAnalytics.GetInstance(this).SetAnalyticsCollectionEnabled(false);
+            //Firebase.Analytics.FirebaseAnalytics.GetInstance(this).SetAnalyticsCollectionEnabled(false);
 #endif
 
             Task.Run(async () =>
@@ -272,13 +280,13 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 RunOnUiThread(() =>
                 {
                     var animationView = FindViewById<LottieAnimationView>(Resource.Id.animation_view);
-
+               
                     if (animationView != null)
                     {
                         animationView.Progress = 1;
                         animationView.Animate().Alpha(1f).SetDuration(200);
                     }
-
+               
                 });
 
                 CommonConfig.Logger.Info("Updating file system storage...");
@@ -417,7 +425,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         {
             var animationView = FindViewById<LottieAnimationView>(Resource.Id.animation_view);
             var progressBar = FindViewById<ProgressBar>(Resource.Id.progress_bar);
-            var loginButton = FindViewById<AppCompatButton>(Resource.Id.splash_login_button);
+            var loginButton = FindViewById<AppCompatButton>(Resource.Id.login_button);
 
             loginButton.Click += (sender, e) => StartActivity(LoginActivity.CreateIntent(this));
 

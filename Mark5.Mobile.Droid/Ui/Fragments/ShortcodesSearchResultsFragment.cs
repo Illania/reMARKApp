@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Android.OS;
-using Android.Support.V4.Widget;
-using Android.Support.V7.App;
-using Android.Support.V7.Widget;
 using Android.Views;
-using FastScrollRecycler;
+using AndroidX.AppCompat.App;
+using AndroidX.AppCompat.Widget;
+using AndroidX.RecyclerView.Widget;
+using AndroidX.SwipeRefreshLayout.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
@@ -14,6 +14,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
+using FastScrollRecycler;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -180,7 +181,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         #region RecyclerView Adapter/ViewHolder
 
         class ShortcodeSearchResultsAdapter : RecyclerView.Adapter, ISectionedAdapter
-        {
+        { 
             public override int ItemCount => Items.Count;
 
             public event EventHandler<ShortcodePreview> ItemClicked = delegate { };
@@ -210,6 +211,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return new ShortcodePreviewViewHolder(itemView);
             }
 
+            string ISectionedAdapter.GetSectionName(int position)
+            {
+                return Items[position].Name?.SafeSubstring(0, 1)?.ToUpper() ?? "";
+            }
+
             public void AppendItems(List<ShortcodePreview> items)
             {
                 var count = Items.Count;
@@ -217,10 +223,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 NotifyItemRangeInserted(count, items.Count);
             }
 
-            string ISectionedAdapter.GetSectionName(int position)
-            {
-                return Items[position].Name?.SafeSubstring(0, 1)?.ToUpper() ?? "";
-            }
         }
 
         class ShortcodePreviewViewHolder : RecyclerView.ViewHolder

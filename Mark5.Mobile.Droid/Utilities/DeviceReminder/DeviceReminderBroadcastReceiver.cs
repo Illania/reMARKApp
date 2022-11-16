@@ -2,16 +2,16 @@
 using Android.App;
 using Android.Content;
 using Android.OS;
-using Android.Support.V4.App;
-using Android.Support.V4.Content;
 using Android.Text.Format;
+using AndroidX.Core.App;
+using AndroidX.Core.Content;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 
 namespace Mark5.Mobile.Droid.Utilities.DeviceReminder
 {
-    [BroadcastReceiver(Enabled = true)]
+    [BroadcastReceiver(Enabled = false, Exported = true)]
     [IntentFilter(new[] { DeviceReminderNotificationManager.ReminderAction })]
     public class DeviceReminderBroadcastReceiver : BroadcastReceiver
     {

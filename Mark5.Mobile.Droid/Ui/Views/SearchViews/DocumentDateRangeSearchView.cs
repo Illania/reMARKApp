@@ -1,8 +1,8 @@
 using System;
 using System.Threading.Tasks;
 using Android.Content;
-using Android.Support.V7.Widget;
 using Android.Views;
+using AndroidX.AppCompat.Widget;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;

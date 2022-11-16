@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using Android.App;
 using Android.Content;
 using Android.Graphics;
-using Android.Support.V4.Content;
-using Android.Support.V4.View;
-using Android.Support.V7.Preferences;
-using Android.Support.V7.Widget;
 using Android.Util;
 using Android.Views;
 using Android.Widget;
+using AndroidX.AppCompat.Widget;
+using AndroidX.Core.Content;
+using AndroidX.Preference;
+using AndroidX.ViewPager.Widget;
 using Com.Airbnb.Lottie;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Droid.Ui.Common;
@@ -200,7 +200,7 @@ namespace Mark5.Mobile.Droid.Utilities
 
                     var ip = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
                     {
-                        Gravity = (int)GravityFlags.Center
+                        Gravity = (GravityFlags)(int)GravityFlags.Center
                     };
                     animationView.LayoutParameters = ip;
                     animationView.SetAdjustViewBounds(true);
@@ -215,7 +215,7 @@ namespace Mark5.Mobile.Droid.Utilities
                     var imageView = new AppCompatImageView(context);
                     var ip = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
                     {
-                        Gravity = (int)GravityFlags.Center
+                        Gravity = (GravityFlags)(int)GravityFlags.Center
                     };
                     imageView.LayoutParameters = ip;
                     imageView.SetAdjustViewBounds(true);

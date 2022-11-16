@@ -2,10 +2,10 @@ using System;
 using Android.Content;
 using Android.Graphics;
 using Android.Graphics.Drawables;
-using Android.Support.V4.Content;
-using Android.Support.V7.Widget;
 using Mark5.Mobile.Droid.Ui.Fragments;
 using System.Linq;
+using AndroidX.RecyclerView.Widget;
+using AndroidX.Core.Content;
 
 namespace Mark5.Mobile.Droid.Ui.Common
 {

@@ -1,8 +1,8 @@
 ﻿using System;
 using Android.Content;
-using Android.Support.V4.View;
 using Android.Util;
 using Android.Views;
+using AndroidX.ViewPager.Widget;
 
 namespace Mark5.Mobile.Droid.Ui.Common
 {

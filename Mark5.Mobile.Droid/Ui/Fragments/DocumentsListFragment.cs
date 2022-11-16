@@ -8,16 +8,9 @@ using Android.Content;
 using Android.Graphics;
 using Android.Graphics.Drawables;
 using Android.OS;
-using Android.Support.Design.Widget;
-using Android.Support.V4.Content;
-using Android.Support.V4.Widget;
-using Android.Support.V7.App;
-using Android.Support.V7.Widget;
-using Android.Support.V7.Widget.Helper;
 using Android.Text;
 using Android.Util;
 using Android.Views;
-using FastScrollRecycler;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
@@ -30,6 +23,15 @@ using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 using Android.Content.Res;
+using AndroidX.CoordinatorLayout.Widget;
+using AndroidX.SwipeRefreshLayout.Widget;
+using AndroidX.RecyclerView.Widget;
+using AndroidX.AppCompat.Widget;
+using Google.Android.Material.FloatingActionButton;
+using AndroidX.AppCompat.App;
+using Google.Android.Material.Snackbar;
+using AndroidX.Core.Content;
+using FastScrollRecycler;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -1375,6 +1377,25 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return Items[position].Direction == DocumentDirection.External ? ViewType.ExternalDocumentView : ViewType.DocumentView;
             }
 
+
+            string ISectionedAdapter.GetSectionName(int position)
+            {
+                var vh = recyclerView?.FindViewHolderForAdapterPosition(position);
+
+                if (vh != null)
+                {
+                    var dpvh = vh as DocumentPreviewViewHolder;
+                    if (dpvh != null)
+                        return dpvh.BubbleDate;
+
+                    var edpvh = vh as ExternalDocumentPreviewViewHolder;
+                    if (edpvh != null)
+                        return edpvh.BubbleDate;
+                }
+
+                return string.Empty;
+            }
+
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
                 var dp = Items[position];
@@ -1750,24 +1771,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public void ResetSwipedState()
             {
                 swipedPosition = null;
-            }
-
-            string ISectionedAdapter.GetSectionName(int position)
-            {
-                var vh = recyclerView?.FindViewHolderForAdapterPosition(position);
-
-                if (vh != null)
-                {
-                    var dpvh = vh as DocumentPreviewViewHolder;
-                    if (dpvh != null)
-                        return dpvh.BubbleDate;
-
-                    var edpvh = vh as ExternalDocumentPreviewViewHolder;
-                    if (edpvh != null)
-                        return edpvh.BubbleDate;
-                }
-
-                return string.Empty;
             }
 
             public static class ViewType

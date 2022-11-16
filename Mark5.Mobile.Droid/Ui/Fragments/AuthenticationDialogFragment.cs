@@ -1,15 +1,15 @@
 ﻿using Android.Content;
 using Android.OS;
-using Android.Support.V4.Hardware.Fingerprint;
-using Android.Support.V7.Widget;
 using Android.Views;
 using Mark5.Mobile.Droid.Utilities.Fingerprint;
+using AndroidX.Core.Hardware.Fingerprint;
+using AndroidX.AppCompat.Widget;
+using AndroidX.Fragment.App;
 using Android.App;
-using DialogFragment = Android.Support.V4.App.DialogFragment;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class AuthenticationDialogFragment : DialogFragment, FingerprintUiHelper.ICallback
+    public class AuthenticationDialogFragment : AndroidX.Fragment.App.DialogFragment, FingerprintUiHelper.ICallback
     {
         FingerprintManagerCompat fingerprintManager;
         FingerprintUiHelper fingerprintUiHelper;

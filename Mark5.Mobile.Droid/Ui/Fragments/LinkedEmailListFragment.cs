@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.OS;
-using Android.Support.V4.Widget;
-using Android.Support.V7.App;
-using Android.Support.V7.Widget;
 using Android.Views;
-using FastScrollRecycler;
+using AndroidX.AppCompat.App;
+using AndroidX.AppCompat.Widget;
+using AndroidX.RecyclerView.Widget;
+using AndroidX.SwipeRefreshLayout.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
@@ -17,6 +17,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
+using FastScrollRecycler;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -206,6 +207,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return new LinkedEmailListViewHolder(itemView);
             }
 
+            string ISectionedAdapter.GetSectionName(int position)
+            {
+                return Items[position].Address?.SafeSubstring(0, 1)?.ToUpper() ?? "";
+            }
+
             public void SetItems(IEnumerable<CommunicationAddress> recipients)
             {
                 Items.Clear();
@@ -232,11 +238,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var count = Items.Count;
                 Items.AddRange(items);
                 NotifyItemRangeInserted(count, items.Count);
-            }
-
-            string ISectionedAdapter.GetSectionName(int position)
-            {
-                return Items[position].Address?.SafeSubstring(0, 1)?.ToUpper() ?? "";
             }
 
             class LinkedEmailListViewHolder : RecyclerView.ViewHolder

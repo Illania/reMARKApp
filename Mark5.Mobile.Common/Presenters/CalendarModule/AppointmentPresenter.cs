@@ -77,7 +77,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             }
         }
 
-        public async void EditAppointmentClicked(AppointmentChangeType appointmentChangeType)
+        public void EditAppointmentClicked(AppointmentChangeType appointmentChangeType)
         {
             view.OpenEditAppointment(appointment.CalendarId, appointment.Id, appointmentChangeType);
         }

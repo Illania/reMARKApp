@@ -1,10 +1,10 @@
 ﻿using System;
 using Android.Content;
 using Android.Graphics;
-using Android.Support.V7.Widget;
 using Android.Text;
 using Android.Views;
 using Android.Views.InputMethods;
+using AndroidX.AppCompat.Widget;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 
@@ -76,7 +76,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
                 {
-                    Gravity = (int)GravityFlags.CenterVertical,
+                    Gravity = (GravityFlags)(int)GravityFlags.CenterVertical,
                 }
             };
 

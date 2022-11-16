@@ -76,5 +76,8 @@
     <BundleResource Include="Resources\success%402x.png" />
     <BundleResource Include="Resources\success%403x.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Info.plist" />
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>

@@ -1,8 +1,8 @@
 ﻿using System;
 using Android.Graphics;
-using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Views.InputMethods;
+using AndroidX.AppCompat.Widget;
 using Mark5.Mobile.Droid.Ui.Common;
 
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
@@ -22,7 +22,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             {
                 LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent)
                 {
-                    Gravity = (int) GravityFlags.Start,
+                    Gravity = (GravityFlags)(int) GravityFlags.Start,
                 }
             };
             topTextView.Text = context.GetString(topTextResId);
@@ -34,7 +34,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
             bottomEditText = LayoutInflater.From(context).Inflate(Resource.Layout.search_edit_text_layout, null).FindViewById<AppCompatEditText>(Resource.Id.search_edit_text);
             bottomEditText.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
             {
-                Gravity = (int) GravityFlags.End,
+                Gravity = (GravityFlags)(int) GravityFlags.End,
             };
             bottomEditText.SetPadding(0, 0, 0, 0);
             bottomEditText.SetBackgroundColor(Color.Transparent);

@@ -8,12 +8,12 @@ using System.Web;
 using Android.App;
 using Android.Content;
 using Android.OS;
-using Android.Support.V4.App;
-using Android.Support.V4.Content;
-using Android.Support.V7.App;
-using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
+using AndroidX.AppCompat.App;
+using AndroidX.AppCompat.Widget;
+using AndroidX.Core.App;
+using AndroidX.Core.Content;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -452,7 +452,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             menu.Add(Menu.None, MenuItemActions.CopyToNew, MenuItemActions.CopyToNew, Resource.String.copy_to_new);
 
-            if (ServerConfig.SystemSettings.SystemInfo.IsDeliveryReportAvailableAvailable)
+            if (ServerConfig.SystemSettings.SystemInfo.DeliveryReportAvailable)
                 menu.Add(Menu.None, MenuItemActions.DeliveryReport, MenuItemActions.DeliveryReport, Resource.String.delivery_report);
 
         }

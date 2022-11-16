@@ -4,7 +4,6 @@ using Android.Views;
 using Android.Widget;
 using Android.Content;
 using Android.Graphics;
-using Android.Support.V4.Content;
 using Com.Syncfusion.Calendar;
 using Com.Syncfusion.Calendar.Enums;
 using Mark5.Mobile.Droid.Ui.Activities;
@@ -12,6 +11,7 @@ using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Coordinators;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Utilities;
+using AndroidX.Core.Content;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments.Calendar
 {

@@ -1,9 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.nordic_it.mark5.android" android:versionName="5.11" android:versionCode="556">
-	<uses-sdk android:minSdkVersion="22" android:targetSdkVersion="30" />
+	<uses-sdk android:minSdkVersion="29" android:targetSdkVersion="31" />
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-	<uses-permission android:name="android.permission.BLUETOOTH" />
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.READ_CONTACTS" />
 	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -29,13 +28,13 @@
 	<uses-permission android:name="com.nordic_it.mark5.android.permission.C2D_MESSAGE" />
 	<application android:label="@string/app_name" android:icon="@mipmap/ic_icon" android:allowBackup="false" android:networkSecurityConfig="@xml/network_security_config">
 		<meta-data android:name="android.max_aspect" android:value="2.1" />
-		<meta-data android:name="com.google.firebase.messaging.default_notification_icon" android:resource="@mipmap/ic_icon" />
-		<meta-data android:name="com.google.firebase.messaging.default_notification_color" android:resource="@color/darkerblue" />
-		<provider android:name="android.support.v4.content.FileProvider" android:authorities="${applicationId}.fileprovider" android:grantUriPermissions="true" android:exported="false">
+		<provider android:name="androidx.core.content.FileProvider" android:authorities="${applicationId}.fileprovider" android:grantUriPermissions="true" android:exported="false">
 			<meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/filepaths" />
 		</provider>
 		<!-- Firebase Declarations -->
 		<!-- Firebase InstanceId Receiver -->
+		<meta-data android:name="com.google.firebase.messaging.default_notification_icon" android:resource="@mipmap/ic_icon" />
+		<meta-data android:name="com.google.firebase.messaging.default_notification_color" android:resource="@color/darkerblue" />
 		<receiver android:name="com.google.firebase.iid.FirebaseInstanceIdInternalReceiver" android:exported="false" />
 		<receiver android:name="com.google.firebase.iid.FirebaseInstanceIdReceiver" android:exported="true" android:permission="com.google.android.c2dm.permission.SEND">
 			<intent-filter>
@@ -66,37 +65,5 @@
 		<!-- Do not modify - internal service -->
 		<service android:name="me.pushy.sdk.services.PushyJobService" android:permission="android.permission.BIND_JOB_SERVICE" android:stopWithTask="false" />
 		<!-- End Pushy Declarations -->
-		<activity android:name=".SplashActivity">
-			<intent-filter>
-				<action android:name="android.intent.action.SEND" />
-				<category android:name="android.intent.category.DEFAULT" />
-				<data android:mimeType="text/plain" />
-			</intent-filter>
-			<intent-filter>
-				<action android:name="android.intent.action.SEND" />
-				<category android:name="android.intent.category.DEFAULT" />
-				<data android:mimeType="text/x-vcard" />
-			</intent-filter>
-			<intent-filter>
-				<action android:name="android.intent.action.SEND" />
-				<category android:name="android.intent.category.DEFAULT" />
-				<data android:mimeType="image/*" />
-			</intent-filter>
-			<intent-filter>
-				<action android:name="android.intent.action.SEND_MULTIPLE" />
-				<category android:name="android.intent.category.DEFAULT" />
-				<data android:mimeType="image/*" />
-			</intent-filter>
-			<intent-filter>
-				<action android:name="android.intent.action.SEND" />
-				<category android:name="android.intent.category.DEFAULT" />
-				<data android:mimeType="application/*" />
-			</intent-filter>
-			<intent-filter>
-				<action android:name="android.intent.action.SEND_MULTIPLE" />
-				<category android:name="android.intent.category.DEFAULT" />
-				<data android:mimeType="application/*" />
-			</intent-filter>
-		</activity>
 	</application>
 </manifest>

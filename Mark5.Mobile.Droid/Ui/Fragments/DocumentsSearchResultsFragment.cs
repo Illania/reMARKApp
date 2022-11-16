@@ -7,11 +7,7 @@ using Android.Content;
 using Android.Graphics;
 using Android.Graphics.Drawables;
 using Android.OS;
-using Android.Support.V4.Widget;
-using Android.Support.V7.App;
-using Android.Support.V7.Widget;
 using Android.Views;
-using FastScrollRecycler;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -20,6 +16,11 @@ using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 using Mark5.Mobile.Common.Model.HubMessages;
+using AndroidX.SwipeRefreshLayout.Widget;
+using AndroidX.RecyclerView.Widget;
+using AndroidX.AppCompat.App;
+using AndroidX.AppCompat.Widget;
+using FastScrollRecycler;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -226,7 +227,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         #region RecyclerView Adapter/ViewHolder
 
         class DocumentSearchResultsAdapter : RecyclerView.Adapter, ISectionedAdapter
-        {
+        { 
             public override int ItemCount => Items.Count;
 
             public List<DocumentPreview> Items { get; } = new List<DocumentPreview>(1000);
@@ -310,6 +311,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return null;
             }
 
+            string ISectionedAdapter.GetSectionName(int position)
+            {
+                var vh = recyclerView.FindViewHolderForAdapterPosition(position);
+
+                if (vh is DocumentPreviewViewHolder dpvh)
+                    return dpvh.BubbleDate;
+
+                if (vh is ExternalDocumentPreviewViewHolder edpvh)
+                    return edpvh.BubbleDate;
+
+                return string.Empty;
+            }
+
             public void AppendItems(List<DocumentPreview> items)
             {
                 var count = Items.Count;
@@ -328,19 +342,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     }
 
                 return position;
-            }
-
-            string ISectionedAdapter.GetSectionName(int position)
-            {
-                var vh = recyclerView.FindViewHolderForAdapterPosition(position);
-
-                if (vh is DocumentPreviewViewHolder dpvh)
-                    return dpvh.BubbleDate;
-
-                if (vh is ExternalDocumentPreviewViewHolder edpvh)
-                    return edpvh.BubbleDate;
-
-                return string.Empty;
             }
 
             public static class ViewType

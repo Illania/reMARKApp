@@ -1,7 +1,7 @@
 ﻿using Android.Graphics;
-using Android.Support.V4.Hardware.Fingerprint;
-using Android.Support.V4.OS;
 using Android.Widget;
+using AndroidX.Core.Hardware.Fingerprint;
+using AndroidX.Core.OS;
 
 namespace Mark5.Mobile.Droid.Utilities.Fingerprint
 {

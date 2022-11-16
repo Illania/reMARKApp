@@ -12,13 +12,16 @@ using Android.Database;
 using Android.Graphics;
 using Android.OS;
 using Android.Provider;
-using Android.Support.Design.Widget;
-using Android.Support.V4.App;
-using Android.Support.V4.Content;
-using Android.Support.V4.View;
-using Android.Support.V4.Widget;
-using Android.Support.V7.Widget;
 using Android.Views;
+using Android.Widget;
+using AndroidX.AppCompat.Widget;
+using AndroidX.CoordinatorLayout.Widget;
+using AndroidX.Core.Content;
+using AndroidX.Core.View;
+using AndroidX.DrawerLayout.Widget;
+using AndroidX.Fragment.App;
+using Google.Android.Material.Navigation;
+using Google.Android.Material.Snackbar;
 using Java.IO;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
@@ -29,6 +32,7 @@ using Mark5.Mobile.Droid.Ui.Coordinators;
 using Mark5.Mobile.Droid.Ui.Fragments;
 using Mark5.Mobile.Droid.Utilities;
 using File = Java.IO.File;
+using Toolbar = AndroidX.AppCompat.Widget.Toolbar;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {

@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using MaterialDialogs;
 using Android.Content;
-using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common.DataAccess.Exceptions;
@@ -14,11 +12,152 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Utilities;
 using Mark5.ServiceReference.Exceptions;
 using Mark5.Mobile.Common.Authenticator;
+using AndroidX.AppCompat.App;
+using AndroidX.AppCompat.Widget;
+using Android.App;
+using AlertDialog = AndroidX.AppCompat.App.AlertDialog;
 
 namespace Mark5.Mobile.Droid.Ui.Common
 {
     public static class Dialogs
     {
+        class MaterialDialog
+        {
+            public class Builder
+            {
+                private readonly AlertDialog.Builder builder;
+
+                private int positiveTextId;
+                private int negativeTextId;
+                private int neutralTextId;
+
+                private int itemsId;
+                private string[] items;
+
+                public Builder(Context context)
+                {
+                    builder = new AlertDialog.Builder(context);
+                }
+
+                internal void Title(int titleId)
+                {
+                    builder.SetTitle(titleId);
+                }
+
+                internal void TitleGravity()
+                {
+                    
+                }
+
+                internal void Title(string title)
+                {
+                    builder.SetTitle(title);
+                }
+
+                internal void CustomView(View customView)
+                {
+                    builder.SetView(customView);
+                }
+
+                internal void PositiveText(int positiveTextId)
+                {
+                    this.positiveTextId = positiveTextId;
+                }
+
+                internal void NegativeText(int negativeTextId)
+                {
+                    this.negativeTextId = negativeTextId;
+                }
+
+                internal void NeutralText(int neutralTextId)
+                {
+                    this.neutralTextId = neutralTextId;
+                }
+
+                internal void OnPositive(SingleButtonCallback callback)
+                {
+                    builder.SetPositiveButton(positiveTextId, callback);
+                }
+
+                internal void OnNegative(SingleButtonCallback callback)
+                {
+                    builder.SetNegativeButton(negativeTextId, callback);
+                }
+
+                internal void OnNeutral(SingleButtonCallback callback)
+                {
+                    builder.SetNeutralButton(neutralTextId, callback);
+                }
+
+                internal void Cancelable(bool isCancelable)
+                {
+                    builder.SetCancelable(isCancelable);
+                }
+
+                internal IDialogInterface Show()
+                {
+                    return builder.Show();
+                }
+
+                internal void AutoDismiss(bool v)
+                {
+                    //TODO To implement. This is not so easy, because normally alert dialogs are dismissed automatically
+                }
+
+                internal void Content(int contentId)
+                {
+                    builder.SetMessage(contentId);
+                }
+
+                internal void Content(string content)
+                {
+                    builder.SetMessage(content);
+                }
+
+                internal void Items(string[] items)
+                {
+                    this.items = items;
+                }
+
+                internal void Items(int itemsId)
+                {
+                    this.itemsId = itemsId;
+                }
+
+                //List, single choice, dismiss when clicking an item of the list
+                internal void ItemsCallback(ListCallback listCallback)
+                {
+                    if (itemsId > 0)
+                        builder.SetItems(itemsId, listCallback);
+                    else
+                        builder.SetItems(items, listCallback);
+                }
+
+                //List, single choice, dismiss when clicking positive or negative button
+                internal void ItemsCallbackSingleChoice(int preselectedItemIndex, SingleChoiceCallback singleChoiceCallback)
+                {
+                    if (itemsId > 0)
+                        builder.SetSingleChoiceItems(itemsId, preselectedItemIndex, singleChoiceCallback);
+                    else
+                        builder.SetSingleChoiceItems(items, preselectedItemIndex, singleChoiceCallback);
+                }
+
+                //List, multiple choice, dismiss on button click
+                internal void ItemsCallbackMultiChoice(bool[] checkedItemIndexes, MultiChoiceCallback multiChoiceCallback)
+                {
+                    if (itemsId > 0)
+                        builder.SetMultiChoiceItems(itemsId, checkedItemIndexes, multiChoiceCallback);
+                    else
+                        builder.SetMultiChoiceItems(items, checkedItemIndexes, multiChoiceCallback);
+                }
+
+                internal IDialogInterface Build()
+                {
+                    return builder.Create();
+                }
+            }
+        }
+
         #region Awaitable dialogs
 
         public static Task<bool> ShowCustomViewDialogAsync(Context context, int titleId, View customView)
@@ -26,7 +165,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             var tcs = new TaskCompletionSource<bool>();
             var builder = new MaterialDialog.Builder(context);
             builder.Title(titleId);
-            builder.CustomView(customView, true);
+            builder.CustomView(customView);
             builder.PositiveText(Resource.String.ok);
             builder.NegativeText(Resource.String.cancel);
             builder.OnPositive(new SingleButtonCallback(() => tcs.SetResult(true)));
@@ -41,7 +180,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             var tcs = new TaskCompletionSource<bool>();
             var builder = new MaterialDialog.Builder(context);
             builder.Title(titleId);
-            builder.CustomView(customView, true);
+            builder.CustomView(customView);
             builder.PositiveText(Resource.String.ok);
             builder.NegativeText(Resource.String.cancel);
             builder.AutoDismiss(false);
@@ -65,8 +204,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             return tcs.Task;
         }
 
-        public static Task<bool> ShowYesNoDialogAsync(Context context, int titleId, int contentId, int positiveTextId = Resource.String.yes,
-            int negativeTextId = Resource.String.no)
+        public static Task<bool> ShowYesNoDialogAsync(Context context, int titleId, int contentId, int positiveTextId = Resource.String.yes, int negativeTextId = Resource.String.no)
         {
             var tcs = new TaskCompletionSource<bool>();
             var builder = new MaterialDialog.Builder(context);
@@ -81,28 +219,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             return tcs.Task;
         }
 
-        public static Task<bool> ShowYesNoDialogAsync(Context context, string title, string content, int positiveTextId = Resource.String.yes,
-            int negativeTextId = Resource.String.no, bool centerTitle = false, bool centerContent = false)
-        {
-            var tcs = new TaskCompletionSource<bool>();
-            var builder = new MaterialDialog.Builder(context);
-            builder.Title(title);
-            builder.Content(content);
-            builder.PositiveText(positiveTextId);
-            builder.NegativeText(negativeTextId);
-            if (centerTitle)
-                builder.TitleGravity(GravityEnum.Center);
-            if (centerContent)
-                builder.ContentGravity(GravityEnum.Center);
-            builder.OnPositive(new SingleButtonCallback(() => tcs.SetResult(true)));
-            builder.OnNegative(new SingleButtonCallback(() => tcs.SetResult(false)));
-            builder.Cancelable(false);
-            builder.Show();
-            return tcs.Task;
-        }
-
-        public static Task<int> ShowYesNoCancelDialogAsync(Context context, int titleId, int contentId = -1, int positiveTextId = Resource.String.yes,
-            int negativeTextId = Resource.String.no, int cancelTextId = Resource.String.cancel)
+        public static Task<int> ShowYesNoCancelDialogAsync(Context context, int titleId, int contentId = -1, int positiveTextId = Resource.String.yes, int negativeTextId = Resource.String.no, int cancelTextId = Resource.String.cancel)
         {
             var tcs = new TaskCompletionSource<int>();
             var builder = new MaterialDialog.Builder(context);
@@ -119,6 +236,27 @@ namespace Mark5.Mobile.Droid.Ui.Common
             builder.OnNeutral(new SingleButtonCallback(() => tcs.SetResult(-1)));
             builder.Cancelable(false);
             builder.Show();
+            return tcs.Task;
+        }
+
+        public static Task<bool> ShowYesNoDialogAsync(Context context, string title, string content, int positiveTextId = Resource.String.yes,
+          int negativeTextId = Resource.String.no, bool centerTitle = false, bool centerContent = false)
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            var builder = new MaterialDialog.Builder(context);
+            builder.Title(title);
+            builder.Content(content);
+            builder.PositiveText(positiveTextId);
+            builder.NegativeText(negativeTextId);
+            //// TODO
+            //if (centerTitle)
+            //    builder.TitleGravity(GravityEnum.Center);
+            //if (centerContent)
+            //    builder.ContentGravity(GravityEnum.Center);
+            builder.OnPositive(new SingleButtonCallback(() => tcs.SetResult(true)));
+            builder.OnNegative(new SingleButtonCallback(() => tcs.SetResult(false)));
+            builder.Cancelable(false);
+            var dialog = builder.Show();
             return tcs.Task;
         }
 
@@ -148,70 +286,78 @@ namespace Mark5.Mobile.Droid.Ui.Common
             return tcs.Task;
         }
 
-        public static Task<T> ShowSingleSelectDialogAsync<T>(Context context, int titleId, List<T> values, T selected = default(T),
-            IEqualityComparer<T> equalityComparer = null, Func<T, string> displayText = null)
+        //TODO need to test if this works properly...
+        public static Task<T> ShowSingleSelectDialogAsync<T>(Context context, int titleId, List<T> values, T preselected = default(T), IEqualityComparer<T> equalityComparer = null, Func<T, string> displayText = null)
         {
+            T newlyselected = default(T);
             var tcs = new TaskCompletionSource<T>();
             var builder = new MaterialDialog.Builder(context);
+
+            var selectedIndex = -1;
+            if (!EqualityComparer<T>.Default.Equals(preselected, default(T)))
+            {
+                for (var i = 0; i < values.Count; i++)
+                    if (equalityComparer == null ? preselected.Equals(values[i]) : equalityComparer.Equals(preselected, values[i]))
+                        selectedIndex = i;
+            }
+
             builder.Title(titleId);
             builder.Items(values.Select(t => { return displayText == null ? t.ToString() : displayText(t); }).ToArray());
-            builder.ItemsCallbackSingleChoice(-1,
+            builder.ItemsCallbackSingleChoice(selectedIndex,
                 new SingleChoiceCallback(si =>
                 {
                     if (si >= 0)
-                        tcs.SetResult(values[si]);
+                        newlyselected = values[si];
                 }));
             builder.PositiveText(Resource.String.ok);
             builder.NegativeText(Resource.String.cancel);
-            builder.OnNegative(new SingleButtonCallback(() => tcs.SetResult(selected)));
-            var md = builder.Build();
-            var selectedIndex = -1;
-            if (!EqualityComparer<T>.Default.Equals(selected, default(T)))
-            {
-                for (var i = 0; i < values.Count; i++)
-                    if (equalityComparer == null ? selected.Equals(values[i]) : equalityComparer.Equals(selected, values[i]))
-                        selectedIndex = i;
+            builder.OnNegative(new SingleButtonCallback(() => tcs.SetResult(preselected)));
+            builder.OnPositive(new SingleButtonCallback(() => tcs.SetResult(newlyselected)));
 
-                md.SetSelectedIndex(selectedIndex);
-            }
 
             builder.Cancelable(false);
-            md.Show();
+            builder.Show();
             return tcs.Task;
         }
 
-        public static Task<List<T>> ShowMultiSelectDialogAsync<T>(Context context, int titleId, List<T> values, List<T> selected = null,
-            IEqualityComparer<T> equalityComparer = null, Func<T, string> displayText = null)
+        //TODO need to test if this works properly...
+        public static Task<List<T>> ShowMultiSelectDialogAsync<T>(Context context, int titleId, List<T> values, List<T> preselected = null, IEqualityComparer<T> equalityComparer = null, Func<T, string> displayText = null)
         {
+            bool[] isCheckedArray = new bool[values.Count];
             var tcs = new TaskCompletionSource<List<T>>();
             var result = new List<T>();
             var builder = new MaterialDialog.Builder(context);
-            builder.Title(titleId);
-            builder.Items(values.Select(t => { return displayText == null ? t.ToString() : displayText(t); }).ToArray());
-            builder.ItemsCallbackMultiChoice(null,
-                new MultiChoiceCallback(si =>
-                {
-                    foreach (var i in si)
-                        result.Add(values[i]);
 
-                    tcs.SetResult(result);
-                }));
-            builder.PositiveText(Resource.String.ok);
-            builder.NegativeText(Resource.String.cancel);
-            builder.OnNegative(new SingleButtonCallback(() => tcs.SetResult(null)));
-            var md = builder.Build();
-            if (selected != null)
+            if (preselected != null)
             {
                 var selectedIndexes = new List<int>();
                 for (var i = 0; i < values.Count; i++)
-                    if (equalityComparer == null ? selected.Contains(values[i]) : selected.Contains(values[i], equalityComparer))
-                        selectedIndexes.Add(i);
-
-                md.SetSelectedIndices(selectedIndexes.ToArray());
+                    if (equalityComparer == null ? preselected.Contains(values[i]) : preselected.Contains(values[i], equalityComparer))
+                        isCheckedArray[i] = true;
             }
 
+            builder.Title(titleId);
+            builder.Items(values.Select(t => { return displayText == null ? t.ToString() : displayText(t); }).ToArray());
+            builder.ItemsCallbackMultiChoice(isCheckedArray, new MultiChoiceCallback((index, isChecked) =>
+            {
+                isCheckedArray[index] = isChecked;
+            }));
+            builder.PositiveText(Resource.String.ok);
+            builder.NegativeText(Resource.String.cancel);
+            builder.OnNegative(new SingleButtonCallback(() => tcs.SetResult(null)));
+            builder.OnPositive(new SingleButtonCallback(() =>
+            {
+                for (int i = 0; i < isCheckedArray.Length; i++)
+                {
+                    if (isCheckedArray[i])
+                        result.Add(values[i]);
+                }
+
+                tcs.SetResult(result);
+            }));
+
             builder.Cancelable(false);
-            md.Show();
+            builder.Show();
             return tcs.Task;
         }
 
@@ -230,20 +376,6 @@ namespace Mark5.Mobile.Droid.Ui.Common
             builder.Cancelable(false);
             builder.Show();
             return tcs.Task;
-        }
-        public static void ShowListDialog(Context context, int titleId, int itemsId, bool includeCancel, Action<int> itemAction, Action negativeAction)
-        {
-            var builder = new MaterialDialog.Builder(context);
-            builder.Title(titleId);
-            builder.Items(itemsId);
-            builder.ItemsCallback(new ListCallback(i => itemAction(i)));
-            if (includeCancel)
-            {
-                builder.NegativeText(Resource.String.cancel);
-                builder.OnNegative(new SingleButtonCallback(negativeAction));
-            }
-            builder.Cancelable(false);
-            builder.Show();
         }
 
         public static Task<int> ShowListDialog(Context context, string title, int itemsId, bool includeCancel)
@@ -317,8 +449,40 @@ namespace Mark5.Mobile.Droid.Ui.Common
             return tcs.Task;
         }
 
+        public static void ShowListDialog(Context context, int titleId, int itemsId, bool includeCancel, Action<int> itemAction, Action negativeAction)
+        {
+            var builder = new MaterialDialog.Builder(context);
+            builder.Title(titleId);
+            builder.Items(itemsId);
+            builder.ItemsCallback(new ListCallback(i => itemAction(i)));
+            if (includeCancel)
+            {
+                builder.NegativeText(Resource.String.cancel);
+                builder.OnNegative(new SingleButtonCallback(negativeAction));
+            }
+            builder.Cancelable(false);
+            builder.Show();
+        }
+
+        public static Task<DateTime> ShowDatePicker(Context context)
+        {
+            var tcs = new TaskCompletionSource<DateTime>();
+            var datePicker = new DatePicker(context);
+            datePicker.DateTime = DateTime.Now;
+            datePicker.MinDate = datePicker.DateTime.ConvertDateTimeToTimestampMilliseconds();
+            var builder = new MaterialDialog.Builder(context);
+            builder.CustomView(datePicker);
+            builder.PositiveText(Resource.String.ok);
+            builder.OnPositive(new SingleButtonCallback(() => { tcs.SetResult(datePicker.DateTime); }));
+            builder.NegativeText(Resource.String.cancel);
+            builder.OnNegative(new SingleButtonCallback(tcs.SetCanceled));
+            builder.Cancelable(false);
+            builder.Show();
+            return tcs.Task;
+        }
+
         public static Task<long> ShowDatePicker(Context context, long initialTimestamp = -1, long minTimestamp = -1, long maxTimestamp = -1,
-            bool addRemoveDateChoice = false)
+        bool addRemoveDateChoice = false)
         {
             var tcs = new TaskCompletionSource<long>();
             var datePicker = new DatePicker(context);
@@ -329,7 +493,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             if (maxTimestamp >= 0)
                 datePicker.MaxDate = maxTimestamp;
             var builder = new MaterialDialog.Builder(context);
-            builder.CustomView(datePicker, false);
+            builder.CustomView(datePicker);
             builder.PositiveText(Resource.String.ok);
             builder.OnPositive(new SingleButtonCallback(() => { tcs.SetResult(datePicker.DateTime.ConvertDateTimeToTimestampMilliseconds()); }));
             builder.NegativeText(Resource.String.cancel);
@@ -357,28 +521,11 @@ namespace Mark5.Mobile.Droid.Ui.Common
             timePicker.SetIs24HourView((Java.Lang.Boolean)false);
 
             var builder = new MaterialDialog.Builder(context);
-            builder.CustomView(timePicker, false);
+            builder.CustomView(timePicker);
             builder.PositiveText(Resource.String.ok);
             builder.OnPositive(new SingleButtonCallback(() => { tcs.SetResult(new TimeSpan(timePicker.Hour, timePicker.Minute, 0)); }));
             builder.NegativeText(Resource.String.cancel);
             builder.OnNegative(new SingleButtonCallback(() => tcs.SetResult(new TimeSpan(initialHour, initialMinute, 0))));
-            builder.Cancelable(false);
-            builder.Show();
-            return tcs.Task;
-        }
-
-        public static Task<DateTime> ShowDatePicker(Context context)
-        {
-            var tcs = new TaskCompletionSource<DateTime>();
-            var datePicker = new DatePicker(context);
-            datePicker.DateTime = DateTime.Now;
-            datePicker.MinDate = datePicker.DateTime.ConvertDateTimeToTimestampMilliseconds();
-            var builder = new MaterialDialog.Builder(context);
-            builder.CustomView(datePicker, false);
-            builder.PositiveText(Resource.String.ok);
-            builder.OnPositive(new SingleButtonCallback(() => { tcs.SetResult(datePicker.DateTime); }));
-            builder.NegativeText(Resource.String.cancel);
-            builder.OnNegative(new SingleButtonCallback(tcs.SetCanceled));
             builder.Cancelable(false);
             builder.Show();
             return tcs.Task;
@@ -391,7 +538,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             if (Android.Text.Format.DateFormat.Is24HourFormat(Android.App.Application.Context))
                 timePicker.SetIs24HourView((Java.Lang.Boolean)true);
             var builder = new MaterialDialog.Builder(context);
-            builder.CustomView(timePicker, false);
+            builder.CustomView(timePicker);
             builder.PositiveText(Resource.String.ok);
             builder.OnPositive(new SingleButtonCallback(() => { tcs.SetResult((timePicker.Hour, timePicker.Minute)); }));
             builder.NegativeText(Resource.String.cancel);
@@ -401,7 +548,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             return tcs.Task;
         }
 
-        public static Task<(int, int)> ShowHourMinutePicker(Context context, (int hours,int minutes) defaultTime)
+        public static Task<(int, int)> ShowHourMinutePicker(Context context, (int hours, int minutes) defaultTime)
         {
             var pickerContainer = new LinearLayoutCompat(context)
             {
@@ -439,7 +586,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             minutePicker.MinValue = 0;
             minutePicker.MaxValue = displayedMinuteValues.Count - 1;
             minutePicker.SetDisplayedValues(displayedMinuteValues.ToArray());
-            minutePicker.Value = defaultTime.minutes/step;
+            minutePicker.Value = defaultTime.minutes / step;
 
             pickerContainer.AddView(hourPicker);
             pickerContainer.AddView(minutePicker);
@@ -447,7 +594,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             var tcs = new TaskCompletionSource<(int, int)>();
             var builder = new MaterialDialog.Builder(context);
             builder.Title("Select hours and minutes:");
-            builder.CustomView(pickerContainer, false);
+            builder.CustomView(pickerContainer);
             builder.PositiveText(Resource.String.ok);
             builder.OnPositive(new SingleButtonCallback(() => tcs.SetResult((hourPicker.Value, minutePicker.Value * step))));
             builder.NegativeText(Resource.String.cancel);
@@ -457,12 +604,12 @@ namespace Mark5.Mobile.Droid.Ui.Common
             return tcs.Task;
         }
 
+
         #endregion
 
         #region Non-awaitable dialogs
 
-        public static void ShowYesNoDialog(Context context, int titleId, int contentId, Action positiveAction, Action negativeAction = null,
-            int positiveTextId = Resource.String.yes, int negativeTextId = Resource.String.no, bool cancelable = false)
+        public static void ShowYesNoDialog(Context context, int titleId, int contentId, Action positiveAction, Action negativeAction = null, int positiveTextId = Resource.String.yes, int negativeTextId = Resource.String.no, bool cancelable = false)
         {
             var builder = new MaterialDialog.Builder(context);
             builder.Title(titleId);
@@ -476,32 +623,13 @@ namespace Mark5.Mobile.Droid.Ui.Common
             builder.Show();
         }
 
-        public static void ShowEditTextDialog(Context context, int titleId, string startText, Action<string> positiveAction, Action negativeAction = null,
-            int positiveTextId = Resource.String.yes, int negativeTextId = Resource.String.no)
+        public static void ShowEditTextDialog(Context context, int titleId, string startText, Action<string> positiveAction, Action negativeAction = null, int positiveTextId = Resource.String.yes, int negativeTextId = Resource.String.no)
         {
             var editTextView = new AppCompatEditText(context);
             editTextView.Text = startText;
 
             var builder = new MaterialDialog.Builder(context);
-            builder.CustomView(editTextView, true);
-            builder.Title(titleId);
-            builder.PositiveText(positiveTextId);
-            builder.NegativeText(negativeTextId);
-            builder.OnPositive(new SingleButtonCallback(() => positiveAction(editTextView.Text)));
-            if (negativeAction != null)
-                builder.OnNegative(new SingleButtonCallback(negativeAction));
-            builder.Cancelable(false);
-            builder.Show();
-        }
-
-        public static void ShowEditTextViewDialog(Context context, int titleId, string text, Action<string> positiveAction, Action negativeAction = null,
-           int positiveTextId = Resource.String.yes, int negativeTextId = Resource.String.no)
-        {
-            var editTextView = new AppCompatTextView(context);
-            editTextView.Text = text;
-            editTextView.SetTextIsSelectable(true);
-            var builder = new MaterialDialog.Builder(context);
-            builder.CustomView(editTextView, true);
+            builder.CustomView(editTextView);
             builder.Title(titleId);
             builder.PositiveText(positiveTextId);
             builder.NegativeText(negativeTextId);
@@ -526,10 +654,18 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
         public static Action ShowInfiniteProgressDialog(Context context, int titleId, int contentId, CancellationTokenSource cts = null)
         {
+            LayoutInflater inflater = (LayoutInflater)context.GetSystemService(Context.LayoutInflaterService);
+            View view = inflater.Inflate(Resource.Layout.progress_dialog, null, false);
+
+            var title = view.FindViewById<AppCompatTextView>(Resource.Id.title);
+            var content = view.FindViewById<AppCompatTextView>(Resource.Id.content);
+            var progress = view.FindViewById<ProgressBar>(Resource.Id.progress);
+
+            title.SetText(titleId);
+            content.SetText(contentId);
+
             var builder = new MaterialDialog.Builder(context);
-            builder.Title(titleId);
-            builder.Content(contentId);
-            builder.Progress(true, -1);
+            builder.CustomView(view);
             if (cts != null)
             {
                 builder.PositiveText(Resource.String.cancel);
@@ -540,37 +676,42 @@ namespace Mark5.Mobile.Droid.Ui.Common
             return dialog.Dismiss;
         }
 
-        public static void ShowMultiSelectDialog<T>(Context context, int titleId, List<T> values, Action<List<T>> positiveAction,
-            Action negativeAction = null, List<T> selected = null, IEqualityComparer<T> equalityComparer = null, Func<T, string> displayText = null)
+        public static void ShowMultiSelectDialog<T>(Context context, int titleId, List<T> values, Action<List<T>> positiveAction, Action negativeAction = null, List<T> preselected = null, IEqualityComparer<T> equalityComparer = null, Func<T, string> displayText = null)
         {
+            bool[] isCheckedArray = new bool[values.Count];
             var result = new List<T>();
             var builder = new MaterialDialog.Builder(context);
-            builder.Title(titleId);
-            builder.Items(values.Select(t => { return displayText == null ? t.ToString() : displayText(t); }).ToArray());
-            builder.ItemsCallbackMultiChoice(null,
-                new MultiChoiceCallback(si =>
-                {
-                    foreach (var i in si)
-                        result.Add(values[i]);
 
-                    positiveAction(result);
-                }));
-            builder.PositiveText(Resource.String.ok);
-            builder.NegativeText(Resource.String.cancel);
-            builder.OnNegative(new SingleButtonCallback(negativeAction));
-            var md = builder.Build();
-            if (selected != null)
+            if (preselected != null)
             {
                 var selectedIndexes = new List<int>();
                 for (var i = 0; i < values.Count; i++)
-                    if (equalityComparer == null ? selected.Contains(values[i]) : selected.Contains(values[i], equalityComparer))
-                        selectedIndexes.Add(i);
-
-                md.SetSelectedIndices(selectedIndexes.ToArray());
+                    if (equalityComparer == null ? preselected.Contains(values[i]) : preselected.Contains(values[i], equalityComparer))
+                        isCheckedArray[i] = true;
             }
 
+            builder.Title(titleId);
+            builder.Items(values.Select(t => { return displayText == null ? t.ToString() : displayText(t); }).ToArray());
+            builder.ItemsCallbackMultiChoice(isCheckedArray, new MultiChoiceCallback((index, isChecked) =>
+            {
+                isCheckedArray[index] = isChecked;
+            }));
+            builder.PositiveText(Resource.String.ok);
+            builder.NegativeText(Resource.String.cancel);
+            builder.OnNegative(new SingleButtonCallback(negativeAction));
+            builder.OnPositive(new SingleButtonCallback(() =>
+            {
+                for (int i = 0; i < isCheckedArray.Length; i++)
+                {
+                    if (isCheckedArray[i])
+                        result.Add(values[i]);
+                }
+
+                positiveAction(result);
+            }));
+
             builder.Cancelable(false);
-            md.Show();
+            builder.Show();
         }
 
         public static void ShowBlockingAlert(Context context, int titleId)
@@ -671,21 +812,21 @@ namespace Mark5.Mobile.Droid.Ui.Common
                     var dismissAction = ShowInfiniteProgressDialog(context, Resource.String.dialog_creating_report, Resource.String.please_wait);
                     Task.Run(() => { return SystemReportCollector.CreateFullReport(); })
                         .ContinueWith(async t =>
-                    {
-                        dismissAction.Invoke();
-
-                        if (!t.IsFaulted)
                         {
-                            var sendWithMark5 = await ShowYesNoDialogAsync(context, Resource.String.send_with_mark5_title, Resource.String.send_report_with_mark5_content);
+                            dismissAction.Invoke();
 
-                            if (sendWithMark5)
-                                context.StartActivity(SystemReportCollector.CreateShareReportComposeDocumentActivityIntent(context, t.Result));
-                            else
-                                context.StartActivity(SystemReportCollector.CreateShareReportIntent(context, t.Result));
+                            if (!t.IsFaulted)
+                            {
+                                var sendWithMark5 = await ShowYesNoDialogAsync(context, Resource.String.send_with_mark5_title, Resource.String.send_report_with_mark5_content);
 
-                            action?.Invoke();
-                        }
-                    }, TaskScheduler.FromCurrentSynchronizationContext());
+                                if (sendWithMark5)
+                                    context.StartActivity(SystemReportCollector.CreateShareReportComposeDocumentActivityIntent(context, t.Result));
+                                else
+                                    context.StartActivity(SystemReportCollector.CreateShareReportIntent(context, t.Result));
+
+                                action?.Invoke();
+                            }
+                        }, TaskScheduler.FromCurrentSynchronizationContext());
                 }));
             }
             builder.Cancelable(false);
@@ -743,7 +884,6 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 return context.GetString(Resource.String.file_too_large);
             if (ex is ReMarkException && ((ReMarkException)ex).ErrorCode.Equals(ErrorConstants.Codes.FileCouldNotBeLoaded))
                 return context.GetString(Resource.String.couldnotopenemlmsg_title);
-
             return context.GetString(Resource.String.generalexception_title);
         }
 
@@ -781,7 +921,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 return false;
             if (ex is ReMarkException && ((ReMarkException)ex).ErrorCode.Equals(ErrorConstants.Codes.FileCouldNotBeLoaded))
                 return true;
-            
+
             return true;
         }
 
@@ -789,29 +929,29 @@ namespace Mark5.Mobile.Droid.Ui.Common
 
         #region Interface implementations
 
-        class SingleButtonCallback : Java.Lang.Object, MaterialDialog.ISingleButtonCallback
+        internal class SingleButtonCallback : Java.Lang.Object, IDialogInterfaceOnClickListener
         {
             readonly Action action;
-            readonly Action<MaterialDialog> actionWithDialog;
+            readonly Action<IDialogInterface> actionWithDialog;
 
             public SingleButtonCallback(Action action)
             {
                 this.action = action;
             }
 
-            public SingleButtonCallback(Action<MaterialDialog> action)
+            public SingleButtonCallback(Action<IDialogInterface> action)
             {
                 this.actionWithDialog = action;
             }
 
-            public void OnClick(MaterialDialog p0, DialogAction p1)
+            public void OnClick(IDialogInterface dialog, int which)
             {
                 action?.Invoke();
-                actionWithDialog?.Invoke(p0);
+                actionWithDialog?.Invoke(dialog);
             }
         }
 
-        class SingleChoiceCallback : Java.Lang.Object, MaterialDialog.IListCallbackSingleChoice
+        internal class SingleChoiceCallback : Java.Lang.Object, IDialogInterfaceOnClickListener
         {
             readonly Action<int> action;
 
@@ -820,30 +960,13 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 this.action = action;
             }
 
-            public bool OnSelection(MaterialDialog p0, View p1, int p2, string p3)
+            public void OnClick(IDialogInterface dialog, int which)
             {
-                action?.Invoke(p2);
-                return true;
+                action?.Invoke(which);
             }
         }
 
-        class MultiChoiceCallback : Java.Lang.Object, MaterialDialog.IListCallbackMultiChoice
-        {
-            readonly Action<int[]> action;
-
-            public MultiChoiceCallback(Action<int[]> action)
-            {
-                this.action = action;
-            }
-
-            public bool OnSelection(MaterialDialog p0, int[] p1, string[] p2)
-            {
-                action?.Invoke(p1);
-                return true;
-            }
-        }
-
-        class ListCallback : Java.Lang.Object, MaterialDialog.IListCallback
+        internal class ListCallback : Java.Lang.Object, IDialogInterfaceOnClickListener
         {
             readonly Action<int> action;
 
@@ -852,9 +975,26 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 this.action = action;
             }
 
-            public void OnSelection(MaterialDialog p0, View p1, int p2, string p3)
+            public void OnClick(IDialogInterface dialog, int which)
             {
-                action?.Invoke(p2);
+                action?.Invoke(which);
+            }
+        }
+
+        //This one only selcts the right one, doesn't dismiss....
+        internal class MultiChoiceCallback : Java.Lang.Object, IDialogInterfaceOnMultiChoiceClickListener
+        {
+            readonly Action<int, bool> action;
+
+            public MultiChoiceCallback(Action<int, bool> action)
+            {
+                this.action = action;
+            }
+
+            //TODO this works differently than the previous version...
+            public void OnClick(IDialogInterface dialog, int which, bool isChecked)
+            {
+                action?.Invoke(which, isChecked);
             }
         }
 

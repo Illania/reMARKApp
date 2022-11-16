@@ -2,9 +2,9 @@
 using Android.Animation;
 using Android.Content;
 using Android.Graphics;
-using Android.Support.V4.View.Animation;
 using Android.Util;
 using Android.Views;
+using AndroidX.Interpolator.View.Animation;
 using Java.Interop;
 
 namespace FastScrollRecycler

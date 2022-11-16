@@ -4,14 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Android.Content;
 using Android.Graphics;
-using Android.Support.V4.Content;
-using Android.Support.V7.Widget;
 using Android.Views;
+using AndroidX.AppCompat.Widget;
+using AndroidX.Core.Content;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
-using MaterialDialogs;
 
 namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 {
@@ -93,19 +92,20 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
             var predefinedLine = LineUtilities.GetLineForCreationModeFlag(DocumentCreationModeFlag.Reply, Document, PlatformConfig.Preferences.AlwaysUseDefaultLine);
             var modalView = new InvitationReplyModalView(Context, invitation.Status, predefinedLine);
-            var builder = new MaterialDialog.Builder(Context).CustomView(modalView, false);
+            //TODO
+            //var builder = new MaterialDialog.Builder(Context).CustomView(modalView, false);
 
-            var dialog = builder.Show();
+            //var dialog = builder.Show();
 
-            modalView.ResponseSelected += (object sender, InvitationReplyDetailViewModel e) =>
-            {
-                dialog?.Dismiss();
-                tcs.SetResult(e);
-            };
+            //modalView.ResponseSelected += (object sender, InvitationReplyDetailViewModel e) =>
+            //{
+            //    dialog?.Dismiss();
+            //    tcs.SetResult(e);
+            //};
 
-            var responseDetails = await tcs.Task;
+            //var responseDetails = await tcs.Task;
 
-            ReplySelected(this, responseDetails);
+            //ReplySelected(this, responseDetails);
         }
 
         public override Task RefreshView()

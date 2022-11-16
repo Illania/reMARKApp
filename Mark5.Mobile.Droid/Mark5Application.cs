@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Runtime;
-using Android.Support.V7.App;
+using AndroidX.AppCompat.App;
 using Firebase.Analytics;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;

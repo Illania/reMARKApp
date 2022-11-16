@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
 using Android.OS;
-using Android.Support.V7.App;
 using Android.Views;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;
-using Android.Support.V4.View;
-using Android.Support.Design.Widget;
-using Android.Support.V4.App;
+using AndroidX.ViewPager.Widget;
+using Google.Android.Material.Tabs;
+using AndroidX.Fragment.App;
+using AndroidX.AppCompat.App;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {

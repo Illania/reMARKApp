@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/white"
@@ -8,15 +8,15 @@
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
     android:orientation="vertical">
-    <android.support.v7.widget.AppCompatTextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/list_item_recipients_name"
         android:textAppearance="@style/fontListSmallLight"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/black" />
-    <android.support.v7.widget.AppCompatTextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/list_item_recipients_address"
         android:textAppearance="@style/fontListPrimary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
-</android.support.v7.widget.LinearLayoutCompat>
+</androidx.appcompat.widget.LinearLayoutCompat>

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Android.OS;
-using Android.Support.V7.App;
+using AndroidX.AppCompat.App;
 using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
