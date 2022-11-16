@@ -24,8 +24,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
 {
     public class MailViewerViewController : AbstractWebViewController
     {
-        const long MaxSize = 5 * 1024 * 1024; // 5MB
-
         readonly NSUrl url;
 
         UIBarButtonItem closeItem;
@@ -163,7 +161,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView
                 var name = url.LastPathComponent;
                 var size = int.Parse(sizeObject.ToString());
 
-                if (size > MaxSize)
+                if (size > ServerConfig.SystemSettings.DocumentsModuleInfo.MaximumAttachmentSizeBytes)
                 {
                     CommonConfig.Logger.Error($"Attempted to open file that is too large. Size {size} bytes.");
 
