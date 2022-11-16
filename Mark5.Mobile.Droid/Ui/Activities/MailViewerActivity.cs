@@ -34,8 +34,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                   DataMimeTypes = new[] { "application/octet-stream", "message/rfc822" })]
     public class MailViewerActivity : BaseAppCompatActivity
     {
-        const long MaxSize = 5 * 1024 * 1024; // 5MB
-
         Toolbar toolbar;
         LinearLayoutCompat linearLayout;
 
@@ -172,7 +170,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                         size = cursor.GetLong(cursor.GetColumnIndex(OpenableColumns.Size));
                     }
 
-                    if (size > MaxSize)
+                    if (size > ServerConfig.SystemSettings.DocumentsModuleInfo.MaximumAttachmentSizeBytes)
                     {
                         CommonConfig.Logger.Error($"Attempted to open file that is too large. Size {size} bytes.");
 
