@@ -123,6 +123,18 @@ namespace Mark5.Mobile.Common.Model
         LineName = 3
     }
 
+    public enum UserActivityType
+    {
+        None = 0,
+        Open = 1,
+        Read = 2,
+        Reply = 3,
+        Forward = 4,
+        Edit = 5,
+        Print = 6
+    }
+
+
     #endregion
 
     #region Contacts

@@ -57,7 +57,7 @@ namespace Mark5.Mobile.IOS.Service
 
 				var queryString = @$"identifier == ""{item.Id}""";
 
-				var searchQuery = new CSSearchQuery(queryString, null)
+				var searchQuery = new CSSearchQuery(queryString, (string[])null)
 				{
 					FoundItemsHandler = DeleteItems,
 					CompletionHandler = HandleError
@@ -78,7 +78,7 @@ namespace Mark5.Mobile.IOS.Service
             {
 				var queryString = @$"identifier == ""{item.Id}""";
 
-				var searchQuery = new CSSearchQuery(queryString, null)
+				var searchQuery = new CSSearchQuery(queryString, (string[])null)
 				{
 					FoundItemsHandler = DeleteItems,
 					CompletionHandler = HandleError
@@ -104,7 +104,7 @@ namespace Mark5.Mobile.IOS.Service
 		{
 			var queryString = @$"identifier == ""{item.Id}""";
 			var found = false;
-			var searchQuery = new CSSearchQuery(queryString, null)
+			var searchQuery = new CSSearchQuery(queryString, (string[])null)
 			{
 				FoundItemsHandler = AddOrUpdateItem,
 				CompletionHandler = HandleError

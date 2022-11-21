@@ -20,6 +20,8 @@ using Mark5.ServiceReference.FileTransferService;
 using DataContract = Mark5.ServiceReference.DataContract;
 using ModuleType = Mark5.Mobile.Common.Model.ModuleType;
 using DocumentPreview = Mark5.Mobile.Common.Model.DocumentPreview;
+using System.Security.AccessControl;
+using System.Security.Cryptography;
 
 namespace Mark5.Mobile.Common.Manager
 {
@@ -41,6 +43,59 @@ namespace Mark5.Mobile.Common.Manager
         {
             this.fileTransferServiceProxy = fileTransferServiceProxy;
             this.documentsDataAccess = documentsDataAccess;
+        }
+
+        public async Task ExecuteUserActivity(Model.UserActivityType userActivityType, DocumentPreview originalDoc, DocumentPreview newDoc)
+        {
+            async Task ExecuteSingleActivity(Model.UserActivity userActivity, DocumentPreview originalDoc, DocumentPreview newDoc)
+            {
+
+                if(userActivity.PerformOnOriginalDocument && userActivity.Categories !=  null)
+                {
+                    var newCategories = originalDoc.Categories.Union(userActivity.Categories).ToList();
+                    await Managers.CommonActionsManager.SetCategoriesAsync(originalDoc, newCategories);
+
+                    foreach (var ex in userActivity.ExtraFields)
+                        await AssignDocumentExtraFieldAsync(originalDoc.Id, ex.Key, ex.Value);
+                }
+
+                if (!userActivity.PerformOnOriginalDocument && newDoc != null && originalDoc != null)
+                {
+                    var newCategories = userActivity.AssignOriginalCategories ? originalDoc.Categories : userActivity.Categories;
+                    await Managers.CommonActionsManager.SetCategoriesAsync(newDoc, newCategories);
+
+                    if (userActivity.AssignOriginalExtraFields)
+                        foreach (var ex in userActivity.ExtraFields)
+                            await AssignDocumentExtraFieldAsync(originalDoc.Id, ex.Key, ex.Value);
+                    else
+                    {
+                        var extraFields = await GetDocumentExtraFieldsAsync(originalDoc.Id);
+                        if(extraFields != null)
+                        {
+                            var newFields = extraFields.Select(kvp => new KeyValuePair<int, string>(kvp.Key.Id, kvp.Value))
+                            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                         
+                            foreach (var ex in newFields)
+                                await AssignDocumentExtraFieldAsync(originalDoc.Id, ex.Key, ex.Value);
+                        }       
+                    }
+                }          
+                
+            }
+
+            if (!ServerConfig.SystemSettings.SystemInfo.UserActivitiesAvailable)
+                return;
+
+            foreach (var activity in ServerConfig.SystemSettings.DocumentsModuleInfo.UserActivities
+                .Where(ua => ua.Type.Equals(userActivityType)))
+                await ExecuteSingleActivity(activity, originalDoc, newDoc);
+
+        }
+
+        public async Task ExecuteUserActivity(Model.UserActivityType userActivityType, List<DocumentPreview> originalDocuments)
+        {
+            foreach (var doc in originalDocuments)
+                await ExecuteUserActivity(userActivityType, doc, null);
         }
 
         public async Task<List<DocumentPreview>> GetDocumentPreviewsAsync(Folder folder, int startId = -1, int endId = -1, SourceType sourceType = SourceType.Auto)
@@ -844,22 +899,24 @@ namespace Mark5.Mobile.Common.Manager
                 }
             }
 
-            if (precedingDocumentId > 0 && (flag == DocumentCreationModeFlag.Reply || flag == DocumentCreationModeFlag.ReplyAll))
+            if (precedingDocumentId > 0 && (flag == DocumentCreationModeFlag.Reply || flag == DocumentCreationModeFlag.ReplyAll || (flag == DocumentCreationModeFlag.Forward)))
             {
+                var userActivityType = (flag == DocumentCreationModeFlag.Forward) ? UserActivityType.Forward : UserActivityType.Reply;
                 try
                 {
                     var container = await documentsDataAccess.GetDocumentWithPreviewAsync(precedingDocumentId);
                     var previousDocument = container.Document;
                     var previousDocumentPreview = container.DocumentPreview;
-
-                    //await SetDocumentReadStatusAsync(previousDocumentPreview, previousDocument, true, ServerConfig.SystemSettings.UserInfo.User, SourceType.Remote);  //TODO
+                    
+                    await ExecuteUserActivity(userActivityType, previousDocumentPreview, documentPreview);
                 }
                 catch (Exception ex)
                 {
-                    CommonConfig.Logger.Error("Error while setting previous document as read", ex);
+                    CommonConfig.Logger.Error($"Error while executing user activity on {userActivityType} action", ex);
                 }
             }
-            if(fileToFolderParameters != null)
+
+            if (fileToFolderParameters != null)
             {
                 try
                 {

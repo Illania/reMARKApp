@@ -326,7 +326,9 @@ namespace Mark5.Mobile.Common.Model.Converters
                 UseForFrom = dmi.UseForFrom.ConvertEnum<UseForFrom>(),
                 LineAppearances = dmi.LineAppearances?.Select(la => la.Convert()).ToList(),
                 UserAppearances = dmi.UserAppearances?.Select(ua => ua.Convert()).ToList(),
-                DefaultAppearance = dmi.DefaultAppearance?.Convert()
+                DefaultAppearance = dmi.DefaultAppearance?.Convert(),
+                UserActivities = dmi.UserActivities?.Select(ua => ua.Convert()).ToList()
+
             };
 
             if (dmi.AttachmentKeywords != null)
@@ -357,6 +359,23 @@ namespace Mark5.Mobile.Common.Model.Converters
                 OriginatorColumnOnly = originatorAppearance.OriginatorColumnOnly
             };
         }
+
+        public static UserActivity Convert(this DataContract.UserActivity userActivity)
+        {
+            return new UserActivity
+            {
+                 Type = userActivity.Type.ConvertEnum<UserActivityType>(),
+                 DescriptionEvent = userActivity.DescriptionEvent,
+                 DescriptionAction = userActivity.DescriptionEvent,
+                 ConfirmationRequired = userActivity.ConfirmationRequired,
+                 PerformOnOriginalDocument = userActivity.PerformOnOriginalDocument,
+                 AssignOriginalCategories = userActivity.AssignOriginalCategories,
+                 AssignOriginalExtraFields = userActivity.AssignOriginalExtraFields,
+                 Categories = userActivity.Categories.Select(c=>c.Convert()).ToList(),
+                 ExtraFields = userActivity.ExtraFields
+            };
+        }
+
 
         public static DocumentsModulePermissions Convert(this DataContract.DocumentsModulePermissions dmp)
         {

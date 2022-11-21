@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Containers;
@@ -119,6 +120,10 @@ namespace Mark5.Mobile.Common.Manager
         Task UpdateExtraFieldAsync(ExtraField extraField, SourceType sourceType = SourceType.Auto);
 
         Task<List<Transmit>> GetDocumentTransmitInfoAsync(int documentId, SourceType sourceType = SourceType.Auto);
+
+        Task ExecuteUserActivity(Model.UserActivityType userActivityType, DocumentPreview originalDoc, DocumentPreview newDoc);
+
+        Task ExecuteUserActivity(Model.UserActivityType userActivityType, List<DocumentPreview> originalDocuments);
 
     }
 }

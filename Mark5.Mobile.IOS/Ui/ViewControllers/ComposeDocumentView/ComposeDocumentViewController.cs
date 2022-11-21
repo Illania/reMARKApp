@@ -412,6 +412,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                     document.Id = PreviousDocumentId.Value;
                     documentPreview.Id = PreviousDocumentId.Value;
+
+                    if (PlatformConfig.Preferences.SyncUserActivities)
+                        await Managers.DocumentsManager.ExecuteUserActivity(Mobile.Common.Model.UserActivityType.Edit, documentPreview, null);
                 }
 
                 var subViews = headerStackView.Subviews.OfType<ComposeDocumentSubView>().ToArray();

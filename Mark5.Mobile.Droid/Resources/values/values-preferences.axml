@@ -106,6 +106,7 @@
     <bool name="pref_documents_sub_originator_default">true</bool>
     <bool name="pref_documents_download_as_plaintext_default">false</bool>
     <bool name="pref_use_message_list_appearance_default">false</bool>
+    <bool name="pref_sync_user_activities_default">false</bool>
     <bool name="pref_documents_enable_move_to_folder_default">true</bool>
     <bool name="pref_callidentification_enabled_default">false</bool>
     <bool name="pref_contacts_sub_comm_fax_default">true</bool>

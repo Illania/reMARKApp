@@ -41,7 +41,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             get => weakRefDocumentPageViewControllerDelegate?.Unwrap();
             set => weakRefDocumentPageViewControllerDelegate = value.Wrap();
         }
-
+       
         Guid failedDocumentToUploadGuid;
         int? folderId;
         Folder folder;
@@ -123,7 +123,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 SendStatusBanner.Attach(this);
         }
 
-        public override void ViewDidAppear(bool animated)
+        public override async void ViewDidAppear(bool animated)
         {
             base.ViewDidAppear(animated);
 
@@ -142,6 +142,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
             else
                 MarkAsReadIfNecessary();
+
+            if(PlatformConfig.Preferences.SyncUserActivities)
+                await Managers.DocumentsManager.ExecuteUserActivity(Mobile.Common.Model.UserActivityType.Open, documentPreview, null);
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -539,6 +542,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 RefreshToolbar();
 
                 MarkAsReadIfNecessary();
+
             }
             catch (Exception ex)
             {
@@ -590,6 +594,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         return;
 
                     await Managers.DocumentsManager.SetDocumentReadStatusAsync(dp, d, true);
+                    if (PlatformConfig.Preferences.SyncUserActivities)
+                        await Managers.DocumentsManager.ExecuteUserActivity(Mobile.Common.Model.UserActivityType.Read, DocumentPreview, null);
                 }
                 catch (Exception ex)
                 {
@@ -1059,6 +1065,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
+
 
         async void CopyToNew()
         {
