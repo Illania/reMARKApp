@@ -367,6 +367,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return;
 
             await MarkAsReadIfNecessary();
+
+            if (PlatformConfig.Preferences.SyncUserActivities)
+                await Managers.DocumentsManager.ExecuteUserActivity(Mobile.Common.Model.UserActivityType.Open, DocumentPreview, null);
         }
 
         public override async void OnUserVisibilityHintChanged()
@@ -692,6 +695,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     return;
 
                 await Managers.DocumentsManager.SetDocumentReadStatusAsync(dp, d, true);
+
+                if (PlatformConfig.Preferences.SyncUserActivities)
+                    await Managers.DocumentsManager.ExecuteUserActivity(Mobile.Common.Model.UserActivityType.Read, dp, null);
+
 
                 if (token.IsCancellationRequested)
                     return;

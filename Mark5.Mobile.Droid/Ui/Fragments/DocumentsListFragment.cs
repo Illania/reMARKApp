@@ -860,6 +860,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 CommonConfig.UsageAnalytics.LogEvent(new SetReadStatusEvent(items.Count));
 
                 await Managers.DocumentsManager.SetDocumentsReadStatusAsync(items, true);
+
+                if (PlatformConfig.Preferences.SyncUserActivities)
+                    await Managers.DocumentsManager.ExecuteUserActivity(UserActivityType.Read, items);
+
                 adapter.RefreshItems(items);
                 searchAdapter.RefreshItems(items);
 

@@ -1093,6 +1093,58 @@ namespace Mark5.ServiceReference.DataContract
         [EnumMember(Value = "LineName")] LineName = 3
     }
 
+    [DataContract(Name = "UserActivity", Namespace = "com.nordic-it.appservice.v3")]
+    public class UserActivity : IExtensibleDataObject
+    {
+        [DataMember(Name = "Type", Order = 0)]
+        public UserActivityType Type { get; set; }
+
+        [DataMember(Name = "DescriptionEvent", Order = 0)]
+        public string DescriptionEvent { get; set; }
+
+        [DataMember(Name = "DescriptionAction", Order = 0)]
+        public string DescriptionAction { get; set; }
+
+        [DataMember(Name = "ConfirmationRequired", Order = 0)]
+        public bool ConfirmationRequired { get; set; }
+
+        [DataMember(Name = "PerformOnOriginalDocument", Order = 0)]
+        public bool PerformOnOriginalDocument { get; set; }
+
+        [DataMember(Name = "AssignOriginalCategories", Order = 0)]
+        public bool AssignOriginalCategories { get; set; }
+
+        [DataMember(Name = "AssignOriginalExtraFields", Order = 0)]
+        public bool AssignOriginalExtraFields { get; set; }
+
+        [DataMember(Name = "Categories", Order = 0)]
+        public List<Category> Categories { get; set; } = new List<Category>();
+
+        [DataMember(Name = "ExtraFields", Order = 0)]
+        public Dictionary<int, string> ExtraFields { get; set; } = new Dictionary<int, string>();
+
+        public ExtensionDataObject ExtensionData { get; set; }
+    }
+
+    [DataContract(Name = "UserActivityType", Namespace = "com.nordic-it.appservice.v3")]
+    public enum UserActivityType
+    {
+        [EnumMember(Value = "None")]
+        None = 0,
+        [EnumMember(Value = "Open")]
+        Open = 1,
+        [EnumMember(Value = "Read")]
+        Read = 2,
+        [EnumMember(Value = "Reply")]
+        Reply = 3,
+        [EnumMember(Value = "Forward")]
+        Forward = 4,
+        [EnumMember(Value = "Edit")]
+        Edit = 5,
+        [EnumMember(Value = "Print")]
+        Print = 6
+    }
+
     #endregion
 
     #region Contact
@@ -2953,6 +3005,8 @@ namespace Mark5.ServiceReference.DataContract
         /// <summary>Default row appearance</summary>
         public OriginatorAppearance DefaultAppearance { get; set; } = new OriginatorAppearance();
 
+        [DataMember(Name = "UserActivities", Order = 3)]
+        public List<UserActivity> UserActivities { get; set; }
     }
 
     [DataContract(Name = "OriginatorAppearance", Namespace = "com.nordic-it.appservice.v3")]

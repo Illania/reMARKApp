@@ -1113,6 +1113,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 await Managers.DocumentsManager.SetDocumentsReadStatusAsync(documentPreviews, true);
 
+                if (PlatformConfig.Preferences.SyncUserActivities)
+                    await Managers.DocumentsManager.ExecuteUserActivity(UserActivityType.Read, documentPreviews);
+
                 var updatedItems = documentPreviews.Select(d => d.Id);
                 ((DocumentListDataSource)TableView.Source).UpdateItems(updatedItems);
                 ((DocumentListDataSource)((UITableViewController)searchController?.SearchResultsController)?.TableView?.Source)?.UpdateItems(updatedItems);

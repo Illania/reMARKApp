@@ -34,6 +34,7 @@ namespace Mark5.Mobile.Common.Model
 
         public bool DeliveryReportAvailable => ServiceVersionGreaterThanOrEqual(4, 5, 0);
 
+        public bool UserActivitiesAvailable => ServiceVersionGreaterThanOrEqual(4, 6, 0);
 
         public bool CalendarModuleAvailable       
         {
