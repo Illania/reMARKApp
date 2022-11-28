@@ -959,6 +959,92 @@ namespace Mark5.ServiceReference.DataContract
         [EnumMember(Value = "Bcc")] Bcc = 3
     }
 
+    [DataContract(Name = "MarkBodyEnumType", Namespace = "com.nordic-it.appservice.v3")]
+    public enum MarkBodyTypeEnum
+    {
+        [EnumMember(Value = "Text")]
+        Text,
+
+        [EnumMember(Value = "Html")]
+        Html,
+
+        [EnumMember(Value = "Rtf")]
+        Rtf,
+
+        [EnumMember(Value = "Tiff")]
+        Tiff,
+
+        [EnumMember(Value = "Internal")]
+        Internal,
+
+        [EnumMember(Value = "Pdf")]
+        Pdf,
+
+        [EnumMember(Value = "Unknown")]
+        Unknown
+    }
+
+
+    [DataContract(Name = "GetAutoReplyResult", Namespace = "com.nordic-it.appservice.v3")]
+    public class GetAutoReplyResult
+    {
+        [DataMember(Name = "Active", Order = 0)]
+        public bool Active { get; set; }
+
+        [DataMember(Name = "ActiveFrom", Order = 0)]
+        public DateTime ActiveFrom { get; set; }
+
+        [DataMember(Name = "ActiveTo", Order = 0)]
+        public DateTime ActiveTo { get; set; }
+
+        [DataMember(Name = "IncomingMailboxGuid", Order = 0)]
+        public Guid IncomingMailboxGuid { get; set; }
+
+        [DataMember(Name = "ReplySubject", Order = 0)]
+        public string ReplySubject { get; set; }
+
+        [DataMember(Name = "ReplyText", Order = 0)]
+        public object ReplyText { get; set; }
+
+        [DataMember(Name = "BodyType", Order = 0)]
+        public MarkBodyTypeEnum BodyType { get; set; }
+    }
+
+    [DataContract(Name = "GetAutoReplyParameters", Namespace = "com.nordic-it.appservice.v3")]
+    public class GetAutoReplyParameters : AbstractParameters
+    {
+    }
+
+    [DataContract(Name = "SetAutoReplyResult", Namespace = "com.nordic-it.appservice.v3")]
+    public class SetAutoReplyResult
+    {
+    }
+
+    [DataContract(Name = "SetAutoReplyParameters", Namespace = "com.nordic-it.appservice.v3")]
+    public class SetAutoReplyParameters : AbstractParameters
+    {
+        [DataMember(Name = "Active", Order = 0)]
+        public bool Active { get; set; }
+
+        [DataMember(Name = "ActiveFrom", Order = 0)]
+        public DateTime ActiveFrom { get; set; }
+
+        [DataMember(Name = "ActiveTo", Order = 0)]
+        public DateTime ActiveTo { get; set; }
+
+        [DataMember(Name = "IncomingMailboxGuid", Order = 0)]
+        public Guid IncomingMailboxGuid { get; set; }
+
+        [DataMember(Name = "ReplySubject", Order = 0)]
+        public string ReplySubject { get; set; }
+
+        [DataMember(Name = "ReplyText", Order = 0)]
+        public object ReplyText { get; set; }
+
+        [DataMember(Name = "BodyType", Order = 0)]
+        public MarkBodyTypeEnum BodyType { get; set; }
+    }
+
     [DataContract(Name = "TemplatePreview", Namespace = "com.nordic-it.appservice.v3")]
     public class TemplatePreview
     {

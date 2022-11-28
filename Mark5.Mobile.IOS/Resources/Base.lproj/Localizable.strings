@@ -1,9 +1,11 @@
 ﻿"account" = "Account";
 "accept" = "Accept";
 "accepted" = "Accepted";
+"active" = "Active";
 "attention" = "Attention";
 "area" = "Area";
 "access_disabled" = "Your device does not have access enabled. Please contact your system administrator and restart the reMARK app.";
+"active_to_less_than_active_from" = "Active to date is less than active fromm date";
 "add" = "Add";
 "add_bookmark"= "Add bookmark";
 "add_to" = "add to";
@@ -30,6 +32,7 @@
 "all_day" = "All-day";
 "attachment_too_big" = "The attachment is bigger than the maximum allowed size on the server";
 "attachments" = "Attachments";
+"autoreply_settings" = "Autoreply setttings";
 "autosave_recover_title" = "Recover email";
 "autosave_recover_content" = "reMARK recovered an autosaved email. Do you want to continue editing it?";
 "available" = "Available";
@@ -183,6 +186,7 @@
 "edit_contact_edit_person" = "Edit person";
 "edit_contact_edit_company" = "Edit company";
 "edit_contact_edit_department" = "Edit department";
+"editing_autoreply___" = "Editing autoreply rule...";
 "editing_contact___" = "Editing contact...";
 "editing_shortcode___" = "Editing mailing list...";
 "editing_extra_field___" = "Editing extra field...";
@@ -278,6 +282,7 @@
 "login_failed_access_disabled" = "Your device does not have access enabled. Please contact your system administrator and restart the reMARK app.";
 "login_failed_account_locked" = "Account locked. Please contact your system administrator.";
 "low" = "Low";
+"mailbox"= "Mailbox";
 "mark5_server_reachability" = "reMARK server: ";
 "mark5_ios_system_report" = "reMARK iOS System Report";
 "mark_as_read" = "Mark as read";

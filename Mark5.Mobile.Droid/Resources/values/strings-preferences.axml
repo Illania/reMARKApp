@@ -87,7 +87,8 @@
     <string name="pref_use_message_list_appearance_title">Use message list appearance</string>
     <string name="pref_use_message_list_appearance_summary_on">Email list will have custom appearance according to reMARK user settings</string>
     <string name="pref_use_message_list_appearance_summary_off">Email list will have default appearance</string>
-    <string name="pref_sync_user_activities">Sync useer activities</string>
+    <string name="pref_sync_user_activities">Sync user activities</string>
+    <string name="pref_sync_user_activities_title">Sync user activities</string>
     <string name="pref_sync_user_activities_summary_on">User activities will be synced with reMARK user settings</string>
     <string name="pref_sync_user_activities_summary_off">User activities will be disabled</string>
     <string name="pref_documents_enable_move_to_folder_title">Enable move to folder</string>

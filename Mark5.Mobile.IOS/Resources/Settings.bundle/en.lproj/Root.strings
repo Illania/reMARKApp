@@ -7,6 +7,7 @@
 "always_ask" = "Always ask";
 "always_ask_short" = "Ask";
 "always_use_default_line" = "Always use default mailbox";
+"autoreply_settings" = "Autoreply settings";
 "anyone" = "Anyone";
 "cache" = "Cache";
 "caller_identification" = "Caller identification";

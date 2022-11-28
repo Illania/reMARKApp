@@ -1,4 +1,5 @@
 ﻿using System;
+using Mark5.ServiceReference.DataContract;
 
 namespace Mark5.Mobile.Common.Model
 {
@@ -133,7 +134,6 @@ namespace Mark5.Mobile.Common.Model
         Edit = 5,
         Print = 6
     }
-
 
     #endregion
 

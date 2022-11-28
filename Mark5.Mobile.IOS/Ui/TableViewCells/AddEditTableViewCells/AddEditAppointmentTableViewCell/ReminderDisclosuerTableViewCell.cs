@@ -8,7 +8,7 @@ using Mark5.Mobile.IOS.Ui.Common;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppointmentTableViewCell
 {
-    public class ReminderDisclosureTableViewCell : AppointmentDisclosureTableViewCell
+    public class ReminderDisclosureTableViewCell : LabelWithChevronTableViewCell
     {
         Source pickerDataSource;
         UIPickerView pickerView;
@@ -55,7 +55,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
         void DoneTapped(UIBarButtonItem sender)
         {
             ReminderInfo reminder = pickerDataSource.GetSelectedReminder(pickerView);
-            Label.Text = reminder.Title;
+            ValueLabel.Text = reminder.Title;
             ReminderSelected?.Invoke(reminder);
             HiddenTextView.ResignFirstResponder();
         }

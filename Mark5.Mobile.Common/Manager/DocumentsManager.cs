@@ -98,6 +98,65 @@ namespace Mark5.Mobile.Common.Manager
                 await ExecuteUserActivity(userActivityType, doc, null);
         }
 
+        public async Task<AutoReplyRule> GetAutoReplyRule(SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
+            {
+                var rule = await AppServiceProxy.GetAutoReplyRuleAsync(new DataContract.GetAutoReplyParameters
+                {
+         
+                });
+
+                return new AutoReplyRule
+                {
+                    Active = rule.Active,
+                    ActiveFrom = rule.ActiveFrom,
+                    ActiveTo = rule.ActiveTo,
+                    IncomingMailboxGuid = rule.IncomingMailboxGuid,
+                    ReplySubject = rule.ReplySubject,
+                    ReplyText = rule.ReplyText,
+                    BodyType = rule.BodyType
+                };
+            }
+
+            else if (sourceType == SourceType.Local)
+                throw new ReMarkException(ErrorConstants.Codes.InvalidSourceType);
+
+            throw new ArgumentException("Invalid sourceType provided.");   
+
+        }
+
+        public async Task SetAutoReplyRule(AutoReplyRule rule, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+
+            if (sourceType == SourceType.Remote)
+            {
+                var result = await AppServiceProxy.SetAutoReplyRuleAsync(new DataContract.SetAutoReplyParameters
+                {
+                    Active = rule.Active,
+                    ActiveFrom = rule.ActiveFrom,
+                    ActiveTo = rule.ActiveTo,
+                    IncomingMailboxGuid = rule.IncomingMailboxGuid,
+                    ReplySubject = rule.ReplySubject,
+                    ReplyText = rule.ReplyText,
+                    BodyType = rule.BodyType 
+                });
+
+                return;
+            }
+
+            else if (sourceType == SourceType.Local)
+                throw new ReMarkException(ErrorConstants.Codes.InvalidSourceType);
+
+            throw new ArgumentException("Invalid sourceType provided.");
+
+        }
+
         public async Task<List<DocumentPreview>> GetDocumentPreviewsAsync(Folder folder, int startId = -1, int endId = -1, SourceType sourceType = SourceType.Auto)
         {
             return await GetDocumentPreviewsAsync(folder.Id, folder.Guid, startId, endId, sourceType);

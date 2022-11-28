@@ -2,7 +2,7 @@
 using Mark5.Mobile.IOS.Ui.Common;
 using UIKit;
 
-namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppointmentTableViewCell
+namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
 {
     public class ToggleTableViewCell : AddEditTableViewCell
     {

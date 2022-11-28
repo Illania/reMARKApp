@@ -300,6 +300,14 @@
 			<key>Title</key>
 			<string>manage_extra_fields</string>
 		</dict>
+			<dict>
+			<key>Type</key>
+			<string>PSMultiValueSpecifier</string>
+			<key>Key</key>
+			<string>AutoReplySettings</string>
+			<key>Title</key>
+			<string>autoreply_settings</string>
+		</dict>
 		<dict>
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>

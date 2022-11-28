@@ -125,5 +125,9 @@ namespace Mark5.Mobile.Common.Manager
 
         Task ExecuteUserActivity(Model.UserActivityType userActivityType, List<DocumentPreview> originalDocuments);
 
+        Task<AutoReplyRule> GetAutoReplyRule(SourceType sourceType = SourceType.Auto);
+
+        Task SetAutoReplyRule(AutoReplyRule rule, SourceType sourceType = SourceType.Auto);
+
     }
 }
