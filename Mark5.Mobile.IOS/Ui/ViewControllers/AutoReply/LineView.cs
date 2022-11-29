@@ -85,11 +85,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AutoReply
 
         public override Task InitializeView()
         {
-            if (RestoreWorkingCopy)
-            {
-                SetLineFromGuid(AutoReplyRule.IncomingMailboxGuid);
-                return Task.CompletedTask;
-            }
             if(AutoReplyRule.IncomingMailboxGuid!= null && AutoReplyRule.IncomingMailboxGuid != Guid.Empty)
                 SetLineFromGuid(AutoReplyRule.IncomingMailboxGuid);
 

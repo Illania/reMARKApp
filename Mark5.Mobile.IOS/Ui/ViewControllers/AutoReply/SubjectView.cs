@@ -73,11 +73,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AutoReply
 
         public override Task InitializeView()
         {
-            if (RestoreWorkingCopy)
-            {
-                textView.Text = AutoReplyRule.ReplySubject;
-                return Task.CompletedTask;
-            }
+            textView.Text = AutoReplyRule.ReplySubject;
             return Task.CompletedTask;
         }
 

@@ -17,8 +17,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AutoReply
         protected float VerticalMargin = 10f;
         protected float InnerMargin = 5f;
 
-        public bool RestoreWorkingCopy { get; set; }
-
         protected AutoReplySubView()
         {
             Initialize();

@@ -57,9 +57,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AutoReply
                 toggleSwitch.TopAnchor.ConstraintEqualTo(ContainerView.TopAnchor, VerticalMargin),
                 toggleSwitch.RightAnchor.ConstraintEqualTo(ContainerView.RightAnchor, -HorizontalMargin),
                 toggleSwitch.BottomAnchor.ConstraintEqualTo(ContainerView.BottomAnchor, -VerticalMargin)
-                //toggleSwitch.LeadingAnchor.ConstraintGreaterThanOrEqualTo(title.LeadingAnchor, HorizontalMargin),
-                //toggleSwitch.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
-                //toggleSwitch.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
             });
         }
 
