@@ -148,6 +148,31 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 };
             }
 
+            var autoReplySettings = FindPreference(GetString(Resource.String.pref_key_autoreply));
+            if (autoReplySettings != null)
+            {
+                autoReplySettings.PreferenceClick += async (object sender, Preference.PreferenceClickEventArgs e) =>
+                {
+                    var autoReplyRule = await Managers.DocumentsManager.GetAutoReplyRule();
+                    /*var autoReplyRule = new AutoReplyRule()
+                    {
+                        Active = true,
+                        ActiveFrom = DateTime.Now,
+                        ActiveTo = DateTime.Now.AddDays(20),
+                        IncomingMailboxGuid = new Guid("9f7624a6-3f2c-403f-83d2-797fe4688f40"),
+                        ReplySubject = "Out of office",
+                        ReplyText = "<html><body><b>I am on vacancy till 15 of December</b></body></html>"
+                    };*/
+                    AutoReplyFragment autoReplyFragment;
+                    string autoReplyFragmentTag;
+                    var fragmentTransaction = Activity.SupportFragmentManager.BeginTransaction();
+                    (autoReplyFragment, autoReplyFragmentTag) = AutoReplyFragment.NewInstance(autoReplyRule);
+                    fragmentTransaction.Replace(Resource.Id.fragment_container, autoReplyFragment, autoReplyFragmentTag);
+                    fragmentTransaction.AddToBackStack(null);
+                    fragmentTransaction.Commit();
+                };
+            }
+
             var extraFieldsOptions = FindPreference(GetString(Resource.String.pref_key_extra_fields_options));
             if (extraFieldsOptions != null)
             {

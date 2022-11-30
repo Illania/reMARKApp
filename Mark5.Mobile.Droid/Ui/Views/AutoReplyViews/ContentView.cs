@@ -76,7 +76,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AutoReplyViews
         public override async Task RefreshView()
         {
             await newContentSemaphore.WaitAsync();
-            await newContentWebView.LoadHtml(context, AutoReplyRule.ReplyText.ToString(), HtmlProcessingConfiguration.DefaultForEditing);
+            await newContentWebView.LoadHtml(context, AutoReplyRule.ReplyText, HtmlProcessingConfiguration.DefaultForEditing);
         }
 
         public override async Task UpdateAutoReply()

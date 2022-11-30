@@ -612,12 +612,12 @@ namespace Mark5.ServiceReference.AppService
 
         public async Task<GetAutoReplyResult> GetAutoReplyRuleAsync(GetAutoReplyParameters parameters, CancellationToken ct = default)
         {
-            return await InvokeAsync<GetAutoReplyResult, GetAutoReplyParameters>("GetAutoReplyRule", parameters, ct);
+            return await InvokeAsync<GetAutoReplyResult, GetAutoReplyParameters>("GetAutoReply", parameters, ct);
         }
 
         public async Task<SetAutoReplyResult> SetAutoReplyRuleAsync(SetAutoReplyParameters parameters, CancellationToken ct = default)
         {
-            return await InvokeAsync<SetAutoReplyResult, SetAutoReplyParameters>("SetAutoReplyRule", parameters, ct);
+            return await InvokeAsync<SetAutoReplyResult, SetAutoReplyParameters>("SetAutoReply", parameters, ct);
         }
 
     }

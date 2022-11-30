@@ -242,7 +242,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AutoReply
                 }
                 CheckDates();
 
-                await LoadHtmlString(autoReplyRule.ReplyText.ToString(), HtmlProcessingConfiguration.DefaultForEditing);
+                await LoadHtmlString(autoReplyRule.ReplyText, HtmlProcessingConfiguration.DefaultForEditing);
                
                 await EndRefreshing();
 

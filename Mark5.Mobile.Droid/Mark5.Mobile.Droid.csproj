@@ -924,7 +924,7 @@
     <Compile Include="Ui\Activities\TransmitDestinationsListActivity.cs" />
     <Compile Include="Ui\Fragments\TransmitDestinationsListFragment.cs" />
     <Compile Include="Ui\Fragments\AutoReplyFragment.cs" />
-    <Compile Include="Ui\Views\AutoReplyViews\AutoReplyView.cs" />
+    <Compile Include="Ui\Views\AutoReplyViews\AutoReplySubView.cs" />
     <Compile Include="Ui\Views\AutoReplyViews\ContentView.cs" />
     <Compile Include="Ui\Views\AutoReplyViews\FormattingView.cs" />
     <Compile Include="Ui\Views\AutoReplyViews\LineView.cs" />
@@ -934,6 +934,11 @@
     <Compile Include="Ui\Views\AutoReplyViews\BasicTextView.cs" />
     <Compile Include="Ui\Views\AutoReplyViews\StartDateView.cs" />
     <Compile Include="Ui\Views\AutoReplyViews\EndDateView.cs" />
+    <Compile Include="Ui\Activities\AutoReplyActivity.cs" />
+    <Compile Include="Resources\Resource.designer.cs">
+      <SubType></SubType>
+      <Generator></Generator>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\AboutAssets.txt" />
@@ -1493,10 +1498,6 @@
       <SubType></SubType>
       <Generator></Generator>
     </AndroidResource>
-    <Compile Include="Resources\Resource.designer.cs">
-      <SubType></SubType>
-      <Generator></Generator>
-    </Compile>
     <AndroidResource Include="Resources\layout\progress_dialog.xml">
       <SubType></SubType>
       <Generator></Generator>

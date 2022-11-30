@@ -25,11 +25,9 @@ namespace Mark5.Mobile.Droid.Ui.Views.AutoReplyViews
     public class IsActiveView: AutoReplySubView
     {
         SwitchCompat ToggleButton;
-        Action toggleChanged = delegate { }; 
-        public IsActiveView(Context context, Action toggleChanged):base(context)
+        public IsActiveView(Context context):base(context)
         {
-            this.toggleChanged = toggleChanged;
-
+            SetPadding(DistanceNormal + DistanceSmall, DistanceNormal + DistanceSmall, DistanceNormal + DistanceSmall, DistanceNormal + DistanceSmall);
             var isActiveText = new BasicTextView(context);
             isActiveText.Text = "Active";
             isActiveText.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent, 1)

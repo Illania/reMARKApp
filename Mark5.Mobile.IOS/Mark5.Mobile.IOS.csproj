@@ -346,11 +346,9 @@
 	    <Compile Include="Ui\ViewControllers\CategoriesListOldViewController.cs" />
 	    <Compile Include="Ui\ViewControllers\DeliveryReportViewController.cs" />
 	    <Compile Include="Ui\ViewControllers\TransmitDestinationsViewController.cs" />
-	    <Compile Include="Ui\TableViewCells\AddEditTableViewCells\AutoReplyTableViewCells\MailboxPickerTableViewCell.cs" />
 	    <Compile Include="Ui\TableViewCells\AddEditTableViewCells\ToggleTableViewCell.cs" />
 	    <Compile Include="Ui\TableViewCells\AddEditTableViewCells\DateSelectionTableViewCell.cs" />
 	    <Compile Include="Ui\TableViewCells\AddEditTableViewCells\LabelWithChevronTableViewCell.cs" />
-	    <Compile Include="Ui\TableViewCells\RichTextEditTableViewCell.cs" />
 	    <Compile Include="Ui\ViewControllers\AutoReply\AutoReplyViewController.cs" />
 	    <Compile Include="Ui\ViewControllers\AutoReply\AutoReplySubView.cs" />
 	    <Compile Include="Ui\ViewControllers\AutoReply\DateView.cs" />

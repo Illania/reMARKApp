@@ -107,7 +107,7 @@ namespace Mark5.Mobile.Common.Manager
             {
                 var rule = await AppServiceProxy.GetAutoReplyRuleAsync(new DataContract.GetAutoReplyParameters
                 {
-         
+                    Token = Token
                 });
 
                 return new AutoReplyRule
@@ -115,10 +115,9 @@ namespace Mark5.Mobile.Common.Manager
                     Active = rule.Active,
                     ActiveFrom = rule.ActiveFrom,
                     ActiveTo = rule.ActiveTo,
-                    IncomingMailboxGuid = rule.IncomingMailboxGuid,
+                    IncomingMailboxGuid = rule.MailboxGuid,
                     ReplySubject = rule.ReplySubject,
-                    ReplyText = rule.ReplyText,
-                    BodyType = rule.BodyType
+                    ReplyText = rule.ReplyText
                 };
             }
 
@@ -129,6 +128,8 @@ namespace Mark5.Mobile.Common.Manager
 
         }
 
+
+
         public async Task SetAutoReplyRule(AutoReplyRule rule, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
@@ -138,13 +139,13 @@ namespace Mark5.Mobile.Common.Manager
             {
                 var result = await AppServiceProxy.SetAutoReplyRuleAsync(new DataContract.SetAutoReplyParameters
                 {
+                    Token = Token,
                     Active = rule.Active,
                     ActiveFrom = rule.ActiveFrom,
                     ActiveTo = rule.ActiveTo,
-                    IncomingMailboxGuid = rule.IncomingMailboxGuid,
+                    MailboxGuid = rule.IncomingMailboxGuid,
                     ReplySubject = rule.ReplySubject,
-                    ReplyText = rule.ReplyText,
-                    BodyType = rule.BodyType 
+                    ReplyText = rule.ReplyText
                 });
 
                 return;

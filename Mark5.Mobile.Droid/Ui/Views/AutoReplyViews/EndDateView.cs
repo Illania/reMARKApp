@@ -25,10 +25,10 @@ namespace Mark5.Mobile.Droid.Ui.Views.AutoReplyViews
 
         protected override async void TimeClicked(object sender, EventArgs e)
         {
-            var end = AutoReplyRule.ActiveTo;
+            var start = AutoReplyRule.ActiveTo;
 
-            TimeSpan result = await Dialogs.ShowTimePicker(Context, end.Hour, end.Minute);
-            var newDate = new DateTime(end.Year, end.Month, end.Day, result.Hours, result.Minutes, 0, DateTimeKind.Local);
+            TimeSpan result = await Dialogs.ShowTimePicker(Context, start.Hour, start.Minute);
+            var newDate = new DateTime(start.Year, start.Month, start.Day, result.Hours, result.Minutes, 0, DateTimeKind.Local);
             AutoReplyRule.ActiveTo = newDate;
             await RefreshView();
         }

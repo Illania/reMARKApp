@@ -30,6 +30,8 @@
     <string name="pref_always_use_default_line_title">Always use default mailbox</string>
     <string name="pref_always_use_default_line_summary_off">The predefined mailbox will be selected according to the original email</string>
     <string name="pref_always_use_default_line_summary_on">The default mailbox will be used on every email</string>
+    <string name="pref_autoreply_title">Autoreply settings</string>
+    <string name="pref_autoreply_summary">Out of office automatic reply settings</string>
     <string name="pref_cache_auto_clean_dialog_title">Clean up cache every</string>
     <string name="pref_cache_auto_clean_summary">Cache will be cleaned up every %s</string>
     <string name="pref_cache_auto_clean_title">Cache clean up</string>
@@ -121,6 +123,7 @@
     <string name="pref_key_advanced_enable_reporting">pref_key_advanced_enable_reporting</string>
     <string name="pref_key_advanced_update_config">pref_key_advanced_update_config</string>
     <string name="pref_key_advanced_connection_diagnostics">pref_key_advanced_connection_diagnostics</string>
+    <string name="pref_key_autoreply">pref_key_autoreply</string>
     <string name="pref_key_cache_auto_clean">pref_key_cache_auto_clean</string>
     <string name="pref_key_cache_clear">pref_key_cache_clear</string>
     <string name="pref_key_cat_about">pref_key_cat_about</string>
@@ -195,9 +198,9 @@
     <string name="pref_search_partial_word_title">Partial word search</string>
     <string name="push_notification_token">push_notification_token</string>
     <string name="azure_application_proxy_token">azure_application_proxy_token</string>
-     <string name="azure_application_proxy_enabled">azure_application_proxy_enabled</string>
-     <string name="azure_application_proxy_app_client_id">azure_application_app_client_id</string>
-     <string name="azure_application_proxy_app_proxy_id">azure_application_proxy_app_proxy_id</string>
+    <string name="azure_application_proxy_enabled">azure_application_proxy_enabled</string>
+    <string name="azure_application_proxy_app_client_id">azure_application_app_client_id</string>
+    <string name="azure_application_proxy_app_proxy_id">azure_application_proxy_app_proxy_id</string>
     <string name="ssl_off">Disabled</string>
     <string name="ssl_on">Enabled</string>
     <string name="ssl_self_signed">Enabled (allow self-signed)</string>

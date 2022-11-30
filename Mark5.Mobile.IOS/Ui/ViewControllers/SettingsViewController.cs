@@ -167,16 +167,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 if (ServerConfig.SystemSettings.SystemInfo.ExtraFieldsEditingAvailable)
                 {
-                    //var autoReplyRule = await Managers.DocumentsManager.GetAutoReplyRule();
-                    var autoReplyRule = new AutoReplyRule()
-                    {
-                        Active = true,
-                        ActiveFrom = DateTime.Now,
-                        ActiveTo = DateTime.Now.AddDays(20),
-                        IncomingMailboxGuid = new Guid("9f7624a6-3f2c-403f-83d2-797fe4688f40"),
-                        ReplySubject = "Out of office",
-                        ReplyText = "<html><body><b>I am on vacancy till 15 of December</b></body></html>"
-                    };
+                    var autoReplyRule = await Managers.DocumentsManager.GetAutoReplyRule();
+
                     var autoReplyVC = new AutoReplyViewController(autoReplyRule);
    
                     PresentViewController(new NavigationController(autoReplyVC, UIModalPresentationStyle.PageSheet), true, null);

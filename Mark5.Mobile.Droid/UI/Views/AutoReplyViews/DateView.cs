@@ -15,6 +15,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.AutoReplyViews
 
         public DateView(Context context) : base(context)
         {
+            SetPadding(DistanceNormal + DistanceSmall, DistanceNormal + DistanceSmall, DistanceNormal + DistanceSmall, DistanceNormal + DistanceSmall);
+
             DateTextView = new BasicTextView(context);
             DateTextView.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent, 1)
             {

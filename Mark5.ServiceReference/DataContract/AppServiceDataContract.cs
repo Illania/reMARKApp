@@ -959,7 +959,7 @@ namespace Mark5.ServiceReference.DataContract
         [EnumMember(Value = "Bcc")] Bcc = 3
     }
 
-    [DataContract(Name = "MarkBodyEnumType", Namespace = "com.nordic-it.appservice.v3")]
+    [DataContract(Name = "MarkBodyTypeEnum", Namespace = "com.nordic-it.appservice.v3")]
     public enum MarkBodyTypeEnum
     {
         [EnumMember(Value = "Text")]
@@ -997,17 +997,15 @@ namespace Mark5.ServiceReference.DataContract
         [DataMember(Name = "ActiveTo", Order = 0)]
         public DateTime ActiveTo { get; set; }
 
-        [DataMember(Name = "IncomingMailboxGuid", Order = 0)]
-        public Guid IncomingMailboxGuid { get; set; }
+        [DataMember(Name = "MailboxGuid", Order = 0)]
+        public Guid MailboxGuid { get; set; }
 
         [DataMember(Name = "ReplySubject", Order = 0)]
         public string ReplySubject { get; set; }
 
         [DataMember(Name = "ReplyText", Order = 0)]
-        public object ReplyText { get; set; }
+        public string ReplyText { get; set; }
 
-        [DataMember(Name = "BodyType", Order = 0)]
-        public MarkBodyTypeEnum BodyType { get; set; }
     }
 
     [DataContract(Name = "GetAutoReplyParameters", Namespace = "com.nordic-it.appservice.v3")]
@@ -1032,17 +1030,15 @@ namespace Mark5.ServiceReference.DataContract
         [DataMember(Name = "ActiveTo", Order = 0)]
         public DateTime ActiveTo { get; set; }
 
-        [DataMember(Name = "IncomingMailboxGuid", Order = 0)]
-        public Guid IncomingMailboxGuid { get; set; }
+        [DataMember(Name = "MailboxGuid", Order = 0)]
+        public Guid MailboxGuid { get; set; }
 
         [DataMember(Name = "ReplySubject", Order = 0)]
         public string ReplySubject { get; set; }
 
         [DataMember(Name = "ReplyText", Order = 0)]
-        public object ReplyText { get; set; }
+        public string ReplyText { get; set; }
 
-        [DataMember(Name = "BodyType", Order = 0)]
-        public MarkBodyTypeEnum BodyType { get; set; }
     }
 
     [DataContract(Name = "TemplatePreview", Namespace = "com.nordic-it.appservice.v3")]

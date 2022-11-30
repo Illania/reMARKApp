@@ -21,7 +21,7 @@
         <androidx.preference.CheckBoxPreference android:key="@string/pref_key_reply_with_attachments" android:title="@string/pref_reply_with_attachments_title" android:summaryOn="@string/pref_reply_with_attachments_summary_on" android:summaryOff="@string/pref_reply_with_attachments_summary_off" android:defaultValue="@bool/pref_reply_with_attachments_default" />
         <androidx.preference.CheckBoxPreference android:key="@string/pref_key_open_file_to_folder_dialog" android:title="@string/pref_open_file_to_folder_dialog_title" android:summaryOn="@string/pref_open_file_to_folder_dialog_summary_on" android:summaryOff="@string/pref_open_file_to_folder_dialog_summary_off" android:defaultValue="@bool/pref_open_file_to_folder_dialog_default" />
         <androidx.preference.CheckBoxPreference android:key="@string/pref_key_sync_user_activities" android:title="@string/pref_sync_user_activities_title" android:summaryOn="@string/pref_sync_user_activities_summary_on" android:summaryOff="@string/pref_sync_user_activities_summary_off" android:defaultValue="@bool/pref_sync_user_activities_default" />
-       
+        <androidx.preference.Preference android:key="@string/pref_key_autoreply" android:title="@string/pref_autoreply_title" android:summary="@string/pref_autoreply_summary" />
 <androidx.preference.Preference android:key="@string/pref_key_extra_fields_options" android:title="@string/pref_extra_fields_options_title" android:summary="@string/pref_extra_fields_options_summary" />
     </androidx.preference.PreferenceScreen>
     <androidx.preference.PreferenceScreen android:key="@string/pref_sync_favorites" android:title="@string/pref_sync_title">

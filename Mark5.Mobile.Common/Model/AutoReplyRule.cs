@@ -10,7 +10,7 @@ namespace Mark5.Mobile.Common.Model
         public DateTime ActiveTo { get; set; } = DateTime.MaxValue;
         public Guid IncomingMailboxGuid { get; set; }
         public string ReplySubject { get; set; }
-        public object ReplyText { get; set; }
+        public string ReplyText { get; set; }
         public MarkBodyTypeEnum BodyType { get; set; }
 
         public AutoReplyRule()
