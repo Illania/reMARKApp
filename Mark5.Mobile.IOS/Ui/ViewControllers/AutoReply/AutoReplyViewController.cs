@@ -242,8 +242,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AutoReply
                 }
                 CheckDates();
 
-                await LoadHtmlString(autoReplyRule.ReplyText, HtmlProcessingConfiguration.DefaultForEditing);
-               
+                if (!string.IsNullOrEmpty(autoReplyRule.ReplyText))
+                    await LoadHtmlString(autoReplyRule.ReplyText, HtmlProcessingConfiguration.DefaultForEditing);
+                else
+                    LoadEditor();
+
                 await EndRefreshing();
 
                 replyTextLoaded = true;
@@ -256,7 +259,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AutoReply
             }
         }
 
-       bool CheckDates()
+        bool CheckDates()
        {
             if (autoReplyRule.ActiveTo < autoReplyRule.ActiveFrom)
             {
@@ -284,6 +287,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AutoReply
 
         async void SaveButtonItem_Clicked(object sender, EventArgs e)
         {
+
+            var subViews = headerStackView.Subviews.OfType<AutoReplySubView>().ToArray();
+            foreach (var subView in subViews)
+                await subView.UpdateAutoReplyRule();
+
+            autoReplyRule.ReplyText = await GetContent();
+
             var result = await CheckDataIsValid();
             if (!result)
                 return;

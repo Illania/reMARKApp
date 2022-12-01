@@ -988,6 +988,9 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "GetAutoReplyResult", Namespace = "com.nordic-it.appservice.v3")]
     public class GetAutoReplyResult
     {
+        [DataMember(Name = "Id", Order = 0)]
+        public int Id { get; set; }
+
         [DataMember(Name = "Active", Order = 0)]
         public bool Active { get; set; }
 
@@ -1021,6 +1024,9 @@ namespace Mark5.ServiceReference.DataContract
     [DataContract(Name = "SetAutoReplyParameters", Namespace = "com.nordic-it.appservice.v3")]
     public class SetAutoReplyParameters : AbstractParameters
     {
+        [DataMember(Name = "Id", Order = 0)]
+        public int Id { get; set; }
+
         [DataMember(Name = "Active", Order = 0)]
         public bool Active { get; set; }
 

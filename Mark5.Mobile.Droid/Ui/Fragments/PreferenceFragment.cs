@@ -149,20 +149,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             var autoReplySettings = FindPreference(GetString(Resource.String.pref_key_autoreply));
-            if (autoReplySettings != null)
+            if (!ServerConfig.SystemSettings.SystemInfo.AutoReplyAvailable)
+                PreferenceScreen.RemovePreference(autoReplySettings);
+            else if(autoReplySettings != null)
             {
                 autoReplySettings.PreferenceClick += async (object sender, Preference.PreferenceClickEventArgs e) =>
                 {
                     var autoReplyRule = await Managers.DocumentsManager.GetAutoReplyRule();
-                    /*var autoReplyRule = new AutoReplyRule()
-                    {
-                        Active = true,
-                        ActiveFrom = DateTime.Now,
-                        ActiveTo = DateTime.Now.AddDays(20),
-                        IncomingMailboxGuid = new Guid("9f7624a6-3f2c-403f-83d2-797fe4688f40"),
-                        ReplySubject = "Out of office",
-                        ReplyText = "<html><body><b>I am on vacancy till 15 of December</b></body></html>"
-                    };*/
                     AutoReplyFragment autoReplyFragment;
                     string autoReplyFragmentTag;
                     var fragmentTransaction = Activity.SupportFragmentManager.BeginTransaction();
@@ -173,6 +166,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 };
             }
 
+            var syncUserActivities = FindPreference(GetString(Resource.String.pref_key_sync_user_activities));
+            if (!ServerConfig.SystemSettings.SystemInfo.UserActivitiesAvailable)
+                PreferenceScreen.RemovePreference(autoReplySettings); 
+      
             var extraFieldsOptions = FindPreference(GetString(Resource.String.pref_key_extra_fields_options));
             if (extraFieldsOptions != null)
             {

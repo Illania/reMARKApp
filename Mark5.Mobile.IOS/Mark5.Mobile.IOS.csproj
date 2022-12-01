@@ -1075,7 +1075,6 @@
 	  <Folder Include="Assets_onboarding.xcassets\onboarding_6.imageset\" />
 	  <Folder Include="Assets_onboarding.xcassets\onboarding_10.imageset\" />
 	  <Folder Include="Ui\TableViewCells\AddEditTableViewCells\AutoReplyTableViewCells\" />
-	  <Folder Include="Ui\ViewControllers\AutoReplyViewController\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 	<Import Project="..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets" Condition="Exists('..\packages\Xamarin.Firebase.iOS.Core.4.0.13\build\Xamarin.Firebase.iOS.Core.targets')" />

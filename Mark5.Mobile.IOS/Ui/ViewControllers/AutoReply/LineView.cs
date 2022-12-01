@@ -93,7 +93,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AutoReply
 
         public override Task UpdateAutoReplyRule()
         {
-            AutoReplyRule.IncomingMailboxGuid = selectedLine.Guid;
+            AutoReplyRule.IncomingMailboxGuid = selectedLine?.Guid ?? Guid.Empty;
             return Task.CompletedTask;
         }
 

@@ -137,7 +137,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
 
             fab = ((BaseAppCompatActivity)Activity).Fab;
-            fab.SetImageResource(Resource.Drawable.action_send);
+            fab.SetImageResource(Resource.Drawable.action_save);
             fab.SetOnClickListener(new ActionOnClickListener(() => CheckDataIsValid(Save)));
             fab.Enabled = false;
             fab.Alpha = 0.6f;
@@ -150,6 +150,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnDestroyView()
         {
+            fab.Visibility = ViewStates.Invisible;
             dismissAction?.Invoke();
             base.OnDestroyView();
             rootView.ViewTreeObserver.GlobalLayout -= RootView_OnGlobalLayout;

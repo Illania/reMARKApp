@@ -112,13 +112,15 @@ namespace Mark5.Mobile.Common.Manager
 
                 return new AutoReplyRule
                 {
+                    Id = rule.Id,
                     Active = rule.Active,
-                    ActiveFrom = rule.ActiveFrom,
-                    ActiveTo = rule.ActiveTo,
+                    ActiveFrom = rule.ActiveFrom == System.Data.SqlTypes.SqlDateTime.MinValue.Value ? DateTime.Now : rule.ActiveFrom,
+                    ActiveTo = rule.ActiveTo == System.Data.SqlTypes.SqlDateTime.MinValue.Value ? DateTime.Now.AddMonths(1) : rule.ActiveTo,
                     IncomingMailboxGuid = rule.MailboxGuid,
                     ReplySubject = rule.ReplySubject,
                     ReplyText = rule.ReplyText
                 };
+
             }
 
             else if (sourceType == SourceType.Local)
@@ -140,6 +142,7 @@ namespace Mark5.Mobile.Common.Manager
                 var result = await AppServiceProxy.SetAutoReplyRuleAsync(new DataContract.SetAutoReplyParameters
                 {
                     Token = Token,
+                    Id = rule.Id,
                     Active = rule.Active,
                     ActiveFrom = rule.ActiveFrom,
                     ActiveTo = rule.ActiveTo,
