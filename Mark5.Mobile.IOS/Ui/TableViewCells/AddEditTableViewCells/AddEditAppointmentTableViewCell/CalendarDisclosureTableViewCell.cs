@@ -4,7 +4,7 @@ using Mark5.Mobile.IOS.Utilities;
 
 namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppointmentTableViewCell
 {
-    public class CalendarDisclosureTableViewCell : AppointmentDisclosureTableViewCell
+    public class CalendarDisclosureTableViewCell : LabelWithChevronTableViewCell
     {
         readonly UIView colorView;
 
@@ -22,10 +22,10 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
 
             ContentView.AddConstraints(new[]
             {
-                colorView.CenterYAnchor.ConstraintEqualTo(Title.CenterYAnchor),
+                colorView.CenterYAnchor.ConstraintEqualTo(TitleLabel.CenterYAnchor),
                 colorView.WidthAnchor.ConstraintEqualTo(10f),
                 colorView.HeightAnchor.ConstraintEqualTo(10f),
-                colorView.TrailingAnchor.ConstraintEqualTo(Label.LeadingAnchor, -HorizontalMargin)
+                colorView.TrailingAnchor.ConstraintEqualTo(ValueLabel.LeadingAnchor, -HorizontalMargin)
             });
         }
 

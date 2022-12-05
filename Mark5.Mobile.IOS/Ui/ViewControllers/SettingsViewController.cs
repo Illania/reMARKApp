@@ -17,6 +17,7 @@ using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Utilities;
 using Mark5.Mobile.IOS.Utilities.Extensions;
 using UIKit;
+using Mark5.Mobile.IOS.Ui.ViewControllers.AutoReply;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
@@ -32,6 +33,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         const string LocalTemplateKey = "localTemplate";
         const string LogoutKey = "logout";
         const string ManageExtraFieldsKey = "ManageExtraFields";
+        const string AutoReplySettingsKey = "AutoReplySettings";
+        const string UserActivitiesKey = "SyncUserActivities";
         const string OpenSettingsAppKey = "openSettingsApp";
         const string SendFeedbackKey = "sendFeedback";
         const string ServerAddressKey = "serverAddress";
@@ -159,6 +162,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return;
                 }
 
+            }
+
+            if (specifier.Key == AutoReplySettingsKey)
+            {
+                if (ServerConfig.SystemSettings.SystemInfo.ExtraFieldsEditingAvailable)
+                {
+                    var autoReplyRule = await Managers.DocumentsManager.GetAutoReplyRule();
+
+                    var autoReplyVC = new AutoReplyViewController(autoReplyRule);
+   
+                    PresentViewController(new NavigationController(autoReplyVC, UIModalPresentationStyle.PageSheet), true, null);
+                    return;
+                }
             }
 
             if (specifier.Key == PresetCategoryKey)
@@ -502,8 +518,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 hiddenKeys.Add(SyncFavoriteFoldersKey);
             }
 
-            if (PlatformConfig.Preferences.UseTemplate != Preferences.TemplateUsageMode.Local && PlatformConfig.Preferences.UseTemplate != Preferences.TemplateUsageMode.AlwaysAsk)
+            if (PlatformConfig.Preferences.UseTemplate != Preferences.TemplateUsageMode.Local
+                && PlatformConfig.Preferences.UseTemplate != Preferences.TemplateUsageMode.AlwaysAsk)
                 hiddenKeys.Add(LocalTemplateKey);
+
+            if (ServerConfig.SystemSettings?.SystemInfo?.UserActivitiesAvailable != true)
+                hiddenKeys.Add(UserActivitiesKey);
+
+            if (ServerConfig.SystemSettings?.SystemInfo?.AutoReplyAvailable != true)
+                hiddenKeys.Add(AutoReplySettingsKey);
 
             SetHiddenKeys(hiddenKeys.ToArray(), false);
         }

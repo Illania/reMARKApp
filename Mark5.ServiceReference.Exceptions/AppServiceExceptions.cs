@@ -182,6 +182,12 @@ namespace Mark5.ServiceReference.Exceptions
         [EnumMember(Value = "CancelSendDocumentError")] CancelSendDocumentError = 3005,
         [EnumMember(Value = "ForceSendDocumentError")]ForceSendDocumentError = 3006,
 
+        [EnumMember(Value = "GetAutoReplyError")]
+        GetAutoReplyError = 4001,
+
+        [EnumMember(Value = "SetAutoReplyError")]
+        SetAutoReplyError = 4002,
+
         [EnumMember(Value = "AddExtraFieldError")]
         AddExtraFieldError = 1214,
 

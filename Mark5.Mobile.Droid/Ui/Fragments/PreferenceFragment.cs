@@ -148,6 +148,28 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 };
             }
 
+            var autoReplySettings = FindPreference(GetString(Resource.String.pref_key_autoreply));
+            if (!ServerConfig.SystemSettings.SystemInfo.AutoReplyAvailable)
+                PreferenceScreen.RemovePreference(autoReplySettings);
+            else if(autoReplySettings != null)
+            {
+                autoReplySettings.PreferenceClick += async (object sender, Preference.PreferenceClickEventArgs e) =>
+                {
+                    var autoReplyRule = await Managers.DocumentsManager.GetAutoReplyRule();
+                    AutoReplyFragment autoReplyFragment;
+                    string autoReplyFragmentTag;
+                    var fragmentTransaction = Activity.SupportFragmentManager.BeginTransaction();
+                    (autoReplyFragment, autoReplyFragmentTag) = AutoReplyFragment.NewInstance(autoReplyRule);
+                    fragmentTransaction.Replace(Resource.Id.fragment_container, autoReplyFragment, autoReplyFragmentTag);
+                    fragmentTransaction.AddToBackStack(null);
+                    fragmentTransaction.Commit();
+                };
+            }
+
+            var syncUserActivities = FindPreference(GetString(Resource.String.pref_key_sync_user_activities));
+            if (!ServerConfig.SystemSettings.SystemInfo.UserActivitiesAvailable)
+                PreferenceScreen.RemovePreference(autoReplySettings); 
+      
             var extraFieldsOptions = FindPreference(GetString(Resource.String.pref_key_extra_fields_options));
             if (extraFieldsOptions != null)
             {

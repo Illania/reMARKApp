@@ -47,7 +47,7 @@ namespace Mark5.Mobile.IOS
     {
         private IPushNotificationsRegistrator pushNotificationsRegistrator;
         const string backgroundTaskID = "com.nordic-it.mark5.mobile.ios.task";
-        private const string syncFusionLicenseKey = "MzU3NTc2QDMxMzgyZTMzMmUzMGNVUXBkU3N4ZU1RbE5OS21KNjRaY2cxakVwVDhzejlObjJPOXV3ZWdHQUk9";
+        private const string syncFusionLicenseKey = "NzY3ODA5QDMyMzAyZTMzMmUzMGFhRnVyQmNGbHlINlQwSXhoTVIvVExDTTJSQTlRUEhyN3I3Mmt6RHBBQlE9";
         DateTime lastForegroundTaskRunDate = DateTime.MinValue;
 
         public override UIWindow Window { get; set; }

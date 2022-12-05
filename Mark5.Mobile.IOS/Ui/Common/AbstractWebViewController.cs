@@ -319,8 +319,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             headerContainerView?.RemoveFromSuperview();
             webView.Hidden = true;
             if (Integration.IsIPhone())
-                webView?.RemoveFromSuperview(); // This has been commented out to avoid eventual crashes 
-                                                // Github link: https://github.com/xamarin/xamarin-macios/issues/4130#issuecomment-399243880
+                webView?.RemoveFromSuperview(); 
             webViewProgressView = null;
             loadIndicatorView = null;
             headerContainerView = null;

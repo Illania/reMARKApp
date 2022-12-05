@@ -44,7 +44,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         const string CalendarIdKey = "calendarId";
         const string AppointmentIdKey = "appointmentId";
         const string RecurrenceIndexKey = "recurrenceIndex";
-        private const string LicenseKey = "MzU3NTc2QDMxMzgyZTMzMmUzMGNVUXBkU3N4ZU1RbE5OS21KNjRaY2cxakVwVDhzejlObjJPOXV3ZWdHQUk9";
+        private const string LicenseKey = "NzY3ODA5QDMyMzAyZTMzMmUzMGFhRnVyQmNGbHlINlQwSXhoTVIvVExDTTJSQTlRUEhyN3I3Mmt6RHBBQlE9";
         Toolbar toolbar;
         DrawerLayout drawer;
         SmoothActionBarDrawerToggle drawerToggle;

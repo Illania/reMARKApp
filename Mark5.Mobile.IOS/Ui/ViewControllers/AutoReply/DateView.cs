@@ -1,40 +1,61 @@
-﻿using UIKit;
-using System;
-using System.Globalization;
-using Foundation;
-using ObjCRuntime;
+﻿using System;
+using System.Threading.Tasks;
+using AngleSharp.Text;
 using CoreGraphics;
 using Mark5.Mobile.IOS.Model;
 using Mark5.Mobile.IOS.Ui.Common;
+using UIKit;
+using System.Globalization;
+using Foundation;
+using ObjCRuntime;
 using static Mark5.Mobile.IOS.Model.DateTimeChangeEvent;
 
-namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppointmentTableViewCell
+namespace Mark5.Mobile.IOS.Ui.ViewControllers.AutoReply
 {
-    public class DateSelectioTableViewCell : AddEditTableViewCell
+    public class DateView: AutoReplySubView
     {
-        static readonly string Key = "DateSelectioTableViewCell";
-        readonly DateRowType rowType;
+        public event EventHandler Edited = delegate { };
+
+        UILabelScalable label;
+        public DateRowType RowType;
 
         UIDatePickerStyled datePicker;
 
         public Action<DateTimeChangeEvent> DateChanged = delegate { };
         public UITextFieldScalable DateTextField;
-        public UILabelScalable Label;
+        public UILabelScalable Label; 
 
-        public DateSelectioTableViewCell(Action<DateTimeChangeEvent> dateChanged, DateRowType rowType) : base(UITableViewCellStyle.Default, Key)
+
+        public DateTime Date { get => (DateTime)datePicker.Date; set => datePicker.Date = (NSDate)value; }
+
+        public bool Empty => string.IsNullOrEmpty(DateTextField?.Text);
+
+        public DateView(DateRowType type, Action<DateTimeChangeEvent> dateChanged)
         {
-            this.rowType = rowType;
-            SelectionStyle = UITableViewCellSelectionStyle.Default;
+            RowType = type;
             DateChanged += dateChanged;
+            Initialize();
+        }
 
-            Label = new UILabelScalable
+        void Initialize()
+        {
+            label = new UILabelScalable
             {
-                TranslatesAutoresizingMaskIntoConstraints = false,
-                Font = Theme.DefaultFont.CustomFont()
+                Text = RowType == DateRowType.Starts ? Localization.GetString("starts") : Localization.GetString("ends"),
+                Font = Theme.DefaultFont.CustomFont(),
+                TextColor = Theme.DarkGray,
+                Opaque = false,
+                TranslatesAutoresizingMaskIntoConstraints = false
             };
-            ContentView.Add(Label);
-
-            datePicker = new UIDatePickerStyled
+            label.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            label.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            label.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            ContainerView.AddSubview(label);
+            ContainerView.AddConstraints(new[]
+            {
+                label.TopAnchor.ConstraintEqualTo(ContainerView.TopAnchor, VerticalMargin),
+                label.LeftAnchor.ConstraintEqualTo(ContainerView.LeftAnchor, HorizontalMargin)
+            }); datePicker = new UIDatePickerStyled
             {
                 Mode = UIDatePickerMode.DateAndTime
             };
@@ -67,37 +88,40 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
                 Text = string.Empty
             };
 
-            ContentView.Add(DateTextField);
-
-            ContentView.AddConstraints(new[]
+            ContainerView.AddSubview(DateTextField);
+            DateTextField.Started += HandleScrollToView;
+            DateTextField.EditingChanged += (sender, e) => Edited(this, EventArgs.Empty);
+            ContainerView.AddConstraints(new[]
             {
-                Label.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
-                Label.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor),
-                Label.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor),
-
-                DateTextField.HeightAnchor.ConstraintGreaterThanOrEqualTo(20f),
-                DateTextField.TopAnchor.ConstraintEqualTo(Label.TopAnchor),
-                DateTextField.BottomAnchor.ConstraintEqualTo(Label.BottomAnchor),
-                DateTextField.LeadingAnchor.ConstraintGreaterThanOrEqualTo(Label.LeadingAnchor, HorizontalMargin),
-                DateTextField.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor)
+                DateTextField.TopAnchor.ConstraintEqualTo(ContainerView.TopAnchor, VerticalMargin),
+                DateTextField.LeftAnchor.ConstraintEqualTo(label.RightAnchor, InnerMargin),
+                DateTextField.RightAnchor.ConstraintEqualTo(ContainerView.RightAnchor, -HorizontalMargin),
+                DateTextField.BottomAnchor.ConstraintEqualTo(ContainerView.BottomAnchor, -VerticalMargin)
             });
+
+            DateTextField.Started += HandleScrollToView;
+            DateTextField.EditingChanged += (sender, e) => Edited(this, EventArgs.Empty);
+        }
+    
+
+        public override Task InitializeView()
+        {
+
+            if (RowType == DateRowType.Starts)
+                SetDateAndTime(AutoReplyRule.ActiveFrom);
+            else
+                SetDateAndTime(AutoReplyRule.ActiveTo);
+
+            return Task.CompletedTask;
         }
 
-        public void SetDateOnly(DateTime dateTime)
+        public override Task UpdateAutoReplyRule()
         {
-            UIStringAttributes attributes = new UIStringAttributes(new NSDictionary(
-                UIStringAttributeKey.Font, Theme.DefaultFont.CustomFont(),
-                UIStringAttributeKey.StrikethroughStyle, NSUnderlineStyle.None
-            ));
-
-            NSMutableAttributedString prettyString = new NSMutableAttributedString(FormatDateString(dateTime));
-
-            prettyString.SetAttributes(attributes.Dictionary, new NSRange(0, prettyString.Length));
-
-            DateTextField.AttributedText = prettyString;
-            DateTextField.TextColor = UIColor.Black;
-
-            SetDateOnlyPicker(dateTime);
+            if (RowType == DateRowType.Starts)
+                InvokeOnMainThread(() => AutoReplyRule.ActiveFrom = (DateTime)datePicker.Date);
+            else
+                InvokeOnMainThread(() => AutoReplyRule.ActiveTo = (DateTime)datePicker.Date);
+            return Task.CompletedTask;
         }
 
         public void SetDateAndTime(DateTime dateTime)
@@ -135,12 +159,12 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
 
         private string FormatDateTimeToString(DateTime dateTime)
         {
-            return $"{ dateTime.ToString("d MMM yyyy", CultureInfo.CurrentCulture) }   { dateTime.ToString("t", CultureInfo.CurrentCulture) }";
+            return $"{dateTime.ToString("d MMM yyyy", CultureInfo.CurrentCulture)}   {dateTime.ToString("t", CultureInfo.CurrentCulture)}";
         }
 
         private string FormatDateString(DateTime dateTime)
         {
-            return $"{ dateTime.Date.ToString("d MMM yyyy", CultureInfo.CurrentCulture) }";
+            return $"{dateTime.Date.ToString("d MMM yyyy", CultureInfo.CurrentCulture)}";
         }
 
         private void SetDateOnlyPicker(DateTime dateTime)
@@ -186,7 +210,8 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
             var selectedDate = datePicker.Date;
             var selectedDateComponents = NSCalendar.CurrentCalendar.Components(NSCalendarUnit.Day | NSCalendarUnit.Month | NSCalendarUnit.Year | NSCalendarUnit.Hour | NSCalendarUnit.Minute, selectedDate);
             var dateTime = new DateTime((int)selectedDateComponents.Year, (int)selectedDateComponents.Month, (int)selectedDateComponents.Day, (int)selectedDateComponents.Hour, (int)selectedDateComponents.Minute, 0, DateTimeKind.Local);
-            DateChanged?.Invoke(new DateTimeChangeEvent(dateTime, rowType));
+            SetDateAndTime(dateTime);
+            DateChanged?.Invoke(new DateTimeChangeEvent(dateTime, RowType));
         }
 
         [Export("cancelTapped:")]
@@ -194,5 +219,7 @@ namespace Mark5.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells.AddEditAppoin
         {
             DateTextField.ResignFirstResponder();
         }
+
     }
 }
+

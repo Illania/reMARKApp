@@ -907,14 +907,14 @@
     <Compile Include="Ui\Fragments\CategoriesListFragment.cs" />
     <Compile Include="Ui\Fragments\CopyToUserWorktrayFragment.cs" />
     <Compile Include="Ui\Fragments\CopyToDepartmentWorktrayFragment.cs" />
-    <Compile Include="UI\Fragments\CommentsListFragment.cs" />
+    <Compile Include="Ui\Fragments\CommentsListFragment.cs" />
     <Compile Include="Ui\Activities\ExtraFieldsListActivity.cs" />
     <Compile Include="Ui\Activities\ExternalDocumentFoldersListActivity.cs" />
     <Compile Include="Ui\Activities\ExternalDocumentListActivity.cs" />
     <Compile Include="Ui\Fragments\ExternalDocumentFoldersListFragment.cs" />
     <Compile Include="Ui\Fragments\ExternalDocumentsListFragment.cs" />
-    <Compile Include="UI\Fragments\ContactEmailAddressesFragment.cs" />
-    <Compile Include="UI\Fragments\LinkedEmailListFragment.cs" />
+    <Compile Include="Ui\Fragments\ContactEmailAddressesFragment.cs" />
+    <Compile Include="Ui\Fragments\LinkedEmailListFragment.cs" />
     <Compile Include="Ui\Activities\ContactEmailAddressesActivity.cs" />
     <Compile Include="Ui\Activities\LinkedEmailListActivity.cs" />
     <Compile Include="Ui\Fragments\CategoriesListOldFragment.cs" />
@@ -923,6 +923,22 @@
     <Compile Include="Ui\Activities\DeliveryReportActivity.cs" />
     <Compile Include="Ui\Activities\TransmitDestinationsListActivity.cs" />
     <Compile Include="Ui\Fragments\TransmitDestinationsListFragment.cs" />
+    <Compile Include="Ui\Fragments\AutoReplyFragment.cs" />
+    <Compile Include="Ui\Views\AutoReplyViews\AutoReplySubView.cs" />
+    <Compile Include="Ui\Views\AutoReplyViews\ContentView.cs" />
+    <Compile Include="Ui\Views\AutoReplyViews\FormattingView.cs" />
+    <Compile Include="Ui\Views\AutoReplyViews\LineView.cs" />
+    <Compile Include="Ui\Views\AutoReplyViews\SubjectView.cs" />
+    <Compile Include="Ui\Views\AutoReplyViews\IsActiveView.cs" />
+    <Compile Include="Ui\Views\AutoReplyViews\DateView.cs" />
+    <Compile Include="Ui\Views\AutoReplyViews\BasicTextView.cs" />
+    <Compile Include="Ui\Views\AutoReplyViews\StartDateView.cs" />
+    <Compile Include="Ui\Views\AutoReplyViews\EndDateView.cs" />
+    <Compile Include="Ui\Activities\AutoReplyActivity.cs" />
+    <Compile Include="Resources\Resource.designer.cs">
+      <SubType></SubType>
+      <Generator></Generator>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\AboutAssets.txt" />
@@ -958,6 +974,7 @@
     <Folder Include="Service\PushNotifications\Firebase\" />
     <Folder Include="Service\PushNotifications\Pushy\" />
     <Folder Include="Service\Reachability\" />
+    <Folder Include="Ui\Views\AutoReplyViews\" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\anim\enter_from_left.xml" />
@@ -1481,10 +1498,6 @@
       <SubType></SubType>
       <Generator></Generator>
     </AndroidResource>
-    <Compile Include="Resources\Resource.designer.cs">
-      <SubType></SubType>
-      <Generator></Generator>
-    </Compile>
     <AndroidResource Include="Resources\layout\progress_dialog.xml">
       <SubType></SubType>
       <Generator></Generator>
