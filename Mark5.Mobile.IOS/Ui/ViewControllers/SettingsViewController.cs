@@ -48,6 +48,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         const string SyncFavoriteFoldersKey = "SyncFavoriteFolders";
         const string SyncFavoriteFoldersGroupKey = "SyncFavoriteFoldersGroup";
         const string ConnectionDiagnosticsKey = "ConnectionDiagnostics";
+        const string SendingDelayKey = "SendingDelay";
+        const string RememberLastUserDelaySettingsKey = "RememberLastUserDelaySettings";
 
         public SettingsViewController()
         {
@@ -525,8 +527,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (ServerConfig.SystemSettings?.SystemInfo?.UserActivitiesAvailable != true)
                 hiddenKeys.Add(UserActivitiesKey);
 
+            if (ServerConfig.SystemSettings?.SystemInfo?.DelaySendAvailable != true)
+            {
+                hiddenKeys.Add(SendingDelayKey);
+                hiddenKeys.Add(RememberLastUserDelaySettingsKey);
+            }
+                
+
             if (ServerConfig.SystemSettings?.SystemInfo?.AutoReplyAvailable != true)
                 hiddenKeys.Add(AutoReplySettingsKey);
+
+            if (ServerConfig.SystemSettings.SystemInfo.ExtraFieldsEditingAvailable != true)
+                hiddenKeys.Add(ManageExtraFieldsKey);
 
             SetHiddenKeys(hiddenKeys.ToArray(), false);
         }
