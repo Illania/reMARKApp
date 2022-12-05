@@ -148,6 +148,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 };
             }
 
+            var sendingDelay = FindPreference(GetString(Resource.String.pref_key_sending_delay));
+            var rememberLastUsedDelaySettings = FindPreference(GetString(Resource.String.pref_key_remember_last_user_delay_settings));
+            if (!ServerConfig.SystemSettings.SystemInfo.DelaySendAvailable)
+            {
+                PreferenceScreen.RemovePreference(sendingDelay);
+                PreferenceScreen.RemovePreference(rememberLastUsedDelaySettings);
+            }
+                
             var autoReplySettings = FindPreference(GetString(Resource.String.pref_key_autoreply));
             if (!ServerConfig.SystemSettings.SystemInfo.AutoReplyAvailable)
                 PreferenceScreen.RemovePreference(autoReplySettings);
@@ -171,6 +179,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 PreferenceScreen.RemovePreference(autoReplySettings); 
       
             var extraFieldsOptions = FindPreference(GetString(Resource.String.pref_key_extra_fields_options));
+            if (!ServerConfig.SystemSettings.SystemInfo.ExtraFieldsEditingAvailable)
+                PreferenceScreen.RemovePreference(extraFieldsOptions);
             if (extraFieldsOptions != null)
             {
                 extraFieldsOptions.PreferenceClick += ExtraFieldsOptions_PreferenceClick;
