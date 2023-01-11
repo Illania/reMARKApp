@@ -31,6 +31,7 @@ using TinyIoC;
 using AndroidX.AppCompat.Widget;
 using Com.Airbnb.Lottie;
 using System.Diagnostics;
+using Microsoft.AppCenter;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
