@@ -68,7 +68,7 @@
     <AndroidSigningStorePass>Xs4Droid2015!</AndroidSigningStorePass>
     <AndroidSigningKeyAlias>default</AndroidSigningKeyAlias>
     <AndroidSigningKeyPass>Xs4Droid2015!</AndroidSigningKeyPass>
-    <AndroidDexTool>dx</AndroidDexTool>
+    <AndroidDexTool>d8</AndroidDexTool>
     <LangVersion>8.0</LangVersion>
     <AndroidCreatePackagePerAbi>false</AndroidCreatePackagePerAbi>
     <AndroidSupportedAbis>armeabi-v7a;arm64-v8a</AndroidSupportedAbis>
