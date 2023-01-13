@@ -20,15 +20,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AutoReply
         public DateRowType RowType;
 
         UIDatePickerStyled datePicker;
+        UIDatePickerStyled timePicker;
 
         public Action<DateTimeChangeEvent> DateChanged = delegate { };
         public UITextFieldScalable DateTextField;
+        public UITextFieldScalable TimeTextField;
         public UILabelScalable Label; 
-
-
-        public DateTime Date { get => (DateTime)datePicker.Date; set => datePicker.Date = (NSDate)value; }
-
-        public bool Empty => string.IsNullOrEmpty(DateTextField?.Text);
 
         public DateView(DateRowType type, Action<DateTimeChangeEvent> dateChanged)
         {
@@ -55,9 +52,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AutoReply
             {
                 label.TopAnchor.ConstraintEqualTo(ContainerView.TopAnchor, VerticalMargin),
                 label.LeftAnchor.ConstraintEqualTo(ContainerView.LeftAnchor, HorizontalMargin)
-            }); datePicker = new UIDatePickerStyled
+            });
+            datePicker = new UIDatePickerStyled
             {
-                Mode = UIDatePickerMode.DateAndTime
+                Mode = UIDatePickerMode.Date
+            };
+            timePicker = new UIDatePickerStyled
+            {
+                Mode = UIDatePickerMode.Time
             };
 
             UIToolbar datePickerToolbar = new UIToolbar(new CGRect(0f, 0f, 0f, 44f))
@@ -76,6 +78,22 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AutoReply
                 }
             };
 
+            UIToolbar timePickerToolbar = new UIToolbar(new CGRect(0f, 0f, 0f, 44f))
+            {
+                Items = new[]
+             {
+                    new UIBarButtonItem(UIBarButtonSystemItem.Cancel, this, new Selector("timePickerCancelTapped:"))
+                    {
+                        TintColor = Theme.DarkerBlue
+                    },
+                    new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
+                    new UIBarButtonItem(UIBarButtonSystemItem.Done, this, new Selector("timePickerDoneTapped:"))
+                    {
+                        TintColor = Theme.DarkerBlue
+                    }
+                }
+            };
+
             DateTextField = new UITextFieldScalable
             {
                 Font = Theme.DefaultFont.CustomFont(),
@@ -88,19 +106,34 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AutoReply
                 Text = string.Empty
             };
 
+            TimeTextField = new UITextFieldScalable
+            {
+                Font = Theme.DefaultFont.CustomFont(),
+                TintColor = Theme.Clear,
+                TextAlignment = UITextAlignment.Right,
+                InputView = timePicker,
+                InputAccessoryView = timePickerToolbar,
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                UserInteractionEnabled = true,
+                Text = string.Empty
+            };
+
             ContainerView.AddSubview(DateTextField);
-            DateTextField.Started += HandleScrollToView;
-            DateTextField.EditingChanged += (sender, e) => Edited(this, EventArgs.Empty);
+            ContainerView.AddSubview(TimeTextField);
             ContainerView.AddConstraints(new[]
             {
+                TimeTextField.TopAnchor.ConstraintEqualTo(ContainerView.TopAnchor, VerticalMargin),
+                TimeTextField.BottomAnchor.ConstraintEqualTo(ContainerView.BottomAnchor, -VerticalMargin),
+                TimeTextField.RightAnchor.ConstraintEqualTo(ContainerView.RightAnchor, -HorizontalMargin),
                 DateTextField.TopAnchor.ConstraintEqualTo(ContainerView.TopAnchor, VerticalMargin),
-                DateTextField.LeftAnchor.ConstraintEqualTo(label.RightAnchor, InnerMargin),
-                DateTextField.RightAnchor.ConstraintEqualTo(ContainerView.RightAnchor, -HorizontalMargin),
-                DateTextField.BottomAnchor.ConstraintEqualTo(ContainerView.BottomAnchor, -VerticalMargin)
+                DateTextField.RightAnchor.ConstraintEqualTo(TimeTextField.LeftAnchor, -HorizontalMargin),
+                DateTextField.BottomAnchor.ConstraintEqualTo(ContainerView.BottomAnchor, -VerticalMargin),
             });
 
             DateTextField.Started += HandleScrollToView;
             DateTextField.EditingChanged += (sender, e) => Edited(this, EventArgs.Empty);
+            TimeTextField.Started += HandleScrollToView;
+            TimeTextField.EditingChanged += (sender, e) => Edited(this, EventArgs.Empty);
         }
     
 
@@ -108,9 +141,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AutoReply
         {
 
             if (RowType == DateRowType.Starts)
-                SetDateAndTime(AutoReplyRule.ActiveFrom);
+                SetDateAndTime(AutoReplyRule.ActiveFrom.ToLocalTime());
             else
-                SetDateAndTime(AutoReplyRule.ActiveTo);
+                SetDateAndTime(AutoReplyRule.ActiveTo.ToLocalTime());
 
             return Task.CompletedTask;
         }
@@ -131,35 +164,37 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AutoReply
                 UIStringAttributeKey.StrikethroughStyle, NSUnderlineStyle.None
             ));
 
-            NSMutableAttributedString prettyString = new NSMutableAttributedString(FormatDateTimeToString(dateTime));
+            NSMutableAttributedString dateString = new NSMutableAttributedString(FormatDateString(dateTime));
+            NSMutableAttributedString timeString = new NSMutableAttributedString(FormatTimeString(dateTime));
 
-            prettyString.SetAttributes(attributes.Dictionary, new NSRange(0, prettyString.Length));
+            dateString.SetAttributes(attributes.Dictionary, new NSRange(0, dateString.Length));
+            timeString.SetAttributes(attributes.Dictionary, new NSRange(0, timeString.Length));
 
-            DateTextField.AttributedText = prettyString;
+            DateTextField.AttributedText = dateString;
             DateTextField.TextColor = UIColor.Black;
+
+            TimeTextField.AttributedText = timeString;
+            TimeTextField.TextColor = UIColor.Black;
 
             SetDateAndTimePicker(dateTime);
         }
 
         public void SetInvalidDateAndTime(DateTime dateTime)
         {
-            var attString = new NSAttributedString(FormatDateTimeToString(dateTime), new UIStringAttributes { StrikethroughColor = UIColor.Red, StrikethroughStyle = NSUnderlineStyle.Single });
+            var dateString = new NSAttributedString(FormatDateString(dateTime),
+                new UIStringAttributes { StrikethroughColor = UIColor.Red, StrikethroughStyle = NSUnderlineStyle.Single });
+            var timeString = new NSAttributedString(FormatTimeString(dateTime),
+               new UIStringAttributes { StrikethroughColor = UIColor.Red, StrikethroughStyle = NSUnderlineStyle.Single });
             DateTextField.TextColor = UIColor.Red;
-            DateTextField.AttributedText = attString;
+            DateTextField.AttributedText = dateString;
+            TimeTextField.TextColor = UIColor.Red;
+            TimeTextField.AttributedText = timeString;
             SetDateAndTimePicker(dateTime);
-        }
-
-        public void SetInvalidDate(DateTime dateTime)
-        {
-            var attString = new NSAttributedString(FormatDateString(dateTime), new UIStringAttributes { StrikethroughColor = UIColor.Red, StrikethroughStyle = NSUnderlineStyle.Single });
-            DateTextField.TextColor = UIColor.Red;
-            DateTextField.AttributedText = attString;
-            SetDateOnlyPicker(dateTime);
         }
 
         private string FormatDateTimeToString(DateTime dateTime)
         {
-            return $"{dateTime.ToString("d MMM yyyy", CultureInfo.CurrentCulture)}   {dateTime.ToString("t", CultureInfo.CurrentCulture)}";
+            return $"{dateTime.ToString("d MMM yyyy", CultureInfo.CurrentCulture)}{dateTime.ToString("t", CultureInfo.CurrentCulture)}";
         }
 
         private string FormatDateString(DateTime dateTime)
@@ -167,28 +202,30 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AutoReply
             return $"{dateTime.Date.ToString("d MMM yyyy", CultureInfo.CurrentCulture)}";
         }
 
-        private void SetDateOnlyPicker(DateTime dateTime)
+        private string FormatTimeString(DateTime dateTime)
         {
-            datePicker = new UIDatePickerStyled
-            {
-                Mode = UIDatePickerMode.Date
-            };
-
-            DateTextField.InputView = datePicker;
-            SetDatePicker(dateTime);
+            return $"{dateTime.ToString("t", CultureInfo.CurrentCulture)}";
         }
+
 
         private void SetDateAndTimePicker(DateTime dateTime)
         {
             datePicker = new UIDatePickerStyled
             {
-                Mode = UIDatePickerMode.DateAndTime
+                Mode = UIDatePickerMode.Date
             };
             DateTextField.InputView = datePicker;
-            SetDatePicker(dateTime);
+            SetDatePicker(datePicker, dateTime);
+
+            timePicker = new UIDatePickerStyled
+            {
+                Mode = UIDatePickerMode.Time
+            };
+            TimeTextField.InputView = timePicker;
+            SetDatePicker(timePicker, dateTime);
         }
 
-        private void SetDatePicker(DateTime dateTime)
+        private void SetDatePicker(UIDatePicker picker,DateTime dateTime)
         {
             var fromComponents = new NSDateComponents
             {
@@ -198,9 +235,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AutoReply
                 Hour = dateTime.Hour,
                 Minute = dateTime.Minute
             };
-
-            var nsDate = NSCalendar.CurrentCalendar.DateFromComponents(fromComponents);
-            datePicker.SetDate(nsDate, false);
+            var date = new DateTime((int)fromComponents.Year, (int)fromComponents.Month, (int)fromComponents.Day,
+                (int)fromComponents.Hour, (int)fromComponents.Minute, 0, DateTimeKind.Local);
+            picker.SetDate((NSDate)date, false);
         }
 
         [Export("doneTapped:")]
@@ -208,8 +245,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AutoReply
         {
             DateTextField.ResignFirstResponder();
             var selectedDate = datePicker.Date;
-            var selectedDateComponents = NSCalendar.CurrentCalendar.Components(NSCalendarUnit.Day | NSCalendarUnit.Month | NSCalendarUnit.Year | NSCalendarUnit.Hour | NSCalendarUnit.Minute, selectedDate);
-            var dateTime = new DateTime((int)selectedDateComponents.Year, (int)selectedDateComponents.Month, (int)selectedDateComponents.Day, (int)selectedDateComponents.Hour, (int)selectedDateComponents.Minute, 0, DateTimeKind.Local);
+            var time = ((DateTime)timePicker.Date).ToLocalTime();
+            var selectedDateComponents = NSCalendar.CurrentCalendar.Components(NSCalendarUnit.Day | NSCalendarUnit.Month | NSCalendarUnit.Year, selectedDate);
+            var dateTime = new DateTime((int)selectedDateComponents.Year, (int)selectedDateComponents.Month, (int)selectedDateComponents.Day, time.Hour, time.Minute, 0, DateTimeKind.Local);
             SetDateAndTime(dateTime);
             DateChanged?.Invoke(new DateTimeChangeEvent(dateTime, RowType));
         }
@@ -218,6 +256,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.AutoReply
         void CancelTapped(UIBarButtonItem sender)
         {
             DateTextField.ResignFirstResponder();
+        }
+
+        [Export("timePickerDoneTapped:")]
+        void TimePickerDoneTapped(UIBarButtonItem sender)
+        {
+            TimeTextField.ResignFirstResponder();
+            var selectedDate = timePicker.Date;
+            var selectedDateComponents = NSCalendar.CurrentCalendar.Components(NSCalendarUnit.Hour | NSCalendarUnit.Minute, selectedDate);
+            var date = (DateTime)datePicker.Date;
+            var dateTime = new DateTime(date.Year, date.Month, date.Day,
+                (int)selectedDateComponents.Hour, (int)selectedDateComponents.Minute, 0, DateTimeKind.Local);
+            SetDateAndTime(dateTime);
+            DateChanged?.Invoke(new DateTimeChangeEvent(dateTime, RowType));
+        }
+
+        [Export("timePickerCancelTapped:")]
+        void TimePickerCancelTapped(UIBarButtonItem sender)
+        {
+            TimeTextField.ResignFirstResponder();
         }
 
     }
