@@ -1462,18 +1462,6 @@
     </AndroidResource>
     <AndroidResource Include="Resources\layout\linear_layout_contact_email_addresses.axml" />
     <AndroidResource Include="Resources\values\strings-preferences.axml" />
-    <AndroidResource Include="Resources\drawable\onboarding_9.xml">
-      <SubType></SubType>
-      <Generator></Generator>
-    </AndroidResource>
-    <AndroidResource Include="Resources\drawable\onboarding_8.xml">
-      <SubType></SubType>
-      <Generator></Generator>
-    </AndroidResource>
-    <AndroidResource Include="Resources\drawable\onboarding_7.xml">
-      <SubType></SubType>
-      <Generator></Generator>
-    </AndroidResource>
     <AndroidResource Include="Resources\drawable\onboarding_6.xml">
       <SubType></SubType>
       <Generator></Generator>

@@ -931,16 +931,6 @@
 		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_3.imageset\onboarding_3.pdf" />
 		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_4.imageset\onboarding_4.pdf" />
 		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_5.imageset\onboarding_5.pdf" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_9.imageset\Contents.json" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_8.imageset\Contents.json" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_7.imageset\Contents.json" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_6.imageset\Contents.json" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_10.imageset\Contents.json" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_6.imageset\onboarding_6.pdf" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_9.imageset\onboarding_9.pdf" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_10.imageset\onboarding_10.pdf" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_7.imageset\onboarding_7.pdf" />
-		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_8.imageset\onboarding_8.pdf" />
 	</ItemGroup>
 	<ItemGroup>
 		<BundleResource Include="Resources\Base.lproj\Localizable.strings" />
@@ -1034,7 +1024,6 @@
 	  <Folder Include="Assets_onboarding.xcassets\onboarding_3.imageset\" />
 	  <Folder Include="Assets_onboarding.xcassets\onboarding_4.imageset\" />
 	  <Folder Include="Assets_onboarding.xcassets\onboarding_5.imageset\" />
-	  <Folder Include="Assets_onboarding.xcassets\onboarding_6.imageset\" />
 	  <Folder Include="Assets_icons.xcassets\Nav-search.imageset\" />
 	  <Folder Include="Assets_icons.xcassets\Nav-mail.imageset\" />
 	  <Folder Include="Assets_icons.xcassets\Nav-contacts.imageset\" />
@@ -1069,11 +1058,6 @@
 	  <Folder Include="Assets_icons.xcassets\Bookmark.imageset\" />
 	  <Folder Include="Assets_icons.xcassets\Compose.imageset\" />
 	  <Folder Include="Ui\Common\Scalable controls\" />
-	  <Folder Include="Assets_onboarding.xcassets\onboarding_9.imageset\" />
-	  <Folder Include="Assets_onboarding.xcassets\onboarding_8.imageset\" />
-	  <Folder Include="Assets_onboarding.xcassets\onboarding_7.imageset\" />
-	  <Folder Include="Assets_onboarding.xcassets\onboarding_6.imageset\" />
-	  <Folder Include="Assets_onboarding.xcassets\onboarding_10.imageset\" />
 	  <Folder Include="Ui\TableViewCells\AddEditTableViewCells\AutoReplyTableViewCells\" />
 	</ItemGroup>
 	<Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />

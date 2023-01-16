@@ -76,7 +76,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             pager.AddOnPageChangeListener(this);
             pager.Adapter = new PagerAdapter(ChildFragmentManager, remoteFolder);
 
-            
             tabLayout.TabSelected += (sender, e) => pager.CurrentItem = e.Tab.Position;
 
             for (var i = 0; i < 2; i++)
