@@ -493,7 +493,7 @@ namespace Mark5.Mobile.Common.Manager
             }
 
             if (sourceType == SourceType.Local)
-                throw new ReMarkException(ErrorConstants.Codes.InvalidSourceType);
+                throw new ReMarkException(ErrorConstants.Codes.InvalidSourceType,"Favorite categories cannot be loaded offline");
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
