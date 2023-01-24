@@ -144,24 +144,21 @@ namespace Mark5.Mobile.Droid.Service
             {
                 var ci = Managers.ActiveConnectionInfo;
                 var usePort = !string.IsNullOrEmpty(ci.Port);
-                var requestUri = $"{(ci.SslMode == SslMode.Off ? "https" : "http")}://{ci.Hostname}{(usePort ? (":" + ci.Port) : "")}/app3";
-                using var httpClient = new HttpClient(CommonConfig.HttpClientHandler()) { Timeout = new TimeSpan(0, 0, 2) };
-                using var requestMessage = new HttpRequestMessage(HttpMethod.Get, "https://your.site.com");
-                if (!string.IsNullOrEmpty(ci.AzureAppProxyBearerToken))
-                    requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", ci.AzureAppProxyBearerToken);
+                var url = $"{(ci.SslMode == SslMode.Off ? "http" : "https")}://{ci.Hostname}{(usePort ? (":" + ci.Port) : "")}/app3";
 
-                var response = await httpClient.SendAsync(requestMessage, HttpCompletionOption.ResponseHeadersRead);
-
-                var result = response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.BadRequest;
-
-                CommonConfig.Logger.Info($"Service connection availability: {result}. [status={response.StatusCode}]");
-
-                return result;
+                using (var httpClient = new HttpClient(CommonConfig.HttpClientHandler())
+                {
+                    Timeout = new TimeSpan(0, 0, 2)
+                })
+                using (var response = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead))
+                {
+                    var result = response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.BadRequest;
+                    return result;
+                }
             }
             catch (Exception ex)
             {
                 CommonConfig.Logger.Info("Cannot check service connection availability", ex);
-
                 return false;
             }
         }
