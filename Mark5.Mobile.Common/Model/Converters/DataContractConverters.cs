@@ -721,7 +721,7 @@ namespace Mark5.Mobile.Common.Model.Converters
 
             };
             if (si.AvailableModules != null)
-                result.AvailableModules.AddRange(si.AvailableModules.Select(mt => mt.ConvertEnum<ModuleType>()));
+                result.AvailableModules.AddRange(si.AvailableModules.Select(mt => mt.ConvertEnum<ModuleType>()).Distinct());
 
             return result;
         }
