@@ -13,6 +13,10 @@ using System.Threading.Tasks;
 using ME.Pushy.Sdk;
 using AndroidX.Core.App;
 using AndroidX.Core.Content;
+using Android.Media;
+using Newtonsoft.Json;
+using static Android.OS.Build;
+using static Javax.Crypto.Spec.PSource;
 
 namespace Mark5.Mobile.Droid.Utilities
 {
@@ -39,17 +43,22 @@ namespace Mark5.Mobile.Droid.Utilities
                     CommonConfig.Logger.Info($"Notification are silenced - ignoring...");
                     return;
                 }
-
+            
                 if (notification.ObjectType == ObjectType.Document)
                 {
-                 
-
                     NotificationManager notificationManager = (NotificationManager)context.GetSystemService(Context.NotificationService);
-
                     await Managers.NotificationsManager.SaveNotification(notification);
-
                     Intent intent = DocumentActivity.CreateIntent(context, folderId: notification.FolderId, documentId: notification.ObjectId, notificationGuid: Serializer.Serialize(notification.Guid));
-                    PendingIntent pendingIntent = PendingIntent.GetActivity(context, notification.ObjectId, intent, PendingIntentFlags.OneShot);
+
+                    PendingIntent pendingIntent = null;
+                    if (Build.VERSION.SdkInt  >= BuildVersionCodes.S)
+                    {
+                        pendingIntent = PendingIntent.GetActivity(context, notification.ObjectId, intent, PendingIntentFlags.Immutable);
+                    }
+                    else
+                    {
+                        pendingIntent = PendingIntent.GetActivity(context, notification.ObjectId, intent, PendingIntentFlags.OneShot);
+                    }
 
                     NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, DocumentChannelId)
                                                    .SetSmallIcon(Resource.Mipmap.ic_icon)
