@@ -130,7 +130,8 @@ namespace Mark5.Mobile.IOS.Service
             try
             {
                 var ci = Managers.ActiveConnectionInfo;
-                var url = $"{(ci.SslMode == SslMode.Off ? "http" : "https")}://{ci.Hostname}:{ci.Port}/app3";
+                var usePort = !string.IsNullOrEmpty(ci.Port);
+                var url = $"{(ci.SslMode == SslMode.Off ? "http" : "https")}://{ci.Hostname}{(usePort ? (":" + ci.Port) : "")}/app3";
 
                 using (var httpClient = new HttpClient(CommonConfig.HttpClientHandler())
                 {
@@ -139,16 +140,12 @@ namespace Mark5.Mobile.IOS.Service
                 using (var response = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead))
                 {
                     var result = response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.BadRequest;
-
-                    CommonConfig.Logger.Info($"Service connection availability: {result}. [status={response.StatusCode}]");
-
                     return result;
                 }
             }
             catch (Exception)
             {
-                CommonConfig.Logger.Info($"Service connection availability: false");
-
+                CommonConfig.Logger.Info("Cannot check service connection availability", ex);
                 return false;
             }
         }
