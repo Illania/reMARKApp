@@ -355,6 +355,7 @@
 	    <Compile Include="Ui\ViewControllers\AutoReply\LineView.cs" />
 	    <Compile Include="Ui\ViewControllers\AutoReply\IsActiveView.cs" />
 	    <Compile Include="Ui\ViewControllers\AutoReply\SubjectView.cs" />
+	    <Compile Include="Ui\ViewControllers\TextViewerViewController.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

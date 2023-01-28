@@ -75,7 +75,7 @@ namespace Mark5.Mobile.Classes.JwtDecoder
         public static bool IsCloseToExpire(string token)
         {
             var (_, Payload, _) = DecodeToken(token);
-            var expiration = JsonConvert.DeserializeObject<JwtExpiration>(Payload).Expiration;
+            var expiration = JsonConvert.DeserializeObject<JwtExpiration>(Payload).ExpiresAt;
 
             bool isCloseToExpire = expiration != null;
 
@@ -87,6 +87,36 @@ namespace Mark5.Mobile.Classes.JwtDecoder
             }
 
             return isCloseToExpire;
+        }
+
+
+        public static string GetUserInfo(string token)
+        {
+            var description = "";
+            var (_, Payload, _) = DecodeToken(token);
+
+            var userInfo = JsonConvert.DeserializeObject<JwtUserInfo>(Payload);
+            var upn = userInfo.UserPrincipalInfo;
+            var name = userInfo.UserName;
+            description += $"User name: {name} \n";
+            description += $"Email: {upn} \n";
+
+            var expInfo = JsonConvert.DeserializeObject<JwtExpiration>(Payload);
+            var issuedAt = expInfo.IssuedAt;
+            if (issuedAt != null)
+            {
+                var issueDate = DateTimeHelpers.FromUnixTime((long)issuedAt);
+                description += $"Token issued on: {issueDate.ToUniversalTime().ToString("G")} UTC\n";
+            }
+
+            var expiresAt = expInfo.ExpiresAt;
+            if (expiresAt != null)
+            {
+                var expDate = DateTimeHelpers.FromUnixTime((long)expiresAt);
+                description += $"Token expires on: {expDate.ToUniversalTime().ToString("G")} UTC\n";
+            }
+
+            return description;
         }
     }
 

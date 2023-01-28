@@ -39,6 +39,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         const string SendFeedbackKey = "sendFeedback";
         const string ServerAddressKey = "serverAddress";
         const string SslEnabledKey = "sslEnabled";
+        const string AzureTokenKey = "AzureToken";
         const string UpdateConfigKey = "updateConfig";
         const string UsernameKey = "username";
         const string UseTemplateKey = "UseTemplate";
@@ -146,6 +147,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 var swipeActionVC = new SwipeActionViewController();
                 NavigationController.PushViewController(swipeActionVC, true);
+                return;
+            }
+
+            if (specifier.Key == AzureTokenKey)
+            {
+                var azureTokenVC = new TextViewerViewController();
+                azureTokenVC.Title = Localization.GetString("azure_proxy_token_info");
+                NavigationController.PushViewController(azureTokenVC, true);
                 return;
             }
 
@@ -282,6 +291,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return cell;
             }
 
+            if (specifier.Key == ServerAddressKey)
+            {
+                var ci = Managers.ActiveConnectionInfo;
+
+                var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
+                cell.TextLabel.Text = specifier.Title;
+                cell.DetailTextLabel.Text = ci?.Hostname + ":" + ci?.Port;
+                cell.DetailTextLabel.TextColor = Theme.DarkGray;
+                return cell;
+            }
+            if (specifier.Key == AzureTokenKey)
+            {
+                var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
+                cell.TextLabel.Text = specifier.Title;
+                cell.DetailTextLabel.Text = "";
+                cell.DetailTextLabel.TextColor = Theme.DarkGray;
+                return cell;
+            }
             if (specifier.Key == VersionKey)
             {
                 var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
@@ -539,6 +566,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             if (ServerConfig.SystemSettings.SystemInfo.ExtraFieldsEditingAvailable != true)
                 hiddenKeys.Add(ManageExtraFieldsKey);
+
+            if (string.IsNullOrEmpty(PlatformConfig.Preferences.AzureApplicationProxyBearerToken))
+                hiddenKeys.Add(AzureTokenKey);
 
             SetHiddenKeys(hiddenKeys.ToArray(), false);
         }
