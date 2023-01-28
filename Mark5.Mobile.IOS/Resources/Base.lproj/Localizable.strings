@@ -36,6 +36,7 @@
 "autosave_recover_title" = "Recover email";
 "autosave_recover_content" = "reMARK recovered an autosaved email. Do you want to continue editing it?";
 "available" = "Available";
+"azure_proxy_token_info" = "Azure App Proxy token info:";
 "back" = "Back";
 "bcc" = "Bcc";
 "big_attachment_warning" = "This attachment is {0} large. Do you still want to download this file?";

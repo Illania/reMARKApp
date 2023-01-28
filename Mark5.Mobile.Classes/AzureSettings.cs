@@ -20,7 +20,7 @@ namespace Mark5.Mobile.Classes
             {
                 var jwtAccessToken = Decoder.DecodeToken(AccessToken);
                 accessTokenExpires = DateTimeOffset.FromUnixTimeSeconds((long)JsonConvert
-                .DeserializeObject<JwtExpiration>(jwtAccessToken.Payload).Expiration).ToLocalTime();
+                .DeserializeObject<JwtExpiration>(jwtAccessToken.Payload).ExpiresAt).ToLocalTime();
             }
 
             return $"AccessToken expires ={accessTokenExpires:f} " +
