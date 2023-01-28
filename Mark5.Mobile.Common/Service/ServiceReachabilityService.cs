@@ -29,7 +29,7 @@ namespace Mark5.Mobile.Common.Service
                             .WaitAndRetryAsync(3, _ => TimeSpan.FromSeconds(2))
                             .ExecuteAsync(async () =>
                             {
-                                var result = await CommonConfig.Reachability.CheckWithServiceConnection();
+                                var result = await CommonConfig.Reachability.CheckWithService();
                                 return result;
                             });
 

@@ -63,8 +63,6 @@ namespace Mark5.Mobile.IOS.Service
                 result &= CheckNetworkAvailability();
             if (result && mode.HasFlag(ReachabilityMode.Google))
                 result &= await CheckWithGoogle();
-            if (result && mode.HasFlag(ReachabilityMode.ServiceConnection))
-                result &= await CheckWithServiceConnection();
             if (result && mode.HasFlag(ReachabilityMode.Service))
                 result &= await CheckWithService();
 
@@ -125,31 +123,6 @@ namespace Mark5.Mobile.IOS.Service
             }
         }
 
-        public async Task<bool> CheckWithServiceConnection()
-        {
-            try
-            {
-                var ci = Managers.ActiveConnectionInfo;
-                var usePort = !string.IsNullOrEmpty(ci.Port);
-                var url = $"{(ci.SslMode == SslMode.Off ? "http" : "https")}://{ci.Hostname}{(usePort ? (":" + ci.Port) : "")}/app3";
-
-                using (var httpClient = new HttpClient(CommonConfig.HttpClientHandler())
-                {
-                    Timeout = new TimeSpan(0, 0, 2)
-                })
-                using (var response = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead))
-                {
-                    var result = response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.BadRequest;
-                    return result;
-                }
-            }
-            catch (Exception)
-            {
-                CommonConfig.Logger.Info("Cannot check service connection availability", ex);
-                return false;
-            }
-        }
-
         public async Task<bool> CheckWithService()
         {
             try
@@ -163,7 +136,10 @@ namespace Mark5.Mobile.IOS.Service
                 }
 
                 var result = await tester.Test();
-                CommonConfig.Logger.Info($"Service availability: {result}");
+
+                if(result == false)
+                    CommonConfig.Logger.Info($"Service availability: {result}");
+
                 return result;
             }
             catch (Exception)

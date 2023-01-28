@@ -25,7 +25,7 @@ namespace Mark5.Mobile.Common.Utilities
 
         bool IsMobileDataEnabled();
 
-        Task<bool> CheckWithServiceConnection();
+        Task<bool> CheckWithService();
     }
 
     public class ReachabilityRefreshedEventArgs : EventArgs
@@ -45,7 +45,6 @@ namespace Mark5.Mobile.Common.Utilities
     {
         NetworkAvailability = 1,
         Google = 2,
-        ServiceConnection = 4,
-        Service = 8
+        Service = 4
     }
 }
