@@ -385,6 +385,7 @@ namespace Mark5.Mobile.Common.Model.Converters
                 OutgoingSupervisor = dmp.OutgoingSupervisor,
                 ManageFilterViewFoldersAllowed = dmp.ManageFilterViewFoldersAllowed,
                 SpamManager = dmp.SpamManager,
+                DeleteDocumentsAllowedLines = dmp.DeleteDocumentsAllowedLines,
                 CabinetSupervisor = dmp.CabinetSupervisor,
                 CreateAllowed = dmp.CreateAllowed,
                 CreateFolderAllowed = dmp.CreateFolderAllowed,
