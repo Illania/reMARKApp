@@ -597,16 +597,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 selectAllItem.SetIcon(Resource.Drawable.action_deselect_all);
             }
 
-            if (ServerConfig.SystemSettings?.SystemInfo?.DelaySendAvailable == true && CurrentAdapter.SelectedItems.Any(dp => dp.TransmitStatus == TransmitStatus.Delayed))
+            var selectedDocuments = CurrentAdapter.SelectedItems;
+            if (ServerConfig.SystemSettings?.SystemInfo?.DelaySendAvailable == true && selectedDocuments.Any(dp => dp.TransmitStatus == TransmitStatus.Delayed))
             {
                 menu.Add(MenuItemGroup.Actions, MenuItemActions.SendNow, MenuItemActions.SendNow, Resource.String.send_now);
                 menu.Add(MenuItemGroup.Actions, MenuItemActions.CancelSend, MenuItemActions.CancelSend, Resource.String.cancel_send);
             }
 
-            if (CurrentAdapter.SelectedItems.Any(dp => !dp.IsReadByCurrent) || !CurrentAdapter.SelectedItems.Any())
+            if (selectedDocuments.Any(dp => !dp.IsReadByCurrent) || !selectedDocuments.Any())
                 menu.Add(MenuItemGroup.Actions, MenuItemActions.MarkAsRead, MenuItemActions.MarkAsRead, Resource.String.mark_as_read);
 
-            if (CurrentAdapter.SelectedItems.Any(dp => dp.IsReadByCurrent))
+            if (selectedDocuments.Any(dp => dp.IsReadByCurrent))
                 menu.Add(MenuItemGroup.Actions, MenuItemActions.MarkAsUnread, MenuItemActions.MarkAsUnread, Resource.String.marks_as_unread);
 
             if (ServerConfig.SystemSettings.DocumentsModuleInfo.WorktrayEnabled ?? true)
@@ -630,21 +631,50 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
                 menu.Add(MenuItemGroup.Actions, MenuItemActions.DeleteFromFolder, MenuItemActions.DeleteFromFolder, Resource.String.delete_from_folder);
 
-            if (ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || CurrentAdapter.SelectedItems.All(dp => dp.Direction == DocumentDirection.Draft))
-                menu.Add(MenuItemGroup.Actions, MenuItemActions.Delete, MenuItemActions.Delete, Resource.String.delete);
+            AddDeleteDocumentMenuItem(selectedDocuments);
 
-            if (CurrentAdapter.SelectedItemCount == 1)
+            if (selectedDocuments.Count == 1)
                 menu.Add(MenuItemGroup.Actions, MenuItemActions.AddRemoveBookmark, MenuItemActions.AddRemoveBookmark,
-                 PlatformConfig.Preferences.HasBookmarkForFolder(Folder.Id, CurrentAdapter.SelectedItems.FirstOrDefault().Id)
+                 PlatformConfig.Preferences.HasBookmarkForFolder(Folder.Id, selectedDocuments.First().Id)
                  ? Resource.String.remove_bookmark
                  : Resource.String.add_bookmark);
 
             if (CurrentAdapter.SelectedItemCount == 1)
                 menu.Add(MenuItemGroup.Actions, MenuItemActions.SetPresetCategory, MenuItemActions.SetPresetCategory, Resource.String.set_preset_category);
 
-            menu.SetGroupEnabled(MenuItemGroup.Actions, CurrentAdapter.SelectedItems.Any());
+            menu.SetGroupEnabled(MenuItemGroup.Actions, selectedDocuments.Any());
 
             return true;
+        }
+
+        private void AddDeleteDocumentMenuItem(List<DocumentPreview> documents)
+        {
+            if ((!ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed
+                && documents.Any(dp => dp.Direction != DocumentDirection.Draft))
+                || documents.Count == 0)
+            {
+                return;
+            }
+
+            var linesAllowedToDelete =
+                ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteDocumentsAllowedLines;
+            if (!linesAllowedToDelete.Any())
+                return;
+            
+            if (documents.Count == 1)
+            {
+                var document = documents.FirstOrDefault();
+                if (document == null) 
+                    return;
+            
+                var linesGuids = document.Lines.Select(l => l.Guid);
+                var intersection = linesAllowedToDelete.Intersect(linesGuids);
+                if (!intersection.Any()) 
+                    return;
+            }
+            
+            menu.Add(MenuItemGroup.Actions, MenuItemActions.Delete,
+                MenuItemActions.Delete, Resource.String.delete);
         }
 
         bool ActionMode.ICallback.OnActionItemClicked(ActionMode mode, IMenuItem item)
