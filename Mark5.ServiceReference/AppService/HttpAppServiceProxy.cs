@@ -83,7 +83,7 @@ namespace Mark5.ServiceReference.AppService
                 {
                     var azureAppProxyAuthService = new AzureAppProxyAuthService(azureApplicationProxyInfo.AppClientId,
                        azureApplicationProxyInfo.ApplicationProxyClientId);
-                    bearerToken = await azureAppProxyAuthService.Authenticate(this, false);
+                    bearerToken = await azureAppProxyAuthService.Authenticate(this, false, true);
 
                     if (!string.IsNullOrEmpty(bearerToken))
                     {
@@ -96,6 +96,7 @@ namespace Mark5.ServiceReference.AppService
             }
             catch (Exception ex) when (!(ex is HttpAppServiceException))
             {
+
                 if (ex is TaskCanceledException tce && !tce.CancellationToken.IsCancellationRequested)
                 {
                     var te = new TimeoutException("Request timed out.");
