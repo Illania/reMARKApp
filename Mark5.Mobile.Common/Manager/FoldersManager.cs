@@ -27,7 +27,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task<List<Folder>> GetFoldersAsync(Folder parentFolder, int depth = 1, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {

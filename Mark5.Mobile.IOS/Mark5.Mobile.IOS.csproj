@@ -30,7 +30,7 @@
 		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
 		<LangVersion>9.0</LangVersion>
 		<CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
-		<CodesignProvision>reMARK 2022 Dev</CodesignProvision>
+		<CodesignProvision>remark 2023</CodesignProvision>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
 		<DebugType>none</DebugType>
@@ -66,9 +66,9 @@
 		<RunCodeAnalysis>true</RunCodeAnalysis>
 		<MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
 		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
-		<CodesignProvision>reMARK 2022 Dev</CodesignProvision>
+		<CodesignProvision>reMark Mark5 Mobile</CodesignProvision>
 		<LangVersion>9.0</LangVersion>
-		<MtouchLink>SdkOnly</MtouchLink>
+		<MtouchLink>None</MtouchLink>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
 		<DebugType>none</DebugType>

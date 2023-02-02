@@ -31,7 +31,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task<List<ShortcodePreview>> GetShortcodePreviewsAsync(Folder folder, int startRowId = -1, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {
@@ -93,7 +93,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task<Shortcode> GetShortcodeAsync(int? folderId, int shortcodeId, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {
@@ -126,7 +126,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task<ShortcodeContainer> GetShortcodeWithPreviewAsync(int? folderId, int shortcodeId, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {
@@ -157,7 +157,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task<bool> CreateOrUpdateShortcodeAsync(Shortcode shortcode, ShortcodePreview shortcodePreview, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {

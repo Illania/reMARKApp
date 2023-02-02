@@ -101,7 +101,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task<AutoReplyRule> GetAutoReplyRule(SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {
@@ -135,7 +135,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task SetAutoReplyRule(AutoReplyRule rule, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {
@@ -169,7 +169,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task<List<DocumentPreview>> GetDocumentPreviewsAsync(int folderId, Guid folderGuid, int startId = -1, int endId = -1, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {
@@ -200,7 +200,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task<List<Transmit>> GetDocumentTransmitInfoAsync(int documentId, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {
@@ -235,7 +235,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task<Document> GetDocumentAsync(int? folderId, int documentId, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {
@@ -269,7 +269,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task<DocumentContainer> GetDocumentWithPreviewAsync(int? folderId, int documentId, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {
@@ -301,7 +301,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task SetDocumentReadStatusAsync(DocumentPreview documentPreview, Document document, bool isRead, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
                 await SetRemoteReadStatusAsync(isRead, documentPreview.Id);
@@ -321,7 +321,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task SetDocumentsReadStatusAsync(List<DocumentPreview> documentPreviews, bool isRead, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
                 await SetRemoteReadStatusAsync(isRead, documentPreviews.Select(dp => dp.Id).ToArray());
@@ -346,7 +346,7 @@ namespace Mark5.Mobile.Common.Manager
             CommonConfig.UsageAnalytics.LogEvent(new SetPriorityEvent(documentPreviews.Count));
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {
@@ -376,7 +376,7 @@ namespace Mark5.Mobile.Common.Manager
             SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {
@@ -403,7 +403,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task MoveToSpamAsync(List<DocumentPreview> documentPreviews, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {
@@ -427,7 +427,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task<List<TemplatePreview>> GetTemplatePreviewsAsync(SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {
@@ -452,7 +452,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task<Template> GetTemplateAsync(int templateId, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {
@@ -479,7 +479,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task<Template> GetDefaultTemplateAsync(DocumentCreationModeFlag creationModeFlag, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {
@@ -506,7 +506,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task<List<RecentAddress>> GetRecentAddressesAsync(SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {
@@ -534,7 +534,7 @@ namespace Mark5.Mobile.Common.Manager
                 recentAddresses = new List<RecentAddress>();
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {
@@ -555,7 +555,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task<List<Category>> GetAllCategoriesAsync(SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {
@@ -583,7 +583,7 @@ namespace Mark5.Mobile.Common.Manager
             CommonConfig.UsageAnalytics.LogEvent(new AddCommentEvent(ModuleType.Documents));
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {
@@ -615,7 +615,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task<bool> EditComment(Document document, Comment comment, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {
@@ -651,7 +651,7 @@ namespace Mark5.Mobile.Common.Manager
             CommonConfig.UsageAnalytics.LogEvent(new DeleteCommentEvent(ModuleType.Documents));
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {
@@ -681,7 +681,7 @@ namespace Mark5.Mobile.Common.Manager
             bool checkMD5 = false, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {
@@ -813,7 +813,7 @@ namespace Mark5.Mobile.Common.Manager
         {
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {
@@ -837,7 +837,7 @@ namespace Mark5.Mobile.Common.Manager
         {
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {
@@ -860,7 +860,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task<string> GetNewDocumentReferenceNumber(DocumentPreview documentPreview, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {
@@ -906,7 +906,7 @@ namespace Mark5.Mobile.Common.Manager
             CommonConfig.UsageAnalytics.LogEvent(new DocumentSentEvent(flag));
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {
@@ -1006,7 +1006,7 @@ namespace Mark5.Mobile.Common.Manager
         internal async Task<Guid> UploadTemporaryAttachmentAsync(Attachment attachment, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {
@@ -1056,7 +1056,7 @@ namespace Mark5.Mobile.Common.Manager
             CommonConfig.UsageAnalytics.LogEvent(new AddExtraFieldEvent(ModuleType.Documents));
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {
@@ -1079,7 +1079,7 @@ namespace Mark5.Mobile.Common.Manager
             CommonConfig.UsageAnalytics.LogEvent(new DeleteExtraFieldEvent(ModuleType.Documents));
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {
@@ -1102,7 +1102,7 @@ namespace Mark5.Mobile.Common.Manager
             CommonConfig.UsageAnalytics.LogEvent(new UpdateExtraFieldEvent(ModuleType.Documents));
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {
@@ -1125,7 +1125,7 @@ namespace Mark5.Mobile.Common.Manager
             CommonConfig.UsageAnalytics.LogEvent(new UpdateExtraFieldEvent(ModuleType.Documents));
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {
@@ -1148,7 +1148,7 @@ namespace Mark5.Mobile.Common.Manager
             CommonConfig.UsageAnalytics.LogEvent(new GetExtraFieldsEvent(ModuleType.Documents));
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {
@@ -1173,7 +1173,7 @@ namespace Mark5.Mobile.Common.Manager
             CommonConfig.UsageAnalytics.LogEvent(new GetDocumentExtraFieldEvent(ModuleType.Documents));
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {
@@ -1198,7 +1198,7 @@ namespace Mark5.Mobile.Common.Manager
             CommonConfig.UsageAnalytics.LogEvent(new GetDocumentExtraFieldEvent(ModuleType.Documents));
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {
@@ -1222,7 +1222,7 @@ namespace Mark5.Mobile.Common.Manager
             CommonConfig.UsageAnalytics.LogEvent(new AssignDocumentExtraFieldEvent(ModuleType.Documents));
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {
@@ -1247,7 +1247,7 @@ namespace Mark5.Mobile.Common.Manager
             CommonConfig.UsageAnalytics.LogEvent(new DeleteDocumentExtraFieldEvent(ModuleType.Documents));
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {

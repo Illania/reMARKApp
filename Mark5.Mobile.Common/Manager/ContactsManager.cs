@@ -31,7 +31,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task<List<ContactPreview>> GetContactPreviewsAsync(Folder folder, int startRowId = -1, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {
@@ -93,7 +93,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task<Contact> GetContactAsync(int? folderId, int contactId, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {
@@ -126,7 +126,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task<ContactContainer> GetContactWithPreviewAsync(int? folderId, int contactId, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {
@@ -157,7 +157,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task<bool> CreateOrUpdateContactAsync(Contact contact, ContactPreview contactPreview, int parentObjectId, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {
@@ -203,7 +203,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task<List<Category>> GetAllCategoriesAsync(SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {
@@ -231,7 +231,7 @@ namespace Mark5.Mobile.Common.Manager
             CommonConfig.UsageAnalytics.LogEvent(new AddCommentEvent(ModuleType.Contacts));
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {
@@ -261,7 +261,7 @@ namespace Mark5.Mobile.Common.Manager
         {
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {
@@ -297,7 +297,7 @@ namespace Mark5.Mobile.Common.Manager
             CommonConfig.UsageAnalytics.LogEvent(new DeleteCommentEvent(ModuleType.Contacts));
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
 
             if (sourceType == SourceType.Remote)
             {

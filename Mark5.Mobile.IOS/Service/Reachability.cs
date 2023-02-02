@@ -44,12 +44,6 @@ namespace Mark5.Mobile.IOS.Service
             }
         }
 
-        public void RefreshServiceReachability(bool isReachable)
-        {
-            IsReachable = isReachable;
-            ReachabilityRefreshed(this, new ReachabilityRefreshedEventArgs(true, isReachable));
-        }
-
         public async Task<bool> Refresh(ReachabilityMode mode = ReachabilityMode.NetworkAvailability | ReachabilityMode.Service, bool testOnly = false)
         {
             IsCheckingReachability = true;
@@ -203,6 +197,15 @@ namespace Mark5.Mobile.IOS.Service
         {
             NetworkStatus networkStatus = ReachabilityProvider.InternetConnectionStatus();
             return networkStatus == NetworkStatus.ReachableViaCarrierDataNetwork;
+        }
+
+        public async Task<SourceType> GetSourceTypeFromReachability()
+        {
+            var isServiceAlive = await CheckWithService();
+            if (isServiceAlive && IsReachable)
+                return SourceType.Remote;
+
+            return SourceType.Local;
         }
     }
 }
