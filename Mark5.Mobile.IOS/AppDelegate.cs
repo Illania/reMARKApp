@@ -345,7 +345,6 @@ namespace Mark5.Mobile.IOS
             Services.DocumentPreviewsDownloadService?.Start();
             Services.DocumentsDownloadService?.Start();
             Services.ActionSyncService?.Start();
-            Services.ServiceReachabilityService?.Start();
 
             HandleForegroundTask();
         }
@@ -356,7 +355,6 @@ namespace Mark5.Mobile.IOS
             Services.DocumentPreviewsDownloadService?.Stop();
             Services.DocumentsDownloadService?.Stop();
             Services.ActionSyncService?.Stop();
-            Services.ServiceReachabilityService?.Stop();
 
             LocalAuthenticationManager.NotifyApplicationEnteredBackground();
 

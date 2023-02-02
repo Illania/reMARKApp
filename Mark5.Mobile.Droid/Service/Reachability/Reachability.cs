@@ -14,6 +14,7 @@ using Mark5.Mobile.Common.Extensions;
 using Android.Net.Wifi;
 using Android.Content;
 using System.Net.Http.Headers;
+using SystemConfiguration;
 
 namespace Mark5.Mobile.Droid.Service
 {
@@ -235,6 +236,15 @@ namespace Mark5.Mobile.Droid.Service
         {
             IsReachable = isReachable;
             ReachabilityRefreshed(this, new ReachabilityRefreshedEventArgs(true, isReachable));
+        }
+
+        public async Task<SourceType> GetSourceTypeFromReachability()
+        {
+            var isServiceAlive = await CheckWithService();
+            if (isServiceAlive && IsReachable)
+                return SourceType.Remote;
+
+            return SourceType.Local;
         }
     }
 }

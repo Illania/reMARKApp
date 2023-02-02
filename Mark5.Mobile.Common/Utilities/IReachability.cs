@@ -17,15 +17,14 @@ namespace Mark5.Mobile.Common.Utilities
         Task<bool> Refresh(ReachabilityMode mode = 
             ReachabilityMode.NetworkAvailability | ReachabilityMode.Service, bool testOnly = false);
 
-        void RefreshServiceReachability(bool isReachable);
-
         Task<ConnectionDiagnosticModel> ConnectionDiagnostics();
 
         bool IsWifiConnected();
 
         bool IsMobileDataEnabled();
 
-        Task<bool> CheckWithService();
+        Task<SourceType> GetSourceTypeFromReachability();
+
     }
 
     public class ReachabilityRefreshedEventArgs : EventArgs
