@@ -73,7 +73,7 @@ namespace Mark5.ServiceReference.FileTransferService
         {
             var azureAppProxyAuthService = new AzureAppProxyAuthService(azureApplicationProxyInfo.AppClientId,
                 azureApplicationProxyInfo.ApplicationProxyClientId);
-            bearerToken = await azureAppProxyAuthService.Authenticate(this, false);
+            bearerToken = await azureAppProxyAuthService.Authenticate(this, false, true);
         }
 
         private bool UseBearerToken()
