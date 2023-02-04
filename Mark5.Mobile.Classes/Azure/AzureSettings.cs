@@ -2,8 +2,7 @@
 using Mark5.Mobile.Classes.JwtDecoder;
 using Newtonsoft.Json;
 
-namespace Mark5.Mobile.Classes
-
+namespace Mark5.Mobile.Classes.Azure
 {
     public static class AzureSettings
     {

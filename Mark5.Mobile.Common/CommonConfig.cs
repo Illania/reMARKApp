@@ -4,6 +4,7 @@ using Mark5.Mobile.Common.Utilities;
 using TinyMessenger;
 using Mark5.Mobile.Common.Storage.AppFileStorage.Interface;
 using Microsoft.Extensions.Logging;
+using Mark5.Mobile.Classes;
 
 namespace Mark5.Mobile.Common
 {

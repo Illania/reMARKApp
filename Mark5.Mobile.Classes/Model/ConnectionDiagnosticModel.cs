@@ -1,9 +1,6 @@
 ﻿using System;
-namespace Mark5.Mobile.Common.Model
+namespace Mark5.Mobile.Classes.Model
 {
-    /*
-     *  POCO to report connection diagnostics results
-     */
     public class ConnectionDiagnosticModel
     {
         public int SuccessfulRequestCount, FailedRequestCount;

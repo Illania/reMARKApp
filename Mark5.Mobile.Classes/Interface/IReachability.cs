@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Classes.Enum;
+using Mark5.Mobile.Classes.Model;
 
-namespace Mark5.Mobile.Common.Utilities
+namespace Mark5.Mobile.Classes
 {
     public interface IReachability
     {
@@ -23,7 +24,9 @@ namespace Mark5.Mobile.Common.Utilities
 
         bool IsMobileDataEnabled();
 
-        Task<SourceType> GetSourceTypeFromReachability();
+        SourceType GetReachabilitySourceType();
+
+        void RefreshServiceReachability(bool isReachable);
 
     }
 

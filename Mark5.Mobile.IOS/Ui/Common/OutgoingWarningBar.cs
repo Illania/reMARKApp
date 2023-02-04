@@ -8,6 +8,7 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.Common.Model.HubMessages;
+using Mark5.Mobile.Classes;
 
 namespace Mark5.Mobile.IOS.Ui.Common
 {

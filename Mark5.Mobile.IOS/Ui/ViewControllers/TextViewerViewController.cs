@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Mark5.Mobile.Classes.Azure;
 using Mark5.Mobile.Classes.JwtDecoder;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
@@ -58,7 +59,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             });
 
             scrollView.AddSubview(textDescription);
-            var info = Decoder.GetUserInfo(Managers.ActiveConnectionInfo.AzureAppProxyBearerToken);
+            var info = Decoder.GetUserInfo(AzureSettings.AccessToken);
             textDescription.Text = info;
         }
 

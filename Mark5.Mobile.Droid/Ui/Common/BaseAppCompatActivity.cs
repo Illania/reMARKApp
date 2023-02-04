@@ -6,6 +6,7 @@ using Android.Views;
 using AndroidX.AppCompat.App;
 using AndroidX.CoordinatorLayout.Widget;
 using Google.Android.Material.FloatingActionButton;
+using Mark5.Mobile.Classes;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;

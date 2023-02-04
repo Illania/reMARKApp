@@ -15,6 +15,9 @@ using Mark5.ServiceReference.Exceptions;
 using Mark5.ServiceReference.Utilities;
 using JwtDecoder = Mark5.Mobile.Classes.JwtDecoder;
 using Mark5.Mobile.Classes;
+using Polly;
+using Polly.Bulkhead;
+using Polly.Wrap;
 
 namespace Mark5.ServiceReference.AppService
 {
@@ -28,16 +31,21 @@ namespace Mark5.ServiceReference.AppService
         readonly string requestUri;
         string bearerToken;
         readonly AzureApplicationProxyInfo azureApplicationProxyInfo;
+        readonly AsyncPolicyWrap policy;
+        readonly IReachability reachability;
+        const int attempts = 3;
+        const double timeOut = 200;
 
 
         public HttpAppServiceProxy(bool ssl, string hostname, string port, Func<HttpMessageHandler> httpClientHandler,
-            Action onStartTransmission, Action onStopTransmission,
+            Action onStartTransmission, Action onStopTransmission, IReachability reachability,
             string bearerToken, AzureApplicationProxyInfo azureApplicationProxyInfo)
         {
      
             this.httpClientHandler = httpClientHandler;
             this.onStartTransmission = onStartTransmission;
             this.onStopTransmission = onStopTransmission;
+            this.reachability = reachability;
             this.bearerToken = bearerToken;
             this.azureApplicationProxyInfo = azureApplicationProxyInfo;
 
@@ -55,8 +63,6 @@ namespace Mark5.ServiceReference.AppService
             
         }
 
-
-      
         async Task<R> InvokeAsync<R, P>(string soapAction, P parameters, CancellationToken ct, bool useShortTimeout = false,
                                            bool checkXmlCharacters = true) where R : class where P : class
         {
@@ -74,11 +80,9 @@ namespace Mark5.ServiceReference.AppService
                 statusCode = res.StatusCode;
                 return await ProcessResponse<R>(soapAction, res);
             }
-    
-            try
-            {
-                onStartTransmission?.Invoke();
 
+            async Task RefreshAzureToken()
+            {
                 if (ShouldRefreshBearerToken(azureApplicationProxyInfo, bearerToken))
                 {
                     var azureAppProxyAuthService = new AzureAppProxyAuthService(azureApplicationProxyInfo.AppClientId,
@@ -91,24 +95,46 @@ namespace Mark5.ServiceReference.AppService
                         AzureSettings.AccessTokenLastUpdated = DateTime.Now.ToLocalTime();
                     }
                 }
-                return await CreateRequestAsync();
-               
+            }
+
+            AsyncPolicy GetRetryPolicy()
+            {
+                return Policy.Handle<Exception>()
+                    .WaitAndRetryAsync(attempts, attempt => TimeSpan.FromMilliseconds(timeOut), (exception, calculatedWaitDuration) => { });
+            }
+
+            var policy = GetRetryPolicy();
+
+            try
+            {
+                onStartTransmission?.Invoke();
+
+                await RefreshAzureToken();
+
+                return await policy.ExecuteAsync(async () =>
+                {
+                    return await CreateRequestAsync();
+                });
+
             }
             catch (Exception ex) when (!(ex is HttpAppServiceException))
             {
-
                 if (ex is TaskCanceledException tce && !tce.CancellationToken.IsCancellationRequested)
                 {
                     var te = new TimeoutException("Request timed out.");
                     throw new HttpAppServiceException(statusCode, te.Message, te);
                 }
-
-               throw new HttpAppServiceException(statusCode, ex.Message, ex);
+                if(ex is System.Net.WebException we && statusCode == 0)
+                {
+                    reachability.RefreshServiceReachability(false);
+                    await reachability.Refresh();
+                }
+                throw new HttpAppServiceException(statusCode, ex.Message, ex); 
             }
             finally
             {
-                onStopTransmission?.Invoke();
-            }
+                onStopTransmission?.Invoke(); 
+            }  
         }
 
         bool ShouldRefreshBearerToken(AzureApplicationProxyInfo azureApplicationProxyInfo, string bearerToken)

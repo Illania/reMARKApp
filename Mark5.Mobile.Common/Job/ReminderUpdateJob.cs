@@ -2,7 +2,9 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Manager;
+using Mark5.Mobile.Classes;
 using Mark5.Mobile.Common.Synchronizer;
+using Mark5.Mobile.Classes.Enum;
 
 namespace Mark5.Mobile.Common.Job
 {
@@ -23,7 +25,7 @@ namespace Mark5.Mobile.Common.Job
                 var start = DateTime.UtcNow;
                 var end = start.AddDays(8);
 
-                await Managers.CalendarManager.GetCalendarAppointmentsAsync(calendarsList, start, end, Model.SourceType.Remote);
+                await Managers.CalendarManager.GetCalendarAppointmentsAsync(calendarsList, start, end, SourceType.Remote);
                 await Synchronizers.LocalRemindersSynchronizer.Synchronize();
 
             }

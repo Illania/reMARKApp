@@ -8,13 +8,14 @@ using ObjCRuntime;
 using UIKit;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Utilities;
+using Mark5.Mobile.Classes;
 
 namespace Mark5.Mobile.IOS.Ui.Common
 {
     public class ReachabilityBar : UILabelScalable
     {
         const double AnimationDuration = .25d;
-        const float VisibleHeight = 20f;
+        const float VisibleHeight = 30f;
         const float HiddenHeight = 0f;
 
         WeakReference<UITableViewController> weakViewController;

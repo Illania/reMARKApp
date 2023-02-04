@@ -27,7 +27,8 @@ namespace Mark5.Mobile.Common.Authenticator
                                                       port,
                                                       CommonConfig.HttpClientHandler,
                                                       CommonConfig.OnStartTransmission,
-                                                      CommonConfig.OnStopTransmission);
+                                                      CommonConfig.OnStopTransmission,
+                                                      CommonConfig.Reachability);
             var result = await proxy.AuthenticateAsync(new DataContract.AuthenticateParameters
             {
                 Username = username,
@@ -65,6 +66,7 @@ namespace Mark5.Mobile.Common.Authenticator
                                           CommonConfig.HttpClientHandler,
                                           CommonConfig.OnStartTransmission,
                                           CommonConfig.OnStopTransmission,
+                                          CommonConfig.Reachability,
                                           accessToken,
                                           azureApplicationProxyInfo);
 

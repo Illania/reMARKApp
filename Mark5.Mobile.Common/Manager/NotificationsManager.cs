@@ -11,6 +11,7 @@ using Mark5.Mobile.Common.Model.Exceptions;
 using Mark5.Mobile.Common.Storage;
 using Mark5.ServiceReference.AppService;
 using DataContract = Mark5.ServiceReference.DataContract;
+using Mark5.Mobile.Classes.Enum;
 
 namespace Mark5.Mobile.Common.Manager
 {
@@ -33,13 +34,14 @@ namespace Mark5.Mobile.Common.Manager
             this.notificationsDataAccess = notificationsDataAccess;
         }
 
+        
         public async Task Subscribe(DeviceType deviceType, string pushToken, SourceType sourceType = SourceType.Auto)
         {
             if (string.IsNullOrWhiteSpace(pushToken))
                 throw new ArgumentException("Null or white space push notification token");
 
             if (sourceType == SourceType.Auto)
-                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -61,13 +63,14 @@ namespace Mark5.Mobile.Common.Manager
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
+        
         public async Task UnSubscribe(DeviceType deviceType, string pushToken, SourceType sourceType = SourceType.Auto)
         {
             if (string.IsNullOrWhiteSpace(pushToken))
                 throw new ArgumentException("Null or white space push notification token");
 
             if (sourceType == SourceType.Auto)
-                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -89,10 +92,11 @@ namespace Mark5.Mobile.Common.Manager
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
+        
         public async Task<List<Notification>> GetNotificationsAsync(DeviceType deviceType, string pushToken, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -130,13 +134,14 @@ namespace Mark5.Mobile.Common.Manager
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
+        
         public async Task SetNotificationReadStatusAsync(string pushToken, List<Guid> notificationGuids, bool isRead, SourceType sourceType = SourceType.Auto)
         {
             if (string.IsNullOrEmpty(pushToken))
                 return;
 
             if (sourceType == SourceType.Auto)
-                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -155,10 +160,11 @@ namespace Mark5.Mobile.Common.Manager
                 throw new ArgumentException("Invalid sourceType provided.");
         }
 
+        
         public async Task<Dictionary<ModuleType, List<Folder>>> GetFoldersNotificationsAsync(DeviceType deviceType, string pushToken, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -183,13 +189,14 @@ namespace Mark5.Mobile.Common.Manager
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
+        
         public async Task SetFoldersNotificationsAsync(DeviceType deviceType, string pushToken, ModuleType moduleType, List<Folder> folders, bool enabled, SourceType sourceType = SourceType.Auto)
         {
             if (string.IsNullOrWhiteSpace(pushToken))
                 throw new ArgumentException("Null or white space push notification token");
 
             if (sourceType == SourceType.Auto)
-                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -228,10 +235,11 @@ namespace Mark5.Mobile.Common.Manager
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
+        
         public async Task<bool> GetCalendarNotificationsEnabledAsync(DeviceType deviceType, string pushToken, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -260,13 +268,14 @@ namespace Mark5.Mobile.Common.Manager
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
+        
         public async Task SetCalendarNotificationsEnabledAsync(DeviceType deviceType, string pushToken, bool enabled, SourceType sourceType = SourceType.Auto)
         {
             if (string.IsNullOrWhiteSpace(pushToken))
                 throw new ArgumentException("Null or white space push notification token");
 
             if (sourceType == SourceType.Auto)
-                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -292,10 +301,11 @@ namespace Mark5.Mobile.Common.Manager
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
+        
         public async Task<string> GetNotificationsSoundAsync(DeviceType deviceType, string pushToken, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -324,13 +334,14 @@ namespace Mark5.Mobile.Common.Manager
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
+        
         public async Task SetNotificationsSoundAsync(DeviceType deviceType, string pushToken, string soundName, SourceType sourceType = SourceType.Auto)
         {
             if (string.IsNullOrWhiteSpace(pushToken))
                 throw new ArgumentException("Null or white space push notification token");
 
             if (sourceType == SourceType.Auto)
-                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -356,13 +367,14 @@ namespace Mark5.Mobile.Common.Manager
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
+        
         public async Task ClearAllNotificationSettingsAsync(DeviceType deviceType, string pushToken, SourceType sourceType = SourceType.Auto)
         {
             if (string.IsNullOrWhiteSpace(pushToken))
                 throw new ArgumentException("Null or white space push notification token");
 
             if (sourceType == SourceType.Auto)
-                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -391,10 +403,11 @@ namespace Mark5.Mobile.Common.Manager
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
+
         public async Task<object> GetRemoteObjectAsync(Notification notification, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {

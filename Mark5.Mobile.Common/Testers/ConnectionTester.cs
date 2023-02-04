@@ -9,6 +9,9 @@ using Polly;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Polly.Bulkhead;
+using Microsoft.Identity.Client;
+using Mark5.Mobile.Classes.Model;
 
 namespace Mark5.Mobile.Common.Testers
 {
@@ -23,8 +26,6 @@ namespace Mark5.Mobile.Common.Testers
 
         public async Task<bool> Test(CancellationToken ct = default(CancellationToken))
         {
-            int retries = 0;
-            const int attempts = 3;
             try
             {
                 if (!await CanTest(ct))
@@ -38,18 +39,11 @@ namespace Mark5.Mobile.Common.Testers
                                                           CommonConfig.HttpClientHandler,
                                                           null,
                                                           null,
+                                                          CommonConfig.Reachability,
                                                           ci.AzureAppProxyBearerToken,
                                                           ci.AzureApplicationProxyInfo);
 
-                var policy = Policy.Handle<Exception>().WaitAndRetryAsync(attempts, attempt => TimeSpan.FromMilliseconds(timeOut), (exception, calculatedWaitDuration) =>
-                {
-                    retries++;
-                    CommonConfig.Logger.Info($"Failed to Ping server after waiting {calculatedWaitDuration}. Retry number {retries}.");
-                });
-                await policy.ExecuteAsync(async () =>
-                {
-                    await proxy.TestAsync(new DataContract.TestParameters());
-                });
+                await proxy.TestAsync(new DataContract.TestParameters());
 
                 return true;
             }
@@ -71,6 +65,7 @@ namespace Mark5.Mobile.Common.Testers
                                                           CommonConfig.HttpClientHandler,
                                                           null,
                                                           null,
+                                                          CommonConfig.Reachability,
                                                           ci.AzureAppProxyBearerToken,
                                                           ci.AzureApplicationProxyInfo);
 
