@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Foundation;
 using Mark5.Mobile.Classes;
+using Mark5.Mobile.Classes.Azure;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;

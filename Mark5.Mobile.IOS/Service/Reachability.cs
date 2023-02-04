@@ -4,6 +4,9 @@ using System.Net.Http;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
+using Mark5.Mobile.Classes;
+using Mark5.Mobile.Classes.Enum;
+using Mark5.Mobile.Classes.Model;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -199,13 +202,14 @@ namespace Mark5.Mobile.IOS.Service
             return networkStatus == NetworkStatus.ReachableViaCarrierDataNetwork;
         }
 
-        public async Task<SourceType> GetSourceTypeFromReachability()
+        public void RefreshServiceReachability(bool isReachable)
         {
-            var isServiceAlive = await CheckWithService();
-            if (isServiceAlive && IsReachable)
-                return SourceType.Remote;
-
-            return SourceType.Local;
+            IsReachable = isReachable;
+            ReachabilityRefreshed(this, new ReachabilityRefreshedEventArgs(true, isReachable));
         }
+
+
+        public SourceType GetReachabilitySourceType() => IsReachable ? SourceType.Remote : SourceType.Local; 
+
     }
 }

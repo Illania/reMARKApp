@@ -15,6 +15,7 @@ using System.Threading;
 using Mark5.Mobile.Common.DataAccess.Exceptions;
 using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Synchronizer;
+using Mark5.Mobile.Classes.Enum;
 
 namespace Mark5.Mobile.Common.Manager
 {
@@ -37,7 +38,7 @@ namespace Mark5.Mobile.Common.Manager
             var endDateUTC = endDate.ConvertUserTimeToUtcCalendar();
 
             if (sourceType == SourceType.Auto)
-                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -65,7 +66,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task<CalendarAppointment> GetCalendarAppointmentAsync(int calendarId, int calendarAppointmentId, int recurrenceIndex = -1, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -93,7 +94,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task<int> CreateOrUpdateCalendarAppointmentAsync(int calendarId, CalendarAppointment calendarAppointment, AppointmentChangeType appointmentChangeType, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -141,7 +142,7 @@ namespace Mark5.Mobile.Common.Manager
             CommonConfig.UsageAnalytics.LogEvent(new DeleteEvent(calendarAppointment.ModuleType, 1));
 
             if (sourceType == SourceType.Auto)
-                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -173,7 +174,7 @@ namespace Mark5.Mobile.Common.Manager
             var endDateUTC = endDate.ConvertUserTimeToUtcCalendar();
 
             if (sourceType == SourceType.Auto)
-                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -202,7 +203,7 @@ namespace Mark5.Mobile.Common.Manager
             var endDateUTC = endDate.ConvertUserTimeToUtcCalendar();
 
             if (sourceType == SourceType.Auto)
-                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {

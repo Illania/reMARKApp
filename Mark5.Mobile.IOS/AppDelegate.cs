@@ -39,6 +39,7 @@ using UIKit;
 using UserNotifications;
 using CoreSpotlight;
 using Mark5.Mobile.Common.Job;
+using Mark5.Mobile.Classes.Enum;
 
 namespace Mark5.Mobile.IOS
 {

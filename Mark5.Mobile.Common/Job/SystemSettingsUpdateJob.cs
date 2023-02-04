@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Mark5.Mobile.Classes.Enum;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 

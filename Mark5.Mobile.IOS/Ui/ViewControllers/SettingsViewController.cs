@@ -18,6 +18,7 @@ using Mark5.Mobile.IOS.Utilities;
 using Mark5.Mobile.IOS.Utilities.Extensions;
 using UIKit;
 using Mark5.Mobile.IOS.Ui.ViewControllers.AutoReply;
+using Mark5.Mobile.Classes.Enum;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {

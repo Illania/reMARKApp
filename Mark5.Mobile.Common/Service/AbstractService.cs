@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Manager;
+using Mark5.Mobile.Classes;
 
 namespace Mark5.Mobile.Common.Service
 {

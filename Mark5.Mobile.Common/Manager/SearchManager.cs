@@ -12,6 +12,7 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.ServiceReference.AppService;
 using DataContract = Mark5.ServiceReference.DataContract;
+using Mark5.Mobile.Classes.Enum;
 
 namespace Mark5.Mobile.Common.Manager
 {
@@ -37,7 +38,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task<List<SavedSearch>> GetSavedSearches(SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -90,7 +91,7 @@ namespace Mark5.Mobile.Common.Manager
             CommonConfig.UsageAnalytics.LogEvent(new DoSearchEvent(ModuleType.Documents));
 
             if (sourceType == SourceType.Auto)
-                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -148,7 +149,7 @@ namespace Mark5.Mobile.Common.Manager
             CommonConfig.UsageAnalytics.LogEvent(new DoSearchEvent(ModuleType.Contacts));
 
             if (sourceType == SourceType.Auto)
-                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -195,7 +196,7 @@ namespace Mark5.Mobile.Common.Manager
             CommonConfig.UsageAnalytics.LogEvent(new DoSearchEvent(ModuleType.Shortcodes));
 
             if (sourceType == SourceType.Auto)
-                sourceType = await CommonConfig.Reachability.GetSourceTypeFromReachability();
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {

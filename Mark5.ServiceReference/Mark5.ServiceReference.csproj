@@ -13,6 +13,7 @@
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="System.ServiceModel.Http" Version="4.8.1" />
+    <PackageReference Include="Polly" Version="7.2.3" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mark5.ServiceReference.Exceptions\Mark5.ServiceReference.Exceptions.csproj" />
@@ -20,5 +21,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="AppService\AppServiceClient.AppServiceClientChannel.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Polly" />
   </ItemGroup>
 </Project>

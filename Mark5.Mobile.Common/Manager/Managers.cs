@@ -4,6 +4,7 @@ using Mark5.Mobile.Common.DataAccess;
 using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Model;
 using Mark5.ServiceReference;
+using Mark5.Mobile.Classes.Enum;
 
 namespace Mark5.Mobile.Common.Manager
 {
@@ -33,6 +34,7 @@ namespace Mark5.Mobile.Common.Manager
                                                                 CommonConfig.HttpClientHandler,
                                                                 CommonConfig.OnStartTransmission,
                                                                 CommonConfig.OnStopTransmission,
+                                                                CommonConfig.Reachability,
                                                                 appToken,
                                                                 azureAppProxyInfo);
 

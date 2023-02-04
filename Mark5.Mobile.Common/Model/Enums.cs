@@ -3,16 +3,6 @@ using Mark5.ServiceReference.DataContract;
 
 namespace Mark5.Mobile.Common.Model
 {
-    #region Managers
-
-    public enum SourceType
-    {
-        Auto = 0,
-        Remote = 1,
-        Local = 2,
-    }
-
-    #endregion
 
     #region Folders
 
