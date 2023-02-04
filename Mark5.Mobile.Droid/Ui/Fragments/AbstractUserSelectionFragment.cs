@@ -15,6 +15,7 @@ using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
 using FastScrollRecycler;
+using Mark5.Mobile.Classes.Enum;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {

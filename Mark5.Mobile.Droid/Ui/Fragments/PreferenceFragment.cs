@@ -14,6 +14,7 @@ using AndroidX.Core.Content;
 using AndroidX.Core.Hardware.Fingerprint;
 using AndroidX.Fragment.App;
 using AndroidX.Preference;
+using Mark5.Mobile.Classes.Enum;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Manager;

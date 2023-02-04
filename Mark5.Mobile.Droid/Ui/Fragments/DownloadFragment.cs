@@ -16,6 +16,7 @@ using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 using AndroidX.AppCompat.Widget;
 using AndroidX.AppCompat.App;
+using Mark5.Mobile.Classes.Enum;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {

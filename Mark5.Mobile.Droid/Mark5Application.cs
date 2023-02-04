@@ -6,6 +6,7 @@ using Android.App;
 using Android.Runtime;
 using AndroidX.AppCompat.App;
 using Firebase.Analytics;
+using Mark5.Mobile.Classes.Enum;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Database;

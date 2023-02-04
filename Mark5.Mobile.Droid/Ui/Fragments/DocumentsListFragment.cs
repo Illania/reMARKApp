@@ -32,6 +32,7 @@ using AndroidX.AppCompat.App;
 using Google.Android.Material.Snackbar;
 using AndroidX.Core.Content;
 using FastScrollRecycler;
+using Mark5.Mobile.Classes.Enum;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {

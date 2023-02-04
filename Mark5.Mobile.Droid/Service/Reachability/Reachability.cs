@@ -16,6 +16,7 @@ using Android.Content;
 using System.Net.Http.Headers;
 using Mark5.Mobile.Classes;
 using Mark5.Mobile.Classes.Model;
+using Mark5.Mobile.Classes.Enum;
 
 namespace Mark5.Mobile.Droid.Service
 {

@@ -23,6 +23,7 @@ using AndroidX.Fragment.App;
 using Google.Android.Material.Navigation;
 using Google.Android.Material.Snackbar;
 using Java.IO;
+using Mark5.Mobile.Classes.Enum;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
