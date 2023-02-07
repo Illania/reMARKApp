@@ -135,10 +135,10 @@ namespace Mark5.Mobile.IOS
                     {
                         var data = url.AbsoluteString.Replace("remark.share.url://", "");
                         var pathArray = data.Split(';');
-
+                        
                         foreach (var path in pathArray)
                         {
-                            urlList.Add(new NSUrl(path));
+                            urlList.Add(NSUrl.FromFilename(path));
                         }
 
                     }
