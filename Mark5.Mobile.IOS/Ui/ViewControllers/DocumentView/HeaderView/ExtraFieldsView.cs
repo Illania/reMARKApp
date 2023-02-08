@@ -1,19 +1,22 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Converters;
 using Mark5.Mobile.IOS.Ui.Common;
+using Foundation;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 {
+
     public class ExtraFieldsView : DocumentSubView
     {
+
         UIStackView stackView;
         Dictionary<DocumentExtraFieldInfo, string> documentExtraFields = new();
         public ExtraFieldsView()
@@ -48,6 +51,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             }
         }
 
+      
         public override async Task RefreshView()
         {
             if (Document == null)
@@ -56,25 +60,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             stackView.ArrangedSubviews.ForEach(v => v.RemoveFromSuperview());
 
             if (ServerConfig.SystemSettings.SystemInfo.ExtraFieldsEditingAvailable)
-                await AddEditableExtraFields();
+                AddEditableExtraFields();
             else
                 AddReadonlyExtraFields();
-
         }
 
-        private async Task AddEditableExtraFields()
+        private void AddEditableExtraFields()
         {
             DocumentExtraFieldInfoEqualityComparer docComparer = new();
 
-            var assignedExtraFields = await Managers.DocumentsManager.GetDocumentExtraFieldsAsync(Document.Id);
-            var availableExtraFields = await Managers.DocumentsManager.GetExtraFieldsAsync();
-            availableExtraFields = availableExtraFields.Where(ef => PlatformConfig.Preferences.IsExtraFieldEnabled(ef.FieldId)).ToList();
+            var assignedExtraFields = Document.ExtraFields;
+            var availableExtraFields = ServerConfig.SystemSettings.DocumentsModuleInfo.ExtraFieldInfos;
+            availableExtraFields = availableExtraFields.Where(ef => PlatformConfig.Preferences.IsExtraFieldEnabled(ef.Id)).ToList();
             documentExtraFields = assignedExtraFields
                 .Where(kv => kv.Key != null)
                 .OrderBy(kv => kv.Key.Name)
                 .ToDictionary(pair => pair.Key, pair => pair.Value, docComparer);
 
-            foreach (var ex in availableExtraFields.Select(ex => ex.ToDocumentExtraFieldInfo()))
+            foreach (var ex in availableExtraFields)
             {
                 if (!documentExtraFields.ContainsKey(ex))
                     documentExtraFields.Add(ex, string.Empty);
@@ -168,7 +171,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
            {
                 Hidden = true;
                 return;
-            }
+           }
 
             Hidden = !documentExtraFields.Any();
         }
