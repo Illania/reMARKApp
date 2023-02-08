@@ -757,9 +757,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (RemoteFolder.Module == ModuleType.Documents)
             {
                 if (foldersAvailableOfflineState.Any(v => v))
-                    menu.Add(Menu.None, MenuItemActions.DisableOffline, MenuItemActions.DisableOffline, Resource.String.remove_offline).SetShowAsAction(ShowAsAction.Never);
+                    menu.Add(Menu.None, MenuItemActions.DisableOffline, MenuItemActions.DisableOffline, Resource.String.disable_caching).SetShowAsAction(ShowAsAction.Never);
                 if (foldersAvailableOfflineState.Any(v => !v))
-                    menu.Add(Menu.None, MenuItemActions.EnableOffline, MenuItemActions.EnableOffline, Resource.String.add_offline).SetShowAsAction(ShowAsAction.Never);
+                    menu.Add(Menu.None, MenuItemActions.EnableOffline, MenuItemActions.EnableOffline, Resource.String.enable_caching).SetShowAsAction(ShowAsAction.Never);
             }
 
             if ((RemoteFolder.Module == ModuleType.Contacts || RemoteFolder.Module == ModuleType.Shortcodes) && selectedFolders.Count == 1 && AsyncHelpers.RunSync(() => Managers.FoldersManager.IsSavedFolderOfflineInfo(selectedFolders[0])))

@@ -136,7 +136,7 @@
 "department" = "Department";
 "departments"= "Departments";
 "description" = "Description"; 
-"disable_sync" = "Disable\nsync";
+"disable_caching" = "Disable\ncaching";
 "disable_notifications" = "Don't\nnotify";
 "disabled" = "Disabled";
 "disconnected" = "Disconnected";
@@ -209,7 +209,7 @@
 "enable_callid_extension_title" = "Enable extension";
 "enable_callid_extension_message" = "To enable caller indentification you must save the folders \"All companies\" and/or \"All persons\". Afterwards go to Settings => Phone => Call Blocking &... and enable reMARK.";
 "enable_notifications" = "Notify";
-"enable_sync" = "Enable\nsync";
+"enable_caching" = "Enable\ncaching";
 "enabled" = "Enabled";
 "ends" = "Ends";
 "error" = "Error";
