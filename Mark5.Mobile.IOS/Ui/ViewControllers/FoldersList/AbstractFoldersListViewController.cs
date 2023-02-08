@@ -1414,7 +1414,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                         if (SyncStatus[f.Id])
                         {
                             var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
-                                Localization.GetString("disable_sync"),
+                                Localization.GetString("disable_caching"),
                                 (a, ip) =>
                                 {
                                     viewControllerWeakReference.Unwrap()?.DisableSync(Items[ip.LongSection][ip.Row]);
@@ -1426,7 +1426,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                         else
                         {
                             var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
-                                Localization.GetString("enable_sync"),
+                                Localization.GetString("enable_caching"),
                                 (a, ip) =>
                                 {
                                     viewControllerWeakReference.Unwrap()?.EnableSync(Items[ip.LongSection][ip.Row]);

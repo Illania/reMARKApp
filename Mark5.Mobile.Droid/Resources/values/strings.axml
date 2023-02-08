@@ -18,7 +18,7 @@
     <string name="add_message">Add message</string>
         <string name="add_message_optional">Add message (optional)</string>
     <string name="add_favorites">Add to favorites</string>
-    <string name="add_offline">Enable sync</string>
+    <string name="enable_caching">Enable caching</string>
     <string name="adding_comment">Adding comment</string>
     <string name="adding_extra_field">Adding extra field</string>
     <string name="adding_appointment">Adding appointment...</string>
@@ -407,7 +407,7 @@
     <string name="remove">Remove</string>
     <string name="remove_bookmark">Remove bookmark</string>
     <string name="remove_favorites">Remove from favourites</string>
-    <string name="remove_offline">Disable sync</string>
+    <string name="disable_caching">Disable caching</string>
     <string name="reply">Reply</string>
     <string name="reply_all">Reply all</string>
     <string name="reply_to">Reply to:</string>
