@@ -26,6 +26,7 @@ using AndroidX.AppCompat.Widget;
 using AndroidX.ViewPager.Widget;
 using AndroidX.AppCompat.App;
 using SearchView = AndroidX.AppCompat.Widget.SearchView;
+using Mark5.Mobile.Classes.Enum;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
