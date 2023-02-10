@@ -18,8 +18,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         {
             try
             {
-                var textStyle = //Theme.CustomFonts[font];
-                                UIFontDescriptor.PreferredBody.TextStyle;
+                var textStyle = UIFontDescriptor.PreferredBody.TextStyle;
 
                 var scaledFont = font;
 
@@ -46,7 +45,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             {
                 UIFont.FromName(Theme.DefaultLightFontName, 28f),
                 UIFontDescriptor.PreferredTitle1.TextStyle
-            },   //AppointmentTitleFont.CustomFont()
+            },   
             {
                 UIFont.FromName(Theme.DefaultFontName, 22f),
                 UIFontDescriptor.PreferredTitle2.TextStyle
@@ -54,27 +53,27 @@ namespace Mark5.Mobile.IOS.Ui.Common
             {
                 UIFont.FromName(Theme.DefaultFontName, 18f),
                 UIFontDescriptor.PreferredTitle3.TextStyle
-            },        //AppointmentDefaultFont.CustomFont().CustomFont()
+            },       
             {
                 UIFont.FromName(Theme.DefaultBoldFontName, 16f),
                 UIFontDescriptor.PreferredHeadline.TextStyle
-            },  //DefaultBoldFont.CustomFont()Name
+            },  
             {
                 UIFont.FromName(Theme.DefaultFontName, 16f),
                 UIFontDescriptor.PreferredBody.TextStyle
-            },          //DefaultFont.CustomFont()
+            },          
             {
                 UIFont.FromName(Theme.DefaultLightFontName, 16f),
                 UIFontDescriptor.PreferredCallout.TextStyle
-            },  //DefaultLightFont.CustomFont()
+            },  
             {
                 UIFont.FromName(Theme.DefaultFontName, 14f),
                 UIFontDescriptor.PreferredSubheadline.TextStyle
-            },   //DefaultActionsFont.CustomFont()
+            },  
             {
                 UIFont.FromName(Theme.DefaultLightFontName, 14f),
                 UIFontDescriptor.PreferredFootnote.TextStyle
-            }, //CalendarTimeLightFont.CustomFont()
+            }, 
             {
                 UIFont.FromName(Theme.DefaultLightFontName, 12f),
                 UIFontDescriptor.PreferredCaption1.TextStyle
