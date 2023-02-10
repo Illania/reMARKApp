@@ -190,7 +190,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             });
 
             settingsButton = new UIButtonScalable();
-            settingsButton.TitleLabel.Font = Theme.DefaultBoldFont.CustomFont().CustomFont();
+            settingsButton.TitleLabel.Font = Theme.DefaultBoldFont.CustomFont();
             settingsButton.SetTitle(Localization.GetString("settings"), UIControlState.Normal);
             settingsButton.SetTitleColor(Theme.DarkBlue, UIControlState.Normal);
             settingsButton.TranslatesAutoresizingMaskIntoConstraints = false;
