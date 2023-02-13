@@ -926,13 +926,10 @@ namespace Mark5.Mobile.Common.DataAccess
 
                     var result = c.Query<int>(query);
 
-                    if (result == null || result.Count < 1)
-                        throw new DataNotFoundException($"Linked folders for document {documentId} could not be found.");
-
                     linkedFoldersId = result;
                 });
 
-                return linkedFoldersId;
+                return linkedFoldersId ?? new List<int>();
             }
             catch (Exception ex) when (!(ex is DataAccessException))
             {
@@ -973,7 +970,8 @@ namespace Mark5.Mobile.Common.DataAccess
                 foreach (var be in businessEntities)
                 {
                     var linkedFoldersIds = await GetLinkedFoldersIds(be.Id);
-                    await restorationDataAccess.SaveDeletedObjectLinkedFolders(be.Id, linkedFoldersIds);
+                    if(linkedFoldersIds.Any())
+                        await restorationDataAccess.SaveDeletedObjectLinkedFolders(be.Id, linkedFoldersIds);
                 }
             }
             catch (Exception ex) when (!(ex is DataAccessException))
