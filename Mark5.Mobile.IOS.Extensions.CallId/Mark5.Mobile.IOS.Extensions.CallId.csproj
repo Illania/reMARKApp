@@ -28,7 +28,7 @@
     <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
     <DeviceSpecificBuild>true</DeviceSpecificBuild>
     <MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
-    <CodesignProvision>reMark CallID</CodesignProvision>
+    <CodesignProvision>remark callid 2023</CodesignProvision>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
     <Optimize>true</Optimize>

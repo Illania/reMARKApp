@@ -33,8 +33,7 @@ namespace Mark5.ServiceReference.AppService
         readonly AzureApplicationProxyInfo azureApplicationProxyInfo;
         readonly AsyncPolicyWrap policy;
         readonly IReachability reachability;
-        const int attempts = 3;
-        const double timeOut = 200;
+        const int MAX_RETRIES = 3;
 
 
         public HttpAppServiceProxy(bool ssl, string hostname, string port, Func<HttpMessageHandler> httpClientHandler,
@@ -68,12 +67,13 @@ namespace Mark5.ServiceReference.AppService
         {
             HttpStatusCode statusCode = 0;
             var useBearerToken = !string.IsNullOrEmpty(bearerToken);
+            var timeout = TimeSpan.FromSeconds(useShortTimeout ? Config.HttpClientShortTimeoutSeconds : Config.HttpClientTimeoutSeconds);
 
             async Task<R> CreateRequestAsync()
             {
                 using var c = new HttpClient(httpClientHandler())
                 {
-                    Timeout = TimeSpan.FromSeconds(useShortTimeout ? Config.HttpClientShortTimeoutSeconds : Config.HttpClientTimeoutSeconds)
+                    Timeout = timeout
                 };
                 var req = CreateRequest(soapAction, parameters, checkXmlCharacters, bearerToken);
                 var res = useBearerToken ? await c.SendAsync(req) : await c.SendAsync(req, ct);
@@ -96,11 +96,16 @@ namespace Mark5.ServiceReference.AppService
                     }
                 }
             }
-
+           
             AsyncPolicy GetRetryPolicy()
             {
-                return Policy.Handle<Exception>()
-                    .WaitAndRetryAsync(attempts, attempt => TimeSpan.FromMilliseconds(timeOut), (exception, calculatedWaitDuration) => { });
+                var retryPolicy = Policy.Handle<Exception>()
+                .WaitAndRetryAsync(retryCount: MAX_RETRIES, sleepDurationProvider: (attemptCount) => timeout,
+                onRetry: (exception, sleepDuration, attemptNumber, context) =>
+                {
+                    Console.WriteLine($"Exception when sending http request. Retrying in {sleepDuration}. {attemptNumber} / {MAX_RETRIES}");
+                });
+                return retryPolicy;
             }
 
             var policy = GetRetryPolicy();
