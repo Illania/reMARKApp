@@ -70,7 +70,8 @@ namespace Mark5.Mobile.Common.Model.Converters
             return result;
         }
 
-        public static CalendarAppointmentOccurrence Convert(this DataContract.CalendarAppointmentOccurrence ca, int appointmentId, int calendarId)
+        public static CalendarAppointmentOccurrence Convert(this DataContract.CalendarAppointmentOccurrence ca, 
+            int appointmentId, int calendarId)
         {
             return new CalendarAppointmentOccurrence
             {
@@ -140,7 +141,6 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Enabled = extraFieldInfo.Enabled
             };
         }
-
  
         public static Comment Convert(this DataContract.Comment c)
         {
@@ -376,7 +376,6 @@ namespace Mark5.Mobile.Common.Model.Converters
             };
         }
 
-
         public static DocumentsModulePermissions Convert(this DataContract.DocumentsModulePermissions dmp)
         {
             return new DocumentsModulePermissions
@@ -468,8 +467,6 @@ namespace Mark5.Mobile.Common.Model.Converters
             };
             return result;
         }
-
-
 
         public static Folder Convert(this DataContract.Folder f)
         {
@@ -803,7 +800,6 @@ namespace Mark5.Mobile.Common.Model.Converters
             return moduleFavorites;
         }
 
-
         #region ICalendar
 
         public static CalendarInvitation Convert(this DataContract.CalendarInvitation ci)
@@ -867,7 +863,8 @@ namespace Mark5.Mobile.Common.Model.Converters
                 ReadByUserNames = doc.ReadByUserNames,
                 Attachments = doc.Attachments.Select(Convert).ToList(),
                 Comments = doc.Comments.Select(Convert).ToList(),
-                ExtraFields = doc.ExtraFields.ToDictionary(kv => kv.Key.Convert(), kv => kv.Value),
+                ExtraFields = doc.ExtraFields.ToDictionary(kv => kv.Key.Convert(), 
+                    kv => kv.Value),
                 IsEncrypted = doc.IsEncrypted,
                 WorktrayComment = doc.WorktrayComment,
                 Invitations = doc.Invitations?.Select(Convert).ToList(),
@@ -920,7 +917,6 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Enabled = extraField.Enabled
             };
         }
-    
 
         public static DataContract.Contact Convert(this Contact c)
         {
@@ -936,7 +932,8 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Account = c.Account,
                 Vat = c.Vat,
                 BirthDate = c.BirthDateTimestamp == -1
-                             ? default(DateTime).AddYears(1) //Used because in one version of the service the birthdate is ignored if equal to default(DateTime)
+                             ? default(DateTime).AddYears(1) //Used because in one version of the service the birthdate
+                                                             //is ignored if equal to default(DateTime)
                              : c.BirthDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
                 Ledger = c.Ledger,
                 PrimaryPerson = c.PrimaryPerson?.Convert(),
@@ -1254,7 +1251,6 @@ namespace Mark5.Mobile.Common.Model.Converters
                 RecurrenceInfo = ci.RecurrenceInfo?.Convert()
             };
         }
-
 
         public static DataContract.Attendee Convert(this Attendee at)
         {
