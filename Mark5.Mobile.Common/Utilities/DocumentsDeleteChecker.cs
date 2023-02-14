@@ -17,7 +17,7 @@ namespace Mark5.Mobile.Common.Utilities
 
             var linesAllowedToDelete =
                 ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteDocumentsAllowedLines;
-            if (!linesAllowedToDelete.Any())
+            if (linesAllowedToDelete == null || !linesAllowedToDelete.Any())
                 return false;
 
             if (documents.Count != 1) 
