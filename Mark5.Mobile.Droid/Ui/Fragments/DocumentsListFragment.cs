@@ -631,7 +631,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
                 menu.Add(MenuItemGroup.Actions, MenuItemActions.DeleteFromFolder, MenuItemActions.DeleteFromFolder, Resource.String.delete_from_folder);
 
-            AddDeleteDocumentMenuItem(selectedDocuments);
+            if (DocumentsDeleteChecker.CanDeleteDocuments(selectedDocuments))
+            {
+                menu.Add(MenuItemGroup.Actions, MenuItemActions.Delete,
+                    MenuItemActions.Delete, Resource.String.delete);
+            }
 
             if (selectedDocuments.Count == 1)
                 menu.Add(MenuItemGroup.Actions, MenuItemActions.AddRemoveBookmark, MenuItemActions.AddRemoveBookmark,
@@ -645,36 +649,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             menu.SetGroupEnabled(MenuItemGroup.Actions, selectedDocuments.Any());
 
             return true;
-        }
-
-        private void AddDeleteDocumentMenuItem(List<DocumentPreview> documents)
-        {
-            if ((!ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed
-                && documents.Any(dp => dp.Direction != DocumentDirection.Draft))
-                || documents.Count == 0)
-            {
-                return;
-            }
-
-            var linesAllowedToDelete =
-                ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteDocumentsAllowedLines;
-            if (!linesAllowedToDelete.Any())
-                return;
-            
-            if (documents.Count == 1)
-            {
-                var document = documents.FirstOrDefault();
-                if (document == null) 
-                    return;
-            
-                var linesGuids = document.Lines.Select(l => l.Guid);
-                var intersection = linesAllowedToDelete.Intersect(linesGuids);
-                if (!intersection.Any()) 
-                    return;
-            }
-            
-            menu.Add(MenuItemGroup.Actions, MenuItemActions.Delete,
-                MenuItemActions.Delete, Resource.String.delete);
         }
 
         bool ActionMode.ICallback.OnActionItemClicked(ActionMode mode, IMenuItem item)
@@ -1949,6 +1923,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 if (swipeAction == Preferences.EmailSwipeAction.MoveToFolder)
                     return PlatformConfig.Preferences.EnableMoveToFolder;
+                if (swipeAction == Preferences.EmailSwipeAction.Delete)
+                    return DocumentsDeleteChecker.CanDeleteDocuments(adapter.SelectedItems);
 
                 return true;
             }
@@ -2034,7 +2010,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     case Preferences.EmailSwipeAction.CopyToWorkTray:
                         return ServerConfig.SystemSettings.DocumentsModuleInfo.WorktrayEnabled ?? true;
                     case Preferences.EmailSwipeAction.Delete:
-                        return ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || adapter.SelectedItems.All(dp => dp.Direction == DocumentDirection.Draft);
+                        return DocumentsDeleteChecker.CanDeleteDocuments(adapter.SelectedItems);
                     case Preferences.EmailSwipeAction.MoveToFolder:
                         return folder.InternalType == FolderInternalType.FilterView || folder.InternalType == FolderInternalType.Static || folder.InternalType == FolderInternalType.Worktray;
                     case Preferences.EmailSwipeAction.RemoveFromFolder:
