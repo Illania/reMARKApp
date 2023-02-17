@@ -247,7 +247,7 @@
     <string name="pref_key_last_user_sending_delay">pref_key_last_user_sending_delay</string>
     <string name="pref_key_bookmarks">pref_key_bookmarks</string>
      <string name="pref_open_file_to_folder_dialog_title">Open file to folder dialog</string>
-    <string name="pref_key_open_file_to_folder_dialog">pref_key_reply_with_attachments</string>
+    <string name="pref_key_open_file_to_folder_dialog">pref_key_open_file_to_folder_dialog</string>
     <string name="pref_open_file_to_folder_dialog_summary_on">File to folder dialog will be opened after sending email.</string>
     <string name="pref_open_file_to_folder_dialog_summary_off">>File to folder dialog will not be opened after sending email.</string>
     <string name="pref_key_extra_fields_settings">pref_key_extra_fields_settings</string>

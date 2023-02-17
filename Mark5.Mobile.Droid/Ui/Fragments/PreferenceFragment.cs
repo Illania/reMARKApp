@@ -153,12 +153,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             var rememberLastUsedDelaySettings = FindPreference(GetString(Resource.String.pref_key_remember_last_user_delay_settings));
             if (!ServerConfig.SystemSettings.SystemInfo.DelaySendAvailable)
             {
-                PreferenceScreen.RemovePreference(sendingDelay);
-                PreferenceScreen.RemovePreference(rememberLastUsedDelaySettings);
+                if(sendingDelay!=null && rememberLastUsedDelaySettings!=null)
+                {
+                    PreferenceScreen.RemovePreference(sendingDelay);
+                    PreferenceScreen.RemovePreference(rememberLastUsedDelaySettings);
+                }
             }
                 
             var autoReplySettings = FindPreference(GetString(Resource.String.pref_key_autoreply));
-            if (!ServerConfig.SystemSettings.SystemInfo.AutoReplyAvailable)
+            if (!ServerConfig.SystemSettings.SystemInfo.AutoReplyAvailable && autoReplySettings != null)
                 PreferenceScreen.RemovePreference(autoReplySettings);
             else if(autoReplySettings != null)
             {
@@ -176,11 +179,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             var syncUserActivities = FindPreference(GetString(Resource.String.pref_key_sync_user_activities));
-            if (!ServerConfig.SystemSettings.SystemInfo.UserActivitiesAvailable)
-                PreferenceScreen.RemovePreference(autoReplySettings); 
+            if (!ServerConfig.SystemSettings.SystemInfo.UserActivitiesAvailable && syncUserActivities!=null)
+                PreferenceScreen.RemovePreference(syncUserActivities); 
       
             var extraFieldsOptions = FindPreference(GetString(Resource.String.pref_key_extra_fields_options));
-            if (!ServerConfig.SystemSettings.SystemInfo.ExtraFieldsEditingAvailable)
+            if (!ServerConfig.SystemSettings.SystemInfo.ExtraFieldsEditingAvailable && extraFieldsOptions != null)
                 PreferenceScreen.RemovePreference(extraFieldsOptions);
             if (extraFieldsOptions != null)
             {
