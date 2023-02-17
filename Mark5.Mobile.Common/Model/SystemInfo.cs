@@ -28,6 +28,8 @@ namespace Mark5.Mobile.Common.Model
         /// </summary>
         public bool NewPushNotificationsSystemAvailable => ServiceVersionGreaterThanOrEqual(4, 0, 0) || SystemVersionGreaterThanOrEqual(1, 37, 13);
 
+        public bool IsReferenceInTemplatesAvailable => ServiceVersionGreaterThanOrEqual(4, 2, 0);
+
         public bool ExtraFieldsEditingAvailable => ServiceVersionGreaterThanOrEqual(4, 4, 0);
         public bool FavoriteCategoriesAvailable => ServiceVersionGreaterThanOrEqual(4, 4, 0);
         public bool RecentAddressDeleteAvailable => ServiceVersionGreaterThanOrEqual(4, 4, 0);

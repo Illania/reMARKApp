@@ -1403,19 +1403,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 template.Attachments.ForEach(attachmentsView.AddAttachment);
         }
 
-        async Task AssignNewDocumentReferenceNumber()
-        {
-            try
-            {
-                var docRef = await Managers.DocumentsManager.GetNewDocumentReferenceNumber(documentPreview);
-                documentPreview.ReferenceNumber = docRef;
-            }
-            catch(Exception ex)
-            {
-                CommonConfig.Logger.Error($"Can't get new document reference number from server: ", ex);
-            }
-        }
-
         async Task ProcessTemplate(Template template, DocumentPreview documentPreview)
         {
             var templateContent = template.Content;
@@ -1428,7 +1415,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (documentPreview?.Addresses != null)
                 fromNameString = documentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.From).Select(da => da.Name).FirstOrDefault() ?? string.Empty;
 
-            await AssignNewDocumentReferenceNumber();
+            if (templateContent.Contains("REF") && ServerConfig.SystemSettings?.SystemInfo?.IsReferenceInTemplatesAvailable == true)
+            {
+                var docRef = await Managers.DocumentsManager.GetNewDocumentReferenceNumber(documentPreview);
+                this.documentPreview.ReferenceNumber = docRef;
+            }
 
             if (template.ContentType == ContentType.Html)
             {
