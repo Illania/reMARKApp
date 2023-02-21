@@ -37,6 +37,8 @@ namespace Mark5.Mobile.Common.Model
         public bool UserActivitiesAvailable => ServiceVersionGreaterThanOrEqual(4, 6, 0);
 
         public bool AutoReplyAvailable => ServiceVersionGreaterThanOrEqual(4, 7, 0);
+        
+        public bool DeleteDocumentsAllowedLinesAvailable => ServiceVersionGreaterThanOrEqual(4, 7, 1);
 
         public bool CalendarModuleAvailable       
         {

@@ -9,10 +9,16 @@ namespace Mark5.Mobile.Common.Utilities
         public static bool CanDeleteDocuments(List<DocumentPreview> documents)
         {
             if ((!ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed
-                 && documents.Any(dp => dp.Direction != DocumentDirection.Draft))
+                && documents.Any(dp => dp.Direction != DocumentDirection.Draft)) 
                 || documents.Count == 0)
             {
                 return false;
+            }
+
+            if (documents.All(dp => dp.Direction == DocumentDirection.Draft)
+                || !ServerConfig.SystemSettings.SystemInfo.DeleteDocumentsAllowedLinesAvailable)
+            {
+                return true;
             }
 
             var linesAllowedToDelete =
