@@ -522,10 +522,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     UIAlertActionStyle.Default,
                     a => RemoveFromFolder(selectedDocuments, d)));
 
-            if (ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || selectedDocuments.All(dp => dp.Direction == DocumentDirection.Draft))
+            if (DocumentsDeleteChecker.CanDeleteDocuments(selectedDocuments))
+            {
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"),
                     UIAlertActionStyle.Destructive,
                     a => Delete(selectedDocuments, d)));
+            }
 
             if (ServerConfig.SystemSettings?.SystemInfo?.DelaySendAvailable == true && selectedDocuments.Any(dp => dp.TransmitStatus == TransmitStatus.Delayed))
             {
@@ -680,10 +682,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     UIAlertActionStyle.Default,
                     a => RemoveFromFolder(selectedDocuments, d)));
 
-            if (ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || selectedDocuments.All(dp => dp.Direction == DocumentDirection.Draft))
+            if (DocumentsDeleteChecker.CanDeleteDocuments(selectedDocuments))
+            {
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"),
                     UIAlertActionStyle.Destructive,
                     a => Delete(selectedDocuments, d)));
+            }
 
             if (ServerConfig.SystemSettings?.SystemInfo?.DelaySendAvailable == true && selectedDocuments.Any(dp => dp.TransmitStatus == TransmitStatus.Delayed))
             {
@@ -1411,7 +1415,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 case EmailSwipeAction.SwipeAction.MoveToFolder:
                     return folder.InternalType == FolderInternalType.FilterView || folder.InternalType == FolderInternalType.Static || folder.InternalType == FolderInternalType.Worktray;
                 case EmailSwipeAction.SwipeAction.Delete:
-                    return ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || documentPreview.Direction == DocumentDirection.Draft;
+                    return DocumentsDeleteChecker.CanDeleteDocuments(
+                        new List<DocumentPreview> { documentPreview });
                 case EmailSwipeAction.SwipeAction.RemoveFromFolder:
                     return folder.InternalType == FolderInternalType.FilterView || folder.InternalType == FolderInternalType.Static || folder.InternalType == FolderInternalType.Worktray;
                 default:

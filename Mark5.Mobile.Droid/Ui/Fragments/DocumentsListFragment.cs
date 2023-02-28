@@ -598,16 +598,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 selectAllItem.SetIcon(Resource.Drawable.action_deselect_all);
             }
 
-            if (ServerConfig.SystemSettings?.SystemInfo?.DelaySendAvailable == true && CurrentAdapter.SelectedItems.Any(dp => dp.TransmitStatus == TransmitStatus.Delayed))
+            var selectedDocuments = CurrentAdapter.SelectedItems;
+            if (ServerConfig.SystemSettings?.SystemInfo?.DelaySendAvailable == true && selectedDocuments.Any(dp => dp.TransmitStatus == TransmitStatus.Delayed))
             {
                 menu.Add(MenuItemGroup.Actions, MenuItemActions.SendNow, MenuItemActions.SendNow, Resource.String.send_now);
                 menu.Add(MenuItemGroup.Actions, MenuItemActions.CancelSend, MenuItemActions.CancelSend, Resource.String.cancel_send);
             }
 
-            if (CurrentAdapter.SelectedItems.Any(dp => !dp.IsReadByCurrent) || !CurrentAdapter.SelectedItems.Any())
+            if (selectedDocuments.Any(dp => !dp.IsReadByCurrent) || !selectedDocuments.Any())
                 menu.Add(MenuItemGroup.Actions, MenuItemActions.MarkAsRead, MenuItemActions.MarkAsRead, Resource.String.mark_as_read);
 
-            if (CurrentAdapter.SelectedItems.Any(dp => dp.IsReadByCurrent))
+            if (selectedDocuments.Any(dp => dp.IsReadByCurrent))
                 menu.Add(MenuItemGroup.Actions, MenuItemActions.MarkAsUnread, MenuItemActions.MarkAsUnread, Resource.String.marks_as_unread);
 
             if (ServerConfig.SystemSettings.DocumentsModuleInfo.WorktrayEnabled ?? true)
@@ -631,19 +632,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
                 menu.Add(MenuItemGroup.Actions, MenuItemActions.DeleteFromFolder, MenuItemActions.DeleteFromFolder, Resource.String.delete_from_folder);
 
-            if (ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || CurrentAdapter.SelectedItems.All(dp => dp.Direction == DocumentDirection.Draft))
-                menu.Add(MenuItemGroup.Actions, MenuItemActions.Delete, MenuItemActions.Delete, Resource.String.delete);
+            if (DocumentsDeleteChecker.CanDeleteDocuments(selectedDocuments))
+            {
+                menu.Add(MenuItemGroup.Actions, MenuItemActions.Delete,
+                    MenuItemActions.Delete, Resource.String.delete);
+            }
 
-            if (CurrentAdapter.SelectedItemCount == 1)
+            if (selectedDocuments.Count == 1)
                 menu.Add(MenuItemGroup.Actions, MenuItemActions.AddRemoveBookmark, MenuItemActions.AddRemoveBookmark,
-                 PlatformConfig.Preferences.HasBookmarkForFolder(Folder.Id, CurrentAdapter.SelectedItems.FirstOrDefault().Id)
+                 PlatformConfig.Preferences.HasBookmarkForFolder(Folder.Id, selectedDocuments.First().Id)
                  ? Resource.String.remove_bookmark
                  : Resource.String.add_bookmark);
 
             if (CurrentAdapter.SelectedItemCount == 1)
                 menu.Add(MenuItemGroup.Actions, MenuItemActions.SetPresetCategory, MenuItemActions.SetPresetCategory, Resource.String.set_preset_category);
 
-            menu.SetGroupEnabled(MenuItemGroup.Actions, CurrentAdapter.SelectedItems.Any());
+            menu.SetGroupEnabled(MenuItemGroup.Actions, selectedDocuments.Any());
 
             return true;
         }
@@ -1920,6 +1924,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 if (swipeAction == Preferences.EmailSwipeAction.MoveToFolder)
                     return PlatformConfig.Preferences.EnableMoveToFolder;
+                if (swipeAction == Preferences.EmailSwipeAction.Delete)
+                    return DocumentsDeleteChecker.CanDeleteDocuments(adapter.SelectedItems);
 
                 return true;
             }
@@ -2005,7 +2011,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     case Preferences.EmailSwipeAction.CopyToWorkTray:
                         return ServerConfig.SystemSettings.DocumentsModuleInfo.WorktrayEnabled ?? true;
                     case Preferences.EmailSwipeAction.Delete:
-                        return ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || adapter.SelectedItems.All(dp => dp.Direction == DocumentDirection.Draft);
+                        return DocumentsDeleteChecker.CanDeleteDocuments(adapter.SelectedItems);
                     case Preferences.EmailSwipeAction.MoveToFolder:
                         return folder.InternalType == FolderInternalType.FilterView || folder.InternalType == FolderInternalType.Static || folder.InternalType == FolderInternalType.Worktray;
                     case Preferences.EmailSwipeAction.RemoveFromFolder:

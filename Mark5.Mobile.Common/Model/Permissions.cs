@@ -1,4 +1,7 @@
-﻿namespace Mark5.Mobile.Common.Model
+﻿using System;
+using System.Collections.Generic;
+
+namespace Mark5.Mobile.Common.Model
 {
     public class Permissions
     {
@@ -22,5 +25,6 @@
         public bool OutgoingSupervisor { get; set; }
         public bool ManageFilterViewFoldersAllowed { get; set; }
         public bool SpamManager { get; set; }
+        public List<Guid> DeleteDocumentsAllowedLines { get; set; } = new List<Guid>();
     }
 }

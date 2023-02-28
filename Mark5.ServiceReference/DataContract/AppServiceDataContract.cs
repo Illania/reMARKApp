@@ -3229,6 +3229,9 @@ namespace Mark5.ServiceReference.DataContract
 
         [DataMember(Name = "SpamManager", Order = 0)]
         public bool SpamManager { get; set; }
+
+        [DataMember(Name = "DeleteDocumentsAllowedLines", Order = 0)]
+        public List<Guid> DeleteDocumentsAllowedLines { get; set; } = new List<Guid>();
     }
 
     [DataContract(Name = "DocumentExtraFieldInfo", Namespace = "com.nordic-it.appservice.v3")]
