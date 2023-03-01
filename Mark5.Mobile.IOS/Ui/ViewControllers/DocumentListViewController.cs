@@ -138,6 +138,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 AutoRefreshIntervalMs);
             autoRefreshWorker.Start();
 
+             //Avoid refresh control being stuck
+            var endRefreshTimer = NSTimer.CreateRepeatingScheduledTimer(TimeSpan.FromSeconds(5.0), delegate {
+                RefreshControl.EndRefreshing();
+            });
+
             if (!Integration.IsRunningAtLeast(11))
                 return;
 
@@ -772,11 +777,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 NavigationController?.PopViewController(true);
             }
-
-            RefreshControl.EndRefreshing();
-            RefreshControl.ValueChanged += RefreshControl_ValueChanged;
-
-            refreshing = false;
+            finally
+            {           
+                RefreshControl.EndRefreshing();
+                RefreshControl.ValueChanged += RefreshControl_ValueChanged;
+                refreshing = false;
+            }
+            
         }
 
         async Task AutoRefreshData(int endId)
