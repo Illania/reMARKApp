@@ -104,7 +104,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (searchController?.SearchResultsController is UITableViewController searchTableViewController)
             {
                 if (searchTableViewController?.TableView?.IndexPathForSelectedRow != null)
-                    searchTableViewController.TableView.DeselectRow(TableView.IndexPathForSelectedRow, true);
+                    searchTableViewController.TableView.DeselectRow(searchTableViewController?.TableView.IndexPathForSelectedRow, true);
 
                 if (searchTableViewController?.TableView?.IndexPathsForSelectedRows?.Length > 0)
                     foreach (var selectedIndexPath in searchTableViewController.TableView?.IndexPathsForSelectedRows)
@@ -294,7 +294,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             searchController = new(searchResultsController)
             {
                 HidesNavigationBarDuringPresentation = false,
-                DimsBackgroundDuringPresentation = true,
                 ObscuresBackgroundDuringPresentation = true,
                 SearchResultsUpdater = this,
             };
