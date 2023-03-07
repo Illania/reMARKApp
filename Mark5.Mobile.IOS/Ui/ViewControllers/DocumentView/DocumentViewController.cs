@@ -939,7 +939,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                       }));
             }
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"), UIAlertActionStyle.Default, a => ShowPriorityActionSheet((UIBarButtonItem)sender)));
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"),
+                UIAlertActionStyle.Default, a => ShowPriorityActionSheet((UIBarButtonItem)sender)));
 
             if (folder?.InternalType == FolderInternalType.FilterView || folder?.InternalType == FolderInternalType.Static || folder?.InternalType == FolderInternalType.Worktray)
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, (a) => RemoveFromFolder(button)));
@@ -951,12 +952,129 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (DocumentsDeleteChecker.CanDeleteDocuments(documents))
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, (a) => Delete(button)));
 
+
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("print"),
+                UIAlertActionStyle.Default, a => PrintPdfFile()));
+
             eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
 
             if (eas.PopoverPresentationController != null)
                 eas.PopoverPresentationController.Delegate = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
 
             PresentViewController(eas, true, null);
+        }
+
+        /*public bool PrintImage(Stream img)
+        {
+            var data = NSData.FromStream(img);
+            var uiimage = UIImage.LoadFromData(data);
+
+            var printer = UIPrintInteractionController.SharedPrintController;
+
+            if (printer == null)
+            {
+                Console.WriteLine("Unable to print at this time.");
+            }
+            else
+            {
+
+                var printInfo = UIPrintInfo.PrintInfo;
+                printInfo.OutputType = UIPrintInfoOutputType.General;
+                printInfo.JobName = "Print Job Name";
+                printer.PrintInfo = printInfo;
+                printer.PrintingItem = uiimage;
+                printer.ShowsPageRange = true;
+
+                var handler = new UIPrintInteractionCompletionHandler((printInteractionController, completed, error) =>
+                {
+                    if (completed)
+                    {
+                        Console.WriteLine("Print Completed.");
+                    }
+                    else if (!completed && error != null)
+                    {
+                        Console.WriteLine("Error Printing.");
+                    }
+
+                });
+
+                CGRect frame = new CGRect();
+                frame.Size = uiimage.Size;
+
+                printer.Present(true, handler);
+            }
+
+            return true;
+        }
+
+        public bool PrintPdfFile(Stream file)
+        {
+            var printInfo = UIPrintInfo.PrintInfo;
+            printInfo.OutputType = UIPrintInfoOutputType.General;
+            printInfo.JobName = "Print PDF";
+
+            //Get the path of the MyDocuments folder
+            var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            //Get the path of the Library folder within the MyDocuments folder
+            var library = Path.Combine(documents, "..", "Library");
+            //Create a new file with the input file name in the Library folder
+            var filepath = Path.Combine(library, "PrintSampleFile");
+
+            //Write the contents of the input file to the newly created file
+            using (MemoryStream tempStream = new MemoryStream())
+            {
+                file.Position = 0;
+                file.CopyTo(tempStream);
+                File.WriteAllBytes(filepath, tempStream.ToArray());
+            }
+
+            var printer = UIPrintInteractionController.SharedPrintController;
+            printInfo.OutputType = UIPrintInfoOutputType.General;
+
+            printer.PrintingItem = NSUrl.FromFilename(filepath);
+            printer.PrintInfo = printInfo;
+
+
+            printer.ShowsPageRange = true;
+
+            printer.Present(true, (handler, completed, err) => {
+                if (!completed && err != null)
+                {
+                    Console.WriteLine("error");
+                }
+            });
+            file.Dispose();
+            return true;
+        }
+    }*/
+
+
+        public void PrintPdfFile()
+        {
+            using (var printInfo = UIPrintInfo.PrintInfo)
+            {
+                printInfo.JobName = $"Print job {documentPreview.ReferenceNumber}";
+                printInfo.OutputType = UIPrintInfoOutputType.General;
+                using (var textFormatter = new UIMarkupTextPrintFormatter(document.HtmlBody)
+                {
+                    StartPage = 0,
+                    MaximumContentWidth = 6 * 72,
+                    PerPageContentInsets = new UIEdgeInsets(72, 72, 72, 72),
+                })
+                {
+                    var printer = UIPrintInteractionController.SharedPrintController;
+                    printer.PrintInfo = printInfo;
+                    printer.PrintFormatter = textFormatter;
+                    printer.ShowsPageRange = true;
+                    printer.Present(true, (handler, completed, error) =>
+                    {
+                        if (!completed && error != null)
+                        {
+                            Console.WriteLine($"Error: {error.LocalizedDescription ?? ""}");
+                        }
+                    });
+                }
+            }
         }
 
         #endregion
