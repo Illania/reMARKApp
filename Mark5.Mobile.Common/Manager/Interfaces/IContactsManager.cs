@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Containers;
+using Mark5.Mobile.Classes.Enum;
 
 namespace Mark5.Mobile.Common.Manager
 {
@@ -26,8 +27,6 @@ namespace Mark5.Mobile.Common.Manager
         Task<bool> CreateOrUpdateContactAsync(Contact contact, ContactPreview contactPreview, int parentObjectId, SourceType sourceType = SourceType.Auto);
 
         Task<List<Category>> GetAllCategoriesAsync(SourceType sourceType = SourceType.Auto);
-
-        Task SetCategoriesAsync(ContactPreview documentPreview, List<Category> categories, SourceType sourceType = SourceType.Auto);
 
         Task<Comment> AddComment(Contact contact, string content, SourceType sourceType = SourceType.Auto);
 

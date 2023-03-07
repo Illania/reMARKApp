@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Net;
 using System.Net.Http;
+using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
+using Mark5.Mobile.Classes;
+using Mark5.Mobile.Classes.Enum;
+using Mark5.Mobile.Classes.Model;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -56,8 +60,6 @@ namespace Mark5.Mobile.IOS.Service
                 result &= CheckNetworkAvailability();
             if (result && mode.HasFlag(ReachabilityMode.Google))
                 result &= await CheckWithGoogle();
-            if (result && mode.HasFlag(ReachabilityMode.ServiceConnection))
-                result &= await CheckWithServiceConnection();
             if (result && mode.HasFlag(ReachabilityMode.Service))
                 result &= await CheckWithService();
 
@@ -118,34 +120,6 @@ namespace Mark5.Mobile.IOS.Service
             }
         }
 
-        public async Task<bool> CheckWithServiceConnection()
-        {
-            try
-            {
-                var ci = Managers.ActiveConnectionInfo;
-                var url = $"{(ci.SslMode == SslMode.Off ? "http" : "https")}://{ci.Hostname}:{ci.Port}/app3";
-
-                using (var httpClient = new HttpClient(CommonConfig.HttpClientHandler())
-                {
-                    Timeout = new TimeSpan(0, 0, 2)
-                })
-                using (var response = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead))
-                {
-                    var result = response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.BadRequest;
-
-                    CommonConfig.Logger.Info($"Service connection availability: {result}. [status={response.StatusCode}]");
-
-                    return result;
-                }
-            }
-            catch (Exception)
-            {
-                CommonConfig.Logger.Info($"Service connection availability: false");
-
-                return false;
-            }
-        }
-
         public async Task<bool> CheckWithService()
         {
             try
@@ -159,7 +133,10 @@ namespace Mark5.Mobile.IOS.Service
                 }
 
                 var result = await tester.Test();
-                CommonConfig.Logger.Info($"Service availability: {result}");
+
+                if(result == false)
+                    CommonConfig.Logger.Info($"Service availability: {result}");
+
                 return result;
             }
             catch (Exception)
@@ -224,5 +201,15 @@ namespace Mark5.Mobile.IOS.Service
             NetworkStatus networkStatus = ReachabilityProvider.InternetConnectionStatus();
             return networkStatus == NetworkStatus.ReachableViaCarrierDataNetwork;
         }
+
+        public void RefreshServiceReachability(bool isReachable)
+        {
+            IsReachable = isReachable;
+            ReachabilityRefreshed(this, new ReachabilityRefreshedEventArgs(true, isReachable));
+        }
+
+
+        public SourceType GetReachabilitySourceType() => IsReachable ? SourceType.Remote : SourceType.Local; 
+
     }
 }

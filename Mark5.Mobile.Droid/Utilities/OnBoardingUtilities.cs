@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using Android.App;
 using Android.Content;
 using Android.Graphics;
-using Android.Support.V4.Content;
-using Android.Support.V4.View;
-using Android.Support.V7.Preferences;
-using Android.Support.V7.Widget;
 using Android.Util;
 using Android.Views;
 using Android.Widget;
+using AndroidX.AppCompat.Widget;
+using AndroidX.Core.Content;
+using AndroidX.Preference;
+using AndroidX.ViewPager.Widget;
 using Com.Airbnb.Lottie;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Droid.Ui.Common;
@@ -100,37 +100,25 @@ namespace Mark5.Mobile.Droid.Utilities
                 "We have made a few changes in the reMARK app. Press next to see what has changed.",
                      Resource.Drawable.onboarding_1),
 
-                new OnBoardingPageModel("Favorite categories",
-                "Now you can set favorite categories for quick assignment.",
+                new OnBoardingPageModel("Landscape orientatioon",
+                "Now reMARK app supports also landscape screen orientation.",
                      Resource.Drawable.onboarding_2),
 
-                new OnBoardingPageModel("Message list appearance",
-                "Now you can use different font and cell colors to highlight email by different criterias.",
+                new OnBoardingPageModel("Out of Office feature",
+                "Now you can set up automatic Out of Office reply in app.",
                      Resource.Drawable.onboarding_3),
 
-                new OnBoardingPageModel("Extra fields management",
-                "Now you can manage extra fields values and switch on/off their visibility.",
+                new OnBoardingPageModel("Extended offline features",
+                "Now you can assign categories, remove, delete and file to folder emails in offline mode.",
                      Resource.Drawable.onboarding_4),
 
-                new OnBoardingPageModel("Bookmarks for emails",
-                "Now you can assign a bookmark for each email folder.",
+                new OnBoardingPageModel("User activities",
+                "Now you can user automatic user action workflows in app.",
                      Resource.Drawable.onboarding_5),
 
-                new OnBoardingPageModel("File to folder after sending email",
-                "Now you can file an email to a folder immediately after sending it.",
-                     Resource.Drawable.onboarding_6),
-
-                new OnBoardingPageModel("Attach external documnets",
-                "Now you can add a reMARK external document as an attachment.",
-                     Resource.Drawable.onboarding_7),
-
-                new OnBoardingPageModel("Copy to department todo list",
-                "Now you can copy an email either to a user or to a department todo list.",
-                     Resource.Drawable.onboarding_8),
-
-                new OnBoardingPageModel("Add a contact from an email header",
-                "Now you can add a new contact by clicking on an email recipient field.",
-                     Resource.Drawable.onboarding_9)
+                new OnBoardingPageModel("Delivery report",
+                "Now you can get a detail email transmit status info.",
+                     Resource.Drawable.onboarding_6)
 
             };
         }
@@ -200,7 +188,7 @@ namespace Mark5.Mobile.Droid.Utilities
 
                     var ip = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
                     {
-                        Gravity = (int)GravityFlags.Center
+                        Gravity = (GravityFlags)(int)GravityFlags.Center
                     };
                     animationView.LayoutParameters = ip;
                     animationView.SetAdjustViewBounds(true);
@@ -215,7 +203,7 @@ namespace Mark5.Mobile.Droid.Utilities
                     var imageView = new AppCompatImageView(context);
                     var ip = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
                     {
-                        Gravity = (int)GravityFlags.Center
+                        Gravity = (GravityFlags)(int)GravityFlags.Center
                     };
                     imageView.LayoutParameters = ip;
                     imageView.SetAdjustViewBounds(true);

@@ -18,16 +18,22 @@
     <None Remove="Xamarin.Essentials" />
     <None Remove="Microsoft.Identity.Client" />
     <None Remove="JwtDecoder\" />
+    <None Remove="Interface\" />
+    <None Remove="Enum\" />
+    <None Remove="Model\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Azure\" />
     <Folder Include="AuthService\" />
     <Folder Include="JwtDecoder\" />
+    <Folder Include="Interface\" />
+    <Folder Include="Enum\" />
+    <Folder Include="Model\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="Microsoft.Graph" Version="3.24.0" />
-    <PackageReference Include="Xamarin.Essentials" Version="1.6.1" />
-    <PackageReference Include="Microsoft.Identity.Client" Version="4.26.0" />
+    <PackageReference Include="Microsoft.Graph" Version="4.50.0" />
+    <PackageReference Include="Xamarin.Essentials" Version="1.7.4" />
+    <PackageReference Include="Microsoft.Identity.Client" Version="4.49.1" />
   </ItemGroup>
 </Project>

@@ -13,7 +13,19 @@ namespace Mark5.Mobile.Classes.JwtDecoder
 
     public class JwtExpiration
     {
+        [JsonProperty("iat")]
+        public double? IssuedAt { get; set; }
+
         [JsonProperty("exp")]
-        public double? Expiration { get; set; }
+        public double? ExpiresAt { get; set; }
+    }
+
+    public class JwtUserInfo
+    {
+        [JsonProperty("upn")]
+        public string UserPrincipalInfo { get; set; }
+
+        [JsonProperty("name")]
+        public string UserName { get; set; }
     }
 }

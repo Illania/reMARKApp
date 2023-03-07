@@ -4,10 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Android.Content;
 using Android.Graphics;
-using Android.Support.V4.Content;
-using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
+using AndroidX.AppCompat.Widget;
+using AndroidX.Core.Content;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -408,7 +408,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 extraFieldsTableRows.Clear();
 
                 if (ServerConfig.SystemSettings.SystemInfo.ExtraFieldsEditingAvailable)
-                    await AddEditableExtraFields();
+                    AddEditableExtraFields();
                 else
                     AddReadonlyExtraFields();
             }
@@ -475,19 +475,19 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             }
         }
 
-        private async Task AddEditableExtraFields()
+        private void AddEditableExtraFields()
         {
             DocumentExtraFieldInfoEqualityComparer docComparer = new DocumentExtraFieldInfoEqualityComparer();
 
-            var assignedExtraFields = await Managers.DocumentsManager.GetDocumentExtraFieldsAsync(Document.Id);
-            var availableExtraFields = await Managers.DocumentsManager.GetExtraFieldsAsync();
-            availableExtraFields = availableExtraFields.Where(ef => PlatformConfig.Preferences.IsExtraFieldEnabled(ef.FieldId)).ToList();
+            var assignedExtraFields = Document.ExtraFields;
+            var availableExtraFields = ServerConfig.SystemSettings.DocumentsModuleInfo.ExtraFieldInfos;
+            availableExtraFields = availableExtraFields.Where(ef => PlatformConfig.Preferences.IsExtraFieldEnabled(ef.Id)).ToList();
             var documentExtraFields = assignedExtraFields
                 .Where(kv => kv.Key != null)
                 .OrderBy(kv => kv.Key.Name)
                 .ToDictionary(pair => pair.Key, pair => pair.Value, docComparer);
 
-            foreach (var ex in availableExtraFields.Select(ex => ex.ToDocumentExtraFieldInfo()))
+            foreach (var ex in availableExtraFields)
             {
                 if (!documentExtraFields.ContainsKey(ex))
                     documentExtraFields.Add(ex, string.Empty);

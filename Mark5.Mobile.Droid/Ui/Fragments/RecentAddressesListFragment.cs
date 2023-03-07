@@ -8,14 +8,14 @@ using Android.Content;
 using Android.Graphics;
 using Android.Graphics.Drawables;
 using Android.OS;
-using Android.Support.V4.Content;
-using Android.Support.V4.Widget;
-using Android.Support.V7.App;
-using Android.Support.V7.Widget;
-using Android.Support.V7.Widget.Helper;
 using Android.Text;
 using Android.Util;
 using Android.Views;
+using AndroidX.AppCompat.App;
+using AndroidX.AppCompat.Widget;
+using AndroidX.Core.Content;
+using AndroidX.RecyclerView.Widget;
+using AndroidX.SwipeRefreshLayout.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -280,6 +280,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public override void OnChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, bool isCurrentlyActive)
             {
 
+                if (!ServerConfig.SystemSettings.SystemInfo.RecentAddressDeleteAvailable)
+                    return;
+
                 if (actionState != ItemTouchHelper.ActionStateSwipe || viewHolder.AdapterPosition == -1) //Sometimes it gets called for viewHolders that are already gone
                     return;
 
@@ -330,6 +333,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override void OnSwiped(RecyclerView.ViewHolder viewHolder, int direction)
         {
+            if (!ServerConfig.SystemSettings.SystemInfo.RecentAddressDeleteAvailable)
+                return;
             ResetViewHolder(viewHolder, direction);
             if (direction == ItemTouchHelper.Left)
             {

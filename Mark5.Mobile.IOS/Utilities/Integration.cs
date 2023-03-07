@@ -179,10 +179,7 @@ namespace Mark5.Mobile.IOS.Utilities
         {
             try
             {
-                var processedNumber = new string(number.Where(c => char.IsDigit(c)).ToArray());
-
-                if (number.Split('|').FirstOrDefault()?.Length > 0)
-                    processedNumber = "+" + processedNumber;
+                var processedNumber = new string(number.Where(c => char.IsDigit(c) || c.Equals("+")).ToArray());
 
                 var callUrl = new NSUrl("tel://" + processedNumber);
 

@@ -8,6 +8,7 @@ using Mark5.Mobile.Common.Model.Converters;
 using Mark5.Mobile.Common.Storage;
 using Mark5.ServiceReference.AppService;
 using DataContract = Mark5.ServiceReference.DataContract;
+using Mark5.Mobile.Classes.Enum;
 
 namespace Mark5.Mobile.Common.Manager
 {
@@ -21,7 +22,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task<SystemSettings> GetSystemSettingsAsync(SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -80,7 +81,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task<SystemUsersDepartments> GetSystemUsersDepartmentsAsync(SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {

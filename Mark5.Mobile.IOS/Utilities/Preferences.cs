@@ -78,6 +78,9 @@ namespace Mark5.Mobile.IOS.Utilities
             public const string BookmarksForFolders= "BookmarksForFolders";
 
             public const string ExtraFieldsSettings = "ExtraFieldsSettings";
+
+            public const string SyncUserActivities = "SyncUserActivities";
+
         }
 
         readonly NSUserDefaults ud;
@@ -142,6 +145,9 @@ namespace Mark5.Mobile.IOS.Utilities
                 },
                 {
                     new NSString(Keys.UseMessageListAppearance), NSNumber.FromBoolean(false)
+                },
+                {
+                    new NSString(Keys.SyncUserActivities), NSNumber.FromBoolean(false)
                 },
                 {
                     new NSString(Keys.ComposePriorityEnabledKey), NSNumber.FromBoolean(false)
@@ -272,6 +278,8 @@ namespace Mark5.Mobile.IOS.Utilities
         public bool UseSmartLinks => ud.BoolForKey(Keys.UseSmartLinks);
 
         public bool UseMessageListAppearance => ud.BoolForKey(Keys.UseMessageListAppearance);
+
+        public bool SyncUserActivities => ud.BoolForKey(Keys.SyncUserActivities);
 
         public bool ComposePriorityEnabled => ud.BoolForKey(Keys.ComposePriorityEnabledKey);
 

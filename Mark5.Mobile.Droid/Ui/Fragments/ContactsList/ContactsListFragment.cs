@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using Android.Support.Design.Widget;
 using Android.Views;
 using Android.OS;
 using Mark5.Mobile.Common;
@@ -9,6 +8,7 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
+using Google.Android.Material.FloatingActionButton;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {

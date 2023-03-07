@@ -7,13 +7,14 @@ using Android.Graphics;
 using Android.Media;
 using Android.OS;
 using Android.Provider;
-using Android.Support.V4.App;
-using Android.Support.V4.Content;
-using Android.Support.V4.Hardware.Fingerprint;
-using Android.Support.V7.App;
-using Android.Support.V7.Preferences;
 using Android.Text;
 using Android.Text.Style;
+using AndroidX.AppCompat.App;
+using AndroidX.Core.Content;
+using AndroidX.Core.Hardware.Fingerprint;
+using AndroidX.Fragment.App;
+using AndroidX.Preference;
+using Mark5.Mobile.Classes.Enum;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Authenticator;
 using Mark5.Mobile.Common.Manager;
@@ -148,7 +149,42 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 };
             }
 
+            var sendingDelay = FindPreference(GetString(Resource.String.pref_key_sending_delay));
+            var rememberLastUsedDelaySettings = FindPreference(GetString(Resource.String.pref_key_remember_last_user_delay_settings));
+            if (!ServerConfig.SystemSettings.SystemInfo.DelaySendAvailable)
+            {
+                if(sendingDelay!=null && rememberLastUsedDelaySettings!=null)
+                {
+                    PreferenceScreen.RemovePreference(sendingDelay);
+                    PreferenceScreen.RemovePreference(rememberLastUsedDelaySettings);
+                }
+            }
+                
+            var autoReplySettings = FindPreference(GetString(Resource.String.pref_key_autoreply));
+            if (!ServerConfig.SystemSettings.SystemInfo.AutoReplyAvailable && autoReplySettings != null)
+                PreferenceScreen.RemovePreference(autoReplySettings);
+            else if(autoReplySettings != null)
+            {
+                autoReplySettings.PreferenceClick += async (object sender, Preference.PreferenceClickEventArgs e) =>
+                {
+                    var autoReplyRule = await Managers.DocumentsManager.GetAutoReplyRule();
+                    AutoReplyFragment autoReplyFragment;
+                    string autoReplyFragmentTag;
+                    var fragmentTransaction = Activity.SupportFragmentManager.BeginTransaction();
+                    (autoReplyFragment, autoReplyFragmentTag) = AutoReplyFragment.NewInstance(autoReplyRule);
+                    fragmentTransaction.Replace(Resource.Id.fragment_container, autoReplyFragment, autoReplyFragmentTag);
+                    fragmentTransaction.AddToBackStack(null);
+                    fragmentTransaction.Commit();
+                };
+            }
+
+            var syncUserActivities = FindPreference(GetString(Resource.String.pref_key_sync_user_activities));
+            if (!ServerConfig.SystemSettings.SystemInfo.UserActivitiesAvailable && syncUserActivities!=null)
+                PreferenceScreen.RemovePreference(syncUserActivities); 
+      
             var extraFieldsOptions = FindPreference(GetString(Resource.String.pref_key_extra_fields_options));
+            if (!ServerConfig.SystemSettings.SystemInfo.ExtraFieldsEditingAvailable && extraFieldsOptions != null)
+                PreferenceScreen.RemovePreference(extraFieldsOptions);
             if (extraFieldsOptions != null)
             {
                 extraFieldsOptions.PreferenceClick += ExtraFieldsOptions_PreferenceClick;

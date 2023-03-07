@@ -70,7 +70,8 @@ namespace Mark5.Mobile.Common.Model.Converters
             return result;
         }
 
-        public static CalendarAppointmentOccurrence Convert(this DataContract.CalendarAppointmentOccurrence ca, int appointmentId, int calendarId)
+        public static CalendarAppointmentOccurrence Convert(this DataContract.CalendarAppointmentOccurrence ca, 
+            int appointmentId, int calendarId)
         {
             return new CalendarAppointmentOccurrence
             {
@@ -99,9 +100,9 @@ namespace Mark5.Mobile.Common.Model.Converters
         {
             var result = new CalendarModuleInfo
             {
-                Permissions = cmi.Permissions?.Convert()
+                Permissions = cmi?.Permissions?.Convert()
             };
-            if (cmi.Calendars != null)
+            if (cmi?.Calendars != null)
                 result.Calendars.AddRange(cmi.Calendars.WhereNotNull().Select(Convert));
             return result;
         }
@@ -140,7 +141,6 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Enabled = extraFieldInfo.Enabled
             };
         }
-
  
         public static Comment Convert(this DataContract.Comment c)
         {
@@ -326,7 +326,9 @@ namespace Mark5.Mobile.Common.Model.Converters
                 UseForFrom = dmi.UseForFrom.ConvertEnum<UseForFrom>(),
                 LineAppearances = dmi.LineAppearances?.Select(la => la.Convert()).ToList(),
                 UserAppearances = dmi.UserAppearances?.Select(ua => ua.Convert()).ToList(),
-                DefaultAppearance = dmi.DefaultAppearance?.Convert()
+                DefaultAppearance = dmi.DefaultAppearance?.Convert(),
+                UserActivities = dmi.UserActivities?.Select(ua => ua.Convert()).ToList()
+
             };
 
             if (dmi.AttachmentKeywords != null)
@@ -358,6 +360,22 @@ namespace Mark5.Mobile.Common.Model.Converters
             };
         }
 
+        public static UserActivity Convert(this DataContract.UserActivity userActivity)
+        {
+            return new UserActivity
+            {
+                 Type = userActivity.Type.ConvertEnum<UserActivityType>(),
+                 DescriptionEvent = userActivity.DescriptionEvent,
+                 DescriptionAction = userActivity.DescriptionEvent,
+                 ConfirmationRequired = userActivity.ConfirmationRequired,
+                 PerformOnOriginalDocument = userActivity.PerformOnOriginalDocument,
+                 AssignOriginalCategories = userActivity.AssignOriginalCategories,
+                 AssignOriginalExtraFields = userActivity.AssignOriginalExtraFields,
+                 Categories = userActivity.Categories.Select(c=>c.Convert()).ToList(),
+                 ExtraFields = userActivity.ExtraFields
+            };
+        }
+
         public static DocumentsModulePermissions Convert(this DataContract.DocumentsModulePermissions dmp)
         {
             return new DocumentsModulePermissions
@@ -366,6 +384,7 @@ namespace Mark5.Mobile.Common.Model.Converters
                 OutgoingSupervisor = dmp.OutgoingSupervisor,
                 ManageFilterViewFoldersAllowed = dmp.ManageFilterViewFoldersAllowed,
                 SpamManager = dmp.SpamManager,
+                DeleteDocumentsAllowedLines = dmp.DeleteDocumentsAllowedLines,
                 CabinetSupervisor = dmp.CabinetSupervisor,
                 CreateAllowed = dmp.CreateAllowed,
                 CreateFolderAllowed = dmp.CreateFolderAllowed,
@@ -407,6 +426,45 @@ namespace Mark5.Mobile.Common.Model.Converters
                 result.Addresses.AddRange(dp.Addresses.WhereNotNull().Select(Convert));
             if (dp.Categories != null)
                 result.Categories.AddRange(dp.Categories.WhereNotNull().Select(Convert));
+            return result;
+        }
+
+        public static Transmit Convert(this DataContract.Transmit transmit)
+        {
+            var result = new Transmit
+            {
+                Destinations = transmit.Destinations.Select(d => d.Convert()).ToList(),
+                DocGuid = transmit.DocGuid,
+                Priority = transmit.Priority.ConvertEnum<Priority>(),
+                Status = transmit.Status.ConvertEnum<TransmitStatus>(),
+            };
+            return result;
+        }
+
+        public static TransmitDestination Convert(this DataContract.TransmitDestination transmitDestination)
+        {
+            var result = new TransmitDestination
+            {
+                Address = transmitDestination.Address,
+                LinkType = transmitDestination.LinkType.ConvertEnum<ComAddressLinkType>(),
+                Status = transmitDestination.Status.Convert()
+            };
+            return result;
+        }
+
+        public static DestinationStatus Convert(this DataContract.DestinationStatus destinationStatus)
+        {
+            var result = new DestinationStatus
+            {
+                Attempts = destinationStatus.Attempts,
+                LastConnectAttempt = destinationStatus.LastConnectAttempt,
+                LastMessage = destinationStatus.LastMessage,
+                StatusDetail = destinationStatus.StatusDetail.ConvertEnum<DestinationStatusDetail>(),
+                TimeStart = destinationStatus.TimeStart,
+                TimeEnd = destinationStatus.TimeEnd,
+                WasSentByLine = destinationStatus.WasSentByLine,
+                WasSentByLineName = destinationStatus.WasSentByLineName
+            };
             return result;
         }
 
@@ -656,11 +714,12 @@ namespace Mark5.Mobile.Common.Model.Converters
                 CustomerName = si.CustomerName,
                 CustomerGuid = si.CustomerGuid,
                 ServerTimeZoneInfoSerialized = si.ServerTimeZoneInfoSerialized,
-                NotificationsInChina = si.NotificationsInChina
+                NotificationsInChina = si.NotificationsInChina,
+                CalendarModuleInstalled = si.AvailableModules.Contains(DataContract.ModuleType.Calendar)
 
             };
             if (si.AvailableModules != null)
-                result.AvailableModules.AddRange(si.AvailableModules.Select(mt => mt.ConvertEnum<ModuleType>()));
+                result.AvailableModules.AddRange(si.AvailableModules.Select(mt => mt.ConvertEnum<ModuleType>()).Distinct());
 
             return result;
         }
@@ -741,7 +800,6 @@ namespace Mark5.Mobile.Common.Model.Converters
             return moduleFavorites;
         }
 
-
         #region ICalendar
 
         public static CalendarInvitation Convert(this DataContract.CalendarInvitation ci)
@@ -805,7 +863,8 @@ namespace Mark5.Mobile.Common.Model.Converters
                 ReadByUserNames = doc.ReadByUserNames,
                 Attachments = doc.Attachments.Select(Convert).ToList(),
                 Comments = doc.Comments.Select(Convert).ToList(),
-                ExtraFields = doc.ExtraFields.ToDictionary(kv => kv.Key.Convert(), kv => kv.Value),
+                ExtraFields = doc.ExtraFields.ToDictionary(kv => kv.Key.Convert(), 
+                    kv => kv.Value),
                 IsEncrypted = doc.IsEncrypted,
                 WorktrayComment = doc.WorktrayComment,
                 Invitations = doc.Invitations?.Select(Convert).ToList(),
@@ -858,7 +917,6 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Enabled = extraField.Enabled
             };
         }
-    
 
         public static DataContract.Contact Convert(this Contact c)
         {
@@ -874,7 +932,8 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Account = c.Account,
                 Vat = c.Vat,
                 BirthDate = c.BirthDateTimestamp == -1
-                             ? default(DateTime).AddYears(1) //Used because in one version of the service the birthdate is ignored if equal to default(DateTime)
+                             ? default(DateTime).AddYears(1) //Used because in one version of the service the birthdate
+                                                             //is ignored if equal to default(DateTime)
                              : c.BirthDateTimestamp.ConvertTimestampMillisecondsToDateTime(),
                 Ledger = c.Ledger,
                 PrimaryPerson = c.PrimaryPerson?.Convert(),
@@ -1192,7 +1251,6 @@ namespace Mark5.Mobile.Common.Model.Converters
                 RecurrenceInfo = ci.RecurrenceInfo?.Convert()
             };
         }
-
 
         public static DataContract.Attendee Convert(this Attendee at)
         {

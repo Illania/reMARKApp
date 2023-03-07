@@ -55,6 +55,12 @@ namespace Mark5.ServiceReference.AppService
 
         Task<GetNewDocumentReferenceNumberResult> GetNewDocumentReferenceNumberAsync(GetNewDocumentReferenceNumberParameters parameters, CancellationToken ct = default);
 
+        Task<GetTransmitInfoResult> GetDocumentTransmitInfoAsync(GetTransmitInfoParameters parameters, CancellationToken ct = default);
+
+        Task<GetAutoReplyResult> GetAutoReplyRuleAsync(GetAutoReplyParameters parameters, CancellationToken ct = default);
+
+        Task<SetAutoReplyResult> SetAutoReplyRuleAsync(SetAutoReplyParameters parameters, CancellationToken ct = default);
+
         #endregion
 
         #region Contacts module

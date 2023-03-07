@@ -14,6 +14,9 @@ using Mark5.Mobile.Common.Extensions;
 using Android.Net.Wifi;
 using Android.Content;
 using System.Net.Http.Headers;
+using Mark5.Mobile.Classes;
+using Mark5.Mobile.Classes.Model;
+using Mark5.Mobile.Classes.Enum;
 
 namespace Mark5.Mobile.Droid.Service
 {
@@ -62,8 +65,6 @@ namespace Mark5.Mobile.Droid.Service
                 result &= CheckNetworkAvailability();
             if (result && mode.HasFlag(ReachabilityMode.Google))
                 result &= await CheckWithGoogle();
-            if (result && mode.HasFlag(ReachabilityMode.ServiceConnection))
-                result &= await CheckWithServiceConnection();
             if (result && mode.HasFlag(ReachabilityMode.Service))
                 result &= await CheckWithService();
 
@@ -138,33 +139,6 @@ namespace Mark5.Mobile.Droid.Service
             }
         }
 
-        public async Task<bool> CheckWithServiceConnection()
-        {
-            try
-            {
-                var ci = Managers.ActiveConnectionInfo;
-                var usePort = !string.IsNullOrEmpty(ci.Port);
-                var requestUri = $"{(ci.SslMode == SslMode.Off ? "https" : "http")}://{ci.Hostname}{(usePort ? (":" + ci.Port) : "")}/app3";
-                using var httpClient = new HttpClient(CommonConfig.HttpClientHandler()) { Timeout = new TimeSpan(0, 0, 2) };
-                using var requestMessage = new HttpRequestMessage(HttpMethod.Get, "https://your.site.com");
-                if (!string.IsNullOrEmpty(ci.AzureAppProxyBearerToken))
-                    requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", ci.AzureAppProxyBearerToken);
-
-                var response = await httpClient.SendAsync(requestMessage, HttpCompletionOption.ResponseHeadersRead);
-
-                var result = response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.BadRequest;
-
-                CommonConfig.Logger.Info($"Service connection availability: {result}. [status={response.StatusCode}]");
-
-                return result;
-            }
-            catch (Exception ex)
-            {
-                CommonConfig.Logger.Info("Cannot check service connection availability", ex);
-
-                return false;
-            }
-        }
 
         public async Task<bool> CheckWithService()
         {
@@ -259,5 +233,13 @@ namespace Mark5.Mobile.Droid.Service
 
             return cm.GetNetworkCapabilities(cm.ActiveNetwork).HasTransport(Android.Net.TransportType.Cellular);
         }
+
+        public void RefreshServiceReachability(bool isReachable)
+        {
+            IsReachable = isReachable;
+            ReachabilityRefreshed(this, new ReachabilityRefreshedEventArgs(true, isReachable));
+        }
+
+        public SourceType GetReachabilitySourceType() => IsReachable ? SourceType.Remote : SourceType.Local;
     }
 }

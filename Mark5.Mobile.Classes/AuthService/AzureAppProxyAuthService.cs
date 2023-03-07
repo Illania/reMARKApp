@@ -45,14 +45,14 @@ namespace Mark5.Mobile.Classes.AuthService
 
         }
 
-        public async Task<string> Authenticate(object parentWindow, bool forceInteractive = true)
+        public async Task<string> Authenticate(object parentWindow, bool forceInteractive = true, bool refresh = false)
         {
             if (account != null && string.IsNullOrEmpty(accessToken))
                 return accessToken;
 
             AuthenticationResult authResult = null;
             var accounts = await pca.GetAccountsAsync();
-            if (accounts.Count() > 1)
+            if (accounts.Count() > 1 && refresh == false)
                 forceInteractive = true;
 
             if (!forceInteractive)

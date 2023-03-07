@@ -3,10 +3,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Android.Content;
 using Android.Graphics;
-using Android.Support.V4.Content;
-using Android.Support.V7.Widget;
 using Android.Text;
 using Android.Views;
+using AndroidX.AppCompat.Widget;
+using AndroidX.Core.Content;
 using MailBee.Mime;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
@@ -104,7 +104,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.MailViewerViews
                     LayoutParameters = new LayoutParams(imageSize, imageSize)
                     {
                         RightMargin = innerMargin,
-                        Gravity = (int) GravityFlags.Center
+                        Gravity = (GravityFlags)(int) GravityFlags.Center
                     }
                 };
                 image.SetImageResource(Resource.Drawable.attachment);
@@ -115,7 +115,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.MailViewerViews
                 {
                     LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
                     {
-                        Gravity = (int) GravityFlags.Center
+                        Gravity = (GravityFlags)(int) GravityFlags.Center
                     },
                     Text = att.Name,
                     Ellipsize = TextUtils.TruncateAt.End,
@@ -129,7 +129,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.MailViewerViews
                 {
                     LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
                     {
-                        Gravity = (int) GravityFlags.Center
+                        Gravity = (GravityFlags)(int) GravityFlags.Center
                     },
                     Text = " (" + Formatters.FormatFileSize(att.Size) + ")",
                 };

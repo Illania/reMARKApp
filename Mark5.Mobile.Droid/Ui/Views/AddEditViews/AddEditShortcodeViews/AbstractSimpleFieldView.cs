@@ -1,12 +1,12 @@
 ﻿using System;
 using Android.Content;
 using Android.Graphics;
-using Android.Support.Design.Widget;
-using Android.Support.V4.Content;
-using Android.Support.V7.Widget;
 using Android.Text;
 using Android.Views;
 using Android.Widget;
+using AndroidX.AppCompat.Widget;
+using AndroidX.Core.Content;
+using Google.Android.Material.TextField;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 
@@ -77,7 +77,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.AddEditShortcodeViews
             {
                 TopMargin = DistanceSmall,
                 LeftMargin = DistanceNormal,
-                Gravity = (int)GravityFlags.Top,
+                Gravity = (GravityFlags)(int)GravityFlags.Top,
             };
             deleteButton.LayoutParameters = addButtonLp;
             deleteButton.Click += DeleteButtonClicked;

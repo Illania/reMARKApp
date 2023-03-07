@@ -69,9 +69,9 @@
 	<key>CFBundleName</key>
 	<string>reMARK</string>
 	<key>CFBundleShortVersionString</key>
-	<string>5.10</string>
+	<string>5.13</string>
 	<key>CFBundleVersion</key>
-	<string>547</string>
+	<string>551</string>
 	<key>CFBundleDisplayName</key>
 	<string>reMARK</string>
 	<key>CFBundleURLTypes</key>

@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using Android.Content;
-using Android.Support.V7.Widget;
 using Android.Text;
 using Android.Views;
 using Android.Widget;
+using AndroidX.AppCompat.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;

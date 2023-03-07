@@ -9,33 +9,33 @@
 	android:paddingBottom="12dp"
 	android:paddingLeft="16dp"
 	android:paddingRight="16dp">
-	<android.support.v7.widget.AppCompatImageView
+	<androidx.appcompat.widget.AppCompatImageView
 		android:id="@+id/list_item_participant_icon"
 		android:layout_width="15dp"
 		android:layout_height="15dp"
 		android:layout_marginRight="10dp"
 		android:layout_centerVertical="true"
 		android:scaleType="fitXY" />
-	<android.support.v7.widget.LinearLayoutCompat
+	<androidx.appcompat.widget.LinearLayoutCompat
 		android:id="@+id/list_item_layout_wrapper"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_toRightOf="@id/list_item_participant_icon"
 		android:orientation="vertical"
 		android:layout_marginRight="30dp">
-		<android.support.v7.widget.AppCompatTextView
+		<androidx.appcompat.widget.AppCompatTextView
 			android:id="@+id/list_item_recipients_name"
 			android:textAppearance="@style/fontListSmallLight"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:textColor="@color/black" />
-		<android.support.v7.widget.AppCompatTextView
+		<androidx.appcompat.widget.AppCompatTextView
 			android:id="@+id/list_item_recipients_address"
 			android:textAppearance="@style/fontListPrimary"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content" />
-	</android.support.v7.widget.LinearLayoutCompat>
-	<android.support.v7.widget.AppCompatImageView
+	</androidx.appcompat.widget.LinearLayoutCompat>
+	<androidx.appcompat.widget.AppCompatImageView
 		android:id="@+id/list_item_participant_remove"
         android:layout_alignParentRight="true"
 		android:layout_width="20dp"

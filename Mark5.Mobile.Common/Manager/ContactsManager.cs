@@ -13,6 +13,7 @@ using Mark5.Mobile.Common.Model.HubMessages;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.ServiceReference.AppService;
 using DataContract = Mark5.ServiceReference.DataContract;
+using Mark5.Mobile.Classes.Enum;
 
 namespace Mark5.Mobile.Common.Manager
 {
@@ -28,10 +29,12 @@ namespace Mark5.Mobile.Common.Manager
             this.contactsDataAccess = contactsDataAccess;
         }
 
+        
         public async Task<List<ContactPreview>> GetContactPreviewsAsync(Folder folder, int startRowId = -1, SourceType sourceType = SourceType.Auto)
         {
+
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -56,8 +59,11 @@ namespace Mark5.Mobile.Common.Manager
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public void GetAllContactPreviews(Folder folder, Action<List<ContactPreview>> callback, Action finishedCallback, Action<Exception> errorCallback, int startRowId = -1, CancellationToken ct = default(CancellationToken), SourceType sourceType = SourceType.Auto)
+        public void GetAllContactPreviews(Folder folder, Action<List<ContactPreview>> callback,
+            Action finishedCallback, Action<Exception> errorCallback, int startRowId = -1,
+            CancellationToken ct = default(CancellationToken), SourceType sourceType = SourceType.Auto)
         {
+
             Task.Run(async () =>
                 {
                     var stopLoop = false;
@@ -90,10 +96,11 @@ namespace Mark5.Mobile.Common.Manager
             return await GetContactAsync(folder?.Id, contactId, sourceType);
         }
 
+        
         public async Task<Contact> GetContactAsync(int? folderId, int contactId, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -123,10 +130,11 @@ namespace Mark5.Mobile.Common.Manager
             return await GetContactWithPreviewAsync(folder?.Id, contactId, sourceType);
         }
 
+        
         public async Task<ContactContainer> GetContactWithPreviewAsync(int? folderId, int contactId, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -154,10 +162,11 @@ namespace Mark5.Mobile.Common.Manager
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
+        
         public async Task<bool> CreateOrUpdateContactAsync(Contact contact, ContactPreview contactPreview, int parentObjectId, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -200,10 +209,11 @@ namespace Mark5.Mobile.Common.Manager
             throw new ArgumentException("Invalid sourceType provided");
         }
 
+        
         public async Task<List<Category>> GetAllCategoriesAsync(SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -226,45 +236,13 @@ namespace Mark5.Mobile.Common.Manager
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task SetCategoriesAsync(ContactPreview contactPreview, List<Category> categories, SourceType sourceType = SourceType.Auto)
-        {
-            CommonConfig.UsageAnalytics.LogEvent(new SetCategoriesEvent(ModuleType.Contacts, 1));
-
-            if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
-
-            if (sourceType == SourceType.Remote)
-            {
-                await AppServiceProxy.SetCategoriesAsync(new DataContract.SetCategoriesParameters
-                {
-                    Token = Token,
-                    ObjectId = contactPreview.Id,
-                    ObjectType = DataContract.ObjectType.Contact,
-                    CategoryIds = categories.Select(c => c.Id).ToArray()
-                });
-
-                contactPreview.Categories.Clear();
-                contactPreview.Categories.AddRange(categories);
-
-                await contactsDataAccess.SetCategoriesAsync(contactPreview, categories);
-
-                CommonConfig.MessengerHub.Publish(new EntityCategoriesChangedMessage(this, ObjectType.Contact, contactPreview.Id, contactPreview.Categories.ToList()));
-
-                return;
-            }
-
-            if (sourceType == SourceType.Local)
-                throw new ReMarkException(ErrorConstants.Codes.InvalidSourceType);
-
-            throw new ArgumentException("Invalid sourceType provided.");
-        }
-
+        
         public async Task<Comment> AddComment(Contact contact, string content, SourceType sourceType = SourceType.Auto)
         {
             CommonConfig.UsageAnalytics.LogEvent(new AddCommentEvent(ModuleType.Contacts));
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -290,11 +268,12 @@ namespace Mark5.Mobile.Common.Manager
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
+        
         public async Task<bool> EditComment(Contact contact, Comment comment, SourceType sourceType = SourceType.Auto)
         {
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -325,12 +304,13 @@ namespace Mark5.Mobile.Common.Manager
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
+        
         public async Task DeleteComment(Contact contact, Comment comment, SourceType sourceType = SourceType.Auto)
         {
             CommonConfig.UsageAnalytics.LogEvent(new DeleteCommentEvent(ModuleType.Contacts));
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {

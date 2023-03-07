@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
+using Polly;
 
 namespace Mark5.Mobile.IOS.PushNotifications
 {
@@ -15,71 +16,123 @@ namespace Mark5.Mobile.IOS.PushNotifications
 
         public NotificationHubClient notificationHubClient => new NotificationHubClient(
             NotificationsConstants.PrimaryConnectionString,
-            NotificationsConstants.NotificationHubName);
+            NotificationsConstants.NotificationHubName,
+             new NotificationHubSettings
+             {
+                 OperationTimeout = TimeSpan.FromSeconds(10),
+                 RetryOptions = new NotificationHubRetryOptions() {
+                     Delay = TimeSpan.FromMilliseconds(500),
+                     MaxDelay  = TimeSpan.FromMilliseconds(1000),
+                     Mode = NotificationHubRetryMode.Fixed,  MaxRetries = 3
+                 }
+             });
 
         public async Task<List<RegistrationDescription>> GetRegistrationForToken(NSData token)
         {
-            var tokenString = string.Join("", token.Select(b => b.ToString("x2")));
-            var registrations = await notificationHubClient.GetRegistrationsByChannelAsync(tokenString, 100);
-            return registrations.ToList();
+                var tokenString = string.Join("", token.Select(b => b.ToString("x2")));
+
+                var retryPolicy = Policy.Handle<TaskCanceledException>()
+                    .WaitAndRetryAsync(retryCount: 3, sleepDurationProvider: _ => TimeSpan.FromMilliseconds(500),
+                    onRetry: (exception, sleepDuration, attemptNumber, context) =>
+                    {
+                        CommonConfig.Logger.Info($"Attempting to get Azure Hub registrations for token:{tokenString}. Attempt #{attemptNumber}");
+                    });
+
+                var policyResult = await retryPolicy.ExecuteAndCaptureAsync(async () =>
+                {
+                    var registrations = await notificationHubClient.GetRegistrationsByChannelAsync(tokenString, 100);
+                    return registrations.ToList();
+                });
+
+                if(policyResult.FinalException!=null)
+                    CommonConfig.Logger.Error($"Could not get Azure Hub registrations for token:{tokenString}. Error: {policyResult.FinalException.Message}");
+
+                return new List<RegistrationDescription>();
 
         }
 
         public async Task RegisterToken(NSData deviceToken)
         {
-
-            // make sure there are no existing registrations for this push handle (used for iOS and Android)    
-            var savedRegistrationId = PlatformConfig.Preferences.AzureHubRegistrationId;
-            var newToken = string.Join("", deviceToken.Select(b => b.ToString("x2")));
-
-            var registrations = await GetRegistrationForToken(deviceToken);
-            if (registrations.Count > 0)
+            try
             {
-                foreach (RegistrationDescription registration in registrations)
+                // make sure there are no existing registrations for this push handle (used for iOS and Android)    
+                var savedRegistrationId = PlatformConfig.Preferences.AzureHubRegistrationId;
+                var newToken = string.Join("", deviceToken.Select(b => b.ToString("x2")));
+
+                var registrations = await GetRegistrationForToken(deviceToken);
+                if (registrations.Count > 0)
                 {
-                    if (string.IsNullOrEmpty(savedRegistrationId))
+                    foreach (RegistrationDescription registration in registrations)
                     {
-                        PlatformConfig.Preferences.AzureHubRegistrationId = registration.RegistrationId;
-                    }
-                    else
-                    {
-                        try
+                        if (string.IsNullOrEmpty(savedRegistrationId))
                         {
-                            await notificationHubClient.DeleteRegistrationAsync(registration);
+                            PlatformConfig.Preferences.AzureHubRegistrationId = registration.RegistrationId;
                         }
-                        catch (Microsoft.Azure.NotificationHubs.Messaging.MessagingEntityNotFoundException)
+                        else
                         {
-                            //ignore
+                            await DeleteRegistrations(registration, savedRegistrationId);
                         }
                     }
+
                 }
-
+                else
+                {
+                    await CreateOrUpdateRegistration(newToken);
+                }
             }
-            else
+            catch(NSErrorException nex)
             {
-                //if no registration exists create new registration
-                var newRegistrationId = await notificationHubClient.CreateRegistrationIdAsync();
+                CommonConfig.Logger.Info($"NSErrorException occured in RegisterToken(), Domain={nex.Domain}, Code={nex.Code}, Message={nex.Message}");
+            }
+        }
 
+        async Task DeleteRegistrations(RegistrationDescription registration, string registrationId)
+        {
+            try
+            {
+                var retryPolicy = Policy.Handle<TaskCanceledException>()
+                    .WaitAndRetryAsync(retryCount: 3, sleepDurationProvider: _ => TimeSpan.FromMilliseconds(500),
+                     onRetry: (exception, sleepDuration, attemptNumber, context) =>
+                     {
+                         CommonConfig.Logger.Info($"Attempting to delete Azure Hub registrations for Id:{registrationId}. Attempt #{attemptNumber}");
+                     });
+
+                var policyResult = await retryPolicy.ExecuteAndCaptureAsync(async () =>
+                {
+                    await notificationHubClient.DeleteRegistrationAsync(registration);
+                });
+
+                if (policyResult.FinalException != null)
+                    CommonConfig.Logger.Error($"Could not delete Azure Hub registrations for Id:{registrationId}. Error: {policyResult.FinalException.Message}");
+            }
+            catch (Microsoft.Azure.NotificationHubs.Messaging.MessagingEntityNotFoundException)
+            {
+                //ignore
+            }
+        }
+
+        async Task CreateOrUpdateRegistration(string token)
+        {
+            string newRegistrationId = string.Empty;
+            try
+            {               
+                //if no registration exists create new registration
+                newRegistrationId = await notificationHubClient.CreateRegistrationIdAsync();
                 PlatformConfig.Preferences.AzureHubRegistrationId = newRegistrationId;
 
-                RegistrationDescription newRegistration = new AppleRegistrationDescription(newToken)
+                    RegistrationDescription newRegistration = new AppleRegistrationDescription(token)
                 {
                     RegistrationId = newRegistrationId,
                     Tags = null
                 };
 
-                try
-                {
-                    await notificationHubClient.CreateOrUpdateRegistrationAsync(newRegistration);
-                }
-                catch (Exception ex)
-                {
-                    PlatformConfig.Preferences.AzureHubRegistrationId = string.Empty;
-                    CommonConfig.Sentry?.LogError($"Error while creating/updating  Azure Notifications Hub registration, token: {newToken}, registrationId: {newRegistrationId}", ex);
-                }
-
+                await notificationHubClient.CreateOrUpdateRegistrationAsync(newRegistration);
             }
-
+            catch (Exception ex)
+            {
+                PlatformConfig.Preferences.AzureHubRegistrationId = string.Empty;
+                CommonConfig.Sentry?.LogError($"Error while creating/updating  Azure Notifications Hub registration, token: {token}, registrationId: {newRegistrationId}", ex);
+            }
         }
 
         public bool ShouldUpdateToken()

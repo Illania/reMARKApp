@@ -100,5 +100,7 @@ namespace Mark5.Mobile.Common.Model
 
         public OriginatorAppearance DefaultAppearance { get; set; } = new OriginatorAppearance();
 
+        public List<UserActivity> UserActivities { get; set; } = new List<UserActivity>();
+
     }
 }

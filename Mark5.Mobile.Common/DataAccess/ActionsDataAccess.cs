@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.DataAccess.Exceptions;
 using Mark5.Mobile.Common.Database;
-using Mark5.Mobile.Common.Model.Actions;
 
 namespace Mark5.Mobile.Common.DataAccess
 {
@@ -16,26 +15,25 @@ namespace Mark5.Mobile.Common.DataAccess
             this.actionsDatabase = actionsDatabase;
         }
 
-        public async Task<List<SetReadStatusAction>> GetSetReadStatusActionsAsync()
+        public async Task<List<T>> GetActionsAsync<T>() where T: new()
         {
             try
             {
-                List<SetReadStatusAction> actions = null;
-
+                List<T> actions = null;
                 await actionsDatabase.RunInConnectionAsync(c =>
                 {
-                    actions = c.Table<SetReadStatusAction>().ToList();
+                    actions = c.Table<T>().ToList();
                 });
 
                 return actions;
             }
             catch (Exception ex) when (!(ex is DataAccessException))
             {
-                throw new DataAccessException("Error adding SetReadStatusAction.", ex);
+                throw new DataAccessException($"Error occurred when getting actions of type <{typeof(T)}>.", ex);
             }
         }
 
-        public async Task SaveSetReadStatusActionAsync(SetReadStatusAction action)
+        public async Task SaveActionAsync<T>(T action) 
         {
             try
             {
@@ -46,22 +44,22 @@ namespace Mark5.Mobile.Common.DataAccess
             }
             catch (Exception ex) when (!(ex is DataAccessException))
             {
-                throw new DataAccessException("Error adding SetReadStatusAction.", ex);
+                throw new DataAccessException($"Error occurred when adding new action of type <{typeof(T)}>.", ex);
             }
         }
 
-        public async Task DeleteSetReadStatusActionAsync(Guid actionGuid)
+        public async Task DeleteActionAsync<T>(Guid actionGuid)
         {
             try
             {
                 await actionsDatabase.RunInConnectionAsync(c =>
                 {
-                    c.Delete<SetReadStatusAction>(actionGuid);
+                    c.Delete<T>(actionGuid);
                 });
             }
             catch (Exception ex) when (!(ex is DataAccessException))
             {
-                throw new DataAccessException("Error deleting SetReadStatusAction.", ex);
+                throw new DataAccessException($"Error occurred when deleting an action of type <{typeof(T)}>.", ex);
             }
         }
     }

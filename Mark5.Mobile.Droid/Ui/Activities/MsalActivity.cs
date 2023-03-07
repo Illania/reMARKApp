@@ -5,7 +5,7 @@ using Microsoft.Identity.Client;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-    [Activity]
+    [Activity(Exported = true)]
     [IntentFilter(new[] { Intent.ActionView },
         Categories = new[] { Intent.CategoryBrowsable, Intent.CategoryDefault },
         DataScheme = "msauth",

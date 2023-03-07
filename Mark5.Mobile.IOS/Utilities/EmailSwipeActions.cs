@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Foundation;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.IOS.Ui.Common;
 
@@ -20,7 +19,8 @@ namespace Mark5.Mobile.IOS.Utilities
             RemoveFromFolder,
             Delete,
             SetPresetCategory,
-            AddBookmark
+            AddBookmark,
+            DeliveryReport
         }
 
         public SwipeAction Action { get; set; }
@@ -48,10 +48,13 @@ namespace Mark5.Mobile.IOS.Utilities
                 new EmailSwipeAction(SwipeAction.Delete),
                 new EmailSwipeAction(SwipeAction.SetPresetCategory),
                 new EmailSwipeAction(SwipeAction.AddBookmark),
+
         };
             if (PlatformConfig.Preferences.EnableMoveToFolder)
                 list.Add(new EmailSwipeAction(SwipeAction.MoveToFolder));
-            
+
+            if (ServerConfig.SystemSettings.SystemInfo.DeliveryReportAvailable)
+                list.Add(new EmailSwipeAction(SwipeAction.DeliveryReport));
             return list;
         }
 
@@ -91,6 +94,9 @@ namespace Mark5.Mobile.IOS.Utilities
 
                 case EmailSwipeAction.SwipeAction.AddBookmark:
                     return Localization.GetString("add_bookmark");
+
+                case EmailSwipeAction.SwipeAction.DeliveryReport:
+                    return Localization.GetString("delivery_report");
 
                 default:
                     CommonConfig.Logger.Error($"Missing implementation for case : {action.ToString()}");

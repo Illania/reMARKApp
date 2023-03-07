@@ -1,10 +1,10 @@
 ﻿using System;
 using Android.Content;
 using Android.Graphics;
-using Android.Support.V4.Widget;
-using Android.Support.V7.Widget;
 using Android.Util;
 using Android.Views;
+using AndroidX.RecyclerView.Widget;
+using AndroidX.SwipeRefreshLayout.Widget;
 
 namespace FastScrollRecycler
 {

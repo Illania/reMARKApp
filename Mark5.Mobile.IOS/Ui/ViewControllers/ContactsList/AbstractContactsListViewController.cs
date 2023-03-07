@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Foundation;
+using Mark5.Mobile.Classes.Enum;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.DataAccess.Exceptions;
 using Mark5.Mobile.Common.Extensions;
@@ -589,9 +590,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
         }     
 
         void ShowCategories(ContactPreview selectedContact)
-        {
-            var vc = new CategoriesListViewController(selectedContact);
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+        {            
+            if (!ServerConfig.SystemSettings.SystemInfo.FavoriteCategoriesAvailable)
+            {
+                var vcOld = new CategoriesListOldViewController(selectedContact);
+                PresentViewController(new NavigationController(vcOld, UIModalPresentationStyle.PageSheet), true, null);
+            }
+            else
+            {
+                var vc = new CategoriesListViewController(selectedContact);
+                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+            } 
         }
 
         
@@ -889,7 +898,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
 
                 var contactPreview = items[indexPath.Section][indexPath.Row];
 
-               if (ServerConfig.SystemSettings.ContactsModuleInfo.WorktrayEnabled ?? true)
+                if (ServerConfig.SystemSettings.ContactsModuleInfo.WorktrayEnabled ?? true)
                 {
                     var copyToWorktrayAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
                                                                            Localization.GetString("copy_to_worktray_ml"),
@@ -900,7 +909,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ContactsList
                     });
                     copyToWorktrayAction.BackgroundColor = Theme.DarkBlue;
                     actions.Add(copyToWorktrayAction);
-               }
+                }
 
                 var moreAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
                                                              Localization.GetString("more"),

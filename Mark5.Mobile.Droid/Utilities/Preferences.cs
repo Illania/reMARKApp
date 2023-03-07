@@ -1,6 +1,6 @@
 using Android.App;
 using Android.Content;
-using Android.Support.V7.Preferences;
+using AndroidX.Preference;
 using Mark5.Mobile.Common.Model;
 using System;
 using System.Collections.Generic;
@@ -49,6 +49,8 @@ namespace Mark5.Mobile.Droid.Utilities
         public bool ReplyWithAttachments => sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_reply_with_attachments), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_reply_with_attachments_default));
 
         public bool OpenFileToFolderDialog => sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_reply_with_attachments), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_reply_with_attachments_default));
+
+        public bool SyncUserActivities => sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_sync_user_activities), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_sync_user_activities_default));
 
         #endregion
 

@@ -15,6 +15,9 @@ using Mark5.ServiceReference.Exceptions;
 using Mark5.ServiceReference.Utilities;
 using JwtDecoder = Mark5.Mobile.Classes.JwtDecoder;
 using Mark5.Mobile.Classes;
+using Polly;
+using Polly.Bulkhead;
+using Polly.Wrap;
 
 namespace Mark5.ServiceReference.AppService
 {
@@ -28,16 +31,20 @@ namespace Mark5.ServiceReference.AppService
         readonly string requestUri;
         string bearerToken;
         readonly AzureApplicationProxyInfo azureApplicationProxyInfo;
+        readonly AsyncPolicyWrap policy;
+        readonly IReachability reachability;
+        const int MAX_RETRIES = 3;
 
 
         public HttpAppServiceProxy(bool ssl, string hostname, string port, Func<HttpMessageHandler> httpClientHandler,
-            Action onStartTransmission, Action onStopTransmission,
+            Action onStartTransmission, Action onStopTransmission, IReachability reachability,
             string bearerToken, AzureApplicationProxyInfo azureApplicationProxyInfo)
         {
      
             this.httpClientHandler = httpClientHandler;
             this.onStartTransmission = onStartTransmission;
             this.onStopTransmission = onStopTransmission;
+            this.reachability = reachability;
             this.bearerToken = bearerToken;
             this.azureApplicationProxyInfo = azureApplicationProxyInfo;
 
@@ -55,35 +62,32 @@ namespace Mark5.ServiceReference.AppService
             
         }
 
-
-      
         async Task<R> InvokeAsync<R, P>(string soapAction, P parameters, CancellationToken ct, bool useShortTimeout = false,
                                            bool checkXmlCharacters = true) where R : class where P : class
         {
             HttpStatusCode statusCode = 0;
             var useBearerToken = !string.IsNullOrEmpty(bearerToken);
+            var timeout = TimeSpan.FromSeconds(useShortTimeout ? Config.HttpClientShortTimeoutSeconds : Config.HttpClientTimeoutSeconds);
 
             async Task<R> CreateRequestAsync()
             {
                 using var c = new HttpClient(httpClientHandler())
                 {
-                    Timeout = TimeSpan.FromSeconds(useShortTimeout ? Config.HttpClientShortTimeoutSeconds : Config.HttpClientTimeoutSeconds)
+                    Timeout = timeout
                 };
                 var req = CreateRequest(soapAction, parameters, checkXmlCharacters, bearerToken);
                 var res = useBearerToken ? await c.SendAsync(req) : await c.SendAsync(req, ct);
                 statusCode = res.StatusCode;
                 return await ProcessResponse<R>(soapAction, res);
             }
-    
-            try
-            {
-                onStartTransmission?.Invoke();
 
+            async Task RefreshAzureToken()
+            {
                 if (ShouldRefreshBearerToken(azureApplicationProxyInfo, bearerToken))
                 {
                     var azureAppProxyAuthService = new AzureAppProxyAuthService(azureApplicationProxyInfo.AppClientId,
                        azureApplicationProxyInfo.ApplicationProxyClientId);
-                    bearerToken = await azureAppProxyAuthService.Authenticate(this, false);
+                    bearerToken = await azureAppProxyAuthService.Authenticate(this, false, true);
 
                     if (!string.IsNullOrEmpty(bearerToken))
                     {
@@ -91,8 +95,32 @@ namespace Mark5.ServiceReference.AppService
                         AzureSettings.AccessTokenLastUpdated = DateTime.Now.ToLocalTime();
                     }
                 }
-                return await CreateRequestAsync();
-               
+            }
+           
+            AsyncPolicy GetRetryPolicy()
+            {
+                var retryPolicy = Policy.Handle<Exception>()
+                .WaitAndRetryAsync(retryCount: MAX_RETRIES, sleepDurationProvider: (attemptCount) => timeout,
+                onRetry: (exception, sleepDuration, attemptNumber, context) =>
+                {
+                    Console.WriteLine($"Exception when sending http request. Retrying in {sleepDuration}. {attemptNumber} / {MAX_RETRIES}");
+                });
+                return retryPolicy;
+            }
+
+            var policy = GetRetryPolicy();
+
+            try
+            {
+                onStartTransmission?.Invoke();
+
+                await RefreshAzureToken();
+
+                return await policy.ExecuteAsync(async () =>
+                {
+                    return await CreateRequestAsync();
+                });
+
             }
             catch (Exception ex) when (!(ex is HttpAppServiceException))
             {
@@ -101,13 +129,17 @@ namespace Mark5.ServiceReference.AppService
                     var te = new TimeoutException("Request timed out.");
                     throw new HttpAppServiceException(statusCode, te.Message, te);
                 }
-
-               throw new HttpAppServiceException(statusCode, ex.Message, ex);
+                if(ex is System.Net.WebException we && statusCode == 0)
+                {
+                    reachability.RefreshServiceReachability(false);
+                    await reachability.Refresh();
+                }
+                throw new HttpAppServiceException(statusCode, ex.Message, ex); 
             }
             finally
             {
-                onStopTransmission?.Invoke();
-            }
+                onStopTransmission?.Invoke(); 
+            }  
         }
 
         bool ShouldRefreshBearerToken(AzureApplicationProxyInfo azureApplicationProxyInfo, string bearerToken)
@@ -603,6 +635,21 @@ namespace Mark5.ServiceReference.AppService
         public async Task<DeleteDocumentExtraFieldResult> DeleteDocumentExtraFieldAsync(DeleteDocumentExtraFieldParameters parameters, CancellationToken ct = default)
         {
             return await InvokeAsync<DeleteDocumentExtraFieldResult, DeleteDocumentExtraFieldParameters>("DeleteDocumentExtraField", parameters, ct);
+        }
+
+        public async Task<GetTransmitInfoResult> GetDocumentTransmitInfoAsync(GetTransmitInfoParameters parameters, CancellationToken ct = default)
+        {
+            return await InvokeAsync<GetTransmitInfoResult, GetTransmitInfoParameters>("GetTransmitInfo", parameters, ct);
+        }
+
+        public async Task<GetAutoReplyResult> GetAutoReplyRuleAsync(GetAutoReplyParameters parameters, CancellationToken ct = default)
+        {
+            return await InvokeAsync<GetAutoReplyResult, GetAutoReplyParameters>("GetAutoReply", parameters, ct);
+        }
+
+        public async Task<SetAutoReplyResult> SetAutoReplyRuleAsync(SetAutoReplyParameters parameters, CancellationToken ct = default)
+        {
+            return await InvokeAsync<SetAutoReplyResult, SetAutoReplyParameters>("SetAutoReply", parameters, ct);
         }
 
     }

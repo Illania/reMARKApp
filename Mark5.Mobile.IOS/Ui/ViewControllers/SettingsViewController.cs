@@ -17,6 +17,8 @@ using Mark5.Mobile.IOS.Ui.TableViewCells;
 using Mark5.Mobile.IOS.Utilities;
 using Mark5.Mobile.IOS.Utilities.Extensions;
 using UIKit;
+using Mark5.Mobile.IOS.Ui.ViewControllers.AutoReply;
+using Mark5.Mobile.Classes.Enum;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
@@ -32,10 +34,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         const string LocalTemplateKey = "localTemplate";
         const string LogoutKey = "logout";
         const string ManageExtraFieldsKey = "ManageExtraFields";
+        const string AutoReplySettingsKey = "AutoReplySettings";
+        const string UserActivitiesKey = "SyncUserActivities";
         const string OpenSettingsAppKey = "openSettingsApp";
         const string SendFeedbackKey = "sendFeedback";
         const string ServerAddressKey = "serverAddress";
         const string SslEnabledKey = "sslEnabled";
+        const string AzureTokenKey = "AzureToken";
         const string UpdateConfigKey = "updateConfig";
         const string UsernameKey = "username";
         const string UseTemplateKey = "UseTemplate";
@@ -45,6 +50,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         const string SyncFavoriteFoldersKey = "SyncFavoriteFolders";
         const string SyncFavoriteFoldersGroupKey = "SyncFavoriteFoldersGroup";
         const string ConnectionDiagnosticsKey = "ConnectionDiagnostics";
+        const string SendingDelayKey = "SendingDelay";
+        const string RememberLastUserDelaySettingsKey = "RememberLastUserDelaySettings";
 
         public SettingsViewController()
         {
@@ -144,6 +151,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return;
             }
 
+            if (specifier.Key == AzureTokenKey)
+            {
+                var azureTokenVC = new TextViewerViewController();
+                azureTokenVC.Title = Localization.GetString("azure_proxy_token_info");
+                NavigationController.PushViewController(azureTokenVC, true);
+                return;
+            }
+
             if (specifier.Key == ManageExtraFieldsKey)
             {
                 if (ServerConfig.SystemSettings.SystemInfo.ExtraFieldsEditingAvailable)
@@ -159,6 +174,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return;
                 }
 
+            }
+
+            if (specifier.Key == AutoReplySettingsKey)
+            {
+                if (ServerConfig.SystemSettings.SystemInfo.ExtraFieldsEditingAvailable)
+                {
+                    var autoReplyRule = await Managers.DocumentsManager.GetAutoReplyRule();
+
+                    var autoReplyVC = new AutoReplyViewController(autoReplyRule);
+   
+                    PresentViewController(new NavigationController(autoReplyVC, UIModalPresentationStyle.PageSheet), true, null);
+                    return;
+                }
             }
 
             if (specifier.Key == PresetCategoryKey)
@@ -264,6 +292,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return cell;
             }
 
+            if (specifier.Key == ServerAddressKey)
+            {
+                var ci = Managers.ActiveConnectionInfo;
+
+                var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
+                cell.TextLabel.Text = specifier.Title;
+                cell.DetailTextLabel.Text = ci?.Hostname + ":" + ci?.Port;
+                cell.DetailTextLabel.TextColor = Theme.DarkGray;
+                return cell;
+            }
+            if (specifier.Key == AzureTokenKey)
+            {
+                var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
+                cell.TextLabel.Text = specifier.Title;
+                cell.DetailTextLabel.Text = "";
+                cell.DetailTextLabel.TextColor = Theme.DarkGray;
+                return cell;
+            }
             if (specifier.Key == VersionKey)
             {
                 var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
@@ -502,8 +548,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 hiddenKeys.Add(SyncFavoriteFoldersKey);
             }
 
-            if (PlatformConfig.Preferences.UseTemplate != Preferences.TemplateUsageMode.Local && PlatformConfig.Preferences.UseTemplate != Preferences.TemplateUsageMode.AlwaysAsk)
+            if (PlatformConfig.Preferences.UseTemplate != Preferences.TemplateUsageMode.Local
+                && PlatformConfig.Preferences.UseTemplate != Preferences.TemplateUsageMode.AlwaysAsk)
                 hiddenKeys.Add(LocalTemplateKey);
+
+            if (ServerConfig.SystemSettings?.SystemInfo?.UserActivitiesAvailable != true)
+                hiddenKeys.Add(UserActivitiesKey);
+
+            if (ServerConfig.SystemSettings?.SystemInfo?.DelaySendAvailable != true)
+            {
+                hiddenKeys.Add(SendingDelayKey);
+                hiddenKeys.Add(RememberLastUserDelaySettingsKey);
+            }
+                
+
+            if (ServerConfig.SystemSettings?.SystemInfo?.AutoReplyAvailable != true)
+                hiddenKeys.Add(AutoReplySettingsKey);
+
+            if (ServerConfig.SystemSettings.SystemInfo.ExtraFieldsEditingAvailable != true)
+                hiddenKeys.Add(ManageExtraFieldsKey);
+
+            if (string.IsNullOrEmpty(PlatformConfig.Preferences.AzureApplicationProxyBearerToken))
+                hiddenKeys.Add(AzureTokenKey);
 
             SetHiddenKeys(hiddenKeys.ToArray(), false);
         }

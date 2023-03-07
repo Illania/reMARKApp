@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
-using Android.Support.Design.Widget;
-using Android.Support.V7.Widget;
 using Android.Views;
+using AndroidX.AppCompat.Widget;
+using Google.Android.Material.TextField;
 using Mark5.Mobile.Classes.AuthService;
 using Mark5.Mobile.Classes.Azure;
 using Mark5.Mobile.Common;
@@ -405,7 +403,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             Services.DocumentsUploadService?.Start();
             Services.DocumentPreviewsDownloadService?.Start();
             Services.DocumentsDownloadService?.Start();
-            Services.ActionSyncService?.Start();
             DeviceReminderWorker.Schedule();
 
             CommonConfig.Logger.Info($"Refreshing reachability status...");

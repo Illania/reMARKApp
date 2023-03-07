@@ -8,7 +8,7 @@
     android:minHeight="56dp">
     <include
         layout="@layout/selected_overlay" />
-    <android.support.v7.widget.LinearLayoutCompat
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/list_item_folder_internal_Layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -18,12 +18,12 @@
         android:orientation="horizontal"
         android:background="?attr/selectableItemBackground"
         android:clickable="true">
-       <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
            android:id="@+id/folder_image_icon"
            android:layout_width="50dp"
            android:layout_height="40dp"
            android:gravity="bottom">
-        <android.support.v7.widget.AppCompatImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:padding="5dp"
             android:layout_width="40dp"
             android:layout_height="40dp"
@@ -33,7 +33,7 @@
             android:tint="@color/darkblue"
             android:gravity="center_vertical"
             android:id="@+id/list_item_folder_icon" />
-        <android.support.v7.widget.AppCompatImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:padding="5dp"
             android:layout_width="25dp"
             android:layout_height="25dp"  
@@ -43,8 +43,8 @@
             android:tint="@color/darkblue"
             android:gravity="bottom|right"
             android:id="@+id/list_item_folder_icon_overlay" />
-	   </RelativeLayout>
-        <android.support.v7.widget.LinearLayoutCompat
+       </RelativeLayout>
+        <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/folderNameLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -53,20 +53,20 @@
             android:orientation="vertical"
             android:gravity="center_vertical"
             android:layout_weight="1">
-            <android.support.v7.widget.AppCompatTextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/list_item_folder_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/fontListPrimary"/>
                 android:layout_marginBottom="2dp" />
-            <android.support.v7.widget.AppCompatTextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/list_item_folder_subtitle"
                 android:singleLine="true"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/fontListSmallLight" />
-        </android.support.v7.widget.LinearLayoutCompat>
-        <android.support.v7.widget.AppCompatTextView
+        </androidx.appcompat.widget.LinearLayoutCompat>
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/failed_and_pending_document_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -82,7 +82,7 @@
             android:gravity="center_vertical"
             android:layout_height="10dp"   
             android:src="@drawable/circle_red" />  
-        <android.support.v7.widget.AppCompatImageButton
+        <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/list_item_folder_expand"
             android:layout_gravity="center_vertical"
             android:layout_width="wrap_content"
@@ -93,5 +93,5 @@
             android:tint="@color/darkblue"
             android:src="@drawable/arrow_right"
             android:clickable="false" />
-    </android.support.v7.widget.LinearLayoutCompat>
+    </androidx.appcompat.widget.LinearLayoutCompat>
 </FrameLayout>

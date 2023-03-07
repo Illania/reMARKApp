@@ -20,6 +20,10 @@ using Mark5.ServiceReference.FileTransferService;
 using DataContract = Mark5.ServiceReference.DataContract;
 using ModuleType = Mark5.Mobile.Common.Model.ModuleType;
 using DocumentPreview = Mark5.Mobile.Common.Model.DocumentPreview;
+using System.Security.AccessControl;
+using System.Security.Cryptography;
+using Mark5.ServiceReference.Exceptions;
+using Mark5.Mobile.Classes.Enum;
 
 namespace Mark5.Mobile.Common.Manager
 {
@@ -43,6 +47,120 @@ namespace Mark5.Mobile.Common.Manager
             this.documentsDataAccess = documentsDataAccess;
         }
 
+        public async Task ExecuteUserActivity(Model.UserActivityType userActivityType, DocumentPreview originalDoc, DocumentPreview newDoc)
+        {
+            async Task ExecuteSingleActivity(Model.UserActivity userActivity, DocumentPreview originalDoc, DocumentPreview newDoc)
+            {
+
+                if(userActivity.PerformOnOriginalDocument && userActivity.Categories !=  null)
+                {
+                    var newCategories = originalDoc.Categories.Union(userActivity.Categories).ToList();
+                    await Managers.CommonActionsManager.SetCategoriesAsync(originalDoc, newCategories);
+
+                    foreach (var ex in userActivity.ExtraFields)
+                        await AssignDocumentExtraFieldAsync(originalDoc.Id, ex.Key, ex.Value);
+                }
+
+                if (!userActivity.PerformOnOriginalDocument && newDoc != null && originalDoc != null)
+                {
+                    var newCategories = userActivity.AssignOriginalCategories ? originalDoc.Categories : userActivity.Categories;
+                    await Managers.CommonActionsManager.SetCategoriesAsync(newDoc, newCategories);
+
+                    if (userActivity.AssignOriginalExtraFields)
+                        foreach (var ex in userActivity.ExtraFields)
+                            await AssignDocumentExtraFieldAsync(originalDoc.Id, ex.Key, ex.Value);
+                    else
+                    {
+                        var extraFields = await GetDocumentExtraFieldsAsync(originalDoc.Id);
+                        if(extraFields != null)
+                        {
+                            var newFields = extraFields.Select(kvp => new KeyValuePair<int, string>(kvp.Key.Id, kvp.Value))
+                            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                         
+                            foreach (var ex in newFields)
+                                await AssignDocumentExtraFieldAsync(originalDoc.Id, ex.Key, ex.Value);
+                        }       
+                    }
+                }          
+                
+            }
+
+            if (!ServerConfig.SystemSettings.SystemInfo.UserActivitiesAvailable)
+                return;
+
+            foreach (var activity in ServerConfig.SystemSettings.DocumentsModuleInfo.UserActivities
+                .Where(ua => ua.Type.Equals(userActivityType)))
+                await ExecuteSingleActivity(activity, originalDoc, newDoc);
+
+        }
+
+        public async Task ExecuteUserActivity(Model.UserActivityType userActivityType, List<DocumentPreview> originalDocuments)
+        {
+            foreach (var doc in originalDocuments)
+                await ExecuteUserActivity(userActivityType, doc, null);
+        }
+
+        public async Task<AutoReplyRule> GetAutoReplyRule(SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
+
+            if (sourceType == SourceType.Remote)
+            {
+                var rule = await AppServiceProxy.GetAutoReplyRuleAsync(new DataContract.GetAutoReplyParameters
+                {
+                    Token = Token
+                });
+
+                return new AutoReplyRule
+                {
+                    Id = rule.Id,
+                    Active = rule.Active,
+                    ActiveFrom = rule.ActiveFrom == System.Data.SqlTypes.SqlDateTime.MinValue.Value ? DateTime.Now : rule.ActiveFrom,
+                    ActiveTo = rule.ActiveTo == System.Data.SqlTypes.SqlDateTime.MinValue.Value ? DateTime.Now.AddMonths(1) : rule.ActiveTo,
+                    IncomingMailboxGuid = rule.MailboxGuid,
+                    ReplySubject = rule.ReplySubject,
+                    ReplyText = rule.ReplyText
+                };
+
+            }
+
+            else if (sourceType == SourceType.Local)
+                throw new ReMarkException(ErrorConstants.Codes.InvalidSourceType);
+
+            throw new ArgumentException("Invalid sourceType provided.");   
+
+        }
+
+        public async Task SetAutoReplyRule(AutoReplyRule rule, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
+
+            if (sourceType == SourceType.Remote)
+            {
+                var result = await AppServiceProxy.SetAutoReplyRuleAsync(new DataContract.SetAutoReplyParameters
+                {
+                    Token = Token,
+                    Id = rule.Id,
+                    Active = rule.Active,
+                    ActiveFrom = rule.ActiveFrom,
+                    ActiveTo = rule.ActiveTo,
+                    MailboxGuid = rule.IncomingMailboxGuid,
+                    ReplySubject = rule.ReplySubject,
+                    ReplyText = rule.ReplyText
+                });
+
+                return;
+            }
+
+            else if (sourceType == SourceType.Local)
+                throw new ReMarkException(ErrorConstants.Codes.InvalidSourceType);
+
+            throw new ArgumentException("Invalid sourceType provided.");
+
+        }
+
         public async Task<List<DocumentPreview>> GetDocumentPreviewsAsync(Folder folder, int startId = -1, int endId = -1, SourceType sourceType = SourceType.Auto)
         {
             return await GetDocumentPreviewsAsync(folder.Id, folder.Guid, startId, endId, sourceType);
@@ -51,30 +169,56 @@ namespace Mark5.Mobile.Common.Manager
         public async Task<List<DocumentPreview>> GetDocumentPreviewsAsync(int folderId, Guid folderGuid, int startId = -1, int endId = -1, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
-                var result = await AppServiceProxy.GetDocumentPreviewsAsync(new DataContract.GetDocumentPreviewsParameters
-                {
-                    Token = Token,
-                    FolderId = folderId,
-                    FolderGuid = folderGuid,
-                    StartId = startId,
-                    EndId = endId,
-                    MaxToFetch = MaxToFetch,
-                    ReverseSortOrder = true
-                });
+                    var result = await AppServiceProxy.GetDocumentPreviewsAsync(new DataContract.GetDocumentPreviewsParameters
+                    {
+                        Token = Token,
+                        FolderId = folderId,
+                        FolderGuid = folderGuid,
+                        StartId = startId,
+                        EndId = endId,
+                        MaxToFetch = MaxToFetch,
+                        ReverseSortOrder = true
+                    });
 
-                var documentPreviews = result.DocumentPreviews.WhereNotNull().OrderByDescending(dp => dp.Id).Select(dp => dp.Convert()).ToList();
+                    var documentPreviews = result.DocumentPreviews.WhereNotNull().OrderByDescending(dp => dp.Id).Select(dp => dp.Convert()).ToList();
 
-                await documentsDataAccess.SaveDocumentPreviewsAsync(folderId, documentPreviews, startId == -1 && endId == -1);
+                    await documentsDataAccess.SaveDocumentPreviewsAsync(folderId, documentPreviews, startId == -1 && endId == -1);
 
-                return documentPreviews;
+                    return documentPreviews;
+
             }
 
             if (sourceType == SourceType.Local)
                 return await documentsDataAccess.GetDocumentPreviewsAsync(folderId, startId, endId, MaxToFetch);
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
+
+        public async Task<List<Transmit>> GetDocumentTransmitInfoAsync(int documentId, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
+
+            if (sourceType == SourceType.Remote)
+            {
+                var result = await AppServiceProxy.GetDocumentTransmitInfoAsync(new DataContract.GetTransmitInfoParameters
+                {
+                    Token = Token,
+                    DocumentId = documentId,
+                    ArchiveDbId = 0
+                });
+
+                var transmitList = result.TransmitList.Select(transmit => transmit.Convert()).ToList();
+
+                return transmitList;
+            }
+
+            else if (sourceType == SourceType.Local)
+                throw new ReMarkException(ErrorConstants.Codes.InvalidSourceType);
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
@@ -92,7 +236,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task<Document> GetDocumentAsync(int? folderId, int documentId, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -126,7 +270,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task<DocumentContainer> GetDocumentWithPreviewAsync(int? folderId, int documentId, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -158,7 +302,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task SetDocumentReadStatusAsync(DocumentPreview documentPreview, Document document, bool isRead, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
                 await SetRemoteReadStatusAsync(isRead, documentPreview.Id);
@@ -178,7 +322,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task SetDocumentsReadStatusAsync(List<DocumentPreview> documentPreviews, bool isRead, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
                 await SetRemoteReadStatusAsync(isRead, documentPreviews.Select(dp => dp.Id).ToArray());
@@ -203,7 +347,7 @@ namespace Mark5.Mobile.Common.Manager
             CommonConfig.UsageAnalytics.LogEvent(new SetPriorityEvent(documentPreviews.Count));
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -233,7 +377,7 @@ namespace Mark5.Mobile.Common.Manager
             SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -260,7 +404,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task MoveToSpamAsync(List<DocumentPreview> documentPreviews, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -284,7 +428,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task<List<TemplatePreview>> GetTemplatePreviewsAsync(SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -309,7 +453,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task<Template> GetTemplateAsync(int templateId, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -336,7 +480,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task<Template> GetDefaultTemplateAsync(DocumentCreationModeFlag creationModeFlag, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -363,7 +507,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task<List<RecentAddress>> GetRecentAddressesAsync(SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -391,7 +535,7 @@ namespace Mark5.Mobile.Common.Manager
                 recentAddresses = new List<RecentAddress>();
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -412,7 +556,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task<List<Category>> GetAllCategoriesAsync(SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -435,45 +579,12 @@ namespace Mark5.Mobile.Common.Manager
             throw new ArgumentException("Invalid sourceType provided.");
         }
 
-        public async Task SetCategoriesAsync(DocumentPreview documentPreview, List<Category> categories, SourceType sourceType = SourceType.Auto)
-        {
-            CommonConfig.UsageAnalytics.LogEvent(new SetCategoriesEvent(ModuleType.Documents, 1));
-
-            if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
-
-            if (sourceType == SourceType.Remote)
-            {
-                await AppServiceProxy.SetCategoriesAsync(new DataContract.SetCategoriesParameters
-                {
-                    Token = Token,
-                    ObjectId = documentPreview.Id,
-                    ObjectType = DataContract.ObjectType.Document,
-                    CategoryIds = categories.Select(c => c.Id).ToArray()
-                });
-
-                documentPreview.Categories.Clear();
-                documentPreview.Categories.AddRange(categories);
-
-                await documentsDataAccess.SetCategoriesAsync(documentPreview, categories);
-
-                CommonConfig.MessengerHub.Publish(new EntityCategoriesChangedMessage(this, ObjectType.Document, documentPreview.Id, documentPreview.Categories.ToList()));
-
-                return;
-            }
-
-            if (sourceType == SourceType.Local)
-                throw new ReMarkException(ErrorConstants.Codes.InvalidSourceType);
-
-            throw new ArgumentException("Invalid sourceType provided.");
-        }
-
         public async Task<Comment> AddComment(Document document, string content, SourceType sourceType = SourceType.Auto)
         {
             CommonConfig.UsageAnalytics.LogEvent(new AddCommentEvent(ModuleType.Documents));
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -505,7 +616,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task<bool> EditComment(Document document, Comment comment, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -541,7 +652,7 @@ namespace Mark5.Mobile.Common.Manager
             CommonConfig.UsageAnalytics.LogEvent(new DeleteCommentEvent(ModuleType.Documents));
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -571,7 +682,7 @@ namespace Mark5.Mobile.Common.Manager
             bool checkMD5 = false, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -703,7 +814,7 @@ namespace Mark5.Mobile.Common.Manager
         {
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -727,7 +838,7 @@ namespace Mark5.Mobile.Common.Manager
         {
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -750,7 +861,7 @@ namespace Mark5.Mobile.Common.Manager
         public async Task<string> GetNewDocumentReferenceNumber(DocumentPreview documentPreview, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -796,7 +907,7 @@ namespace Mark5.Mobile.Common.Manager
             CommonConfig.UsageAnalytics.LogEvent(new DocumentSentEvent(flag));
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -852,22 +963,24 @@ namespace Mark5.Mobile.Common.Manager
                 }
             }
 
-            if (precedingDocumentId > 0 && (flag == DocumentCreationModeFlag.Reply || flag == DocumentCreationModeFlag.ReplyAll))
+            if (precedingDocumentId > 0 && (flag == DocumentCreationModeFlag.Reply || flag == DocumentCreationModeFlag.ReplyAll || (flag == DocumentCreationModeFlag.Forward)))
             {
+                var userActivityType = (flag == DocumentCreationModeFlag.Forward) ? UserActivityType.Forward : UserActivityType.Reply;
                 try
                 {
                     var container = await documentsDataAccess.GetDocumentWithPreviewAsync(precedingDocumentId);
                     var previousDocument = container.Document;
                     var previousDocumentPreview = container.DocumentPreview;
-
-                    //await SetDocumentReadStatusAsync(previousDocumentPreview, previousDocument, true, ServerConfig.SystemSettings.UserInfo.User, SourceType.Remote);  //TODO
+                    
+                    await ExecuteUserActivity(userActivityType, previousDocumentPreview, documentPreview);
                 }
                 catch (Exception ex)
                 {
-                    CommonConfig.Logger.Error("Error while setting previous document as read", ex);
+                    CommonConfig.Logger.Error($"Error while executing user activity on {userActivityType} action", ex);
                 }
             }
-            if(fileToFolderParameters != null)
+
+            if (fileToFolderParameters != null)
             {
                 try
                 {
@@ -894,7 +1007,7 @@ namespace Mark5.Mobile.Common.Manager
         internal async Task<Guid> UploadTemporaryAttachmentAsync(Attachment attachment, SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -944,7 +1057,7 @@ namespace Mark5.Mobile.Common.Manager
             CommonConfig.UsageAnalytics.LogEvent(new AddExtraFieldEvent(ModuleType.Documents));
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -967,7 +1080,7 @@ namespace Mark5.Mobile.Common.Manager
             CommonConfig.UsageAnalytics.LogEvent(new DeleteExtraFieldEvent(ModuleType.Documents));
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -990,7 +1103,7 @@ namespace Mark5.Mobile.Common.Manager
             CommonConfig.UsageAnalytics.LogEvent(new UpdateExtraFieldEvent(ModuleType.Documents));
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -1013,7 +1126,7 @@ namespace Mark5.Mobile.Common.Manager
             CommonConfig.UsageAnalytics.LogEvent(new UpdateExtraFieldEvent(ModuleType.Documents));
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -1036,7 +1149,7 @@ namespace Mark5.Mobile.Common.Manager
             CommonConfig.UsageAnalytics.LogEvent(new GetExtraFieldsEvent(ModuleType.Documents));
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -1061,7 +1174,7 @@ namespace Mark5.Mobile.Common.Manager
             CommonConfig.UsageAnalytics.LogEvent(new GetDocumentExtraFieldEvent(ModuleType.Documents));
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -1086,7 +1199,7 @@ namespace Mark5.Mobile.Common.Manager
             CommonConfig.UsageAnalytics.LogEvent(new GetDocumentExtraFieldEvent(ModuleType.Documents));
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -1110,7 +1223,7 @@ namespace Mark5.Mobile.Common.Manager
             CommonConfig.UsageAnalytics.LogEvent(new AssignDocumentExtraFieldEvent(ModuleType.Documents));
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {
@@ -1135,7 +1248,7 @@ namespace Mark5.Mobile.Common.Manager
             CommonConfig.UsageAnalytics.LogEvent(new DeleteDocumentExtraFieldEvent(ModuleType.Documents));
 
             if (sourceType == SourceType.Auto)
-                sourceType = CommonConfig.Reachability.IsReachable ? SourceType.Remote : SourceType.Local;
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
 
             if (sourceType == SourceType.Remote)
             {

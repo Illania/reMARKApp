@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
+using Mark5.Mobile.Classes.Enum;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.Containers;
 using Mark5.Mobile.Common.Storage.AppFileStorage.Interface;
@@ -51,8 +53,6 @@ namespace Mark5.Mobile.Common.Manager
         Task<List<RecentAddress>> DeleteRecentAddressesAsync(List<RecentAddress> recentAddresses, SourceType sourceType = SourceType.Auto);
 
         Task<List<Category>> GetAllCategoriesAsync(SourceType sourceType = SourceType.Auto);
-
-        Task SetCategoriesAsync(DocumentPreview documentPreview, List<Category> categories, SourceType sourceType = SourceType.Auto);
 
         Task<Comment> AddComment(Document document, string content, SourceType sourceType = SourceType.Auto);
 
@@ -119,6 +119,16 @@ namespace Mark5.Mobile.Common.Manager
         Task UpdateExtraFieldsAsync(List<ExtraField> extraFields, SourceType sourceType = SourceType.Auto);
 
         Task UpdateExtraFieldAsync(ExtraField extraField, SourceType sourceType = SourceType.Auto);
+
+        Task<List<Transmit>> GetDocumentTransmitInfoAsync(int documentId, SourceType sourceType = SourceType.Auto);
+
+        Task ExecuteUserActivity(Model.UserActivityType userActivityType, DocumentPreview originalDoc, DocumentPreview newDoc);
+
+        Task ExecuteUserActivity(Model.UserActivityType userActivityType, List<DocumentPreview> originalDocuments);
+
+        Task<AutoReplyRule> GetAutoReplyRule(SourceType sourceType = SourceType.Auto);
+
+        Task SetAutoReplyRule(AutoReplyRule rule, SourceType sourceType = SourceType.Auto);
 
     }
 }

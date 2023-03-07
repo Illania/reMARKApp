@@ -1,8 +1,8 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Manager;
+using Mark5.Mobile.Classes;
 
 namespace Mark5.Mobile.Common.Service
 {
@@ -40,10 +40,10 @@ namespace Mark5.Mobile.Common.Service
                 CommonConfig.Reachability.ReachabilityRefreshed -= ReachabilityRefreshed;
                 CommonConfig.Reachability.ReachabilityRefreshed += ReachabilityRefreshed;
 
-                if (Managers.ActiveConnectionInfo == null)
-                    return;
-
                 if (!CommonConfig.Reachability.IsReachable)
+                        return;
+                               
+                if (Managers.ActiveConnectionInfo == null)
                     return;
 
                 workerTaskCts?.Cancel();

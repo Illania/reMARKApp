@@ -14,14 +14,14 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView;
-using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Utilities;
 using TinyMessenger;
 using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
-    public class DocumentsListViewController : AbstractTableViewController, IPrimaryViewController, IUISearchResultsUpdating, IUIViewControllerRestoration
+    public class DocumentsListViewController : AbstractTableViewController, IPrimaryViewController,
+        IUISearchResultsUpdating, IUIViewControllerRestoration
     {
         const int AutoRefreshIntervalMs = 5 * 1000;
 
@@ -37,7 +37,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         bool refreshing;
         bool selectAllEnabled;
-        
 
         UISearchController searchController;
         CancellationTokenSource searchCancellationTokenSource;
@@ -105,7 +104,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (searchController?.SearchResultsController is UITableViewController searchTableViewController)
             {
                 if (searchTableViewController?.TableView?.IndexPathForSelectedRow != null)
-                    searchTableViewController.TableView.DeselectRow(TableView.IndexPathForSelectedRow, true);
+                    searchTableViewController.TableView.DeselectRow(searchTableViewController?.TableView.IndexPathForSelectedRow, true);
 
                 if (searchTableViewController?.TableView?.IndexPathsForSelectedRows?.Length > 0)
                     foreach (var selectedIndexPath in searchTableViewController.TableView?.IndexPathsForSelectedRows)
@@ -125,25 +124,38 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (((DocumentListDataSource)TableView.Source).Empty)
                 await RefreshData();
 
+
             CommonConfig.Logger.Info($"Starting automatic refresh...");
 
             autoRefreshWorker?.Stop();
-            autoRefreshWorker = new AutoRefreshWorker(AutoRefreshData, () => { return ((DocumentListDataSource)TableView.Source).Items.Aggregate((i1, i2) => i1.Id > i2.Id ? i1 : i2); }, AutoRefreshIntervalMs);
+            autoRefreshWorker = new AutoRefreshWorker(AutoRefreshData, () => {
+                var items = ((DocumentListDataSource)TableView.Source).Items.ToArray();
+
+                return items.Any()
+                    ? MoreLinq.MoreEnumerable.MaxBy(items, i => i.Id).FirstOrDefault()
+                    : default;
+            },
+                AutoRefreshIntervalMs);
             autoRefreshWorker.Start();
 
-            if (Integration.IsRunningAtLeast(11))
+             //Avoid refresh control being stuck
+            var endRefreshTimer = NSTimer.CreateRepeatingScheduledTimer(TimeSpan.FromSeconds(5.0), delegate {
+                RefreshControl.EndRefreshing();
+            });
+
+            if (!Integration.IsRunningAtLeast(11))
+                return;
+
+            NSOperationQueue.MainQueue.AddOperation(() =>
             {
-                NSOperationQueue.MainQueue.AddOperation(() =>
-                {
-                    var ni = NavigationItem;
+                var ni = NavigationItem;
 
-                    if (ParentViewController != null && ParentViewController is UIViewController && !(ParentViewController is UINavigationController))
-                        ni = ParentViewController?.NavigationItem;
+                if (ParentViewController is UIViewController && !(ParentViewController is UINavigationController))
+                    ni = ParentViewController?.NavigationItem;
 
-                    if (ni.SearchController == null)
-                        ni.SearchController = searchController;
-                });
-            }
+                if (ni.SearchController == null)
+                    ni.SearchController = searchController;
+            });
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -272,17 +284,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         void InitializeSearchBar()
         {
             DefinesPresentationContext = true;
-          
+
             searchResultsController = new SearchResultsController() {
                 DisableRowActions = false,
                 DocumentListViewController = this,
                 Folder = Folder
             };
-  
+
             searchController = new(searchResultsController)
             {
                 HidesNavigationBarDuringPresentation = false,
-                DimsBackgroundDuringPresentation = true,
                 ObscuresBackgroundDuringPresentation = true,
                 SearchResultsUpdater = this,
             };
@@ -301,9 +312,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return new UIKeyCommand[] { UIKeyCommand.Create((NSString)" ", 0, new ObjCRuntime.Selector("spacebarPressed")) };
                 }
                 else
-                    return base.KeyCommands;         
+                    return base.KeyCommands;
+            }
         }
-    }
 
         [Export("spacebarPressed")]
         private void OnSpacebarPressed()
@@ -313,7 +324,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (selectedRowIp == null)
                 return;
 
-            var selectedDocument = ((DocumentListDataSource)TableView.Source).Items[selectedRowIp.Row];   
+            var selectedDocument = ((DocumentListDataSource)TableView.Source).Items[selectedRowIp.Row];
             MarkAsRead(selectedDocument);
 
             if (selectedRowIp.Row == ((DocumentListDataSource)TableView.Source).Items.Count - 1)
@@ -332,7 +343,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         }
 
         void InitializeHandlers()
-        {        
+        {
 
             if (goToBookmarkItem != null)
                 goToBookmarkItem.Clicked += GoToBookmarkItem_Clicked;
@@ -515,10 +526,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     UIAlertActionStyle.Default,
                     a => RemoveFromFolder(selectedDocuments, d)));
 
-            if (ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || selectedDocuments.All(dp => dp.Direction == DocumentDirection.Draft))
+            if (DocumentsDeleteChecker.CanDeleteDocuments(selectedDocuments))
+            {
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"),
                     UIAlertActionStyle.Destructive,
                     a => Delete(selectedDocuments, d)));
+            }
 
             if (ServerConfig.SystemSettings?.SystemInfo?.DelaySendAvailable == true && selectedDocuments.Any(dp => dp.TransmitStatus == TransmitStatus.Delayed))
             {
@@ -543,11 +556,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 if (!PlatformConfig.Preferences.HasBookmarkForFolder(Folder.Id, selectedDocuments.FirstOrDefault().Id))
                 {
-                   eas.AddAction(UIAlertAction.Create(
-                                    Localization.GetString("add_bookmark"),
-                                    UIAlertActionStyle.Default,
-                                    a => AddBookmark(selectedDocuments.FirstOrDefault())));
-                        
+                    eas.AddAction(UIAlertAction.Create(
+                                     Localization.GetString("add_bookmark"),
+                                     UIAlertActionStyle.Default,
+                                     a => AddBookmark(selectedDocuments.FirstOrDefault())));
+
                 }
                 else
                 {
@@ -562,7 +575,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                                  UIAlertActionStyle.Default,
                                  a => AssignPresetCategory(selectedDocuments.FirstOrDefault())));
             }
-              
+
             eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, a => exitEditItem.Enabled = true));
 
             if (eas.PopoverPresentationController != null)
@@ -673,10 +686,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     UIAlertActionStyle.Default,
                     a => RemoveFromFolder(selectedDocuments, d)));
 
-            if (ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || selectedDocuments.All(dp => dp.Direction == DocumentDirection.Draft))
+            if (DocumentsDeleteChecker.CanDeleteDocuments(selectedDocuments))
+            {
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"),
                     UIAlertActionStyle.Destructive,
                     a => Delete(selectedDocuments, d)));
+            }
 
             if (ServerConfig.SystemSettings?.SystemInfo?.DelaySendAvailable == true && selectedDocuments.Any(dp => dp.TransmitStatus == TransmitStatus.Delayed))
             {
@@ -706,7 +721,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(eas, true, null);
         }
 
-   
+
         #endregion
 
         #region Refreshing
@@ -732,23 +747,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 if (forceClear)
                     ((DocumentListDataSource)TableView.Source)?.Reset();
 
-                var documentPreviews = await Managers.DocumentsManager.GetDocumentPreviewsAsync(Folder, endId: endId);
+                var documentPreviews = await Managers.DocumentsManager.GetDocumentPreviewsAsync(Folder, startId, endId);
+
 
                 if (OnlyShowExternalDocuments)
                 {
                     documentPreviews = documentPreviews.FindAll((DocumentPreview dp) => dp.Direction == DocumentDirection.External);
                 }
-      
+
                 ((DocumentListDataSource)TableView.Source).LoadMoreEnabled = documentPreviews.Count >= PlatformConfig.Preferences.DocumentsToDownload;
                 CommonConfig.Logger.Info($"Enable load more documents set to {((DocumentListDataSource)TableView.Source).LoadMoreEnabled}");
 
                 Services.DocumentsDownloadService.Notify();
 
-                if(PlatformConfig.Preferences.SortByDate)
+                if (PlatformConfig.Preferences.SortByDate)
                     ((DocumentListDataSource)TableView.Source).InsertItems(documentPreviews);
                 else
                     ((DocumentListDataSource)TableView.Source).AppendItems(documentPreviews);
-                
+
                 if (documentPreviews.Any())
                     newDocumentsAvailableAction?.Invoke();
             }
@@ -760,11 +776,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 NavigationController?.PopViewController(true);
             }
-
-            RefreshControl.EndRefreshing();
-            RefreshControl.ValueChanged += RefreshControl_ValueChanged;
-
-            refreshing = false;
+            finally
+            {           
+                RefreshControl.EndRefreshing();
+                RefreshControl.ValueChanged += RefreshControl_ValueChanged;
+                refreshing = false;
+            }
+            
         }
 
         async Task AutoRefreshData(int endId)
@@ -977,7 +995,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void SelectAll(UITableView tableView)
         {
-            var dataSource =  (DocumentListDataSource)tableView.Source;
+            var dataSource = (DocumentListDataSource)tableView.Source;
             var currentSection = 0;
             var rowsInSection = dataSource.RowsInSection(null, currentSection);
 
@@ -1041,7 +1059,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        public  void Delete(DocumentPreview selectedDocument, UIPopoverPresentationControllerDelegate d) =>
+        public void Delete(DocumentPreview selectedDocument, UIPopoverPresentationControllerDelegate d) =>
             Delete(new List<DocumentPreview> { selectedDocument }, d);
 
         public async void Delete(List<DocumentPreview> selectedDocuments, UIPopoverPresentationControllerDelegate d)
@@ -1078,7 +1096,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         public void ShowCategories(DocumentPreview selectedDocument)
         {
-            PresentViewController(new NavigationController(new CategoriesListViewController(selectedDocument), UIModalPresentationStyle.PageSheet), true, null);
+            if (!ServerConfig.SystemSettings.SystemInfo.FavoriteCategoriesAvailable)
+            {
+                PresentViewController(new NavigationController(
+                    new CategoriesListOldViewController(selectedDocument), UIModalPresentationStyle.PageSheet), true, null);
+
+            }
+            else
+            {
+                PresentViewController(new NavigationController(
+                    new CategoriesListViewController(selectedDocument), UIModalPresentationStyle.PageSheet), true, null);
+            }
         }
 
 
@@ -1094,6 +1122,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 CommonConfig.UsageAnalytics.LogEvent(new SetReadStatusEvent(documentPreviews.Count));
 
                 await Managers.DocumentsManager.SetDocumentsReadStatusAsync(documentPreviews, true);
+
+                if (PlatformConfig.Preferences.SyncUserActivities)
+                    await Managers.DocumentsManager.ExecuteUserActivity(UserActivityType.Read, documentPreviews);
 
                 var updatedItems = documentPreviews.Select(d => d.Id);
                 ((DocumentListDataSource)TableView.Source).UpdateItems(updatedItems);
@@ -1185,7 +1216,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
             catch (Exception ex)
             {
-           
+
                 CommonConfig.Logger.Error($"Cancel send failed [businessEntities.Count={delayedItems.Count}]", ex);
 
                 await Dialogs.ShowErrorAlertAsync(this, ex);
@@ -1227,7 +1258,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return;
 
                 lastSearchQuery = searchText;
-                
+
                 searchResultsController.SearchDocuments(searchText, searchCancellationTokenSource.Token);
             }
         }
@@ -1281,7 +1312,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     if (index >= 0)
                     {
                         var documentPreview = ((DocumentListDataSource)tableView.Source).Items[index];
-                        documentPreview.Priority= message.Priority;
+                        documentPreview.Priority = message.Priority;
 
                         var selectedRow = tableView.IndexPathForSelectedRow;
 
@@ -1390,7 +1421,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 case EmailSwipeAction.SwipeAction.MoveToFolder:
                     return folder.InternalType == FolderInternalType.FilterView || folder.InternalType == FolderInternalType.Static || folder.InternalType == FolderInternalType.Worktray;
                 case EmailSwipeAction.SwipeAction.Delete:
-                    return ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || documentPreview.Direction == DocumentDirection.Draft;
+                    return DocumentsDeleteChecker.CanDeleteDocuments(
+                        new List<DocumentPreview> { documentPreview });
                 case EmailSwipeAction.SwipeAction.RemoveFromFolder:
                     return folder.InternalType == FolderInternalType.FilterView || folder.InternalType == FolderInternalType.Static || folder.InternalType == FolderInternalType.Worktray;
                 default:
@@ -1456,6 +1488,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     case EmailSwipeAction.SwipeAction.RemoveFromFolder:
                         RemoveFromFolder(documentPreview, popoverDelegate);
                         break;
+                    case EmailSwipeAction.SwipeAction.DeliveryReport:
+                        ShowDeliveryReport(documentPreview);
+                        break;
                     default:
                         CommonConfig.Logger.Error("Missed case for EmailSwipeAction : " + swipeAction.Action.ToString());
                         break;
@@ -1463,36 +1498,44 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
+        void ShowDeliveryReport(DocumentPreview dp)
+        {
+            var vc = new TransmitDestinationsViewController() { DocumentId = dp.Id, ReferenceNumber = dp.ReferenceNumber };
+            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+        }
+       
+
         Category presetCategory;
 
         async void AssignPresetCategory(DocumentPreview documentPreview)
         {
-
-            if(presetCategory == null)
+            if (presetCategory == null)
             {
                 var categories = await Managers.DocumentsManager.GetAllCategoriesAsync();
-                    presetCategory = categories.Where(c => c.Id == PlatformConfig.Preferences.PresetCategoryId).FirstOrDefault();
-                    if (presetCategory == null)
-                        return;
-
+                presetCategory = categories.FirstOrDefault(c => c.Id == PlatformConfig.Preferences.PresetCategoryId);
+                if (presetCategory == null)
+                    return;
             }
 
-            CommonConfig.Logger.Info($"Attempting to assign preset category [documentPreview.Id={documentPreview.Id}]...");
+            var oldCategories = documentPreview.Categories;
+            var newCategories = oldCategories.Union(new List<Category> { presetCategory }).ToList();
+            CommonConfig.Logger.Info($"Attempting to assign preset category " +
+                                     $"[documentPreview.Id={documentPreview.Id}]...");
 
             try
             {
-                await Managers.DocumentsManager.SetCategoriesAsync(documentPreview, new List<Category> { presetCategory });
-
-                ((DocumentListDataSource)TableView.Source).UpdateItems(new List<int> { documentPreview.Id });
-                ((DocumentListDataSource)((UITableViewController)searchController?.SearchResultsController)?.TableView?.Source)?.UpdateItems(new List<int> { documentPreview.Id });
+                await Managers.CommonActionsManager.SetCategoriesAsync(documentPreview, newCategories);
+                ((DocumentListDataSource)TableView.Source)
+                    .UpdateItems(new List<int> { documentPreview.Id });
+                ((DocumentListDataSource)((UITableViewController)searchController?.SearchResultsController)
+                    ?.TableView.Source)?.UpdateItems(new List<int> { documentPreview.Id });
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error($"Assigning preset category for [documentPreview.Id={documentPreview.Id}] failed", ex);
-
+                CommonConfig.Logger.Error($"Assigning preset category for " +
+                                          $"[documentPreview.Id={documentPreview.Id}] failed", ex);
                 await Dialogs.ShowErrorAlertAsync(this, ex);
             }
-            
         }
 
         async void AddBookmark(DocumentPreview documentPreview)
@@ -1561,6 +1604,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     return Localization.GetString("delete_from_folder");
                 case EmailSwipeAction.SwipeAction.SetPresetCategory:
                     return Localization.GetString("set_preset_category");
+                case EmailSwipeAction.SwipeAction.DeliveryReport:
+                    return Localization.GetString("delivery_report");
                 case EmailSwipeAction.SwipeAction.AddBookmark:
                     if(!PlatformConfig.Preferences.HasBookmarkForFolder(Folder.Id, documentPreview.Id))
                         return Localization.GetString("add_bookmark");

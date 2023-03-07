@@ -1,17 +1,8 @@
 ﻿using System;
+using Mark5.ServiceReference.DataContract;
 
 namespace Mark5.Mobile.Common.Model
 {
-    #region Managers
-
-    public enum SourceType
-    {
-        Auto = 0,
-        Remote = 1,
-        Local = 2,
-    }
-
-    #endregion
 
     #region Folders
 
@@ -121,6 +112,17 @@ namespace Mark5.Mobile.Common.Model
         UserName = 1,
         UserLogin = 2,
         LineName = 3
+    }
+
+    public enum UserActivityType
+    {
+        None = 0,
+        Open = 1,
+        Read = 2,
+        Reply = 3,
+        Forward = 4,
+        Edit = 5,
+        Print = 6
     }
 
     #endregion

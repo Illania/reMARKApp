@@ -21,21 +21,21 @@ namespace Mark5.Mobile.Common.DataAccess
 
         Task<ContactContainer> GetContactWithPreviewAsync(int contactId);
 
-        Task RemoveFromFolderAsync(List<ContactPreview> contactPreviews, Folder folder);
+        Task RemoveFromFolderAsync(List<ContactPreview> contactPreviews, int folderId, bool saveBeforeDeletion = false);
 
-        Task RemoveFromFolderAsync(List<Contact> contacts, Folder folder);
+        Task RemoveFromFolderAsync(List<Contact> contacts, int folderId, bool saveBeforeDeletion = false);
 
-        Task RemoveFromFolderAsync(List<int> conIds, int folderId);
+        Task DeleteAsync(List<ContactPreview> contactPreviews, bool saveBeforeDeletion = false);
 
-        Task DeleteAsync(List<ContactPreview> contactPreviews);
+        Task DeleteAsync(List<Contact> contacts, bool saveBeforeDeletion = false);
 
-        Task DeleteAsync(List<Contact> contacts);
+        Task DeleteAsync(List<int> contactsIds);
 
         Task SaveAllCategories(List<Category> categories);
 
         Task<List<Category>> GetAllCategoriesAsync();
 
-        Task SetCategoriesAsync(ContactPreview contactPreview, List<Category> categories);
+        Task SetCategoriesAsync(int contactId, List<Category> categories);
 
         Task AddCommentAsync(Contact contact, Comment comment);
 

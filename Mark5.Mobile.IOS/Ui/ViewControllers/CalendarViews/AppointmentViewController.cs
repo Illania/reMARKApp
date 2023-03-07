@@ -463,7 +463,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                     TranslatesAutoresizingMaskIntoConstraints = false,
                     LineBreakMode = UILineBreakMode.WordWrap,
                     Lines = 0,
-                    Font = Theme.AppointmentDefaultFont.CustomFont().CustomFont(),
+                    Font = Theme.AppointmentDefaultFont.CustomFont(),
                     TextColor = Theme.DarkGray,
                 };
 
@@ -474,7 +474,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                     TranslatesAutoresizingMaskIntoConstraints = false,
                     LineBreakMode = UILineBreakMode.WordWrap,
                     Lines = 0,
-                    Font = Theme.AppointmentDefaultFont.CustomFont().CustomFont(),
+                    Font = Theme.AppointmentDefaultFont.CustomFont(),
                     TextColor = Theme.Black
                 };
 

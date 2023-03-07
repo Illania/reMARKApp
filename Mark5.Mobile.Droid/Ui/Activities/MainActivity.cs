@@ -12,14 +12,18 @@ using Android.Database;
 using Android.Graphics;
 using Android.OS;
 using Android.Provider;
-using Android.Support.Design.Widget;
-using Android.Support.V4.App;
-using Android.Support.V4.Content;
-using Android.Support.V4.View;
-using Android.Support.V4.Widget;
-using Android.Support.V7.Widget;
 using Android.Views;
+using Android.Widget;
+using AndroidX.AppCompat.Widget;
+using AndroidX.CoordinatorLayout.Widget;
+using AndroidX.Core.Content;
+using AndroidX.Core.View;
+using AndroidX.DrawerLayout.Widget;
+using AndroidX.Fragment.App;
+using Google.Android.Material.Navigation;
+using Google.Android.Material.Snackbar;
 using Java.IO;
+using Mark5.Mobile.Classes.Enum;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -29,6 +33,7 @@ using Mark5.Mobile.Droid.Ui.Coordinators;
 using Mark5.Mobile.Droid.Ui.Fragments;
 using Mark5.Mobile.Droid.Utilities;
 using File = Java.IO.File;
+using Toolbar = AndroidX.AppCompat.Widget.Toolbar;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
@@ -40,7 +45,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
         const string CalendarIdKey = "calendarId";
         const string AppointmentIdKey = "appointmentId";
         const string RecurrenceIndexKey = "recurrenceIndex";
-        private const string LicenseKey = "MzU3NTc2QDMxMzgyZTMzMmUzMGNVUXBkU3N4ZU1RbE5OS21KNjRaY2cxakVwVDhzejlObjJPOXV3ZWdHQUk9";
+        private const string LicenseKey = "NzY3ODA5QDMyMzAyZTMzMmUzMGFhRnVyQmNGbHlINlQwSXhoTVIvVExDTTJSQTlRUEhyN3I3Mmt6RHBBQlE9";
         Toolbar toolbar;
         DrawerLayout drawer;
         SmoothActionBarDrawerToggle drawerToggle;
@@ -108,7 +113,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             navigationView.Menu.Clear();
 
-            if (ServerConfig.SystemSettings?.SystemInfo.SystemVersion >= new Version(1, 35, 12))
+            if (!ServerConfig.SystemSettings.SystemInfo.CalendarModuleAvailable)
                 navigationView.InflateMenu(Resource.Menu.menu_drawer_1_35_10);
             else
                 navigationView.InflateMenu(Resource.Menu.menu_drawer);

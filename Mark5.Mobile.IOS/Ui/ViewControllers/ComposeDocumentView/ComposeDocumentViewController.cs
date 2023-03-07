@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Foundation;
 using GMImagePicker;
+using Mark5.Mobile.Classes.Enum;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -412,6 +413,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                     document.Id = PreviousDocumentId.Value;
                     documentPreview.Id = PreviousDocumentId.Value;
+
+                    if (PlatformConfig.Preferences.SyncUserActivities)
+                        await Managers.DocumentsManager.ExecuteUserActivity(Mobile.Common.Model.UserActivityType.Edit, documentPreview, null);
                 }
 
                 var subViews = headerStackView.Subviews.OfType<ComposeDocumentSubView>().ToArray();
@@ -1645,12 +1649,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             if (documentPreview?.Addresses != null)
                 fromNameString = documentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.From).Select(da => da.Name).FirstOrDefault() ?? string.Empty;
 
-            if (templateContent.Contains("REF"))
+            if (templateContent.Contains("REF") && ServerConfig.SystemSettings?.SystemInfo?.IsReferenceInTemplatesAvailable == true)
             {
                 var docRef = await Managers.DocumentsManager.GetNewDocumentReferenceNumber(documentPreview);
                 this.documentPreview.ReferenceNumber = docRef;
             }
-
 
             if (template.ContentType == ContentType.Html)
             {

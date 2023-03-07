@@ -6,10 +6,10 @@ using Android.Graphics;
 using Android.OS;
 using Android.Provider;
 using Android.Runtime;
-using Android.Support.V4.Graphics.Drawable;
-using Android.Support.V7.Widget;
 using Android.Telephony;
 using Android.Views;
+using AndroidX.AppCompat.Widget;
+using AndroidX.Core.Graphics.Drawable;
 using Mark5.Mobile.Droid.Ui.Common;
 using PhoneNumbers;
 using static Android.Views.View;
@@ -120,7 +120,7 @@ namespace Mark5.Mobile.Droid.Utilities
                 {
                     RightMargin = marginValue,
                     LeftMargin = marginValue,
-                    Gravity = (int)GravityFlags.Center,
+                    Gravity = (GravityFlags)(int)GravityFlags.Center,
                 },
             };
             layout.SetPadding(paddingHorizontal, paddingVertical, paddingHorizontal, paddingVertical);
@@ -142,7 +142,7 @@ namespace Mark5.Mobile.Droid.Utilities
                 Text = name,
                 LayoutParameters = new LinearLayoutCompat.LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1)
                 {
-                    Gravity = (int)GravityFlags.CenterVertical,
+                    Gravity = (GravityFlags)(int)GravityFlags.CenterVertical,
                 }
             };
             textView.SetTextAppearanceCompat(context, Resource.Style.fontCallerId);

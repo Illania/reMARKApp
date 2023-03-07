@@ -15,6 +15,7 @@ using Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews.RecurrenceView;
 using static Mark5.Mobile.IOS.Model.DateTimeChangeEvent;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common;
+using Mark5.Mobile.Classes.Enum;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
 {
@@ -725,16 +726,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 {
                     if (ViewModel != null && ViewModel.Calendar != null)
                     {
-                        ((CalendarDisclosureTableViewCell)Cell).SetLabel(ViewModel.Calendar.Name);
+                        ((CalendarDisclosureTableViewCell)Cell).Label = ViewModel.Calendar.Name;
                         ((CalendarDisclosureTableViewCell)Cell).SetCalendarColor(ViewModel.Calendar.HexColor);
                     }
                     else
-                        ((CalendarDisclosureTableViewCell)Cell).SetLabel(Localization.GetString("none"));
+                        ((CalendarDisclosureTableViewCell)Cell).Label = Localization.GetString("none");
                 }
 
                 protected override void Initialize()
                 {
-                    ((CalendarDisclosureTableViewCell)Cell).SetTitle(Localization.GetString("calendar"));
+                    ((CalendarDisclosureTableViewCell)Cell).Title = Localization.GetString("calendar");
                 }
 
                 public async override void OnClicked(NSIndexPath indexPath)
@@ -914,23 +915,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 {
                 }
 
-                public override AddEditTableViewCell CreateCell() => new AppointmentDisclosureTableViewCell();
+                public override AddEditTableViewCell CreateCell() => new LabelWithChevronTableViewCell();
 
                 public override void RefreshRow()
                 {
                     if (ViewModel != null && ViewModel.RecurrenceInfo != null &&
                         (ViewModel.ChangeType != AppointmentChangeType.Occurence || ViewModel.Type != CalendarOccurenceType.ChangedOccurrence))
-                        ((AppointmentDisclosureTableViewCell)Cell).SetLabel(ViewModel.RecurrenceInfo.ToFriendlyString());
+                        ((LabelWithChevronTableViewCell)Cell).Label = ViewModel.RecurrenceInfo.ToFriendlyString();
                     else
-                        ((AppointmentDisclosureTableViewCell)Cell).SetLabel(Localization.GetString("never"));
+                        ((LabelWithChevronTableViewCell)Cell).Label = Localization.GetString("never");
 
                     if (ViewModel.ChangeType == AppointmentChangeType.Occurence || ViewModel.Type == CalendarOccurenceType.ChangedOccurrence)
-                        ((AppointmentDisclosureTableViewCell)Cell).SetEnabled(false);
+                        ((LabelWithChevronTableViewCell)Cell).Enabled = false;
                 }
 
                 protected override void Initialize()
                 {
-                    ((AppointmentDisclosureTableViewCell)Cell).SetTitle(Localization.GetString("repeats"));
+                    ((LabelWithChevronTableViewCell)Cell).Title = Localization.GetString("repeats");
                 }
 
                 public async override void OnClicked(NSIndexPath indexPath)
@@ -966,24 +967,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 {
                 }
 
-                public override AddEditTableViewCell CreateCell() => new AppointmentDisclosureTableViewCell();
+                public override AddEditTableViewCell CreateCell() => new LabelWithChevronTableViewCell();
 
                 public override void RefreshRow()
                 {
                     if (ViewModel != null && ViewModel.Participants != null)
                     {
                         if (ViewModel.Participants.Count == 0)
-                            ((AppointmentDisclosureTableViewCell)Cell).SetLabel("None");
+                            ((LabelWithChevronTableViewCell)Cell).Label= "None";
                         else
-                            ((AppointmentDisclosureTableViewCell)Cell).SetLabel($"{ViewModel.Participants.Count}");
+                            ((LabelWithChevronTableViewCell)Cell).Label = $"{ViewModel.Participants.Count}";
                     }
                     else
-                        ((AppointmentDisclosureTableViewCell)Cell).SetLabel("None");
+                        ((LabelWithChevronTableViewCell)Cell).Label = "None";
                 }
 
                 protected override void Initialize()
                 {
-                    ((AppointmentDisclosureTableViewCell)Cell).SetTitle("Participants");
+                    ((LabelWithChevronTableViewCell)Cell).Title = "Participants";
                 }
 
                 public override void OnClicked(NSIndexPath indexPath)
@@ -1007,12 +1008,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                     if (ViewModel != null && ViewModel.ReminderTimeBeforeStart > -1)
                     {
                         ReminderInfo reminder = ReminderInfo.ConvertFromSeconds((int)ViewModel.ReminderTimeBeforeStart);
-                        ((ReminderDisclosureTableViewCell)Cell).SetLabel(reminder.Title);
+                        ((ReminderDisclosureTableViewCell)Cell).Label = reminder.Title;
                         ((ReminderDisclosureTableViewCell)Cell).SetPickerSelection(reminder);
                     }
                     else
                     {
-                        ((ReminderDisclosureTableViewCell)Cell).SetLabel(Localization.GetString("none"));
+                        ((ReminderDisclosureTableViewCell)Cell).Label = Localization.GetString("none");
                     }
                 }
 
@@ -1020,7 +1021,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.CalendarViews
                 {
                     ReminderDisclosureTableViewCell cell = (ReminderDisclosureTableViewCell)Cell;
                     cell.ReminderSelected = ReminderSelected;
-                    cell.SetTitle(Localization.GetString("reminder"));
+                    cell.Title = Localization.GetString("reminder");
                 }
 
                 void ReminderSelected(ReminderInfo reminder)

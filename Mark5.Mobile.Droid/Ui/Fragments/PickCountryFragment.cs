@@ -2,10 +2,11 @@
 using System.Threading.Tasks;
 using Android.Graphics;
 using Android.OS;
-using Android.Support.V4.Content;
-using Android.Support.V7.App;
-using Android.Support.V7.Widget;
 using Android.Views;
+using AndroidX.AppCompat.App;
+using AndroidX.AppCompat.Widget;
+using AndroidX.Core.Content;
+using AndroidX.RecyclerView.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Droid.Ui.Common;

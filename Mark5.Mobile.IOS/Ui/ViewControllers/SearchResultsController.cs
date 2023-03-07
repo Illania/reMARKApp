@@ -13,6 +13,7 @@ using UIKit;
 using Foundation;
 using Mark5.Mobile.IOS.Utilities;
 using System.Collections.Generic;
+using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.IOS.Ui
 {
@@ -151,10 +152,12 @@ namespace Mark5.Mobile.IOS.Ui
                     UIAlertActionStyle.Default,
                     a => DocumentListViewController.RemoveFromFolder(selectedDocuments, d)));
 
-            if (ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || selectedDocuments.All(dp => dp.Direction == DocumentDirection.Draft))
+            if (DocumentsDeleteChecker.CanDeleteDocuments(selectedDocuments))
+            {
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"),
                     UIAlertActionStyle.Destructive,
                     a => DocumentListViewController.Delete(selectedDocuments, d)));
+            }
 
             if (ServerConfig.SystemSettings?.SystemInfo?.DelaySendAvailable == true && selectedDocuments.Any(dp => dp.TransmitStatus == TransmitStatus.Delayed))
             {

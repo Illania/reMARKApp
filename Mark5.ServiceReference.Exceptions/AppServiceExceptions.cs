@@ -124,6 +124,7 @@ namespace Mark5.ServiceReference.Exceptions
         [EnumMember(Value = "GetTemplatesError")] GetTemplatesError = 1220,
         [EnumMember(Value = "GetTemplateError")] GetTemplateError = 1221,
         [EnumMember(Value = "GetDefaultTemplateError")] GetDefaultTemplateError = 1222,
+        [EnumMember(Value = "GetDocumentTransmitInfoError")]GetDocumentTransmitInfoError = 1224,
         [EnumMember(Value = "DocumentAlreadySentError")] DocumentAlreadySentError = 1230,
 
         [EnumMember(Value = "GetContactsError")] GetContactsError = 1300,
@@ -180,6 +181,12 @@ namespace Mark5.ServiceReference.Exceptions
 
         [EnumMember(Value = "CancelSendDocumentError")] CancelSendDocumentError = 3005,
         [EnumMember(Value = "ForceSendDocumentError")]ForceSendDocumentError = 3006,
+
+        [EnumMember(Value = "GetAutoReplyError")]
+        GetAutoReplyError = 4001,
+
+        [EnumMember(Value = "SetAutoReplyError")]
+        SetAutoReplyError = 4002,
 
         [EnumMember(Value = "AddExtraFieldError")]
         AddExtraFieldError = 1214,

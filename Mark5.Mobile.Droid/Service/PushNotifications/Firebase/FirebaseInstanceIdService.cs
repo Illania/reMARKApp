@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Mark5.Mobile.Droid.Service
 {
-    [Service]
+    [Service(Exported = true)]
     [IntentFilter(new[] { "com.google.firebase.INSTANCE_ID_EVENT" })]
     public class FirebaseInstanceIdService : Firebase.Iid.FirebaseInstanceIdService
     {

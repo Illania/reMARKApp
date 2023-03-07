@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Android.Content;
 using Android.OS;
-using Android.Support.V7.App;
+using AndroidX.AppCompat.App;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;

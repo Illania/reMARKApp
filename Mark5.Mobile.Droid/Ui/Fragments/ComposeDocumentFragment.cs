@@ -7,12 +7,14 @@ using Android.Content;
 using Android.Graphics;
 using Android.OS;
 using Android.Provider;
-using Android.Support.Design.Widget;
-using Android.Support.V4.Widget;
-using Android.Support.V7.App;
-using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
+using AndroidX.AppCompat.App;
+using AndroidX.AppCompat.Widget;
+using AndroidX.Core.Content;
+using AndroidX.Core.Widget;
+using Google.Android.Material.FloatingActionButton;
+using Mark5.Mobile.Classes.Enum;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -441,6 +443,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                     document.Id = previousDocumentId.Value;
                     documentPreview.Id = previousDocumentId.Value;
+
+                    if (PlatformConfig.Preferences.SyncUserActivities)
+                        await Managers.DocumentsManager.ExecuteUserActivity(Mobile.Common.Model.UserActivityType.Edit, documentPreview, null);
                 }
 
                 document.Guid = Guid.NewGuid();
@@ -633,7 +638,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     if (string.IsNullOrWhiteSpace(path))
                         throw new Exception("Unable to open attachment");
 
-                    var uri = Android.Support.V4.Content.FileProvider.GetUriForFile(Context, Context.PackageName + ".fileprovider", new Java.IO.File(path));
+                    var uri = FileProvider.GetUriForFile(Context, Context.PackageName + ".fileprovider", new Java.IO.File(path));
                     var mimeType = MimeTypeMap.GetMimeType(System.IO.Path.GetExtension(path));
 
                     var openFileIntent = new Intent(Intent.ActionView);
@@ -784,9 +789,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public void AskIfShouldSave()
         {
             if (previousDocumentDirection == DocumentDirection.Draft)
-                Dialogs.ShowYesNoDialog(Context, Resource.String.save_draft, Resource.String.confirm_change_draft, () => { saveDraft = true; SendDocument(); }, DeleteAutoSavedDocumentAndClose);
+                Dialogs.ShowYesNoDialog(Context, Resource.String.save_draft, Resource.String.confirm_change_draft,
+                    () => {
+                        saveDraft = true;
+                        SendDocument();
+                    }, DeleteAutoSavedDocumentAndClose);
             else
-                Dialogs.ShowYesNoDialog(Context, Resource.String.save_draft, Resource.String.confirm_save_as_draft, () => { saveDraft = true; SendDocument(); }, DeleteAutoSavedDocumentAndClose, cancelable: true);
+                Dialogs.ShowYesNoDialog(Context, Resource.String.save_draft, Resource.String.confirm_save_as_draft,
+                    () => {
+                        saveDraft = true; SendDocument();
+                    }, DeleteAutoSavedDocumentAndClose, cancelable: true);
         }
 
         public async void DeleteAutoSavedDocumentAndClose()
@@ -944,15 +956,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         return;
  
                     }
-  
+
                     var sendConfirmed = await Dialogs.ShowYesNoDialogAsync(Context, Resources.GetString(Resource.String.confirm_delay_send_title),
-                                                                           String.Format(Resources.GetString(Resource.String.confirm_delay_send_content), dateFormat.Format(dateToPrint) + ", " + timeFormat.Format(dateToPrint)),
-                                                                           centerTitle: true, centerContent: true);
+                                                                            String.Format(Resources.GetString(Resource.String.confirm_delay_send_content),
+                                                                            dateFormat.Format(dateToPrint) + ", " + timeFormat.Format(dateToPrint)),
+                                                                            centerTitle: true, centerContent: true);
 
                     if (sendConfirmed)
                     {
                         if (PlatformConfig.Preferences.RememberLastUserDelaySettings)
-                            PlatformConfig.Preferences.LastUserSendingDelay = LastPickedUserSendingDelay.pickedHours * 3600 + LastPickedUserSendingDelay.pickedMinutes * 60;
+                            PlatformConfig.Preferences.LastUserSendingDelay = LastPickedUserSendingDelay.pickedHours * 3600
+                                + LastPickedUserSendingDelay.pickedMinutes * 60;
 
                         SaveAndQueueWorkingCopy(false, pickedDateMilliseconds);
                     }    
@@ -1401,12 +1415,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (documentPreview?.Addresses != null)
                 fromNameString = documentPreview.Addresses.Where(da => da.AddressType == DocumentAddressType.From).Select(da => da.Name).FirstOrDefault() ?? string.Empty;
 
-            if(templateContent.Contains("REF"))
+            if (templateContent.Contains("REF") && ServerConfig.SystemSettings?.SystemInfo?.IsReferenceInTemplatesAvailable == true)
             {
                 var docRef = await Managers.DocumentsManager.GetNewDocumentReferenceNumber(documentPreview);
                 this.documentPreview.ReferenceNumber = docRef;
             }
-
 
             if (template.ContentType == ContentType.Html)
             {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Mark5.Mobile.Classes.Model;
 using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Common.Testers

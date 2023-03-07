@@ -114,52 +114,59 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
 
         void PrepareContent()
         {
-            contentView.AddArrangedSubview(subjectView);
-            contentView.AddArrangedSubview(subHeaderView);
-            contentView.AddArrangedSubview(fromView);
-            if (!toView.IsEmpty())
-                contentView.AddArrangedSubview(toView);
-            contentView.AddArrangedSubview(ccView);
-            contentView.AddArrangedSubview(bccView);
-            contentView.AddArrangedSubview(secondSeparator);
-            contentView.AddArrangedSubview(priorityView);
-            contentView.AddArrangedSubview(readByView);
-            contentView.AddArrangedSubview(referenceNumberView);
-            contentView.AddArrangedSubview(creatorView);
-            contentView.AddArrangedSubview(originatorView);
-            contentView.AddArrangedSubview(worktrayCommentView);
-            contentView.AddArrangedSubview(extraFieldsView);
-            contentView.AddArrangedSubview(bottomView);
-            contentView.AddArrangedSubview(attachmentsListView);
-            contentView.AddArrangedSubview(calendarInvitationView);
-
-            contentView.AddConstraints(new[]
-             {
+            try
+            {
+                contentView.AddArrangedSubview(subjectView);
+                contentView.AddArrangedSubview(subHeaderView);
+                contentView.AddArrangedSubview(fromView);
+                if (!toView.IsEmpty())
+                    contentView.AddArrangedSubview(toView);
+                contentView.AddArrangedSubview(ccView);
+                contentView.AddArrangedSubview(bccView);
+                contentView.AddArrangedSubview(secondSeparator);
+                contentView.AddArrangedSubview(priorityView);
+                contentView.AddArrangedSubview(readByView);
+                contentView.AddArrangedSubview(referenceNumberView);
+                contentView.AddArrangedSubview(creatorView);
+                contentView.AddArrangedSubview(originatorView);
+                contentView.AddArrangedSubview(worktrayCommentView);
+                contentView.AddArrangedSubview(extraFieldsView);
+                contentView.AddArrangedSubview(bottomView);
+                contentView.AddArrangedSubview(attachmentsListView);
+                contentView.AddArrangedSubview(calendarInvitationView);
+                contentView.AddConstraints(new[]
+           {
                 bottomView.WidthAnchor.ConstraintEqualTo(contentView.WidthAnchor),
                 bottomView.HeightAnchor.ConstraintEqualTo(ExternalVerticalMargin)
             });
 
-            hiddenViews.Add(firstSeparator);
-            if (!toView.IsEmpty())
-                hiddenViews.Add(ccView);
-            hiddenViews.Add(bccView);
-            hiddenViews.Add(secondSeparator);
-            hiddenViews.Add(priorityView);
-            hiddenViews.Add(readByView);
-            hiddenViews.Add(referenceNumberView);
-            hiddenViews.Add(creatorView);
-            hiddenViews.Add(originatorView);
-            hiddenViews.Add(worktrayCommentView);
-            hiddenViews.Add(extraFieldsView);
+                hiddenViews.Add(firstSeparator);
+                if (!toView.IsEmpty())
+                    hiddenViews.Add(ccView);
+                hiddenViews.Add(bccView);
+                hiddenViews.Add(secondSeparator);
+                hiddenViews.Add(priorityView);
+                hiddenViews.Add(readByView);
+                hiddenViews.Add(referenceNumberView);
+                hiddenViews.Add(creatorView);
+                hiddenViews.Add(originatorView);
+                hiddenViews.Add(worktrayCommentView);
+                hiddenViews.Add(extraFieldsView);
 
-            hiddenViews.ForEach(v =>
+                hiddenViews.ForEach(v =>
+                {
+                    v.Hidden = true;
+                    v.Alpha = 0.0f;
+                });
+
+                if (toView.IsEmpty())
+                    subViews.Remove(toView);
+            }
+            catch(NullReferenceException nre)
             {
-                v.Hidden = true;
-                v.Alpha = 0.0f;
-            });
+                Console.WriteLine(nre.Message);
+            }
 
-            if (toView.IsEmpty())
-                subViews.Remove(toView);
         }
 
         void InitializeHandlers()
@@ -364,7 +371,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
             DeinitializeHandlers();
             InitializeHandlers();
 
-            foreach (var view in subViews)
+            foreach (var view in subViews.ToList())
             {
                 view.Document = Document;
                 view.DocumentPreview = DocumentPreview;

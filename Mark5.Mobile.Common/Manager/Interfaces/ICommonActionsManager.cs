@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Mark5.Mobile.Common.Model;
+using Mark5.Mobile.Classes.Enum;
 
 namespace Mark5.Mobile.Common.Manager
 {
@@ -39,5 +40,9 @@ namespace Mark5.Mobile.Common.Manager
         Task AddFavoriteCategory(int categoryId, SourceType sourceType = SourceType.Auto);
 
         Task RemoveFavoriteCategory(int categoryId, SourceType sourceType = SourceType.Auto);
+
+        Task SetCategoriesAsync(IBusinessEntity businessEntity, List<Category> categories, SourceType sourceType = SourceType.Auto);
+
+        Task RestoreDeletedObjectsLocalAsync(List<int> ids, ObjectType objectType);
     }
 }

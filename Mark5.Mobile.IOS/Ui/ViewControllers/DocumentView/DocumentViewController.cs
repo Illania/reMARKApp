@@ -5,10 +5,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using Foundation;
+using Mark5.Mobile.Classes.Enum;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.HubMessages;
+using Mark5.Mobile.Common.Reports;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Model;
@@ -18,12 +20,10 @@ using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
-using Mark5.Mobile.IOS.Ui.ViewControllers.MailViewerView;
 using Mark5.Mobile.IOS.Utilities;
 using TinyMessenger;
 using UIKit;
 using WebKit;
-using Xamarin.Essentials;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
@@ -42,7 +42,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             get => weakRefDocumentPageViewControllerDelegate?.Unwrap();
             set => weakRefDocumentPageViewControllerDelegate = value.Wrap();
         }
-
+       
         Guid failedDocumentToUploadGuid;
         int? folderId;
         Folder folder;
@@ -124,7 +124,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 SendStatusBanner.Attach(this);
         }
 
-        public override void ViewDidAppear(bool animated)
+        public override async void ViewDidAppear(bool animated)
         {
             base.ViewDidAppear(animated);
 
@@ -143,6 +143,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
             else
                 MarkAsReadIfNecessary();
+
+            if(PlatformConfig.Preferences.SyncUserActivities)
+                await Managers.DocumentsManager.ExecuteUserActivity(Mobile.Common.Model.UserActivityType.Open, documentPreview, null);
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -540,6 +543,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 RefreshToolbar();
 
                 MarkAsReadIfNecessary();
+
             }
             catch (Exception ex)
             {
@@ -591,6 +595,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                         return;
 
                     await Managers.DocumentsManager.SetDocumentReadStatusAsync(dp, d, true);
+                    if (PlatformConfig.Preferences.SyncUserActivities)
+                        await Managers.DocumentsManager.ExecuteUserActivity(Mobile.Common.Model.UserActivityType.Read, DocumentPreview, null);
                 }
                 catch (Exception ex)
                 {
@@ -781,6 +787,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             DocumentPageViewControllerDelegate?.AddViewControllerToCache(this);
         }
 
+
         #endregion
 
         #region Toolbar event handlers
@@ -937,7 +944,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             if (folder?.InternalType == FolderInternalType.FilterView || folder?.InternalType == FolderInternalType.Static || folder?.InternalType == FolderInternalType.Worktray)
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, (a) => RemoveFromFolder(button)));
 
-            if (ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed)
+            var documents = new List<DocumentPreview>
+            {
+                documentPreview
+            };
+            if (DocumentsDeleteChecker.CanDeleteDocuments(documents))
                 eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, (a) => Delete(button)));
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
@@ -999,8 +1010,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void DoAssignCategory()
         {
-            var vc = new CategoriesListViewController(documentPreview);
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+            if (!ServerConfig.SystemSettings.SystemInfo.FavoriteCategoriesAvailable)
+            {
+                var vcOld = new CategoriesListOldViewController(documentPreview);
+                PresentViewController(new NavigationController(vcOld, UIModalPresentationStyle.PageSheet), true, null);
+            }
+            else
+            {
+                var vc = new CategoriesListViewController(documentPreview);
+                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+            }
         }
 
         async void UserActionsButton_Clicked(object sender, EventArgs e)
@@ -1030,13 +1049,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        void CommentsButton_Clicked(object sender, EventArgs e)
+        async void CommentsButton_Clicked(object sender, EventArgs e)
         {
-            var vc = new CommentsListViewController
-            {
-                Entity = document
-            };
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+             var vc = new CommentsListViewController
+             {
+                 Entity = document
+             };
+             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         void DoRespond(DocumentCreationModeFlag creationModeFlag)
@@ -1051,6 +1070,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
+
 
         async void CopyToNew()
         {

@@ -7,7 +7,7 @@
     android:layout_height="wrap_content">
     <include
         layout="@layout/selected_overlay" />
-    <android.support.v7.widget.LinearLayoutCompat
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/list_item_document_external_internal_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -16,25 +16,25 @@
         android:paddingRight="16dp"
         android:orientation="horizontal"
         android:background="?attr/selectableItemBackground">
-        <android.support.v7.widget.LinearLayoutCompat
+        <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/list_item_document_external_categories"
             android:layout_width="4dp"
             android:layout_height="match_parent"
             android:layout_marginRight="8dp"
             android:orientation="vertical" />
-        <android.support.v7.widget.LinearLayoutCompat
+        <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_marginRight="8dp"
             android:orientation="vertical">
-            <android.support.v7.widget.AppCompatImageView
+            <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/list_item_document_external_icon"
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:layout_margin="4dp"
                 android:src="@drawable/attachment"
                 android:tint="@color/darkblue" />
-            <android.support.v7.widget.AppCompatImageView
+            <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/list_item_document_external_comment"
                 android:layout_width="16dp"
                 android:layout_height="16dp"
@@ -42,31 +42,31 @@
                 android:src="@drawable/comment"
                 android:tint="@color/darkblue"
                 android:visibility="gone" />
-               <android.support.v7.widget.AppCompatImageView
+               <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/list_item_document_external_high_priority"
                     android:layout_width="16dp"
                     android:layout_height="16dp"
                     android:layout_margin="4dp"
                     android:src="@drawable/high_priority"
                     android:visibility="gone" />
-            <android.support.v7.widget.AppCompatImageView
+            <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/list_item_document_external_low_priority"
                     android:layout_width="16dp"
                     android:layout_height="16dp"
                     android:layout_margin="4dp"
                     android:src="@drawable/low_priority"
                     android:visibility="gone" />
-        </android.support.v7.widget.LinearLayoutCompat>
-        <android.support.v7.widget.LinearLayoutCompat
+        </androidx.appcompat.widget.LinearLayoutCompat>
+        <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-            <android.support.v7.widget.LinearLayoutCompat
+            <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="4dp"
                 android:orientation="horizontal">
-                <android.support.v7.widget.AppCompatTextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/list_item_document_external_name"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
@@ -76,7 +76,7 @@
                     android:textColor="@color/darkblue"
                     android:maxLines="1"
                     android:ellipsize="end" />
-                <android.support.v7.widget.AppCompatTextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/list_item_document_external_date"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
@@ -84,16 +84,16 @@
                     android:gravity="right|center_vertical"
                     android:textAppearance="@style/fontListSmallLight"
                     android:maxLines="1" />
-            </android.support.v7.widget.LinearLayoutCompat>
-            <android.support.v7.widget.AppCompatTextView
+            </androidx.appcompat.widget.LinearLayoutCompat>
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/list_item_document_external_preview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/fontListSmallLight"
                 android:maxLines="5"
                 android:ellipsize="end" />
-        </android.support.v7.widget.LinearLayoutCompat>
-    </android.support.v7.widget.LinearLayoutCompat>
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </androidx.appcompat.widget.LinearLayoutCompat>
     <View
         android:id="@+id/swiped_background"
         android:layout_width="match_parent"

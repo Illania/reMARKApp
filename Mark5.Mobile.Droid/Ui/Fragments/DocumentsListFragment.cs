@@ -8,16 +8,9 @@ using Android.Content;
 using Android.Graphics;
 using Android.Graphics.Drawables;
 using Android.OS;
-using Android.Support.Design.Widget;
-using Android.Support.V4.Content;
-using Android.Support.V4.Widget;
-using Android.Support.V7.App;
-using Android.Support.V7.Widget;
-using Android.Support.V7.Widget.Helper;
 using Android.Text;
 using Android.Util;
 using Android.Views;
-using FastScrollRecycler;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Extensions;
 using Mark5.Mobile.Common.Manager;
@@ -30,6 +23,16 @@ using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Utilities;
 using Android.Content.Res;
+using AndroidX.CoordinatorLayout.Widget;
+using AndroidX.SwipeRefreshLayout.Widget;
+using AndroidX.RecyclerView.Widget;
+using AndroidX.AppCompat.Widget;
+using Google.Android.Material.FloatingActionButton;
+using AndroidX.AppCompat.App;
+using Google.Android.Material.Snackbar;
+using AndroidX.Core.Content;
+using FastScrollRecycler;
+using Mark5.Mobile.Classes.Enum;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
@@ -67,6 +70,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         ActionMode actionMode;
         SearchView searchView;
         FloatingActionButton fab;
+        Category presetCategory;
 
         bool shouldNotifyAdapter;
         bool shouldNotifySearchAdapter;
@@ -594,16 +598,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 selectAllItem.SetIcon(Resource.Drawable.action_deselect_all);
             }
 
-            if (ServerConfig.SystemSettings?.SystemInfo?.DelaySendAvailable == true && CurrentAdapter.SelectedItems.Any(dp => dp.TransmitStatus == TransmitStatus.Delayed))
+            var selectedDocuments = CurrentAdapter.SelectedItems;
+            if (ServerConfig.SystemSettings?.SystemInfo?.DelaySendAvailable == true && selectedDocuments.Any(dp => dp.TransmitStatus == TransmitStatus.Delayed))
             {
                 menu.Add(MenuItemGroup.Actions, MenuItemActions.SendNow, MenuItemActions.SendNow, Resource.String.send_now);
                 menu.Add(MenuItemGroup.Actions, MenuItemActions.CancelSend, MenuItemActions.CancelSend, Resource.String.cancel_send);
             }
 
-            if (CurrentAdapter.SelectedItems.Any(dp => !dp.IsReadByCurrent) || !CurrentAdapter.SelectedItems.Any())
+            if (selectedDocuments.Any(dp => !dp.IsReadByCurrent) || !selectedDocuments.Any())
                 menu.Add(MenuItemGroup.Actions, MenuItemActions.MarkAsRead, MenuItemActions.MarkAsRead, Resource.String.mark_as_read);
 
-            if (CurrentAdapter.SelectedItems.Any(dp => dp.IsReadByCurrent))
+            if (selectedDocuments.Any(dp => dp.IsReadByCurrent))
                 menu.Add(MenuItemGroup.Actions, MenuItemActions.MarkAsUnread, MenuItemActions.MarkAsUnread, Resource.String.marks_as_unread);
 
             if (ServerConfig.SystemSettings.DocumentsModuleInfo.WorktrayEnabled ?? true)
@@ -627,19 +632,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
                 menu.Add(MenuItemGroup.Actions, MenuItemActions.DeleteFromFolder, MenuItemActions.DeleteFromFolder, Resource.String.delete_from_folder);
 
-            if (ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || CurrentAdapter.SelectedItems.All(dp => dp.Direction == DocumentDirection.Draft))
-                menu.Add(MenuItemGroup.Actions, MenuItemActions.Delete, MenuItemActions.Delete, Resource.String.delete);
+            if (DocumentsDeleteChecker.CanDeleteDocuments(selectedDocuments))
+            {
+                menu.Add(MenuItemGroup.Actions, MenuItemActions.Delete,
+                    MenuItemActions.Delete, Resource.String.delete);
+            }
 
-            if (CurrentAdapter.SelectedItemCount == 1)
+            if (selectedDocuments.Count == 1)
                 menu.Add(MenuItemGroup.Actions, MenuItemActions.AddRemoveBookmark, MenuItemActions.AddRemoveBookmark,
-                 PlatformConfig.Preferences.HasBookmarkForFolder(Folder.Id, CurrentAdapter.SelectedItems.FirstOrDefault().Id)
+                 PlatformConfig.Preferences.HasBookmarkForFolder(Folder.Id, selectedDocuments.First().Id)
                  ? Resource.String.remove_bookmark
                  : Resource.String.add_bookmark);
 
             if (CurrentAdapter.SelectedItemCount == 1)
                 menu.Add(MenuItemGroup.Actions, MenuItemActions.SetPresetCategory, MenuItemActions.SetPresetCategory, Resource.String.set_preset_category);
 
-            menu.SetGroupEnabled(MenuItemGroup.Actions, CurrentAdapter.SelectedItems.Any());
+            menu.SetGroupEnabled(MenuItemGroup.Actions, selectedDocuments.Any());
 
             return true;
         }
@@ -857,6 +865,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 CommonConfig.UsageAnalytics.LogEvent(new SetReadStatusEvent(items.Count));
 
                 await Managers.DocumentsManager.SetDocumentsReadStatusAsync(items, true);
+
+                if (PlatformConfig.Preferences.SyncUserActivities)
+                    await Managers.DocumentsManager.ExecuteUserActivity(UserActivityType.Read, items);
+
                 adapter.RefreshItems(items);
                 searchAdapter.RefreshItems(items);
 
@@ -961,41 +973,37 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         }
 
-        Category presetCategory;
-
         async void AssignPresetCategory(DocumentPreview documentPreview)
         {
-
             if (presetCategory == null)
             {
                 var categories = await Managers.DocumentsManager.GetAllCategoriesAsync();
-                presetCategory = categories.Where(c => c.Id == PlatformConfig.Preferences.PresetCategoryId).FirstOrDefault();
+                presetCategory = categories.FirstOrDefault(
+                    c => c.Id == PlatformConfig.Preferences.PresetCategoryId);
                 if (presetCategory == null)
                     return;
-
             }
+            
+            var oldCategories = documentPreview.Categories;
+            var newCategories = oldCategories.Union(new List<Category> { presetCategory }).ToList();
 
             CommonConfig.Logger.Info($"Attempting to assign preset category [documentPreview.Id={documentPreview.Id}]...");
-            dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.set_preset_category, Resource.String.please_wait);
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, 
+                Resource.String.set_preset_category, Resource.String.please_wait);
 
             try
             {
-                await Managers.DocumentsManager.SetCategoriesAsync(documentPreview, new List<Category> { presetCategory });
-
+                await Managers.CommonActionsManager.SetCategoriesAsync(documentPreview, newCategories);
                 dismissAction();
                 actionMode?.Finish();
             }
             catch (Exception ex)
             {
                 dismissAction();
-
-                CommonConfig.Logger.Error($"Assigning preset category for [documentPreview.Id={documentPreview.Id}] failed", ex);
-
-
+                CommonConfig.Logger.Error($"Assigning preset category for " +
+                                          $"[documentPreview.Id={documentPreview.Id}] failed", ex);
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
-
             }
-
         }
 
         void SelectDeselectAll()
@@ -1378,6 +1386,25 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return Items[position].Direction == DocumentDirection.External ? ViewType.ExternalDocumentView : ViewType.DocumentView;
             }
 
+
+            string ISectionedAdapter.GetSectionName(int position)
+            {
+                var vh = recyclerView?.FindViewHolderForAdapterPosition(position);
+
+                if (vh != null)
+                {
+                    var dpvh = vh as DocumentPreviewViewHolder;
+                    if (dpvh != null)
+                        return dpvh.BubbleDate;
+
+                    var edpvh = vh as ExternalDocumentPreviewViewHolder;
+                    if (edpvh != null)
+                        return edpvh.BubbleDate;
+                }
+
+                return string.Empty;
+            }
+
             public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
                 var dp = Items[position];
@@ -1755,24 +1782,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 swipedPosition = null;
             }
 
-            string ISectionedAdapter.GetSectionName(int position)
-            {
-                var vh = recyclerView?.FindViewHolderForAdapterPosition(position);
-
-                if (vh != null)
-                {
-                    var dpvh = vh as DocumentPreviewViewHolder;
-                    if (dpvh != null)
-                        return dpvh.BubbleDate;
-
-                    var edpvh = vh as ExternalDocumentPreviewViewHolder;
-                    if (edpvh != null)
-                        return edpvh.BubbleDate;
-                }
-
-                return string.Empty;
-            }
-
             public static class ViewType
             {
                 public const int DocumentView = 0;
@@ -1915,6 +1924,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 if (swipeAction == Preferences.EmailSwipeAction.MoveToFolder)
                     return PlatformConfig.Preferences.EnableMoveToFolder;
+                if (swipeAction == Preferences.EmailSwipeAction.Delete)
+                    return DocumentsDeleteChecker.CanDeleteDocuments(adapter.SelectedItems);
 
                 return true;
             }
@@ -2000,7 +2011,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     case Preferences.EmailSwipeAction.CopyToWorkTray:
                         return ServerConfig.SystemSettings.DocumentsModuleInfo.WorktrayEnabled ?? true;
                     case Preferences.EmailSwipeAction.Delete:
-                        return ServerConfig.SystemSettings.DocumentsModuleInfo.Permissions.DeleteAllowed || adapter.SelectedItems.All(dp => dp.Direction == DocumentDirection.Draft);
+                        return DocumentsDeleteChecker.CanDeleteDocuments(adapter.SelectedItems);
                     case Preferences.EmailSwipeAction.MoveToFolder:
                         return folder.InternalType == FolderInternalType.FilterView || folder.InternalType == FolderInternalType.Static || folder.InternalType == FolderInternalType.Worktray;
                     case Preferences.EmailSwipeAction.RemoveFromFolder:

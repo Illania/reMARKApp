@@ -6,14 +6,15 @@ using Android.Content;
 using Android.Graphics;
 using Android.Graphics.Drawables;
 using Android.OS;
-using Android.Support.V4.Content;
-using Android.Support.V4.Widget;
-using Android.Support.V7.App;
-using Android.Support.V7.Widget;
-using Android.Support.V7.Widget.Helper;
 using Android.Text;
 using Android.Util;
 using Android.Views;
+using AndroidX.AppCompat.App;
+using AndroidX.AppCompat.Widget;
+using AndroidX.Core.Content;
+using AndroidX.RecyclerView.Widget;
+using AndroidX.SwipeRefreshLayout.Widget;
+using Mark5.Mobile.Classes.Enum;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -165,38 +166,46 @@ namespace Mark5.Mobile.Droid
         }
 
         async void RefreshDataAsync()
-        {
-            RefreshLayout.Post(() => RefreshLayout.Refreshing = true);
-
-            switch (BusinessEntityPreview.ObjectType)
+        {        
+            try
             {
-                case ObjectType.Document:
-                    var documentPreview = BusinessEntityPreview as DocumentPreview;
-                    selectedCategories.AddRange(documentPreview.Categories);
-                    originalCategories.AddRange(documentPreview.Categories);
-                    availableCategories = await Managers.DocumentsManager.GetAllCategoriesAsync(Restored ? SourceType.Local : SourceType.Auto);
-                    break;
-                case ObjectType.Contact:
-                    availableCategories = await Managers.ContactsManager.GetAllCategoriesAsync(Restored ? SourceType.Local : SourceType.Auto);
-                    var contactPreview = BusinessEntityPreview as ContactPreview;
-                    selectedCategories.AddRange(contactPreview.Categories);
-                    originalCategories.AddRange(contactPreview.Categories);
-                    break;
-                default:
-                    throw new ArgumentException("The business entity provided does not have categories in the model");
+                RefreshLayout.Post(() => RefreshLayout.Refreshing = true);
+                switch (BusinessEntityPreview.ObjectType)
+                {
+                    case ObjectType.Document:
+                        var documentPreview = BusinessEntityPreview as DocumentPreview;
+                        selectedCategories.AddRange(documentPreview.Categories);
+                        originalCategories.AddRange(documentPreview.Categories);
+                        availableCategories = await Managers.DocumentsManager.GetAllCategoriesAsync(Restored ? SourceType.Local : SourceType.Auto);
+                        break;
+                    case ObjectType.Contact:
+                        availableCategories = await Managers.ContactsManager.GetAllCategoriesAsync(Restored ? SourceType.Local : SourceType.Auto);
+                        var contactPreview = BusinessEntityPreview as ContactPreview;
+                        selectedCategories.AddRange(contactPreview.Categories);
+                        originalCategories.AddRange(contactPreview.Categories);
+                        break;
+                    default:
+                        throw new ArgumentException("The business entity provided does not have categories in the model");
+                }
+
+                favoriteCategoriesIds = await Managers.CommonActionsManager.GetFavoriteCategories();
+                if (favoriteCategoriesIds != null)
+                    favoriteCategories = availableCategories.Except(selectedCategories).Where(c => c != null && favoriteCategoriesIds.Contains(c.Id)).ToList();
+               
             }
-
-            favoriteCategoriesIds = await Managers.CommonActionsManager.GetFavoriteCategories();
-            if (favoriteCategoriesIds != null)
-                favoriteCategories = availableCategories.Except(selectedCategories).Where(c => c != null && favoriteCategoriesIds.Contains(c.Id)).ToList();
-
-            ReloadTable();
-
-            RefreshLayout.Post(() =>
+            catch (Exception ex)
             {
-                RefreshLayout.Refreshing = false;
-                RefreshLayout.Enabled = false;
-            });
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
+            }
+            finally
+            {
+                ReloadTable();
+                RefreshLayout.Post(() =>
+                {
+                    RefreshLayout.Refreshing = false;
+                    RefreshLayout.Enabled = false;
+                });
+            } 
         }
 
         public void ReloadTable()
@@ -250,11 +259,11 @@ namespace Mark5.Mobile.Droid
                 {
                     case ObjectType.Document:
                         var documentPreview = BusinessEntityPreview as DocumentPreview;
-                        await Managers.DocumentsManager.SetCategoriesAsync(documentPreview, selectedCategories);
+                        await Managers.CommonActionsManager.SetCategoriesAsync(documentPreview, selectedCategories);
                         break;
                     case ObjectType.Contact:
                         var contactPreview = BusinessEntityPreview as ContactPreview;
-                        await Managers.ContactsManager.SetCategoriesAsync(contactPreview, selectedCategories);
+                        await Managers.CommonActionsManager.SetCategoriesAsync(contactPreview, selectedCategories);
                         break;
                     default:
                         throw new ArgumentException("Invalid BusinessEntityPreview!");

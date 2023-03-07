@@ -7,9 +7,10 @@ using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Provider;
-using Android.Support.V4.App;
-using Android.Support.V4.Content;
-using Android.Support.V7.Widget;
+using Android.Widget;
+using AndroidX.AppCompat.Widget;
+using AndroidX.Core.App;
+using AndroidX.Core.Content;
 using HtmlAgilityPack;
 using MailBee;
 using MailBee.Mime;
@@ -23,6 +24,7 @@ using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Views.Common;
 using Mark5.Mobile.Droid.Ui.Views.MailViewerViews;
 using Mark5.Mobile.Droid.Utilities;
+using Toolbar = AndroidX.AppCompat.Widget.Toolbar;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
@@ -32,8 +34,6 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                   DataMimeTypes = new[] { "application/octet-stream", "message/rfc822" })]
     public class MailViewerActivity : BaseAppCompatActivity
     {
-        const long MaxSize = 5 * 1024 * 1024; // 5MB
-
         Toolbar toolbar;
         LinearLayoutCompat linearLayout;
 
@@ -170,7 +170,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                         size = cursor.GetLong(cursor.GetColumnIndex(OpenableColumns.Size));
                     }
 
-                    if (size > MaxSize)
+                    if (size > ServerConfig.SystemSettings.DocumentsModuleInfo.MaximumAttachmentSizeBytes)
                     {
                         CommonConfig.Logger.Error($"Attempted to open file that is too large. Size {size} bytes.");
 

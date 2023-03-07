@@ -1,7 +1,7 @@
 ﻿using Android.App;
 using Android.Content;
 using Android.OS;
-using Android.Support.V7.App;
+using AndroidX.AppCompat.App;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {

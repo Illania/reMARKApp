@@ -6,6 +6,7 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Foundation;
+using Mark5.Mobile.Classes.Enum;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.DataAccess.Exceptions;
 using Mark5.Mobile.Common.Extensions;
@@ -123,11 +124,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             else if (TableView?.Source as GrouppedDataSource != null)
                 QuickRefreshData();
 
-            CommonConfig.Logger.Info($"Starting automatic refresh...");
+            //CommonConfig.Logger.Info($"Starting automatic refresh...");
 
-            autoRefreshWorker?.Stop();
-            autoRefreshWorker = new AutoRefreshWorker(AutoRefreshData, AutoRefreshIntervalMs);
-            autoRefreshWorker.Start();
+            //autoRefreshWorker?.Stop();
+            //autoRefreshWorker = new AutoRefreshWorker(AutoRefreshData, AutoRefreshIntervalMs);
+            //autoRefreshWorker.Start();
 
             if (Integration.IsRunningAtLeast(11))
             {
@@ -150,9 +151,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             DeinitializeHandlers();
 
-            autoRefreshWorker?.Stop();
-            autoRefreshWorker?.Dispose();
-            autoRefreshWorker = null;
+            //autoRefreshWorker?.Stop();
+            //autoRefreshWorker?.Dispose();
+            //autoRefreshWorker = null;
 
             if (NavigationController != null && NavigationController.NavigationBarHidden)
                 NavigationController.SetNavigationBarHidden(false, true);
@@ -166,8 +167,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             CommonConfig.Logger.Warning("Received memory warning!");
 
 
-            autoRefreshWorker?.Stop();
-            autoRefreshWorker = null;
+            //autoRefreshWorker?.Stop();
+            //autoRefreshWorker = null;
 
             (TableView.Source as DataSource)?.Reset();
             (TableView.Source as GrouppedDataSource)?.Reset();
@@ -182,8 +183,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             UnsubscribeFromMessages();
 
-            autoRefreshWorker?.Stop();
-            autoRefreshWorker = null;
+            //autoRefreshWorker?.Stop();
+            //autoRefreshWorker = null;
 
             EditModeItem = null;
             CreateContactItem = null;
@@ -1413,7 +1414,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                         if (SyncStatus[f.Id])
                         {
                             var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
-                                Localization.GetString("disable_sync"),
+                                Localization.GetString("disable_caching"),
                                 (a, ip) =>
                                 {
                                     viewControllerWeakReference.Unwrap()?.DisableSync(Items[ip.LongSection][ip.Row]);
@@ -1425,7 +1426,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                         else
                         {
                             var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
-                                Localization.GetString("enable_sync"),
+                                Localization.GetString("enable_caching"),
                                 (a, ip) =>
                                 {
                                     viewControllerWeakReference.Unwrap()?.EnableSync(Items[ip.LongSection][ip.Row]);

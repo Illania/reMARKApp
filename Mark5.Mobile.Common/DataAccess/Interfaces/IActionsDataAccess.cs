@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Mark5.Mobile.Common.Model.Actions;
 
 namespace Mark5.Mobile.Common.DataAccess
 {
     interface IActionsDataAccess
     {
-        Task SaveSetReadStatusActionAsync(SetReadStatusAction action);
+        Task SaveActionAsync<T>(T action);
 
-        Task<List<SetReadStatusAction>> GetSetReadStatusActionsAsync();
+        Task<List<T>> GetActionsAsync<T>() where T : new();
 
-        Task DeleteSetReadStatusActionAsync(Guid actionGuid);
+        Task DeleteActionAsync<T>(Guid actionGuid);
     }
 }

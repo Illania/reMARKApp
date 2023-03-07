@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Contacts;
 using Foundation;
+using Mark5.Mobile.IOS.Common;
 using Mark5.Mobile.IOS.Common.ShareExtension;
 using Social;
 using UIKit;
@@ -15,14 +16,12 @@ namespace reMARK.Mobile.IOS.Extensions.Share
 
         protected ShareViewController(IntPtr handle) : base(handle)
         {
-            // Note: this .ctor should not contain any initialization logic.
+            // Note: this constructor should not contain any initialization logic.
         }
 
         public override void DidReceiveMemoryWarning()
         {
-            // Releases the view if it doesn't have a superview.
             base.DidReceiveMemoryWarning();
-
             // Release any cached data, images, etc that aren't in use.
         }
 
@@ -30,10 +29,8 @@ namespace reMARK.Mobile.IOS.Extensions.Share
         {
             base.ViewDidLoad();
             List<string> attachmentList = new();
-
-
+            
             var attachments = (ExtensionContext?.InputItems[0])?.Attachments;
-
 
             foreach (var provider in attachments)
             {
@@ -58,7 +55,7 @@ namespace reMARK.Mobile.IOS.Extensions.Share
 
                                 var sharedFileUrl = sharedFolder.Append("contacts", false).AppendPathExtension("vcf");
 
-                                nsData.Save(sharedFileUrl.Path, true, out var error);
+                                nsData.Save(sharedFileUrl, true, out var error);
 
                                 if (error != null)
                                     ShareExtensionErrorLogger.WriteToLog(error.GetDebugDescription(), new NSErrorException(error));
@@ -74,6 +71,7 @@ namespace reMARK.Mobile.IOS.Extensions.Share
 
                     }
                 }
+
                 //for images and files
                 if (provider.HasItemConformingTo(ContentType.Image) || provider.HasItemConformingTo(ContentType.URL))
                 {
@@ -98,7 +96,7 @@ namespace reMARK.Mobile.IOS.Extensions.Share
                                
                                 var sharedFileUrl = sharedFolder.Append(fileName, false);
 
-                                fileData.Save(sharedFileUrl.Path, true, out var error);
+                                fileData.Save(sharedFileUrl, true, out var error);
 
                                 if (error != null)
                                     ShareExtensionErrorLogger.WriteToLog(error.GetDebugDescription(), new NSErrorException(error));
@@ -108,40 +106,37 @@ namespace reMARK.Mobile.IOS.Extensions.Share
                         }
                     }
            
-                    if (provider.HasItemConformingTo(ContentType.Text))
-                    {
-                        var result = await provider.LoadItemAsync(ContentType.Text, null);
+                if (provider.HasItemConformingTo(ContentType.Text))
+                {
+                    var result = await provider.LoadItemAsync(ContentType.Text, null);
 
-                        if (result is NSObject dataObject)
+                    if (result is NSObject dataObject)
+                    {
+
+                        var mutableString = (NSMutableString)dataObject;
+
+                        using (var containerUrl = NSFileManager.DefaultManager.GetContainerUrl(ShareExtensionContainerUtilities.AppGroupId))
                         {
 
-                            var mutableString = (NSMutableString)dataObject;
+                            var sharedFolder = containerUrl.Append($"Library", true).Append("Caches", true);
 
-                            using (var containerUrl = NSFileManager.DefaultManager.GetContainerUrl(ShareExtensionContainerUtilities.AppGroupId))
-                            {
+                            if (!NSFileManager.DefaultManager.FileExists(sharedFolder.AbsoluteString))
+                                NSFileManager.DefaultManager.CreateDirectory(sharedFolder.AbsoluteString, true, new NSFileAttributes());
 
-                                var sharedFolder = containerUrl.Append($"Library", true).Append("Caches", true);
+                            var sharedFileUrl = sharedFolder.Append("text", false).AppendPathExtension("txt");
 
-                                if (!NSFileManager.DefaultManager.FileExists(sharedFolder.AbsoluteString))
-                                    NSFileManager.DefaultManager.CreateDirectory(sharedFolder.AbsoluteString, true, new NSFileAttributes());
+                            File.WriteAllText(sharedFileUrl.Path, mutableString.ToString());
 
-                                var sharedFileUrl = sharedFolder.Append("text", false).AppendPathExtension("txt");
-
-                                File.WriteAllText(sharedFileUrl.Path, mutableString.ToString());
-
-                                UIApplication.SharedApplication.OpenUrl(NSUrl.FromString($"remark.share.text://{sharedFileUrl.Path}"));
-                                ExtensionContext.CompleteRequest(new NSExtensionItem[0], null);
-                                return;
-                            }
+                            UIApplication.SharedApplication.OpenUrl(NSUrl.FromString($"remark.share.text://{sharedFileUrl.Path}"));
                         }
                     }
+                }
                 }
             
                var pathString = string.Join(';', attachmentList);
                UIApplication.SharedApplication.OpenUrl(NSUrl.FromString($"remark.share.url://{pathString}"));
-               ExtensionContext.CompleteRequest(new NSExtensionItem[0], null);
 
-           
+               await ExtensionContext.CompleteRequestAsync(null);
         }
 
         public override bool IsContentValid()
@@ -152,7 +147,7 @@ namespace reMARK.Mobile.IOS.Extensions.Share
 
         public override async void DidSelectPost()
         {
-            ExtensionContext.CompleteRequest(new NSExtensionItem[0], null);
+            await ExtensionContext.CompleteRequestAsync(new NSExtensionItem[0]);
             return;
 
         }

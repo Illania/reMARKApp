@@ -2,9 +2,11 @@ using System;
 using System.Text;
 using Android.Content;
 using Android.OS;
-using Android.Support.Design.Widget;
-using Android.Support.V7.App;
 using Android.Views;
+using AndroidX.AppCompat.App;
+using AndroidX.CoordinatorLayout.Widget;
+using Google.Android.Material.FloatingActionButton;
+using Mark5.Mobile.Classes;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Activities;
@@ -132,7 +134,6 @@ namespace Mark5.Mobile.Droid.Ui.Common
             {
                 var network = await CommonConfig.Reachability.Refresh(ReachabilityMode.NetworkAvailability, true);
                 var google = await CommonConfig.Reachability.Refresh(ReachabilityMode.Google, true);
-                var serviceConnection = await CommonConfig.Reachability.Refresh(ReachabilityMode.ServiceConnection, true);
                 var service = await CommonConfig.Reachability.Refresh(ReachabilityMode.Service, true);
 
                 var title = GetString(Resource.String.connection_status);
@@ -145,9 +146,6 @@ namespace Mark5.Mobile.Droid.Ui.Common
                 messageSb.Append(" ");
                 messageSb.AppendLine(google ? GetString(Resource.String.ok) : GetString(Resource.String.unavailable));
                 messageSb.Append(GetString(Resource.String.mark5_server_reachability));
-                messageSb.Append(" ");
-                messageSb.AppendLine(serviceConnection ? GetString(Resource.String.ok) : GetString(Resource.String.unavailable));
-                messageSb.Append(GetString(Resource.String.mark5_service_reachability));
                 messageSb.Append(" ");
                 messageSb.AppendLine(service ? GetString(Resource.String.ok) : GetString(Resource.String.unavailable));
 

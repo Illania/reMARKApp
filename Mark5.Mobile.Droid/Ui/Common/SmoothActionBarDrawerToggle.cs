@@ -1,7 +1,7 @@
 using System;
-using Android.Support.V7.App;
-using Android.Support.V7.Widget;
-using Android.Support.V4.Widget;
+using AndroidX.AppCompat.App;
+using AndroidX.AppCompat.Widget;
+using AndroidX.DrawerLayout.Widget;
 
 namespace Mark5.Mobile.Droid.Ui.Common
 {

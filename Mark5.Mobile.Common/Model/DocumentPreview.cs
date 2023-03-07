@@ -6,7 +6,7 @@ using SQLite;
 namespace Mark5.Mobile.Common.Model
 {
     [Table("DocumentPreview")]
-    public class DocumentPreview : BusinessEntityPreview, IComparable<DocumentPreview>
+    public class DocumentPreview : BusinessEntityPreview, IComparable<DocumentPreview>, ICategorizable
     {
         [Ignore]
         public override ObjectType ObjectType => ObjectType.Document;

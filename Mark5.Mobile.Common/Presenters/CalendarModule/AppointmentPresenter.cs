@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Mark5.Mobile.Classes.Enum;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.HubMessages;
@@ -77,7 +78,7 @@ namespace Mark5.Mobile.Common.Presenters.CalendarModule
             }
         }
 
-        public async void EditAppointmentClicked(AppointmentChangeType appointmentChangeType)
+        public void EditAppointmentClicked(AppointmentChangeType appointmentChangeType)
         {
             view.OpenEditAppointment(appointment.CalendarId, appointment.Id, appointmentChangeType);
         }

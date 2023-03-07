@@ -6,12 +6,6 @@ using Android.Content;
 using Android.Graphics;
 using Android.OS;
 using Android.Views;
-using Android.Support.Design.Widget;
-using Android.Support.V4.Content;
-using Android.Support.V4.View;
-using Android.Support.V4.Widget;
-using Android.Support.V7.App;
-using Android.Support.V7.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.DataAccess.Exceptions;
 using Mark5.Mobile.Common.Extensions;
@@ -25,10 +19,18 @@ using Mark5.Mobile.Droid.Utilities;
 using TinyMessenger;
 using Android.Widget;
 using System.Threading;
+using AndroidX.RecyclerView.Widget;
+using AndroidX.SwipeRefreshLayout.Widget;
+using Google.Android.Material.FloatingActionButton;
+using AndroidX.AppCompat.Widget;
+using AndroidX.ViewPager.Widget;
+using AndroidX.AppCompat.App;
+using SearchView = AndroidX.AppCompat.Widget.SearchView;
+using Mark5.Mobile.Classes.Enum;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class FoldersListFragment : BaseFragment, ActionMode.ICallback, IMenuItemOnActionExpandListener, Android.Support.V7.Widget.SearchView.IOnQueryTextListener
+    public class FoldersListFragment : BaseFragment, ActionMode.ICallback, IMenuItemOnActionExpandListener, SearchView.IOnQueryTextListener
     {
         const int AutoRefreshIntervalMs = 15 * 1000; // 15 seconds
         AutoRefreshWorker autoRefreshWorker;
@@ -47,7 +49,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         protected FolderListAdapter Adapter;
         protected SearchFolderListAdapter SearchAdapter;
-        protected Android.Support.V7.Widget.SearchView SearchView;
+        protected SearchView SearchView;
         protected RecyclerView RecyclerView;
         protected SwipeRefreshLayout RefreshLayout;
         protected List<Section> AvailableSections;
@@ -251,13 +253,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             Managers.DocumentsManager.NotifyPendingAndFailedCountChanged().FireAndForget();
 
-            CommonConfig.Logger.Info($"Starting automatic refresh...");
+            //CommonConfig.Logger.Info($"Starting automatic refresh...");
 
-            autoRefreshWorker?.Stop();
-            autoRefreshWorker = new AutoRefreshWorker(AutoRefreshData, AutoRefreshIntervalMs);
-            autoRefreshWorker.Start();
+            //autoRefreshWorker?.Stop();
+            //autoRefreshWorker = new AutoRefreshWorker(AutoRefreshData, AutoRefreshIntervalMs);
+            //autoRefreshWorker.Start();
 
-            CommonConfig.Logger.Info($"Started automatic refresh");
+            //CommonConfig.Logger.Info($"Started automatic refresh");
         }
 
         public override void OnSaveInstanceState(Bundle outState)
@@ -293,7 +295,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             CommonConfig.Logger.Info($"Stopping automatic refresh...");
 
-            autoRefreshWorker?.Stop();
+            //autoRefreshWorker?.Stop();
 
             CommonConfig.Logger.Info($"Stopped automatic refresh");
         }
@@ -312,7 +314,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var filterItem = menu.FindItem(Resource.Id.action_filter);
             filterItem.SetOnActionExpandListener(this);
-            SearchView = (Android.Support.V7.Widget.SearchView)filterItem.ActionView;
+            SearchView = (SearchView)filterItem.ActionView;
             SearchView.QueryHint = GetString(Resource.String.filter);
             SearchView.SetOnQueryTextListener(this);
 
@@ -756,9 +758,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (RemoteFolder.Module == ModuleType.Documents)
             {
                 if (foldersAvailableOfflineState.Any(v => v))
-                    menu.Add(Menu.None, MenuItemActions.DisableOffline, MenuItemActions.DisableOffline, Resource.String.remove_offline).SetShowAsAction(ShowAsAction.Never);
+                    menu.Add(Menu.None, MenuItemActions.DisableOffline, MenuItemActions.DisableOffline, Resource.String.disable_caching).SetShowAsAction(ShowAsAction.Never);
                 if (foldersAvailableOfflineState.Any(v => !v))
-                    menu.Add(Menu.None, MenuItemActions.EnableOffline, MenuItemActions.EnableOffline, Resource.String.add_offline).SetShowAsAction(ShowAsAction.Never);
+                    menu.Add(Menu.None, MenuItemActions.EnableOffline, MenuItemActions.EnableOffline, Resource.String.enable_caching).SetShowAsAction(ShowAsAction.Never);
             }
 
             if ((RemoteFolder.Module == ModuleType.Contacts || RemoteFolder.Module == ModuleType.Shortcodes) && selectedFolders.Count == 1 && AsyncHelpers.RunSync(() => Managers.FoldersManager.IsSavedFolderOfflineInfo(selectedFolders[0])))
@@ -1019,7 +1021,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 RefreshLayout.Enabled = false;
                 Adapter.ClearSelections();
                 RecyclerView.SwapAdapter(SearchAdapter, true);
-                (this as Android.Support.V7.Widget.SearchView.IOnQueryTextListener).OnQueryTextChange(string.Empty);
+                (this as SearchView.IOnQueryTextListener).OnQueryTextChange(string.Empty);
                 return true;
             }
 

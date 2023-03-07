@@ -4,6 +4,7 @@ using Mark5.Mobile.Common.DataAccess;
 using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Model;
 using Mark5.ServiceReference;
+using Mark5.Mobile.Classes.Enum;
 
 namespace Mark5.Mobile.Common.Manager
 {
@@ -33,6 +34,7 @@ namespace Mark5.Mobile.Common.Manager
                                                                 CommonConfig.HttpClientHandler,
                                                                 CommonConfig.OnStartTransmission,
                                                                 CommonConfig.OnStopTransmission,
+                                                                CommonConfig.Reachability,
                                                                 appToken,
                                                                 azureAppProxyInfo);
 
@@ -46,9 +48,10 @@ namespace Mark5.Mobile.Common.Manager
                                                                                   azureAppProxyInfo);
 
             var foldersDataAccess = new FoldersDataAccess(DatabaseConnectionProvider.DatabaseForModuleType);
-            var documentsDataAccess = new DocumentsDataAccess(DatabaseConnectionProvider.DocumentsDatabase);
-            var contactsDataAccess = new ContactsDataAccess(DatabaseConnectionProvider.ContactsDatabase);
-            var shortcodesDataAccess = new ShortcodesDataAccess(DatabaseConnectionProvider.ShortcodesDatabase);
+            var restorationDataAccess = new RestorationDataAccess(DatabaseConnectionProvider.SystemDatabase);
+            var documentsDataAccess = new DocumentsDataAccess(DatabaseConnectionProvider.DocumentsDatabase, restorationDataAccess);
+            var contactsDataAccess = new ContactsDataAccess(DatabaseConnectionProvider.ContactsDatabase, restorationDataAccess);
+            var shortcodesDataAccess = new ShortcodesDataAccess(DatabaseConnectionProvider.ShortcodesDatabase, restorationDataAccess);
             var calendarDataAccess = new CalendarDataAccess(DatabaseConnectionProvider.CalendarDatabase);
             var notificationsDataAccess = new NotificationsDataAccess(DatabaseConnectionProvider.SystemDatabase);
             var actionsDataAccess = new ActionsDataAccess(DatabaseConnectionProvider.ActionsDatabase);
@@ -61,7 +64,7 @@ namespace Mark5.Mobile.Common.Manager
             SearchManager = new SearchManager(connectionInfo, appServiceProxy, documentsDataAccess, contactsDataAccess, shortcodesDataAccess);
             NotificationsManager = new NotificationsManager(connectionInfo, appServiceProxy, foldersDataAccess, notificationsDataAccess);
             SystemManager = new SystemManager(connectionInfo, appServiceProxy);
-            CommonActionsManager = new CommonActionsManager(connectionInfo, appServiceProxy, documentsDataAccess, contactsDataAccess, shortcodesDataAccess, calendarDataAccess);
+            CommonActionsManager = new CommonActionsManager(connectionInfo, appServiceProxy, documentsDataAccess, contactsDataAccess, shortcodesDataAccess);
             CleanUpManager = new CleanUpManager(documentsDataAccess, contactsDataAccess, shortcodesDataAccess, calendarDataAccess);
             ActionsManager = new ActionsManager(connectionInfo, appServiceProxy, actionsDataAccess);
         }

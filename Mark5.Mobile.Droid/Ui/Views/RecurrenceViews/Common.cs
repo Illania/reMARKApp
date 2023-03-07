@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Android.Content;
-using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
 using Mark5.Mobile.Common.Model;
@@ -10,9 +9,10 @@ using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.Droid.Utilities;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Droid.Ui.Common;
-using Android.Support.V4.Content;
 using Android.Graphics;
 using Android.Graphics.Drawables;
+using AndroidX.Core.Content;
+using AndroidX.AppCompat.Widget;
 
 namespace Mark5.Mobile.Droid.Ui.Views.RecurrenceViews
 {

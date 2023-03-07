@@ -18,7 +18,7 @@
     <string name="add_message">Add message</string>
         <string name="add_message_optional">Add message (optional)</string>
     <string name="add_favorites">Add to favorites</string>
-    <string name="add_offline">Enable sync</string>
+    <string name="enable_caching">Enable caching</string>
     <string name="adding_comment">Adding comment</string>
     <string name="adding_extra_field">Adding extra field</string>
     <string name="adding_appointment">Adding appointment...</string>
@@ -71,6 +71,7 @@
     <string name="confirm_save_as_draft">Do you want to save the email as draft?</string>
     <string name="confirm_send_invitations_title">Send invitations</string>
     <string name="confirm_send_invitations_content">Do you want to send invitations immediately?</string>
+    <string name="confirm_save_autoreply">Do you want to save the autoreply settings?</string>
     <string name="connection_status">Connection status</string>
     <string name="contact">Contact</string>
     <string name="contacts">Contacts</string>
@@ -109,6 +110,7 @@
     <string name="deleting_comment">Deleting comment</string>
     <string name="deleting_extra_field">Deleting extra field</string>
     <string name="deleting_from_folder">Removing from folder...</string>
+    <string name="delivery_report">Delivery report</string>
     <string name="departments">Departments</string>
     <string name="description">Description</string>
     <string name="diagnostics_progress_text">Performing Diagnostics</string>
@@ -285,6 +287,8 @@
     <string name="invalid_line_draft_content">You need to select a mailbox to save this draft</string>
     <string name="invalid_token">Invalid session</string>
     <string name="invalid_token_message">Session token is invalid. Please re-authenticate.</string>
+    <string name="invalid_date">Invalid date</string>
+    <string name="invalid_date_message">Start date should not exceed end date.</string>
     <string name="large_attachment">This attachment is larger than 20MB. Do you want to download it?</string>
     <string name="last_downloaded_on">Last downloaded on:</string>
     <string name="ledger">Ledger</string>
@@ -295,6 +299,7 @@
     <string name="loading_appointments">Loading appointments</string>
     <string name="loading_contact">Loading contact</string>
     <string name="loading_document">Loading email</string>
+    <string name="loading_autoreply">Loading autoreply settings</string>
     <string name="loading_mail">Loading email</string>
     <string name="loading_template">Loading template</string>
     <string name="loading_templates">Loading templates</string>
@@ -402,7 +407,7 @@
     <string name="remove">Remove</string>
     <string name="remove_bookmark">Remove bookmark</string>
     <string name="remove_favorites">Remove from favourites</string>
-    <string name="remove_offline">Disable sync</string>
+    <string name="disable_caching">Disable caching</string>
     <string name="reply">Reply</string>
     <string name="reply_all">Reply all</string>
     <string name="reply_to">Reply to:</string>
@@ -411,6 +416,7 @@
     <string name="responsible_users">Responsible users</string>
     <string name="save">Save</string>
     <string name="save_draft">Save draft</string>
+    <string name="saving_autoreply">Saving autoreply settings</string>
     <string name="save_offline">Save offline</string>
     <string name="saving_draft">Saving draft</string>
     <string name="scan_finger">Scan finger</string>
@@ -544,6 +550,7 @@
     <string name="time_remaining_minutes_zero">Time remaining: less than one minute</string>
     <string name="to">To</string>
     <string name="to_prefix">to</string>
+     <string name="transmit_destinations">Transmit destinations</string>
     <string name="today">Today</string>
     <string name="type_search_query">Search query</string>
     <string name="unavailable">Unavailable</string>

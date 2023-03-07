@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Mark5.Mobile.Common.Manager;
 using Newtonsoft.Json;
 
 namespace Mark5.Mobile.Common.Model
@@ -8,10 +10,12 @@ namespace Mark5.Mobile.Common.Model
     {
         public Version SystemVersion { get; set; }
         public Version ServiceVersion { get; set; }
+        public bool CalendarModuleInstalled { get; set; }
         public string ServerTimeZoneInfoSerialized { get; set; }
         public string CustomerName { get; set; }
         public Guid CustomerGuid { get; set; }
         public bool SyncFavoritesAvailable => ServiceVersionGreaterThanOrEqual(3, 2, 0);
+        public bool SetNotificationReadStatusAvailable => ServiceVersionGreaterThanOrEqual(4, 3, 0);
         public bool ChangeSingleOccurrenceAvailable => SystemVersionGreaterThanOrEqual(1, 38, 10);
         public bool DelaySendAvailable => SystemVersionGreaterThanOrEqual(1, 38, 14);
         public bool InternalMailsAvailable => false;
@@ -24,7 +28,32 @@ namespace Mark5.Mobile.Common.Model
         /// </summary>
         public bool NewPushNotificationsSystemAvailable => ServiceVersionGreaterThanOrEqual(4, 0, 0) || SystemVersionGreaterThanOrEqual(1, 37, 13);
 
+        public bool IsReferenceInTemplatesAvailable => ServiceVersionGreaterThanOrEqual(4, 2, 0);
+
         public bool ExtraFieldsEditingAvailable => ServiceVersionGreaterThanOrEqual(4, 4, 0);
+        public bool FavoriteCategoriesAvailable => ServiceVersionGreaterThanOrEqual(4, 4, 0);
+        public bool RecentAddressDeleteAvailable => ServiceVersionGreaterThanOrEqual(4, 4, 0);
+
+        public bool DeliveryReportAvailable => ServiceVersionGreaterThanOrEqual(4, 5, 0);
+
+        public bool UserActivitiesAvailable => ServiceVersionGreaterThanOrEqual(4, 6, 0);
+
+        public bool AutoReplyAvailable => ServiceVersionGreaterThanOrEqual(4, 7, 0);
+        
+        public bool DeleteDocumentsAllowedLinesAvailable => ServiceVersionGreaterThanOrEqual(4, 7, 1);
+
+        public bool CalendarModuleAvailable       
+        {
+
+            get{
+
+                if (!SystemVersionGreaterThanOrEqual(1, 35, 12))
+                    return false;
+                else
+                    return ServiceVersionGreaterThanOrEqual(4, 5, 0) && CalendarModuleInstalled;
+            }
+
+        }
 
         List<ModuleType> availableModules;
         public List<ModuleType> AvailableModules
@@ -70,5 +99,6 @@ namespace Mark5.Mobile.Common.Model
             return new Version(major, minor, build) <= SystemVersion;
         }
 
-    }
+
+}
 }

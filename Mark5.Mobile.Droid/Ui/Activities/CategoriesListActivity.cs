@@ -2,7 +2,7 @@
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
-using Android.Support.V7.Widget;
+using AndroidX.AppCompat.Widget;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Utilities;
@@ -17,6 +17,7 @@ namespace Mark5.Mobile.Droid
         public const string CategoriesResultKey = "CategoriesResult_0b8c55ac-2dbe-441e-af92-daa330d040fe";
 
         Toolbar toolbar;
+        CategoriesListOldFragment clfOld;
         CategoriesListFragment clf;
 
         public static Intent CreateIntent(Context context, BusinessEntityPreview bep)
@@ -49,26 +50,47 @@ namespace Mark5.Mobile.Droid
                 string tag;
                 var bep = Serializer.Deserialize<BusinessEntityPreview>(Intent.Extras.GetString(BusinessEntityPreviewIntentKey));
                 var ft = SupportFragmentManager.BeginTransaction();
-                (clf, tag) = CategoriesListFragment.NewInstance(bep);
-
-                ft.Replace(Resource.Id.fragment_container, clf, tag);
+               
+                if (!ServerConfig.SystemSettings.SystemInfo.FavoriteCategoriesAvailable)
+                {
+                    (clfOld, tag) = CategoriesListOldFragment.NewInstance(bep);
+                    ft.Replace(Resource.Id.fragment_container, clfOld, tag);
+                }
+                else
+                {
+                    (clf, tag) = CategoriesListFragment.NewInstance(bep);
+                    ft.Replace(Resource.Id.fragment_container, clf, tag);
+                }
+              
                 ft.Commit();
 
                 CommonConfig.Logger.Info($"Created {nameof(CategoriesListActivity)}");
             }
             else
             {
-                clf = (CategoriesListFragment)SupportFragmentManager.FindFragmentById(Resource.Id.fragment_container);
+                if (!ServerConfig.SystemSettings.SystemInfo.FavoriteCategoriesAvailable)
+                {
+                    clfOld = (CategoriesListOldFragment)SupportFragmentManager.FindFragmentById(Resource.Id.fragment_container);
+                }
+                else
+                {
+                    clf = (CategoriesListFragment)SupportFragmentManager.FindFragmentById(Resource.Id.fragment_container);
+                }
+               
                 CommonConfig.Logger.Info($"Restored {nameof(CategoriesListActivity)}");
             }
         }
 
         public override void OnBackPressed()
         {
-            if (clf != null)
+            if (ServerConfig.SystemSettings.SystemInfo.FavoriteCategoriesAvailable && clf != null)
             {
                 clf.AskIfShouldSave();
-            }          
+            }
+            else if (!ServerConfig.SystemSettings.SystemInfo.FavoriteCategoriesAvailable && clfOld != null)
+            {
+                clfOld.AskIfShouldSave();
+            }  
         }
 
         public override void Finish()

@@ -89,20 +89,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         protected override async void FolderSelected(Folder folder, bool isFromFavorite)
         {
             if (delayedCopy == true)
-            { 
+            {
                 tcs.SetResult(folder.Id);
                 return;
             }
 
+            bool done;
             if (fromFolder == null)
-                await CopyBusinessEntityToFolder(folder);
+                done = await CopyBusinessEntityToFolder(folder);
             else
-                await MoveBusinessEntityToFolder(folder);
+                done = await MoveBusinessEntityToFolder(folder);
 
             if (TableView?.IndexPathForSelectedRow != null)
                 TableView.DeselectRow(TableView.IndexPathForSelectedRow, true);
-
-            tcs.SetResult(folder.Id);
+            if(done)
+            {
+                tcs.TrySetResult(folder.Id);
+                DismissViewController(true, null);
+            }
+                
         }
 
         protected async override Task FolderExpand(Folder folder)
@@ -128,15 +133,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         void CancelModeItem_Clicked(object sender, EventArgs e)
         {
-            tcs.SetResult(null);
             DismissViewController(true, null);
+            tcs.TrySetResult(null);
         }
 
-        async Task CopyBusinessEntityToFolder(Folder folder)
+        async Task<bool> CopyBusinessEntityToFolder(Folder folder)
         {
             var confirmed = await Dialogs.ShowListActionSheetAsync(this, new[] { Localization.GetString("copy") }, View);
             if (confirmed < 0)
-                return;
+                return false;
 
             CommonConfig.Logger.Info($"Copying business entities to folder [businessEntities.Count={businessEntities?.Count}, " +
                 $"businessEntities.Type={businessEntities?.First().ObjectType}, folder.Id={folder?.Id}]");
@@ -146,6 +151,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             {
                 await Managers.CommonActionsManager.CopyToFolder(businessEntities, folder);
                 dismissAction();
+                return true;
             }
             catch (Exception ex)
             {
@@ -155,6 +161,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 dismissAction();
                 await Dialogs.ShowErrorAlertAsync(this, ex);
                 tcs.SetResult(null);
+                return false;
             }
             finally
             {
@@ -162,11 +169,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             }
         }
 
-        async Task MoveBusinessEntityToFolder(Folder folder)
+        async Task<bool> MoveBusinessEntityToFolder(Folder folder)
         {
             var confirmed = await Dialogs.ShowListActionSheetAsync(this, new[] { Localization.GetString("move") }, View);
             if (confirmed < 0)
-                return;
+                return false;
 
             CommonConfig.Logger.Info($"Moving business entities to folder [businessEntities.Count={businessEntities?.Count}, " +
                 $"businessEntities.Type={businessEntities?.First().ObjectType}, folder.Id={folder?.Id}]");
@@ -176,6 +183,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             {
                 await Managers.CommonActionsManager.MoveToFolder(businessEntities, fromFolder, folder);
                 dismissAction();
+                return true;
             }
             catch (Exception ex)
             {
@@ -185,6 +193,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 dismissAction();
                 await Dialogs.ShowErrorAlertAsync(this, ex);
                 tcs.SetResult(null);
+                return false;
             }
             finally
             {
