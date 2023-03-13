@@ -5,64 +5,69 @@
     
     
       
-      <testcase classname="fastlane.lanes" name="00: default_platform" time="0.00044">
+      <testcase classname="fastlane.lanes" name="00: default_platform" time="0.000362">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="01: get_info_plist_value" time="0.00278">
+      <testcase classname="fastlane.lanes" name="01: get_info_plist_value" time="0.00262">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="02: set_info_plist_value" time="0.003643">
+      <testcase classname="fastlane.lanes" name="02: set_info_plist_value" time="0.00236">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="03: set_info_plist_value" time="0.002435">
+      <testcase classname="fastlane.lanes" name="03: set_info_plist_value" time="0.002589">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="04: set_info_plist_value" time="0.005148">
+      <testcase classname="fastlane.lanes" name="04: set_info_plist_value" time="0.002244">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="05: get_info_plist_value" time="0.003096">
+      <testcase classname="fastlane.lanes" name="05: get_info_plist_value" time="0.001864">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="06: set_info_plist_value" time="0.003671">
+      <testcase classname="fastlane.lanes" name="06: set_info_plist_value" time="0.002112">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="07: set_info_plist_value" time="0.003164">
+      <testcase classname="fastlane.lanes" name="07: set_info_plist_value" time="0.001966">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="08: set_info_plist_value" time="0.002974">
+      <testcase classname="fastlane.lanes" name="08: set_info_plist_value" time="0.002207">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="09: update_plist" time="0.022734">
+      <testcase classname="fastlane.lanes" name="09: update_plist" time="0.020985">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="10: sync_code_signing" time="13.252209">
+      <testcase classname="fastlane.lanes" name="10: sync_code_signing" time="15.582356">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="11: xamarin_build" time="861.320054">
+      <testcase classname="fastlane.lanes" name="11: nuget restore /Users/anna/mark5-app-new/Mark5.sln -verbosity detailed" time="10.805786">
         
-          <failure message="/Library/Ruby/Gems/2.6.0/gems/fastlane-2.212.1/fastlane/lib/fastlane/actions/actions_helper.rb:67:in `execute_action'&#10;/Library/Ruby/Gems/2.6.0/gems/fastlane-2.212.1/fastlane/lib/fastlane/runner.rb:255:in `block in execute_action'&#10;/Library/Ruby/Gems/2.6.0/gems/fastlane-2.212.1/fastlane/lib/fastlane/runner.rb:229:in `chdir'&#10;/Library/Ruby/Gems/2.6.0/gems/fastlane-2.212.1/fastlane/lib/fastlane/runner.rb:229:in `execute_action'&#10;/Library/Ruby/Gems/2.6.0/gems/fastlane-2.212.1/fastlane/lib/fastlane/runner.rb:157:in `trigger_action_by_name'&#10;/Library/Ruby/Gems/2.6.0/gems/fastlane-2.212.1/fastlane/lib/fastlane/fast_file.rb:159:in `method_missing'&#10;Fastfile:120:in `block (2 levels) in parsing_binding'&#10;/Library/Ruby/Gems/2.6.0/gems/fastlane-2.212.1/fastlane/lib/fastlane/lane.rb:33:in `call'&#10;/Library/Ruby/Gems/2.6.0/gems/fastlane-2.212.1/fastlane/lib/fastlane/runner.rb:49:in `block in execute'&#10;/Library/Ruby/Gems/2.6.0/gems/fastlane-2.212.1/fastlane/lib/fastlane/runner.rb:45:in `chdir'&#10;/Library/Ruby/Gems/2.6.0/gems/fastlane-2.212.1/fastlane/lib/fastlane/runner.rb:45:in `execute'&#10;/Library/Ruby/Gems/2.6.0/gems/fastlane-2.212.1/fastlane/lib/fastlane/lane_manager.rb:47:in `cruise_lane'&#10;/Library/Ruby/Gems/2.6.0/gems/fastlane-2.212.1/fastlane/lib/fastlane/command_line_handler.rb:36:in `handle'&#10;/Library/Ruby/Gems/2.6.0/gems/fastlane-2.212.1/fastlane/lib/fastlane/commands_generator.rb:110:in `block (2 levels) in run'&#10;/Library/Ruby/Gems/2.6.0/gems/commander-4.6.0/lib/commander/command.rb:187:in `call'&#10;/Library/Ruby/Gems/2.6.0/gems/commander-4.6.0/lib/commander/command.rb:157:in `run'&#10;/Library/Ruby/Gems/2.6.0/gems/commander-4.6.0/lib/commander/runner.rb:444:in `run_active_command'&#10;/Library/Ruby/Gems/2.6.0/gems/fastlane-2.212.1/fastlane_core/lib/fastlane_core/ui/fastlane_runner.rb:124:in `run!'&#10;/Library/Ruby/Gems/2.6.0/gems/commander-4.6.0/lib/commander/delegates.rb:18:in `run!'&#10;/Library/Ruby/Gems/2.6.0/gems/fastlane-2.212.1/fastlane/lib/fastlane/commands_generator.rb:354:in `run'&#10;/Library/Ruby/Gems/2.6.0/gems/fastlane-2.212.1/fastlane/lib/fastlane/commands_generator.rb:43:in `start'&#10;/Library/Ruby/Gems/2.6.0/gems/fastlane-2.212.1/fastlane/lib/fastlane/cli_tools_distributor.rb:123:in `take_off'&#10;/Library/Ruby/Gems/2.6.0/gems/fastlane-2.212.1/bin/fastlane:23:in `&lt;top (required)&gt;'&#10;/usr/local/bin/fastlane:23:in `load'&#10;/usr/local/bin/fastlane:23:in `&lt;main&gt;'&#10;&#10;not 0 result" />
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="12: xamarin_build" time="746.34729">
+        
+          <failure message="/Library/Ruby/Gems/2.6.0/gems/fastlane-2.212.1/fastlane/lib/fastlane/actions/actions_helper.rb:67:in `execute_action'&#10;/Library/Ruby/Gems/2.6.0/gems/fastlane-2.212.1/fastlane/lib/fastlane/runner.rb:255:in `block in execute_action'&#10;/Library/Ruby/Gems/2.6.0/gems/fastlane-2.212.1/fastlane/lib/fastlane/runner.rb:229:in `chdir'&#10;/Library/Ruby/Gems/2.6.0/gems/fastlane-2.212.1/fastlane/lib/fastlane/runner.rb:229:in `execute_action'&#10;/Library/Ruby/Gems/2.6.0/gems/fastlane-2.212.1/fastlane/lib/fastlane/runner.rb:157:in `trigger_action_by_name'&#10;/Library/Ruby/Gems/2.6.0/gems/fastlane-2.212.1/fastlane/lib/fastlane/fast_file.rb:159:in `method_missing'&#10;Fastfile:125:in `block (2 levels) in parsing_binding'&#10;/Library/Ruby/Gems/2.6.0/gems/fastlane-2.212.1/fastlane/lib/fastlane/lane.rb:33:in `call'&#10;/Library/Ruby/Gems/2.6.0/gems/fastlane-2.212.1/fastlane/lib/fastlane/runner.rb:49:in `block in execute'&#10;/Library/Ruby/Gems/2.6.0/gems/fastlane-2.212.1/fastlane/lib/fastlane/runner.rb:45:in `chdir'&#10;/Library/Ruby/Gems/2.6.0/gems/fastlane-2.212.1/fastlane/lib/fastlane/runner.rb:45:in `execute'&#10;/Library/Ruby/Gems/2.6.0/gems/fastlane-2.212.1/fastlane/lib/fastlane/lane_manager.rb:47:in `cruise_lane'&#10;/Library/Ruby/Gems/2.6.0/gems/fastlane-2.212.1/fastlane/lib/fastlane/command_line_handler.rb:36:in `handle'&#10;/Library/Ruby/Gems/2.6.0/gems/fastlane-2.212.1/fastlane/lib/fastlane/commands_generator.rb:110:in `block (2 levels) in run'&#10;/Library/Ruby/Gems/2.6.0/gems/commander-4.6.0/lib/commander/command.rb:187:in `call'&#10;/Library/Ruby/Gems/2.6.0/gems/commander-4.6.0/lib/commander/command.rb:157:in `run'&#10;/Library/Ruby/Gems/2.6.0/gems/commander-4.6.0/lib/commander/runner.rb:444:in `run_active_command'&#10;/Library/Ruby/Gems/2.6.0/gems/fastlane-2.212.1/fastlane_core/lib/fastlane_core/ui/fastlane_runner.rb:124:in `run!'&#10;/Library/Ruby/Gems/2.6.0/gems/commander-4.6.0/lib/commander/delegates.rb:18:in `run!'&#10;/Library/Ruby/Gems/2.6.0/gems/fastlane-2.212.1/fastlane/lib/fastlane/commands_generator.rb:354:in `run'&#10;/Library/Ruby/Gems/2.6.0/gems/fastlane-2.212.1/fastlane/lib/fastlane/commands_generator.rb:43:in `start'&#10;/Library/Ruby/Gems/2.6.0/gems/fastlane-2.212.1/fastlane/lib/fastlane/cli_tools_distributor.rb:123:in `take_off'&#10;/Library/Ruby/Gems/2.6.0/gems/fastlane-2.212.1/bin/fastlane:23:in `&lt;top (required)&gt;'&#10;/usr/local/bin/fastlane:23:in `load'&#10;/usr/local/bin/fastlane:23:in `&lt;main&gt;'&#10;&#10;not 0 result" />
         
       </testcase>
     

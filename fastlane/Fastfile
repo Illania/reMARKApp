@@ -101,6 +101,10 @@ platform :ios do
     username: "ag"
     )
 end
+
+ def nuget(sln)
+    sh "nuget restore #{sln} -verbosity detailed"
+end
   
   desc "Build beta version"
   lane :beta_build do
@@ -117,6 +121,7 @@ end
       force_for_new_devices: true,
       readonly: false
     )
+    nuget('/Users/anna/mark5-app-new/Mark5.sln')
     xamarin_build(
         solution: '/Users/anna/mark5-app-new/Mark5.sln',
         platform: 'iPhone',
