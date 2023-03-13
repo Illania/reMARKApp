@@ -1,0 +1,18 @@
+git_url("https://gitlab.com/illania/extra.git")
+
+storage_mode("git")
+
+type("App Store") # The default type, can be: appstore, adhoc, enterprise or development
+
+app_identifier(["com.nordic-it.mark5.mobile.ios", "com.nordic-it.mark5.mobile.ios.callid","com.nordic-it.mark5.mobile.ios.share"])
+
+username("dev@nordic-it.com") # Your Apple Developer Portal username
+
+
+itc_team_id("58551803") # App Store Connect Team ID
+team_id("5Q7TTRG4M4") # Developer Portal Team ID
+
+# For all available options run `fastlane match --help`
+# Remove the # in the beginning of the line to enable the other options
+
+# The docs are available on https://docs.fastlane.tools/actions/match

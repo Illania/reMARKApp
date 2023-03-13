@@ -1,0 +1,143 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+default_platform(:ios)
+
+platform :ios do
+
+  desc "Get certificates"
+  lane :certificates do
+    sync_code_signing(
+      type: "development",
+      app_identifier: ['com.nordic-it.mark5.mobile.ios', 'com.nordic-it.mark5.mobile.ios.callid', 'com.nordic-it.mark5.mobile.ios.share'],
+      force_for_new_devices: true,
+      readonly: true
+    )
+
+    # You can repeate the sync_code_signing with other types of certificates such as appstore and adhoc
+    sync_code_signing(
+      type: "appstore",
+      app_identifier: ['com.nordic-it.mark5.mobile.ios', 'com.nordic-it.mark5.mobile.ios.callid', 'com.nordic-it.mark5.mobile.ios.share'],
+      readonly: true
+    )
+  end
+
+  desc "Generate new certificates"
+  lane :generate_new_certificates do
+    sync_code_signing(
+      type: "development",
+      app_identifier: ['com.nordic-it.mark5.mobile.ios', 'com.nordic-it.mark5.mobile.ios.callid', 'com.nordic-it.mark5.mobile.ios.share'],
+      force_for_new_devices: true,
+      readonly: false
+    )
+    
+     sync_code_signing(
+      type: "appstore",
+      app_identifier: ['com.nordic-it.mark5.mobile.ios', 'com.nordic-it.mark5.mobile.ios.callid', 'com.nordic-it.mark5.mobile.ios.share'],
+      readonly: false
+    )
+
+      sync_code_signing(
+      type: "adhoc",
+      app_identifier: ['com.nordic-it.mark5.mobile.ios', 'com.nordic-it.mark5.mobile.ios.callid', 'com.nordic-it.mark5.mobile.ios.share'],
+      force_for_new_devices: true,
+      readonly: false
+    )
+  end
+
+  def bump_build_version(type)
+    build_number = get_info_plist_value(path: "./Mark5.Mobile.IOS/Info.plist", key: "CFBundleVersion")
+    new_build_number = build_number.to_i+1
+    set_info_plist_value(path: "./Mark5.Mobile.IOS/Info.plist", key: "CFBundleVersion", value: new_build_number.to_s)
+    set_info_plist_value(path: "./Mark5.Mobile.IOS.Extensions.CallId/Info.plist", key: "CFBundleVersion", value: new_build_number.to_s)
+    set_info_plist_value(path: "./reMARK.Mobile.IOS.Extensions.Share/Info.plist", key: "CFBundleVersion", value: new_build_number.to_s)
+    
+    current_version = get_info_plist_value(path: "./Mark5.Mobile.IOS/Info.plist", key: "CFBundleShortVersionString")
+    
+    components = current_version.split('.')
+    major = components[0].to_i
+    minor = components[1].to_i
+    patch = components[2].to_i
+
+    if type == "major"
+      major += 1
+      minor = 0
+      patch = 0
+    elsif type == "minor"
+      minor += 1
+      patch = 0
+    elsif type == "patch"
+      patch += 1
+    else
+      abort("Unknown version bump type: #{type}\nValid options: major, minor, patch.")
+    end
+
+    new_version = [major, minor, patch].join('.')
+    set_info_plist_value(path: "./Mark5.Mobile.IOS/Info.plist", key: "CFBundleShortVersionString", value: new_version)
+    set_info_plist_value(path: "./Mark5.Mobile.IOS.Extensions.CallId/Info.plist", key: "CFBundleShortVersionString", value: new_version)
+    set_info_plist_value(path: "./reMARK.Mobile.IOS.Extensions.Share/Info.plist", key: "CFBundleShortVersionString", value: new_version)
+ 
+ end 
+
+
+ def post_to_slack
+  slack(
+    slack_url: "https://hooks.slack.com/services/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",
+    message: "App successfully released!",
+    channel: "#fastlane", 
+    success: true,  
+    username: "ag"
+    )
+end
+  
+  desc "Build beta version"
+  lane :beta_build do
+    bump_build_version("patch")
+    update_plist( 
+      plist_path: "./Mark5.Mobile.IOS/Entitlements.plist",
+      block: proc do |plist|
+        plist[:"aps-environment"] = "production"
+      end
+    )
+    sync_code_signing(
+      type: "appstore",
+      app_identifier: ['com.nordic-it.mark5.mobile.ios', 'com.nordic-it.mark5.mobile.ios.callid', 'com.nordic-it.mark5.mobile.ios.share'],
+      force_for_new_devices: true,
+      readonly: false
+    )
+    xamarin_build(
+        solution: '/Users/anna/mark5-app-new/Mark5.sln',
+        platform: 'iPhone',
+        target: 'Rebuild',
+        build_type: 'Release',
+        print_all: true,
+        build_util: 'msbuild',
+        ipa_name: 'remark.ipa'
+    )
+    upload_to_testflight(
+        changelog: "test fastlane build",
+        distribute_external: true,
+        distribute_only: false,
+        groups: [
+            "test"
+        ],
+        skip_submission: true, 
+        skip_waiting_for_build_processing: true,
+    )
+    post_to_slack
+  end
+
+end
+

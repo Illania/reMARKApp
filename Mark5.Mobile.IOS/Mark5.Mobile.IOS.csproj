@@ -30,7 +30,7 @@
 		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
 		<LangVersion>9.0</LangVersion>
 		<CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
-		<CodesignProvision>remark 2023</CodesignProvision>
+		<CodesignProvision>Automatic</CodesignProvision>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
 		<DebugType>none</DebugType>
@@ -66,7 +66,7 @@
 		<RunCodeAnalysis>true</RunCodeAnalysis>
 		<MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
 		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
-		<CodesignProvision>remark 2023</CodesignProvision>
+		<CodesignProvision>match Development com.nordic-it.mark5.mobile.ios</CodesignProvision>
 		<LangVersion>9.0</LangVersion>
 		<MtouchLink>None</MtouchLink>
 	</PropertyGroup>
@@ -86,7 +86,7 @@
 		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
 		<LangVersion>9.0</LangVersion>
 		<MtouchLink>SdkOnly</MtouchLink>
-		<CodesignProvision>Apple Distribution 2022 Mark5.Mobile</CodesignProvision>
+		<CodesignProvision>match AppStore com.nordic-it.mark5.mobile.ios</CodesignProvision>
 	</PropertyGroup>
 	<ItemGroup>
 		<Compile Include="Properties\AssemblyInfo.cs" />
