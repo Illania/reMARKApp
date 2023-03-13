@@ -1,0 +1,22 @@
+Get the official reMARK app.
+
+reMARK is an enterprise email solution for teams that work with high volume email on shared email addresses.
+
+With this app you have access to emails, contacts, search and mailing lists from your iPhone and iPad. 
+
+App functionality:
+- Send, receive, reply and forward emails
+- Browse through folders in emails, contacts and mailing lists
+- Add favourite folders
+- Get notifications on specific folders
+- Mark emails as read/unread
+- File to folders and work-tray from emails and contacts
+- Comment 
+- View actions on emails and contacts
+- Assign categories to emails
+- Download attachments 
+- Use templates
+- View contacts with all details from reMARK
+- Filter through emails
+- Use advanced search in emails, contacts and mailing lists
+- Work without internet connection

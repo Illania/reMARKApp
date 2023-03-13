@@ -2,7 +2,7 @@ git_url("https://gitlab.com/illania/extra.git")
 git_branch("master")
 git_user_email("ag@nordic-it.com")
 
-type("development") # The default type, can be: appstore, adhoc, enterprise or development
+type("appstore") # The default type, can be: appstore, adhoc, enterprise or development
 
 app_identifier(["com.nordic-it.mark5.mobile.ios", "com.nordic-it.mark5.mobile.ios.callid", "com.nordic-it.mark5.mobile.ios.share"])
 

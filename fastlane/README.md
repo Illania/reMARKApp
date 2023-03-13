@@ -31,13 +31,21 @@ Get certificates
 
 Generate new certificates
 
-### ios beta_build
+### ios build_beta
 
 ```sh
-[bundle exec] fastlane ios beta_build
+[bundle exec] fastlane ios build_beta
 ```
 
 Build beta version
+
+### ios upload_beta
+
+```sh
+[bundle exec] fastlane ios upload_beta
+```
+
+Upload beta to Testflight
 
 ----
 

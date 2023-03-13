@@ -26,7 +26,7 @@ platform :ios do
       readonly: true
     )
 
-    # You can repeate the sync_code_signing with other types of certificates such as appstore and adhoc
+    # You can repeat the sync_code_signing with other types of certificates such as appstore and adhoc
     sync_code_signing(
       type: "appstore",
       app_identifier: ['com.nordic-it.mark5.mobile.ios', 'com.nordic-it.mark5.mobile.ios.callid', 'com.nordic-it.mark5.mobile.ios.share'],
@@ -107,7 +107,7 @@ end
 end
   
   desc "Build beta version"
-  lane :beta_build do
+  lane :build_beta do
     bump_build_version("patch")
     update_plist( 
       plist_path: "./Mark5.Mobile.IOS/Entitlements.plist",
@@ -131,18 +131,26 @@ end
         build_util: 'msbuild',
         ipa_name: 'remark.ipa'
     )
-    upload_to_testflight(
-        changelog: "test fastlane build",
-        distribute_external: true,
-        distribute_only: false,
-        groups: [
-            "test"
-        ],
-        skip_submission: true, 
-        skip_waiting_for_build_processing: true,
-    )
     post_to_slack
   end
+
+
+  desc "Upload beta to Testflight"
+  lane :upload_beta do
+     app_store_connect_api_key()
+     pilot(
+      changelog: "test fastlane build",
+      distribute_external: true,
+      distribute_only: false,
+      ipa: "./Mark5.Mobile.IOS/bin/iPhone/Release/remark.ipa",
+       groups: [
+            "test"
+        ],
+      skip_submission: true,
+      skip_waiting_for_build_processing: true
+    ) 
+  end
+    
 
 end
 
