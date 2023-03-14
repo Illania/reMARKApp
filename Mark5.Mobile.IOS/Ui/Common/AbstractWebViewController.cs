@@ -8,12 +8,12 @@ using CoreGraphics;
 using Foundation;
 using HtmlAgilityPack;
 using Mark5.Mobile.Common;
-using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Model;
 using Mark5.Mobile.IOS.Utilities;
 using ObjCRuntime;
 using UIKit;
 using WebKit;
+using ContentType = Mark5.Mobile.Common.Model.ContentType;
 
 namespace Mark5.Mobile.IOS.Ui.Common
 {
@@ -204,6 +204,22 @@ namespace Mark5.Mobile.IOS.Ui.Common
             });
 
             keyboardDisShowNotification = UIKeyboard.Notifications.ObserveDidShow(HandleKeyboardDidShow);
+        }
+
+        protected void Print()
+        {
+            var printFormatter = webView.ViewPrintFormatter;
+            printFormatter.StartPage = 0;
+            printFormatter.ContentInsets = new UIEdgeInsets(72, 72, 72, 72);
+
+            var printer = UIPrintInteractionController.SharedPrintController;
+            printer.PrintFormatter = printFormatter;
+            printer.ShowsPageRange = true;
+            printer.Present(true, (handler, completed, error) =>
+            {
+                if (!completed) 
+                    Console.WriteLine($"Error: {error.LocalizedDescription ?? ""}");
+            });
         }
 
         public override void TraitCollectionDidChange(UITraitCollection previousTraitCollection)
