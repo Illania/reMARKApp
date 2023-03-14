@@ -383,6 +383,7 @@
     <string name="port">Port</string>
     <string name="port_invalid">Port is not valid</string>
     <string name="preparing">Preparing...</string>
+    <string name="print">Print</string>
     <string name="priority">Priority</string>
     <string name="priority_low">Low</string>
     <string name="priority_normal">Normal</string>

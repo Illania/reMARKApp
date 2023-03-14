@@ -55,6 +55,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         private AppCompatImageView _button1;
         private AppCompatImageView _button2;
         private AppCompatImageView _button3;
+        private ContentView contentView;
 
         private CancellationTokenSource _setReadStatusCancellationTokenSource;
 
@@ -258,7 +259,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 civ.ReplySelected += CalendarInvitationView_ReplySelected;
                 _linearLayout.AddView(civ);
 
-                var contentView = new ContentView(Context);
+                contentView = new ContentView(Context);
                 contentView.MailToLinkClicked += ContentView_MailToLinkClicked;
                 _linearLayout.AddView(contentView);
             }
@@ -558,6 +559,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 menu.Add(Menu.None, MenuItemActions.DeliveryReport, 
                     MenuItemActions.DeliveryReport, Resource.String.delivery_report);
             }
+
+            menu.Add(Menu.None, MenuItemActions.Print,
+                MenuItemActions.Print, Resource.String.print);
         }
 
         public override async void OnPrepareOptionsMenu(IMenu menu)
@@ -697,7 +701,18 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return true;
             }
 
+            if (item.ItemId == MenuItemActions.Print)
+            {
+                Print();
+                return true;
+            }
+
             return base.OnOptionsItemSelected(item);
+        }
+
+        private void Print()
+        {
+            contentView.Print();
         }
 
         private async Task RefreshView()
@@ -1391,6 +1406,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public const int DeleteFromFolder = 100;
             public const int Delete = 101;
             public const int DeliveryReport = 102;
+            public const int Print = 103;
         }
 
         static class RequestCodes

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Android.Content;
+using Android.Print;
 using Android.Views;
 using Android.Webkit;
 using Mark5.Mobile.Common;
@@ -61,6 +62,16 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
                 webView.LoadData(string.Empty, "text/plain", "UTF-8");
             }
+        }
+
+        internal void Print()
+        {
+            if (Context == null) 
+                return;
+            
+            var printManager = (PrintManager) Context.GetSystemService(Context.PrintService);
+            var printAdapter = webView.CreatePrintDocumentAdapter($"print_{DocumentPreview.ReferenceNumber}");
+            printManager?.Print("Document", printAdapter, null);
         }
 
         class CustomWebView : WebView
