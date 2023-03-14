@@ -46,8 +46,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
             var js = $"PastePlain(\'{stringToPaste}\')";
             EvaluateJavaScript("javascript: " + js, completionHandler: (result, error) =>
             {
-                if (error != null)
-                    CommonConfig.Logger.Debug("Error while pasting as text: " + error);
+                CommonConfig.Logger.Debug("Error while pasting as text: " + error);
             });
         }
 
@@ -262,21 +261,24 @@ namespace Mark5.Mobile.IOS.Ui.Common
                 prePlainTextNode.Attributes["style"].Remove();
 
                 string[] splitter = { ";" };
-                string[] styleClasses = styles.Split(splitter, StringSplitOptions.None);
+                var styleClasses = styles.Split(splitter, StringSplitOptions.None);
 
                 StringBuilder sbStyles = new($"font-family:{font.FamilyName}; font-size:{font.PointSize}pt;");
 
-                if (null != styleClasses && styleClasses.Length > 0)
+                if (styleClasses.Length > 0)
                 {
                     foreach (var item in styleClasses)
                     {
-                        if (!string.IsNullOrWhiteSpace(item) && !item.ToUpper().Contains("FONT-FAMILY:")
-                            && !item.ToUpper().Contains("FONT-SIZE:") && !item.ToUpper().Contains("FONT:"))
+                        if (string.IsNullOrWhiteSpace(item) 
+                            || item.ToUpper().Contains("FONT-FAMILY:")
+                            || item.ToUpper().Contains("FONT-SIZE:") ||
+                            item.ToUpper().Contains("FONT:"))
                         {
-   
-                            sbStyles.Append(item.Trim());
-                            sbStyles.Append(";");
+                            continue;
                         }
+                        
+                        sbStyles.Append(item.Trim());
+                        sbStyles.Append(";");
                     }
                 }
 
@@ -288,7 +290,6 @@ namespace Mark5.Mobile.IOS.Ui.Common
             }
 
             webView?.LoadHtmlString(htmlTemplate.DocumentNode.InnerHtml, NSBundle.MainBundle.BundleUrl);
-
         }
 
         public override void ViewDidLayoutSubviews()
@@ -354,23 +355,24 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         protected void HeaderView_EndAnimating(object sender, EventArgs e) => headerAnimationRunning = false;
 
-        protected void HeaderView_Animating(object sender, EventArgs e) => SetHeaderPadding(headerView.Layer.PresentationLayer.Frame.Height / webView.ScrollView.ZoomScale);
+        protected void HeaderView_Animating(object sender, EventArgs e) => 
+            SetHeaderPadding(headerView.Layer.PresentationLayer.Frame.Height / webView.ScrollView.ZoomScale);
 
-        protected void SetHeaderView(UIView headerView)
+        protected void SetHeaderView(UIView view)
         {
-            this.headerView = headerView;
+            headerView = view;
 
             foreach (var subview in headerContainerView.Subviews)
                 subview.RemoveFromSuperview();
 
-            headerView.TranslatesAutoresizingMaskIntoConstraints = false;
-            headerContainerView.AddSubview(headerView);
+            view.TranslatesAutoresizingMaskIntoConstraints = false;
+            headerContainerView.AddSubview(view);
             headerContainerView.AddConstraints(new[]
             {
-                headerView.TopAnchor.ConstraintEqualTo(headerContainerView.TopAnchor),
-                headerView.BottomAnchor.ConstraintEqualTo(headerContainerView.BottomAnchor),
-                headerView.LeadingAnchor.ConstraintEqualTo(headerContainerView.LeadingAnchor),
-                headerView.TrailingAnchor.ConstraintEqualTo(headerContainerView.TrailingAnchor)
+                view.TopAnchor.ConstraintEqualTo(headerContainerView.TopAnchor),
+                view.BottomAnchor.ConstraintEqualTo(headerContainerView.BottomAnchor),
+                view.LeadingAnchor.ConstraintEqualTo(headerContainerView.LeadingAnchor),
+                view.TrailingAnchor.ConstraintEqualTo(headerContainerView.TrailingAnchor)
             });
         }
 
@@ -458,7 +460,6 @@ namespace Mark5.Mobile.IOS.Ui.Common
             webView?.StopLoading();
             webView?.LoadHtmlString(text, null);
             ApplyFontToHtmlString(Theme.DefaultFont.CustomFont(TraitCollection), text);
-          
         }
 
         protected void LoadNoContentString()
@@ -510,10 +511,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
             webView?.LoadHtmlString(html, null);
         }
 
-        protected virtual async Task<string> GetContent()
-        {
-            return await webView?.EvaluateJavaScriptAsync("document.documentElement.outerHTML") as NSString;
-        }
+        protected virtual async Task<string> GetContent() => 
+            await webView?.EvaluateJavaScriptAsync("document.documentElement.outerHTML") as NSString;
 
         protected Task<(NSObject, NSError)> EvaluateJavaScriptAsync(string script)
         {
@@ -525,8 +524,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
         protected Task<(NSObject, NSError)> InsertTemplate(ContentType contentType, int id, string content)
         {
             var tcs = new TaskCompletionSource<(NSObject, NSError)>();
-            string sanitizedContent = string.Empty;
-            string typeString = string.Empty;
+            string sanitizedContent;
+            string typeString;
 
             if (contentType == ContentType.Html)
             {
@@ -557,11 +556,12 @@ namespace Mark5.Mobile.IOS.Ui.Common
             return tcs.Task;
         }
 
-        void MoveViewToCaret(int caretPosition)
+        private void MoveViewToCaret(int caretPosition)
         {
             var bottomCaretPosition = caretPosition + 30; //Line height
 
-            var verticalOffset = bottomCaretPosition - (webView.ScrollView.Bounds.Height - keyboardHeight - webView.ScrollView.ContentInset.Top); //The last is only for iOS 10 
+            var verticalOffset = 
+                bottomCaretPosition - (webView.ScrollView.Bounds.Height - keyboardHeight - webView.ScrollView.ContentInset.Top); //The last is only for iOS 10 
 
             CGPoint offset;
 
@@ -637,7 +637,7 @@ namespace Mark5.Mobile.IOS.Ui.Common
         [Export("webView:didFailNavigation:withError:")]
         void DidFailNavigation(WKWebView webView, WKNavigation navigation, NSError error) => loadTcs.SetResult(false);
 
-        void SetHeaderPadding(nfloat height)
+        private void SetHeaderPadding(nfloat height)
         {
             var headerPaddingJs = headerPaddingJsTemplate;
             headerPaddingJs = HtmlUtilities.ProcessWebTemplate(headerPaddingJs, (int)height);
@@ -701,7 +701,8 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         protected async void OnFilePaste()
         {
-            await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("unable_to_paste_title"), Localization.GetString("unable_to_paste_content"));
+            await Dialogs.ShowConfirmAlertAsync(this, 
+                Localization.GetString("unable_to_paste_title"), Localization.GetString("unable_to_paste_content"));
         }
     }
 }

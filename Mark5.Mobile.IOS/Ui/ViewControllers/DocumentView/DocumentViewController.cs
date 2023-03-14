@@ -10,7 +10,6 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.Common.Model.HubMessages;
-using Mark5.Mobile.Common.Reports;
 using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Model;
@@ -80,7 +79,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         public EventHandler ReplyClicked => ReplyActionsButton_Clicked;
         public EventHandler FileToClicked => FileToButton_Clicked;
         public EventHandler CommentsClicked => CommentsButton_Clicked;
-        public EventHandler UserActionsClicke => UserActionsButton_Clicked;
+        public EventHandler UserActionsClicked => UserActionsButton_Clicked;
 
         public DocumentViewController(bool forceShowActionBar = false)
         {
@@ -144,8 +143,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             else
                 MarkAsReadIfNecessary();
 
-            if(PlatformConfig.Preferences.SyncUserActivities)
-                await Managers.DocumentsManager.ExecuteUserActivity(Mobile.Common.Model.UserActivityType.Open, documentPreview, null);
+            if (PlatformConfig.Preferences.SyncUserActivities)
+            {
+                await Managers.DocumentsManager
+                    .ExecuteUserActivity(UserActivityType.Open, documentPreview, null);
+            }
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -161,7 +163,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             DeinitializeHandlers();
             UnsubscribeFromMessages();
 
-            if (NavigationController != null && !(ParentViewController is DocumentPageViewController))
+            if (NavigationController != null && ParentViewController is not DocumentPageViewController)
                 NavigationController.ToolbarHidden = true;
 
             SendStatusBanner.Detach(this);
@@ -200,33 +202,35 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Init methods
 
-        void InitNavigationBar()
+        private void InitNavigationBar()
         {
             editDocumentButtonItem = new UIBarButtonItem
             {
                 Image = UIImage.FromBundle("Edit")
             };
 
-            if (PresentingViewController != null && !hideDoneButton)
-            {
-                doneButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
-                NavigationItem.SetRightBarButtonItem(doneButtonItem, false);
-            }
+            if (PresentingViewController == null || hideDoneButton) 
+                return;
+            
+            doneButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
+            NavigationItem.SetRightBarButtonItem(doneButtonItem, false);
         }
 
-        void InitHeaderView()
+        private void InitHeaderView()
         {
             SetHeaderView(headerView = new HeaderView());
         }
 
-        void InitToolbar()
+        private void InitToolbar()
         {
             commentsButton = new UIButtonScalable
             {
                 Frame = new CoreGraphics.CGRect(0f, 0f, 25f, 25f),
                 Enabled = false,
             };
-            commentsButton.SetImage(UIImage.FromBundle("Comments").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+            commentsButton.SetImage(
+                UIImage.FromBundle("Comments")
+                    ?.ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
 
             ToolbarItems = new[]
             {
@@ -261,7 +265,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             };
         }
 
-        void InitializeHandlers()
+        private void InitializeHandlers()
         {
             if (headerView != null)
             {
@@ -296,21 +300,21 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         {
             var invitation = document.Invitations.First();
             var line = LineUtilities.GetLineForCreationModeFlag(DocumentCreationModeFlag.Reply, document, PlatformConfig.Preferences.AlwaysUseDefaultLine);
-            var appointmentReplyVC = new InvitationReplyViewController(invitation.Status, line)
+            var appointmentReplyVc = new InvitationReplyViewController(invitation.Status, line)
             {
                 ModalPresentationStyle = UIModalPresentationStyle.OverFullScreen,
                 ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve
             };
 
-            NavigationController.PresentViewController(appointmentReplyVC, true, null);
+            NavigationController?.PresentViewController(appointmentReplyVc, true, null);
 
-            InvitationReplyDetailViewModel detailsModel = await appointmentReplyVC.Result;
+            var detailsModel = await appointmentReplyVc.Result;
 
             if (detailsModel != null)
                 await SendInvitationReply(sender as CalendarInvitationView, invitation, detailsModel);
         }
 
-        void DeinitializeHandlers()
+        private void DeinitializeHandlers()
         {
             if (headerView != null)
             {
@@ -340,64 +344,56 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 editDocumentButtonItem.Clicked -= EditDocumentButtonItem_Clicked;
         }
 
-        void SubscribeToMessages()
+        private void SubscribeToMessages()
         {
-            readStatusChangedToken = CommonConfig.MessengerHub.Subscribe<DocumentPreviewReadStatusChangedMessage>(ReadStatusChangedHandler, m => m.DocumentPreviewId == document?.Id);
-            draftSentToken = CommonConfig.MessengerHub.Subscribe<DraftSentMessage>(DraftSentHandler, m => m.DocumentId == document?.Id);
-            commentsCountChangedToken = CommonConfig.MessengerHub.Subscribe<EntityPreviewCommentCountChangedMessage>(CommentsCountChangedHandler, m => m.EntityId == document?.Id);
-
+            readStatusChangedToken = CommonConfig.MessengerHub.Subscribe<DocumentPreviewReadStatusChangedMessage>(
+                ReadStatusChangedHandler, m => m.DocumentPreviewId == document?.Id);
+            
+            draftSentToken = CommonConfig.MessengerHub.Subscribe<DraftSentMessage>(
+                DraftSentHandler, m => m.DocumentId == document?.Id);
+            
+            commentsCountChangedToken = CommonConfig.MessengerHub.Subscribe<EntityPreviewCommentCountChangedMessage>(
+                CommentsCountChangedHandler, m => m.EntityId == document?.Id);
         }
 
-        void UnsubscribeFromMessages()
+        private void UnsubscribeFromMessages()
         {
             readStatusChangedToken?.Dispose();
             draftSentToken?.Dispose();
         }
 
-        public void SetData(Folder folder, DocumentPreview documentPreview)
+        public void SetData(Folder folderCurrent, DocumentPreview documentPreviewCurrent)
         {
-            CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(documentPreview?.Direction == DocumentDirection.External));
+            CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(
+                documentPreviewCurrent?.Direction == DocumentDirection.External));
 
             failedDocumentToUploadGuid = Guid.Empty;
             document = null;
             documentId = null;
             folderId = null;
-            notificationGuid = default(Guid);
+            notificationGuid = default;
 
-            this.documentPreview = documentPreview;
-            this.folder = folder;
+            documentPreview = documentPreviewCurrent;
+            folder = folderCurrent;
         }
 
-        public void SetData(DocumentPreview documentPreview, bool hideDoneButton)
+        public void SetData(DocumentPreview documentPreviewCurrent, bool hideDoneButtonCurrent)
         {
-            CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(documentPreview?.Direction == DocumentDirection.External));
+            CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(
+                documentPreview?.Direction == DocumentDirection.External));
 
             failedDocumentToUploadGuid = Guid.Empty;
             folder = null;
             document = null;
             documentId = null;
             folderId = null;
-            notificationGuid = default(Guid);
+            notificationGuid = default;
 
-            this.documentPreview = documentPreview;
-            this.hideDoneButton = hideDoneButton;
+            documentPreview = documentPreviewCurrent;
+            hideDoneButton = hideDoneButtonCurrent;
         }
 
-        public void SetData(DocumentPreview documentPreview)
-        {
-            CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(documentPreview?.Direction == DocumentDirection.External));
-
-            failedDocumentToUploadGuid = Guid.Empty;
-            document = null;
-            documentId = null;
-            folderId = null;
-            folder = null;
-            notificationGuid = default(Guid);
-
-            this.documentPreview = documentPreview;
-        }
-
-        public void SetData(int documentId)
+        public void SetData(int documentIdCurrent)
         {
             CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(false));
 
@@ -406,12 +402,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             folder = null;
             folderId = null;
             documentPreview = null;
-            notificationGuid = default(Guid);
+            notificationGuid = default;
 
-            this.documentId = documentId;
+            documentId = documentIdCurrent;
         }
 
-        public void SetData(int documentId, Guid notificationGuid)
+        public void SetData(int documentIdCurrent, Guid notification)
         {
             CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(false));
 
@@ -420,11 +416,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             folder = null;
             folderId = null;
             documentPreview = null;
-            this.documentId = documentId;
-            this.notificationGuid = notificationGuid;
+            documentId = documentIdCurrent;
+            notificationGuid = notification;
         }
 
-        public void SetData(Guid failedDocumentToUploadGuid)
+        public void SetData(Guid failedDocumentToUpload)
         {
             CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(false));
 
@@ -432,12 +428,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             documentPreview = null;
             folder = null;
             documentId = null;
-            notificationGuid = default(Guid);
+            notificationGuid = default;
 
-            this.failedDocumentToUploadGuid = failedDocumentToUploadGuid;
+            failedDocumentToUploadGuid = failedDocumentToUpload;
         }
 
-        public void ClearData()
+        private void ClearData()
         {
             loadCts?.Cancel();
 
@@ -446,7 +442,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             documentPreview = null;
             folder = null;
             documentId = null;
-            notificationGuid = default(Guid);
+            notificationGuid = default;
 
             if (flagButton != null)
                 flagButton.Enabled = false;
@@ -475,11 +471,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             Clear();
         }
 
-        public bool IsShowingDocumentWithId(int documentId)
-        {
-            return documentPreview?.Id == documentId || this.documentId == documentId;
-        }
-
         public void SetRefreshDataOnAppear()
         {
             refreshDataOnAppear = true;
@@ -489,7 +480,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Refresh methods
 
-        public async void RefreshData()
+        private async void RefreshData()
         {
             loadCts?.Cancel();
             loadCts = new CancellationTokenSource();
@@ -605,33 +596,31 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             });
         }
 
-        public void RefreshNavigationBar()
+        private void RefreshNavigationBar()
         {
             if (document != null && documentPreview.Direction == DocumentDirection.Draft)
-            {
                 NavigationItem.SetRightBarButtonItem(editDocumentButtonItem, true);
-            }
         }
 
         public void RefreshToolbar()
         {
             var enableBottomActions = failedDocumentToUploadGuid == Guid.Empty;
-            if (enableBottomActions)
+            if (!enableBottomActions) 
+                return;
+            
+            if (!forceShowActionBar && Integration.IsIPad())
             {
-                if (!forceShowActionBar && Integration.IsIPad())
-                {
-                    DocumentPageViewControllerDelegate?.UpdateIPadNavigationButtons(document != null, document?.Comments?.Count.ToString());
-                }
-                else
-                {
-                    flagButton.Enabled = document != null;
-                    fileToButton.Enabled = document != null;
-                    replyActionsButton.Enabled = document != null;
-                    commentsBadgeButton.BadgeValue = document?.Comments?.Count.ToString();
-                    commentsBadgeButton.Enabled = document != null;
-                    commentsButton.Enabled = document != null;
-                    userActionsButton.Enabled = document != null;
-                }
+                DocumentPageViewControllerDelegate?.UpdateIPadNavigationButtons(document != null, document?.Comments?.Count.ToString());
+            }
+            else
+            {
+                flagButton.Enabled = document != null;
+                fileToButton.Enabled = document != null;
+                replyActionsButton.Enabled = document != null;
+                commentsBadgeButton.BadgeValue = document?.Comments?.Count.ToString();
+                commentsBadgeButton.Enabled = document != null;
+                commentsButton.Enabled = document != null;
+                userActionsButton.Enabled = document != null;
             }
         }
 
@@ -639,7 +628,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region Subviews event handlers
 
-        async void HeaderView_AttachmentTapped(object sender, AttachmentButtonTappedEventArgs e)
+        private async void HeaderView_AttachmentTapped(object sender, AttachmentButtonTappedEventArgs e)
         {
             var attachmentDescription = e.Attachment;
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("opening_attachment___"));
@@ -648,15 +637,19 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
-                if(!Integration.IsIPad())
+                if (!Integration.IsIPad())
                 {
-                    var path = await Managers.DocumentsManager.GetAttachmentAsync(attachmentDescription, document, false, SourceType.Local);
+                    var path = await Managers.DocumentsManager
+                        .GetAttachmentAsync(attachmentDescription, document, false, SourceType.Local);
 
                     if (string.IsNullOrWhiteSpace(path))
                     {
                         if (PlatformConfig.Preferences.LargeAttachmentWarning
                             && attachmentDescription.SizeInBytes > LargeAttachmentSizeInBytes
-                            && !await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("warning"), string.Format(Localization.GetString("big_attachment_warning"), UI.PrettyFileSize(attachmentDescription.SizeInBytes))))
+                            && !await Dialogs.ShowYesNoAlertAsync(this, 
+                                Localization.GetString("warning"), 
+                                string.Format(Localization.GetString("big_attachment_warning"), 
+                                    UI.PrettyFileSize(attachmentDescription.SizeInBytes))))
                         {
                             dismissAction();
                             return;
@@ -670,14 +663,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                     await AttachmentsUtilities.OpenAttachment(path, this, document.Id, attachmentDescription?.Name ?? string.Empty);
                 }
-               else
-               {
+                else
+                {
                     var currentItemIndex = document.Attachments.IndexOf(attachmentDescription);
                     var attachmentsList = await Managers.DocumentsManager.GetAttachmentsAsync(document);
                     AttachmentsUtilities.OpenAttachmentsInQuickLook(attachmentsList, currentItemIndex, this);
-               }
-                    
-
+                }
             }
             catch (Exception ex)
             {
@@ -692,37 +683,38 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-
-        async void HeaderView_RecipientTapped(object sender, RecipientTappedEventArgs e)
+        private async void HeaderView_RecipientTapped(object sender, RecipientTappedEventArgs e)
         {
             await ShowMenuForRecipientTappedAction(sender, e.Recipent);
         }
 
-        async Task ShowMenuForRecipientTappedAction(object sender, string recipient )
+        private async Task ShowMenuForRecipientTappedAction(object sender, string recipient )
         {
             var d = new PopoverPresentationControllerDelegate(doneButtonItem);
-            var source = await Dialogs.ShowListActionSheetAsync(this, new[] { Localization.GetString("new_document"), Localization.GetString("new_contact") }, d);
+            var source = await Dialogs.ShowListActionSheetAsync(this, new[]
+            {
+                Localization.GetString("new_document"), Localization.GetString("new_contact")
+            }, d);
             if (source < 0)
                 return;
 
             if (source == 0)
             {
-                PresentComposeViewWithPreconfiguredFields(preconfiguredToAddresses: new string[] { recipient });
+                PresentComposeViewWithPreconfiguredFields(preconfiguredToAddresses: new[] { recipient });
             }
 
             if (source == 1)
-            {
                 PresentContactViewWithPreconfiguredFields(recipient);
-            }
-
         }
 
-        void PresentComposeViewWithPreconfiguredFields(string subject = null, string body = null,
+        private void PresentComposeViewWithPreconfiguredFields(string subject = null, string body = null,
             string[] preconfiguredToAddresses = null, string[] preconfiguredCcAddresses = null, string[] preconfiguredBccAddresses = null)
         {
             var preconfiguredAddresses = new Dictionary<DocumentAddressType, string[]>
             {
-                { DocumentAddressType.To, preconfiguredToAddresses }
+                {
+                    DocumentAddressType.To, preconfiguredToAddresses
+                }
             };
 
             if (preconfiguredCcAddresses != null)
@@ -743,21 +735,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         }
 
 
-        public DocumentAddress GetEmail(string email) => Validator.ContainsValidEmails(email, out List<DocumentAddress> addresses)
-                                                           ? addresses.First()
-                                                           : new DocumentAddress();
+        private static DocumentAddress GetEmail(string email) => 
+            Validator.ContainsValidEmails(email, out var addresses)
+                ? addresses.First() 
+                : new DocumentAddress();
 
-        async void PresentContactViewWithPreconfiguredFields(string preconfiguredEmailAddress)
+        private async void PresentContactViewWithPreconfiguredFields(string preconfiguredEmailAddress)
         {
-            var choice = await Dialogs.ShowListActionSheetAsync(this, new[] {
+            var choice = await Dialogs.ShowListActionSheetAsync(this, new[] 
+            {
                 Localization.GetString("add_company"),
                 Localization.GetString("add_department"),
-                Localization.GetString("add_person") });
+                Localization.GetString("add_person") 
+            });
 
             if (choice < 0)
                 return;
 
-            ContactType type = ContactType.None;
+            var type = ContactType.None;
             switch (choice)
             {
                 case 0:
@@ -778,7 +773,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 PreconfiguredEmailAddress = GetEmail(preconfiguredEmailAddress)
             };
             PresentViewController(new NavigationController(vc),true, null);
-
          }
 
         protected override void OnWebViewLoaded()
@@ -786,16 +780,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             base.OnWebViewLoaded();
             DocumentPageViewControllerDelegate?.AddViewControllerToCache(this);
         }
-
-
+        
         #endregion
 
         #region Toolbar event handlers
 
-        public async void FlagButton_Clicked(object sender, EventArgs e)
+        private async void FlagButton_Clicked(object sender, EventArgs e)
         {
             var isRead = documentPreview.IsReadByCurrent;
-            var flagListStrings = new string[]
+            var flagListStrings = new []
             {
                 Localization.GetString(isRead ? "mark_as_unread" : "mark_as_read"),
                 Localization.GetString("categories")
@@ -817,9 +810,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        async void ReplyActionsButton_Clicked(object sender, EventArgs e)
+        private async void ReplyActionsButton_Clicked(object sender, EventArgs e)
         {
-            var replyListStrings = new string[]
+            var replyListStrings = new []
             {
                 Localization.GetString("reply"),
                 Localization.GetString("reply_all"),
@@ -848,7 +841,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        async void ShowPriorityActionSheet(UIBarButtonItem barButtonItem)
+        private async void ShowPriorityActionSheet(UIBarButtonItem barButtonItem)
         {
             var priorities = new List<Priority>
             {
@@ -856,7 +849,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 Priority.Normal,
                 Priority.Urgent
             };
-            var priorityStrings = priorities.Select(p => UI.PrettyPriorityString(p));
+            var priorityStrings = priorities.Select(UI.PrettyPriorityString);
             var result = await Dialogs.ShowListActionSheetAsync(this, priorityStrings.ToArray(), barButtonItem);
 
             if (result < 0)
@@ -867,14 +860,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             await SetPriority(priority);
         }
 
-        async Task SetPriority(Priority priority)
+        private async Task SetPriority(Priority priority)
         {
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("setting_priority___"));
 
             try
             {
                 CommonConfig.Logger.Info($"Attempting to setting priority for document [documentId={document.Id}]");
-                await Managers.DocumentsManager.SetDocumentsPriorityAsync(new List<DocumentPreview> { documentPreview }, priority);
+                await Managers.DocumentsManager.SetDocumentsPriorityAsync(
+                    new List<DocumentPreview> { documentPreview }, priority);
 
                 UpdatePriority();
 
@@ -894,7 +888,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             headerView.UpdatePriority();
         }
 
-        void FileToButton_Clicked(object sender, EventArgs e)
+        private void FileToButton_Clicked(object sender, EventArgs e)
         {
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
 
@@ -913,7 +907,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                             document
                         }
                     };
-                    PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+                    PresentViewController(new NavigationController(
+                        vc, UIModalPresentationStyle.PageSheet), true, null);
                 }));
             }
 
@@ -942,17 +937,27 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             eas.AddAction(UIAlertAction.Create(Localization.GetString("set_priority"),
                 UIAlertActionStyle.Default, a => ShowPriorityActionSheet((UIBarButtonItem)sender)));
 
-            eas.AddAction(UIAlertAction.Create(Localization.GetString("print"), UIAlertActionStyle.Default, a => Print()));
-            
-            if (folder?.InternalType == FolderInternalType.FilterView || folder?.InternalType == FolderInternalType.Static || folder?.InternalType == FolderInternalType.Worktray)
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete_from_folder"), UIAlertActionStyle.Default, (a) => RemoveFromFolder(button)));
+            eas.AddAction(UIAlertAction.Create(Localization.GetString("print"), 
+                UIAlertActionStyle.Default, a => Print()));
+
+            if (folder?.InternalType == FolderInternalType.FilterView
+                || folder?.InternalType == FolderInternalType.Static
+                || folder?.InternalType == FolderInternalType.Worktray)
+            {
+                eas.AddAction(UIAlertAction.Create(
+                    Localization.GetString("delete_from_folder"), 
+                    UIAlertActionStyle.Default, (a) => RemoveFromFolder(button)));
+            }
 
             var documents = new List<DocumentPreview>
             {
                 documentPreview
             };
             if (DocumentsDeleteChecker.CanDeleteDocuments(documents))
-                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), UIAlertActionStyle.Destructive, (a) => Delete(button)));
+            {
+                eas.AddAction(UIAlertAction.Create(Localization.GetString("delete"), 
+                    UIAlertActionStyle.Destructive, (a) => Delete(button)));
+            }
 
             eas.AddAction(UIAlertAction.Create(Localization.GetString("cancel"), UIAlertActionStyle.Cancel, null));
 
@@ -966,9 +971,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         #region NavigationBar event handlers
 
-        void EditDocumentButtonItem_Clicked(object sender, EventArgs e) => PresentEditing();
+        private void EditDocumentButtonItem_Clicked(object sender, EventArgs e) => PresentEditing();
 
-        void DoneButtonItem_Clicked(object sender, EventArgs e) => DismissViewController(true, null);
+        private void DoneButtonItem_Clicked(object sender, EventArgs e) => DismissViewController(true, null);
 
         #endregion
 
@@ -987,7 +992,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        async Task DoChangeReadStatus(bool isReadByCurrent)
+        private async Task DoChangeReadStatus(bool isReadByCurrent)
         {
             CommonConfig.Logger.Info($"Attempting to mark as {(isReadByCurrent ? "unread" : "read")} [documentPreview={documentPreview}]...");
 
@@ -1011,7 +1016,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        void DoAssignCategory()
+        private void DoAssignCategory()
         {
             if (!ServerConfig.SystemSettings.SystemInfo.FavoriteCategoriesAvailable)
             {
@@ -1027,7 +1032,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void UserActionsButton_Clicked(object sender, EventArgs e)
         {
-            var actionLinksListString = new string[]
+            var actionLinksListString = new []
             {
                 Localization.GetString("history"),
                 Localization.GetString("overview")
@@ -1052,7 +1057,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        async void CommentsButton_Clicked(object sender, EventArgs e)
+        private async void CommentsButton_Clicked(object sender, EventArgs e)
         {
              var vc = new CommentsListViewController
              {
@@ -1061,7 +1066,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
              PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        void DoRespond(DocumentCreationModeFlag creationModeFlag)
+        private void DoRespond(DocumentCreationModeFlag creationModeFlag)
         {
             var vc = new ComposeDocumentViewController
             {
@@ -1074,26 +1079,25 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-
-        async void CopyToNew()
+        private async void CopyToNew()
         {
             if (document == null || documentPreview == null)
                 return;
 
-            CopyToNewOption[] data;
-
             var hasAttachments = document.Attachments.Any();
-            if (hasAttachments)
-                data = new[] { CopyToNewOption.Addresses, CopyToNewOption.Content, CopyToNewOption.Attachments };
-            else
-                data = new[] { CopyToNewOption.Addresses, CopyToNewOption.Content };
+            var data = hasAttachments 
+                ? new[] { CopyToNewOption.Addresses, CopyToNewOption.Content, CopyToNewOption.Attachments } 
+                : new[] { CopyToNewOption.Addresses, CopyToNewOption.Content };
 
-            var selections = await Dialogs.ShowMultiSelectViewControllerAsync(this, Localization.GetString("copy_to_new"), data, data, UI.PrettyCopyToNewString, LambdaEqualityComparer<CopyToNewOption>.Create(ctno => ctno), true);
+            var selections = await Dialogs.ShowMultiSelectViewControllerAsync(this, 
+                Localization.GetString("copy_to_new"), data, data, UI.PrettyCopyToNewString, 
+                LambdaEqualityComparer<CopyToNewOption>.Create(option => option), true);
+            
             if (selections == null || selections.Length < 1)
                 return;
 
             CopyToNewOption copyToNewOption = CopyToNewOption.None;
-            for (int i = 0; i < selections.Length; i++)
+            for (var i = 0; i < selections.Length; i++)
                 copyToNewOption |= selections[i];
 
             var vc = new ComposeDocumentViewController
@@ -1108,16 +1112,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
-        void CopyToWorktray()
-        {
-            var vc = new CopyToWorktrayViewController
-            {
-                BusinessEntities = new List<IBusinessEntity> { document }
-            };
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
-        }
-
-        async void RemoveFromFolder(UIBarButtonItem button)
+        private async void RemoveFromFolder(UIBarButtonItem button)
         {
             var d = new PopoverPresentationControllerDelegate(button);
             var result = await Dialogs.ShowDestructiveActionSheetAsync(this, Localization.GetString("delete_from_folder"), d);
@@ -1148,7 +1143,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        async void Delete(UIBarButtonItem button)
+        private async void Delete(UIBarButtonItem button)
         {
             var d = new PopoverPresentationControllerDelegate(button);
             var result = await Dialogs.ShowDestructiveActionSheetAsync(this, Localization.GetString("delete"), d);
@@ -1182,7 +1177,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        async Task SendInvitationReply(CalendarInvitationView cv, CalendarInvitation invitation, InvitationReplyDetailViewModel vm)
+        private async Task SendInvitationReply(CalendarInvitationView cv, CalendarInvitation invitation, InvitationReplyDetailViewModel vm)
         {
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("sending_reply___"));
 
@@ -1198,7 +1193,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 responseDocument.Lines = new List<Line> { vm.Line };
 
                 //Body
-                string previousDocumentContent = string.Empty;
+                var previousDocumentContent = string.Empty;
 
                 if (!string.IsNullOrWhiteSpace(document?.HtmlBody))
                 {
@@ -1230,8 +1225,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     case ParticipantStatus.Tentative:
                         responseSubjectString = "TENTATIVE: ";
                         break;
-                    default:
-                        break;
                 }
 
                 responseDocumentPreview.Subject = responseSubjectString + documentPreview.Subject;
@@ -1259,7 +1252,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 //notify to update calendar datasource
                 if (invitation.Status == ParticipantStatus.Accepted || invitation.Status == ParticipantStatus.Tentative)
-                    CommonConfig.MessengerHub.Publish(new EntityAddedMessage(this, ObjectType.CalendarAppointment, invitation.AppointmentId));
+                {
+                    CommonConfig.MessengerHub.Publish(
+                        new EntityAddedMessage(this, ObjectType.CalendarAppointment, invitation.AppointmentId));
+                }
 
                 dismissAction();
             }
@@ -1267,7 +1263,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             {
                 dismissAction();
 
-                CommonConfig.Logger.Error($"Error while replying to calendar invitation for document [documentId={document.Id}]", ex);
+                var id = document == null ? string.Empty : document.Id.ToString();
+                CommonConfig.Logger.Error($"Error while replying to calendar invitation for document [documentId={id}]", ex);
                 await Dialogs.ShowErrorAlertAsync(this, ex);
             }
         }
@@ -1287,21 +1284,24 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 {
                     try
                     {
-                        var parts = action.Request.Url.AbsoluteString.Split("?");
-                        var to = parts[0].Split(",");
-
-                        if (parts.Length > 1)
+                        if (action.Request.Url.AbsoluteString != null)
                         {
-                            var parsed = HttpUtility.ParseQueryString(parts[1]);
-                            var subject = parsed["subject"];
-                            var body = parsed["body"];
-                            var cc = parsed["cc"]?.Split(",");
-                            var bcc = parsed["bcc"]?.Split(",");
+                            var parts = action.Request.Url.AbsoluteString.Split("?");
+                            var to = parts[0].Split(",");
 
-                            PresentComposeViewWithPreconfiguredFields(subject, body, to, cc, bcc);
+                            if (parts.Length > 1)
+                            {
+                                var parsed = HttpUtility.ParseQueryString(parts[1]);
+                                var subject = parsed["subject"];
+                                var body = parsed["body"];
+                                var cc = parsed["cc"]?.Split(",");
+                                var bcc = parsed["bcc"]?.Split(",");
+
+                                PresentComposeViewWithPreconfiguredFields(subject, body, to, cc, bcc);
+                            }
+                            else
+                                PresentComposeViewWithPreconfiguredFields(preconfiguredToAddresses: to);
                         }
-                        else
-                            PresentComposeViewWithPreconfiguredFields(preconfiguredToAddresses: to);
                     }
                     catch (Exception ex)
                     {
@@ -1309,29 +1309,29 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     }
                 }
                 else
+                {
                     Integration.OpenLink(action.Request.Url,
-                                         async () => await Dialogs.ShowConfirmAlertAsync(this,
-                                                                                         Localization.GetString("unable_open_link_title"),
-                                                                                         Localization.GetString("unable_open_link_content") + action.Request.Url.Scheme));
+                        async () => await Dialogs.ShowConfirmAlertAsync(
+                            this,
+                            Localization.GetString("unable_open_link_title"),
+                            Localization.GetString("unable_open_link_content") + action.Request.Url.Scheme));
+                }
                 return false;
             }
 
-            if (action.NavigationType == WKNavigationType.Reload)
-                return false;
-
-            return true;
+            return action.NavigationType != WKNavigationType.Reload;
         }
 
         #endregion
 
         #region Messages handlers
 
-        void ReadStatusChangedHandler(DocumentPreviewReadStatusChangedMessage obj)
+        private void ReadStatusChangedHandler(DocumentPreviewReadStatusChangedMessage obj)
         {
             BeginInvokeOnMainThread(headerView.UpdateReadBy);
         }
 
-        void DraftSentHandler(DraftSentMessage message)
+        private void DraftSentHandler(DraftSentMessage message)
         {
             BeginInvokeOnMainThread(() =>
             {
@@ -1342,12 +1342,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             });
         }
 
-        void CommentsCountChangedHandler(EntityPreviewCommentCountChangedMessage m)
+        private void CommentsCountChangedHandler(EntityPreviewCommentCountChangedMessage m)
         {
             if (Integration.IsIPad())
-                BeginInvokeOnMainThread(() => DocumentPageViewControllerDelegate?.UpdateIPadNavigationButtons(true, document.Comments.Count().ToString()));
+            {
+                BeginInvokeOnMainThread(() => DocumentPageViewControllerDelegate?.UpdateIPadNavigationButtons(
+                    true, document.Comments.Count().ToString()));
+            }
             else
-                BeginInvokeOnMainThread(() => commentsBadgeButton.SetBadgeValue(document.Comments.Count().ToString(), false));
+            {
+                BeginInvokeOnMainThread(() => commentsBadgeButton.SetBadgeValue(
+                    document.Comments.Count().ToString(), false));
+            }
         }
 
         #endregion
@@ -1393,15 +1399,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         }
 
         [Export("viewControllerWithRestorationIdentifierPath:coder:")]
-        public static UIViewController Restore(string[] identifierComponents, NSCoder coder)
-        {
-            if (coder.DecodeBool("doNotRestore"))
-                return null;
-
-            return new DocumentViewController();
-        }
+        public static UIViewController Restore(string[] identifierComponents, NSCoder coder) => 
+            coder.DecodeBool("doNotRestore") ? null : new DocumentViewController();
 
         #endregion
-
     }
 }

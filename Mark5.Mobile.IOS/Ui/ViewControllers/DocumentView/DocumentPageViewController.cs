@@ -487,7 +487,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView
         void UserActionsButton_Clicked(object sender, EventArgs e)
         {
             var vc = (DocumentViewController)ViewControllers.FirstOrDefault();
-            vc.UserActionsClicke(sender, e);
+            vc.UserActionsClicked(sender, e);
         }
 
         void CommentsButton_TouchUpInside(object sender, EventArgs e)
