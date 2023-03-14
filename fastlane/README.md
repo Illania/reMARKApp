@@ -47,6 +47,22 @@ Build beta version
 
 Upload beta to Testflight
 
+### ios bump_droid
+
+```sh
+[bundle exec] fastlane ios bump_droid
+```
+
+Bump Android version
+
+### ios build_droid
+
+```sh
+[bundle exec] fastlane ios build_droid
+```
+
+Build Android app
+
 ----
 
 This README.md is auto-generated and will be re-generated every time [_fastlane_](https://fastlane.tools) is run.

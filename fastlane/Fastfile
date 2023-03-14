@@ -57,15 +57,7 @@ platform :ios do
     )
   end
 
-  def bump_build_version(type)
-    build_number = get_info_plist_value(path: "./Mark5.Mobile.IOS/Info.plist", key: "CFBundleVersion")
-    new_build_number = build_number.to_i+1
-    set_info_plist_value(path: "./Mark5.Mobile.IOS/Info.plist", key: "CFBundleVersion", value: new_build_number.to_s)
-    set_info_plist_value(path: "./Mark5.Mobile.IOS.Extensions.CallId/Info.plist", key: "CFBundleVersion", value: new_build_number.to_s)
-    set_info_plist_value(path: "./reMARK.Mobile.IOS.Extensions.Share/Info.plist", key: "CFBundleVersion", value: new_build_number.to_s)
-    
-    current_version = get_info_plist_value(path: "./Mark5.Mobile.IOS/Info.plist", key: "CFBundleShortVersionString")
-    
+  def bump_version(current_version,type)
     components = current_version.split('.')
     major = components[0].to_i
     minor = components[1].to_i
@@ -84,12 +76,43 @@ platform :ios do
       abort("Unknown version bump type: #{type}\nValid options: major, minor, patch.")
     end
 
-    new_version = [major, minor, patch].join('.')
+    return new_version = [major, minor, patch].join('.')
+  end
+
+  def bump_build_version(type)
+    build_number = get_info_plist_value(path: "./Mark5.Mobile.IOS/Info.plist", key: "CFBundleVersion")
+    new_build_number = build_number.to_i+1
+    set_info_plist_value(path: "./Mark5.Mobile.IOS/Info.plist", key: "CFBundleVersion", value: new_build_number.to_s)
+    set_info_plist_value(path: "./Mark5.Mobile.IOS.Extensions.CallId/Info.plist", key: "CFBundleVersion", value: new_build_number.to_s)
+    set_info_plist_value(path: "./reMARK.Mobile.IOS.Extensions.Share/Info.plist", key: "CFBundleVersion", value: new_build_number.to_s)
+    
+    current_version = get_info_plist_value(path: "./Mark5.Mobile.IOS/Info.plist", key: "CFBundleShortVersionString")
+    
+    new_version = bump_version(current_version, type)
+
     set_info_plist_value(path: "./Mark5.Mobile.IOS/Info.plist", key: "CFBundleShortVersionString", value: new_version)
     set_info_plist_value(path: "./Mark5.Mobile.IOS.Extensions.CallId/Info.plist", key: "CFBundleShortVersionString", value: new_version)
     set_info_plist_value(path: "./reMARK.Mobile.IOS.Extensions.Share/Info.plist", key: "CFBundleShortVersionString", value: new_version)
  
  end 
+
+  def bump_droid_build_version(type)
+    require 'nokogiri'
+    manifest_file = '/Users/anna/mark5-app-new/Mark5.Mobile.Droid/Properties/AndroidManifest.xml'
+    doc = File.open(manifest_file) { |f|
+      @doc = Nokogiri::XML(f)
+      manifest_node = @doc.xpath('//manifest')
+      current_version = @doc.at('//manifest/@android:versionName').text
+      new_version = bump_version(current_version, type)
+      current_build = @doc.at('//manifest/@android:versionCode').text
+      new_build = (current_build.to_i+1).to_s
+      puts new_version
+      puts new_build
+      manifest_node.attr('android:versionName', new_version)
+      manifest_node.attr('android:versionCode', new_build)
+      File.write(manifest_file, @doc.to_xml)
+    }
+  end
 
 
  def post_to_slack
@@ -146,9 +169,29 @@ end
        groups: [
             "test"
         ],
-      skip_submission: true,
-      skip_waiting_for_build_processing: true
+      skip_submission: false,
+      skip_waiting_for_build_processing: false
     ) 
+  end
+
+  desc "Bump Android version"
+  lane :bump_droid do
+    bump_droid_build_version('patch')
+  end
+
+  desc "Build Android app"
+  lane :build_droid do
+    nuget('/Users/anna/mark5-app-new/Mark5.sln')
+    bump_droid_version('patch')
+    xamarin_build(
+        solution: '/Users/anna/mark5-app-new/Mark5.sln',
+        platform: '',
+        target: 'Rebuild',
+        build_type: 'Release',
+        print_all: true,
+        build_util: 'msbuild',
+        ipa_name: 'remark.ipa'
+    )
   end
     
 
