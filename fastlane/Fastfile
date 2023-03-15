@@ -17,25 +17,9 @@ default_platform(:ios)
 
 platform :ios do
 
-  desc "Get certificates"
-  lane :certificates do
-    sync_code_signing(
-      type: "development",
-      app_identifier: ['com.nordic-it.mark5.mobile.ios', 'com.nordic-it.mark5.mobile.ios.callid', 'com.nordic-it.mark5.mobile.ios.share'],
-      force_for_new_devices: true,
-      readonly: true
-    )
-
-    # You can repeat the sync_code_signing with other types of certificates such as appstore and adhoc
-    sync_code_signing(
-      type: "appstore",
-      app_identifier: ['com.nordic-it.mark5.mobile.ios', 'com.nordic-it.mark5.mobile.ios.callid', 'com.nordic-it.mark5.mobile.ios.share'],
-      readonly: true
-    )
-  end
-
-  desc "Generate new certificates"
-  lane :generate_new_certificates do
+#region Certificates
+  desc "Generate certificates"
+  lane :generate_certificates do
     sync_code_signing(
       type: "development",
       app_identifier: ['com.nordic-it.mark5.mobile.ios', 'com.nordic-it.mark5.mobile.ios.callid', 'com.nordic-it.mark5.mobile.ios.share'],
@@ -55,6 +39,18 @@ platform :ios do
       force_for_new_devices: true,
       readonly: false
     )
+  end
+#endregion
+
+#region Versioning
+  def get_version
+    version = get_info_plist_value(path: "./Mark5.Mobile.IOS/Info.plist", key: "CFBundleShortVersionString")
+    return version
+  end
+
+  def get_build_number
+    build_number = get_info_plist_value(path: "./Mark5.Mobile.IOS/Info.plist", key: "CFBundleVersion")
+    return build_number
   end
 
   def bump_version(current_version,type)
@@ -95,6 +91,165 @@ platform :ios do
     set_info_plist_value(path: "./reMARK.Mobile.IOS.Extensions.Share/Info.plist", key: "CFBundleShortVersionString", value: new_version)
  
  end 
+#endregion
+
+#region Build
+  def nuget(sln)
+    sh "nuget restore #{sln} -verbosity detailed"
+  end
+
+  desc "Build release"
+  lane :build_release do |options|
+    begin
+      bump_build_version(options[:increment])
+      update_plist( 
+        plist_path: "./Mark5.Mobile.IOS/Entitlements.plist",
+        block: proc do |plist|
+          plist[:"aps-environment"] = "production"
+        end
+      )
+      sync_code_signing(
+        type: "appstore",
+        app_identifier: [
+          'com.nordic-it.mark5.mobile.ios', 
+          'com.nordic-it.mark5.mobile.ios.callid', 
+          'com.nordic-it.mark5.mobile.ios.share'
+        ],
+        force_for_new_devices: true,
+        readonly: false
+      )
+      nuget('/Users/anna/mark5-app-new/Mark5.sln')
+      xamarin_build(
+          solution: '/Users/anna/mark5-app-new/Mark5.sln',
+          platform: 'iPhone',
+          target: 'Rebuild',
+          build_type: 'Release',
+          print_all: true,
+          build_util: 'msbuild',
+          ipa_name: 'remark.ipa'
+      )
+      slack_on_success
+    rescue => exception
+      slack_on_error(exception)
+    end
+#endregion
+
+#region Slack
+  def slack_on_success(message)
+     slack(
+      slack_url: "https://hooks.slack.com/services/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",
+      message: message,
+      channel: "#fastlane", 
+      success: true,  
+      username: "ag",
+      attachment_properties: {
+       fields: [
+           {
+               title: "Version",
+               value: get_version,
+           },
+           {
+               title: "Build number",
+               value: get_build_number,
+           }
+         ]
+        }  
+      )
+  end 
+
+
+  def slack_on_error(exception)
+      slack(  
+         slack_url: "https://hooks.slack.com/services/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",
+         message: "Error occured ☹️!",
+         channel: "#fastlane", 
+         success: false,
+         username: "ag",
+         attachment_properties: {
+             fields: [
+                 {
+                     title: "Error message",
+                     value: exception
+                 }
+             ]
+         }
+     )
+  end
+#endregion
+
+#region Deliver
+  desc "Upload beta to Testflight"
+  lane :testflight do |options|
+    begin
+     if options[:type] == "internal"
+      groups = ["internal"]
+     elseif options[:type] == "public"
+      groups = ["all"]
+     else
+      groups = ["test"] 
+
+     app_store_connect_api_key()
+     pilot(
+      changelog: options[:changelog] if options[:changelog] != nil else "small fixes",
+      distribute_external: true,
+      distribute_only: false,
+      ipa: "./Mark5.Mobile.IOS/bin/iPhone/Release/remark.ipa",
+      groups: groups,
+      skip_submission: false,
+      skip_waiting_for_build_processing: false
+    )
+      slack_on_success("reMARK iOS app successfully uploaded to Testflight 📱")
+    rescue => exception
+     slack_on_error(exception)
+  end
+
+  desc "Upload to AppStore"
+  lane :appstore do
+    begin 
+     app_store_connect_api_key()
+     deliver(
+      app_version: get_version,
+      app_identifier: "com.nordic-it.mark5.mobile.ios",
+      ipa: "./Mark5.Mobile.IOS/bin/iPhone/Release/remark.ipa",
+      submit_for_review: true,
+      automatic_release: true,
+      phased_release: true,
+      force: true, # Skip HTMl report verification
+      skip_metadata: false,
+      skip_screenshots: true,
+      skip_binary_upload: false,
+    )
+      slack_on_success("reMARK iOS app successfully uploaded to AppStore 📱")
+    rescue => exception
+      slack_on_error(exception)
+
+  end
+
+
+#endregion
+
+
+  
+    
+
+end
+
+platform :android do
+
+  desc "Build Android app"
+  lane :build_droid do
+    nuget('/Users/anna/mark5-app-new/Mark5.sln')
+    bump_droid_build_version('patch')
+    xamarin_build(
+        solution: '/Users/anna/mark5-app-new/Mark5.sln',
+        platform: '',
+        target: 'Rebuild',
+        build_type: 'Release',
+        print_all: true,
+        build_util: 'msbuild',
+        ipa_name: 'remark.ipa'
+    )
+  end
 
   def bump_droid_build_version(type)
     require 'nokogiri'
@@ -106,8 +261,6 @@ platform :ios do
       new_version = bump_version(current_version, type)
       current_build = @doc.at('//manifest/@android:versionCode').text
       new_build = (current_build.to_i+1).to_s
-      puts new_version
-      puts new_build
       manifest_node.attr('android:versionName', new_version)
       manifest_node.attr('android:versionCode', new_build)
       File.write(manifest_file, @doc.to_xml)
@@ -115,85 +268,6 @@ platform :ios do
   end
 
 
- def post_to_slack
-  slack(
-    slack_url: "https://hooks.slack.com/services/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",
-    message: "App successfully released!",
-    channel: "#fastlane", 
-    success: true,  
-    username: "ag"
-    )
-end
-
- def nuget(sln)
-    sh "nuget restore #{sln} -verbosity detailed"
-end
-  
-  desc "Build beta version"
-  lane :build_beta do
-    bump_build_version("patch")
-    update_plist( 
-      plist_path: "./Mark5.Mobile.IOS/Entitlements.plist",
-      block: proc do |plist|
-        plist[:"aps-environment"] = "production"
-      end
-    )
-    sync_code_signing(
-      type: "appstore",
-      app_identifier: ['com.nordic-it.mark5.mobile.ios', 'com.nordic-it.mark5.mobile.ios.callid', 'com.nordic-it.mark5.mobile.ios.share'],
-      force_for_new_devices: true,
-      readonly: false
-    )
-    nuget('/Users/anna/mark5-app-new/Mark5.sln')
-    xamarin_build(
-        solution: '/Users/anna/mark5-app-new/Mark5.sln',
-        platform: 'iPhone',
-        target: 'Rebuild',
-        build_type: 'Release',
-        print_all: true,
-        build_util: 'msbuild',
-        ipa_name: 'remark.ipa'
-    )
-    post_to_slack
-  end
-
-
-  desc "Upload beta to Testflight"
-  lane :upload_beta do
-     app_store_connect_api_key()
-     pilot(
-      changelog: "test fastlane build",
-      distribute_external: true,
-      distribute_only: false,
-      ipa: "./Mark5.Mobile.IOS/bin/iPhone/Release/remark.ipa",
-       groups: [
-            "test"
-        ],
-      skip_submission: false,
-      skip_waiting_for_build_processing: false
-    ) 
-  end
-
-  desc "Bump Android version"
-  lane :bump_droid do
-    bump_droid_build_version('patch')
-  end
-
-  desc "Build Android app"
-  lane :build_droid do
-    nuget('/Users/anna/mark5-app-new/Mark5.sln')
-    bump_droid_version('patch')
-    xamarin_build(
-        solution: '/Users/anna/mark5-app-new/Mark5.sln',
-        platform: '',
-        target: 'Rebuild',
-        build_type: 'Release',
-        print_all: true,
-        build_util: 'msbuild',
-        ipa_name: 'remark.ipa'
-    )
-  end
-    
 
 end
 
