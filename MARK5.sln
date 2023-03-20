@@ -38,6 +38,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mark5.Mobile.Classes", "Mar
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastScrollRecycler", "FastScrollRecycler\FastScrollRecycler.csproj", "{F36FC024-B7D6-4512-BF4C-AEC8B0C93CE2}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DC97EE97-0B0E-4532-AF9F-D64DBF0301DA}"
+	ProjectSection(SolutionItems) = preProject
+		package.json = package.json
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Ad-Hoc|Any CPU = Ad-Hoc|Any CPU
