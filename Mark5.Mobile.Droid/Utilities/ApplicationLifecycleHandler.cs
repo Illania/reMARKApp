@@ -8,8 +8,10 @@ using Mark5.Mobile.Droid.Ui.Activities;
 using Mark5.Mobile.Droid.Ui.Common;
 using Mark5.Mobile.Droid.Ui.Fragments;
 
-namespace Mark5.Mobile.Droid.Utilities {
-    public class ApplicationLifecycleHandler : Java.Lang.Object, Application.IActivityLifecycleCallbacks {
+namespace Mark5.Mobile.Droid.Utilities
+{
+    public class ApplicationLifecycleHandler : Java.Lang.Object, Application.IActivityLifecycleCallbacks
+    {
         const string AuthenticationFragmentTag = "authenticationFragmentTag";
         const string lastClosedKey = "lastClosedKey";
 
@@ -18,7 +20,8 @@ namespace Mark5.Mobile.Droid.Utilities {
 
         public bool ApplicationVisible => activitiesStarted > 0;
 
-        public void OnActivityStarted(Activity activity) {
+        public void OnActivityStarted(Activity activity)
+        {
             if (activity is SplashActivity)
                 return;
 
@@ -27,18 +30,22 @@ namespace Mark5.Mobile.Droid.Utilities {
                  activity is BaseAppCompatActivity bca &&
                  PlatformConfig.Preferences.AuthorizationEnabled &&
                  ShouldAuthenticate() &&
-                 IsAuthenticationPossible(activity)) {
-                if ((AuthenticationDialogFragment)bca.SupportFragmentManager.FindFragmentByTag(AuthenticationFragmentTag) == null) {
+                 IsAuthenticationPossible(activity))
+            {
+                if ((AuthenticationDialogFragment)bca.SupportFragmentManager.FindFragmentByTag(AuthenticationFragmentTag) == null)
+                {
                     var authFragment = new AuthenticationDialogFragment();
                     authFragment.Show(bca.SupportFragmentManager, AuthenticationFragmentTag);
                 }
-            } else
+            }
+            else
                 ResetLastClosedTime();
 
             activitiesStarted++;
         }
 
-        public void OnActivityStopped(Activity activity) {
+        public void OnActivityStopped(Activity activity)
+        {
             if (activity is SplashActivity)
                 return;
 
@@ -49,14 +56,16 @@ namespace Mark5.Mobile.Droid.Utilities {
                 SaveLastClosedTime();
         }
 
-        void SaveLastClosedTime() {
+        void SaveLastClosedTime()
+        {
             var prefManager = PreferenceManager.GetDefaultSharedPreferences(Application.Context);
             var editor = prefManager.Edit();
             editor.PutString(lastClosedKey, DateTime.UtcNow.ToString("s"));
             editor.Apply();
         }
 
-        DateTime? GetLastClosedTime() {
+        DateTime? GetLastClosedTime()
+        {
             var prefManager = PreferenceManager.GetDefaultSharedPreferences(Application.Context);
             var timeString = prefManager.GetString(lastClosedKey, string.Empty);
             if (timeString == string.Empty)
@@ -65,14 +74,16 @@ namespace Mark5.Mobile.Droid.Utilities {
             return DateTime.SpecifyKind(Convert.ToDateTime(timeString), DateTimeKind.Utc);
         }
 
-        void ResetLastClosedTime() {
+        void ResetLastClosedTime()
+        {
             var prefManager = PreferenceManager.GetDefaultSharedPreferences(Application.Context);
             var editor = prefManager.Edit();
             editor.PutString(lastClosedKey, string.Empty);
             editor.Apply();
         }
 
-        bool ShouldAuthenticate() {
+        bool ShouldAuthenticate()
+        {
             var lastTime = GetLastClosedTime();
             if (lastTime == null)
                 return false;
@@ -81,12 +92,14 @@ namespace Mark5.Mobile.Droid.Utilities {
             return timeDifference.TotalMinutes >= PlatformConfig.Preferences.AuthorizationInterval;
         }
 
-        public void OnAuthenticationSuccessful() {
+        public void OnAuthenticationSuccessful()
+        {
             authenticated = true;
             ResetLastClosedTime();
         }
 
-        bool IsAuthenticationPossible(Activity activity) {
+        bool IsAuthenticationPossible(Activity activity)
+        {
             var keyguardManager = (KeyguardManager)activity.GetSystemService(Context.KeyguardService);
             var fingerprintManager = FingerprintManagerCompat.From(activity);
 
@@ -95,23 +108,28 @@ namespace Mark5.Mobile.Droid.Utilities {
 
         #region Unused callbacks
 
-        public void OnActivityCreated(Activity activity, Bundle savedInstanceState) {
+        public void OnActivityCreated(Activity activity, Bundle savedInstanceState)
+        {
             //Nothing to do
         }
 
-        public void OnActivityDestroyed(Activity activity) {
+        public void OnActivityDestroyed(Activity activity)
+        {
             //Nothing to do
         }
 
-        public void OnActivityResumed(Activity activity) {
+        public void OnActivityResumed(Activity activity)
+        {
             //Nothing to do
         }
 
-        public void OnActivityPaused(Activity activity) {
+        public void OnActivityPaused(Activity activity)
+        {
             //Nothing to do
         }
 
-        public void OnActivitySaveInstanceState(Activity activity, Bundle outState) {
+        public void OnActivitySaveInstanceState(Activity activity, Bundle outState)
+        {
             //Nothing to do
         }
 
