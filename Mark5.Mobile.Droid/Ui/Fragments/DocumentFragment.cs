@@ -1401,10 +1401,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public const int Comments = 70;
             public const int Actions = 80;
             public const int Links = 90;
+            public const int Print = 91;
             public const int DeleteFromFolder = 100;
             public const int Delete = 101;
             public const int DeliveryReport = 102;
-            public const int Print = 103;
         }
 
         static class RequestCodes
