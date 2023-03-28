@@ -37,6 +37,8 @@ namespace Mark5.Mobile.Droid
         {
             ThreadPool.SetMinThreads(50, 50);
             ThreadPool.SetMaxThreads(100, 100);
+            var t = 0;
+            t++;
         }
 
         public override void OnCreate()
