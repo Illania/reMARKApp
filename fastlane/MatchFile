@@ -1,16 +1,15 @@
-git_url("https://gitlab.com/illania/extra.git")
-git_branch("master")
-git_user_email("ag@nordic-it.com")
+# This file is used only for iOS apps
 
-type("appstore") # The default type, can be: appstore, adhoc, enterprise or development
+# Certificates repository settings
+git_url('https://gitlab.com/illania/extra.git')
+git_branch('master')
+git_user_email('ag@nordic-it.com')
 
-app_identifier(["com.nordic-it.mark5.mobile.ios", "com.nordic-it.mark5.mobile.ios.callid", "com.nordic-it.mark5.mobile.ios.share"])
+type('appstore') # The default provisioning profile type, can be: appstore, adhoc, enterprise or development
 
-username("dev@nordic-it.com") # Your Apple Developer Portal username
+# iOS projects to sign
+app_identifier(['com.nordic-it.mark5.mobile.ios',
+                'com.nordic-it.mark5.mobile.ios.callid',
+                'com.nordic-it.mark5.mobile.ios.share'])
 
-# For all available options run `fastlane match --help`
-# Remove the # in the beginning of the line to enable the other options
-
-# The docs are available on https://docs.fastlane.tools/actions/match
-ENV["FASTLANE_PASSWORD"] = "QaZ1457#ss11@De" #Apple Developer account password
-ENV["MATCH_PASSWORD"] = "Xs4Dev2014!" #Password for the .p12 files saved in git repo.
+username('dev@nordic-it.com') # Your Apple Developer Portal username

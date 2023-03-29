@@ -12,262 +12,247 @@
 
 # Uncomment the line if you want fastlane to automatically update itself
 # update_fastlane
+require 'nokogiri'
 
 default_platform(:ios)
 
 platform :ios do
 
 #region Certificates
-  desc "Generate certificates"
+  desc 'Generate certificates'
   lane :generate_certificates do
     sync_code_signing(
-      type: "development",
-      app_identifier: ['com.nordic-it.mark5.mobile.ios', 'com.nordic-it.mark5.mobile.ios.callid', 'com.nordic-it.mark5.mobile.ios.share'],
+      type: 'development',
+      app_identifier: ['com.nordic-it.mark5.mobile.ios',
+                       'com.nordic-it.mark5.mobile.ios.callid',
+                       'com.nordic-it.mark5.mobile.ios.share'],
       force_for_new_devices: true,
       readonly: false
     )
-    
-     sync_code_signing(
-      type: "appstore",
-      app_identifier: ['com.nordic-it.mark5.mobile.ios', 'com.nordic-it.mark5.mobile.ios.callid', 'com.nordic-it.mark5.mobile.ios.share'],
+    sync_code_signing(
+      type: 'appstore',
+      app_identifier: ['com.nordic-it.mark5.mobile.ios',
+                       'com.nordic-it.mark5.mobile.ios.callid',
+                       'com.nordic-it.mark5.mobile.ios.share'],
       readonly: false
     )
-
-      sync_code_signing(
-      type: "adhoc",
-      app_identifier: ['com.nordic-it.mark5.mobile.ios', 'com.nordic-it.mark5.mobile.ios.callid', 'com.nordic-it.mark5.mobile.ios.share'],
+    sync_code_signing(
+      type: 'adhoc',
+      app_identifier: ['com.nordic-it.mark5.mobile.ios',
+                       'com.nordic-it.mark5.mobile.ios.callid',
+                       'com.nordic-it.mark5.mobile.ios.share'],
       force_for_new_devices: true,
       readonly: false
     )
   end
-#endregion
+#endregion 
 
 #region Versioning
-  def get_version
-    version = get_info_plist_value(path: "./Mark5.Mobile.IOS/Info.plist", key: "CFBundleShortVersionString")
-    return version
+  def version
+    get_info_plist_value(path: './Mark5.Mobile.IOS/Info.plist',
+                         key: 'CFBundleShortVersionString')
   end
 
-  def get_build_number
-    build_number = get_info_plist_value(path: "./Mark5.Mobile.IOS/Info.plist", key: "CFBundleVersion")
-    return build_number
+  def build_number
+    get_info_plist_value(path: './Mark5.Mobile.IOS/Info.plist',
+                         key: 'CFBundleVersion')
   end
-
-  def bump_version(current_version,type)
-    components = current_version.split('.')
-    major = components[0].to_i
-    minor = components[1].to_i
-    patch = components[2].to_i
-
-    if type == "major"
-      major += 1
-      minor = 0
-      patch = 0
-    elsif type == "minor"
-      minor += 1
-      patch = 0
-    elsif type == "patch"
-      patch += 1
-    else
-      abort("Unknown version bump type: #{type}\nValid options: major, minor, patch.")
-    end
-
-    return new_version = [major, minor, patch].join('.')
-  end
-
-  def bump_build_version(type)
-    build_number = get_info_plist_value(path: "./Mark5.Mobile.IOS/Info.plist", key: "CFBundleVersion")
-    new_build_number = build_number.to_i+1
-    set_info_plist_value(path: "./Mark5.Mobile.IOS/Info.plist", key: "CFBundleVersion", value: new_build_number.to_s)
-    set_info_plist_value(path: "./Mark5.Mobile.IOS.Extensions.CallId/Info.plist", key: "CFBundleVersion", value: new_build_number.to_s)
-    set_info_plist_value(path: "./reMARK.Mobile.IOS.Extensions.Share/Info.plist", key: "CFBundleVersion", value: new_build_number.to_s)
-    
-    current_version = get_info_plist_value(path: "./Mark5.Mobile.IOS/Info.plist", key: "CFBundleShortVersionString")
-    
-    new_version = bump_version(current_version, type)
-
-    set_info_plist_value(path: "./Mark5.Mobile.IOS/Info.plist", key: "CFBundleShortVersionString", value: new_version)
-    set_info_plist_value(path: "./Mark5.Mobile.IOS.Extensions.CallId/Info.plist", key: "CFBundleShortVersionString", value: new_version)
-    set_info_plist_value(path: "./reMARK.Mobile.IOS.Extensions.Share/Info.plist", key: "CFBundleShortVersionString", value: new_version)
- 
- end 
 #endregion
 
-#region Build
-  def nuget(sln)
-    sh "nuget restore #{sln} -verbosity detailed"
+#region Build 
+  def update_entitlements
+    update_plist(
+      plist_path: './Mark5.Mobile.IOS/Entitlements.plist',
+      block: proc do |plist|
+        plist[:"aps-environment"] = 'production'
+        plist[:"com.apple.developer.icloud-container-environment"] = 'Production'
+      end
+    )
+  rescue StandardError => e
+    slack_on_error(e)
   end
 
-  desc "Build release"
+  desc 'Build iOS app release'
   lane :build_release do |options|
     begin
-      bump_build_version(options[:increment])
-      update_plist( 
-        plist_path: "./Mark5.Mobile.IOS/Entitlements.plist",
-        block: proc do |plist|
-          plist[:"aps-environment"] = "production"
-        end
+      bump_version(platform: 'iOS', type: options[:version_type], info_plist_pathes: ENV['INFO_PLIST_PATHES'])
+      bump_code(platform: 'iOS', info_plist_pathes: ENV['INFO_PLIST_PATHES'])
+      update_entitlements
+      generate_certificates
+      nuget(
+        solution: 'Mark5.sln',
+        verbosity: 'detailed'
       )
-      sync_code_signing(
-        type: "appstore",
-        app_identifier: [
-          'com.nordic-it.mark5.mobile.ios', 
-          'com.nordic-it.mark5.mobile.ios.callid', 
-          'com.nordic-it.mark5.mobile.ios.share'
-        ],
-        force_for_new_devices: true,
-        readonly: false
-      )
-      nuget('/Users/anna/mark5-app-new/Mark5.sln')
-      xamarin_build(
-          solution: '/Users/anna/mark5-app-new/Mark5.sln',
-          platform: 'iPhone',
-          target: 'Rebuild',
-          build_type: 'Release',
-          print_all: true,
-          build_util: 'msbuild',
-          ipa_name: 'remark.ipa'
+      msbuild(
+        solution: './Mark5.sln',
+        platform: 'iPhone',
+        target: options[:target],
+        build_type: 'Release',
+        ipa_name: 'remark.ipa'
       )
       slack_on_success
-    rescue => exception
-      slack_on_error(exception)
+    rescue StandardError => e
+      slack_on_error(e)
     end
+  end
 #endregion
 
 #region Slack
   def slack_on_success(message)
-     slack(
-      slack_url: "https://hooks.slack.com/services/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",
+    slack(
+      slack_url: ENV['SLACK_URL'],
       message: message,
-      channel: "#fastlane", 
-      success: true,  
-      username: "ag",
-      attachment_properties: {
-       fields: [
-           {
-               title: "Version",
-               value: get_version,
-           },
-           {
-               title: "Build number",
-               value: get_build_number,
-           }
-         ]
-        }  
-      )
-  end 
-
+      channel: ENV['SLACK_CHANNEL'],
+      success: true,
+      attachment_properties: { fields: [{ title: 'Version', value: get_version },
+                                        { title: 'Build number', value: get_build_number }] }
+    )
+  end
 
   def slack_on_error(exception)
-      slack(  
-         slack_url: "https://hooks.slack.com/services/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",
-         message: "Error occured ☹️!",
-         channel: "#fastlane", 
-         success: false,
-         username: "ag",
-         attachment_properties: {
-             fields: [
-                 {
-                     title: "Error message",
-                     value: exception
-                 }
-             ]
-         }
-     )
+    slack(
+      slack_url: ENV['SLACK_URL'],
+      message: 'Error occured ☹️!',
+      channel: ENV['SLACK_CHANNEL'],
+      success: false,
+      attachment_properties: { fields: [{ title: 'Error message', value: exception }] }
+    )
   end
 #endregion
 
 #region Deliver
-  desc "Upload beta to Testflight"
-  lane :testflight do |options|
+  desc 'Upload to Testflight'
+  lane :release_beta do |options|
     begin
-     if options[:type] == "internal"
-      groups = ["internal"]
-     elseif options[:type] == "public"
-      groups = ["all"]
-     else
-      groups = ["test"] 
-
-     app_store_connect_api_key()
-     pilot(
-      changelog: options[:changelog] if options[:changelog] != nil else "small fixes",
-      distribute_external: true,
-      distribute_only: false,
-      ipa: "./Mark5.Mobile.IOS/bin/iPhone/Release/remark.ipa",
-      groups: groups,
-      skip_submission: false,
-      skip_waiting_for_build_processing: false
-    )
-      slack_on_success("reMARK iOS app successfully uploaded to Testflight 📱")
-    rescue => exception
-     slack_on_error(exception)
+      groups = options[:type] == 'internal' ? ['internal'] : ['all']
+      app_store_connect_api_key
+      pilot(
+        changelog: options[:changelog],
+        distribute_external: true,
+        distribute_only: false,
+        ipa: './Mark5.Mobile.IOS/bin/iPhone/Release/remark.ipa',
+        groups: groups,
+        skip_submission: false,
+        skip_waiting_for_build_processing: false
+      )
+      slack_on_success('reMARK iOS app successfully uploaded to Testflight 📱')
+    rescue StandardError => e
+      slack_on_error(e)
+    end
   end
 
-  desc "Upload to AppStore"
-  lane :appstore do
-    begin 
-     app_store_connect_api_key()
-     deliver(
-      app_version: get_version,
-      app_identifier: "com.nordic-it.mark5.mobile.ios",
-      ipa: "./Mark5.Mobile.IOS/bin/iPhone/Release/remark.ipa",
-      submit_for_review: true,
-      automatic_release: true,
-      phased_release: true,
-      force: true, # Skip HTMl report verification
-      skip_metadata: false,
-      skip_screenshots: true,
-      skip_binary_upload: false,
-    )
-      slack_on_success("reMARK iOS app successfully uploaded to AppStore 📱")
-    rescue => exception
-      slack_on_error(exception)
-
+  desc 'Upload to AppStore'
+  lane :release do
+    begin
+      deliver(
+        api_key: app_store_connect_api_key,
+        app_version: version,
+        app_identifier: 'com.nordic-it.mark5.mobile.ios',
+        ipa: './Mark5.Mobile.IOS/bin/iPhone/Release/remark.ipa',
+        submit_for_review: true,
+        automatic_release: true,
+        phased_release: true,
+        force: true, # Skip HTMl report verification
+        skip_metadata: false,
+        skip_screenshots: true,
+        skip_binary_upload: false,
+        run_precheck_before_submit: false,
+        submission_information: (ENV['SUBMISSION_INFORMATION'])
+      )
+      slack_on_success('reMARK iOS app successfully uploaded to AppStore 📱')
+    rescue StandardError => e
+      slack_on_error(e)
+    end
   end
-
-
 #endregion
-
-
-  
-    
-
 end
 
 platform :android do
 
-  desc "Build Android app"
-  lane :build_droid do
-    nuget('/Users/anna/mark5-app-new/Mark5.sln')
-    bump_droid_build_version('patch')
-    xamarin_build(
-        solution: '/Users/anna/mark5-app-new/Mark5.sln',
-        platform: '',
-        target: 'Rebuild',
-        build_type: 'Release',
-        print_all: true,
-        build_util: 'msbuild',
-        ipa_name: 'remark.ipa'
-    )
-  end
+#region Versioning
 
-  def bump_droid_build_version(type)
-    require 'nokogiri'
-    manifest_file = '/Users/anna/mark5-app-new/Mark5.Mobile.Droid/Properties/AndroidManifest.xml'
-    doc = File.open(manifest_file) { |f|
+  def version
+    File.open(ENV['ANDROID_MANIFEST_PATH']) do |f|
       @doc = Nokogiri::XML(f)
-      manifest_node = @doc.xpath('//manifest')
       current_version = @doc.at('//manifest/@android:versionName').text
-      new_version = bump_version(current_version, type)
-      current_build = @doc.at('//manifest/@android:versionCode').text
-      new_build = (current_build.to_i+1).to_s
-      manifest_node.attr('android:versionName', new_version)
-      manifest_node.attr('android:versionCode', new_build)
-      File.write(manifest_file, @doc.to_xml)
-    }
+      return current_version.to_s
+    end
   end
 
+  def build_number
+    File.open(ENV['ANDROID_MANIFEST_PATH']) do |f|
+      @doc = Nokogiri::XML(f)
+      current_build = @doc.at('//manifest/@android:versionCode').text
+      return current_build.to_s
+    end
+  end
 
+#endregion
 
+#region Build
+
+  desc 'Build Android app release'
+  lane :build_release do |options|
+    begin
+      bump_version(platform: 'Android', type: options[:version_type], manifest_file_path: ENV['ANDROID_MANIFEST_PATH'])
+      bump_code(platform: 'Android', manifest_file_path: ENV['ANDROID_MANIFEST_PATH'])
+      nuget(
+        solution: 'Mark5.sln',
+        verbosity: 'detailed'
+      )
+      msbuild(
+        project: './Mark5.Mobile.Droid/Mark5.Mobile.Droid.csproj',
+        target: 'Build',
+        build_type: options[:target],
+        sign_apk: true,
+        android_signing_keystore: ENV['PATH_TO_KEYSTORE'],
+        android_signing_key_alias: 'default',
+        android_signing_key_pass: 'Xs4Droid2015!',
+        android_signing_store_pass: 'Xs4Droid2015!'
+      )
+    rescue StandardError => e
+      slack_on_error(e)
+    end
+  end
+
+#endregion
+
+#region Deliver
+  desc 'Upload beta release to Google Play beta'
+  lane :release_beta do
+    begin
+      supply(
+        apk: './Mark5.Mobile.Droid/bin/Release/com.nordic_it.mark5.android-Signed.apk',
+        track: 'beta',
+        skip_upload_images: true,
+        skip_upload_screenshots: true,
+        package_name: 'com.nordic_it.mark5.android',
+        version_name: version,
+        version_code: build_number
+      )
+      slack_on_success('reMark Android app was succcessfully uploaded to Google beta')
+    rescue StandardError => e
+      slack_on_error(e)
+    end
+  end
+
+  desc 'Upload release to Google Play'
+  lane :release do
+    begin
+      suppply(
+        apk: './Mark5.Mobile.Droid/bin/Release/com.nordic_it.mark5.android-Signed.apk',
+        track: 'rollout',
+        rollout: '0.5',
+        skip_upload_images: true,
+        skip_upload_screenshots: true,
+        package_name: 'com.nordic_it.mark5.android',
+        version_name: version,
+        version_code: build_number
+      )
+      slack_on_success('reMark Android app was succcessfully uploaded to Google beta')
+    rescue StandardError => e
+      slack_on_error(e)
+    end
+  end
+#endregion
 end
-

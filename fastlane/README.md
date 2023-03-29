@@ -15,53 +15,85 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 ## iOS
 
-### ios certificates
+### ios generate_certificates
 
 ```sh
-[bundle exec] fastlane ios certificates
+[bundle exec] fastlane ios generate_certificates
 ```
 
-Get certificates
+Generate certificates
 
-### ios generate_new_certificates
+### ios entitlements
 
 ```sh
-[bundle exec] fastlane ios generate_new_certificates
+[bundle exec] fastlane ios entitlements
 ```
 
-Generate new certificates
+Update entitlements
 
-### ios build_beta
+### ios build_release
 
 ```sh
-[bundle exec] fastlane ios build_beta
+[bundle exec] fastlane ios build_release
 ```
 
-Build beta version
+Build release
 
-### ios upload_beta
+### ios bump_ios
 
 ```sh
-[bundle exec] fastlane ios upload_beta
+[bundle exec] fastlane ios bump_ios
 ```
 
-Upload beta to Testflight
+bump ios version and build number
 
-### ios bump_droid
+### ios bump_android
 
 ```sh
-[bundle exec] fastlane ios bump_droid
+[bundle exec] fastlane ios bump_android
 ```
 
-Bump Android version
+bump android version
 
-### ios build_droid
+### ios restore
 
 ```sh
-[bundle exec] fastlane ios build_droid
+[bundle exec] fastlane ios restore
 ```
 
-Build Android app
+restore nuget
+
+### ios msbuild_ios
+
+```sh
+[bundle exec] fastlane ios msbuild_ios
+```
+
+msbuild ios
+
+### ios msbuild_android
+
+```sh
+[bundle exec] fastlane ios msbuild_android
+```
+
+msbuild android
+
+### ios release_beta
+
+```sh
+[bundle exec] fastlane ios release_beta
+```
+
+Upload to Testflight
+
+### ios release
+
+```sh
+[bundle exec] fastlane ios release
+```
+
+Upload to AppStore
 
 ----
 
