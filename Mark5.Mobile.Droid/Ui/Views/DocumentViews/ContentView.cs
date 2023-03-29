@@ -67,13 +67,20 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 
         internal void Print()
         {
-            if (Context == null) 
-                return;
-            
-            var printManager = (PrintManager) Context.GetSystemService(Context.PrintService);
-            var printAdapter = _webView.CreatePrintDocumentAdapter($"print_{DocumentPreview.ReferenceNumber}");
-            printManager?.Print("Document", printAdapter, null);
-        }
+            try
+            {
+                if (Context == null)
+                    return;
+
+                var printManager = (PrintManager)Context.GetSystemService(Context.PrintService);
+                var printAdapter = _webView.CreatePrintDocumentAdapter($"print_{DocumentPreview.ReferenceNumber}");
+                printManager?.Print("Document", printAdapter, null);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error(ex.Message);
+            }
+}
 
         private class CustomWebView : WebView
         {
