@@ -13,6 +13,7 @@ using Mark5.Mobile.IOS.Utilities;
 using ObjCRuntime;
 using UIKit;
 using WebKit;
+using Xamarin.Forms;
 using ContentType = Mark5.Mobile.Common.Model.ContentType;
 
 namespace Mark5.Mobile.IOS.Ui.Common
@@ -211,14 +212,30 @@ namespace Mark5.Mobile.IOS.Ui.Common
             printFormatter.StartPage = 0;
             printFormatter.ContentInsets = new UIEdgeInsets(72, 72, 72, 72);
 
+            var printInfo = UIPrintInfo.PrintInfo;
+            printInfo.OutputType = UIPrintInfoOutputType.General;
+            printInfo.JobName = "reMark app print";
+
             var printer = UIPrintInteractionController.SharedPrintController;
+            printer.PrintInfo = printInfo;
             printer.PrintFormatter = printFormatter;
             printer.ShowsPageRange = true;
-            printer.Present(true, (handler, completed, error) =>
+
+
+            var handler = new UIPrintInteractionCompletionHandler((printInteractionController, completed, error) =>
             {
-                if (!completed) 
-                    Console.WriteLine($"Error: {error.LocalizedDescription ?? ""}");
+                if (completed)
+                {
+                    CommonConfig.Logger.Error($"Printing completed.");
+                }
+                else if (!completed && error != null)
+                {
+                    CommonConfig.Logger.Error($"Error occurred when printing the document: {error.LocalizedDescription}.");
+                }
             });
+
+            printer.Present(true, handler);
+
         }
 
         public override void TraitCollectionDidChange(UITraitCollection previousTraitCollection)
