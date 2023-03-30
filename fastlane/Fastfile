@@ -72,7 +72,7 @@ platform :ios do
       msbuild(
         solution: './Mark5.sln',
         platform: 'iPhone',
-        target: options[:target],
+        target: options[:target].nil? ? 'Rebuild' : options[:target],
         build_type: 'Release',
         ipa_name: 'remark.ipa'
       )
@@ -207,7 +207,7 @@ platform :android do
       )
       msbuild(
         project: './Mark5.Mobile.Droid/Mark5.Mobile.Droid.csproj',
-        target: options[:target],
+        target: options[:target].nil? ? 'Rebuild' : options[:target],
         build_type: 'Release',
         sign_apk: true,
         android_signing_keystore: ENV['PATH_TO_KEYSTORE'],
