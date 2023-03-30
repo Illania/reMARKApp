@@ -5,7 +5,27 @@
     
     
       
-      <testcase classname="fastlane.lanes" name="0: default_platform" time="0.000355">
+      <testcase classname="fastlane.lanes" name="0: default_platform" time="0.00095">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="1: bump_version" time="0.003656">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="2: bump_code" time="0.000849">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="3: nuget" time="4.784574">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="4: msbuild" time="213.803569">
         
       </testcase>
     
