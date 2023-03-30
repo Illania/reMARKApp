@@ -286,10 +286,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 }
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 CommonConfig.Logger.Error("Can't initialize NavigationBar for AbstractFoldersListViewController", ex);
-            } 
+            }
         }
 
         protected virtual void InitializeView()
@@ -604,7 +604,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 CommonConfig.Logger.Debug($"Automatic refresh running...");
 
                 await RefreshFolders(true);
-               
+
             }
             catch (Exception ex)
             {
@@ -1164,9 +1164,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                                 {
                                     if (work != null)
                                         await work();
-                                    
+
                                 }
-                                catch(Exception ex)
+                                catch (Exception ex)
                                 {
                                     Console.WriteLine(ex.Message);
                                 }
@@ -1585,7 +1585,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         protected class DataSource : UITableViewSource, IDisposable
         {
             public bool Empty => Items.Count < 1;
-            public int[] Itemids => Items.SelectMany(f => f.Select(h=>h.Id)).ToArray();
+            public int[] Itemids => Items.SelectMany(f => f.Select(h => h.Id)).ToArray();
 
             public SortedDictionary<int, bool> FavoriteStatus { get; set; } = new SortedDictionary<int, bool>();
             public SortedDictionary<int, bool> SyncStatus { get; set; } = new SortedDictionary<int, bool>();
@@ -1596,7 +1596,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             readonly bool disableRowActions;
 
             bool loading = true;
-            public List<List<Folder>> Items = new ();
+            public List<List<Folder>> Items = new();
 
             public DataSource(AbstractFoldersListViewController viewController, UITableView tableView, ModuleType module, bool disableRowActions)
             {
@@ -1644,7 +1644,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 return Items.Count;
             }
-  
+
             public override nint RowsInSection(UITableView tableview, nint section)
             {
                 if (loading || Empty)
@@ -1701,7 +1701,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 viewControllerWeakReference.Unwrap()?.FolderDeselected(f);
             }
 
-           async void ExpandCollapse(UITapGestureRecognizer g)
+            async void ExpandCollapse(UITapGestureRecognizer g)
             {
                 var viewLocation = g.View.Bounds.Location;
                 var location = tableViewWeakReference.Unwrap()?.ConvertPointFromView(viewLocation, g.View);
@@ -1769,7 +1769,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                         if (SyncStatus[f.Id])
                         {
                             var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
-                                Localization.GetString("disable_sync"),
+                                Localization.GetString("disable_caching"),
                                 (a, ip) =>
                                 {
                                     viewControllerWeakReference.Unwrap()?.DisableSync(Items[ip.Section][ip.Row]);
@@ -1781,7 +1781,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                         else
                         {
                             var action = UITableViewRowAction.Create(UITableViewRowActionStyle.Default,
-                                Localization.GetString("enable_sync"),
+                                Localization.GetString("enable_caching"),
                                 (a, ip) =>
                                 {
                                     viewControllerWeakReference.Unwrap()?.EnableSync(Items[ip.Section][ip.Row]);
@@ -1832,7 +1832,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 return actions.ToArray();
             }
-       
+
             public void SetFolders(List<Folder> folders)
             {
                 try
@@ -1853,10 +1853,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                     tableViewWeakReference.Unwrap()?.EndUpdates();
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
-                }   
+                }
             }
 
             public void Reload()
@@ -1887,13 +1887,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 var folders = new List<Folder>();
                 for (var i = 0; i < Items.Count; i++)
                 {
-                    for(var k = 0; k < Items[i].Count; k++)
+                    for (var k = 0; k < Items[i].Count; k++)
                     {
                         var f = Items[i][k];
                         if (f.Id == folderId)
                             folders.Add(f);
                     }
-                    
+
                 }
                 return folders.ToArray();
             }
@@ -1954,7 +1954,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                     {
                         ExpandGestureRecognizer = new UITapGestureRecognizer(ExpandCollapse)
                     };
-                cell.Initialize(f,false);
+                cell.Initialize(f, false);
 
                 if (viewControllerWeakReference.Unwrap()?.ShouldDisableFolder(f) ?? false)
                     cell.Disable();
