@@ -76,14 +76,6 @@ Upload beta release to Google Play beta
 
 Upload release to Google Play
 
-### android test
-
-```sh
-[bundle exec] fastlane android test
-```
-
-Upload release to Google Play
-
 ----
 
 This README.md is auto-generated and will be re-generated every time [_fastlane_](https://fastlane.tools) is run.

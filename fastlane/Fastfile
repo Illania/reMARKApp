@@ -20,24 +20,13 @@ platform :ios do
 
 #region Certificates
   desc 'Generate certificates'
-  lane :generate_certificates do
+  lane :generate_certificates do |options|
     app_bundles = ['com.nordic-it.mark5.mobile.ios',
                    'com.nordic-it.mark5.mobile.ios.callid',
                    'com.nordic-it.mark5.mobile.ios.share']
 
     sync_code_signing(
-      type: 'development',
-      app_identifier: app_bundles,
-      force_for_new_devices: true,
-      readonly: false
-    )
-    sync_code_signing(
-      type: 'appstore',
-      app_identifier: app_bundles,
-      readonly: false
-    )
-    sync_code_signing(
-      type: 'adhoc',
+      type: options[:type],
       app_identifier: app_bundles,
       force_for_new_devices: true,
       readonly: false
@@ -76,7 +65,6 @@ platform :ios do
       bump_version(platform: 'iOS', type: options[:version_type], info_plist_pathes: ENV['INFO_PLIST_PATHES'])
       bump_code(platform: 'iOS', info_plist_pathes: ENV['INFO_PLIST_PATHES'])
       update_entitlements
-      generate_certificates
       nuget(
         sln: 'Mark5.sln',
         verbosity: 'detailed'
@@ -137,7 +125,7 @@ platform :ios do
     export_compliance_contains_proprietary_cryptography: false,
     export_compliance_available_on_french_store: false
   }
-  
+
   desc 'Upload to Testflight'
   lane :release_beta do |options|
     begin
@@ -256,7 +244,7 @@ platform :android do
   desc 'Upload release to Google Play'
   lane :release do
     begin
-      suppply(
+      supply(
         apk: './Mark5.Mobile.Droid/bin/Release/com.nordic_it.mark5.android-Signed.apk',
         track: 'rollout',
         rollout: '0.5',
