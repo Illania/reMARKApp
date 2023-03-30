@@ -23,61 +23,13 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 Generate certificates
 
-### ios entitlements
-
-```sh
-[bundle exec] fastlane ios entitlements
-```
-
-Update entitlements
-
 ### ios build_release
 
 ```sh
 [bundle exec] fastlane ios build_release
 ```
 
-Build release
-
-### ios bump_ios
-
-```sh
-[bundle exec] fastlane ios bump_ios
-```
-
-bump ios version and build number
-
-### ios bump_android
-
-```sh
-[bundle exec] fastlane ios bump_android
-```
-
-bump android version
-
-### ios restore
-
-```sh
-[bundle exec] fastlane ios restore
-```
-
-restore nuget
-
-### ios msbuild_ios
-
-```sh
-[bundle exec] fastlane ios msbuild_ios
-```
-
-msbuild ios
-
-### ios msbuild_android
-
-```sh
-[bundle exec] fastlane ios msbuild_android
-```
-
-msbuild android
+Build iOS app release
 
 ### ios release_beta
 
@@ -94,6 +46,43 @@ Upload to Testflight
 ```
 
 Upload to AppStore
+
+----
+
+
+## Android
+
+### android build_release
+
+```sh
+[bundle exec] fastlane android build_release
+```
+
+Build Android app release
+
+### android release_beta
+
+```sh
+[bundle exec] fastlane android release_beta
+```
+
+Upload beta release to Google Play beta
+
+### android release
+
+```sh
+[bundle exec] fastlane android release
+```
+
+Upload release to Google Play
+
+### android test
+
+```sh
+[bundle exec] fastlane android test
+```
+
+Upload release to Google Play
 
 ----
 

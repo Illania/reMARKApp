@@ -21,26 +21,24 @@ platform :ios do
 #region Certificates
   desc 'Generate certificates'
   lane :generate_certificates do
+    app_bundles = ['com.nordic-it.mark5.mobile.ios',
+                   'com.nordic-it.mark5.mobile.ios.callid',
+                   'com.nordic-it.mark5.mobile.ios.share']
+
     sync_code_signing(
       type: 'development',
-      app_identifier: ['com.nordic-it.mark5.mobile.ios',
-                       'com.nordic-it.mark5.mobile.ios.callid',
-                       'com.nordic-it.mark5.mobile.ios.share'],
+      app_identifier: app_bundles,
       force_for_new_devices: true,
       readonly: false
     )
     sync_code_signing(
       type: 'appstore',
-      app_identifier: ['com.nordic-it.mark5.mobile.ios',
-                       'com.nordic-it.mark5.mobile.ios.callid',
-                       'com.nordic-it.mark5.mobile.ios.share'],
+      app_identifier: app_bundles,
       readonly: false
     )
     sync_code_signing(
       type: 'adhoc',
-      app_identifier: ['com.nordic-it.mark5.mobile.ios',
-                       'com.nordic-it.mark5.mobile.ios.callid',
-                       'com.nordic-it.mark5.mobile.ios.share'],
+      app_identifier: app_bundles,
       force_for_new_devices: true,
       readonly: false
     )
@@ -80,7 +78,7 @@ platform :ios do
       update_entitlements
       generate_certificates
       nuget(
-        solution: 'Mark5.sln',
+        sln: 'Mark5.sln',
         verbosity: 'detailed'
       )
       msbuild(
@@ -121,6 +119,25 @@ platform :ios do
 #endregion
 
 #region Deliver
+  submission_information = {
+    add_id_info_limits_tracking: false,
+    add_id_info_serves_ads: false,
+    add_id_info_tracks_action: false,
+    add_id_info_tracks_install: false,
+    add_id_info_uses_idfa: false,
+    content_rights_has_rights: true,
+    content_rights_contains_third_party_content: true,
+    export_compliance_platform: 'ios',
+    export_compliance_compliance_required: false,
+    export_compliance_encryption_updated: false,
+    export_compliance_app_type: nil,
+    export_compliance_uses_encryption: false,
+    export_compliance_is_exempt: false,
+    export_compliance_contains_third_party_cryptography: false,
+    export_compliance_contains_proprietary_cryptography: false,
+    export_compliance_available_on_french_store: false
+  }
+  
   desc 'Upload to Testflight'
   lane :release_beta do |options|
     begin
@@ -157,7 +174,7 @@ platform :ios do
         skip_screenshots: true,
         skip_binary_upload: false,
         run_precheck_before_submit: false,
-        submission_information: (ENV['SUBMISSION_INFORMATION'])
+        submission_information: submission_information
       )
       slack_on_success('reMARK iOS app successfully uploaded to AppStore 📱')
     rescue StandardError => e
@@ -197,13 +214,13 @@ platform :android do
       bump_version(platform: 'Android', type: options[:version_type], manifest_file_path: ENV['ANDROID_MANIFEST_PATH'])
       bump_code(platform: 'Android', manifest_file_path: ENV['ANDROID_MANIFEST_PATH'])
       nuget(
-        solution: 'Mark5.sln',
+        sln: 'Mark5.sln',
         verbosity: 'detailed'
       )
       msbuild(
         project: './Mark5.Mobile.Droid/Mark5.Mobile.Droid.csproj',
-        target: 'Build',
-        build_type: options[:target],
+        target: options[:target],
+        build_type: 'Release',
         sign_apk: true,
         android_signing_keystore: ENV['PATH_TO_KEYSTORE'],
         android_signing_key_alias: 'default',
