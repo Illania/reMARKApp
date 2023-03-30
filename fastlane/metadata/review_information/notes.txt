@@ -1,0 +1,9 @@
+The application will ask also about hostname and port upon first launch. For the purpose of reviewing use following details:
+
+Hostname: mail.nordic-it.com
+Port: 8096
+Use SSL: Checked
+
+Please note that the hostname DOES NOT have any http nor https prefix!
+
+These details need to be entered by the user, since reMARK is a system that is self-hosted and it is responsibility of system administrator to expose an appropriate endpoint.

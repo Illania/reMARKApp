@@ -1,0 +1,15 @@
+# This file is used only for iOS apps
+
+# Certificates repository settings
+git_url('https://gitlab.com/illania/extra.git')
+git_branch('master')
+git_user_email('ag@nordic-it.com')
+
+type('appstore') # The default provisioning profile type, can be: appstore, adhoc, enterprise or development
+
+# iOS projects to sign
+app_identifier(['com.nordic-it.mark5.mobile.ios',
+                'com.nordic-it.mark5.mobile.ios.callid',
+                'com.nordic-it.mark5.mobile.ios.share'])
+
+username('dev@nordic-it.com') # Your Apple Developer Portal username

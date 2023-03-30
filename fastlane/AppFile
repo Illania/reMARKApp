@@ -1,0 +1,8 @@
+app_identifier 'com.nordic-it.mark5.mobile.ios'
+apple_id 'dev@nordic-it.com' # Your Apple Developer Portal username
+
+itc_team_id '58551803' # App Store Connect Team ID
+team_id '5Q7TTRG4M4' # Developer Portal Team ID
+
+json_key_file('./fastlane/google-key.json') # Google Service json key
+package_name('com.nordic_it.mark5.android')
