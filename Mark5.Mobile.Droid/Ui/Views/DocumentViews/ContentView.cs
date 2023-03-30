@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Android.Content;
+using Android.Print;
 using Android.Views;
 using Android.Webkit;
 using Mark5.Mobile.Common;
@@ -12,7 +13,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
 {
     public class ContentView : DocumentView
     {
-        CustomWebView webView;
+        private CustomWebView _webView;
 
         public event EventHandler<string> MailToLinkClicked = delegate { };
 
@@ -22,22 +23,23 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             InitializeView();
         }
 
-        void InitializeView()
+        private void InitializeView()
         {
             SetPadding(DistanceNone, DistanceNormal, DistanceNone, DistanceNormal);
 
             var customWebViewClient = new CustomWebViewClient();
             customWebViewClient.MailToLinkClicked += (sender, e) => MailToLinkClicked(sender, e);
 
-            webView = new CustomWebView(Context);
-            webView.SetWebViewClient(customWebViewClient);
-            webView.Settings.SetSupportZoom(true);
-            webView.Settings.BuiltInZoomControls = true;
-            webView.Settings.DisplayZoomControls = false;
-            webView.Settings.JavaScriptEnabled = false;
-            webView.VerticalScrollBarEnabled = false;
-            webView.HorizontalScrollBarEnabled = false;
-            AddView(webView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
+            _webView = new CustomWebView(Context);
+            _webView.SetWebViewClient(customWebViewClient);
+            _webView.Settings.SetSupportZoom(true);
+            _webView.Settings.BuiltInZoomControls = true;
+            _webView.Settings.DisplayZoomControls = false;
+            _webView.Settings.JavaScriptEnabled = false;
+            _webView.VerticalScrollBarEnabled = false;
+            _webView.HorizontalScrollBarEnabled = false;
+            AddView(_webView, new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
         }
 
         public override async Task RefreshView()
@@ -47,23 +49,40 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
                 Visibility = ViewStates.Visible;
 
                 if (PlatformConfig.Preferences.DocumentBodyRequestType == DocumentBodyTypeRequest.PlainTextOnly)
-                    await webView.LoadPlainText(Context, Document.PlainTextBody, PlainTextProcessingConfiguration.DefaultForViewing);
+                    await _webView.LoadPlainText(Context, Document.PlainTextBody, PlainTextProcessingConfiguration.DefaultForViewing);
                 else if (!string.IsNullOrWhiteSpace(Document.HtmlBody))
-                    await webView.LoadHtml(Context, Document.HtmlBody, HtmlProcessingConfiguration.DefaultForViewing);
+                    await _webView.LoadHtml(Context, Document.HtmlBody, HtmlProcessingConfiguration.DefaultForViewing);
                 else if (!string.IsNullOrWhiteSpace(Document.PlainTextBody))
-                    await webView.LoadPlainText(Context, Document.PlainTextBody, PlainTextProcessingConfiguration.DefaultForViewing);
+                    await _webView.LoadPlainText(Context, Document.PlainTextBody, PlainTextProcessingConfiguration.DefaultForViewing);
                 else
-                    webView.LoadNoContentString(Context);
+                    _webView.LoadNoContentString(Context);
             }
             else
             {
                 Visibility = ViewStates.Gone;
 
-                webView.LoadData(string.Empty, "text/plain", "UTF-8");
+                _webView.LoadData(string.Empty, "text/plain", "UTF-8");
             }
         }
 
-        class CustomWebView : WebView
+        internal void Print()
+        {
+            try
+            {
+                if (Context == null)
+                    return;
+
+                var printManager = (PrintManager)Context.GetSystemService(Context.PrintService);
+                var printAdapter = _webView.CreatePrintDocumentAdapter($"print_{DocumentPreview.ReferenceNumber}");
+                printManager?.Print("Document", printAdapter, null);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error(ex.Message);
+            }
+}
+
+        private class CustomWebView : WebView
         {
             public CustomWebView(Context context)
                 : base(context)
@@ -85,7 +104,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             }
         }
 
-        class CustomWebViewClient : WebViewClient
+        private class CustomWebViewClient : WebViewClient
         {
             public event EventHandler<string> MailToLinkClicked = delegate { };
 
@@ -110,7 +129,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.DocumentViews
             {
                 try
                 {
-                    view.Context.StartActivity(new Intent(Intent.ActionView, Android.Net.Uri.Parse(url)));
+                    view.Context?.StartActivity(new Intent(Intent.ActionView, Android.Net.Uri.Parse(url)));
                 }
                 catch (Exception ex)
                 {

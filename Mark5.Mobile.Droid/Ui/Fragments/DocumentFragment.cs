@@ -55,6 +55,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         private AppCompatImageView _button1;
         private AppCompatImageView _button2;
         private AppCompatImageView _button3;
+        private ContentView _contentView;
 
         private CancellationTokenSource _setReadStatusCancellationTokenSource;
 
@@ -258,9 +259,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 civ.ReplySelected += CalendarInvitationView_ReplySelected;
                 _linearLayout.AddView(civ);
 
-                var contentView = new ContentView(Context);
-                contentView.MailToLinkClicked += ContentView_MailToLinkClicked;
-                _linearLayout.AddView(contentView);
+                _contentView = new ContentView(Context);
+                _contentView.MailToLinkClicked += ContentView_MailToLinkClicked;
+                _linearLayout.AddView(_contentView);
             }
 
             HasOptionsMenu = true;
@@ -532,6 +533,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             menu.Add(Menu.None, MenuItemActions.Links, 
                 MenuItemActions.Links, Resource.String.overview);
 
+            menu.Add(Menu.None, MenuItemActions.Print, 
+                MenuItemActions.Print, Resource.String.print);
+
             if (_folder?.InternalType == FolderInternalType.FilterView ||
                 _folder?.InternalType == FolderInternalType.Static ||
                 _folder?.InternalType == FolderInternalType.Worktray)
@@ -694,6 +698,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 StartActivity(TransmitDestinationsListActivity.CreateIntent(Context, _documentPreview.Id, 
                     _documentPreview.ReferenceNumber));
+                return true;
+            }
+
+            if (item.ItemId == MenuItemActions.Print)
+            {
+                _contentView.Print();
                 return true;
             }
 
@@ -901,7 +911,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         private async void CopyToWorktrayAction()
         {
-            var option = await Dialogs.ShowListDialog(Context, Resource.String.copy_to_worktray, Resource.Array.copy_to_worktray_options, true);
+            var option = await Dialogs.ShowListDialog(Context, Resource.String.copy_to_worktray, 
+                Resource.Array.copy_to_worktray_options, true);
 
             if (option == 0)
             {
@@ -981,13 +992,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         private async void DeleteFromFolderAction()
         {
-            var yesNo = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete_from_folder, Resource.String.delete_from_folder_are_you_sure);
+            var yesNo = await Dialogs.ShowYesNoDialogAsync(Context, Resource.String.delete_from_folder, 
+                Resource.String.delete_from_folder_are_you_sure);
             if (!yesNo)
                 return;
 
             CommonConfig.Logger.Info($"Attempting to delete from folder [documentPreview={_documentPreview}]...");
 
-            _dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.deleting_from_folder, Resource.String.please_wait);
+            _dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, Resource.String.deleting_from_folder, 
+                Resource.String.please_wait);
 
             try
             {
@@ -1142,7 +1155,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (canOpen)
                     Context.StartActivity(openFileIntent);
                 else
-                    await Dialogs.ShowConfirmDialogAsync(Context, Resource.String.attachment_cannot_be_opened_title, Resource.String.attachment_cannot_be_opened_summary);
+                    await Dialogs.ShowConfirmDialogAsync(Context, Resource.String.attachment_cannot_be_opened_title, 
+                        Resource.String.attachment_cannot_be_opened_summary);
             }
             catch (Exception ex)
             {
@@ -1211,8 +1225,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        private async void CalendarInvitationView_ReplySelected(object sender, 
-            InvitationReplyDetailViewModel vm)
+        private async void CalendarInvitationView_ReplySelected(object sender, InvitationReplyDetailViewModel vm)
         {
             var civ = sender as CalendarInvitationView;
             var invitation = _document?.Invitations?.FirstOrDefault();
@@ -1388,6 +1401,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public const int Comments = 70;
             public const int Actions = 80;
             public const int Links = 90;
+            public const int Print = 91;
             public const int DeleteFromFolder = 100;
             public const int Delete = 101;
             public const int DeliveryReport = 102;
