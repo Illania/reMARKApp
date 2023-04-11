@@ -385,7 +385,8 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             if (!string.IsNullOrEmpty(savedRecipient))
                 currentRecipients.Add(savedRecipient);
 
-            var lineRelatedRecipient = currentRecipients.FirstOrDefault(r => r.Contains(lineAddress));
+            var lineRelatedRecipient = currentRecipients.FirstOrDefault(r => r.Contains(lineAddress,
+                StringComparison.OrdinalIgnoreCase));
             if (lineRelatedRecipient != null)
             {
                 savedRecipient = lineRelatedRecipient;
