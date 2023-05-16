@@ -81,6 +81,7 @@ namespace Mark5.Mobile.Common.Authenticator
             var connectionInfo = new ConnectionInfo
             {
                 Token = result.Token,
+                Username = result.User?.Username ?? string.Empty,
                 AzureUserId = azureUser.Id,
                 Hostname = hostname,
                 Port = port,

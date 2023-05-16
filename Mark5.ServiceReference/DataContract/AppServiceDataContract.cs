@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
@@ -64,6 +64,9 @@ namespace Mark5.ServiceReference.DataContract
     {
         [DataMember(Name = "Token", Order = 0, IsRequired = true)]
         public string Token { get; set; }
+
+        [DataMember(Name = "User", Order = 1)]
+        public SystemUser User { get; set; }
     }
 
     [DataContract(Name = "AzureUser", Namespace = "com.nordic-it.appservice.v3")]
@@ -330,7 +333,7 @@ namespace Mark5.ServiceReference.DataContract
     }
 
     [DataContract(Name = "CancelSendDocumentResult", Namespace = "com.nordic-it.appservice.v3")]
-    public class CancelSendDocumentResult 
+    public class CancelSendDocumentResult
     {
 
     }
@@ -344,7 +347,7 @@ namespace Mark5.ServiceReference.DataContract
     }
 
     [DataContract(Name = "ForceSendDocumentResult", Namespace = "com.nordic-it.appservice.v3")]
-    public class ForceSendDocumentResult 
+    public class ForceSendDocumentResult
     {
 
     }
@@ -448,7 +451,7 @@ namespace Mark5.ServiceReference.DataContract
     }
 
     [DataContract(Name = "GetNewDocumentReferenceNumberResult", Namespace = "com.nordic-it.appservice.v3")]
-    public class GetNewDocumentReferenceNumberResult 
+    public class GetNewDocumentReferenceNumberResult
     {
         [DataMember(Name = "ReferenceNumber", Order = 0)]
         public string ReferenceNumber { get; set; }
@@ -727,7 +730,7 @@ namespace Mark5.ServiceReference.DataContract
     }
 
     [DataContract(Name = "DeleteExtraFieldResult", Namespace = "com.nordic-it.appservice.v3")]
-    public class DeleteExtraFieldResult 
+    public class DeleteExtraFieldResult
     {
     }
 
@@ -740,7 +743,7 @@ namespace Mark5.ServiceReference.DataContract
     }
 
     [DataContract(Name = "UpdateExtraFieldsResult", Namespace = "com.nordic-it.appservice.v3")]
-    public class UpdateExtraFieldsResult 
+    public class UpdateExtraFieldsResult
     {
     }
 
@@ -798,7 +801,7 @@ namespace Mark5.ServiceReference.DataContract
     }
 
     [DataContract(Name = "DeleteDocumentExtraFieldResult", Namespace = "com.nordic-it.appservice.v3")]
-    public class DeleteDocumentExtraFieldResult 
+    public class DeleteDocumentExtraFieldResult
     {
     }
 
@@ -842,8 +845,8 @@ namespace Mark5.ServiceReference.DataContract
     public class Transmit
     {
         [DataMember(Name = "Status", Order = 0)]
-        public TransmitStatus Status{ get; set; }
-        
+        public TransmitStatus Status { get; set; }
+
         [DataMember(Name = "DocGuid", Order = 0)]
         public Guid DocGuid { get; set; }
 
@@ -885,13 +888,13 @@ namespace Mark5.ServiceReference.DataContract
         public DestinationStatusDetail StatusDetail { get; set; }
 
         [DataMember(Name = "TimeStart", Order = 0)]
-        public  DateTime TimeStart { get; set; }
+        public DateTime TimeStart { get; set; }
 
         [DataMember(Name = "TimeEnd", Order = 0)]
         public DateTime TimeEnd { get; set; }
 
         [DataMember(Name = "WasSentByLine", Order = 0)]
-        public Guid WasSentByLine{ get; set; }
+        public Guid WasSentByLine { get; set; }
 
         [DataMember(Name = "WasSentByLineName", Order = 0)]
         public string WasSentByLineName { get; set; }
@@ -1783,7 +1786,7 @@ namespace Mark5.ServiceReference.DataContract
         public int RecurrenceIndex { get; set; } = -1;
 
         [DataMember(Name = "ChangedOccurenceId", Order = 1)]
-        public int ChangedOccurenceId{ get; set; } = -1;
+        public int ChangedOccurenceId { get; set; } = -1;
 
         [DataMember(Name = "Subject", Order = 2)]
         public string Subject { get; set; } = string.Empty;
