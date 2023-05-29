@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.nordic_it.mark5.mobile.android" android:versionName="5.12.7" android:versionCode="571">
 	<uses-sdk android:minSdkVersion="29" android:targetSdkVersion="31" />
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -32,17 +32,14 @@
 			<meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/filepaths" />
 		</provider>
 		<!-- Firebase Declarations -->
+		<service android:name="mark5.mobile.droid.service.FCMService" android:exported="true">
+			<intent-filter>
+				<action android:name="com.google.firebase.MESSAGING_EVENT" />
+			</intent-filter>
+		</service>
 		<!-- Firebase InstanceId Receiver -->
 		<meta-data android:name="com.google.firebase.messaging.default_notification_icon" android:resource="@mipmap/ic_icon" />
 		<meta-data android:name="com.google.firebase.messaging.default_notification_color" android:resource="@color/darkerblue" />
-		<receiver android:name="com.google.firebase.iid.FirebaseInstanceIdInternalReceiver" android:exported="false" />
-		<receiver android:name="com.google.firebase.iid.FirebaseInstanceIdReceiver" android:exported="true" android:permission="com.google.android.c2dm.permission.SEND">
-			<intent-filter>
-				<action android:name="com.google.android.c2dm.intent.RECEIVE" />
-				<action android:name="com.google.android.c2dm.intent.REGISTRATION" />
-				<category android:name="${applicationId}" />
-			</intent-filter>
-		</receiver>
 		<!-- Pushy Declarations -->
 		<!-- Pushy Update Receiver -->
 		<!-- Do not modify - internal BroadcastReceiver that restarts the listener service -->
