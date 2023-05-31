@@ -37,7 +37,7 @@
     <JavaMaximumHeapSize>1G</JavaMaximumHeapSize>
     <AndroidTlsProvider>btls</AndroidTlsProvider>
     <AndroidKeyStore>True</AndroidKeyStore>
-    <AndroidSigningKeyStore>/Users/illania/extra/App Development Certificates/Android/default.keystore</AndroidSigningKeyStore>
+    <AndroidSigningKeyStore>../../extra/App Development Certificates/Android/default.keystore</AndroidSigningKeyStore>
     <AndroidSigningStorePass>Xs4Droid2015!</AndroidSigningStorePass>
     <AndroidSigningKeyAlias>default</AndroidSigningKeyAlias>
     <AndroidSigningKeyPass>Xs4Droid2015!</AndroidSigningKeyPass>
