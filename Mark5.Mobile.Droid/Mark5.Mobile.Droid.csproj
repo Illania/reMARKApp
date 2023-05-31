@@ -895,8 +895,7 @@
     <Compile Include="Ui\Activities\MsalActivity.cs" />
     <Compile Include="Ui\Common\ViewPagerFixed.cs" />
     <Compile Include="Service\PushNotifications\Firebase\FirebaseRegistrator.cs" />
-    <Compile Include="Service\PushNotifications\Firebase\FirebaseInstanceIdService.cs" />
-    <Compile Include="Service\PushNotifications\Firebase\FirebaseMessagingService.cs" />
+    <Compile Include="Service\PushNotifications\Firebase\FCMService.cs" />
     <Compile Include="Service\PushNotifications\Pushy\PushyRegistrator.cs" />
     <Compile Include="Service\PushNotifications\Pushy\PushyReceiver.cs" />
     <Compile Include="Service\Reachability\Reachability.cs" />
@@ -1523,6 +1522,9 @@
     <AndroidAsset Include="Assets\editorScript.js" />
     <AndroidAsset Include="Assets\initTemplate.js" />
     <AndroidAsset Include="Assets\splash.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <GoogleServicesJson Include="google-services.json" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Import Project="..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets')" />

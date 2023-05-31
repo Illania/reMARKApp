@@ -1,5 +1,4 @@
 ﻿using System;
-using Firebase.Iid;
 using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Manager;
 using Mark5.Mobile.Common.Model;
@@ -7,21 +6,36 @@ using Mark5.Mobile.Common.Extensions;
 using Android.Content;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Firebase.Messaging;
+using Android.Gms.Extensions;
 
 namespace Mark5.Mobile.Droid.Service
 {
     public class FirebaseRegistrator: IPushNotificationsRegistrator
     {
-        private string ActiveToken => FirebaseInstanceId.Instance?.Token;
+        private async Task<string> GetActiveToken()
+        {
+            try
+            {
+                var token = await FirebaseMessaging.Instance.GetToken();
+                return token.ToString();
+            }
+            catch(Exception ex)
+            {
+                CommonConfig.Logger.Debug($"Get token failed: {ex.Message}");
+                return string.Empty;
+            }
+
+        }
 
         public async Task RegisterToken(Context context)
         {
 
-            await Task.Run(() =>
+            await Task.Run(async () => 
             {
                 try
                 {
-                    var token = ActiveToken;
+                    var token = await GetActiveToken();
 
                     if (string.IsNullOrEmpty(token))
                         return;
@@ -48,21 +62,23 @@ namespace Mark5.Mobile.Droid.Service
             });
         }
 
-        public void UpdateToken()
+        public async void UpdateToken()
         {
-            if (!string.IsNullOrWhiteSpace(ActiveToken))
+            var token = await GetActiveToken();
+            if (!string.IsNullOrWhiteSpace(token))
             {
-                PlatformConfig.Preferences.PushNotificationToken = FirebaseInstanceId.Instance.Token;
-                CommonConfig.Sentry.LogError($"Firebase token {ActiveToken} updated to  new token {FirebaseInstanceId.Instance.Token}");
+
+                PlatformConfig.Preferences.PushNotificationToken = token;
+                CommonConfig.Sentry.LogError($"Firebase token updated to  new token {token}");
             }
         }
 
-        public void DeleteToken()
+        public async void DeleteToken()
         {
             try
             {
-                FirebaseInstanceId.Instance?.DeleteInstanceId();
-                var _nullToken = ActiveToken; // Token will be null, but it will cause refresh
+                await FirebaseMessaging.Instance?.DeleteToken();
+                var _nullToken = GetActiveToken(); // Token will be null, but it will cause refresh
             }
             catch (Exception ex)
             {
