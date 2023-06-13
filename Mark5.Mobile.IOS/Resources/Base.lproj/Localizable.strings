@@ -412,6 +412,7 @@
 "saving_draft___" = "Saving draft...";
 "search" = "Search";
 "search_all" = "All";
+"search_and" = "and";
 "search_any" = "Any";
 "search_attachments" = "Attachment";
 "search_both" = "Both";
@@ -436,6 +437,7 @@
 "search_lines" = "Mailbox";
 "search_message" = "Message";
 "search_name" = "Search name";
+"search_or" = "or";
 "search_outgoing" = "Outbox";
 "search_person" = "Person";
 "search_physical_address" = "Post address";
@@ -447,6 +449,7 @@
 "search_short_id" = "Short ID";
 "search_subject" = "Subject";
 "search_subject_or_message" = "Subject or Message";
+"search_subject_and_message" = "Subject and Message";
 "search_to" = "To";
 "search_to_date" = "To date";
 "search_today" = "Today";

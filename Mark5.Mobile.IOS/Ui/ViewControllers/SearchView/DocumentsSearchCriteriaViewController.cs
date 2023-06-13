@@ -302,15 +302,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 {
                     BackgroundColor = Theme.LightGray
                 };
-                valueTextFieldSegmentedControl = new UISegmentedControl(new[]
-                {
-                    Localization.GetString("search_subject"),
-                    Localization.GetString("search_message"),
-                    Localization.GetString("search_both")
-                })
+
+                var labels = GetSubjectMessageCriteriaLabels();
+
+                valueTextFieldSegmentedControl = new UISegmentedControl(labels)
                 {
                     TranslatesAutoresizingMaskIntoConstraints = false
                 };
+
                 valueTextFieldSegmentedControl.AddTarget(this, new Selector("segmentedControlChanged:"), UIControlEvent.ValueChanged);
                 valueTextFieldAccessoryView.AddSubview(valueTextFieldSegmentedControl);
                 valueTextFieldAccessoryView.AddConstraints(new[]
@@ -359,6 +358,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 AddArrangedSubview(mainView);
             }
 
+            private static string[] GetSubjectMessageCriteriaLabels()
+            {
+                if(ServerConfig.SystemSettings?.SystemInfo?.SubjectAndMessageSearchAvailable == true)
+                    return new[]
+                    {
+                        Localization.GetString("search_subject"),
+                        Localization.GetString("search_message"),
+                        Localization.GetString("search_and"),
+                        Localization.GetString("search_or")
+                    };
+
+                else
+                    return new[]
+                    {
+                        Localization.GetString("search_subject"),
+                        Localization.GetString("search_message"),
+                        Localization.GetString("search_both"),
+                    };
+            }
+
             protected override void UpdateRow()
             {
                 titleLabel.Text = Localization.GetString("search_where");
@@ -370,6 +389,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                         break;
                     case SubjectMessageClause.MessageOnly:
                         titleLabel.Text += Localization.GetString("search_message");
+                        break;
+                    case SubjectMessageClause.SubjectAndMessage:
+                        titleLabel.Text += Localization.GetString("search_subject_and_message");
                         break;
                     default:
                         titleLabel.Text += Localization.GetString("search_subject_or_message");
@@ -390,20 +412,44 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             [Export("segmentedControlChanged:")]
             void SegmentedControlChanged(UISegmentedControl segmentedControl)
             {
-                switch (segmentedControl.SelectedSegment)
+                if (ServerConfig.SystemSettings?.SystemInfo?.SubjectAndMessageSearchAvailable == true)
                 {
-                    case 0:
-                        Criteria.SubjectMessageClause = SubjectMessageClause.SubjectOnly;
-                        break;
+                    switch (segmentedControl.SelectedSegment)
+                    {
+                        case 0:
+                            Criteria.SubjectMessageClause = SubjectMessageClause.SubjectOnly;
+                            break;
 
-                    case 1:
-                        Criteria.SubjectMessageClause = SubjectMessageClause.MessageOnly;
-                        break;
+                        case 1:
+                            Criteria.SubjectMessageClause = SubjectMessageClause.MessageOnly;
+                            break;
 
-                    case 2:
-                        Criteria.SubjectMessageClause = SubjectMessageClause.SubjectOrMessage;
-                        break;
+                        case 2:
+                            Criteria.SubjectMessageClause = SubjectMessageClause.SubjectAndMessage;
+                            break;
+
+                        case 3:
+                            Criteria.SubjectMessageClause = SubjectMessageClause.SubjectOrMessage;
+                            break;
+                    }
                 }
+                else
+                {
+                    switch (segmentedControl.SelectedSegment)
+                    {
+                        case 0:
+                            Criteria.SubjectMessageClause = SubjectMessageClause.SubjectOnly;
+                            break;
+
+                        case 1:
+                            Criteria.SubjectMessageClause = SubjectMessageClause.MessageOnly;
+                            break;
+
+                        case 2:
+                            Criteria.SubjectMessageClause = SubjectMessageClause.SubjectOrMessage;
+                            break;
+                    }
+                }     
 
                 UpdateRow();
             }
@@ -419,8 +465,23 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     case SubjectMessageClause.MessageOnly:
                         valueTextFieldSegmentedControl.SelectedSegment = 1;
                         break;
-                    default:
+                    case SubjectMessageClause.SubjectOrMessage:
+                        if (ServerConfig.SystemSettings?.SystemInfo?.SubjectAndMessageSearchAvailable == true)
+                        {
+                            valueTextFieldSegmentedControl.SelectedSegment = 3;
+                            break;
+                        }
+                        else
+                        {
+                            valueTextFieldSegmentedControl.SelectedSegment = 2;
+                            break;
+                        }
+                    case SubjectMessageClause.SubjectAndMessage:
                         valueTextFieldSegmentedControl.SelectedSegment = 2;
+                        break;
+                    default:
+                        valueTextFieldSegmentedControl.SelectedSegment =
+                            (ServerConfig.SystemSettings?.SystemInfo?.SubjectAndMessageSearchAvailable == true) ? 3 : 2;
                         break;
                 }
 
