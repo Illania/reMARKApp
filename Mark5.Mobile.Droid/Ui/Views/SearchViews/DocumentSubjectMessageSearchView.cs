@@ -1,17 +1,30 @@
-﻿using Mark5.Mobile.Common.Model;
+﻿using System;
+using Mark5.Mobile.Common;
+using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 {
     public class DocumentSubjectMessageSearchView : AbstractMultiSearchView<SearchDocumentsCriteria>
     {
         public DocumentSubjectMessageSearchView(Android.Content.Context context)
-            : base(context, Resource.String.search_document_where, Resource.String.search_document_where_hint, Resource.Array.search_document_subject_message)
+            : base(context, Resource.String.search_document_where, Resource.String.search_document_where_hint, GetSubjectMessageCriteriaValuesArray())
         {
         }
 
+        private static int GetSubjectMessageCriteriaValuesArray()
+        {
+            if(ServerConfig.SystemSettings?.SystemInfo?.SubjectAndMessageSearchAvailable == true)
+                return Resource.Array.search_document_subject_message_v2;
+            else
+                return Resource.Array.search_document_subject_message;
+        }
         public override void Refresh()
         {
-            Spinner.SetSelection((int) Criteria.SubjectMessageClause);
+            if (ServerConfig.SystemSettings?.SystemInfo?.SubjectAndMessageSearchAvailable == false && (int)Criteria.SubjectMessageClause > 2)
+                Spinner.SetSelection((int)SubjectMessageClause.SubjectOrMessage);
+            else
+                Spinner.SetSelection((int)Criteria.SubjectMessageClause);
+            
             BottomEditText.Text = Criteria.SubjectMessageField;
         }
 

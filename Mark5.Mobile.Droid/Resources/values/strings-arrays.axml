@@ -18,6 +18,12 @@
         <item>Subject</item>
         <item>Message</item>
     </string-array>
+     <string-array name="search_document_subject_message_v2"> 
+        <item>Subject or Message</item>
+        <item>Subject</item>
+        <item>Message</item>
+        <item>Subject and Message</item>
+    </string-array>
         <string-array name="set_time_options">
         <item>Send email at</item>
         <item>Send email after</item>
