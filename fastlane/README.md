@@ -60,6 +60,14 @@ Upload to AppStore
 
 Build Android app release
 
+### android upload_internal_beta
+
+```sh
+[bundle exec] fastlane android upload_internal_beta
+```
+
+Upload internal beta release to Confluence Android Installers page
+
 ### android release_beta
 
 ```sh

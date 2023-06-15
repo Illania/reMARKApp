@@ -36,12 +36,12 @@ platform :ios do
 
 #region Versioning
   def version
-    get_info_plist_value(path: './Mark5.Mobile.IOS/Info.plist',
+    get_info_plist_value(path: ENV['INFO_PLIST_MOBILE_IOS_PATH'],
                          key: 'CFBundleShortVersionString')
   end
 
   def build_number
-    get_info_plist_value(path: './Mark5.Mobile.IOS/Info.plist',
+    get_info_plist_value(path: ENV['INFO_PLIST_MOBILE_IOS_PATH'],
                          key: 'CFBundleVersion')
   end
 #endregion
@@ -49,7 +49,7 @@ platform :ios do
 #region Build 
   def update_entitlements
     update_plist(
-      plist_path: './Mark5.Mobile.IOS/Entitlements.plist',
+      plist_path: ENV['ENTITLEMENTS_PLIST_PATH'],
       block: proc do |plist|
         plist[:"aps-environment"] = 'production'
         plist[:"com.apple.developer.icloud-container-environment"] = 'Production'
@@ -135,7 +135,7 @@ platform :ios do
         changelog: options[:changelog],
         distribute_external: true,
         distribute_only: false,
-        ipa: './Mark5.Mobile.IOS/bin/iPhone/Release/remark.ipa',
+        ipa: ENV['REMARK_IPA_PATH'],
         groups: groups,
         skip_submission: false,
         skip_waiting_for_build_processing: false
@@ -152,8 +152,8 @@ platform :ios do
       deliver(
         api_key: app_store_connect_api_key,
         app_version: version,
-        app_identifier: 'com.nordic-it.mark5.mobile.ios',
-        ipa: './Mark5.Mobile.IOS/bin/iPhone/Release/remark.ipa',
+        app_identifier: ENV['IOS_APP_IDENTIFIER'],
+        ipa: ENV['REMARK_IPA_PATH'],
         submit_for_review: true,
         automatic_release: true,
         phased_release: true,
@@ -206,14 +206,14 @@ platform :android do
         verbosity: 'detailed'
       )
       msbuild(
-        project: './Mark5.Mobile.Droid/Mark5.Mobile.Droid.csproj',
+        project: ENV['ANDROID_PROJECT_PATH'],
         target: options[:target].nil? ? 'Rebuild' : options[:target],
         build_type: 'Release',
         sign_apk: true,
         android_signing_keystore: ENV['PATH_TO_KEYSTORE'],
-        android_signing_key_alias: 'default',
-        android_signing_key_pass: 'Xs4Droid2015!',
-        android_signing_store_pass: 'Xs4Droid2015!'
+        android_signing_key_alias: ENV['ANDROID_SIGNING_KEY_ALIAS'],
+        android_signing_key_pass: ENV['ANDROID_SIGNING_KEY_PASS'],
+        android_signing_store_pass: ENV['ANDROID_SIGNING_STORE_PASS']
       )
     rescue StandardError => e
       slack_on_error(e)
@@ -223,15 +223,27 @@ platform :android do
 #endregion
 
 #region Deliver
+ desc 'Upload internal beta release to Confluence Android Installers page'
+  lane :upload_internal_beta do |options|
+    begin
+      _apk_path="#{ENV['ANDROID_RELEASE_FOLDER_PATH']}/remark_#{build_number}.apk"
+      system("mv #{ENV['ANDROID_SIGNED_APK_PATH']} #{_apk_path}")
+      sh "./upload.sh -e \"#{ENV['ATLASSIAN_EMAIL']}\" -t \"#{ENV['ATLASSIAN_API_TOKEN']}\" -f \"#{_apk_path}\" -c \"#{options[:comment]}\""
+      slack_on_success('reMark Android app was succcessfully uploaded to Android Installers page')
+    rescue StandardError => e
+      slack_on_error(e)
+    end
+  end
+
   desc 'Upload beta release to Google Play beta'
   lane :release_beta do
     begin
       supply(
-        apk: './Mark5.Mobile.Droid/bin/Release/com.nordic_it.mark5.android-Signed.apk',
+        apk: "#{ENV['ANDROID_SIGNED_APK_PATH']}",
         track: 'beta',
         skip_upload_images: true,
         skip_upload_screenshots: true,
-        package_name: 'com.nordic_it.mark5.android',
+        package_name: ENV['ANDROID_BUNDLE_IDENTIFIER'],
         version_name: version,
         version_code: build_number
       )
@@ -245,7 +257,7 @@ platform :android do
   lane :release do
     begin
       supply(
-        apk: './Mark5.Mobile.Droid/bin/Release/com.nordic_it.mark5.android-Signed.apk',
+        apk: "#{ENV['ANDROID_SIGNED_APK_PATH']}",
         track: 'rollout',
         rollout: '0.5',
         skip_upload_images: true,
