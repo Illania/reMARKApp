@@ -24,7 +24,6 @@ namespace Mark5.Mobile.Common.Manager
         {
             this.foldersDataAccess = foldersDataAccess;
         }
-
         
         public async Task<List<Folder>> GetFoldersAsync(Folder parentFolder, int depth = 1, SourceType sourceType = SourceType.Auto)
         {
@@ -55,6 +54,77 @@ namespace Mark5.Mobile.Common.Manager
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
+
+        public async Task AddSavedFolderInfo(Folder folder)
+        {
+            var infos = await FileSystemStorage.GetSavedOfflineFolderInfosAsync();
+
+            SavedOfflineFolderInfo existingInfo;
+            if ((existingInfo = infos.FirstOrDefault(sfi => sfi.FolderId == folder.Id && sfi.Module == folder.Module)) != null)
+            {
+                existingInfo.FolderName = folder.Name;
+                existingInfo.LastDownloaded = DateTime.UtcNow.ConvertDateTimeToTimestampMilliseconds();
+            }
+            else
+            {
+                infos.Add(new SavedOfflineFolderInfo
+                {
+                    FolderId = folder.Id,
+                    FolderGuid = folder.Guid,
+                    FolderName = folder.Name,
+                    Module = folder.Module,
+                    LastDownloaded = DateTime.UtcNow.ConvertDateTimeToTimestampMilliseconds()
+                });
+            }
+
+            await FileSystemStorage.SaveSavedOfflineFolderInfos(infos);
+
+            if (folder.Module == ModuleType.Documents)
+                Services.DocumentPreviewsDownloadService.Notify();
+        }
+
+        public async Task RemoveSavedFolderInfo(Folder folder)
+        {
+            var infos = await FileSystemStorage.GetSavedOfflineFolderInfosAsync();
+
+            var removed = infos.RemoveAll(sfi => sfi.FolderId == folder.Id && sfi.Module == folder.Module);
+
+            if (removed > 0)
+                await FileSystemStorage.SaveSavedOfflineFolderInfos(infos);
+        }
+
+        public async Task<bool> IsSavedFolderOfflineInfo(Folder folder)
+        {
+            return await IsSavedFolderOfflineInfo(folder.Module, folder.Id);
+        }
+
+        public async Task<bool> IsSavedFolderOfflineInfo(ModuleType module, int folderId)
+        {
+            var infos = await FileSystemStorage.GetSavedOfflineFolderInfosAsync();
+            return infos.Any(sfi => sfi.FolderId == folderId && sfi.Module == module);
+        }
+
+        public async Task<SavedOfflineFolderInfo> GetSavedFolderOfflineInfo(Folder folder)
+        {
+            var infos = await FileSystemStorage.GetSavedOfflineFolderInfosAsync();
+            return infos.FirstOrDefault(sfi => sfi.FolderId == folder.Id && sfi.Module == folder.Module);
+        }
+
+        public async Task<List<Folder>> SearchFolders(string searchText)
+        {
+            var foldersResult = await AppServiceProxy.SearchFolders(new DataContract.SearchFoldersParameters
+            {
+                Token = Token,
+                Name = searchText,
+                ModuleType = (DataContract.ModuleType)ModuleType.Documents
+            });
+
+            var folders = foldersResult.Folders.WhereNotNull().Select(f => f.Convert()).OrderBy(f => f.Position).ToList();
+
+            return folders;
+        }
+
+        #region Favorite folders (working with local FileStorage)
 
         public async Task<List<Folder>> GetFavoriteFoldersAsync(ModuleType module)
         {
@@ -135,107 +205,6 @@ namespace Mark5.Mobile.Common.Manager
             return moduleFavoriteFolders.FirstOrDefault(f => f.Id == folderId) != null;
         }
 
-        public async Task AddSavedFolderInfo(Folder folder)
-        {
-            var infos = await FileSystemStorage.GetSavedOfflineFolderInfosAsync();
-
-            SavedOfflineFolderInfo existingInfo;
-            if ((existingInfo = infos.FirstOrDefault(sfi => sfi.FolderId == folder.Id && sfi.Module == folder.Module)) != null)
-            {
-                existingInfo.FolderName = folder.Name;
-                existingInfo.LastDownloaded = DateTime.UtcNow.ConvertDateTimeToTimestampMilliseconds();
-            }
-            else
-            {
-                infos.Add(new SavedOfflineFolderInfo
-                {
-                    FolderId = folder.Id,
-                    FolderGuid = folder.Guid,
-                    FolderName = folder.Name,
-                    Module = folder.Module,
-                    LastDownloaded = DateTime.UtcNow.ConvertDateTimeToTimestampMilliseconds()
-                });
-            }
-
-            await FileSystemStorage.SaveSavedOfflineFolderInfos(infos);
-
-            if (folder.Module == ModuleType.Documents)
-                Services.DocumentPreviewsDownloadService.Notify();
-        }
-
-        public async Task RemoveSavedFolderInfo(Folder folder)
-        {
-            var infos = await FileSystemStorage.GetSavedOfflineFolderInfosAsync();
-
-            var removed = infos.RemoveAll(sfi => sfi.FolderId == folder.Id && sfi.Module == folder.Module);
-
-            if (removed > 0)
-                await FileSystemStorage.SaveSavedOfflineFolderInfos(infos);
-        }
-
-        public async Task<bool> IsSavedFolderOfflineInfo(Folder folder)
-        {
-            return await IsSavedFolderOfflineInfo(folder.Module, folder.Id);
-        }
-
-        public async Task<bool> IsSavedFolderOfflineInfo(ModuleType module, int folderId)
-        {
-            var infos = await FileSystemStorage.GetSavedOfflineFolderInfosAsync();
-            return infos.Any(sfi => sfi.FolderId == folderId && sfi.Module == module);
-        }
-
-        public async Task<SavedOfflineFolderInfo> GetSavedFolderOfflineInfo(Folder folder)
-        {
-            var infos = await FileSystemStorage.GetSavedOfflineFolderInfosAsync();
-            return infos.FirstOrDefault(sfi => sfi.FolderId == folder.Id && sfi.Module == folder.Module);
-        }
-
-        public async Task<List<Folder>> SearchFolders(string searchText)
-        {
-            var foldersResult = await AppServiceProxy.SearchFolders(new DataContract.SearchFoldersParameters
-            {
-                Token = Token,
-                Name = searchText,
-                ModuleType = (DataContract.ModuleType)ModuleType.Documents
-            });
-
-            var folders = foldersResult.Folders.WhereNotNull().Select(f => f.Convert()).OrderBy(f => f.Position).ToList();
-
-            return folders;
-        }
-
-        public async Task<ModuleFavoriteFoldersCollection> GetServiceFavoriteFoldersAsync(List<ModuleType> modules = null, bool retain = true)
-        {
-            modules = modules ?? new List<ModuleType> { ModuleType.Contacts, ModuleType.Documents, ModuleType.Shortcodes };
-
-            var result = await AppServiceProxy.GetFavoriteFolders(new DataContract.GetFavoriteFoldersParameters
-            {
-                Modules = modules.Select(module => module.ConvertEnum<DataContract.ModuleType>()).ToList(),
-                Token = ConnectionInfo.Token
-            });
-
-            ModuleFavoriteFoldersCollection moduleFavorites = result.Convert();
-
-            if (moduleFavorites.ModuleFavoriteFolders != null && retain)
-            {
-                foreach (var module in moduleFavorites.ModuleFavoriteFolders)
-                    await SetFavoriteFoldersAsync(module.ModuleType, module.Folders);
-            }
-
-            return moduleFavorites;
-        }
-
-        public async Task UpdateServiceFavoriteFoldersAsync()
-        {
-            Dictionary<ModuleType, List<Folder>> localFavorites = await FileSystemStorage.GetFavoriteFoldersAsync();
-
-            await AppServiceProxy.UpdateFavoriteFolders(new DataContract.UpdateFavoriteFoldersParameters
-            {
-                ModuleFavoriteFoldersList = localFavorites.Convert(),
-                Token = ConnectionInfo.Token
-            });
-        }
-
         public async Task ClearFavoritesAsync(List<ModuleType> modules = null)
         {
             modules = modules ?? new List<ModuleType> { ModuleType.Contacts, ModuleType.Documents, ModuleType.Shortcodes };
@@ -254,6 +223,9 @@ namespace Mark5.Mobile.Common.Manager
 
             await FileSystemStorage.SaveFavoriteFoldersAsync(favorites);
         }
+
+        #endregion
+
 
         #region Helper methods
 

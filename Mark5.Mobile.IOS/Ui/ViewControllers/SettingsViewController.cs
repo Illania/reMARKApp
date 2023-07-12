@@ -19,6 +19,7 @@ using Mark5.Mobile.IOS.Utilities.Extensions;
 using UIKit;
 using Mark5.Mobile.IOS.Ui.ViewControllers.AutoReply;
 using Mark5.Mobile.Classes.Enum;
+using AngleSharp.Io;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
@@ -471,18 +472,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         async void SettingsChanged(NSNotification n)
         {
-            var key = n.Object.ToString();
+            var userInfo = n.UserInfo;
+            if (userInfo.ContainsKey(new NSString(UseServerTimezoneKey)))
+                await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("restart_required_title"),
+                    Localization.GetString("restart_required_content"));
 
-            if (key == UseServerTimezoneKey)
-                await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("restart_required_title"), Localization.GetString("restart_required_content"));
-
-            if (key == DocumentsToDownloadKey)
+            if (userInfo.ContainsKey(new NSString(DocumentsToDownloadKey)))
             {
                 Managers.DocumentsManager.MaxToFetch = PlatformConfig.Preferences.DocumentsToDownload;
                 return;
             }
 
-            if (key == DocumentBodyRequestTypeKey)
+            if (userInfo.ContainsKey(new NSString(DocumentBodyRequestTypeKey)))
             {
                 Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
                 Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
@@ -490,51 +491,76 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 return;
             }
 
-            if (key == SyncFavoriteFoldersKey)
+            if (userInfo.ContainsKey(new NSString(SyncFavoriteFoldersKey)))
                 await HandleFavoriteSync();
 
-            if (key == UseTemplateKey)
+            if (userInfo.ContainsKey(new NSString(UseTemplateKey)))
                 RefreshHiddenSettings();
         }
 
         async Task HandleFavoriteSync()
         {
-            if (!PlatformConfig.Preferences.SyncFavoriteFoldersEnabled)
+            if (PlatformConfig.Preferences.SyncFavoriteFolders == (int)FavoriteFoldersSyncType.None)
                 return;
+
+            if(!ServerConfig.SystemSettings.SystemInfo.SyncFavoritesWithDesktopAvailable
+                && PlatformConfig.Preferences.SyncFavoriteFolders == (int)FavoriteFoldersSyncType.SyncWithDesktop)
+            {
+                PlatformConfig.Preferences.SyncFavoriteFolders = (int)FavoriteFoldersSyncType.None;
+                await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("attention"), Localization.GetString("sync_fav_folders_with_desktop_not_available"));
+                return;
+            }
 
             try
             {
-                var response = await Managers.FoldersManager.GetServiceFavoriteFoldersAsync(retain: false);
-                if (response.ModuleFavoriteFolders == null)
-                    await Managers.FoldersManager.UpdateServiceFavoriteFoldersAsync();
+                Managers.FavoriteFoldersManager = PlatformConfig.Preferences.SyncFavoriteFolders ==
+                    (int)FavoriteFoldersSyncType.SyncWithDesktop
+                    ? Managers.FavoriteFoldersDesktopSyncManager
+                    : Managers.FavoriteFoldersDeviceSyncManager;
+
+                var moduleFavoriteFoldersCollection = await Managers.FavoriteFoldersManager.GetServiceFavoriteFoldersAsync(retain: false);
+                if (moduleFavoriteFoldersCollection.ModuleFavoriteFolders == null || PlatformConfig.Preferences.SyncFavoriteFolders ==
+                    (int)FavoriteFoldersSyncType.SyncWithDesktop)
+                    await Managers.FavoriteFoldersManager.UpdateServiceFavoriteFoldersAsync();
                 else
                 {
-                    var selectedOption = await Dialogs.ShowListActionSheetWithTitleAsync(this, new string[] { Localization.GetString("sync_fav_folders_use_server"), Localization.GetString("sync_fav_folders_use_device") }, View, Localization.GetString("sync_fav_folders_action_title"), $"{Localization.GetString("sync_fav_folders_action_description")} : {response.UpdatedAt.ToLongDateString()}");
-
-                    if (selectedOption == 0)
-                    {
-                        foreach (var mff in response.ModuleFavoriteFolders)
-                            await Managers.FoldersManager.SetFavoriteFoldersAsync(mff.ModuleType, mff.Folders);
-
-                        var availableModules = new List<ModuleType> { ModuleType.Shortcodes, ModuleType.Contacts, ModuleType.Documents };
-                        await Managers.FoldersManager.ClearFavoritesAsync(availableModules.Except(response.ModuleFavoriteFolders.Select(mf => mf.ModuleType)).ToList());
-                    }
-                    else if (selectedOption == 1)
-                        await Managers.FoldersManager.UpdateServiceFavoriteFoldersAsync();
-                    else
-                    {
-                        PlatformConfig.Preferences.SyncFavoriteFoldersEnabled = false;
-                        return;
-                    }
+                    ProcessFavoriteFoldersDeviceSyncOption(moduleFavoriteFoldersCollection);
                 }
-
-                PlatformConfig.Preferences.SyncFavoriteFoldersEnabled = true;
             }
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error("Error while shynchonizing favorite folders", ex);
-                PlatformConfig.Preferences.SyncFavoriteFoldersEnabled = false;
+                PlatformConfig.Preferences.SyncFavoriteFolders = (int)FavoriteFoldersSyncType.None;
                 Dialogs.ShowErrorAlert(this, new Exception(Localization.GetString("sync_error_general")));
+            }
+        }
+
+        async void ProcessFavoriteFoldersDeviceSyncOption(ModuleFavoriteFoldersCollection moduleFavoriteFoldersCollection)
+        {
+            var selectedOption = await Dialogs.ShowListActionSheetWithTitleAsync(this, new string[] {
+                        Localization.GetString("sync_fav_folders_use_server"),
+                        Localization.GetString("sync_fav_folders_use_device")
+                    },
+                        View,
+                        Localization.GetString("sync_fav_folders_action_title"),
+                        $"{Localization.GetString("sync_fav_folders_action_description")} : " +
+                        $"{moduleFavoriteFoldersCollection.UpdatedAt.ToLongDateString()}");
+
+            if (selectedOption == 0)
+            {
+                foreach (var mff in moduleFavoriteFoldersCollection.ModuleFavoriteFolders)
+                    await Managers.FoldersManager.SetFavoriteFoldersAsync(mff.ModuleType, mff.Folders);
+
+                var availableModules = new List<ModuleType> { ModuleType.Shortcodes, ModuleType.Contacts, ModuleType.Documents };
+                await Managers.FoldersManager.ClearFavoritesAsync(availableModules.Except(
+                    moduleFavoriteFoldersCollection.ModuleFavoriteFolders.Select(mf => mf.ModuleType)).ToList());
+            }
+            else if (selectedOption == 1)
+                await Managers.FavoriteFoldersManager.UpdateServiceFavoriteFoldersAsync();
+            else
+            {
+                PlatformConfig.Preferences.SyncFavoriteFolders = (int)FavoriteFoldersSyncType.None;
+                return;
             }
         }
 
@@ -561,7 +587,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 hiddenKeys.Add(RememberLastUserDelaySettingsKey);
             }
                 
-
             if (ServerConfig.SystemSettings?.SystemInfo?.AutoReplyAvailable != true)
                 hiddenKeys.Add(AutoReplySettingsKey);
 

@@ -1,6 +1,7 @@
 using Android.App;
 using Android.Content;
 using AndroidX.Preference;
+using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using System;
 using System.Collections.Generic;
@@ -306,7 +307,7 @@ namespace Mark5.Mobile.Droid.Utilities
                 e.Commit();
             }
         }
-
+       
         public List<EmailSwipeAction> GetAllAvailableActions()
         {
             var arr = Application.Context.Resources.GetStringArray(Resource.Array.pref_email_swipe_actions_entryvalues).ToList();
@@ -473,22 +474,39 @@ namespace Mark5.Mobile.Droid.Utilities
         }
         #endregion
 
-        #region Folders favorites
+        #region Favorite folders
 
-        public bool SyncFavoritesEnabled
+        public FavoriteFoldersSyncType SyncFavoriteFolders
         {
             get
             {
-                return sp.GetBoolean(Application.Context.GetString(Resource.String.pref_key_sync_favorites_enabled), Application.Context.Resources.GetBoolean(Resource.Boolean.pref_key_sync_favorites_value));
+                if (!ServerConfig.SystemSettings.SystemInfo.SyncFavoritesWithDesktopAvailable)
+                {
+                    return (FavoriteFoldersSyncType)int.Parse(sp.GetString(Application.Context.GetString(Resource.String.pref_key_sync_favorite_folders_old),
+                        Application.Context.GetString(Resource.String.pref_sync_favorite_folders_default)));
+                }
+                else
+                {
+                    return (FavoriteFoldersSyncType)int.Parse(sp.GetString(Application.Context.GetString(Resource.String.pref_key_sync_favorite_folders),
+                        Application.Context.GetString(Resource.String.pref_sync_favorite_folders_default)));
+                }
             }
-
             set
             {
                 var e = sp.Edit();
-                e.PutBoolean(Application.Context.GetString(Resource.String.pref_key_sync_favorites_enabled), value);
+                if (!ServerConfig.SystemSettings.SystemInfo.SyncFavoritesWithDesktopAvailable)
+                {
+                    e.PutString(Application.Context.GetString(Resource.String.pref_key_sync_favorite_folders_old), $"{(int)value}");
+                }
+                else
+                {
+                    e.PutString(Application.Context.GetString(Resource.String.pref_key_sync_favorite_folders), $"{(int)value}");
+                }
                 e.Commit();
             }
         }
+
+
 
         #endregion
     }

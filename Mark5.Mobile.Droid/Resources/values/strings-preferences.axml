@@ -221,13 +221,9 @@
     <string name="pref_key_set_preset_category">pref_key_set_preset_category</string>
     <string name="pref_set_preset_category_summary">Select preset category to be used for quick category assigning.</string>
     <string name="pref_set_preset_category_title">Preset category</string>
-    <string name="pref_key_sync_favorites_enabled">pref_key_sync_favorites_enabled</string>
     <string name="pref_sync_favorites_title">Favorites synchronisation</string>
-    <bool name="pref_key_sync_favorites_value">false</bool>
     <string name="pref_sync_favorites">pref_sync_favorites</string>
-    <string name="sync_favorite_folders_title">Sync favorite folders</string>
     <string name="pref_sync_title">Sync</string>
-    <string name="sync_favorite_folders_summary">Synchronize favorite folders across devices and installations</string>
     <string name="pref_documents_confirm_remove_summary_off">The email will be removed straight away when using swipe actions.</string>
     <string name="pref_documents_confirm_remove_summary_on">You will be asked for confirmation when removing an email from folder with swipe actions.</string>
     <string name="pref_documents_confirm_remove_title">Confirm remove from folder with swipe</string>
@@ -246,9 +242,14 @@
     <string name="pref_key_sending_delay">pref_key_sending_delay</string>
     <string name="pref_key_last_user_sending_delay">pref_key_last_user_sending_delay</string>
     <string name="pref_key_bookmarks">pref_key_bookmarks</string>
-     <string name="pref_open_file_to_folder_dialog_title">Open file to folder dialog</string>
+    <string name="pref_open_file_to_folder_dialog_title">Open file to folder dialog</string>
     <string name="pref_key_open_file_to_folder_dialog">pref_key_open_file_to_folder_dialog</string>
     <string name="pref_open_file_to_folder_dialog_summary_on">File to folder dialog will be opened after sending email.</string>
     <string name="pref_open_file_to_folder_dialog_summary_off">>File to folder dialog will not be opened after sending email.</string>
     <string name="pref_key_extra_fields_settings">pref_key_extra_fields_settings</string>
+    <string name="pref_sync_favorite_folders_title">Favorites synchronization</string>
+    <string name="pref_sync_favorite_folders_summary">Favorite folders synchronization mode</string>
+    <string name="pref_sync_favorite_folders_dialog_title">Sync mode</string>
+    <string name="pref_key_sync_favorite_folders">pref_key_sync_favorite_folders</string>
+    <string name="pref_key_sync_favorite_folders_old">pref_key_sync_favorite_folders_old</string>
 </resources>

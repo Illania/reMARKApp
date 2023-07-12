@@ -91,6 +91,13 @@ namespace Mark5.Mobile.Common.Model
         HtmlAndPlainText = 3,
     }
 
+    public enum FavoriteFoldersSyncType
+    {
+        None = 0,
+        SyncWithDesktop = 1,
+        SyncAmongDevices = 2
+    }
+
     public enum TransmitStatus
     {
         None = 0,

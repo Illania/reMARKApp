@@ -18,6 +18,7 @@ using Mark5.Mobile.Classes;
 using Polly;
 using Polly.Bulkhead;
 using Polly.Wrap;
+using System.ServiceModel;
 
 namespace Mark5.ServiceReference.AppService
 {
@@ -650,6 +651,26 @@ namespace Mark5.ServiceReference.AppService
         public async Task<SetAutoReplyResult> SetAutoReplyRuleAsync(SetAutoReplyParameters parameters, CancellationToken ct = default)
         {
             return await InvokeAsync<SetAutoReplyResult, SetAutoReplyParameters>("SetAutoReply", parameters, ct);
+        }
+
+        public async Task<GetUserFavoriteFoldersResult> GetUserFavoriteFoldersAsync(GetUserFavoriteFoldersParameters parameters, CancellationToken ct = default)
+        {
+            return await InvokeAsync<GetUserFavoriteFoldersResult, GetUserFavoriteFoldersParameters>("GetUserFavoriteFolders", parameters, ct);
+        }
+
+        public async Task<AddUserFavoriteFolderResult> AddUserFavoriteFolderAsync(AddUserFavoriteFolderParameters parameters, CancellationToken ct = default)
+        {
+            return await InvokeAsync<AddUserFavoriteFolderResult, AddUserFavoriteFolderParameters>("AddUserFavoriteFolder", parameters, ct);
+        }
+
+        public async Task<RemoveUserFavoriteFolderResult> RemoveUserFavoriteFolderAsync(RemoveUserFavoriteFolderParameters parameters, CancellationToken ct = default)
+        {
+            return await InvokeAsync<RemoveUserFavoriteFolderResult, RemoveUserFavoriteFolderParameters>("RemoveUserFavoriteFolder", parameters, ct);
+        }
+
+        public async Task<UpdateUserFavoriteFoldersResult> UpdateUserFavoriteFoldersAsync(UpdateUserFavoriteFoldersParameters parameters, CancellationToken ct = default)
+        {
+            return await InvokeAsync<UpdateUserFavoriteFoldersResult, UpdateUserFavoriteFoldersParameters>("UpdateUserFavoriteFolders", parameters, ct);
         }
 
     }

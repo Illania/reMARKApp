@@ -777,28 +777,35 @@ namespace Mark5.Mobile.Common.Model.Converters
             };
         }
 
-        public static ModuleFavoriteFoldersCollection Convert(this DataContract.GetFavoriteFoldersResult moduleFavoritesResult)
+        private static ModuleFavoriteFoldersCollection Convert(List<DataContract.ModuleFavoriteFolders> moduleFavoriteFolders, DateTime updatedAt)
         {
             ModuleFavoriteFoldersCollection moduleFavorites = new ModuleFavoriteFoldersCollection
             {
-                UpdatedAt = moduleFavoritesResult.UpdatedAt
+                UpdatedAt = updatedAt
             };
 
-            if (moduleFavoritesResult.ModuleFavoriteFoldersList != null)
+            if (moduleFavoriteFolders != null)
             {
                 moduleFavorites.ModuleFavoriteFolders = new List<ModuleFavoriteFolders>();
 
-                foreach (var fav in moduleFavoritesResult.ModuleFavoriteFoldersList)
+                foreach (var fav in moduleFavoriteFolders)
                 {
                     var newFav = new ModuleFavoriteFolders { ModuleType = (ModuleType)fav.ModuleType };
                     newFav.Folders.AddRange(fav.Folders.Select(Convert));
-
                     moduleFavorites.ModuleFavoriteFolders.Add(newFav);
                 }
             }
 
             return moduleFavorites;
         }
+
+        public static ModuleFavoriteFoldersCollection Convert(this DataContract.GetFavoriteFoldersResult moduleFavoritesResult) =>
+            Convert(moduleFavoritesResult.ModuleFavoriteFoldersList, moduleFavoritesResult.UpdatedAt);
+
+
+        public static ModuleFavoriteFoldersCollection Convert(this DataContract.GetUserFavoriteFoldersResult moduleFavoritesResult) =>
+            Convert(moduleFavoritesResult.ModuleFavoriteFoldersList, moduleFavoritesResult.UpdatedAt);
+ 
 
         #region ICalendar
 
