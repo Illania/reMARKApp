@@ -300,7 +300,7 @@
 			<key>Title</key>
 			<string>manage_extra_fields</string>
 		</dict>
-			<dict>
+		<dict>
 			<key>Type</key>
 			<string>PSMultiValueSpecifier</string>
 			<key>Key</key>
@@ -509,11 +509,25 @@
 		</dict>
 		<dict>
 			<key>Type</key>
-			<string>PSToggleSwitchSpecifier</string>
-			<key>Title</key>
-			<string>sync_favorite_folders_title</string>
+			<string>PSMultiValueSpecifier</string>
 			<key>Key</key>
 			<string>SyncFavoriteFolders</string>
+			<key>Title</key>
+			<string>sync_favorite_folders_title</string>
+			<key>DefaultValue</key>
+			<integer>0</integer>
+			<key>Titles</key>
+			<array>
+				<string>don&apos;t sync</string>
+				<string>sync with desktop</string>
+				<string>sync across devices</string>
+			</array>
+			<key>Values</key>
+			<array>
+				<integer>0</integer>
+				<integer>1</integer>
+				<integer>2</integer>
+			</array>
 		</dict>
 		<dict>
 			<key>Type</key>

@@ -806,6 +806,11 @@ namespace Mark5.Mobile.IOS
                     CommonConfig.Logger.Info("Cleared cache");
                 }
 
+                if (PlatformConfig.Preferences.SyncFavoriteFolders == (int)FavoriteFoldersSyncType.SyncAmongDevices)
+                    Managers.FavoriteFoldersManager = Managers.FavoriteFoldersDeviceSyncManager;
+                if (PlatformConfig.Preferences.SyncFavoriteFolders == (int)FavoriteFoldersSyncType.SyncWithDesktop)
+                    Managers.FavoriteFoldersManager = Managers.FavoriteFoldersDesktopSyncManager;
+
                 ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
 
                 if (await Managers.CleanUpManager.IsCleanUpNecessary(PlatformConfig.Preferences.CleanCacheIntervalDays))

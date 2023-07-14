@@ -804,6 +804,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
             Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
 
+            if (PlatformConfig.Preferences.SyncFavoriteFolders == (int)FavoriteFoldersSyncType.SyncAmongDevices)
+                Managers.FavoriteFoldersManager = Managers.FavoriteFoldersDeviceSyncManager;
+            if (PlatformConfig.Preferences.SyncFavoriteFolders == (int)FavoriteFoldersSyncType.SyncWithDesktop)
+                Managers.FavoriteFoldersManager = Managers.FavoriteFoldersDesktopSyncManager;
+
             CommonConfig.Logger.Info("Retrieving system settings...");
 
             ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync();

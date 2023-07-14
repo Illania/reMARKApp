@@ -46,9 +46,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         protected UIBarButtonItem CreateShortcodeItem;
 
         TinyMessageSubscriptionToken outgoingDocumentCountChangedToken;
-
-        AutoRefreshWorker autoRefreshWorker;
-
         UISearchController searchController;
         CancellationTokenSource searchCancellationTokenSource;
         readonly List<CancellationTokenSource> searchCancellationTokenSourceList = new();
@@ -124,12 +121,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             else if (TableView?.Source as GrouppedDataSource != null)
                 QuickRefreshData();
 
-            //CommonConfig.Logger.Info($"Starting automatic refresh...");
-
-            //autoRefreshWorker?.Stop();
-            //autoRefreshWorker = new AutoRefreshWorker(AutoRefreshData, AutoRefreshIntervalMs);
-            //autoRefreshWorker.Start();
-
             if (Integration.IsRunningAtLeast(11))
             {
                 NSOperationQueue.MainQueue.AddOperation(() =>
@@ -151,10 +142,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             DeinitializeHandlers();
 
-            //autoRefreshWorker?.Stop();
-            //autoRefreshWorker?.Dispose();
-            //autoRefreshWorker = null;
-
             if (NavigationController != null && NavigationController.NavigationBarHidden)
                 NavigationController.SetNavigationBarHidden(false, true);
 
@@ -165,10 +152,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         public override void DidReceiveMemoryWarning()
         {
             CommonConfig.Logger.Warning("Received memory warning!");
-
-
-            //autoRefreshWorker?.Stop();
-            //autoRefreshWorker = null;
 
             (TableView.Source as DataSource)?.Reset();
             (TableView.Source as GrouppedDataSource)?.Reset();
@@ -182,9 +165,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             base.Recycle();
 
             UnsubscribeFromMessages();
-
-            //autoRefreshWorker?.Stop();
-            //autoRefreshWorker = null;
 
             EditModeItem = null;
             CreateContactItem = null;
@@ -426,6 +406,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
             PresentViewController(new NavigationController(vc), true, null);
         }
 
+        private bool SyncFavoriteFoldersEnabled()
+        {
+
+            return PlatformConfig.Preferences.SyncFavoriteFolders != (int)FavoriteFoldersSyncType.None
+                && Managers.FavoriteFoldersManager != null;
+        }
+
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         async void EditModeItem_Clicked(object sender, EventArgs e)
         {
@@ -440,6 +427,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
                 {
                     var gds = (GrouppedDataSource)TableView.Source;
                     await Managers.FoldersManager.SetFavoriteFoldersAsync(ParentFolder.Module, gds.GetFoldersInSection(GrouppedDataSource.Section.Favorites));
+
+                    if (SyncFavoriteFoldersEnabled() && !CommonConfig.Reachability.IsReachable)
+                        throw new Exception(Localization.GetString("sync_error_network"));
+
+                    if (SyncFavoriteFoldersEnabled() && CommonConfig.Reachability.IsReachable)
+                        await Managers.FavoriteFoldersManager.UpdateServiceFavoriteFoldersAsync();
+
                 }
                 catch (Exception ex)
                 {
@@ -542,13 +536,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             if (IsRootOfFoldersList && !OnlyShowRemoteSection)
             {
-
-
-                if (PlatformConfig.Preferences.SyncFavoriteFoldersEnabled && CommonConfig.Reachability.IsReachable)
+                if (SyncFavoriteFoldersEnabled() && CommonConfig.Reachability.IsReachable)
                 {
                     try
                     {
-                        await Managers.FoldersManager.GetServiceFavoriteFoldersAsync(new List<ModuleType> { ParentFolder.Module });
+                        await Managers.FavoriteFoldersManager.GetServiceFavoriteFoldersAsync(new List<ModuleType> { ParentFolder.Module });
                     }
                     catch (Exception ex)
                     {
@@ -770,11 +762,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 await Managers.FoldersManager.AddFavoriteFolderAsync(folder.Module, folder);
 
-                if (PlatformConfig.Preferences.SyncFavoriteFoldersEnabled && !CommonConfig.Reachability.IsReachable)
+                if (SyncFavoriteFoldersEnabled() && !CommonConfig.Reachability.IsReachable)
                     throw new Exception(Localization.GetString("sync_error_network"));
 
-                if (PlatformConfig.Preferences.SyncFavoriteFoldersEnabled && CommonConfig.Reachability.IsReachable)
-                    await Managers.FoldersManager.UpdateServiceFavoriteFoldersAsync();
+                if (SyncFavoriteFoldersEnabled() && CommonConfig.Reachability.IsReachable)
+                    await Managers.FavoriteFoldersManager.UpdateServiceFavoriteFoldersAsync();
 
                 if (TableView.Source is GrouppedDataSource gds)
                 {
@@ -812,11 +804,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
                 await Managers.FoldersManager.RemoveFavoriteFolderAsync(folder.Module, folder);
 
-                if (PlatformConfig.Preferences.SyncFavoriteFoldersEnabled && !CommonConfig.Reachability.IsReachable)
+                if (SyncFavoriteFoldersEnabled() && !CommonConfig.Reachability.IsReachable)
                     throw new Exception(Localization.GetString("sync_error_network"));
 
-                if (PlatformConfig.Preferences.SyncFavoriteFoldersEnabled && CommonConfig.Reachability.IsReachable)
-                    await Managers.FoldersManager.UpdateServiceFavoriteFoldersAsync();
+                if (SyncFavoriteFoldersEnabled() && CommonConfig.Reachability.IsReachable)
+                    await Managers.FavoriteFoldersManager.UpdateServiceFavoriteFoldersAsync();
 
                 if (TableView.Source is GrouppedDataSource gds)
                 {

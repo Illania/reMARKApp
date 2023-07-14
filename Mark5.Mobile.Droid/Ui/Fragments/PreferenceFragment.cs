@@ -205,14 +205,22 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 };
             }
 
-            var checkBox = (CheckBoxPreference)FindPreference(GetString(Resource.String.pref_key_sync_favorites_enabled));
-            if (checkBox != null)
+
+            var syncFavorites = FindPreference(GetString(Resource.String.pref_key_sync_favorite_folders));
+            var syncFavoritesOld = FindPreference(GetString(Resource.String.pref_key_sync_favorite_folders_old));
+            if (!ServerConfig.SystemSettings.SystemInfo.SyncFavoritesWithDesktopAvailable && syncFavorites != null)
             {
-                checkBox.PreferenceClick += async (object sender, Preference.PreferenceClickEventArgs e) =>
-                {
-                    if (checkBox.Checked)
-                        await HandleSync();
-                };
+                PreferenceScreen.RemovePreference(syncFavorites);
+                if (syncFavoritesOld != null)
+                    syncFavoritesOld.PreferenceChange += async (object sender, Preference.PreferenceChangeEventArgs e) => await HandleSync(e);
+
+            }
+
+            if (ServerConfig.SystemSettings.SystemInfo.SyncFavoritesWithDesktopAvailable && syncFavoritesOld != null)
+            {
+                PreferenceScreen.RemovePreference(syncFavoritesOld);
+                if (syncFavorites != null)
+                    syncFavorites.PreferenceChange += async (object sender, Preference.PreferenceChangeEventArgs e) => await HandleSync(e);
             }
 
             var serviceVersion = ServerConfig.SystemSettings?.SystemInfo?.ServiceVersion;
@@ -239,50 +247,69 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-        async Task HandleSync()
+        async Task HandleSync(Preference.PreferenceChangeEventArgs e)
         {
-            if (!PlatformConfig.Preferences.SyncFavoritesEnabled)
+            var newValue = int.Parse(e.NewValue.ToString());
+            var selected = (FavoriteFoldersSyncType)newValue;
+            if (selected == FavoriteFoldersSyncType.None)
                 return;
+
+            if (!ServerConfig.SystemSettings.SystemInfo.SyncFavoritesWithDesktopAvailable
+                && selected == FavoriteFoldersSyncType.SyncWithDesktop)
+            {         
+                await Dialogs.ShowConfirmDialogAsync(this.Context, Resource.String.attention,Resource.String.sync_fav_folders_with_desktop_not_available);
+                return;
+            }
 
             try
             {
-                var response = await Managers.FoldersManager.GetServiceFavoriteFoldersAsync(retain: false);
-                if (response.ModuleFavoriteFolders == null)
-                    await Managers.FoldersManager.UpdateServiceFavoriteFoldersAsync();
+                Managers.FavoriteFoldersManager = selected ==
+                      FavoriteFoldersSyncType.SyncWithDesktop
+                      ? Managers.FavoriteFoldersDesktopSyncManager
+                      : Managers.FavoriteFoldersDeviceSyncManager;
+
+                var moduleFavoriteFoldersCollection = await Managers.FavoriteFoldersManager.GetServiceFavoriteFoldersAsync(retain: false);
+                if (moduleFavoriteFoldersCollection.ModuleFavoriteFolders == null || PlatformConfig.Preferences.SyncFavoriteFolders ==
+                    FavoriteFoldersSyncType.SyncWithDesktop)
+                    await Managers.FavoriteFoldersManager.UpdateServiceFavoriteFoldersAsync();
                 else
                 {
-                    var selectedOption = await Dialogs.ShowListDialog(Activity, Resource.String.sync_fav_folders_action_title, $"{GetString(Resource.String.sync_fav_folders_action_description)} { response.UpdatedAt.ToShortDateString() }", new string[] { GetString(Resource.String.sync_fav_folders_use_server), GetString(Resource.String.sync_fav_folders_use_device) }, true);
-
-                    if (selectedOption == 0)
-                    {
-                        foreach (var favorite in response.ModuleFavoriteFolders)
-                            await Managers.FoldersManager.SetFavoriteFoldersAsync(favorite.ModuleType, favorite.Folders);
-
-                        var availableModules = new List<ModuleType> { ModuleType.Shortcodes, ModuleType.Contacts, ModuleType.Documents };
-                        await Managers.FoldersManager.ClearFavoritesAsync(availableModules.Except(response.ModuleFavoriteFolders.Select(mff => mff.ModuleType)).ToList());
-                    }
-                    else if (selectedOption == 1)
-                        await Managers.FoldersManager.UpdateServiceFavoriteFoldersAsync();
-                    else
-                    {
-                        PlatformConfig.Preferences.SyncFavoritesEnabled = false;
-                        return;
-                    }
+                    ProcessFavoriteFoldersDeviceSyncOption(moduleFavoriteFoldersCollection);
                 }
-
-                PlatformConfig.Preferences.SyncFavoritesEnabled = true;
             }
             catch (Exception ex)
             {
-                CommonConfig.Logger.Error("Error while shynchonizing favorite folders", ex);
-                PlatformConfig.Preferences.SyncFavoritesEnabled = false;
+                CommonConfig.Logger.Error("Error while synchronizing favorite folders", ex);
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
+            }
+        }
+
+
+        async void ProcessFavoriteFoldersDeviceSyncOption(ModuleFavoriteFoldersCollection moduleFavoriteFoldersCollection)
+        {
+            var selectedOption = await Dialogs.ShowListDialog(Activity, Resource.String.sync_fav_folders_action_title,
+                 $"{GetString(Resource.String.sync_fav_folders_action_description)} {moduleFavoriteFoldersCollection.UpdatedAt.ToShortDateString()}",
+                 new string[] { GetString(Resource.String.sync_fav_folders_use_server), GetString(Resource.String.sync_fav_folders_use_device) }, true);
+
+            if (selectedOption == 0)
+            {
+                foreach (var favorite in moduleFavoriteFoldersCollection.ModuleFavoriteFolders)
+                    await Managers.FoldersManager.SetFavoriteFoldersAsync(favorite.ModuleType, favorite.Folders);
+
+                var availableModules = new List<ModuleType> { ModuleType.Shortcodes, ModuleType.Contacts, ModuleType.Documents };
+                await Managers.FoldersManager.ClearFavoritesAsync(availableModules.Except(moduleFavoriteFoldersCollection.ModuleFavoriteFolders.Select(mff => mff.ModuleType)).ToList());
+            }
+            else if (selectedOption == 1)
+                await Managers.FavoriteFoldersManager.UpdateServiceFavoriteFoldersAsync();
+            else
+            {
+                return;
             }
         }
 
         public override bool OnPreferenceTreeClick(Preference preference)
         {
-            if (preference.Key == GetString(Resource.String.pref_key_sync_favorites_enabled))
+            if (preference.Key == GetString(Resource.String.pref_key_sync_favorite_folders))
                 return false;
 
             if (preference.Key == GetString(Resource.String.pref_key_documents_use_server_timezone))

@@ -65,7 +65,7 @@
 "sort_by_date" = "Sort by date";
 "ssl" = "SSL";
 "sync_favorite_folders_title" = "Sync favorite folders";
-"sync_favorite_folders_footer" = "Synchronize favorite folders across devices and installations";
+"sync_favorite_folders_footer" = "Favorite folders synchronization mode";
 "unread_indicator_me" = "Unread indicator";
 "update_config" = "Update system configuration";
 "use_server_timezone" = "Use time zone of reMARK Server";

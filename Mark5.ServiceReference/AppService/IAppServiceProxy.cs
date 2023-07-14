@@ -185,13 +185,27 @@ namespace Mark5.ServiceReference.AppService
 
         #endregion
 
-        #region Folder favorites
+        #region Favorite folders (sync across devices)
 
         Task<GetFavoriteFoldersResult> GetFavoriteFolders(GetFavoriteFoldersParameters parameters, CancellationToken ct = default(CancellationToken));
 
         Task<UpdateFavoriteFoldersResult> UpdateFavoriteFolders(UpdateFavoriteFoldersParameters parameters, CancellationToken ct = default(CancellationToken));
 
         #endregion
+
+        #region Favorite folders (sync with reMARK)
+
+        Task<GetUserFavoriteFoldersResult> GetUserFavoriteFoldersAsync(GetUserFavoriteFoldersParameters parameters, CancellationToken ct = default);
+
+        Task<AddUserFavoriteFolderResult> AddUserFavoriteFolderAsync(AddUserFavoriteFolderParameters parameters, CancellationToken ct = default);
+
+        Task<RemoveUserFavoriteFolderResult> RemoveUserFavoriteFolderAsync(RemoveUserFavoriteFolderParameters parameters, CancellationToken ct = default);
+
+        Task<UpdateUserFavoriteFoldersResult> UpdateUserFavoriteFoldersAsync(UpdateUserFavoriteFoldersParameters parameters, CancellationToken ct = default);
+
+        #endregion
+
+        #region Extra fields
 
         Task<AddExtraFieldResult> AddExtraFieldAsync(AddExtraFieldParameters parameters, CancellationToken ct = default);
 
@@ -210,6 +224,8 @@ namespace Mark5.ServiceReference.AppService
         Task<DeleteDocumentExtraFieldResult> DeleteDocumentExtraFieldAsync(DeleteDocumentExtraFieldParameters parameters, CancellationToken ct = default);
 
         Task<GetDocumentExtraFieldsResult> GetDocumentExtraFieldsAsync(GetDocumentExtraFieldsParameters parameters, CancellationToken ct = default);
+
+        #endregion
 
 
     }

@@ -3444,7 +3444,7 @@ namespace Mark5.ServiceReference.DataContract
 
     #endregion
 
-    #region Folder favorites
+    #region Favorite folders (Sync among devices and installations)
 
     [DataContract(Name = "ModuleFavoriteFolders", Namespace = "com.nordic-it.appservice.v3")]
     public class ModuleFavoriteFolders
@@ -3485,6 +3485,74 @@ namespace Mark5.ServiceReference.DataContract
     {
         [DataMember(Name = "UpdatedAt", Order = 0)]
         public DateTime UpdatedAt { get; set; }
+    }
+
+    #endregion
+
+    #region Favorite folders (Sync with Desktop)
+
+    [DataContract(Name = "GetUserFavoriteFoldersParameters", Namespace = "com.nordic-it.appservice.v3")]
+    public class GetUserFavoriteFoldersParameters : AbstractParameters
+    {
+        [DataMember(Name = "Modules", Order = 0)]
+        public List<ModuleType> Modules { get; set; }
+    }
+
+    [DataContract(Name = "GetUserFavoriteFoldersResult", Namespace = "com.nordic-it.appservice.v3")]
+    public class GetUserFavoriteFoldersResult
+    {
+        [DataMember(Name = "ModuleFavoriteFoldersList", Order = 0)]
+        public List<ModuleFavoriteFolders> ModuleFavoriteFoldersList { get; set; }
+
+        [DataMember(Name = "UpdatedAt", Order = 0)]
+        public DateTime UpdatedAt { get; set; }
+    }
+
+    [DataContract(Name = "UpdateUserFavoriteFoldersParameters", Namespace = "com.nordic-it.appservice.v3")]
+    public class UpdateUserFavoriteFoldersParameters : AbstractParameters
+    {
+        [DataMember(Name = "ModuleFavoriteFoldersList", Order = 0)]
+        public List<ModuleFavoriteFolders> ModuleFavoriteFoldersList { get; set; } = new List<ModuleFavoriteFolders>();
+    }
+
+    [DataContract(Name = "UpdateUserFavoriteFoldersResult", Namespace = "com.nordic-it.appservice.v3")]
+    public class UpdateUserFavoriteFoldersResult
+    {
+        [DataMember(Name = "UpdatedAt", Order = 0)]
+        public DateTime UpdatedAt { get; set; }
+    }
+
+    [DataContract(Name = "AddUserFavoriteFolderParameters", Namespace = "com.nordic-it.appservice.v3")]
+    public class AddUserFavoriteFolderParameters : AbstractParameters
+    {
+        [DataMember(Name = "ModuleType", Order = 0)]
+        public ModuleType ModuleType { get; set; }
+
+        [DataMember(Name = "FolderGuid", Order = 0)]
+        public Guid FolderGuid { get; set; }
+
+        [DataMember(Name = "FolderPosition", Order = 0)]
+        public int FolderPosition { get; set; }
+    }
+
+    [DataContract(Name = "AddUserFavoriteFolderResult", Namespace = "com.nordic-it.appservice.v3")]
+    public class AddUserFavoriteFolderResult
+    {
+    }
+
+    [DataContract(Name = "RemoveUserFavoriteFolderParameters", Namespace = "com.nordic-it.appservice.v3")]
+    public class RemoveUserFavoriteFolderParameters : AbstractParameters
+    {
+        [DataMember(Name = "ModuleType", Order = 0)]
+        public ModuleType ModuleType { get; set; }
+
+        [DataMember(Name = "FolderGuid", Order = 0)]
+        public Guid FolderGuid { get; set; }
+    }
+
+    [DataContract(Name = "RemoveUserFavoriteFolderResult", Namespace = "com.nordic-it.appservice.v3")]
+    public class RemoveUserFavoriteFolderResult
+    {
     }
 
     #endregion

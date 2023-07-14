@@ -75,7 +75,7 @@ namespace Mark5.Mobile.IOS.Utilities
 
             public const string PresetCategoryIdKey = "PresetCategoryId";
 
-            public const string BookmarksForFolders= "BookmarksForFolders";
+            public const string BookmarksForFolders = "BookmarksForFolders";
 
             public const string ExtraFieldsSettings = "ExtraFieldsSettings";
 
@@ -198,7 +198,7 @@ namespace Mark5.Mobile.IOS.Utilities
                     new NSString(Keys.EmailTrailingSwipeActions), NSArray.FromStrings (EmailSwipeAction.SwipeAction.More.ToString(), EmailSwipeAction.SwipeAction.CopyToWorkTray.ToString(), EmailSwipeAction.SwipeAction.MarkAsRead.ToString())
                 },
                 {
-                    new NSString(Keys.SyncFavoriteFoldersKey), NSNumber.FromBoolean(false)
+                    new NSString(Keys.SyncFavoriteFoldersKey), NSNumber.FromInt16(1)
                 },
                 {
                     new NSString(Keys.PresetCategoryIdKey), NSNumber.FromInt16(1)
@@ -271,7 +271,9 @@ namespace Mark5.Mobile.IOS.Utilities
             }
         }
 
-        public DocumentBodyTypeRequest DocumentBodyRequestType => ud.BoolForKey(Keys.DocumentBodyRequestTypeKey) ? DocumentBodyTypeRequest.PlainTextOnly : DocumentBodyTypeRequest.HtmlOnly;
+        public DocumentBodyTypeRequest DocumentBodyRequestType => ud.BoolForKey(Keys.DocumentBodyRequestTypeKey)
+            ? DocumentBodyTypeRequest.PlainTextOnly
+            : DocumentBodyTypeRequest.HtmlOnly;
 
         public bool HideReadNotifications => ud.BoolForKey(Keys.HideReadNotificationsKey);
 
@@ -425,7 +427,7 @@ namespace Mark5.Mobile.IOS.Utilities
             var hasBookmark = BookmarksForFolders.Contains(new KeyValuePair<string, string>(folderId.ToString(), docId.ToString()));
             return hasBookmark;
         }
- 
+
         public void SetBookmarkForFolder(int folderId, int docId)
         {
             var newBookmarks = BookmarksForFolders;
@@ -453,13 +455,13 @@ namespace Mark5.Mobile.IOS.Utilities
 
             BookmarksForFolders = newBookmarks;
         }
-           
-        public Dictionary<string,string> BookmarksForFolders
+
+        public Dictionary<string, string> BookmarksForFolders
         {
             get
             {
                 var udActions = ud.DictionaryForKey(Keys.BookmarksForFolders)
-                    .ToDictionary(k=> k.Key.ToString(), k => k.Value.ToString());
+                    .ToDictionary(k => k.Key.ToString(), k => k.Value.ToString());
                 return udActions;
             }
 
@@ -582,12 +584,14 @@ namespace Mark5.Mobile.IOS.Utilities
         }
 
         #region Favorites sync
-        public bool SyncFavoriteFoldersEnabled
+
+
+        public int SyncFavoriteFolders
         {
-            get => ud.BoolForKey(Keys.SyncFavoriteFoldersKey);
+            get => (int)ud.IntForKey(Keys.SyncFavoriteFoldersKey);
             set
             {
-                ud.SetBool(value, Keys.SyncFavoriteFoldersKey);
+                ud.SetInt(value, Keys.SyncFavoriteFoldersKey);
                 ud.Synchronize();
             }
         }

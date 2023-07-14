@@ -5,6 +5,7 @@ using Mark5.Mobile.Common.Database;
 using Mark5.Mobile.Common.Model;
 using Mark5.ServiceReference;
 using Mark5.Mobile.Classes.Enum;
+using Mark5.Mobile.Common.Manager.Interfaces;
 
 namespace Mark5.Mobile.Common.Manager
 {
@@ -23,6 +24,9 @@ namespace Mark5.Mobile.Common.Manager
         public static ICommonActionsManager CommonActionsManager { get; private set; }
         public static ICleanUpManager CleanUpManager { get; private set; }
         internal static IActionsManager ActionsManager { get; private set; }
+        public static IFavoriteFoldersManager FavoriteFoldersManager { get; set; }
+        public static IFavoriteFoldersManager FavoriteFoldersDesktopSyncManager { get; private set; }
+        public static IFavoriteFoldersManager FavoriteFoldersDeviceSyncManager { get; private set; }
 
         public static void Initialize(ConnectionInfo connectionInfo, string appToken = "", AzureApplicationProxyInfo azureAppProxyInfo =  null)
         {
@@ -67,6 +71,9 @@ namespace Mark5.Mobile.Common.Manager
             CommonActionsManager = new CommonActionsManager(connectionInfo, appServiceProxy, documentsDataAccess, contactsDataAccess, shortcodesDataAccess);
             CleanUpManager = new CleanUpManager(documentsDataAccess, contactsDataAccess, shortcodesDataAccess, calendarDataAccess);
             ActionsManager = new ActionsManager(connectionInfo, appServiceProxy, actionsDataAccess);
+            FavoriteFoldersDesktopSyncManager = new FavoriteFoldersDesktopSyncManager(connectionInfo, appServiceProxy);
+            FavoriteFoldersDeviceSyncManager = new FavoriteFoldersDeviceSyncManager(connectionInfo, appServiceProxy);
         }
+
     }
 }

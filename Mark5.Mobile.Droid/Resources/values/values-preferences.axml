@@ -207,4 +207,23 @@
         <item>30</item>
     </string-array>
     <string name="pref_auth_default">-1</string>
+    <string-array name="pref_sync_favorite_folders_entries">
+        <item>don\'t sync</item>
+        <item>sync with desktop</item>
+        <item>sync across devices</item>
+    </string-array>
+    <string-array name="pref_sync_favorite_folders_entryvalues">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+       <string-array name="pref_sync_favorite_folders_entries_old">
+        <item>don\'t sync</item>
+        <item>sync across devices</item>
+    </string-array>
+    <string-array name="pref_sync_favorite_folders_entryvalues_old">
+        <item>0</item>
+        <item>2</item>
+    </string-array>
+    <string name="pref_sync_favorite_folders_default">0</string>
 </resources>
