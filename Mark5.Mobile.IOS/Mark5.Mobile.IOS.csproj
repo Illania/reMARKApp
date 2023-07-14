@@ -357,6 +357,8 @@
 	    <Compile Include="Ui\ViewControllers\AutoReply\IsActiveView.cs" />
 	    <Compile Include="Ui\ViewControllers\AutoReply\SubjectView.cs" />
 	    <Compile Include="Ui\ViewControllers\TextViewerViewController.cs" />
+	    <Compile Include="Ui\ViewControllers\SearchView\DocumentsSearchResultsFilterController.cs" />
+	    <Compile Include="Ui\ViewControllers\SearchView\DocumentsSearchResultsDataSource.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
