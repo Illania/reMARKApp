@@ -5,27 +5,17 @@
     
     
       
-      <testcase classname="fastlane.lanes" name="0: default_platform" time="0.00095">
+      <testcase classname="fastlane.lanes" name="0: default_platform" time="0.000598">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="1: bump_version" time="0.003656">
+      <testcase classname="fastlane.lanes" name="1: ./upload.sh -e &quot;ag@nordic-it.com&quot; -t &quot;ATATT3xFfGF0So7nBC54jiRABfOBw3_SSIDmEg3U2oAV4ixPgYnuakv1EFAL351xXDdIUSc05I1W4vv_Ftir8nGLubIN3cixUbJijFRaO7IoCmbF_0GgZBNP73JX9MHDiqNY6-IQJeHt9_SQ3PQnVBV137V5nDYmEsScwVzmi57MRIdWSTl3AE0=1D7A5AC5&quot; -f &quot;./../Mark5.Mobile.Droid/bin/Release/remark_571.apk&quot; -c &quot;dummy apk uploaded&quot;" time="0.554966">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="2: bump_code" time="0.000849">
-        
-      </testcase>
-    
-      
-      <testcase classname="fastlane.lanes" name="3: nuget" time="4.784574">
-        
-      </testcase>
-    
-      
-      <testcase classname="fastlane.lanes" name="4: msbuild" time="213.803569">
+      <testcase classname="fastlane.lanes" name="2: slack" time="0.473121">
         
       </testcase>
     
