@@ -172,7 +172,7 @@ namespace Mark5.Mobile.Droid.Ui.Views.SearchViews
 
         public string GetText()
         {
-            return bottomEditText.Text ?? string.Empty;
+            return string.IsNullOrWhiteSpace(bottomEditText.Text) ? string.Empty : bottomEditText.Text;
         }
     }
 }

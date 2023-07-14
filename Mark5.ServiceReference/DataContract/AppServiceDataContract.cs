@@ -2438,6 +2438,7 @@ namespace Mark5.ServiceReference.DataContract
         [EnumMember(Value = "SubjectOrMessage")] SubjectOrMessage = 0,
         [EnumMember(Value = "SubjectOnly")] SubjectOnly = 1,
         [EnumMember(Value = "MessageOnly")] MessageOnly = 2,
+        [EnumMember(Value = "SubjectAndMessage")] SubjectAndMessage = 3,
     }
 
     [DataContract(Name = "FromToClause", Namespace = "com.nordic-it.appservice.v3")]

@@ -320,6 +320,7 @@ namespace Mark5.Mobile.Common.Model
         SubjectOrMessage = 0,
         SubjectOnly = 1,
         MessageOnly = 2,
+        SubjectAndMessage = 3
     }
 
     public enum FromToClause

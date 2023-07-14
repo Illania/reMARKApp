@@ -18,6 +18,7 @@ namespace Mark5.Mobile.Common.Model
         public bool SetNotificationReadStatusAvailable => ServiceVersionGreaterThanOrEqual(4, 3, 0);
         public bool ChangeSingleOccurrenceAvailable => SystemVersionGreaterThanOrEqual(1, 38, 10);
         public bool DelaySendAvailable => SystemVersionGreaterThanOrEqual(1, 38, 14);
+        public bool SubjectAndMessageSearchAvailable => SystemVersionGreaterThanOrEqual(1, 50, 1);
         public bool InternalMailsAvailable => false;
         public bool NotificationsInChina { get; set; }
 
