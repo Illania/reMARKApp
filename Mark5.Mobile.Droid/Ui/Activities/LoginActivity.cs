@@ -392,10 +392,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
             Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
             Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
 
-            if (PlatformConfig.Preferences.SyncFavoriteFolders == FavoriteFoldersSyncType.SyncAmongDevices)
-                Managers.FavoriteFoldersManager = Managers.FavoriteFoldersDeviceSyncManager;
-            if (PlatformConfig.Preferences.SyncFavoriteFolders == FavoriteFoldersSyncType.SyncWithDesktop)
-                Managers.FavoriteFoldersManager = Managers.FavoriteFoldersDesktopSyncManager;
+     
 
             CommonConfig.Logger.Info("Retrieving system settings...");
 
@@ -422,7 +419,19 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 TinyIoCContainer.Current.Register<IPushNotificationsRegistrator>(new FirebaseRegistrator());
 
             pushNotificationsRegistrator = TinyIoCContainer.Current.Resolve<IPushNotificationsRegistrator>();
- 
+
+            if (PlatformConfig.Preferences.SyncFavoriteFolders != null &&
+                PlatformConfig.Preferences.SyncFavoriteFolders == FavoriteFoldersSyncType.SyncAmongDevices)
+                Managers.FavoriteFoldersManager = Managers.FavoriteFoldersDeviceSyncManager;
+            if (PlatformConfig.Preferences.SyncFavoriteFolders != null &&
+                PlatformConfig.Preferences.SyncFavoriteFolders == FavoriteFoldersSyncType.SyncWithDesktop)
+                Managers.FavoriteFoldersManager = Managers.FavoriteFoldersDesktopSyncManager;
+            else
+            {
+                Managers.FavoriteFoldersManager = null;
+                PlatformConfig.Preferences.SyncFavoriteFolders = FavoriteFoldersSyncType.None;
+            }
+
             using var loggerFactory = new LoggerFactory().AddSentry(o =>
             {
                 o.DiagnosticLevel = SentryLevel.Debug;
