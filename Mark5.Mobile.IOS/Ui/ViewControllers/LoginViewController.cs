@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 using Airbnb.Lottie;
@@ -23,7 +21,6 @@ using Microsoft.Extensions.Logging;
 using Sentry;
 using UIKit;
 using UserNotifications;
-using Xamarin.Essentials;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
@@ -41,7 +38,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         const float TextFieldHeight = 28f;
 
         const float LoginButtonWidth = 100f;
-        const float LoginButtonHeight = 24f;
+        const float LoginButtonHeight = 40f;
 
         #endregion
 
@@ -338,6 +335,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             loginButton.TranslatesAutoresizingMaskIntoConstraints = false;
             loginButton.SetTitle(Localization.GetString("login"), UIControlState.Normal);
             loginButton.SetTitleColor(Theme.DarkBlue, UIControlState.Normal);
+            loginButton.BackgroundColor = Theme.LightBlue;
+            loginButton.Layer.BorderColor = Theme.DarkGray.CGColor;
+            loginButton.Layer.BorderWidth = 1;
+            loginButton.Layer.CornerRadius = 0;
+            
 
             containerView.AddSubview(loginButton);
             containerView.AddConstraints(new[]
@@ -350,8 +352,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             orLabel = new UILabelScalable
             {
-                Text = "or",
-                Font = Theme.DefaultFont.CustomFont(),
+                Text = "OR",
+                Font = Theme.DefaultBoldFont.CustomFont(),
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 TextColor = Theme.DarkBlue,
                 TextAlignment = UITextAlignment.Center,
