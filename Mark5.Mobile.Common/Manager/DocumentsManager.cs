@@ -117,7 +117,7 @@ namespace Mark5.Mobile.Common.Manager
                     Id = rule.Id,
                     Active = rule.Active,
                     ActiveFrom = rule.ActiveFrom == System.Data.SqlTypes.SqlDateTime.MinValue.Value ? DateTime.Now : rule.ActiveFrom,
-                    ActiveTo = rule.ActiveTo == System.Data.SqlTypes.SqlDateTime.MinValue.Value ? DateTime.Now.AddMonths(1) : rule.ActiveTo,
+                    ActiveTo = rule.ActiveTo == System.Data.SqlTypes.SqlDateTime.MaxValue.Value ? DateTime.Now.AddMonths(1) : rule.ActiveTo,
                     IncomingMailboxGuid = rule.MailboxGuid,
                     ReplySubject = rule.ReplySubject,
                     ReplyText = rule.ReplyText
