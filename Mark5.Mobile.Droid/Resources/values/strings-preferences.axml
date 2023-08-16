@@ -30,7 +30,7 @@
     <string name="pref_always_use_default_line_title">Always use default mailbox</string>
     <string name="pref_always_use_default_line_summary_off">The predefined mailbox will be selected according to the original email</string>
     <string name="pref_always_use_default_line_summary_on">The default mailbox will be used on every email</string>
-    <string name="pref_autoreply_title">Autoreply settings</string>
+    <string name="pref_autoreply_title">Out of office settings</string>
     <string name="pref_autoreply_summary">Out of office automatic reply settings</string>
     <string name="pref_cache_auto_clean_dialog_title">Clean up cache every</string>
     <string name="pref_cache_auto_clean_summary">Cache will be cleaned up every %s</string>
