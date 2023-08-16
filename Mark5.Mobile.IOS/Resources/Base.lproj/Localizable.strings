@@ -276,7 +276,7 @@
 "location" = "Location";
 "logging_in___" = "Logging in...";
 "logging_out___" = "Logging out...";
-"login" = "Login";
+"login" = "LOG IN";
 "login_failed" = "Login failed";
 "login_failed_azure_desc" = "Could not log in to reMARK. An error happened during authentication.";
 "login_failed_desc" = "Could not log in to reMARK. Please check your username, password and server address.\n\nYou may also want to verify SSL settings, by tapping Settings in top right corner of the screen.";
