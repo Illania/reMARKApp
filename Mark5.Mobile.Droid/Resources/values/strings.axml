@@ -72,7 +72,7 @@
     <string name="confirm_save_as_draft">Do you want to save the email as draft?</string>
     <string name="confirm_send_invitations_title">Send invitations</string>
     <string name="confirm_send_invitations_content">Do you want to send invitations immediately?</string>
-    <string name="confirm_save_autoreply">Do you want to save the autoreply settings?</string>
+    <string name="confirm_save_autoreply">Do you want to save the out of office settings?</string>
     <string name="connection_status">Connection status</string>
     <string name="contact">Contact</string>
     <string name="contacts">Contacts</string>
@@ -300,7 +300,7 @@
     <string name="loading_appointments">Loading appointments</string>
     <string name="loading_contact">Loading contact</string>
     <string name="loading_document">Loading email</string>
-    <string name="loading_autoreply">Loading autoreply settings</string>
+    <string name="loading_autoreply">Loading out of office settings</string>
     <string name="loading_mail">Loading email</string>
     <string name="loading_template">Loading template</string>
     <string name="loading_templates">Loading templates</string>
@@ -418,7 +418,7 @@
     <string name="responsible_users">Responsible users</string>
     <string name="save">Save</string>
     <string name="save_draft">Save draft</string>
-    <string name="saving_autoreply">Saving autoreply settings</string>
+    <string name="saving_autoreply">Saving out of office settings</string>
     <string name="save_offline">Save offline</string>
     <string name="saving_draft">Saving draft</string>
     <string name="scan_finger">Scan finger</string>

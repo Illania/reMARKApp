@@ -32,7 +32,7 @@
 "all_day" = "All-day";
 "attachment_too_big" = "The attachment is bigger than the maximum allowed size on the server";
 "attachments" = "Attachments";
-"autoreply_settings" = "Autoreply setttings";
+"autoreply_settings" = "Out of office setttings";
 "autosave_recover_title" = "Recover email";
 "autosave_recover_content" = "reMARK recovered an autosaved email. Do you want to continue editing it?";
 "available" = "Available";
@@ -187,7 +187,7 @@
 "edit_contact_edit_person" = "Edit person";
 "edit_contact_edit_company" = "Edit company";
 "edit_contact_edit_department" = "Edit department";
-"editing_autoreply___" = "Editing autoreply rule...";
+"editing_autoreply___" = "Editing out of office rule...";
 "editing_contact___" = "Editing contact...";
 "editing_shortcode___" = "Editing mailing list...";
 "editing_extra_field___" = "Editing extra field...";
