@@ -791,6 +791,7 @@ namespace Mark5.Mobile.IOS
                         ApplicationProxyClientId = PlatformConfig.Preferences.AzureApplicationProxyAppProxyId,
                         IsEnabled =PlatformConfig.Preferences.AzureApplicationProxyEnabled
                     });
+
                 Managers.DocumentsManager.MaxToFetch = PlatformConfig.Preferences.DocumentsToDownload;
                 Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
                 Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
@@ -808,8 +809,15 @@ namespace Mark5.Mobile.IOS
 
                 if (PlatformConfig.Preferences.SyncFavoriteFolders == (int)FavoriteFoldersSyncType.SyncAmongDevices)
                     Managers.FavoriteFoldersManager = Managers.FavoriteFoldersDeviceSyncManager;
-                if (PlatformConfig.Preferences.SyncFavoriteFolders == (int)FavoriteFoldersSyncType.SyncWithDesktop)
+                if (PlatformConfig.Preferences.SyncFavoriteFolders == (int)FavoriteFoldersSyncType.SyncWithDesktop
+                    && ServerConfig.SystemSettings?.SystemInfo?.SyncFavoritesWithDesktopAvailable == true)
                     Managers.FavoriteFoldersManager = Managers.FavoriteFoldersDesktopSyncManager;
+                else
+                {
+                    Managers.FavoriteFoldersManager = null;
+                    PlatformConfig.Preferences.SyncFavoriteFolders = (int)FavoriteFoldersSyncType.None;
+                }
+                    
 
                 ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
 

@@ -103,13 +103,8 @@ namespace Mark5.Mobile.Droid
                         Managers.DocumentsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
                         Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
                         Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
-
-                        if (PlatformConfig.Preferences.SyncFavoriteFolders == FavoriteFoldersSyncType.SyncAmongDevices)
-                            Managers.FavoriteFoldersManager = Managers.FavoriteFoldersDeviceSyncManager;
-                        if (PlatformConfig.Preferences.SyncFavoriteFolders == FavoriteFoldersSyncType.SyncWithDesktop)
-                            Managers.FavoriteFoldersManager = Managers.FavoriteFoldersDesktopSyncManager;
-
                         ServerConfig.SystemSettings = await Managers.SystemManager.GetSystemSettingsAsync(SourceType.Local);
+ 
                     }
                 })
                 .Wait();
