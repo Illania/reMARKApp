@@ -45,6 +45,8 @@ namespace Mark5.Mobile.Common.Model
 
         public bool SyncFavoritesWithDesktopAvailable => ServiceVersionGreaterThanOrEqual(4, 8, 0);
 
+        public bool AttachByReferenceAvailable => ServiceVersionGreaterThanOrEqual(4, 8, 0);
+
         public bool CalendarModuleAvailable       
         {
 

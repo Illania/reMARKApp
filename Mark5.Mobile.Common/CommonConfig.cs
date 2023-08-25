@@ -14,6 +14,7 @@ namespace Mark5.Mobile.Common
         public static IFolder DataFolder { get; set; }
         public static IFolder DatabaseFolder { get; set; }
         public static IFolder AttachmentsFolder { get; set; }
+        public static IFolder EmlFolder { get; set; }
         public static IFolder DocumentsToUploadFolder { get; set; }
         public static IFolder DocumentWorkingCopyFolder { get; set; }
         public static IFolder RetainedDataFolder { get; set; }

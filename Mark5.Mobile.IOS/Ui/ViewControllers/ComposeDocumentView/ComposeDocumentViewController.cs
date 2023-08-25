@@ -621,12 +621,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             if(!Integration.IsiOSApplicationOnMac())
             {
-                var source = await Dialogs.ShowListActionSheetAsync(this, new[] {
+                var menuItems = new List<string>{
                     Localization.GetString("insert_template"),
                     Localization.GetString("take_photo"),
                     Localization.GetString("existing_photo"),
                     Localization.GetString("browse_files"),
-                    Localization.GetString("browse_external_remark_files") }, d);
+                    Localization.GetString("browse_external_remark_files")
+                };
+
+                if (ServerConfig.SystemSettings?.SystemInfo?.AttachByReferenceAvailable == true)
+                    menuItems.Add(Localization.GetString("attach_by_reference"));
+
+                var source = await Dialogs.ShowListActionSheetAsync(this, menuItems.ToArray(), d);
 
                 if (source < 0)
                     return;
@@ -660,6 +666,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.External));
                     await InsertExternalAttachment();
                 }
+
+                if (ServerConfig.SystemSettings?.SystemInfo?.AttachByReferenceAvailable == true && source == 5)
+                {
+                    CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.ReferenceEml));
+                    await AttachByReference();
+                }
+
             }
             else
             {
@@ -691,6 +704,86 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             }
 
         }
+
+        async Task AttachByReference()
+        {
+            try
+            {
+                var vc = new SearchByReferenceViewController()
+                {
+                   ModalPresentationStyle = UIModalPresentationStyle.OverCurrentContext,
+                   ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve
+                };
+                PresentViewController(vc, false, null);
+                var docId = await vc.Result;
+
+                if (docId > 0)
+                {
+                    var emlFilePath = await Managers.DocumentsManager.GetDocumentEmlAsync(docId);
+                    await HandleEmlPath(emlFilePath);             
+                }
+
+                DismissModalViewController(false);
+            }
+            catch (OperationCanceledException) { }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Failed to get document eml async", ex.InnerException);
+                await Dialogs.ShowErrorAlertAsync(this, ex.InnerException);
+            }
+
+        }
+
+
+        async Task HandleEmlPath(string path)
+        {
+            Stream stream = null;
+
+            var url = new NSUrl(path);
+            try
+            {
+                   
+                var fileName = url.LastPathComponent;
+                stream = new FileStream(path, FileMode.Open, FileAccess.Read);
+                var result = url.TryGetResource(NSUrl.FileSizeKey, out NSObject sizeObject, out NSError _error);
+
+                if (!result)
+                    throw new Exception(_error.ToString());
+
+                long sizeInBytes = 0;
+
+                if (sizeObject != null)
+                {
+                    sizeInBytes = int.Parse(sizeObject.ToString());
+                }
+                else
+                {
+                    sizeInBytes = stream.Length;
+                }
+                if (sizeInBytes > ServerConfig.SystemSettings.DocumentsModuleInfo.MaximumAttachmentSizeBytes)
+                {
+                    await Dialogs.ShowErrorAlertAsync(this, new Exception(Localization.GetString("attachment_too_big")));
+                    return;
+                }
+
+                var file = await Managers.DocumentsManager.SaveDocumentWorkingCopyAttachmentAsync(fileName, stream);
+                attachmentsView.AddFileDescription(new FileDescription(file));
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Failed to save attachment [Url={url}, PreviousDocumentId={PreviousDocumentId}, " +
+                    $"PreviousDocumentFolderId={PreviousDocumentFolderId}, CreationModeFlag={DocumentCreationModeFlag}]", ex);
+
+                await Dialogs.ShowErrorAlertAsync(this, new Exception(Localization.GetString("error_saving_local_attachment")));
+            }
+            finally
+            {
+                stream?.Dispose();
+                
+            }
+
+        }
+
 
         void SendButton_Clicked(object sender, EventArgs e)
         {

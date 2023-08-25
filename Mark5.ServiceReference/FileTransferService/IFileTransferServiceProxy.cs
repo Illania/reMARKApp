@@ -13,5 +13,7 @@ namespace Mark5.ServiceReference.FileTransferService
         Task<GetAttachmentResponse> GetAttachmentAsync(GetAttachmentRequest req, Func<Stream, Task> handler, CancellationToken ct = default(CancellationToken));
 
         Task<UploadTemporaryAttachmentResponse> UploadTemporaryAttachmentAsync(UploadTemporaryAttachmentRequest req, CancellationToken ct = default(CancellationToken));
+
+        Task<GetEmlResponse> GetDocumentEmlAsync(GetEmlRequest req, Func<Stream, Task> saveHandler, CancellationToken ct = default(CancellationToken));
     }
 }

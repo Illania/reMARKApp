@@ -23,6 +23,7 @@ namespace Mark5.ServiceReference.FileTransferService
             public const string Version = "version";
             public const string Attachment = "attachment";
             public const string Temporary = "temporary";
+            public const string Eml = "eml";
         }
 
         static class Headers
@@ -205,6 +206,124 @@ namespace Mark5.ServiceReference.FileTransferService
                         throw new HttpRequestException($"Invalid server response: {res.StatusCode}.");
 
                     var result = new GetAttachmentResponse();
+
+                    IEnumerable<string> headers;
+
+                    if (res.Headers.TryGetValues(Headers.Filename, out headers))
+                        result.Filename = headers.FirstOrDefault();
+
+                    if (res.Headers.TryGetValues(Headers.Extension, out headers))
+                        result.Extension = headers.FirstOrDefault();
+
+                    if (res.Headers.TryGetValues(Headers.ContentLength, out headers))
+                        result.Size = Convert.ToInt32(headers.FirstOrDefault() ?? "- 1");
+
+                    if (res.Headers.TryGetValues(Headers.Md5, out headers))
+                        result.Md5 = headers.FirstOrDefault();
+
+                    using (var stream = await res.Content.ReadAsStreamAsync())
+                    {
+                        await saveHandler_(stream);
+                    }
+
+                    return result;
+                }
+            }
+
+            async Task<GetAttachmentResponse> GetAttachmentV301(GetAttachmentRequest req_, Func<Stream, Task> saveHandler_, CancellationToken ct_)
+            {
+                using (var client = new HttpClient(httpClientHandler())
+                {
+                    Timeout = TimeSpan.FromSeconds(Config.HttpClientTimeoutSeconds)
+                })
+                {
+                    var path = $"{endpointUrl}/{Segments.Attachment}/{req_.Id}&documentId={req_.DocumentId}";
+
+                    var request = new HttpRequestMessage(HttpMethod.Get, path);
+                    if (!string.IsNullOrEmpty(bearerToken))
+                        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+                    request.Headers.Add(Headers.Token, req_.Token);
+                    var res = UseBearerToken()
+                       ? await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead)
+                       : await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct_);
+
+                    if (res.StatusCode != HttpStatusCode.OK)
+                        return null;
+
+                    var result = new GetAttachmentResponse();
+
+                    IEnumerable<string> headers;
+
+                    if (res.Headers.TryGetValues(Headers.Filename, out headers))
+                        result.Filename = headers.FirstOrDefault().Base64Decode();
+
+                    if (res.Headers.TryGetValues(Headers.Extension, out headers))
+                        result.Extension = headers.FirstOrDefault().Base64Decode();
+
+                    if (res.Headers.TryGetValues(Headers.ContentLength, out headers))
+                        result.Size = Convert.ToInt32(headers.FirstOrDefault() ?? "- 1");
+
+                    if (res.Headers.TryGetValues(Headers.Md5, out headers))
+                        result.Md5 = headers.FirstOrDefault();
+
+                    using (var stream = await res.Content.ReadAsStreamAsync())
+                    {
+                        await saveHandler_(stream);
+                    }
+
+                    return result;
+                }
+            }
+        }
+
+        public async Task<GetEmlResponse> GetDocumentEmlAsync(GetEmlRequest req, Func<Stream, Task> saveHandler,
+            CancellationToken ct = default(CancellationToken))
+        {
+  
+                try
+                {
+                    onStartTransmission?.Invoke();
+
+                    if (IsTokenCloseToExpire())
+                        await UpdateBearerToken();
+
+                    return await GetDocumentEml(req, saveHandler, ct);
+                }
+                catch (OperationCanceledException)
+                {
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    throw new FileTransferServiceException(ex);
+                }
+                finally
+                {
+                    onStopTransmission?.Invoke();
+                }
+
+  
+            async Task<GetEmlResponse> GetDocumentEml(GetEmlRequest req_, Func<Stream, Task> saveHandler_, CancellationToken ct_)
+            {
+                using (var client = new HttpClient(httpClientHandler())
+                {
+                    Timeout = TimeSpan.FromSeconds(Config.HttpClientTimeoutSeconds)
+                })
+                {
+                    var path = $"{endpointUrl}/{Segments.Eml}/{req_.DocumentId}";
+
+                    var request = new HttpRequestMessage(HttpMethod.Get, path);
+                    if (!string.IsNullOrEmpty(bearerToken))
+                        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+                    request.Headers.Add(Headers.Token, req_.Token);
+                    var res = UseBearerToken()
+                        ? await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead)
+                        : await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct_);
+
+                    if (res.StatusCode != HttpStatusCode.OK)
+                        throw new HttpRequestException($"Invalid server response: {res.StatusCode}.");
+
+                    var result = new GetEmlResponse();
 
                     IEnumerable<string> headers;
 

@@ -35,6 +35,27 @@ namespace Mark5.ServiceReference.DataContract
         public Stream Stream { get; set; }
     }
 
+    public class GetEmlRequest
+    {
+        public string Token { get; set; }
+
+        public int DocumentId { get; set; } = -1;
+    }
+
+    public class GetEmlResponse
+    {
+        public string Filename { get; set; }
+
+        public string Extension { get; set; }
+
+        public int Size { get; set; }
+
+        public string Md5 { get; set; }
+
+        public Stream Stream { get; set; }
+    }
+
+
     public class UploadTemporaryAttachmentRequest
     {
         public string Token { get; set; }

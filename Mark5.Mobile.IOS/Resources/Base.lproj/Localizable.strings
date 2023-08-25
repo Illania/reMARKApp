@@ -30,6 +30,7 @@
 "adding_shortcode___" = "Adding mailing list...";
 "address" = "Address";
 "all_day" = "All-day";
+"attach_by_reference" = "Attach by reference";
 "attachment_too_big" = "The attachment is bigger than the maximum allowed size on the server";
 "attachments" = "Attachments";
 "autoreply_settings" = "Out of office setttings";
