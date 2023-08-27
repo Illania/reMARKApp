@@ -314,7 +314,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
         public void DocumentSelected(DocumentPreview documentPreview)
         {
            tcs.SetResult(documentPreview.Id);
-           ///NavigationController?.PopViewController(false);
            DismissViewController(false, null);
         }
 

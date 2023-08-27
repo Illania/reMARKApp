@@ -938,6 +938,8 @@
       <SubType></SubType>
       <Generator></Generator>
     </Compile>
+    <Compile Include="Ui\Activities\SearchByReferenceResultsActivity.cs" />
+    <Compile Include="Ui\Fragments\DocumentsSearchByReferenceResultsFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\AboutAssets.txt" />

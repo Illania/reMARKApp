@@ -302,7 +302,7 @@ namespace Mark5.ServiceReference.FileTransferService
                     onStopTransmission?.Invoke();
                 }
 
-  
+
             async Task<GetEmlResponse> GetDocumentEml(GetEmlRequest req_, Func<Stream, Task> saveHandler_, CancellationToken ct_)
             {
                 using (var client = new HttpClient(httpClientHandler())

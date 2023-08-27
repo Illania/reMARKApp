@@ -56,6 +56,7 @@ namespace Mark5.Mobile.Droid
                     CommonConfig.DataFolder = await mainFolder.CreateFolderAsync(Path.Combine("data", "data"), CreationCollisionOption.OpenIfExists);
                     CommonConfig.DatabaseFolder = await mainFolder.CreateFolderAsync(Path.Combine("data", "db"), CreationCollisionOption.OpenIfExists);
                     CommonConfig.AttachmentsFolder = await mainFolder.CreateFolderAsync(Path.Combine("..", "cache", "att"), CreationCollisionOption.OpenIfExists);
+                    CommonConfig.EmlFolder = await mainFolder.CreateFolderAsync(Path.Combine("Eml", "v2", "att"), CreationCollisionOption.OpenIfExists);
                     CommonConfig.DocumentsToUploadFolder = await mainFolder.CreateFolderAsync(Path.Combine("data", "documents_upload"), CreationCollisionOption.OpenIfExists);
                     CommonConfig.DocumentWorkingCopyFolder = await mainFolder.CreateFolderAsync(Path.Combine("data", "document_work"), CreationCollisionOption.OpenIfExists);
                     CommonConfig.RetainedDataFolder = await mainFolder.CreateFolderAsync("retained", CreationCollisionOption.OpenIfExists);

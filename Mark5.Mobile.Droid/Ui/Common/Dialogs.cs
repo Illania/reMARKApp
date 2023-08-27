@@ -628,6 +628,7 @@ namespace Mark5.Mobile.Droid.Ui.Common
             var editTextView = new AppCompatEditText(context);
             editTextView.Text = startText;
 
+            var tcs = new TaskCompletionSource<(int, int)>();
             var builder = new MaterialDialog.Builder(context);
             builder.CustomView(editTextView);
             builder.Title(titleId);
@@ -636,6 +637,8 @@ namespace Mark5.Mobile.Droid.Ui.Common
             builder.OnPositive(new SingleButtonCallback(() => positiveAction(editTextView.Text)));
             if (negativeAction != null)
                 builder.OnNegative(new SingleButtonCallback(negativeAction));
+            else
+                builder.OnNegative(new SingleButtonCallback(tcs.SetCanceled));
             builder.Cancelable(false);
             builder.Show();
         }
