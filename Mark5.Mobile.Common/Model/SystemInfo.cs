@@ -43,7 +43,9 @@ namespace Mark5.Mobile.Common.Model
         
         public bool DeleteDocumentsAllowedLinesAvailable => ServiceVersionGreaterThanOrEqual(4, 7, 1);
 
-        public bool SyncFavoritesWithDesktopAvailable => ServiceVersionGreaterThanOrEqual(4, 8, 0);
+        public bool SyncFavoritesWithDesktopAvailable => ServiceVersionGreaterThanOrEqual(4, 8, 1);
+
+        public bool AttachByReferenceAvailable => ServiceVersionGreaterThanOrEqual(4, 8, 0);
 
         public bool CalendarModuleAvailable       
         {

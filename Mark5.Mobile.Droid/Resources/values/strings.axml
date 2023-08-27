@@ -404,6 +404,7 @@
     <string name="read_by_prefix">read by</string>
     <string name="refresh">Refresh</string>
     <string name="reference">Ref.</string>
+     <string name="reference_number">Reference number</string>
     <string name="reset">Reset</string>
     <string name="related_contacts">Related</string>
     <string name="remove">Remove</string>

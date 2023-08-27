@@ -20,9 +20,6 @@ using Mark5.ServiceReference.FileTransferService;
 using DataContract = Mark5.ServiceReference.DataContract;
 using ModuleType = Mark5.Mobile.Common.Model.ModuleType;
 using DocumentPreview = Mark5.Mobile.Common.Model.DocumentPreview;
-using System.Security.AccessControl;
-using System.Security.Cryptography;
-using Mark5.ServiceReference.Exceptions;
 using Mark5.Mobile.Classes.Enum;
 
 namespace Mark5.Mobile.Common.Manager
@@ -677,6 +674,35 @@ namespace Mark5.Mobile.Common.Manager
 
             throw new ArgumentException("Invalid sourceType provided.");
         }
+
+        public async Task<string> GetDocumentEmlAsync(int documentId,
+         bool checkMD5 = false, SourceType sourceType = SourceType.Auto)
+        {
+            if (sourceType == SourceType.Auto)
+                sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
+
+            if (sourceType == SourceType.Remote)
+            {
+                var path = string.Empty;
+                var response = await fileTransferServiceProxy.GetDocumentEmlAsync(new DataContract.GetEmlRequest
+                {
+                    Token = Token,
+                    DocumentId = documentId,
+                },
+                async stream => { path = await FileSystemStorage.SaveEmlAsync(documentId, stream); });
+
+                return path;
+            }
+
+            if (sourceType == SourceType.Local)
+            {
+                var path = await FileSystemStorage.CheckEmlExistsAsync(documentId);
+                return path;
+            }
+
+            throw new ArgumentException("Invalid sourceType provided.");
+        }
+
 
         public async Task<string> GetAttachmentAsync(AttachmentDescription attachmentDescription, Document document,
             bool checkMD5 = false, SourceType sourceType = SourceType.Auto)

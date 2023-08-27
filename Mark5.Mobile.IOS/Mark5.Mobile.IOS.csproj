@@ -359,6 +359,10 @@
 	    <Compile Include="Ui\ViewControllers\TextViewerViewController.cs" />
 	    <Compile Include="Ui\ViewControllers\SearchView\DocumentsSearchResultsFilterController.cs" />
 	    <Compile Include="Ui\ViewControllers\SearchView\DocumentsSearchResultsDataSource.cs" />
+	    <Compile Include="Ui\ViewControllers\SearchByReferenceViewController.cs" />
+	    <Compile Include="Ui\ViewControllers\SearchView\DocumentsSearchByReferenceResultsViewController.cs" />
+	    <Compile Include="Ui\ViewControllers\SearchView\DocumentsSearchByReferenceResultsFilterController.cs" />
+	    <Compile Include="Ui\ViewControllers\SearchView\DocumentsSearchByReferenceResultsDataSource.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

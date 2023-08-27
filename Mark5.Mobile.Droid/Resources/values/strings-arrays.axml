@@ -36,6 +36,11 @@
         <item>External documents</item>
         <item>Device files</item>
     </string-array>
+    <string-array name="add_attachment_options_with_reference">
+        <item>External documents</item>
+        <item>Device files</item>
+        <item>Reference</item>
+    </string-array>
     <string-array name="picker_choice_with_internal_contacts">
         <item>Recent addresses</item>
         <item>Contacts</item>

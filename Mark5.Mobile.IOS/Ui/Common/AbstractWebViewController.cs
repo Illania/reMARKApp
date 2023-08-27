@@ -528,8 +528,19 @@ namespace Mark5.Mobile.IOS.Ui.Common
             webView?.LoadHtmlString(html, null);
         }
 
-        protected virtual async Task<string> GetContent() => 
-            await webView?.EvaluateJavaScriptAsync("document.documentElement.outerHTML") as NSString;
+        protected virtual async Task<string> GetContent()
+        {
+            try
+            {
+                return await webView?.EvaluateJavaScriptAsync("document.documentElement.outerHTML") as NSString;
+            }
+            catch(Exception ex)
+            {
+                CommonConfig.Logger.Error(ex.Message);
+                return string.Empty;
+            }
+        }
+          
 
         protected Task<(NSObject, NSError)> EvaluateJavaScriptAsync(string script)
         {

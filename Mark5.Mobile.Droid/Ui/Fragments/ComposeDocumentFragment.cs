@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Android.App;
@@ -298,10 +299,35 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info($"Paused {nameof(ComposeDocumentFragment)}");
         }
 
+        private async Task AttachByReference(int docId)
+        {
+            try
+            {
+                if (docId > 0)
+                {
+                    var emlFilePath = await Managers.DocumentsManager.GetDocumentEmlAsync(docId);
+                    var emlPathUri = Uri.Parse(emlFilePath);
+                    await HandleEmlPath(emlPathUri);
+                }          
+            }
+            catch(Exception ex)
+            {
+                CommonConfig.Logger.Error($"Failed to get document eml async", ex.InnerException);
+                await Dialogs.ShowErrorDialogAsync(Context, ex.InnerException);
+            }    
+        }
+ 
+
         public override async void OnActivityResult(int requestCode, int resultCode, Intent data)
         {
             if (requestCode == RequestCodes.AttachmentRequestCode && resultCode == (int)Result.Ok)
                 HandleAddAttachment(data);
+
+            if (requestCode == RequestCodes.AttachByReferenceRequestCode && resultCode == (int)Result.Ok)
+            {
+                var docId = Serializer.Deserialize<int>(data.GetStringExtra(SearchByReferenceResultsActivity.SearchByReferenceResultKey));
+                await AttachByReference(docId);
+            }
 
             if (requestCode == RequestCodes.RecentAddressesRequestCode && resultCode == (int)Result.Ok)
             {
@@ -365,10 +391,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 await SaveAndQueueWorkingCopyToUpload();
                 Activity?.Finish();
             }
-
-
-
         }
+
 
         async Task RetrieveAndAddShortcode(int shortcodeId, int folderId)
         {
@@ -516,6 +540,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             public const int AttachmentRequestCode = 111;
             public const int RemarkAttachmentRequestCode = 112;
+            public const int AttachByReferenceRequestCode = 113;
             public const int RecentAddressesRequestCode = 222;
             public const int ContactsRequestCode = 333;
             public const int InternalContactsRequestCode = 334;
@@ -1141,6 +1166,41 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             attachmentsView.AddAttachmentDescriptions(attachments);
         }
 
+        async Task HandleEmlPath(Uri path)
+        {
+            Stream stream = null;
+
+            try
+            {
+
+                var fileName = path.LastPathSegment;
+                stream = new FileStream(path.Path, FileMode.Open, FileAccess.Read);
+
+                long sizeInBytes = stream.Length; 
+
+                if (sizeInBytes > ServerConfig.SystemSettings.DocumentsModuleInfo.MaximumAttachmentSizeBytes)
+                {
+                    await Dialogs.ShowErrorDialogAsync(Context, new Exception(Resources.GetString(Resource.String.attachment_too_big)));
+                    return;
+                }
+
+                var file = await Managers.DocumentsManager.SaveDocumentWorkingCopyAttachmentAsync(fileName, stream);
+                attachmentsView.AddFileDescription(new FileDescription(file));
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Failed to save attachment [Url={path.Path}");
+                await Dialogs.ShowErrorDialogAsync(Context, new Exception($"{Resources.GetString(Resource.String.error_saving_local_attachment)}:{ex.Message}"));
+            }
+            finally
+            {
+                stream?.Dispose(); 
+
+            }
+
+        }
+
+
         private async Task HandleOneAttachment(Uri uri)
         {
             IFile file = null;
@@ -1198,6 +1258,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             attachmentItem.SetShowAsAction(ShowAsAction.Always);
         }
 
+        [Obsolete]
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
             if (item.ItemId == Android.Resource.Id.Home)
@@ -1211,12 +1272,29 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             if (item.ItemId == MenuItemActions.AddAttachment)
             {
-                Dialogs.ShowListDialog(Context, Resource.String.add_attachment_from, Resource.Array.add_attachment_options, true, (choice) =>
+                var attachByReferenceAvailable = ServerConfig.SystemSettings?.SystemInfo?.AttachByReferenceAvailable == true;
+                var itemsId = attachByReferenceAvailable ? Resource.Array.add_attachment_options_with_reference : Resource.Array.add_attachment_options;
+                Dialogs.ShowListDialog(Context, Resource.String.add_attachment_from, itemsId, true, (choice) =>
                 {
                     if (choice == 0) //Mark5 external documents
                         StartActivityForResult(ExternalDocumentFoldersListActivity.CreateIntent(Context), RequestCodes.RemarkAttachmentRequestCode);
                     else if (choice == 1) //Device files
                         AddAttachmentFromDevice();
+                    else if (attachByReferenceAvailable && choice == 2) //Attach by reference
+                        Dialogs.ShowEditTextDialog(Context, Resource.String.reference_number, string.Empty,
+                            (text) => {
+                                var criteria = new SearchDocumentsCriteria();
+                                criteria.Reference = text;
+                                criteria.PartialWordSearch = PlatformConfig.Preferences.PartialWordSearch;
+                                criteria.MaxToFetch = PlatformConfig.Preferences.MaxDocumentsToSearch;
+
+                                CommonConfig.Logger.Info($"Starting search... [criteria={Serializer.Serialize(criteria)}]");
+
+                                StartActivityForResult(SearchByReferenceResultsActivity.CreateIntent(Context, criteria),
+                                    requestCode: RequestCodes.AttachByReferenceRequestCode);
+
+                            }, null, Resource.String.confirm, Resource.String.cancel);
+
                 }, null);
                  
                 CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.Local));

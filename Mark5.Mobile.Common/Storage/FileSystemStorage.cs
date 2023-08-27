@@ -244,6 +244,34 @@ namespace Mark5.Mobile.Common.Storage
             return file.Path;
         }
 
+        public static async Task<string> SaveEmlAsync(int documentId, Stream attachmentStream, CancellationToken ct = default(CancellationToken))
+        {
+            var path = CommonConfig.EmlFolder.Path + CommonConfig.PathSeparator + CommonConfig.Utf8Normalizer(Path.ChangeExtension(documentId.ToString(), ".eml"));
+            var fileExists = await CommonConfig.EmlFolder.CheckExistsAsync(CommonConfig.Utf8Normalizer(Path.ChangeExtension(documentId.ToString(), ".eml")));
+            if (fileExists == ExistenceCheckResult.FileExists)
+                return path;
+
+            var file = await CommonConfig.EmlFolder.CreateFileAsync(CommonConfig.Utf8Normalizer(Path.ChangeExtension(documentId.ToString(), ".eml")),
+                CreationCollisionOption.ReplaceExisting, ct);
+            using (var fileStream = await file.OpenAsync(AppFileStorage.Enum.FileAccess.ReadAndWrite))
+            {
+                await attachmentStream.CopyToAsync(fileStream);
+            }
+
+            return file.Path;
+        }
+
+        public static async Task<string> CheckEmlExistsAsync(int documentId)
+        {
+            var fileExists = await CommonConfig.EmlFolder.CheckExistsAsync(CommonConfig.Utf8Normalizer(Path.ChangeExtension(documentId.ToString(), ".eml")));
+
+            if (fileExists != ExistenceCheckResult.FileExists)
+                return string.Empty;
+
+            return CommonConfig.EmlFolder.Path + CommonConfig.PathSeparator + CommonConfig.Utf8Normalizer(Path.ChangeExtension(documentId.ToString(), ".eml"));
+        }
+
+
         public static async Task<string> CheckAttachmentsExistsAsync(AttachmentDescription attachmentDescription)
         {
             var folderExists = await CommonConfig.AttachmentsFolder.CheckExistsAsync(attachmentDescription.Id.ToString());
