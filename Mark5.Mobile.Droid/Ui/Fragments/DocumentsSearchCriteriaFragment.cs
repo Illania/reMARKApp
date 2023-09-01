@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Android.Animation;
 using Android.Content;
 using Android.Content.Res;
@@ -31,6 +32,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         const string SearchCriteriaKey = "SearchCriteria_d48ddd3d-781c-45dd-bd25-8cb1ea7ab423";
 
         SearchDocumentsCriteria searchCriteria;
+        public SavedDocumentsSearch CurrentSavedSearch { get; set; }
+        DocumentSavedSearchView savedSearchView = null;
 
         LinearLayoutCompat containerLinearLayout;
         FloatingActionButton fab;
@@ -91,6 +94,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             p.Behavior = new FloatingActionButtonBehavior();
             fab.LayoutParameters = p;
 
+            
+            if (ServerConfig.SystemSettings?.SystemInfo?.SavedSearchesAvailable == true)
+            {
+                savedSearchView = new DocumentSavedSearchView(Context, this);
+                subviews.Add(savedSearchView);
+            }
+          
             var directionCriteria = new DocumentDirectionsSearchView(Context);
             subviews.Add(directionCriteria);
 
@@ -120,6 +130,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 subviews.Add(handledCriteria);
             }
 
+            if (ServerConfig.SystemSettings?.SystemInfo?.SavedSearchesAvailable == true)
+                containerLinearLayout.AddView(savedSearchView);
             containerLinearLayout.AddView(directionCriteria);
             containerLinearLayout.AddView(subjectMessageCriteria);
             containerLinearLayout.AddView(fromToCriteria);
@@ -199,8 +211,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
             menu.Clear();
-            var item = menu.Add(Menu.None, 10, 10, Resource.String.reset);
+            var item = menu.Add(IMenu.None, 10, 10, Resource.String.reset);
             item.SetShowAsAction(ShowAsAction.Always);
+
+            if (ServerConfig.SystemSettings?.SystemInfo?.SavedSearchesAvailable == true)
+            {
+                var itemSave = menu.Add(IMenu.None, 20, 20, Resource.String.save);
+                itemSave.SetShowAsAction(ShowAsAction.Always);
+            }   
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
@@ -210,8 +228,78 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 Reset();
                 return true;
             }
+            if(item.ItemId == 20)
+            {
+                SaveSearch();
+                return true;
+            }
 
             return base.OnOptionsItemSelected(item);
+        }
+
+
+        private async void SaveSearch()
+        {
+            if (CurrentSavedSearch != null)
+            {
+
+                var choice = await Dialogs.ShowListDialog(Context, Resource.String.save, Resource.Array.save_options, true);
+
+
+                if (choice < 0)
+                    return;
+
+                HandleSaveButtonChoice(choice);
+            }
+            else
+            {
+                await AddNewSavedSearch();
+            }
+        }
+
+        protected async void HandleSaveButtonChoice(int choice)
+        {
+            switch (choice)
+            {
+                case 0:
+                    if (CurrentSavedSearch != null)
+                    {
+                        UpdateCriteria();
+                        await Managers.SearchManager.UpdateSavedDocumentsSearchAsync(CurrentSavedSearch.Id,
+                            new SavedDocumentsSearch()
+                            {
+                                Id = CurrentSavedSearch.Id,
+                                Name = CurrentSavedSearch.Name,
+                                Criteria = searchCriteria
+                            });
+                    }  
+                    break;
+                case 1:
+                    await AddNewSavedSearch();
+                    break;
+
+            }
+        }
+
+        private async Task AddNewSavedSearch()
+        {
+            try
+            {
+                Dialogs.ShowEditTextDialog(Context, Resource.String.saved_search_name, string.Empty,
+                    async (text) => {
+                        var newSavedSearch = new SavedDocumentsSearch() { Criteria = CurrentSavedSearch?.Criteria ?? searchCriteria, Name = text };
+                        var newSavedSearchSaved = await Managers.SearchManager.AddSavedDocumentsSearchAsync(newSavedSearch);
+                        CurrentSavedSearch = newSavedSearchSaved;
+                        searchCriteria = newSavedSearchSaved.Criteria;
+                        savedSearchView.UpdateSavedSearch(CurrentSavedSearch);
+                        ReloadCriteria(CurrentSavedSearch.Criteria);
+
+                    }, null, Resource.String.confirm, Resource.String.cancel);
+            }
+            catch (TaskCanceledException)
+            {
+                return;
+            }
         }
 
         public void PrepareEditableTextRow()
@@ -289,6 +377,19 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 c.Criteria = searchCriteria;
                 c.Refresh();
             });
+            if (!string.IsNullOrEmpty(CurrentSavedSearch?.Name))
+                savedSearchView.UpdateBottomTextView(CurrentSavedSearch.Name);
+               
+        }
+
+        public void ReloadCriteria(SearchDocumentsCriteria criteria)
+        {
+            searchCriteria = criteria;
+            subviews.ForEach(c =>
+            {
+                c.Criteria = criteria;
+                c.Refresh();
+            });
         }
 
         void HandleSearchButtonClicked()
@@ -315,6 +416,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             searchCriteria = new SearchDocumentsCriteria();
             containerLinearLayout.RequestFocus();
             ((InputMethodManager)Context.GetSystemService(Context.InputMethodService)).HideSoftInputFromWindow(containerLinearLayout.WindowToken, HideSoftInputFlags.None);
+            savedSearchView?.UpdateBottomTextView(GetString(Resource.String.saved_searches_none_selected));
+            CurrentSavedSearch = null;
             RefreshViews();
 
             try

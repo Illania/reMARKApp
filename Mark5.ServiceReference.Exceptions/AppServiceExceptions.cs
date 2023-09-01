@@ -147,6 +147,13 @@ namespace Mark5.ServiceReference.Exceptions
         [EnumMember(Value = "SearchShortcodesError")] SearchShortcodesError = 1603,
         [EnumMember(Value = "SearchCalendarEventsError")] SearchCalendarEventsError = 1604,
 
+        [EnumMember(Value = "GetDocumentsSavedSearchesError")] GetDocumentsSavedSearchesError = 1604,
+        [EnumMember(Value = "GetContactsSavedSearchesError")] GetContactsSavedSearchesError = 1605,
+        [EnumMember(Value = "GetShortcodesSavedSearchesError")] GetShortcodesSavedSearchesError = 1606,
+        [EnumMember(Value = "AddSavedSearchesError")] AddSavedSearchesError = 1607,
+        [EnumMember(Value = "DeleteSavedSearchesError")] DeleteSavedSearchesError = 1608,
+        [EnumMember(Value = "UpdateSavedSearchesError")] UpdateSavedSearchesError = 1609,
+
         [EnumMember(Value = "GetNotificationsError")] GetNotificationsError = 1700,
         [EnumMember(Value = "SetFoldersNotificationsError")] SetFoldersNotificationsError = 1701,
         [EnumMember(Value = "GetFoldersNotificationsError")] GetFoldersNotificationsError = 1702,

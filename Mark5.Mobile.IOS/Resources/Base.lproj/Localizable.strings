@@ -69,6 +69,8 @@
 "confirm_delayed_send_content" = "The mail will be sent at:\n {0}\nDo you wish to proceed?";
 "confirm_extra_field_update_title" = "Edit extra field";
 "confirm_extra_field_content" = "Are you sure you want to change the field name to '{0}'?";
+"confirm_saved_search_deletion_title" = "Delete saved search";
+"confirm_saved_search_deletion_content" = "Are you sure you want to delete the saved search?";
 "confirm_send_invitations_title"= "Send invitations";
 "confirm_send_invitations_content"= "Do you want to send invitations immediately?";
 "country" = "Country";
@@ -131,6 +133,7 @@
 "deleting___" = "Deleting...";
 "deleting_comment___" = "Deleting comment...";
 "deleting_extraField___" = "Deleting extra field...";
+"deleting_saved_search___" = "Deleting saved search...";
 "deleting_from_folder___" = "Removing from folder...";
 "delivery_report" = "Delivery report";
 "destinations_list_empty"= "Destinations list empty";
@@ -212,6 +215,7 @@
 "enable_notifications" = "Notify";
 "enable_caching" = "Enable\ncaching";
 "enabled" = "Enabled";
+"enter_new_name" = "Enter new name...";
 "ends" = "Ends";
 "error" = "Error";
 "error_appserviceexception_title" = "Error";
@@ -407,6 +411,9 @@
 "recent_addresses_title" = "Recent addresses";
 "safari" = "Open in Safari";
 "save" = "Save";
+"save_as" = "Save As...";
+"saved_searches" = "Saved searches";
+"saved_searches_list_empty" = "Saved searches list empty";
 "save_draft" = "Save draft";
 "save_modifications" = "Save modifications";
 "save_offline" = "Save\noffline";
@@ -455,6 +462,7 @@
 "search_to_date" = "To date";
 "search_today" = "Today";
 "search_type" = "Type...";
+"search_load" = "Load...";
 "search_unhandled" = "Unhandled";
 "search_unread" = "Unread emails";
 "search_where" = "Where: ";

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Android.Content;
 using Android.Content.Res;
 using Android.Graphics;
@@ -32,6 +33,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         LinearLayoutCompat containerLinearLayout;
         FloatingActionButton fab;
+        public SavedShortcodesSearch CurrentSavedSearch { get; set; }
+        ShortcodeSavedSearchView savedSearchView = null;
+
 
         List<AbstractSearchView<SearchShortcodesCriteria>> subviews = new List<AbstractSearchView<SearchShortcodesCriteria>>();
 
@@ -90,6 +94,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             p.Behavior = new FloatingActionButtonBehavior();
             fab.LayoutParameters = p;
 
+            if (ServerConfig.SystemSettings?.SystemInfo?.SavedSearchesAvailable == true)
+            {
+                savedSearchView = new ShortcodeSavedSearchView(Context, this);
+                subviews.Add(savedSearchView);
+            }
+
             var nameCriteria = new ShortcodeNameSearchView(Context);
             subviews.Add(nameCriteria);
 
@@ -98,6 +108,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var descriptionCriteria = new ShortcodeDescriptionSearchView(Context);
             subviews.Add(descriptionCriteria);
+
+            if (ServerConfig.SystemSettings?.SystemInfo?.SavedSearchesAvailable == true)
+                containerLinearLayout.AddView(savedSearchView);
 
             containerLinearLayout.AddView(nameCriteria);
             containerLinearLayout.AddView(emailCriteria);
@@ -172,6 +185,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             menu.Clear();
             var item = menu.Add(Menu.None, 10, 10, Resource.String.reset);
             item.SetShowAsAction(ShowAsAction.Always);
+
+            if (ServerConfig.SystemSettings?.SystemInfo?.SavedSearchesAvailable == true)
+            {
+                var itemSave = menu.Add(IMenu.None, 20, 20, Resource.String.save);
+                itemSave.SetShowAsAction(ShowAsAction.Always);
+            }
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
@@ -182,8 +201,79 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return true;
             }
 
+            if (item.ItemId == 20)
+            {
+                SaveSearch();
+                return true;
+            }
+
             return base.OnOptionsItemSelected(item);
         }
+
+        private async void SaveSearch()
+        {
+            if (CurrentSavedSearch != null)
+            {
+
+                var choice = await Dialogs.ShowListDialog(Context, Resource.String.save, Resource.Array.save_options, true);
+
+
+                if (choice < 0)
+                    return;
+
+                HandleSaveButtonChoice(choice);
+            }
+            else
+            {
+                await AddNewSavedSearch();
+            }
+        }
+
+        protected async void HandleSaveButtonChoice(int choice)
+        {
+            switch (choice)
+            {
+                case 0:
+                    if (CurrentSavedSearch != null)
+                    {
+                        UpdateCriteria();
+                        await Managers.SearchManager.UpdateSavedShortcodesSearchAsync(CurrentSavedSearch.Id,
+                            new SavedShortcodesSearch()
+                            {
+                                Id = CurrentSavedSearch.Id,
+                                Name = CurrentSavedSearch.Name,
+                                Criteria = searchCriteria
+                            });
+                    }
+                    break;
+                case 1:
+                    await AddNewSavedSearch();
+                    break;
+
+            }
+        }
+
+        private async Task AddNewSavedSearch()
+        {
+            try
+            {
+                Dialogs.ShowEditTextDialog(Context, Resource.String.saved_search_name, string.Empty,
+                    async (text) => {
+                        var newSavedSearch = new SavedShortcodesSearch() { Criteria = CurrentSavedSearch?.Criteria ?? searchCriteria, Name = text };
+                        var newSavedSearchSaved = await Managers.SearchManager.AddSavedShortcodesSearchAsync(newSavedSearch);
+                        CurrentSavedSearch = newSavedSearchSaved;
+                        searchCriteria = newSavedSearchSaved.Criteria;
+                        savedSearchView.UpdateSavedSearch(CurrentSavedSearch);
+                        ReloadCriteria(CurrentSavedSearch.Criteria);
+
+                    }, null, Resource.String.confirm, Resource.String.cancel);
+            }
+            catch (TaskCanceledException)
+            {
+                return;
+            }
+        }
+
 
         public void ReplaceFragment(Fragment f, string tag)
         {
@@ -212,6 +302,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 c.Criteria = searchCriteria;
                 c.Refresh();
             });
+            if (!string.IsNullOrEmpty(CurrentSavedSearch?.Name))
+                savedSearchView.UpdateBottomTextView(CurrentSavedSearch.Name);
+
+        }
+
+        public void ReloadCriteria(SearchShortcodesCriteria criteria)
+        {
+            searchCriteria = criteria;
+            subviews.ForEach(c =>
+            {
+                c.Criteria = criteria;
+                c.Refresh();
+            });
+
         }
 
         async void Reset()
@@ -219,6 +323,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             searchCriteria = new SearchShortcodesCriteria();
             containerLinearLayout.RequestFocus();
             ((InputMethodManager)Context.GetSystemService(Context.InputMethodService)).HideSoftInputFromWindow(containerLinearLayout.WindowToken, HideSoftInputFlags.None);
+            savedSearchView?.UpdateBottomTextView(GetString(Resource.String.saved_searches_none_selected));
+            CurrentSavedSearch = null;
             RefreshViews();
 
             try

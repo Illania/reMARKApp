@@ -2197,16 +2197,59 @@ namespace Mark5.ServiceReference.DataContract
 
     #region Search
 
-    [DataContract(Name = "GetSavedSearchesParameters", Namespace = "com.nordic-it.appservice.v3")]
-    public class GetSavedSearchesParameters : AbstractParameters
+    [DataContract(Name = "SavedFilter", Namespace = "com.nordic-it.appservice.v3")]
+    public class SavedFilter
     {
+        [DataMember(Name = "Name", Order = 0)]
+        public string Name { get; set; }
+
+        [DataMember(Name = "Id", Order = 0)]
+        public int Id { get; set; }
+
+        [DataMember(Name = "ModuleType", Order = 0)]
+        public ModuleType ModuleType { get; set; }
+
+        [DataMember(Name = "FilterXml", Order = 0)]
+        public string FilterXml { get; set; }
     }
 
-    [DataContract(Name = "GetSavedSearchesResult", Namespace = "com.nordic-it.appservice.v3")]
-    public class GetSavedSearchesResult
+    [DataContract(Name = "SavedDocumentsFilter", Namespace = "com.nordic-it.appservice.v3")]
+    public class SavedDocumentsFilter
     {
-        [DataMember(Name = "SavedSearches", Order = 0)]
-        public List<SavedSearch> SavedSearches { get; set; } = new List<SavedSearch>();
+        [DataMember(Name = "Name", Order = 0)]
+        public string Name { get; set; }
+
+        [DataMember(Name = "Id", Order = 0)]
+        public int Id { get; set; }
+
+        [DataMember(Name = "SearchParameters", Order = 0)]
+        public SearchDocumentsParameters SearchParameters { get; set; }
+    }
+
+    [DataContract(Name = "SavedContactsFilter", Namespace = "com.nordic-it.appservice.v3")]
+    public class SavedContactsFilter
+    {
+        [DataMember(Name = "Name", Order = 0)]
+        public string Name { get; set; }
+
+        [DataMember(Name = "Id", Order = 0)]
+        public int Id { get; set; }
+
+        [DataMember(Name = "SearchParameters", Order = 0)]
+        public SearchContactsParameters SearchParameters { get; set; }
+    }
+
+    [DataContract(Name = "SavedShortcodesFilter", Namespace = "com.nordic-it.appservice.v3")]
+    public class SavedShortcodesFilter
+    {
+        [DataMember(Name = "Name", Order = 0)]
+        public string Name { get; set; }
+
+        [DataMember(Name = "Id", Order = 0)]
+        public int Id { get; set; }
+
+        [DataMember(Name = "SearchShortcodesParameters", Order = 0)]
+        public SearchShortcodesParameters SearchParameters { get; set; }
     }
 
     [DataContract(Name = "SearchDocumentsParameters", Namespace = "com.nordic-it.appservice.v3")]
@@ -2399,19 +2442,6 @@ namespace Mark5.ServiceReference.DataContract
     {
         [DataMember(Name = "ShortcodePreviews", Order = 0)]
         public List<ShortcodePreview> ShortcodePreviews { get; set; } = new List<ShortcodePreview>();
-    }
-
-    [DataContract(Name = "SavedSearch", Namespace = "com.nordic-it.appservice.v3")]
-    public class SavedSearch
-    {
-        [DataMember(Name = "Name", Order = 0)]
-        public string Name { get; set; }
-
-        [DataMember(Name = "ObjectType", Order = 0)]
-        public ObjectType ObjectType { get; set; }
-
-        [DataMember(Name = "SavedSearchFilterHash", Order = 0)]
-        public string SavedSearchFilterHash { get; set; }
     }
 
     [DataContract(Name = "FiledInFolderType", Namespace = "com.nordic-it.appservice.v3")]
@@ -3557,5 +3587,95 @@ namespace Mark5.ServiceReference.DataContract
 
     #endregion
 
+    #region Saved Searches
+
+    [DataContract(Name = "GetSavedDocumentsSearchesParameters", Namespace = "com.nordic-it.appservice.v3")]
+    public class GetSavedDocumentsSearchesParameters : AbstractParameters
+    {
+    }
+
+    [DataContract(Name = "GetSavedDocumentsSearchesResult", Namespace = "com.nordic-it.appservice.v3")]
+    public class GetSavedDocumentsSearchesResult 
+    {
+        [DataMember(Name = "SavedSearches", Order = 0)]
+        public List<SavedDocumentsFilter> SavedSearches { get; set; } = new List<SavedDocumentsFilter>();
+    }
+
+    [DataContract(Name = "GetSavedContactsSearchesParameters", Namespace = "com.nordic-it.appservice.v3")]
+    public class GetSavedContactsSearchesParameters : AbstractParameters
+    {
+    }
+
+    [DataContract(Name = "GetSavedContactsSearchesResult", Namespace = "com.nordic-it.appservice.v3")]
+    public class GetSavedContactsSearchesResult
+    {
+        [DataMember(Name = "SavedSearches", Order = 0)]
+        public List<SavedContactsFilter> SavedSearches { get; set; } = new List<SavedContactsFilter>();
+    }
+
+    [DataContract(Name = "GetSavedShortcodesSearchesParameters", Namespace = "com.nordic-it.appservice.v3")]
+    public class GetSavedShortcodesSearchesParameters : AbstractParameters
+    {
+    }
+
+    [DataContract(Name = "GetSavedShortcodesSearchesResult", Namespace = "com.nordic-it.appservice.v3")]
+    public class GetSavedShortcodesSearchesResult
+    {
+        [DataMember(Name = "SavedSearches", Order = 0)]
+        public List<SavedShortcodesFilter> SavedSearches { get; set; } = new List<SavedShortcodesFilter>();
+    }
+
+    [DataContract(Name = "AddSavedSearchesParameters", Namespace = "com.nordic-it.appservice.v3")]
+    public class AddSavedSearchesParameters : AbstractParameters
+    {
+        [DataMember(Name = "ModuleType", Order = 0)]
+        public ModuleType ModuleType { get; set; }
+
+        [DataMember(Name = "Name", Order = 0)]
+        public string Name { get; set; }
+
+        [DataMember(Name = "SavedSearchJson", Order = 0)]
+        public string SavedSearchJson { get; set; }
+    }
+
+    [DataContract(Name = "AddSavedSearchesResult", Namespace = "com.nordic-it.appservice.v3")]
+    public class AddSavedSearchesResult
+    {
+        [DataMember(Name = "Id", Order = 0)]
+        public int Id { get; set; }
+    }
+
+    [DataContract(Name = "UpdateSavedSearchesParameters", Namespace = "com.nordic-it.appservice.v3")]
+    public class UpdateSavedSearchesParameters : AbstractParameters
+    {
+        [DataMember(Name = "Id", Order = 0)]
+        public int Id { get; set; }
+
+        [DataMember(Name = "ModuleType", Order = 0)]
+        public ModuleType ModuleType { get; set; }
+
+        [DataMember(Name = "SavedSearchJson", Order = 0)]
+        public string SavedSearchJson { get; set; }
+    }
+
+    [DataContract(Name = "UpdateSavedSearchesResult", Namespace = "com.nordic-it.appservice.v3")]
+    public class UpdateSavedSearchesResult 
+    {
+    }
+
+    [DataContract(Name = "DeleteSavedSearchesParameters", Namespace = "com.nordic-it.appservice.v3")]
+    public class DeleteSavedSearchesParameters : AbstractParameters
+    {
+        [DataMember(Name = "Id", Order = 0)]
+        public int Id { get; set; }
+    }
+
+    [DataContract(Name = "DeleteSavedSearchesResult", Namespace = "com.nordic-it.appservice.v3")]
+    public class DeleteSavedSearchesResult
+    {
+    }
+
+
+    #endregion
 }
 

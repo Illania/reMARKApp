@@ -647,16 +647,6 @@ namespace Mark5.Mobile.Common.Model.Converters
             };
         }
 
-        public static SavedSearch Convert(this DataContract.SavedSearch ss)
-        {
-            return new SavedSearch
-            {
-                Name = ss.Name,
-                ObjectType = ss.ObjectType.ConvertEnum<ObjectType>(),
-                SavedSearchFilterHash = ss.SavedSearchFilterHash
-            };
-        }
-
         public static Shortcode Convert(this DataContract.Shortcode s)
         {
             var result = new Shortcode
@@ -838,6 +828,126 @@ namespace Mark5.Mobile.Common.Model.Converters
                 Status = at.Status.ConvertEnum<ParticipantStatus>(),
                 Type = at.Type.ConvertEnum<ParticipantType>(),
             };
+        }
+
+        public static SearchDocumentsCriteria Convert(this DataContract.SearchDocumentsParameters parameters)
+        {
+            try
+            {
+                var criteria = new SearchDocumentsCriteria()
+                {
+                    SavedSearchFilterHash = parameters.SavedSearchFilterHash,
+                    MaxToFetch = parameters.MaxToFetch,
+                    SubjectMessageField = parameters.SubjectMessageField,
+                    SubjectMessageClause = parameters.SubjectMessageClause.ConvertEnum<SubjectMessageClause>(),
+                    FromToField = parameters.FromToField,
+                    SearchInAttachments = parameters.SearchInAttachments,
+                    UnreadOnly = parameters.Unread,
+                    PartialWordSearch = parameters.PartialWordSearch,
+                    Handled = parameters.Processed,
+                    Reference = parameters.Reference,
+                    Priorities = parameters.Priorities?.Select(p => p.ConvertEnum<Priority>()).ToList() ?? new List<Priority>(),
+                    Directions = parameters.Directions?.Select(p => p.ConvertEnum<DocumentDirection>()).ToList() ?? new List<DocumentDirection>(),
+                    CategoryIds = parameters.CategoryIds.ToList(),
+                    MustHaveCategoryIds = parameters.MustHaveCategoryIds.ToList(),
+                    LineGuids = parameters.LineGuids.ToList(),
+                    CreatorGuids = parameters.CreatorGuids.ToList(),
+                    DateRange = new DateRange()
+                    {
+                        Enabled = parameters.DateRange?.Enabled ?? false,
+                        StartTimestamp = parameters.DateRange?.Start.ToUniversalTime().ConvertDateTimeToTimestampMilliseconds() ?? DateTime.MinValue.ConvertDateTimeToTimestampMilliseconds(),
+                        EndTimestamp = parameters.DateRange?.End.ToUniversalTime().ConvertDateTimeToTimestampMilliseconds() ?? DateTime.MaxValue.ConvertDateTimeToTimestampMilliseconds()
+                    },
+                    Comment = parameters.Comment,
+                    AttachmentName = parameters.AttachmentName,
+                    HavingAttachmentsOnly = parameters.HavingAttachmentsOnly,
+                    FiledInFolderType = parameters.FiledInFolderType.ConvertEnum<FiledInFolderType>(),
+                    FiledInFolderFolderType = parameters.FiledInFolderFolderType.ConvertEnum<FiledInFolderFolderType>(),
+                    ExtraFields = parameters.ExtraFields
+                };
+                return criteria;
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null;
+            }
+          
+        }
+
+        public static SearchContactsCriteria Convert(this DataContract.SearchContactsParameters parameters)
+        {
+            var criteria = new SearchContactsCriteria()
+            {
+                SavedSearchFilterHash = parameters.SavedSearchFilterHash,
+                MaxToFetch = parameters.MaxToFetch,
+                Name = parameters.Name,
+                FirstName = parameters.FirstName,
+                LastName = parameters.LastName,
+                ShortId = parameters.ShortId,
+                Description = parameters.Description,
+                ContactTypes = new HashSet<ContactType>(parameters.ContactTypes.Select(ct => ct.ConvertEnum<ContactType>())),
+                ComAddress = parameters.ComAddress,
+                PostAddress = parameters.PostAddress,
+                Vat = parameters.Vat,
+                Ledger = parameters.Ledger,
+                CountryPrefix = parameters.CountryPrefix,
+                CategoryIds = parameters.CategoriesIds.ToList(),
+                MustHaveCategoryIds = parameters.MustHaveCategoriesIds.ToList(),
+                Comment = parameters.Comment,
+                FiledInFolderType = parameters.FiledInFolderType.ConvertEnum<FiledInFolderType>(),
+                FiledInFolderFolderType = parameters.FiledInFolderFolderType.ConvertEnum<FiledInFolderFolderType>()
+            };
+            return criteria;
+        }
+
+        public static SearchShortcodesCriteria Convert(this DataContract.SearchShortcodesParameters parameters)
+        {
+            var criteria = new SearchShortcodesCriteria()
+            {
+                SavedSearchFilterHash = parameters.SavedSearchFilterHash,
+                MaxToFetch = parameters.MaxToFetch,
+                Name = parameters.Name,
+                Description = parameters.Description,
+                Address = parameters.Address,
+                FiledInFolderType = parameters.FiledInFolderType.ConvertEnum<FiledInFolderType>(),
+                FiledInFolderFolderType = parameters.FiledInFolderFolderType.ConvertEnum<FiledInFolderFolderType>()
+            };
+            return criteria;
+        }
+
+        public static SavedDocumentsSearch Convert(this DataContract.SavedDocumentsFilter filter)
+        {
+            var savedSearch = new SavedDocumentsSearch()
+            {
+                Id = filter.Id,
+                Name = filter.Name,
+                Criteria = filter.SearchParameters.Convert()
+            };
+            return savedSearch;
+        }
+
+
+        public static SavedContactsSearch Convert(this DataContract.SavedContactsFilter filter)
+        {
+            var savedSearch = new SavedContactsSearch()
+            {
+                Id = filter.Id,
+                Name = filter.Name,
+                Criteria = filter.SearchParameters.Convert()
+            };
+            return savedSearch;
+        }
+
+        public static SavedShortcodesSearch Convert(this DataContract.SavedShortcodesFilter filter)
+        {
+            var savedSearch = new SavedShortcodesSearch()
+            {
+                Id = filter.Id,
+                Name = filter.Name,
+                Criteria = filter.SearchParameters.Convert()
+            };
+            return savedSearch;
         }
 
         #endregion

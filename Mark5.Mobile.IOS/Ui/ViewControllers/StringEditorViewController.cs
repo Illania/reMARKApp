@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Foundation;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Utilities;
 using UIKit;
@@ -10,14 +11,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
     {
         protected readonly TaskCompletionSource<string> tcs = new();
         public Task<string> Result => tcs.Task;
-
+        
         protected UITextField valueTextField;
         protected UIView containerView;
         UIButtonScalable okButton;
         UIButtonScalable cancelButton;
         UIView verticalLine;
         UIView horizontalLine;
-
         NSLayoutConstraint[] sharedConstraints;
 
         public override void ViewDidLoad()
@@ -27,7 +27,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             InitializeView();
         }
 
-        virtual protected void InitializeView()
+        protected virtual void InitializeView()
         {
             View.BackgroundColor = UIColor.FromWhiteAlpha(0.3f, 0.5f);
 
@@ -54,8 +54,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             valueTextField = new UITextField
             {
-                TranslatesAutoresizingMaskIntoConstraints = false
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                AttributedPlaceholder = new NSAttributedString(Localization.GetString("enter_new_name"), new UIStringAttributes
+                {
+                    ForegroundColor = Theme.DarkGray
+                })
             };
+
+           
 
             cancelButton = new UIButtonScalable
             {
@@ -153,27 +159,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
             cancelButton = null;
         }
 
-        virtual protected async void OkButton_TouchedUpInside(object sender, EventArgs e)
+        protected virtual void OkButton_TouchedUpInside(object sender, EventArgs e)
         {
             containerView.RemoveFromSuperview();
-
             View.BackgroundColor = Theme.Clear;
-
-        
-            var updateConfirmed = await Dialogs.ShowYesNoAlertAsync(this, Localization.GetString("confirm_extra_field_update_title"),
-                                                                        string.Format(Localization.GetString("confirm_extra_field_content"),
-                                                                        valueTextField.Text));
-
-            if (updateConfirmed)
-                tcs.SetResult(valueTextField.Text);
-            else
-                tcs.SetCanceled();
-            
-
+            tcs.SetResult(valueTextField.Text);            
             DismissViewController(true, null);
         }
 
-        void CancelButton_TouchedUpInside(object sender, EventArgs e)
+        private void CancelButton_TouchedUpInside(object sender, EventArgs e)
         {
             tcs.SetCanceled();
             DismissViewController(true, null);
