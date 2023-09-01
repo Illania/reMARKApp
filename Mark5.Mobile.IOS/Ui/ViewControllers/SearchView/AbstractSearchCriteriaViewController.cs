@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Foundation;
@@ -22,9 +21,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
         UIScrollView scrollView;
         protected UIStackView StackView;
         protected UIButtonScalable SearchButton;
+        protected UIButtonScalable SaveButton;
 
         NSLayoutConstraint searchButtonBottomConstraint1;
         NSLayoutConstraint searchButtonBottomConstraint2;
+
+        NSLayoutConstraint saveButtonBottomConstraint1;
+        NSLayoutConstraint saveButtonBottomConstraint2;
 
         NSObject didShowNotificationObserver;
         NSObject willChangeFrameNotificationObserver;
@@ -124,8 +127,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             {
                 SearchButton.HeightAnchor.ConstraintEqualTo(55f),
                 SearchButton.WidthAnchor.ConstraintEqualTo(150f),
-                SearchButton.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor)
+                SearchButton.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor, (ServerConfig.SystemSettings?.SystemInfo?.SavedSearchesAvailable== true) ? -85f : 0)
             });
+
 
             if (Integration.IsRunningAtLeast(11))
                 searchButtonBottomConstraint1 = SearchButton.BottomAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.BottomAnchor, -8f);
@@ -139,6 +143,47 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             {
                 searchButtonBottomConstraint1,
                 searchButtonBottomConstraint2
+            });
+
+            if (ServerConfig.SystemSettings?.SystemInfo?.SavedSearchesAvailable== true)
+                CreateSaveButton();
+        }
+
+        private void CreateSaveButton()
+        {
+            SaveButton = new UIButtonScalable
+            {
+                TintColor = Theme.DarkerBlue,
+                BackgroundColor = Theme.LightBlue,
+                ClipsToBounds = true,
+                ContentEdgeInsets = new UIEdgeInsets(14f, 14f, 14f, 14f),
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+
+            SaveButton.SetTitle(Localization.GetString("save").ToUpper(), UIControlState.Normal);
+            SaveButton.SetTitleColor(Theme.DarkBlue, UIControlState.Normal);
+            SaveButton.TitleLabel.Font = Theme.DefaultLightFont.CustomFont();
+            SaveButton.Layer.CornerRadius = 4f;
+            View.AddSubview(SaveButton);
+            View.AddConstraints(new[]
+            {
+                SaveButton.HeightAnchor.ConstraintEqualTo(55f),
+                SaveButton.WidthAnchor.ConstraintEqualTo(150f),
+                SaveButton.CenterXAnchor.ConstraintEqualTo(View.CenterXAnchor, 85f),
+            });
+
+            if (Integration.IsRunningAtLeast(11))
+                saveButtonBottomConstraint1 = SaveButton.BottomAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.BottomAnchor, -8f);
+            else
+                saveButtonBottomConstraint1 = SaveButton.BottomAnchor.ConstraintEqualTo(BottomLayoutGuide.GetTopAnchor(), -8f);
+
+            saveButtonBottomConstraint2 = SaveButton.BottomAnchor.ConstraintEqualTo(View.BottomAnchor);
+            saveButtonBottomConstraint2.Active = false;
+
+            View.AddConstraints(new[]
+            {
+                saveButtonBottomConstraint1,
+                saveButtonBottomConstraint2
             });
         }
 
@@ -157,6 +202,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             resetItem.Clicked += ResetItem_Clicked;
             SearchButton.TouchUpInside += SearchButton_TouchUpInside;
 
+            if(SaveButton != null)
+                SaveButton.TouchUpInside += SaveButton_TouchUpInside;
+
             foreach (var view in StackView.Subviews.OfType<AbstractSearchView>())
                 view.Activated += View_Activated;
 
@@ -173,6 +221,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             RefreshView();
         }
 
+        protected abstract void SaveButton_TouchUpInside(object sender, EventArgs e);
+
         public override void ViewWillDisappear(bool animated)
         {
             base.ViewWillDisappear(animated);
@@ -180,6 +230,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             closeItem.Clicked -= CloseItem_Clicked;
             resetItem.Clicked -= ResetItem_Clicked;
             SearchButton.TouchUpInside -= SearchButton_TouchUpInside;
+
+            if(SaveButton != null)
+                SaveButton.TouchUpInside -= SaveButton_TouchUpInside;
 
             foreach (var view in StackView.Subviews.OfType<AbstractSearchView>())
                 view.Activated -= View_Activated;
@@ -253,12 +306,26 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     searchButtonBottomConstraint1.Active = false;
                     searchButtonBottomConstraint2.Active = true;
                     searchButtonBottomConstraint2.Constant = -keyboardOffset - 8f;
-                }
+
+                    if(SaveButton != null)
+                    {
+                        saveButtonBottomConstraint1.Active = false;
+                        saveButtonBottomConstraint2.Active = true;
+                        saveButtonBottomConstraint2.Constant = -keyboardOffset - 8f;
+                    }
+                 }
                 else
                 {
                     searchButtonBottomConstraint1.Active = true;
                     searchButtonBottomConstraint2.Active = false;
                     searchButtonBottomConstraint2.Constant = 0f;
+
+                    if(SaveButton != null)
+                    {
+                        saveButtonBottomConstraint1.Active = true;
+                        saveButtonBottomConstraint2.Active = false;
+                        saveButtonBottomConstraint2.Constant = 0f;
+                    }
                 }
 
                 UIView.AnimateNotify(e.AnimationDuration, 0d, e.GetAimationOptions(), () =>
@@ -334,5 +401,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
 
             protected void SetAsActive() => Activated?.Invoke(this, EventArgs.Empty);
         }
+
+     
     }
 }

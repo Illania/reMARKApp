@@ -103,8 +103,6 @@ namespace Mark5.ServiceReference.AppService
 
         #region Search
 
-        Task<GetSavedSearchesResult> GetSavedSearchesAsync(GetSavedSearchesParameters parameters, CancellationToken ct = default(CancellationToken));
-
         Task<SearchDocumentsResult> SearchDocumentsAsync(SearchDocumentsParameters parameters, CancellationToken ct = default(CancellationToken));
 
         Task<SearchContactsResult> SearchContactsAsync(SearchContactsParameters parameters, CancellationToken ct = default(CancellationToken));
@@ -224,6 +222,22 @@ namespace Mark5.ServiceReference.AppService
         Task<DeleteDocumentExtraFieldResult> DeleteDocumentExtraFieldAsync(DeleteDocumentExtraFieldParameters parameters, CancellationToken ct = default);
 
         Task<GetDocumentExtraFieldsResult> GetDocumentExtraFieldsAsync(GetDocumentExtraFieldsParameters parameters, CancellationToken ct = default);
+
+        #endregion
+
+        #region Saved Searches
+
+        Task<GetSavedDocumentsSearchesResult> GetSavedDocumentsSearches(GetSavedDocumentsSearchesParameters parameters, CancellationToken ct = default);
+
+        Task<GetSavedContactsSearchesResult> GetSavedContactsSearches(GetSavedContactsSearchesParameters parameters, CancellationToken ct = default);
+
+        Task<GetSavedShortcodesSearchesResult> GetSavedShortcodesSearches(GetSavedShortcodesSearchesParameters parameters, CancellationToken ct = default);
+
+        Task<AddSavedSearchesResult> AddSavedSearch(AddSavedSearchesParameters parameters, CancellationToken ct = default);
+
+        Task<DeleteSavedSearchesResult> DeleteSavedSearch(DeleteSavedSearchesParameters parameters, CancellationToken ct = default);
+
+        Task<UpdateSavedSearchesResult> UpdateSavedSearch(UpdateSavedSearchesParameters parameters, CancellationToken ct = default);
 
         #endregion
 

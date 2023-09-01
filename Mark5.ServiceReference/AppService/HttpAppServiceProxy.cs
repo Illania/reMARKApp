@@ -403,11 +403,6 @@ namespace Mark5.ServiceReference.AppService
             return await InvokeAsync<GetCalendarAlarmsResult, GetCalendarAlarmsParameters>("GetCalendarAlarms", parameters, ct);
         }
 
-        public async Task<GetSavedSearchesResult> GetSavedSearchesAsync(GetSavedSearchesParameters parameters, CancellationToken ct = default(CancellationToken))
-        {
-            return await InvokeAsync<GetSavedSearchesResult, GetSavedSearchesParameters>("GetSavedSearches", parameters, ct);
-        }
-
         public async Task<SearchDocumentsResult> SearchDocumentsAsync(SearchDocumentsParameters parameters, CancellationToken ct = default(CancellationToken))
         {
             return await InvokeAsync<SearchDocumentsResult, SearchDocumentsParameters>("SearchDocuments", parameters, ct);
@@ -671,6 +666,36 @@ namespace Mark5.ServiceReference.AppService
         public async Task<UpdateUserFavoriteFoldersResult> UpdateUserFavoriteFoldersAsync(UpdateUserFavoriteFoldersParameters parameters, CancellationToken ct = default)
         {
             return await InvokeAsync<UpdateUserFavoriteFoldersResult, UpdateUserFavoriteFoldersParameters>("UpdateUserFavoriteFolders", parameters, ct);
+        }
+
+        public async Task<GetSavedDocumentsSearchesResult> GetSavedDocumentsSearches(GetSavedDocumentsSearchesParameters parameters, CancellationToken ct = default)
+        {
+            return await InvokeAsync<GetSavedDocumentsSearchesResult, GetSavedDocumentsSearchesParameters>("GetSavedDocumentsSearches", parameters, ct);
+        }
+
+        public async Task<GetSavedContactsSearchesResult> GetSavedContactsSearches(GetSavedContactsSearchesParameters parameters, CancellationToken ct = default)
+        {
+            return await InvokeAsync<GetSavedContactsSearchesResult, GetSavedContactsSearchesParameters>("GetSavedContactsSearches", parameters, ct);
+        }
+
+        public async Task<GetSavedShortcodesSearchesResult> GetSavedShortcodesSearches(GetSavedShortcodesSearchesParameters parameters, CancellationToken ct = default)
+        {
+            return await InvokeAsync<GetSavedShortcodesSearchesResult, GetSavedShortcodesSearchesParameters>("GetSavedShortcodesSearches", parameters, ct);
+        }
+
+        public async Task<AddSavedSearchesResult> AddSavedSearch(AddSavedSearchesParameters parameters, CancellationToken ct = default)
+        {
+            return await InvokeAsync<AddSavedSearchesResult, AddSavedSearchesParameters>("AddSavedSearches", parameters, ct);
+        }
+
+        public async Task<DeleteSavedSearchesResult> DeleteSavedSearch(DeleteSavedSearchesParameters parameters, CancellationToken ct = default)
+        {
+            return await InvokeAsync<DeleteSavedSearchesResult, DeleteSavedSearchesParameters>("DeleteSavedSearches", parameters, ct);
+        }
+
+        public async Task<UpdateSavedSearchesResult> UpdateSavedSearch(UpdateSavedSearchesParameters parameters, CancellationToken ct = default)
+        {
+            return await InvokeAsync<UpdateSavedSearchesResult, UpdateSavedSearchesParameters>("UpdateSavedSearches", parameters, ct);
         }
 
     }

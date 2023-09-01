@@ -72,4 +72,8 @@
         <item>Copy to folder</item>
         <item>Copy to to-do list</item>
     </string-array>
+<string-array name="save_options">
+        <item>Save</item>
+        <item>Save as</item>
+    </string-array>
 </resources>

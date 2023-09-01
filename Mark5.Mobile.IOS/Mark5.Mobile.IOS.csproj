@@ -346,7 +346,7 @@
 	    <Compile Include="Ui\ViewControllers\ExternalDocumentFoldersListViewController.cs" />
 	    <Compile Include="Ui\ViewControllers\CategoriesListOldViewController.cs" />
 	    <Compile Include="Ui\ViewControllers\DeliveryReportViewController.cs" />
-	    <Compile Include="Ui\ViewControllers\TransmitDestinationsViewController.cs" />
+	    <Compile Include="Ui\ViewControllers\SavedDocumentSearchesViewController.cs" />
 	    <Compile Include="Ui\TableViewCells\AddEditTableViewCells\ToggleTableViewCell.cs" />
 	    <Compile Include="Ui\TableViewCells\AddEditTableViewCells\DateSelectionTableViewCell.cs" />
 	    <Compile Include="Ui\TableViewCells\AddEditTableViewCells\LabelWithChevronTableViewCell.cs" />
@@ -363,6 +363,9 @@
 	    <Compile Include="Ui\ViewControllers\SearchView\DocumentsSearchByReferenceResultsViewController.cs" />
 	    <Compile Include="Ui\ViewControllers\SearchView\DocumentsSearchByReferenceResultsFilterController.cs" />
 	    <Compile Include="Ui\ViewControllers\SearchView\DocumentsSearchByReferenceResultsDataSource.cs" />
+	    <Compile Include="Ui\ViewControllers\TransmitDestinationsViewController.cs" />
+	    <Compile Include="Ui\ViewControllers\SavedContactSearchesViewController.cs" />
+	    <Compile Include="Ui\ViewControllers\SavedShortcodeSearchesViewController.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

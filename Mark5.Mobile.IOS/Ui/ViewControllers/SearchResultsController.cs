@@ -6,13 +6,9 @@ using Mark5.Mobile.Common;
 using Mark5.Mobile.Common.Model;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.ViewControllers;
-using Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView;
 using Mark5.Mobile.Common.Extensions;
-
 using UIKit;
-using Foundation;
 using Mark5.Mobile.IOS.Utilities;
-using System.Collections.Generic;
 using Mark5.Mobile.Common.Utilities;
 
 namespace Mark5.Mobile.IOS.Ui

@@ -17,14 +17,20 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
 {
     public class ContactsSearchCriteriaViewController : AbstractSearchCriteriaViewController, IUIViewControllerRestoration
     {
-        SearchContactsCriteria criteria = new SearchContactsCriteria();
+        SearchContactsCriteria criteria = new();
+        public SavedContactsSearch CurrentSavedSearch { get; set; }
+        ContactsSavedSearchesView savedSearchesView = null;
 
         public override void LoadView()
         {
             base.LoadView();
 
             CommonConfig.UsageAnalytics.LogEvent(new OpenSearchEvent());
-
+            if (ServerConfig.SystemSettings?.SystemInfo?.SavedSearchesAvailable == true)
+            {
+                savedSearchesView = new ContactsSavedSearchesView(this);
+                StackView.AddArrangedSubview(savedSearchesView);
+            }
             StackView.AddArrangedSubview(new ContactTypesSearchView());
             StackView.AddArrangedSubview(new NameSearchView());
             StackView.AddArrangedSubview(new AddressSearchView());
@@ -53,6 +59,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             base.ResetItem_Clicked(sender, e);
 
             criteria = new SearchContactsCriteria();
+            CurrentSavedSearch = null;
+            savedSearchesView?.ResetView();
 
             RefreshView();
             await SaveCriteria();
@@ -68,6 +76,43 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 PresentViewController(new ContactsSplitSearchViewController(criteria), true, null);
             else
                 NavigationController.PushViewController(new ContactsSearchResultsViewController { Criteria = criteria }, true);
+        }
+
+        protected override async void SaveButton_TouchUpInside(object sender, EventArgs e)
+        {
+            if (CurrentSavedSearch != null)
+            {
+                var choice = await Dialogs.ShowListActionSheetAsync(this, new[]
+                {
+                    Localization.GetString("save"),
+                    Localization.GetString("save_as"),
+                });
+
+                if (choice < 0)
+                    return;
+
+                HandleSaveButtonChoice(choice);
+            }
+            else
+            {
+                await AddNewSavedSearch();
+            }
+
+        }
+
+        protected async void HandleSaveButtonChoice(int choice)
+        {
+            switch (choice)
+            {
+                case 0:
+                    if (CurrentSavedSearch != null)
+                        await Managers.SearchManager.UpdateSavedContactsSearchAsync(CurrentSavedSearch.Id, CurrentSavedSearch);
+                    break;
+                case 1:
+                    await AddNewSavedSearch();
+                    break;
+
+            }
         }
 
         protected override async Task SaveCriteria()
@@ -98,6 +143,42 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
         {
             foreach (var view in StackView.Subviews.OfType<AbstractContactsSearchView>())
                 view.SetCriteria(criteria);
+        }
+
+        public void ReloadCriteria(SearchContactsCriteria criteria)
+        {
+            foreach (var view in StackView.Subviews.OfType<AbstractContactsSearchView>())
+                view.SetCriteria(criteria);
+        }
+
+        public void UpdateCurrentSavedSearch(SavedContactsSearch savedSearch)
+        {
+            CurrentSavedSearch = savedSearch;
+        }
+
+        private async Task AddNewSavedSearch()
+        {
+            try
+            {
+                //show view controller to enter new saved search title
+                var dp = new StringEditorViewController
+                {
+                    ModalPresentationStyle = UIModalPresentationStyle.OverCurrentContext,
+                    ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve
+                };
+                PresentViewController(dp, false, null);
+                var newName = await dp.Result;
+                var newSavedSearch = new SavedContactsSearch() { Criteria = CurrentSavedSearch?.Criteria ?? criteria, Name = newName };
+                var newSavedSearchSaved = await Managers.SearchManager.AddSavedContactsSearchAsync(newSavedSearch);
+                CurrentSavedSearch = newSavedSearchSaved;
+                criteria = newSavedSearchSaved.Criteria;
+                savedSearchesView.SetCurrent(newName);
+                RefreshView();
+            }
+            catch (TaskCanceledException)
+            {
+                return;
+            }
         }
 
         abstract class AbstractContactsSearchView : AbstractSearchView
@@ -960,6 +1041,109 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     return null;
                 }
             }
+        }
+
+        class ContactsSavedSearchesView : AbstractContactsSearchView
+        {
+            readonly WeakReference<ContactsSearchCriteriaViewController> parentViewControllerWeakReference;
+
+            readonly UIView view;
+            readonly UILabelScalable label;
+            readonly UILabelScalable text;
+            string currentSearchName;
+
+            public ContactsSavedSearchesView(ContactsSearchCriteriaViewController parentViewController)
+            {
+                parentViewControllerWeakReference = parentViewController.Wrap();
+
+                view = new UIView
+                {
+                    BackgroundColor = InactiveBackgroundColor,
+                    UserInteractionEnabled = true
+                };
+                view.Layer.CornerRadius = CornerRadius;
+                view.Layer.MasksToBounds = true;
+                view.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("tapped:")));
+
+                label = new UILabelScalable
+                {
+                    Text = Localization.GetString("saved_searches"),
+                    TextColor = LabelTextColor,
+                    Font = Font,
+                    TextAlignment = UITextAlignment.Center,
+                    TranslatesAutoresizingMaskIntoConstraints = false,
+                    UserInteractionEnabled = false,
+                    Lines = 1,
+                    MinimumScaleFactor = .8f,
+                    AdjustsFontSizeToFitWidth = true
+                };
+
+                text = new UILabelScalable
+                {
+                    Text = Localization.GetString("search_load"),
+                    TextColor = Theme.LightGray,
+                    Font = Font,
+                    TintColor = Theme.LightGray,
+                    TextAlignment = UITextAlignment.Center,
+                    TranslatesAutoresizingMaskIntoConstraints = false,
+                    UserInteractionEnabled = false,
+                };
+                view.Add(label);
+                view.Add(text);
+                view.AddConstraints(new[]
+                {
+                    label.TopAnchor.ConstraintEqualTo(view.TopAnchor,4f),
+                    label.LeftAnchor.ConstraintEqualTo(view.LeftAnchor,4f),
+                    label.RightAnchor.ConstraintEqualTo(view.RightAnchor,-4f),
+                    text.TopAnchor.ConstraintEqualTo(label.BottomAnchor,2f),
+                    text.LeftAnchor.ConstraintEqualTo(view.LeftAnchor,4f),
+                    text.RightAnchor.ConstraintEqualTo(view.RightAnchor,-4f),
+                    text.BottomAnchor.ConstraintEqualTo(view.BottomAnchor,-4f),
+                    label.HeightAnchor.ConstraintEqualTo(text.HeightAnchor)
+                });
+
+                AddArrangedSubview(view);
+            }
+
+            protected override void UpdateRow()
+            {
+                if (!string.IsNullOrEmpty(currentSearchName))
+                    text.Text = currentSearchName;
+            }
+
+            public void SetCurrent(string name)
+            {
+                currentSearchName = name;
+                text.Text = name;
+            }
+
+            public void ResetView()
+            {
+                currentSearchName = string.Empty;
+                text.Text = Localization.GetString("search_load");
+            }
+
+            [Export("tapped:")]
+            async void Tapped(UITapGestureRecognizer recognizer)
+            {
+                var vc = new SavedContactSearchesViewController();
+                parentViewControllerWeakReference.Unwrap()?.PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+
+                var result = await vc.Result;
+                if (result == null)
+                    return;
+
+                Criteria = result.Criteria;
+                currentSearchName = result.Name;
+                (parentViewControllerWeakReference.Unwrap())?.UpdateCurrentSavedSearch(savedSearch: result);
+                (parentViewControllerWeakReference.Unwrap())?.ReloadCriteria(Criteria);
+
+                text.UserInteractionEnabled = true;
+                text.BecomeFirstResponder();
+
+                UpdateRow();
+            }
+
         }
 
         #region State restoration
