@@ -43,7 +43,7 @@
 		<ConsolePause>false</ConsolePause>
         <CopyAppBundle>true</CopyAppBundle>
 		<RunCodeAnalysis>true</RunCodeAnalysis>
-		<CodesignProvision>match AppStore com.nordic-it.mark5.mobile.ios</CodesignProvision>
+		<CodesignProvision>Mark5Mobile Distribution 2023</CodesignProvision>
 		<CodesignKey>Apple Distribution: Nordic IT Europe ApS (5Q7TTRG4M4)</CodesignKey>
 		<MtouchUseLlvm>true</MtouchUseLlvm>
 		<MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
@@ -87,7 +87,7 @@
 		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
 		<LangVersion>9.0</LangVersion>
 		<MtouchLink>SdkOnly</MtouchLink>
-		<CodesignProvision>match AppStore com.nordic-it.mark5.mobile.ios</CodesignProvision>
+		<CodesignProvision>Mark5Mobile Distribution 2023</CodesignProvision>
 	</PropertyGroup>
 	<ItemGroup>
 		<Compile Include="Properties\AssemblyInfo.cs" />
