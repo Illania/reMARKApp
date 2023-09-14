@@ -18,7 +18,7 @@
     <DefineConstants>DEBUG;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodesignKey>Apple Development: Lars Hansen (TUYUES9KMZ)</CodesignKey>
+    <!--<CodesignKey>Apple Development: Lars Hansen (TUYUES9KMZ)</CodesignKey>-->
     <MtouchDebug>true</MtouchDebug>
     <MtouchNoSymbolStrip>true</MtouchNoSymbolStrip>
     <MtouchFastDev>true</MtouchFastDev>
@@ -32,7 +32,7 @@
     <IntermediateOutputPath></IntermediateOutputPath>
     <Commandlineparameters></Commandlineparameters>
     <LangVersion>default</LangVersion>
-    <CodesignProvision>match Development com.nordic-it.mark5.mobile.ios.share</CodesignProvision>
+    <!--<CodesignProvision>match Development com.nordic-it.mark5.mobile.ios.share</CodesignProvision>-->
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
     <Optimize>true</Optimize>
@@ -40,16 +40,18 @@
     <DefineConstants></DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodesignKey>Apple Distribution: Nordic IT Europe ApS (5Q7TTRG4M4)</CodesignKey>
+    <!--<CodesignKey>Apple Distribution: Nordic IT Europe ApS (5Q7TTRG4M4)</CodesignKey>-->
     <MtouchUseLlvm>true</MtouchUseLlvm>
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
     <MtouchLink>SdkOnly</MtouchLink>
     <MtouchArch>ARMv7, ARM64</MtouchArch>
     <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
     <MtouchVerbosity></MtouchVerbosity>
-    <CodesignProvision>match AppStore com.nordic-it.mark5.mobile.ios.share</CodesignProvision>
+    <!--<CodesignProvision>match AppStore com.nordic-it.mark5.mobile.ios.share</CodesignProvision>-->
     <LangVersion>default</LangVersion>
     <MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
+    <CodesignProvision>Mark5MobileShare Distribution 2023</CodesignProvision>
+    <CodesignKey>Apple Distribution: Nordic IT Europe ApS (5Q7TTRG4M4)</CodesignKey>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
     <DebugType>pdbonly</DebugType>
@@ -58,14 +60,14 @@
     <DefineConstants></DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodesignKey>Apple Distribution: Nordic IT Europe ApS (5Q7TTRG4M4)</CodesignKey>
+    <!--<CodesignKey>Apple Distribution: Nordic IT Europe ApS (5Q7TTRG4M4)</CodesignKey>-->
     <MtouchNoSymbolStrip>true</MtouchNoSymbolStrip>
     <MtouchLink>None</MtouchLink>
     <MtouchArch>x86_64</MtouchArch>
     <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
     <MtouchVerbosity></MtouchVerbosity>
     <LangVersion>default</LangVersion>
-    <CodesignProvision>match AppStore com.nordic-it.mark5.mobile.ios.share</CodesignProvision>
+    <!--<CodesignProvision>match AppStore com.nordic-it.mark5.mobile.ios.share</CodesignProvision>-->
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
     <DebugSymbols>true</DebugSymbols>
@@ -75,7 +77,7 @@
     <DefineConstants>DEBUG;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodesignKey>Apple Development: Lars Hansen (TUYUES9KMZ)</CodesignKey>
+    <!--<CodesignKey>Apple Development: Lars Hansen (TUYUES9KMZ)</CodesignKey>-->
     <DeviceSpecificBuild>true</DeviceSpecificBuild>
     <MtouchDebug>true</MtouchDebug>
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
@@ -84,7 +86,7 @@
     <MtouchArch>ARM64</MtouchArch>
     <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
     <MtouchVerbosity></MtouchVerbosity>
-    <CodesignProvision>match Development com.nordic-it.mark5.mobile.ios.share</CodesignProvision>
+    <!--<CodesignProvision>match Development com.nordic-it.mark5.mobile.ios.share</CodesignProvision>-->
     <LangVersion>default</LangVersion>
     <MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
   </PropertyGroup>
