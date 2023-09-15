@@ -211,7 +211,10 @@ namespace Mark5.Mobile.IOS.Utilities
                 },
                 {
                     new NSString(Keys.ExtraFieldsSettings), new NSDictionary()
-                }
+                },
+                {
+                    new NSString(Keys.SortByDate), NSNumber.FromBoolean(true)
+                },
 
             };
 

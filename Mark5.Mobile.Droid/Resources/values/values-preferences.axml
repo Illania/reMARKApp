@@ -80,7 +80,7 @@
         <item>10 minutes</item>
     </string-array>
      <string-array name="pref_sending_delay_entryvalues">
-        <item>0</item>
+        <item>0</item>6
         <item>30</item>
         <item>60</item>
         <item>120</item>
@@ -89,7 +89,7 @@
         <item>600</item>
     </string-array>
     <bool name="pref_documents_show_time_older_emails_default">false</bool>
-    <bool name="pref_documents_sort_by_date_default">false</bool>
+    <bool name="pref_documents_sort_by_date_default">true</bool>
     <string name="pref_sending_delay_default">0</string>
     <string name="pref_preset_category_default">0</string>
     <bool name="pref_remember_last_user_delay_settings_default">false</bool>
