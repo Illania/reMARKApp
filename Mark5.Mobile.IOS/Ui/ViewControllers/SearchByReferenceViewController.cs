@@ -173,18 +173,28 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             View.BackgroundColor = Theme.Clear;
 
-            var criteria = new Mobile.Common.Model.SearchDocumentsCriteria();
-            criteria.Reference = valueTextField.Text;
-            criteria.PartialWordSearch = PlatformConfig.Preferences.PartialWordSearch;
-            criteria.MaxToFetch = PlatformConfig.Preferences.DocumentsToSearch;
+            var criteria = new Mobile.Common.Model.SearchDocumentsCriteria
+            {
+                Reference = valueTextField.Text,
+                PartialWordSearch = PlatformConfig.Preferences.PartialWordSearch,
+                MaxToFetch = PlatformConfig.Preferences.DocumentsToSearch
+            };
 
             CommonConfig.Logger.Info($"Starting search... [criteria={Serializer.Serialize(criteria)}]");
-
-            var vc = new DocumentsSearchByReferenceResultsViewController { Criteria = criteria };
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.FormSheet), true, null);
-            var docId = await vc.Result;
-            tcs.SetResult(docId);
-            DismissViewController(false, null);    
+            try
+            {
+                var vc = new DocumentsSearchByReferenceResultsViewController { Criteria = criteria };
+                PresentViewController(new NavigationController(vc, UIModalPresentationStyle.Automatic), true, null);
+                var docId = await vc.Result;
+                tcs.SetResult(docId);
+                DismissViewController(false, null);
+            }
+            catch (TaskCanceledException ex)
+            {
+                tcs.SetCanceled();
+                DismissViewController(false, null);
+            }
+             
         }
 
         void CancelButton_TouchedUpInside(object sender, EventArgs e)
