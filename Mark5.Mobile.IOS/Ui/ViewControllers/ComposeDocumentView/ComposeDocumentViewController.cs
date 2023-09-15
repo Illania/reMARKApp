@@ -725,12 +725,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                 DismissModalViewController(false);
             }
-            catch (OperationCanceledException) { }
+            catch (OperationCanceledException) {
+                DismissModalViewController(false);
+            }
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error($"Failed to get document eml async", ex.InnerException);
                 await Dialogs.ShowErrorAlertAsync(this, ex.InnerException);
             }
+
 
         }
 
