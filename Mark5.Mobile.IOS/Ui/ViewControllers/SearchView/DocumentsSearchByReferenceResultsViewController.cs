@@ -23,8 +23,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
         public Task<int> Result => tcs.Task;
 
         UIBarButtonItem closeItem;
-        UIBarButtonItem closeLeftButton;
-        UIBarButtonItem backBarButton;
 
         DocumentsSearchByReferenceResultsFilterController searchResultsController;
         UISearchController searchController;
@@ -56,6 +54,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
+
+            if (UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
+                ModalInPresentation = true;
 
             if (Integration.IsRunningAtLeast(11))
             {
@@ -158,21 +159,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 Title = Localization.GetString("close")
             };
 
-            backBarButton = new UIBarButtonItem();
-            backBarButton.SetTitleTextAttributes(new UITextAttributes() { TextColor = Theme.DarkerBlue }, UIControlState.Normal);
-            NavigationItem.BackBarButtonItem = backBarButton;
-
-            if (!Integration.IsRunningAtLeast(13) && Integration.IsIPad())
-                NavigationItem.SetRightBarButtonItem(closeItem, false);
-
-            if(Integration.IsiOSApplicationOnMac())
-            {
-                closeLeftButton = new UIBarButtonItem
-                {
-                    Title = Localization.GetString("close")
-                };
-                NavigationItem.SetLeftBarButtonItem(closeLeftButton, false);
-            }
+            NavigationItem.SetRightBarButtonItem(closeItem, false);
     
         }
 
@@ -209,19 +196,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
         {
             if (closeItem != null)
                 closeItem.Clicked += CloseItem_Clicked;
-
-            if (closeLeftButton != null)
-                closeLeftButton.Clicked += CloseItem_Clicked;
-
         }
 
         void DeinitializeHandlers()
         {
             if (closeItem != null)
                 closeItem.Clicked -= CloseItem_Clicked;
-
-            if (closeLeftButton != null)
-                closeLeftButton.Clicked -= CloseItem_Clicked;
 
         }
 
@@ -232,6 +212,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
 
         private void CloseItem_Clicked(object sender, EventArgs e)
         {
+            tcs.SetCanceled();
             DismissViewController(true, null);
         }
 
