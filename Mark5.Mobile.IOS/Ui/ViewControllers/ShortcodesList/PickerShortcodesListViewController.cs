@@ -47,7 +47,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             }
             finally
             {
-                tableView.DeselectRow(tableView.IndexPathForSelectedRow, true);
+                if(indexPath!= null)
+                    tableView.DeselectRow(indexPath, true);
             }
         }
     }

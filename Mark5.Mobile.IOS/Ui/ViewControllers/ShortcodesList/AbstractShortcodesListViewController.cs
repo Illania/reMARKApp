@@ -15,7 +15,6 @@ using Mark5.Mobile.Common.Utilities;
 using Mark5.Mobile.Common.Utilities.Extensions;
 using Mark5.Mobile.IOS.Ui.Common;
 using Mark5.Mobile.IOS.Ui.TableViewCells;
-using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Utilities;
 using TinyMessenger;
 using UIKit;
@@ -86,7 +85,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ShortcodesList
             if (searchController.SearchResultsController is UITableViewController searchTableViewController)
             {
                 if (searchTableViewController?.TableView?.IndexPathForSelectedRow != null)
-                    searchTableViewController.TableView.DeselectRow(TableView.IndexPathForSelectedRow, true);
+                    searchTableViewController.TableView.DeselectRow(searchTableViewController.TableView.IndexPathForSelectedRow, true);
 
                 if (searchTableViewController?.TableView?.IndexPathsForSelectedRows?.Length > 0)
                     foreach (var selectedIndexPath in searchTableViewController.TableView?.IndexPathsForSelectedRows)
