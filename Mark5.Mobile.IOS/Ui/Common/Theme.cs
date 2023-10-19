@@ -263,6 +263,38 @@ namespace Mark5.Mobile.IOS.Ui.Common
 
         #endregion
 
+
+        #region NavigationBar color
+        public static void ApplyDarkBlueTheme(this UINavigationBar navigationBar)
+        {
+            if (Integration.IsRunningAtLeast(13))
+            {
+                var appearance = new UINavigationBarAppearance();
+                appearance.ConfigureWithOpaqueBackground();
+                appearance.ShadowColor = UIColor.Clear;
+                appearance.BackgroundColor = DarkerBlue;
+                navigationBar.StandardAppearance = appearance;
+                navigationBar.CompactAppearance = appearance;
+                navigationBar.ScrollEdgeAppearance = appearance;
+            }
+        }
+
+        public static void ApplyWhiteTheme(this UINavigationBar navigationBar)
+        {
+            if (Integration.IsRunningAtLeast(13))
+            {
+                var appearance = new UINavigationBarAppearance();
+                appearance.ConfigureWithOpaqueBackground();
+                appearance.ShadowColor = UIColor.Clear;
+                appearance.BackgroundColor = White;
+                navigationBar.StandardAppearance = appearance;
+                navigationBar.CompactAppearance = appearance;
+                navigationBar.ScrollEdgeAppearance = appearance;
+            }
+        }
+        #endregion
+
+
         #region Utilities
 
         static UIImage SolidColorImage(UIColor color)
