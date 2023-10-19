@@ -131,6 +131,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
 
             if (!Integration.IsRunningAtLeast(13) && Integration.IsIPad())
                 NavigationItem.SetRightBarButtonItem(closeItem, false);
+
+            if (NavigationController != null)
+                NavigationController.NavigationBar.ApplyWhiteTheme();
         }
 
         void InitializeView()

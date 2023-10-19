@@ -194,8 +194,18 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             if (Integration.IsRunningAtLeast(11))
             {
                 if (NavigationController != null)
-                    NavigationController.NavigationBar.PrefersLargeTitles = false;
+                {
+                    NavigationController.NavigationBar.PrefersLargeTitles = false;    
+                }
                 NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            }
+
+            if (Integration.IsRunningAtLeast(13))
+            {
+                if (NavigationController != null)
+                {
+                    NavigationController.NavigationBar.ApplyDarkBlueTheme();
+                }
             }
 
             closeItem.Clicked += CloseItem_Clicked;

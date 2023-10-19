@@ -95,6 +95,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                     foreach (var selectedIndexPath in searchTableViewController.TableView?.IndexPathsForSelectedRows)
                         searchTableViewController.TableView.DeselectRow(selectedIndexPath, true);
             }
+
         }
 
         public override void ViewDidAppear(bool animated)
@@ -184,6 +185,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
         void InitializeNavigationBar()
         {
             NavigationItem.Title = Localization.GetString("search_results");
+            NavigationItem.HidesSearchBarWhenScrolling = false;
 
             exitEditItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
             editItem = new UIBarButtonItem(UIBarButtonSystemItem.Edit);
@@ -208,7 +210,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 };
                 NavigationItem.SetLeftBarButtonItem(closeLeftButton, false);
             }
-    
+
+            if (NavigationController != null)
+                NavigationController.NavigationBar.ApplyWhiteTheme();
+
         }
 
         void InitializeSearchBar()
