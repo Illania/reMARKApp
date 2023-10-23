@@ -208,7 +208,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                                                    UIAlertActionStyle.Default,
                                                    a =>
                 {
-                    this.CopyToWorktray((IBusinessEntity)selectedContacts);
+                    this.CopyToWorktray(selectedContacts.Cast<IBusinessEntity>().ToList());
                     EndEditing();
                 }));
             }
@@ -217,7 +217,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 UIAlertActionStyle.Default,
                 a =>
                 {
-                    this.CopyToFolder((IBusinessEntity)selectedContacts);
+                    this.CopyToFolder(selectedContacts.Cast<IBusinessEntity>().ToList());
                     EndEditing();
                 }));
 
@@ -287,6 +287,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 nc.PopToViewController(nc.ViewControllers[0], false);
 
                 var vc = (ContactViewController)nc.ViewControllers[0];
+                vc.OpenedFromSearchResults = true;
 
                 if (vc.IsShowingContactWithId(contactPreview.Id))
                     return;
@@ -298,6 +299,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
             else
             {
                 var vc = new ContactViewController();
+                vc.OpenedFromSearchResults = true;
                 vc.SetData(contactPreview, true, true);
                 vc.SetRefreshDataOnAppear();
                 NavigationController.PushViewController(vc, true);

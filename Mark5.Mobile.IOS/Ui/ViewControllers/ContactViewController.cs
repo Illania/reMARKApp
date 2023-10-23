@@ -37,6 +37,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         bool refreshDataOnAppear;
         bool hideDoneButton;
         bool hideNavigationButtons;
+        public bool OpenedFromSearchResults { get; set; } = false;
 
         UIView headerView;
         UILabelScalable nameLabel;
@@ -324,8 +325,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         void InitializeNavigationBar()
         {
-            if (PresentingViewController == null)
-            {
+           if (PresentingViewController == null || OpenedFromSearchResults == true)
+           {
                 if (ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.CreateAllowed || ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.EditAllowed)
                 {
                     editButtonItem = new UIBarButtonItem
@@ -336,7 +337,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NavigationItem.SetRightBarButtonItem(editButtonItem, false);
                 }
             }
-            else if (!hideDoneButton)
+            else
+            if (!hideDoneButton)
             {
                 doneButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
                 NavigationItem.SetRightBarButtonItem(doneButtonItem, false);

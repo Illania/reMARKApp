@@ -222,7 +222,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
                 UIAlertActionStyle.Default,
                 a =>
                 {
-                    this.CopyToFolder((IBusinessEntity)selectedShortcodes);
+                    this.CopyToFolder(selectedShortcodes.Cast<IBusinessEntity>().ToList());
                     EndEditing();
                 }));
 
