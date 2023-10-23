@@ -337,8 +337,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                     NavigationItem.SetRightBarButtonItem(editButtonItem, false);
                 }
             }
-            else
-            if (!hideDoneButton)
+            else if (!hideDoneButton)
             {
                 doneButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Done);
                 NavigationItem.SetRightBarButtonItem(doneButtonItem, false);
