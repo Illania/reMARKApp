@@ -713,10 +713,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         private async Task InsertExternalAttachment2()
         {
-            var view = new DocumentPickerFoldersListViewController();
-            PresentViewController(new NavigationController(view, UIModalPresentationStyle.PageSheet), true, null);
+            var documentPicker = new DocumentPickerFoldersListViewController();
+            PresentViewController(new NavigationController(documentPicker, UIModalPresentationStyle.PageSheet), true, null);
 
-            //view.Result
+            var document = await documentPicker.Result;
+            if (document == null)
+                return;
+
+            //attachmentsView.AddAttachmentDescriptions(attachmentDescs);
         }
 
         async Task AttachByReference()

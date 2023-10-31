@@ -10,8 +10,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 {
     public class DocumentPickerFoldersListViewController : AbstractFoldersListViewController
     {
-        readonly TaskCompletionSource<List<AttachmentDescription>> tcs = new TaskCompletionSource<List<AttachmentDescription>>();
-        public Task<List<AttachmentDescription>> Result => tcs.Task;
+        readonly TaskCompletionSource<Document> tcs = new TaskCompletionSource<Document>();
+        public Task<Document> Result => tcs.Task;
 
         UIBarButtonItem cancelModeItem;
 
@@ -62,11 +62,10 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
         protected override async void FolderSelected(Folder folder, bool isFromFavorite)
         {
-            var vc = new ExternalDocumentsListViewController
+            var vc = new DocumentPickerListViewController
             {
                 Folder = folder,
-                DisableRowActions = true,
-                OnlyShowExternalDocuments = true
+                DisableRowActions = true
             };
 
             NavigationController?.PushViewController(vc, true);
