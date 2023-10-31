@@ -131,6 +131,7 @@
 		<Compile Include="Ui\ViewControllers\ContactsSplitViewController.cs" />
 		<Compile Include="Ui\ViewControllers\CopyToWorktrayViewController.cs" />
 		<Compile Include="Ui\ViewControllers\DocumentListViewController.cs" />
+		<Compile Include="Ui\ViewControllers\DocumentPickerFoldersListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\DocumentsSplitViewController.cs" />
 		<Compile Include="Ui\ViewControllers\FoldersNotificationsListViewController.cs" />
 		<Compile Include="Ui\ViewControllers\LoginSettingsViewController.cs" />

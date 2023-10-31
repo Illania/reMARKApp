@@ -671,7 +671,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 if (source == 5)
                 {
                     CommonConfig.UsageAnalytics.LogEvent(new ComposeAttachEmailEvent());
-                    //await InsertExternalAttachment();
+                    await InsertExternalAttachment2();
                 }
 
                 if (ServerConfig.SystemSettings?.SystemInfo?.AttachByReferenceAvailable == true && source == 6)
@@ -709,6 +709,14 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 }
             }
 
+        }
+
+        private async Task InsertExternalAttachment2()
+        {
+            var view = new DocumentPickerFoldersListViewController();
+            PresentViewController(new NavigationController(view, UIModalPresentationStyle.PageSheet), true, null);
+
+            //view.Result
         }
 
         async Task AttachByReference()

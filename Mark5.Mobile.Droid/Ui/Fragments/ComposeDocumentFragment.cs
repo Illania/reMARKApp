@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -98,7 +98,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         Action dismissAction;
 
-        (int pickedHours, int pickedMinutes) LastPickedUserSendingDelay = (0,0);
+        (int pickedHours, int pickedMinutes) LastPickedUserSendingDelay = (0, 0);
 
         public static (ComposeDocumentFragment fragment, string tag) NewInstance(DocumentCreationModeFlag documentCreationModeFlag, CopyToNewOption? copyToNewOption, bool? restoreWorkingCopy,
                                                                                  DocumentDirection? previousDocumentDirection, int? previousDocumentFolderId, int? previousDocumentId,
@@ -308,15 +308,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     var emlFilePath = await Managers.DocumentsManager.GetDocumentEmlAsync(docId);
                     var emlPathUri = Uri.Parse(emlFilePath);
                     await HandleEmlPath(emlPathUri);
-                }          
+                }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 CommonConfig.Logger.Error($"Failed to get document eml async", ex.InnerException);
                 await Dialogs.ShowErrorDialogAsync(Context, ex.InnerException);
-            }    
+            }
         }
- 
+
 
         public override async void OnActivityResult(int requestCode, int resultCode, Intent data)
         {
@@ -520,7 +520,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     var androidUri = Uri.Parse(uri.AbsoluteUri);
                     await HandleOneAttachment(androidUri);
                 }
-            }     
+            }
 
             if (preconfiguredContent != null)
                 await contentView.InsertPlainText(preconfiguredContent);
@@ -815,13 +815,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             if (previousDocumentDirection == DocumentDirection.Draft)
                 Dialogs.ShowYesNoDialog(Context, Resource.String.save_draft, Resource.String.confirm_change_draft,
-                    () => {
+                    () =>
+                    {
                         saveDraft = true;
                         SendDocument();
                     }, DeleteAutoSavedDocumentAndClose);
             else
                 Dialogs.ShowYesNoDialog(Context, Resource.String.save_draft, Resource.String.confirm_save_as_draft,
-                    () => {
+                    () =>
+                    {
                         saveDraft = true; SendDocument();
                     }, DeleteAutoSavedDocumentAndClose, cancelable: true);
         }
@@ -975,11 +977,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                     var dateToPrint = new Java.Util.Date(pickedDateMilliseconds);
 
-                    if(!usePicker)
+                    if (!usePicker)
                     {
                         SaveAndQueueWorkingCopy(false, pickedDateMilliseconds);
                         return;
- 
+
                     }
 
                     var sendConfirmed = await Dialogs.ShowYesNoDialogAsync(Context, Resources.GetString(Resource.String.confirm_delay_send_title),
@@ -994,8 +996,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                                 + LastPickedUserSendingDelay.pickedMinutes * 60;
 
                         SaveAndQueueWorkingCopy(false, pickedDateMilliseconds);
-                    }    
-                       
+                    }
+
                     else
                     {
                         fab.Enabled = true;
@@ -1108,7 +1110,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             else
                 Activity?.Finish();
         }
-        
+
 
         async void HandleAddAttachment(Intent data)
         {
@@ -1176,7 +1178,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var fileName = path.LastPathSegment;
                 stream = new FileStream(path.Path, FileMode.Open, FileAccess.Read);
 
-                long sizeInBytes = stream.Length; 
+                long sizeInBytes = stream.Length;
 
                 if (sizeInBytes > ServerConfig.SystemSettings.DocumentsModuleInfo.MaximumAttachmentSizeBytes)
                 {
@@ -1194,7 +1196,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
             finally
             {
-                stream?.Dispose(); 
+                stream?.Dispose();
 
             }
 
@@ -1234,7 +1236,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 stream?.Dispose();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 CommonConfig.Logger.Error($"Failed to save attachment", ex);
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
@@ -1280,9 +1282,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                         StartActivityForResult(ExternalDocumentFoldersListActivity.CreateIntent(Context), RequestCodes.RemarkAttachmentRequestCode);
                     else if (choice == 1) //Device files
                         AddAttachmentFromDevice();
-                    else if (attachByReferenceAvailable && choice == 2) //Attach by reference
+                    else if (choice == 2) //Email from folder
+                        AttachEmailFromFolder();
+                    else if (attachByReferenceAvailable && choice == 3) //Attach by reference
                         Dialogs.ShowEditTextDialog(Context, Resource.String.reference_number, string.Empty,
-                            (text) => {
+                            (text) =>
+                            {
                                 var criteria = new SearchDocumentsCriteria();
                                 criteria.Reference = text;
                                 criteria.PartialWordSearch = PlatformConfig.Preferences.PartialWordSearch;
@@ -1296,11 +1301,15 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                             }, null, Resource.String.confirm, Resource.String.cancel);
 
                 }, null);
-                 
+
                 CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.Local));
             }
 
             return true;
+        }
+
+        private void AttachEmailFromFolder()
+        {
         }
 
         void AddAttachmentFromDevice()
@@ -1337,6 +1346,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             public const int InsertTemplate = 10;
             public const int AddAttachment = 20;
+            public const int AttachEmail = 30;
         }
 
         #endregion
