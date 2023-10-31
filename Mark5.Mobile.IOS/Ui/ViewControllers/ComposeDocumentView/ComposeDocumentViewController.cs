@@ -670,7 +670,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                 if (source == 5)
                 {
-                    CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.Email));
+                    CommonConfig.UsageAnalytics.LogEvent(new ComposeAttachEmailEvent());
                     //await InsertExternalAttachment();
                 }
 

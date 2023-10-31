@@ -35,6 +35,7 @@
     <string-array name="add_attachment_options">
         <item>External documents</item>
         <item>Device files</item>
+        <item>Email from folder</item>
     </string-array>
     <string-array name="add_attachment_options_with_reference">
         <item>External documents</item>
