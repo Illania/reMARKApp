@@ -43,7 +43,8 @@ namespace Mark5.Mobile.Common.Utilities
         PickPhoto,
         Local,
         External,
-        ReferenceEml
+        ReferenceEml,
+        Email
     }
 
     public enum TemplateType
