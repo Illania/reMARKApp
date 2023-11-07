@@ -136,12 +136,6 @@
   <ItemGroup>
     <Compile Include="CallIdDirectoryHandler.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Mark5.Mobile.IOS.Common\Mark5.Mobile.IOS.Common.csproj">
-      <Project>{9735C6AC-AAEE-4768-B8DB-E29A2FAFF4F9}</Project>
-      <Name>Mark5.Mobile.IOS.Common</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.AppExtension.CSharp.targets" />
   <Import Project="..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets')" />
 </Project>
