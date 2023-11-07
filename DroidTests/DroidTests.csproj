@@ -44,12 +44,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Mark5.Mobile.Droid\Mark5.Mobile.Droid.csproj">
-      <Project>{18408F16-3AEB-4095-949F-3299BACA8B58}</Project>
-      <Name>Mark5.Mobile.Droid</Name>
-      <ReferenceOutputAssembly>False</ReferenceOutputAssembly>
-      <Private>False</Private>
-    </ProjectReference>
     <ProjectReference Include="..\CommonTests\CommonTests.csproj">
       <Project>{2A1AFC02-E3C4-4481-80C3-C272D55F58C5}</Project>
       <Name>CommonTests</Name>
