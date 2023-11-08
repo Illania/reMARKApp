@@ -100,24 +100,24 @@ namespace Mark5.Mobile.Droid.Utilities
                 "We have made a few changes in the reMARK app. Press next to see what has changed.",
                      Resource.Drawable.onboarding_1),
 
-                new OnBoardingPageModel("Landscape orientatioon",
-                "Now reMARK app supports also landscape screen orientation.",
+                new OnBoardingPageModel("Attach by reference number",
+                "Now you can attach an email by reference number.",
                      Resource.Drawable.onboarding_2),
 
-                new OnBoardingPageModel("Out of Office feature",
-                "Now you can set up automatic Out of Office reply in app.",
+                new OnBoardingPageModel("Mobile print",
+                "Now you can send a document for print to a mobile printer.",
                      Resource.Drawable.onboarding_3),
 
-                new OnBoardingPageModel("Extended offline features",
-                "Now you can assign categories, remove, delete and file to folder emails in offline mode.",
+                new OnBoardingPageModel("Favorite searches",
+                "Now you can save and load your search settings from your Favorite searches.",
                      Resource.Drawable.onboarding_4),
 
-                new OnBoardingPageModel("User activities",
-                "Now you can user automatic user action workflows in app.",
+                new OnBoardingPageModel("Subject and Message filter",
+                "Now you can search a document by Subject and Message.",
                      Resource.Drawable.onboarding_5),
 
-                new OnBoardingPageModel("Delivery report",
-                "Now you can get a detail email transmit status info.",
+                new OnBoardingPageModel("Sync Favorites with Desktop app",
+                "Now you can sync your favorite folders with Desktop app.",
                      Resource.Drawable.onboarding_6)
 
             };
