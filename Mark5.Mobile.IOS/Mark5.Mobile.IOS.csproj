@@ -30,7 +30,7 @@
 		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
 		<LangVersion>9.0</LangVersion>
 		<CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
-		<CodesignProvision>Automatic</CodesignProvision>
+		<CodesignProvision>remark mobile dev</CodesignProvision>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
 		<DebugType>none</DebugType>
@@ -43,8 +43,6 @@
 		<ConsolePause>false</ConsolePause>
         <CopyAppBundle>true</CopyAppBundle>
 		<RunCodeAnalysis>true</RunCodeAnalysis>
-		<CodesignProvision>Mark5Mobile Distribution 2023</CodesignProvision>
-		<CodesignKey>Apple Distribution: Nordic IT Europe ApS (5Q7TTRG4M4)</CodesignKey>
 		<MtouchUseLlvm>true</MtouchUseLlvm>
 		<MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
 		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
@@ -62,14 +60,14 @@
 		<ConsolePause>false</ConsolePause>
 		<MtouchArch>ARM64</MtouchArch>
 		<CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
-		<CodesignKey>Apple Development: Lars Hansen (TUYUES9KMZ)</CodesignKey>
 		<MtouchDebug>true</MtouchDebug>
 		<RunCodeAnalysis>true</RunCodeAnalysis>
 		<MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
 		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
-		<CodesignProvision>match Development com.nordic-it.mark5.mobile.ios</CodesignProvision>
+		<CodesignProvision>remark mobile dev</CodesignProvision>
 		<LangVersion>9.0</LangVersion>
 		<MtouchLink>None</MtouchLink>
+		<CodesignKey>Apple Development: Lars Hansen (TUYUES9KMZ)</CodesignKey>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
 		<DebugType>none</DebugType>
@@ -87,7 +85,7 @@
 		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
 		<LangVersion>9.0</LangVersion>
 		<MtouchLink>SdkOnly</MtouchLink>
-		<CodesignProvision>Mark5Mobile Distribution 2023</CodesignProvision>
+		<CodesignProvision>Automatic</CodesignProvision>
 	</PropertyGroup>
 	<ItemGroup>
 		<Compile Include="Properties\AssemblyInfo.cs" />
