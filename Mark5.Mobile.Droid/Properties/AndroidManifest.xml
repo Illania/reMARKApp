@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.nordic_it.mark5.mobile.android" android:versionName="5.12.7" android:versionCode="571">
-	<uses-sdk android:minSdkVersion="29" android:targetSdkVersion="31" />
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"  xmlns:tools="http://schemas.android.com/tools" package="com.nordic_it.mark5.android" android:versionName="5.13.1" android:versionCode="575">
+	<uses-sdk android:minSdkVersion="29" android:targetSdkVersion="33" />
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 	<uses-permission android:name="android.permission.INTERNET" />
@@ -17,6 +17,7 @@
 	<uses-permission android:name="android.permission.GET_ACCOUNTS" />
 	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 	<uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
+	<uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove" />
 	<queries>
 		<intent>
 			<action android:name="android.intent.action.VIEW" />
