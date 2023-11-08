@@ -41,5 +41,13 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Mark5.Mobile.IOS\Mark5.Mobile.IOS.csproj">
+      <Project>{3FB59A6F-9438-433D-A3BA-247D914A06AE}</Project>
+      <Name>Mark5.Mobile.IOS</Name>
+      <ReferenceOutputAssembly>False</ReferenceOutputAssembly>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
