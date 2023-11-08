@@ -494,9 +494,9 @@ namespace Mark5.Mobile.Common.Manager
             }
 
             if (sourceType == SourceType.Local)
-                throw new ReMarkException(ErrorConstants.Codes.InvalidSourceType,"Favorite categories cannot be loaded offline");
-
-            throw new ArgumentException("Invalid sourceType provided.");
+                return new List<int>();
+            else
+                throw new ArgumentException("Invalid sourceType provided.");
         }
 
         public async Task AddFavoriteCategory(int categoryId, SourceType sourceType = SourceType.Auto)
