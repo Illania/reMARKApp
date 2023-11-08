@@ -28,7 +28,7 @@
     <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
     <DeviceSpecificBuild>true</DeviceSpecificBuild>
     <MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
-    <CodesignProvision>match Development com.nordic-it.mark5.mobile.ios.callid</CodesignProvision>
+    <CodesignProvision>remark callid dev</CodesignProvision>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
     <DebugType>none</DebugType>
@@ -46,7 +46,6 @@
     <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
     <LangVersion>9.0</LangVersion>
     <MtouchLink>SdkOnly</MtouchLink>
-    <CodesignProvision>Mark5MobileCallID Distribution 2023</CodesignProvision>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
     <DebugType>pdbonly</DebugType>
@@ -62,7 +61,8 @@
     <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
     <MtouchUseLlvm>true</MtouchUseLlvm>
     <MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
-    <CodesignProvision>reMark iOS CallID 2021 Distribution</CodesignProvision>
+    <CrashReportingEnabled>false</CrashReportingEnabled>
+    <ProductDefinition></ProductDefinition>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
     <DebugSymbols>true</DebugSymbols>
@@ -84,7 +84,7 @@
     <MtouchArch>ARM64</MtouchArch>
     <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
     <MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
-    <CodesignProvision>match Development com.nordic-it.mark5.mobile.ios.callid</CodesignProvision>
+    <CodesignProvision>remark callid dev</CodesignProvision>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -135,6 +135,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CallIdDirectoryHandler.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Mark5.Mobile.IOS.Common\Mark5.Mobile.IOS.Common.csproj">
+      <Project>{9735C6AC-AAEE-4768-B8DB-E29A2FAFF4F9}</Project>
+      <Name>Mark5.Mobile.IOS.Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.AppExtension.CSharp.targets" />
   <Import Project="..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets')" />
