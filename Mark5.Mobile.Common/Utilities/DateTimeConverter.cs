@@ -10,7 +10,10 @@ namespace Mark5.Mobile.Common.Utilities
 
         public static DateTime ConvertTimestampMillisecondsToDateTime(this long timestamp)
         {
-            return epoch.AddMilliseconds(timestamp);
+            if (timestamp == -1)
+                return epoch;
+
+            return epoch.AddMilliseconds(timestamp);    
         }
 
         public static long ConvertDateTimeToTimestampMilliseconds(this DateTime dateTime)
