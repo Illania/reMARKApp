@@ -58,7 +58,7 @@ namespace Mark5.Mobile.Common.Model
                 if (!SystemVersionGreaterThanOrEqual(1, 35, 12))
                     return false;
                 else
-                    return !ServiceVersionGreaterThanOrEqual(4, 5, 0) || CalendarModuleInstalled;
+                    return CalendarModuleInstalled;
             }
 
         }
