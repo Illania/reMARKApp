@@ -963,6 +963,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.SearchView
 
                 if (!dateRange.Enabled)
                 {
+                    dateRange.StartTimestamp = -1;
+                    dateRange.EndTimestamp = -1;
                     fromValue.Text = Localization.GetString("search_dash");
                     toValue.Text = Localization.GetString("search_today");
 
