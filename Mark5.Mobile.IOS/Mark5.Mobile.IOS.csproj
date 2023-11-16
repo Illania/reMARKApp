@@ -940,6 +940,10 @@
 		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_3.imageset\onboarding_3.pdf" />
 		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_4.imageset\onboarding_4.pdf" />
 		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_5.imageset\onboarding_5.pdf" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_6.imageset\onboarding_6.pdf" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_6.imageset\Contents.json" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_7.imageset\onboarding_7.pdf" />
+		<ImageAsset Include="Assets_onboarding.xcassets\onboarding_7.imageset\Contents.json" />
 	</ItemGroup>
 	<ItemGroup>
 		<BundleResource Include="Resources\Base.lproj\Localizable.strings" />
