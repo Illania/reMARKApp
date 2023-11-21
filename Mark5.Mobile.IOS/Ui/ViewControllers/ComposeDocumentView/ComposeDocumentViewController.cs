@@ -670,8 +670,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                 if (source == 5)
                 {
-                    CommonConfig.UsageAnalytics.LogEvent(new ComposeAttachEmailEvent());
-                    await InsertExternalAttachment2();
+                    CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.FolderEml));
+                    await AttachEmlFromFolder();
                 }
 
                 if (ServerConfig.SystemSettings?.SystemInfo?.AttachByReferenceAvailable == true && source == 6)
@@ -711,16 +711,33 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         }
 
-        private async Task InsertExternalAttachment2()
+        private async Task AttachEmlFromFolder()
         {
-            var documentPicker = new DocumentPickerFoldersListViewController();
-            PresentViewController(new NavigationController(documentPicker, UIModalPresentationStyle.PageSheet), true, null);
+            try
+            {
+                var documentPicker = new DocumentPickerFoldersListViewController()
+                {
+                    ModalPresentationStyle = UIModalPresentationStyle.OverCurrentContext,
+                    ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve
+                };
+                PresentViewController(new NavigationController(documentPicker, UIModalPresentationStyle.OverCurrentContext), true, null);
 
-            var document = await documentPicker.Result;
-            if (document == null)
-                return;
+                var documentResult = await documentPicker.Result;
+                if (documentResult == null)
+                    return;
 
-            //attachmentsView.AddAttachmentDescriptions(attachmentDescs);
+                var documentId = documentResult.Id;
+                if (documentId > 0)
+                {
+                    var emlFilePath = await Managers.DocumentsManager.GetDocumentEmlAsync(documentId);
+                    await HandleEmlPath(emlFilePath);
+                }
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Failed to get document eml", ex.InnerException);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
+            }
         }
 
         async Task AttachByReference()
@@ -752,10 +769,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 CommonConfig.Logger.Error($"Failed to get document eml async", ex.InnerException);
                 await Dialogs.ShowErrorAlertAsync(this, ex.InnerException);
             }
-
-
         }
-
 
         async Task HandleEmlPath(string path)
         {

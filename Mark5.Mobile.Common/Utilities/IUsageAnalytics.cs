@@ -43,7 +43,8 @@ namespace Mark5.Mobile.Common.Utilities
         PickPhoto,
         Local,
         External,
-        ReferenceEml
+        ReferenceEml,
+        FolderEml
     }
 
     public enum TemplateType
@@ -348,14 +349,6 @@ namespace Mark5.Mobile.Common.Utilities
     {
         public ComposeInsertTemplateEvent()
             : base(ModuleType.Documents, "compose_insert_template")
-        {
-        }
-    }
-
-    public class ComposeAttachEmailEvent : AnalyticsEvent
-    {
-        public ComposeAttachEmailEvent()
-            : base(ModuleType.Documents, "email_from_folder")
         {
         }
     }
