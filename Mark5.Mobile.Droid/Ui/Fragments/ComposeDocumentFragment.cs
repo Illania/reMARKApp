@@ -299,13 +299,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info($"Paused {nameof(ComposeDocumentFragment)}");
         }
 
-        private async Task AttachByReference(int docId)
+        private async Task AttachDocument(int documentId)
         {
             try
             {
-                if (docId > 0)
+                if (documentId > 0)
                 {
-                    var emlFilePath = await Managers.DocumentsManager.GetDocumentEmlAsync(docId);
+                    var emlFilePath = await Managers.DocumentsManager.GetDocumentEmlAsync(documentId);
                     var emlPathUri = Uri.Parse(emlFilePath);
                     await HandleEmlPath(emlPathUri);
                 }
@@ -325,7 +325,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (requestCode == RequestCodes.AttachByReferenceRequestCode && resultCode == (int)Result.Ok)
             {
                 var docId = Serializer.Deserialize<int>(data.GetStringExtra(SearchByReferenceResultsActivity.SearchByReferenceResultKey));
-                await AttachByReference(docId);
+                await AttachDocument(docId);
             }
 
             if (requestCode == RequestCodes.AttachFromFolderRequestCode
@@ -333,7 +333,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 && data is { Extras: { } } && data.HasExtra(DocumentPickerFoldersListActivity.AttachmentResultKey))
             {
                 var documentId = data.Extras.GetInt(DocumentPickerFoldersListActivity.AttachmentResultKey);
-                await AttachByReference(documentId);
+                await AttachDocument(documentId);
             }
 
             if (requestCode == RequestCodes.RecentAddressesRequestCode && resultCode == (int)Result.Ok)
@@ -399,7 +399,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 Activity?.Finish();
             }
         }
-
 
         async Task RetrieveAndAddShortcode(int shortcodeId, int folderId)
         {
