@@ -317,7 +317,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
         }
 
-
         public override async void OnActivityResult(int requestCode, int resultCode, Intent data)
         {
             if (requestCode == RequestCodes.AttachmentRequestCode && resultCode == (int)Result.Ok)
@@ -327,6 +326,14 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             {
                 var docId = Serializer.Deserialize<int>(data.GetStringExtra(SearchByReferenceResultsActivity.SearchByReferenceResultKey));
                 await AttachByReference(docId);
+            }
+
+            if (requestCode == RequestCodes.AttachFromFolderRequestCode
+                && resultCode == (int)Result.Ok
+                && data is { Extras: { } } && data.HasExtra(DocumentPickerFoldersListActivity.AttachmentResultKey))
+            {
+                var documentId = data.Extras.GetInt(DocumentPickerFoldersListActivity.AttachmentResultKey);
+                await AttachByReference(documentId);
             }
 
             if (requestCode == RequestCodes.RecentAddressesRequestCode && resultCode == (int)Result.Ok)
@@ -541,6 +548,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public const int AttachmentRequestCode = 111;
             public const int RemarkAttachmentRequestCode = 112;
             public const int AttachByReferenceRequestCode = 113;
+            public const int AttachFromFolderRequestCode = 114;
             public const int RecentAddressesRequestCode = 222;
             public const int ContactsRequestCode = 333;
             public const int InternalContactsRequestCode = 334;
@@ -1308,8 +1316,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return true;
         }
 
+        [Obsolete]
         private void AttachEmailFromFolder()
         {
+            StartActivityForResult(DocumentPickerFoldersListActivity.CreateIntent(Context),
+                RequestCodes.AttachFromFolderRequestCode);
         }
 
         void AddAttachmentFromDevice()
