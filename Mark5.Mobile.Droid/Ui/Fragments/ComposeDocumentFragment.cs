@@ -1356,7 +1356,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             public const int InsertTemplate = 10;
             public const int AddAttachment = 20;
-            public const int AttachEmail = 30;
         }
 
         #endregion
