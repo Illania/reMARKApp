@@ -135,7 +135,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             CommonConfig.Logger.Info("Appeared");
 
             RefreshData();
-          
+
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -293,7 +293,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             {
                 sendButtonItem.Clicked += SendButton_Clicked;
             }
-                
+
             toView.AddButtonTapped += RecipientView_AddButtonTapped;
             ccView.AddButtonTapped += RecipientView_AddButtonTapped;
             bccView.AddButtonTapped += RecipientView_AddButtonTapped;
@@ -619,14 +619,15 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         {
             var d = new PopoverPresentationControllerDelegate((UIBarButtonItem)sender);
 
-            if(!Integration.IsiOSApplicationOnMac())
+            if (!Integration.IsiOSApplicationOnMac())
             {
                 var menuItems = new List<string>{
                     Localization.GetString("insert_template"),
                     Localization.GetString("take_photo"),
                     Localization.GetString("existing_photo"),
                     Localization.GetString("browse_files"),
-                    Localization.GetString("browse_external_remark_files")
+                    Localization.GetString("browse_external_remark_files"),
+                    Localization.GetString("email_from_folder")
                 };
 
                 if (ServerConfig.SystemSettings?.SystemInfo?.AttachByReferenceAvailable == true)
@@ -667,12 +668,17 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     await InsertExternalAttachment();
                 }
 
-                if (ServerConfig.SystemSettings?.SystemInfo?.AttachByReferenceAvailable == true && source == 5)
+                if (source == 5)
+                {
+                    CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.FolderEml));
+                    await AttachEmlFromFolder();
+                }
+
+                if (ServerConfig.SystemSettings?.SystemInfo?.AttachByReferenceAvailable == true && source == 6)
                 {
                     CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.ReferenceEml));
                     await AttachByReference();
                 }
-
             }
             else
             {
@@ -705,14 +711,43 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         }
 
+        private async Task AttachEmlFromFolder()
+        {
+            try
+            {
+                var documentPicker = new DocumentPickerFoldersListViewController()
+                {
+                    ModalPresentationStyle = UIModalPresentationStyle.OverCurrentContext,
+                    ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve
+                };
+                PresentViewController(new NavigationController(documentPicker, UIModalPresentationStyle.OverCurrentContext), true, null);
+
+                var documentResult = await documentPicker.Result;
+                if (documentResult == null)
+                    return;
+
+                var documentId = documentResult.Id;
+                if (documentId > 0)
+                {
+                    var emlFilePath = await Managers.DocumentsManager.GetDocumentEmlAsync(documentId);
+                    await HandleEmlPath(emlFilePath);
+                }
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Failed to get document eml", ex.InnerException);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
+            }
+        }
+
         async Task AttachByReference()
         {
             try
             {
                 var vc = new SearchByReferenceViewController()
                 {
-                   ModalPresentationStyle = UIModalPresentationStyle.OverCurrentContext,
-                   ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve
+                    ModalPresentationStyle = UIModalPresentationStyle.OverCurrentContext,
+                    ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve
                 };
                 PresentViewController(vc, false, null);
                 var docId = await vc.Result;
@@ -720,12 +755,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 if (docId > 0)
                 {
                     var emlFilePath = await Managers.DocumentsManager.GetDocumentEmlAsync(docId);
-                    await HandleEmlPath(emlFilePath);             
+                    await HandleEmlPath(emlFilePath);
                 }
 
                 DismissModalViewController(false);
             }
-            catch (OperationCanceledException) {
+            catch (OperationCanceledException)
+            {
                 DismissModalViewController(false);
             }
             catch (Exception ex)
@@ -733,10 +769,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 CommonConfig.Logger.Error($"Failed to get document eml async", ex.InnerException);
                 await Dialogs.ShowErrorAlertAsync(this, ex.InnerException);
             }
-
-
         }
-
 
         async Task HandleEmlPath(string path)
         {
@@ -745,7 +778,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             var url = new NSUrl(path);
             try
             {
-                   
+
                 var fileName = url.LastPathComponent;
                 stream = new FileStream(path, FileMode.Open, FileAccess.Read);
                 var result = url.TryGetResource(NSUrl.FileSizeKey, out NSObject sizeObject, out NSError _error);
@@ -782,7 +815,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             finally
             {
                 stream?.Dispose();
-                
+
             }
 
         }
@@ -791,7 +824,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         void SendButton_Clicked(object sender, EventArgs e)
         {
             var useSendingDelay = PlatformConfig.Preferences.SendingDelay > 0;
-            SendButtonItem_Clicked(sender, new SendButtonClickedEventArgs() { Delayed = useSendingDelay , UsePicker = !useSendingDelay});
+            SendButtonItem_Clicked(sender, new SendButtonClickedEventArgs() { Delayed = useSendingDelay, UsePicker = !useSendingDelay });
         }
 
         void SendButton_TouchUpInside(object sender, EventArgs e)
@@ -806,7 +839,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         }
 
         async void SendButtonItem_Clicked(object sender, EventArgs e)
-        {          
+        {
             if (autoSaveWorkingCopyWorker != null)
             {
                 autoSaveWorkingCopyWorker.Stop();
@@ -827,7 +860,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             if (!sent)
                 return;
 
-            DismissViewController(true, null); 
+            DismissViewController(true, null);
         }
 
         async Task ShowFileToFolderMenu(object sender)
@@ -847,7 +880,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             if (source == 0)
             {
                 FileToFolderParameters.FileToFolderType = FileToFolderType.CopyToFolder;
-                FileToFolderParameters.FileToFolderId = await this.CopyToFolderAsync(documentPreview, true); 
+                FileToFolderParameters.FileToFolderId = await this.CopyToFolderAsync(documentPreview, true);
             }
 
             if (source == 1)
@@ -974,12 +1007,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             try
             {
                 string path = null;
-                if(!Integration.IsIPad())
+                if (!Integration.IsIPad())
                 {
 
                     if (e.AttachmentDescription != null)
                     {
-             
+
                         path = e.AttachmentDescription.DocumentId == -1
                            ? await Managers.DocumentsManager.GetAttachmentAsync(e.AttachmentDescription, previousDocument, false, SourceType.Local)
                            : await Managers.DocumentsManager.GetAttachmentAsync(e.AttachmentDescription, e.AttachmentDescription.DocumentId, false,
@@ -1022,7 +1055,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             {
                 CommonConfig.Logger.Error($"Failed to view attachment [document.Id={document.Id}, previousDocumentId={previousDocument?.Id}, " +
                     $"e.AttachmentDescription.Name={e.AttachmentDescription?.Name}, e.FileDescription.Name={e.FileDescription?.Name}]", ex);
-                
+
                 dismissAction();
                 await Dialogs.ShowErrorAlertAsync(this, ex);
             }
@@ -1112,7 +1145,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 {
                     var sendingDelay = PlatformConfig.Preferences.SendingDelay;
                     pickedDateTime = pickedDateTime.AddSeconds(sendingDelay);
-                }  
+                }
                 else
                     pickedDateTime = await GetDelaySendDateTimeFromPicker(sender);
 
@@ -1163,7 +1196,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                 pickedDateTime = await cd.Result;
             }
-            if(choice == -1)
+            if (choice == -1)
             {
                 return DateTime.MinValue;
             }
@@ -1174,7 +1207,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
         async Task<bool> SaveAndQueueWorkingCopy(long timestamp = -1)
         {
-            
+
             var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("sending_document___"));
 
             try
@@ -1433,7 +1466,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             var pa = await vc.Result;
             if (pa != null)
                 recipientsView.AddRecipent(pa.Name, pa.Address);
-            
+
         }
 
         async Task DoOpenInternalContacts(RecipientsView recipientsView)
@@ -1485,7 +1518,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 {
                     picker.PopoverPresentationController.Delegate = d;
                     picker.PopoverPresentationController.BarButtonItem = sender;
-                   
+
                 }
                 PresentViewController(picker, true, null);
             }
@@ -1493,7 +1526,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             {
                 await Dialogs.ShowConfirmAlertAsync(this, Localization.GetString("warning"), Localization.GetString("camera_not_available"));
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 CommonConfig.Logger.Error("Error happened when opening 'Insert new photo' dialog.", ex);
             }
@@ -1549,11 +1582,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 }
                 PresentViewController(picker, true, null);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 CommonConfig.Logger.Error("Error happened when opening 'Add existing photo' dialog.", ex);
             }
-          
+
         }
 
 
@@ -1601,7 +1634,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
                     stream = new FileStream(url.Path, FileMode.Open, FileAccess.Read);
                     var result = url.TryGetResource(NSUrl.FileSizeKey, out NSObject sizeObject, out NSError _error);
-                    
+
                     if (!result)
                         throw new Exception(_error.ToString());
 
@@ -1862,7 +1895,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             }
         }
 
-        public class SendButtonClickedEventArgs: EventArgs
+        public class SendButtonClickedEventArgs : EventArgs
         {
             public bool Delayed { get; set; }
             public bool UsePicker { get; set; } = true;

@@ -631,6 +631,10 @@
     <Compile Include="Mark5Application.cs" />
     <Compile Include="PlatformConfig.cs" />
     <Compile Include="Model\PushNotification.cs" />
+    <Compile Include="Ui\Activities\DocumentPickerFoldersListActivity.cs" />
+    <Compile Include="Ui\Activities\DocumentPickerListActivity.cs" />
+    <Compile Include="Ui\Fragments\DocumentPickerFoldersListFragment.cs" />
+    <Compile Include="Ui\Fragments\DocumentPickerListFragment.cs" />
     <Compile Include="Utilities\Conversion.cs" />
     <Compile Include="Utilities\DateTimeFormatter.cs" />
     <Compile Include="Utilities\DeviceInfoProvider.cs" />
