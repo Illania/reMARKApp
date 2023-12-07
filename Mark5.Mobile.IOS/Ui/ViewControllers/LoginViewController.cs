@@ -602,7 +602,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
                 //We assume that all the connection details are correct (no need to validate or confirm hostname, port, SSL)
                 var azureUserId = azureUser.Id;
-                var hostname = endpointInfo.Hostname;
+                var hostname = endpointInfo.Hostname.Trim();
                 var port = endpointInfo.Port > 0 ? endpointInfo.Port.ToString() : string.Empty;
                 var sslMode = endpointInfo.UseSsl ? SslMode.On : SslMode.Off;
 
