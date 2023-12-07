@@ -30,7 +30,7 @@
 		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
 		<LangVersion>9.0</LangVersion>
 		<CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
-		<CodesignProvision>remark mobile dev</CodesignProvision>
+		<CodesignProvision>reMark mobile Dev</CodesignProvision>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
 		<DebugType>none</DebugType>
@@ -64,7 +64,7 @@
 		<RunCodeAnalysis>true</RunCodeAnalysis>
 		<MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
 		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
-		<CodesignProvision>remark mobile dev</CodesignProvision>
+		<CodesignProvision>reMark mobile Dev</CodesignProvision>
 		<LangVersion>9.0</LangVersion>
 		<MtouchLink>None</MtouchLink>
 		<CodesignKey>Apple Development: Lars Hansen (TUYUES9KMZ)</CodesignKey>

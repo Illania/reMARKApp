@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
 using Contacts;
+using CoreFoundation;
 using Foundation;
 using Mark5.Mobile.IOS.Common;
 using Mark5.Mobile.IOS.Common.ShareExtension;
+using ObjCRuntime;
 using Social;
 using UIKit;
 using ContentType = MobileCoreServices.UTType;
@@ -25,118 +29,120 @@ namespace reMARK.Mobile.IOS.Extensions.Share
             // Release any cached data, images, etc that aren't in use.
         }
 
-        public override async void ViewDidLoad()
+
+        public override void ViewDidAppear(bool animated)
         {
-            base.ViewDidLoad();
             List<string> attachmentList = new();
-            
-            var attachments = (ExtensionContext?.InputItems[0])?.Attachments;
+            var alertView = UIAlertController.Create("Sharing to reMARK..", " ", UIAlertControllerStyle.Alert);
 
-            foreach (var provider in attachments)
+            PresentViewController(alertView, true, async () =>
             {
-                if (provider.HasItemConformingTo(ContentType.VCard))
-                {
-                    var result = await provider.LoadItemAsync(ContentType.VCard, null);
+                var group = new DispatchGroup();
+                var attachments = (ExtensionContext?.InputItems[0])?.Attachments;
 
-                    if (result is NSObject contactData)
+                foreach (var provider in attachments)
+                {
+                    group.Enter();
+
+                    if (provider.HasItemConformingTo(ContentType.VCard))
                     {
-                        try
+                        var result = await provider.LoadItemAsync(ContentType.VCard, null);
+
+                        if (result is NSObject contactData)
                         {
-                            var nsData = (NSData)contactData;
-                            var contact = CNContactVCardSerialization.GetContactsFromData(nsData, out _);
+                            try
+                            {
+                                var nsData = (NSData)contactData;
+                                var contact = CNContactVCardSerialization.GetContactsFromData(nsData, out _);
+
+                                using (var containerUrl = NSFileManager.DefaultManager.GetContainerUrl(ShareExtensionContainerUtilities.AppGroupId))
+                                {
+                                    var sharedFileUrl = containerUrl.Append("contacts", false).AppendPathExtension("vcf");
+
+                                    nsData.Save(sharedFileUrl, true, out var error);
+
+                                    if (error != null)
+                                        ShareExtensionErrorLogger.WriteToLog(error.GetDebugDescription(), new NSErrorException(error));
+                                    else
+                                        attachmentList.Add(sharedFileUrl.Path);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                ShareExtensionErrorLogger.WriteToLog("Error while sharing contact vcard", ex);
+                                continue;
+                            }
+
+                        }
+                    }
+
+                    if (provider.HasItemConformingTo(ContentType.Image) || provider.HasItemConformingTo(ContentType.FileURL))
+                    {
+                        var contentType = provider.HasItemConformingTo(ContentType.Image) ? ContentType.Image : ContentType.FileURL;
+
+                        var data = await provider.LoadItemAsync(contentType, null);
+
+                        if (data is NSObject dataObject)
+                        {
+                            var fileUrl = (NSUrl)dataObject;
+                            var fileData = NSData.FromUrl(fileUrl);
+                            var fileName = fileUrl.LastPathComponent;
+                            var urlEncodedFileName = Uri.EscapeDataString(fileName);
 
                             using (var containerUrl = NSFileManager.DefaultManager.GetContainerUrl(ShareExtensionContainerUtilities.AppGroupId))
                             {
-
-                                var sharedFolder = containerUrl.Append($"Library", true).Append("Caches", true);
-
-                                if (!NSFileManager.DefaultManager.FileExists(sharedFolder.AbsoluteString))
-                                    NSFileManager.DefaultManager.CreateDirectory(sharedFolder.AbsoluteString, true, new NSFileAttributes());
-
-                                var sharedFileUrl = sharedFolder.Append("contacts", false).AppendPathExtension("vcf");
-
-                                nsData.Save(sharedFileUrl, true, out var error);
-
+                                var sharedFileUrl = containerUrl.Append(fileName, false);
+                                fileData.Save(sharedFileUrl, true, out var error);
                                 if (error != null)
                                     ShareExtensionErrorLogger.WriteToLog(error.GetDebugDescription(), new NSErrorException(error));
-
-                                attachmentList.Add(sharedFileUrl.Path);
+                                else
+                                    attachmentList.Add(sharedFileUrl.AbsoluteString);
                             }
                         }
-                        catch (Exception ex)
-                        {
-                            ShareExtensionErrorLogger.WriteToLog("Error while sharing contact vcard", ex);
-                            continue;
-                        }
-
                     }
-                }
 
-                //for images and files
-                if (provider.HasItemConformingTo(ContentType.Image) || provider.HasItemConformingTo(ContentType.URL))
-                {
-                        var contentType = provider.HasItemConformingTo(ContentType.Image) ? ContentType.Image : ContentType.URL;
-
-                        var result = await provider.LoadItemAsync(contentType, null);
+                    if (provider.HasItemConformingTo(ContentType.Text))
+                    {
+                        var result = await provider.LoadItemAsync(ContentType.Text, null);
 
                         if (result is NSObject dataObject)
                         {
 
-                            var fileUrl = (NSUrl)dataObject;
-                            var fileData = NSData.FromUrl(fileUrl);
-                            var fileName = fileUrl.LastPathComponent;
-                         
+                            var mutableString = (NSMutableString)dataObject;
+
                             using (var containerUrl = NSFileManager.DefaultManager.GetContainerUrl(ShareExtensionContainerUtilities.AppGroupId))
                             {
+                                var sharedFileUrl = containerUrl.Append("text", false).AppendPathExtension("txt");
 
-                                var sharedFolder = containerUrl.Append($"Library", true).Append("Caches", true);
+                                File.WriteAllText(sharedFileUrl.Path, mutableString.ToString());
 
-                                if (!NSFileManager.DefaultManager.FileExists(sharedFolder.AbsoluteString))
-                                    NSFileManager.DefaultManager.CreateDirectory(sharedFolder.AbsoluteString, true, new NSFileAttributes());
-                               
-                                var sharedFileUrl = sharedFolder.Append(fileName, false);
-
-                                fileData.Save(sharedFileUrl, true, out var error);
-
-                                if (error != null)
-                                    ShareExtensionErrorLogger.WriteToLog(error.GetDebugDescription(), new NSErrorException(error));
-                                  
-                                attachmentList.Add(sharedFileUrl.Path);
+                                UIApplication.SharedApplication.OpenUrl(NSUrl.FromString($"remark.share.text://{sharedFileUrl.Path}"));
                             }
                         }
                     }
-           
-                if (provider.HasItemConformingTo(ContentType.Text))
+
+                    group.Leave();
+                }
+
+                group.Notify(DispatchQueue.MainQueue, () =>
                 {
-                    var result = await provider.LoadItemAsync(ContentType.Text, null);
-
-                    if (result is NSObject dataObject)
+                    try
                     {
-
-                        var mutableString = (NSMutableString)dataObject;
-
-                        using (var containerUrl = NSFileManager.DefaultManager.GetContainerUrl(ShareExtensionContainerUtilities.AppGroupId))
-                        {
-
-                            var sharedFolder = containerUrl.Append($"Library", true).Append("Caches", true);
-
-                            if (!NSFileManager.DefaultManager.FileExists(sharedFolder.AbsoluteString))
-                                NSFileManager.DefaultManager.CreateDirectory(sharedFolder.AbsoluteString, true, new NSFileAttributes());
-
-                            var sharedFileUrl = sharedFolder.Append("text", false).AppendPathExtension("txt");
-
-                            File.WriteAllText(sharedFileUrl.Path, mutableString.ToString());
-
-                            UIApplication.SharedApplication.OpenUrl(NSUrl.FromString($"remark.share.text://{sharedFileUrl.Path}"));
-                        }
+                        var pathString = string.Join(';', attachmentList);
+                        var url = NSUrl.FromString($"remark.share.url://{pathString}");
+                        UIApplication.SharedApplication.OpenUrl(url);
                     }
-                }
-                }
-            
-               var pathString = string.Join(';', attachmentList);
-               UIApplication.SharedApplication.OpenUrl(NSUrl.FromString($"remark.share.url://{pathString}"));
+                    catch (Exception e)
+                    {
+                        alertView.Message = $"Error: {e.Message}";
+                    }
+                    DismissViewController(false, async () =>
+                    {
+                        await ExtensionContext.CompleteRequestAsync(null);
+                    });
+                });
 
-               await ExtensionContext.CompleteRequestAsync(null);
+            });
         }
 
         public override bool IsContentValid()

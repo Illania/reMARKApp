@@ -29,7 +29,7 @@
             extensionItems, $extensionItem,
             SUBQUERY (
             $extensionItem.attachments, $attachment,
-            ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO &quot;public.url&quot; ||
+            ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO &quot;public.file-url&quot; ||
             ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO &quot;public.text&quot; ||
             ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO &quot;public.vcard&quot; ||
             ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO &quot;public.image&quot; 

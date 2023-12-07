@@ -138,7 +138,7 @@ namespace Mark5.Mobile.IOS
                         
                         foreach (var path in pathArray)
                         {
-                            urlList.Add(NSUrl.FromFilename(path));
+                            urlList.Add(NSUrl.FromString(path));
                         }
 
                     }

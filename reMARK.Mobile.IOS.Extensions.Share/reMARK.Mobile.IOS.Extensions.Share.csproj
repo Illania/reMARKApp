@@ -33,6 +33,8 @@
     <Commandlineparameters></Commandlineparameters>
     <LangVersion>default</LangVersion>
     <!--<CodesignProvision>match Development com.nordic-it.mark5.mobile.ios.share</CodesignProvision>-->
+    <CodesignProvision>reMark Share Dev</CodesignProvision>
+    <CodesignKey>Apple Development: Lars Hansen (TUYUES9KMZ)</CodesignKey>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
     <Optimize>true</Optimize>
@@ -89,6 +91,8 @@
     <!--<CodesignProvision>match Development com.nordic-it.mark5.mobile.ios.share</CodesignProvision>-->
     <LangVersion>default</LangVersion>
     <MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
+    <CodesignProvision>reMark Share Dev</CodesignProvision>
+    <CodesignKey>iPhone Developer</CodesignKey>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
