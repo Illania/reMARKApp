@@ -51,6 +51,7 @@
 "cancel" = "Cancel";
 "cancel_send" = "Cancel send";
 "cancelled" = "Cancelled";
+"cannot_copy_or_move_to_dynamic_folder" = "Cannot copy or move to dynamic folder.";
 "cannot_mail_report_content" = "There are no mail accounts configured on your device. You need to have an account configured before you can send feedback.";
 "cannot_mail_report_title" = "Cannot send report";
 "cannot_open_attachment_content" = "There is no app installed that can open this file.";
@@ -114,7 +115,6 @@
 "copying___" = "Copying...";
 "copying_to_own_worktray___" = "Copying to own To-do list...";
 "copying_to_worktray___" = "Copying to To-do list...";
-"can_not_copy_or_move_to_dynamic_folder" = "Cannot copy or move to dynamic folder.";
 "create_appointment" = "Create appointment";
 "creating_appointment___" = "Creating appointment...";
 "create_report" = "Create report";

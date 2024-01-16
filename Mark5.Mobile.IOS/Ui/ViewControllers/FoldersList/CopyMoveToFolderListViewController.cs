@@ -88,13 +88,13 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         protected override async void FolderSelected(Folder folder, bool isFromFavorite)
         {
-            if (folder.InternalType != FolderInternalType.FilterView &&
-                folder.InternalType != FolderInternalType.Static
+            if (folder.InternalType != FolderInternalType.FilterView
+                && folder.InternalType != FolderInternalType.Static
                 && folder.InternalType != FolderInternalType.Worktray)
             {
                 await Dialogs.ShowConfirmAlertAsync(this,
                     Localization.GetString("failed"),
-                    Localization.GetString("can_not_copy_or_move_to_dynamic_folder"));
+                    Localization.GetString("cannot_copy_or_move_to_dynamic_folder"));
                 return;
             }
 

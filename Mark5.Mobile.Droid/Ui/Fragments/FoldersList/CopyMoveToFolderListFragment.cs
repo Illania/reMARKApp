@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -121,10 +121,20 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (position < 0)
                 return;
 
-            
+
             var toFolder = CurrentAdapter.GetItemAtPosition(position).Folder;
 
-            if(delayedCopy == false)
+            if (toFolder.InternalType != FolderInternalType.FilterView
+                && toFolder.InternalType != FolderInternalType.Static
+                && toFolder.InternalType != FolderInternalType.Worktray)
+            {
+                await Dialogs.ShowConfirmDialogAsync(Context,
+                    Resource.String.failed,
+                    Resource.String.cannot_copy_or_move_to_dynamic_folder);
+                return;
+            }
+
+            if (delayedCopy == false)
             {
                 if (actionType == ActionType.Copy)
                     await CopyBusinessEntityToFolder(toFolder);
@@ -139,8 +149,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 Activity.SetResult(Android.App.Result.Ok, data);
                 dismissAction();
                 Activity?.Finish();
-                
-            }  
+
+            }
         }
 
         protected override void Adapter_ItemLongClicked(object sender, int position)
