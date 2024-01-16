@@ -114,6 +114,7 @@
 "copying___" = "Copying...";
 "copying_to_own_worktray___" = "Copying to own To-do list...";
 "copying_to_worktray___" = "Copying to To-do list...";
+"can_not_copy_or_move_to_dynamic_folder" = "Cannot copy or move to dynamic folder.";
 "create_appointment" = "Create appointment";
 "creating_appointment___" = "Creating appointment...";
 "create_report" = "Create report";

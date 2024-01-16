@@ -88,6 +88,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
         protected override async void FolderSelected(Folder folder, bool isFromFavorite)
         {
+            if (folder.InternalType != FolderInternalType.FilterView &&
+                folder.InternalType != FolderInternalType.Static
+                && folder.InternalType != FolderInternalType.Worktray)
+            {
+                await Dialogs.ShowConfirmAlertAsync(this,
+                    Localization.GetString("failed"),
+                    Localization.GetString("can_not_copy_or_move_to_dynamic_folder"));
+                return;
+            }
+
             if (delayedCopy == true)
             {
                 tcs.SetResult(folder.Id);
@@ -102,12 +112,12 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
 
             if (TableView?.IndexPathForSelectedRow != null)
                 TableView.DeselectRow(TableView.IndexPathForSelectedRow, true);
-            if(done)
+            if (done)
             {
                 tcs.TrySetResult(folder.Id);
                 DismissViewController(true, null);
             }
-                
+
         }
 
         protected async override Task FolderExpand(Folder folder)
@@ -123,9 +133,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList
         protected override bool ShouldDisableFolder(Folder folder)
         {
             if (folder.Local)
-                return true;
-
-            if (folder.InternalType != FolderInternalType.FilterView && folder.InternalType != FolderInternalType.Static && folder.InternalType != FolderInternalType.Worktray)
                 return true;
 
             return false;
