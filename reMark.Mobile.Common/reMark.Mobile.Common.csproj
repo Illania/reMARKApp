@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net7.0;net7.0-android;net7.0-ios</TargetFrameworks>
+		<UseMaui>true</UseMaui>
+		<SingleProject>true</SingleProject>
+		<ImplicitUsings>enable</ImplicitUsings>
+
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">14.2</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-ios|AnyCPU'">
+	  <CreatePackage>false</CreatePackage>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-ios|AnyCPU'">
+	  <CreatePackage>false</CreatePackage>
+	</PropertyGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\reMark.Mobile.Classes\reMark.Mobile.Classes.csproj">
+	    <ReferenceSourceTarget></ReferenceSourceTarget>
+	  </ProjectReference>
+	  <ProjectReference Include="..\reMark.ServiceReference.Exceptions\reMark.ServiceReference.Exceptions.csproj">
+	    <ReferenceSourceTarget></ReferenceSourceTarget>
+	  </ProjectReference>
+	  <ProjectReference Include="..\reMark.ServiceReference\reMark.ServiceReference.csproj">
+	    <ReferenceSourceTarget></ReferenceSourceTarget>
+	  </ProjectReference>
+	  <ProjectReference Include="..\TinyMessenger\TinyMessenger.csproj">
+	    <ReferenceSourceTarget></ReferenceSourceTarget>
+	  </ProjectReference>
+	</ItemGroup>
+	<ItemGroup>
+	  <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+	  <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+	  <PackageReference Include="Polly" Version="8.2.1" />
+	  <PackageReference Include="sqlite-net-pcl" Version="1.8.116" />
+	  <PackageReference Include="Sentry" Version="3.41.3" />
+	  <PackageReference Include="Sentry.Extensions.Logging" Version="3.41.3" />
+	  <PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.7" />
+	</ItemGroup>
+</Project>

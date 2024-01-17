@@ -1,0 +1,30 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace reMark.Mobile.Common.Utilities
+{
+    public class LambdaEqualityComparer<T> : IEqualityComparer<T>
+    {
+        public static LambdaEqualityComparer<T> Create(Func<T, object> func)
+        {
+            return new LambdaEqualityComparer<T>(func);
+        }
+
+        readonly Func<T, object> func;
+
+        LambdaEqualityComparer(Func<T, object> func)
+        {
+            this.func = func;
+        }
+
+        public bool Equals(T x, T y)
+        {
+            return func(x).Equals(func(y));
+        }
+
+        public int GetHashCode(T obj)
+        {
+            return func(obj).GetHashCode();
+        }
+    }
+}

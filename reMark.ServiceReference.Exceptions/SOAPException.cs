@@ -1,0 +1,21 @@
+﻿using System;
+
+namespace reMark.ServiceReference.Exceptions
+{
+    public class SOAPException : Exception
+    {
+        public SOAPException()
+        {
+        }
+
+        public SOAPException(string message)
+            : base(message)
+        {
+        }
+
+        public SOAPException(string message, Exception innerException)
+            : base(message, innerException)
+        {
+        }
+    }
+}

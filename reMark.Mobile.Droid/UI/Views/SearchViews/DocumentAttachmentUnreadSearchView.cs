@@ -1,0 +1,32 @@
+using System;
+using reMark.Mobile.Common.Model;
+
+namespace reMark.Mobile.Droid.Ui.Views.SearchViews
+{
+    public class DocumentAttachmentUnreadSearchView : AbstractButtonsSearchView<SearchDocumentsCriteria>
+    {
+        readonly CustomButton withAttachmentsButton;
+        readonly CustomButton unreadEmailsButton;
+
+        public DocumentAttachmentUnreadSearchView(Android.Content.Context context)
+            : base(context)
+        {
+            withAttachmentsButton = new CustomButton(context, Resource.String.search_document_with_attachments);
+            unreadEmailsButton = new CustomButton(context, Resource.String.search_document_unread);
+
+            AddButtons(withAttachmentsButton, unreadEmailsButton);
+        }
+
+        public override void Refresh()
+        {
+            withAttachmentsButton.UpdateSelectedState(Criteria.HavingAttachmentsOnly);
+            unreadEmailsButton.UpdateSelectedState(Criteria.UnreadOnly);
+        }
+
+        public override void UpdateCriteria()
+        {
+            Criteria.HavingAttachmentsOnly = withAttachmentsButton.Selected;
+            Criteria.UnreadOnly = unreadEmailsButton.Selected;
+        }
+    }
+}

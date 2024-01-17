@@ -1,12 +1,10 @@
-﻿using System;
-using Foundation;
+﻿using System.Diagnostics;
+using System.Text;
 
 namespace reMARK.Mobile.IOS.Extensions
 {
     public class ErrorLogger
     {
-        public ErrorLogger()
-        {
             readonly object logFileLock = new object();
             readonly string logPath;
             readonly string logFilePath;
@@ -57,6 +55,5 @@ namespace reMARK.Mobile.IOS.Extensions
                 }
             }
 
-        }
     }
 }

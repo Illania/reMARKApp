@@ -1,0 +1,552 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net7.0-ios</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>true</ImplicitUsings>
+    <SupportedOSPlatformVersion>13.0</SupportedOSPlatformVersion>
+    <UseMaui>true</UseMaui>
+    <Platforms>AnyCPU;iPhoneSimulator;iPhone</Platforms>
+  </PropertyGroup>
+  <PropertyGroup>
+		<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+		<Platform Condition=" '$(Platform)' == '' ">iPhoneSimulator</Platform>
+		<ProjectGuid>{3FB59A6F-9438-433D-A3BA-247D914A06AE}</ProjectGuid>
+		<ProjectTypeGuids>{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+		<OutputType>Exe</OutputType>
+	  <RootNamespace>reMark.Mobile.IOS</RootNamespace>
+		<AssemblyName>reMark.Mobile.IOS</AssemblyName>
+    <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
+		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+	</PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
+		<DebugSymbols>true</DebugSymbols>
+		<DebugType>full</DebugType>
+		<Optimize>false</Optimize>
+		<OutputPath>bin\iPhoneSimulator\Debug</OutputPath>
+		<DefineConstants>__IOS__;__MOBILE__;__UNIFIED__;DEBUG;</DefineConstants>
+		<ErrorReport>prompt</ErrorReport>
+		<WarningLevel>4</WarningLevel>
+		<ConsolePause>false</ConsolePause>
+		<RunCodeAnalysis>true</RunCodeAnalysis>
+		<CodesignKey>Apple Development: Lars Hansen (TUYUES9KMZ)</CodesignKey>
+		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
+		<LangVersion>10.0</LangVersion>
+		<CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
+		<CodesignProvision>Automatic</CodesignProvision>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
+		<DebugType>none</DebugType>
+		<Optimize>true</Optimize>
+		<OutputPath>bin\iPhoneSimulator\Release</OutputPath>
+		<ErrorReport>prompt</ErrorReport>
+		<WarningLevel>4</WarningLevel>
+		<ConsolePause>false</ConsolePause>
+    <CopyAppBundle>true</CopyAppBundle>
+		<RunCodeAnalysis>true</RunCodeAnalysis>
+		<CodesignProvision>Mark5Mobile Distribution 2023</CodesignProvision>
+		<CodesignKey>Apple Distribution: Nordic IT Europe ApS (5Q7TTRG4M4)</CodesignKey>
+		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
+		<LangVersion>10.0</LangVersion>
+		<CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
+	</PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
+		<DebugSymbols>true</DebugSymbols>
+		<DebugType>full</DebugType>
+		<Optimize>false</Optimize>
+		<OutputPath>bin\iPhone\Debug</OutputPath>
+		<DefineConstants>DEBUG</DefineConstants>
+		<ErrorReport>prompt</ErrorReport>
+		<WarningLevel>4</WarningLevel>
+		<ConsolePause>false</ConsolePause>
+		<CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
+		<CodesignKey>Apple Development: Lars Hansen (TUYUES9KMZ)</CodesignKey>
+		<RunCodeAnalysis>true</RunCodeAnalysis>
+    <MtouchArch>ARM64</MtouchArch>
+		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
+		<CodesignProvision>match Development com.nordic-it.mark5.mobile.ios</CodesignProvision>
+		<LangVersion>9.0</LangVersion>
+		<MtouchLink>None</MtouchLink>
+	</PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
+		<DebugType>none</DebugType>
+		<Optimize>true</Optimize>
+		<OutputPath>bin\iPhone\Release</OutputPath>
+		<ErrorReport>prompt</ErrorReport>
+		<WarningLevel>4</WarningLevel>
+		<CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
+		<MtouchArch>ARM64</MtouchArch>
+		<ConsolePause>false</ConsolePause>
+		<CodesignKey>Apple Distribution: Nordic IT Europe ApS (5Q7TTRG4M4)</CodesignKey>
+		<RunCodeAnalysis>true</RunCodeAnalysis>
+		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
+		<LangVersion>9.0</LangVersion>
+		<MtouchLink>SdkOnly</MtouchLink>
+		<CodesignProvision>Mark5Mobile Distribution 2023</CodesignProvision>
+	</PropertyGroup>
+  <ItemGroup>
+    <None Remove="Resources\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ImageAsset Update="Assets_icons.xcassets\Folderslist-Worktray.imageset\worktray%402x.png">
+      <Link>Assets_icons.xcassets\Folderslist-Worktray.imageset\worktray%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Folderslist-Worktray.imageset\worktray%403x.png">
+      <Link>Assets_icons.xcassets\Folderslist-Worktray.imageset\worktray%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Email-Large.imageset\large_email%403x.png">
+      <Link>Assets_icons.xcassets\Email-Large.imageset\large_email%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Email-Large.imageset\large_email%402x.png">
+      <Link>Assets_icons.xcassets\Email-Large.imageset\large_email%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Message.imageset\message%403x.png">
+      <Link>Assets_icons.xcassets\Message.imageset\message%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Message.imageset\message%402x.png">
+      <Link>Assets_icons.xcassets\Message.imageset\message%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Mark-As-Read.imageset\markasread%402x.png">
+      <Link>Assets_icons.xcassets\Mark-As-Read.imageset\markasread%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Mark-As-Read.imageset\markasread%403x.png">
+      <Link>Assets_icons.xcassets\Mark-As-Read.imageset\markasread%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Message-Small.imageset\message-small%403x.png">
+      <Link>Assets_icons.xcassets\Message-Small.imageset\message-small%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Message-Small.imageset\message-small%402x.png">
+      <Link>Assets_icons.xcassets\Message-Small.imageset\message-small%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Settings-Filled.imageset\settings-filled%403x.png">
+      <Link>Assets_icons.xcassets\Settings-Filled.imageset\settings-filled%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Settings-Filled.imageset\settings-filled%402x.png">
+      <Link>Assets_icons.xcassets\Settings-Filled.imageset\settings-filled%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Nav-calendar.imageset\Nav-calendar%403x.png">
+      <Link>Assets_icons.xcassets\Nav-calendar.imageset\Nav-calendar%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Nav-calendar.imageset\Nav-calendar%402x.png">
+      <Link>Assets_icons.xcassets\Nav-calendar.imageset\Nav-calendar%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Folderslist-Folder.imageset\folder%402x.png">
+      <Link>Assets_icons.xcassets\Folderslist-Folder.imageset\folder%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Folderslist-Folder.imageset\folder%403x.png">
+      <Link>Assets_icons.xcassets\Folderslist-Folder.imageset\folder%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Warning.imageset\warning%402x.png">
+      <Link>Assets_icons.xcassets\Warning.imageset\warning%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Warning.imageset\warning%403x.png">
+      <Link>Assets_icons.xcassets\Warning.imageset\warning%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Attachment-Small.imageset\attachment-small%403x.png">
+      <Link>Assets_icons.xcassets\Attachment-Small.imageset\attachment-small%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Attachment-Small.imageset\attachment-small%402x.png">
+      <Link>Assets_icons.xcassets\Attachment-Small.imageset\attachment-small%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Folderslist-Draft.imageset\draft%402x.png">
+      <Link>Assets_icons.xcassets\Folderslist-Draft.imageset\draft%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Folderslist-Draft.imageset\draft%403x.png">
+      <Link>Assets_icons.xcassets\Folderslist-Draft.imageset\draft%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Done.imageset\done%402x.png">
+      <Link>Assets_icons.xcassets\Done.imageset\done%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Done.imageset\done%403x.png">
+      <Link>Assets_icons.xcassets\Done.imageset\done%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Flag.imageset\flag%403x.png">
+      <Link>Assets_icons.xcassets\Flag.imageset\flag%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Flag.imageset\flag%402x.png">
+      <Link>Assets_icons.xcassets\Flag.imageset\flag%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Shortcodes.imageset\shortcodes%403x.png">
+      <Link>Assets_icons.xcassets\Shortcodes.imageset\shortcodes%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Shortcodes.imageset\shortcodes%402x.png">
+      <Link>Assets_icons.xcassets\Shortcodes.imageset\shortcodes%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Email.imageset\email%403x.png">
+      <Link>Assets_icons.xcassets\Email.imageset\email%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Email.imageset\email%402x.png">
+      <Link>Assets_icons.xcassets\Email.imageset\email%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Shortcodes-Filled.imageset\shortcodes-filled%403x.png">
+      <Link>Assets_icons.xcassets\Shortcodes-Filled.imageset\shortcodes-filled%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Shortcodes-Filled.imageset\shortcodes-filled%402x.png">
+      <Link>Assets_icons.xcassets\Shortcodes-Filled.imageset\shortcodes-filled%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Attachment.imageset\attachment%402x.png">
+      <Link>Assets_icons.xcassets\Attachment.imageset\attachment%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Attachment.imageset\attachment%403x.png">
+      <Link>Assets_icons.xcassets\Attachment.imageset\attachment%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Bin.imageset\bin%403x.png">
+      <Link>Assets_icons.xcassets\Bin.imageset\bin%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Bin.imageset\bin%402x.png">
+      <Link>Assets_icons.xcassets\Bin.imageset\bin%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Sms-Large.imageset\large_sms%402x.png">
+      <Link>Assets_icons.xcassets\Sms-Large.imageset\large_sms%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Sms-Large.imageset\large_sms%403x.png">
+      <Link>Assets_icons.xcassets\Sms-Large.imageset\large_sms%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\SelectAll.imageset\selectAll%402x.png">
+      <Link>Assets_icons.xcassets\SelectAll.imageset\selectAll%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\SelectAll.imageset\selectAll%403x.png">
+      <Link>Assets_icons.xcassets\SelectAll.imageset\selectAll%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Contacts.imageset\contacts%402x.png">
+      <Link>Assets_icons.xcassets\Contacts.imageset\contacts%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Contacts.imageset\contacts%403x.png">
+      <Link>Assets_icons.xcassets\Contacts.imageset\contacts%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Worktray.imageset\worktray%402x.png">
+      <Link>Assets_icons.xcassets\Worktray.imageset\worktray%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Worktray.imageset\worktray%403x.png">
+      <Link>Assets_icons.xcassets\Worktray.imageset\worktray%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Search-Large.imageset\search_large%403x.png">
+      <Link>Assets_icons.xcassets\Search-Large.imageset\search_large%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Search-Large.imageset\search_large%402x.png">
+      <Link>Assets_icons.xcassets\Search-Large.imageset\search_large%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Search-Filled.imageset\Search-Filled%403x.png">
+      <Link>Assets_icons.xcassets\Search-Filled.imageset\Search-Filled%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Search-Filled.imageset\Search-Filled%402x.png">
+      <Link>Assets_icons.xcassets\Search-Filled.imageset\Search-Filled%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Phone.imageset\phone%403x.png">
+      <Link>Assets_icons.xcassets\Phone.imageset\phone%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Phone.imageset\phone%402x.png">
+      <Link>Assets_icons.xcassets\Phone.imageset\phone%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Nav-shortcodes.imageset\Nav-shortcodes%402x.png">
+      <Link>Assets_icons.xcassets\Nav-shortcodes.imageset\Nav-shortcodes%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Nav-shortcodes.imageset\Nav-shortcodes%403x.png">
+      <Link>Assets_icons.xcassets\Nav-shortcodes.imageset\Nav-shortcodes%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Documents-Filled.imageset\documents-filled%403x.png">
+      <Link>Assets_icons.xcassets\Documents-Filled.imageset\documents-filled%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Documents-Filled.imageset\documents-filled%402x.png">
+      <Link>Assets_icons.xcassets\Documents-Filled.imageset\documents-filled%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\File-To.imageset\fileto%403x.png">
+      <Link>Assets_icons.xcassets\File-To.imageset\fileto%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\File-To.imageset\fileto%402x.png">
+      <Link>Assets_icons.xcassets\File-To.imageset\fileto%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Actions.imageset\actions%403x.png">
+      <Link>Assets_icons.xcassets\Actions.imageset\actions%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Actions.imageset\actions%402x.png">
+      <Link>Assets_icons.xcassets\Actions.imageset\actions%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Nav-contacts.imageset\Nav-contacts%403x.png">
+      <Link>Assets_icons.xcassets\Nav-contacts.imageset\Nav-contacts%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Nav-contacts.imageset\Nav-contacts%402x.png">
+      <Link>Assets_icons.xcassets\Nav-contacts.imageset\Nav-contacts%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Edit-Small.imageset\edit_small%403x.png">
+      <Link>Assets_icons.xcassets\Edit-Small.imageset\edit_small%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Edit-Small.imageset\edit_small%402x.png">
+      <Link>Assets_icons.xcassets\Edit-Small.imageset\edit_small%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Nav-mail.imageset\Nav-mail%403x.png">
+      <Link>Assets_icons.xcassets\Nav-mail.imageset\Nav-mail%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Nav-mail.imageset\Nav-mail%402x.png">
+      <Link>Assets_icons.xcassets\Nav-mail.imageset\Nav-mail%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Download.imageset\download%403x.png">
+      <Link>Assets_icons.xcassets\Download.imageset\download%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Download.imageset\download%402x.png">
+      <Link>Assets_icons.xcassets\Download.imageset\download%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Reply.imageset\reply%402x.png">
+      <Link>Assets_icons.xcassets\Reply.imageset\reply%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Reply.imageset\reply%403x.png">
+      <Link>Assets_icons.xcassets\Reply.imageset\reply%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Mobile-Large.imageset\large_mobile%402x.png">
+      <Link>Assets_icons.xcassets\Mobile-Large.imageset\large_mobile%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Mobile-Large.imageset\large_mobile%403x.png">
+      <Link>Assets_icons.xcassets\Mobile-Large.imageset\large_mobile%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Map.imageset\map%402x.png">
+      <Link>Assets_icons.xcassets\Map.imageset\map%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Map.imageset\map%403x.png">
+      <Link>Assets_icons.xcassets\Map.imageset\map%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Expand.imageset\expand%402x.png">
+      <Link>Assets_icons.xcassets\Expand.imageset\expand%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Expand.imageset\expand%403x.png">
+      <Link>Assets_icons.xcassets\Expand.imageset\expand%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\DeselectAll.imageset\deselectAll%402x.png">
+      <Link>Assets_icons.xcassets\DeselectAll.imageset\deselectAll%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\DeselectAll.imageset\deselectAll%403x.png">
+      <Link>Assets_icons.xcassets\DeselectAll.imageset\deselectAll%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Documents.imageset\documents%402x.png">
+      <Link>Assets_icons.xcassets\Documents.imageset\documents%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Documents.imageset\documents%403x.png">
+      <Link>Assets_icons.xcassets\Documents.imageset\documents%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Offline.imageset\offline%403x.png">
+      <Link>Assets_icons.xcassets\Offline.imageset\offline%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Offline.imageset\offline%402x.png">
+      <Link>Assets_icons.xcassets\Offline.imageset\offline%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Contacts-Filled.imageset\contacts-filled%403x.png">
+      <Link>Assets_icons.xcassets\Contacts-Filled.imageset\contacts-filled%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Contacts-Filled.imageset\contacts-filled%402x.png">
+      <Link>Assets_icons.xcassets\Contacts-Filled.imageset\contacts-filled%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Remove.imageset\remove%403x.png">
+      <Link>Assets_icons.xcassets\Remove.imageset\remove%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Remove.imageset\remove%402x.png">
+      <Link>Assets_icons.xcassets\Remove.imageset\remove%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Pending.imageset\pending%403x.png">
+      <Link>Assets_icons.xcassets\Pending.imageset\pending%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Pending.imageset\pending%402x.png">
+      <Link>Assets_icons.xcassets\Pending.imageset\pending%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Full-Dot.imageset\full-dot%402x.png">
+      <Link>Assets_icons.xcassets\Full-Dot.imageset\full-dot%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Full-Dot.imageset\full-dot%403x.png">
+      <Link>Assets_icons.xcassets\Full-Dot.imageset\full-dot%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Edit.imageset\edit%403x.png">
+      <Link>Assets_icons.xcassets\Edit.imageset\edit%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Edit.imageset\edit%402x.png">
+      <Link>Assets_icons.xcassets\Edit.imageset\edit%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Documents-Small.imageset\documents-small%402x.png">
+      <Link>Assets_icons.xcassets\Documents-Small.imageset\documents-small%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Documents-Small.imageset\documents-small%403x.png">
+      <Link>Assets_icons.xcassets\Documents-Small.imageset\documents-small%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Checkmark.imageset\checkmark%402x.png">
+      <Link>Assets_icons.xcassets\Checkmark.imageset\checkmark%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Checkmark.imageset\checkmark%403x.png">
+      <Link>Assets_icons.xcassets\Checkmark.imageset\checkmark%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Arrow-Down.imageset\arrow-down%402x.png">
+      <Link>Assets_icons.xcassets\Arrow-Down.imageset\arrow-down%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Arrow-Down.imageset\arrow-down%403x.png">
+      <Link>Assets_icons.xcassets\Arrow-Down.imageset\arrow-down%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Failed.imageset\failed%402x.png">
+      <Link>Assets_icons.xcassets\Failed.imageset\failed%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Failed.imageset\failed%403x.png">
+      <Link>Assets_icons.xcassets\Failed.imageset\failed%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Arrow-Up.imageset\arrow-up%402x.png">
+      <Link>Assets_icons.xcassets\Arrow-Up.imageset\arrow-up%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Arrow-Up.imageset\arrow-up%403x.png">
+      <Link>Assets_icons.xcassets\Arrow-Up.imageset\arrow-up%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Settings.imageset\settings%402x.png">
+      <Link>Assets_icons.xcassets\Settings.imageset\settings%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Settings.imageset\settings%403x.png">
+      <Link>Assets_icons.xcassets\Settings.imageset\settings%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Add.imageset\add%402x.png">
+      <Link>Assets_icons.xcassets\Add.imageset\add%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Add.imageset\add%403x.png">
+      <Link>Assets_icons.xcassets\Add.imageset\add%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Outgoing.imageset\outgoing%402x.png">
+      <Link>Assets_icons.xcassets\Outgoing.imageset\outgoing%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Outgoing.imageset\outgoing%403x.png">
+      <Link>Assets_icons.xcassets\Outgoing.imageset\outgoing%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Comments.imageset\comments%402x.png">
+      <Link>Assets_icons.xcassets\Comments.imageset\comments%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Comments.imageset\comments%403x.png">
+      <Link>Assets_icons.xcassets\Comments.imageset\comments%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Map-Large.imageset\large_map%403x.png">
+      <Link>Assets_icons.xcassets\Map-Large.imageset\large_map%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Map-Large.imageset\large_map%402x.png">
+      <Link>Assets_icons.xcassets\Map-Large.imageset\large_map%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Arrow-Expand.imageset\arrow_expand%402x.png">
+      <Link>Assets_icons.xcassets\Arrow-Expand.imageset\arrow_expand%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Arrow-Expand.imageset\arrow_expand%403x.png">
+      <Link>Assets_icons.xcassets\Arrow-Expand.imageset\arrow_expand%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Search-Small.imageset\search_small%402x.png">
+      <Link>Assets_icons.xcassets\Search-Small.imageset\search_small%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Search-Small.imageset\search_small%403x.png">
+      <Link>Assets_icons.xcassets\Search-Small.imageset\search_small%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Nav-settings.imageset\Nav-settings%403x.png">
+      <Link>Assets_icons.xcassets\Nav-settings.imageset\Nav-settings%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Nav-settings.imageset\Nav-settings%402x.png">
+      <Link>Assets_icons.xcassets\Nav-settings.imageset\Nav-settings%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Incoming.imageset\incoming%402x.png">
+      <Link>Assets_icons.xcassets\Incoming.imageset\incoming%402x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Incoming.imageset\incoming%403x.png">
+      <Link>Assets_icons.xcassets\Incoming.imageset\incoming%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Sending.imageset\sending%403x.png">
+      <Link>Assets_icons.xcassets\Sending.imageset\sending%403x.png</Link>
+    </ImageAsset>
+    <ImageAsset Update="Assets_icons.xcassets\Sending.imageset\sending%402x.png">
+      <Link>Assets_icons.xcassets\Sending.imageset\sending%402x.png</Link>
+    </ImageAsset>
+  </ItemGroup>
+  <ItemGroup>
+		<BundleResource Include="Resources\Base.lproj\Localizable.strings" />
+		<BundleResource Include="Resources\Settings.bundle\Root.Login.inApp.plist" />
+		<BundleResource Include="Resources\Settings.bundle\Root.inApp.plist" />
+		<BundleResource Include="Resources\Settings.bundle\en.lproj\Root.strings" />
+		<BundleResource Include="GoogleService-Info.plist" />
+		<BundleResource Include="Resources\html\editor.html" />
+		<BundleResource Include="Resources\html\empty.html" />
+		<BundleResource Include="Resources\html\plain.html" />
+		<BundleResource Include="Resources\html\scriptsAtEnd.js" />
+		<BundleResource Include="Resources\html\scriptsAtStart.js" />
+		<BundleResource Include="Resources\html\fonts.css" />
+		<BundleResource Include="Resources\html\headerPadding.js" />
+		<BundleResource Include="Resources\html\replyHeader.html" />
+		<BundleResource Include="Resources\html\blank.html" />
+		<BundleResource Include="Resources\html\replyEditor.html" />
+		<BundleResource Include="Resources\splash.json" />
+		<BundleResource Include="Resources\Base.lproj\Onboarding.strings" />
+	</ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.IO.Compression" Version="4.3.0" />
+    <PackageReference Include="System.Net.Http" Version="4.3.4" />
+    <PackageReference Include="MailBee.NET" Version="12.4.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="modernhttpclient" Version="2.4.2" />
+    <PackageReference Include="Drastic.InAppSettingsKit" Version="1.0.1" />
+    <PackageReference Include="OpenTK" Version="4.8.2" />
+    <PackageReference Include="Xamarin.Firebase.iOS.Core" Version="8.10.0.3" />
+    <PackageReference Include="Xamarin.Firebase.iOS.CloudMessaging" Version="8.10.0.3" />
+    <PackageReference Include="Polly" Version="8.2.1" />
+    <PackageReference Include="Microsoft.AppCenter" Version="5.0.3" />
+    <PackageReference Include="Microsoft.AppCenter.Crashes" Version="5.0.3" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.57" />
+    <PackageReference Include="AngleSharp" Version="1.0.7" />
+    <PackageReference Include="PreMailer.Net" Version="2.5.0" />
+    <PackageReference Include="NET-iOS.GMImagePicker" Version="2.5.1" />
+    <PackageReference Include="Microsoft.Identity.Client" Version="4.49.1" />
+    <PackageReference Include="System.Drawing.Common" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Primitives" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Configuration" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+    <PackageReference Include="morelinq" Version="4.1.0" />
+    <PackageReference Include="Sentry.Extensions.Logging" Version="3.41.3" />
+    <PackageReference Include="Sentry" Version="3.41.3" />
+    <PackageReference Include="Microsoft.Azure.NotificationHubs" Version="4.1.0" />
+    <PackageReference Include="PInvoke.NCrypt" Version="0.7.124" />
+    <PackageReference Include="PInvoke.BCrypt" Version="0.7.124" />
+    <PackageReference Include="PInvoke.Kernel32" Version="0.7.124" />
+    <PackageReference Include="PInvoke.Windows.Core" Version="0.7.124" />
+    <PackageReference Include="PCLCrypto" Version="2.0.147" />
+    <PackageReference Include="Validation" Version="2.5.51" />
+    <PackageReference Include="System.CodeDom" Version="8.0.0" />
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="8.0.0" />
+    <PackageReference Include="System.Security.Principal.Windows" Version="5.0.0" />
+    <PackageReference Include="System.Security.AccessControl" Version="6.0.0" />
+    <PackageReference Include="System.Management" Version="8.0.0" />
+    <PackageReference Include="System.Buffers" Version="4.5.1" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
+    <PackageReference Include="System.Memory" Version="4.5.5" />
+    <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
+    <PackageReference Include="SQLitePCLRaw.core" Version="2.1.7" />
+    <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.7" />
+    <PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.7" />
+    <PackageReference Include="sqlite-net" Version="1.6.292" />
+    <PackageReference Include="Xamarin.Firebase.iOS.Analytics" Version="8.10.0.3" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
+    <PackageReference Include="System.Collections.Immutable" Version="8.0.0" />
+    <PackageReference Include="System.Reflection.Metadata" Version="8.0.0" />
+    <PackageReference Include="System.Text.Encodings.Web" Version="8.0.0" />
+    <PackageReference Include="System.Text.Json" Version="8.0.1" />
+    <PackageReference Include="Lottie.iOS" Version="1.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\reMark.Mobile.Classes\reMark.Mobile.Classes.csproj" />
+    <ProjectReference Include="..\reMark.Mobile.Common\reMark.Mobile.Common.csproj" />
+    <ProjectReference Include="..\reMark.Mobile.IOS.Common\reMark.Mobile.IOS.Common.csproj" />
+    <ProjectReference Include="..\reMark.Mobile.IOS.Extensions.CallId\reMark.Mobile.IOS.Extensions.CallId.csproj">
+      <IsAppExtension>true</IsAppExtension>
+    </ProjectReference>
+    <ProjectReference Include="..\reMark.Mobile.IOS.Extensions.Share\reMark.Mobile.IOS.Extensions.Share.csproj">
+      <IsAppExtension>true</IsAppExtension>
+    </ProjectReference>
+    <ProjectReference Include="..\reMark.ServiceReference.Exceptions\reMark.ServiceReference.Exceptions.csproj" />
+    <ProjectReference Include="..\reMark.ServiceReference\reMark.ServiceReference.csproj" />
+    <ProjectReference Include="..\SVProgressHUD\SVProgressHUD.csproj" />
+  </ItemGroup>
+</Project>

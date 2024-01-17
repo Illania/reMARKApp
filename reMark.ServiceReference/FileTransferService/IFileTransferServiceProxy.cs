@@ -1,0 +1,19 @@
+using System;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+using reMark.ServiceReference.DataContract;
+
+namespace reMark.ServiceReference.FileTransferService
+{
+    public interface IFileTransferServiceProxy
+    {
+        Task<GetServiceVersionResponse> GetServiceVersionAsync(GetServiceVersionRequest req, CancellationToken ct = default(CancellationToken));
+
+        Task<GetAttachmentResponse> GetAttachmentAsync(GetAttachmentRequest req, Func<Stream, Task> handler, CancellationToken ct = default(CancellationToken));
+
+        Task<UploadTemporaryAttachmentResponse> UploadTemporaryAttachmentAsync(UploadTemporaryAttachmentRequest req, CancellationToken ct = default(CancellationToken));
+
+        Task<GetEmlResponse> GetDocumentEmlAsync(GetEmlRequest req, Func<Stream, Task> saveHandler, CancellationToken ct = default(CancellationToken));
+    }
+}

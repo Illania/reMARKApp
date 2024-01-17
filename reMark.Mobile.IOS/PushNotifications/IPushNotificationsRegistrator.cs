@@ -1,0 +1,135 @@
+﻿using Foundation;
+using reMark.Mobile.Common;
+using reMark.Mobile.Common.Manager;
+using reMark.Mobile.Common.Model;
+using UIKit;
+using UserNotifications;
+using reMark.Mobile.Common.Extensions;
+using System.Threading.Tasks;
+using System;
+using Microsoft.Extensions.Logging;
+using DeviceType = reMark.Mobile.Common.Model.DeviceType;
+
+namespace reMark.Mobile.IOS.PushNotifications
+{
+    public interface IPushNotificationsRegistrator
+    {
+
+        public string ActiveToken { get; }
+
+        public Task RegisterToken(NSData deviceToken);
+
+        public void UpdateToken(string newToken)
+        {
+            
+            var oldToken = PlatformConfig.Preferences.PushNotificationToken;
+            PlatformConfig.Preferences.PushNotificationToken = newToken;
+
+            if (!ShouldUpdateToken())
+                return;
+
+            if (!string.IsNullOrWhiteSpace(oldToken) && oldToken != newToken)
+            {
+                CommonConfig.Logger.Info("New push notification token is different, so try to unsubscribe old one...");
+                CommonConfig.Sentry?.LogInformation("New push notification token is different, so try to unsubscribe old one...");
+                Managers.NotificationsManager.UnSubscribe(DeviceType.IOS, oldToken).FireAndForget();
+            }
+
+            if (!string.IsNullOrWhiteSpace(newToken))
+            {
+                CommonConfig.Logger.Info($"Sending new push notification token: {newToken}");
+                CommonConfig.Sentry?.LogInformation($"Sending new push notification token: {newToken}");
+                Managers.NotificationsManager.Subscribe(DeviceType.IOS, newToken).FireAndForget();
+            }
+            else
+            {
+                CommonConfig.Logger.Info("Received empty or null push notification token...");
+                CommonConfig.Sentry?.LogInformation("Received empty or null push notification token...");
+            }
+
+        }
+
+        public bool ShouldUpdateToken();
+
+        public void RequestAuthorization()
+        {
+            try
+            {
+
+                UNUserNotificationCenter.Current.RequestAuthorization(
+                    UNAuthorizationOptions.Alert
+                    | UNAuthorizationOptions.Badge
+                    | UNAuthorizationOptions.Sound,
+                    OnAuthorizationRequestCompleted);
+            }
+            catch (NSErrorException nex)
+            {
+                CommonConfig.Logger.Error($"Error while requesting authorization", nex);
+                CommonConfig.Sentry?.LogError($"Error while requesting authorization", nex);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Error while requesting authorization", ex);
+                CommonConfig.Sentry?.LogError($"Error while requesting authorization", ex);
+            }
+        }
+
+        public void OnAuthorizationRequestCompleted(bool result, NSError error)
+        {
+            try
+            {
+                if (result)
+                {
+                    var nsobject = new NSObject();
+                    //Registers for receipt of push notifications using the Apple Push Service.
+                    nsobject.InvokeOnMainThread(UIApplication.SharedApplication.RegisterForRemoteNotifications);
+
+                    var serviceVersion = ServerConfig.SystemSettings?.SystemInfo?.ServiceVersion;
+
+                    if (serviceVersion == null)
+                    {
+                        CommonConfig.Logger.Info($"It is not possible to update the push notification token because the server version is null");
+                        return;
+                    }
+
+                    if (serviceVersion.CompareTo(new Version(3, 1, 5)) < 0)
+                    {
+                        CommonConfig.Logger.Info($"Not sending the push token because the current service version is less than 3.1.5");
+                        return;
+                    }
+
+                    if (ServerConfig.SystemSettings?.SystemInfo?.NotificationsInChina == true)
+                    {
+                        CommonConfig.Logger.Info($"Not sending the push token because the current service is using Chinese Notifications");
+                        return;
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(ActiveToken))
+                    {
+                        UpdateToken(ActiveToken);
+                    }
+                }
+                else
+                {
+                    if (error != null)
+                    {
+                        CommonConfig.Logger.Error(new NSErrorException(error));
+                        CommonConfig.Sentry?.LogError(error.DebugDescription);
+                    }
+                }
+            }
+            catch (NSErrorException nex)
+            {
+                CommonConfig.Logger.Error($"Error while requesting authorization", nex);
+                CommonConfig.Sentry?.LogError($"Error while requesting authorization", nex);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Error while requesting authorization", ex);
+                CommonConfig.Sentry?.LogError($"Error while requesting authorization", ex);
+            }
+            
+        }
+
+    }
+}

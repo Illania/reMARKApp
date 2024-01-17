@@ -1,0 +1,27 @@
+﻿using Android.Content;
+using Android.Text;
+using TextChangedEventArgs = Android.Text.TextChangedEventArgs;
+
+namespace reMark.Mobile.Droid.Ui.Views.AddEditContactViews
+{
+    public class DescriptionView : AbstractSimpleFieldView
+    {
+        public DescriptionView(Context context)
+            : base(context, Resource.String.edit_contact_description, true, true,
+                   inputType: InputTypes.TextFlagMultiLine
+                   | InputTypes.TextFlagCapSentences
+                   | InputTypes.TextFlagAutoCorrect | InputTypes.ClassText)
+        {
+        }
+
+        public override void RefreshView()
+        {
+            Content = ContactPreview.Description;
+        }
+
+        protected override void ContentChanged(object sender, TextChangedEventArgs e)
+        {
+            ContactPreview.Description = Content;
+        }
+    }
+}

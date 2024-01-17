@@ -1,0 +1,113 @@
+﻿using System;
+using System.Collections.Generic;
+using reMark.Mobile.Common;
+using reMark.Mobile.IOS.Ui.Common;
+
+namespace reMark.Mobile.IOS.Utilities
+{
+    public class EmailSwipeAction
+    {
+        public enum SwipeAction
+        {
+            More,
+            MarkAsRead,
+            CopyToWorkTray,
+            CopyToFolder,
+            Categories,
+            MoveToFolder,
+            SetPriority,
+            RemoveFromFolder,
+            Delete,
+            SetPresetCategory,
+            AddBookmark,
+            DeliveryReport
+        }
+
+        public SwipeAction Action { get; set; }
+
+        public EmailSwipeAction(SwipeAction action)
+        {
+            Action = action;
+        }
+
+        public EmailSwipeAction(string action)
+        {
+            Action = ParseStringToSwipeAction(action);
+        }
+
+        public static List<EmailSwipeAction> GetAllAvailableActions()
+        {
+            List<EmailSwipeAction> list = new()
+            {
+                new EmailSwipeAction(SwipeAction.MarkAsRead),
+                new EmailSwipeAction(SwipeAction.CopyToWorkTray),
+                new EmailSwipeAction(SwipeAction.CopyToFolder),
+                new EmailSwipeAction(SwipeAction.Categories),
+                new EmailSwipeAction(SwipeAction.SetPriority),
+                new EmailSwipeAction(SwipeAction.RemoveFromFolder),
+                new EmailSwipeAction(SwipeAction.Delete),
+                new EmailSwipeAction(SwipeAction.SetPresetCategory),
+                new EmailSwipeAction(SwipeAction.AddBookmark),
+
+        };
+            if (PlatformConfig.Preferences.EnableMoveToFolder)
+                list.Add(new EmailSwipeAction(SwipeAction.MoveToFolder));
+
+            if (ServerConfig.SystemSettings.SystemInfo.DeliveryReportAvailable)
+                list.Add(new EmailSwipeAction(SwipeAction.DeliveryReport));
+            return list;
+        }
+
+        public string GetName() {
+            return GetLocalizedName(Action);
+        }
+
+        public static string GetLocalizedName(EmailSwipeAction.SwipeAction action)
+        {
+            switch (action)
+            {
+                case EmailSwipeAction.SwipeAction.MarkAsRead:
+                    return Localization.GetString("mark_as_read_unread");
+
+                case EmailSwipeAction.SwipeAction.CopyToWorkTray:
+                    return Localization.GetString("copy_to_worktray_ml");
+                case EmailSwipeAction.SwipeAction.Delete:
+                    return Localization.GetString("delete");
+
+                case EmailSwipeAction.SwipeAction.Categories:
+                    return Localization.GetString("categories");
+
+                case EmailSwipeAction.SwipeAction.CopyToFolder:
+                    return Localization.GetString("copy_to_folder");
+
+                case EmailSwipeAction.SwipeAction.MoveToFolder:
+                    return Localization.GetString("move_to_folder");
+
+                case EmailSwipeAction.SwipeAction.SetPriority:
+                    return Localization.GetString("set_priority");
+
+                case EmailSwipeAction.SwipeAction.RemoveFromFolder:
+                    return Localization.GetString("delete_from_folder");
+
+                case EmailSwipeAction.SwipeAction.SetPresetCategory:
+                    return Localization.GetString("set_preset_category");
+
+                case EmailSwipeAction.SwipeAction.AddBookmark:
+                    return Localization.GetString("add_bookmark");
+
+                case EmailSwipeAction.SwipeAction.DeliveryReport:
+                    return Localization.GetString("delivery_report");
+
+                default:
+                    CommonConfig.Logger.Error($"Missing implementation for case : {action.ToString()}");
+                    return "";
+            }
+
+        }
+
+        public static EmailSwipeAction.SwipeAction ParseStringToSwipeAction(string value)
+        {
+            return (EmailSwipeAction.SwipeAction)Enum.Parse(typeof(EmailSwipeAction.SwipeAction), value, true);
+        }
+    }
+}
