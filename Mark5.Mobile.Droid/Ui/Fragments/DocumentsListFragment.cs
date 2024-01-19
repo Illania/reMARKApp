@@ -151,7 +151,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             };
 
             recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recycler_view);
-            recyclerView.SetLayoutManager(new LinearLayoutManager(Activity));
+            recyclerView.SetLayoutManager(new WrapContentLinearLayoutManager(Activity));
             recyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
 
 
