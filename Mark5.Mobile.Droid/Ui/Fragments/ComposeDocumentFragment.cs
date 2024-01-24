@@ -246,7 +246,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             subjectView.Edited += Subview_Edited;
             subViews.Add(subjectView);
 
-            if(ServerConfig.SystemSettings.SystemInfo.SendAsPlainTextAvailable)
+            if (ServerConfig.SystemSettings.SystemInfo.SendAsPlainTextAvailable)
             {
                 sendAsPlainTextView = new SendAsPlainTextView(Context);
                 sendAsPlainTextView.Edited += SendAsPlainTextView_Edited;
@@ -262,11 +262,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             foreach (var subview in subViews)
             {
-                linearLayout.AddView(subview);
+                linearLayout?.AddView(subview);
                 if (subview != attachmentsView && subview != contentView)
-                    linearLayout.AddView(new Divider(Context));
+                    linearLayout?.AddView(new Divider(Context));
             }
-
 
             fab = ((BaseAppCompatActivity)Activity).Fab;
             fab.SetImageResource(Resource.Drawable.action_send);
