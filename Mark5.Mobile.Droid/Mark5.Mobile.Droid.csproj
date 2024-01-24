@@ -951,6 +951,7 @@
     <Compile Include="Ui\Fragments\PickContactSavedSearchesFragment.cs" />
     <Compile Include="Ui\Fragments\PickShortcodeSavedSearchesFragment.cs" />
     <Compile Include="Ui\Common\WrapContentLinearLayoutManager.cs" />
+    <Compile Include="Ui\Views\ComposeDocumentViews\SendAsPlainTextView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\AboutAssets.txt" />

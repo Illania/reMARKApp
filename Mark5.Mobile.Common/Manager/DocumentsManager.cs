@@ -928,7 +928,8 @@ namespace Mark5.Mobile.Common.Manager
 
         internal async Task SendDocumentAsync(Document document, DocumentPreview documentPreview, DocumentCreationModeFlag flag,
             int precedingDocumentId, int precedingDocumentFolderId, long sendOnTimestamp, bool confirmRead, bool confirmDelivery,
-            List<Guid> temporaryAttachmentGuids, FileToFolderParameters fileToFolderParameters = null, SourceType sourceType = SourceType.Auto)
+            List<Guid> temporaryAttachmentGuids, FileToFolderParameters fileToFolderParameters = null, SourceType sourceType = SourceType.Auto,
+            bool sendAsPlainText = false)
         {
             CommonConfig.UsageAnalytics.LogEvent(new DocumentSentEvent(flag));
 
@@ -949,7 +950,8 @@ namespace Mark5.Mobile.Common.Manager
                     Delayed = sendOnTimestamp > 0,
                     ConfirmRead = confirmRead,
                     ConfirmDelivery = confirmDelivery,
-                    TemporaryAttachmentGuids = temporaryAttachmentGuids ?? new List<Guid>()
+                    TemporaryAttachmentGuids = temporaryAttachmentGuids ?? new List<Guid>(),
+                    SendAsPlainText = sendAsPlainText
                 });
 
                 document.Id = result.Id;

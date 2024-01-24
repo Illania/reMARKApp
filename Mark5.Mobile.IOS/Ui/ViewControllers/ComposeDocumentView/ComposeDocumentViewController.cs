@@ -16,6 +16,7 @@ using Mark5.Mobile.IOS.Common.ShareExtension;
 using Mark5.Mobile.IOS.Model;
 using Mark5.Mobile.IOS.Model.HubMessages;
 using Mark5.Mobile.IOS.Ui.Common;
+using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.Subviews;
 using Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews;
 using Mark5.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using Mark5.Mobile.IOS.Utilities;
@@ -56,6 +57,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         bool templateLoaded;
         string previousDocumentContent;
         bool refreshing;
+        bool sendAsPlainText = false;
 
         UIBarButtonItem cancelButtonItem;
         UIBarButtonItem insertButtonItem;
@@ -71,6 +73,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
         PriorityView priorityView;
         SubjectView subjectView;
         AttachmentsView attachmentsView;
+        SendAsPlainTextView sendAsPlainTextView;
 
         SuggestionsListView suggestionsListView;
         Worker autoSaveWorkingCopyWorker;
@@ -168,6 +171,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             lineView?.RemoveFromSuperview();
             priorityView?.RemoveFromSuperview();
             subjectView?.RemoveFromSuperview();
+            sendAsPlainTextView?.RemoveFromSuperview();
             attachmentsView?.RemoveFromSuperview();
 
             suggestionsListView?.RemoveFromSuperview();
@@ -178,6 +182,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             lineView = null;
             priorityView = null;
             subjectView = null;
+            sendAsPlainTextView = null;
             attachmentsView = null;
             suggestionsListView = null;
         }
@@ -258,6 +263,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             if (PlatformConfig.Preferences.ComposePriorityEnabled)
                 headerStackView.AddArrangedSubview(priorityView = new PriorityView(this));
             headerStackView.AddArrangedSubview(subjectView = new SubjectView());
+            if(ServerConfig.SystemSettings.SystemInfo.SendAsPlainTextAvailable)
+                headerStackView.AddArrangedSubview(sendAsPlainTextView = new SendAsPlainTextView());
             headerStackView.AddArrangedSubview(attachmentsView = new AttachmentsView());
 
             var containerView = new UIView
@@ -308,8 +315,16 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             lineView.Edited += Subview_Edited;
             subjectView.Edited += Subview_Edited;
 
+            if(sendAsPlainTextView != null)
+                sendAsPlainTextView.Edited += SendAsPlainTextView_Edited;
+
             attachmentsView.Tapped += AttachmentsView_Tapped;
             attachmentsView.DeleteTapped += AttachmentsView_DeleteTapped;
+        }
+
+        private void SendAsPlainTextView_Edited(object sender, EventArgs eventArgs)
+        {
+            sendAsPlainText = ((SendAsPlainTextEventArgs)eventArgs).SendAsPlainText;
         }
 
         void DeinitializeHandlers()
@@ -340,6 +355,9 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             bccView.Edited -= Subview_Edited;
             lineView.Edited -= Subview_Edited;
             subjectView.Edited -= Subview_Edited;
+
+            if (sendAsPlainTextView != null)
+                sendAsPlainTextView.Edited -= SendAsPlainTextView_Edited;
 
             attachmentsView.Tapped -= AttachmentsView_Tapped;
             attachmentsView.DeleteTapped -= AttachmentsView_DeleteTapped;
@@ -1229,7 +1247,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     PreviousDocumentDirection = PreviousDocumentDirection,
                     DocumentPreview = documentPreview,
                     Document = document,
-                    SendOnTimestamp = timestamp
+                    SendOnTimestamp = timestamp,
+                    SendAsPlainText = sendAsPlainText
                 });
 
                 await Managers.DocumentsManager.QueueWorkingCopyToUpload();
@@ -1281,7 +1300,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     FileToFolderParameters = FileToFolderParameters,
                     PreviousDocumentDirection = PreviousDocumentDirection,
                     DocumentPreview = documentPreview,
-                    Document = document
+                    Document = document,
+                    SendAsPlainText = sendAsPlainText
                 });
                 await Managers.DocumentsManager.QueueWorkingCopyToUpload();
 
@@ -1732,7 +1752,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     FileToFolderParameters = FileToFolderParameters,
                     PreviousDocumentDirection = PreviousDocumentDirection,
                     DocumentPreview = documentPreview,
-                    Document = document
+                    Document = document,
+                    SendAsPlainText = sendAsPlainText
                 });
 
                 CommonConfig.Logger.Info("Saved working copy");
