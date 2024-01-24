@@ -6,12 +6,12 @@ using UIKit;
 
 namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.Subviews
 {
-    public class SendAsPlainTextView: ComposeDocumentSubView
+    public class SendAsPlainTextView : ComposeDocumentSubView
     {
         public event EventHandler Edited = delegate { };
 
-        UILabelScalable label;
-        UISwitch toggleSwitch;
+        private UILabelScalable label;
+        private UISwitch toggleSwitch;
 
         public bool IsActive
         {
@@ -51,7 +51,8 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.Subviews
 
             toggleSwitch.SetContentHuggingPriority((float)UILayoutPriority.DefaultHigh, UILayoutConstraintAxis.Horizontal);
             ContainerView.Add(toggleSwitch);
-            toggleSwitch.ValueChanged += (sender, e) => Edited(this, new SendAsPlainTextEventArgs(sendAsPlainText: toggleSwitch.On));
+            toggleSwitch.ValueChanged += (sender, e) =>
+                Edited(this, new SendAsPlainTextEventArgs(sendAsPlainText: toggleSwitch.On));
             ContainerView.AddConstraints(new[]
             {
                 toggleSwitch.TopAnchor.ConstraintEqualTo(ContainerView.TopAnchor, VerticalMargin),
@@ -64,6 +65,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.Subviews
         {
             return Task.CompletedTask;
         }
+
         public override Task UpdateDocument()
         {
             return Task.CompletedTask;
@@ -80,4 +82,3 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.Subviews
         }
     }
 }
-

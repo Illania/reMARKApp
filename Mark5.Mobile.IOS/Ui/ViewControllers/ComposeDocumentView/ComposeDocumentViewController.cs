@@ -263,7 +263,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             if (PlatformConfig.Preferences.ComposePriorityEnabled)
                 headerStackView.AddArrangedSubview(priorityView = new PriorityView(this));
             headerStackView.AddArrangedSubview(subjectView = new SubjectView());
-            if(ServerConfig.SystemSettings.SystemInfo.SendAsPlainTextAvailable)
+            if (ServerConfig.SystemSettings.SystemInfo.SendAsPlainTextAvailable)
                 headerStackView.AddArrangedSubview(sendAsPlainTextView = new SendAsPlainTextView());
             headerStackView.AddArrangedSubview(attachmentsView = new AttachmentsView());
 
@@ -285,7 +285,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             SetHeaderView(containerView);
         }
 
-        void InitializeHandlers()
+        private void InitializeHandlers()
         {
             cancelButtonItem.Clicked += CancelButtonItem_Clicked;
             insertButtonItem.Clicked += InsertButtonItem_Clicked;
@@ -315,7 +315,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             lineView.Edited += Subview_Edited;
             subjectView.Edited += Subview_Edited;
 
-            if(sendAsPlainTextView != null)
+            if (sendAsPlainTextView != null)
                 sendAsPlainTextView.Edited += SendAsPlainTextView_Edited;
 
             attachmentsView.Tapped += AttachmentsView_Tapped;

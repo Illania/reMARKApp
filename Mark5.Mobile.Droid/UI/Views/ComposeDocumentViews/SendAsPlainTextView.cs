@@ -3,11 +3,10 @@ using System.Threading.Tasks;
 using Android.Content;
 using Android.Views;
 using AndroidX.AppCompat.Widget;
-using Mark5.Mobile.Common.Model;
 
 namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 {
-    public class SendAsPlainTextView: ComposeDocumentView
+    public class SendAsPlainTextView : ComposeDocumentView
     {
         SwitchCompat ToggleButton;
 
@@ -15,10 +14,12 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
         public SendAsPlainTextView(Context context) : base(context)
         {
-            SetPadding(DistanceNormal + DistanceSmall, DistanceNormal + DistanceSmall, DistanceNormal + DistanceSmall, DistanceNormal + DistanceSmall);
+            SetPadding(DistanceNormal + DistanceSmall, DistanceNormal + DistanceSmall,
+                DistanceNormal + DistanceSmall, DistanceNormal + DistanceSmall);
             var label = new AppCompatTextView(context);
             label.Text = "Send as plain text";
-            label.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent, 1)
+            label.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent,
+                ViewGroup.LayoutParams.WrapContent, 1)
             {
                 Gravity = (GravityFlags)((int)GravityFlags.Left | (int)GravityFlags.CenterVertical),
             };
@@ -28,14 +29,16 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
             ToggleButton = new SwitchCompat(context)
             {
                 Gravity = GravityFlags.Right,
-                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
+                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent,
+                    ViewGroup.LayoutParams.WrapContent)
                 {
                     Gravity = (GravityFlags)((int)GravityFlags.Right | (int)GravityFlags.CenterVertical),
                     RightMargin = 0,
                 },
                 SwitchPadding = 0,
             };
-            ToggleButton.CheckedChange += (sender, e) => Edited(this, new Android.Widget.CompoundButton.CheckedChangeEventArgs(ToggleButton.Checked));
+            ToggleButton.CheckedChange += (sender, e) => Edited(this,
+                new Android.Widget.CompoundButton.CheckedChangeEventArgs(ToggleButton.Checked));
 
             AddView(ToggleButton);
         }
@@ -44,4 +47,3 @@ namespace Mark5.Mobile.Droid.Ui.Views.ComposeDocumentViews
         public override Task UpdateDocument() => Task.CompletedTask;
     }
 }
-
