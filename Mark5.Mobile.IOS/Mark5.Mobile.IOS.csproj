@@ -366,6 +366,7 @@
 	    <Compile Include="Ui\ViewControllers\TransmitDestinationsViewController.cs" />
 	    <Compile Include="Ui\ViewControllers\SavedContactSearchesViewController.cs" />
 	    <Compile Include="Ui\ViewControllers\SavedShortcodeSearchesViewController.cs" />
+	    <Compile Include="Ui\ViewControllers\ComposeDocumentView\Subviews\SendAsPlainTextView.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />

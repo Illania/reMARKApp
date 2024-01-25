@@ -476,6 +476,7 @@
 "selected_time_before_current_time_title" = "The selected time is invalid";
 "selected_time_before_current_time_content" = "The selected time is before the current time. Please try again.";
 "send" = "Send";
+"send_as_plain_text" = "Send as plain text";
 "send_cancelled" = "Send cancelled";
 "send_now" = "Send now";
 "send_email_after" = "Send email after";

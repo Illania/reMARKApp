@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using Mark5.Mobile.Common.Manager;
 using Newtonsoft.Json;
 
 namespace Mark5.Mobile.Common.Model
@@ -49,6 +47,7 @@ namespace Mark5.Mobile.Common.Model
 
         public bool SavedSearchesAvailable => ServiceVersionGreaterThanOrEqual(4, 10, 0);
 
+        public bool SendAsPlainTextAvailable => ServiceVersionGreaterThanOrEqual(4, 11, 0);
 
         public bool CalendarModuleAvailable       
         {

@@ -133,7 +133,8 @@ namespace Mark5.Mobile.Common.Service
                                                                     info.ConfirmDelivery,
                                                                     uploadedAttachmentsGuids,
                                                                     info.FileToFolderParameters,
-                                                                    SourceType.Remote);
+                                                                    SourceType.Remote,
+                                                                    info.SendAsPlainText);
 
                             if (info.SendOnTimestamp < 0)
                             {
