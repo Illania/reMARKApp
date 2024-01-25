@@ -7,6 +7,7 @@
     <OutputType>Library</OutputType>
     <ApplicationId>com.nordic-it.mark5.mobile.ios.callid</ApplicationId>
     <Platforms>iPhoneSimulator;iPhone;AnyCPU</Platforms>
+    <SkipValidateMauiImplicitPackageReferences>true</SkipValidateMauiImplicitPackageReferences> 
   </PropertyGroup>
   <PropertyGroup>
 		<IsAppExtension>True</IsAppExtension>
@@ -85,8 +86,12 @@
     <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
     <CodesignProvision>reMark iOS CallID 2021 Distribution</CodesignProvision>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' " />
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' " />
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <MtouchHttpClientHandler>HttpClientHandler</MtouchHttpClientHandler>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <MtouchHttpClientHandler>HttpClientHandler</MtouchHttpClientHandler>
+  </PropertyGroup>
   <ItemGroup>
     <None Remove="Resources\" />
   </ItemGroup>

@@ -1,19 +1,6 @@
-<<<<<<< Updated upstream
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
 using Contacts;
 using CoreFoundation;
-using Foundation;
-using Mark5.Mobile.IOS.Common;
-using Mark5.Mobile.IOS.Common.ShareExtension;
-using ObjCRuntime;
-=======
-﻿using Contacts;
 using reMark.Mobile.IOS.Common.ShareExtension;
->>>>>>> Stashed changes
 using Social;
 using ContentType = MobileCoreServices.UTType;
 

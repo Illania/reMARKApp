@@ -11,6 +11,7 @@
     <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
     <JavaMaximumHeapSize>1G</JavaMaximumHeapSize>
     <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
+    <SkipValidateMauiImplicitPackageReferences>true</SkipValidateMauiImplicitPackageReferences> 
   </PropertyGroup>
     <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
