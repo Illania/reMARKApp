@@ -22,6 +22,7 @@ using reMark.Mobile.IOS.Utilities;
 using Photos;
 using UIKit;
 using Preferences = reMark.Mobile.IOS.Utilities.Preferences;
+using reMark.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView.Subviews;
 
 namespace reMark.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 {
