@@ -68,7 +68,7 @@ namespace reMark.Mobile.Droid.Ui.Fragments
         string preconfiguredSubject;
         List<System.Uri> preconfiguredAttachmentList;
         bool saveDraft = false;
-
+        bool sendAsPlainText = false;
         bool restoreWorkingCopy;
 
         DocumentCreationModeFlag documentCreationModeFlag = DocumentCreationModeFlag.New;
@@ -94,6 +94,7 @@ namespace reMark.Mobile.Droid.Ui.Fragments
         PriorityView priorityView;
         LineView lineView;
         SubjectView subjectView;
+        SendAsPlainTextView sendAsPlainTextView;
         AttachmentsView attachmentsView;
         ContentView contentView;
         FormattingView formattingView;
@@ -253,6 +254,13 @@ namespace reMark.Mobile.Droid.Ui.Fragments
             subjectView.Edited += Subview_Edited;
             subViews.Add(subjectView);
 
+            if (ServerConfig.SystemSettings.SystemInfo.SendAsPlainTextAvailable)
+            {
+                sendAsPlainTextView = new SendAsPlainTextView(Context);
+                sendAsPlainTextView.Edited += SendAsPlainTextView_Edited;
+                subViews.Add(sendAsPlainTextView);
+            }
+
             attachmentsView = new AttachmentsView(Context);
             attachmentsView.Clicked += AttachmentsView_Clicked;
             subViews.Add(attachmentsView);
@@ -262,11 +270,10 @@ namespace reMark.Mobile.Droid.Ui.Fragments
 
             foreach (var subview in subViews)
             {
-                linearLayout.AddView(subview);
+                linearLayout?.AddView(subview);
                 if (subview != attachmentsView && subview != contentView)
-                    linearLayout.AddView(new Divider(Context));
+                    linearLayout?.AddView(new Divider(Context));
             }
-
 
             fab = ((BaseAppCompatActivity)Activity).Fab;
             fab.SetImageResource(Resource.Drawable.action_send);
@@ -280,6 +287,11 @@ namespace reMark.Mobile.Droid.Ui.Fragments
             HasOptionsMenu = true;
 
             return rootView;
+        }
+
+        private void SendAsPlainTextView_Edited(object sender, CompoundButton.CheckedChangeEventArgs e)
+        {
+            sendAsPlainText = e.IsChecked;
         }
 
         public override void OnDestroyView()
@@ -940,7 +952,8 @@ namespace reMark.Mobile.Droid.Ui.Fragments
                 PreviousDocumentDirection = previousDocumentDirection,
                 FileToFolderParameters = fileToFolderParameters,
                 DocumentPreview = documentPreview,
-                Document = document
+                Document = document,
+                SendAsPlainText = sendAsPlainText
             });
 
             try
@@ -1100,7 +1113,8 @@ namespace reMark.Mobile.Droid.Ui.Fragments
                 FileToFolderParameters = fileToFolderParameters,
                 DocumentPreview = documentPreview,
                 Document = document,
-                SendOnTimestamp = timestamp
+                SendOnTimestamp = timestamp,
+                SendAsPlainText = sendAsPlainText
             });
             var t = Managers.DocumentsManager.QueueWorkingCopyToUpload();
             await t;
@@ -1158,7 +1172,8 @@ namespace reMark.Mobile.Droid.Ui.Fragments
                     PreviousDocumentDirection = previousDocumentDirection,
                     FileToFolderParameters = fileToFolderParameters,
                     DocumentPreview = documentPreview,
-                    Document = document
+                    Document = document,
+                    SendAsPlainText = sendAsPlainText
                 });
 
                 CommonConfig.Logger.Info("Saved working copy");

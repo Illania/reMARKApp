@@ -12,5 +12,6 @@ namespace reMark.Mobile.Common.Model
         public bool ConfirmDelivery { get; set; }
         public DateTime SendDateTime { get; set; }
         public FileToFolderParameters FileToFolderParameters { get; set; }
+        public bool SendAsPlainText { get; set; }
     }
 }

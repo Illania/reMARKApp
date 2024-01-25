@@ -309,6 +309,8 @@ namespace reMark.ServiceReference.DataContract
         [DataMember(Name = "Delayed", Order = 1)]
         public bool Delayed { get; set; }
 
+        [DataMember(Name ="SendAsPlainText", Order = 2)]
+        public bool SendAsPlainText { get; set; }
     }
 
     [DataContract(Name = "SendDocumentResult", Namespace = "com.nordic-it.appservice.v3")]

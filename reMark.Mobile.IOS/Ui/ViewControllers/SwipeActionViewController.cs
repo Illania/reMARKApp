@@ -47,7 +47,8 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
             if (leadingSwipeButton != null)
             {
                 var action = PlatformConfig.Preferences.EmailLeadingSwipeActions.First();
-                if (action != null) {
+                if (action != null)
+                {
                     BeginInvokeOnMainThread(() =>
                     {
                         leadingSwipeButton.SetTitle(action.GetName(), UIControlState.Normal);
@@ -58,12 +59,13 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
             if (middleSwipeButton != null)
             {
                 var action = PlatformConfig.Preferences.EmailTrailingSwipeActions.ElementAt(1);
-                if (action != null) {
+                if (action != null)
+                {
                     BeginInvokeOnMainThread(() =>
                     {
                         middleSwipeButton.SetTitle(action.GetName(), UIControlState.Normal);
                     });
-                } 
+                }
             }
 
             if (lastSwipeButton != null)
@@ -630,7 +632,6 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
         #region Actions
         void SetAction(nint tag, EmailSwipeAction.SwipeAction action)
         {
-
             CommonConfig.UsageAnalytics.LogEvent(new SwipeActionChangedEvent());
 
             switch (tag)
@@ -647,7 +648,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
             }
         }
 
-        void SelectAction_Clicked(object sender, EventArgs e)
+        private void SelectAction_Clicked(object sender, EventArgs e)
         {
             var eas = UIAlertController.Create(null, null, UIAlertControllerStyle.ActionSheet);
 
@@ -668,6 +669,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                 {
                     SetAction(senderBtn.Tag, EmailSwipeAction.SwipeAction.CopyToWorkTray);
                 }));
+
             eas.AddAction(UIAlertAction.Create(
                 Localization.GetString("copy_to_folder"),
                 UIAlertActionStyle.Default,
@@ -687,7 +689,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                     }));
             }
 
-            if(ServerConfig.SystemSettings.SystemInfo.DeliveryReportAvailable)
+            if (ServerConfig.SystemSettings.SystemInfo.DeliveryReportAvailable)
             {
                 eas.AddAction(UIAlertAction.Create(
                     Localization.GetString("delivery_report"),
@@ -729,7 +731,6 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                 {
                     SetAction(senderBtn.Tag, EmailSwipeAction.SwipeAction.RemoveFromFolder);
                 }));
-
 
             eas.AddAction(UIAlertAction.Create(
                 Localization.GetString("delete"),

@@ -51,6 +51,7 @@
 "cancel" = "Cancel";
 "cancel_send" = "Cancel send";
 "cancelled" = "Cancelled";
+"cannot_copy_or_move_to_dynamic_folder" = "Cannot copy or move to dynamic folder.";
 "cannot_mail_report_content" = "There are no mail accounts configured on your device. You need to have an account configured before you can send feedback.";
 "cannot_mail_report_title" = "Cannot send report";
 "cannot_open_attachment_content" = "There is no app installed that can open this file.";
@@ -474,6 +475,7 @@
 "selected_time_before_current_time_title" = "The selected time is invalid";
 "selected_time_before_current_time_content" = "The selected time is before the current time. Please try again.";
 "send" = "Send";
+"send_as_plain_text" = "Send as plain text";
 "send_cancelled" = "Send cancelled";
 "send_now" = "Send now";
 "send_email_after" = "Send email after";

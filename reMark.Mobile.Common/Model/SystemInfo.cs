@@ -48,6 +48,8 @@ namespace reMark.Mobile.Common.Model
 
         public bool SavedSearchesAvailable => ServiceVersionGreaterThanOrEqual(4, 10, 0);
 
+        public bool SendAsPlainTextAvailable => ServiceVersionGreaterThanOrEqual(4, 11, 0);
+
         List<ModuleType> availableModules;
         public List<ModuleType> AvailableModules
         {

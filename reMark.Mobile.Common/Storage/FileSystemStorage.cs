@@ -400,6 +400,7 @@ namespace reMark.Mobile.Common.Storage
                 ConfirmRead = documentWorkingCopy.ConfirmRead,
                 SendOnTimestamp = documentWorkingCopy.SendOnTimestamp,
                 SendDateTime = DateTime.UtcNow,
+                SendAsPlainText = documentWorkingCopy.SendAsPlainText
             }));
             var documentPreviewFile = await folder.CreateFileAsync("documentPreview.json", CreationCollisionOption.FailIfExists);
             await documentPreviewFile.WriteAllTextAsync(Serializer.Serialize(documentWorkingCopy.DocumentPreview));

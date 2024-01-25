@@ -45,7 +45,8 @@
     <string name="cancel_send">Cancel send</string>
     <string name="cancelled">Cancelled</string>
     <string name="calendar">Calendar</string>
-    <string name="calendars">Calendars</string>
+    <string name="calendars">Calendars</string>    
+    <string name="cannot_copy_or_move_to_dynamic_folder">Cannot copy or move to dynamic folder.</string>
     <string name="cannot_edit_comment_content">This comment cannot be edited anymore</string>
     <string name="cannot_edit_comment_title">Cannot edit comment</string>
     <string name="cannot_edit_extra_field_title">Cannot edit extra field</string>
@@ -251,6 +252,7 @@
     <string name="error_while_sending_document">There was an error while sending the email</string>
     <string name="extra_fields_alert_not_available_title">Extra fields editing not available</string>
     <string name="extra_fields_alert_not_available_content">To use extra fields editing functionality please update reMARK App Service API to version 4.4 or higher</string>
+    <string name="failed">Failed</string>
     <string name="failed_send_document_notification_content">One or more emails could not be sent. Please check Outgoing folder for details.</string>
     <string name="failed_send_document_notification_title">Failed to send emails</string>
     <string name="file_to_folder">File to folder</string>
