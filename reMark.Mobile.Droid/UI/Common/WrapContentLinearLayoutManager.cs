@@ -1,9 +1,9 @@
 ﻿using Android.Content;
 using AndroidX.RecyclerView.Widget;
 using Java.Lang;
-using Mark5.Mobile.Common;
+using reMark.Mobile.Common;
 
-namespace Mark5.Mobile.Droid.Ui.Common
+namespace reMark.Mobile.Droid.Ui.Common
 {
     public class WrapContentLinearLayoutManager: LinearLayoutManager
     {
