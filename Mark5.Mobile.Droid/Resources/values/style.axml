@@ -27,7 +27,8 @@
         <item name="preferenceTheme">@style/mark5preference</item>
         <item name="alertDialogTheme">@style/mark5dialog</item>
         <item name="android:statusBarColor">@color/darkerblue</item>
-         <item name="android:datePickerStyle">@style/mark5DatePicker</item>
+        <item name="android:datePickerStyle">@style/mark5DatePicker</item>
+        <item name="android:editTextColor">@color/darkgray</item>
     </style>
     <style name="mark5" parent="mark5Base">
     </style>

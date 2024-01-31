@@ -33,16 +33,18 @@ using Google.Android.Material.Snackbar;
 using AndroidX.Core.Content;
 using FastScrollRecycler;
 using Mark5.Mobile.Classes.Enum;
+using Exception = System.Exception;
+using SearchView = AndroidX.AppCompat.Widget.SearchView;
 
 namespace Mark5.Mobile.Droid.Ui.Fragments
 {
-    public class DocumentsListFragment : BaseFragment, ActionMode.ICallback, IMenuItemOnActionExpandListener, SearchView.IOnQueryTextListener
+    public class DocumentsListFragment : BaseFragment, ActionMode.ICallback
     {
         public Folder Folder { get; set; }
 
         DocumentsListAdapter CurrentAdapter => (DocumentsListAdapter)recyclerView.GetAdapter();
 
-        readonly Handler searchHandler = new Handler();
+        readonly Handler searchHandler = new Handler(Looper.MainLooper);
 
         protected const string FolderBundleKey = "Folder_5ab3effc-9a60-4b26-805e-72a0c3527b0d";
         const string SelectedDocumentPreviewsKey = "SelectedDocumentPreviews_9d33e0b7-9791-4ee9-82bd-73af5c0b5716";
@@ -61,6 +63,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         IMenu menu;
         CoordinatorLayout coordinatorLayout;
+        public SearchView _searchView;
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
         SwipeHelperCallback swipeHelperCallback;
@@ -68,7 +71,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         DocumentsListAdapter adapter;
         DocumentsListAdapter searchAdapter;
         ActionMode actionMode;
-        SearchView searchView;
         FloatingActionButton fab;
         Category presetCategory;
 
@@ -80,6 +82,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         bool hideSearch;
         bool onlyShowExternalDocuments;
+        public bool activityStartup;
 
         AutoRefreshWorker autoRefreshWorker;
 
@@ -129,9 +132,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            activityStartup = true;
             CommonConfig.Logger.Info($"Creating {nameof(DocumentsListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]...");
 
-            var rootView = inflater.Inflate(Resource.Layout.list, container, false);
+            var rootView = inflater.Inflate(Resource.Layout.list_with_searchbar, container, false);
 
             coordinatorLayout = (CoordinatorLayout)container.Parent.Parent;
 
@@ -150,10 +154,13 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 await RefreshData(forceClear: true);
             };
 
+            _searchView = rootView.FindViewById<AndroidX.AppCompat.Widget.SearchView>(Resource.Id.SearchView);
+            _searchView.QueryHint = GetString(Resource.String.filter);
+            _searchView.QueryTextChange += _searchView_QueryTextChange;
+
             recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recycler_view);
             recyclerView.SetLayoutManager(new WrapContentLinearLayoutManager(Activity));
             recyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
-
 
             adapter = new DocumentsListAdapter(Activity, recyclerView, async (startId) => await RefreshData(startId));
             adapter.FolderId = Folder.Id;
@@ -171,7 +178,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }));
             recyclerView.SetAdapter(adapter);
 
-
             swipeHelperCallback = new SwipeHelperCallback(Context, this, adapter, refreshLayout, Folder);
             itemTouchHelper = new ItemTouchHelper(swipeHelperCallback);
             itemTouchHelper.AttachToRecyclerView(recyclerView);
@@ -187,8 +193,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             HasOptionsMenu = true;
 
-            HasOptionsMenu = true;
-
             return rootView;
         }
 
@@ -200,6 +204,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = Folder?.Name;
 
             CommonConfig.Logger.Info($"Created {nameof(DocumentsListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]");
+
         }
 
         public override void OnDestroyView()
@@ -286,19 +291,16 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             inflater.Inflate(Resource.Menu.menu_main, menu);
 
             var filterItem = menu.FindItem(Resource.Id.action_filter);
-            filterItem.SetOnActionExpandListener(this);
-            searchView = (SearchView)filterItem.ActionView;
-            searchView.QueryHint = GetString(Resource.String.filter);
-            searchView.SetOnQueryTextListener(this);
+            filterItem.SetVisible(false);
 
             if (!hideSearch)
             {
-                var searchItem = menu.Add(Menu.None, 10, Menu.None, Resource.String.search);
+                var searchItem = menu.Add(IMenu.None, 10, IMenu.None, Resource.String.search);
                 searchItem.SetIcon(Resource.Drawable.action_search_server);
                 searchItem.SetShowAsAction(ShowAsAction.Always);
             }
 
-            var bookmarkItem = menu.Add(Menu.None, 11, Menu.None, Resource.String.search);
+            var bookmarkItem = menu.Add(IMenu.None, 11, IMenu.None, Resource.String.search);
             bookmarkItem.SetIcon(Resource.Drawable.ic_bookmark);
             bookmarkItem.SetShowAsAction(ShowAsAction.Always); 
         }
@@ -369,7 +371,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 CommonConfig.Logger.Error($"Adding bookmark for folder Id= {Folder.Id} [documentPreview.Id={documentPreview.Id}] failed", ex);
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
-
             }
 
         }
@@ -1101,58 +1102,43 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         #region Filtering
 
-        bool IMenuItemOnActionExpandListener.OnMenuItemActionExpand(IMenuItem item)
+        private void _searchView_QueryTextChange(object sender, SearchView.QueryTextChangeEventArgs e)
         {
-            if (item.ItemId == Resource.Id.action_filter)
+            var newText = e.NewText;
+            if (string.IsNullOrEmpty(newText))
             {
-                CommonConfig.UsageAnalytics.LogEvent(new FilterEvent(false, module: ModuleType.Documents));
-
-                menu?.FindItem(10)?.SetVisible(false);
-
-                refreshLayout.Enabled = false;
-                adapter.ClearSelections();
-                recyclerView.SwapAdapter(searchAdapter, true);
-                (this as SearchView.IOnQueryTextListener).OnQueryTextChange(string.Empty);
-                return true;
+                DisableSearchFilter();
             }
-
-            return false;
-        }
-
-        bool IMenuItemOnActionExpandListener.OnMenuItemActionCollapse(IMenuItem item)
-        {
-            if (item.ItemId == Resource.Id.action_filter)
+            else
             {
-                menu?.FindItem(10)?.SetVisible(true);
-
+                EnableSearchFilter();
                 searchHandler.RemoveCallbacksAndMessages(null);
-                searchAdapter.Clear();
-                searchAdapter.ClearSelections();
-                recyclerView.SwapAdapter(adapter, true);
-                refreshLayout.Enabled = true;
-                return true;
-            }
-
-            return false;
-        }
-
-        bool SearchView.IOnQueryTextListener.OnQueryTextChange(string newText)
-        {
-            searchHandler.RemoveCallbacksAndMessages(null);
-            searchHandler.PostDelayed(() =>
+                searchHandler.PostDelayed(() =>
                 {
                     if (string.IsNullOrWhiteSpace(newText))
                         searchAdapter.ReplaceItems(adapter.Items);
                     else
                         searchAdapter.ReplaceItems(adapter.Items.Where(dp => MatchesQuery(dp, newText)).ToList());
                 },
-                500);
-            return false;
+                    500);
+            }
         }
 
-        bool SearchView.IOnQueryTextListener.OnQueryTextSubmit(string query)
+        private void EnableSearchFilter()
         {
-            return false;
+            CommonConfig.UsageAnalytics.LogEvent(new FilterEvent(false, module: ModuleType.Documents));
+            refreshLayout.Enabled = false;
+            adapter.ClearSelections();
+            recyclerView.SwapAdapter(searchAdapter, true);
+        }
+
+        private void DisableSearchFilter()
+        {
+            searchHandler.RemoveCallbacksAndMessages(null);
+            searchAdapter.Clear();
+            searchAdapter.ClearSelections();
+            recyclerView.SwapAdapter(adapter, true);
+            refreshLayout.Enabled = true;
         }
 
         static bool MatchesQuery(DocumentPreview dp, string query)
@@ -1344,7 +1330,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         {
             public override int ItemCount => Items.Count;
 
-            public List<DocumentPreview> Items { get; } = new List<DocumentPreview>(1000);
+            public List<DocumentPreview> Items { get; private set; } = new List<DocumentPreview>(1000);
 
             public List<DocumentPreview> SelectedItems => selectedDocumentsInView.Values.ToList();
 
@@ -1379,6 +1365,10 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 this.recyclerView = recyclerView;
                 this.context = context;
                 this.loadMoreAction = loadMoreAction;
+            }
+            public void SetItems(List<DocumentPreview> items)
+            {
+                Items = items;
             }
 
             public override int GetItemViewType(int position)
@@ -1608,9 +1598,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 else
                     cell.ItemView.SetBackgroundColor(new Color(ContextCompat.GetColor(context, Resource.Color.white)));
             }
-
-            
-
 
             public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
             {
@@ -2363,5 +2350,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
         }
+ 
     }
 }

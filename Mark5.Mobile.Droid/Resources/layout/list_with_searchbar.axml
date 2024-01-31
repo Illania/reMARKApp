@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/swipe_refresh_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+    <RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/white"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:orientation="vertical">
+    <androidx.appcompat.widget.SearchView
+    android:background="@color/darkblue"
+    android:id="@+id/SearchView"
+    android:iconifiedByDefault="false"
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:queryHint="Search Email"/>
+    <FastScrollRecycler.FastScrollRecyclerView
+    android:id="@id/recycler_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:clipToPadding="false"
+    android:layout_below="@id/SearchView"
+    app:fastScrollPopupBackgroundColor="@color/darkblue"
+    app:fastScrollPopupBackgroundSize="60dp"
+    app:fastScrollPopupTextColor="@color/lightgray"
+    app:fastScrollPopupTextSize="28dp"
+    app:fastScrollThumbColor="@color/darkblue"
+    app:fastScrollThumbHeight="60dp"
+    app:fastScrollTrackColor="@color/lightgray" />
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/empty_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:textAppearance="@style/fontVeryLarge"
+        android:textColor="@color/lightgray"
+        android:visibility="gone" />
+</RelativeLayout>
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
