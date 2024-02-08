@@ -172,7 +172,7 @@ namespace reMark.ServiceReference.DataContract
         [EnumMember(Value = "Documents")] Documents = 1,
         [EnumMember(Value = "Contacts")] Contacts = 2,
         [EnumMember(Value = "Shortcodes")] Shortcodes = 3,
-        [EnumMember(Value = "Calendar")] Calendar = 4,
+        //[EnumMember(Value = "Calendar")] Calendar = 4,
     }
 
     [DataContract(Name = "FolderType", Namespace = "com.nordic-it.appservice.v3")]
@@ -309,7 +309,7 @@ namespace reMark.ServiceReference.DataContract
         [DataMember(Name = "Delayed", Order = 1)]
         public bool Delayed { get; set; }
 
-        [DataMember(Name ="SendAsPlainText", Order = 2)]
+        [DataMember(Name = "SendAsPlainText", Order = 2)]
         public bool SendAsPlainText { get; set; }
     }
 
@@ -2965,8 +2965,8 @@ namespace reMark.ServiceReference.DataContract
         [DataMember(Name = "ShortcodesModuleInfo", Order = 0)]
         public ShortcodesModuleInfo ShortcodesModuleInfo { get; set; } = new ShortcodesModuleInfo();
 
-        [DataMember(Name = "CalendarModuleInfo", Order = 0)]
-        public CalendarModuleInfo CalendarModuleInfo { get; set; } = new CalendarModuleInfo();
+        /*[DataMember(Name = "CalendarModuleInfo", Order = 0)]
+        public CalendarModuleInfo CalendarModuleInfo { get; set; } = new CalendarModuleInfo();*/
 
         [DataMember(Name = "UserInfo", Order = 0)]
         public UserInfo UserInfo { get; set; } = new UserInfo();
@@ -3554,7 +3554,7 @@ namespace reMark.ServiceReference.DataContract
     }
 
     [DataContract(Name = "GetSavedDocumentsSearchesResult", Namespace = "com.nordic-it.appservice.v3")]
-    public class GetSavedDocumentsSearchesResult 
+    public class GetSavedDocumentsSearchesResult
     {
         [DataMember(Name = "SavedSearches", Order = 0)]
         public List<SavedDocumentsFilter> SavedSearches { get; set; } = new List<SavedDocumentsFilter>();
@@ -3618,7 +3618,7 @@ namespace reMark.ServiceReference.DataContract
     }
 
     [DataContract(Name = "UpdateSavedSearchesResult", Namespace = "com.nordic-it.appservice.v3")]
-    public class UpdateSavedSearchesResult 
+    public class UpdateSavedSearchesResult
     {
     }
 

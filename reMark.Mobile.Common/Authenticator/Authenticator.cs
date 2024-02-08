@@ -13,7 +13,14 @@ namespace reMark.Mobile.Common.Authenticator
     {
         public async Task<bool> IsAuthenticatedAsync(CancellationToken ct = default(CancellationToken))
         {
-            return await GetConnectionInfoAsync(ct) != null;
+            try
+            {
+                return await GetConnectionInfoAsync(ct) != null;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public async Task<ConnectionInfo> AuthenticateAsync(string username, string password, SslMode sslMode, string hostname, string port, CancellationToken ct = default(CancellationToken))

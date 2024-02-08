@@ -311,6 +311,11 @@ namespace reMark.Mobile.Common.Storage
 
                 return null;
             }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Error in GetAsync for type {typeof(T)}", ex);
+                return default;
+            }
             finally
             {
                 semaphores[filename].Release();
