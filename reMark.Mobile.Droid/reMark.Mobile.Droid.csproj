@@ -1,0 +1,154 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net7.0-android</TargetFramework>
+    <SupportedOSPlatformVersion>21</SupportedOSPlatformVersion>
+    <OutputType>Exe</OutputType>
+    <Nullable>enable</Nullable>
+    <UseMaui>true</UseMaui>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationId>com.nordic_it.mark5.mobile.android</ApplicationId>
+    <ApplicationVersion>6.0</ApplicationVersion>
+    <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+    <JavaMaximumHeapSize>1G</JavaMaximumHeapSize>
+    <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
+    <SkipValidateMauiImplicitPackageReferences>true</SkipValidateMauiImplicitPackageReferences> 
+  </PropertyGroup>
+    <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <RuntimeIdentifiers>android-arm;android-arm64;android-x86;android-x64</RuntimeIdentifiers> 
+    <ProjectGuid>{18408F16-3AEB-4095-949F-3299BACA8B58}</ProjectGuid>
+    <ProjectTypeGuids>{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <MandroidI18n>cjk;mideast;west;other;rare</MandroidI18n>
+    <AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidClientHandler</AndroidHttpClientHandlerType>
+    <JavaMaximumHeapSize>1G</JavaMaximumHeapSize>
+    <AndroidTlsProvider>btls</AndroidTlsProvider>
+    <AndroidKeyStore>True</AndroidKeyStore>
+    <AndroidSigningKeyStore>/Users/mac/remark-appdroid/extra/App Development Certificates/Android/default.keystore</AndroidSigningKeyStore>
+    <AndroidSigningStorePass>Xs4Droid2015!</AndroidSigningStorePass>
+    <AndroidSigningKeyAlias>default</AndroidSigningKeyAlias>
+    <AndroidSigningKeyPass>Xs4Droid2015!</AndroidSigningKeyPass>
+    <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
+    <AndroidDexTool>d8</AndroidDexTool>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AndroidManagedSymbols>true</AndroidManagedSymbols>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <AndroidLinkSkip>System.Runtime;System.Collections;System.Runtime.Serialization</AndroidLinkSkip>
+    <MandroidI18n>cjk;mideast;west;other;rare</MandroidI18n>
+    <AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidClientHandler</AndroidHttpClientHandlerType>
+    <JavaMaximumHeapSize>1G</JavaMaximumHeapSize>
+    <AndroidTlsProvider>btls</AndroidTlsProvider>
+    <AndroidKeyStore>True</AndroidKeyStore>
+    <AndroidSigningKeyStore>../../extra/App Development Certificates/Android/default.keystore</AndroidSigningKeyStore>
+    <AndroidSigningStorePass>Xs4Droid2015!</AndroidSigningStorePass>
+    <AndroidSigningKeyAlias>default</AndroidSigningKeyAlias>
+    <AndroidSigningKeyPass>Xs4Droid2015!</AndroidSigningKeyPass>
+    <AndroidDexTool>d8</AndroidDexTool>
+    <LangVersion>10.0</LangVersion>
+    <AndroidCreatePackagePerAbi>false</AndroidCreatePackagePerAbi>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)|$(Platform)'=='net7.0-android|AnyCPU'">
+    <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="Resources\mipmap-mdpi\" />
+    <Folder Include="Model\HubMessages\" />
+    <Folder Include="Utilities\Extensions\" />
+    <Folder Include="Utilities\Fingerprint\" />
+    <Folder Include="Utilities\CallerId\" />
+    <Folder Include="Utilities\Worker\" />
+    <Folder Include="Service\PushNotifications\" />
+    <Folder Include="Service\PushNotifications\Firebase\" />
+    <Folder Include="Service\PushNotifications\Pushy\" />
+    <Folder Include="Service\Reachability\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\reMark.ServiceReference.Exceptions\reMark.ServiceReference.Exceptions.csproj">
+      <ReferenceSourceTarget>ProjectReference</ReferenceSourceTarget>
+    </ProjectReference>
+    <ProjectReference Include="..\reMark.Mobile.Classes\reMark.Mobile.Classes.csproj">
+      <ReferenceSourceTarget>ProjectReference</ReferenceSourceTarget>
+    </ProjectReference>
+    <ProjectReference Include="..\reMark.Mobile.Common\reMark.Mobile.Common.csproj">
+      <ReferenceSourceTarget>ProjectReference</ReferenceSourceTarget>
+    </ProjectReference>
+    <ProjectReference Include="..\reMark.ServiceReference\reMark.ServiceReference.csproj">
+      <ReferenceSourceTarget>ProjectReference</ReferenceSourceTarget>
+    </ProjectReference>
+    <ProjectReference Include="..\TinyMessenger\TinyMessenger.csproj">
+      <ReferenceSourceTarget>ProjectReference</ReferenceSourceTarget>
+    </ProjectReference>
+    <ProjectReference Include="..\FastScroller\FastScrollRecycler.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <GoogleServicesJson Include="google-services.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Xamarin.AndroidX.AppCompat" Version="1.6.1.6" />
+    <PackageReference Include="Xamarin.AndroidX.AppCompat.AppCompatResources" Version="1.6.1.7" />
+    <PackageReference Include="Xamarin.AndroidX.AppCompat.Resources" Version="1.1.0.2" />
+    <PackageReference Include="Xamarin.AndroidX.RecyclerView" Version="1.3.2.1" />
+    <PackageReference Include="Xamarin.Google.Android.Material" Version="1.10.0.2" />
+    <PackageReference Include="Xamarin.AndroidX.CoordinatorLayout" Version="1.2.0.10" />
+    <PackageReference Include="Pushy.SDK.Xamarin.Android" Version="1.0.93" />
+    <PackageReference Include="MailBee.NET" Version="12.4.0" />
+    <PackageReference Include="Xamarin.AndroidX.SwipeRefreshLayout" Version="1.1.0.17" />
+    <PackageReference Include="Microsoft.AppCenter" Version="5.0.3" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.57" />
+    <PackageReference Include="libphonenumber-csharp" Version="8.13.27" />
+    <PackageReference Include="Xamarin.AndroidX.Legacy.Support.Core.Utils" Version="1.0.0.22" />
+    <PackageReference Include="Xamarin.AndroidX.Legacy.Support.V4" Version="1.0.0.22" />
+    <PackageReference Include="Xamarin.AndroidX.Legacy.Support.Core.UI" Version="1.0.0.23" />
+    <PackageReference Include="Com.Airbnb.Android.Lottie" Version="4.2.2" />
+    <PackageReference Include="Xamarin.AndroidX.Preference" Version="1.2.1.3" />
+    <PackageReference Include="Microsoft.AppCenter.Crashes" Version="5.0.3" />
+    <PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime" Version="2.6.2.3" />
+    <PackageReference Include="Xamarin.AndroidX.Lifecycle.Common" Version="2.6.2.3" />
+    <PackageReference Include="Xamarin.AndroidX.Annotation" Version="1.7.0.3" />
+    <PackageReference Include="Xamarin.AndroidX.Collection" Version="1.3.0.2" />
+    <PackageReference Include="Xamarin.AndroidX.Core" Version="1.12.0.3" />
+    <PackageReference Include="Xamarin.AndroidX.Fragment" Version="1.6.2.1" />
+    <PackageReference Include="Xamarin.AndroidX.Activity" Version="1.8.1.1" />
+    <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData.Core" Version="2.6.2.3" />
+    <PackageReference Include="Xamarin.AndroidX.Loader" Version="1.1.0.22" />
+    <PackageReference Include="Xamarin.AndroidX.CustomView" Version="1.1.0.21" />
+    <PackageReference Include="Xamarin.AndroidX.Lifecycle.ViewModel" Version="2.6.2.3" />
+    <PackageReference Include="Xamarin.AndroidX.ViewPager" Version="1.0.0.22" />
+    <PackageReference Include="Xamarin.AndroidX.SavedState" Version="1.2.1.6" />
+    <PackageReference Include="Xamarin.AndroidX.Arch.Core.Runtime" Version="2.2.0.6" />
+    <PackageReference Include="Xamarin.Kotlin.StdLib" Version="1.9.21.1" />
+    <PackageReference Include="Xamarin.KotlinX.Coroutines.Android" Version="1.7.3.3" />
+    <PackageReference Include="Xamarin.Google.Guava.ListenableFuture" Version="1.0.0.17" />
+    <PackageReference Include="Xamarin.AndroidX.Startup.StartupRuntime" Version="1.1.1.10" />
+    <PackageReference Include="Xamarin.AndroidX.Sqlite.Framework" Version="2.4.0.1" />
+    <PackageReference Include="Xamarin.AndroidX.Room.Room.Ktx" Version="2.6.1" />
+    <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData" Version="2.6.2.3" />
+    <PackageReference Include="Xamarin.AndroidX.Lifecycle.Service" Version="2.6.2.3" />
+    <PackageReference Include="Xamarin.AndroidX.Annotation.Experimental" Version="1.3.1.4" />
+    <PackageReference Include="Xamarin.AndroidX.Work.Runtime" Version="2.9.0" />
+    <PackageReference Include="PreMailer.Net" Version="2.5.0" />
+    <PackageReference Include="Xamarin.Firebase.Analytics" Version="121.3.0.4" />
+    <PackageReference Include="Xamarin.Firebase.Messaging" Version="123.3.1.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Resources\Resource.designer.cs" />
+  </ItemGroup>
+</Project>

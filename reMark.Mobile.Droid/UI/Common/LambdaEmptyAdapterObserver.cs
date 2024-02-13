@@ -1,0 +1,30 @@
+﻿using System;
+using AndroidX.RecyclerView.Widget;
+
+namespace reMark.Mobile.Droid.Ui.Common
+{
+    public class LambdaEmptyAdapterObserver : RecyclerView.AdapterDataObserver
+    {
+        readonly Action action;
+
+        public LambdaEmptyAdapterObserver(Action action)
+        {
+            this.action = action;
+        }
+
+        public override void OnChanged()
+        {
+            action();
+        }
+
+        public override void OnItemRangeInserted(int positionStart, int itemCount)
+        {
+            action();
+        }
+
+        public override void OnItemRangeRemoved(int positionStart, int itemCount)
+        {
+            action();
+        }
+    }
+}

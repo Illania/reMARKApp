@@ -1,0 +1,38 @@
+﻿using System;
+
+namespace reMark.Mobile.Common.Model
+{
+    public class Comment : ICopiable<Comment>
+    {
+        public int Id { get; set; } = -1;
+
+        public Guid Guid { get; set; }
+        public long DateAddedTimestamp { get; set; } = -1;
+
+        public int UserId { get; set; }
+        public string UserName { get; set; }
+        public string Content { get; set; }
+        public int ParentId { get; set; }
+        public int ParentTypeId { get; set; }
+
+        public Comment ShallowCopy()
+        {
+            return new Comment
+            {
+                Id = Id,
+                Guid = Guid,
+                DateAddedTimestamp = DateAddedTimestamp,
+                UserId = UserId,
+                UserName = UserName,
+                Content = Content,
+                ParentId = ParentId,
+                ParentTypeId = ParentTypeId
+            };
+        }
+
+        public Comment DeepCopy()
+        {
+            return ShallowCopy();
+        }
+    }
+}

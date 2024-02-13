@@ -1,0 +1,17 @@
+﻿namespace reMark.Mobile.Common.Model
+{
+    public class ObjectLink
+    {
+        public int FromObjectId { get; set; } = -1;
+
+        public ObjectType FromObjectType { get; set; }
+        public int ToObjectId { get; set; } = -1;
+
+        public ObjectType ToObjectType { get; set; }
+        public bool IsReverse { get; set; }
+        public string Description { get; set; }
+        public ObjectLinkTypeInfo TypeInfo { get; set; }
+        public long LinkTimeStamp { get; set; } = -1;
+
+    }
+}

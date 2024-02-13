@@ -1,0 +1,128 @@
+using System;
+using Android.Content;
+using Android.Graphics;
+using Android.Util;
+using Android.Views;
+using AndroidX.AppCompat.Widget;
+using AndroidX.CardView.Widget;
+using AndroidX.Core.Content;
+using reMark.Mobile.Common.Model;
+using reMark.Mobile.Droid.Ui.Common;
+using reMark.Mobile.Droid.Utilities;
+using Color = Android.Graphics.Color;
+
+namespace reMark.Mobile.Droid.Ui.Views
+{
+    public class ObjectLinksView : CardView
+    {
+        int distanceVeryLarge;
+        int distanceLarge;
+        int distanceNormal;
+        int distanceSmall;
+
+        LinearLayoutCompat innerLayout;
+
+        public event EventHandler<ObjectLink> ObjectLinkClicked = delegate { };
+
+        public ObjectLinksView(Context context, string title, ObjectLink[] objectLinks)
+            : base(context)
+        {
+            InitializeView(title, objectLinks);
+        }
+
+        void InitializeView(string title, ObjectLink[] objectLinks)
+        {
+            LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
+            Elevation = 0;
+            Radius = Conversion.ConvertDpToPixels(2f);
+            UseCompatPadding = true;
+
+            distanceVeryLarge = Conversion.ConvertDpToPixels(24f);
+            distanceLarge = Conversion.ConvertDpToPixels(16f);
+            distanceNormal = Conversion.ConvertDpToPixels(8f);
+            distanceSmall = Conversion.ConvertDpToPixels(4f);
+
+            innerLayout = new LinearLayoutCompat(Context)
+            {
+                LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
+                Orientation = LinearLayoutCompat.Vertical
+            };
+            innerLayout.SetPadding(0, distanceLarge, 0, distanceLarge);
+            AddView(innerLayout);
+
+            var titleView = new AppCompatTextView(Context)
+            {
+                LayoutParameters = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+                {
+                    BottomMargin = distanceSmall
+                },
+                Text = title
+            };
+            titleView.SetTextAppearanceCompat(Context, Resource.Style.fontLarge);
+            titleView.SetTextColor(new Color(ContextCompat.GetColor(Context, Resource.Color.darkblue)));
+            titleView.SetPadding(distanceVeryLarge, 0, distanceNormal, 0);
+            innerLayout.AddView(titleView);
+
+            foreach (var objectLink in objectLinks)
+            {
+                var olv = new ObjectLinkView(Context, objectLink, distanceVeryLarge, distanceNormal);
+                olv.Click += (sender, e) => ObjectLinkClicked(this, objectLink);
+                innerLayout.AddView(olv);
+            }
+        }
+
+        class ObjectLinkView : LinearLayoutCompat
+        {
+            public ObjectLinkView(Context context, ObjectLink ol, int distanceVeryLarge, int distanceNormal)
+                : base(context)
+            {
+                LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
+                Orientation = Vertical;
+                SetPadding(distanceVeryLarge, distanceNormal, distanceVeryLarge, distanceNormal);
+
+                var titleView = new AppCompatTextView(Context)
+                {
+                    LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
+                    Text = ol.TypeInfo.DescriptionSimple
+                };
+                titleView.SetTextAppearanceCompat(Context, Resource.Style.fontPrimary);
+                AddView(titleView);
+
+                var subtitleView = new AppCompatTextView(Context)
+                {
+                    LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
+                    Text = ol.Description
+                };
+                subtitleView.SetTextAppearanceCompat(Context, Resource.Style.fontSmallLight);
+                AddView(subtitleView);
+
+                if (ol.IsReverse)
+                {
+                    Clickable = ol.FromObjectType == ObjectType.Document || ol.FromObjectType == ObjectType.Contact || ol.FromObjectType == ObjectType.Shortcode;
+                    if (Clickable)
+                    {
+                        var typedArray = Context.ObtainStyledAttributes(new int[]
+                        {
+                            Resource.Attribute.selectableItemBackground
+                        });
+                        SetBackgroundResource(typedArray.GetResourceId(0, 0));
+                        typedArray.Recycle();
+                    }
+                }
+                else
+                {
+                    Clickable = ol.ToObjectType == ObjectType.Document || ol.ToObjectType == ObjectType.Contact || ol.ToObjectType == ObjectType.Shortcode;
+                    if (Clickable)
+                    {
+                        var typedArray = Context.ObtainStyledAttributes(new int[]
+                        {
+                            Resource.Attribute.selectableItemBackground
+                        });
+                        SetBackgroundResource(typedArray.GetResourceId(0, 0));
+                        typedArray.Recycle();
+                    }
+                }
+            }
+        }
+    }
+}

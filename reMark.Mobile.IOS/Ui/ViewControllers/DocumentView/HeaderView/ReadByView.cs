@@ -1,0 +1,32 @@
+﻿using System.Linq;
+using System.Threading.Tasks;
+using reMark.Mobile.IOS.Ui.Common;
+
+namespace reMark.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
+{
+    public class ReadByView : TextSubView
+    {
+        public ReadByView()
+            : base(Localization.GetString("read_by"))
+        {
+        }
+
+        public override async Task RefreshView()
+        {
+            var readByUsernames = Document?.ReadByUserNames?.Values.SelectMany(s => s.Split('|')).OrderBy(s => s).Select(s => s.ToUpper());
+            if (readByUsernames != null && readByUsernames.Any() && TextView != null)
+                TextView.Text = string.Join(", ", readByUsernames);
+        }
+
+        public override void UpdateVisibility()
+        {
+            if (Document == null)
+            {
+                Hidden = true;
+                return;
+            }
+
+            Hidden = Document.ReadByUserNames.Count < 1;
+        }
+    }
+}

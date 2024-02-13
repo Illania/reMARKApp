@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="gcm_defaultSenderId" translatable="false">310064787348</string>
+  <string name="firebase_database_url" translatable="false">https://reMark-android.firebaseio.com</string>
+  <string name="google_storage_bucket" translatable="false">reMark-android.appspot.com</string>
+  <string name="project_id" translatable="false">reMark-android</string>
+</resources>
