@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Text;
 using Foundation;
 
-namespace reMARK.Mobile.IOS.Common.Base
+namespace reMark.Mobile.IOS.Common.Base
 {
     public class ErrorLogger
     {

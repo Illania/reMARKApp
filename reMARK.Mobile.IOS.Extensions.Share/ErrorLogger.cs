@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Text;
 
-namespace reMARK.Mobile.IOS.Extensions
+namespace reMark.Mobile.IOS.Extensions
 {
     public class ErrorLogger
     {
