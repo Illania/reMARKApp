@@ -1,0 +1,28 @@
+﻿using System;
+using Android.App;
+using Android.Content;
+using reMark.Mobile.Common;
+using reMark.Mobile.Droid.Utilities;
+
+namespace reMark.Mobile.Droid.Service
+{
+    [BroadcastReceiver(Enabled = true, Exported = false)]
+	[IntentFilter(new[] { "pushy.me" })]
+	public class PushyReceiver : BroadcastReceiver
+	{ 
+        public override async void OnReceive(Context context, Intent intent)
+		{
+			try
+			{
+				var notification = PushNotificationsConverter.ExtractNotification(intent.Extras);
+				await PushNotificationsUtilities.ProcessMessageReceived(context, notification);
+			}
+			catch (Exception ex)
+			{
+				CommonConfig.Logger.Error($"Could not process notification. " +
+                    $"message.data.keys={string.Join(",", intent.Extras.KeySet())}]", ex);
+			}
+
+        }
+	}
+}

@@ -1,6 +1,11 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <TargetFramework>net7.0-ios</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>true</ImplicitUsings>
+    <SkipValidateMauiImplicitPackageReferences>true</SkipValidateMauiImplicitPackageReferences> 
+  </PropertyGroup>
+   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{5DDB3BAE-617A-417A-B6AA-68F82B48E3AF}</ProjectGuid>
@@ -12,6 +17,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
+    <CreatePackage>false</CreatePackage>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug</OutputPath>
@@ -31,6 +37,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
+    <CreatePackage>false</CreatePackage>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
     <DefineConstants>
@@ -44,40 +51,29 @@
     </MtouchHttpClientHandler>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Core" />
-    <Reference Include="Xamarin.iOS" />
+    <BundleResource Condition="'$(_ResourcePrefix)' != ''" Update="Resources\error%403x.png">
+      <Link>Resources\error%403x.png</Link>
+    </BundleResource>
+    <BundleResource Condition="'$(_ResourcePrefix)' != ''" Update="Resources\angle-mask%403x.png">
+      <Link>Resources\angle-mask%403x.png</Link>
+    </BundleResource>
+    <BundleResource Condition="'$(_ResourcePrefix)' != ''" Update="Resources\angle-mask%402x.png">
+      <Link>Resources\angle-mask%402x.png</Link>
+    </BundleResource>
+    <BundleResource Condition="'$(_ResourcePrefix)' != ''" Update="Resources\error%402x.png">
+      <Link>Resources\error%402x.png</Link>
+    </BundleResource>
+    <BundleResource Condition="'$(_ResourcePrefix)' != ''" Update="Resources\info%403x.png">
+      <Link>Resources\info%403x.png</Link>
+    </BundleResource>
+    <BundleResource Condition="'$(_ResourcePrefix)' != ''" Update="Resources\success%402x.png">
+      <Link>Resources\success%402x.png</Link>
+    </BundleResource>
+    <BundleResource Condition="'$(_ResourcePrefix)' != ''" Update="Resources\success%403x.png">
+      <Link>Resources\success%403x.png</Link>
+    </BundleResource>
+    <BundleResource Condition="'$(_ResourcePrefix)' != ''" Update="Resources\info%402x.png">
+      <Link>Resources\info%402x.png</Link>
+    </BundleResource>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Resources\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="NativeMethods.cs" />
-    <Compile Include="ProgressHUD.cs" />
-    <Compile Include="RadialGradientLayer.cs" />
-    <Compile Include="IndefiniteAnimatedView.cs" />
-    <Compile Include="ProgressAnimatedView.cs" />
-    <Compile Include="Enums.cs" />
-    <Compile Include="GlobalSuppressions.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <BundleResource Include="Resources\angle-mask.png" />
-    <BundleResource Include="Resources\angle-mask%402x.png" />
-    <BundleResource Include="Resources\angle-mask%403x.png" />
-    <BundleResource Include="Resources\error.png" />
-    <BundleResource Include="Resources\error%402x.png" />
-    <BundleResource Include="Resources\error%403x.png" />
-    <BundleResource Include="Resources\info.png" />
-    <BundleResource Include="Resources\info%402x.png" />
-    <BundleResource Include="Resources\info%403x.png" />
-    <BundleResource Include="Resources\success.png" />
-    <BundleResource Include="Resources\success%402x.png" />
-    <BundleResource Include="Resources\success%403x.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Info.plist" />
-  </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>

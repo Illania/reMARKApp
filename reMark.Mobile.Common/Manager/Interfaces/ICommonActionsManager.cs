@@ -1,0 +1,48 @@
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using reMark.Mobile.Common.Model;
+using reMark.Mobile.Classes.Enum;
+
+namespace reMark.Mobile.Common.Manager
+{
+    public interface ICommonActionsManager
+    {
+        Task<List<ObjectAction>> GetObjectActionsAsync(IBusinessEntity businessEntity, SourceType sourceType = SourceType.Auto);
+
+        Task<List<ObjectLink>> GetObjectLinksAsync(IBusinessEntity businessEntity, SourceType sourceType = SourceType.Auto);
+
+        Task CopyToFolder(List<IBusinessEntity> businessEntities, Folder folder, SourceType sourceType = SourceType.Auto);
+
+        Task CopyToFolder(List<int> businessEntitiesIds, ObjectType objectType, int folderId, SourceType sourceType = SourceType.Auto);
+
+        Task MoveToFolder(List<IBusinessEntity> businessEntities, Folder fromFolder, Folder toFolder, SourceType sourceType = SourceType.Auto);
+
+        Task MoveToFolder(List<int> businessEntitiesIds, ObjectType objectType, Folder fromFolder, Folder toFolder, SourceType sourceType = SourceType.Auto);
+
+        Task CopyToWorktray(List<IBusinessEntity> businessEntities, SourceType sourceType = SourceType.Auto);
+
+        Task CopyToWorktray(List<int> businessEntitiesIds, ObjectType objectType, SourceType sourceType = SourceType.Auto);
+
+        Task CopyToUserWorktray(List<IBusinessEntity> businessEntities, List<SystemUser> systemUsers, string comment = null, SourceType sourceType = SourceType.Auto);
+
+        Task CopyToUserWorktray(List<IBusinessEntity> businessEntities, List<int> systemUsersIds, string comment = null, SourceType sourceType = SourceType.Auto);
+
+        Task CopyToUserWorktray(List<int> businessEntitiesIds, ObjectType objectType, List<SystemUser> systemUsers, string comment = null, SourceType sourceType = SourceType.Auto);
+
+        Task CopyToUserWorktray(List<int> ids, ObjectType objectType, List<int> systemUsersIds, string comment = null, SourceType sourceType = SourceType.Auto);
+      
+        Task RemoveFromFolder(List<IBusinessEntity> businessEntities, Folder folder, SourceType sourceType = SourceType.Auto);
+
+        Task Delete(List<IBusinessEntity> businessEntities, SourceType sourceType = SourceType.Auto);
+
+        Task<List<int>> GetFavoriteCategories(SourceType sourceType = SourceType.Auto);
+
+        Task AddFavoriteCategory(int categoryId, SourceType sourceType = SourceType.Auto);
+
+        Task RemoveFavoriteCategory(int categoryId, SourceType sourceType = SourceType.Auto);
+
+        Task SetCategoriesAsync(IBusinessEntity businessEntity, List<Category> categories, SourceType sourceType = SourceType.Auto);
+
+        Task RestoreDeletedObjectsLocalAsync(List<int> ids, ObjectType objectType);
+    }
+}

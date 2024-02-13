@@ -1,0 +1,22 @@
+﻿using reMark.Mobile.Common.Model;
+
+namespace reMark.Mobile.Droid.Ui.Views.SearchViews
+{
+    public class DocumentExtraFieldsSearchView : AbstractEditableTextSearchView<SearchDocumentsCriteria>
+    {
+        public DocumentExtraFieldsSearchView(Android.Content.Context context)
+            : base(context, Resource.String.search_document_extra_fields)
+        {
+        }
+
+        public override void Refresh()
+        {
+            SetText(Criteria.ExtraFields);
+        }
+
+        public override void UpdateCriteria()
+        {
+            Criteria.ExtraFields = GetText();
+        }
+    }
+}

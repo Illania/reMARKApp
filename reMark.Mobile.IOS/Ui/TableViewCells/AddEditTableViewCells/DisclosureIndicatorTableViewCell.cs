@@ -1,0 +1,100 @@
+﻿using System;
+using Foundation;
+using reMark.Mobile.IOS.Ui.Common;
+using UIKit;
+
+namespace reMark.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
+{
+    public class DisclosureIndicatorTableViewCell : AddEditTableViewCell
+    {
+        public static readonly NSString Key = new NSString("DisclosureIndicatorTableViewCell");
+
+        protected UILabelScalable TitleLabel { get; set; }
+        protected UILabelScalable ContentLabel { get; set; }
+
+        NSLayoutConstraint leftContentConstraint;
+
+        readonly UIButtonScalable chevronButton;
+
+        public DisclosureIndicatorTableViewCell()
+            : base(UITableViewCellStyle.Default, Key)
+        {
+            SelectionStyle = UITableViewCellSelectionStyle.Default;
+
+            TitleLabel = new UILabelScalable
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                Font = Theme.DefaultFont.CustomFont(),
+                TextColor = Theme.DarkBlue,
+            };
+            TitleLabel.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            TitleLabel.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            ContentView.AddSubview(TitleLabel);
+
+            ContentLabel = new UILabelScalable
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                Font = Theme.DefaultFont.CustomFont(),
+                Lines = 0,
+            };
+            ContentView.AddSubview(ContentLabel);
+
+            chevronButton = GetChevron();
+            chevronButton.TranslatesAutoresizingMaskIntoConstraints = false;
+            chevronButton.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            ContentView.AddSubview(chevronButton);
+
+            ContentView.AddConstraints(new[]
+            {
+                TitleLabel.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor, VerticalMargin),
+                TitleLabel.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor, -VerticalMargin),
+                TitleLabel.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+
+                ContentLabel.HeightAnchor.ConstraintGreaterThanOrEqualTo(20f),
+                ContentLabel.TopAnchor.ConstraintEqualTo(TitleLabel.TopAnchor),
+                ContentLabel.BottomAnchor.ConstraintEqualTo(TitleLabel.BottomAnchor),
+                leftContentConstraint = ContentLabel.LeadingAnchor.ConstraintEqualTo(TitleLabel.TrailingAnchor, InnerHorizontalMargin),
+
+                chevronButton.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
+                chevronButton.LeadingAnchor.ConstraintEqualTo(ContentLabel.TrailingAnchor, InnerHorizontalMargin),
+                chevronButton.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
+            });
+        }
+
+        public void SetTitle(string title)
+        {
+            if (string.IsNullOrEmpty(title))
+            {
+                leftContentConstraint.Constant = 0;
+            }
+            else
+            {
+                leftContentConstraint.Constant = InnerHorizontalMargin;
+                TitleLabel.Text = title;
+            }
+        }
+
+        public void SetTitleColor(UIColor color)
+        {
+            TitleLabel.TextColor = color;
+        }
+
+        public void SetContent(string content)
+        {
+            ContentLabel.Text = content;
+        }
+
+        public void RemoveChevron()
+        {
+            chevronButton.RemoveFromSuperview();
+        }
+
+        public override void Reset()
+        {
+            SetErrorState(false);
+
+            TitleLabel.Text = string.Empty;
+            ContentLabel.Text = string.Empty;
+        }
+    }
+}

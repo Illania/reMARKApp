@@ -1,19 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
 using Contacts;
 using CoreFoundation;
-using Foundation;
-using Mark5.Mobile.IOS.Common;
-using Mark5.Mobile.IOS.Common.ShareExtension;
-using ObjCRuntime;
+using reMark.Mobile.IOS.Common.ShareExtension;
 using Social;
-using UIKit;
 using ContentType = MobileCoreServices.UTType;
 
-namespace reMARK.Mobile.IOS.Extensions.Share
+namespace reMark.Mobile.IOS.Extensions.Share
 {
     public partial class ShareViewController : SLComposeServiceViewController
     {

@@ -1,0 +1,155 @@
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Foundation;
+using reMark.Mobile.Common.Model;
+using reMark.Mobile.IOS.Ui.Common;
+using reMark.Mobile.IOS.Utilities;
+using ObjCRuntime;
+using UIKit;
+
+namespace reMark.Mobile.IOS.Ui.ViewControllers.ComposeDocumentViews.Subviews
+{
+    public class PriorityView : ComposeDocumentSubView
+    {
+        Priority selectedPriority = Priority.Normal;
+
+        public event EventHandler Edited = delegate { };
+        public event EventHandler ActionSheetWillAppear = delegate { };
+
+        readonly WeakReference<UIViewController> weakViewController;
+
+        UILabelScalable label;
+        UILabelScalable selectedPriorityLabel;
+
+        public PriorityView(UIViewController viewController)
+        {
+            weakViewController = new WeakReference<UIViewController>(viewController);
+            Initialize();
+        }
+
+        void Initialize()
+        {
+            label = new UILabelScalable
+            {
+                Text = Localization.GetString("priority") + ": ",
+                Font = Theme.DefaultFont.CustomFont(),
+                TextColor = Theme.DarkGray,
+                Opaque = false,
+                Lines = 0,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            label.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            label.SetContentHuggingPriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Vertical);
+            label.SetContentCompressionResistancePriority((float)UILayoutPriority.Required, UILayoutConstraintAxis.Horizontal);
+            ContainerView.AddSubview(label);
+            ContainerView.AddConstraints(new[]
+            {
+                label.TopAnchor.ConstraintEqualTo(ContainerView.TopAnchor, VerticalMargin),
+                label.LeftAnchor.ConstraintEqualTo(ContainerView.LeftAnchor, HorizontalMargin)
+            });
+
+            selectedPriorityLabel = new UILabelScalable
+            {
+                BackgroundColor = UIColor.Clear,
+                Text = UI.PrettyPriorityString(selectedPriority),
+                Font = Theme.DefaultFont.CustomFont(),
+                Opaque = false,
+                Lines = 1,
+                UserInteractionEnabled = true,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            selectedPriorityLabel.AddGestureRecognizer(new UITapGestureRecognizer(this, new Selector("PriorityLabelTapped")));
+            ContainerView.AddSubview(selectedPriorityLabel);
+            ContainerView.AddConstraints(new[]
+            {
+                selectedPriorityLabel.TopAnchor.ConstraintEqualTo(ContainerView.TopAnchor, VerticalMargin),
+                selectedPriorityLabel.LeftAnchor.ConstraintEqualTo(label.RightAnchor, InnerMargin),
+                selectedPriorityLabel.RightAnchor.ConstraintEqualTo(ContainerView.RightAnchor, -HorizontalMargin),
+                selectedPriorityLabel.BottomAnchor.ConstraintEqualTo(ContainerView.BottomAnchor, -VerticalMargin)
+            });
+        }
+
+        #region Overrides
+
+        public override Task InitializeView()
+        {
+            if (RestoreWorkingCopy)
+            {
+                SelectPriority(DocumentPreview.Priority);
+                return Task.CompletedTask;
+            }
+
+            if (DocumentCreationModeFlag == DocumentCreationModeFlag.Edit)
+            {
+                var previousDocumentPriority = PreviousDocumentPreview.Priority;
+
+                if (previousDocumentPriority != Priority.Low && previousDocumentPriority != Priority.Normal && previousDocumentPriority != Priority.Urgent)
+                    previousDocumentPriority = Priority.Normal;
+
+                SelectPriority(previousDocumentPriority);
+            }
+
+            return Task.CompletedTask;
+        }
+
+        public override Task UpdateDocument()
+        {
+            DocumentPreview.Priority = selectedPriority;
+            return Task.CompletedTask;
+        }
+
+        #endregion
+
+        #region Event handlers
+
+        [Export("PriorityLabelTapped")]
+        async void PriorityLabelTapped()
+        {
+            selectedPriorityLabel.TextColor = Theme.TintColor;
+
+            HandleScrollToView(this, EventArgs.Empty);
+            ActionSheetWillAppear(this, EventArgs.Empty);
+
+            var priorityStrings = new[]
+            {
+                UI.PrettyPriorityString(Priority.Urgent),
+                UI.PrettyPriorityString(Priority.Normal),
+                UI.PrettyPriorityString(Priority.Low)
+            };
+
+            if (!weakViewController.TryGetTarget(out UIViewController viewController))
+                return;
+
+            var result = await Dialogs.ShowListActionSheetAsync(viewController, priorityStrings, selectedPriorityLabel);
+            switch (result)
+            {
+                case 0:
+                    SelectPriority(Priority.Urgent);
+                    break;
+                case 1:
+                    SelectPriority(Priority.Normal);
+                    break;
+                case 2:
+                    SelectPriority(Priority.Low);
+                    break;
+            }
+        }
+
+        #endregion
+
+        #region Helper methods
+
+        void SelectPriority(Priority priority)
+        {
+            selectedPriorityLabel.TextColor = Theme.Black;
+
+            selectedPriority = priority;
+            selectedPriorityLabel.Text = UI.PrettyPriorityString(priority);
+
+            Edited(this, EventArgs.Empty);
+        }
+
+        #endregion
+    }
+}

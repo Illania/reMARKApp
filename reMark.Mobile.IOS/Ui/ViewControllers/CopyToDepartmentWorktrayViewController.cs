@@ -1,0 +1,578 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Foundation;
+using reMark.Mobile.Common;
+using reMark.Mobile.Common.Extensions;
+using reMark.Mobile.Common.Manager;
+using reMark.Mobile.Common.Model;
+using reMark.Mobile.Common.Utilities.Extensions;
+using reMark.Mobile.IOS.Ui.Common;
+using reMark.Mobile.IOS.Ui.TableViewCells;
+using reMark.Mobile.IOS.Utilities;
+using UIKit;
+
+namespace reMark.Mobile.IOS.Ui.ViewControllers
+{
+    public class CopyToDepartmentWorktrayViewController : AbstractTableViewController, IUISearchResultsUpdating
+    {
+        public List<IBusinessEntity> BusinessEntities { get; set; }
+        public bool DelayedCopy { get; set; } = false;
+
+        readonly TaskCompletionSource<List<int>> tcs = new();
+        public Task<List<int>> Result => tcs.Task;
+
+        UIBarButtonItem cancelItem;
+        UIBarButtonItem doneItem;
+
+        UISearchController searchController;
+        CancellationTokenSource searchCancellationTokenSource;
+        readonly List<CancellationTokenSource> searchCancellationTokenSourceList = new List<CancellationTokenSource>();
+
+        public CopyToDepartmentWorktrayViewController()
+            : base(UITableViewStyle.Grouped)
+        {
+        }
+
+        public override void LoadView()
+        {
+            base.LoadView();
+
+            InitializeNavigationBar();
+            InitializeView();
+            InitializeSearchBar();
+        }
+
+        public override void ViewWillAppear(bool animated)
+        {
+            base.ViewWillAppear(animated);
+
+            if (Integration.IsRunningAtLeast(11))
+            {
+                if (NavigationController != null)
+                    NavigationController.NavigationBar.PrefersLargeTitles = true;
+                NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+            }
+
+            InitializeHandlers();
+        }
+
+        public override async void ViewDidAppear(bool animated)
+        {
+            base.ViewDidAppear(animated);
+
+            CommonConfig.Logger.Info("Appeared");
+
+            if (((DataSource)TableView.Source).Empty)
+                await RefreshData();
+
+            if (Integration.IsRunningAtLeast(11))
+            {
+                NSOperationQueue.MainQueue.AddOperation(() =>
+                {
+                    var ni = NavigationItem;
+
+                    if (ParentViewController != null && ParentViewController is UIViewController && !(ParentViewController is UINavigationController))
+                        ni = ParentViewController?.NavigationItem;
+
+                    if (ni.SearchController == null)
+                        ni.SearchController = searchController;
+                });
+            }
+        }
+
+        public override void ViewWillDisappear(bool animated)
+        {
+            base.ViewWillDisappear(animated);
+
+            DeinitializeHandlers();
+        }
+
+        public override void DidReceiveMemoryWarning()
+        {
+            CommonConfig.Logger.Warning("Received memory warning!");
+
+            ((DataSource)TableView.Source)?.Reset();
+
+            GC.Collect();
+            base.DidReceiveMemoryWarning();
+        }
+
+        protected override void Recycle()
+        {
+            base.Recycle();
+
+            cancelItem = null;
+            doneItem = null;
+
+            searchCancellationTokenSource?.Dispose();
+            searchCancellationTokenSource = null;
+            searchCancellationTokenSourceList.ForEach(cts => cts?.Dispose());
+            searchCancellationTokenSourceList.Clear();
+
+            ((DataSource)TableView.Source)?.Reset();
+
+            searchController.SearchResultsUpdater = null;
+            searchController = null;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            if (CommonConfig.Logger.IsDebugEnabled())
+                CommonConfig.Logger.Debug("Disposed");
+        }
+
+        void InitializeNavigationBar()
+        {
+            NavigationItem.Title = Localization.GetString("copy_to_worktray");
+
+            cancelItem = new UIBarButtonItem(UIBarButtonSystemItem.Cancel);
+            NavigationItem.SetLeftBarButtonItem(cancelItem, false);
+
+            doneItem = new UIBarButtonItem(UIBarButtonSystemItem.Done)
+            {
+                Enabled = false
+            };
+            NavigationItem.SetRightBarButtonItem(doneItem, false);
+        }
+
+        void InitializeView()
+        {
+            TableView.Source = new DataSource(this, TableView);
+            TableView.AllowsSelection = true;
+            TableView.AllowsMultipleSelection = true;
+            TableView.RowHeight = UITableView.AutomaticDimension;
+            TableView.EstimatedRowHeight = 40f;
+        }
+
+        void InitializeSearchBar()
+        {
+            DefinesPresentationContext = true;
+
+            var searchResultsController = new UITableViewController();
+            var searchResultsDataSource = new SearchDataSource(this, searchResultsController.TableView);
+            searchResultsController.TableView.Source = searchResultsDataSource;
+            searchResultsController.TableView.EstimatedRowHeight = 40f;
+            searchResultsController.TableView.RowHeight = UITableView.AutomaticDimension;
+
+            searchController = new UISearchController(searchResultsController)
+            {
+                HidesNavigationBarDuringPresentation = true,
+                DimsBackgroundDuringPresentation = true,
+                ObscuresBackgroundDuringPresentation = true,
+                SearchResultsUpdater = this
+            };
+            searchController.SearchBar.Placeholder = Localization.GetString("filter");
+
+            if (!Integration.IsRunningAtLeast(11))
+            {
+                TableView.TableHeaderView = searchController.SearchBar;
+            }
+        }
+
+        void InitializeHandlers()
+        {
+            if (cancelItem != null)
+                cancelItem.Clicked += CancelItem_Clicked;
+
+            if (doneItem != null)
+                doneItem.Clicked += DoneItem_Clicked;
+        }
+
+        void DeinitializeHandlers()
+        {
+            if (cancelItem != null)
+                cancelItem.Clicked -= CancelItem_Clicked;
+
+            if (doneItem != null)
+                doneItem.Clicked -= DoneItem_Clicked;
+        }
+
+        void CancelItem_Clicked(object sender, EventArgs e)
+        {
+            tcs.SetResult(null);
+            DismissViewController(true, null);
+        }
+
+        async void DoneItem_Clicked(object sender, EventArgs e)
+        {
+            if (((DataSource)TableView.Source).IsOwnSelected)
+            {
+                var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("copying_to_own_worktray___"));
+
+                try
+                {
+                    await Managers.CommonActionsManager.CopyToWorktray(BusinessEntities);
+                    dismissAction();
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error("Could not copy to own worktray", ex);
+
+                    dismissAction();
+                    await Dialogs.ShowErrorAlertAsync(this, ex);
+                }
+            }
+
+            var selectedDepartments = ((DataSource)TableView.Source).SelectedItems;
+            var systemUserIds = selectedDepartments.SelectMany(s => s.UserIds).ToList() ?? new List<int>();
+        
+            if (selectedDepartments.Count > 0)
+            {
+                var dismissAction = Dialogs.ShowInfiniteProgressDialog(Localization.GetString("copying_to_worktray___"));
+
+                if (DelayedCopy == true)
+                {
+                    dismissAction();
+                    tcs.SetResult(systemUserIds);
+                    DismissViewController(true, null);
+                }
+              
+                try
+                {
+                   
+                    await Managers.CommonActionsManager.CopyToUserWorktray(BusinessEntities, systemUserIds);
+                    dismissAction();
+                }
+                catch (Exception ex)
+                {
+                    CommonConfig.Logger.Error("Could not copy to users' worktrays", ex);
+
+                    dismissAction();
+                    await Dialogs.ShowErrorAlertAsync(this, ex);
+                }
+            }
+            tcs.SetResult(systemUserIds);
+            DismissViewController(true, null);
+        }
+
+        async Task RefreshData()
+        {
+            CommonConfig.Logger.Info($"Refreshing list of users");
+
+            try
+            {
+                var usersDepartments = await Managers.SystemManager.GetSystemUsersDepartmentsAsync();
+                ((DataSource)TableView.Source).SetItems(usersDepartments.Departments);
+
+                var firstItemIndexPath = NSIndexPath.FromRowSection(0, 0);
+                TableView.SelectRow(firstItemIndexPath, false, UITableViewScrollPosition.None);
+                ((DataSource)TableView.Source).RowSelected(TableView, firstItemIndexPath);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error($"Could not refresh list of users", ex);
+
+                await Dialogs.ShowErrorAlertAsync(this, ex);
+            }
+        }
+
+        void EnableDoneButton() => doneItem.Enabled = true;
+        void DisableDoneButton() => doneItem.Enabled = false;
+
+        void IUISearchResultsUpdating.UpdateSearchResultsForSearchController(UISearchController searchController)
+        {
+            var searchText = searchController.SearchBar.Text;
+
+            if (!searchController.Active || string.IsNullOrWhiteSpace(searchText))
+            {
+                searchCancellationTokenSourceList.ForEach(cts => cts?.Cancel());
+                searchCancellationTokenSourceList.Clear();
+
+                var dataSource = ((UITableViewController)searchController.SearchResultsController).TableView.Source;
+                ((SearchDataSource)dataSource)?.Reset();
+            }
+            else
+            {
+                if (searchCancellationTokenSource != null)
+                {
+                    searchCancellationTokenSource.Cancel();
+                    searchCancellationTokenSourceList.Remove(searchCancellationTokenSource);
+                    searchCancellationTokenSource = null;
+                }
+
+                searchCancellationTokenSource = new CancellationTokenSource();
+                searchCancellationTokenSourceList.Add(searchCancellationTokenSource);
+
+                DoSearchSystemUsers(searchText, searchCancellationTokenSource.Token);
+            }
+        }
+
+        async void DoSearchSystemUsers(string searchText, CancellationToken ct)
+        {
+            var tableViewController = searchController?.SearchResultsController as UITableViewController;
+            var dataSource = tableViewController?.TableView?.Source as SearchDataSource;
+            dataSource?.Reset();
+
+            await Task.Delay(500);
+
+            if (ct.IsCancellationRequested)
+                return;
+
+            var ds = (DataSource)TableView.Source;
+            var filteredSystemUsers = ds.Items.Where(c => MatchesQuery(c, searchText)).ToList();
+
+            if (ct.IsCancellationRequested)
+                return;
+
+            dataSource?.SetItems(filteredSystemUsers);
+        }
+
+        static bool MatchesQuery(SystemDepartment su, string query)
+        {
+            if (su.Name?.ContainsCaseInsensitive(query) ?? false)
+                return true;
+
+            return false;
+        }
+
+        void ShowSystemUserFromSearch(int systemUserId)
+        {
+            searchController.Active = false;
+
+            var ds = (DataSource)TableView.Source;
+            var index = ds.Items.FindIndex(su => su.Id == systemUserId);
+            if (index < 0)
+                return;
+
+            var indexPath = NSIndexPath.FromRowSection(index, 1);
+
+            TableView.SelectRow(indexPath, false, UITableViewScrollPosition.Middle);
+            ((DataSource)TableView.Source).RowSelected(TableView, indexPath);
+        }
+
+        class DataSource : UITableViewSource
+        {
+            public bool Empty => items.Count < 1;
+            public bool IsOwnSelected => tableViewWeakReference.Unwrap()?.IndexPathsForSelectedRows.Contains(NSIndexPath.FromRowSection(0, 0)) ?? false;
+            public List<SystemDepartment> Items => items;
+
+            public List<SystemDepartment> SelectedItems
+            {
+                get
+                {
+                    var tableView = tableViewWeakReference.Unwrap();
+
+                    if (tableView.IndexPathsForSelectedRows == null || tableView.IndexPathsForSelectedRows.Length < 1)
+                        return new List<SystemDepartment>();
+
+                    var rows = tableView.IndexPathsForSelectedRows.Where(indexPath => indexPath.Section != 0).ToArray();
+                    return rows.Select(ip => items[ip.Row]).ToList();
+                }
+            }
+
+            readonly WeakReference<CopyToDepartmentWorktrayViewController> viewControllerWeakReference;
+            readonly WeakReference<UITableView> tableViewWeakReference;
+
+            bool loading = true;
+            readonly List<SystemDepartment> items = new List<SystemDepartment>(50);
+
+            public DataSource(CopyToDepartmentWorktrayViewController viewController, UITableView tableView)
+            {
+                viewControllerWeakReference = viewController.Wrap();
+                tableViewWeakReference = tableView.Wrap();
+            }
+
+            public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
+            {
+                if (indexPath.Section == 0)
+                {
+                    var ownCell = tableView.DequeueReusableCell("ownCell") ?? UITableViewCellUtilities.CreateDefault("ownCell", UITableViewCellSelectionStyle.None);
+                    ownCell.TextLabel.Text = Localization.GetString("own_worktray");
+
+                    ownCell.Accessory = tableView.IndexPathsForSelectedRows != null && tableView.IndexPathsForSelectedRows.Contains(indexPath)
+                        ? UITableViewCellAccessory.Checkmark
+                        : UITableViewCellAccessory.None;
+
+                    return ownCell;
+                }
+
+                if (loading)
+                    return tableView.DequeueReusableCell(WaitTableViewCell.DefaultId) as WaitTableViewCell ?? new WaitTableViewCell();
+
+                if (Empty)
+                {
+                    var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.DefaultId) as EmptyTableViewCell ?? new EmptyTableViewCell();
+                    emptyCell.Initialize(Localization.GetString("no_system_users"));
+                    return emptyCell;
+                }
+
+                var su = items[indexPath.Row];
+
+                var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSubtitle("cell", UITableViewCellSelectionStyle.None);
+                cell.TextLabel.Text = $"{su.Name}";
+                cell.DetailTextLabel.Text = su.Name;
+
+                cell.Accessory = tableView.IndexPathsForSelectedRows != null && tableView.IndexPathsForSelectedRows.Contains(indexPath)
+                    ? UITableViewCellAccessory.Checkmark
+                    : UITableViewCellAccessory.None;
+
+                return cell;
+            }
+
+            public override nint RowsInSection(UITableView tableview, nint section)
+            {
+                if (section == 0)
+                    return 1;
+
+                if (loading || Empty)
+                    return 1;
+
+                return items.Count;
+            }
+
+            public override nint NumberOfSections(UITableView tableView) => 2;
+
+            public override string[] SectionIndexTitles(UITableView tableView)
+            {
+                var sectionIndexTitles = items.Select(cp => cp.Name.SafeSubstring(0, 1).ToUpper()).Distinct();
+                if (sectionIndexTitles.Any())
+                    sectionIndexTitles = sectionIndexTitles.Prepend("#");
+                return sectionIndexTitles.ToArray();
+            }
+
+            public override nint SectionFor(UITableView tableView, string title, nint atIndex)
+            {
+                if (title == "#")
+                {
+                    tableView.ScrollToRow(NSIndexPath.FromRowSection(0, 0), UITableViewScrollPosition.Top, true);
+                    return -1;
+                }
+
+                var row = items.FindIndex(cp => cp.Name.SafeSubstring(0, 1).ToUpper() == title);
+                if (row >= 0)
+                    tableView.ScrollToRow(NSIndexPath.FromRowSection(row, 1), UITableViewScrollPosition.Top, true);
+
+                return -1;
+            }
+
+            public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath) => 50f;
+
+            public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
+            {
+                var cell = tableView.CellAt(indexPath);
+                if (cell == null)
+                    return;
+
+                cell.Accessory = UITableViewCellAccessory.Checkmark;
+
+                if (tableView.IndexPathsForSelectedRows != null && tableView.IndexPathsForSelectedRows.Length > 0)
+                    viewControllerWeakReference.Unwrap()?.EnableDoneButton();
+                else
+                    viewControllerWeakReference.Unwrap()?.DisableDoneButton();
+            }
+
+            public override void RowDeselected(UITableView tableView, NSIndexPath indexPath)
+            {
+                var cell = tableView.CellAt(indexPath);
+                if (cell == null)
+                    return;
+
+                cell.Accessory = UITableViewCellAccessory.None;
+
+                if (tableView.IndexPathsForSelectedRows != null && tableView.IndexPathsForSelectedRows.Length > 0)
+                    viewControllerWeakReference.Unwrap()?.EnableDoneButton();
+                else
+                    viewControllerWeakReference.Unwrap()?.DisableDoneButton();
+            }
+
+            public void SetItems(List<SystemDepartment> systemUsersDepartments)
+            {
+                loading = false;
+
+                items.Clear();
+                items.AddRange(systemUsersDepartments);
+
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(1), UITableViewRowAnimation.Fade);
+            }
+
+            public void Reset()
+            {
+                loading = true;
+
+                items.Clear();
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(1), UITableViewRowAnimation.Fade);
+            }
+        }
+
+        class SearchDataSource : UITableViewSource
+        {
+            public bool Empty => items.Count < 1;
+
+            readonly WeakReference<CopyToDepartmentWorktrayViewController> viewControllerWeakReference;
+            readonly WeakReference<UITableView> tableViewWeakReference;
+
+            bool loading = true;
+            readonly List<SystemDepartment> items = new List<SystemDepartment>(50);
+
+            public SearchDataSource(CopyToDepartmentWorktrayViewController viewController, UITableView tableView)
+            {
+                viewControllerWeakReference = viewController.Wrap();
+                tableViewWeakReference = tableView.Wrap();
+            }
+
+            public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
+            {
+                if (loading)
+                    return tableView.DequeueReusableCell(WaitTableViewCell.DefaultId) as WaitTableViewCell ?? new WaitTableViewCell();
+
+                if (Empty)
+                {
+                    var emptyCell = tableView.DequeueReusableCell(EmptyTableViewCell.DefaultId) as EmptyTableViewCell ?? new EmptyTableViewCell();
+                    emptyCell.Initialize(Localization.GetString("no_matching_users"));
+                    return emptyCell;
+                }
+
+                var su = items[indexPath.Row];
+
+                var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSubtitle("cell", UITableViewCellSelectionStyle.None);
+                cell.Tag = su.Id;
+                cell.TextLabel.Text = $"{su.Name}";
+                cell.DetailTextLabel.Text = su.Name;
+
+                cell.Accessory = UITableViewCellAccessory.DisclosureIndicator;
+
+                return cell;
+            }
+
+            public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
+            {
+                var cell = tableView.CellAt(indexPath);
+                if (cell == null)
+                    return;
+
+                viewControllerWeakReference.Unwrap()?.ShowSystemUserFromSearch((int)cell.Tag);
+            }
+
+            public override nint RowsInSection(UITableView tableview, nint section)
+            {
+                if (loading || Empty)
+                    return 1;
+
+                return items.Count;
+            }
+
+            public void SetItems(List<SystemDepartment> systemUsers)
+            {
+                loading = false;
+
+                items.Clear();
+                items.AddRange(systemUsers);
+
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+            }
+
+            public void Reset()
+            {
+                loading = true;
+
+                items.Clear();
+                tableViewWeakReference.Unwrap()?.ReloadSections(NSIndexSet.FromIndex(0), UITableViewRowAnimation.Fade);
+            }
+        }
+    }
+}
