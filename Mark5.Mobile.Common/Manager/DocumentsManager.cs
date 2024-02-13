@@ -21,6 +21,7 @@ using DataContract = Mark5.ServiceReference.DataContract;
 using ModuleType = Mark5.Mobile.Common.Model.ModuleType;
 using DocumentPreview = Mark5.Mobile.Common.Model.DocumentPreview;
 using Mark5.Mobile.Classes.Enum;
+using Mark5.Mobile.Classes.AuthService;
 
 namespace Mark5.Mobile.Common.Manager
 {
@@ -370,7 +371,7 @@ namespace Mark5.Mobile.Common.Manager
         }
 
         public async Task ReplyToCalendarInvitationAsync(Document document, DocumentPreview documentPreview, CalendarInvitation invitation,
-            ParticipantStatus answer, bool isSilent, int originalDocumentId, int originalDocumentFolderId,
+            Model.ParticipantStatus answer, bool isSilent, int originalDocumentId, int originalDocumentFolderId,
             SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
@@ -378,6 +379,26 @@ namespace Mark5.Mobile.Common.Manager
 
             if (sourceType == SourceType.Remote)
             {
+                var participantStatus = answer;
+                var calendarInvitation = invitation;
+                var addressName = document.Lines.Select(l => l.FromAddress).FirstOrDefault();
+                var docLinesAddresses = document.Lines.Select(l => l.FromAddress);
+                var attendeesToUpdate = invitation.Attendees.Where(att => docLinesAddresses.Contains(att.Name));
+                attendeesToUpdate.ForEach(att => att.Status = answer);
+
+                if (Managers.MicrosoftGraphClient == null)
+                { 
+                    Managers.MicrosoftGraphClient = new MicrosoftGraphClient();
+                    await Managers.MicrosoftGraphClient.Authenticate(this, forceInteractive: false);
+                }
+
+                var result = await Managers.MicrosoftGraphClient.ImportFromICal((invitation.Id, invitation.Attendees)
+               , new List<string> { addressName });
+
+                if(result == null)
+                    throw new ReMarkException(ErrorConstants.Codes.CalendarEventNotFound);
+
+
                 await AppServiceProxy.ReplyToCalendarInvitationAsync(new DataContract.ReplyToCalendarInvitationParameters
                 {
                     Token = Token,
@@ -392,6 +413,7 @@ namespace Mark5.Mobile.Common.Manager
 
                 return;
             }
+
             else if (sourceType == SourceType.Local)
                 throw new ReMarkException(ErrorConstants.Codes.InvalidSourceType);
 

@@ -49,18 +49,7 @@ namespace Mark5.Mobile.Common.Model
 
         public bool SendAsPlainTextAvailable => ServiceVersionGreaterThanOrEqual(4, 11, 0);
 
-        public bool CalendarModuleAvailable       
-        {
-
-            get{
-
-                if (!SystemVersionGreaterThanOrEqual(1, 35, 12))
-                    return false;
-                else
-                    return CalendarModuleInstalled;
-            }
-
-        }
+        public bool CalendarModuleAvailable  => ServiceVersionGreaterThanOrEqual(4, 12, 0);    
 
         List<ModuleType> availableModules;
         public List<ModuleType> AvailableModules

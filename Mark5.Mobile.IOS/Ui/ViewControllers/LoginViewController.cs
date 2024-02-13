@@ -63,7 +63,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
         bool startLogoScaleAnimationDone;
 
         IAuthenticator authenticator;
-        MicrosoftAuthService microsoftAuthService;
         AzureAppProxyAuthService azureAppProxyAuthService;
 
         SslMode sslMode = SslMode.On;
@@ -571,11 +570,11 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
 
             try
             {
-                microsoftAuthService = new MicrosoftAuthService();
-                var accessToken = await microsoftAuthService.Authenticate(this);
+                Managers.MicrosoftGraphClient = new MicrosoftGraphClient();
+                var accessToken = await Managers.MicrosoftGraphClient.Authenticate(this);
 
-                var azureUser = await microsoftAuthService.GetAzureUser();
-                var endpointList = await microsoftAuthService.GetAzureEndpointInfoList();
+                var azureUser = await Managers.MicrosoftGraphClient.GetAzureUser();
+                var endpointList = await Managers.MicrosoftGraphClient.GetAzureEndpointInfoList();
 
                 if (!endpointList.Any())
                     throw new Exception("No connection info was found on Azure");
@@ -594,7 +593,7 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers
                 else
                     endpointInfo = endpointList.First();
 
-                var azureAppProxyInfo = await microsoftAuthService.GetAzureApplicationProxyInfo();
+                var azureAppProxyInfo = await Managers.MicrosoftGraphClient.GetAzureApplicationProxyInfo();
 
                 PlatformConfig.Preferences.AzureApplicationProxyAppProxyId = azureAppProxyInfo.ApplicationProxyClientId;
                 PlatformConfig.Preferences.AzureApplicationProxyAppClientId = azureAppProxyInfo.AppClientId;

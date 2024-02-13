@@ -30,7 +30,7 @@ using TinyIoC;
 
 namespace Mark5.Mobile.Droid.Ui.Activities
 {
-     [Activity(ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize )]
+    [Activity(ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize )]
     public class LoginActivity : BaseAppCompatActivity
     {
         CancellationTokenSource cts;
@@ -215,11 +215,11 @@ namespace Mark5.Mobile.Droid.Ui.Activities
 
             try
             {
-                var microsoftAuthService = new MicrosoftAuthService();
-                await microsoftAuthService.Authenticate(this);
+                Managers.MicrosoftGraphClient = new MicrosoftGraphClient();
+                await Managers.MicrosoftGraphClient.Authenticate(this);
 
-                var azureUser = await microsoftAuthService.GetAzureUser();
-                var endpointList = await microsoftAuthService.GetAzureEndpointInfoList();
+                var azureUser = await Managers.MicrosoftGraphClient.GetAzureUser();
+                var endpointList = await Managers.MicrosoftGraphClient.GetAzureEndpointInfoList();
 
                 if (!endpointList.Any())
                     throw new Exception("No connection info was found on Azure");
@@ -238,7 +238,7 @@ namespace Mark5.Mobile.Droid.Ui.Activities
                 else
                     endpointInfo = endpointList.First();
 
-                var azureAppProxyInfo = await microsoftAuthService.GetAzureApplicationProxyInfo();
+                var azureAppProxyInfo = await Managers.MicrosoftGraphClient.GetAzureApplicationProxyInfo();
 
                 PlatformConfig.Preferences.AzureApplicationProxyAppProxyId = azureAppProxyInfo.ApplicationProxyClientId;
                 PlatformConfig.Preferences.AzureApplicationProxyAppClientId = azureAppProxyInfo.AppClientId;

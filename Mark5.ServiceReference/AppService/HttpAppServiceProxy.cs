@@ -13,12 +13,9 @@ using Mark5.Mobile.Classes.Azure;
 using Mark5.ServiceReference.DataContract;
 using Mark5.ServiceReference.Exceptions;
 using Mark5.ServiceReference.Utilities;
-using JwtDecoder = Mark5.Mobile.Classes.JwtDecoder;
 using Mark5.Mobile.Classes;
 using Polly;
-using Polly.Bulkhead;
 using Polly.Wrap;
-using System.ServiceModel;
 
 namespace Mark5.ServiceReference.AppService
 {
@@ -32,7 +29,6 @@ namespace Mark5.ServiceReference.AppService
         readonly string requestUri;
         string bearerToken;
         readonly AzureApplicationProxyInfo azureApplicationProxyInfo;
-        readonly AsyncPolicyWrap policy;
         readonly IReachability reachability;
         const int MAX_RETRIES = 3;
 

@@ -11,6 +11,7 @@ namespace Mark5.Mobile.Common.Model.Exceptions
             public static string FileCouldNotBeLoaded = "file_could_not_be_loaded";
             public static string LoginNeeded = "login_needed";
             public static string UnsupportedFile = "unsupported_file";
+            public static string CalendarEventNotFound = "calendar_event_not_found";
         }
 
         private static Dictionary<string, string> Messages = new Dictionary<string, string>
@@ -19,7 +20,8 @@ namespace Mark5.Mobile.Common.Model.Exceptions
             { Codes.InvalidSourceType, "This action can only be performed when online." },
             { Codes.FileCouldNotBeLoaded, "File could not be loaded." },
             { Codes.LoginNeeded, "You need to log in to reMARK before you can use the app." },
-            { Codes.UnsupportedFile, "Unsupported file." }
+            { Codes.UnsupportedFile, "Unsupported file." },
+             { Codes.CalendarEventNotFound, "Calendar event doesn't exist." }
         };
 
         public static string Message(string code)

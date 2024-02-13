@@ -138,7 +138,6 @@ namespace Mark5.Mobile.IOS.Ui.ViewControllers.DocumentView.HeaderView
         public override void UpdateVisibility()
         {
             Hidden = Document?.Invitations?.FirstOrDefault() == null || !ServerConfig.SystemSettings.SystemInfo.CalendarModuleAvailable;
-
         }
     }
 }
