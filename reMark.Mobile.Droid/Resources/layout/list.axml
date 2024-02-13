@@ -31,5 +31,3 @@
             android:visibility="gone" />
     </FrameLayout>
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-

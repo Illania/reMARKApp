@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -32,6 +32,8 @@ using AndroidX.AppCompat.App;
 using Google.Android.Material.Snackbar;
 using AndroidX.Core.Content;
 using FastScrollRecycler;
+using Exception = System.Exception;
+using SearchView = AndroidX.AppCompat.Widget.SearchView;
 using reMark.Mobile.Classes.Enum;
 using View = Android.Views.View;
 using Preferences = reMark.Mobile.Droid.Utilities.Preferences;
@@ -40,20 +42,21 @@ using Paint = Android.Graphics.Paint;
 using Layout = Android.Text.Layout;
 using reMark.Mobile.Droid.UI;
 
+
 namespace reMark.Mobile.Droid.Ui.Fragments
 {
-    public class DocumentsListFragment : BaseFragment, ActionMode.ICallback, IMenuItemOnActionExpandListener, SearchView.IOnQueryTextListener
+    public class DocumentsListFragment : BaseFragment, ActionMode.ICallback
     {
         public Folder Folder { get; set; }
 
         DocumentsListAdapter CurrentAdapter => (DocumentsListAdapter)recyclerView.GetAdapter();
 
-        readonly Handler searchHandler = new Handler();
+        readonly Handler searchHandler = new Handler(Looper.MainLooper);
 
         protected const string FolderBundleKey = "Folder_5ab3effc-9a60-4b26-805e-72a0c3527b0d";
         const string SelectedDocumentPreviewsKey = "SelectedDocumentPreviews_9d33e0b7-9791-4ee9-82bd-73af5c0b5716";
         const string FirstRowIdKey = "FirstRowId_ab73aa33-930f-4139-94b1-b7828d5f4de7";
-        const string LastRowIdKey = "LastRowId_a92f8e84-7274-48e3-9296-3d52a9b3231c"; 
+        const string LastRowIdKey = "LastRowId_a92f8e84-7274-48e3-9296-3d52a9b3231c";
         protected const string HideSearchBundleKey = "HideSearchBundle_4ec1a10c-f9e5-43f8-8e73-c555f7679b43";
         protected const string OnlyShowExternalDocumentsBundleKey = "OnlyShowExternalDocuments_119623bc-74c6-4763-898a-319ea8fc9591";
 
@@ -67,6 +70,7 @@ namespace reMark.Mobile.Droid.Ui.Fragments
 
         IMenu menu;
         CoordinatorLayout coordinatorLayout;
+        public SearchView _searchView;
         SwipeRefreshLayout refreshLayout;
         RecyclerView recyclerView;
         SwipeHelperCallback swipeHelperCallback;
@@ -74,7 +78,6 @@ namespace reMark.Mobile.Droid.Ui.Fragments
         DocumentsListAdapter adapter;
         DocumentsListAdapter searchAdapter;
         ActionMode actionMode;
-        SearchView searchView;
         FloatingActionButton fab;
         Category presetCategory;
 
@@ -86,6 +89,7 @@ namespace reMark.Mobile.Droid.Ui.Fragments
 
         bool hideSearch;
         bool onlyShowExternalDocuments;
+        public bool activityStartup;
 
         AutoRefreshWorker autoRefreshWorker;
 
@@ -135,9 +139,10 @@ namespace reMark.Mobile.Droid.Ui.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            activityStartup = true;
             CommonConfig.Logger.Info($"Creating {nameof(DocumentsListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]...");
 
-            var rootView = inflater.Inflate(Resource.Layout.list, container, false);
+            var rootView = inflater.Inflate(Resource.Layout.list_with_searchbar, container, false);
 
             coordinatorLayout = (CoordinatorLayout)container.Parent.Parent;
 
@@ -156,10 +161,16 @@ namespace reMark.Mobile.Droid.Ui.Fragments
                 await RefreshData(forceClear: true);
             };
 
+            _searchView = rootView.FindViewById<SearchView>(Resource.Id.SearchView);
+            if (_searchView != null)
+            {
+                _searchView.QueryHint = GetString(Resource.String.filter);
+                _searchView.QueryTextChange += _searchView_QueryTextChange;
+            }
+
             recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recycler_view);
             recyclerView.SetLayoutManager(new WrapContentLinearLayoutManager(Activity));
             recyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
-
 
             adapter = new DocumentsListAdapter(Activity, recyclerView, async (startId) => await RefreshData(startId));
             adapter.FolderId = Folder.Id;
@@ -173,10 +184,9 @@ namespace reMark.Mobile.Droid.Ui.Fragments
                 emptyView.Visibility = adapter.ItemCount < 1 ? ViewStates.Visible : ViewStates.Gone;
                 recyclerView.Visibility = adapter.ItemCount > 0 ? ViewStates.Visible : ViewStates.Gone;
                 menu?.FindItem(Resource.Id.action_filter)?.SetEnabled(adapter.ItemCount > 0);
-                
+
             }));
             recyclerView.SetAdapter(adapter);
-
 
             swipeHelperCallback = new SwipeHelperCallback(Context, this, adapter, refreshLayout, Folder);
             itemTouchHelper = new ItemTouchHelper(swipeHelperCallback);
@@ -193,8 +203,6 @@ namespace reMark.Mobile.Droid.Ui.Fragments
 
             HasOptionsMenu = true;
 
-            HasOptionsMenu = true;
-
             return rootView;
         }
 
@@ -206,6 +214,7 @@ namespace reMark.Mobile.Droid.Ui.Fragments
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = Folder?.Name;
 
             CommonConfig.Logger.Info($"Created {nameof(DocumentsListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]");
+
         }
 
         public override void OnDestroyView()
@@ -292,22 +301,18 @@ namespace reMark.Mobile.Droid.Ui.Fragments
             inflater.Inflate(Resource.Menu.menu_main, menu);
 
             var filterItem = menu.FindItem(Resource.Id.action_filter);
-            filterItem.ApplyColor(filterItem.TitleFormatted.ToString(), this);
-            filterItem.SetOnActionExpandListener(this);
-            searchView = (SearchView)filterItem.ActionView;
-            searchView.QueryHint = GetString(Resource.String.filter);
-            searchView.SetOnQueryTextListener(this);
+            filterItem.SetVisible(false);
 
             if (!hideSearch)
             {
-                var searchItem = menu.Add(Menu.None, 10, Menu.None, Resource.String.search);
+                var searchItem = menu.Add(IMenu.None, 10, IMenu.None, Resource.String.search);
                 searchItem.SetIcon(Resource.Drawable.action_search_server);
                 searchItem.SetShowAsAction(ShowAsAction.Always);
             }
 
-            var bookmarkItem = menu.Add(Menu.None, 11, Menu.None, Resource.String.search);
+            var bookmarkItem = menu.Add(IMenu.None, 11, IMenu.None, Resource.String.search);
             bookmarkItem.SetIcon(Resource.Drawable.ic_bookmark);
-            bookmarkItem.SetShowAsAction(ShowAsAction.Always); 
+            bookmarkItem.SetShowAsAction(ShowAsAction.Always);
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
@@ -317,7 +322,7 @@ namespace reMark.Mobile.Droid.Ui.Fragments
                 StartActivity(SearchActivity.CreateIntent(Context, ModuleType.Documents));
                 return true;
             }
-            if(item.ItemId == 11)
+            if (item.ItemId == 11)
             {
                 GoToBookmark();
                 return true;
@@ -326,7 +331,7 @@ namespace reMark.Mobile.Droid.Ui.Fragments
             return base.OnOptionsItemSelected(item);
         }
 
-        
+
         #endregion
 
         #region Actions
@@ -376,7 +381,6 @@ namespace reMark.Mobile.Droid.Ui.Fragments
                 CommonConfig.Logger.Error($"Adding bookmark for folder Id= {Folder.Id} [documentPreview.Id={documentPreview.Id}] failed", ex);
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
-
             }
 
         }
@@ -430,7 +434,8 @@ namespace reMark.Mobile.Droid.Ui.Fragments
                     snackbar.View.SetBackgroundColor(new Color(ContextCompat.GetColor(Activity, Resource.Color.darkerblue)));
                     snackbar.Show();
 
-                    Activity?.RunOnUiThread(() => {
+                    Activity?.RunOnUiThread(() =>
+                    {
                         adapter?.PrependItems(documents);
                     });
 
@@ -739,7 +744,7 @@ namespace reMark.Mobile.Droid.Ui.Fragments
                 return true;
             }
 
-            if(item.ItemId == MenuItemActions.AddRemoveBookmark)
+            if (item.ItemId == MenuItemActions.AddRemoveBookmark)
             {
                 if (!PlatformConfig.Preferences.HasBookmarkForFolder(Folder.Id, CurrentAdapter.SelectedItems.First().Id))
                     AddBookmark(CurrentAdapter.SelectedItems.First());
@@ -808,9 +813,9 @@ namespace reMark.Mobile.Droid.Ui.Fragments
                 adapter.RefreshItems(delayedItems);
                 searchAdapter.RefreshItems(delayedItems);
 
-                CommonConfig.Logger.Info($"Documents with IDs:{string.Join(",",items.Select(i=>i.Id).ToList()).TrimEnd(',')} forced sent.");
+                CommonConfig.Logger.Info($"Documents with IDs:{string.Join(",", items.Select(i => i.Id).ToList()).TrimEnd(',')} forced sent.");
 
-                foreach(var item in delayedItems)
+                foreach (var item in delayedItems)
                     CommonConfig.MessengerHub.Publish(new DocumentUploadStatusChangedMessage(this, DocumentUploadStatusChangedMessage.Status.DocumentSent,
                         Guid.Empty, false));
 
@@ -990,12 +995,12 @@ namespace reMark.Mobile.Droid.Ui.Fragments
                 if (presetCategory == null)
                     return;
             }
-            
+
             var oldCategories = documentPreview.Categories;
             var newCategories = oldCategories.Union(new List<Category> { presetCategory }).ToList();
 
             CommonConfig.Logger.Info($"Attempting to assign preset category [documentPreview.Id={documentPreview.Id}]...");
-            dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, 
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity,
                 Resource.String.set_preset_category, Resource.String.please_wait);
 
             try
@@ -1015,9 +1020,9 @@ namespace reMark.Mobile.Droid.Ui.Fragments
 
         void SelectDeselectAll()
         {
-            if (actionMode == null) 
+            if (actionMode == null)
                 return;
-            
+
             CurrentAdapter?.SetSelected(CurrentAdapter.Items, selectEnabled);
             actionMode.Title = CurrentAdapter?.SelectedItemCount.ToString();
             selectEnabled = !selectEnabled;
@@ -1108,58 +1113,40 @@ namespace reMark.Mobile.Droid.Ui.Fragments
 
         #region Filtering
 
-        bool IMenuItemOnActionExpandListener.OnMenuItemActionExpand(IMenuItem item)
+        private void _searchView_QueryTextChange(object sender, SearchView.QueryTextChangeEventArgs e)
         {
-            if (item.ItemId == Resource.Id.action_filter)
+            var newText = e.NewText;
+            if (string.IsNullOrEmpty(newText))
             {
-                CommonConfig.UsageAnalytics.LogEvent(new FilterEvent(false, module: ModuleType.Documents));
-
-                menu?.FindItem(10)?.SetVisible(false);
-
-                refreshLayout.Enabled = false;
-                adapter.ClearSelections();
-                recyclerView.SwapAdapter(searchAdapter, true);
-                (this as SearchView.IOnQueryTextListener).OnQueryTextChange(string.Empty);
-                return true;
+                DisableSearchFilter();
+                return;
             }
 
-            return false;
-        }
-
-        bool IMenuItemOnActionExpandListener.OnMenuItemActionCollapse(IMenuItem item)
-        {
-            if (item.ItemId == Resource.Id.action_filter)
-            {
-                menu?.FindItem(10)?.SetVisible(true);
-
-                searchHandler.RemoveCallbacksAndMessages(null);
-                searchAdapter.Clear();
-                searchAdapter.ClearSelections();
-                recyclerView.SwapAdapter(adapter, true);
-                refreshLayout.Enabled = true;
-                return true;
-            }
-
-            return false;
-        }
-
-        bool SearchView.IOnQueryTextListener.OnQueryTextChange(string newText)
-        {
+            EnableSearchFilter();
             searchHandler.RemoveCallbacksAndMessages(null);
             searchHandler.PostDelayed(() =>
-                {
-                    if (string.IsNullOrWhiteSpace(newText))
-                        searchAdapter.ReplaceItems(adapter.Items);
-                    else
-                        searchAdapter.ReplaceItems(adapter.Items.Where(dp => MatchesQuery(dp, newText)).ToList());
-                },
-                500);
-            return false;
+            {
+                searchAdapter.ReplaceItems(string.IsNullOrWhiteSpace(newText)
+                    ? adapter.Items
+                    : adapter.Items.Where(dp => MatchesQuery(dp, newText)).ToList());
+            }, 500);
         }
 
-        bool SearchView.IOnQueryTextListener.OnQueryTextSubmit(string query)
+        private void EnableSearchFilter()
         {
-            return false;
+            CommonConfig.UsageAnalytics.LogEvent(new FilterEvent(false, module: ModuleType.Documents));
+            refreshLayout.Enabled = false;
+            adapter.ClearSelections();
+            recyclerView.SwapAdapter(searchAdapter, true);
+        }
+
+        private void DisableSearchFilter()
+        {
+            searchHandler.RemoveCallbacksAndMessages(null);
+            searchAdapter.Clear();
+            searchAdapter.ClearSelections();
+            recyclerView.SwapAdapter(adapter, true);
+            refreshLayout.Enabled = true;
         }
 
         static bool MatchesQuery(DocumentPreview dp, string query)
@@ -1336,12 +1323,12 @@ namespace reMark.Mobile.Droid.Ui.Fragments
                     if (position >= 0)
                     {
                         shouldNotifySearchAdapter = true;
-                        searchAdapter.RemoveItemAtPosition(position); 
+                        searchAdapter.RemoveItemAtPosition(position);
                     }
                 }
             });
         }
-           
+
 
         #endregion
 
@@ -1351,7 +1338,7 @@ namespace reMark.Mobile.Droid.Ui.Fragments
         {
             public override int ItemCount => Items.Count;
 
-            public List<DocumentPreview> Items { get; } = new List<DocumentPreview>(1000);
+            public List<DocumentPreview> Items { get; private set; } = new List<DocumentPreview>(1000);
 
             public List<DocumentPreview> SelectedItems => selectedDocumentsInView.Values.ToList();
 
@@ -1386,6 +1373,10 @@ namespace reMark.Mobile.Droid.Ui.Fragments
                 this.recyclerView = recyclerView;
                 this.context = context;
                 this.loadMoreAction = loadMoreAction;
+            }
+            public void SetItems(List<DocumentPreview> items)
+            {
+                Items = items;
             }
 
             public override int GetItemViewType(int position)
@@ -1464,7 +1455,7 @@ namespace reMark.Mobile.Droid.Ui.Fragments
                     dpvh.UnreadIndicator = unreadIndicatorMe ? !dp.IsReadByCurrent : !dp.IsReadByAnyone;
                     dpvh.AttachmentIndicator = dp.AttachmentsCount > 0;
                     dpvh.CommentIndicator = dp.CommentsCount > 0;
-                    dpvh.PriorityHighIndicator = dp.Priority == Priority.Urgent; 
+                    dpvh.PriorityHighIndicator = dp.Priority == Priority.Urgent;
                     dpvh.PriorityLowIndicator = dp.Priority == Priority.Low;
 
                     if (compactList)
@@ -1523,7 +1514,7 @@ namespace reMark.Mobile.Droid.Ui.Fragments
 
                 if (defaultAppearance.FontColorEnable)
                     cell.SetTextColor(daReadColor);
-       
+
                 if (defaultAppearance.UnreadFontColorEnable)
                     cell.SetTextColor(dp.IsReadByCurrent ? daReadColor : daUnreadColor);
 
@@ -1531,7 +1522,7 @@ namespace reMark.Mobile.Droid.Ui.Fragments
                 var lineAppearance = ServerConfig.SystemSettings.DocumentsModuleInfo.LineAppearances.FirstOrDefault(la => dp.Lines.Any(l => l.Guid == la.OriginatorGid));
                 if (lineAppearance != null && lineAppearance.Enable)
                 {
-                    var laReadColor = new Color(lineAppearance.FontColor); 
+                    var laReadColor = new Color(lineAppearance.FontColor);
                     var laUnreadColor = new Color(lineAppearance.UnreadFontColor);
                     var laBgColor = new Color(lineAppearance.BackgroundColor);
                     cell.ItemView.SetBackgroundColor(laBgColor);
@@ -1616,9 +1607,6 @@ namespace reMark.Mobile.Droid.Ui.Fragments
                     cell.ItemView.SetBackgroundColor(new Color(ContextCompat.GetColor(context, Resource.Color.white)));
             }
 
-            
-
-
             public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
             {
                 if (viewType == ViewType.DocumentView)
@@ -1639,7 +1627,7 @@ namespace reMark.Mobile.Droid.Ui.Fragments
             public void PrependItems(List<DocumentPreview> items)
             {
                 var count = items.Count;
- 
+
                 if (PlatformConfig.Preferences.SortByDate)
                 {
                     Items.Sort();
@@ -2137,9 +2125,9 @@ namespace reMark.Mobile.Droid.Ui.Fragments
             public bool AttachmentIndicator { set => attachmentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
             public bool CommentIndicator { set => commentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
-            
+
             public bool PriorityHighIndicator { set => priorityHighImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
-            
+
             public bool PriorityLowIndicator { set => priorityLowImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
             public bool Compact
@@ -2260,11 +2248,11 @@ namespace reMark.Mobile.Droid.Ui.Fragments
             }
 
             public bool CommentIndicator { set => commentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
-           
+
             public bool PriorityHighIndicator { set => priorityHighImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
-            
+
             public bool PriorityLowIndicator { set => priorityLowImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
-            
+
             public bool Selected { set => selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
             public int SwipedDirection
@@ -2370,5 +2358,6 @@ namespace reMark.Mobile.Droid.Ui.Fragments
                 }
             }
         }
+
     }
 }

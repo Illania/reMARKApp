@@ -27,7 +27,8 @@
         <item name="preferenceTheme">@style/reMarkpreference</item>
         <item name="alertDialogTheme">@style/reMarkdialog</item>
         <item name="android:statusBarColor">@color/darkerblue</item>
-         <item name="android:datePickerStyle">@style/reMarkDatePicker</item>
+        <item name="android:editTextColor">@color/darkgray</item>
+        <item name="android:datePickerStyle">@style/reMarkDatePicker</item>
     </style>
     <style name="reMark" parent="reMarkBase">
     </style>
