@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -49,7 +49,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
         protected const string FolderBundleKey = "Folder_5ab3effc-9a60-4b26-805e-72a0c3527b0d";
         const string SelectedDocumentPreviewsKey = "SelectedDocumentPreviews_9d33e0b7-9791-4ee9-82bd-73af5c0b5716";
         const string FirstRowIdKey = "FirstRowId_ab73aa33-930f-4139-94b1-b7828d5f4de7";
-        const string LastRowIdKey = "LastRowId_a92f8e84-7274-48e3-9296-3d52a9b3231c"; 
+        const string LastRowIdKey = "LastRowId_a92f8e84-7274-48e3-9296-3d52a9b3231c";
         protected const string HideSearchBundleKey = "HideSearchBundle_4ec1a10c-f9e5-43f8-8e73-c555f7679b43";
         protected const string OnlyShowExternalDocumentsBundleKey = "OnlyShowExternalDocuments_119623bc-74c6-4763-898a-319ea8fc9591";
 
@@ -154,9 +154,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 await RefreshData(forceClear: true);
             };
 
-            _searchView = rootView.FindViewById<AndroidX.AppCompat.Widget.SearchView>(Resource.Id.SearchView);
-            _searchView.QueryHint = GetString(Resource.String.filter);
-            _searchView.QueryTextChange += _searchView_QueryTextChange;
+            _searchView = rootView.FindViewById<SearchView>(Resource.Id.SearchView);
+            if (_searchView != null)
+            {
+                _searchView.QueryHint = GetString(Resource.String.filter);
+                _searchView.QueryTextChange += _searchView_QueryTextChange;
+            }
 
             recyclerView = rootView.FindViewById<RecyclerView>(Resource.Id.recycler_view);
             recyclerView.SetLayoutManager(new WrapContentLinearLayoutManager(Activity));
@@ -174,7 +177,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 emptyView.Visibility = adapter.ItemCount < 1 ? ViewStates.Visible : ViewStates.Gone;
                 recyclerView.Visibility = adapter.ItemCount > 0 ? ViewStates.Visible : ViewStates.Gone;
                 menu?.FindItem(Resource.Id.action_filter)?.SetEnabled(adapter.ItemCount > 0);
-                
+
             }));
             recyclerView.SetAdapter(adapter);
 
@@ -302,7 +305,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
             var bookmarkItem = menu.Add(IMenu.None, 11, IMenu.None, Resource.String.search);
             bookmarkItem.SetIcon(Resource.Drawable.ic_bookmark);
-            bookmarkItem.SetShowAsAction(ShowAsAction.Always); 
+            bookmarkItem.SetShowAsAction(ShowAsAction.Always);
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
@@ -312,7 +315,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 StartActivity(SearchActivity.CreateIntent(Context, ModuleType.Documents));
                 return true;
             }
-            if(item.ItemId == 11)
+            if (item.ItemId == 11)
             {
                 GoToBookmark();
                 return true;
@@ -321,7 +324,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             return base.OnOptionsItemSelected(item);
         }
 
-        
+
         #endregion
 
         #region Actions
@@ -424,7 +427,8 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     snackbar.View.SetBackgroundColor(new Color(ContextCompat.GetColor(Activity, Resource.Color.darkerblue)));
                     snackbar.Show();
 
-                    Activity?.RunOnUiThread(() => {
+                    Activity?.RunOnUiThread(() =>
+                    {
                         adapter?.PrependItems(documents);
                     });
 
@@ -733,7 +737,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 return true;
             }
 
-            if(item.ItemId == MenuItemActions.AddRemoveBookmark)
+            if (item.ItemId == MenuItemActions.AddRemoveBookmark)
             {
                 if (!PlatformConfig.Preferences.HasBookmarkForFolder(Folder.Id, CurrentAdapter.SelectedItems.First().Id))
                     AddBookmark(CurrentAdapter.SelectedItems.First());
@@ -802,9 +806,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 adapter.RefreshItems(delayedItems);
                 searchAdapter.RefreshItems(delayedItems);
 
-                CommonConfig.Logger.Info($"Documents with IDs:{string.Join(",",items.Select(i=>i.Id).ToList()).TrimEnd(',')} forced sent.");
+                CommonConfig.Logger.Info($"Documents with IDs:{string.Join(",", items.Select(i => i.Id).ToList()).TrimEnd(',')} forced sent.");
 
-                foreach(var item in delayedItems)
+                foreach (var item in delayedItems)
                     CommonConfig.MessengerHub.Publish(new DocumentUploadStatusChangedMessage(this, DocumentUploadStatusChangedMessage.Status.DocumentSent,
                         Guid.Empty, false));
 
@@ -984,12 +988,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 if (presetCategory == null)
                     return;
             }
-            
+
             var oldCategories = documentPreview.Categories;
             var newCategories = oldCategories.Union(new List<Category> { presetCategory }).ToList();
 
             CommonConfig.Logger.Info($"Attempting to assign preset category [documentPreview.Id={documentPreview.Id}]...");
-            dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, 
+            dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity,
                 Resource.String.set_preset_category, Resource.String.please_wait);
 
             try
@@ -1009,9 +1013,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
         void SelectDeselectAll()
         {
-            if (actionMode == null) 
+            if (actionMode == null)
                 return;
-            
+
             CurrentAdapter?.SetSelected(CurrentAdapter.Items, selectEnabled);
             actionMode.Title = CurrentAdapter?.SelectedItemCount.ToString();
             selectEnabled = !selectEnabled;
@@ -1108,20 +1112,17 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             if (string.IsNullOrEmpty(newText))
             {
                 DisableSearchFilter();
+                return;
             }
-            else
+
+            EnableSearchFilter();
+            searchHandler.RemoveCallbacksAndMessages(null);
+            searchHandler.PostDelayed(() =>
             {
-                EnableSearchFilter();
-                searchHandler.RemoveCallbacksAndMessages(null);
-                searchHandler.PostDelayed(() =>
-                {
-                    if (string.IsNullOrWhiteSpace(newText))
-                        searchAdapter.ReplaceItems(adapter.Items);
-                    else
-                        searchAdapter.ReplaceItems(adapter.Items.Where(dp => MatchesQuery(dp, newText)).ToList());
-                },
-                    500);
-            }
+                searchAdapter.ReplaceItems(string.IsNullOrWhiteSpace(newText)
+                    ? adapter.Items
+                    : adapter.Items.Where(dp => MatchesQuery(dp, newText)).ToList());
+            }, 500);
         }
 
         private void EnableSearchFilter()
@@ -1315,12 +1316,12 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     if (position >= 0)
                     {
                         shouldNotifySearchAdapter = true;
-                        searchAdapter.RemoveItemAtPosition(position); 
+                        searchAdapter.RemoveItemAtPosition(position);
                     }
                 }
             });
         }
-           
+
 
         #endregion
 
@@ -1447,7 +1448,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                     dpvh.UnreadIndicator = unreadIndicatorMe ? !dp.IsReadByCurrent : !dp.IsReadByAnyone;
                     dpvh.AttachmentIndicator = dp.AttachmentsCount > 0;
                     dpvh.CommentIndicator = dp.CommentsCount > 0;
-                    dpvh.PriorityHighIndicator = dp.Priority == Priority.Urgent; 
+                    dpvh.PriorityHighIndicator = dp.Priority == Priority.Urgent;
                     dpvh.PriorityLowIndicator = dp.Priority == Priority.Low;
 
                     if (compactList)
@@ -1506,7 +1507,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
 
                 if (defaultAppearance.FontColorEnable)
                     cell.SetTextColor(daReadColor);
-       
+
                 if (defaultAppearance.UnreadFontColorEnable)
                     cell.SetTextColor(dp.IsReadByCurrent ? daReadColor : daUnreadColor);
 
@@ -1514,7 +1515,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 var lineAppearance = ServerConfig.SystemSettings.DocumentsModuleInfo.LineAppearances.FirstOrDefault(la => dp.Lines.Any(l => l.Guid == la.OriginatorGid));
                 if (lineAppearance != null && lineAppearance.Enable)
                 {
-                    var laReadColor = new Color(lineAppearance.FontColor); 
+                    var laReadColor = new Color(lineAppearance.FontColor);
                     var laUnreadColor = new Color(lineAppearance.UnreadFontColor);
                     var laBgColor = new Color(lineAppearance.BackgroundColor);
                     cell.ItemView.SetBackgroundColor(laBgColor);
@@ -1619,7 +1620,7 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public void PrependItems(List<DocumentPreview> items)
             {
                 var count = items.Count;
- 
+
                 if (PlatformConfig.Preferences.SortByDate)
                 {
                     Items.Sort();
@@ -2117,9 +2118,9 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             public bool AttachmentIndicator { set => attachmentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
             public bool CommentIndicator { set => commentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
-            
+
             public bool PriorityHighIndicator { set => priorityHighImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
-            
+
             public bool PriorityLowIndicator { set => priorityLowImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
             public bool Compact
@@ -2240,11 +2241,11 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
             }
 
             public bool CommentIndicator { set => commentImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
-           
+
             public bool PriorityHighIndicator { set => priorityHighImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
-            
+
             public bool PriorityLowIndicator { set => priorityLowImageView.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
-            
+
             public bool Selected { set => selectedOverlay.Visibility = value ? ViewStates.Visible : ViewStates.Gone; }
 
             public int SwipedDirection
@@ -2350,6 +2351,6 @@ namespace Mark5.Mobile.Droid.Ui.Fragments
                 }
             }
         }
- 
+
     }
 }
