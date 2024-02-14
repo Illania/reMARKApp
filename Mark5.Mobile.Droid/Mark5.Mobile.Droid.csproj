@@ -215,7 +215,7 @@
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Diagnostics.DiagnosticSource">
-      <HintPath>..\packages\System.Diagnostics.DiagnosticSource.4.7.1\lib\netstandard1.3\System.Diagnostics.DiagnosticSource.dll</HintPath>
+      <HintPath>..\packages\System.Diagnostics.DiagnosticSource.6.0.0\lib\netstandard2.0\System.Diagnostics.DiagnosticSource.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.Android.Volley">
       <HintPath>..\packages\Xamarin.Android.Volley.1.1.1.1\lib\monoandroid80\Xamarin.Android.Volley.dll</HintPath>
@@ -624,6 +624,12 @@
         </Reference>
         <Reference Include="Xamarin.GooglePlayServices.Measurement.Sdk">
           <HintPath>..\packages\Xamarin.GooglePlayServices.Measurement.Sdk.121.1.1\lib\monoandroid12.0\Xamarin.GooglePlayServices.Measurement.Sdk.dll</HintPath>
+        </Reference>
+        <Reference Include="Std.UriTemplate">
+          <HintPath>..\packages\Std.UriTemplate.0.0.50\lib\netstandard2.0\Std.UriTemplate.dll</HintPath>
+        </Reference>
+        <Reference Include="Microsoft.Kiota.Abstractions">
+          <HintPath>..\packages\Microsoft.Kiota.Abstractions.1.7.9\lib\netstandard2.1\Microsoft.Kiota.Abstractions.dll</HintPath>
         </Reference>
   </ItemGroup>
   <ItemGroup>
