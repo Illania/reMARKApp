@@ -1,0 +1,224 @@
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using reMark.ServiceReference.DataContract;
+
+namespace reMark.ServiceReference.AppService
+{
+    public interface IAppServiceProxy
+    {
+        Version Version { get; }
+
+        #region Authentication
+
+        Task<AuthenticateResult> AuthenticateAsync(AuthenticateParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<AuthenticateWithAzureResult> AuthenticateWithAzureAsync(AuthenticateWithAzureParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        #endregion
+
+        #region Folders
+
+        Task<GetFoldersResult> GetFoldersAsync(GetFoldersParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<SearchFoldersResult> SearchFolders(SearchFoldersParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        #endregion
+
+        #region Documents module
+
+        Task<GetDocumentPreviewsResult> GetDocumentPreviewsAsync(GetDocumentPreviewsParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<GetDocumentResult> GetDocumentAsync(GetDocumentParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<SendDocumentResult> SendDocumentAsync(SendDocumentParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<CancelSendDocumentResult> CancelSendDocumentAsync(CancelSendDocumentParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<ForceSendDocumentResult> ForceSendDocumentAsync(ForceSendDocumentParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<SetDocumentsReadStatusResult> SetDocumentsReadStatusAsync(SetDocumentsReadStatusParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<SetDocumentPriorityResult> SetDocumentPriorityAsync(SetDocumentPriorityParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<MoveToSpamResult> MoveToSpamAsync(MoveToSpamParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<GetTemplatePreviewsResult> GetTemplatePreviewsAsync(GetTemplatePreviewsParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<GetTemplateResult> GetTemplateAsync(GetTemplateParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<GetDefaultTemplateResult> GetDefaultTemplateAsync(GetDefaultTemplateParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<GetLinesResult> GetLinesAsync(GetLinesParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<ReplyToCalendarInvitationResult> ReplyToCalendarInvitationAsync(ReplyToCalendarInvitationParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<GetNewDocumentReferenceNumberResult> GetNewDocumentReferenceNumberAsync(GetNewDocumentReferenceNumberParameters parameters, CancellationToken ct = default);
+
+        Task<GetTransmitInfoResult> GetDocumentTransmitInfoAsync(GetTransmitInfoParameters parameters, CancellationToken ct = default);
+
+        Task<GetAutoReplyResult> GetAutoReplyRuleAsync(GetAutoReplyParameters parameters, CancellationToken ct = default);
+
+        Task<SetAutoReplyResult> SetAutoReplyRuleAsync(SetAutoReplyParameters parameters, CancellationToken ct = default);
+
+        #endregion
+
+        #region Contacts module
+
+        Task<GetContactPreviewsResult> GetContactPreviewsAsync(GetContactPreviewsParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<GetContactResult> GetContactAsync(GetContactParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<CreateOrUpdateContactResult> CreateOrUpdateContactAsync(CreateOrUpdateContactParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        #endregion
+
+        #region Shortcodes module
+
+        Task<GetShortcodePreviewsResult> GetShortcodePreviewsAsync(GetShortcodePreviewsParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<GetShortcodeResult> GetShortcodeAsync(GetShortcodeParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<CreateOrUpdateShortcodeResult> CreateOrUpdateShortcodeAsync(CreateOrUpdateShortcodeParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        #endregion
+
+        #region Search
+
+        Task<SearchDocumentsResult> SearchDocumentsAsync(SearchDocumentsParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<SearchContactsResult> SearchContactsAsync(SearchContactsParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<SearchShortcodesResult> SearchShortcodesAsync(SearchShortcodesParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        #endregion
+
+        #region Notifications
+
+        Task<GetNotificationsResult> GetNotificationsAsync(GetNotificationsParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<SetFoldersNotificationsResult> SetFoldersNotificationsAsync(SetFoldersNotificationsParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<GetFoldersNotificationsResult> GetFoldersNotificationsAsync(GetFoldersNotificationsParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<GetNotificationsSoundResult> GetNotificationsSoundAsync(GetNotificationsSoundParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<SetNotificationsSoundResult> SetNotificationsSoundAsync(SetNotificationsSoundParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<ClearAllNotificationsResult> ClearAllNotificationsAsync(ClearAllNotificationsParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<SetNotificationReadStatusResult> SetNotificationReadStatusAsync(SetNotificationReadStatusParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        #endregion
+
+        #region Common
+
+        Task<AddCommentResult> AddCommentAsync(AddCommentParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<EditCommentResult> EditCommentAsync(EditCommentParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<DeleteCommentResult> DeleteCommentAsync(DeleteCommentParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<GetAllCategoriesResult> GetAllCategoriesAsync(GetAllCategoriesParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<SetCategoriesResult> SetCategoriesAsync(SetCategoriesParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<GetFavoriteCategoriesResult> GetFavoriteCategoriesAsync(GetFavoriteCategoriesParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<AddFavoriteCategoryResult> AddFavoriteCategoryAsync(AddFavoriteCategoryParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<RemoveFavoriteCategoryResult> RemoveFavoriteCategoryAsync(RemoveFavoriteCategoryParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<GetObjectActionsResult> GetObjectActionsAsync(GetObjectActionsParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<GetObjectLinksResult> GetObjectLinksAsync(GetObjectLinksParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<GetRecentAddressesResult> GetRecentAddressesAsync(GetRecentAddressesParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<DeleteRecentAddressesResult> DeleteRecentAddressesAsync(DeleteRecentAddressesParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<FileToFolderResult> FileToFolderAsync(FileToFolderParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<CopyToWorktrayResult> CopyToWorktrayAsync(CopyToWorktrayParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<DeleteResult> DeleteAsync(DeleteParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<RemoveFromFolderResult> RemoveFromFolderAsync(RemoveFromFolderParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        #endregion
+
+        #region System
+
+        Task<GetSystemSettingsResult> GetSystemSettingsAsync(GetSystemSettingsParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<GetSystemUsersResult> GetSystemUsersAsync(GetSystemUsersParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        #endregion
+
+        #region Diagnostic methods
+
+        Task<TestResult> TestAsync(TestParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        #endregion
+
+        #region Favorite folders (sync across devices)
+
+        Task<GetFavoriteFoldersResult> GetFavoriteFolders(GetFavoriteFoldersParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        Task<UpdateFavoriteFoldersResult> UpdateFavoriteFolders(UpdateFavoriteFoldersParameters parameters, CancellationToken ct = default(CancellationToken));
+
+        #endregion
+
+        #region Favorite folders (sync with reMARK)
+
+        Task<GetUserFavoriteFoldersResult> GetUserFavoriteFoldersAsync(GetUserFavoriteFoldersParameters parameters, CancellationToken ct = default);
+
+        Task<AddUserFavoriteFolderResult> AddUserFavoriteFolderAsync(AddUserFavoriteFolderParameters parameters, CancellationToken ct = default);
+
+        Task<RemoveUserFavoriteFolderResult> RemoveUserFavoriteFolderAsync(RemoveUserFavoriteFolderParameters parameters, CancellationToken ct = default);
+
+        Task<UpdateUserFavoriteFoldersResult> UpdateUserFavoriteFoldersAsync(UpdateUserFavoriteFoldersParameters parameters, CancellationToken ct = default);
+
+        #endregion
+
+        #region Extra fields
+
+        Task<AddExtraFieldResult> AddExtraFieldAsync(AddExtraFieldParameters parameters, CancellationToken ct = default);
+
+        Task<DeleteExtraFieldResult> DeleteExtraFieldAsync(DeleteExtraFieldParameters parameters, CancellationToken ct = default);
+
+        Task<UpdateExtraFieldsResult> UpdateExtraFieldsAsync(UpdateExtraFieldsParameters parameters, CancellationToken ct = default);
+
+        Task<UpdateExtraFieldResult> UpdateExtraFieldAsync(UpdateExtraFieldParameters parameters, CancellationToken ct = default);
+
+        Task<GetExtraFieldsResult> GetExtraFieldsAsync(GetExtraFieldsParameters parameters, CancellationToken ct = default);
+
+        Task<GetDocumentExtraFieldResult> GetDocumentExtraFieldAsync(GetDocumentExtraFieldParameters parameters, CancellationToken ct = default);
+
+        Task<AssignDocumentExtraFieldResult> AssignDocumentExtraFieldAsync(AssignDocumentExtraFieldParameters parameters, CancellationToken ct = default);
+
+        Task<DeleteDocumentExtraFieldResult> DeleteDocumentExtraFieldAsync(DeleteDocumentExtraFieldParameters parameters, CancellationToken ct = default);
+
+        Task<GetDocumentExtraFieldsResult> GetDocumentExtraFieldsAsync(GetDocumentExtraFieldsParameters parameters, CancellationToken ct = default);
+
+        #endregion
+
+        #region Saved Searches
+
+        Task<GetSavedDocumentsSearchesResult> GetSavedDocumentsSearches(GetSavedDocumentsSearchesParameters parameters, CancellationToken ct = default);
+
+        Task<GetSavedContactsSearchesResult> GetSavedContactsSearches(GetSavedContactsSearchesParameters parameters, CancellationToken ct = default);
+
+        Task<GetSavedShortcodesSearchesResult> GetSavedShortcodesSearches(GetSavedShortcodesSearchesParameters parameters, CancellationToken ct = default);
+
+        Task<AddSavedSearchesResult> AddSavedSearch(AddSavedSearchesParameters parameters, CancellationToken ct = default);
+
+        Task<DeleteSavedSearchesResult> DeleteSavedSearch(DeleteSavedSearchesParameters parameters, CancellationToken ct = default);
+
+        Task<UpdateSavedSearchesResult> UpdateSavedSearch(UpdateSavedSearchesParameters parameters, CancellationToken ct = default);
+
+        #endregion
+
+
+    }
+}

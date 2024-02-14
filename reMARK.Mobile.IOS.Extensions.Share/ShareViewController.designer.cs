@@ -6,7 +6,7 @@
 
 using Foundation;
 
-namespace reMARK.Mobile.IOS.Extensions.Share
+namespace reMark.Mobile.IOS.Extensions.Share
 {
     [Register("ShareViewController")]
     partial class ShareViewController

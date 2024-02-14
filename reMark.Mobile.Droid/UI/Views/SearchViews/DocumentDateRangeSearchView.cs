@@ -1,0 +1,156 @@
+using System;
+using System.Threading.Tasks;
+using Android.Content;
+using Android.Views;
+using AndroidX.AppCompat.Widget;
+using reMark.Mobile.Common.Model;
+using reMark.Mobile.Common.Utilities;
+using reMark.Mobile.Droid.Ui.Common;
+using reMark.Mobile.Droid.Ui.Fragments;
+using reMark.Mobile.Droid.Utilities;
+
+namespace reMark.Mobile.Droid.Ui.Views.SearchViews
+{
+    public class DocumentDateRangeSearchView : AbstractSearchView<SearchDocumentsCriteria>
+    {
+        long fromTimestamp = -1;
+        long toTimestamp = -1;
+
+        readonly AppCompatTextView dateRangeFromTextView;
+        readonly AppCompatTextView dateRangeToTextView;
+
+        readonly DocumentSearchCriteriaFragment parentFragment;
+
+        public DocumentDateRangeSearchView(Context context, DocumentSearchCriteriaFragment f)
+            : base(context)
+        {
+            Orientation = Horizontal;
+            SetBackgroundColor(BackgroundColorNormalState);
+
+            parentFragment = f;
+
+            var leftLayout = new LinearLayoutCompat(context)
+            {
+                Orientation = Vertical,
+                LayoutParameters = new LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1)
+            };
+            leftLayout.Click += From_Click;
+            AddView(leftLayout);
+
+            var fromTitleTextView = new AppCompatTextView(context)
+            {
+                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
+                Gravity = GravityFlags.Center
+            };
+            fromTitleTextView.Text = Context.GetString(Resource.String.search_document_date_from);
+            fromTitleTextView.SetTextAppearanceCompat(context, TextStyleTopLineResourceId);
+            leftLayout.AddView(fromTitleTextView);
+
+            dateRangeFromTextView = new AppCompatTextView(context)
+            {
+                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
+                Gravity = GravityFlags.Center
+            };
+            dateRangeFromTextView.SetTextAppearanceCompat(context, TextStyleBottomLineResourceId);
+            leftLayout.AddView(dateRangeFromTextView);
+
+            var separator = new AppCompatTextView(context)
+            {
+                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.MatchParent),
+                Gravity = GravityFlags.Center
+            };
+            separator.Text = "\u2014";
+            separator.SetTextAppearanceCompat(context, TextStyleBottomLineResourceId);
+            AddView(separator);
+
+            var rightLayout = new LinearLayoutCompat(context)
+            {
+                Orientation = Vertical,
+                LayoutParameters = new LayoutParams(0, ViewGroup.LayoutParams.MatchParent, 1)
+            };
+            rightLayout.Click += To_Click;
+            AddView(rightLayout);
+
+            var toTitleTextView = new AppCompatTextView(context)
+            {
+                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
+                Gravity = GravityFlags.Center
+            };
+            toTitleTextView.Text = Context.GetString(Resource.String.search_document_date_to);
+
+            toTitleTextView.SetTextAppearanceCompat(context, TextStyleTopLineResourceId);
+            rightLayout.AddView(toTitleTextView);
+
+            dateRangeToTextView = new AppCompatTextView(context)
+            {
+                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
+                Gravity = GravityFlags.Center
+            };
+
+            dateRangeToTextView.SetTextAppearanceCompat(context, TextStyleBottomLineResourceId);
+            rightLayout.AddView(dateRangeToTextView);
+
+            UpdateText();
+        }
+
+        async Task OpenDateRangeFragment(bool startWithTo)
+        {
+            var (f, tag) = PickDateRangeFragment.NewInstance(fromTimestamp, toTimestamp, startWithTo);
+            parentFragment.ReplaceFragment(f, tag);
+
+            var (fromTimeStamp, toTimeStamp) = await f.Task;
+            UpdateTimestamps(fromTimeStamp, toTimeStamp);
+        }
+
+        void UpdateTimestamps(long fromTimeStamp, long toTimeStamp)
+        {
+            fromTimestamp = fromTimeStamp;
+            toTimestamp = toTimeStamp;
+
+            UpdateText();
+            UpdateCriteria();
+        }
+
+        async void From_Click(object sender, EventArgs e)
+        {
+            await OpenDateRangeFragment(false);
+        }
+
+        async void To_Click(object sender, EventArgs e)
+        {
+            await OpenDateRangeFragment(true);
+        }
+
+        void UpdateText()
+        {
+            dateRangeFromTextView.Text = fromTimestamp == -1 ? "-" : fromTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds().FormatUserTimestampAsDateString(Context);
+            dateRangeToTextView.Text = toTimestamp == -1 ? "-" : toTimestamp.ConvertTimestampMillisecondsToDateTime().ConvertUtcToUserTime().ConvertDateTimeToTimestampMilliseconds().FormatUserTimestampAsDateString(Context);
+        }
+
+        public override void Refresh()
+        {
+            if (Criteria.DateRange != null && Criteria.DateRange.Enabled)
+            {
+                fromTimestamp = Criteria.DateRange.StartTimestamp;
+                toTimestamp = Criteria.DateRange.EndTimestamp;
+            }
+            else
+            {
+                fromTimestamp = -1;
+                toTimestamp = -1;
+            }
+
+            UpdateText();
+        }
+
+        public override void UpdateCriteria()
+        {
+            Criteria.DateRange = new DateRange
+            {
+                Enabled = fromTimestamp != -1 || toTimestamp != -1,
+                StartTimestamp = fromTimestamp,
+                EndTimestamp = toTimestamp
+            };
+        }
+    }
+}

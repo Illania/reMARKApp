@@ -1,0 +1,120 @@
+﻿using Android.Content;
+using Android.OS;
+using Android.Views;
+using reMark.Mobile.Droid.Utilities.Fingerprint;
+using AndroidX.Core.Hardware.Fingerprint;
+using AndroidX.AppCompat.Widget;
+using AndroidX.Fragment.App;
+using Android.App;
+using View = Android.Views.View;
+
+namespace reMark.Mobile.Droid.Ui.Fragments
+{
+    public class AuthenticationDialogFragment : AndroidX.Fragment.App.DialogFragment, FingerprintUiHelper.ICallback
+    {
+        FingerprintManagerCompat fingerprintManager;
+        FingerprintUiHelper fingerprintUiHelper;
+        KeyguardManager keyguardManager;
+
+        bool IsFingerprintAuthAvailable => fingerprintManager.IsHardwareDetected
+                                && fingerprintManager.HasEnrolledFingerprints;
+        bool IsDeviceCredentialAuthAvailable => keyguardManager.IsKeyguardSecure;
+
+        static class RequestCodes
+        {
+            public static int ConfirmCredentialRequest = 1;
+        }
+
+        public override void OnCreate(Bundle savedInstanceState)
+        {
+            base.OnCreate(savedInstanceState);
+
+            RetainInstance = true;
+            SetStyle(StyleNormal, Android.Resource.Style.ThemeMaterialLightDialog);
+
+            fingerprintManager = FingerprintManagerCompat.From(Context);
+            keyguardManager = (KeyguardManager)Context.GetSystemService(Context.KeyguardService);
+        }
+
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        {
+            Dialog.SetTitle(Resource.String.fingerprint_dialog_title);
+            Dialog.SetCanceledOnTouchOutside(false);
+
+            var view = inflater.Inflate(Resource.Layout.fingerprint_dialog_container, container, false);
+            var iconImageView = view.FindViewById<AppCompatImageView>(Resource.Id.fingerprint_icon);
+            var statusTextView = view.FindViewById<AppCompatTextView>(Resource.Id.fingerprint_status);
+            var deviceCredentialButton = view.FindViewById<AppCompatButton>(Resource.Id.pin_button);
+
+            if (IsDeviceCredentialAuthAvailable)
+            {
+                deviceCredentialButton.Visibility = ViewStates.Visible;
+                deviceCredentialButton.Click += (s, e) => OnDeviceCredentialRequest();
+
+                if (!IsFingerprintAuthAvailable)
+                {
+                    Dialog.SetTitle(string.Empty);
+                    view.Visibility = ViewStates.Gone;
+                }
+            }
+
+            fingerprintUiHelper = new FingerprintUiHelper(fingerprintManager, iconImageView, statusTextView, this);
+
+            return view;
+        }
+
+        public override void OnResume()
+        {
+            base.OnResume();
+
+            if (IsFingerprintAuthAvailable)
+                fingerprintUiHelper.StartListening();
+            else if (IsDeviceCredentialAuthAvailable)
+                OnDeviceCredentialRequest();
+            else
+                DismissAndNotify();  //Should never reach this
+        }
+
+        public override void OnPause()
+        {
+            base.OnPause();
+
+            if (IsFingerprintAuthAvailable)
+                fingerprintUiHelper.StopListening();
+        }
+
+        public override void OnActivityResult(int requestCode, int resultCode, Intent data)
+        {
+            if (requestCode == RequestCodes.ConfirmCredentialRequest && resultCode == (int)Result.Ok)
+                OnAuthenticatedWithDeviceCredential();
+        }
+
+        void OnDeviceCredentialRequest()
+        {
+            var screenLockIntent = keyguardManager.CreateConfirmDeviceCredentialIntent(GetString(Resource.String.auth_credential_title),
+                                                                           GetString(Resource.String.auth_credential_content));
+            StartActivityForResult(screenLockIntent, RequestCodes.ConfirmCredentialRequest);
+        }
+
+        public void OnAuthenticatedWithFingerprint()
+        {
+            DismissAndNotify();
+        }
+
+        public void OnAuthenticatedWithDeviceCredential()
+        {
+            DismissAndNotify();
+        }
+
+        void DismissAndNotify()
+        {
+            ((reMarkApplication)Activity.Application).LifecycleHandler.OnAuthenticationSuccessful();
+            Dismiss();
+        }
+
+        public void OnError()
+        {
+            //Empty on purpose
+        }
+    }
+}

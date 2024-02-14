@@ -1,0 +1,75 @@
+﻿using System;
+using CoreFoundation;
+using Foundation;
+using reMark.Mobile.IOS.Ui.Common;
+using UIKit;
+
+namespace reMark.Mobile.IOS.Ui.TableViewCells.AddEditTableViewCells
+{
+    public class TextFieldTableViewCell : AddEditTableViewCell
+    {
+        public static readonly NSString Key = new NSString("TextFieldTableViewCell");
+
+        public Action<string> ContentEdited;
+
+        readonly UITextFieldScalable textField;
+
+        public TextFieldTableViewCell()
+            : base(UITableViewCellStyle.Default, Key)
+        {
+            SelectionStyle = UITableViewCellSelectionStyle.None;
+
+            textField = new UITextFieldScalable
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                Font = Theme.DefaultFont.CustomFont(),
+                BorderStyle = UITextBorderStyle.None
+            };
+            textField.EditingChanged += TextField_EditingChanged;
+            textField.AutocorrectionType = UITextAutocorrectionType.No;
+            ContentView.AddSubview(textField);
+
+            ContentView.AddConstraints(new[]
+            {
+                textField.TopAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TopAnchor, VerticalMargin),
+                textField.BottomAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.BottomAnchor, -VerticalMargin),
+                textField.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor),
+                textField.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
+            });
+        }
+
+        void TextField_EditingChanged(object sender, EventArgs e)
+        {
+            ContentEdited?.Invoke(textField.Text);
+        }
+
+        public void SetPlaceholder(string placeholder)
+        {
+            textField.Placeholder = placeholder;
+        }
+
+        public void SetContent(string content)
+        {
+            textField.Text = content;
+        }
+
+        public void SetAutocapitalizationType(UITextAutocapitalizationType type)
+        {
+            textField.AutocapitalizationType = type;
+        }
+
+        public void SetAutocorrectionType(UITextAutocorrectionType type)
+        {
+            textField.AutocorrectionType = type;
+        }
+
+        public override void Reset()
+        {
+            ContentEdited = delegate { };
+            SetErrorState(false);
+
+            textField.Placeholder = string.Empty;
+            textField.Text = string.Empty;
+        }
+    }
+}

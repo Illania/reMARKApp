@@ -1,0 +1,28 @@
+﻿using System.Net;
+using System.Net.Security;
+using reMark.Mobile.Common;
+using Xamarin.Android.Net;
+
+namespace reMark.Mobile.Droid.Utilities
+{
+    public class SSLCertificateVerificationManager
+    {
+        readonly RemoteCertificateValidationCallback remoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => { return true; };
+
+        public void EnableSelfSignedCertificates()
+        {
+            CommonConfig.Logger.Warning("**** ENABLING CUSTOM VALIDATION CALLBACK ****");
+
+            ServicePointManager.ServerCertificateValidationCallback = remoteCertificateValidationCallback;
+            CommonConfig.HttpClientHandler = () => new InsecureAndroidClientHandler { AutomaticDecompression = Config.AcceptedResponseCompression };
+        }
+
+        public void DisableSelfSignedCertificates()
+        {
+            CommonConfig.Logger.Info("Disabling custom validation callback");
+
+            ServicePointManager.ServerCertificateValidationCallback = null;
+            CommonConfig.HttpClientHandler = () => new AndroidClientHandler { AutomaticDecompression = Config.AcceptedResponseCompression };
+        }
+    }
+}

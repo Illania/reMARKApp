@@ -1,0 +1,550 @@
+﻿using System.Drawing;
+using System.Linq;
+using System.Text.RegularExpressions;
+using Foundation;
+using reMark.Mobile.Common;
+using reMark.Mobile.Common.Extensions;
+using reMark.Mobile.Common.Model;
+using reMark.Mobile.Common.Utilities;
+using reMark.Mobile.IOS.Ui.Common;
+using reMark.Mobile.IOS.Utilities;
+using reMark.Mobile.IOS.Utilities.Extensions;
+using Microsoft.Maui.Platform;
+using UIKit;
+using Color = Microsoft.Maui.Graphics.Color;
+
+namespace reMark.Mobile.IOS.Ui.TableViewCells
+{
+    public class DocumentsTableViewCell : UITableViewCell
+    {
+        public static readonly NSString DefaultId = new NSString(nameof(DocumentsTableViewCell));
+        public static readonly NSString CompactId = new NSString(nameof(DocumentsTableViewCell) + "_Compact");
+        public static readonly NSString ExternalId = new NSString(nameof(DocumentsTableViewCell) + "_External");
+        public static readonly NSString UploadId = new NSString(nameof(DocumentsTableViewCell) + "_Upload");
+
+        readonly UIStackView categoriesStackView;
+        readonly UIImageView directionIndicatorImageView;
+        readonly UIImageView unreadIndicatorImageView;
+        readonly UIImageView priorityIndicatorImageView;
+        readonly UIImageView attachmentsIndicatorImageView;
+        readonly UIImageView commentsIndicatorImageView;
+        readonly UILabelScalable topLabel;
+        readonly UILabelScalable dateLabel;
+        readonly UILabelScalable middleLabel;
+        readonly UITextViewScalable bottomLabel;
+
+        readonly bool unreadIndicatorMe = PlatformConfig.Preferences.UnreadIndicatorMe;
+        readonly bool showCreatorOutgoing = PlatformConfig.Preferences.ShowCreatorOutgoing;
+        readonly bool useMessageListAppearance = PlatformConfig.Preferences.UseMessageListAppearance;
+
+        public DocumentsTableViewCell(NSString reuseIdentifier)
+            : base(UITableViewCellStyle.Default, reuseIdentifier)
+        {
+            if (reuseIdentifier == DefaultId || reuseIdentifier == CompactId || reuseIdentifier == ExternalId)
+            {
+                SelectionStyle = UITableViewCellSelectionStyle.Default;
+                Accessory = UITableViewCellAccessory.DisclosureIndicator;
+            }
+            else
+            {
+                SelectionStyle = UITableViewCellSelectionStyle.None;
+                Accessory = UITableViewCellAccessory.None;
+            }
+
+            var leadingMarginGuide = new UILayoutGuide();
+            ContentView.AddLayoutGuide(leadingMarginGuide);
+            ContentView.ClipsToBounds = true;
+
+            leadingMarginGuide.LeadingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.LeadingAnchor).Active = true;
+            var leadingMarginWidthAnchor = leadingMarginGuide.WidthAnchor.ConstraintEqualTo(0f);
+            leadingMarginWidthAnchor.SetIdentifier("leadingMarginWidth");
+            leadingMarginWidthAnchor.Active = true;
+
+            if (reuseIdentifier == DefaultId || reuseIdentifier == CompactId || reuseIdentifier == ExternalId)
+            {
+                categoriesStackView = new UIStackView
+                {
+                    Axis = UILayoutConstraintAxis.Vertical,
+                    Alignment = UIStackViewAlignment.Fill,
+                    Distribution = UIStackViewDistribution.FillEqually,
+                    TranslatesAutoresizingMaskIntoConstraints = false
+                };
+
+                ContentView.AddSubview(categoriesStackView);
+                ContentView.AddConstraints(new[]
+                {
+                    categoriesStackView.TrailingAnchor.ConstraintEqualTo(leadingMarginGuide.TrailingAnchor, -8f),
+                    categoriesStackView.TopAnchor.ConstraintEqualTo(ContentView.TopAnchor, 4f),
+                    categoriesStackView.BottomAnchor.ConstraintEqualTo(ContentView.BottomAnchor, -4f),
+                    categoriesStackView.WidthAnchor.ConstraintEqualTo(4f),
+                });
+            }
+
+            topLabel = new UILabelScalable
+            {
+                Font = Theme.DefaultBoldFont.CustomFont(),
+                Lines = 1,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+            
+
+            ContentView.AddSubview(topLabel);
+            ContentView.AddConstraints(new[]
+            {
+                topLabel.TopAnchor.ConstraintEqualTo(ContentView.TopAnchor, 8f),
+                topLabel.LeadingAnchor.ConstraintEqualTo(leadingMarginGuide.TrailingAnchor, 15f + 8f),
+                topLabel.HeightAnchor.ConstraintGreaterThanOrEqualTo(Theme.MinimumLabelSize),
+            });
+
+            if (reuseIdentifier == DefaultId || reuseIdentifier == CompactId || reuseIdentifier == ExternalId)
+            {
+                dateLabel = new UILabelScalable
+                {
+                    Font = Theme.DefaultLightFont.CustomFont().WithRelativeSize(-2f),
+                    TextColor = Theme.DarkGray,
+                    Lines = 1,
+                    TranslatesAutoresizingMaskIntoConstraints = false
+                };
+                dateLabel.SetContentHuggingPriority(1000f, UILayoutConstraintAxis.Horizontal);
+                dateLabel.SetContentCompressionResistancePriority(1000f, UILayoutConstraintAxis.Horizontal);
+
+                ContentView.AddSubview(dateLabel);
+                ContentView.AddConstraints(new[]
+                {
+                    dateLabel.LeadingAnchor.ConstraintEqualTo(topLabel.TrailingAnchor, 8f),
+                    dateLabel.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
+                    dateLabel.CenterYAnchor.ConstraintEqualTo(topLabel.CenterYAnchor)
+                });
+            }
+            else
+            {
+                ContentView.AddConstraints(new[]
+                {
+                    topLabel.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor)
+                });
+            }
+
+            middleLabel = new UILabelScalable
+            {
+                Font = Theme.DefaultFont.CustomFont(),
+                Lines = 1,
+                TranslatesAutoresizingMaskIntoConstraints = false
+            };
+
+            ContentView.AddSubview(middleLabel);
+            ContentView.AddConstraints(new[]
+            {
+                middleLabel.LeadingAnchor.ConstraintEqualTo(topLabel.LeadingAnchor),
+                middleLabel.TopAnchor.ConstraintEqualTo(topLabel.BottomAnchor, 4f),
+                middleLabel.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
+            });
+
+            if (reuseIdentifier == DefaultId)
+            {
+                bottomLabel = new UITextViewScalable
+                {
+                    Font = Theme.DefaultFont.CustomFont().WithRelativeSize(-2f),
+                    TextColor = Theme.DarkGray,
+                    Selectable = false,
+                    Editable = false,
+                    ScrollEnabled = false,
+                    ClipsToBounds = false,
+                    TextContainerInset = UIEdgeInsets.Zero,
+                    UserInteractionEnabled = false,
+                    TranslatesAutoresizingMaskIntoConstraints = false,
+                    BackgroundColor = UIColor.Clear,
+                    
+                };
+                bottomLabel.TextContainer.MaximumNumberOfLines = 3;
+                bottomLabel.TextContainer.LineFragmentPadding = 0f;
+
+                ContentView.AddSubview(bottomLabel);
+                ContentView.AddConstraints(new[]
+                {
+                    bottomLabel.LeadingAnchor.ConstraintEqualTo(topLabel.LeadingAnchor),
+                    bottomLabel.TopAnchor.ConstraintEqualTo(middleLabel.BottomAnchor, 4f),
+                    bottomLabel.TrailingAnchor.ConstraintEqualTo(ContentView.ReadableContentGuide.TrailingAnchor),
+                    bottomLabel.BottomAnchor.ConstraintEqualTo(ContentView.BottomAnchor, -8f),
+                });
+            }
+            else
+            {
+                ContentView.AddConstraints(new[]
+                {
+                    middleLabel.BottomAnchor.ConstraintEqualTo(ContentView.BottomAnchor, -8f),
+                });
+            }
+
+            if (reuseIdentifier == DefaultId || reuseIdentifier == CompactId || reuseIdentifier == UploadId)
+            {
+                directionIndicatorImageView = new UIImageView
+                {
+                    ContentMode = UIViewContentMode.ScaleToFill,
+                    TranslatesAutoresizingMaskIntoConstraints = false
+                };
+
+                ContentView.AddSubview(directionIndicatorImageView);
+                ContentView.AddConstraints(new[]
+                {
+                    directionIndicatorImageView.LeadingAnchor.ConstraintEqualTo(leadingMarginGuide.TrailingAnchor),
+                    directionIndicatorImageView.CenterYAnchor.ConstraintEqualTo(topLabel.CenterYAnchor),
+                    directionIndicatorImageView.WidthAnchor.ConstraintEqualTo(15f),
+                    directionIndicatorImageView.HeightAnchor.ConstraintEqualTo(15f),
+                });
+            }
+
+            if (reuseIdentifier == DefaultId || reuseIdentifier == CompactId)
+            {
+                unreadIndicatorImageView = new UIImageView
+                {
+                    ContentMode = UIViewContentMode.ScaleToFill,
+                    Image = UIImage.FromBundle("Full-Dot").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
+                    TranslatesAutoresizingMaskIntoConstraints = false
+                };
+
+                ContentView.AddSubview(unreadIndicatorImageView);
+                ContentView.AddConstraints(new[]
+                {
+                    unreadIndicatorImageView.LeadingAnchor.ConstraintEqualTo(leadingMarginGuide.TrailingAnchor),
+                    unreadIndicatorImageView.TopAnchor.ConstraintEqualTo(directionIndicatorImageView.BottomAnchor, 4f),
+                    unreadIndicatorImageView.WidthAnchor.ConstraintEqualTo(15f),
+                    unreadIndicatorImageView.HeightAnchor.ConstraintEqualTo(15f),
+                });
+            }
+
+            if (reuseIdentifier == DefaultId)
+            {
+                attachmentsIndicatorImageView = new UIImageView
+                {
+                    ContentMode = UIViewContentMode.ScaleToFill,
+                    Image = UIImage.FromBundle("Attachment-Small").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
+                    TranslatesAutoresizingMaskIntoConstraints = false
+                };
+
+                ContentView.AddSubview(attachmentsIndicatorImageView);
+                ContentView.AddConstraints(new[]
+                {
+                    attachmentsIndicatorImageView.LeadingAnchor.ConstraintEqualTo(leadingMarginGuide.TrailingAnchor),
+                    attachmentsIndicatorImageView.TopAnchor.ConstraintEqualTo(unreadIndicatorImageView.BottomAnchor, 4f),
+                    attachmentsIndicatorImageView.WidthAnchor.ConstraintEqualTo(15f),
+                    attachmentsIndicatorImageView.HeightAnchor.ConstraintEqualTo(15f),
+                });
+
+                commentsIndicatorImageView = new UIImageView
+                {
+                    ContentMode = UIViewContentMode.ScaleToFill,
+                    Image = UIImage.FromBundle("Message-Small").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate),
+                    TranslatesAutoresizingMaskIntoConstraints = false
+                };
+
+                ContentView.AddSubview(commentsIndicatorImageView);
+                ContentView.AddConstraints(new[]
+                {
+                    commentsIndicatorImageView.LeadingAnchor.ConstraintEqualTo(leadingMarginGuide.TrailingAnchor),
+                    commentsIndicatorImageView.TopAnchor.ConstraintEqualTo(attachmentsIndicatorImageView.BottomAnchor, 4f),
+                    commentsIndicatorImageView.WidthAnchor.ConstraintEqualTo(15f),
+                    commentsIndicatorImageView.HeightAnchor.ConstraintEqualTo(15f)
+                });
+
+                priorityIndicatorImageView = new UIImageView
+                {
+                    ContentMode = UIViewContentMode.ScaleToFill,
+                    Image = UIImage.FromBundle("Priority-Low").ImageWithRenderingMode(UIImageRenderingMode.AlwaysOriginal),
+                    TranslatesAutoresizingMaskIntoConstraints = false
+                };
+
+                ContentView.AddSubview(priorityIndicatorImageView);
+                ContentView.AddConstraints(new[]
+                {
+                    priorityIndicatorImageView.LeadingAnchor.ConstraintEqualTo(leadingMarginGuide.TrailingAnchor),
+                    priorityIndicatorImageView.TopAnchor.ConstraintEqualTo(commentsIndicatorImageView.BottomAnchor, 4f),
+                    priorityIndicatorImageView.WidthAnchor.ConstraintEqualTo(15f),
+                    priorityIndicatorImageView.HeightAnchor.ConstraintEqualTo(15f),
+                });
+            }
+        }
+
+        public void Initialize(DocumentPreview dp)
+        {
+            if (ReuseIdentifier == DefaultId || ReuseIdentifier == CompactId || ReuseIdentifier == ExternalId)
+                InitializeCategories(dp);
+            InitializeTopLabel(dp);
+            if (ReuseIdentifier == DefaultId || ReuseIdentifier == CompactId || ReuseIdentifier == ExternalId)
+                InitializeDate(dp);
+            InitializeMiddleLabel(dp);
+            if (ReuseIdentifier == DefaultId)
+                InitializeBottomLabel(dp);
+            if (ReuseIdentifier == DefaultId || ReuseIdentifier == CompactId || ReuseIdentifier == UploadId)
+                InitializeDirectionIndicator(dp);
+            if (ReuseIdentifier == DefaultId || ReuseIdentifier == CompactId)
+                InitializeUnreadIndicator(dp);
+            if (ReuseIdentifier == DefaultId)
+            {
+                InitializeAttachmentIndicator(dp);
+                InitializeCommentsIndicator(dp);
+                InitializePriorityIndicator(dp);
+            }
+            if (useMessageListAppearance)
+                InitializeMessageListAppearance(dp);
+        }
+
+        void InitializeCategories(DocumentPreview dp)
+        {
+            if (categoriesStackView == null)
+                return;
+
+            categoriesStackView.Subviews.ForEach(v => v.RemoveFromSuperview());
+            foreach (var c in dp.Categories)
+            {
+                var v = new UIView
+                {
+                    BackgroundColor = UI.UIColorFromHexString(c.HexColor),
+                    UserInteractionEnabled = false
+                };
+                categoriesStackView.AddArrangedSubview(v);
+            }
+        }
+
+        void InitializeTopLabel(DocumentPreview dp)
+        {
+            if (topLabel == null)
+                return;
+
+            string text = null;
+            if (dp.Direction == DocumentDirection.Incoming)
+            {
+                var address = dp.Addresses.FirstOrDefault(da => da.AddressType == DocumentAddressType.From);
+                if (address != null)
+                    text = string.IsNullOrWhiteSpace(address.Name) ? address.Address : address.Name;
+            }
+            else
+            {
+                if (showCreatorOutgoing)
+                    text = dp.Creator;
+                else
+                {
+                    var address = dp.Addresses.Where(da => da.AddressType == DocumentAddressType.To || da.AddressType == DocumentAddressType.Cc || da.AddressType == DocumentAddressType.Bcc).OrderBy(da => da.AddressType).FirstOrDefault();
+                    if (address != null)
+                        text = string.IsNullOrWhiteSpace(address.Name) ? address.Address : address.Name;
+                }
+            }
+
+            topLabel.Text = text ?? string.Empty;
+        }
+
+        void InitializeDate(DocumentPreview dp)
+        {
+            if (dateLabel == null)
+                return;
+
+            var timestampMs = dp.DateReceivedTimestamp.ConvertTimestampMillisecondsToDateTime()
+                                .ConvertUtcToUserTime()
+                                .ConvertDateTimeToTimestampMilliseconds();
+            dateLabel.Text = PlatformConfig.Preferences.ShowTimeForOldEmails ?
+                timestampMs.FormatUserTimestampAsCompactMediumDateTimeString() :
+                timestampMs.FormatUserTimestampAsCompactShortDateTimeString();
+        }
+
+        void InitializeMiddleLabel(DocumentPreview dp)
+        {
+            if (middleLabel == null)
+                return;
+
+            middleLabel.Text = dp.Subject;
+        }
+
+        void InitializeBottomLabel(DocumentPreview dp)
+        {
+            if (bottomLabel == null)
+                return;
+
+            bottomLabel.Text = !string.IsNullOrWhiteSpace(dp.Preview) ? Regex.Replace(dp.Preview, @"\r\n?|\n", "  ", RegexOptions.Multiline) : Localization.GetString("no_content");
+        }
+
+        void InitializeDirectionIndicator(DocumentPreview dp)
+        {
+            if (directionIndicatorImageView == null)
+                return;
+
+            UIImage image = null;
+
+            if (dp.TransmitStatus == TransmitStatus.Fail || dp.TransmitStatus == TransmitStatus.FailedBounced || dp.TransmitStatus == TransmitStatus.InCancel)
+            {
+                directionIndicatorImageView.TintColor = UIColor.Red;
+                image = UIImage.FromBundle("Failed").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+            }
+            else if (dp.TransmitStatus == TransmitStatus.PartialSent)
+            {
+                directionIndicatorImageView.TintColor = Theme.Gray;
+                image = UIImage.FromBundle("Partially-Sent").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+            }
+            else if (dp.TransmitStatus == TransmitStatus.Delayed)
+            {
+                directionIndicatorImageView.TintColor = Theme.TintColor;
+                image = UIImage.FromBundle("Delayed").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+            } 
+            else
+            {
+                directionIndicatorImageView.TintColor = Theme.TintColor;
+                switch (dp.Direction)
+                {
+                    case DocumentDirection.Incoming:
+                        image = UIImage.FromBundle("Incoming").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+                        break;
+                    case DocumentDirection.Outgoing:
+                        image = UIImage.FromBundle("Outgoing").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+                        break;
+                    case DocumentDirection.Draft:
+                        image = UIImage.FromBundle("Edit-Small").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+                        break;
+                }
+
+            }
+
+            directionIndicatorImageView.Image = image;
+        }
+
+        void SetTextColor(UIColor color)
+        {
+            bottomLabel.TextColor = topLabel.TextColor = middleLabel.TextColor = color;
+        }
+
+        void InitializeMessageListAppearance(DocumentPreview dp)
+        {
+            //apply default appearance
+            var defaultAppearance = ServerConfig.SystemSettings.DocumentsModuleInfo.DefaultAppearance;
+            var daReadColor = Color.FromInt(defaultAppearance.FontColor).ToPlatform();
+            var daUnreadColor = Color.FromInt(defaultAppearance.UnreadFontColor).ToPlatform();
+
+            if (defaultAppearance.FontColorEnable)
+                SetTextColor(daReadColor);
+            if(defaultAppearance.UnreadFontColorEnable)
+                SetTextColor(dp.IsReadByCurrent ? daReadColor : daUnreadColor);          
+
+            //if row appearance depends from line use line appearance           
+            var lineAppearance = ServerConfig.SystemSettings.DocumentsModuleInfo.LineAppearances.FirstOrDefault(la => dp.Lines.Any(l => l.Guid == la.OriginatorGid));
+            if (lineAppearance != null && lineAppearance.Enable)
+            {
+                var laReadColor = Color.FromInt(lineAppearance.FontColor).ToPlatform();
+                var laUnreadColor = Color.FromInt(lineAppearance.UnreadFontColor).ToPlatform();
+                var laBgColor = Color.FromInt(lineAppearance.BackgroundColor).ToPlatform();
+                BackgroundColor = laBgColor;
+                if (defaultAppearance.FontColorEnable)
+                    SetTextColor(laReadColor);
+                if (defaultAppearance.UnreadFontColorEnable)
+                    SetTextColor(dp.IsReadByCurrent ? laReadColor : laUnreadColor);
+
+            }
+
+            //if row appearance depends from user use user appearance           
+            var userAppearance = ServerConfig.SystemSettings.DocumentsModuleInfo.UserAppearances.FirstOrDefault(la => dp.CreatorGuid == la.OriginatorGid);
+            if (userAppearance != null && userAppearance.Enable)
+            {
+                var uaReadColor = Color.FromInt(userAppearance.FontColor).ToPlatform();
+                var uaUnreadColor = Color.FromInt(userAppearance.UnreadFontColor).ToPlatform();
+                var uaBgColor = Color.FromInt(userAppearance.BackgroundColor).ToPlatform();
+                BackgroundColor = uaBgColor;
+                if (defaultAppearance.FontColorEnable)
+                    SetTextColor(uaReadColor);
+                if (defaultAppearance.UnreadFontColorEnable)
+                    SetTextColor(dp.IsReadByCurrent ? uaReadColor : uaUnreadColor);
+            }
+ 
+        }
+
+        void InitializeUnreadIndicator(DocumentPreview dp)
+        {
+            if (unreadIndicatorImageView == null)
+                return;
+            var show = unreadIndicatorMe ? !dp.IsReadByCurrent : !dp.IsReadByAnyone;
+            unreadIndicatorImageView.Alpha = show ? 1f : 0f;
+        }
+
+        void InitializeAttachmentIndicator(DocumentPreview dp)
+        {
+            if (attachmentsIndicatorImageView == null)
+                return;
+
+            attachmentsIndicatorImageView.Alpha = dp.AttachmentsCount > 0 ? 1f : 0f;
+        }
+
+        void InitializePriorityIndicator(DocumentPreview dp)
+        {
+            if (priorityIndicatorImageView == null)
+                return;
+
+            if (dp.Priority == Priority.Urgent)
+                priorityIndicatorImageView.Image = UIImage.FromBundle("Priority-High").ImageWithRenderingMode(UIImageRenderingMode.AlwaysOriginal);
+            else
+                priorityIndicatorImageView.Image = UIImage.FromBundle("Priority-Low").ImageWithRenderingMode(UIImageRenderingMode.AlwaysOriginal);
+
+            priorityIndicatorImageView.Alpha = (dp.Priority == Priority.Low || dp.Priority == Priority.Urgent) ? 1f : 0f;
+        }
+
+        void InitializeCommentsIndicator(DocumentPreview dp)
+        {
+            if (commentsIndicatorImageView == null)
+                return;
+
+            commentsIndicatorImageView.Alpha = dp.CommentsCount > 0 ? 1f : 0f;
+        }
+
+        public override void SetSelected(bool selected, bool animated)
+        {
+            UIColor[] colors = null;
+
+            if (categoriesStackView != null)
+            {
+                colors = new UIColor[categoriesStackView.Subviews.Length];
+                for (var i = 0; i < categoriesStackView.Subviews.Length; i++)
+                    colors[i] = categoriesStackView.Subviews[i].BackgroundColor;
+            }
+
+            base.SetSelected(selected, animated);
+
+            if (colors != null)
+            {
+                for (var i = 0; i < categoriesStackView.Subviews.Length; i++)
+                    categoriesStackView.Subviews[i].BackgroundColor = colors[i];
+
+                colors = null;
+            }
+        }
+
+        public override void SetHighlighted(bool highlighted, bool animated)
+        {
+            UIColor[] colors = null;
+
+            if (categoriesStackView != null)
+            {
+                colors = new UIColor[categoriesStackView.Subviews.Length];
+                for (var i = 0; i < categoriesStackView.Subviews.Length; i++)
+                    colors[i] = categoriesStackView.Subviews[i].BackgroundColor;
+            }
+
+            base.SetHighlighted(highlighted, animated);
+
+            if (colors != null)
+            {
+                for (var i = 0; i < categoriesStackView.Subviews.Length; i++)
+                    categoriesStackView.Subviews[i].BackgroundColor = colors[i];
+
+                colors = null;
+            }
+        }
+
+        public override void SetEditing(bool editing, bool animated)
+        {
+            base.SetEditing(editing, animated);
+
+            var c = ContentView?.Constraints?.FirstOrDefault(nslc => nslc.GetIdentifier() == "leadingMarginWidth");
+            if (c != null)
+                c.Constant = editing ? 16f : 0f;
+
+            if (animated)
+                AnimateNotify(.25d, ContentView.LayoutIfNeeded, null);
+            else
+                LayoutIfNeeded();
+        }
+    }
+}

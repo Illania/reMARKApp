@@ -1,0 +1,88 @@
+﻿
+using Android.App;
+using Android.Content;
+using Android.Content.PM;
+using Android.OS;
+using AndroidX.AppCompat.Widget;
+using reMark.Mobile.Common;
+using reMark.Mobile.Common.Model;
+using reMark.Mobile.Droid.Ui.Common;
+using reMark.Mobile.Droid.Ui.Fragments;
+using Toolbar = AndroidX.AppCompat.Widget.Toolbar;
+
+namespace reMark.Mobile.Droid.Ui.Activities
+{
+     [Activity(ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize )]
+    public class ParentContactSelectorFoldersListActivity : BaseAppCompatActivity
+    {
+        public const string ParentContactResultKey = "RecipientResult_7638a4cd-f12f-4e8a-8862-98fd9fa208bc";
+
+        public const int ContactRequestCode = 123;
+
+        const string ChildrenTypeIntentKey = "ChildrenTypeKey_09ed9796-4e13-42ff-8848-df5ca3731c25";
+
+        Toolbar toolbar;
+
+        public static Intent CreateIntent(Context context, ContactType childrenType)
+        {
+            var intent = new Intent(context, typeof(ParentContactSelectorFoldersListActivity));
+
+            if (childrenType != ContactType.None)
+                intent.PutExtra(ChildrenTypeIntentKey, (int)childrenType);
+
+            return intent;
+        }
+
+        protected override void OnCreate(Bundle savedInstanceState)
+        {
+            base.OnCreate(savedInstanceState);
+
+            CommonConfig.Logger.Info($"Creating {nameof(PickerContactFolderListActivity)}...");
+
+            OverridePendingTransition(Resource.Animation.slide_up, Resource.Animation.no_change);
+
+            SetContentView(Resource.Layout.base_layout);
+
+            toolbar = FindViewById<Toolbar>(Resource.Id.toolbar);
+            SetSupportActionBar(toolbar);
+            SupportActionBar.SetDisplayHomeAsUpEnabled(true);
+
+            if (savedInstanceState == null)
+            {
+                var childrenType = (ContactType)Intent.Extras.GetInt(ChildrenTypeIntentKey);
+
+                var ft = SupportFragmentManager.BeginTransaction();
+                var (pcflf, tag) = ParentContactSelectorFoldersListFragment.NewInstance(childrenType, Folder.RootForModule(ModuleType.Contacts), true, true, true);
+
+                ft.Replace(Resource.Id.fragment_container, pcflf, tag);
+                ft.Commit();
+
+                CommonConfig.Logger.Info($"Created {nameof(PickerContactFolderListActivity)}");
+            }
+            else
+            {
+                CommonConfig.Logger.Info($"Restored {nameof(PickerContactFolderListActivity)}");
+            }
+        }
+
+        protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
+        {
+            if (requestCode == ContactRequestCode && resultCode == Result.Ok && data.HasExtra(ParentContactSelectorActivity.ParentContactResultKey))
+            {
+                var parentContactString = data.GetStringExtra(ParentContactSelectorActivity.ParentContactResultKey);
+
+                var resultIntent = new Intent();
+                resultIntent.PutExtra(ParentContactResultKey, parentContactString);
+                SetResult(Result.Ok, resultIntent);
+                Finish();
+            }
+        }
+
+        public override void Finish()
+        {
+            base.Finish();
+
+            OverridePendingTransition(Resource.Animation.no_change, Resource.Animation.slide_down);
+        }
+    }
+}

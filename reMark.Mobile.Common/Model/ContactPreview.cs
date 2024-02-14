@@ -1,0 +1,78 @@
+﻿using System.Collections.Generic;
+using reMark.Mobile.Common.Utilities;
+using SQLite;
+
+namespace reMark.Mobile.Common.Model
+{
+    [Table("ContactPreview")]
+    public class ContactPreview : BusinessEntityPreview, ICategorizable
+    {
+        [Ignore]
+        public override ObjectType ObjectType => ObjectType.Contact;
+
+        [Ignore]
+        public override ModuleType ModuleType => ModuleType.Contacts;
+
+        [Ignore]
+        public int RowId { get; set; } = -1;
+
+        [Column("Name")]
+        public string Name { get; set; }
+
+        [Column("CompanyName")]
+        public string CompanyName { get; set; }
+
+        [Column("ShortId")]
+        public string ShortId { get; set; }
+
+        [Column("Description")]
+        public string Description { get; set; }
+
+        [Column("Type")]
+        public ContactType Type { get; set; }
+
+        [Column("CommentsCount")]
+        public int CommentsCount { get; set; }
+
+        List<Category> categories;
+
+        [Ignore]
+        public List<Category> Categories
+        {
+            get
+            {
+                if (categories == null)
+                    categories = new List<Category>();
+                return categories;
+            }
+            set => categories = value;
+        }
+
+        [Ignore]
+        public CommunicationAddress PrimaryAddress { get; set; }
+
+        #region Serialization
+
+        [Column("CategoriesString")]
+        public string CategoriesString { get => Serializer.Serialize(Categories); set => Categories = Serializer.Deserialize<List<Category>>(value); }
+
+        [Column("PrimaryAddressString")]
+        public string PrimaryAddressString { get => Serializer.Serialize(PrimaryAddress); set => PrimaryAddress = Serializer.Deserialize<CommunicationAddress>(value); }
+
+        #endregion
+
+        public override string ToString()
+        {
+            return $"[ContactPreview: Id={Id}, RowId={RowId}, Name={Name}]";
+        }
+
+        public override bool Equals(object contactPreview)
+        {
+            if (!(contactPreview is ContactPreview cp))
+                return false;
+            return cp.Id == Id;
+        }
+            
+          
+    }
+}

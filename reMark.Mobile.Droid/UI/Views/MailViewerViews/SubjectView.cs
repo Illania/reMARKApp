@@ -1,0 +1,48 @@
+﻿using System.Threading.Tasks;
+using Android.Content;
+using Android.Views;
+using AndroidX.AppCompat.Widget;
+using reMark.Mobile.Droid.Ui.Common;
+
+namespace reMark.Mobile.Droid.Ui.Views.MailViewerViews
+{
+    public class SubjectView : MailViewerView
+    {
+        AppCompatTextView subjectTextView;
+
+        public SubjectView(Context context)
+            : base(context)
+        {
+            InitializeView();
+        }
+
+        void InitializeView()
+        {
+            SetPadding(DistanceLarge, DistanceLarge, DistanceLarge, DistanceNormal);
+
+            subjectTextView = new AppCompatTextView(Context)
+            {
+                LayoutParameters = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+            };
+            subjectTextView.SetTextAppearanceCompat(Context, Resource.Style.fontTitle);
+
+            AddView(subjectTextView);
+        }
+
+        public override Task RefreshView()
+        {
+            if (MailMessage != null)
+            {
+                Visibility = ViewStates.Visible;
+                subjectTextView.Text = string.IsNullOrWhiteSpace(MailMessage.Subject) ? Context.GetString(Resource.String.no_subject) : MailMessage.Subject;
+            }
+            else
+            {
+                Visibility = ViewStates.Gone;
+                subjectTextView.Text = string.Empty;
+            }
+
+            return Task.CompletedTask;
+        }
+    }
+}
