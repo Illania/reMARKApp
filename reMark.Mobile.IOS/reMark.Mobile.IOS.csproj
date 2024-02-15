@@ -1,12 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net7.0-ios</TargetFramework>
+    <TargetFramework>net8.0-ios</TargetFramework>
     <OutputType>Exe</OutputType>
     <Nullable>enable</Nullable>
     <ImplicitUsings>true</ImplicitUsings>
     <SupportedOSPlatformVersion>13.0</SupportedOSPlatformVersion>
     <UseMaui>true</UseMaui>
-    <Platforms>AnyCPU</Platforms>
     <Registrar>dynamic</Registrar>
     <SkipValidateMauiImplicitPackageReferences>true</SkipValidateMauiImplicitPackageReferences> 
   </PropertyGroup>
@@ -22,7 +21,7 @@
 		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Registrar>dynamic</Registrar>
 	</PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
 		<DebugSymbols>true</DebugSymbols>
 		<DebugType>full</DebugType>
 		<Optimize>false</Optimize>
@@ -39,7 +38,7 @@
 		<CodesignProvision>Automatic</CodesignProvision>
     <Registrar>dynamic</Registrar>
 	</PropertyGroup>
-	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
 		<DebugType>none</DebugType>
 		<Optimize>true</Optimize>
 		<OutputPath>bin\iPhoneSimulator\Release</OutputPath>
@@ -55,7 +54,7 @@
 		<CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
     <Registrar>dynamic</Registrar>
 	</PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
 		<DebugSymbols>true</DebugSymbols>
 		<DebugType>full</DebugType>
 		<Optimize>false</Optimize>
@@ -129,7 +128,7 @@
     <WarningsNotAsErrors></WarningsNotAsErrors>
     <Nullable></Nullable>
 	</PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
     <DebugSymbols></DebugSymbols>
 		<DebugType>none</DebugType>
 		<Optimize>true</Optimize>
@@ -203,149 +202,7 @@
     <WarningsNotAsErrors></WarningsNotAsErrors>
     <Nullable></Nullable>
 	</PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <IntermediateOutputPath></IntermediateOutputPath>
-    <DebugSymbols></DebugSymbols>
-    <DebugType></DebugType>
-    <Optimize></Optimize>
-    <OutputPath></OutputPath>
-    <DefineConstants></DefineConstants>
-    <WarningLevel></WarningLevel>
-    <TreatWarningsAsErrors></TreatWarningsAsErrors>
-    <DocumentationFile></DocumentationFile>
-    <ConsolePause>true</ConsolePause>
-    <ExternalConsole>false</ExternalConsole>
-    <Commandlineparameters></Commandlineparameters>
-    <RunWithWarnings>true</RunWithWarnings>
-    <CreatePackage>false</CreatePackage>
-    <PackagingExtraArgs></PackagingExtraArgs>
-    <EnablePackageSigning></EnablePackageSigning>
-    <UseHardenedRuntime>false</UseHardenedRuntime>
-    <CodesignProvision></CodesignProvision>
-    <CodesignKey></CodesignKey>
-    <PackageSigningKey></PackageSigningKey>
-    <CodesignExtraArgs></CodesignExtraArgs>
-    <DeviceSpecificBuild></DeviceSpecificBuild>
-    <MtouchDebug>false</MtouchDebug>
-    <_BundlerDebug></_BundlerDebug>
-    <MtouchNoSymbolStrip>false</MtouchNoSymbolStrip>
-    <IOSDebugOverWiFi></IOSDebugOverWiFi>
-    <MtouchFastDev></MtouchFastDev>
-    <MtouchProfiling></MtouchProfiling>
-    <MtouchSdkVersion></MtouchSdkVersion>
-    <MtouchExtraArgs></MtouchExtraArgs>
-    <MtouchVerbosity></MtouchVerbosity>
-    <MtouchUseLlvm></MtouchUseLlvm>
-    <MtouchUseThumb></MtouchUseThumb>
-    <MtouchFloat32>false</MtouchFloat32>
-    <MtouchEnableBitcode></MtouchEnableBitcode>
-    <MtouchEnableSGenConc>false</MtouchEnableSGenConc>
-    <MtouchInterpreter></MtouchInterpreter>
-    <BuildIpa>false</BuildIpa>
-    <IpaIncludeArtwork></IpaIncludeArtwork>
-    <IpaMetadata></IpaMetadata>
-    <IpaPackageName></IpaPackageName>
-    <CrashReportingApiKey></CrashReportingApiKey>
-    <CrashReportingEnabled>false</CrashReportingEnabled>
-    <ProductDefinition></ProductDefinition>
-    <EnableCodeSigning></EnableCodeSigning>
-    <CodesignEntitlements></CodesignEntitlements>
-    <CodesignResourceRules></CodesignResourceRules>
-    <IOSDebuggerPort></IOSDebuggerPort>
-    <MtouchLink></MtouchLink>
-    <MtouchI18n></MtouchI18n>
-    <MtouchArch></MtouchArch>
-    <MtouchHttpClientHandler></MtouchHttpClientHandler>
-    <CrashReportingDelay>-1</CrashReportingDelay>
-    <OptimizePNGs></OptimizePNGs>
-    <OnDemandResourcesInitialInstallTags></OnDemandResourcesInitialInstallTags>
-    <OnDemandResourcesPrefetchOrder></OnDemandResourcesPrefetchOrder>
-    <AssemblyName></AssemblyName>
-    <SignAssembly></SignAssembly>
-    <DelaySign>false</DelaySign>
-    <PublicSign>false</PublicSign>
-    <AssemblyOriginatorKeyFile></AssemblyOriginatorKeyFile>
-    <NoWarn></NoWarn>
-    <AllowUnsafeBlocks></AllowUnsafeBlocks>
-    <CheckForOverflowUnderflow></CheckForOverflowUnderflow>
-    <LangVersion>Default</LangVersion>
-    <NoStdLib></NoStdLib>
-    <PlatformTarget></PlatformTarget>
-    <WarningsNotAsErrors></WarningsNotAsErrors>
-    <Nullable></Nullable>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <IntermediateOutputPath></IntermediateOutputPath>
-    <DebugSymbols></DebugSymbols>
-    <DebugType></DebugType>
-    <Optimize></Optimize>
-    <OutputPath></OutputPath>
-    <DefineConstants></DefineConstants>
-    <WarningLevel></WarningLevel>
-    <TreatWarningsAsErrors></TreatWarningsAsErrors>
-    <DocumentationFile></DocumentationFile>
-    <ConsolePause>true</ConsolePause>
-    <ExternalConsole>false</ExternalConsole>
-    <Commandlineparameters></Commandlineparameters>
-    <RunWithWarnings>true</RunWithWarnings>
-    <CreatePackage>false</CreatePackage>
-    <PackagingExtraArgs></PackagingExtraArgs>
-    <EnablePackageSigning></EnablePackageSigning>
-    <UseHardenedRuntime>false</UseHardenedRuntime>
-    <CodesignProvision></CodesignProvision>
-    <CodesignKey></CodesignKey>
-    <PackageSigningKey></PackageSigningKey>
-    <CodesignExtraArgs></CodesignExtraArgs>
-    <DeviceSpecificBuild></DeviceSpecificBuild>
-    <MtouchDebug>false</MtouchDebug>
-    <_BundlerDebug></_BundlerDebug>
-    <MtouchNoSymbolStrip>false</MtouchNoSymbolStrip>
-    <IOSDebugOverWiFi></IOSDebugOverWiFi>
-    <MtouchFastDev></MtouchFastDev>
-    <MtouchProfiling></MtouchProfiling>
-    <MtouchSdkVersion></MtouchSdkVersion>
-    <MtouchExtraArgs></MtouchExtraArgs>
-    <MtouchVerbosity></MtouchVerbosity>
-    <MtouchUseLlvm></MtouchUseLlvm>
-    <MtouchUseThumb></MtouchUseThumb>
-    <MtouchFloat32>false</MtouchFloat32>
-    <MtouchEnableBitcode></MtouchEnableBitcode>
-    <MtouchEnableSGenConc>false</MtouchEnableSGenConc>
-    <MtouchInterpreter></MtouchInterpreter>
-    <BuildIpa>false</BuildIpa>
-    <IpaIncludeArtwork></IpaIncludeArtwork>
-    <IpaMetadata></IpaMetadata>
-    <IpaPackageName></IpaPackageName>
-    <CrashReportingApiKey></CrashReportingApiKey>
-    <CrashReportingEnabled>false</CrashReportingEnabled>
-    <ProductDefinition></ProductDefinition>
-    <EnableCodeSigning></EnableCodeSigning>
-    <CodesignEntitlements></CodesignEntitlements>
-    <CodesignResourceRules></CodesignResourceRules>
-    <IOSDebuggerPort></IOSDebuggerPort>
-    <MtouchLink></MtouchLink>
-    <MtouchI18n></MtouchI18n>
-    <MtouchArch></MtouchArch>
-    <MtouchHttpClientHandler></MtouchHttpClientHandler>
-    <CrashReportingDelay>-1</CrashReportingDelay>
-    <OptimizePNGs></OptimizePNGs>
-    <OnDemandResourcesInitialInstallTags></OnDemandResourcesInitialInstallTags>
-    <OnDemandResourcesPrefetchOrder></OnDemandResourcesPrefetchOrder>
-    <AssemblyName></AssemblyName>
-    <SignAssembly></SignAssembly>
-    <DelaySign>false</DelaySign>
-    <PublicSign>false</PublicSign>
-    <AssemblyOriginatorKeyFile></AssemblyOriginatorKeyFile>
-    <NoWarn></NoWarn>
-    <AllowUnsafeBlocks></AllowUnsafeBlocks>
-    <CheckForOverflowUnderflow></CheckForOverflowUnderflow>
-    <LangVersion>Default</LangVersion>
-    <NoStdLib></NoStdLib>
-    <PlatformTarget></PlatformTarget>
-    <WarningsNotAsErrors></WarningsNotAsErrors>
-    <Nullable></Nullable>
-  </PropertyGroup>
-  <ItemGroup>
+   <ItemGroup>
     <None Remove="Resources\" />
   </ItemGroup>
   <ItemGroup>
