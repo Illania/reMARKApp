@@ -372,7 +372,7 @@ namespace reMark.Mobile.Common.Manager
 
         public async Task ReplyToCalendarInvitationAsync(Document document, DocumentPreview documentPreview, CalendarInvitation invitation,
             Model.ParticipantStatus answer, bool isSilent, int originalDocumentId, int originalDocumentFolderId,
-            SourceType sourceType = SourceType.Auto, Func<object> getActivity = null)
+            SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
                 sourceType = CommonConfig.Reachability.GetReachabilitySourceType();
@@ -385,31 +385,31 @@ namespace reMark.Mobile.Common.Manager
                 var docLinesAddresses = document.Lines.Select(l => l.FromAddress);
                 var attendeesToUpdate = invitation.Attendees.Where(att => docLinesAddresses.Contains(att.Name));
                 attendeesToUpdate.ForEach(att => att.Status = answer);
-
-                if (Managers.MicrosoftGraphClient == null)
-                { 
-                    Managers.MicrosoftGraphClient = new MicrosoftGraphClient(getActivity);
-                    await Managers.MicrosoftGraphClient.Authenticate(this, forceInteractive: false);
-                }
-
+ 
                 var result = await Managers.MicrosoftGraphClient.ImportFromICal((invitation.Id, invitation.Attendees)
                , new List<string> { addressName });
 
                 if(result == null)
                     throw new ReMarkException(ErrorConstants.Codes.CalendarEventNotFound);
 
-
-                await AppServiceProxy.ReplyToCalendarInvitationAsync(new DataContract.ReplyToCalendarInvitationParameters
+                try
                 {
-                    Token = Token,
-                    Document = document.Convert(),
-                    DocumentPreview = documentPreview.Convert(),
-                    Invitation = invitation.Convert(),
-                    Answer = answer.ConvertEnum<DataContract.ParticipantStatus>(),
-                    IsSilent = isSilent,
-                    OriginalDocumentId = originalDocumentId,
-                    OriginalDocumentFolderId = originalDocumentFolderId,
-                });
+                    await AppServiceProxy.ReplyToCalendarInvitationAsync(new DataContract.ReplyToCalendarInvitationParameters
+                    {
+                        Token = Token,
+                        Document = document.Convert(),
+                        DocumentPreview = documentPreview.Convert(),
+                        Invitation = invitation.Convert(),
+                        Answer = answer.ConvertEnum<DataContract.ParticipantStatus>(),
+                        IsSilent = isSilent,
+                        OriginalDocumentId = originalDocumentId,
+                        OriginalDocumentFolderId = originalDocumentFolderId
+                    });
+                }   
+                catch(Exception ex)
+                {
+                      throw new ReMarkException(ErrorConstants.Codes.CalendarEventNotFound);
+                }
 
                 return;
             }

@@ -14,6 +14,7 @@ using AndroidX.AppCompat.App;
 using AndroidX.AppCompat.Widget;
 using AndroidX.Core.App;
 using AndroidX.Core.Content;
+using Microsoft.Identity.Client;
 using reMark.Mobile.Classes.Enum;
 using reMark.Mobile.Common;
 using reMark.Mobile.Common.Manager;
@@ -63,9 +64,13 @@ namespace reMark.Mobile.Droid.Ui.Fragments
         private AppCompatImageView _button3;
         private ContentView _contentView;
 
+        private CalendarInvitationView _calendarInvitationView;
+
         private CancellationTokenSource _setReadStatusCancellationTokenSource;
 
         private Action _dismissAction;
+
+        private string authToken;
 
         public static (DocumentFragment fragment, string tag) NewInstance(Folder folder = null, int? folderId = null,
             DocumentPreview dp = null, int? docId = null, Guid? notificationGuid = null, Guid? failDocToUploadGuid = null)
@@ -122,6 +127,7 @@ namespace reMark.Mobile.Droid.Ui.Fragments
 
             if (Arguments.ContainsKey(FailedDocumentToUploadGuidBundleKey))
                 _failedDocumentToUploadGuid = Serializer.Deserialize<Guid>(Arguments.GetString(FailedDocumentToUploadGuidBundleKey));
+
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -261,9 +267,9 @@ namespace reMark.Mobile.Droid.Ui.Fragments
                 av.AttachmentLongClicked += AttachmentsView_AttachmentLongClicked;
                 _linearLayout.AddView(av);
 
-                var civ = new CalendarInvitationView(Context, this.Activity);
-                civ.ReplySelected += CalendarInvitationView_ReplySelected;
-                _linearLayout.AddView(civ);
+                _calendarInvitationView = new CalendarInvitationView(Context, this.Activity);
+                _calendarInvitationView.ReplySelected += CalendarInvitationView_ReplySelected;
+                _linearLayout.AddView(_calendarInvitationView);
 
                 _contentView = new ContentView(Context);
                 _contentView.MailToLinkClicked += ContentView_MailToLinkClicked;
@@ -453,12 +459,29 @@ namespace reMark.Mobile.Droid.Ui.Fragments
             }
         }
 
-        public override void OnActivityResult(int requestCode, int resultCode, Intent data)
+        public override async void OnActivityResult(int requestCode, int resultCode, Intent data)
         {
-            if (resultCode != (int)Result.Ok) 
+            if(requestCode == RequestCodes.MsalAuthRequest && resultCode == (int)Result.Ok)
+            {
+                var status = Serializer.Deserialize<ParticipantStatus>(data.GetStringExtra(MsalAuthActivity.StatusResultKey));
+                var invitation = _document.Invitations.FirstOrDefault();
+                if(invitation != null)
+                    invitation.Status = status;
+                await _calendarInvitationView.RefreshView();
+                _dismissAction();
+            }
+            else if(requestCode == RequestCodes.MsalAuthRequest && resultCode == (int)Result.Canceled)
+            {
+                _dismissAction();
+                var exception = Serializer.Deserialize<Exception>(data.GetStringExtra(MsalAuthActivity.ExceptionResultKey));
+                await Dialogs.ShowErrorDialogAsync(Activity, exception);
                 return;
-            
-            if (requestCode == RequestCodes.CommentsRequest)
+            }
+            else if (resultCode != (int)Result.Ok) 
+            {
+                return;
+            }  
+            else if (requestCode == RequestCodes.CommentsRequest)
             {
                 var comments = Serializer.Deserialize<List<Comment>>(
                     data.GetStringExtra(CommentsListActivity.CommentsResultKey));
@@ -469,7 +492,7 @@ namespace reMark.Mobile.Droid.Ui.Fragments
                 var categories = Serializer.Deserialize<List<Category>>(
                     data.GetStringExtra(CategoriesListActivity.CategoriesResultKey));
                 UpdateCategories(categories);
-            }
+            }          
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
@@ -660,6 +683,7 @@ namespace reMark.Mobile.Droid.Ui.Fragments
             {
                 StartActivityForResult(CategoriesListActivity.CreateIntent(Context, _documentPreview), 
                     RequestCodes.CategoriesRequest);
+                
                 return true;
             }
 
@@ -1245,9 +1269,9 @@ namespace reMark.Mobile.Droid.Ui.Fragments
         private async Task SendInvitationReply(CalendarInvitationView cv, 
             CalendarInvitation invitation, InvitationReplyDetailViewModel vm)
         {
-           // _dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, 
-           //     Resource.String.sending_appointment_response, 
-            //    Resource.String.please_wait);
+            _dismissAction = Dialogs.ShowInfiniteProgressDialog(Activity, 
+               Resource.String.sending_appointment_response, 
+               Resource.String.please_wait);
 
             try
             {
@@ -1321,29 +1345,21 @@ namespace reMark.Mobile.Droid.Ui.Fragments
 
                 if (_document != null)
                 {
-                    await Managers.DocumentsManager.ReplyToCalendarInvitationAsync(
-                        responseDocument, responseDocumentPreview,
-                        invitation, vm.Status, string.IsNullOrEmpty(vm.Message),
-                        _document.Id, _folder?.Id ?? _folderId ?? 0, getActivity: GetActivity);
+                    var intent = MsalAuthActivity.CreateIntent(Context, responseDocument, responseDocumentPreview,
+                    invitation, vm.Status,  string.IsNullOrEmpty(vm.Message),
+                        _document.Id, _folder?.Id ?? _folderId ?? 0);
+                        intent.SetFlags(ActivityFlags.NoAnimation);
+                    StartActivityForResult(intent, RequestCodes.MsalAuthRequest);              
                 }
-
-                invitation.Status = vm.Status;
-                await cv.RefreshView();
-
-              //  _dismissAction();
+             
             }
             catch (Exception ex)
             {
-              //  _dismissAction();
+                _dismissAction();
 
                 CommonConfig.Logger.Error($"Error while replying to calendar invitation for document [documentId={_document.Id}]", ex);
-                await Dialogs.ShowErrorDialogAsync(Context, ex);
+                await Dialogs.ShowErrorDialogAsync(Activity, ex);
             }
-        }
-
-        private Activity GetActivity()
-        {
-            return this.Activity;
         }
 
         private async Task RefreshData()
@@ -1414,6 +1430,7 @@ namespace reMark.Mobile.Droid.Ui.Fragments
         {
             public static int CommentsRequest = 1;
             public static int CategoriesRequest = 2;
+            public static int MsalAuthRequest = 3;
         }
     }
 }

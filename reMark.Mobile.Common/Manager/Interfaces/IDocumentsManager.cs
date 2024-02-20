@@ -38,7 +38,7 @@ namespace reMark.Mobile.Common.Manager
 
         Task ReplyToCalendarInvitationAsync(Document document, DocumentPreview documentPreview, CalendarInvitation invitation,
             ParticipantStatus answer, bool isSilent, int originalDocumentId, int originalDocumentFolderId,
-            SourceType sourceType = SourceType.Auto, Func<object> getActivity = null);
+            SourceType sourceType = SourceType.Auto);
 
         Task MoveToSpamAsync(List<DocumentPreview> documentPreviews, SourceType sourceType = SourceType.Auto);
 

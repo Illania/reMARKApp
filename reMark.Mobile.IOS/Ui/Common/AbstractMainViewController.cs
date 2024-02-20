@@ -51,13 +51,6 @@ namespace reMark.Mobile.IOS.Ui.Common
         {
             base.LoadView();
 
-            SettingsNavigationController = new NavigationController(new SettingsViewController())
-            {
-                RestorationIdentifier = "NavigationController_" + nameof(SettingsViewController)
-            };
-
-            SettingsNavigationController.TabBarItem.Title = "";
-
             TabBar.TintColor = Theme.DarkBlue;
             TabBar.UnselectedItemTintColor = Theme.DarkBlue;
             CurrentNavigationModuleType = NavigationModule.NavigationModuleType.Mail;
@@ -327,14 +320,9 @@ namespace reMark.Mobile.IOS.Ui.Common
             var selectedIndex = abVc.SelectedIndex;
 
             if (selectedIndex == 0)
-            {
-                var nc = new DarkNavigationController(new SearchCriteriaViewController(), UIModalPresentationStyle.FullScreen)
-                {
-                    ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve,
-                    RestorationIdentifier = "NavigationController_" + nameof(SearchCriteriaViewController)
-                };
-                PresentViewController(nc, true, null);
-            }
+                OpenSearch();
+            if(selectedIndex == 4)
+                OpenSettings();
         }
 
         bool Handle_ShouldSelectViewController(UITabBarController tabBarController, UIViewController viewController)
@@ -382,7 +370,7 @@ namespace reMark.Mobile.IOS.Ui.Common
                     break;
                 case NavigationModule.NavigationModuleType.Settings:
                     moduleNavigationButton.SetImage(UIImage.FromBundle(nextModule.Image).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
-                    SelectedIndex = 4;
+                    OpenSettings();
                     break;
                 case NavigationModule.NavigationModuleType.Search:
                     OpenSearch();
@@ -391,6 +379,16 @@ namespace reMark.Mobile.IOS.Ui.Common
 
             if (module != ModuleType.None)
                 CommonConfig.UsageAnalytics.LogEvent(new OpenModuleEvent(module));
+        }
+
+        void OpenSettings()
+        {
+            var nc = new NavigationController(new SettingsViewController(), UIModalPresentationStyle.FullScreen)
+            {
+                ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve,
+                RestorationIdentifier = "NavigationController_" + nameof(SettingsViewController)
+            };
+            PresentViewController(nc, true, null);
         }
 
         void OpenSearch()

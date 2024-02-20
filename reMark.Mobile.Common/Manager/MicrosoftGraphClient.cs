@@ -5,24 +5,26 @@ using Microsoft.Identity.Client;
 using Microsoft.Kiota.Abstractions.Authentication;
 using Newtonsoft.Json;
 using Constants = reMark.Mobile.Common.Manager.MicrosoftGraphConstants;
+using Microsoft.Maui.Platform;
 
 namespace reMark.Mobile.Common.Manager
 { 
     public class MicrosoftGraphClient: IMicrosoftGraphClient
     {
-        readonly IPublicClientApplication pca;
-        readonly GraphServiceClient graphClient;
-        string accessToken;
-        string directoryId;
-        public static IAccount Account;
-
-        public MicrosoftGraphClient(Func<object> getActivity = null)
+        private readonly IPublicClientApplication _pca;
+        private readonly GraphServiceClient _graphClient;
+        private string _directoryId;
+        private static IAccount _account;
+        public string AccessToken {get; set;}
+        
+  
+        public MicrosoftGraphClient()
         {
             try
             {
                 if (DeviceInfo.Platform == DevicePlatform.iOS)
                 {
-                    pca = PublicClientApplicationBuilder.Create(Constants.ClientId)
+                    _pca = PublicClientApplicationBuilder.Create(Constants.ClientId)
                             .WithRedirectUri(Constants.IosRedirectUri)
                             .WithIosKeychainSecurityGroup("com.microsoft.adalcache")
                             .Build();
@@ -30,14 +32,13 @@ namespace reMark.Mobile.Common.Manager
                 }
                 else if (DeviceInfo.Platform == DevicePlatform.Android)
                 {
-                    pca = PublicClientApplicationBuilder.Create(Constants.ClientId)
+                    _pca = PublicClientApplicationBuilder.Create(Constants.ClientId)
                             .WithRedirectUri(Constants.AndroidRedirectUri)
-                            .WithParentActivityOrWindow(getActivity)
                             .Build();
                 }
 
-                var authenticationProvider = new BaseBearerTokenAuthenticationProvider(new TokenProvider(pca, Constants.Scopes()));
-                graphClient = new GraphServiceClient(authenticationProvider);
+                var authenticationProvider = new BaseBearerTokenAuthenticationProvider(new TokenProvider(_pca, Constants.Scopes()));
+                _graphClient = new GraphServiceClient(authenticationProvider);
 
             }
             catch (Exception ex)
@@ -55,14 +56,13 @@ namespace reMark.Mobile.Common.Manager
             public TokenProvider(IPublicClientApplication pca, string[] scopes)
             {
                 this.pca = pca;
-                // this.account = account;
                 this.scopes = scopes;
             }
 
             public async Task<string> GetAuthorizationTokenAsync(Uri uri, Dictionary<string, object> additionalAuthenticationContext = default,
                 CancellationToken cancellationToken = default)
             {
-                var result = await pca.AcquireTokenSilent(scopes, Account)
+                var result = await pca.AcquireTokenSilent(scopes, _account)
                             .ExecuteAsync();
                 return result.AccessToken;
             }
@@ -72,11 +72,11 @@ namespace reMark.Mobile.Common.Manager
 
         public async Task<string> Authenticate(object parentWindow, bool forceInteractive = true)
         {
-            if (Account != null && string.IsNullOrEmpty(accessToken))
-                return accessToken;
+            if (_account != null && string.IsNullOrEmpty(AccessToken))
+                return AccessToken;
 
             AuthenticationResult authResult = null;
-            var accounts = await pca.GetAccountsAsync();
+            var accounts = await _pca.GetAccountsAsync();
             if (accounts.Count() > 1)
                 forceInteractive = true;
 
@@ -84,8 +84,8 @@ namespace reMark.Mobile.Common.Manager
             {
                 try
                 {
-                    Account = accounts.FirstOrDefault();
-                    authResult = await pca.AcquireTokenSilent(Constants.Scopes(), Account).ExecuteAsync();
+                    _account = accounts.FirstOrDefault();
+                    authResult = await _pca.AcquireTokenSilent(Constants.Scopes(), _account).ExecuteAsync();
                 }
                 catch (MsalUiRequiredException)
                 {
@@ -93,26 +93,28 @@ namespace reMark.Mobile.Common.Manager
                 }
             }
 
-            if (Account == null)
+            if (_account == null)
             {
                 // The user was not already connected.
-                authResult = await pca.AcquireTokenInteractive(Constants.Scopes())
-                                           .WithParentActivityOrWindow(parentWindow)
-                                           .ExecuteAsync();
+                authResult = await _pca.AcquireTokenInteractive(Constants.Scopes())
+                                        .WithParentActivityOrWindow(parentWindow)
+                                        .ExecuteAsync();
             }
 
             if (authResult != null)
             {
-                accessToken = authResult.AccessToken;
-                directoryId = authResult.TenantId;
-                Account = authResult.Account;
+                AccessToken = authResult.AccessToken;
+                _directoryId = authResult.TenantId;
+                _account = authResult.Account;
             }
-            return accessToken;
+            return AccessToken;
         }
+
+        public bool IsAuthenticated() => string.IsNullOrEmpty(AccessToken);
 
         public async Task<AzureUser> GetAzureUser()
         {
-            var user = await graphClient.Me.GetAsync();
+            var user = await _graphClient.Me.GetAsync();
 
             return new AzureUser
             {
@@ -127,7 +129,7 @@ namespace reMark.Mobile.Common.Manager
         {
             var endpointList = new List<AzureEndpointInfo>();
 
-            var extension = await graphClient.Organization[directoryId].Extensions[Constants.EndpointInfoExtName].GetAsync();
+            var extension = await _graphClient.Organization[_directoryId].Extensions[Constants.EndpointInfoExtName].GetAsync();
             var addData = extension.AdditionalData;
 
             foreach (var key in addData.Keys)
@@ -154,7 +156,7 @@ namespace reMark.Mobile.Common.Manager
             IDictionary<string, object> addData;
             try
             {
-                var extension = await graphClient.Organization[directoryId].Extensions[Constants.AppProxyExtName].GetAsync();
+                var extension = await _graphClient.Organization[_directoryId].Extensions[Constants.AppProxyExtName].GetAsync();
                 addData = extension.AdditionalData;
             }
             catch (Exception ex)
@@ -188,7 +190,7 @@ namespace reMark.Mobile.Common.Manager
         {
             try
             {
-                var page = await graphClient.Me.Events.GetAsync( (requestConfiguration) =>
+                var page = await _graphClient.Me.Events.GetAsync( (requestConfiguration) =>
 {
                     requestConfiguration.QueryParameters.Filter = $"iCalUId eq '{iCalUid}'";
                 });
@@ -203,13 +205,13 @@ namespace reMark.Mobile.Common.Manager
         }
 
         private async Task AcceptEventAsync(string eventKey) 
-            => await graphClient.Me.Events[eventKey].Accept.PostAsync(new Microsoft.Graph.Me.Events.Item.Accept.AcceptPostRequestBody());
+            => await _graphClient.Me.Events[eventKey].Accept.PostAsync(new Microsoft.Graph.Me.Events.Item.Accept.AcceptPostRequestBody());
 
         private async Task DeclineEventAsync(string eventKey)
-            => await graphClient.Me.Calendar.Events[eventKey].Decline.PostAsync(new Microsoft.Graph.Me.Calendar.Events.Item.Decline.DeclinePostRequestBody());
+            => await _graphClient.Me.Calendar.Events[eventKey].Decline.PostAsync(new Microsoft.Graph.Me.Calendar.Events.Item.Decline.DeclinePostRequestBody());
 
         private async Task TentativelyAcceptEventAsync(string eventKey)
-            => await graphClient.Me.Calendar.Events[eventKey].TentativelyAccept.PostAsync(new Microsoft.Graph.Me.Calendar.Events.Item.TentativelyAccept.TentativelyAcceptPostRequestBody());
+            => await _graphClient.Me.Calendar.Events[eventKey].TentativelyAccept.PostAsync(new Microsoft.Graph.Me.Calendar.Events.Item.TentativelyAccept.TentativelyAcceptPostRequestBody());
 
         public async Task<Event> ImportFromICal((string Id, List<Common.Model.Attendee> Attendees) iEvent,
          List<string> participantAddressesToUpdate)

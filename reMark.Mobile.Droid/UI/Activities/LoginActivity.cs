@@ -213,7 +213,7 @@ namespace reMark.Mobile.Droid.Ui.Activities
 
             try
             {
-                Managers.MicrosoftGraphClient = new MicrosoftGraphClient(()=> this);
+                Managers.MicrosoftGraphClient = new MicrosoftGraphClient();
                 await Managers.MicrosoftGraphClient.Authenticate(this);
 
                 var azureUser = await Managers.MicrosoftGraphClient.GetAzureUser();

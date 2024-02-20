@@ -914,8 +914,8 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
 
                     try
                     {
-                        if (folder.Module == ModuleType.Contacts)
-                            CallIdExtensionUtilities.ReloadExtension();
+                       // if (folder.Module == ModuleType.Contacts)
+                        //    CallIdExtensionUtilities.ReloadExtension();
                     }
                     catch (Exception ex)
                     {

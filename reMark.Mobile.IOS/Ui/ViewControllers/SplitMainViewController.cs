@@ -43,7 +43,6 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                 documentSplitViewController,
                 contactSplitViewController,
                 shortcodeSplitViewController,
-                SettingsNavigationController
             };
         }
 

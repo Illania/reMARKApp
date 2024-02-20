@@ -167,7 +167,7 @@ namespace reMark.Mobile.Common.Storage.AppFileStorage
         {
             Requires.NotNullOrEmpty(desiredName, "desiredName");
             await AwaitExtensions.SwitchOffMainThreadAsync(cancellationToken);
-            EnsureExists();
+            //EnsureExists();
             string nameToUse = desiredName;
             string newPath = System.IO.Path.Combine(Path, nameToUse);
             if (Directory.Exists(newPath))
@@ -280,8 +280,8 @@ namespace reMark.Mobile.Common.Storage.AppFileStorage
                 throw new IOException("Cannot delete root storage folder.");
             }
             await AwaitExtensions.SwitchOffMainThreadAsync(cancellationToken);
-            EnsureExists();
-            Directory.Delete(Path, true);
+            if(Directory.Exists(Path))
+                Directory.Delete(Path, true);
         }
 
         void EnsureExists()

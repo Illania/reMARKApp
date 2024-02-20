@@ -11,7 +11,7 @@ using reMark.Mobile.Common.Authenticator;
 using reMark.Mobile.Common.Manager;
 using reMark.Mobile.Common.Model;
 using reMark.Mobile.Common.Utilities;
-using reMark.Mobile.IOS.Common.CallId;
+//using reMark.Mobile.IOS.Common.CallId;
 using reMark.Mobile.IOS.Ui.Common;
 using reMark.Mobile.IOS.Ui.TableViewCells;
 using reMark.Mobile.IOS.Utilities;
@@ -56,15 +56,32 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
         const string SendingDelayKey = "SendingDelay";
         const string RememberLastUserDelaySettingsKey = "RememberLastUserDelaySettings";
 
+        UIBarButtonItem closeItem;
+
         public SettingsViewController()
         {
             File = "Root.inApp";
-            ShowDoneButton = false;
+            ShowDoneButton = true;
             NeverShowPrivacySettings = false;
             ShowCreditsFooter = false;
             Delegate = this;
             base.NavigationItem.RightBarButtonItem = null;
+            
         }
+
+
+        public override void LoadView()
+        {
+            base.LoadView();
+            NavigationItem.RightBarButtonItem = null;
+            closeItem = new UIBarButtonItem
+            {
+                Title = Localization.GetString("close")
+            };
+            closeItem.SetTitleTextAttributes(new UIStringAttributes() { ForegroundColor = UIColor.DarkGray }, UIControlState.Normal);
+            NavigationItem.SetLeftBarButtonItem(closeItem, false);
+        }
+
 
         public override void ViewDidLoad()
         {
@@ -84,6 +101,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                 if (NavigationController != null)
                     NavigationController.NavigationBar.PrefersLargeTitles = true;
                 NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
+
                 TableView.CellLayoutMarginsFollowReadableWidth = true;
                 TableView.InsetsContentViewsToSafeArea = true;
             }
@@ -92,7 +110,25 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
             Title = "";
             NavigationItem.Title = "Settings";
 
+            closeItem.Clicked += CloseItem_Clicked;
+
             RefreshHiddenSettings();
+        }
+
+        void CloseItem_Clicked(object sender, EventArgs e)
+        {
+
+            if (NavigationController != null)
+                NavigationController.ModalTransitionStyle = UIModalTransitionStyle.CoverVertical;
+            
+            DismissViewController(true, null);
+        }
+
+        public override void ViewWillDisappear(bool animated)
+        {
+            base.ViewWillDisappear(animated);
+
+            closeItem.Clicked -= CloseItem_Clicked;
         }
 
         public override void WillDisplayHeaderView(UITableView tableView, UIView headerView, nint section) => headerView.ApplyTheme();
@@ -228,7 +264,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
         [Export("tableView:cellForSpecifier:")]
         public virtual UITableViewCell GetCellForSpecifier(UITableView tableView, SettingsSpecifier specifier)
         {
-            if (specifier.Key == CallerIdentificationEnabled)
+            /*if (specifier.Key == CallerIdentificationEnabled)
             {
                 var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
                 cell.TextLabel.Text = specifier.Title;
@@ -246,7 +282,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                     CommonConfig.Logger.Error("Call ID extension not available exception ", ex);
                 }
                 return cell;
-            }
+            }*/
 
             if (specifier.Key == LocalTemplateKey)
             {
@@ -360,8 +396,8 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                 case UsernameKey:
                 case ServerAddressKey:
                 case SslEnabledKey:
-                case CallerIdentificationEnabled:
-                    return 44f;
+                //case CallerIdentificationEnabled:
+                //    return 44f;
                 case VersionKey:
                     return 44f;
                 default:
@@ -597,6 +633,8 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
 
             if (string.IsNullOrEmpty(PlatformConfig.Preferences.AzureApplicationProxyBearerToken))
                 hiddenKeys.Add(AzureTokenKey);
+
+            hiddenKeys.Add(CallerIdentificationEnabled);
 
             SetHiddenKeys(hiddenKeys.ToArray(), false);
         }

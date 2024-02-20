@@ -1244,6 +1244,12 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
 
                 responseDocumentPreview.Direction = DocumentDirection.Outgoing;
 
+                if (Managers.MicrosoftGraphClient == null || !Managers.MicrosoftGraphClient.IsAuthenticated())
+                { 
+                    Managers.MicrosoftGraphClient = new MicrosoftGraphClient();
+                    await Managers.MicrosoftGraphClient.Authenticate(this, forceInteractive: false);
+                }
+
                 await Managers.DocumentsManager.ReplyToCalendarInvitationAsync(responseDocument, responseDocumentPreview,
                     invitation, vm.Status, string.IsNullOrEmpty(vm.Message), document.Id, folder?.Id ?? folderId ?? 0);
 

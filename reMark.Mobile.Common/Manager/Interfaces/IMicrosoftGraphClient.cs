@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using reMark.Mobile.Classes.Azure;
+﻿using reMark.Mobile.Classes.Azure;
 using Microsoft.Graph.Models;
 
 namespace reMark.Mobile.Common.Manager
@@ -17,6 +15,8 @@ namespace reMark.Mobile.Common.Manager
 
         public Task<Event> ImportFromICal((string Id, List<Common.Model.Attendee> Attendees) iEvent,
             List<string> participantAddressesToUpdate);
+        
+        public bool IsAuthenticated();
 
     }
 }
