@@ -385,35 +385,23 @@ namespace reMark.Mobile.Common.Manager
                 var docLinesAddresses = document.Lines.Select(l => l.FromAddress);
                 var attendeesToUpdate = invitation.Attendees.Where(att => docLinesAddresses.Contains(att.Name));
                 attendeesToUpdate.ForEach(att => att.Status = answer);
- 
-                var result = await Managers.MicrosoftGraphClient.ImportFromICal((invitation.Id, invitation.Attendees)
-               , new List<string> { addressName });
 
-                if(result == null)
-                    throw new ReMarkException(ErrorConstants.Codes.CalendarEventNotFound);
+                var result = await Managers.MicrosoftGraphClient.ImportFromICal((invitation.Id, invitation.Attendees),
+                new List<string> { addressName });
 
-                try
+                await AppServiceProxy.ReplyToCalendarInvitationAsync(new DataContract.ReplyToCalendarInvitationParameters
                 {
-                    await AppServiceProxy.ReplyToCalendarInvitationAsync(new DataContract.ReplyToCalendarInvitationParameters
-                    {
-                        Token = Token,
-                        Document = document.Convert(),
-                        DocumentPreview = documentPreview.Convert(),
-                        Invitation = invitation.Convert(),
-                        Answer = answer.ConvertEnum<DataContract.ParticipantStatus>(),
-                        IsSilent = isSilent,
-                        OriginalDocumentId = originalDocumentId,
-                        OriginalDocumentFolderId = originalDocumentFolderId
-                    });
-                }   
-                catch(Exception ex)
-                {
-                      throw new ReMarkException(ErrorConstants.Codes.CalendarEventNotFound);
-                }
-
+                    Token = Token,
+                    Document = document.Convert(),
+                    DocumentPreview = documentPreview.Convert(),
+                    Invitation = invitation.Convert(),
+                    Answer = answer.ConvertEnum<DataContract.ParticipantStatus>(),
+                    IsSilent = isSilent,
+                    OriginalDocumentId = originalDocumentId,
+                    OriginalDocumentFolderId = originalDocumentFolderId
+                });
                 return;
-            }
-
+            }   
             else if (sourceType == SourceType.Local)
                 throw new ReMarkException(ErrorConstants.Codes.InvalidSourceType);
 

@@ -335,7 +335,7 @@ namespace reMark.ServiceReference.AppService
 
         public async Task<ReplyToCalendarInvitationResult> ReplyToCalendarInvitationAsync(ReplyToCalendarInvitationParameters parameters, CancellationToken ct = default(CancellationToken))
         {
-            return await InvokeAsync<ReplyToCalendarInvitationResult, ReplyToCalendarInvitationParameters>("ReplyToCalendarInvitation", parameters, ct, false);
+            return await InvokeAsync<ReplyToCalendarInvitationResult, ReplyToCalendarInvitationParameters>("ReplyToCalendarInvitation", parameters, ct, retry: false);
         }
 
         public async Task<GetContactPreviewsResult> GetContactPreviewsAsync(GetContactPreviewsParameters parameters, CancellationToken ct = default(CancellationToken))

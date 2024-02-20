@@ -6,6 +6,7 @@ using Microsoft.Kiota.Abstractions.Authentication;
 using Newtonsoft.Json;
 using Constants = reMark.Mobile.Common.Manager.MicrosoftGraphConstants;
 using Microsoft.Maui.Platform;
+using reMark.Mobile.Common.Model.Exceptions;
 
 namespace reMark.Mobile.Common.Manager
 { 
@@ -188,20 +189,12 @@ namespace reMark.Mobile.Common.Manager
         #region Calendar
         private async Task<Event> GetEventByICalUidAsync(string iCalUid)
         {
-            try
+            var page = await _graphClient.Me.Events.GetAsync( (requestConfiguration) =>
             {
-                var page = await _graphClient.Me.Events.GetAsync( (requestConfiguration) =>
-{
-                    requestConfiguration.QueryParameters.Filter = $"iCalUId eq '{iCalUid}'";
-                });
-                    
-                return page.Value.FirstOrDefault();//.AsResult();
-            }
-            catch (Exception e)
-            {
-                return null;
-                //return Result.Fail<Event>($"Unable to get event from MS Graph: {e}");
-            }
+                requestConfiguration.QueryParameters.Filter = $"iCalUId eq '{iCalUid}'";
+            });
+                
+            return page.Value.FirstOrDefault();
         }
 
         private async Task AcceptEventAsync(string eventKey) 
@@ -220,7 +213,7 @@ namespace reMark.Mobile.Common.Manager
             if (string.IsNullOrEmpty(iEvent.Id))
                 return null;
 
-            var result = await GetEventByICalUidAsync(iEvent.Id);
+            var result = await GetEventFromMsGraph(iEvent);
 
             if (result == null)
                 return null;
@@ -230,7 +223,7 @@ namespace reMark.Mobile.Common.Manager
                 .FirstOrDefault(att
                     => participantAddressesToUpdate.Any(participant
                         => att.Name.Equals(participant, StringComparison.InvariantCultureIgnoreCase)));
-                
+
             calendarEvent.AdditionalData["ExternalIcsUid"] = iEvent.Id;
 
             switch (attendee?.Status)
@@ -278,6 +271,19 @@ namespace reMark.Mobile.Common.Manager
                 };
             }
             return calendarEvent;
+
+            async Task<Event> GetEventFromMsGraph((string Id, List<Model.Attendee> Attendees) iEvent)
+            {
+                try
+                {
+                    return await GetEventByICalUidAsync(iEvent.Id);
+                }
+                catch(Exception ex)
+                {
+                    throw new ReMarkException(ErrorConstants.Codes.CantGetEventFromMsGraph);
+                }
+                
+            }
         }
     }
 
