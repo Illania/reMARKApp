@@ -56,7 +56,7 @@ platform :ios do
       end
     )
   rescue StandardError => e
-    slack_on_error(e)
+    message_on_error(e)
   end
 
   desc 'Build iOS app release'
@@ -76,21 +76,44 @@ platform :ios do
         build_type: 'Release',
         ipa_name: 'remark.ipa'
       )
-      slack_on_success
+      message_on_success('reMark iOS app was succcessfully built','iOS')
     rescue StandardError => e
-      slack_on_error(e)
+      message_on_error(e)
+    end
+  end
+#endregion
+
+#region Messaging
+  def message_on_success(message, platform)
+    if ENV['DEFAULT_MESSENGER']=='slack'
+      slack_on_success(message, platform)
+    elsif ENV['DEFAULT_MESSENGER']=='teams'
+      teams_on_success(message,platform)
+    else
+      raise "Messenger not supported"
+    end
+  end
+
+   def message_on_error(exception)
+    if ENV['DEFAULT_MESSENGER']=='slack'
+      slack_on_error(exception)
+    elsif ENV['DEFAULT_MESSENGER']=='teams'
+      teams_on_error(exception)
+    else
+      raise "Messenger not supported"
     end
   end
 #endregion
 
 #region Slack
-  def slack_on_success(message)
+  def slack_on_success(message, platform)
     slack(
       slack_url: ENV['SLACK_URL'],
       message: message,
       channel: ENV['SLACK_CHANNEL'],
       success: true,
-      attachment_properties: { fields: [{ title: 'Version', value: get_version },
+      attachment_properties: { fields: [{ title: 'Platform', value: platform },
+                                        { title: 'Version', value: get_version },
                                         { title: 'Build number', value: get_build_number }] }
     )
   end
@@ -103,6 +126,43 @@ platform :ios do
       success: false,
       attachment_properties: { fields: [{ title: 'Error message', value: exception }] }
     )
+  end
+#endregion
+
+#region Teams
+  def teams_on_success(message, platform)
+  teams(
+    teams_url: ENV['TEAMS_URL'],
+    title: "reMARK app build",
+    message: message,
+     facts:[
+      {
+        "name" => "Platform",
+        "value" => platform
+      },
+      {
+        "name" => "Version",
+        "value" => get_version
+      },
+      {
+        "name" => "Build number",
+        "value" => get_build_number
+      }
+    ]  
+  )
+  end
+
+  def teams_on_error(exception)
+  teams(
+    teams_url: ENV['TEAMS_URL'],
+    title: "reMARK app build",
+    message: 'Error occured ☹️!',
+    facts:[
+      {
+        "Error message" => exception
+      }
+    ]
+  )
   end
 #endregion
 
@@ -129,7 +189,8 @@ platform :ios do
   desc 'Upload to Testflight'
   lane :release_beta do |options|
     begin
-      groups = options[:type] == 'internal' ? ['internal'] : ['all']
+      #possible types: 'internal', 'all', 'test'
+      groups = options[:type] 
       app_store_connect_api_key
       pilot(
         changelog: options[:changelog],
@@ -140,9 +201,24 @@ platform :ios do
         skip_submission: false,
         skip_waiting_for_build_processing: false
       )
-      slack_on_success('reMARK iOS app successfully uploaded to Testflight 📱')
+      message_on_success('reMARK iOS app successfully uploaded to Testflight 📱', 'iOS')
     rescue StandardError => e
-      slack_on_error(e)
+      message_on_error(e)
+    end
+  end
+
+  desc 'Test Teams'
+  lane :teams_test do |options|
+    begin
+      message = options[:message] 
+      teams_url = ENV['TEAMS_URL']
+      teams_bot(
+        teams_url: teams_url,
+        title: "Welcome from Fastlane",
+        text: message,
+        activity_title: "Hey",
+        activity_image: "https://seeklogo.com/images/F/fastlane-logo-6CA0B0B428-seeklogo.com.png"
+      )
     end
   end
 
@@ -164,9 +240,9 @@ platform :ios do
         run_precheck_before_submit: false,
         submission_information: submission_information
       )
-      slack_on_success('reMARK iOS app successfully uploaded to AppStore 📱')
+      message_on_success('reMARK iOS app successfully uploaded to AppStore 📱', 'iOS')
     rescue StandardError => e
-      slack_on_error(e)
+      message_on_error(e)
     end
   end
 #endregion
@@ -229,9 +305,9 @@ platform :android do
       _apk_path="#{ENV['ANDROID_RELEASE_FOLDER_PATH']}/remark_#{build_number}.apk"
       system("mv #{ENV['ANDROID_SIGNED_APK_PATH']} #{_apk_path}")
       sh "./upload.sh -e \"#{ENV['ATLASSIAN_EMAIL']}\" -t \"#{ENV['ATLASSIAN_API_TOKEN']}\" -f \"#{_apk_path}\" -c \"#{options[:comment]}\""
-      slack_on_success('reMark Android app was succcessfully uploaded to Android Installers page')
+      message_on_success('reMark Android app was succcessfully uploaded to Android Installers page', 'Android')
     rescue StandardError => e
-      slack_on_error(e)
+      message_on_error(e)
     end
   end
 
@@ -247,9 +323,9 @@ platform :android do
         version_name: version,
         version_code: build_number
       )
-      slack_on_success('reMark Android app was succcessfully uploaded to Google beta')
+      message_on_success('reMark Android app was succcessfully uploaded to Google beta','Android')
     rescue StandardError => e
-      slack_on_error(e)
+      message_on_error(e)
     end
   end
 
@@ -266,9 +342,9 @@ platform :android do
         version_name: version,
         version_code: build_number
       )
-      slack_on_success('reMark Android app was succcessfully uploaded to Google beta')
+      message_on_success('reMark Android app was succcessfully uploaded to Google beta','Android')
     rescue StandardError => e
-      slack_on_error(e)
+      message_on_error(e)
     end
   end
 #endregion

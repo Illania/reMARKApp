@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <ApplicationId>com.nordic-it.mark5.mobile.ios</ApplicationId>
     <TargetFramework>net8.0-ios</TargetFramework>
     <OutputType>Exe</OutputType>
     <Nullable>enable</Nullable>
@@ -7,49 +8,10 @@
     <SupportedOSPlatformVersion>13.0</SupportedOSPlatformVersion>
     <UseMaui>true</UseMaui>
     <SkipValidateMauiImplicitPackageReferences>true</SkipValidateMauiImplicitPackageReferences> 
-    <Configurations>Debug_iPhoneSimulator;Release_iPhoneSimulator;Debug_iPhone;Release_iPhone;Debug;Release</Configurations>
+    <Configurations>Debug_;Debug;Release</Configurations>
   </PropertyGroup>
-  <PropertyGroup>
-		<Configuration Condition=" '$(Configuration)' == '' ">Debug|AnyCPU</Configuration>
-		<Platform Condition=" '$(Platform)' == '' ">iPhoneSimulator</Platform>
-		<ProjectGuid>{3FB59A6F-9438-433D-A3BA-247D914A06AE}</ProjectGuid>
-		<ProjectTypeGuids>{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-		<OutputType>Exe</OutputType>
-	  <RootNamespace>reMark.Mobile.IOS</RootNamespace>
-		<AssemblyName>reMark.Mobile.IOS</AssemblyName>
-    <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
-		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <LangVersion>11.0</LangVersion>
-    <MtouchLink>None</MtouchLink>
-	</PropertyGroup>
-    <PropertyGroup>
-		<Configuration Condition=" '$(Configuration)' == '' ">Release|AnyCPU</Configuration>
-		<Platform Condition=" '$(Platform)' == '' ">iPhone</Platform>
-		<ProjectGuid>{3FB59A6F-9438-433D-A3BA-247D914A06AE}</ProjectGuid>
-		<ProjectTypeGuids>{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-		<OutputType>Exe</OutputType>
-	  <RootNamespace>reMark.Mobile.IOS</RootNamespace>
-		<AssemblyName>reMark.Mobile.IOS</AssemblyName>
-    <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
-		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <Registrar>dynamic</Registrar>
-    <DebugSymbols>false</DebugSymbols>
-    <IntermediateOutputPath>obj\Release</IntermediateOutputPath>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Release</OutputPath>
-    <DefineConstants></DefineConstants>
-    <WarningLevel>4</WarningLevel>
-    <CreatePackage>false</CreatePackage>
-    <CodesignKey>iPhone Developer</CodesignKey>
-    <MtouchNoSymbolStrip>true</MtouchNoSymbolStrip>
-    <MtouchVerbosity></MtouchVerbosity>
-    <MtouchUseLlvm>false</MtouchUseLlvm>
-    <NoWarn></NoWarn>
-    <NoStdLib>false</NoStdLib>
-    <LangVersion>11.0</LangVersion>
-	</PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug_iPhoneSimulator|AnyCPU' ">
+ <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <Platform Condition=" '$(Platform)' == '' ">iPhoneSimulator</Platform>
 		<DebugSymbols>true</DebugSymbols>
 		<DebugType>full</DebugType>
 		<Optimize>false</Optimize>
@@ -59,100 +21,92 @@
 		<WarningLevel>4</WarningLevel>
 		<ConsolePause>false</ConsolePause>
 		<RunCodeAnalysis>true</RunCodeAnalysis>
-		<CodesignKey>Apple Development: Lars Hansen (TUYUES9KMZ)</CodesignKey>
 		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
 		<LangVersion>11.0</LangVersion>
+    <CodesignKey>Apple Development: Lars Hansen (TUYUES9KMZ)</CodesignKey>
 		<CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
 		<CodesignProvision>Automatic</CodesignProvision>
     <Registrar>dynamic</Registrar>
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release_iPhoneSimulator|AnyCPU' ">
-		<DebugType>none</DebugType>
-		<Optimize>true</Optimize>
-		<OutputPath>bin\iPhoneSimulator\Release</OutputPath>
-		<ErrorReport>prompt</ErrorReport>
-		<WarningLevel>4</WarningLevel>
-		<ConsolePause>false</ConsolePause>
-    <CopyAppBundle>true</CopyAppBundle>
-		<RunCodeAnalysis>true</RunCodeAnalysis>
-		<CodesignProvision>Mark5Mobile Distribution 2023</CodesignProvision>
-		<CodesignKey>Apple Distribution: Nordic IT Europe ApS (5Q7TTRG4M4)</CodesignKey>
-		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
-		<LangVersion>11.0</LangVersion>
-		<CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
-    <Registrar>dynamic</Registrar>
-	</PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug_iPhone|AnyCPU' ">
-		<DebugSymbols>true</DebugSymbols>
+    <!-- <MtouchArch>x86_64</MtouchArch>-->
+  </PropertyGroup>
+  <PropertyGroup>
+		<Configuration Condition=" '$(Configuration)' == '' ">Debug_|AnyCPU</Configuration>
+   <!--<Platform Condition=" '$(Platform)' == '' ">iPhone</Platform>-->
+		<!--<ProjectGuid>{3FB59A6F-9438-433D-A3BA-247D914A06AE}</ProjectGuid>-->
+		<!--<ProjectTypeGuids>{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>-->
+		<OutputType>Exe</OutputType>
+	  <RootNamespace>reMark.Mobile.IOS</RootNamespace>
+		<AssemblyName>reMark.Mobile.IOS</AssemblyName>
+    <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
+		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <LangVersion>11.0</LangVersion>
+    <MtouchLink>SdkOnly</MtouchLink>
+    <MtouchUseLlvm>false</MtouchUseLlvm>
+    <!--<MtouchDebug>true</MtouchDebug>-->
+    <DebugSymbols>true</DebugSymbols>
+    <DefineConstants>DEBUG;</DefineConstants>
 		<DebugType>full</DebugType>
 		<Optimize>false</Optimize>
-		<OutputPath>bin\iPhone\Debug</OutputPath>
-		<DefineConstants>DEBUG</DefineConstants>
 		<ErrorReport>prompt</ErrorReport>
 		<WarningLevel>4</WarningLevel>
-		<TreatWarningsAsErrors></TreatWarningsAsErrors>
-		<DocumentationFile></DocumentationFile>
 		<ConsolePause>false</ConsolePause>
 		<CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
 		<CodesignKey>Apple Development: Lars Hansen (TUYUES9KMZ)</CodesignKey>
-		<RunCodeAnalysis>true</RunCodeAnalysis>
+		<!--<RunCodeAnalysis>true</RunCodeAnalysis>-->
+    <!--<MtouchArch>ARM64</MtouchArch>-->
+		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
+		<CodesignProvision>remark mobile dev</CodesignProvision>
+		<LangVersion>11.0</LangVersion>
+    <Registrar>dynamic</Registrar>
+    <ExternalConsole>false</ExternalConsole>
+    <RunWithWarnings>true</RunWithWarnings>
+    <CreatePackage>false</CreatePackage>
+  </PropertyGroup>
+  <PropertyGroup>
+		<Configuration Condition=" '$(Configuration)' == '' ">Release|AnyCPU</Configuration>
+		<Platform Condition=" '$(Platform)' == '' ">iPhone</Platform>
+    <RootNamespace>reMark.Mobile.IOS</RootNamespace>
+    <AssemblyName>reMark.Mobile.IOS</AssemblyName>   
+    <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Registrar>dynamic</Registrar>
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\iPhone\Release</OutputPath>
+    <DefineConstants></DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
     <MtouchArch>ARM64</MtouchArch>
-		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
-		<CodesignProvision>match Development com.nordic-it.mark5.mobile.ios</CodesignProvision>
-		<LangVersion>11.0</LangVersion>
-		<MtouchLink>None</MtouchLink>
+    <ConsolePause>false</ConsolePause>
+    <CodesignKey>Apple Distribution: Nordic IT Europe ApS (5Q7TTRG4M4)</CodesignKey>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
+    <LangVersion>11.0</LangVersion>
+    <MtouchLink>SdkOnly</MtouchLink>
+    <CodesignProvision>Mark5Mobile Distribution 2023</CodesignProvision>
     <Registrar>dynamic</Registrar>
     <ExternalConsole>false</ExternalConsole>
     <RunWithWarnings>true</RunWithWarnings>
     <CreatePackage>false</CreatePackage>
     <UseHardenedRuntime>false</UseHardenedRuntime>
     <MtouchDebug>false</MtouchDebug>
-    <MtouchNoSymbolStrip>false</MtouchNoSymbolStrip>
-    <MtouchFloat32>false</MtouchFloat32>
-    <MtouchEnableSGenConc>false</MtouchEnableSGenConc>
-    <BuildIpa>false</BuildIpa>
-    <CrashReportingEnabled>false</CrashReportingEnabled>
-	</PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release_iPhone|AnyCPU' ">
-    <DebugSymbols></DebugSymbols>
-		<DebugType>none</DebugType>
-		<Optimize>true</Optimize>
-		<OutputPath>bin\iPhone\Release</OutputPath>
-		<DefineConstants></DefineConstants>
-		<ErrorReport>prompt</ErrorReport>
-		<WarningLevel>4</WarningLevel>
-		<TreatWarningsAsErrors></TreatWarningsAsErrors>
-		<DocumentationFile></DocumentationFile>
-		<CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
-		<MtouchArch>ARM64</MtouchArch>
-		<ConsolePause>false</ConsolePause>
-		<CodesignKey>Apple Distribution: Nordic IT Europe ApS (5Q7TTRG4M4)</CodesignKey>
-		<RunCodeAnalysis>true</RunCodeAnalysis>
-		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
-		<LangVersion>11.0</LangVersion>
-		<MtouchLink>SdkOnly</MtouchLink>
-		<CodesignProvision>Mark5Mobile Distribution 2023</CodesignProvision>
-    <Registrar>dynamic</Registrar>
-    <IntermediateOutputPath></IntermediateOutputPath>
-    <ExternalConsole>false</ExternalConsole>
-    <Commandlineparameters></Commandlineparameters>
-    <RunWithWarnings>true</RunWithWarnings>
-    <CreatePackage>false</CreatePackage>
-    <UseHardenedRuntime>false</UseHardenedRuntime>
-    <MtouchDebug>false</MtouchDebug>
-    <_BundlerDebug></_BundlerDebug>
     <MtouchNoSymbolStrip>false</MtouchNoSymbolStrip>
     <MtouchFloat32>false</MtouchFloat32>
     <MtouchEnableBitcode></MtouchEnableBitcode>
     <MtouchEnableSGenConc>false</MtouchEnableSGenConc>
     <MtouchInterpreter></MtouchInterpreter>
-    <BuildIpa>false</BuildIpa>
+    <MtouchUseLlvm>false</MtouchUseLlvm>
+    <NoStdLib>false</NoStdLib>
+    <BuildIpa>true</BuildIpa>
     <CrashReportingDelay>-1</CrashReportingDelay>
 	</PropertyGroup>
    <ItemGroup>
     <None Remove="Resources\" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Resources/AppIcon/" />
     <Folder Include="Resources\" />
   </ItemGroup>
   <ItemGroup>
@@ -608,4 +562,7 @@
     <ProjectReference Include="..\reMark.ServiceReference\reMark.ServiceReference.csproj" />
     <ProjectReference Include="..\SVProgressHUD\SVProgressHUD.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <MauiIcon Include="Resources\AppIcon\appicon.svg" Color="#FF0000" />
+</ItemGroup>
 </Project>
