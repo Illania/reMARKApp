@@ -1,0 +1,1 @@
+Fixed crash when scrolling through documents list.
