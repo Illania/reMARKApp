@@ -119,7 +119,6 @@
     <PackageReference Include="Xamarin.AndroidX.Legacy.Support.Core.Utils" Version="1.0.0.22" />
     <PackageReference Include="Xamarin.AndroidX.Legacy.Support.V4" Version="1.0.0.22" />
     <PackageReference Include="Xamarin.AndroidX.Legacy.Support.Core.UI" Version="1.0.0.23" />
-    <PackageReference Include="Com.Airbnb.Android.Lottie" Version="4.2.2" />
     <PackageReference Include="Xamarin.AndroidX.Preference" Version="1.2.1.3" />
     <PackageReference Include="Microsoft.AppCenter.Crashes" Version="5.0.3" />
     <PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime" Version="2.6.2.3" />

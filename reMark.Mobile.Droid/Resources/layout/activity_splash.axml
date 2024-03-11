@@ -4,11 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <com.airbnb.lottie.LottieAnimationView
+  <!--<com.airbnb.lottie.LottieAnimationView
+      android:id="@+id/animation_view"
+      android:layout_width="280dp"
+      android:layout_height="280dp"
+      app:lottie_fileName="splash.json"
+      android:layout_centerInParent="true"/>-->
+    <ImageView
         android:id="@+id/animation_view"
         android:layout_width="280dp"
         android:layout_height="280dp"
-        app:lottie_fileName="splash.json"
         android:layout_centerInParent="true"/>
     <ProgressBar
         android:id="@+id/progress_bar"

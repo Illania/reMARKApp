@@ -3,5 +3,4 @@
 # Ensure this file is checked in to source control!
 
 gem 'fastlane-plugin-xamarin_native'
-gem 'fastlane-plugin-teams'
 gem 'fastlane-plugin-teams_bot'
