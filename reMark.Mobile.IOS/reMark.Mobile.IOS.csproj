@@ -621,4 +621,13 @@
     <ProjectReference Include="..\reMark.ServiceReference\reMark.ServiceReference.csproj" />
     <ProjectReference Include="..\SVProgressHUD\SVProgressHUD.csproj" />
   </ItemGroup>
+<<<<<<< Updated upstream
+=======
+  <ItemGroup>
+    <MauiIcon Include="Resources\AppIcon\appicon.svg" Color="#FFFFFF" />
+</ItemGroup>
+<ItemGroup>
+    <TrimmableAssembly Include="Microsoft.Graph" />
+</ItemGroup>
+>>>>>>> Stashed changes
 </Project>
