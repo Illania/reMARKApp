@@ -2965,8 +2965,8 @@ namespace reMark.ServiceReference.DataContract
         [DataMember(Name = "ShortcodesModuleInfo", Order = 0)]
         public ShortcodesModuleInfo ShortcodesModuleInfo { get; set; } = new ShortcodesModuleInfo();
 
-        /*[DataMember(Name = "CalendarModuleInfo", Order = 0)]
-        public CalendarModuleInfo CalendarModuleInfo { get; set; } = new CalendarModuleInfo();*/
+        [DataMember(Name = "CalendarModuleInfo", Order = 0)]
+        public CalendarModuleInfo CalendarModuleInfo { get; set; } = new CalendarModuleInfo();
 
         [DataMember(Name = "UserInfo", Order = 0)]
         public UserInfo UserInfo { get; set; } = new UserInfo();
