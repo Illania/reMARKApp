@@ -28,10 +28,11 @@ using reMark.Mobile.Droid.Utilities.Workers;
 using Microsoft.AppCenter.Crashes;
 using TinyIoC;
 using AndroidX.AppCompat.Widget;
-using Com.Airbnb.Lottie;
+//using Com.Airbnb.Lottie;
 using System.Diagnostics;
 using Microsoft.AppCenter;
 using ProgressBar = Android.Widget.ProgressBar;
+using Android.Graphics.Drawables;
 
 namespace reMark.Mobile.Droid.Ui.Activities
 {
@@ -263,17 +264,19 @@ namespace reMark.Mobile.Droid.Ui.Activities
                     return false;
                 }
 
-                RunOnUiThread(() =>
+
+                /*RunOnUiThread(() =>
                 {
                     var animationView = FindViewById<LottieAnimationView>(Resource.Id.animation_view);
-               
+
                     if (animationView != null)
                     {
                         animationView.Progress = 1;
                         animationView.Animate().Alpha(1f).SetDuration(200);
                     }
-               
-                });
+
+                });*/
+                
 
                 CommonConfig.Logger.Info("Updating file system storage...");
 
@@ -394,8 +397,7 @@ namespace reMark.Mobile.Droid.Ui.Activities
         }
 
         void ShowLoginButton()
-        {
-            var animationView = FindViewById<LottieAnimationView>(Resource.Id.animation_view);
+        {   
             var progressBar = FindViewById<ProgressBar>(Resource.Id.progress_bar);
             var loginButton = FindViewById<AppCompatButton>(Resource.Id.login_button);
 
@@ -404,8 +406,14 @@ namespace reMark.Mobile.Droid.Ui.Activities
             progressBar.Visibility = ViewStates.Gone;
             loginButton.Visibility = ViewStates.Visible;
 
-            animationView.Alpha = 1f;
-            animationView.PlayAnimation();
+            //var animationView = FindViewById<LottieAnimationView>(Resource.Id.animation_view);
+            //animationView.Alpha = 1f;
+            //animationView.PlayAnimation();
+
+            var animationView = FindViewById<ImageView>(Resource.Id.animation_view);
+            animationView.SetImageResource(Resource.Drawable.appicon_gray);
+
+            
         }
     }
 }
