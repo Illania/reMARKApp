@@ -1,6 +1,6 @@
 ﻿using System;
 using Foundation;
-using reMARK.Mobile.IOS.Common.Base;
+using reMark.Mobile.IOS.Common.Base;
 
 namespace reMark.Mobile.IOS.Common.CallId
 {
