@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net7.0-ios</TargetFramework>
+    <TargetFramework>net8.0-ios</TargetFramework>
     <OutputType>Exe</OutputType>
     <Nullable>enable</Nullable>
     <ImplicitUsings>true</ImplicitUsings>
@@ -9,29 +9,12 @@
     <Platforms>AnyCPU;iPhoneSimulator;iPhone</Platforms>
     <Registrar>dynamic</Registrar>
     <SkipValidateMauiImplicitPackageReferences>true</SkipValidateMauiImplicitPackageReferences> 
-<<<<<<< Updated upstream
-  </PropertyGroup>
-  <PropertyGroup>
-		<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-		<Platform Condition=" '$(Platform)' == '' ">iPhoneSimulator</Platform>
-		<ProjectGuid>{3FB59A6F-9438-433D-A3BA-247D914A06AE}</ProjectGuid>
-		<ProjectTypeGuids>{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-		<OutputType>Exe</OutputType>
-	  <RootNamespace>reMark.Mobile.IOS</RootNamespace>
-		<AssemblyName>reMark.Mobile.IOS</AssemblyName>
-    <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
-		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <Registrar>dynamic</Registrar>
-	</PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
-=======
     <Configurations>Debug;Release</Configurations>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <RootNamespace>reMark.Mobile.IOS</RootNamespace>
     <AssemblyName>reMark.Mobile.IOS</AssemblyName>   
     <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
->>>>>>> Stashed changes
 		<DebugSymbols>true</DebugSymbols>
 		<DebugType>full</DebugType>
 		<Optimize>false</Optimize>
@@ -40,49 +23,6 @@
 		<WarningLevel>4</WarningLevel>
 		<ConsolePause>false</ConsolePause>
 		<RunCodeAnalysis>true</RunCodeAnalysis>
-<<<<<<< Updated upstream
-		<CodesignKey>Apple Development: Lars Hansen (TUYUES9KMZ)</CodesignKey>
-		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
-		<LangVersion>10.0</LangVersion>
-		<CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
-		<CodesignProvision>Automatic</CodesignProvision>
-    <Registrar>dynamic</Registrar>
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
-		<DebugType>none</DebugType>
-		<Optimize>true</Optimize>
-		<OutputPath>bin\iPhoneSimulator\Release</OutputPath>
-		<ErrorReport>prompt</ErrorReport>
-		<WarningLevel>4</WarningLevel>
-		<ConsolePause>false</ConsolePause>
-    <CopyAppBundle>true</CopyAppBundle>
-		<RunCodeAnalysis>true</RunCodeAnalysis>
-		<CodesignProvision>Mark5Mobile Distribution 2023</CodesignProvision>
-		<CodesignKey>Apple Distribution: Nordic IT Europe ApS (5Q7TTRG4M4)</CodesignKey>
-		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
-		<LangVersion>10.0</LangVersion>
-		<CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
-    <Registrar>dynamic</Registrar>
-	</PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
-		<DebugSymbols>true</DebugSymbols>
-		<DebugType>full</DebugType>
-		<Optimize>false</Optimize>
-		<OutputPath>bin\iPhone\Debug</OutputPath>
-		<DefineConstants>DEBUG</DefineConstants>
-		<ErrorReport>prompt</ErrorReport>
-		<WarningLevel>4</WarningLevel>
-		<ConsolePause>false</ConsolePause>
-		<CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
-		<CodesignKey>Apple Development: Lars Hansen (TUYUES9KMZ)</CodesignKey>
-		<RunCodeAnalysis>true</RunCodeAnalysis>
-    <MtouchArch>ARM64</MtouchArch>
-		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
-		<CodesignProvision>match Development com.nordic-it.mark5.mobile.ios</CodesignProvision>
-		<LangVersion>9.0</LangVersion>
-		<MtouchLink>None</MtouchLink>
-    <Registrar>dynamic</Registrar>
-=======
 		<LangVersion>11.0</LangVersion>
     <Registrar>dynamic</Registrar>
     <MtouchUseLlvm>false</MtouchUseLlvm>
@@ -137,24 +77,6 @@
     <CodesignKey>Apple Distribution: Nordic IT Europe ApS (5Q7TTRG4M4)</CodesignKey>
     <CodesignProvision>Mark5Mobile Distribution 2023</CodesignProvision>
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
->>>>>>> Stashed changes
-	</PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
-		<DebugType>none</DebugType>
-		<Optimize>true</Optimize>
-		<OutputPath>bin\iPhone\Release</OutputPath>
-		<ErrorReport>prompt</ErrorReport>
-		<WarningLevel>4</WarningLevel>
-		<CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
-		<MtouchArch>ARM64</MtouchArch>
-		<ConsolePause>false</ConsolePause>
-		<CodesignKey>Apple Distribution: Nordic IT Europe ApS (5Q7TTRG4M4)</CodesignKey>
-		<RunCodeAnalysis>true</RunCodeAnalysis>
-		<MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
-		<LangVersion>9.0</LangVersion>
-		<MtouchLink>SdkOnly</MtouchLink>
-		<CodesignProvision>Mark5Mobile Distribution 2023</CodesignProvision>
-    <Registrar>dynamic</Registrar>
 	</PropertyGroup>
   <ItemGroup>
     <None Remove="Resources\" />
@@ -621,13 +543,10 @@
     <ProjectReference Include="..\reMark.ServiceReference\reMark.ServiceReference.csproj" />
     <ProjectReference Include="..\SVProgressHUD\SVProgressHUD.csproj" />
   </ItemGroup>
-<<<<<<< Updated upstream
-=======
   <ItemGroup>
     <MauiIcon Include="Resources\AppIcon\appicon.svg" Color="#FFFFFF" />
 </ItemGroup>
 <ItemGroup>
     <TrimmableAssembly Include="Microsoft.Graph" />
 </ItemGroup>
->>>>>>> Stashed changes
 </Project>

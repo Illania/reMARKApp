@@ -167,7 +167,7 @@ namespace reMark.Mobile.Common.Storage.AppFileStorage
         {
             Requires.NotNullOrEmpty(desiredName, "desiredName");
             await AwaitExtensions.SwitchOffMainThreadAsync(cancellationToken);
-            EnsureExists();
+            //EnsureExists();
             string nameToUse = desiredName;
             string newPath = System.IO.Path.Combine(Path, nameToUse);
             if (Directory.Exists(newPath))
