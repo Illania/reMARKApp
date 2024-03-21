@@ -411,45 +411,56 @@ namespace reMark.Mobile.IOS.Ui.TableViewCells
 
         void InitializeMessageListAppearance(DocumentPreview dp)
         {
-            //apply default appearance
-            var defaultAppearance = ServerConfig.SystemSettings.DocumentsModuleInfo.DefaultAppearance;
-            var daReadColor = Color.FromInt(defaultAppearance.FontColor).ToPlatform();
-            var daUnreadColor = Color.FromInt(defaultAppearance.UnreadFontColor).ToPlatform();
-
-            if (defaultAppearance.FontColorEnable)
-                SetTextColor(daReadColor);
-            if(defaultAppearance.UnreadFontColorEnable)
-                SetTextColor(dp.IsReadByCurrent ? daReadColor : daUnreadColor);          
-
-            //if row appearance depends from line use line appearance           
-            var lineAppearance = ServerConfig.SystemSettings.DocumentsModuleInfo.LineAppearances.FirstOrDefault(la => dp.Lines.Any(l => l.Guid == la.OriginatorGid));
-            if (lineAppearance != null && lineAppearance.Enable)
+            try
             {
-                var laReadColor = Color.FromInt(lineAppearance.FontColor).ToPlatform();
-                var laUnreadColor = Color.FromInt(lineAppearance.UnreadFontColor).ToPlatform();
-                var laBgColor = Color.FromInt(lineAppearance.BackgroundColor).ToPlatform();
-                BackgroundColor = laBgColor;
+                //apply default appearance
+                var defaultAppearance = ServerConfig.SystemSettings.DocumentsModuleInfo.DefaultAppearance;
+                if (defaultAppearance == null)
+                    return;
+
+                var daReadColor = Color.FromInt(defaultAppearance.FontColor).ToPlatform();
+                var daUnreadColor = Color.FromInt(defaultAppearance.UnreadFontColor).ToPlatform();
+
                 if (defaultAppearance.FontColorEnable)
-                    SetTextColor(laReadColor);
+                    SetTextColor(daReadColor);
                 if (defaultAppearance.UnreadFontColorEnable)
-                    SetTextColor(dp.IsReadByCurrent ? laReadColor : laUnreadColor);
+                    SetTextColor(dp.IsReadByCurrent ? daReadColor : daUnreadColor);
+
+                //if row appearance depends from line use line appearance           
+                var lineAppearance = ServerConfig.SystemSettings.DocumentsModuleInfo.LineAppearances.FirstOrDefault(la => dp.Lines.Any(l => l.Guid == la.OriginatorGid));
+                if (lineAppearance != null && lineAppearance.Enable)
+                {
+                    var laReadColor = Color.FromInt(lineAppearance.FontColor).ToPlatform();
+                    var laUnreadColor = Color.FromInt(lineAppearance.UnreadFontColor).ToPlatform();
+                    var laBgColor = Color.FromInt(lineAppearance.BackgroundColor).ToPlatform();
+                    BackgroundColor = laBgColor;
+                    if (defaultAppearance.FontColorEnable)
+                        SetTextColor(laReadColor);
+                    if (defaultAppearance.UnreadFontColorEnable)
+                        SetTextColor(dp.IsReadByCurrent ? laReadColor : laUnreadColor);
+
+                }
+
+                //if row appearance depends from user use user appearance           
+                var userAppearance = ServerConfig.SystemSettings.DocumentsModuleInfo.UserAppearances.FirstOrDefault(la => dp.CreatorGuid == la.OriginatorGid);
+                if (userAppearance != null && userAppearance.Enable)
+                {
+                    var uaReadColor = Color.FromInt(userAppearance.FontColor).ToPlatform();
+                    var uaUnreadColor = Color.FromInt(userAppearance.UnreadFontColor).ToPlatform();
+                    var uaBgColor = Color.FromInt(userAppearance.BackgroundColor).ToPlatform();
+                    BackgroundColor = uaBgColor;
+                    if (defaultAppearance.FontColorEnable)
+                        SetTextColor(uaReadColor);
+                    if (defaultAppearance.UnreadFontColorEnable)
+                        SetTextColor(dp.IsReadByCurrent ? uaReadColor : uaUnreadColor);
+                }
+
 
             }
-
-            //if row appearance depends from user use user appearance           
-            var userAppearance = ServerConfig.SystemSettings.DocumentsModuleInfo.UserAppearances.FirstOrDefault(la => dp.CreatorGuid == la.OriginatorGid);
-            if (userAppearance != null && userAppearance.Enable)
+            catch (Exception ex)
             {
-                var uaReadColor = Color.FromInt(userAppearance.FontColor).ToPlatform();
-                var uaUnreadColor = Color.FromInt(userAppearance.UnreadFontColor).ToPlatform();
-                var uaBgColor = Color.FromInt(userAppearance.BackgroundColor).ToPlatform();
-                BackgroundColor = uaBgColor;
-                if (defaultAppearance.FontColorEnable)
-                    SetTextColor(uaReadColor);
-                if (defaultAppearance.UnreadFontColorEnable)
-                    SetTextColor(dp.IsReadByCurrent ? uaReadColor : uaUnreadColor);
+                CommonConfig.Logger.Error("Failed to initialize message list appearance.", ex);
             }
- 
         }
 
         void InitializeUnreadIndicator(DocumentPreview dp)
