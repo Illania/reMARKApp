@@ -690,11 +690,10 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
 
         private async Task ShowMenuForRecipientTappedAction(object sender, string recipient )
         {
-            var d = new PopoverPresentationControllerDelegate(doneButtonItem);
             var source = await Dialogs.ShowListActionSheetAsync(this, new[]
             {
                 Localization.GetString("new_document"), Localization.GetString("new_contact")
-            }, d);
+            }, headerView);
             if (source < 0)
                 return;
 
@@ -747,7 +746,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                 Localization.GetString("add_company"),
                 Localization.GetString("add_department"),
                 Localization.GetString("add_person") 
-            });
+            }, headerView);
 
             if (choice < 0)
                 return;
