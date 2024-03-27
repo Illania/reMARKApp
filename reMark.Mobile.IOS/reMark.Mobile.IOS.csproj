@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <ApplicationId>com.nordic-it.mark5.mobile.ios</ApplicationId>
     <TargetFramework>net8.0-ios</TargetFramework>
     <OutputType>Exe</OutputType>
     <Nullable>enable</Nullable>
@@ -533,12 +534,6 @@
     <ProjectReference Include="..\reMark.Mobile.Classes\reMark.Mobile.Classes.csproj" />
     <ProjectReference Include="..\reMark.Mobile.Common\reMark.Mobile.Common.csproj" />
     <ProjectReference Include="..\reMark.Mobile.IOS.Common\reMark.Mobile.IOS.Common.csproj" />
-    <ProjectReference Include="..\reMark.Mobile.IOS.Extensions.CallId\reMark.Mobile.IOS.Extensions.CallId.csproj">
-      <IsAppExtension>true</IsAppExtension>
-    </ProjectReference>
-    <ProjectReference Include="..\reMark.Mobile.IOS.Extensions.Share\reMark.Mobile.IOS.Extensions.Share.csproj">
-      <IsAppExtension>true</IsAppExtension>
-    </ProjectReference>
     <ProjectReference Include="..\reMark.ServiceReference.Exceptions\reMark.ServiceReference.Exceptions.csproj" />
     <ProjectReference Include="..\reMark.ServiceReference\reMark.ServiceReference.csproj" />
     <ProjectReference Include="..\SVProgressHUD\SVProgressHUD.csproj" />
