@@ -55,7 +55,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers.FoldersList
                 if (folder.Local)
                     vc = new DocumentsToUploadListViewController();
                 else
-                    vc = new DocumentsListViewController
+                    vc = new DocumentsSegmentListViewController()
                     {
                         Folder = folder
                     };

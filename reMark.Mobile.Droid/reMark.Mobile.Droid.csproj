@@ -149,4 +149,7 @@
   <ItemGroup>
     <Compile Remove="Resources\Resource.designer.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <None Remove="Resources/layout/pager_documentlist.axml" />
+  </ItemGroup>
 </Project>

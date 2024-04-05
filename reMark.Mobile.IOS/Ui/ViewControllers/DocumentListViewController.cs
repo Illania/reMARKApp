@@ -28,6 +28,9 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
         public Folder Folder { get; set; }
         public bool DisableRowActions { get; set; }
         public bool OnlyShowExternalDocuments { get; set; }
+        public bool OnlyShowUnreadDocuments {get; set;}
+
+        public UITableViewController? SearchResultsController => (UITableViewController?)(searchController?.SearchResultsController);
 
         UIBarButtonItem selectAllItem;
         UIBarButtonItem goToBookmarkItem;
@@ -38,7 +41,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
         bool refreshing;
         bool selectAllEnabled;
 
-        UISearchController searchController;
+        protected UISearchController searchController;
         CancellationTokenSource searchCancellationTokenSource;
         readonly List<CancellationTokenSource> searchCancellationTokenSourceList = new List<CancellationTokenSource>();
         string lastSearchQuery;
@@ -754,6 +757,10 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                 {
                     documentPreviews = documentPreviews.FindAll((DocumentPreview dp) => dp.Direction == DocumentDirection.External);
                 }
+                else if (OnlyShowUnreadDocuments)
+                {
+                    documentPreviews = documentPreviews.FindAll((DocumentPreview dp) => dp.IsReadByCurrent == false);
+                }
 
                 ((DocumentListDataSource)TableView.Source).LoadMoreEnabled = documentPreviews.Count >= PlatformConfig.Preferences.DocumentsToDownload;
                 CommonConfig.Logger.Info($"Enable load more documents set to {((DocumentListDataSource)TableView.Source).LoadMoreEnabled}");
@@ -804,6 +811,11 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                 CommonConfig.Logger.Debug($"Automatic refresh running...");
 
                 var documents = await Managers.DocumentsManager.GetDocumentPreviewsAsync(Folder, endId: endId);
+
+                if(OnlyShowUnreadDocuments)
+                {
+                    documents = documents.FindAll((DocumentPreview dp) => dp.IsReadByCurrent == false);
+                }
 
                 if (documents.Count > 0)
                 {
@@ -975,7 +987,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
 
                 var updatedItems = selectedDocuments.Select(d => d.Id);
                 ((DocumentListDataSource)TableView.Source).UpdateItems(updatedItems);
-                ((DocumentListDataSource)((UITableViewController)searchController?.SearchResultsController)?.TableView?.Source)?.UpdateItems(updatedItems);
+                ((DocumentListDataSource)SearchResultsController?.TableView?.Source)?.UpdateItems(updatedItems);
 
                 EndEditing(TableView);
 
@@ -1113,7 +1125,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
         public void MarkAsRead(DocumentPreview documentPreview) =>
             MarkAsRead(new List<DocumentPreview> { documentPreview });
 
-        public async void MarkAsRead(List<DocumentPreview> documentPreviews)
+        public virtual async void MarkAsRead(List<DocumentPreview> documentPreviews)
         {
             CommonConfig.Logger.Info($"Attempting to mark as read [documentPreviews={documentPreviews.Count}]...");
 
@@ -1128,7 +1140,8 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
 
                 var updatedItems = documentPreviews.Select(d => d.Id);
                 ((DocumentListDataSource)TableView.Source).UpdateItems(updatedItems);
-                ((DocumentListDataSource)((UITableViewController)searchController?.SearchResultsController)?.TableView?.Source)?.UpdateItems(updatedItems);
+                ((DocumentListDataSource)SearchResultsController?.TableView?.Source)?.UpdateItems(updatedItems);
+
             }
             catch (Exception ex)
             {
@@ -1153,7 +1166,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
 
                 var updatedItems = documentPreviews.Select(d => d.Id);
                 ((DocumentListDataSource)TableView.Source).UpdateItems(updatedItems);
-                ((DocumentListDataSource)((UITableViewController)searchController?.SearchResultsController)?.TableView?.Source)?.UpdateItems(updatedItems);
+                ((DocumentListDataSource)SearchResultsController?.TableView?.Source)?.UpdateItems(updatedItems);
             }
             catch (Exception ex)
             {
@@ -1176,7 +1189,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                 await Managers.DocumentsManager.ForceSendDocument(delayedItems);
                 var updatedItemsIds = delayedItems.Select(d => d.Id);
                 ((DocumentListDataSource)TableView.Source).UpdateItems(updatedItemsIds);
-                ((DocumentListDataSource)((UITableViewController)searchController?.SearchResultsController)?.TableView?.Source)?.UpdateItems(updatedItemsIds);
+                ((DocumentListDataSource)SearchResultsController?.TableView?.Source)?.UpdateItems(updatedItemsIds);
 
                 CommonConfig.Logger.Info($"Documents with IDs:{string.Join(",", delayedItems.Select(i => i.Id).ToList()).TrimEnd(',')} forced sent.");
 
@@ -1207,7 +1220,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                 await Managers.DocumentsManager.CancelSendDocument(delayedItems);
                 var updatedItemsIds = delayedItems.Select(d => d.Id);
                 ((DocumentListDataSource)TableView.Source).UpdateItems(updatedItemsIds);
-                ((DocumentListDataSource)((UITableViewController)searchController?.SearchResultsController)?.TableView?.Source)?.UpdateItems(updatedItemsIds);
+                ((DocumentListDataSource)SearchResultsController?.TableView?.Source)?.UpdateItems(updatedItemsIds);
 
                 foreach (var item in delayedItems)
                     CommonConfig.MessengerHub.Publish(new DocumentUploadStatusChangedMessage(this, DocumentUploadStatusChangedMessage.Status.DocumentSendCancelled,
@@ -1239,7 +1252,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                 searchCancellationTokenSourceList.ForEach(cts => cts?.Cancel());
                 searchCancellationTokenSourceList.Clear();
 
-                var dataSource = ((UITableViewController)searchController.SearchResultsController).TableView.Source;
+                var dataSource = SearchResultsController?.TableView.Source;
                 ((DocumentListDataSource)dataSource)?.Reset();
             }
             else
@@ -1267,11 +1280,11 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
 
         #region Messages handlers
 
-        void ReadStatusChangedHandler(DocumentPreviewReadStatusChangedMessage message)
+        protected virtual void ReadStatusChangedHandler(DocumentPreviewReadStatusChangedMessage message)
         {
             BeginInvokeOnMainThread(() =>
             {
-                foreach (var tableView in new UITableView[] { TableView, ((UITableViewController)searchController?.SearchResultsController)?.TableView })
+                foreach (var tableView in new UITableView[] { TableView, SearchResultsController?.TableView })
                 {
                     if (tableView == null || tableView.Source == null)
                         continue;
@@ -1281,6 +1294,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                     if (index >= 0)
                     {
                         var documentPreview = ((DocumentListDataSource)tableView.Source).Items[index];
+
                         documentPreview.IsReadByCurrent = message.IsReadByCurrent;
                         documentPreview.IsReadByAnyone = message.IsReadByAnyone;
 
@@ -1332,7 +1346,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
         {
             BeginInvokeOnMainThread(() =>
             {
-                foreach (var tableView in new UITableView[] { TableView, ((UITableViewController)searchController?.SearchResultsController)?.TableView })
+                foreach (var tableView in new UITableView[] { TableView, SearchResultsController?.TableView })
                 {
                     if (tableView == null || tableView.Source == null)
                         continue;
@@ -1393,7 +1407,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
         {
             BeginInvokeOnMainThread(() =>
             {
-                foreach (var tableView in new UITableView[] { TableView, ((UITableViewController)searchController?.SearchResultsController)?.TableView })
+                foreach (var tableView in new UITableView[] { TableView, SearchResultsController?.TableView })
                 {
                     if (tableView == null || tableView.Source == null)
                         continue;

@@ -12,6 +12,11 @@ namespace reMark.Mobile.IOS.Ui.Common
         protected UIViewController[] ViewControllers;
         protected UIViewController CurrentViewController;
 
+        private ToggleSwitchBarButtonItem toggleSwitch;
+
+
+        public bool HasToggleBar {get; set;}
+
         public override void LoadView()
         {
             base.LoadView();
@@ -24,6 +29,20 @@ namespace reMark.Mobile.IOS.Ui.Common
 
             if (Integration.IsRunningAtLeast(13))
                 SegmentedControl.SelectedSegmentTintColor = Theme.DarkBlue;
+
+            if(HasToggleBar)
+            {
+                toggleSwitch = new ToggleSwitchBarButtonItem();
+                toggleSwitch.ToggleSwitchValueChanged += (sender, isOn) => {
+                    if (isOn)
+                        SegmentedControl.SelectedSegment = 1;
+                    else
+                        SegmentedControl.SelectedSegment = 0;
+
+                    HandleSelectedSegmentChanged((int)SegmentedControl.SelectedSegment);
+                };
+            }
+
         }
 
         public override void ViewDidLoad()
@@ -44,16 +63,37 @@ namespace reMark.Mobile.IOS.Ui.Common
             AddChildViewController(vc);
             vc.View.Frame = View.Bounds;
             View.AddSubview(vc.View);
+
             if (vc.NavigationItem.LeftBarButtonItems != null)
                 NavigationItem.SetLeftBarButtonItems(vc.NavigationItem.LeftBarButtonItems, false);
             else
                 NavigationItem.SetLeftBarButtonItem(null, false);
-            if (vc.NavigationItem.RightBarButtonItems != null)
-                NavigationItem.SetRightBarButtonItems(vc.NavigationItem.RightBarButtonItems, false);
-            else
-                NavigationItem.SetRightBarButtonItem(null, false);
+
+            if(HasToggleBar)
+            {
+                CreateRightBarButtonsWithToggle(vc);
+            }
+            else 
+            {
+                if (vc.NavigationItem.RightBarButtonItems != null)
+                    NavigationItem.SetRightBarButtonItems(vc.NavigationItem.RightBarButtonItems, false);
+                else
+                    NavigationItem.SetRightBarButtonItem(null, false);
+            }
+
             vc.DidMoveToParentViewController(this);
             CurrentViewController = vc;
+        }
+
+        private void CreateRightBarButtonsWithToggle(UIViewController vc)
+        {
+            List<UIBarButtonItem> rightBarButtonItems = new List<UIBarButtonItem>();
+
+            if (vc.NavigationItem.RightBarButtonItems != null)
+                rightBarButtonItems.AddRange(vc.NavigationItem.RightBarButtonItems);
+           
+            rightBarButtonItems.AddRange(new List<UIBarButtonItem>{toggleSwitch.CreateToggleBarButtonItem()});
+            NavigationItem.SetRightBarButtonItems(rightBarButtonItems.ToArray(), false);
         }
 
         protected override void Recycle()
@@ -64,6 +104,45 @@ namespace reMark.Mobile.IOS.Ui.Common
             SegmentedControl = null;
             ViewControllers = null;
             CurrentViewController = null;
+        }
+
+        private void HandleSelectedSegmentChanged(int selectedSegent)
+        {
+            View.EndEditing(true);
+
+            var vc = ViewControllers[selectedSegent];
+            CurrentViewController.WillMoveToParentViewController(null);
+            vc.WillMoveToParentViewController(this);
+            CurrentViewController.RemoveFromParentViewController();
+            AddChildViewController(vc);
+            CurrentViewController.View.RemoveFromSuperview();
+            vc.View.Frame = View.Bounds;
+            View.AddSubview(vc.View);
+
+            if (!Integration.IsRunningAtLeast(11))
+                NavigationController.View.SetNeedsLayout();
+
+            if (vc.NavigationItem.LeftBarButtonItems != null)
+                NavigationItem.SetLeftBarButtonItems(vc.NavigationItem.LeftBarButtonItems, false);
+            else
+                NavigationItem.SetLeftBarButtonItem(null, false);
+
+            if(HasToggleBar)
+            {
+                CreateRightBarButtonsWithToggle(vc);       
+            }
+            else 
+            {
+                if (vc.NavigationItem.RightBarButtonItems != null)
+                    NavigationItem.SetRightBarButtonItems(vc.NavigationItem.RightBarButtonItems, false);
+                else
+                    NavigationItem.SetRightBarButtonItem(null, false);
+            }
+
+            vc.DidMoveToParentViewController(this);
+            CurrentViewController.DidMoveToParentViewController(null);
+            CurrentViewController = vc;
+
         }
 
         [Export("segmentedControlHasChangedValue:")]

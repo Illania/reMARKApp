@@ -19,12 +19,12 @@ using AndroidX.Preference;
 
 namespace reMark.Mobile.Droid.Ui.Fragments
 {
-    public class FoldersNotificationsListFragment : BaseFragment, ViewPager.IOnPageChangeListener
+    public class DocumentsUnreadDocumentsListFragment : BaseFragment, ViewPager.IOnPageChangeListener
     {
         static readonly int[] tabTitles =
         {
-            Resource.String.folders,
-            Resource.String.notifications
+            Resource.String.documents,
+            Resource.String.unread_documents
         };
 
         const string RemoteFolderBundleKey = "RemoteFolder_403cbd64-83e9-4e13-8809-0868debb55b9";
@@ -36,22 +36,23 @@ namespace reMark.Mobile.Droid.Ui.Fragments
         ViewPager pager;
 
         IMenu menu;
+        Switch switchControl;
 
         int savedCurrentPageIndex = -1;
 
-        public static FoldersNotificationsListFragment NewInstance()
+        public static DocumentsUnreadDocumentsListFragment NewInstance()
         {
-            return new FoldersNotificationsListFragment();
+            return new DocumentsUnreadDocumentsListFragment();
         }
 
-        public static (FoldersNotificationsListFragment fragment, string tag) NewInstance(Folder remoteFolder)
+        public static (DocumentsUnreadDocumentsListFragment fragment, string tag) NewInstance(Folder remoteFolder)
         {
             var args = new Bundle();
 
             if (remoteFolder != null)
                 args.PutString(RemoteFolderBundleKey, Serializer.Serialize(remoteFolder.ShallowCopy()));
 
-            var fragment = new FoldersNotificationsListFragment();
+            var fragment = new DocumentsUnreadDocumentsListFragment();
             fragment.Arguments = args;
 
             var tag = $"{nameof(FoldersNotificationsListFragment)} [FolderId={remoteFolder.Id}, ModuleType={remoteFolder.Module}]";
@@ -74,7 +75,7 @@ namespace reMark.Mobile.Droid.Ui.Fragments
         {
             CommonConfig.Logger.Info($"Creating {nameof(FoldersNotificationsListFragment)}...");
 
-            var rootView = inflater.Inflate(Resource.Layout.pager, container, false);
+            var rootView = inflater.Inflate(Resource.Layout.pager_documentlist, container, false);
 
             tabLayout = rootView.FindViewById<TabLayout>(Resource.Id.tab_layout);
 
@@ -90,6 +91,20 @@ namespace reMark.Mobile.Droid.Ui.Fragments
                 tabLayout.AddTab(tabLayout.NewTab().SetText(tabTitles[i]));
 
             tabLayout.TabGravity = TabLayout.GravityFill;
+
+            switchControl = rootView.FindViewById<Switch>(Resource.Id.unread_switch);
+            switchControl.CheckedChange += (sender, e) =>
+            {
+                if (switchControl.Checked)
+                {
+                    pager.CurrentItem = 1;
+                }
+                else
+                {
+                     pager.CurrentItem = 0;
+                }
+            };
+
 
             return rootView;
         }
@@ -167,9 +182,10 @@ namespace reMark.Mobile.Droid.Ui.Fragments
                 {
                     case 0:
                         //Item1 is the fragment
-                        return FoldersListFragment.NewInstance(folder, loadRemoteFromCache: folder.SubFolders?.Any()).fragment;
+                        return DocumentsListFragment.NewInstance(folder).fragment;
+                        //return FoldersListFragment.NewInstance(folder, loadRemoteFromCache: folder.SubFolders?.Any()).fragment;
                     case 1:
-                        return NotificationsListFragment.NewInstance(folder.Module.ObjectTypes()).fragment;
+                        return UnreadDocumentsListFragment.NewInstance(folder).fragment;
                     default:
                         return null;
                 }
