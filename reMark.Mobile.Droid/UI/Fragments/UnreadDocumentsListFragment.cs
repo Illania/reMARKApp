@@ -31,7 +31,7 @@ namespace reMark.Mobile.Droid.Ui.Fragments
 
         public async override void UpdateReadStatus(DocumentPreviewReadStatusChangedMessage m)
         {
-            var adapters =  new DocumentsListAdapter[]{adapter, searchAdapter};
+            var adapters =  new DocumentsListAdapter[]{ adapter, searchAdapter };
             foreach(var adapter in adapters)
             {
                 var position = adapter.GetPosition(m.DocumentPreviewId);
@@ -48,7 +48,7 @@ namespace reMark.Mobile.Droid.Ui.Fragments
                     //if read document was marked as unread it is not present in current (unread only) dataSource and index will be -1
                     //so we need to get document preview from database first
                     var document = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(-1, m.DocumentPreviewId);
-                    if(!m.IsReadByCurrent)
+                    if (!m.IsReadByCurrent)
                         adapter.InsertItems([document.DocumentPreview]);
                 }
             }

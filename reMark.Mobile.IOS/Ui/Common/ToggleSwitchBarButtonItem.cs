@@ -1,8 +1,8 @@
-
 using UIKit;
 using CoreGraphics;
 using reMark.Mobile.IOS.Ui.Common;
 using reMark.Mobile.IOS.Utilities.Extensions;
+
 public class ToggleSwitchBarButtonItem
 {
     private UIView? toggleView;
@@ -10,10 +10,8 @@ public class ToggleSwitchBarButtonItem
 
     public event EventHandler<bool>? ToggleSwitchValueChanged;
 
-
     public UIBarButtonItem CreateToggleBarButtonItem()
     {
-
         toggleView = new UIView
         {
             Frame = new CGRect(0, 0, 135, 30) // Set the frame size as needed
@@ -35,7 +33,7 @@ public class ToggleSwitchBarButtonItem
             On = isOn
         };
 
-        toggleSwitch.ValueChanged += (sender, e) =>
+        toggleSwitch.ValueChanged += (_, _) =>
         {
             isOn = toggleSwitch.On;
             ToggleSwitchValueChanged?.Invoke(this, isOn);
@@ -55,5 +53,4 @@ public class ToggleSwitchBarButtonItem
 
         return toggleBarButtonItem;
     }
-
 }

@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Foundation;
 using reMark.Mobile.Common;
 using reMark.Mobile.Common.Extensions;
@@ -30,7 +25,8 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
         public bool OnlyShowExternalDocuments { get; set; }
         public bool OnlyShowUnreadDocuments {get; set;}
 
-        public UITableViewController? SearchResultsController => (UITableViewController?)(searchController?.SearchResultsController);
+        public UITableViewController? SearchResultsController => 
+            (UITableViewController?)(searchController?.SearchResultsController);
 
         UIBarButtonItem selectAllItem;
         UIBarButtonItem goToBookmarkItem;
@@ -754,14 +750,10 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
 
 
                 if (OnlyShowExternalDocuments)
-                {
-                    documentPreviews = documentPreviews.FindAll((DocumentPreview dp) => dp.Direction == DocumentDirection.External);
-                }
+                    documentPreviews = documentPreviews.FindAll(dp => dp.Direction == DocumentDirection.External);
                 else if (OnlyShowUnreadDocuments)
-                {
-                    documentPreviews = documentPreviews.FindAll((DocumentPreview dp) => dp.IsReadByCurrent == false);
-                }
-
+                    documentPreviews = documentPreviews.FindAll(dp => dp.IsReadByCurrent == false);
+                
                 ((DocumentListDataSource)TableView.Source).LoadMoreEnabled = documentPreviews.Count >= PlatformConfig.Preferences.DocumentsToDownload;
                 CommonConfig.Logger.Info($"Enable load more documents set to {((DocumentListDataSource)TableView.Source).LoadMoreEnabled}");
 
@@ -789,7 +781,6 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                 RefreshControl.ValueChanged += RefreshControl_ValueChanged;
                 refreshing = false;
             }
-            
         }
 
         async Task AutoRefreshData(int endId)
@@ -812,10 +803,8 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
 
                 var documents = await Managers.DocumentsManager.GetDocumentPreviewsAsync(Folder, endId: endId);
 
-                if(OnlyShowUnreadDocuments)
-                {
-                    documents = documents.FindAll((DocumentPreview dp) => dp.IsReadByCurrent == false);
-                }
+                if (OnlyShowUnreadDocuments)
+                    documents = documents.FindAll(dp => dp.IsReadByCurrent == false);
 
                 if (documents.Count > 0)
                 {

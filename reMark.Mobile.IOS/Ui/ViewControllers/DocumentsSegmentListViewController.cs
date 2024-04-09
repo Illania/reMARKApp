@@ -8,7 +8,6 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
 {
     public class DocumentsSegmentListViewController : AbstractMultiViewController, IUIViewControllerRestoration
     {
-
         public Folder Folder {get; set;}
         public DocumentsSegmentListViewController() => HasToggleBar = true;
 
@@ -19,7 +18,6 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
             SegmentedControl.InsertSegment(Localization.GetString("all"), 0, false);
             SegmentedControl.InsertSegment(Localization.GetString("unread"), 1, false);
             SegmentedControl.Hidden = true;
-
           
             ViewControllers = new UIViewController[]
             {
@@ -31,7 +29,6 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
-
             RestorationIdentifier = nameof(FoldersNotificationsListViewController);
             RestorationClass = Class;
         }
@@ -40,19 +37,23 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewDidAppear(animated);
 
-            if (Integration.IsRunningAtLeast(11))
+            if (!Integration.IsRunningAtLeast(11))
+                return;
+
+            NSOperationQueue.MainQueue.AddOperation(() =>
             {
-                NSOperationQueue.MainQueue.AddOperation(() =>
+                var ni = NavigationItem;
+
+                if (ParentViewController != null
+                    && ParentViewController is UIViewController
+                    && !(ParentViewController is UINavigationController))
                 {
-                    var ni = NavigationItem;
+                    ni = ParentViewController?.NavigationItem;
+                }
 
-                    if (ParentViewController != null && ParentViewController is UIViewController && !(ParentViewController is UINavigationController))
-                        ni = ParentViewController?.NavigationItem;
-
-                    if (ni.SearchController == null)
-                        ni.SearchController = CurrentViewController?.NavigationItem?.SearchController;
-                });
-            }
+                if (ni != null)
+                    ni.SearchController ??= CurrentViewController.NavigationItem?.SearchController;
+            });
         }
 
         #region State restoration
@@ -76,6 +77,5 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
         }
 
         #endregion
-
     }
 }

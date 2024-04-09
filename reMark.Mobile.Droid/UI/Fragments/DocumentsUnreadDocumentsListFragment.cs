@@ -1,21 +1,15 @@
 using Android.OS;
 using Android.Views;
 using reMark.Mobile.Common;
-using reMark.Mobile.Common.Extensions;
 using reMark.Mobile.Common.Utilities;
 using reMark.Mobile.Common.Model;
 using reMark.Mobile.Droid.Ui.Common;
-using System.Linq;
 using AndroidX.ViewPager.Widget;
 using Google.Android.Material.Tabs;
 using AndroidX.Fragment.App;
 using AndroidX.AppCompat.App;
 using View = Android.Views.View;
-using Toolbar = AndroidX.AppCompat.Widget.Toolbar;
 using Switch = AndroidX.AppCompat.Widget.SwitchCompat;
-using reMark.Mobile.Droid.UI;
-using Android.Widget;
-using AndroidX.Preference;
 
 namespace reMark.Mobile.Droid.Ui.Fragments
 {
@@ -105,7 +99,6 @@ namespace reMark.Mobile.Droid.Ui.Fragments
                 }
             };
 
-
             return rootView;
         }
 
@@ -170,8 +163,7 @@ namespace reMark.Mobile.Droid.Ui.Fragments
 
             readonly Folder folder;
 
-            public PagerAdapter(FragmentManager fm, Folder folder)
-                : base(fm)
+            public PagerAdapter(FragmentManager fm, Folder folder) : base(fm)
             {
                 this.folder = folder;
             }

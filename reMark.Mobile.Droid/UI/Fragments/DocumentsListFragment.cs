@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Text.RegularExpressions;
 using Android.Content;
 using Android.Graphics;
 using Android.Graphics.Drawables;
@@ -22,7 +17,6 @@ using reMark.Mobile.Common.Utilities.Extensions;
 using reMark.Mobile.Droid.Ui.Activities;
 using reMark.Mobile.Droid.Ui.Common;
 using reMark.Mobile.Droid.Utilities;
-using Android.Content.Res;
 using AndroidX.CoordinatorLayout.Widget;
 using AndroidX.SwipeRefreshLayout.Widget;
 using AndroidX.RecyclerView.Widget;
@@ -40,7 +34,6 @@ using Preferences = reMark.Mobile.Droid.Utilities.Preferences;
 using Color = Android.Graphics.Color;
 using Paint = Android.Graphics.Paint;
 using Layout = Android.Text.Layout;
-using reMark.Mobile.Droid.UI;
 using TinyMessenger;
 
 
@@ -527,10 +520,10 @@ namespace reMark.Mobile.Droid.Ui.Fragments
                 }
 
                 if (onlyShowExternalDocuments)
-                    documentPreviews = documentPreviews.FindAll((DocumentPreview dp) => dp.Direction == DocumentDirection.External);
+                    documentPreviews = documentPreviews.FindAll(dp => dp.Direction == DocumentDirection.External);
                 else if (onlyShowUnreadDocuments)
                 {
-                    documentPreviews = documentPreviews.FindAll((DocumentPreview dp) => dp.IsReadByCurrent == false);
+                    documentPreviews = documentPreviews.FindAll(dp => dp.IsReadByCurrent == false);
                 }
 
 

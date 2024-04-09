@@ -4,7 +4,6 @@ using reMark.Mobile.Common.Model;
 using reMark.Mobile.Common.Model.HubMessages;
 using reMark.Mobile.Common.Utilities;
 using reMark.Mobile.IOS.Ui.Common;
-using UIKit;
 
 namespace reMark.Mobile.IOS.Ui.ViewControllers
 {
@@ -19,9 +18,9 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
         {
             BeginInvokeOnMainThread(async () =>
             {
-                foreach (var tableView in new UITableView[] { TableView, SearchResultsController?.TableView })
+                foreach (var tableView in new[] { TableView, SearchResultsController?.TableView })
                 {
-                    if (tableView == null || tableView.Source == null)
+                    if (tableView?.Source == null)
                         continue;
 
                     var index = ((DocumentListDataSource)tableView.Source).Items.FindIndex(dp => dp.Id == message.DocumentPreviewId);
@@ -30,24 +29,22 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                     {
                         var documentPreview = ((DocumentListDataSource)tableView.Source).Items[index];
 
-                        if(message.IsReadByCurrent)
-                        {
-                            ((DocumentListDataSource)TableView.Source).RemoveItems(new List<int>{documentPreview.Id});
-                            ((DocumentListDataSource)SearchResultsController?.TableView?.Source)?
-                                .RemoveItems(new List<int>{documentPreview.Id});
-                        }    
+                        if (!message.IsReadByCurrent)
+                            continue;
+
+                        ((DocumentListDataSource)TableView.Source).RemoveItems(new List<int>{documentPreview.Id});
+                        ((DocumentListDataSource)SearchResultsController?.TableView?.Source)?.RemoveItems(new List<int>{documentPreview.Id});
                     }
                     else
                     {
                         //if read document was marked as unread it is not present in current (unread only) dataSource and index will be -1
                         //so we need to get document preview from database first
                         var document = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(-1, message.DocumentPreviewId);
-                        if(!message.IsReadByCurrent)
-                        {
-                            ((DocumentListDataSource)TableView.Source).InsertItems(new List<DocumentPreview>{document.DocumentPreview});
-                            ((DocumentListDataSource)SearchResultsController?.TableView?.Source)?
-                                .InsertItems(new List<DocumentPreview>{document.DocumentPreview});
-                        }
+                        if (message.IsReadByCurrent)
+                            continue;
+                        
+                        ((DocumentListDataSource)TableView.Source).InsertItems(new List<DocumentPreview>{document.DocumentPreview});
+                        ((DocumentListDataSource)SearchResultsController?.TableView?.Source)?.InsertItems(new List<DocumentPreview>{document.DocumentPreview});
                     }
                 }
             });
@@ -70,15 +67,12 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
     
                 ((DocumentListDataSource)TableView.Source).RemoveItems(updatedItems);
                 ((DocumentListDataSource)SearchResultsController?.TableView?.Source)?.RemoveItems(updatedItems);
-                
             }
             catch (Exception ex)
             {
                 CommonConfig.Logger.Error($"Marking as read failed [documentPreviews.Count={documentPreviews.Count}]", ex);
-
                 await Dialogs.ShowErrorAlertAsync(this, ex);
             }
         }
-
     }
 }

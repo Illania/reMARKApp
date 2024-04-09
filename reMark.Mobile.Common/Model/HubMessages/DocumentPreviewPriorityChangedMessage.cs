@@ -7,6 +7,7 @@ namespace reMark.Mobile.Common.Model.HubMessages
         public int DocumentPreviewId { get; }
 
         public Priority Priority { get; }
+        
         public int Id => DocumentPreviewId;
 
         public DocumentPreviewPriorityChangedMessage(object sender, int documentPreviewId, Priority priority)
