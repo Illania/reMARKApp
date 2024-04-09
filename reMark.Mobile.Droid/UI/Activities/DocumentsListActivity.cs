@@ -2,38 +2,26 @@
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
-using AndroidX.AppCompat.Widget;
 using reMark.Mobile.Common;
 using reMark.Mobile.Common.Model;
-using reMark.Mobile.Common.Model.HubMessages;
 using reMark.Mobile.Common.Utilities;
 using reMark.Mobile.Droid.Ui.Common;
 using reMark.Mobile.Droid.Ui.Fragments;
-using TinyMessenger;
 using Toolbar = AndroidX.AppCompat.Widget.Toolbar;
 
 namespace reMark.Mobile.Droid.Ui.Activities
 {
-     [Activity(ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize )]
+    [Activity(ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize )]
     public class DocumentsListActivity : BaseAppCompatActivity
     {
         public const string FolderIntentKey = "Folder_fc733ef0-68cb-4412-9255-cf128602f176";
-
         const string dlfFragmentTagKey = "DocumentsListFragmentTagKey";
         const string dtulfFragmentTagKey = "DocumentsToUploadListFragmentTagKey";
 
         Toolbar toolbar;
 
-        DocumentsListFragment dlf;
+        DocumentsUnreadDocumentsListFragment dlf;
         DocumentsToUploadListFragment odlf;
-
-        TinyMessageSubscriptionToken readStatusToken;
-        TinyMessageSubscriptionToken priorityToken;
-        TinyMessageSubscriptionToken categoriesToken;
-        TinyMessageSubscriptionToken commentCountToken;
-        TinyMessageSubscriptionToken entityMovedFromFolderToken;
-        TinyMessageSubscriptionToken entityRemovedFromFolderToken;
-        TinyMessageSubscriptionToken entityRemovedToken;
 
         string dlfFragmentTag;
         string dtuFragmentTag;
@@ -72,7 +60,7 @@ namespace reMark.Mobile.Droid.Ui.Activities
                 }
                 else
                 {
-                    (dlf, dlfFragmentTag) = DocumentsListFragment.NewInstance(folder);
+                    (dlf, dlfFragmentTag) = DocumentsUnreadDocumentsListFragment.NewInstance(folder);
                     ft.Replace(Resource.Id.fragment_container, dlf, dlfFragmentTag);
                 }
                 ft.Commit();
@@ -84,7 +72,7 @@ namespace reMark.Mobile.Droid.Ui.Activities
                 dlfFragmentTag = savedInstanceState.GetString(dlfFragmentTagKey);
                 if (!string.IsNullOrEmpty(dlfFragmentTag))
                 {
-                    dlf = SupportFragmentManager.FindFragmentByTag(dlfFragmentTag) as DocumentsListFragment;
+                    dlf = SupportFragmentManager.FindFragmentByTag(dlfFragmentTag) as DocumentsUnreadDocumentsListFragment;
                     CommonConfig.Logger.Info($"Reassigned {nameof(DocumentsListFragment)}");
                 }
 
@@ -96,17 +84,6 @@ namespace reMark.Mobile.Droid.Ui.Activities
                 }
 
                 CommonConfig.Logger.Info($"Restored {nameof(DocumentsListActivity)}");
-            }
-
-            if (dlf != null)
-            {
-                readStatusToken = CommonConfig.MessengerHub.Subscribe<DocumentPreviewReadStatusChangedMessage>(dlf.UpdateReadStatus, m => dlf != null && m.Sender != dlf);
-                priorityToken = CommonConfig.MessengerHub.Subscribe<DocumentPreviewPriorityChangedMessage>(dlf.UpdatePriority, m => dlf != null && m.Sender != dlf);
-                categoriesToken = CommonConfig.MessengerHub.Subscribe<EntityCategoriesChangedMessage>(dlf.UpdateCategories, m => dlf != null && m.Sender != dlf && m.ObjectType == ObjectType.Document);
-                commentCountToken = CommonConfig.MessengerHub.Subscribe<EntityPreviewCommentCountChangedMessage>(dlf.UpdateCommentsCount, m => dlf != null && m.Sender != dlf && m.ObjectType == ObjectType.Document);
-                entityMovedFromFolderToken = CommonConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(dlf.UpdateMovedFromFolderEntities, m => dlf != null && m.Sender != dlf && dlf.Folder.Id == m.FromFolderId && m.ObjectType == ObjectType.Document);
-                entityRemovedFromFolderToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(dlf.UpdateRemovedFromFolderEntities, m => dlf != null && m.Sender != dlf && dlf.Folder.Id == m.FromFolderId && m.ObjectType == ObjectType.Document);
-                entityRemovedToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedMessage>(dlf.UpdateRemovedEntities, m => dlf != null && m.Sender != dlf && m.ObjectType == ObjectType.Document);
             }
         }
 
@@ -128,14 +105,6 @@ namespace reMark.Mobile.Droid.Ui.Activities
         protected override void OnDestroy()
         {
             base.OnDestroy();
-
-            readStatusToken?.Dispose();
-            priorityToken?.Dispose();
-            commentCountToken?.Dispose();
-            categoriesToken?.Dispose();
-            entityMovedFromFolderToken?.Dispose();
-            entityRemovedFromFolderToken?.Dispose();
-            entityRemovedToken?.Dispose();
         }
     }
 }

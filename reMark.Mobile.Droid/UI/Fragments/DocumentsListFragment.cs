@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Text.RegularExpressions;
 using Android.Content;
 using Android.Graphics;
 using Android.Graphics.Drawables;
@@ -22,7 +17,6 @@ using reMark.Mobile.Common.Utilities.Extensions;
 using reMark.Mobile.Droid.Ui.Activities;
 using reMark.Mobile.Droid.Ui.Common;
 using reMark.Mobile.Droid.Utilities;
-using Android.Content.Res;
 using AndroidX.CoordinatorLayout.Widget;
 using AndroidX.SwipeRefreshLayout.Widget;
 using AndroidX.RecyclerView.Widget;
@@ -40,7 +34,7 @@ using Preferences = reMark.Mobile.Droid.Utilities.Preferences;
 using Color = Android.Graphics.Color;
 using Paint = Android.Graphics.Paint;
 using Layout = Android.Text.Layout;
-using reMark.Mobile.Droid.UI;
+using TinyMessenger;
 
 
 namespace reMark.Mobile.Droid.Ui.Fragments
@@ -59,7 +53,17 @@ namespace reMark.Mobile.Droid.Ui.Fragments
         const string LastRowIdKey = "LastRowId_a92f8e84-7274-48e3-9296-3d52a9b3231c";
         protected const string HideSearchBundleKey = "HideSearchBundle_4ec1a10c-f9e5-43f8-8e73-c555f7679b43";
         protected const string OnlyShowExternalDocumentsBundleKey = "OnlyShowExternalDocuments_119623bc-74c6-4763-898a-319ea8fc9591";
+        protected const string OnlyShowUnreadDocumentsBundleKey = "OnlyShowUnreadDocuments_119623bc-74c6-4763-898a-319ea8fc9592";
 
+        #region Subscription tokens
+        TinyMessageSubscriptionToken readStatusToken;
+        TinyMessageSubscriptionToken priorityToken;
+        TinyMessageSubscriptionToken categoriesToken;
+        TinyMessageSubscriptionToken commentCountToken;
+        TinyMessageSubscriptionToken entityMovedFromFolderToken;
+        TinyMessageSubscriptionToken entityRemovedFromFolderToken;
+        TinyMessageSubscriptionToken entityRemovedToken;
+        #endregion
 
         const int AutoRefreshIntervalMs = 5 * 1000; // 5 seconds
 
@@ -75,25 +79,26 @@ namespace reMark.Mobile.Droid.Ui.Fragments
         RecyclerView recyclerView;
         SwipeHelperCallback swipeHelperCallback;
         ItemTouchHelper itemTouchHelper;
-        DocumentsListAdapter adapter;
-        DocumentsListAdapter searchAdapter;
-        ActionMode actionMode;
+        protected DocumentsListAdapter adapter;
+        protected DocumentsListAdapter searchAdapter;
+        protected ActionMode actionMode;
         FloatingActionButton fab;
         Category presetCategory;
 
-        bool shouldNotifyAdapter;
-        bool shouldNotifySearchAdapter;
+        protected bool shouldNotifyAdapter;
+        protected bool shouldNotifySearchAdapter;
 
         int savedFirstRowId = -1;
         int savedLastRowId = -1;
 
         bool hideSearch;
         bool onlyShowExternalDocuments;
+        bool onlyShowUnreadDocuments;
         public bool activityStartup;
 
         AutoRefreshWorker autoRefreshWorker;
 
-        Action dismissAction;
+        protected Action dismissAction;
 
         public static (DocumentsListFragment fragment, string tag) NewInstance(Folder folder)
         {
@@ -102,14 +107,14 @@ namespace reMark.Mobile.Droid.Ui.Fragments
             if (folder != null)
                 args.PutString(FolderBundleKey, Serializer.Serialize(folder));
 
-            var fragment = new DocumentsListFragment
+            var dlf = new DocumentsListFragment
             {
                 Arguments = args
             };
 
             var tag = $"{nameof(DocumentsListFragment)} [folder.id={folder.Id}, folder.name={folder.Name}]";
 
-            return (fragment, tag);
+            return (dlf, tag);
         }
 
         public override void OnCreate(Bundle savedInstanceState)
@@ -133,6 +138,9 @@ namespace reMark.Mobile.Droid.Ui.Fragments
 
             if (Arguments.ContainsKey(OnlyShowExternalDocumentsBundleKey))
                 onlyShowExternalDocuments = Arguments.GetBoolean(OnlyShowExternalDocumentsBundleKey);
+
+            if (Arguments.ContainsKey(OnlyShowUnreadDocumentsBundleKey))
+                onlyShowUnreadDocuments = Arguments.GetBoolean(OnlyShowUnreadDocumentsBundleKey);
         }
 
         #region Fragment overrides
@@ -144,7 +152,7 @@ namespace reMark.Mobile.Droid.Ui.Fragments
 
             var rootView = inflater.Inflate(Resource.Layout.list_with_searchbar, container, false);
 
-            coordinatorLayout = (CoordinatorLayout)container.Parent.Parent;
+            coordinatorLayout = (CoordinatorLayout)container.Parent.Parent.Parent.Parent;
 
             var emptyView = rootView.FindViewById<AppCompatTextView>(Resource.Id.empty_view);
             emptyView.SetText(Resource.String.empty_folder);
@@ -172,8 +180,10 @@ namespace reMark.Mobile.Droid.Ui.Fragments
             recyclerView.SetLayoutManager(new WrapContentLinearLayoutManager(Activity));
             recyclerView.AddItemDecoration(new DividerItemDecorator(Activity));
 
-            adapter = new DocumentsListAdapter(Activity, recyclerView, async (startId) => await RefreshData(startId));
-            adapter.FolderId = Folder.Id;
+            adapter = new DocumentsListAdapter(Activity, recyclerView, async (startId) => await RefreshData(startId))
+            {
+                FolderId = Folder.Id
+            };
             adapter.ItemClicked += Adapter_ItemClicked;
             adapter.ItemLongClicked += Adapter_ItemLongClicked;
             adapter.RegisterAdapterDataObserver(new LambdaEmptyAdapterObserver(() =>
@@ -209,18 +219,42 @@ namespace reMark.Mobile.Droid.Ui.Fragments
         public override void OnViewCreated(View view, Bundle savedInstanceState)
         {
             base.OnViewCreated(view, savedInstanceState);
-
+            
             ((AppCompatActivity)Activity).SupportActionBar.Title = GetString(Resource.String.documents);
             ((AppCompatActivity)Activity).SupportActionBar.Subtitle = Folder?.Name;
 
-            CommonConfig.Logger.Info($"Created {nameof(DocumentsListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]");
+            SubscribeToEvents();
 
+            CommonConfig.Logger.Info($"Created {nameof(DocumentsListFragment)} [folder.id={Folder?.Id}, folder.name={Folder?.Name}]");
+        }
+
+        public void SubscribeToEvents()
+        {
+            readStatusToken = CommonConfig.MessengerHub.Subscribe<DocumentPreviewReadStatusChangedMessage>(UpdateReadStatus, m => m.Sender != this);
+            priorityToken = CommonConfig.MessengerHub.Subscribe<DocumentPreviewPriorityChangedMessage>(UpdatePriority, m => m.Sender != this);
+            categoriesToken = CommonConfig.MessengerHub.Subscribe<EntityCategoriesChangedMessage>(UpdateCategories, m => m.Sender !=  this && m.ObjectType == ObjectType.Document);
+            commentCountToken = CommonConfig.MessengerHub.Subscribe<EntityPreviewCommentCountChangedMessage>(UpdateCommentsCount, m => m.Sender != this && m.ObjectType == ObjectType.Document);
+            entityMovedFromFolderToken = CommonConfig.MessengerHub.Subscribe<EntityMovedFromFolderMessage>(UpdateMovedFromFolderEntities, m => m.Sender != this && Folder.Id == m.FromFolderId && m.ObjectType == ObjectType.Document);
+            entityRemovedFromFolderToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedFromFolderMessage>(UpdateRemovedFromFolderEntities, m => m.Sender != this && Folder.Id == m.FromFolderId && m.ObjectType == ObjectType.Document);
+            entityRemovedToken = CommonConfig.MessengerHub.Subscribe<EntityRemovedMessage>(UpdateRemovedEntities, m => m.Sender != this && m.ObjectType == ObjectType.Document);
+        }
+
+        public void UnSubscribeFromEvents()
+        {
+            dismissAction?.Invoke();
+            readStatusToken?.Dispose();
+            priorityToken?.Dispose();
+            commentCountToken?.Dispose();
+            categoriesToken?.Dispose();
+            entityMovedFromFolderToken?.Dispose();
+            entityRemovedFromFolderToken?.Dispose();
+            entityRemovedToken?.Dispose();
         }
 
         public override void OnDestroyView()
         {
-            dismissAction?.Invoke();
-            base.OnDestroyView();
+           UnSubscribeFromEvents();
+           base.OnDestroyView();
         }
 
         public override async void OnResume()
@@ -425,6 +459,11 @@ namespace reMark.Mobile.Droid.Ui.Fragments
 
                 var documents = await Managers.DocumentsManager.GetDocumentPreviewsAsync(Folder, endId: endId);
 
+                if(onlyShowUnreadDocuments)
+                {
+                    documents = documents.FindAll((DocumentPreview dp) => dp.IsReadByCurrent == false);
+                }
+
                 var incomingCount = documents?.Count(d => d.Direction == DocumentDirection.Incoming && d.TransmitStatus != TransmitStatus.Delayed) ?? 0;
                 if (incomingCount > 0)
                 {
@@ -481,7 +520,12 @@ namespace reMark.Mobile.Droid.Ui.Fragments
                 }
 
                 if (onlyShowExternalDocuments)
-                    documentPreviews = documentPreviews.FindAll((DocumentPreview dp) => dp.Direction == DocumentDirection.External);
+                    documentPreviews = documentPreviews.FindAll(dp => dp.Direction == DocumentDirection.External);
+                else if (onlyShowUnreadDocuments)
+                {
+                    documentPreviews = documentPreviews.FindAll(dp => dp.IsReadByCurrent == false);
+                }
+
 
                 adapter.EnableLoadMore = documentPreviews.Count >= PlatformConfig.Preferences.DocumentsToDownload;
                 CommonConfig.Logger.Info($"Enable load more documents set to {adapter.EnableLoadMore}");
@@ -866,7 +910,7 @@ namespace reMark.Mobile.Droid.Ui.Fragments
             }
         }
 
-        async void MarkAsRead(List<DocumentPreview> items)
+        public virtual async void MarkAsRead(List<DocumentPreview> items)
         {
             CommonConfig.Logger.Info($"Attempting to mark as read [businessEntities.Count={items.Count}]...");
 
@@ -1184,104 +1228,81 @@ namespace reMark.Mobile.Droid.Ui.Fragments
 
         #region Messenger hub related
 
-        public void UpdateReadStatus(DocumentPreviewReadStatusChangedMessage m)
+        private void Update<T>(T message, Action<DocumentsListAdapter, DocumentPreview> updateAction) 
+        where T: IMessageWithId
         {
-            var position = adapter.GetPosition(m.DocumentPreviewId);
-            if (position >= 0)
+            var adapters = new DocumentsListAdapter[] { adapter, searchAdapter };
+            foreach (var adapter in adapters)
             {
-                shouldNotifyAdapter = true;
-                var dp = adapter.Items[position];
-                dp.IsReadByCurrent = m.IsReadByCurrent;
-                dp.IsReadByAnyone = m.IsReadByAnyone;
-            }
-
-            position = searchAdapter.GetPosition(m.DocumentPreviewId);
-            if (position >= 0)
-            {
-                shouldNotifySearchAdapter = true;
-                var dp = searchAdapter.Items[position];
-                dp.IsReadByCurrent = m.IsReadByCurrent;
-                dp.IsReadByAnyone = m.IsReadByAnyone;
+                var position = adapter.GetPosition(message.Id);
+                if (position >= 0)
+                {
+                    shouldNotifyAdapter = true;
+                    var dp = adapter.Items[position];
+                    updateAction(adapter, dp);
+                }
             }
         }
 
-        public void UpdatePriority(DocumentPreviewPriorityChangedMessage m)
-        {
-            var position = adapter.GetPosition(m.DocumentPreviewId);
-            if (position >= 0)
+        public virtual void UpdateReadStatus(DocumentPreviewReadStatusChangedMessage message){
+            if (message is IMessageWithId messageWithId)
             {
-                shouldNotifyAdapter = true;
-                var dp = adapter.Items[position];
-                dp.Priority = m.Priority;
-            }
-
-            position = searchAdapter.GetPosition(m.DocumentPreviewId);
-            if (position >= 0)
-            {
-                shouldNotifySearchAdapter = true;
-                var dp = searchAdapter.Items[position];
-                dp.Priority = m.Priority;
+                Update(messageWithId, (adapter, dp) =>
+                {
+                    dp.IsReadByCurrent = message.IsReadByCurrent;
+                    dp.IsReadByAnyone = message.IsReadByAnyone;
+                });
             }
         }
 
-        public void UpdateCategories(EntityCategoriesChangedMessage m)
+        public void UpdatePriority(DocumentPreviewPriorityChangedMessage message)
         {
-            var position = adapter.GetPosition(m.EntityId);
-            if (position >= 0)
+            if (message is IMessageWithId messageWithId)
             {
-                shouldNotifyAdapter = true;
-                var dp = adapter.Items[position];
-                dp.Categories.Clear();
-                dp.Categories.AddRange(m.Categories);
-                adapter.NotifyDataSetChanged();
-            }
-
-            position = searchAdapter.GetPosition(m.EntityId);
-            if (position >= 0)
-            {
-                shouldNotifySearchAdapter = true;
-                var dp = searchAdapter.Items[position];
-                dp.Categories.Clear();
-                dp.Categories.AddRange(m.Categories);
-                searchAdapter.NotifyDataSetChanged();
-            }
+                Update(messageWithId, (adapter, dp) =>
+                {
+                    dp.Priority = message.Priority;
+                });
+            }    
         }
 
-        public void UpdateCommentsCount(EntityPreviewCommentCountChangedMessage m)
+        public void UpdateCategories(EntityCategoriesChangedMessage message)
         {
-            var position = adapter.GetPosition(m.EntityId);
-            if (position >= 0)
+            if (message is IMessageWithId messageWithId)
             {
-                shouldNotifyAdapter = true;
-                var dp = adapter.Items[position];
-                dp.CommentsCount = m.CommentsCount;
-            }
+                Update(messageWithId, (adapter, dp) =>
+                {
+                    dp.Categories.Clear();
+                    dp.Categories.AddRange(message.Categories);
+                    adapter.NotifyDataSetChanged();
+                });
+            } 
+        }
 
-            position = searchAdapter.GetPosition(m.EntityId);
-            if (position >= 0)
+        public void UpdateCommentsCount(EntityPreviewCommentCountChangedMessage message)
+        {
+            if (message is IMessageWithId messageWithId)
             {
-                shouldNotifySearchAdapter = true;
-                var dp = searchAdapter.Items[position];
-                dp.CommentsCount = m.CommentsCount;
-            }
+                Update(messageWithId, (adapter, dp) =>
+                {
+                    dp.CommentsCount = message.CommentsCount;
+                });
+            } 
         }
 
         public void UpdateMovedFromFolderEntities(EntityMovedFromFolderMessage m)
         {
             foreach (var entityId in m.EntitiesId)
             {
-                var position = adapter.GetPosition(entityId);
-                if (position >= 0)
+                var adapters =  new DocumentsListAdapter[]{adapter, searchAdapter};
+                foreach(var adapter in adapters)
                 {
-                    shouldNotifyAdapter = true;
-                    adapter.RemoveItemAtPosition(position);
-                }
-
-                position = searchAdapter.GetPosition(entityId);
-                if (position >= 0)
-                {
-                    shouldNotifySearchAdapter = true;
-                    searchAdapter.RemoveItemAtPosition(position);
+                    var position = adapter.GetPosition(entityId);
+                    if (position >= 0)
+                    {
+                        shouldNotifyAdapter = true;
+                        adapter.RemoveItemAtPosition(position);
+                    }
                 }
             }
         }
@@ -1290,18 +1311,15 @@ namespace reMark.Mobile.Droid.Ui.Fragments
         {
             foreach (var entityId in m.EntitiesId)
             {
-                var position = adapter.GetPosition(entityId);
-                if (position >= 0)
+                var adapters =  new DocumentsListAdapter[]{adapter, searchAdapter};
+                foreach(var adapter in adapters)
                 {
-                    shouldNotifyAdapter = true;
-                    adapter.RemoveItemAtPosition(position);
-                }
-
-                position = searchAdapter.GetPosition(entityId);
-                if (position >= 0)
-                {
-                    shouldNotifySearchAdapter = true;
-                    searchAdapter.RemoveItemAtPosition(position);
+                    var position = adapter.GetPosition(entityId);
+                    if (position >= 0)
+                    {
+                        shouldNotifyAdapter = true;
+                        adapter.RemoveItemAtPosition(position);
+                    }
                 }
             }
         }
@@ -1312,18 +1330,15 @@ namespace reMark.Mobile.Droid.Ui.Fragments
             {
                 foreach (var entityId in m.EntitiesId)
                 {
-                    var position = adapter.GetPosition(entityId);
-                    if (position >= 0)
+                    var adapters =  new DocumentsListAdapter[]{adapter, searchAdapter};
+                    foreach(var adapter in adapters)
                     {
-                        shouldNotifyAdapter = true;
-                        adapter.RemoveItemAtPosition(position);
-                    }
-
-                    position = searchAdapter.GetPosition(entityId);
-                    if (position >= 0)
-                    {
-                        shouldNotifySearchAdapter = true;
-                        searchAdapter.RemoveItemAtPosition(position);
+                        var position = adapter.GetPosition(entityId);
+                        if (position >= 0)
+                        {
+                            shouldNotifyAdapter = true;
+                            adapter.RemoveItemAtPosition(position);
+                        }
                     }
                 }
             });
