@@ -1205,6 +1205,31 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 document.HtmlBody = await GetContent();
                 documentPreview.Direction = DocumentDirection.Outgoing;
 
+                async Task SaveAttachmentsLocally()
+                {
+                    try
+                    {
+                        var attachments = previousDocument.Attachments;
+                        foreach (var attachmentDescription in attachments)
+                        {
+                            var path = await Managers.DocumentsManager
+                                .GetAttachmentAsync(attachmentDescription, previousDocument, false, SourceType.Auto);
+                            var filename = attachmentDescription.SafeName;
+                            var stream = new FileStream(path, FileMode.Open, FileAccess.Read);
+                            await Managers.DocumentsManager.SaveDocumentWorkingCopyAttachmentAsync(filename, stream);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        CommonConfig.Logger.Error($"Failed to save attachments locally for forwarded email with Id={previousDocument.Id}]", ex.InnerException);
+                    }
+                }
+
+                if (DocumentCreationModeFlag == DocumentCreationModeFlag.Forward)
+                {
+                    await SaveAttachmentsLocally();
+                }
+            
                 await Managers.DocumentsManager.SaveDocumentWorkingCopyAsync(new DocumentWorkingCopy
                 {
                     DocumentCreationModeFlag = DocumentCreationModeFlag,
