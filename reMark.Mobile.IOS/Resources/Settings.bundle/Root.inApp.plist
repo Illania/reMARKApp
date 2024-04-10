@@ -518,9 +518,9 @@
 			<integer>0</integer>
 			<key>Titles</key>
 			<array>
-				<string>don&apos;t sync</string>
-				<string>sync with desktop</string>
-				<string>sync across devices</string>
+				<string>Don&apos;t sync</string>
+				<string>Sync with desktop</string>
+				<string>Sync across devices</string>
 			</array>
 			<key>Values</key>
 			<array>
