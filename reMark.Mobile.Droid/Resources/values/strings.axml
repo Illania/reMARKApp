@@ -144,6 +144,7 @@
     <string name="document_previous">Previous</string>
     <string name="document_next">Next</string>
     <string name="documents">Emails</string>
+    <string name="unread_documents">Unread emails</string>
     <string name="done">Done</string>
     <string name="dont_close_app">Please do not close the app before download is completed.\n\nClosing the app will interrupt download and all progress will be lost!</string>
     <string name="download">Download</string>

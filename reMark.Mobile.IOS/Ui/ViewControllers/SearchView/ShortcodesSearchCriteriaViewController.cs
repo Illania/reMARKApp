@@ -83,7 +83,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers.SearchView
                 {
                     Localization.GetString("save"),
                     Localization.GetString("save_as"),
-                });
+                }, savedSearchesView);
 
                 if (choice < 0)
                     return;

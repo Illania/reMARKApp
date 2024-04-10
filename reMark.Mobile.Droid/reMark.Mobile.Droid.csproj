@@ -12,6 +12,7 @@
     <JavaMaximumHeapSize>1G</JavaMaximumHeapSize>
     <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
     <SkipValidateMauiImplicitPackageReferences>true</SkipValidateMauiImplicitPackageReferences> 
+    <Configurations>Release;Debug</Configurations>
   </PropertyGroup>
     <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -19,8 +20,6 @@
     <RuntimeIdentifiers>android-arm;android-arm64;android-x86;android-x64</RuntimeIdentifiers> 
     <ProjectGuid>{18408F16-3AEB-4095-949F-3299BACA8B58}</ProjectGuid>
     <ProjectTypeGuids>{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -34,7 +33,7 @@
     <JavaMaximumHeapSize>1G</JavaMaximumHeapSize>
     <AndroidTlsProvider>btls</AndroidTlsProvider>
     <AndroidKeyStore>True</AndroidKeyStore>
-    <AndroidSigningKeyStore>/Users/mac/remark-appdroid/extra/App Development Certificates/Android/default.keystore</AndroidSigningKeyStore>
+    <AndroidSigningKeyStore>../../extra/Certificates/Android/default.keystore</AndroidSigningKeyStore>
     <AndroidSigningStorePass>Xs4Droid2015!</AndroidSigningStorePass>
     <AndroidSigningKeyAlias>default</AndroidSigningKeyAlias>
     <AndroidSigningKeyPass>Xs4Droid2015!</AndroidSigningKeyPass>
@@ -56,7 +55,7 @@
     <JavaMaximumHeapSize>1G</JavaMaximumHeapSize>
     <AndroidTlsProvider>btls</AndroidTlsProvider>
     <AndroidKeyStore>True</AndroidKeyStore>
-    <AndroidSigningKeyStore>../../extra/App Development Certificates/Android/default.keystore</AndroidSigningKeyStore>
+    <AndroidSigningKeyStore>../../extra/Certificates/Android/default.keystore</AndroidSigningKeyStore>
     <AndroidSigningStorePass>Xs4Droid2015!</AndroidSigningStorePass>
     <AndroidSigningKeyAlias>default</AndroidSigningKeyAlias>
     <AndroidSigningKeyPass>Xs4Droid2015!</AndroidSigningKeyPass>
@@ -151,5 +150,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Resources\Resource.designer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Resources/layout/pager_documentlist.axml" />
   </ItemGroup>
 </Project>

@@ -17,6 +17,11 @@ namespace reMark.Mobile.IOS.Ui.Common
         }
 
 
+        public UITextFieldScalable(IntPtr handle) : base(handle)
+        {
+            AdjustsFontForContentSizeCategory = true;
+        }
+
     }
 }
 

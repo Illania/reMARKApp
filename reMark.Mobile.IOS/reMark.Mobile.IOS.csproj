@@ -77,7 +77,7 @@
     <CodesignProvision>Mark5Mobile Distribution 2023</CodesignProvision>
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
 	</PropertyGroup>
-   <ItemGroup>
+  <ItemGroup>
     <None Remove="Resources\" />
   </ItemGroup>
   <ItemGroup>

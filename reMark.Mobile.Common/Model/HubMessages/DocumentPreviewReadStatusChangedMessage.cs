@@ -2,8 +2,9 @@
 
 namespace reMark.Mobile.Common.Model.HubMessages
 {
-    public class DocumentPreviewReadStatusChangedMessage : TinyMessageBase
+    public class DocumentPreviewReadStatusChangedMessage : TinyMessageBase, IMessageWithId
     {
+        public int Id => DocumentPreviewId;
         public int DocumentPreviewId { get; }
 
         public bool IsReadByCurrent { get; }
