@@ -26,6 +26,9 @@ build_ios_app-job:       # This job runs in the build_ios_app stage, which runs 
     - ios_build
   script:
     - fastlane ios build_release version_type:"patch"
+  only:
+    - merge_requests
+    - /^main$/
 
 build_android_app-job:       # This job runs in the build_android_app stage, which runs after build_ios_app stage.
   stage: build_android_app
@@ -33,4 +36,7 @@ build_android_app-job:       # This job runs in the build_android_app stage, whi
     - android_build
   script:
     - fastlane android build_release version_type:"patch"
+  only:
+    - merge_requests
+    - /^main$/
 
