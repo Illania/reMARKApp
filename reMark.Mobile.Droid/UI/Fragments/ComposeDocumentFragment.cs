@@ -943,6 +943,31 @@ namespace reMark.Mobile.Droid.Ui.Fragments
         {
             dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, saveDraft ? Resource.String.saving_draft : Resource.String.sending_document, Resource.String.please_wait);
 
+            async Task SaveAttachmentsLocally()
+            {
+                try
+                {
+                    var attachments = previousDocument.Attachments;
+                    foreach (var attachmentDescription in attachments)
+                    {
+                        var path = await Managers.DocumentsManager
+                            .GetAttachmentAsync(attachmentDescription, previousDocument, false, SourceType.Auto);
+                        var filename = attachmentDescription.SafeName;
+                        var stream = new FileStream(path, FileMode.Open, FileAccess.Read);
+                        await Managers.DocumentsManager.SaveDocumentWorkingCopyAttachmentAsync(filename, stream);
+                    }
+                }
+                catch(Exception ex)
+                {
+                    CommonConfig.Logger.Error($"Failed to save attachments locally for forwarded email with Id={previousDocumentId}]", ex.InnerException);
+                }
+            }
+
+            if (documentCreationModeFlag == DocumentCreationModeFlag.Forward)
+            {
+                await SaveAttachmentsLocally();
+            }
+
             await Managers.DocumentsManager.SaveDocumentWorkingCopyAsync(new DocumentWorkingCopy
             {
                 DocumentCreationModeFlag = documentCreationModeFlag,
