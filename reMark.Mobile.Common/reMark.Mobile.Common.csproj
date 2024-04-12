@@ -16,6 +16,12 @@
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-ios|AnyCPU'">
 	  <CreatePackage>false</CreatePackage>
 	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+	  <LangVersion>11.0</LangVersion>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+	  <LangVersion>11.0</LangVersion>
+	</PropertyGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\reMark.Mobile.Classes\reMark.Mobile.Classes.csproj">
 	    <ReferenceSourceTarget></ReferenceSourceTarget>

@@ -32,10 +32,11 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
             File = "Root.Login.inApp";
             ShowDoneButton = true;
             NeverShowPrivacySettings = true;
-            ShowCreditsFooter = false;
-            SettingsStore = new InMemorySettingsStore();
+            ShowCreditsFooter = false;          //var sslMode = values.SslMode != SslMode.Off;
 
-            SettingsStore.SetBool(values.SslMode != SslMode.Off, SslEnabledKey);
+            SettingsStore = new InMemorySettingsStore();
+            NSNumber sslEnabled = new NSNumber(values.SslMode != SslMode.Off);
+            SettingsStore.SetObject(sslEnabled, SslEnabledKey);
         }
 
         public override void ViewWillAppear(bool animated)
@@ -61,11 +62,14 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
         {
             if (RestrictedSettingsValuesUpdated != null)
             {
-                var sslEnabled = SettingsStore.GetBool(SslEnabledKey);
+                var sslEnabled = SettingsStore.GetObject(SslEnabledKey);
+                var ssl = false;
+                if(sslEnabled is NSNumber number)
+                    ssl = number.BoolValue;
 
                 var rsv = new SettingsValues();
 
-                if (sslEnabled)
+                if (ssl)
                     rsv.SslMode = SslMode.On;
                 else
                     rsv.SslMode = SslMode.Off;

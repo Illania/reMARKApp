@@ -11,6 +11,7 @@ namespace reMark.Mobile.Common.Model.Exceptions
             public static string FileCouldNotBeLoaded = "file_could_not_be_loaded";
             public static string LoginNeeded = "login_needed";
             public static string UnsupportedFile = "unsupported_file";
+            public static string CantGetEventFromMsGraph = "cant_get_event_from_ms_graph";
         }
 
         private static Dictionary<string, string> Messages = new Dictionary<string, string>
@@ -19,7 +20,8 @@ namespace reMark.Mobile.Common.Model.Exceptions
             { Codes.InvalidSourceType, "This action can only be performed when online." },
             { Codes.FileCouldNotBeLoaded, "File could not be loaded." },
             { Codes.LoginNeeded, "You need to log in to reMARK before you can use the app." },
-            { Codes.UnsupportedFile, "Unsupported file." }
+            { Codes.UnsupportedFile, "Unsupported file." },
+            { Codes.CantGetEventFromMsGraph, "Can't get event from MsGraph." }
         };
 
         public static string Message(string code)

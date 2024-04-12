@@ -45,7 +45,6 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                 documentsNavigationController,
                 contactsNavigationController,
                 shortcodesNavigationController,
-                SettingsNavigationController,
             };
         }
 

@@ -280,8 +280,8 @@ namespace reMark.Mobile.Common.Storage.AppFileStorage
                 throw new IOException("Cannot delete root storage folder.");
             }
             await AwaitExtensions.SwitchOffMainThreadAsync(cancellationToken);
-            EnsureExists();
-            Directory.Delete(Path, true);
+            if(Directory.Exists(Path))
+                Directory.Delete(Path, true);
         }
 
         void EnsureExists()

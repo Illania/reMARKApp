@@ -5,6 +5,7 @@ using reMark.Mobile.Common.Database;
 using reMark.Mobile.Common.Model;
 using reMark.ServiceReference;
 using reMark.Mobile.Common.Manager.Interfaces;
+using reMark.Mobile.Classes.AuthService;
 
 namespace reMark.Mobile.Common.Manager
 {
@@ -25,6 +26,7 @@ namespace reMark.Mobile.Common.Manager
         public static IFavoriteFoldersManager FavoriteFoldersManager { get; set; }
         public static IFavoriteFoldersManager FavoriteFoldersDesktopSyncManager { get; private set; }
         public static IFavoriteFoldersManager FavoriteFoldersDeviceSyncManager { get; private set; }
+        public static IMicrosoftGraphClient MicrosoftGraphClient { get; set; }
 
         public static void Initialize(ConnectionInfo connectionInfo, string appToken = "", AzureApplicationProxyInfo azureAppProxyInfo =  null)
         {

@@ -56,7 +56,7 @@ platform :ios do
       end
     )
   rescue StandardError => e
-    slack_on_error(e)
+    message_on_error(e)
   end
 
   desc 'Build iOS app release'
@@ -75,12 +75,6 @@ platform :ios do
         configuration: options[:configuration].nil? ? 'Release' : options[:configuration],
         ipa_name: 'remark.ipa'
       )
-<<<<<<< Updated upstream
-      slack_on_success
-    rescue StandardError => e
-      slack_on_error(e)
-    end
-=======
       ios_message_on_build_success()
     rescue StandardError => e
       message_on_error(e)
@@ -106,7 +100,6 @@ def ios_message_on_publish_success(release_type)
     ios_teams_on_publish_success(release_type)
   else
     raise "Messenger not supported"
->>>>>>> Stashed changes
   end
 end
 
@@ -122,28 +115,19 @@ end
 #endregion
 
 #region Slack
-<<<<<<< Updated upstream
-  def slack_on_success(message)
-=======
   def ios_slack_on_success(message, platform)
->>>>>>> Stashed changes
     slack(
       slack_url: ENV['SLACK_URL'],
       message: message,
       channel: ENV['SLACK_CHANNEL'],
       success: true,
-<<<<<<< Updated upstream
-      attachment_properties: { fields: [{ title: 'Version', value: get_version },
-                                        { title: 'Build number', value: get_build_number }] }
-=======
       attachment_properties: { fields: [{ title: 'Platform', value: platform },
                                         { title: 'Version', value: ios_version },
                                         { title: 'Build number', value: ios_build_number }] }
->>>>>>> Stashed changes
     )
   end
 
-  def ios_slack_on_error(exception)
+  def slack_on_error(exception)
     slack(
       slack_url: ENV['SLACK_URL'],
       message: 'Error occured ☹️!',
@@ -154,8 +138,6 @@ end
   end
 #endregion
 
-<<<<<<< Updated upstream
-=======
 #region Teams
 def ios_teams_on_build_success()
   teams_bot(
@@ -273,7 +255,6 @@ def ios_teams_on_build_success()
   end
 #endregion
 
->>>>>>> Stashed changes
 #region Deliver
   submission_information = {
     add_id_info_limits_tracking: false,
@@ -297,12 +278,8 @@ def ios_teams_on_build_success()
   desc 'Upload to Testflight'
   lane :release_beta do |options|
     begin
-<<<<<<< Updated upstream
-      groups = options[:type] == 'internal' ? ['internal'] : ['all']
-=======
       #possible types: 'internal', 'all', 'test'
       groups = options[:type]
->>>>>>> Stashed changes
       app_store_connect_api_key
       pilot(
         changelog: options[:changelog],
@@ -313,11 +290,6 @@ def ios_teams_on_build_success()
         skip_submission: false,
         skip_waiting_for_build_processing: false
       )
-<<<<<<< Updated upstream
-      slack_on_success('reMARK iOS app successfully uploaded to Testflight 📱')
-    rescue StandardError => e
-      slack_on_error(e)
-=======
       if groups == 'test'
         ios_message_on_publish_success('Test')
       elsif groups == 'internal'
@@ -327,7 +299,6 @@ def ios_teams_on_build_success()
       end
     rescue StandardError => e
       message_on_error(e)
->>>>>>> Stashed changes
     end
   end
 
@@ -349,13 +320,9 @@ def ios_teams_on_build_success()
         run_precheck_before_submit: false,
         submission_information: submission_information
       )
-<<<<<<< Updated upstream
-      slack_on_success('reMARK iOS app successfully uploaded to AppStore 📱')
-=======
       ios_message_on_publish_success('Release')
->>>>>>> Stashed changes
     rescue StandardError => e
-      slack_on_error(e)
+      message_on_error(e)
     end
   end
 #endregion
@@ -419,15 +386,6 @@ def android_slack_on_success(message, platform)
   )
 end
 
-def android_slack_on_error(exception)
-  slack(
-    slack_url: ENV['SLACK_URL'],
-    message: 'Error occured ☹️!',
-    channel: ENV['SLACK_CHANNEL'],
-    success: false,
-    attachment_properties: { fields: [{ title: 'Error message', value: exception }] }
-  )
-end
 #endregion
 
 #region Teams
@@ -560,13 +518,9 @@ end
       _apk_path="#{ENV['ANDROID_RELEASE_FOLDER_PATH']}/remark_#{android_build_number()}.apk"
       system("mv #{ENV['ANDROID_SIGNED_APK_PATH']} #{_apk_path}")
       sh "./upload.sh -e \"#{ENV['ATLASSIAN_EMAIL']}\" -t \"#{ENV['ATLASSIAN_API_TOKEN']}\" -f \"#{_apk_path}\" -c \"#{options[:comment]}\""
-<<<<<<< Updated upstream
-      slack_on_success('reMark Android app was succcessfully uploaded to Android Installers page')
-=======
       android_message_on_publish_success('Internal Beta')
->>>>>>> Stashed changes
     rescue StandardError => e
-      slack_on_error(e)
+      message_on_error(e)
     end
   end
 
@@ -582,13 +536,9 @@ end
         version_name: android_version,
         version_code: android_build_number
       )
-<<<<<<< Updated upstream
-      slack_on_success('reMark Android app was succcessfully uploaded to Google beta')
-=======
       android_message_on_publish_success('Public Beta')
->>>>>>> Stashed changes
     rescue StandardError => e
-      slack_on_error(e)
+      message_on_error(e)
     end
   end
 
@@ -605,13 +555,9 @@ end
         version_name: android_version,
         version_code: android_build_number
       )
-<<<<<<< Updated upstream
-      slack_on_success('reMark Android app was succcessfully uploaded to Google beta')
-=======
       android_message_on_publish_success('Release')
->>>>>>> Stashed changes
     rescue StandardError => e
-      slack_on_error(e)
+      message_on_error(e)
     end
   end
 #endregion

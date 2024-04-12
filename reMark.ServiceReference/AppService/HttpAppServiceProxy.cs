@@ -15,10 +15,11 @@ using reMark.ServiceReference.Utilities;
 using JwtDecoder = reMark.Mobile.Classes.JwtDecoder;
 using reMark.Mobile.Classes;
 using Polly;
-using Polly.Bulkhead;
 using Polly.Wrap;
 using System.ServiceModel;
 using reMark.Mobile.Classes.AuthService;
+using System.Data.SqlTypes;
+
 
 namespace reMark.ServiceReference.AppService
 {
@@ -32,7 +33,6 @@ namespace reMark.ServiceReference.AppService
         readonly string requestUri;
         string bearerToken;
         readonly AzureApplicationProxyInfo azureApplicationProxyInfo;
-        readonly AsyncPolicyWrap policy;
         readonly IReachability reachability;
         const int MAX_RETRIES = 3;
 
@@ -64,7 +64,7 @@ namespace reMark.ServiceReference.AppService
         }
 
         async Task<R> InvokeAsync<R, P>(string soapAction, P parameters, CancellationToken ct, bool useShortTimeout = false,
-                                           bool checkXmlCharacters = true) where R : class where P : class
+                                           bool checkXmlCharacters = true, bool retry = true) where R : class where P : class
         {
             HttpStatusCode statusCode = 0;
             var useBearerToken = !string.IsNullOrEmpty(bearerToken);
@@ -117,10 +117,10 @@ namespace reMark.ServiceReference.AppService
 
                 await RefreshAzureToken();
 
-                return await policy.ExecuteAsync(async () =>
-                {
+                if(retry)
+                    return await policy.ExecuteAsync(CreateRequestAsync);
+                else
                     return await CreateRequestAsync();
-                });
 
             }
             catch (Exception ex) when (!(ex is HttpAppServiceException))
@@ -335,7 +335,7 @@ namespace reMark.ServiceReference.AppService
 
         public async Task<ReplyToCalendarInvitationResult> ReplyToCalendarInvitationAsync(ReplyToCalendarInvitationParameters parameters, CancellationToken ct = default(CancellationToken))
         {
-            return await InvokeAsync<ReplyToCalendarInvitationResult, ReplyToCalendarInvitationParameters>("ReplyToCalendarInvitation", parameters, ct);
+            return await InvokeAsync<ReplyToCalendarInvitationResult, ReplyToCalendarInvitationParameters>("ReplyToCalendarInvitation", parameters, ct, retry: false);
         }
 
         public async Task<GetContactPreviewsResult> GetContactPreviewsAsync(GetContactPreviewsParameters parameters, CancellationToken ct = default(CancellationToken))

@@ -2,15 +2,19 @@
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Android.App;
 using Android.Content;
 using Android.Graphics;
 using Android.Views;
+using AndroidX.AppCompat.App;
 using AndroidX.AppCompat.Widget;
 using AndroidX.Core.Content;
+using Google.Android.Material.Dialog;
 using reMark.Mobile.Common;
 using reMark.Mobile.Common.Model;
 using reMark.Mobile.Common.Utilities;
 using reMark.Mobile.Droid.Ui.Common;
+using AlertDialog = AndroidX.AppCompat.App.AlertDialog;
 using Color = Android.Graphics.Color;
 
 namespace reMark.Mobile.Droid.Ui.Views.DocumentViews
@@ -20,11 +24,13 @@ namespace reMark.Mobile.Droid.Ui.Views.DocumentViews
         AppCompatTextView summaryLabel;
         AppCompatTextView whenLabel;
         AppCompatTextView respondButton;
+        Activity _activity;
 
         public event EventHandler<InvitationReplyDetailViewModel> ReplySelected = delegate { };
 
-        public CalendarInvitationView(Context context) : base(context)
+        public CalendarInvitationView(Context context, Activity activity) : base(context)
         {
+            _activity = activity;
             InitializeView();
         }
 
@@ -92,21 +98,25 @@ namespace reMark.Mobile.Droid.Ui.Views.DocumentViews
             var tcs = new TaskCompletionSource<InvitationReplyDetailViewModel>();
 
             var predefinedLine = LineUtilities.GetLineForCreationModeFlag(DocumentCreationModeFlag.Reply, Document, PlatformConfig.Preferences.AlwaysUseDefaultLine);
+
             var modalView = new InvitationReplyModalView(Context, invitation.Status, predefinedLine);
-            //TODO
-            //var builder = new MaterialDialog.Builder(Context).CustomView(modalView, false);
 
-            //var dialog = builder.Show();
+            var alertDialogBuilder = new AlertDialog.Builder(Context);
+            alertDialogBuilder.SetView(modalView);
+            
+            var dialog = alertDialogBuilder.Create();
+            dialog.Show();
 
-            //modalView.ResponseSelected += (object sender, InvitationReplyDetailViewModel e) =>
-            //{
-            //    dialog?.Dismiss();
-            //    tcs.SetResult(e);
-            //};
+            modalView.ResponseSelected += (object sender, InvitationReplyDetailViewModel e) =>
+            {
+                dialog.Dismiss();
+                tcs.SetResult(e);
+            };
 
-            //var responseDetails = await tcs.Task;
+            var responseDetails = await tcs.Task;
 
-            //ReplySelected(this, responseDetails);
+            ReplySelected(this, responseDetails);
+
         }
 
         public override Task RefreshView()

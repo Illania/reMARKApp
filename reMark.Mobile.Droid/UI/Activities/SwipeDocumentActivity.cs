@@ -27,7 +27,7 @@ namespace reMark.Mobile.Droid.Ui.Activities
         public const string NotificationGuidIntentKey = "NotificationGuid_0473a08d-5f96-4acd-924a-6d160a23cdf2";
 
         const int MaxNeighbours = 500;
-
+    
         int initialPosition;
 
         Toolbar toolbar;

@@ -94,7 +94,9 @@
     <ProjectReference Include="..\TinyMessenger\TinyMessenger.csproj">
       <ReferenceSourceTarget>ProjectReference</ReferenceSourceTarget>
     </ProjectReference>
-    <ProjectReference Include="..\FastScroller\FastScrollRecycler.csproj" />
+    <ProjectReference Include="..\FastScroller\FastScrollRecycler.csproj">
+      <ReferenceSourceTarget></ReferenceSourceTarget>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <GoogleServicesJson Include="google-services.json" />

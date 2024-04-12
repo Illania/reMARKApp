@@ -21,6 +21,7 @@ using DataContract = reMark.ServiceReference.DataContract;
 using ModuleType = reMark.Mobile.Common.Model.ModuleType;
 using DocumentPreview = reMark.Mobile.Common.Model.DocumentPreview;
 using reMark.Mobile.Classes.Enum;
+using reMark.Mobile.Classes.AuthService;
 
 namespace reMark.Mobile.Common.Manager
 {
@@ -370,7 +371,7 @@ namespace reMark.Mobile.Common.Manager
         }
 
         public async Task ReplyToCalendarInvitationAsync(Document document, DocumentPreview documentPreview, CalendarInvitation invitation,
-            ParticipantStatus answer, bool isSilent, int originalDocumentId, int originalDocumentFolderId,
+            Model.ParticipantStatus answer, bool isSilent, int originalDocumentId, int originalDocumentFolderId,
             SourceType sourceType = SourceType.Auto)
         {
             if (sourceType == SourceType.Auto)
@@ -378,6 +379,16 @@ namespace reMark.Mobile.Common.Manager
 
             if (sourceType == SourceType.Remote)
             {
+                var participantStatus = answer;
+                var calendarInvitation = invitation;
+                var addressName = document.Lines.Select(l => l.FromAddress).FirstOrDefault();
+                var docLinesAddresses = document.Lines.Select(l => l.FromAddress);
+                var attendeesToUpdate = invitation.Attendees.Where(att => docLinesAddresses.Contains(att.Name));
+                attendeesToUpdate.ForEach(att => att.Status = answer);
+
+                var result = await Managers.MicrosoftGraphClient.ImportFromICal((invitation.Id, invitation.Attendees),
+                new List<string> { addressName });
+
                 await AppServiceProxy.ReplyToCalendarInvitationAsync(new DataContract.ReplyToCalendarInvitationParameters
                 {
                     Token = Token,
@@ -387,11 +398,10 @@ namespace reMark.Mobile.Common.Manager
                     Answer = answer.ConvertEnum<DataContract.ParticipantStatus>(),
                     IsSilent = isSilent,
                     OriginalDocumentId = originalDocumentId,
-                    OriginalDocumentFolderId = originalDocumentFolderId,
+                    OriginalDocumentFolderId = originalDocumentFolderId
                 });
-
                 return;
-            }
+            }   
             else if (sourceType == SourceType.Local)
                 throw new ReMarkException(ErrorConstants.Codes.InvalidSourceType);
 

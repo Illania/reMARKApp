@@ -12,13 +12,13 @@ namespace reMark.Mobile.IOS.Common.CallId
         {
             TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
 
-            if(IsChinaCustomer())
-            {
+            //if(IsChinaCustomer())
+            //{
                 tcs.SetResult(false);
                 return tcs.Task;
-            }
+            //}
 
-            CXCallDirectoryManager.SharedInstance.GetEnabledStatusForExtension(extensionId,
+           /* CXCallDirectoryManager.SharedInstance.GetEnabledStatusForExtension(extensionId,
                                                                                (CXCallDirectoryEnabledStatus status, NSError statuserror) =>
             {
                 if (statuserror == null)
@@ -31,7 +31,7 @@ namespace reMark.Mobile.IOS.Common.CallId
                     tcs.SetException(new NSErrorException(statuserror));
                 }
             });
-            return tcs.Task;
+            return tcs.Task;*/
         }
 
         public static void ReloadExtension()

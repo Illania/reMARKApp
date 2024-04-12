@@ -13,6 +13,8 @@ using View = Android.Views.View;
 using DatePicker = Android.Widget.DatePicker;
 using ProgressBar = Android.Widget.ProgressBar;
 using TimePicker = Android.Widget.TimePicker;
+using Polly;
+using Context = Android.Content.Context;
 
 namespace reMark.Mobile.Droid.Ui.Common
 {

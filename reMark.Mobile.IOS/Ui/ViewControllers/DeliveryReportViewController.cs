@@ -34,6 +34,8 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
             if (Integration.IsRunningAtLeast(11))
                 NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Never;
 
+            if(NavigationController!=null)
+                NavigationController.NavigationBar.LargeTitleTextAttributes = new UIStringAttributes(){ForegroundColor = Theme.DarkBlue};
         }
 
         public override void LoadView()
