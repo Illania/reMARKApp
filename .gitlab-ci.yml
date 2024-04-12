@@ -25,6 +25,8 @@ variables:
   LANG: "en_US.UTF-8"
 
 before_script:
+  - gem install bundler
+  - bundle install
   - bundle exec fastlane update_plugins
 
 build_ios_app-job:       # This job runs in the build_ios_app stage, which runs first.
