@@ -2,26 +2,31 @@
 <testsuites>
   <testsuite name="fastlane.lanes">
     
-      <testcase classname="fastlane.lanes" name="0: default_platform" time="0.000425">
-      </testcase>
     
-
-      <testcase classname="fastlane.lanes" name="1: app_store_connect_api_key" time="0.005948">
-      </testcase>
-
-      <testcase classname="fastlane.lanes" name="1: bump_version" time="0.004027">
-      </testcase>
     
-
-      <testcase classname="fastlane.lanes" name="2: bump_code" time="0.001093">
-      </testcase>
-    
-
-      <testcase classname="fastlane.lanes" name="3: dotnet" time="75.129429">       
-      </testcase>
-   
       
-      <testcase classname="fastlane.lanes" name="4: teams_bot" time="2.03908">
+      <testcase classname="fastlane.lanes" name="0: default_platform" time="0.000533">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="1: bump_version" time="0.001255">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="2: bump_code" time="0.000728">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="3: dotnet" time="319.373335">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="4: teams_bot" time="1.505764">
+        
       </testcase>
     
   </testsuite>
