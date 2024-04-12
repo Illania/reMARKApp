@@ -39,14 +39,6 @@ Build iOS app release
 
 Upload to Testflight
 
-### ios teams_test
-
-```sh
-[bundle exec] fastlane ios teams_test
-```
-
-Test Teams
-
 ### ios release
 
 ```sh
