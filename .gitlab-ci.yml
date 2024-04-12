@@ -17,12 +17,20 @@
 # https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Getting-Started.gitlab-ci.yml
 
 stages:          # List of stages for jobs, and their order of execution
-  - build
+  - build_ios_app
+  - build_android_app
 
-build-job:       # This job runs in the build stage, which runs first.
-  stage: build
+build_ios_app-job:       # This job runs in the build_ios_app stage, which runs first.
+  stage: build_ios_app
   tags:
     - ios_build
   script:
     - fastlane ios build_release version_type:"patch"
+
+build_android_app-job:       # This job runs in the build_android_app stage, which runs after build_ios_app stage.
+  stage: build_android_app
+  tags:
+    - android_build
+  script:
+    - fastlane android build_release version_type:"patch"
 
