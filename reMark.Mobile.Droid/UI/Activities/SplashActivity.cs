@@ -28,7 +28,7 @@ using reMark.Mobile.Droid.Utilities.Workers;
 using Microsoft.AppCenter.Crashes;
 using TinyIoC;
 using AndroidX.AppCompat.Widget;
-//using Com.Airbnb.Lottie;
+using Com.Airbnb.Lottie;
 using System.Diagnostics;
 using Microsoft.AppCenter;
 using ProgressBar = Android.Widget.ProgressBar;
@@ -265,7 +265,7 @@ namespace reMark.Mobile.Droid.Ui.Activities
                 }
 
 
-                /*RunOnUiThread(() =>
+                RunOnUiThread(() =>
                 {
                     var animationView = FindViewById<LottieAnimationView>(Resource.Id.animation_view);
 
@@ -275,7 +275,7 @@ namespace reMark.Mobile.Droid.Ui.Activities
                         animationView.Animate().Alpha(1f).SetDuration(200);
                     }
 
-                });*/
+                });
                 
 
                 CommonConfig.Logger.Info("Updating file system storage...");
@@ -406,13 +406,9 @@ namespace reMark.Mobile.Droid.Ui.Activities
             progressBar.Visibility = ViewStates.Gone;
             loginButton.Visibility = ViewStates.Visible;
 
-            //var animationView = FindViewById<LottieAnimationView>(Resource.Id.animation_view);
-            //animationView.Alpha = 1f;
-            //animationView.PlayAnimation();
-
-            var animationView = FindViewById<ImageView>(Resource.Id.animation_view);
-            animationView.SetImageResource(Resource.Drawable.appicon_gray);
-
+            var animationView = FindViewById<LottieAnimationView>(Resource.Id.animation_view);
+            animationView.Alpha = 1f;
+            animationView.PlayAnimation();
             
         }
     }

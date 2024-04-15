@@ -10,7 +10,7 @@ using AndroidX.AppCompat.Widget;
 using AndroidX.Core.Content;
 using AndroidX.Preference;
 using AndroidX.ViewPager.Widget;
-//using Com.Airbnb.Lottie;
+using Com.Airbnb.Lottie;
 using reMark.Mobile.Common;
 using reMark.Mobile.Droid.Ui.Common;
 using Color = Android.Graphics.Color;
@@ -186,7 +186,7 @@ namespace reMark.Mobile.Droid.Utilities
                 if (position == 0)
                 {
                   
-                    /*var animationView = new LottieAnimationView(context);
+                    var animationView = new LottieAnimationView(context);
                     animationView.SetAnimation("splash.json");
 
                     var ip = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
@@ -198,18 +198,6 @@ namespace reMark.Mobile.Droid.Utilities
                     animationView.SetScaleType(ImageView.ScaleType.FitStart);
                     animationView.SetMaxHeight(maxHeight);
                     animationView.PlayAnimation();
-                    topView = animationView;*/
-                    
-                    var animationView = new ImageView(context);
-                    var ip = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
-                    {
-                        Gravity = (GravityFlags)(int)GravityFlags.Center
-                    };
-                    animationView.SetImageResource(Resource.Drawable.appicon_gray);
-                    animationView.LayoutParameters = ip;
-                    animationView.SetAdjustViewBounds(true);
-                    animationView.SetScaleType(ImageView.ScaleType.FitStart);
-                    animationView.SetMaxHeight(maxHeight);
                     topView = animationView;
                     
                 }
