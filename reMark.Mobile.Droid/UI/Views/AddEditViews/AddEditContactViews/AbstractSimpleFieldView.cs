@@ -34,7 +34,7 @@ namespace reMark.Mobile.Droid.Ui.Views.AddEditContactViews
 
             this.errorResourceId = errorResourceId;
 
-            var textInputLayout = new TextInputLayout(Context)
+            var textInputLayout = new LinearLayoutCompat(Context)
             {
                 LayoutParameters = new LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1.0f),
             };
@@ -62,7 +62,7 @@ namespace reMark.Mobile.Droid.Ui.Views.AddEditContactViews
             }
 
             textInputLayout.AddView(contentEditText);
-            textInputLayout.HintEnabled = floatingHint;
+            //textInputLayout.HintEnabled = floatingHint;
 
             var topBottomDistance = floatingHint ? 0 : DistanceSmall;
             var leftDistance = DistanceLarge;
