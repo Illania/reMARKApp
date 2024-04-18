@@ -85,6 +85,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
         {
             HidesBottomBarWhenPushed = true;
             this.forceShowActionBar = forceShowActionBar;
+            NavigationController?.SetToolbarHidden(true, false);
         }
 
         #region UIViewController overrides
