@@ -29,10 +29,10 @@
             extensionItems, $extensionItem,
             SUBQUERY (
             $extensionItem.attachments, $attachment,
-            ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO &quot;public.file-url&quot; ||
-            ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO &quot;public.text&quot; ||
-            ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO &quot;public.vcard&quot; ||
-            ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO &quot;public.image&quot; 
+            ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.file-url" ||
+            ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.text" ||
+            ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.vcard" ||
+            ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.image" 
  ).@count &gt;= 1
             ).@count &gt; 0</string>
 		</dict>

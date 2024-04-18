@@ -242,6 +242,7 @@ namespace reMark.Mobile.IOS.Ui.Common
 
         protected void CreateDocumentFromSharingOptions()
         {
+            openedfromSharingOptions = false;
             if (sharingOptions == null)
                 return;
 

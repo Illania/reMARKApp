@@ -2,6 +2,6 @@
 {
     public static class ShareExtensionContainerUtilities
     {
-        public const string AppGroupId = "group.com.nordic-it.reMark.Mobile.IOS.";
+        public const string AppGroupId = "group.com.nordic-it.mark5.mobile.ios";
     }
 }

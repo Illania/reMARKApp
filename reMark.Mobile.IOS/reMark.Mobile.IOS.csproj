@@ -9,6 +9,7 @@
     <UseMaui>true</UseMaui>
     <SkipValidateMauiImplicitPackageReferences>true</SkipValidateMauiImplicitPackageReferences> 
     <Configurations>Debug;Release</Configurations>
+    <Registrar>dynamic</Registrar>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <RootNamespace>reMark.Mobile.IOS</RootNamespace>
@@ -42,6 +43,7 @@
     <CodesignKey>Apple Development: Lars Hansen (TUYUES9KMZ)</CodesignKey>
 		<CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
 		<CodesignProvision>remark mobile dev</CodesignProvision> 
+		<CodesignExtraArgs></CodesignExtraArgs> 
   </PropertyGroup>
 	 <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <RootNamespace>reMark.Mobile.IOS</RootNamespace>
@@ -533,9 +535,14 @@
     <ProjectReference Include="..\reMark.Mobile.Classes\reMark.Mobile.Classes.csproj" />
     <ProjectReference Include="..\reMark.Mobile.Common\reMark.Mobile.Common.csproj" />
     <ProjectReference Include="..\reMark.Mobile.IOS.Common\reMark.Mobile.IOS.Common.csproj" />
+    <ProjectReference Include="..\reMark.Mobile.IOS.Extensions.Share\reMARK.Mobile.IOS.Extensions.Share.csproj" >
+      <IsAppExtension>true</IsAppExtension>
+      <IsWatchApp>false</IsWatchApp>
+    </ProjectReference>
     <ProjectReference Include="..\reMark.ServiceReference.Exceptions\reMark.ServiceReference.Exceptions.csproj" />
     <ProjectReference Include="..\reMark.ServiceReference\reMark.ServiceReference.csproj" />
     <ProjectReference Include="..\SVProgressHUD\SVProgressHUD.csproj" />
+    <ProjectReference Include="..\TinyMessenger\TinyMessenger.csproj" />
   </ItemGroup>
   <ItemGroup>
     <MauiIcon Include="Resources\AppIcon\appicon.svg" Color="#FFFFFF" />
