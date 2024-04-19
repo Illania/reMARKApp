@@ -80,7 +80,7 @@ namespace reMark.Mobile.IOS.Ui.Common
             CurrentViewController = vc;
         }
 
-        private void CreateRightBarButtonsWithToggle(UIViewController vc)
+        public void CreateRightBarButtonsWithToggle(UIViewController vc)
         {
             var rightBarButtonItems = new List<UIBarButtonItem>();
 

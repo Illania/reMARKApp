@@ -1632,18 +1632,22 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
             }
 
             tableView.SetEditing(true, true);
-            NavigationItem.SetRightBarButtonItems(new[] { exitEditItem, selectAllItem }, true);
-            NavigationItem.SetLeftBarButtonItem(editItem, true);
-
-            selectAllEnabled = true;
+            ParentViewController?.NavigationItem.SetRightBarButtonItems(new[] { exitEditItem, selectAllItem }, true);
+            ParentViewController?.NavigationItem.SetLeftBarButtonItem(editItem, true);
+            
+            selectAllEnabled= true;
             selectAllItem.Image = UIImage.FromBundle("SelectAll");
         }
 
         public void EndEditing(UITableView tableView)
         {
             tableView.SetEditing(false, true);
-            NavigationItem.SetRightBarButtonItems(new[] { goToBookmarkItem }, false);
-            NavigationItem.SetLeftBarButtonItem(NavigationItem.BackBarButtonItem, true);
+            if (ParentViewController is DocumentsSegmentListViewController documentsSegmentListVc)
+            {
+                NavigationItem.SetRightBarButtonItems(new[] { goToBookmarkItem }, false); 
+                documentsSegmentListVc.CreateRightBarButtonsWithToggle(this);
+            }
+            ParentViewController?.NavigationItem.SetLeftBarButtonItem(NavigationItem.BackBarButtonItem, true);
         }
 
         void UpdatePriorityForDocument(IEnumerable<int> ids)
