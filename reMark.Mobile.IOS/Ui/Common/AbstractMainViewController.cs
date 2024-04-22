@@ -367,7 +367,7 @@ namespace reMark.Mobile.IOS.Ui.Common
                 case NavigationModule.NavigationModuleType.Shortcodes:
                     module = ModuleType.Shortcodes;
                     moduleNavigationButton.SetImage(UIImage.FromBundle(nextModule.Image).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
-                    SelectedIndex = 3;
+                    SelectedIndex = 2;
                     break;
                 case NavigationModule.NavigationModuleType.Settings:
                     moduleNavigationButton.SetImage(UIImage.FromBundle(nextModule.Image).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
