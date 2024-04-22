@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 using BackgroundTasks;
 using Firebase.CloudMessaging;
 using Firebase.Core;
@@ -19,7 +14,6 @@ using reMark.Mobile.Common.Model;
 using reMark.Mobile.Common.Model.HubMessages;
 using reMark.Mobile.Common.Service;
 using reMark.Mobile.Common.Storage;
-using reMark.Mobile.Common.Storage.AppFileStorage;
 using reMark.Mobile.Common.Storage.AppFileStorage.Enum;
 using reMark.Mobile.Common.Utilities;
 using reMark.Mobile.IOS.Common.ShareExtension;
@@ -39,8 +33,6 @@ using UserNotifications;
 using CoreSpotlight;
 using reMark.Mobile.Common.Job;
 using reMark.Mobile.Classes.Enum;
-using Firebase.Analytics;
-using reMark.Mobile.IOS;
 using ActivityIndicator = reMark.Mobile.IOS.Utilities.ActivityIndicator;
 using FileSystem = reMark.Mobile.Common.Storage.AppFileStorage.FileSystem;
 using Preferences = reMark.Mobile.IOS.Utilities.Preferences;
@@ -52,12 +44,10 @@ namespace reMark.Mobile.IOS
     {
         private IPushNotificationsRegistrator pushNotificationsRegistrator;
         const string backgroundTaskID = "com.nordic-it.reMark.Mobile.IOS.task";
-        private const string syncFusionLicenseKey = "NzY3ODA5QDMyMzAyZTMzMmUzMGFhRnVyQmNGbHlINlQwSXhoTVIvVExDTTJSQTlRUEhyN3I3Mmt6RHBBQlE9";
         DateTime lastForegroundTaskRunDate = DateTime.MinValue;
 
         public override UIWindow Window { get; set; }
         private bool isLoggedIn = false;
-        public SpotlightSearchManager SpotlightSearchManager { get; private set; }
 
         public override bool WillFinishLaunching(UIApplication application, NSDictionary launchOptions)
         {
@@ -127,6 +117,7 @@ namespace reMark.Mobile.IOS
         //This function is necessary for Microsoft Authentication
         public override bool OpenUrl(UIApplication app, NSUrl url, NSDictionary options)
         {
+            var containerUrl = NSFileManager.DefaultManager.GetContainerUrl(ShareExtensionContainerUtilities.AppGroupId);
             if (url.Scheme == "remark.share.url" || url.Scheme == "remark.share.text")
             {
 
@@ -137,20 +128,23 @@ namespace reMark.Mobile.IOS
                     SharedContentInsertType insertType = SharedContentInsertType.File;
                     if (url.Scheme == "remark.share.url")
                     {
-                        var data = url.AbsoluteString.Replace("remark.share.url://", "");
-                        var pathArray = data.Split(';');
+                        var data = url.AbsoluteString?.Replace("remark.share.url://", "");
+                        if (string.IsNullOrEmpty(data)) 
+                            return true;
                         
-                        foreach (var path in pathArray)
-                        {
-                            urlList.Add(NSUrl.FromFilename(path));
-                        }
+                        var pathArray = data.Split(';');
 
+                        urlList.AddRange(pathArray.Select(fileName => containerUrl.Append(fileName, false)));
                     }
                     else if(url.Scheme == "remark.share.text")
                     {
                         insertType = SharedContentInsertType.Text;
-                        var textFilePath = url.AbsoluteString.Replace("remark.share.text://", "");
-                        urlList.Add(new NSUrl(textFilePath));
+                        var data = url.AbsoluteString?.Replace("remark.share.text://", "");
+                        if (string.IsNullOrEmpty(data)) 
+                            return true;
+                        var fileName = data.Split(';')[0];
+                        var sharedFileUrl = containerUrl.Append(fileName, false);
+                        urlList.Add(sharedFileUrl);
                     }
 
 
@@ -235,10 +229,6 @@ namespace reMark.Mobile.IOS
             UIApplication.SharedApplication.SetMinimumBackgroundFetchInterval(OneDayInterval);
 
             Window.MakeKeyAndVisible();
-
-            //Check note on background task down
-            //if (UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
-            //    BGTaskScheduler.Shared.Register(backgroundTaskID, null, HandleBackgroundTask);
 
             if (launchOptions == null)
                 return true;
@@ -356,10 +346,6 @@ namespace reMark.Mobile.IOS
             Services.ActionSyncService?.Stop();
 
             LocalAuthenticationManager.NotifyApplicationEnteredBackground();
-
-            //Check note on background task down
-            //if (UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
-            //    ScheduleBackgroundTask();
         }
 
         public override void ReceiveMemoryWarning(UIApplication application)
