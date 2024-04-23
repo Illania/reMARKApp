@@ -37,7 +37,7 @@
     <AndroidSigningStorePass>Xs4Droid2015!</AndroidSigningStorePass>
     <AndroidSigningKeyAlias>default</AndroidSigningKeyAlias>
     <AndroidSigningKeyPass>Xs4Droid2015!</AndroidSigningKeyPass>
-    <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
+    <EmbedAssembliesIntoApk>false</EmbedAssembliesIntoApk>
     <AndroidDexTool>d8</AndroidDexTool>
     <LangVersion>12.0</LangVersion>
   </PropertyGroup>
