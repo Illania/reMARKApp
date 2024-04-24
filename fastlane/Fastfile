@@ -211,7 +211,7 @@ def ios_teams_on_build_success()
   def get_user_guides_confluence_page_link()
     numbers = ios_version.scan(/\d+\.\d+/)
     major_minor_version = numbers.first
-    return "[User guides](#{ENV['USER_GUIDES_CONFLUENCE_LINK']}/#{major_minor_version})"
+    return "[User guides](#{ENV['USER_GUIDES_CONFLUENCE_LINK']})"
   end
 
   def get_test_plan_confluence_page_link()
@@ -220,19 +220,17 @@ def ios_teams_on_build_success()
 
   def ios_get_text_for_release_type(release_type)
     text = ""
-    if release_type == 'Test'
+    if release_type == "Test"
       text << "reMARK iOS app Dev Test Beta version #{ios_version()} (build #{((ios_build_number()))}) has been successfully uploaded to Testflight.\n"
-    elsif release_type == 'Internal Beta'
+    elsif release_type == "Internal beta"
       text << "reMARK iOS app Internal Beta version #{ios_version()} (build #{ios_build_number()}) has been successfully uploaded to Testflight.\n"
-    elsif release_type == "Public Beta"
+    elsif release_type == "Public beta"
       text << "reMARK iOS app Public Beta version #{ios_version()} (build #{ios_build_number()}) has been successfully uploaded to Testflight.\n"
-    else
-      text = "reMARK iOS app Public Beta version #{ios_version()} (build #{ios_build_number()}) has been successfully uploaded to AppStore.\n"
     end
     text << "Please refer to #{ios_get_release_confluence_page_link()} for complete resolved tickets list.\n"
     text << "Also please check out #{get_user_guides_confluence_page_link()} to see setup guides for new features.\n"
 
-    if release_type == 'Internal Beta'
+    if release_type == "Internal beta"
       text << "Note for Support Team: please download and check out the updated #{get_test_plan_confluence_page_link()}."
     end
     return text
@@ -452,19 +450,17 @@ def android_teams_on_publish_success(release_type)
 
 def android_get_text_for_release_type(release_type)
   text = ""
-  if release_type == 'Test'
+  if release_type == "Test"
     text << "reMARK Android app Dev Test Beta version #{android_version()} (build #{android_build_number()}) has been successfully published.\n"
-  elsif release_type == 'Internal Beta'
+  elsif release_type == "Internal beta"
     text << "reMARK Android app Internal Beta version #{android_version()} (build #{android_build_number()}) has been successfully uploaded to #{android_get_installers_confluence_page_link()}.\n"
-  elsif release_type == "Public Beta"
+  elsif release_type == "Public beta"
     text << "reMARK Android app Public Beta version #{android_version()} (build #{android_build_number()}) has been successfully uploaded to Google Play Beta.\n"
-  else
-    text << "reMARK Android app Public Beta version #{android_version()} (build #{android_build_number()}) has been successfully uploaded to AppStore.\n"
   end
   text << "Please refer to #{android_get_release_confluence_page_link()} for complete resolved tickets list.\n"
   text <<  "Also please check out #{get_user_guides_confluence_page_link()} to see setup guides for new features.\n"
 
-  if release_type == 'Internal Beta'
+  if release_type == "Internal beta"
     text << "Note for Support Team: please download and check out the updated #{get_test_plan_confluence_page_link()}."
   end
   return text
@@ -518,7 +514,7 @@ end
       _apk_path="#{ENV['ANDROID_RELEASE_FOLDER_PATH']}/remark_#{android_build_number()}.apk"
       system("mv #{ENV['ANDROID_SIGNED_APK_PATH']} #{_apk_path}")
       sh "./upload.sh -e \"#{ENV['ATLASSIAN_EMAIL']}\" -t \"#{ENV['ATLASSIAN_API_TOKEN']}\" -f \"#{_apk_path}\" -c \"#{options[:comment]}\""
-      android_message_on_publish_success('Internal Beta')
+      #android_message_on_publish_success('Internal beta')
     rescue StandardError => e
       message_on_error(e)
     end
@@ -536,7 +532,7 @@ end
         version_name: android_version,
         version_code: android_build_number
       )
-      android_message_on_publish_success('Public Beta')
+      android_message_on_publish_success('Public beta')
     rescue StandardError => e
       message_on_error(e)
     end

@@ -1,4 +1,5 @@
 1. Added possibility to send email as plain text.
 2. Added possibility to accept/decline invitations for Office 365 calendars.
 3. Added possibility to add emails as attachments.
-4. Implemented filter bar for documents.
+4. Added quick filter for unread messages.
+4. Added filter bar for documents.
