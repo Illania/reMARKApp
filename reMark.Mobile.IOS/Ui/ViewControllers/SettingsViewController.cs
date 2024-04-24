@@ -11,7 +11,7 @@ using reMark.Mobile.Common.Authenticator;
 using reMark.Mobile.Common.Manager;
 using reMark.Mobile.Common.Model;
 using reMark.Mobile.Common.Utilities;
-//using reMark.Mobile.IOS.Common.CallId;
+using reMark.Mobile.IOS.Common.CallId;
 using reMark.Mobile.IOS.Ui.Common;
 using reMark.Mobile.IOS.Ui.TableViewCells;
 using reMark.Mobile.IOS.Utilities;
@@ -20,6 +20,7 @@ using UIKit;
 using reMark.Mobile.IOS.Ui.ViewControllers.AutoReply;
 using reMark.Mobile.Classes.Enum;
 using AngleSharp.Io;
+using Microsoft.Maui.Platform;
 using Preferences = reMark.Mobile.IOS.Utilities.Preferences;
 using DeviceType = reMark.Mobile.Common.Model.DeviceType;
 
@@ -66,7 +67,6 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
             ShowCreditsFooter = false;
             Delegate = this;
             base.NavigationItem.RightBarButtonItem = null;
-            
         }
 
 
@@ -159,15 +159,171 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
 
             return size.Height + 10f;
         }
+        
+        public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
+        {
+            var specifier = SettingsReader.GetSpecifier(indexPath);
+            return specifier.Key == LocalTemplateKey ? 150 : 44;
+        }
+
 
         public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
         {
-            var cell = base.GetCell(tableView, indexPath);
+            var specifier = SettingsReader.GetSpecifier(indexPath);
 
+            var cell = base.GetCell(tableView, indexPath);
+            
+            switch (specifier.Key)
+            {
+                case CallerIdentificationEnabled:
+                    cell = GetCallerIdCell(tableView, cell, specifier);
+                    break;
+                case LocalTemplateKey:
+                    cell = GetLocalTemplateCell(tableView, cell);
+                    break;
+                case UsernameKey:
+                    cell = GetUsernameCell(tableView, cell, specifier);
+                    break;
+                case ServerAddressKey:
+                    cell = GetServerAddressCell(tableView, cell, specifier);
+                    break;
+                case SslEnabledKey:
+                    cell = GetSslCell(tableView, cell, specifier);
+                    break;
+                case AzureTokenKey:
+                    cell = GetAzureTokenCell(tableView, cell, specifier);
+                    break;
+                case VersionKey:
+                    cell = GetVersionCell(tableView, cell, specifier);
+                    break;
+                case EmailSwipeActionsKey:
+                    cell = GetEmailSwipeActionsCell(tableView, cell, specifier);
+                    break;
+                case ManageExtraFieldsKey:
+                    cell = GetManageExtraFieldsCell(tableView, cell, specifier);
+                    break;
+                case PresetCategoryKey:
+                    cell = GetPresetCategoryCell(tableView, cell, specifier);
+                    break;
+            }
+            
             if (cell.TextLabel != null)
                 cell.TextLabel.Font = Theme.DefaultFont.CustomFont();
             if (cell.DetailTextLabel != null)
                 cell.DetailTextLabel.Font = Theme.DefaultLightFont.CustomFont();
+
+            return cell;
+        }
+
+        private static UITableViewCell GetPresetCategoryCell(UITableView tableView, UITableViewCell cell, SettingsSpecifier specifier)
+        {
+            cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
+            cell.TextLabel.Text = specifier.Title;
+            cell.DetailTextLabel.Text = "";
+            cell.DetailTextLabel.TextColor = Theme.DarkGray;
+            return cell;
+        }
+
+        private static UITableViewCell GetManageExtraFieldsCell(UITableView tableView, UITableViewCell cell, SettingsSpecifier specifier)
+        {
+            cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
+            cell.TextLabel.Text = specifier.Title;
+            cell.DetailTextLabel.Text = "";
+            cell.DetailTextLabel.TextColor = Theme.DarkGray;
+            return cell;
+        }
+
+        private static UITableViewCell GetEmailSwipeActionsCell(UITableView tableView, UITableViewCell cell, SettingsSpecifier specifier)
+        {
+            cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
+            cell.TextLabel.Text = specifier.Title;
+            cell.DetailTextLabel.Text = "";
+            cell.DetailTextLabel.TextColor = Theme.DarkGray;
+            return cell;
+        }
+
+        private static UITableViewCell GetVersionCell(UITableView tableView, UITableViewCell cell, SettingsSpecifier specifier)
+        {
+            cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
+            cell.TextLabel.Text = specifier.Title;
+            cell.DetailTextLabel.Text = $"{NSBundle.MainBundle.InfoDictionary["CFBundleShortVersionString"]} ({NSBundle.MainBundle.InfoDictionary["CFBundleVersion"]})";
+            cell.DetailTextLabel.TextColor = Theme.DarkGray;
+            return cell;
+        }
+
+        private static UITableViewCell GetAzureTokenCell(UITableView tableView, UITableViewCell cell, SettingsSpecifier specifier)
+        {
+            cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
+            cell.TextLabel.Text = specifier.Title;
+            cell.DetailTextLabel.Text = "";
+            cell.DetailTextLabel.TextColor = Theme.DarkGray;
+            return cell;
+        }
+
+        private static UITableViewCell GetSslCell(UITableView tableView, UITableViewCell cell, SettingsSpecifier specifier)
+        {
+            var ci = Managers.ActiveConnectionInfo;
+            var sslEnabled = ci?.SslMode != SslMode.Off;
+            cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
+            cell.TextLabel.Text = specifier.Title;
+            cell.DetailTextLabel.Text = sslEnabled ? Localization.GetString("enabled") : Localization.GetString("disabled");
+            cell.DetailTextLabel.TextColor = sslEnabled ? Theme.DarkGray : Theme.Brown;
+            return cell;
+        }
+
+        private static UITableViewCell GetServerAddressCell(UITableView tableView, UITableViewCell cell, SettingsSpecifier specifier)
+        {
+            var ci = Managers.ActiveConnectionInfo;
+            cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
+            cell.TextLabel.Text = specifier.Title;
+            cell.DetailTextLabel.Text = ci?.Hostname + ":" + ci?.Port;
+            cell.DetailTextLabel.TextColor = Theme.DarkGray;
+            return cell;
+        }
+
+        private static UITableViewCell GetUsernameCell(UITableView tableView, UITableViewCell cell, SettingsSpecifier specifier)
+        {
+            var ci = Managers.ActiveConnectionInfo;
+            cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
+            cell.TextLabel.Text = specifier.Title;
+            cell.DetailTextLabel.Text = ci?.Username;
+            cell.DetailTextLabel.TextColor = Theme.DarkGray;
+            return cell;
+        }
+
+        private static UITableViewCell GetLocalTemplateCell(UITableView tableView, UITableViewCell cell)
+        {
+            cell = (EditTextViewCell)(tableView.DequeueReusableCell(EditTextViewCell.Key));
+            if (cell == null)
+            {
+                cell = new EditTextViewCell();
+                ((EditTextViewCell)cell).ContentChanged += (sender, e) => 
+                    PlatformConfig.Preferences.LocalTemplate = ((EditTextViewCell)cell).Content;
+            }
+            ((EditTextViewCell)cell).Content = PlatformConfig.Preferences.LocalTemplate;
+            return cell;
+        }
+
+        private static UITableViewCell GetCallerIdCell(UITableView tableView, UITableViewCell cell, SettingsSpecifier specifier)
+        {
+            cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
+            cell.TextLabel.Text = specifier.Title;
+                
+            try
+            {
+                if (CallIdExtensionUtilities.IsCallIdExtensionEnabled().Result) 
+                    cell.DetailTextLabel.Text = "Enabled";
+                else
+                    cell.DetailTextLabel.Text = "Disabled";
+
+                cell.DetailTextLabel.TextColor = Theme.DarkGray;
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Call ID extension not available exception ", ex);
+                cell.DetailTextLabel.Text = "Disabled";
+                cell.DetailTextLabel.TextColor = Theme.DarkGray;
+            }
 
             return cell;
         }
@@ -260,151 +416,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
 
             base.RowSelected(tableView, indexPath);
         }
-
-        [Export("tableView:cellForSpecifier:")]
-        public virtual UITableViewCell GetCellForSpecifier(UITableView tableView, SettingsSpecifier specifier)
-        {
-            /*if (specifier.Key == CallerIdentificationEnabled)
-            {
-                var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
-                cell.TextLabel.Text = specifier.Title;
-                try
-                {
-                    if (CallIdExtensionUtilities.IsCallIdExtensionEnabled().Result)
-                        cell.DetailTextLabel.Text = "Enabled";
-                    else
-                        cell.DetailTextLabel.Text = "Disabled";
-
-                    cell.DetailTextLabel.TextColor = Theme.DarkGray;
-                }
-                catch (Exception ex)
-                {
-                    CommonConfig.Logger.Error("Call ID extension not available exception ", ex);
-                }
-                return cell;
-            }*/
-
-            if (specifier.Key == LocalTemplateKey)
-            {
-                var cell = (EditTextViewCell)tableView.DequeueReusableCell(EditTextViewCell.Key);
-                if (cell == null)
-                {
-                    cell = new EditTextViewCell();
-                    cell.ContentChanged += (sender, e) => PlatformConfig.Preferences.LocalTemplate = cell.Content;
-                }
-                cell.Content = PlatformConfig.Preferences.LocalTemplate;
-
-                return cell;
-            }
-
-            if (specifier.Key == UsernameKey)
-            {
-                var ci = Managers.ActiveConnectionInfo;
-
-                var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
-                cell.TextLabel.Text = specifier.Title;
-                cell.DetailTextLabel.Text = ci?.Username;
-                cell.DetailTextLabel.TextColor = Theme.DarkGray;
-                return cell;
-            }
-
-            if (specifier.Key == ServerAddressKey)
-            {
-                var ci = Managers.ActiveConnectionInfo;
-
-                var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
-                cell.TextLabel.Text = specifier.Title;
-                cell.DetailTextLabel.Text = ci?.Hostname + ":" + ci?.Port;
-                cell.DetailTextLabel.TextColor = Theme.DarkGray;
-                return cell;
-            }
-
-            if (specifier.Key == SslEnabledKey)
-            {
-                var ci = Managers.ActiveConnectionInfo;
-                var sslEnabled = ci?.SslMode != SslMode.Off;
-
-                var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
-                cell.TextLabel.Text = specifier.Title;
-                cell.DetailTextLabel.Text = sslEnabled ? Localization.GetString("enabled") : Localization.GetString("disabled");
-                cell.DetailTextLabel.TextColor = sslEnabled ? Theme.DarkGray : Theme.Brown;
-                return cell;
-            }
-
-            if (specifier.Key == ServerAddressKey)
-            {
-                var ci = Managers.ActiveConnectionInfo;
-
-                var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
-                cell.TextLabel.Text = specifier.Title;
-                cell.DetailTextLabel.Text = ci?.Hostname + ":" + ci?.Port;
-                cell.DetailTextLabel.TextColor = Theme.DarkGray;
-                return cell;
-            }
-            if (specifier.Key == AzureTokenKey)
-            {
-                var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
-                cell.TextLabel.Text = specifier.Title;
-                cell.DetailTextLabel.Text = "";
-                cell.DetailTextLabel.TextColor = Theme.DarkGray;
-                return cell;
-            }
-            if (specifier.Key == VersionKey)
-            {
-                var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
-                cell.TextLabel.Text = specifier.Title;
-                cell.DetailTextLabel.Text = $"{NSBundle.MainBundle.InfoDictionary["CFBundleShortVersionString"]} ({NSBundle.MainBundle.InfoDictionary["CFBundleVersion"]})";
-                cell.DetailTextLabel.TextColor = Theme.DarkGray;
-                return cell;
-            }
-
-            if (specifier.Key == EmailSwipeActionsKey)
-            {
-                var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
-                cell.TextLabel.Text = specifier.Title;
-                cell.DetailTextLabel.Text = "";
-                cell.DetailTextLabel.TextColor = Theme.DarkGray;
-                return cell;
-            }
-
-            if (specifier.Key == ManageExtraFieldsKey)
-            {
-                var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
-                cell.TextLabel.Text = specifier.Title;
-                cell.DetailTextLabel.Text = "";
-                cell.DetailTextLabel.TextColor = Theme.DarkGray;
-                return cell;
-            }
-            if (specifier.Key == PresetCategoryKey)
-            {
-                var cell = tableView.DequeueReusableCell("cell") ?? UITableViewCellUtilities.CreateWithSideText("cell");
-                cell.TextLabel.Text = specifier.Title;
-                cell.DetailTextLabel.Text = "";
-                cell.DetailTextLabel.TextColor = Theme.DarkGray;
-                return cell;
-            }
-            return null;
-        }
-
-        [Export("tableView:heightForSpecifier:")]
-        public virtual nfloat GetHeightForSpecifier(UITableView tableView, SettingsSpecifier specifier)
-        {
-            switch (specifier.Key)
-            {
-                case LocalTemplateKey:
-                    return 150f;
-                case UsernameKey:
-                case ServerAddressKey:
-                case SslEnabledKey:
-                //case CallerIdentificationEnabled:
-                //    return 44f;
-                case VersionKey:
-                    return 44f;
-                default:
-                    return 0f;
-            }
-        }
-
+        
         [Export("settingsViewController:buttonTappedForSpecifier:")]
         public virtual async void ButtonTappedForSpecifier(AppSettingsViewController sender, SettingsSpecifier specifier)
         {
@@ -633,8 +645,6 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
 
             if (string.IsNullOrEmpty(PlatformConfig.Preferences.AzureApplicationProxyBearerToken))
                 hiddenKeys.Add(AzureTokenKey);
-
-            hiddenKeys.Add(CallerIdentificationEnabled);
 
             SetHiddenKeys(hiddenKeys.ToArray(), false);
         }
