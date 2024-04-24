@@ -6,32 +6,32 @@ namespace reMark.Mobile.IOS.Common.CallId
 {
     public static class CallIdExtensionUtilities
     {
-        static readonly string extensionId = "com.nordic-it.reMark.Mobile.IOS.callid";
+        static readonly string extensionId = "com.nordic-it.mark5.Mobile.IOS.callid";
 
         public static Task<bool> IsCallIdExtensionEnabled()
         {
             TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
 
-            //if(IsChinaCustomer())
-            //{
+            if(IsChinaCustomer())
+            {
                 tcs.SetResult(false);
                 return tcs.Task;
-            //}
+            }
 
-           /* CXCallDirectoryManager.SharedInstance.GetEnabledStatusForExtension(extensionId,
-                                                                               (CXCallDirectoryEnabledStatus status, NSError statuserror) =>
-            {
-                if (statuserror == null)
+            CXCallDirectoryManager.SharedInstance.GetEnabledStatusForExtension(extensionId,
+                (CXCallDirectoryEnabledStatus status, NSError statuserror) =>
                 {
-                    var enabled = status == CXCallDirectoryEnabledStatus.Enabled;
-                    tcs.SetResult(enabled);
-                }
-                else
-                {
-                    tcs.SetException(new NSErrorException(statuserror));
-                }
-            });
-            return tcs.Task;*/
+                    if (statuserror == null)
+                    {
+                        var enabled = status == CXCallDirectoryEnabledStatus.Enabled;
+                        tcs.SetResult(enabled);
+                    }
+                    else
+                    {
+                        tcs.SetException(new NSErrorException(statuserror));
+                    }
+                });
+            return tcs.Task;
         }
 
         public static void ReloadExtension()
@@ -44,16 +44,8 @@ namespace reMark.Mobile.IOS.Common.CallId
                     if (status == CXCallDirectoryEnabledStatus.Enabled)
                     {
                         CXCallDirectoryManager.SharedInstance.ReloadExtension(extensionId,
-                                                                              error =>
-                        {
-                            if (error != null)
-                            {
-                                throw new NSErrorException(error);
-                            }
-                        });
+                                                                              error => throw new NSErrorException(error));
                     }
-                    else
-                        return;
                 }
                 else
                 {

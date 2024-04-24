@@ -391,7 +391,6 @@
 			<key>DefaultValue</key>
 			<true/>
 		</dict>
-	<!--
 		<dict>
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
@@ -400,7 +399,6 @@
 			<key>FooterText</key>
 			<string>caller_identification_desc</string>
 		</dict>
-	-->	
 		<dict>
 			<key>Type</key>
 			<string>IASKCustomViewSpecifier</string>
