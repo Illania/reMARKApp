@@ -514,7 +514,7 @@ end
       _apk_path="#{ENV['ANDROID_RELEASE_FOLDER_PATH']}/remark_#{android_build_number()}.apk"
       system("mv #{ENV['ANDROID_SIGNED_APK_PATH']} #{_apk_path}")
       sh "./upload.sh -e \"#{ENV['ATLASSIAN_EMAIL']}\" -t \"#{ENV['ATLASSIAN_API_TOKEN']}\" -f \"#{_apk_path}\" -c \"#{options[:comment]}\""
-      #android_message_on_publish_success('Internal beta')
+      android_message_on_publish_success('Internal beta')
     rescue StandardError => e
       message_on_error(e)
     end
