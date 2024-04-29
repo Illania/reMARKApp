@@ -467,6 +467,7 @@
 		<BundleResource Include="Resources\Base.lproj\Onboarding.strings" />
 	</ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Sentry.Extensions.Logging" Version="4.4.0" />
     <PackageReference Include="System.IO.Compression" Version="4.3.0" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
     <PackageReference Include="MailBee.NET" Version="11.2.0" />
@@ -499,8 +500,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Configuration" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
     <PackageReference Include="morelinq" Version="4.1.0" />
-    <PackageReference Include="Sentry.Extensions.Logging" Version="3.41.3" />
-    <PackageReference Include="Sentry" Version="3.41.3" />
+    <PackageReference Include="Sentry" Version="4.4.0" />
     <PackageReference Include="Microsoft.Azure.NotificationHubs" Version="4.1.0" />
     <PackageReference Include="PInvoke.NCrypt" Version="0.7.124" />
     <PackageReference Include="PInvoke.BCrypt" Version="0.7.124" />
