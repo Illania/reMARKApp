@@ -68,6 +68,9 @@
     <AndroidDexTool>d8</AndroidDexTool>
     <LangVersion>12.0</LangVersion>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)|$(Platform)'=='net8.0-android|AnyCPU'">
+    <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
+  </PropertyGroup>
   <ItemGroup>
     <Folder Include="Resources\mipmap-mdpi\" />
     <Folder Include="Model\HubMessages\" />

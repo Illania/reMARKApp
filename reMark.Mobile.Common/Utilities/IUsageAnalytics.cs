@@ -42,7 +42,8 @@ namespace reMark.Mobile.Common.Utilities
         PickPhoto,
         Local,
         External,
-        ReferenceEml
+        ReferenceEml,
+        FolderEml
     }
 
     public enum TemplateType
