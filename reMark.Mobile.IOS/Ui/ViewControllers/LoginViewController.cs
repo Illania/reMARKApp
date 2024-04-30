@@ -13,7 +13,6 @@ using reMark.Mobile.IOS.Ui.Common;
 using reMark.Mobile.IOS.Utilities;
 using reMark.ServiceReference.Exceptions;
 using Microsoft.Extensions.Logging;
-using Sentry;
 using UIKit;
 using UserNotifications;
 using Airbnb.Lottie;
@@ -940,7 +939,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                     s.SetTag("DeviceName", ci.FriendlyDeviceName);
                     s.SetTag("ServerName", $"{ci.Hostname}:{ci.Port}");
                     s.SetTag("SslEnabled", $"{ci.SslMode}");
-                    s.User = new User { Username = ci.Username };
+                    s.User = new SentryUser() { Username = ci.Username };
                 });
             });
             CommonConfig.Sentry = loggerFactory.CreateLogger("base");

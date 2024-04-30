@@ -204,6 +204,7 @@
 "edit_this_event_only" = "Edit this event only";
 "edit_all_events_in_series" = "Edit all events in series";
 "editing_comment___" = "Editing comment...";
+"email_from_folder" = "Email from folder";
 "email_sent" = "Email sent";
 "email_error" = "Error while sending email";
 "empty_token_enable_title" = "Problem while enabling notifications";

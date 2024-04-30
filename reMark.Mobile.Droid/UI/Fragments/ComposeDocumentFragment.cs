@@ -1,18 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
-using Android.Graphics;
 using Android.OS;
 using Android.Provider;
 using Android.Views;
 using Android.Widget;
 using AndroidX.AppCompat.App;
 using AndroidX.AppCompat.Widget;
-using AndroidX.Core.Content;
 using AndroidX.Core.Widget;
 using Google.Android.Material.FloatingActionButton;
 using reMark.Mobile.Classes.Enum;
@@ -43,7 +36,7 @@ namespace reMark.Mobile.Droid.Ui.Fragments
 {
     public class ComposeDocumentFragment : BaseFragment
     {
-        readonly List<ComposeDocumentView> subViews = new List<ComposeDocumentView>(10);
+        readonly List<ComposeDocumentView> subViews = new(10);
 
         const string RestoreWorkingCopyBundleKey = "RestoreWorkingCopy_a6c252fc-09b9-44a9-941f-ea3785c0864d";
         const string DocumentCreationModeFlagBundleKey = "DocumentCreationModeFlag_b181c281-54bd-4c21-a476-a69ea0f83872";
@@ -319,13 +312,13 @@ namespace reMark.Mobile.Droid.Ui.Fragments
             CommonConfig.Logger.Info($"Paused {nameof(ComposeDocumentFragment)}");
         }
 
-        private async Task AttachByReference(int docId)
+        private async Task AttachByReference(int documentId)
         {
             try
             {
-                if (docId > 0)
+                if (documentId > 0)
                 {
-                    var emlFilePath = await Managers.DocumentsManager.GetDocumentEmlAsync(docId);
+                    var emlFilePath = await Managers.DocumentsManager.GetDocumentEmlAsync(documentId);
                     var emlPathUri = Uri.Parse(emlFilePath);
                     await HandleEmlPath(emlPathUri);
                 }          
@@ -348,7 +341,15 @@ namespace reMark.Mobile.Droid.Ui.Fragments
                 var docId = Serializer.Deserialize<int>(data.GetStringExtra(SearchByReferenceResultsActivity.SearchByReferenceResultKey));
                 await AttachByReference(docId);
             }
-
+            
+            if (requestCode == RequestCodes.AttachFromFolderRequestCode
+                && resultCode == (int)Result.Ok
+                && data is { Extras: { } } && data.HasExtra(DocumentPickerFoldersListActivity.AttachmentResultKey))
+            {
+                var documentId = data.Extras.GetInt(DocumentPickerFoldersListActivity.AttachmentResultKey);
+                await AttachByReference(documentId);
+            }
+            
             if (requestCode == RequestCodes.RecentAddressesRequestCode && resultCode == (int)Result.Ok)
             {
                 var recipient = Serializer.Deserialize<Recipient>(data.GetStringExtra(RecentAddressesListActivity.RecipientResultKey));
@@ -561,6 +562,7 @@ namespace reMark.Mobile.Droid.Ui.Fragments
             public const int AttachmentRequestCode = 111;
             public const int RemarkAttachmentRequestCode = 112;
             public const int AttachByReferenceRequestCode = 113;
+            public const int AttachFromFolderRequestCode = 114;
             public const int RecentAddressesRequestCode = 222;
             public const int ContactsRequestCode = 333;
             public const int InternalContactsRequestCode = 334;
@@ -1328,7 +1330,9 @@ namespace reMark.Mobile.Droid.Ui.Fragments
                         StartActivityForResult(ExternalDocumentFoldersListActivity.CreateIntent(Context), RequestCodes.RemarkAttachmentRequestCode);
                     else if (choice == 1) //Device files
                         AddAttachmentFromDevice();
-                    else if (attachByReferenceAvailable && choice == 2) //Attach by reference
+                    else if (choice == 2) //Email from folder
+                        AttachEmailFromFolder();
+                    else if (attachByReferenceAvailable && choice == 3) //Attach by reference
                         Dialogs.ShowEditTextDialog(Context, Resource.String.reference_number, string.Empty,
                             (text) => {
                                 var criteria = new SearchDocumentsCriteria();
@@ -1349,6 +1353,13 @@ namespace reMark.Mobile.Droid.Ui.Fragments
             }
 
             return true;
+        }
+        
+
+        private void AttachEmailFromFolder()
+        {
+            StartActivityForResult(DocumentPickerFoldersListActivity.CreateIntent(Context),
+                RequestCodes.AttachFromFolderRequestCode);
         }
 
         void AddAttachmentFromDevice()

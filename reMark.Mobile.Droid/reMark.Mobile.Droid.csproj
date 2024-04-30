@@ -68,6 +68,9 @@
     <AndroidDexTool>d8</AndroidDexTool>
     <LangVersion>12.0</LangVersion>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)|$(Platform)'=='net8.0-android|AnyCPU'">
+    <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
+  </PropertyGroup>
   <ItemGroup>
     <Folder Include="Resources\mipmap-mdpi\" />
     <Folder Include="Model\HubMessages\" />
@@ -114,7 +117,7 @@
     <PackageReference Include="Xamarin.Google.Android.Material" Version="1.10.0.2" />
     <PackageReference Include="Xamarin.AndroidX.CoordinatorLayout" Version="1.2.0.10" />
     <PackageReference Include="Pushy.SDK.Xamarin.Android" Version="1.0.93" />
-    <PackageReference Include="MailBee.NET" Version="12.4.0" />
+    <PackageReference Include="MailBee.NET" Version="11.2.0" />
     <PackageReference Include="Xamarin.AndroidX.SwipeRefreshLayout" Version="1.1.0.17" />
     <PackageReference Include="Microsoft.AppCenter" Version="5.0.3" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.57" />

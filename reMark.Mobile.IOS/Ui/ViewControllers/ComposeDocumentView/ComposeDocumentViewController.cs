@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using System.Text.RegularExpressions;
 using Foundation;
 using GMImagePicker;
 using reMark.Mobile.Classes.Enum;
@@ -645,7 +640,8 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     Localization.GetString("take_photo"),
                     Localization.GetString("existing_photo"),
                     Localization.GetString("browse_files"),
-                    Localization.GetString("browse_external_remark_files")
+                    Localization.GetString("browse_external_remark_files"),
+                    Localization.GetString("email_from_folder"),
                 };
 
                 if (ServerConfig.SystemSettings?.SystemInfo?.AttachByReferenceAvailable == true)
@@ -685,8 +681,12 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.External));
                     await InsertExternalAttachment();
                 }
-
-                if (ServerConfig.SystemSettings?.SystemInfo?.AttachByReferenceAvailable == true && source == 5)
+                if (source == 5)
+                {
+                    CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.FolderEml));
+                    await AttachEmlFromFolder();
+                }
+                if (ServerConfig.SystemSettings?.SystemInfo?.AttachByReferenceAvailable == true && source == 6)
                 {
                     CommonConfig.UsageAnalytics.LogEvent(new ComposeAddAttachmentEvent(AddAttachmentType.ReferenceEml));
                     await AttachByReference();
@@ -723,7 +723,36 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             }
 
         }
+        
+        private async Task AttachEmlFromFolder()
+        {
+            try
+            {
+                var documentPicker = new DocumentPickerFoldersListViewController()
+                {
+                    ModalPresentationStyle = UIModalPresentationStyle.OverCurrentContext,
+                    ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve
+                };
+                PresentViewController(new NavigationController(documentPicker, UIModalPresentationStyle.OverCurrentContext), true, null);
 
+                var documentResult = await documentPicker.Result;
+                if (documentResult == null)
+                    return;
+
+                var documentId = documentResult.Id;
+                if (documentId > 0)
+                {
+                    var emlFilePath = await Managers.DocumentsManager.GetDocumentEmlAsync(documentId);
+                    await HandleEmlPath(emlFilePath);
+                }
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Failed to get document eml", ex.InnerException);
+                await Dialogs.ShowErrorAlertAsync(this, ex);
+            }
+        }
+        
         async Task AttachByReference()
         {
             try

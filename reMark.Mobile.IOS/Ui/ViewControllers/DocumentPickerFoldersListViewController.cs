@@ -1,0 +1,91 @@
+﻿using reMark.Mobile.IOS.Ui.Common;
+using reMark.Mobile.IOS.Ui.ViewControllers.FoldersList;
+using UIKit;
+using reMark.Mobile.Common.Model;
+
+namespace reMark.Mobile.IOS.Ui.ViewControllers
+{
+    public class DocumentPickerFoldersListViewController : AbstractFoldersListViewController
+    {
+        readonly TaskCompletionSource<Document> tcs = new TaskCompletionSource<Document>();
+        public Task<Document> Result => tcs.Task;
+
+        UIBarButtonItem cancelModeItem;
+
+        public DocumentPickerFoldersListViewController()
+            : base(ModuleType.Documents, true, false, false, true)
+        {
+        }
+
+        protected DocumentPickerFoldersListViewController(Folder folder)
+            : base(folder, true, false, false, true)
+        {
+        }
+
+        protected override void InitializeNavigationBar()
+        {
+            NavigationItem.Title = IsRootOfFoldersList ? Localization.GetString("documents") : ParentFolder.Name;
+
+            if (DisableNavigationBarActions)
+                return;
+
+            if (IsRootOfFoldersList)
+            {
+                cancelModeItem = new UIBarButtonItem
+                {
+                    Title = Localization.GetString("cancel")
+                };
+                NavigationItem.SetLeftBarButtonItem(cancelModeItem, false);
+
+                NavigationItem.Title = Localization.GetString("documents");
+            }
+        }
+
+        protected override void InitializeHandlers()
+        {
+            base.InitializeHandlers();
+
+            if (cancelModeItem != null)
+                cancelModeItem.Clicked += CancelModeItem_Clicked;
+        }
+
+        protected override void DeinitializeHandlers()
+        {
+            base.DeinitializeHandlers();
+
+            if (cancelModeItem != null)
+                cancelModeItem.Clicked -= CancelModeItem_Clicked;
+        }
+
+        protected override async void FolderSelected(Folder folder, bool isFromFavorite)
+        {
+            var vc = new DocumentPickerListViewController
+            {
+                Folder = folder,
+                DisableRowActions = true
+            };
+
+            NavigationController?.PushViewController(vc, true);
+
+            var result = await vc.Result;
+            tcs.SetResult(result);
+
+            DismissViewController(true, null);
+        }
+
+        protected override async Task FolderExpand(Folder folder)
+        {
+            await base.FolderExpand(folder);
+
+            var vc = new DocumentPickerFoldersListViewController(folder);
+            NavigationController?.PushViewController(vc, true);
+
+            var result = await vc.Result;
+            tcs.SetResult(result);
+
+            DismissViewController(true, null);
+        }
+
+        void CancelModeItem_Clicked(object sender, EventArgs e) => DismissViewController(true, null);
+    }
+}

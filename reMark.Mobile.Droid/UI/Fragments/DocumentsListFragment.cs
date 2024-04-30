@@ -145,6 +145,11 @@ namespace reMark.Mobile.Droid.Ui.Fragments
 
         #region Fragment overrides
 
+        protected virtual CoordinatorLayout GetCoordinatorLayout(ViewGroup container)
+        {
+            return (CoordinatorLayout)container.Parent.Parent.Parent.Parent;
+        }
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             activityStartup = true;
@@ -152,7 +157,7 @@ namespace reMark.Mobile.Droid.Ui.Fragments
 
             var rootView = inflater.Inflate(Resource.Layout.list_with_searchbar, container, false);
 
-            coordinatorLayout = (CoordinatorLayout)container.Parent.Parent.Parent.Parent;
+            coordinatorLayout = GetCoordinatorLayout(container);
 
             var emptyView = rootView.FindViewById<AppCompatTextView>(Resource.Id.empty_view);
             emptyView.SetText(Resource.String.empty_folder);

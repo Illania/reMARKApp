@@ -54,6 +54,7 @@ namespace reMark.Mobile.Droid.Ui.Activities
 
             base.OnCreate(savedInstanceState);
 
+            //This License is for MailBee Version 
             Global.LicenseKey = "MN110-C50DF2550CBE0D750DF4AF2E15D9-0B99";
 
             SetContentView(Resource.Layout.mailviewer_layout);
