@@ -7,7 +7,9 @@
     <SupportedOSPlatformVersion>13.0</SupportedOSPlatformVersion>
     <OutputType>Library</OutputType>
     <Platforms>iPhoneSimulator;iPhone;AnyCPU</Platforms>
-    <SkipValidateMauiImplicitPackageReferences>true</SkipValidateMauiImplicitPackageReferences> 
+    <SkipValidateMauiImplicitPackageReferences>true</SkipValidateMauiImplicitPackageReferences>
+    <RuntimeIdentifiers>ios-arm64</RuntimeIdentifiers>
+    <RunAOTCompilation>false</RunAOTCompilation>
   </PropertyGroup>
   <PropertyGroup>
 		<IsAppExtension>True</IsAppExtension>
@@ -49,7 +51,8 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <RootNamespace>reMark.Mobile.IOS.Extensions.Share</RootNamespace>
-    <AssemblyName>reMark.Mobile.IOS.Extensions.Share</AssemblyName>    
+    <AssemblyName>reMark.Mobile.IOS.Extensions.Share</AssemblyName>
+    <RunAOTCompilation>false</RunAOTCompilation>
     <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
 		<DebugSymbols>false</DebugSymbols>
 		<DebugType>none</DebugType>
