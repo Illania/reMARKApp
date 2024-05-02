@@ -7,7 +7,9 @@
     <OutputType>Library</OutputType>
     <ApplicationId>com.nordic-it.mark5.mobile.ios.callid</ApplicationId>
     <Platforms>iPhoneSimulator;iPhone;AnyCPU</Platforms>
-    <SkipValidateMauiImplicitPackageReferences>true</SkipValidateMauiImplicitPackageReferences> 
+    <SkipValidateMauiImplicitPackageReferences>true</SkipValidateMauiImplicitPackageReferences>
+    <RuntimeIdentifiers>ios-arm64</RuntimeIdentifiers>
+    <RunAOTCompilation>false</RunAOTCompilation>
   </PropertyGroup>
   <PropertyGroup>
 		<IsAppExtension>True</IsAppExtension>
@@ -49,7 +51,8 @@
   </PropertyGroup>
  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <RootNamespace>reMark.Mobile.IOS.Extensions.CallId</RootNamespace>
-    <AssemblyName>reMark.Mobile.IOS.Extensions.CallId</AssemblyName>    
+    <AssemblyName>reMark.Mobile.IOS.Extensions.CallId</AssemblyName>
+   <RunAOTCompilation>false</RunAOTCompilation>
     <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
     <DebugSymbols>false</DebugSymbols>
     <DebugType>none</DebugType>

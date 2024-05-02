@@ -539,7 +539,7 @@
       <IsAppExtension>true</IsAppExtension>
       <IsWatchApp>false</IsWatchApp>
     </ProjectReference>
-    <ProjectReference Include="..\reMark.Mobile.IOS.Extensions.CallId\reMARK.Mobile.IOS.Extensions.CallId.csproj" >
+    <ProjectReference Include="..\reMark.Mobile.IOS.Extensions.CallId\reMark.Mobile.IOS.Extensions.CallId.csproj" >
       <IsAppExtension>true</IsAppExtension>
       <IsWatchApp>false</IsWatchApp>
     </ProjectReference>
