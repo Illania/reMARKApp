@@ -1,16 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Provider;
 using Android.Views;
-using Android.Widget;
 using AndroidX.AppCompat.App;
 using Java.IO;
 using reMark.Mobile.Common;
@@ -29,10 +23,9 @@ using Microsoft.AppCenter.Crashes;
 using TinyIoC;
 using AndroidX.AppCompat.Widget;
 using Com.Airbnb.Lottie;
-using System.Diagnostics;
-using Microsoft.AppCenter;
 using ProgressBar = Android.Widget.ProgressBar;
-using Android.Graphics.Drawables;
+using Exception = System.Exception;
+
 
 namespace reMark.Mobile.Droid.Ui.Activities
 {
@@ -100,16 +93,15 @@ namespace reMark.Mobile.Droid.Ui.Activities
 
         private void HandleSendFile(Intent intent)
         {
-            var contactUri = (Android.Net.Uri)intent.GetParcelableExtra(Intent.ExtraStream);
+            var sharedFileUri = (Android.Net.Uri)(intent.GetParcelableExtra(Intent.ExtraStream));
+            var fileStream = ContentResolver.OpenInputStream(sharedFileUri);
 
-            var fullPathToSave = GetFilePath(contactUri);
-          
-            var fileStream = ContentResolver.OpenInputStream(contactUri);
+            var fullPathToSave = GetFilePath(sharedFileUri);
 
-            if(TrySaveSharedFile(fullPathToSave, fileStream) == true)
+            if (TrySaveSharedFile(fullPathToSave, fileStream) == true)
             {
                 StartActivity(ComposeDocumentActivity.CreateIntent(this, DocumentCreationModeFlag.New, CopyToNewOption.None,
-                    false, DocumentDirection.None, null, null, null, null, null, new List<Uri>() { new Uri(fullPathToSave) }));
+                    false, DocumentDirection.None, null, null, null, null, null, new List<string>() { fullPathToSave }));
             }
 
         }
@@ -127,7 +119,7 @@ namespace reMark.Mobile.Droid.Ui.Activities
         private void HandleSendMultipleFiles(Intent intent)
         {
             var fileUris = intent.GetParcelableArrayListExtra(Intent.ExtraStream);
-            var uriList = new List<Uri>();
+            var uriList = new List<string>();
             if (fileUris != null)
             {
                 foreach (var uri in fileUris)
@@ -141,7 +133,7 @@ namespace reMark.Mobile.Droid.Ui.Activities
 
                     if (TrySaveSharedFile(fullPathToSave, fileStream) == true)
                     {
-                        uriList.Add(new Uri(fullPathToSave));
+                        uriList.Add(fullPathToSave);
                     }
                 }
             }
@@ -158,7 +150,7 @@ namespace reMark.Mobile.Droid.Ui.Activities
         {
             string name = null;
 
-            var cursor = ContentResolver.Query(uri, new string[] { OpenableColumns.DisplayName, OpenableColumns.Size }, null, null, null);
+            var cursor = ContentResolver?.Query(uri, new string[] { OpenableColumns.DisplayName, OpenableColumns.Size }, null, null, null);
             if (cursor != null)
             {
                 try
@@ -177,21 +169,50 @@ namespace reMark.Mobile.Droid.Ui.Activities
             var folderName = Path.Combine(CommonConfig.AttachmentsFolder.Path);
             var folderPath = Path.Combine(folderName, Guid.NewGuid().ToString());
 
-            if (!Directory.Exists(folderPath))
-                Directory.CreateDirectory(folderPath);
+            if (!System.IO.Directory.Exists(folderPath))
+                System.IO.Directory.CreateDirectory(folderPath);
 
             var fullPathToSave = Path.Combine(folderPath, newName);
 
             return fullPathToSave;
+        }
 
+        private static bool TrySaveSharedFile(Android.Net.Uri uriToSave, Stream fileStream)
+        {
+            try
+            {
+
+                string path = uriToSave.Path;
+                Java.Net.URI uri = new Java.Net.URI(uriToSave.ToString()); // Creating URI from Android.Net.Uri
+                Java.IO.File file = new Java.IO.File(uri);
+                OutputStream output = new FileOutputStream(file);
+                byte[] buffer = new byte[4 * 1024]; // or other buffer size
+                int read;
+
+                while ((read = fileStream.Read(buffer)) != -1)
+                {
+                    output.Write(buffer, 0, read);
+                }
+
+                output.Flush();
+                output.Close();
+
+                return true;
+
+            }
+            catch (Exception ex)
+            {
+                Android.Util.Log.Error("TrySaveSharedFile", ex.Message);
+                return false;
+            }
         }
 
         private static bool TrySaveSharedFile(string fullPathToSave, Stream fileStream)
         {
             try
             {
-                var uri2 = new Java.Net.URI("file://" + fullPathToSave);
-                Java.IO.File file = new Java.IO.File(uri2);
+                var uri = new Java.Net.URI("file://" + fullPathToSave);
+                Java.IO.File file = new Java.IO.File(uri);
                 OutputStream output = new FileOutputStream(file);
                 byte[] buffer = new byte[4 * 1024]; // or other buffer size
                 int read;

@@ -59,7 +59,7 @@ namespace reMark.Mobile.Droid.Ui.Fragments
         Dictionary<DocumentAddressType, string[]> preconfiguredEmailAddresses;
         string preconfiguredContent;
         string preconfiguredSubject;
-        List<System.Uri> preconfiguredAttachmentList;
+        List<string> preconfiguredAttachmentList;
         bool saveDraft = false;
         bool sendAsPlainText = false;
         bool restoreWorkingCopy;
@@ -105,7 +105,7 @@ namespace reMark.Mobile.Droid.Ui.Fragments
         public static (ComposeDocumentFragment fragment, string tag) NewInstance(DocumentCreationModeFlag documentCreationModeFlag, CopyToNewOption? copyToNewOption, bool? restoreWorkingCopy,
                                                                                  DocumentDirection? previousDocumentDirection, int? previousDocumentFolderId, int? previousDocumentId,
                                                                                  Dictionary<DocumentAddressType, string[]> preconfiguredEmailAddresses, string preconfiguredContent,
-                                                                                 string preconfiguredSubject, List<System.Uri> preconfiguredAttachmentList)
+                                                                                 string preconfiguredSubject, List<string> preconfiguredAttachmentList)
         {
             if (copyToNewOption != null && copyToNewOption != CopyToNewOption.None)
                 CommonConfig.UsageAnalytics.LogEvent(new ComposeCopyToNewEvent());
@@ -195,7 +195,7 @@ namespace reMark.Mobile.Droid.Ui.Fragments
 
 
             if (Arguments.ContainsKey(PreconfiguredAttachmentListBundleKey))
-                preconfiguredAttachmentList = Serializer.Deserialize<List<System.Uri>>(Arguments.GetString(PreconfiguredAttachmentListBundleKey));
+                preconfiguredAttachmentList = Serializer.Deserialize<List<string>>(Arguments.GetString(PreconfiguredAttachmentListBundleKey));
 
             restoreWorkingCopy = restoreWorkingCopy || Restored;
         }
@@ -538,7 +538,8 @@ namespace reMark.Mobile.Droid.Ui.Fragments
             {
                 foreach (var uri in preconfiguredAttachmentList)
                 {
-                    var androidUri = Uri.Parse(uri.AbsoluteUri);
+                    var androidUri = Android.Net.Uri.FromFile(new Java.IO.File(uri));
+                    CommonConfig.Logger.Info($"Android Uri:{androidUri}");
                     await HandleOneAttachment(androidUri);
                 }
             }     
@@ -1254,9 +1255,13 @@ namespace reMark.Mobile.Droid.Ui.Fragments
         private async Task HandleOneAttachment(Uri uri)
         {
             IFile file = null;
+            CommonConfig.Logger.Info($"Uri scheme: {uri.Scheme}");
+
+            CommonConfig.Logger.Info($"Entered HandleOneAttachment");
+            CommonConfig.Logger.Info($"HandleOneAttachment uri: {uri.Path}");
 
             var stream = Activity.ContentResolver.OpenInputStream(uri);
-
+            CommonConfig.Logger.Info($"HandleOneAttachment stream opened");
             string filename;
 
             if (uri.Scheme == "file")
@@ -1271,6 +1276,7 @@ namespace reMark.Mobile.Droid.Ui.Fragments
 
             try
             {
+                CommonConfig.Logger.Info($"HandleOneAttachment SaveDocumentWorkingCopyAttachmentAsync");
                 file = await Managers.DocumentsManager.SaveDocumentWorkingCopyAttachmentAsync(filename, stream);
                 var size = new Java.IO.File(file.Path).Length();
 
