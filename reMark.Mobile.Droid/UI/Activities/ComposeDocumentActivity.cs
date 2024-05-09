@@ -45,7 +45,7 @@ namespace reMark.Mobile.Droid.Ui.Activities
                                           Dictionary<DocumentAddressType, string[]> preconfiguredEmailAddresses = null,
                                           string preconfiguredContent = null,
                                           string preconfiguredSubject = null,
-                                          List<Uri> preconfiguredAttachmentList = null)
+                                          List<string> preconfiguredAttachmentList = null)
         {
             var intent = new Intent(context, typeof(ComposeDocumentActivity));
 
@@ -116,7 +116,7 @@ namespace reMark.Mobile.Droid.Ui.Activities
                 Dictionary<DocumentAddressType, string[]> preconfiguredEmailAddresses = null;
                 string preconfiguredContent = null;
                 string preconfiguredSubject = null;
-                List<Uri> preconfiguredAttachmentList = null;
+                List<string> preconfiguredAttachmentList = null;
 
                 if (Intent.HasExtra(DocumentCreationModeFlagIntentKey))
                     documentCreationMode = (DocumentCreationModeFlag)Intent.Extras.GetInt(DocumentCreationModeFlagIntentKey);
@@ -146,7 +146,7 @@ namespace reMark.Mobile.Droid.Ui.Activities
                     preconfiguredSubject = Intent.Extras.GetString(PreconfiguredSubjectIntentKey);
 
                 if (Intent.HasExtra(PreconfiguredAttachmentListIntentKey))
-                    preconfiguredAttachmentList = Serializer.Deserialize<List<Uri>>(Intent.Extras.GetString(PreconfiguredAttachmentListIntentKey));
+                    preconfiguredAttachmentList = Serializer.Deserialize<List<string>>(Intent.Extras.GetString(PreconfiguredAttachmentListIntentKey));
 
                 (cdf, cdfFragmentTag) = ComposeDocumentFragment.NewInstance(documentCreationMode.Value,
                                                                             copyToNewOption,
