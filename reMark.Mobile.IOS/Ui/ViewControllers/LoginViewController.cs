@@ -801,10 +801,12 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
             Managers.NotificationsManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
             Managers.SearchManager.DocumentBodyTypeRequest = PlatformConfig.Preferences.DocumentBodyRequestType;
 
-            if (PlatformConfig.Preferences.SyncFavoriteFolders == (int)FavoriteFoldersSyncType.SyncAmongDevices)
-                Managers.FavoriteFoldersManager = Managers.FavoriteFoldersDeviceSyncManager;
-            if (PlatformConfig.Preferences.SyncFavoriteFolders == (int)FavoriteFoldersSyncType.SyncWithDesktop)
-                Managers.FavoriteFoldersManager = Managers.FavoriteFoldersDesktopSyncManager;
+            Managers.FavoriteFoldersManager = PlatformConfig.Preferences.SyncFavoriteFolders switch
+            {
+                (int)FavoriteFoldersSyncType.SyncAmongDevices => Managers.FavoriteFoldersDeviceSyncManager,
+                (int)FavoriteFoldersSyncType.SyncWithDesktop => Managers.FavoriteFoldersDesktopSyncManager,
+                _ => null
+            };
 
             CommonConfig.Logger.Info("Retrieving system settings...");
 

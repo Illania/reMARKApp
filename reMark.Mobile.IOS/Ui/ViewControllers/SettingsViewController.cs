@@ -563,11 +563,10 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
 
             try
             {
-                Managers.FavoriteFoldersManager = PlatformConfig.Preferences.SyncFavoriteFolders ==
-                    (int)FavoriteFoldersSyncType.SyncWithDesktop
-                    ? Managers.FavoriteFoldersDesktopSyncManager
+                Managers.FavoriteFoldersManager = PlatformConfig.Preferences.SyncFavoriteFolders == (int)FavoriteFoldersSyncType.SyncWithDesktop 
+                    ? Managers.FavoriteFoldersDesktopSyncManager 
                     : Managers.FavoriteFoldersDeviceSyncManager;
-
+                
                 var moduleFavoriteFoldersCollection = await Managers.FavoriteFoldersManager.GetServiceFavoriteFoldersAsync(retain: false);
                 if (moduleFavoriteFoldersCollection.ModuleFavoriteFolders == null || PlatformConfig.Preferences.SyncFavoriteFolders ==
                     (int)FavoriteFoldersSyncType.SyncWithDesktop)
