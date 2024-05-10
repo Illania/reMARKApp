@@ -773,15 +773,18 @@ namespace reMark.Mobile.IOS
                     CommonConfig.Logger.Info("Cleared cache");
                 }
 
-                if (PlatformConfig.Preferences.SyncFavoriteFolders == (int)FavoriteFoldersSyncType.SyncAmongDevices)
-                    Managers.FavoriteFoldersManager = Managers.FavoriteFoldersDeviceSyncManager;
-                if (PlatformConfig.Preferences.SyncFavoriteFolders == (int)FavoriteFoldersSyncType.SyncWithDesktop
-                    && ServerConfig.SystemSettings?.SystemInfo?.SyncFavoritesWithDesktopAvailable == true)
-                    Managers.FavoriteFoldersManager = Managers.FavoriteFoldersDesktopSyncManager;
-                else
+                switch (PlatformConfig.Preferences.SyncFavoriteFolders)
                 {
-                    Managers.FavoriteFoldersManager = null;
-                    PlatformConfig.Preferences.SyncFavoriteFolders = (int)FavoriteFoldersSyncType.None;
+                    case (int)FavoriteFoldersSyncType.SyncAmongDevices:
+                        Managers.FavoriteFoldersManager = Managers.FavoriteFoldersDeviceSyncManager;
+                        break;
+                    case (int)FavoriteFoldersSyncType.SyncWithDesktop:
+                        Managers.FavoriteFoldersManager = Managers.FavoriteFoldersDesktopSyncManager;
+                        break;
+                    default:
+                        Managers.FavoriteFoldersManager = null;
+                        PlatformConfig.Preferences.SyncFavoriteFolders = (int)FavoriteFoldersSyncType.None;
+                        break;
                 }
                     
 
