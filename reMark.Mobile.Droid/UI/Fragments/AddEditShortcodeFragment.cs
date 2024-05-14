@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Android.App;
+﻿using Android.App;
 using Android.Content;
 using Android.OS;
 using Android.Views;
-using Android.Widget;
 using AndroidX.AppCompat.App;
 using AndroidX.AppCompat.Widget;
 using AndroidX.CoordinatorLayout.Widget;
@@ -36,9 +32,9 @@ namespace reMark.Mobile.Droid.Ui.Fragments
             public const int ContactAddressRequestCode = 111;
         }
 
-        Shortcode shortcode;
-        ShortcodePreview shortcodePreview;
-        ShortcodeCreationModeFlag creationModeFlag;
+        Shortcode _shortcode;
+        ShortcodePreview _shortcodePreview;
+        ShortcodeCreationModeFlag _creationModeFlag;
 
         LinearLayoutCompat linearLayout;
         ProgressBar progressBar;
@@ -53,11 +49,12 @@ namespace reMark.Mobile.Droid.Ui.Fragments
         EntryView ccView;
         EntryView bccView;
 
-        List<AddEditShortcodeView> subviews = new List<AddEditShortcodeView>();
+        List<AddEditShortcodeView> subviews = new();
 
         Action dismissAction;
 
-        public static (AddEditShortcodeFragment fragment, string tag) NewInstance(ShortcodeCreationModeFlag? flag, ShortcodePreview shortcodePreview)
+        public static (AddEditShortcodeFragment fragment, string tag) NewInstance(ShortcodeCreationModeFlag? flag, 
+            ShortcodePreview shortcodePreview)
         {
             if (flag == ShortcodeCreationModeFlag.Edit)
                 CommonConfig.UsageAnalytics.LogEvent(new OpenEditShortcodeEvent());
@@ -84,19 +81,19 @@ namespace reMark.Mobile.Droid.Ui.Fragments
         {
             base.OnCreate(savedInstanceState);
 
-            if (Arguments.ContainsKey(ShortcodeCreationModeFlagBundleKey))
-                creationModeFlag = (ShortcodeCreationModeFlag)Arguments.GetInt(ShortcodeCreationModeFlagBundleKey);
+            if (Arguments != null && Arguments.ContainsKey(ShortcodeCreationModeFlagBundleKey))
+                _creationModeFlag = (ShortcodeCreationModeFlag)Arguments.GetInt(ShortcodeCreationModeFlagBundleKey);
 
             if (savedInstanceState?.ContainsKey(ShortcodePreviewBundleKey) == true)
-                shortcodePreview = Serializer.Deserialize<ShortcodePreview>(savedInstanceState.GetString(ShortcodePreviewBundleKey));
-            else if (Arguments.ContainsKey(ShortcodePreviewBundleKey))
-                shortcodePreview = Serializer.Deserialize<ShortcodePreview>(Arguments.GetString(ShortcodePreviewBundleKey));
+                _shortcodePreview = Serializer.Deserialize<ShortcodePreview>(savedInstanceState.GetString(ShortcodePreviewBundleKey));
+            else if (Arguments != null && Arguments.ContainsKey(ShortcodePreviewBundleKey))
+                _shortcodePreview = Serializer.Deserialize<ShortcodePreview>(Arguments.GetString(ShortcodePreviewBundleKey));
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            CommonConfig.Logger.Info($"Creating {nameof(AddEditShortcodeFragment)} [shortcode.id={shortcodePreview?.Id}, " +
-                                     $" mode={creationModeFlag}]...");
+            CommonConfig.Logger.Info($"Creating {nameof(AddEditShortcodeFragment)} [shortcode.id={_shortcodePreview?.Id}, " +
+                                     $" mode={_creationModeFlag}]...");
 
             var rootView = inflater.Inflate(Resource.Layout.linear_layout_with_progress, container, false);
 
@@ -131,18 +128,18 @@ namespace reMark.Mobile.Droid.Ui.Fragments
         {
             base.OnSaveInstanceState(outState);
 
-            if (shortcodePreview != null)
-                outState.PutString(ShortcodePreviewBundleKey, Serializer.Serialize(shortcodePreview));
+            if (_shortcodePreview != null)
+                outState.PutString(ShortcodePreviewBundleKey, Serializer.Serialize(_shortcodePreview));
         }
 
-        void SetTitle()
+        private void SetTitle()
         {
             var resId = 0;
-            if (creationModeFlag == ShortcodeCreationModeFlag.New)
+            if (_creationModeFlag == ShortcodeCreationModeFlag.New)
             {
                 resId = Resource.String.edit_shortcode_create;
             }
-            else if (creationModeFlag == ShortcodeCreationModeFlag.Edit)
+            else if (_creationModeFlag == ShortcodeCreationModeFlag.Edit)
             {
                 resId = Resource.String.edit_shortcode_edit;
             }
@@ -171,8 +168,8 @@ namespace reMark.Mobile.Droid.Ui.Fragments
         {
             base.OnViewCreated(view, savedInstanceState);
 
-            CommonConfig.Logger.Info($"Created {nameof(AddEditShortcodeFragment)} [shortcode.id={shortcodePreview?.Id}, " +
-                                     $" mode={creationModeFlag}]...");
+            CommonConfig.Logger.Info($"Created {nameof(AddEditShortcodeFragment)} [shortcode.id={_shortcodePreview?.Id}, " +
+                                     $" mode={_creationModeFlag}]...");
         }
 
         public override async void OnResume()
@@ -199,26 +196,26 @@ namespace reMark.Mobile.Droid.Ui.Fragments
 
         #region Refreh methods
 
-        async Task RefreshData()
+        private async Task RefreshData()
         {
-            if (creationModeFlag == ShortcodeCreationModeFlag.New && shortcodePreview == null)
+            if (_creationModeFlag == ShortcodeCreationModeFlag.New && _shortcodePreview == null)
             {
-                shortcode = new Shortcode();
-                shortcodePreview = new ShortcodePreview();
+                _shortcode = new Shortcode();
+                _shortcodePreview = new ShortcodePreview();
             }
             else
             {
                 try
                 {
-                    if (shortcodePreview.Id <= 0)
+                    if (_shortcodePreview.Id <= 0)
                         return;
                         
-                    shortcode = await Managers.ShortcodesManager.GetShortcodeAsync(-1, shortcodePreview.Id, SourceType.Local);
+                    _shortcode = await Managers.ShortcodesManager.GetShortcodeAsync(-1, _shortcodePreview.Id, SourceType.Local);
                     RefreshView();
                 }
                 catch (Exception ex)
                 {
-                    CommonConfig.Logger.Error($"Retrieving shortcode failed [shortcodeId={shortcodePreview?.Id}]", ex);
+                    CommonConfig.Logger.Error($"Retrieving shortcode failed [shortcodeId={_shortcodePreview?.Id}]", ex);
 
                     await Dialogs.ShowErrorDialogAsync(Activity, ex);
 
@@ -229,23 +226,23 @@ namespace reMark.Mobile.Droid.Ui.Fragments
             RefreshView();
         }
 
-        void RefreshView()
+        private void RefreshView()
         {
             progressBar.Visibility = ViewStates.Gone;
             scrollView.Visibility = ViewStates.Visible;
 
             foreach (var subview in subviews)
             {
-                subview.Shortcode = shortcode;
-                subview.ShortcodePreview = shortcodePreview;
-                subview.CreationModeFlag = creationModeFlag;
+                subview.Shortcode = _shortcode;
+                subview.ShortcodePreview = _shortcodePreview;
+                subview.CreationModeFlag = _creationModeFlag;
                 subview.RefreshView();
             }
         }
 
         #endregion
 
-        async void HandleSend()
+        private async void HandleSend()
         {
             if (nameView != null && !nameView.ContainsValidContent())
             {
@@ -253,17 +250,17 @@ namespace reMark.Mobile.Droid.Ui.Fragments
                 return;
             }
 
-            var titleResource = creationModeFlag == ShortcodeCreationModeFlag.Edit ? Resource.String.edit_shortcode_edit_loading : Resource.String.edit_shortcode_add_loading;
+            var titleResource = _creationModeFlag == ShortcodeCreationModeFlag.Edit ? Resource.String.edit_shortcode_edit_loading : Resource.String.edit_shortcode_add_loading;
             dismissAction = Dialogs.ShowInfiniteProgressDialog(Context, titleResource, Resource.String.please_wait);
 
             try
             {
-                await Managers.ShortcodesManager.CreateOrUpdateShortcodeAsync(shortcode, shortcodePreview);
+                await Managers.ShortcodesManager.CreateOrUpdateShortcodeAsync(_shortcode, _shortcodePreview);
 
                 dismissAction();
 
-                if (creationModeFlag == ShortcodeCreationModeFlag.Edit)
-                    CommonConfig.MessengerHub.Publish(new ShortcodePreviewChangedMessage(this, shortcodePreview));
+                if (_creationModeFlag == ShortcodeCreationModeFlag.Edit)
+                    CommonConfig.MessengerHub.Publish(new ShortcodePreviewChangedMessage(this, _shortcodePreview));
 
                 Activity?.OnBackPressed();
             }
@@ -271,8 +268,8 @@ namespace reMark.Mobile.Droid.Ui.Fragments
             {
                 dismissAction();
 
-                CommonConfig.Logger.Error($"Error while adding/editing shortcode  [shortcode.id={shortcodePreview?.Id}, " +
-                                     $" mode={creationModeFlag}]...", ex);
+                CommonConfig.Logger.Error($"Error while adding/editing shortcode  [shortcode.id={_shortcodePreview?.Id}, " +
+                                     $" mode={_creationModeFlag}]...", ex);
 
                 await Dialogs.ShowErrorDialogAsync(Activity, ex);
             }
@@ -280,7 +277,7 @@ namespace reMark.Mobile.Droid.Ui.Fragments
 
         #region ContactAddress request
 
-        void OnContactAddressRequest(DocumentAddressType type)
+        private void OnContactAddressRequest(DocumentAddressType type)
         {
             requestAddressType = type;
 
@@ -290,11 +287,11 @@ namespace reMark.Mobile.Droid.Ui.Fragments
 
         public override void OnActivityResult(int requestCode, int resultCode, Intent data)
         {
-            if (requestCode == RequestCodes.ContactAddressRequestCode && resultCode == (int)Result.Ok)
-            {
-                var recipient = Serializer.Deserialize<Recipient>(data.GetStringExtra(PickerContactFolderListActivity.RecipientResultKey));
-                GetEntryViewPerType(requestAddressType).AddEntry(recipient);
-            }
+            if (requestCode != RequestCodes.ContactAddressRequestCode || resultCode != (int)Result.Ok)
+                return;
+
+            var recipient = Serializer.Deserialize<Recipient>(data.GetStringExtra(PickerContactFolderListActivity.RecipientResultKey));
+            GetEntryViewPerType(requestAddressType).AddEntry(recipient);
         }
 
         EntryView GetEntryViewPerType(DocumentAddressType type)
@@ -313,6 +310,5 @@ namespace reMark.Mobile.Droid.Ui.Fragments
         }
 
         #endregion
-
     }
 }
