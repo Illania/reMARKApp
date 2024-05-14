@@ -210,8 +210,10 @@ namespace reMark.Mobile.Droid.Ui.Fragments
             {
                 try
                 {
+                    if (shortcodePreview.Id <= 0)
+                        return;
+                        
                     shortcode = await Managers.ShortcodesManager.GetShortcodeAsync(-1, shortcodePreview.Id, SourceType.Local);
-
                     RefreshView();
                 }
                 catch (Exception ex)
