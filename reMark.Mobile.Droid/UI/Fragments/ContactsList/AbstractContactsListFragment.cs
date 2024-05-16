@@ -334,66 +334,86 @@ namespace reMark.Mobile.Droid.Ui.Fragments
             return true;
         }
 
-        bool ActionMode.ICallback.OnPrepareActionMode(ActionMode mode, IMenu menu)
+        bool ActionMode.ICallback.OnPrepareActionMode(ActionMode? mode, IMenu? menu)
         {
-            menu.Clear();
+            menu?.Clear();
 
             if (ServerConfig.SystemSettings.ContactsModuleInfo.WorktrayEnabled ?? true)
-                menu.Add(Menu.None, MenuItemActions.CopyToWorktray, MenuItemActions.CopyToWorktray, Resource.String.copy_to_worktray);
+            {
+                var ctwItem =  menu?.Add(MenuItemGroup.Actions, MenuItemActions.CopyToWorktray, MenuItemActions.CopyToWorktray, Resource.String.copy_to_worktray);
+                ctwItem?.SetShowAsAction(ShowAsAction.Never);
+            }
+               
+            var ctfItem = menu?.Add(MenuItemGroup.Actions, MenuItemActions.CopyToFolder, MenuItemActions.CopyToFolder, Resource.String.copy_to_folder);
+            ctfItem?.SetShowAsAction(ShowAsAction.Never);
 
-            menu.Add(Menu.None, MenuItemActions.CopyToFolder, MenuItemActions.CopyToFolder, Resource.String.copy_to_folder);
-
-            if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
-                menu.Add(Menu.None, MenuItemActions.MoveToFolder, MenuItemActions.MoveToFolder, Resource.String.move_to_folder);
-
+            if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static 
+            || Folder.InternalType == FolderInternalType.Worktray)
+            {
+                var mtfItem = menu?.Add(MenuItemGroup.Actions, MenuItemActions.MoveToFolder, MenuItemActions.MoveToFolder, Resource.String.move_to_folder);
+                mtfItem?.SetShowAsAction(ShowAsAction.Never);
+            }
+                
             if (CurrentAdapter.SelectedItemCount == 1)
-                menu.Add(Menu.None, MenuItemActions.Categories, MenuItemActions.Categories, Resource.String.categories);
-
-            if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static || Folder.InternalType == FolderInternalType.Worktray)
-                menu.Add(Menu.None, MenuItemActions.DeleteFromFolder, MenuItemActions.DeleteFromFolder, Resource.String.delete_from_folder);
-
+            {
+                var catItem = menu?.Add(MenuItemGroup.Actions, MenuItemActions.Categories, MenuItemActions.Categories, Resource.String.categories);
+                catItem?.SetShowAsAction(ShowAsAction.Never);
+            }
+                
+            if (Folder.InternalType == FolderInternalType.FilterView || Folder.InternalType == FolderInternalType.Static 
+            || Folder.InternalType == FolderInternalType.Worktray)
+            {
+                var dffItem = menu?.Add(MenuItemGroup.Actions, MenuItemActions.DeleteFromFolder, MenuItemActions.DeleteFromFolder, Resource.String.delete_from_folder);
+                dffItem?.SetShowAsAction(ShowAsAction.Never);
+            }
+                
             if (ServerConfig.SystemSettings.ContactsModuleInfo.Permissions.DeleteAllowed)
-                menu.Add(Menu.None, MenuItemActions.Delete, MenuItemActions.Delete, Resource.String.delete);
+            {
+                var deleteItem = menu?.Add(MenuItemGroup.Actions, MenuItemActions.Delete, MenuItemActions.Delete, Resource.String.delete);
+                deleteItem?.SetShowAsAction(ShowAsAction.Never);
+            }
+                         
+            menu?.SetGroupEnabled(MenuItemGroup.Actions, CurrentAdapter.SelectedItemCount > 0);
 
             return true;
         }
 
-        bool ActionMode.ICallback.OnActionItemClicked(ActionMode mode, IMenuItem item)
+        bool ActionMode.ICallback.OnActionItemClicked(ActionMode? mode, IMenuItem? item)
         {
-            if (item.ItemId == MenuItemActions.CopyToWorktray)
+            if (item?.ItemId == MenuItemActions.CopyToWorktray)
             {
                 CopyToWorktrayAction();
                 return true;
             }
 
-            if (item.ItemId == MenuItemActions.CopyToFolder)
+            if (item?.ItemId == MenuItemActions.CopyToFolder)
             {
                 StartActivity(CopyMoveToFolderListActivity.CreateIntent(Context, CopyMoveToFolderListActivity.ModeType.Copy, ModuleType.Contacts, CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList()));
                 ActionMode?.Finish();
                 return true;
             }
 
-            if (item.ItemId == MenuItemActions.MoveToFolder)
+            if (item?.ItemId == MenuItemActions.MoveToFolder)
             {
                 StartActivity(CopyMoveToFolderListActivity.CreateIntent(Context, CopyMoveToFolderListActivity.ModeType.Move, ModuleType.Contacts, CurrentAdapter.SelectedItems.Select(sp => sp).Cast<IBusinessEntity>().ToList(), Folder));
                 ActionMode?.Finish();
                 return true;
             }
 
-            if (item.ItemId == MenuItemActions.Categories)
+            if (item?.ItemId == MenuItemActions.Categories)
             {
                 StartActivity(CategoriesListActivity.CreateIntent(Context, CurrentAdapter.SelectedItems.First()));
                 ActionMode?.Finish();
                 return true;
             }
 
-            if (item.ItemId == MenuItemActions.DeleteFromFolder)
+            if (item?.ItemId == MenuItemActions.DeleteFromFolder)
             {
                 DeleteFromFolderAction();
                 return true;
             }
 
-            if (item.ItemId == MenuItemActions.Delete)
+            if (item?.ItemId == MenuItemActions.Delete)
             {
                 DeleteAction();
                 return true;
@@ -402,7 +422,7 @@ namespace reMark.Mobile.Droid.Ui.Fragments
             return base.OnOptionsItemSelected(item);
         }
 
-        void ActionMode.ICallback.OnDestroyActionMode(ActionMode mode)
+        void ActionMode.ICallback.OnDestroyActionMode(ActionMode? mode)
         {
             CurrentAdapter.ClearSelections();
             ActionMode = null;
@@ -503,6 +523,11 @@ namespace reMark.Mobile.Droid.Ui.Fragments
             public const int Categories = 50;
             public const int DeleteFromFolder = 70;
             public const int Delete = 71;
+        }
+        
+        static class MenuItemGroup
+        {
+            public const int Actions = 1;
         }
 
         #endregion
