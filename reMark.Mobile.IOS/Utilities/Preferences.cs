@@ -198,7 +198,7 @@ namespace reMark.Mobile.IOS.Utilities
                     new NSString(Keys.EmailTrailingSwipeActions), NSArray.FromStrings (EmailSwipeAction.SwipeAction.More.ToString(), EmailSwipeAction.SwipeAction.CopyToWorkTray.ToString(), EmailSwipeAction.SwipeAction.MarkAsRead.ToString())
                 },
                 {
-                    new NSString(Keys.SyncFavoriteFoldersKey), NSNumber.FromInt16(1)
+                    new NSString(Keys.SyncFavoriteFoldersKey), NSNumber.FromInt16(0)
                 },
                 {
                     new NSString(Keys.PresetCategoryIdKey), NSNumber.FromInt16(1)
