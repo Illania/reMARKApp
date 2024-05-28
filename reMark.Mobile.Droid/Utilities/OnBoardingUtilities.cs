@@ -101,25 +101,25 @@ namespace reMark.Mobile.Droid.Utilities
                 new OnBoardingPageModel("Welcome to reMARK",
                 "We have made a few changes in the reMARK app. Press next to see what has changed.",
                      Resource.Drawable.onboarding_1),
-
-                new OnBoardingPageModel("Landscape orientatioon",
-                "Now reMARK app supports also landscape screen orientation.",
+                
+                new OnBoardingPageModel("Outlook Office 365 calendar invitations support",
+                "Now you can accept/decline Office 365 calendar invitations.",
                      Resource.Drawable.onboarding_2),
 
-                new OnBoardingPageModel("Out of Office feature",
-                "Now you can set up automatic Out of Office reply in app.",
+                new OnBoardingPageModel("Send as plain text",
+                "Now you can send emails as plain text.",
                      Resource.Drawable.onboarding_3),
 
-                new OnBoardingPageModel("Extended offline features",
-                "Now you can assign categories, remove, delete and file to folder emails in offline mode.",
+                new OnBoardingPageModel("Unread filter",
+                "Now you can filter documents by unread criteria.",
                      Resource.Drawable.onboarding_4),
 
-                new OnBoardingPageModel("User activities",
-                "Now you can user automatic user action workflows in app.",
+                new OnBoardingPageModel("Add email as attachments",
+                "Now you can add emails as attachments.",
                      Resource.Drawable.onboarding_5),
 
-                new OnBoardingPageModel("Delivery report",
-                "Now you can get a detail email transmit status info.",
+                new OnBoardingPageModel("Documents filter bar",
+                "Now you can filter documents with a filter bar.",
                      Resource.Drawable.onboarding_6)
 
             };
