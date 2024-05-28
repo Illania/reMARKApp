@@ -3223,7 +3223,7 @@ namespace reMark.ServiceReference.DataContract
         [DataMember(Name = "SpamManager", Order = 0)]
         public bool SpamManager { get; set; }
 
-        [DataMember(Name = "DeleteDocumentsAllowedLines", Order = 0)]
+        [DataMember(Name = "DeleteDocumentsAllowedLines", Order = 1)]
         public List<Guid> DeleteDocumentsAllowedLines { get; set; } = new List<Guid>();
     }
 
