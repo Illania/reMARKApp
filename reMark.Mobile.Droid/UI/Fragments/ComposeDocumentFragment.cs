@@ -1439,15 +1439,15 @@ namespace reMark.Mobile.Droid.Ui.Fragments
             if (documentCreationModeFlag == DocumentCreationModeFlag.Edit)
                 return;
 
-            if (copyToNewOption.HasAnyFlag(CopyToNewOption.Content, CopyToNewOption.Attachments))
-                return;
-
             switch (PlatformConfig.Preferences.UseTemplate)
             {
                 case Preferences.TemplateUsageMode.Default:
                     CommonConfig.UsageAnalytics.LogEvent(new ComposeAddTemplateEvent(TemplateType.Default));
 
                     await GetDefaultTemplate(true);
+                    
+                    if (copyToNewOption.HasAnyFlag(CopyToNewOption.Content, CopyToNewOption.Attachments))
+                        await contentView.LoadMergedContent();
                     break;
                 case Preferences.TemplateUsageMode.Local:
                     CommonConfig.UsageAnalytics.LogEvent(new ComposeAddTemplateEvent(TemplateType.Local));
