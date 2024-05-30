@@ -547,9 +547,6 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             if (DocumentCreationModeFlag == DocumentCreationModeFlag.Edit)
                 return;
 
-            if (CopyToNewOption.HasAnyFlag(CopyToNewOption.Content, CopyToNewOption.Attachments))
-                return;
-
             switch (PlatformConfig.Preferences.UseTemplate)
             {
                 case Preferences.TemplateUsageMode.Default:
