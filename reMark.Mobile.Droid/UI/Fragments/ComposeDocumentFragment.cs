@@ -1483,7 +1483,16 @@ namespace reMark.Mobile.Droid.Ui.Fragments
         {
             try
             {
-                var template = await Managers.DocumentsManager.GetDefaultTemplateAsync(documentCreationModeFlag);
+                var creationMode = documentCreationModeFlag;
+                if ((copyToNewOption.HasFlag(CopyToNewOption.Addresses)
+                    || copyToNewOption.HasFlag(CopyToNewOption.Content)
+                    || copyToNewOption.HasFlag(CopyToNewOption.Attachments))
+                    && documentCreationModeFlag == DocumentCreationModeFlag.New)
+                {
+                    creationMode = DocumentCreationModeFlag.Edit;
+                }
+                
+                var template = await Managers.DocumentsManager.GetDefaultTemplateAsync(creationMode);
                 if (template != null)
                     await ApplyTemplate(template, initializing);
             }

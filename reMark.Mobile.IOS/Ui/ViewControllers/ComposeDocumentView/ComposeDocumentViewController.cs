@@ -1361,7 +1361,16 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
 
             try
             {
-                var template = await Managers.DocumentsManager.GetDefaultTemplateAsync(DocumentCreationModeFlag);
+                var creationMode = DocumentCreationModeFlag;
+                if ((CopyToNewOption.HasFlag(CopyToNewOption.Addresses)
+                    || CopyToNewOption.HasFlag(CopyToNewOption.Content)
+                    || CopyToNewOption.HasFlag(CopyToNewOption.Attachments))
+                    && DocumentCreationModeFlag == DocumentCreationModeFlag.New)
+                {
+                    creationMode = DocumentCreationModeFlag.Edit;
+                }
+                
+                var template = await Managers.DocumentsManager.GetDefaultTemplateAsync(creationMode);
                 if (template == null)
                     return;
 
