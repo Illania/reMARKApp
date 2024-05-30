@@ -130,55 +130,65 @@ namespace reMark.Mobile.Droid.Ui.Views.ComposeDocumentViews
             }
             else
             {
-                var previousDocumentLoaded = false;
-
                 await newContentSemaphore.WaitAsync();
                 newContentWebView.LoadEditor(context);
-
-
-                if (PreviousDocument != null && PreviousDocumentDirection == DocumentDirection.Draft ||
-                    (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption.HasFlag(CopyToNewOption.Content)))
+                
+                if (DocumentCreationModeFlag == DocumentCreationModeFlag.New && CopyToNewOption.HasFlag(CopyToNewOption.Content))
+                    await LoadPreviousDocumentBody(oldContentSemaphore, oldContentWebView);
+                else if (PreviousDocument != null && PreviousDocumentDirection == DocumentDirection.Draft)
+                    await LoadPreviousDocumentBody(newContentSemaphore, newContentWebView);
+                else if (PreviousDocumentPreview != null &&
+                         (DocumentCreationModeFlag == DocumentCreationModeFlag.Reply && CopyToNewOption == CopyToNewOption.None ||
+                          DocumentCreationModeFlag == DocumentCreationModeFlag.ReplyAll && CopyToNewOption == CopyToNewOption.None ||
+                          DocumentCreationModeFlag == DocumentCreationModeFlag.Forward && CopyToNewOption == CopyToNewOption.None))
                 {
-                    if (!string.IsNullOrWhiteSpace(PreviousDocument?.HtmlBody))
-                    {
-                        await newContentSemaphore.WaitAsync();
-                        await newContentWebView.LoadHtml(context, PreviousDocument.HtmlBody, HtmlProcessingConfiguration.DefaultForEditing);
-                    }
-                    else if (!string.IsNullOrWhiteSpace(PreviousDocument?.PlainTextBody))
-                    {
-                        await newContentSemaphore.WaitAsync();
-                        await newContentWebView.LoadPlainText(context, PreviousDocument.PlainTextBody, PlainTextProcessingConfiguration.DefaultForEditing);
-                    }
+                    await ProcessReplyForward();
                 }
-                else if (PreviousDocumentPreview != null && (DocumentCreationModeFlag == DocumentCreationModeFlag.Reply && CopyToNewOption == CopyToNewOption.None ||
-                                                             DocumentCreationModeFlag == DocumentCreationModeFlag.ReplyAll && CopyToNewOption == CopyToNewOption.None ||
-                                                             DocumentCreationModeFlag == DocumentCreationModeFlag.Forward && CopyToNewOption == CopyToNewOption.None))
-                {
-                    if (!string.IsNullOrWhiteSpace(PreviousDocument?.HtmlBody))
-                    {
-                        var config = HtmlProcessingConfiguration.DefaultForEditing;
-                        config.InjectReplyHeader = true;
-                        config.ReplyHeaderParameters = HtmlUtilities.GetReplyHeaderParameters(Context, PreviousDocumentPreview, PreviousDocument);
+            }
+        }
+        
+        private async Task ProcessReplyForward()
+        {
+            var previousDocumentLoaded = false;
+            
+            if (!string.IsNullOrWhiteSpace(PreviousDocument?.HtmlBody))
+            {
+                var config = HtmlProcessingConfiguration.DefaultForEditing;
+                config.InjectReplyHeader = true;
+                config.ReplyHeaderParameters = HtmlUtilities.GetReplyHeaderParameters(Context, PreviousDocumentPreview, PreviousDocument);
 
-                        await oldContentSemaphore.WaitAsync();
-                        await oldContentWebView.LoadHtml(context, PreviousDocument.HtmlBody, config);
+                await oldContentSemaphore.WaitAsync();
+                await oldContentWebView.LoadHtml(context, PreviousDocument.HtmlBody, config);
 
-                        previousDocumentLoaded = true;
-                    }
-                    else if (!string.IsNullOrWhiteSpace(PreviousDocument?.PlainTextBody))
-                    {
-                        var config = PlainTextProcessingConfiguration.DefaultForEditing;
-                        config.InjectReplyHeader = true;
-                        config.ReplyHeaderParameters = HtmlUtilities.GetReplyHeaderParameters(Context, PreviousDocumentPreview, PreviousDocument);
+                previousDocumentLoaded = true;
+            }
+            else if (!string.IsNullOrWhiteSpace(PreviousDocument?.PlainTextBody))
+            {
+                var config = PlainTextProcessingConfiguration.DefaultForEditing;
+                config.InjectReplyHeader = true;
+                config.ReplyHeaderParameters = HtmlUtilities.GetReplyHeaderParameters(Context, PreviousDocumentPreview, PreviousDocument);
 
-                        await oldContentSemaphore.WaitAsync();
-                        await oldContentWebView.LoadPlainText(context, PreviousDocument.PlainTextBody, config);
+                await oldContentSemaphore.WaitAsync();
+                await oldContentWebView.LoadPlainText(context, PreviousDocument.PlainTextBody, config);
 
-                        previousDocumentLoaded = true;
-                    }
+                previousDocumentLoaded = true;
+            }
 
-                    showOldContentButton.Visibility = previousDocumentLoaded ? ViewStates.Visible : ViewStates.Gone;
-                }
+            showOldContentButton.Visibility = previousDocumentLoaded ? ViewStates.Visible : ViewStates.Gone;
+        }
+
+        private async Task LoadPreviousDocumentBody(SemaphoreSlim semaphoreSlim, CustomWebView webView)
+        {
+            if (!string.IsNullOrWhiteSpace(PreviousDocument?.HtmlBody))
+            {
+                await semaphoreSlim.WaitAsync();
+                await webView.LoadHtml(context, PreviousDocument.HtmlBody, HtmlProcessingConfiguration.DefaultForEditing);
+            }
+            else if (!string.IsNullOrWhiteSpace(PreviousDocument?.PlainTextBody))
+            {
+                await semaphoreSlim.WaitAsync();
+                await webView.LoadPlainText(context, PreviousDocument.PlainTextBody,
+                    PlainTextProcessingConfiguration.DefaultForEditing);
             }
         }
 
@@ -357,6 +367,13 @@ namespace reMark.Mobile.Droid.Ui.Views.ComposeDocumentViews
         {
             newContentWebView.SetUnderline();
             oldContentWebView.SetUnderline();
+        }
+        
+        public async Task LoadMergedContent()
+        {
+            var mergedContent = await GetContentAsync();
+            await newContentSemaphore.WaitAsync();
+            await newContentWebView.LoadHtml(context, mergedContent, HtmlProcessingConfiguration.DefaultForEditing);
         }
 
         #endregion
