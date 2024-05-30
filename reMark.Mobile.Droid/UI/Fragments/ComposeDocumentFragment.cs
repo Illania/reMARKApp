@@ -1438,6 +1438,12 @@ namespace reMark.Mobile.Droid.Ui.Fragments
 
             if (documentCreationModeFlag == DocumentCreationModeFlag.Edit)
                 return;
+            
+            if (!ServerConfig.SystemSettings.SystemInfo.CopyToNewTemplateAvailable)
+            {
+                if (copyToNewOption.HasAnyFlag(CopyToNewOption.Content, CopyToNewOption.Attachments))
+                    return;
+            }
 
             switch (PlatformConfig.Preferences.UseTemplate)
             {
@@ -1445,9 +1451,12 @@ namespace reMark.Mobile.Droid.Ui.Fragments
                     CommonConfig.UsageAnalytics.LogEvent(new ComposeAddTemplateEvent(TemplateType.Default));
 
                     await GetDefaultTemplate(true);
-                    
-                    if (copyToNewOption.HasAnyFlag(CopyToNewOption.Content, CopyToNewOption.Attachments))
-                        await contentView.LoadMergedContent();
+
+                    if (ServerConfig.SystemSettings.SystemInfo.CopyToNewTemplateAvailable)
+                    {
+                        if (copyToNewOption.HasAnyFlag(CopyToNewOption.Content, CopyToNewOption.Attachments))
+                            await contentView.LoadMergedContent();
+                    }
                     break;
                 case Preferences.TemplateUsageMode.Local:
                     CommonConfig.UsageAnalytics.LogEvent(new ComposeAddTemplateEvent(TemplateType.Local));
@@ -1484,14 +1493,17 @@ namespace reMark.Mobile.Droid.Ui.Fragments
             try
             {
                 var creationMode = documentCreationModeFlag;
-                if ((copyToNewOption.HasFlag(CopyToNewOption.Addresses)
-                    || copyToNewOption.HasFlag(CopyToNewOption.Content)
-                    || copyToNewOption.HasFlag(CopyToNewOption.Attachments))
-                    && documentCreationModeFlag == DocumentCreationModeFlag.New)
+                if (ServerConfig.SystemSettings.SystemInfo.CopyToNewTemplateAvailable)
                 {
-                    creationMode = DocumentCreationModeFlag.Edit;
+                    if ((copyToNewOption.HasFlag(CopyToNewOption.Addresses)
+                         || copyToNewOption.HasFlag(CopyToNewOption.Content)
+                         || copyToNewOption.HasFlag(CopyToNewOption.Attachments))
+                        && documentCreationModeFlag == DocumentCreationModeFlag.New)
+                    {
+                        creationMode = DocumentCreationModeFlag.Edit;
+                    }
                 }
-                
+
                 var template = await Managers.DocumentsManager.GetDefaultTemplateAsync(creationMode);
                 if (template != null)
                     await ApplyTemplate(template, initializing);

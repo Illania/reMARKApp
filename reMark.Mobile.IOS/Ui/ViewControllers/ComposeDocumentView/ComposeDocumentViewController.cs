@@ -547,6 +547,12 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             if (DocumentCreationModeFlag == DocumentCreationModeFlag.Edit)
                 return;
 
+            if (!ServerConfig.SystemSettings.SystemInfo.CopyToNewTemplateAvailable)
+            {
+                if (CopyToNewOption.HasAnyFlag(CopyToNewOption.Content, CopyToNewOption.Attachments))
+                    return;
+            }
+
             switch (PlatformConfig.Preferences.UseTemplate)
             {
                 case Preferences.TemplateUsageMode.Default:
@@ -1362,12 +1368,16 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
             try
             {
                 var creationMode = DocumentCreationModeFlag;
-                if ((CopyToNewOption.HasFlag(CopyToNewOption.Addresses)
-                    || CopyToNewOption.HasFlag(CopyToNewOption.Content)
-                    || CopyToNewOption.HasFlag(CopyToNewOption.Attachments))
-                    && DocumentCreationModeFlag == DocumentCreationModeFlag.New)
+
+                if (ServerConfig.SystemSettings.SystemInfo.CopyToNewTemplateAvailable)
                 {
-                    creationMode = DocumentCreationModeFlag.Edit;
+                    if ((CopyToNewOption.HasFlag(CopyToNewOption.Addresses)
+                         || CopyToNewOption.HasFlag(CopyToNewOption.Content)
+                         || CopyToNewOption.HasFlag(CopyToNewOption.Attachments))
+                        && DocumentCreationModeFlag == DocumentCreationModeFlag.New)
+                    {
+                        creationMode = DocumentCreationModeFlag.Edit;
+                    } 
                 }
                 
                 var template = await Managers.DocumentsManager.GetDefaultTemplateAsync(creationMode);
