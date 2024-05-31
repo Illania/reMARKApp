@@ -26,7 +26,8 @@ namespace reMark.Mobile.Common.Model
         /// New Notifications System works only on systems with API 4.0.0 or greater or with server versions equal or greater that 1.37.13.
         /// All 1.33 and 1.35 version work with old notifications system.
         /// </summary>
-        public bool NewPushNotificationsSystemAvailable => ServiceVersionGreaterThanOrEqual(4, 0, 0) || SystemVersionGreaterThanOrEqual(1, 37, 13);
+        public bool NewPushNotificationsSystemAvailable =>
+            ServiceVersionGreaterThanOrEqual(4, 0, 0) || SystemVersionGreaterThanOrEqual(1, 37, 13);
 
         public bool IsReferenceInTemplatesAvailable => ServiceVersionGreaterThanOrEqual(4, 2, 0);
 
@@ -39,7 +40,7 @@ namespace reMark.Mobile.Common.Model
         public bool UserActivitiesAvailable => ServiceVersionGreaterThanOrEqual(4, 6, 0);
 
         public bool AutoReplyAvailable => ServiceVersionGreaterThanOrEqual(4, 7, 0);
-        
+
         public bool DeleteDocumentsAllowedLinesAvailable => ServiceVersionGreaterThanOrEqual(4, 7, 1);
 
         public bool SyncFavoritesWithDesktopAvailable => ServiceVersionGreaterThanOrEqual(4, 8, 1);
@@ -50,11 +51,11 @@ namespace reMark.Mobile.Common.Model
 
         public bool SendAsPlainTextAvailable => ServiceVersionGreaterThanOrEqual(4, 11, 0);
 
-        public bool CalendarModuleAvailable  => ServiceVersionGreaterThanOrEqual(4, 12, 0);  
-        
-        public bool CopyToNewTemplateAvailable => ServiceVersionGreaterThanOrEqual(4, 13, 0);  
+        public bool CalendarModuleAvailable => ServiceVersionGreaterThanOrEqual(4, 12, 0);
 
-        List<ModuleType> availableModules;
+        public bool CopyToNewTemplateAvailable => ServiceVersionGreaterThanOrEqual(4, 13, 0) || ServiceVersionEqual(4,10,1);
+
+    List<ModuleType> availableModules;
         public List<ModuleType> AvailableModules
         {
             get
@@ -91,6 +92,11 @@ namespace reMark.Mobile.Common.Model
         public bool ServiceVersionGreaterThanOrEqual(int major, int minor, int build)
         {
             return new Version(major, minor, build) <= ServiceVersion;
+        }
+        
+        public bool ServiceVersionEqual(int major, int minor, int build)
+        {
+            return new Version(major, minor, build) == ServiceVersion;
         }
 
         public bool SystemVersionGreaterThanOrEqual(int major, int minor, int build)
