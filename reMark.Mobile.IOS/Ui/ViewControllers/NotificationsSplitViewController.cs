@@ -4,7 +4,7 @@ using reMark.Mobile.IOS.Ui.ViewControllers.DocumentView;
 
 namespace reMark.Mobile.IOS.Ui.ViewControllers
 {
-    public class DocumentsSplitViewController : AbstractSplitViewController
+    public class NotificationsSplitViewController : AbstractSplitViewController
     {
         protected override NavigationController CreatePrimaryNavigationController()
         {
@@ -16,9 +16,9 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
 
         protected override NavigationController CreateSecondaryNavigationController()
         {
-            return new NavigationController(new DocumentPageViewController())
+            return new NavigationController(new NotificationPageViewController())
             {
-                RestorationIdentifier = "Secondary_NavigationController_" + nameof(DocumentPageViewController)
+                RestorationIdentifier = "Secondary_NavigationController_" + nameof(NotificationPageViewController)
             };
         }
     }

@@ -57,6 +57,20 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
             Delegate = new DocumentPageDelegate();
 
             DataSource = new NotificationPageDataSource();
+            ((NotificationPageDataSource)DataSource).OnNextViewControllerLoaded += PageDelegate_OnNextViewControllerLoaded;
+        }
+        
+        private void PageDelegate_OnNextViewControllerLoaded(UIViewController viewController)
+        {
+            if (viewController != null)
+            {
+                // This method should run on the UI thread.
+                InvokeOnMainThread(() =>
+                {
+                    SetViewControllers(new[] { viewController }, 
+                        UIPageViewControllerNavigationDirection.Forward, true, null);
+                });
+            }
         }
 
         public override void ViewWillAppear(bool animated)
@@ -269,8 +283,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
             {
                 DocumentPageViewControllerDelegate = this
             };
-
-            //vc.SetData(folder, documentPreview);
+            
             vc.SetData(documentPreview.Id, notificationGuid);
             vc.SetRefreshDataOnAppear();
 
@@ -351,16 +364,6 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
         #region Swipe Related
         //Both the delegate and the datasource are used only when swiping
 
-        async Task<DocumentViewController> GoToPageAndReturnVC(int nextDocumentPreviewFolderId, int nextDocumentPreviewId, Guid nextDocumentNotificationGuid)
-        {
-            CommonConfig.UsageAnalytics.LogEvent(new DocumentQuickSwitchEvent());
-            var nextDocument = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(nextDocumentPreviewFolderId, nextDocumentPreviewId);
-            var vc = GetDocumentViewController(nextDocument.DocumentPreview, nextDocumentNotificationGuid);
-          
-            return vc;
-            
-        }
-
         #region Delegate
         protected class DocumentPageDelegate : UIPageViewControllerDelegate
         {
@@ -384,9 +387,13 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
         #endregion
 
         #region DataSource
+        public delegate void DocumentViewControllerLoadedHandler(UIViewController viewController);
+        
         protected class NotificationPageDataSource : UIPageViewControllerDataSource
         {
-            public override  UIViewController GetNextViewController(UIPageViewController pageViewController, UIViewController referenceViewController)
+            public event DocumentViewControllerLoadedHandler OnNextViewControllerLoaded;
+    
+            public override UIViewController GetNextViewController(UIPageViewController pageViewController, UIViewController referenceViewController)
             {
                 try
                 {
@@ -402,10 +409,13 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                     var nextDocumentPreviewId = pageVC.Notifications[index + 1].ObjectId;
                     var nextDocumentPreviewFolderId = pageVC.Notifications[index + 1].FolderId;
                     var nextDocumentNotificationGuid = pageVC.Notifications[index + 1].Guid;
+                    
+         
+                    // Asynchronously fetch the next view controller
+                    FetchNextViewController(pageVC, nextDocumentPreviewFolderId, nextDocumentPreviewId, nextDocumentNotificationGuid,
+                        OnNextViewControllerLoaded);
 
-                    var task = Task.Run(async () => await pageVC.GoToPageAndReturnVC(nextDocumentPreviewFolderId, nextDocumentPreviewId, nextDocumentNotificationGuid));
-
-                    return task.Result;
+                    return null;  // Return null initially, as the async operation is in progress.
                 }
                 catch (Exception ex)
                 {
@@ -413,7 +423,18 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                     return null;
                 }
             }
+            
+            private async void FetchNextViewController(NotificationPageViewController pageViewController, int nextDocumentPreviewFolderId, int nextDocumentPreviewId, 
+                Guid nextDocumentNotificationGuid,
+                DocumentViewControllerLoadedHandler callback)
+            {
+                var nextDocument = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(nextDocumentPreviewFolderId, nextDocumentPreviewId);
+                var nextViewController = pageViewController.GetDocumentViewController(nextDocument.DocumentPreview, nextDocumentNotificationGuid);
 
+                // Invoke the callback when the task is complete.
+                callback?.Invoke(nextViewController);
+            }
+            
             public override UIViewController GetPreviousViewController(UIPageViewController pageViewController, UIViewController referenceViewController)
             {
                 try
@@ -430,12 +451,14 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
 
 
                     var previousDocumentPreviewId = pageVC.Notifications[index - 1].ObjectId;
-                    var previousDocumentFolderId = pageVC.Notifications[index - 1].FolderId;
+                    var previousDocumentPreviewFolderId = pageVC.Notifications[index - 1].FolderId;
                     var previousDocumentNotificationGuid = pageVC.Notifications[index + 1].Guid;
 
-                    var task = Task.Run(async () => await pageVC.GoToPageAndReturnVC(previousDocumentPreviewId, previousDocumentFolderId, previousDocumentNotificationGuid));
+                    // Asynchronously fetch the next view controller
+                    FetchNextViewController(pageVC, previousDocumentPreviewFolderId, previousDocumentPreviewId, 
+                        previousDocumentNotificationGuid, OnNextViewControllerLoaded);
 
-                    return task.Result;
+                    return null;  // Return null initially, as the async operation is in progress.
                 }
                 catch (Exception ex)
                 {

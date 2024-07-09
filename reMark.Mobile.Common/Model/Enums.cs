@@ -383,6 +383,7 @@ namespace reMark.Mobile.Common.Model
         Documents = 1,
         Contacts = 2,
         Shortcodes = 3,
+        Notifications = 4
     }
 
     #endregion

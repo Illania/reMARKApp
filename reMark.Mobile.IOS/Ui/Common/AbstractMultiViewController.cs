@@ -2,6 +2,9 @@
 using Foundation;
 using reMark.Mobile.IOS.Utilities;
 using ObjCRuntime;
+using reMark.Mobile.Common;
+using reMark.Mobile.IOS.Model;
+using reMark.Mobile.IOS.Model.HubMessages;
 using UIKit;
 
 namespace reMark.Mobile.IOS.Ui.Common
@@ -140,7 +143,7 @@ namespace reMark.Mobile.IOS.Ui.Common
         }
 
         [Export("segmentedControlHasChangedValue:")]
-        void SegmentedControlHasChangedValue(UISegmentedControl sender)
+        public virtual void SegmentedControlHasChangedValue(UISegmentedControl sender)
         {
             View.EndEditing(true);
 

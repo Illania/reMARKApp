@@ -10,6 +10,8 @@ using reMark.Mobile.Common.Model;
 using reMark.Mobile.Common.Model.HubMessages;
 using reMark.Mobile.Common.Utilities;
 using reMark.Mobile.Common.Utilities.Extensions;
+using reMark.Mobile.IOS.Model;
+using reMark.Mobile.IOS.Model.HubMessages;
 using reMark.Mobile.IOS.Ui.Common;
 using reMark.Mobile.IOS.Ui.TableViewCells;
 using reMark.Mobile.IOS.Ui.ViewControllers.DocumentView;
@@ -64,11 +66,14 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
 
             if (parent == null && SplitViewController != null && !SplitViewController.Collapsed)
             {
+                if (SplitViewController is not NotificationsSplitViewController)
+                    return;
+                
                 var nc = (UINavigationController)SplitViewController.ViewControllers[1];
                 nc.PopToRootViewController(false);
 
-                //var vc = (NotificationPageViewController)nc.ViewControllers[0];
-                //vc.ClearPage();
+                var vc = (NotificationPageViewController)nc.ViewControllers[0];
+                vc.ClearPage();
             }
         }
 
@@ -307,15 +312,16 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
             switch (notification.ObjectType)
             {
                 case ObjectType.Document:
-                    SelectDocument(notification.ObjectId, notification.FolderId, notification.Guid);
+                    SelectNotification(notification.ObjectId, notification.FolderId, notification.Guid);
                     break;
             }
         }
 
-        public virtual async void SelectDocument(int documentPreviewId, int folderId, Guid notificationGuid)
+        public virtual async void SelectNotification(int documentPreviewId, int folderId, Guid notificationGuid)
         {
             if (SplitViewController != null && !SplitViewController.Collapsed)
             {
+
                 var nc = (UINavigationController)SplitViewController.ViewControllers[1];
                 nc.PopToViewController(nc.ViewControllers[0], false);
 
