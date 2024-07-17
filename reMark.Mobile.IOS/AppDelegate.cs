@@ -335,7 +335,8 @@ namespace reMark.Mobile.IOS
             Services.DocumentsDownloadService?.Start();
             Services.ActionSyncService?.Start();
 
-            HandleForegroundTask();
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(28));
+            HandleForegroundTask(cts.Token);
         }
 
         public override void DidEnterBackground(UIApplication application)
@@ -561,25 +562,30 @@ namespace reMark.Mobile.IOS
 
         #region Update Activities
 
-        public override void PerformFetch(UIApplication application, Action<UIBackgroundFetchResult> completionHandler)
+        
+        
+        public override async void PerformFetch(UIApplication application, Action<UIBackgroundFetchResult> completionHandler)
         {
-            CommonConfig.Logger.Info("Background Fetch started...");
-
-            Task.Run(async () =>
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(28));
+            try
             {
-                try
-                {
-                    await RunJobs();
-
-                    completionHandler(UIBackgroundFetchResult.NewData);
-                }
-                catch (Exception ex)
-                {
-                    CommonConfig.Logger.Error("Background Fetch error!", ex);
-                    completionHandler(UIBackgroundFetchResult.Failed);
-                }
-            });
+                await RunJobs(cts.Token);
+                completionHandler(UIBackgroundFetchResult.NewData);
+            }
+            catch (OperationCanceledException)
+            {
+                CommonConfig.Logger.Warning("Background Fetch was cancelled due to timeout.");
+                completionHandler(UIBackgroundFetchResult.NoData);
+            }
+            catch (Exception ex)
+            {
+                CommonConfig.Logger.Error("Background Fetch error!", ex);
+                completionHandler(UIBackgroundFetchResult.Failed);
+            }
         }
+        
+        
+        
 
         //https://github.com/xamarin/xamarin-macios/issues/7456
         //Unfortunately we can't use BGTaskScheduler because there is a bug in Xamarin.
@@ -608,7 +614,10 @@ namespace reMark.Mobile.IOS
                 try
                 {
                     CommonConfig.Logger.Info("Running background task ");
-                    await RunJobs();
+                    using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(28));
+                
+                    await RunJobs(cts.Token);
+                        
                     task.SetTaskCompleted(true);
                 }
                 catch (Exception ex)
@@ -622,7 +631,7 @@ namespace reMark.Mobile.IOS
             ScheduleBackgroundTask();
         }
 
-        void HandleForegroundTask()
+        void HandleForegroundTask(CancellationToken cancellationToken)
         {
             if (lastForegroundTaskRunDate > DateTime.Now.AddHours(-1))
                 return;
@@ -634,7 +643,7 @@ namespace reMark.Mobile.IOS
                 try
                 {
                     CommonConfig.Logger.Info("Running foreground task ");
-                    await RunJobs();
+                    await RunJobs(cancellationToken);
                 }
                 catch (Exception ex)
                 {
@@ -642,14 +651,35 @@ namespace reMark.Mobile.IOS
                 }
             });
         }
-
-        async Task RunJobs()
+        
+        async Task RunJobs(CancellationToken cancellationToken)
         {
-            if (!await AuthenticatorFactory.Create().IsAuthenticatedAsync())
+            if (!await AuthenticatorFactory.Create().IsAuthenticatedAsync(cancellationToken))
                 return;
 
-            var job1 = Jobs.SystemSettingsUpdateJob.Run();
-            await Task.WhenAll(job1);
+            try
+            {
+                // Wrap the task in another Task.Run to respect the time constraints 
+                // and to surface any potential exceptions.
+                var job1 = Task.Run(async () =>
+                {
+                    await Jobs.SystemSettingsUpdateJob.Run();
+                }, cancellationToken);
+
+                // Wait for the job to complete, or cancel if the time is exceeded.
+                await Task.WhenAll(job1);
+            }
+            catch (OperationCanceledException)
+            {
+                // Handle cancellation – this might be triggered by the iOS time constraint, 
+                // or if you decide to cancel the task based on your logic.
+                Console.WriteLine("Job was cancelled due to time constraints.");
+            }
+            catch (Exception ex)
+            {
+                // Log or handle any other exceptions that may have occurred
+                Console.WriteLine($"Exception occurred while running jobs: {ex.Message}");
+            }
         }
 
 
