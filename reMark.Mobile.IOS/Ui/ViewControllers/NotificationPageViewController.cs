@@ -1,5 +1,4 @@
-﻿using CoreText;
-using reMark.Mobile.Common;
+﻿using reMark.Mobile.Common;
 using reMark.Mobile.Common.Manager;
 using reMark.Mobile.Common.Model;
 using reMark.Mobile.Common.Model.HubMessages;
@@ -31,7 +30,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
         public Folder Folder { get; set; }
         public DocumentPreview InitialDocumentPreview { get; set; }
         public Guid InitialNotificationGuid { get; set; }
-        public List<Notification> Notifications { get; set; }
+        public List<(Notification, DocumentPreview)> Notifications { get; set; }
 
         public bool Empty => !IsShowingAnyDocument();
 
@@ -60,15 +59,15 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
             ((NotificationPageDataSource)DataSource).OnNextViewControllerLoaded += PageDelegate_OnNextViewControllerLoaded;
         }
         
-        private void PageDelegate_OnNextViewControllerLoaded(UIViewController viewController)
+        private void PageDelegate_OnNextViewControllerLoaded(DocumentViewController viewController, UIPageViewControllerNavigationDirection direction)
         {
             if (viewController != null)
             {
                 // This method should run on the UI thread.
                 InvokeOnMainThread(() =>
                 {
-                    SetViewControllers(new[] { viewController }, 
-                        UIPageViewControllerNavigationDirection.Forward, true, null);
+                    SetViewControllers(new[] { viewController }, direction, false, 
+                        (finished) => UpdateToolBar(viewController));
                 });
             }
         }
@@ -170,17 +169,17 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
         {
             var vc = (DocumentViewController)ViewControllers.FirstOrDefault();
             var documentPreview = vc.DocumentPreview;
+            
 
-            var index = Notifications.FindIndex(dp => dp.ObjectId == documentPreview.Id);
+            var index = Notifications.FindIndex(dp => dp.Item1.ObjectId == documentPreview.Id);
             if (index < 1)
                 return;
 
-            var previousDocumentPreviewId = Notifications[index - 1].ObjectId;
-            var previousDocumentPreviewFolderId = Notifications[index - 1].FolderId;
-            var previousDocumentNotificationGuid = Notifications[index - 1].Guid;
+            var previousDocumentPreviewId = Notifications[index - 1].Item1.ObjectId;
+            var previousDocumentPreviewFolderId = Notifications[index - 1].Item1.FolderId;
+            var previousDocumentNotificationGuid = Notifications[index - 1].Item1.Guid;
 
             var documentContainer = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(previousDocumentPreviewFolderId, previousDocumentPreviewId);
-
             GoToPage(documentContainer.DocumentPreview, previousDocumentNotificationGuid, UIPageViewControllerNavigationDirection.Reverse);
         }
 
@@ -189,13 +188,13 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
             var vc = (DocumentViewController)ViewControllers.FirstOrDefault();
             var documentPreview = vc.DocumentPreview;
 
-            var index = Notifications.FindIndex(dp => dp.ObjectId == documentPreview.Id);
+            var index = Notifications.FindIndex(dp => dp.Item1.ObjectId == documentPreview.Id);
             if (index < 0 || index >= Notifications.Count - 1)
                 return;
 
-            var nextDocumentPreviewId = Notifications[index + 1].ObjectId;
-            var nextDocumentPreviewFolderId = Notifications[index + 1].FolderId;
-            var nextDocumentNotificationGuid = Notifications[index + 1].Guid;
+            var nextDocumentPreviewId = Notifications[index + 1].Item1.ObjectId;
+            var nextDocumentPreviewFolderId = Notifications[index + 1].Item1.FolderId;
+            var nextDocumentNotificationGuid = Notifications[index + 1].Item1.Guid;
 
             var documentContainer = await Managers.DocumentsManager.GetDocumentWithPreviewAsync( nextDocumentPreviewFolderId, nextDocumentPreviewId);
             GoToPage(documentContainer.DocumentPreview, nextDocumentNotificationGuid, UIPageViewControllerNavigationDirection.Forward);
@@ -247,13 +246,13 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
 
         bool HasNext(DocumentPreview documentPreview)
         {
-            var index = Notifications.FindIndex(dp => dp.ObjectId == documentPreview.Id);
+            var index = Notifications.FindIndex(dp => dp.Item2.Id == documentPreview.Id);
             return index >= 0 && index < Notifications.Count - 1;
         }
 
         bool HasPrevious(DocumentPreview documentPreview)
         {
-            var index = Notifications.FindIndex(dp => dp.ObjectId == documentPreview.Id);
+            var index = Notifications.FindIndex(dp => dp.Item2.Id == documentPreview.Id);
             return index >= 1;
         }
 
@@ -363,16 +362,31 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
 
         #region Swipe Related
         //Both the delegate and the datasource are used only when swiping
+        //Both the delegate and the datasource are used only when swiping
+
+        DocumentViewController GoToPageAndReturnVC(DocumentPreview documentPreview, Guid notificationGuid)
+        {
+            CommonConfig.UsageAnalytics.LogEvent(new DocumentQuickSwitchEvent());
+            var vc = GetDocumentViewController(documentPreview, notificationGuid);
+            return vc;
+        }
 
         #region Delegate
         protected class DocumentPageDelegate : UIPageViewControllerDelegate
         {
-            public override void DidFinishAnimating(UIPageViewController pageViewController, bool finished, UIViewController[] previousViewControllers, bool completed)
+            
+            public override void DidFinishAnimating(UIPageViewController pageViewController, bool finished, 
+                UIViewController[] previousViewControllers, bool completed)
             {
+                if (pageViewController == null) 
+                    return;
                 var vc = (DocumentViewController)pageViewController.ViewControllers.FirstOrDefault();
+                if (vc == null) return;
                 var documentPreview = vc.DocumentPreview;
+                if (documentPreview == null)
+                    return;
                 var pageVC = (NotificationPageViewController)pageViewController;
-                var index = pageVC.Notifications.FindIndex(dp => dp.ObjectId == documentPreview.Id);
+                var index = pageVC.Notifications.FindIndex(dp => dp.Item2.Id == documentPreview.Id);
                 if (index < 0 || index > pageVC.Notifications.Count - 1)
                     return;
                 CommonConfig.MessengerHub.Publish(new GoToDocumentMessage(this, documentPreview.Id));
@@ -387,7 +401,8 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
         #endregion
 
         #region DataSource
-        public delegate void DocumentViewControllerLoadedHandler(UIViewController viewController);
+        public delegate void DocumentViewControllerLoadedHandler(DocumentViewController viewController, 
+            UIPageViewControllerNavigationDirection direction);
         
         protected class NotificationPageDataSource : UIPageViewControllerDataSource
         {
@@ -400,22 +415,25 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                     var vc = (DocumentViewController)pageViewController.ViewControllers.FirstOrDefault();
                     var documentPreview = vc.DocumentPreview;
                     var pageVC = (NotificationPageViewController)pageViewController;
+                    
 
-                    var index = pageVC.Notifications.FindIndex(dp => dp.ObjectId == documentPreview.Id);
+                  
+                    var index = pageVC.Notifications.FindIndex(dp => dp.Item1.ObjectId== documentPreview.Id);
 
                     if (index < 0 || index >= pageVC.Notifications.Count - 1)
                         return null;
 
-                    var nextDocumentPreviewId = pageVC.Notifications[index + 1].ObjectId;
-                    var nextDocumentPreviewFolderId = pageVC.Notifications[index + 1].FolderId;
-                    var nextDocumentNotificationGuid = pageVC.Notifications[index + 1].Guid;
-                    
+                    var nextDocumentPreviewId = pageVC.Notifications[index + 1].Item1.ObjectId;
+                    var nextDocumentPreviewFolderId = pageVC.Notifications[index + 1].Item1.FolderId;
+                    var nextDocumentNotificationGuid = pageVC.Notifications[index + 1].Item1.Guid;
+                    var nextDocumentPreview = pageVC.Notifications[index + 1].Item2;
+                    return pageVC.GoToPageAndReturnVC(nextDocumentPreview, nextDocumentNotificationGuid);
          
                     // Asynchronously fetch the next view controller
-                    FetchNextViewController(pageVC, nextDocumentPreviewFolderId, nextDocumentPreviewId, nextDocumentNotificationGuid,
+                  /*  FetchNextViewController(pageVC, nextDocumentPreviewFolderId, nextDocumentPreviewId, nextDocumentNotificationGuid,
+                        UIPageViewControllerNavigationDirection.Forward,
                         OnNextViewControllerLoaded);
-
-                    return null;  // Return null initially, as the async operation is in progress.
+*/
                 }
                 catch (Exception ex)
                 {
@@ -424,17 +442,19 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                 }
             }
             
-            private async void FetchNextViewController(NotificationPageViewController pageViewController, int nextDocumentPreviewFolderId, int nextDocumentPreviewId, 
+            private async void FetchNextViewController(NotificationPageViewController pageViewController, 
+                int nextDocumentPreviewFolderId, int nextDocumentPreviewId, 
                 Guid nextDocumentNotificationGuid,
+                UIPageViewControllerNavigationDirection direction,
                 DocumentViewControllerLoadedHandler callback)
             {
                 var nextDocument = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(nextDocumentPreviewFolderId, nextDocumentPreviewId);
                 var nextViewController = pageViewController.GetDocumentViewController(nextDocument.DocumentPreview, nextDocumentNotificationGuid);
 
                 // Invoke the callback when the task is complete.
-                callback?.Invoke(nextViewController);
+                callback?.Invoke(nextViewController, direction);
             }
-            
+           
             public override UIViewController GetPreviousViewController(UIPageViewController pageViewController, UIViewController referenceViewController)
             {
                 try
@@ -442,22 +462,24 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                     var vc = (DocumentViewController)pageViewController.ViewControllers.FirstOrDefault();
                     var documentPreview = vc.DocumentPreview;
                     var pageVC = (NotificationPageViewController)pageViewController;
+                    pageVC.PreviousDocumentButton_Clicked(null, new EventArgs());
       
 
-                    var index = pageVC.Notifications.FindIndex(dp => dp.ObjectId == documentPreview.Id);
+                    var index = pageVC.Notifications.FindIndex(dp => dp.Item1.ObjectId == documentPreview.Id);
 
-                    if (index < 1)
+                    if (index < 1) 
                         return null;
-
-
-                    var previousDocumentPreviewId = pageVC.Notifications[index - 1].ObjectId;
-                    var previousDocumentPreviewFolderId = pageVC.Notifications[index - 1].FolderId;
-                    var previousDocumentNotificationGuid = pageVC.Notifications[index + 1].Guid;
-
+                    
+                    var previousDocumentPreviewId = pageVC.Notifications[index - 1].Item1.ObjectId;
+                    var previousDocumentPreviewFolderId = pageVC.Notifications[index - 1].Item1.FolderId;
+                    var previousDocumentNotificationGuid = pageVC.Notifications[index - 1].Item1.Guid;
+                    var previousDocumentPreview = pageVC.Notifications[index - 1].Item2;
+                    return pageVC.GoToPageAndReturnVC(previousDocumentPreview, previousDocumentNotificationGuid);
+/*
                     // Asynchronously fetch the next view controller
                     FetchNextViewController(pageVC, previousDocumentPreviewFolderId, previousDocumentPreviewId, 
-                        previousDocumentNotificationGuid, OnNextViewControllerLoaded);
-
+                        previousDocumentNotificationGuid, UIPageViewControllerNavigationDirection.Reverse, OnNextViewControllerLoaded);
+*/
                     return null;  // Return null initially, as the async operation is in progress.
                 }
                 catch (Exception ex)
