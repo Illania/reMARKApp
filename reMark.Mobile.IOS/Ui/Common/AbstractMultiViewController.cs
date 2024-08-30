@@ -104,11 +104,11 @@ namespace reMark.Mobile.IOS.Ui.Common
             CurrentViewController = null;
         }
 
-        private void HandleSelectedSegmentChanged(int selectedSegent)
+        private void HandleSelectedSegmentChanged(int selectedSegment)
         {
             View.EndEditing(true);
 
-            var vc = ViewControllers[selectedSegent];
+            var vc = ViewControllers[selectedSegment];
             CurrentViewController.WillMoveToParentViewController(null);
             vc.WillMoveToParentViewController(this);
             CurrentViewController.RemoveFromParentViewController();
@@ -148,6 +148,8 @@ namespace reMark.Mobile.IOS.Ui.Common
             View.EndEditing(true);
 
             var vc = ViewControllers[sender.SelectedSegment];
+            if (CurrentViewController == null) 
+                return;
             CurrentViewController.WillMoveToParentViewController(null);
             vc.WillMoveToParentViewController(this);
             CurrentViewController.RemoveFromParentViewController();

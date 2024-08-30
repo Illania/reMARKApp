@@ -20,12 +20,6 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
             this.moduleType = moduleType;
         }
 
-        public FoldersNotificationsListViewController(ModuleType moduleType, int selectedSegment)
-        {
-            this.moduleType = moduleType;
-            SegmentedControl.SelectedSegment = selectedSegment;
-        }
-
         public override void LoadView()
         {
             base.LoadView();
@@ -43,7 +37,11 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                  new BrowseFoldersListViewController(moduleType),
                  new NotificationsListViewController(moduleType.ObjectTypes())
             };
-            
+            //var shouldSelectedSegment =  moduleType == ModuleType.Documents ? 0 : 1;
+            //if (SegmentedControl.SelectedSegment == shouldSelectedSegment)
+            //    return;
+            SegmentedControl.SelectedSegment = moduleType == ModuleType.Documents ? 0 : 1;
+            SegmentedControlHasChangedValue(SegmentedControl);
         }
 
         public override void ViewDidLoad()
@@ -52,6 +50,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
 
             RestorationIdentifier = nameof(FoldersNotificationsListViewController);
             RestorationClass = Class;
+ 
         }
 
         public override void ViewWillAppear(bool animated)
@@ -65,6 +64,21 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                 NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
             }
             
+        }
+
+        private void HandleSelectedSegmentChanged(int selectedSegment)
+        {
+            switch (selectedSegment)
+            {
+                case 0:
+                    CommonConfig.MessengerHub.Publish(new NavigationModuleChangedMessage(this,
+                        new NavigationModule(NavigationModule.NavigationModuleType.Mail)));
+                    break;
+                case 1:
+                    CommonConfig.MessengerHub.Publish(new NavigationModuleChangedMessage(this,
+                        new NavigationModule(NavigationModule.NavigationModuleType.Notifications)));
+                    break;
+            }
         }
 
         public override void ViewDidAppear(bool animated)
@@ -105,19 +119,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
         public override void SegmentedControlHasChangedValue(UISegmentedControl sender)
         {
             base.SegmentedControlHasChangedValue(sender);
-
-            switch (SegmentedControl.SelectedSegment)
-            {
-                case 1:
-                   CommonConfig.MessengerHub.Publish(new NavigationModuleChangedMessage(this,
-                       new NavigationModule(NavigationModule.NavigationModuleType.Notifications)));
-                    break;
-                case 0:
-                    CommonConfig.MessengerHub.Publish(new NavigationModuleChangedMessage(this,
-                       new NavigationModule(NavigationModule.NavigationModuleType.Mail)));
-                    break;
-            }
-   
+            HandleSelectedSegmentChanged((int)sender.SelectedSegment);
         }
 
         #region State restoration
@@ -127,7 +129,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
         {
             base.EncodeRestorableState(coder);
             coder.Encode((int)moduleType, "moduleType");
-            coder.Encode(SegmentedControl.SelectedSegment, "selectedSegment");
+           // coder.Encode(SegmentedControl.SelectedSegment, "selectedSegment");
             CommonConfig.Logger.Info($"Encoding restorable state.. Selected segment {SegmentedControl.SelectedSegment}");
         }
         
@@ -136,17 +138,18 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
         public override void DecodeRestorableState(NSCoder coder)
         {
             base.DecodeRestorableState(coder);
-            SegmentedControl.SelectedSegment = coder.DecodeInt("selectedSegment");
+         //   SegmentedControl.SelectedSegment = coder.DecodeInt("selectedSegment");
             CommonConfig.Logger.Info($"Decoding restorable state.. Selected segment {SegmentedControl.SelectedSegment}");
         }
 
+        /*
         [Export("viewControllerWithRestorationIdentifierPath:coder:")]
         public static UIViewController Restore(string[] identifierComponents, NSCoder coder)
         {
             CommonConfig.Logger.Info($"Decoding module type.. ");
-            var moduleType = (ModuleType)coder.DecodeInt("moduleType");
-            return new FoldersNotificationsListViewController(moduleType);
-        }
+           // var moduleType = (ModuleType)coder.DecodeInt("moduleType");
+           // return new FoldersNotificationsListViewController(moduleType);
+        }*/
 
         #endregion
 

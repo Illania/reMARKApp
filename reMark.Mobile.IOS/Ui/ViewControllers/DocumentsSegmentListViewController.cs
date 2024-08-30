@@ -29,7 +29,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
-            RestorationIdentifier = nameof(FoldersNotificationsListViewController);
+            RestorationIdentifier = nameof(DocumentsSegmentListViewController);
             RestorationClass = Class;
         }
 

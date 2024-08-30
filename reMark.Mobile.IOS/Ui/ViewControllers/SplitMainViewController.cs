@@ -28,6 +28,11 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
             {
                 RestorationIdentifier = nameof(DocumentsSplitViewController)
             };
+            
+            _notificationsSplitViewController = new NotificationsSplitViewController()
+            {
+                RestorationIdentifier = nameof(NotificationsSplitViewController)
+            };
 
             _contactSplitViewController = new ContactsSplitViewController
             {
@@ -39,17 +44,13 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                 RestorationIdentifier = nameof(ShortcodesSplitViewController)
             };
 
-            _notificationsSplitViewController = new NotificationsSplitViewController()
-            {
-                RestorationIdentifier = nameof(NotificationsSplitViewController)
-            };
 
             ViewControllers = new UIViewController[]
             {
                 _documentSplitViewController,
+                _notificationsSplitViewController,
                 _contactSplitViewController,
                 _shortcodeSplitViewController,
-                _notificationsSplitViewController
             };
         }
 

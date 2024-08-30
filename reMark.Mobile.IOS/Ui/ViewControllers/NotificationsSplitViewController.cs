@@ -8,9 +8,9 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
     {
         protected override NavigationController CreatePrimaryNavigationController()
         {
-            return new NavigationController(new FoldersNotificationsListViewController(ModuleType.Documents))
+            return new NavigationController(new FoldersNotificationsListViewController(ModuleType.Notifications))
             {
-                RestorationIdentifier = "Primary_NavigationController_" + nameof(FoldersNotificationsListViewController) + "_" + nameof(ModuleType.Documents)
+                RestorationIdentifier = "Primary_NavigationController_" + nameof(FoldersNotificationsListViewController) + "_" + nameof(ModuleType.Notifications)
             };
         }
 

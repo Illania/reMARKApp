@@ -270,8 +270,18 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                 var notificationsPreviews = new List<(Notification,DocumentPreview)>();
                 foreach (var n in notifications)
                 {
-                    var dc = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(n.FolderId, n.ObjectId);
-                    notificationsPreviews.Add((n, dc.DocumentPreview));
+                    if(n.ObjectId == 2722959)
+                        continue;
+                    try
+                    {
+                        var dc = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(n.FolderId, n.ObjectId);
+                        notificationsPreviews.Add((n, dc.DocumentPreview));
+                    }
+                    catch (Exception ex)
+                    {
+                        CommonConfig.Logger.Error($"Could not get document with ID={n.ObjectId}", ex);
+                    }
+                   
                 }
                    
                 ((NotificationsListDataSource)TableView.Source).SetItems(notificationsPreviews, PlatformConfig.Preferences.HideReadNotifications ? unreadFilter : null);
