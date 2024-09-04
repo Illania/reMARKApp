@@ -265,13 +265,12 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
 
             try
             {
-                var notifications = await Managers.NotificationsManager.GetNotificationsAsync(DeviceType.IOS, PlatformConfig.Preferences.PushNotificationToken);
+                var notifications = await Managers.NotificationsManager.GetNotificationsAsync(DeviceType.IOS, 
+                    PlatformConfig.Preferences.PushNotificationToken);
                 notifications = notifications.Where(n => objectTypes.Contains(n.ObjectType)).ToList();
                 var notificationsPreviews = new List<(Notification,DocumentPreview)>();
-                foreach (var n in notifications)
+                foreach (var n in notifications.Take(5))
                 {
-                    if(n.ObjectId == 2722959)
-                        continue;
                     try
                     {
                         var dc = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(n.FolderId, n.ObjectId);
@@ -338,6 +337,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
         {
             if (SplitViewController != null && !SplitViewController.Collapsed)
             {
+           
 
                 var nc = (UINavigationController)SplitViewController.ViewControllers[1];
                 nc.PopToViewController(nc.ViewControllers[0], false);
@@ -347,11 +347,12 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
 
                 if (vc.IsShowingDocumentWithId(documentPreviewId))
                     return;
+                var documentPreview = vc.Notifications.FirstOrDefault(n => n.Item2.Id == documentPreviewId).Item2;
 
-                var documentPreviewContainer = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(folderId,
-                    documentPreviewId);
+                //var documentPreviewContainer = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(folderId,
+                //    documentPreviewId);
                 vc.HidesBottomBarWhenPushed = false;
-                vc.SetPage(documentPreviewContainer.DocumentPreview, notificationGuid, false);
+                vc.SetPage(documentPreview, notificationGuid, false);
             }
             else
             {

@@ -2,8 +2,6 @@
 using reMark.Mobile.Common;
 using reMark.Mobile.Common.Extensions;
 using reMark.Mobile.Common.Model;
-using reMark.Mobile.IOS.Model;
-using reMark.Mobile.IOS.Model.HubMessages;
 using reMark.Mobile.IOS.Ui.Common;
 using reMark.Mobile.IOS.Ui.ViewControllers.FoldersList;
 using reMark.Mobile.IOS.Utilities;
@@ -27,21 +25,32 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
             NavigationItem.Title = GetTitleForModule(moduleType);
 
             SegmentedControl.InsertSegment(Localization.GetString("folders"), 0, false);
-            SegmentedControl.InsertSegment(Localization.GetString("notifications"), 1, false);
-
             SegmentedControl.SetTitleTextAttributes(new UIStringAttributes { ForegroundColor= Theme.White }, UIControlState.Selected);
+            SegmentedControl.InsertSegment(Localization.GetString("notifications"), 1, false);
             SegmentedControl.SetTitleTextAttributes(new UIStringAttributes { ForegroundColor = Theme.DarkerBlue }, UIControlState.Normal);
 
-            ViewControllers = new UIViewController[]
+
+            if (Integration.IsIPad())
             {
-                 new BrowseFoldersListViewController(moduleType),
-                 new NotificationsListViewController(moduleType.ObjectTypes())
-            };
-            //var shouldSelectedSegment =  moduleType == ModuleType.Documents ? 0 : 1;
-            //if (SegmentedControl.SelectedSegment == shouldSelectedSegment)
-            //    return;
-            SegmentedControl.SelectedSegment = moduleType == ModuleType.Documents ? 0 : 1;
-            SegmentedControlHasChangedValue(SegmentedControl);
+                //SegmentedControl.Hidden = true;
+                //var nvsc = new NotificationsSplitViewController();
+                //nvsc.Delegate = new SplitViewControllerDelegate();
+                ViewControllers = new UIViewController[]
+                {
+                    new BrowseFoldersListViewController(moduleType),
+                    new NotificationsSplitViewController()
+                };
+            }
+            else
+            {
+                SegmentedControl.InsertSegment(Localization.GetString("notifications"), 1, false);
+                SegmentedControl.SetTitleTextAttributes(new UIStringAttributes { ForegroundColor = Theme.DarkerBlue }, UIControlState.Normal);
+                ViewControllers = new UIViewController[]
+                {
+                    new BrowseFoldersListViewController(moduleType),
+                    new NotificationsListViewController(moduleType.ObjectTypes())
+                };
+            }
         }
 
         public override void ViewDidLoad()
@@ -65,21 +74,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
             }
             
         }
-
-        private void HandleSelectedSegmentChanged(int selectedSegment)
-        {
-            switch (selectedSegment)
-            {
-                case 0:
-                    CommonConfig.MessengerHub.Publish(new NavigationModuleChangedMessage(this,
-                        new NavigationModule(NavigationModule.NavigationModuleType.Mail)));
-                    break;
-                case 1:
-                    CommonConfig.MessengerHub.Publish(new NavigationModuleChangedMessage(this,
-                        new NavigationModule(NavigationModule.NavigationModuleType.Notifications)));
-                    break;
-            }
-        }
+        
 
         public override void ViewDidAppear(bool animated)
         {
@@ -119,7 +114,9 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
         public override void SegmentedControlHasChangedValue(UISegmentedControl sender)
         {
             base.SegmentedControlHasChangedValue(sender);
-            HandleSelectedSegmentChanged((int)sender.SelectedSegment);
+            if(SegmentedControl.SelectedSegment == 1 && Integration.IsIPad())
+                PresentViewController(new NotificationsSplitViewController(), false,null);
+                //NavigationController.PushViewController(new NotificationsSplitViewController(), false);
         }
 
         #region State restoration
@@ -129,7 +126,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
         {
             base.EncodeRestorableState(coder);
             coder.Encode((int)moduleType, "moduleType");
-           // coder.Encode(SegmentedControl.SelectedSegment, "selectedSegment");
+            coder.Encode(SegmentedControl.SelectedSegment, "selectedSegment");
             CommonConfig.Logger.Info($"Encoding restorable state.. Selected segment {SegmentedControl.SelectedSegment}");
         }
         
@@ -138,18 +135,18 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
         public override void DecodeRestorableState(NSCoder coder)
         {
             base.DecodeRestorableState(coder);
-         //   SegmentedControl.SelectedSegment = coder.DecodeInt("selectedSegment");
+            SegmentedControl.SelectedSegment = coder.DecodeInt("selectedSegment");
             CommonConfig.Logger.Info($"Decoding restorable state.. Selected segment {SegmentedControl.SelectedSegment}");
         }
 
-        /*
+        
         [Export("viewControllerWithRestorationIdentifierPath:coder:")]
         public static UIViewController Restore(string[] identifierComponents, NSCoder coder)
         {
             CommonConfig.Logger.Info($"Decoding module type.. ");
-           // var moduleType = (ModuleType)coder.DecodeInt("moduleType");
-           // return new FoldersNotificationsListViewController(moduleType);
-        }*/
+            var moduleType = (ModuleType)coder.DecodeInt("moduleType");
+             return new FoldersNotificationsListViewController(moduleType);
+        }
 
         #endregion
 
