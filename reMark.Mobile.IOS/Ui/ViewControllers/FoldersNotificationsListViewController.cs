@@ -26,19 +26,13 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
 
             SegmentedControl.InsertSegment(Localization.GetString("folders"), 0, false);
             SegmentedControl.SetTitleTextAttributes(new UIStringAttributes { ForegroundColor= Theme.White }, UIControlState.Selected);
-            SegmentedControl.InsertSegment(Localization.GetString("notifications"), 1, false);
-            SegmentedControl.SetTitleTextAttributes(new UIStringAttributes { ForegroundColor = Theme.DarkerBlue }, UIControlState.Normal);
-
 
             if (Integration.IsIPad())
             {
-                //SegmentedControl.Hidden = true;
-                //var nvsc = new NotificationsSplitViewController();
-                //nvsc.Delegate = new SplitViewControllerDelegate();
+                SegmentedControl.Hidden = true;
                 ViewControllers = new UIViewController[]
                 {
-                    new BrowseFoldersListViewController(moduleType),
-                    new NotificationsSplitViewController()
+                    new BrowseFoldersListViewController(moduleType)
                 };
             }
             else
@@ -108,15 +102,6 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                 default:
                     return string.Empty;
             }
-        }
-
-        [Export("segmentedControlHasChangedValue:")]
-        public override void SegmentedControlHasChangedValue(UISegmentedControl sender)
-        {
-            base.SegmentedControlHasChangedValue(sender);
-            if(SegmentedControl.SelectedSegment == 1 && Integration.IsIPad())
-                PresentViewController(new NotificationsSplitViewController(), false,null);
-                //NavigationController.PushViewController(new NotificationsSplitViewController(), false);
         }
 
         #region State restoration

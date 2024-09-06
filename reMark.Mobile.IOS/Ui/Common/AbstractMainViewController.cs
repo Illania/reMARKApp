@@ -347,20 +347,15 @@ namespace reMark.Mobile.IOS.Ui.Common
                     moduleNavigationButton.SetImage(UIImage.FromBundle(nextModule.Image).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
                     SelectedIndex = 0;
                     break;
-                case NavigationModule.NavigationModuleType.Notifications:
-                    module = ModuleType.Notifications;
-                    SelectedIndex = 1;
-                    var selected = TabBarController.SelectedViewController;
-                    break;
                 case NavigationModule.NavigationModuleType.Contacts:
                     module = ModuleType.Contacts;
                     moduleNavigationButton.SetImage(UIImage.FromBundle(nextModule.Image).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
-                    SelectedIndex = 2;
+                    SelectedIndex = 1;
                     break;
                 case NavigationModule.NavigationModuleType.Shortcodes:
                     module = ModuleType.Shortcodes;
                     moduleNavigationButton.SetImage(UIImage.FromBundle(nextModule.Image).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
-                    SelectedIndex = 3;
+                    SelectedIndex = 2;
                     break;
                 case NavigationModule.NavigationModuleType.Settings:
                     moduleNavigationButton.SetImage(UIImage.FromBundle(nextModule.Image).ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);

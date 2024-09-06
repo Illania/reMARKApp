@@ -44,10 +44,6 @@ namespace reMark.Mobile.IOS.Model
                     Title = Localization.GetString("settings");
                     Image = "Nav-settings";
                     break;
-                case NavigationModuleType.Notifications:
-                    Title = Localization.GetString("settings");
-                    Image = "Nav-notifications";
-                    break;
                 case NavigationModuleType.Dummy:
                     Title = "Dummy";
                     Image = "Failed";
@@ -55,6 +51,6 @@ namespace reMark.Mobile.IOS.Model
             }
         }
 
-        public enum NavigationModuleType { Mail, Calendar, Shortcodes, Contacts, Search, Settings, Dummy, Notifications }
+        public enum NavigationModuleType { Mail, Calendar, Shortcodes, Contacts, Search, Settings, Dummy}
     }
 }

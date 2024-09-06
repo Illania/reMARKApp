@@ -283,7 +283,8 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                 DocumentPageViewControllerDelegate = this
             };
             
-            vc.SetData(Folder,documentPreview);
+            vc.SetData(Folder,documentPreview, notificationGuid);
+            vc.SetRefreshDataOnAppear();
             vc.SetRefreshDataOnAppear();
 
             return vc;

@@ -14,7 +14,6 @@ using reMark.Mobile.IOS.Model;
 using reMark.Mobile.IOS.Model.HubMessages;
 using reMark.Mobile.IOS.Ui.Common;
 using reMark.Mobile.IOS.Ui.TableViewCells;
-using reMark.Mobile.IOS.Ui.ViewControllers.DocumentView;
 using reMark.Mobile.IOS.Utilities;
 using TinyMessenger;
 using UIKit;
@@ -33,6 +32,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
         Func<(Notification, DocumentPreview), bool> unreadFilter = (n) => !n.Item1.IsRead;
 
         TinyMessageSubscriptionToken newNotificationsMessageToken;
+        TinyMessageSubscriptionToken goToDocumentToken;
 
         public NotificationsListViewController(ObjectType[] objectTypes)
         {
@@ -100,6 +100,30 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
             ReachabilityBar.Attach(this);
             SendStatusBanner.Attach(this);
         }
+        
+        async void HandleAction(GoToDocumentMessage message)
+        {
+            BeginInvokeOnMainThread(() =>
+            {
+                foreach (var tableView in new[] { TableView })
+                {
+                    if (tableView == null || tableView.Source == null)
+                        continue;
+
+                    var index = ((NotificationsListDataSource)tableView.Source).Items.FindIndex(dp => dp.Item2.Id == message.DocumentId);
+
+                    var selectedItem = ((NotificationsListDataSource)tableView.Source).Items[index];
+                    MarkAsRead(selectedItem.Item1, NSIndexPath.FromRowSection(index, 0));
+                    
+                    if (index >= 0)
+                    {
+                        tableView.SelectRow(NSIndexPath.FromRowSection(index, 0), true, UITableViewScrollPosition.None);
+                        tableView.ScrollToRow(NSIndexPath.FromRowSection(index, 0), UITableViewScrollPosition.None, true);
+                    }
+                    
+                }
+            });
+        }
 
         public override void ViewDidAppear(bool animated)
         {
@@ -115,6 +139,9 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                     RefreshData();
                 });
             });
+            
+            goToDocumentToken?.Dispose();
+            goToDocumentToken = CommonConfig.MessengerHub.Subscribe<GoToDocumentMessage>(HandleAction);
 
             RefreshData();
 
@@ -137,7 +164,8 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
             base.ViewWillDisappear(animated);
 
             newNotificationsMessageToken?.Dispose();
-
+            goToDocumentToken?.Dispose();
+            
             DeinitializeHandlers();
         }
 
@@ -269,7 +297,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                     PlatformConfig.Preferences.PushNotificationToken);
                 notifications = notifications.Where(n => objectTypes.Contains(n.ObjectType)).ToList();
                 var notificationsPreviews = new List<(Notification,DocumentPreview)>();
-                foreach (var n in notifications.Take(5))
+                foreach (var n in notifications)
                 {
                     try
                     {
@@ -279,11 +307,13 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                     catch (Exception ex)
                     {
                         CommonConfig.Logger.Error($"Could not get document with ID={n.ObjectId}", ex);
+                        continue;
                     }
                    
                 }
                    
-                ((NotificationsListDataSource)TableView.Source).SetItems(notificationsPreviews, PlatformConfig.Preferences.HideReadNotifications ? unreadFilter : null);
+                ((NotificationsListDataSource)TableView.Source).SetItems(notificationsPreviews, 
+                    PlatformConfig.Preferences.HideReadNotifications ? unreadFilter : null);
 
                 markAsReadItem.Enabled = notifications.Any(n => !n.IsRead);
 
@@ -333,12 +363,27 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
             }
         }
 
+        private async Task MarkAsRead(Notification notification, NSIndexPath row)
+        {
+            if (ServerConfig.SystemSettings?.SystemInfo?.SetNotificationReadStatusAvailable != true)
+                await Managers.NotificationsManager.MarkAsRead(notification);
+            else
+            {
+                if (!notification.IsRead)
+                    Integration.DecreaseNotificationBadge();
+
+                Managers.NotificationsManager?.SetNotificationReadStatusAsync(PlatformConfig.Preferences.PushNotificationToken, new List<Guid> { notification.Guid }, true);
+                RefreshData();
+            }
+            
+            TableView.ReloadRows(new[] { row }, UITableViewRowAnimation.Fade);
+        }
+
+
         public virtual async void SelectNotification(int documentPreviewId, int folderId, Guid notificationGuid)
         {
             if (SplitViewController != null && !SplitViewController.Collapsed)
             {
-           
-
                 var nc = (UINavigationController)SplitViewController.ViewControllers[1];
                 nc.PopToViewController(nc.ViewControllers[0], false);
 
@@ -348,9 +393,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                 if (vc.IsShowingDocumentWithId(documentPreviewId))
                     return;
                 var documentPreview = vc.Notifications.FirstOrDefault(n => n.Item2.Id == documentPreviewId).Item2;
-
-                //var documentPreviewContainer = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(folderId,
-                //    documentPreviewId);
+                
                 vc.HidesBottomBarWhenPushed = false;
                 vc.SetPage(documentPreview, notificationGuid, false);
             }
@@ -366,14 +409,6 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                     };
                     NavigationController.PushViewController(vc, true);
             }
-        }
-        
-        void PresentDocumentViewController(int documentId, Guid notificationGuid)
-        {
-            var vc = new DocumentViewController();
-            vc.SetRefreshDataOnAppear();
-            vc.SetData(documentId, notificationGuid);
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
         }
 
         #endregion

@@ -6,11 +6,14 @@ using reMark.Mobile.IOS.Ui.ViewControllers.ShortcodesList;
 using UIKit;
 using reMark.Mobile.IOS.Ui.Common;
 using System.Threading.Tasks;
+using reMark.Mobile.IOS.Utilities;
 
 namespace reMark.Mobile.IOS.Ui.ViewControllers.FoldersList
 {
     public class BrowseFoldersListViewController : AbstractFoldersListViewController, IUIViewControllerRestoration
     {
+
+        protected UIBarButtonItem NotificationsBarButtonItem;
         public BrowseFoldersListViewController(ModuleType module)
             : base(module, false, false, false)
         {
@@ -19,6 +22,35 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers.FoldersList
         protected BrowseFoldersListViewController(Folder folder)
             : base(folder, false, false, false)
         {
+        }
+        
+        public override void LoadView()
+        {
+            base.LoadView();
+
+            InitializeNavigationBar();
+        }
+
+        protected void InitializeNavigationBar()
+        {
+            if (Integration.IsIPad())
+            {
+                NotificationsBarButtonItem = new UIBarButtonItem
+                {
+                
+                    Image = UIImage.FromBundle("Notifications"),
+                    Width = 16, 
+                    Enabled = true
+                };
+                NavigationItem.SetRightBarButtonItem( NotificationsBarButtonItem, false);
+                NotificationsBarButtonItem.Clicked+= NotificationsBarButtonItemOnClicked;
+            }
+            
+        }
+
+        private void NotificationsBarButtonItemOnClicked(object? sender, EventArgs e)
+        {
+            PresentViewController(new NotificationsSplitViewController(), false,null);
         }
 
         public override void ViewDidLoad()
