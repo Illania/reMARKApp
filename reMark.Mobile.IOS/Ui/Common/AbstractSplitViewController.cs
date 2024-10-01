@@ -56,7 +56,8 @@ namespace reMark.Mobile.IOS.Ui.Common
             return CreateSecondaryNavigationController();
         }
 
-        bool HandleCollapseSecondViewController(UISplitViewController splitViewController, UIViewController secondaryViewController, 
+        private bool HandleCollapseSecondViewController(UISplitViewController splitViewController, 
+            UIViewController secondaryViewController, 
             UIViewController primaryViewController)
         {
             var secondaryNavigationController = (NavigationController)secondaryViewController;
@@ -64,7 +65,8 @@ namespace reMark.Mobile.IOS.Ui.Common
                 return true;
 
             var primaryNavigationController = (NavigationController)primaryViewController;
-            secondaryNavigationController.ViewControllers.ForEach(vc => primaryNavigationController.PushViewController(vc, false));
+            secondaryNavigationController.ViewControllers.ForEach(vc => 
+                primaryNavigationController.PushViewController(vc, false));
 
             return true;
         }

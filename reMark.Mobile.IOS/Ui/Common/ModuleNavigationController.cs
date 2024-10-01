@@ -35,7 +35,13 @@ namespace reMark.Mobile.IOS.Ui.Common
         ReMarkNavigationButton mailBtn;
         ReMarkNavigationButton shortCodesBtn;
 
-        readonly List<string> constraintIdentifiers = new() { mailBtnConstraintIdentifier, shortcodeBtnConstraintIdentifier, searchBtnConstraintIdentifier, settingsBtnConstraintIdentifier };
+        private readonly List<string> _constraintIdentifiers = new()
+        {
+            mailBtnConstraintIdentifier, 
+            shortcodeBtnConstraintIdentifier, 
+            searchBtnConstraintIdentifier, 
+            settingsBtnConstraintIdentifier
+        };
 
         public ModuleNavigationController(NavigationModule.NavigationModuleType currentModule)
         {
@@ -162,8 +168,10 @@ namespace reMark.Mobile.IOS.Ui.Common
         void UpdateLayoutOnRotation()
         {
             foreach (var constraint in View.Constraints)
-                if (constraintIdentifiers.Contains(constraint.GetIdentifier()))
+            {
+                if (_constraintIdentifiers.Contains(constraint.GetIdentifier()))
                     View.RemoveConstraint(constraint);
+            }
 
             foreach (var view in View.Subviews)
                 if (view.Tag == titleTag)

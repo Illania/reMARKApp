@@ -553,6 +553,4 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
         }
         #endregion
     }
-
-
 }

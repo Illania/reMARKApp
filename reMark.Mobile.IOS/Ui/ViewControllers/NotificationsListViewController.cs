@@ -64,17 +64,17 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
         {
             base.WillMoveToParentViewController(parent);
 
-            if (parent == null && SplitViewController != null && !SplitViewController.Collapsed)
-            {
-                if (SplitViewController is not NotificationsSplitViewController)
-                    return;
-                
-                var nc = (UINavigationController)SplitViewController.ViewControllers[1];
-                nc.PopToRootViewController(false);
+            if (parent != null || SplitViewController == null || SplitViewController.Collapsed)
+                return;
 
-                var vc = (NotificationPageViewController)nc.ViewControllers[0];
-                vc.ClearPage();
-            }
+            if (SplitViewController is not NotificationsSplitViewController)
+                return;
+                
+            var nc = (UINavigationController)SplitViewController.ViewControllers[1];
+            nc.PopToRootViewController(false);
+
+            var vc = (NotificationPageViewController)nc.ViewControllers[0];
+            vc.ClearPage();
         }
 
         public override void ViewWillAppear(bool animated)
@@ -110,17 +110,17 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                     if (tableView == null || tableView.Source == null)
                         continue;
 
-                    var index = ((NotificationsListDataSource)tableView.Source).Items.FindIndex(dp => dp.Item2.Id == message.DocumentId);
+                    var index = ((NotificationsListDataSource)tableView.Source).Items.FindIndex(
+                        dp => dp.Item2.Id == message.DocumentId);
 
                     var selectedItem = ((NotificationsListDataSource)tableView.Source).Items[index];
                     MarkAsRead(selectedItem.Item1, NSIndexPath.FromRowSection(index, 0));
-                    
-                    if (index >= 0)
-                    {
-                        tableView.SelectRow(NSIndexPath.FromRowSection(index, 0), true, UITableViewScrollPosition.None);
-                        tableView.ScrollToRow(NSIndexPath.FromRowSection(index, 0), UITableViewScrollPosition.None, true);
-                    }
-                    
+
+                    if (index < 0)
+                        continue;
+
+                    tableView.SelectRow(NSIndexPath.FromRowSection(index, 0), true, UITableViewScrollPosition.None);
+                    tableView.ScrollToRow(NSIndexPath.FromRowSection(index, 0), UITableViewScrollPosition.None, true);
                 }
             });
         }
@@ -307,9 +307,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                     catch (Exception ex)
                     {
                         CommonConfig.Logger.Error($"Could not get document with ID={n.ObjectId}", ex);
-                        continue;
                     }
-                   
                 }
                    
                 ((NotificationsListDataSource)TableView.Source).SetItems(notificationsPreviews, 

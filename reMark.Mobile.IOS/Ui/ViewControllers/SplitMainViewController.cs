@@ -6,7 +6,6 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
 {
     public class SplitMainViewController : AbstractMainViewController
     {
-
         DocumentsSplitViewController _documentSplitViewController;
         ContactsSplitViewController _contactSplitViewController;
         ShortcodesSplitViewController _shortcodeSplitViewController;
@@ -44,7 +43,6 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                 RestorationIdentifier = nameof(ShortcodesSplitViewController)
             };
 
-
             ViewControllers = new UIViewController[]
             {
                 _documentSplitViewController,
@@ -60,6 +58,5 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
 
             RestorationIdentifier = nameof(SplitViewController);
         }
-
     }
 }

@@ -299,10 +299,7 @@ namespace reMark.Mobile.Common.Manager
                     Console.WriteLine((ex.Message));
                 }
             }
-
-
-
-
+            
             if (sourceType == SourceType.Local)
                 return await documentsDataAccess.GetDocumentWithPreviewAsync(documentId);
 

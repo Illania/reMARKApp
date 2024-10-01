@@ -27,25 +27,23 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers.FoldersList
         public override void LoadView()
         {
             base.LoadView();
-
             InitializeNavigationBar();
         }
 
         protected void InitializeNavigationBar()
         {
-            if (Integration.IsIPad())
+            if (!Integration.IsIPad())
+                return;
+
+            NotificationsBarButtonItem = new UIBarButtonItem
             {
-                NotificationsBarButtonItem = new UIBarButtonItem
-                {
                 
-                    Image = UIImage.FromBundle("Notifications"),
-                    Width = 16, 
-                    Enabled = true
-                };
-                NavigationItem.SetRightBarButtonItem( NotificationsBarButtonItem, false);
-                NotificationsBarButtonItem.Clicked+= NotificationsBarButtonItemOnClicked;
-            }
-            
+                Image = UIImage.FromBundle("Notifications"),
+                Width = 16, 
+                Enabled = true
+            };
+            NavigationItem.SetRightBarButtonItem( NotificationsBarButtonItem, false);
+            NotificationsBarButtonItem.Clicked+= NotificationsBarButtonItemOnClicked;
         }
 
         private void NotificationsBarButtonItemOnClicked(object? sender, EventArgs e)

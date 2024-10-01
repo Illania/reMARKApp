@@ -50,25 +50,22 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
-
             RestorationIdentifier = nameof(FoldersNotificationsListViewController);
             RestorationClass = Class;
- 
         }
 
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
 
-            if (Integration.IsRunningAtLeast(11))
-            {
-                if (NavigationController != null)
-                    NavigationController.NavigationBar.PrefersLargeTitles = true;
-                NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
-            }
+            if (!Integration.IsRunningAtLeast(11))
+                return;
+
+            if (NavigationController != null)
+                NavigationController.NavigationBar.PrefersLargeTitles = true;
             
+            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
         }
-        
 
         public override void ViewDidAppear(bool animated)
         {
@@ -114,7 +111,6 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
             coder.Encode(SegmentedControl.SelectedSegment, "selectedSegment");
             CommonConfig.Logger.Info($"Encoding restorable state.. Selected segment {SegmentedControl.SelectedSegment}");
         }
-        
 
         [Export("decodeRestorableStateWithCoder:")]
         public override void DecodeRestorableState(NSCoder coder)
@@ -123,7 +119,6 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
             SegmentedControl.SelectedSegment = coder.DecodeInt("selectedSegment");
             CommonConfig.Logger.Info($"Decoding restorable state.. Selected segment {SegmentedControl.SelectedSegment}");
         }
-
         
         [Export("viewControllerWithRestorationIdentifierPath:coder:")]
         public static UIViewController Restore(string[] identifierComponents, NSCoder coder)
@@ -134,6 +129,5 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
         }
 
         #endregion
-
     }
 }
