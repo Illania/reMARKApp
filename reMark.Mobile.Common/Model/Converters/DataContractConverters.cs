@@ -402,12 +402,15 @@ namespace reMark.Mobile.Common.Model.Converters
 
         public static Line Convert(this DataContract.Line l)
         {
-            return new Line
+            var line =  new Line
             {
                 FromAddress = l.FromAddress,
                 Guid = l.Guid,
-                Name = l.Name
+                Name = l.Name,
+                LineOwnerType = l.LineOwnerType.ConvertEnum<LineOwnerType>(),
+                OwnerUserId = l.OwnerUserId
             };
+            return line;
         }
 
         public static Notification Convert(this DataContract.Notification n)
@@ -1095,7 +1098,9 @@ namespace reMark.Mobile.Common.Model.Converters
             {
                 Guid = line.Guid,
                 Name = line.Name,
-                FromAddress = line.FromAddress
+                FromAddress = line.FromAddress,
+                LineOwnerType = line.LineOwnerType.ConvertEnum<DataContract.LineOwnerType>(),
+                OwnerUserId = line.OwnerUserId
             };
         }
 

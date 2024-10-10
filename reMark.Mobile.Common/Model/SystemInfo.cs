@@ -54,6 +54,8 @@ namespace reMark.Mobile.Common.Model
         public bool CalendarModuleAvailable => ServiceVersionGreaterThanOrEqual(4, 12, 0);
 
         public bool CopyToNewTemplateAvailable => ServiceVersionGreaterThanOrEqual(4, 13, 0) || ServiceVersionEqual(4,10,1);
+        
+        public bool PrivateLinesAvailable => ServiceVersionGreaterThanOrEqual(4, 14, 0);
 
     List<ModuleType> availableModules;
         public List<ModuleType> AvailableModules
