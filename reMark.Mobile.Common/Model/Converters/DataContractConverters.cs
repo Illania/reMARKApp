@@ -1,8 +1,5 @@
-using System;
-using System.Linq;
 using reMark.Mobile.Common.Extensions;
 using DataContract = reMark.ServiceReference.DataContract;
-using System.Collections.Generic;
 using reMark.Mobile.Common.Utilities;
 
 namespace reMark.Mobile.Common.Model.Converters

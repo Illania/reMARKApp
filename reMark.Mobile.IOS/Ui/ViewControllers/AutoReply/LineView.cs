@@ -1,12 +1,8 @@
-﻿using System;
-using Foundation;
+﻿using Foundation;
 using reMark.Mobile.Common;
 using reMark.Mobile.IOS.Ui.Common;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using UIKit;
 using reMark.Mobile.Common.Model;
-using System.Linq;
 using ObjCRuntime;
 
 namespace reMark.Mobile.IOS.Ui.ViewControllers.AutoReply
