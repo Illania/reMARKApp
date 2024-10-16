@@ -85,6 +85,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers.SearchView
 
         protected override void SearchButton_TouchUpInside(object sender, EventArgs e)
         {
+            
             criteria.PartialWordSearch = PlatformConfig.Preferences.PartialWordSearch;
             criteria.MaxToFetch = PlatformConfig.Preferences.DocumentsToSearch;
 
@@ -163,10 +164,11 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers.SearchView
                 view.SetCriteria(criteria);
         }
 
-        public void ReloadCriteria(SearchDocumentsCriteria criteria)
+        public void ReloadCriteria(SearchDocumentsCriteria savedSearchCriteria)
         {
+            this.criteria = savedSearchCriteria;
             foreach (var view in StackView.Subviews.OfType<AbstractDocumentsSearchView>())
-                view.SetCriteria(criteria);
+                view.SetCriteria(this.criteria);
         }
 
         public void UpdateCurrentSavedSearch(SavedDocumentsSearch savedSearch)
@@ -339,6 +341,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers.SearchView
                     if (directions.Count > 2)
                         directions.Clear();
                 }
+                Criteria.SavedSearchFilterHash = null;
 
                 UpdateRow();
             }
@@ -573,6 +576,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers.SearchView
             void TextFieldDidChange(UITextFieldScalable textField)
             {
                 Criteria.SubjectMessageField = textField.Text;
+                Criteria.SavedSearchFilterHash = null;
             }
 
             [Export("textFieldShouldReturn:")]
@@ -756,6 +760,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers.SearchView
             void TextFieldDidChange(UITextFieldScalable textField)
             {
                 Criteria.FromToField = textField.Text;
+                Criteria.SavedSearchFilterHash = null;
             }
 
             [Export("textFieldShouldReturn:")]
@@ -1080,6 +1085,8 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers.SearchView
                     dateRange.Enabled = true;
                     dateRange.EndTimestamp = toDate.ConvertUserTimeToUtc().ConvertDateTimeToTimestampMilliseconds();
                 }
+                
+                Criteria.SavedSearchFilterHash = null;
 
                 UpdateRow();
             }
@@ -1345,6 +1352,8 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers.SearchView
 
                     Criteria.Priorities = result.ToList();
                 }
+                
+                Criteria.SavedSearchFilterHash = null;
 
                 UpdateRow();
             }
@@ -1586,6 +1595,8 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers.SearchView
                     Criteria.Comment = textField.Text;
                 if (textField == attachmentNameTextField)
                     Criteria.AttachmentName = textField.Text;
+                
+                Criteria.SavedSearchFilterHash = null;
             }
 
             [Export("textFieldShouldReturn:")]
@@ -1720,6 +1731,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers.SearchView
             void TextFieldDidChange(UITextFieldScalable textField)
             {
                 Criteria.ExtraFields = textField.Text;
+                Criteria.SavedSearchFilterHash = null;
             }
 
 
@@ -1793,6 +1805,8 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers.SearchView
                     Criteria.HavingAttachmentsOnly = !Criteria.HavingAttachmentsOnly;
                 if (recognizer.View == unreadView)
                     Criteria.UnreadOnly = !Criteria.UnreadOnly;
+                
+                Criteria.SavedSearchFilterHash = null;
 
                 UpdateRow();
             }
@@ -1875,6 +1889,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers.SearchView
                 else
                     Criteria.Handled = false;
 
+                Criteria.SavedSearchFilterHash = null;
                 UpdateRow();
             }
         }
@@ -1973,6 +1988,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers.SearchView
                 currentSearchName = result.Name;
                 (parentViewControllerWeakReference.Unwrap())?.UpdateCurrentSavedSearch(savedSearch: result);
                 (parentViewControllerWeakReference.Unwrap())?.ReloadCriteria(Criteria);
+                
 
                 text.UserInteractionEnabled = true;
                 text.BecomeFirstResponder();
