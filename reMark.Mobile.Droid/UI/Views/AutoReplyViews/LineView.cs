@@ -33,7 +33,16 @@ namespace reMark.Mobile.Droid.Ui.Views.AutoReplyViews
             : base(context)
         {
             defaultOutgoingLine = ServerConfig.SystemSettings.DocumentsModuleInfo.DefaultOutgoingLine;
-            availableOutgoingLines = ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.ToList();
+            if(!ServerConfig.SystemSettings.SystemInfo.PrivateLinesAvailable)
+                availableOutgoingLines = ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines;
+            else
+            {
+                var privateLines = ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Where(
+                    l => l.LineOwnerType == LineOwnerType.Private 
+                         && l.OwnerUserId == ServerConfig.SystemSettings.UserInfo.User.Id);
+                availableOutgoingLines = privateLines.ToList();
+
+            }
 
             SetPadding(DistanceNormal + DistanceSmall, DistanceNormal + DistanceSmall, DistanceSmall, DistanceNormal + DistanceSmall);
 

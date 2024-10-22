@@ -384,6 +384,12 @@ namespace reMark.Mobile.Common.Model
         Contacts = 2,
         Shortcodes = 3,
     }
+    
+    public enum LineOwnerType
+    {
+        Shared = 0,
+        Private = 1
+    }
 
     #endregion
 
