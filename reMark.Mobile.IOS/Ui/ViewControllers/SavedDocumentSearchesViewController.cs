@@ -284,7 +284,6 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                 dismissAction();
 
                 ((DataSource)TableView.Source).RemoveSavedSearch(savedDocumentsSearch);
-                ((DataSource)TableView.Source).SortItems();
 
             }
             catch (OperationCanceledException) { }
@@ -405,12 +404,14 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                 var position = Items.FindIndex(c => c.Id == savedDocumentsSearch.Id);
                 if (position >= 0)
                 {
+                    tableViewWeakReference.Unwrap()?.BeginUpdates();
                     Items.RemoveAt(position);
 
                     if (Items.Count == 0)
                         tableViewWeakReference.Unwrap()?.ReloadRows(new[] { NSIndexPath.FromRowSection(position, 0) }, UITableViewRowAnimation.Fade);
                     else
                         tableViewWeakReference.Unwrap()?.DeleteRows(new[] { NSIndexPath.FromRowSection(position, 0) }, UITableViewRowAnimation.Fade);
+                    tableViewWeakReference.Unwrap()?.EndUpdates();
                 }
             }
 
