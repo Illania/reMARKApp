@@ -90,10 +90,11 @@ namespace reMark.Mobile.IOS.Ui
 
         void InitializeBookmarkAppearance(DocumentPreview dp, int folderId, DocumentsTableViewCell cell)
         {
+            var currentCellColor = cell.BackgroundColor;
             if (PlatformConfig.Preferences.HasBookmarkForFolder(folderId, dp.Id))
                 cell.BackgroundColor = Theme.Bookmark;
             else
-                cell.BackgroundColor = Theme.White;
+                cell.BackgroundColor = currentCellColor;
         }
 
         public override nint RowsInSection(UITableView tableview, nint section)
