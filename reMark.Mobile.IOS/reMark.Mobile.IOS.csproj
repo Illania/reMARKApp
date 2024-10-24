@@ -40,9 +40,8 @@
     <CreatePackage>false</CreatePackage>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <DefineConstants>__IOS__;__MOBILE__;__UNIFIED__;DEBUG;</DefineConstants>
-    <CodesignKey>Apple Development: Lars Hansen (TUYUES9KMZ)</CodesignKey>
 		<CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
-		<CodesignProvision>remark mobile dev</CodesignProvision>
+		<CodesignKey>iPhone Developer</CodesignKey>
   </PropertyGroup>
 	 <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <RootNamespace>reMark.Mobile.IOS</RootNamespace>
