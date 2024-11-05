@@ -172,7 +172,7 @@ namespace reMark.ServiceReference.DataContract
         [EnumMember(Value = "Documents")] Documents = 1,
         [EnumMember(Value = "Contacts")] Contacts = 2,
         [EnumMember(Value = "Shortcodes")] Shortcodes = 3,
-        //[EnumMember(Value = "Calendar")] Calendar = 4,
+        [EnumMember(Value = "Calendar")] Calendar = 4,
     }
 
     [DataContract(Name = "FolderType", Namespace = "com.nordic-it.appservice.v3")]
