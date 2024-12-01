@@ -100,8 +100,8 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
             ReachabilityBar.Attach(this);
             SendStatusBanner.Attach(this);
         }
-        
-        async void HandleAction(GoToDocumentMessage message)
+
+        void HandleAction(GoToDocumentMessage message)
         {
             BeginInvokeOnMainThread(() =>
             {
