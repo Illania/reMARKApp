@@ -18,6 +18,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
             SegmentedControl.InsertSegment(Localization.GetString("all"), 0, false);
             SegmentedControl.InsertSegment(Localization.GetString("unread"), 1, false);
             SegmentedControl.Hidden = true;
+            NavigationItem.Title = this.Folder?.Name;
           
             ViewControllers = new UIViewController[]
             {

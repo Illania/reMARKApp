@@ -172,7 +172,7 @@ namespace reMark.ServiceReference.DataContract
         [EnumMember(Value = "Documents")] Documents = 1,
         [EnumMember(Value = "Contacts")] Contacts = 2,
         [EnumMember(Value = "Shortcodes")] Shortcodes = 3,
-        //[EnumMember(Value = "Calendar")] Calendar = 4,
+        [EnumMember(Value = "Calendar")] Calendar = 4,
     }
 
     [DataContract(Name = "FolderType", Namespace = "com.nordic-it.appservice.v3")]
@@ -677,6 +677,13 @@ namespace reMark.ServiceReference.DataContract
 
         [DataMember(Name = "FromAddress", Order = 0)]
         public string FromAddress { get; set; }
+        
+        [DataMember(Name = "LineOwnerType", Order = 1)]
+        public LineOwnerType LineOwnerType { get; set; }
+        
+        [DataMember(Name = "OwnerUserId", Order = 1)]
+        public int OwnerUserId { get; set; }
+        
     }
 
 
@@ -952,6 +959,15 @@ namespace reMark.ServiceReference.DataContract
         /// <summary>Delivery confirmation was received</summary>
         [EnumMember(Value = "Delivered")]
         Delivered = 10
+    }
+    
+    [DataContract(Name = "LineOwnerType", Namespace = "com.nordic-it.appservice.v3")]
+    public enum LineOwnerType
+    {
+        [EnumMember(Value = "Shared")]
+        Shared = 0,
+        [EnumMember(Value = "Private")]
+        Private = 1
     }
 
     [DataContract(Name = "ComAddressLinkType", Namespace = "com.nordic-it.appservice.v3")]

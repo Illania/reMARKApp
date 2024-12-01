@@ -71,6 +71,16 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)|$(Platform)'=='net8.0-android|AnyCPU'">
     <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
+    <EmbedAssembliesIntoApk>false</EmbedAssembliesIntoApk>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="Resources\mipmap-mdpi\" />

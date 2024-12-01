@@ -543,7 +543,7 @@ end
     begin
       supply(
         apk: "#{ENV['ANDROID_SIGNED_APK_PATH']}",
-        track: 'rollout',
+        track: 'production',
         rollout: '0.5',
         skip_upload_images: true,
         skip_upload_screenshots: true,

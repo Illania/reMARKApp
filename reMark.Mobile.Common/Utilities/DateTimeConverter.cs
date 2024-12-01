@@ -10,7 +10,19 @@ namespace reMark.Mobile.Common.Utilities
 
         public static DateTime ConvertTimestampMillisecondsToDateTime(this long timestamp)
         {
-            return epoch.AddMilliseconds(timestamp);
+            if(timestamp < 0) 
+                return epoch;
+            var epochDateTime = DateTime.Now.AddDays(1);
+            try
+            {
+                epochDateTime = epoch.AddMilliseconds(timestamp);
+            }
+            catch
+            {
+                // ignored
+            }
+
+            return epochDateTime;
         }
 
         public static long ConvertDateTimeToTimestampMilliseconds(this DateTime dateTime)

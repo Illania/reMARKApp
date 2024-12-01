@@ -1,12 +1,8 @@
-﻿using System;
-using Foundation;
+﻿using Foundation;
 using reMark.Mobile.Common;
 using reMark.Mobile.IOS.Ui.Common;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using UIKit;
 using reMark.Mobile.Common.Model;
-using System.Linq;
 using ObjCRuntime;
 
 namespace reMark.Mobile.IOS.Ui.ViewControllers.AutoReply
@@ -34,9 +30,19 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers.AutoReply
             this.viewController = viewController;
 
             defaultOutgoingLine = ServerConfig.SystemSettings.DocumentsModuleInfo.DefaultOutgoingLine;
-            availableOutgoingLines = ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines;
+            if(!ServerConfig.SystemSettings.SystemInfo.PrivateLinesAvailable)
+                availableOutgoingLines = ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines;
+            else
+            {
+                var privateLines = ServerConfig.SystemSettings.DocumentsModuleInfo.OutgoingLines.Where(
+                    l => l.LineOwnerType == LineOwnerType.Private 
+                         && l.OwnerUserId == ServerConfig.SystemSettings.UserInfo.User.Id);
+                availableOutgoingLines = privateLines.ToList();
 
+            }
+            
             Initialize();
+      
         }
 
         void Initialize()
