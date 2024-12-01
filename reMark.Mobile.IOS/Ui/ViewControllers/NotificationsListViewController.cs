@@ -10,6 +10,8 @@ using reMark.Mobile.Common.Model;
 using reMark.Mobile.Common.Model.HubMessages;
 using reMark.Mobile.Common.Utilities;
 using reMark.Mobile.Common.Utilities.Extensions;
+using reMark.Mobile.IOS.Model;
+using reMark.Mobile.IOS.Model.HubMessages;
 using reMark.Mobile.IOS.Ui.Common;
 using reMark.Mobile.IOS.Ui.TableViewCells;
 using reMark.Mobile.IOS.Utilities;
@@ -27,9 +29,10 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
 
         bool refreshing;
 
-        Func<Notification, bool> unreadFilter = (n) => !n.IsRead;
+        Func<(Notification, DocumentPreview), bool> unreadFilter = (n) => !n.Item1.IsRead;
 
         TinyMessageSubscriptionToken newNotificationsMessageToken;
+        TinyMessageSubscriptionToken goToDocumentToken;
 
         public NotificationsListViewController(ObjectType[] objectTypes)
         {
@@ -50,11 +53,28 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
         }
 
         public override void ViewDidLoad()
-        {
+        {                       
             base.ViewDidLoad();
 
             RestorationIdentifier = nameof(NotificationsListViewController);
             RestorationClass = Class;
+        }
+        
+        public override void WillMoveToParentViewController(UIViewController parent)
+        {
+            base.WillMoveToParentViewController(parent);
+
+            if (parent != null || SplitViewController == null || SplitViewController.Collapsed)
+                return;
+
+            if (SplitViewController is not NotificationsSplitViewController)
+                return;
+                
+            var nc = (UINavigationController)SplitViewController.ViewControllers[1];
+            nc.PopToRootViewController(false);
+
+            var vc = (NotificationPageViewController)nc.ViewControllers[0];
+            vc.ClearPage();
         }
 
         public override void ViewWillAppear(bool animated)
@@ -81,6 +101,30 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
             SendStatusBanner.Attach(this);
         }
 
+        void HandleAction(GoToDocumentMessage message)
+        {
+            BeginInvokeOnMainThread(() =>
+            {
+                foreach (var tableView in new[] { TableView })
+                {
+                    if (tableView == null || tableView.Source == null)
+                        continue;
+
+                    var index = ((NotificationsListDataSource)tableView.Source).Items.FindIndex(
+                        dp => dp.Item2.Id == message.DocumentId);
+
+                    var selectedItem = ((NotificationsListDataSource)tableView.Source).Items[index];
+                    MarkAsRead(selectedItem.Item1, NSIndexPath.FromRowSection(index, 0));
+
+                    if (index < 0)
+                        continue;
+
+                    tableView.SelectRow(NSIndexPath.FromRowSection(index, 0), true, UITableViewScrollPosition.None);
+                    tableView.ScrollToRow(NSIndexPath.FromRowSection(index, 0), UITableViewScrollPosition.None, true);
+                }
+            });
+        }
+
         public override void ViewDidAppear(bool animated)
         {
             base.ViewDidAppear(animated);
@@ -95,6 +139,9 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                     RefreshData();
                 });
             });
+            
+            goToDocumentToken?.Dispose();
+            goToDocumentToken = CommonConfig.MessengerHub.Subscribe<GoToDocumentMessage>(HandleAction);
 
             RefreshData();
 
@@ -117,7 +164,8 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
             base.ViewWillDisappear(animated);
 
             newNotificationsMessageToken?.Dispose();
-
+            goToDocumentToken?.Dispose();
+            
             DeinitializeHandlers();
         }
 
@@ -133,7 +181,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
         {
             CommonConfig.Logger.Warning("Received memory warning!");
 
-            ((DataSource)TableView.Source)?.Reset();
+            ((NotificationsListDataSource)TableView.Source)?.Reset();
 
             GC.Collect();
             base.DidReceiveMemoryWarning();
@@ -145,7 +193,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
 
             markAsReadItem = null;
 
-            ((DataSource)TableView.Source)?.Reset();
+            ((NotificationsListDataSource)TableView.Source)?.Reset();
         }
 
         protected override void Dispose(bool disposing)
@@ -176,7 +224,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
         {
             RefreshControl = new UIRefreshControl();
 
-            TableView.Source = new DataSource(this, TableView);
+            TableView.Source = new NotificationsListDataSource(this, TableView);
             TableView.RowHeight = UITableView.AutomaticDimension;
             TableView.EstimatedRowHeight = 50f;
             TableView.RefreshControl = RefreshControl;
@@ -214,7 +262,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                 else
                 {
                     await Managers.NotificationsManager?.SetNotificationReadStatusAsync(PlatformConfig.Preferences.PushNotificationToken,
-                                     (((DataSource)TableView.Source)?.Items.Select(n => n.Guid)).ToList(), true);
+                                     (((NotificationsListDataSource)TableView.Source)?.Items.Select(n => n.Item1.Guid)).ToList(), true);
                 }
                 Integration.ClearNotificationBadge();
                 RefreshData();
@@ -245,9 +293,25 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
 
             try
             {
-                var notifications = await Managers.NotificationsManager.GetNotificationsAsync(DeviceType.IOS, PlatformConfig.Preferences.PushNotificationToken);
+                var notifications = await Managers.NotificationsManager.GetNotificationsAsync(DeviceType.IOS, 
+                    PlatformConfig.Preferences.PushNotificationToken);
                 notifications = notifications.Where(n => objectTypes.Contains(n.ObjectType)).ToList();
-                ((DataSource)TableView.Source).SetItems(notifications, PlatformConfig.Preferences.HideReadNotifications ? unreadFilter : null);
+                var notificationsPreviews = new List<(Notification,DocumentPreview)>();
+                foreach (var n in notifications)
+                {
+                    try
+                    {
+                        var dc = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(n.FolderId, n.ObjectId);
+                        notificationsPreviews.Add((n, dc.DocumentPreview));
+                    }
+                    catch (Exception ex)
+                    {
+                        CommonConfig.Logger.Error($"Could not get document with ID={n.ObjectId}", ex);
+                    }
+                }
+                   
+                ((NotificationsListDataSource)TableView.Source).SetItems(notificationsPreviews, 
+                    PlatformConfig.Preferences.HideReadNotifications ? unreadFilter : null);
 
                 markAsReadItem.Enabled = notifications.Any(n => !n.IsRead);
 
@@ -292,24 +356,64 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
             switch (notification.ObjectType)
             {
                 case ObjectType.Document:
-                    PresentDocumentViewController(notification.ObjectId, notification.Guid);
+                    SelectNotification(notification.ObjectId, notification.FolderId, notification.Guid);
                     break;
             }
         }
 
-        void PresentDocumentViewController(int documentId, Guid notificationGuid)
+        private async Task MarkAsRead(Notification notification, NSIndexPath row)
         {
-            var vc = new DocumentViewController();
-            vc.SetRefreshDataOnAppear();
-            vc.SetData(documentId, notificationGuid);
-            PresentViewController(new NavigationController(vc, UIModalPresentationStyle.PageSheet), true, null);
+            if (ServerConfig.SystemSettings?.SystemInfo?.SetNotificationReadStatusAvailable != true)
+                await Managers.NotificationsManager.MarkAsRead(notification);
+            else
+            {
+                if (!notification.IsRead)
+                    Integration.DecreaseNotificationBadge();
+
+                Managers.NotificationsManager?.SetNotificationReadStatusAsync(PlatformConfig.Preferences.PushNotificationToken, new List<Guid> { notification.Guid }, true);
+                RefreshData();
+            }
+            
+            TableView.ReloadRows(new[] { row }, UITableViewRowAnimation.Fade);
+        }
+
+
+        public virtual async void SelectNotification(int documentPreviewId, int folderId, Guid notificationGuid)
+        {
+            if (SplitViewController != null && !SplitViewController.Collapsed)
+            {
+                var nc = (UINavigationController)SplitViewController.ViewControllers[1];
+                nc.PopToViewController(nc.ViewControllers[0], false);
+
+                var vc = (NotificationPageViewController)nc.ViewControllers[0];
+                vc.Notifications = ((NotificationsListDataSource)TableView.Source).Items;
+
+                if (vc.IsShowingDocumentWithId(documentPreviewId))
+                    return;
+                var documentPreview = vc.Notifications.FirstOrDefault(n => n.Item2.Id == documentPreviewId).Item2;
+                
+                vc.HidesBottomBarWhenPushed = false;
+                vc.SetPage(documentPreview, notificationGuid, false);
+            }
+            else
+            {
+                    var documentPreviewContainer = await Managers.DocumentsManager.GetDocumentWithPreviewAsync(folderId,
+                    documentPreviewId);
+                    var vc = new NotificationPageViewController()
+                    {
+                        InitialNotificationGuid = notificationGuid,
+                        InitialDocumentPreview = documentPreviewContainer.DocumentPreview,
+                        Notifications = ((NotificationsListDataSource)TableView.Source).Items
+                    };
+                    NavigationController.PushViewController(vc, true);
+            }
         }
 
         #endregion
 
         #region DataSource
 
-        class DataSource : UITableViewSource
+        class NotificationsListDataSource : UITableViewSource
         {
             public bool Empty => Items.Count < 1;
 
@@ -317,9 +421,9 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
             readonly WeakReference<UITableView> tableViewWeakReference;
 
             bool loading = true;
-            public List<Notification> Items { get; set; } = new List<Notification>();
+            public List<(Notification, DocumentPreview)> Items { get; set; } = new ();
 
-            public DataSource(NotificationsListViewController viewController, UITableView tableView)
+            public NotificationsListDataSource(NotificationsListViewController viewController, UITableView tableView)
             {
                 viewControllerWeakReference = viewController.Wrap();
                 tableViewWeakReference = tableView.Wrap();
@@ -339,10 +443,12 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
 
                 var n = Items[indexPath.Row];
 
-                var reuseIdentifier = n.Type == EventType.NewObjectCreated ? NotificationsTableViewCell.NewObjectCreatedId : NotificationsTableViewCell.DefaultId;
+                var reuseIdentifier = n.Item1.Type == EventType.NewObjectCreated 
+                    ? NotificationsTableViewCell.NewObjectCreatedId
+                    : NotificationsTableViewCell.DefaultId;
 
                 var cell = tableView.DequeueReusableCell(reuseIdentifier) as NotificationsTableViewCell ?? new NotificationsTableViewCell(reuseIdentifier);
-                cell.Initialize(n);
+                cell.Initialize(n.Item1);
 
                 return cell;
             }
@@ -350,7 +456,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
                 var n = Items[indexPath.Row];
-                viewControllerWeakReference.Unwrap()?.NotificationSelected(n, indexPath);
+                viewControllerWeakReference.Unwrap()?.NotificationSelected(n.Item1, indexPath);
             }
 
             public override nint RowsInSection(UITableView tableview, nint section)
@@ -361,7 +467,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                 return Items.Count;
             }
 
-            public void SetItems(List<Notification> notifications, Func<Notification, bool> filter = null)
+            public void SetItems(List<(Notification, DocumentPreview)> notifications, Func<(Notification, DocumentPreview), bool> filter = null)
             {
                 loading = false;
 

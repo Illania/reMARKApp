@@ -363,7 +363,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
             draftSentToken?.Dispose();
         }
 
-        public void SetData(Folder folderCurrent, DocumentPreview documentPreviewCurrent)
+        public void SetData(Folder folderCurrent, DocumentPreview documentPreviewCurrent, Guid notificationGuidCurrent = default)
         {
             CommonConfig.UsageAnalytics.LogEvent(new OpenDocumentEvent(
                 documentPreviewCurrent?.Direction == DocumentDirection.External));
@@ -372,7 +372,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
             document = null;
             documentId = null;
             folderId = null;
-            notificationGuid = default;
+            notificationGuid = notificationGuidCurrent;
 
             documentPreview = documentPreviewCurrent;
             folder = folderCurrent;
@@ -491,7 +491,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
             {
                 await StartRefreshing();
 
-                if (notificationGuid != default(Guid))
+                if (notificationGuid != default)
                     await Managers.NotificationsManager.MarkAsRead(notificationGuid);
 
                 if (failedDocumentToUploadGuid != Guid.Empty)

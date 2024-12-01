@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using CoreGraphics;
+﻿using CoreGraphics;
 using Foundation;
 using reMark.Mobile.Common;
 using reMark.Mobile.Common.Manager;
@@ -21,15 +17,7 @@ namespace reMark.Mobile.IOS.Ui.Common
 {
     public class AbstractMainViewController : UITabBarController
     {
-        protected const string DocumentsTag = "documents";
-        protected const string ContactsTag = "contacts";
-        protected const string ShortcodesTag = "shortcodes";
-        protected const string SettingsTag = "settings";
-        protected const string SearchTag = "search";
-
-        protected NavigationModule.NavigationModuleType CurrentNavigationModuleType;
-
-        protected NavigationController SettingsNavigationController;
+        private NavigationModule.NavigationModuleType CurrentNavigationModuleType;
 
         UIView navigationButtonContainer;
         UIButtonScalable moduleNavigationButton;
@@ -42,8 +30,8 @@ namespace reMark.Mobile.IOS.Ui.Common
         TinyMessageSubscriptionToken reMarkNav;
 
         #region ShareOptions
-        protected bool openedfromSharingOptions = false;
-        protected SharingOptions sharingOptions;
+        protected bool OpenedFromSharingOptions = false;
+        protected SharingOptions SharingOptions;
         #endregion
 
 
@@ -202,7 +190,7 @@ namespace reMark.Mobile.IOS.Ui.Common
 
             OnBoardingUtilities.ShowOnBoardingIfNecessary(this);
 
-            if (openedfromSharingOptions)
+            if (OpenedFromSharingOptions)
                 CreateDocumentFromSharingOptions();
             else
                 CheckAutoSavedDocument();
@@ -242,19 +230,19 @@ namespace reMark.Mobile.IOS.Ui.Common
 
         protected void CreateDocumentFromSharingOptions()
         {
-            openedfromSharingOptions = false;
-            if (sharingOptions == null)
+            OpenedFromSharingOptions = false;
+            if (SharingOptions == null)
                 return;
 
             var sharedText = string.Empty;
 
-            if (sharingOptions.SharedContentInsertType == SharedContentInsertType.Text)
+            if (SharingOptions.SharedContentInsertType == SharedContentInsertType.Text)
             {
-                var textFileUrl = sharingOptions.UrlList.FirstOrDefault();
+                var textFileUrl = SharingOptions.UrlList.FirstOrDefault();
                 sharedText = File.ReadAllText(textFileUrl.Path);
             }
 
-            var vc = new ComposeDocumentViewController(sharingOptions) {
+            var vc = new ComposeDocumentViewController(SharingOptions) {
                 DocumentCreationModeFlag = DocumentCreationModeFlag.New,
                 PreconfiguredContent = string.IsNullOrEmpty(sharedText) ? null : sharedText
             };
@@ -293,9 +281,6 @@ namespace reMark.Mobile.IOS.Ui.Common
 
         void ModuleNavigationButton_TouchUpInside(object sender, EventArgs e)
         {
-            var del = UIApplication.SharedApplication?.Delegate as AppDelegate;
-            var root = del?.Window?.RootViewController as AbstractMainViewController;
-
             var vc = new ModuleNavigationController(CurrentNavigationModuleType);
 
             if (Integration.IsIPad())
@@ -315,15 +300,18 @@ namespace reMark.Mobile.IOS.Ui.Common
 
         void Handle_ViewControllerSelected(object sender, UITabBarSelectionEventArgs e)
         {
-            var x = TabBar.SelectedItem;
-
             var abVc = (AbstractMainViewController)sender;
             var selectedIndex = abVc.SelectedIndex;
 
-            if (selectedIndex == 0)
-                OpenSearch();
-            if(selectedIndex == 4)
-                OpenSettings();
+            switch (selectedIndex)
+            {
+                case 0:
+                    OpenSearch();
+                    break;
+                case 4:
+                    OpenSettings();
+                    break;
+            }
         }
 
         bool Handle_ShouldSelectViewController(UITabBarController tabBarController, UIViewController viewController)
@@ -473,10 +461,10 @@ namespace reMark.Mobile.IOS.Ui.Common
             blureEffectView.Alpha = 0;
             ContainerView.AddSubview(blureEffectView);
             PresentedViewController.GetTransitionCoordinator().AnimateAlongsideTransition(
-            (UIViewControllerTransitionCoordinatorContext) =>
+            (_) =>
             {
                 blureEffectView.Alpha = 1;
-            }, (UIViewControllerTransitionCoordinatorContext) =>
+            }, (_) =>
             {
 
             });

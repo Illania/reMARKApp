@@ -17,8 +17,8 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
 
         public SimpleMainViewController(SharingOptions sharingOptions)
         {
-            this.sharingOptions = sharingOptions;
-            openedfromSharingOptions = true;
+            this.SharingOptions = sharingOptions;
+            OpenedFromSharingOptions = true;
         }
 
         public override void LoadView()

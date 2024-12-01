@@ -13,7 +13,6 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <RootNamespace>reMark.Mobile.IOS</RootNamespace>
-    <AssemblyName>reMark.Mobile.IOS</AssemblyName>   
     <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
 		<DebugSymbols>true</DebugSymbols>
 		<DebugType>full</DebugType>
@@ -45,7 +44,6 @@
   </PropertyGroup>
 	 <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <RootNamespace>reMark.Mobile.IOS</RootNamespace>
-    <AssemblyName>reMark.Mobile.IOS</AssemblyName>   
     <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
 		<DebugSymbols>false</DebugSymbols>
 		<DebugType>none</DebugType>
@@ -537,11 +535,11 @@
     <ProjectReference Include="..\reMark.Mobile.Classes\reMark.Mobile.Classes.csproj" />
     <ProjectReference Include="..\reMark.Mobile.Common\reMark.Mobile.Common.csproj" />
     <ProjectReference Include="..\reMark.Mobile.IOS.Common\reMark.Mobile.IOS.Common.csproj" />
-    <ProjectReference Include="..\reMark.Mobile.IOS.Extensions.Share\reMARK.Mobile.IOS.Extensions.Share.csproj" >
+    <ProjectReference Include="..\reMark.Mobile.IOS.Extensions.Share\reMARK.Mobile.IOS.Extensions.Share.csproj">
       <IsAppExtension>true</IsAppExtension>
       <IsWatchApp>false</IsWatchApp>
     </ProjectReference>
-    <ProjectReference Include="..\reMark.Mobile.IOS.Extensions.CallId\reMark.Mobile.IOS.Extensions.CallId.csproj" >
+    <ProjectReference Include="..\reMark.Mobile.IOS.Extensions.CallId\reMark.Mobile.IOS.Extensions.CallId.csproj">
       <IsAppExtension>true</IsAppExtension>
       <IsWatchApp>false</IsWatchApp>
     </ProjectReference>

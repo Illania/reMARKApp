@@ -1,4 +1,5 @@
 ﻿using Foundation;
+using reMark.Mobile.Common;
 using reMark.Mobile.Common.Extensions;
 using reMark.Mobile.Common.Model;
 using reMark.Mobile.IOS.Ui.Common;
@@ -24,22 +25,31 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
             NavigationItem.Title = GetTitleForModule(moduleType);
 
             SegmentedControl.InsertSegment(Localization.GetString("folders"), 0, false);
-            SegmentedControl.InsertSegment(Localization.GetString("notifications"), 1, false);
-
             SegmentedControl.SetTitleTextAttributes(new UIStringAttributes { ForegroundColor= Theme.White }, UIControlState.Selected);
-            SegmentedControl.SetTitleTextAttributes(new UIStringAttributes { ForegroundColor = Theme.DarkerBlue }, UIControlState.Normal);
 
-            ViewControllers = new UIViewController[]
+            if (Integration.IsIPad())
             {
-                 new BrowseFoldersListViewController(moduleType),
-                 new NotificationsListViewController(moduleType.ObjectTypes())
-            };
+                SegmentedControl.Hidden = true;
+                ViewControllers = new UIViewController[]
+                {
+                    new BrowseFoldersListViewController(moduleType)
+                };
+            }
+            else
+            {
+                SegmentedControl.InsertSegment(Localization.GetString("notifications"), 1, false);
+                SegmentedControl.SetTitleTextAttributes(new UIStringAttributes { ForegroundColor = Theme.DarkerBlue }, UIControlState.Normal);
+                ViewControllers = new UIViewController[]
+                {
+                    new BrowseFoldersListViewController(moduleType),
+                    new NotificationsListViewController(moduleType.ObjectTypes())
+                };
+            }
         }
 
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
-
             RestorationIdentifier = nameof(FoldersNotificationsListViewController);
             RestorationClass = Class;
         }
@@ -48,12 +58,13 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
         {
             base.ViewWillAppear(animated);
 
-            if (Integration.IsRunningAtLeast(11))
-            {
-                if (NavigationController != null)
-                    NavigationController.NavigationBar.PrefersLargeTitles = true;
-                NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
-            }
+            if (!Integration.IsRunningAtLeast(11))
+                return;
+
+            if (NavigationController != null)
+                NavigationController.NavigationBar.PrefersLargeTitles = true;
+            
+            NavigationItem.LargeTitleDisplayMode = UINavigationItemLargeTitleDisplayMode.Automatic;
         }
 
         public override void ViewDidAppear(bool animated)
@@ -74,7 +85,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                 });
             }
         }
-
+        
         static string GetTitleForModule(ModuleType moduleType)
         {
             switch (moduleType)
@@ -92,27 +103,31 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
 
         #region State restoration
 
+        [Export("encodeRestorableStateWithCoder:")]
         public override void EncodeRestorableState(NSCoder coder)
         {
             base.EncodeRestorableState(coder);
             coder.Encode((int)moduleType, "moduleType");
             coder.Encode(SegmentedControl.SelectedSegment, "selectedSegment");
+            CommonConfig.Logger.Info($"Encoding restorable state.. Selected segment {SegmentedControl.SelectedSegment}");
         }
 
+        [Export("decodeRestorableStateWithCoder:")]
         public override void DecodeRestorableState(NSCoder coder)
         {
             base.DecodeRestorableState(coder);
             SegmentedControl.SelectedSegment = coder.DecodeInt("selectedSegment");
+            CommonConfig.Logger.Info($"Decoding restorable state.. Selected segment {SegmentedControl.SelectedSegment}");
         }
-
+        
         [Export("viewControllerWithRestorationIdentifierPath:coder:")]
         public static UIViewController Restore(string[] identifierComponents, NSCoder coder)
         {
+            CommonConfig.Logger.Info($"Decoding module type.. ");
             var moduleType = (ModuleType)coder.DecodeInt("moduleType");
-            return new FoldersNotificationsListViewController(moduleType);
+             return new FoldersNotificationsListViewController(moduleType);
         }
 
         #endregion
-
     }
 }

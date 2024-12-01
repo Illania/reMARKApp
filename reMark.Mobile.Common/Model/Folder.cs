@@ -188,6 +188,7 @@ namespace reMark.Mobile.Common.Model
             switch (module)
             {
                 case ModuleType.Documents:
+                case ModuleType.Notifications:
                     return DocumentsRootFolder;
                 case ModuleType.Contacts:
                     return ContactsRootFolder;
@@ -203,6 +204,7 @@ namespace reMark.Mobile.Common.Model
             switch (module)
             {
                 case ModuleType.Documents:
+                case ModuleType.Notifications:
                     return DocumentsFavoriteRootFolder;
                 case ModuleType.Contacts:
                     return ContactsFavoriteRootFolder;

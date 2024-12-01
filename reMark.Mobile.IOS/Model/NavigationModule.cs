@@ -51,6 +51,6 @@ namespace reMark.Mobile.IOS.Model
             }
         }
 
-        public enum NavigationModuleType { Mail, Calendar, Shortcodes, Contacts, Search, Settings, Dummy }
+        public enum NavigationModuleType { Mail, Calendar, Shortcodes, Contacts, Search, Settings, Dummy}
     }
 }

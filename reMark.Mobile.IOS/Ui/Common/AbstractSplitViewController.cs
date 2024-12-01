@@ -16,11 +16,6 @@ namespace reMark.Mobile.IOS.Ui.Common
             CollapseSecondViewController = HandleCollapseSecondViewController;
         }
 
-        public override void ViewDidAppear(bool animated)
-        {
-            base.ViewDidAppear(animated);
-        }
-
         public override void LoadView()
         {
             base.LoadView();
@@ -61,14 +56,17 @@ namespace reMark.Mobile.IOS.Ui.Common
             return CreateSecondaryNavigationController();
         }
 
-        bool HandleCollapseSecondViewController(UISplitViewController splitViewController, UIViewController secondaryViewController, UIViewController primaryViewController)
+        private bool HandleCollapseSecondViewController(UISplitViewController splitViewController, 
+            UIViewController secondaryViewController, 
+            UIViewController primaryViewController)
         {
             var secondaryNavigationController = (NavigationController)secondaryViewController;
             if ((secondaryNavigationController.ViewControllers[0] as ISecondaryViewController)?.Empty == true)
                 return true;
 
             var primaryNavigationController = (NavigationController)primaryViewController;
-            secondaryNavigationController.ViewControllers.ForEach(vc => primaryNavigationController.PushViewController(vc, false));
+            secondaryNavigationController.ViewControllers.ForEach(vc => 
+                primaryNavigationController.PushViewController(vc, false));
 
             return true;
         }

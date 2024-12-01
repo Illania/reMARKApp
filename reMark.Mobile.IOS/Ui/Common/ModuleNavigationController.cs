@@ -35,14 +35,16 @@ namespace reMark.Mobile.IOS.Ui.Common
         ReMarkNavigationButton mailBtn;
         ReMarkNavigationButton shortCodesBtn;
 
-        readonly NavigationModule.NavigationModuleType currentModule;
-
-        readonly List<string> constraintIdentifiers = new List<string> { mailBtnConstraintIdentifier, shortcodeBtnConstraintIdentifier, searchBtnConstraintIdentifier, settingsBtnConstraintIdentifier };
+        private readonly List<string> _constraintIdentifiers = new()
+        {
+            mailBtnConstraintIdentifier, 
+            shortcodeBtnConstraintIdentifier, 
+            searchBtnConstraintIdentifier, 
+            settingsBtnConstraintIdentifier
+        };
 
         public ModuleNavigationController(NavigationModule.NavigationModuleType currentModule)
         {
-            this.currentModule = currentModule;
-
             closeButton = new UIButtonScalable
             {
                 TintColor = Theme.White,
@@ -166,8 +168,10 @@ namespace reMark.Mobile.IOS.Ui.Common
         void UpdateLayoutOnRotation()
         {
             foreach (var constraint in View.Constraints)
-                if (constraintIdentifiers.Contains(constraint.GetIdentifier()))
+            {
+                if (_constraintIdentifiers.Contains(constraint.GetIdentifier()))
                     View.RemoveConstraint(constraint);
+            }
 
             foreach (var view in View.Subviews)
                 if (view.Tag == titleTag)
@@ -238,7 +242,7 @@ namespace reMark.Mobile.IOS.Ui.Common
                 }
             }
 
-            readonly UIButtonScalable Button = new UIButtonScalable
+            readonly UIButtonScalable Button = new()
             {
                 TintColor = Theme.White,
                 BackgroundColor = Theme.White,
@@ -247,7 +251,7 @@ namespace reMark.Mobile.IOS.Ui.Common
                 ImageEdgeInsets = new UIEdgeInsets(15f, 15f, 15f, 15f)
             };
 
-            readonly UILabelScalable Title = new UILabelScalable
+            readonly UILabelScalable Title = new()
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 TextColor = Theme.DarkBlue,

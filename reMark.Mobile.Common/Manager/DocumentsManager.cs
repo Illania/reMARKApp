@@ -23,6 +23,7 @@ using DocumentPreview = reMark.Mobile.Common.Model.DocumentPreview;
 using reMark.Mobile.Classes.Enum;
 using reMark.Mobile.Classes.AuthService;
 
+
 namespace reMark.Mobile.Common.Manager
 {
     class DocumentsManager : AbstractManager, IDocumentsManager
@@ -272,25 +273,33 @@ namespace reMark.Mobile.Common.Manager
 
             if (sourceType == SourceType.Remote)
             {
-                var result = await AppServiceProxy.GetDocumentAsync(new DataContract.GetDocumentParameters
+                try
                 {
-                    Token = Token,
-                    FolderId = folderId ?? -1,
-                    DocumentId = documentId,
-                    BodyRequest = DocumentBodyTypeRequest.ConvertEnum<DataContract.DocumentBodyTypeRequest>(),
-                    IncludePreview = true
-                });
+                    var result = await AppServiceProxy.GetDocumentAsync(new DataContract.GetDocumentParameters
+                    {
+                        Token = Token,
+                        FolderId = folderId ?? -1,
+                        DocumentId = documentId,
+                        BodyRequest = DocumentBodyTypeRequest.ConvertEnum<DataContract.DocumentBodyTypeRequest>(),
+                        IncludePreview = true
+                    });
 
-                var documentPreview = result.DocumentPreview.Convert();
-                var document = result.Document.Convert();
+                    var documentPreview = result.DocumentPreview.Convert();
+                    var document = result.Document.Convert();
 
-                var container = new DocumentContainer(documentPreview, document);
+                    var container = new DocumentContainer(documentPreview, document);
 
-                await documentsDataAccess.SaveDocumentWithPreviewAsync(container);
+                    await documentsDataAccess.SaveDocumentWithPreviewAsync(container);
 
-                return container;
+                    return container;
+
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine((ex.Message));
+                }
             }
-
+            
             if (sourceType == SourceType.Local)
                 return await documentsDataAccess.GetDocumentWithPreviewAsync(documentId);
 

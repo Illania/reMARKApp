@@ -6,43 +6,49 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
 {
     public class SplitMainViewController : AbstractMainViewController
     {
-
-        DocumentsSplitViewController documentSplitViewController;
-        ContactsSplitViewController contactSplitViewController;
-        ShortcodesSplitViewController shortcodeSplitViewController;
+        DocumentsSplitViewController _documentSplitViewController;
+        ContactsSplitViewController _contactSplitViewController;
+        ShortcodesSplitViewController _shortcodeSplitViewController;
+        NotificationsSplitViewController _notificationsSplitViewController;
 
         public SplitMainViewController() { }
 
         public SplitMainViewController(SharingOptions sharingOptions)
         {
-            this.sharingOptions = sharingOptions;
-            openedfromSharingOptions = true;
+            this.SharingOptions = sharingOptions;
+            OpenedFromSharingOptions = true;
         }
 
         public override void LoadView()
         {
             base.LoadView();
 
-            documentSplitViewController = new DocumentsSplitViewController
+            _documentSplitViewController = new DocumentsSplitViewController
             {
                 RestorationIdentifier = nameof(DocumentsSplitViewController)
             };
+            
+            _notificationsSplitViewController = new NotificationsSplitViewController()
+            {
+                RestorationIdentifier = nameof(NotificationsSplitViewController)
+            };
 
-            contactSplitViewController = new ContactsSplitViewController
+            _contactSplitViewController = new ContactsSplitViewController
             {
                 RestorationIdentifier = nameof(ContactsSplitViewController)
             };
 
-            shortcodeSplitViewController = new ShortcodesSplitViewController
+            _shortcodeSplitViewController = new ShortcodesSplitViewController
             {
                 RestorationIdentifier = nameof(ShortcodesSplitViewController)
             };
 
             ViewControllers = new UIViewController[]
             {
-                documentSplitViewController,
-                contactSplitViewController,
-                shortcodeSplitViewController,
+                _documentSplitViewController,
+                _notificationsSplitViewController,
+                _contactSplitViewController,
+                _shortcodeSplitViewController,
             };
         }
 
@@ -52,6 +58,5 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
 
             RestorationIdentifier = nameof(SplitViewController);
         }
-
     }
 }

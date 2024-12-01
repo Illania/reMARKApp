@@ -383,7 +383,8 @@ namespace reMark.Mobile.Common.Model
         Documents = 1,
         Contacts = 2,
         Shortcodes = 3,
-        Calendar = 4
+        Calendar = 4,
+        Notifications = 5     
     }
     
     public enum LineOwnerType
