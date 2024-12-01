@@ -25,7 +25,7 @@ using View = Android.Views.View;
 
 namespace reMark.Mobile.Droid.Ui.Views.ComposeDocumentViews
 {
-    public class ContentView : ComposeDocumentView
+    public partial class ContentView : ComposeDocumentView
     {
         readonly CustomWebView newContentWebView;
         readonly AppCompatButton showOldContentButton;
@@ -312,7 +312,10 @@ namespace reMark.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
                 var html = htmlDocument.DocumentNode.OuterHtml;
 
-                html = PreMailer.Net.PreMailer.MoveCssInline(html, true, null, null, true, true).Html;
+                html = PreMailer.Net.PreMailer.MoveCssInline(html, true, null, null, 
+                    true, true).Html;
+                
+                html = ReplaceTextDecorationAttribute(html);
 
                 var p = new Processor();
                 p.Dom.OuterHtml = html;
@@ -320,6 +323,24 @@ namespace reMark.Mobile.Droid.Ui.Views.ComposeDocumentViews
 
                 return html;
             });
+        }
+
+
+        /// <summary>
+        /// Replaces instances of the CSS property 'text-decoration-line: line-through;' 
+        /// with the shorthand equivalent 'text-decoration: line-through;' in the provided HTML string
+        /// to avoid a limitation related to the OpenXml document format when converting html to rtf format on server side,
+        /// which removes the strikethrough from lines that are marked with 'text-decoration-line: line-through;' attribute.
+        /// Refernece ticket https://nordicit.atlassian.net/browse/M5APP-1621
+        /// </summary>
+        /// <param name="html">A string containing HTML content where the CSS replacements will be made.</param>
+        /// <returns>A string with the specified CSS property replaced by its shorthand form.</returns>
+        private static string ReplaceTextDecorationAttribute(string html)
+        {
+            const string pattern = @"text-decoration-line:\s*line-through;";
+            const string replacement = "text-decoration: line-through;";
+            html = TextDecorationLineRegex().Replace(html, replacement);
+            return html;
         }
 
         Task<string> MergeContentAsync(string newContent, string oldContent)
@@ -375,6 +396,9 @@ namespace reMark.Mobile.Droid.Ui.Views.ComposeDocumentViews
             await newContentSemaphore.WaitAsync();
             await newContentWebView.LoadHtml(context, mergedContent, HtmlProcessingConfiguration.DefaultForEditing);
         }
+
+        [GeneratedRegex(@"text-decoration-line:\s*line-through;", RegexOptions.IgnoreCase, "en-RU")]
+        private static partial Regex TextDecorationLineRegex();
 
         #endregion
     }
