@@ -12,17 +12,17 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
 {
     public class NotificationPageViewController : AbstractPageViewController, IDocumentPageViewControllerDelegate, ISecondaryViewController
     {
-        UIBarButtonItem previousDocumentButtonItem;
-        UIBarButtonItem nextDocumentButtonItem;
-        UIBarButtonItem editDocumentButtonItem;
+        UIBarButtonItem _previousDocumentButtonItem;
+        UIBarButtonItem _nextDocumentButtonItem;
+        UIBarButtonItem _editDocumentButtonItem;
 
         // Buttons for iPad only
-        UIBarButtonItem flagButton;
-        UIBarButtonItem fileToButton;
-        UIButtonScalable commentsButton;
-        BadgeBarButtonItem commentsBadgeButton;
-        UIBarButtonItem replyActionsButton;
-        UIBarButtonItem userActionsButton;
+        UIBarButtonItem _flagButton;
+        UIBarButtonItem _fileToButton;
+        UIButtonScalable _commentsButton;
+        BadgeBarButtonItem _commentsBadgeButton;
+        UIBarButtonItem _replyActionsButton;
+        UIBarButtonItem _userActionsButton;
 
         const int CacheCapacity = 5; // Going below 5 might cause issues with internal caching of
                                      // UIPageViewController
@@ -34,7 +34,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
 
         public bool Empty => !IsShowingAnyDocument();
 
-        readonly List<DocumentViewController> viewControllerCache = new(CacheCapacity + 1);
+        readonly List<DocumentViewController> _viewControllerCache = new(CacheCapacity + 1);
 
         public NotificationPageViewController()
         {
@@ -96,17 +96,17 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
 
         void InitNavigationBar()
         {
-            nextDocumentButtonItem = new UIBarButtonItem
+            _nextDocumentButtonItem = new UIBarButtonItem
             {
                 Image = UIImage.FromBundle("Arrow-Down"),
             };
 
-            previousDocumentButtonItem = new UIBarButtonItem
+            _previousDocumentButtonItem = new UIBarButtonItem
             {
                 Image = UIImage.FromBundle("Arrow-Up"),
             };
 
-            editDocumentButtonItem = new UIBarButtonItem
+            _editDocumentButtonItem = new UIBarButtonItem
             {
                 Image = UIImage.FromBundle("Edit"),
             };
@@ -114,22 +114,22 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
 
         void InitializeHandlers()
         {
-            if (nextDocumentButtonItem != null)
-                nextDocumentButtonItem.Clicked += NextDocumentButton_Clicked;
-            if (previousDocumentButtonItem != null)
-                previousDocumentButtonItem.Clicked += PreviousDocumentButton_Clicked;
-            if (editDocumentButtonItem != null)
-                editDocumentButtonItem.Clicked += EditDocumentButtonItem_Clicked;
+            if (_nextDocumentButtonItem != null)
+                _nextDocumentButtonItem.Clicked += NextDocumentButton_Clicked;
+            if (_previousDocumentButtonItem != null)
+                _previousDocumentButtonItem.Clicked += PreviousDocumentButton_Clicked;
+            if (_editDocumentButtonItem != null)
+                _editDocumentButtonItem.Clicked += EditDocumentButtonItem_Clicked;
         }
 
         void DeinitializeHandlers()
         {
-            if (nextDocumentButtonItem != null)
-                nextDocumentButtonItem.Clicked -= NextDocumentButton_Clicked;
-            if (previousDocumentButtonItem != null)
-                previousDocumentButtonItem.Clicked -= PreviousDocumentButton_Clicked;
-            if (editDocumentButtonItem != null)
-                editDocumentButtonItem.Clicked -= EditDocumentButtonItem_Clicked;
+            if (_nextDocumentButtonItem != null)
+                _nextDocumentButtonItem.Clicked -= NextDocumentButton_Clicked;
+            if (_previousDocumentButtonItem != null)
+                _previousDocumentButtonItem.Clicked -= PreviousDocumentButton_Clicked;
+            if (_editDocumentButtonItem != null)
+                _editDocumentButtonItem.Clicked -= EditDocumentButtonItem_Clicked;
         }
 
         public override void DidReceiveMemoryWarning()
@@ -144,9 +144,9 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
         {
             base.Recycle();
 
-            foreach (var cachedViewController in viewControllerCache)
+            foreach (var cachedViewController in _viewControllerCache)
                 cachedViewController.RecycleIfNeeded();
-            viewControllerCache.Clear();
+            _viewControllerCache.Clear();
         }
 
         protected override void Dispose(bool disposing)
@@ -213,14 +213,14 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
         {
             var vc = (DocumentViewController)ViewControllers?.FirstOrDefault();
 
-            if (vc == null || viewControllerCache == null)
+            if (vc == null || _viewControllerCache == null)
                 return;
 
-            var index = viewControllerCache?.FindIndex(v => v != null && v.DocumentPreview?.Id == vc.DocumentPreview?.Id);
+            var index = _viewControllerCache?.FindIndex(v => v != null && v.DocumentPreview?.Id == vc.DocumentPreview?.Id);
             if (index >= 0)
             {
-                viewControllerCache[index.Value].RecycleIfNeeded();
-                viewControllerCache.RemoveAt(index.Value);
+                _viewControllerCache[index.Value].RecycleIfNeeded();
+                _viewControllerCache.RemoveAt(index.Value);
             }
 
             SetToolbarItems(null, true);
@@ -274,7 +274,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
 
         DocumentViewController GetDocumentViewController(DocumentPreview documentPreview, Guid notificationGuid)
         {
-            var cachedViewController = viewControllerCache.FirstOrDefault(dvc => dvc.DocumentPreview?.Id == documentPreview.Id);
+            var cachedViewController = _viewControllerCache.FirstOrDefault(dvc => dvc.DocumentPreview?.Id == documentPreview.Id);
             if (cachedViewController != null)
                 return cachedViewController;
 
@@ -293,11 +293,11 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
         public void AddViewControllerToCache(DocumentViewController vc)
         {
             vc.DisableRecyclingOnDisappear();
-            viewControllerCache.Add(vc);
-            if (viewControllerCache.Count > CacheCapacity)
+            _viewControllerCache.Add(vc);
+            if (_viewControllerCache.Count > CacheCapacity)
             {
-                viewControllerCache[0].RecycleIfNeeded();
-                viewControllerCache.RemoveAt(0);
+                _viewControllerCache[0].RecycleIfNeeded();
+                _viewControllerCache.RemoveAt(0);
             }
         }
 
@@ -314,15 +314,15 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
 
         void UpdateNavigationBar(DocumentPreview documentPreview, bool isSearchActive = false)
         {
-            nextDocumentButtonItem.Enabled = HasNext(documentPreview);
-            previousDocumentButtonItem.Enabled = HasPrevious(documentPreview);
+            _nextDocumentButtonItem.Enabled = HasNext(documentPreview);
+            _previousDocumentButtonItem.Enabled = HasPrevious(documentPreview);
 
             if (isSearchActive && SplitViewController != null && !SplitViewController.Collapsed)
             {
                 if (documentPreview.Direction == DocumentDirection.Draft)
                 {
                     var rightButtons = new UIBarButtonItem[1];
-                    rightButtons[0] = editDocumentButtonItem;
+                    rightButtons[0] = _editDocumentButtonItem;
 
                     NavigationItem.SetRightBarButtonItems(rightButtons, false);
                 }
@@ -337,17 +337,17 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                 if (documentPreview.Direction == DocumentDirection.Draft)
                 {
                     var rightButtons = new UIBarButtonItem[3];
-                    rightButtons[0] = nextDocumentButtonItem;
-                    rightButtons[1] = previousDocumentButtonItem;
-                    rightButtons[2] = editDocumentButtonItem;
+                    rightButtons[0] = _nextDocumentButtonItem;
+                    rightButtons[1] = _previousDocumentButtonItem;
+                    rightButtons[2] = _editDocumentButtonItem;
 
                     NavigationItem.SetRightBarButtonItems(rightButtons, false);
                 }
                 else
                 {
                     var rightButtons = new UIBarButtonItem[2];
-                    rightButtons[0] = nextDocumentButtonItem;
-                    rightButtons[1] = previousDocumentButtonItem;
+                    rightButtons[0] = _nextDocumentButtonItem;
+                    rightButtons[1] = _previousDocumentButtonItem;
                     NavigationItem.SetRightBarButtonItems(rightButtons, false);
                 }
             }
@@ -365,7 +365,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
         //Both the delegate and the datasource are used only when swiping
         //Both the delegate and the datasource are used only when swiping
 
-        DocumentViewController GoToPageAndReturnVC(DocumentPreview documentPreview, Guid notificationGuid)
+        DocumentViewController GoToPageAndReturnVc(DocumentPreview documentPreview, Guid notificationGuid)
         {
             CommonConfig.UsageAnalytics.LogEvent(new DocumentQuickSwitchEvent());
             var vc = GetDocumentViewController(documentPreview, notificationGuid);
@@ -381,14 +381,14 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
             {
                 var vc = (DocumentViewController)pageViewController.ViewControllers.FirstOrDefault();
                 var documentPreview = vc.DocumentPreview;
-                var pageVC = (NotificationPageViewController)pageViewController;
-                var index = pageVC.Notifications.FindIndex(dp => dp.Item1.ObjectId == documentPreview.Id);
-                if (index < 0 || index > pageVC.Notifications.Count - 1)
+                var pageVc = (NotificationPageViewController)pageViewController;
+                var index = pageVc.Notifications.FindIndex(dp => dp.Item1.ObjectId == documentPreview.Id);
+                if (index < 0 || index > pageVc.Notifications.Count - 1)
                     return;
                 CommonConfig.MessengerHub.Publish(new GoToDocumentMessage(this, documentPreview.Id));
 
-                pageVC.UpdateToolBar(vc);
-                pageVC.UpdateNavigationBar(documentPreview);
+                pageVc.UpdateToolBar(vc);
+                pageVc.UpdateNavigationBar(documentPreview);
 
                 var vcPrevious = (DocumentViewController)previousViewControllers?.FirstOrDefault();
                 vcPrevious?.ResetOffset();
@@ -411,16 +411,16 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                 {
                     var vc = (DocumentViewController)pageViewController.ViewControllers.FirstOrDefault();
                     var documentPreview = vc.DocumentPreview;
-                    var pageVC = (NotificationPageViewController)pageViewController;
+                    var pageVc = (NotificationPageViewController)pageViewController;
 
-                    var index = pageVC.Notifications.FindIndex(dp => dp.Item1.ObjectId== documentPreview.Id);
+                    var index = pageVc.Notifications.FindIndex(dp => dp.Item1.ObjectId== documentPreview.Id);
 
-                    if (index < 0 || index >= pageVC.Notifications.Count - 1)
+                    if (index < 0 || index >= pageVc.Notifications.Count - 1)
                         return null!;
                     
-                    var nextDocumentNotificationGuid = pageVC.Notifications[index + 1].Item1.Guid;
-                    var nextDocumentPreview = pageVC.Notifications[index + 1].Item2;
-                    return pageVC.GoToPageAndReturnVC(nextDocumentPreview, nextDocumentNotificationGuid);
+                    var nextDocumentNotificationGuid = pageVc.Notifications[index + 1].Item1.Guid;
+                    var nextDocumentPreview = pageVc.Notifications[index + 1].Item2;
+                    return pageVc.GoToPageAndReturnVc(nextDocumentPreview, nextDocumentNotificationGuid);
                 }
                 catch (Exception ex)
                 {
@@ -435,16 +435,16 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
                 {
                     var vc = (DocumentViewController)pageViewController.ViewControllers.FirstOrDefault();
                     var documentPreview = vc.DocumentPreview;
-                    var pageVC = (NotificationPageViewController)pageViewController;
+                    var pageVc = (NotificationPageViewController)pageViewController;
                     
-                    var index = pageVC.Notifications.FindIndex(dp => dp.Item1.ObjectId == documentPreview.Id);
+                    var index = pageVc.Notifications.FindIndex(dp => dp.Item1.ObjectId == documentPreview.Id);
 
                     if (index < 1) 
                         return null!;
                     
-                    var previousDocumentNotificationGuid = pageVC.Notifications[index - 1].Item1.Guid;
-                    var previousDocumentPreview = pageVC.Notifications[index - 1].Item2;
-                    return pageVC.GoToPageAndReturnVC(previousDocumentPreview, previousDocumentNotificationGuid);
+                    var previousDocumentNotificationGuid = pageVc.Notifications[index - 1].Item1.Guid;
+                    var previousDocumentPreview = pageVc.Notifications[index - 1].Item2;
+                    return pageVc.GoToPageAndReturnVc(previousDocumentPreview, previousDocumentNotificationGuid);
 
                 }
                 catch (Exception ex)
@@ -461,62 +461,62 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers
         #region iPad related
         public void UpdateIPadNavigationButtons(bool enabled, string commentBadgeValue)
         {
-            flagButton = new UIBarButtonItem
+            _flagButton = new UIBarButtonItem
             {
                 Image = UIImage.FromBundle("Flag"),
                 Enabled = enabled
             };
 
-            flagButton.Clicked += FlagButton_Clicked;
+            _flagButton.Clicked += FlagButton_Clicked;
 
-            replyActionsButton = new UIBarButtonItem
+            _replyActionsButton = new UIBarButtonItem
             {
                 Image = UIImage.FromBundle("Reply"),
                 Enabled = enabled
             };
 
-            replyActionsButton.Clicked += ReplyButton_Clicked;
+            _replyActionsButton.Clicked += ReplyButton_Clicked;
 
-            fileToButton = new UIBarButtonItem
+            _fileToButton = new UIBarButtonItem
             {
                 Image = UIImage.FromBundle("Worktray"),
                 Enabled = enabled
             };
 
-            fileToButton.Clicked += FileToButton_Clicked;
+            _fileToButton.Clicked += FileToButton_Clicked;
 
-            commentsButton = new UIButtonScalable
+            _commentsButton = new UIButtonScalable
             {
                 Frame = new CoreGraphics.CGRect(0f, 0f, 25f, 25f),
                 Enabled = enabled,
             };
 
-            commentsButton.SetImage(UIImage.FromBundle("Comments").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+            _commentsButton.SetImage(UIImage.FromBundle("Comments").ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
 
-            commentsButton.TouchUpInside += CommentsButton_TouchUpInside;
+            _commentsButton.TouchUpInside += CommentsButton_TouchUpInside;
 
-            commentsBadgeButton = new BadgeBarButtonItem(commentsButton)
+            _commentsBadgeButton = new BadgeBarButtonItem(_commentsButton)
             {
                 Enabled = enabled,
             };
 
-            commentsBadgeButton.SetBadgeValue(commentBadgeValue);
+            _commentsBadgeButton.SetBadgeValue(commentBadgeValue);
 
-            userActionsButton = new UIBarButtonItem
+            _userActionsButton = new UIBarButtonItem
             {
                 Image = UIImage.FromBundle("Actions"),
                 Enabled = enabled
             };
 
-            userActionsButton.Clicked += UserActionsButton_Clicked;
+            _userActionsButton.Clicked += UserActionsButton_Clicked;
 
             var leftButtons = new[]
             {
-                flagButton,
-                replyActionsButton,
-                fileToButton,
-                commentsBadgeButton,
-                userActionsButton
+                _flagButton,
+                _replyActionsButton,
+                _fileToButton,
+                _commentsBadgeButton,
+                _userActionsButton
             };
 
             NavigationItem.SetLeftBarButtonItems(leftButtons, false);
