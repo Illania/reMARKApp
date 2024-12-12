@@ -328,7 +328,8 @@ namespace reMark.Mobile.Common.Model.Converters
                 Creator = dp.Creator,
                 TransmitStatus = dp.TransmitStatus.ConvertEnum<TransmitStatus>(),
                 Lines = dp.Lines?.Select(l=>l.Convert()).ToList(),
-                CreatorGuid = dp.CreatorGuid
+                CreatorGuid = dp.CreatorGuid,
+                IdArchive = dp.IdArchive
             };
             if (dp.Addresses != null)
                 result.Addresses.AddRange(dp.Addresses.WhereNotNull().Select(Convert));
@@ -919,7 +920,8 @@ namespace reMark.Mobile.Common.Model.Converters
                 CreatorId = dp.CreatorId,
                 Creator = dp.Creator,
                 Lines = dp.Lines.Select(l => l.Convert()).ToList(),
-                CreatorGuid = dp.CreatorGuid
+                CreatorGuid = dp.CreatorGuid,
+                IdArchive = dp.IdArchive
             };
         }
 

@@ -1257,7 +1257,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                     }
                 }
 
-                if (DocumentCreationModeFlag == DocumentCreationModeFlag.Forward)
+                if (DocumentCreationModeFlag == DocumentCreationModeFlag.Forward && previousDocumentPreview.IdArchive > 0)
                 {
                     await SaveAttachmentsLocally();
                 }
