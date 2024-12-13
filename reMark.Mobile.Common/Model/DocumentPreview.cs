@@ -94,6 +94,9 @@ namespace reMark.Mobile.Common.Model
 
         [Column("Creator")]
         public string Creator { get; set; }
+        
+        [Column("IdArchive")]
+        public int IdArchive { get; set; }
 
         [Column("TransmitStatus")]
         public TransmitStatus TransmitStatus { get; set; }

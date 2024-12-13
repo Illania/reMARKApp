@@ -586,6 +586,9 @@ namespace reMark.ServiceReference.DataContract
 
         [DataMember(Name = "CreatorGuid", Order = 2)]
         public Guid CreatorGuid { get; set; }
+        
+        [DataMember(Name = "IdArchive", Order = 3)]
+        public int IdArchive { get; set; }
     }
 
     [DataContract(Name = "DocumentAddress", Namespace = "com.nordic-it.appservice.v3")]
