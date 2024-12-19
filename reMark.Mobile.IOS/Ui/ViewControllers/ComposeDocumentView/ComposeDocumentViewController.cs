@@ -1331,7 +1331,7 @@ namespace reMark.Mobile.IOS.Ui.ViewControllers.ComposeDocumentView
                 await Managers.DocumentsManager.QueueWorkingCopyToUpload();
 
                 if (previousDocumentPreview != null)
-                    CommonConfig.MessengerHub.PublishAsync(new DraftSentMessage(this, previousDocumentPreview.Id));
+                    CommonConfig.MessengerHub.Publish(new DraftSentMessage(this, previousDocumentPreview.Id));
 
                 dismissAction();
 
