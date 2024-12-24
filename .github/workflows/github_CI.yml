@@ -1,0 +1,42 @@
+name: CI Workflow
+
+on: 
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  build_ios_app:
+    runs-on: self-hosted # This specifies a self-hosted runner
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main' # Only run on merge requests or main branch
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      
+      - name: Set Locale
+        run: |
+          echo "LANG=en_US.UTF-8" >> $GITHUB_ENV
+          echo "LC_ALL=en_US.UTF-8" >> $GITHUB_ENV
+
+      - name: Install Fastlane
+        run: |
+          gem install fastlane
+      
+      - name: Build iOS App
+        run: fastlane ios build_release version_type:"patch"
+
+  build_android_app:
+    runs-on: self-hosted # This specifies a self-hosted runner
+    needs: build_ios_app # Ensure this runs after the iOS build is complete
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main' # Only run on merge requests or main branch
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      
+      - name: Install Fastlane
+        run: |
+          gem install fastlane
+      
+      - name: Build Android App
+        run: fastlane android build_release version_type:"patch"
