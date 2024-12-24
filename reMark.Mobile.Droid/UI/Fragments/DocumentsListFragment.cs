@@ -145,9 +145,32 @@ namespace reMark.Mobile.Droid.Ui.Fragments
 
         #region Fragment overrides
 
+
+        /// <summary>
+        /// Tries to find a CoordinatorLayout in the view hierarchy starting from the given container.
+        /// The function traverses up the view hierarchy up to a maximum of four levels.
+        /// If a CoordinatorLayout is found, it is returned; otherwise, an exception is thrown.
+        /// </summary>
+        /// <param name="container">The starting point in the view hierarchy.</param>
+        /// <returns>A CoordinatorLayout if found; otherwise, an exception is thrown.</returns>
         protected virtual CoordinatorLayout GetCoordinatorLayout(ViewGroup container)
         {
-            return (CoordinatorLayout)container.Parent.Parent.Parent.Parent;
+            ViewGroup current = container; // Start with the immediate parent of the container
+            const int maxLevels = 5;       // Maximum number of levels to traverse
+            int level = 0;
+
+            while (current != null && level < maxLevels)
+            {
+                if (current is CoordinatorLayout layout) // Check if we found a CoordinatorLayout
+                {
+                    return layout;
+                }
+
+                current = current.Parent as ViewGroup; // Move up to the next parent
+                level++;
+            }
+
+            throw new InvalidOperationException("CoordinatorLayout not found."); // CoordinatorLayout not found
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
