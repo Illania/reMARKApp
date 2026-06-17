@@ -61,7 +61,7 @@ The application provides secure access to organizational communication and docum
 
 | Login | Folder Navigation | Email Viewer |
 |---------|---------|---------|
-| ![](docs/screenshots/login.png) | ![](docs/screenshots/folders.png) | ![](docs/screenshots/email-viewer.png) |
+| ![](docs/screenshots/login.jpg) | ![](docs/screenshots/folders.jpg) | ![](docs/screenshots/emails.jpg) |
 
 > Create a `docs/screenshots` folder and place your screenshots there.
 
