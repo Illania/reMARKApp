@@ -59,9 +59,9 @@ The application provides secure access to organizational communication and docum
 
 ## Screenshots
 
-| Login | Folder Navigation | Email Viewer |
+| Login | Folder Navigation | Email Viewer | New Contact | Search
 |---------|---------|---------|
-| ![](docs/screenshots/login.jpg) | ![](docs/screenshots/folders.jpg) | ![](docs/screenshots/emails.jpg) |
+| ![](docs/screenshots/login.jpg) | ![](docs/screenshots/folders.jpg) | ![](docs/screenshots/emails.jpg) |![](docs/screenshots/contacts.jpg) | ![](docs/screenshots/search.jpg) |
 
 > Create a `docs/screenshots` folder and place your screenshots there.
 
